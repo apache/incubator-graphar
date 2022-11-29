@@ -1,0 +1,107 @@
+name: GraphAr CI
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'LICENSE'
+      - '**.md'
+      - '**.rst'
+      - 'docs/**'
+      - 'misc/**'
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      - 'LICENSE'
+      - '**.md'
+      - '**.rst'
+      - 'docs/**'
+      - 'misc/**'
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  GraphAr-on-ubuntu:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+          submodules: true
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y libboost-graph-dev
+
+    - name: CMake
+      run: |
+        mkdir build
+        pushd build
+        cmake .. -DBUILD_TESTS=ON
+        popd
+
+    - name: Cpp Format and lint
+      run: |
+        # install clang-format
+        sudo curl -L https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-22538c65/clang-format-8_linux-amd64 --output /usr/bin/clang-format
+        sudo chmod +x /usr/bin/clang-format
+
+        pushd build
+
+        # validate format
+        function prepend() { while read line; do echo "${1}${line}"; done; }
+
+        make clformat
+        GIT_DIFF=$(git diff --ignore-submodules)
+        if [[ -n $GIT_DIFF ]]; then
+            echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            echo "| clang-format failures found!"
+            echo "|"
+            echo "$GIT_DIFF" | prepend "| "
+            echo "|"
+            echo "| Run: "
+            echo "|"
+            echo "|    make clformat"
+            echo "|"
+            echo "| to fix this error."
+            echo "|"
+            echo "| Ensure you are working with clang-format-8, which can be obtained from"
+            echo "|"
+            echo "|    https://github.com/muttleyxd/clang-tools-static-binaries/releases"
+            echo "|"
+            echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            exit -1
+        fi
+
+        function ec() { [[ "$1" == "-h" ]] && { shift && eval $* > /dev/null 2>&1; ec=$?; echo $ec; } || eval $*; ec=$?; }
+
+        ec make cpplint
+        if [[ "$ec" != "0" ]]; then
+            echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            echo "| cpplint failures found! Run: "
+            echo "|"
+            echo "|    make vineyard_cpplint"
+            echo "|"
+            echo "| to fix this error."
+            echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+            exit -1
+        fi
+
+        popd
+
+    - name: Build GraphAr
+      run: |
+        pushd build
+        make -j$(nproc)
+        popd
+
+    - name: Test
+      run: |
+        cd build && make test
+

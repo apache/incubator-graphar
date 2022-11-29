@@ -1,0 +1,10 @@
+breathe
+docutils==0.16
+furo        # sphinx theme
+nbsphinx
+sphinx>=3.0.2
+sphinx-copybutton
+sphinx-panels
+sphinxemoji
+sphinxext-opengraph
+markupsafe==2.0.1

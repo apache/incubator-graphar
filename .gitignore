@@ -1,0 +1,11 @@
+/build/
+spark/generator/target/
+.vscode
+.idea
+.DS_store
+.cache
+
+# docs
+/docs/_build/
+
+

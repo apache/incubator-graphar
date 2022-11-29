@@ -1,0 +1,9 @@
+[submodule "test/gar-test"]
+	path = test/gar-test
+	url = https://github.com/acezen/gar-test.git
+[submodule "thirdparty/yaml-cpp"]
+	path = thirdparty/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "thirdparty/Catch2"]
+	path = thirdparty/Catch2
+	url = https://github.com/catchorg/Catch2.git
