@@ -180,19 +180,19 @@ Please refer to `more examples <../applications/out-of-core.html>`_ for learning
 
 .. _Building Steps: https://github.com/alibaba/GraphAr/blob/main/README.rst
 
-.. _person.vertex.yml: https://github.com/acezen/gar-test/blob/master/ldbc_sample/csv/person.vertex.yml
+.. _person.vertex.yml: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/person.vertex.yml
 
-.. _person_knows_person.edge.yml: https://github.com/acezen/gar-test/blob/master/ldbc_sample/csv/person_knows_person.edge.yml
+.. _person_knows_person.edge.yml: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/person_knows_person.edge.yml
 
-.. _./vertex/person/firstName_lastName_gender/part0: https://github.com/acezen/gar-test/blob/master/ldbc_sample/csv/vertex/person/firstName_lastName_gender/part0
+.. _./vertex/person/firstName_lastName_gender/part0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/vertex/person/firstName_lastName_gender/part0
 
-.. _test data: https://github.com/acezen/gar-test/blob/master/ldbc_sample/
+.. _test data: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/
 
-.. _./edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0: https://github.com/acezen/gar-test/tree/master/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0
+.. _./edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0
 
-.. _./edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0: https://github.com/acezen/gar-test/blob/master/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0
+.. _./edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0
 
-.. _./edge/person_knows_person/ordered_by_source/offset/part0: https://github.com/acezen/gar-test/blob/master/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/part0
+.. _./edge/person_knows_person/ordered_by_source/offset/part0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/part0
 
 .. _example program: https://github.com/alibaba/GraphAr/blob/main/test/test_example/test_construct_info_example.cc
 

@@ -268,7 +268,7 @@ third-party libraries may not have the same license as GraphAr.
 
 .. _GraphAr File Format: https://github.com/alibaba/GraphAr/blob/main/docs/user-guide/file-format.rst
 
-.. _example files: https://github.com/acezen/gar-test/blob/master/ldbc_sample/
+.. _example files: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/
 
 .. _Contribution Guide: https://github.com/alibaba/GraphAr/blob/main/CONTRIBUTING.rst
 
