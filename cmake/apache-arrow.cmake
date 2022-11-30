@@ -69,7 +69,7 @@ function(build_arrow)
 
     include(ExternalProject)
     externalproject_add(arrow_ep
-            URL https://github.com/apache/arrow/archive/refs/tags/apache-arrow-9.0.0.tar.gz
+            URL https://www.apache.org/dyn/closer.lua?action=download&filename=arrow/arrow-9.0.0/apache-arrow-9.0.0.tar.gz
             SOURCE_SUBDIR cpp
             BINARY_DIR "${ARROW_BINARY_DIR}"
             CMAKE_ARGS "${ARROW_CMAKE_ARGS}"
