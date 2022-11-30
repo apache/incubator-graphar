@@ -1,6 +1,6 @@
 [submodule "test/gar-test"]
 	path = test/gar-test
-	url = https://github.com/acezen/gar-test.git
+	url = https://github.com/GraphScope/gar-test.git
 [submodule "thirdparty/yaml-cpp"]
 	path = thirdparty/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
