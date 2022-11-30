@@ -238,31 +238,31 @@ third-party libraries may not have the same license as GraphAr.
 .. |GraphAr Docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
    :target: https://alibaba.github.io/GraphAr/
 
-.. |Overview Pic| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/overview.png
+.. |Overview Pic| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/overview.png?raw=true
   :width: 650
   :alt: Overview
 
-.. |Property Graph| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/property_graph.png
+.. |Property Graph| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/property_graph.png?raw=true
   :width: 650
   :alt: property graph
 
-.. |Vertex Logical Table| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/vertex_logical_table.png
+.. |Vertex Logical Table| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/vertex_logical_table.png?raw=true
   :width: 650
   :alt: vertex logical table
 
-.. |Vertex Physical Table| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/vertex_physical_table.png
+.. |Vertex Physical Table| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/vertex_physical_table.png?raw=true
   :width: 650
   :alt: vertex physical table
 
-.. |Edge Logical Table| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/edge_logical_table.png
+.. |Edge Logical Table| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/edge_logical_table.png?raw=true
   :width: 650
   :alt: edge logical table
 
-.. |Edge Physical Table1| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/edge_physical_table1.png
+.. |Edge Physical Table1| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/edge_physical_table1.png?raw=true
   :width: 650
   :alt: edge logical table1
 
-.. |Edge Physical Table2| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/edge_physical_table2.png
+.. |Edge Physical Table2| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/edge_physical_table2.png?raw=true
   :width: 650
   :alt: edge logical table2
 

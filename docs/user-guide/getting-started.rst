@@ -11,7 +11,7 @@ GAR uses a group of Yaml files to save the meta information for a graph.
 
 Graph information
 `````````````````
-The graph information file defines the most basic information of a graph includes its name, the root directory path of the data files, the vertex information and edge information files it contains, and the version of GraphAr. For example, the file "ldbc_sample.graph.yml" defines an example graph named "ldbc_sample", which includes one type of vertices ("person") and one type of edges ("person knows person"). 
+The graph information file defines the most basic information of a graph includes its name, the root directory path of the data files, the vertex information and edge information files it contains, and the version of GraphAr. For example, the file "ldbc_sample.graph.yml" defines an example graph named "ldbc_sample", which includes one type of vertices ("person") and one type of edges ("person knows person").
 
 .. code:: Yaml
 
@@ -25,7 +25,7 @@ The graph information file defines the most basic information of a graph include
 
 Vertex information
 ``````````````````
-Each vertex information file defines a single group of vertices with the same vertex label, e.g., "person" in this case. The vertex chunk size, the relative path for vertex data files and the version of GraphAr are specified. These vertices could have some properties, which are divided into property groups. Each property group has its own file type (CSV, ORC or Parquet) and the prefix of the relative path for its data files, it also lists all properties in this group, with every property contains the name, data type and if it is the primary key. 
+Each vertex information file defines a single group of vertices with the same vertex label, e.g., "person" in this case. The vertex chunk size, the relative path for vertex data files and the version of GraphAr are specified. These vertices could have some properties, which are divided into property groups. Each property group has its own file type (CSV, ORC or Parquet) and the prefix of the relative path for its data files, it also lists all properties in this group, with every property contains the name, data type and if it is the primary key.
 
 The file `person.vertex.yml`_ located inside the test data contains an example of the vertex information file. In this example, the "person" vertices have two property groups. The first group contains only one property (named "id") and the second group contains three properties ("firstName", "lastName" and "gender").
 
@@ -37,7 +37,7 @@ In GAR format, separate data files are used to store the structure (called adjLi
 
 .. note::
 
-  It is allowed to store different types of adjLists for a group of edges at the same time. 
+  It is allowed to store different types of adjLists for a group of edges at the same time.
 
 
 
@@ -46,12 +46,12 @@ GAR Data Files
 
 Property data
 `````````````
-The vertex properties are stored in vertex property chunks with the chunk size specified by the vertex information file. Different property groups correspond to individual groups of data files. 
-In our example, the property group ("first name", "last name", "gender") for vertex chunk 0 of "person" vertices are stored in `./vertex/person/first_name_last_name_gender/part0`_. 
+The vertex properties are stored in vertex property chunks with the chunk size specified by the vertex information file. Different property groups correspond to individual groups of data files.
+In our example, the property group ("first name", "last name", "gender") for vertex chunk 0 of "person" vertices are stored in `./vertex/person/firstName_lastName_gender/part0`_.
 
 In practice of graph processing, it is common to only query a subset of columns of the properties. Thus, the column-oriented formats like Apache ORC and Apache Parquet are more efficient, which eliminate the need to read columns that are not relevant. We also provide data files in ORC and Parquet for the example graph in the `test data`_.
 
-Similar with vertices, the edge properties are stored in edge property chunks. For each vertex chunk, its associated edges (if the edge type is **ordered_by_source** or **unordered_by_source**, the associated edges are edges in which the source vertex is in this chunk; otherwise, if the edge type is **ordered_by_dest** or **unordered_by_dest**, the associated edges are edges in which the destination is in this chunk) are maintained in some edge chunks, with the size of each chunk not greater than the edge chunk size, which is defined by the edge information file. 
+Similar with vertices, the edge properties are stored in edge property chunks. For each vertex chunk, its associated edges (if the edge type is **ordered_by_source** or **unordered_by_source**, the associated edges are edges in which the source vertex is in this chunk; otherwise, if the edge type is **ordered_by_dest** or **unordered_by_dest**, the associated edges are edges in which the destination is in this chunk) are maintained in some edge chunks, with the size of each chunk not greater than the edge chunk size, which is defined by the edge information file.
 
 For instance, the file `./edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0`_ stores the property group "creationDate" of "person_knows_person" edges for the first edge chunk of the first vertex chunk, and the adjList type of the edges is **ordered_by_source**.
 
@@ -59,11 +59,11 @@ AdjList data
 ````````````
 The adjList in GAR describes the topology structure, i.e., the source vertex id and the destination vertex id for each of a group of edges. As explained in `Edges in GraphAr <file-format.html#edges-in-graphar>`_, the edges are separated into edge chunks, and each edge chunk has its own adjList table and 0 or more property tables.
 
-For example, the file `./edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0`_ saves the adjList of "person_knows_person" edges for the first edge chunk of the first vertex chunk, and the adjList type of the edges is "ordered_by_source". The adjList table has only two columns representing source and destination respectively, and it can be saved in CSV, ORC or Parquet files. 
+For example, the file `./edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0`_ saves the adjList of "person_knows_person" edges for the first edge chunk of the first vertex chunk, and the adjList type of the edges is "ordered_by_source". The adjList table has only two columns representing source and destination respectively, and it can be saved in CSV, ORC or Parquet files.
 
 .. note::
 
-  If the edges are ordered, there may be offset chunks to construct the index for accessing edges of a single vertex. It stores the start offset for each vertex's edges, see `./edge/person_knows_person/ordered_by_source/offset/part0`_ as an example. 
+  If the edges are ordered, there may be offset chunks to construct the index for accessing edges of a single vertex. It stores the start offset for each vertex's edges, see `./edge/person_knows_person/ordered_by_source/offset/part0`_ as an example.
 
 
 How to Use GAR
@@ -98,7 +98,7 @@ Also, the metadata of a graph can be constructed easily through reading the alre
 
 Read GAR files
 ``````````````
-GAR supports to read the graph data flexibly, e.g., to get data for a single vertex, a vertex chunk or all vertices with a specific label. In addition, necessary property groups can be selected to read and avoid reading all properties from the files. As for edges, all of the adjList, offset and property chunks can be accessed conveniently and flexibly. 
+GAR supports to read the graph data flexibly, e.g., to get data for a single vertex, a vertex chunk or all vertices with a specific label. In addition, necessary property groups can be selected to read and avoid reading all properties from the files. As for edges, all of the adjList, offset and property chunks can be accessed conveniently and flexibly.
 
 As a simple case, the following example shows how to read all vertices with label "person" of the graph defined by "graph_info" and output the values of "id" and "firstName" for each vertex.
 
@@ -106,9 +106,9 @@ As a simple case, the following example shows how to read all vertices with labe
 
   graph_info = ...
   auto& vertices = GraphArchive::ConstructVerticesCollection(graph_info, "person").value();
-    
+
   for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-    // get a vertex and access its data 
+    // get a vertex and access its data
     auto vertex = *it;
     std::cout << "id=" << vertex.property<int64_t>("id").value() << ", firstName=" << vertex.property<std::string>("firstName").value() <<std::endl;
   }
@@ -131,9 +131,9 @@ See also `GAR Reader API Reference <../api-reference.html#readers>`_.
 
 Write GAR files
 ```````````````
-As same with the readers, the GAR writers provide different-level methods to output the graph data in memory into GAR files. 
+As same with the readers, the GAR writers provide different-level methods to output the graph data in memory into GAR files.
 
-As the simplest cases, the fist example below adds vertices to **VerticesBuilder**, and then dumps the data to files; the second example constructs a collection of edges and then dumps them. 
+As the simplest cases, the fist example below adds vertices to **VerticesBuilder**, and then dumps the data to files; the second example constructs a collection of edges and then dumps them.
 
 .. code:: C++
 
@@ -157,9 +157,9 @@ As the simplest cases, the fist example below adds vertices to **VerticesBuilder
   edge_info = ...
   prefix = ...
   GraphArchive::builder::EdgesBuilder builder(edge_info, prefix, GraphArchive::AdjListType::ordered_by_source);
-  
+
   // add an edge (0 -> 3)
-  GraphArchive::builder::Edge e(0, 3); 
+  GraphArchive::builder::Edge e(0, 3);
   e.AddProperty("creationDate", "2011-07-20T20:02:04.233+0000");
   builder.AddVertex(e);
   // add other edges
@@ -184,7 +184,7 @@ Please refer to `more examples <../applications/out-of-core.html>`_ for learning
 
 .. _person_knows_person.edge.yml: https://github.com/acezen/gar-test/blob/master/ldbc_sample/csv/person_knows_person.edge.yml
 
-.. _./vertex/person/first_name_last_name_gender/part0: https://github.com/acezen/gar-test/blob/master/ldbc_sample/csv/vertex/person/first_name_last_name_gender/part0
+.. _./vertex/person/firstName_lastName_gender/part0: https://github.com/acezen/gar-test/blob/master/ldbc_sample/csv/vertex/person/firstName_lastName_gender/part0
 
 .. _test data: https://github.com/acezen/gar-test/blob/master/ldbc_sample/
 
