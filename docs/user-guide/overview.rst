@@ -17,6 +17,10 @@ The GraphAr project includes such topics as:
 - A set of Apache Spark tools for generating, loading and transforming GAR files. (coming soon)
 - How to use GraphAr to write graph algorithms, or to work with existing systems such as GraphScope. (see `Application Cases <../applications/out-of-core.html>`_)
 
+.. image:: ../images/overview.png
+   :alt: overview
+
+
 GraphAr Features
 ------------------------
 
