@@ -211,7 +211,7 @@ target linked with GraphAr C++ shared library.
 
 
 Contributing to GraphAr
-----------------------
+-----------------------
 
 - Read the `Contribution Guide`_.
 - Please report bugs by submitting `GitHub Issues`_ or ask me anything in `Github Discussions`_.
@@ -238,39 +238,39 @@ third-party libraries may not have the same license as GraphAr.
 .. |GraphAr Docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
    :target: https://alibaba.github.io/GraphAr/
 
-.. |Overview Pic| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/overview.png?raw=true
+.. |Overview Pic| image:: https://alibaba.github.io/GraphAr/_images/overview.png
   :width: 650
   :alt: Overview
 
-.. |Property Graph| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/property_graph.png?raw=true
+.. |Property Graph| image:: https://alibaba.github.io/GraphAr/_images/property_graph.png
   :width: 650
   :alt: property graph
 
-.. |Vertex Logical Table| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/vertex_logical_table.png?raw=true
+.. |Vertex Logical Table| image:: https://alibaba.github.io/GraphAr/_images/vertex_logical_table.png
   :width: 650
   :alt: vertex logical table
 
-.. |Vertex Physical Table| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/vertex_physical_table.png?raw=true
+.. |Vertex Physical Table| image:: https://alibaba.github.io/GraphAr/_images/vertex_physical_table.png
   :width: 650
   :alt: vertex physical table
 
-.. |Edge Logical Table| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/edge_logical_table.png?raw=true
+.. |Edge Logical Table| image:: https://alibaba.github.io/GraphAr/_images/edge_logical_table.png
   :width: 650
   :alt: edge logical table
 
-.. |Edge Physical Table1| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/edge_physical_table1.png?raw=true
+.. |Edge Physical Table1| image:: https://alibaba.github.io/GraphAr/_images/edge_physical_table1.png
   :width: 650
   :alt: edge logical table1
 
-.. |Edge Physical Table2| image:: https://github.com/alibaba/GraphAr/blob/main/docs/images/edge_physical_table2.png?raw=true
+.. |Edge Physical Table2| image:: https://alibaba.github.io/GraphAr/_images/edge_physical_table2.png
   :width: 650
   :alt: edge logical table2
 
-.. _GraphAr File Format: https://github.com/alibaba/GraphAr/blob/main/docs/user-guide/file-format.rst
+.. _GraphAr File Format: https://alibaba.github.io/GraphAr/user-guide/file-format.html
 
 .. _example files: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/
 
-.. _Contribution Guide: https://github.com/alibaba/GraphAr/blob/main/CONTRIBUTING.rst
+.. _Contribution Guide: https://alibaba.github.io/GraphAr/user-guide/contributing.html
 
 .. _GitHub Issues: https://github.com/alibaba/GraphAr/issues/new
 
