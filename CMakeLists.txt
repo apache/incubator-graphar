@@ -39,18 +39,20 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
                "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif ()
 
-find_program(ccache_EXECUTABLE ccache)
-if(ccache_EXECUTABLE)
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE ${ccache_EXECUTABLE})
-    set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ${ccache_EXECUTABLE})
-    add_custom_target(ccache-stats
-        COMMAND ${ccache_EXECUTABLE} --show-stats
-    )
-else()
-    add_custom_target(ccache-stats
-        COMMAND echo "ccache not found."
-    )
-endif(ccache_EXECUTABLE)
+if(NOT (CMAKE_CXX_COMPILER_LAUNCHER MATCHES "ccache") AND NOT (CMAKE_C_COMPILER_LAUNCHER MATCHES "ccache"))
+    find_program(ccache_EXECUTABLE ccache)
+    if(ccache_EXECUTABLE)
+        set(CMAKE_C_COMPILER_LAUNCHER ${ccache_EXECUTABLE})
+        set(CMAKE_CXX_COMPILER_LAUNCHER ${ccache_EXECUTABLE})
+        add_custom_target(ccache-stats
+            COMMAND ${ccache_EXECUTABLE} --show-stats
+        )
+    else()
+        add_custom_target(ccache-stats
+            COMMAND echo "ccache not found."
+        )
+    endif(ccache_EXECUTABLE)
+endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall")
 
