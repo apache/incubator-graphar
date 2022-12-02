@@ -3,7 +3,7 @@ GraphAr
 
 |GraphAr CI| |Docs CI| |GraphAr Docs|
 
-GraphAr is an open source, standard data file format with C++ SDK and Spark tools for graph data storage and retrieval.
+GraphAr (short for "Graph Archive") is an open source, standard data file format with C++ SDK and Spark tools for graph data storage and retrieval.
 
 The GraphAr project includes such modules as:
 
