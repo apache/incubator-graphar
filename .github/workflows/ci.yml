@@ -34,10 +34,18 @@ jobs:
       with:
           submodules: true
 
+    - name: Cache for cccache
+      uses: actions/cache@v3
+      with:
+        path: ~/.ccache
+        key: ${{ matrix.os }}-build-ccache-${{ hashFiles('**/git-modules.txt') }}
+        restore-keys: |
+          ${{ matrix.os }}-build-ccache-
+
     - name: Install dependencies
       run: |
         sudo apt-get update -y
-        sudo apt-get install -y libboost-graph-dev
+        sudo apt-get install -y libboost-graph-dev ccache
 
     - name: CMake
       run: |
@@ -99,6 +107,7 @@ jobs:
       run: |
         pushd build
         make -j$(nproc)
+        make ccache-stats
         popd
 
     - name: Test
