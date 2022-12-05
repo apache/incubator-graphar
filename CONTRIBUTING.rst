@@ -7,7 +7,7 @@ GraphAr is an open source project and we love to receive contributions from our 
 There are many ways to contribute, from improving the documentation, submitting bug reports and
 feature requests or writing code which can be incorporated into GraphAr itself.
 
-Reporting Bugs
+Reporting bug
 -------------------
 
 If you've noticed a bug in GraphAr, first make sure that you are testing against
@@ -33,7 +33,7 @@ If you have a general question about GraphAr, please don't use the issue tracker
 The issue tracker is a tool to address bugs and feature requests in GraphAr itself.
 Use one of the following resources for questions about using GraphAr or issues with your own code:
 
-* Ask on our `Github Discussions`_
+* Ask on our `Github Discussions`_.
 
 Contributing code and documentation changes
 -------------------------------------------
@@ -86,8 +86,10 @@ Now you should be able to run the test suite:
 
     make test
 
-Generate the document
-^^^^^^^^^^^^^^^^^^^^^^
+How to generate the document
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you want to improve the document, you need to know how to generate the docs.
 
 The documentation is generated using Doxygen and sphinx. You can build GraphAr's documentation in the :code:`docs/` directory using:
 
@@ -109,18 +111,16 @@ Get the code format & style right
 Your patch should follow the same conventions & pass the same code quality
 checks as the rest of the project which follows the `Google C++ Style Guide <https://google.github.io/styleguide/cppguide.html>`_.
 
-You can format your code by the CMakefile command:
+You can format your code by the command:
 
 .. code:: shell
 
-    cd build
     make clformat
 
-You can check & fix style issues by running the *cpplint* linter with the CMakefile command:
+You can check & fix style issues by running the *cpplint* linter with the command:
 
 .. code:: shell
 
-    cd build
     make cpplint
 
 Submitting your changes
@@ -134,7 +134,7 @@ Run the test suite to make sure that nothing is broken.
 
 2. Sign the Contributor License Agreement(CLA)
 
-Please make sure you have signed our `Contributor License Agreement <https://www.alibaba.com/contributor-agreement/>`_.
+Please make sure you have signed our `Contributor License Agreement`_.
 We are not asking you to assign copyright to us, but to give us the right to distribute your code without restriction.
 We ask this of all contributors in order to assure our users of the origin and continuing existence of the code. You only need to sign the CLA once.
 
@@ -226,5 +226,7 @@ is an opportunity to grow the community.
 .. _interactive rebase: https://help.github.com/en/github/using-git/about-git-rebase
 
 .. _GraphAr Dependencies: https://github.com/alibaba/GraphAr#dependencies
+
+.. _Contributor License Agreement: https://cla-assistant.io/alibaba/GraphAr
 
 .. _glossary: https://chromium.googlesource.com/chromiumos/docs/+/HEAD/glossary.md
