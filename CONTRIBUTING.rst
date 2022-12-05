@@ -11,8 +11,8 @@ Reporting Bugs
 -------------------
 
 If you've noticed a bug in GraphAr, first make sure that you are testing against
-the `latest version of GraphAr<https://github.com/alibaba/GraphAr/tree/main>`_ -
-your issue may already have been fixed. If not, search our `issues list<https://github.com/alibaba/GraphAr/issues>`_
+the `latest version of GraphAr <https://github.com/alibaba/GraphAr/tree/main>`_ -
+your issue may already have been fixed. If not, search our `issues list <https://github.com/alibaba/GraphAr/issues>`_
 on GitHub in case a similar issue has already been opened.
 
 If you get confirmation of your bug, `file an bug issue`_ before starting to code.
@@ -27,7 +27,7 @@ which describes the feature you would like to see, why you need it, and how it s
 
 Support questions
 -----------------
-If you have a general question about GraphAr, please don't use the issue tracker for this.
+If you have a general question about GraphAr, please don't use the issue tracker for that.
 The issue tracker is a tool to address bugs and feature requests in GraphAr itself.
 Use one of the following resources for questions about using GraphAr or issues with your own code:
 
@@ -48,7 +48,7 @@ Fork & create a branch
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 You will need to fork the main GraphAr code and clone it to your local machine. See
-`github help page<https://help.github.com/articles/fork-a-repo>`_ for help.
+`github help page <https://help.github.com/articles/fork-a-repo>`_ for help.
 
 Then you need to create a branch with a descriptive name.
 
@@ -132,7 +132,7 @@ Once your changes and tests are ready to submit for review:
 
 2. Sign the Contributor License Agreement(CLA)
 
-    Please make sure you have signed our [Contributor License Agreement](https://www.alibaba.com/contributor-agreement/).
+    Please make sure you have signed our `Contributor License Agreement <https://www.alibaba.com/contributor-agreement/>`_.
 We are not asking you to assign copyright to us, but to give us the right to distribute your code without restriction.
 We ask this of all contributors in order to assure our users of the origin and continuing existence of the code. You only need to sign the CLA once.
 
@@ -160,7 +160,7 @@ Finally, go to GitHub and `make a Pull Request`_ :D
 Github Actions will run our test suite against different environments. We
 care about quality, so your PR won't be merged until all tests pass.
 
-Discussing and Keeping your Pull Request updated
+Discussing and keeping your Pull Request updated
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 You will probably get feedback or requests for changes to your pull request.
@@ -171,8 +171,8 @@ are correct and necessary.
 If a maintainer asks you to "rebase" your PR, they're saying that a lot of code
 has changed, and that you need to update your branch so it's easier to merge.
 
-To learn more about rebasing in Git, there are a lot of `good<http://git-scm.com/book/en/Git-Branching-Rebasing>`_
-`resources<https://help.github.com/en/github/using-git/about-git-rebase>`_ but here's the suggested workflow:
+To learn more about rebasing in Git, there are a lot of `good <http://git-scm.com/book/en/Git-Branching-Rebasing>`_
+`resources <https://help.github.com/en/github/using-git/about-git-rebase>`_ but here's the suggested workflow:
 
 .. code:: shell
 
@@ -216,6 +216,8 @@ is an opportunity to grow the community.
 .. _fork GraphAr: https://help.github.com/articles/fork-a-repo
 
 .. _make a Pull Request: https://help.github.com/articles/creating-a-pull-request
+
+.. _Github Discussions: https://github.com/alibaba/GraphAr/discussions
 
 .. _git rebasing: http://git-scm.com/book/en/Git-Branching-Rebasing
 
