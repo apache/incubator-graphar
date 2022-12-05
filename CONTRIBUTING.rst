@@ -22,8 +22,10 @@ Requesting feature or enhancement
 
 If you find yourself wishing for a feature that doesn't exist in GraphAr, you are probably not alone.
 There are bound to be others out there with similar needs. Many of the features that GraphAr has today
-have been added because our users saw the need. `Open an feature request issue`_ on GitHub
-which describes the feature you would like to see, why you need it, and how it should work.
+have been added because our users saw the need.
+
+`Open an feature request issue`_ on GitHub which describes the feature you would
+like to see, why you need it, and how it should work.
 
 Support questions
 -----------------
@@ -36,7 +38,7 @@ Use one of the following resources for questions about using GraphAr or issues w
 Contributing code and documentation changes
 -------------------------------------------
 
-If you would like to contribute a new feature or a bug fix to Elasticsearch,
+If you would like to contribute a new feature or a bug fix to GraphAr,
 please discuss your idea first on the GitHub issue. If there is no GitHub issue
 for your idea, please open one. It may be that somebody is already working on
 it, or that there are particular complexities that you should know about before
@@ -128,17 +130,17 @@ Once your changes and tests are ready to submit for review:
 
 1. Test you changes
 
-    Run the test suite to make sure that nothing is broken.
+Run the test suite to make sure that nothing is broken.
 
 2. Sign the Contributor License Agreement(CLA)
 
-    Please make sure you have signed our `Contributor License Agreement <https://www.alibaba.com/contributor-agreement/>`_.
+Please make sure you have signed our `Contributor License Agreement <https://www.alibaba.com/contributor-agreement/>`_.
 We are not asking you to assign copyright to us, but to give us the right to distribute your code without restriction.
 We ask this of all contributors in order to assure our users of the origin and continuing existence of the code. You only need to sign the CLA once.
 
 3. Submit a pull request
 
-    At this point, you should switch back to your main branch and make sure it's
+At this point, you should switch back to your main branch and make sure it's
 up to date with GraphAr's main branch:
 
 .. code:: shell
