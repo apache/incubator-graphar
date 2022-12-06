@@ -132,7 +132,7 @@ Once your changes and tests are ready to submit for review:
 
 Run the test suite to make sure that nothing is broken.
 
-2. Sign the Contributor License Agreement(CLA)
+2. Sign the Contributor License Agreement (CLA)
 
 Please make sure you have signed our `Contributor License Agreement`_.
 We are not asking you to assign copyright to us, but to give us the right to distribute your code without restriction.
@@ -174,7 +174,7 @@ If a maintainer asks you to "rebase" your PR, they're saying that a lot of code
 has changed, and that you need to update your branch so it's easier to merge.
 
 To learn more about rebasing in Git, there are a lot of `good <http://git-scm.com/book/en/Git-Branching-Rebasing>`_
-`resources <https://help.github.com/en/github/using-git/about-git-rebase>`_ but here's the suggested workflow:
+`resources <https://help.github.com/en/github/using-git/about-git-rebase>`_, but here's the suggested workflow:
 
 .. code:: shell
 
