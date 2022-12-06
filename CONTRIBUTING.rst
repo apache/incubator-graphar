@@ -210,9 +210,9 @@ not land, the submitters should come away from the experience feeling like their
 effort was not wasted or unappreciated. Every pull request from a new contributor
 is an opportunity to grow the community.
 
-.. _file an bug issue: https://github.com/alibaba/GraphAr/issues/new/choose
+.. _file an bug issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=Bug&template=bug_report.yml&title=%5BBug%5D%3A+%3Ctitle%3E
 
-.. _Open an feature request issue: https://github.com/alibaba/GraphAr/issues/new/choose
+.. _Open an feature request issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFeat%5D
 
 .. _fork GraphAr: https://help.github.com/articles/fork-a-repo
 
