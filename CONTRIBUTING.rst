@@ -31,9 +31,8 @@ Support questions
 -----------------
 If you have a general question about GraphAr, please don't use the issue tracker for that.
 The issue tracker is a tool to address bugs and feature requests in GraphAr itself.
-Use one of the following resources for questions about using GraphAr or issues with your own code:
+Use our `Github Discussions`_. for questions about using GraphAr or issues with your own code:
 
-* Ask on our `Github Discussions`_.
 
 Contributing code and documentation changes
 -------------------------------------------
