@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions
+    url: https://github.com/alibaba/GraphAr/discussions
+    about: Search for and ask questions on our github Discussions chat.
