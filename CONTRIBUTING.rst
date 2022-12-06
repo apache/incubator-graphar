@@ -1,149 +1,231 @@
 Contributing to GraphAr
 ========================
 
-GraphAr has been developed by an active team of software engineers and researchers. Any contributions from the open-source community to improve this project are welcome!
+First off, thank you for considering contributing to GraphAr. It's people like you that make GraphAr better and better.
 
-Install Development Dependencies
---------------------------------
+GraphAr is an open source project and we love to receive contributions from our community — you!
+There are many ways to contribute, from improving the documentation, submitting bug reports and
+feature requests or writing code which can be incorporated into GraphAr itself.
 
-GraphAr requires the following C++ packages for development:
+Reporting bug
+-------------------
 
-- A modern C++ compiler compliant with C++17 standard (g++ >= 7.1 or clang++ >= 5).
-- `CMake <https://cmake.org/>`_ (>=2.8)
+If you've noticed a bug in GraphAr, first make sure that you are testing against
+the `latest version of GraphAr <https://github.com/alibaba/GraphAr/tree/main>`_ -
+your issue may already have been fixed. If not, search our `issues list <https://github.com/alibaba/GraphAr/issues>`_
+on GitHub in case a similar issue has already been opened.
 
-Build the Source
-----------------
+If you get confirmation of your bug, `file an bug issue`_ before starting to code.
 
-You can do an out-of-source build using CMake:
+Requesting feature or enhancement
+---------------------------------------
+
+If you find yourself wishing for a feature that doesn't exist in GraphAr, you are probably not alone.
+There are bound to be others out there with similar needs. Many of the features that GraphAr has today
+have been added because our users saw the need.
+
+`Open an feature request issue`_ on GitHub which describes the feature you would
+like to see, why you need it, and how it should work.
+
+Support questions
+-----------------
+If you have a general question about GraphAr, please don't use the issue tracker for that.
+The issue tracker is a tool to address bugs and feature requests in GraphAr itself.
+Use our `Github Discussions`_. for questions about using GraphAr or issues with your own code:
+
+
+Contributing code and documentation changes
+-------------------------------------------
+
+If you would like to contribute a new feature or a bug fix to GraphAr,
+please discuss your idea first on the GitHub issue. If there is no GitHub issue
+for your idea, please open one. It may be that somebody is already working on
+it, or that there are particular complexities that you should know about before
+starting the implementation. There are often a number of ways to fix a problem
+and it is important to find the right approach before spending time on a PR
+that cannot be merged.
+
+Fork & create a branch
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+You will need to fork the main GraphAr code and clone it to your local machine. See
+`github help page <https://help.github.com/articles/fork-a-repo>`_ for help.
+
+Then you need to create a branch with a descriptive name.
+
+A good branch name would be (where issue #42 is the ticket you're working on):
+
+.. code:: shell
+
+    git checkout -b 42-add-chinese-translations
+
+Get the test suite running
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Make sure your system has the required dependencies for GraphAr. See the `GraphAr Dependencies`_ for more details.
+
+Now initialize the submodules of GraphAr:
 
 .. code:: shell
 
     git submodule update --init
-    mkdir build
-    cd build
-    cmake ..
-    make -j$(nproc)
 
-The `gar` shared library will be generated under the `build` directory.
-
-Optional: Using a Custom Namespace
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-The `namespace` that `gar` is defined in is configurable. By default,
-it is defined in `namespace GraphArchive`; however this can be toggled by
-setting `NAMESPACE` option with cmake:
+Then you can do an out-of-source build using CMake and build the test suite:
 
 .. code:: shell
 
     mkdir build
-    cd build
-    cmake .. -DNAMESPACE=MyNamespace
-    make -j$(nproc)
-
-
-Run Unit Tests
---------------
-
-GraphAr has included a set of unit tests in the continuous integration process. Test cases can be built from the following commands:
-
-.. code:: shell
-
     cd build
     cmake .. -DBUILD_TESTS=ON
     make -j$(nproc)
 
-After building test cases, you could run C++ unit tests by:
+Now you should be able to run the test suite:
 
 .. code:: shell
 
-    cd build
     make test
 
-You could only run a specified test case by running the test case binary directly:
+How to generate the document
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+If you want to improve the document, you need to know how to generate the docs.
+
+The documentation is generated using Doxygen and sphinx. You can build GraphAr's documentation in the :code:`docs/` directory using:
 
 .. code:: shell
 
-    cd build
-    ./test_info
-
-
-Documentation
--------------
-
-The documentation is generated using Doxygen and sphinx. Users can build GraphAr's documentation in the :code:`docs/` directory using:
-
-.. code:: bash
-
-    cd build
     make doc
 
-The HTML documentation will be available under `docs/_build/html`:
+The HTML documentation will be available under `docs/_build/html`.
 
-.. code:: bash
+Implement your fix or feature
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    open _build/html/index.html
+At this point, you're ready to make your changes! Feel free to ask for help;
+everyone is a beginner at first :smile_cat:
 
-The latest version of online documentation can be found at `GraphAr Documentation`_.
+Get the code format & style right
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The documentation follows the syntax of Doxygen and sphinx markup. If you find anything you can help, please submit pull requests to us. Thanks for your enthusiasm!
+Your patch should follow the same conventions & pass the same code quality
+checks as the rest of the project which follows the `Google C++ Style Guide <https://google.github.io/styleguide/cppguide.html>`_.
 
-Reporting Bugs
---------------
+You can format your code by the command:
 
-GraphAr is hosted on Github, and use Github issues as the bug tracker. You can `file an issue`_ when you find anything that is expected to work with GraphAr but it doesn't.
+.. code:: shell
 
-Before creating a new bug entry, we recommend you first `search` among existing GraphAr bugs to see if it has already been resolved.
+    make clformat
 
-When creating a new bug entry, please provide necessary information of your problem in the description, such as operating system version, GraphAr version, and other system configurations to help us to diagnose the problem.
+You can check & fix style issues by running the *cpplint* linter with the command:
 
-Code format
-^^^^^^^^^^^
+.. code:: shell
 
-GraphAr follows the `Google C++ Style Guide <https://google.github.io/styleguide/cppguide.html>`_. When submitting patches to GraphAr, please format your code with clang-format by the Makefile command `make clformat`, and make sure your code doesn't break the cpplint convention using the CMakefile command `make cpplint`.
+    make cpplint
 
-Open a pull request
-^^^^^^^^^^^^^^^^^^^
+Submitting your changes
+^^^^^^^^^^^^^^^^^^^^^^^
 
-When opening issues or submitting pull requests, we'll ask you to prefix the pull request title with the issue number and the kind of patch (`BUGFIX` or `FEATURE`) in brackets, for example, `[BUGFIX-1234] Fix crash in reading arrow table in GraphAr` or `[FEATURE-2345] Support spark writer`.
+Once your changes and tests are ready to submit for review:
 
-Git workflow for newcomers
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+1. Test you changes
 
-You generally do NOT need to rebase your pull requests unless there are merge
-conflicts with the main. When Github complaining that "Can't automatically merge"
-on your pull request, you'll be asked to rebase your pull request on top of
-the latest main branch, using the following commands:
+Run the test suite to make sure that nothing is broken.
 
-+ First rebasing to the most recent main:
+2. Sign the Contributor License Agreement (CLA)
 
-  .. code:: shell
+Please make sure you have signed our `Contributor License Agreement`_.
+We are not asking you to assign copyright to us, but to give us the right to distribute your code without restriction.
+We ask this of all contributors in order to assure our users of the origin and continuing existence of the code. You only need to sign the CLA once.
 
-      git remote add upstream https://github.com/alibaba/GraphAr.git
-      git fetch upstream
-      git rebase upstream/main
+3. Submit a pull request
 
-+ Then git may show you some conflicts when it cannot merge, say `conflict.cpp`,
-  you need
+At this point, you should switch back to your main branch and make sure it's
+up to date with GraphAr's main branch:
 
-  - Manually modify the file to resolve the conflicts
-  - After resolved, mark it as resolved by:
+.. code:: shell
 
-  .. code:: shell
+    git remote add upstream https://github.com/alibaba/GraphAr.git
+    git checkout main
+    git pull upstream main
 
-      git add conflict.cpp
+Then update your feature branch from your local copy of main, and push it!
 
-+ Then you can continue rebasing by:
+.. code:: shell
 
-  .. code:: shell
+    git checkout 42-add-chinese-translations
+    git rebase main
+    git push --set-upstream origin 42-add-chinese-translations
 
-      git rebase --continue
+Finally, go to GitHub and `make a Pull Request`_ :D
 
-+ Finally push to your fork, then the pull request will be got updated:
+Github Actions will run our test suite against different environments. We
+care about quality, so your PR won't be merged until all tests pass.
 
-  .. code:: shell
+Discussing and keeping your Pull Request updated
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-      git push --force
+You will probably get feedback or requests for changes to your pull request.
+This is a big part of the submission process so don't be discouraged!
+It is a necessary part of the process in order to evaluate whether the changes
+are correct and necessary.
 
-.. _file an issue: https://github.com/alibaba/GraphAr/issues/new
+If a maintainer asks you to "rebase" your PR, they're saying that a lot of code
+has changed, and that you need to update your branch so it's easier to merge.
 
-.. _GraphAr Documentation: https://alibaba.github.io/GraphAr/
+To learn more about rebasing in Git, there are a lot of `good <http://git-scm.com/book/en/Git-Branching-Rebasing>`_
+`resources <https://help.github.com/en/github/using-git/about-git-rebase>`_, but here's the suggested workflow:
+
+.. code:: shell
+
+    git checkout 42-add-chinese-translations
+    git pull --rebase upstream main
+    git push --force-with-lease 42-add-chinese-translations
+
+Feel free to post a comment in the pull request to ping reviewers if you are awaiting an answer
+on something. If you encounter words or acronyms that seem unfamiliar, refer to this `glossary`_.
+
+Merging a PR (maintainers only)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A PR can only be merged into main by a maintainer if:
+
+* It is passing CI.
+* It has been approved by at least two maintainers. If it was a maintainer who
+  opened the PR, only one extra approval is needed.
+* It has no requested changes.
+* It is up to date with current main.
+
+Any maintainer is allowed to merge a PR if all of these conditions are
+met.
+
+Reviewing pull requests
+-----------------------
+
+All contributors who choose to review and provide feedback on Pull Requests have
+a responsibility to both the project and the individual making the contribution.
+
+When reviewing a pull request, the primary goals are for the codebase to improve
+and for the person submitting the request to succeed. Even if a pull request does
+not land, the submitters should come away from the experience feeling like their
+effort was not wasted or unappreciated. Every pull request from a new contributor
+is an opportunity to grow the community.
+
+.. _file an bug issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=Bug&template=bug_report.yml&title=%5BBug%5D%3A+%3Ctitle%3E
+
+.. _Open an feature request issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFeat%5D
+
+.. _fork GraphAr: https://help.github.com/articles/fork-a-repo
+
+.. _make a Pull Request: https://help.github.com/articles/creating-a-pull-request
+
+.. _Github Discussions: https://github.com/alibaba/GraphAr/discussions
+
+.. _git rebasing: http://git-scm.com/book/en/Git-Branching-Rebasing
+
+.. _interactive rebase: https://help.github.com/en/github/using-git/about-git-rebase
+
+.. _GraphAr Dependencies: https://github.com/alibaba/GraphAr#dependencies
+
+.. _Contributor License Agreement: https://cla-assistant.io/alibaba/GraphAr
+
+.. _glossary: https://chromium.googlesource.com/chromiumos/docs/+/HEAD/glossary.md
