@@ -7,6 +7,8 @@ GraphAr is an open source project and we love to receive contributions from our 
 There are many ways to contribute, from improving the documentation, submitting bug reports and
 feature requests or writing code which can be incorporated into GraphAr itself.
 
+Note that no matter how you contribute, your participation is governed by our `Code of Conduct`_.
+
 Reporting bug
 -------------------
 
@@ -209,6 +211,8 @@ and for the person submitting the request to succeed. Even if a pull request doe
 not land, the submitters should come away from the experience feeling like their
 effort was not wasted or unappreciated. Every pull request from a new contributor
 is an opportunity to grow the community.
+
+.. _Code_of_Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
 
 .. _file an bug issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=Bug&template=bug_report.yml&title=%5BBug%5D%3A+%3Ctitle%3E
 
