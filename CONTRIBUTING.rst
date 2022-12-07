@@ -212,7 +212,7 @@ not land, the submitters should come away from the experience feeling like their
 effort was not wasted or unappreciated. Every pull request from a new contributor
 is an opportunity to grow the community.
 
-.. _Code_of_Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
+.. _Code of Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
 
 .. _file an bug issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=Bug&template=bug_report.yml&title=%5BBug%5D%3A+%3Ctitle%3E
 
