@@ -21,29 +21,29 @@ namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {
 
 Status EdgesBuilder::appendToArray(
-    DataType::type type, const std::string& property_name,
+    const DataType& type, const std::string& property_name,
     std::shared_ptr<arrow::Array>& array,  // NOLINT
     const std::vector<Edge>& edges) {
-  switch (type) {
-  case DataType::type::BOOL:
-    return tryToAppend<DataType::type::BOOL>(property_name, array, edges);
-  case DataType::type::INT32:
-    return tryToAppend<DataType::type::INT32>(property_name, array, edges);
-  case DataType::type::INT64:
-    return tryToAppend<DataType::type::INT64>(property_name, array, edges);
-  case DataType::type::FLOAT:
-    return tryToAppend<DataType::type::FLOAT>(property_name, array, edges);
-  case DataType::type::DOUBLE:
-    return tryToAppend<DataType::type::DOUBLE>(property_name, array, edges);
-  case DataType::type::STRING:
-    return tryToAppend<DataType::type::STRING>(property_name, array, edges);
+  switch (type.id()) {
+  case Type::BOOL:
+    return tryToAppend<Type::BOOL>(property_name, array, edges);
+  case Type::INT32:
+    return tryToAppend<Type::INT32>(property_name, array, edges);
+  case Type::INT64:
+    return tryToAppend<Type::INT64>(property_name, array, edges);
+  case Type::FLOAT:
+    return tryToAppend<Type::FLOAT>(property_name, array, edges);
+  case Type::DOUBLE:
+    return tryToAppend<Type::DOUBLE>(property_name, array, edges);
+  case Type::STRING:
+    return tryToAppend<Type::STRING>(property_name, array, edges);
   default:
     return Status::TypeError();
   }
   return Status::TypeError();
 }
 
-template <DataType::type type>
+template <Type type>
 Status EdgesBuilder::tryToAppend(
     const std::string& property_name,
     std::shared_ptr<arrow::Array>& array,  // NOLINT
@@ -93,25 +93,24 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::convertToTable(
   std::shared_ptr<arrow::Array> array;
   schema_vector.push_back(
       arrow::field(GeneralParams::kSrcIndexCol,
-                   DataType::DataTypeToArrowDataType(DataType::type::INT64)));
+                   DataType::DataTypeToArrowDataType(DataType(Type::INT64))));
   GAR_RETURN_NOT_OK(tryToAppend(1, array, edges));
   arrays.push_back(array);
   // add dst
   schema_vector.push_back(
       arrow::field(GeneralParams::kDstIndexCol,
-                   DataType::DataTypeToArrowDataType(DataType::type::INT64)));
+                   DataType::DataTypeToArrowDataType(DataType(Type::INT64))));
   GAR_RETURN_NOT_OK(tryToAppend(0, array, edges));
   arrays.push_back(array);
   // add properties
   for (auto& property_group : property_groups) {
     for (auto& property : property_group.GetProperties()) {
       // add a column to schema
-      DataType::type type = property.type;
       schema_vector.push_back(
-          arrow::field(property.name, DataType::DataTypeToArrowDataType(type)));
+          arrow::field(property.name, DataType::DataTypeToArrowDataType(property.type)));
       // add a column to data
       std::shared_ptr<arrow::Array> array;
-      GAR_RETURN_NOT_OK(appendToArray(type, property.name, array, edges));
+      GAR_RETURN_NOT_OK(appendToArray(property.type, property.name, array, edges));
       arrays.push_back(array);
     }
   }
@@ -130,7 +129,7 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::getOffsetTable(
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
   schema_vector.push_back(
       arrow::field(GeneralParams::kOffsetCol,
-                   DataType::DataTypeToArrowDataType(DataType::type::INT64)));
+                   DataType::DataTypeToArrowDataType(DataType(Type::INT64))));
 
   size_t index = 0;
   for (IdType i = begin_index; i < end_index; i++) {

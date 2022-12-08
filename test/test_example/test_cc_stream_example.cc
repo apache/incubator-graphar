@@ -86,7 +86,7 @@ TEST_CASE("test_cc_using_stream_example") {
 
   // extend the original vertex info and write results to gar using writer
   // construct property group
-  GAR_NAMESPACE::Property cc = {"cc", GAR_NAMESPACE::DataType::INT64, false};
+  GAR_NAMESPACE::Property cc = {"cc", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT64), false};
   std::vector<GAR_NAMESPACE::Property> property_vector = {cc};
   GAR_NAMESPACE::PropertyGroup group(property_vector,
                                      GAR_NAMESPACE::FileType::PARQUET);

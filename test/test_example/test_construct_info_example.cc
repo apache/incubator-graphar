@@ -21,7 +21,8 @@ limitations under the License.
 TEST_CASE("test_construct_info_example") {
   /*------------------construct graph info------------------*/
   std::string name = "graph", prefix = "file:///tmp/";
-  GAR_NAMESPACE::GraphInfo graph_info(name, prefix);
+  GAR_NAMESPACE::InfoVersion version(1);
+  GAR_NAMESPACE::GraphInfo graph_info(name, version, prefix);
   // validate
   REQUIRE(graph_info.GetName() == name);
   REQUIRE(graph_info.GetPrefix() == prefix);
@@ -33,7 +34,7 @@ TEST_CASE("test_construct_info_example") {
   /*------------------construct vertex info------------------*/
   std::string vertex_label = "person", vertex_prefix = "vertex/person/";
   int chunk_size = 100;
-  GAR_NAMESPACE::VertexInfo vertex_info(vertex_label, chunk_size,
+  GAR_NAMESPACE::VertexInfo vertex_info(vertex_label, chunk_size, version,
                                         vertex_prefix);
   // validate
   REQUIRE(vertex_info.GetLabel() == vertex_label);
@@ -41,12 +42,12 @@ TEST_CASE("test_construct_info_example") {
   REQUIRE(vertex_info.GetPropertyGroups().size() == 0);
 
   // construct properties and property groups
-  GAR_NAMESPACE::Property id = {"id", GAR_NAMESPACE::DataType::INT32, true};
+  GAR_NAMESPACE::Property id = {"id", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32), true};
   GAR_NAMESPACE::Property firstName = {"firstName",
-                                       GAR_NAMESPACE::DataType::STRING, false};
+                                       GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::STRING), false};
   GAR_NAMESPACE::Property lastName = {"lastName",
-                                      GAR_NAMESPACE::DataType::STRING, false};
-  GAR_NAMESPACE::Property gender = {"gender", GAR_NAMESPACE::DataType::STRING,
+                                      GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::STRING), false};
+  GAR_NAMESPACE::Property gender = {"gender", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::STRING),
                                     false};
   std::vector<GAR_NAMESPACE::Property> property_vector_1 = {id},
                                        property_vector_2 = {firstName, lastName,
@@ -101,7 +102,7 @@ TEST_CASE("test_construct_info_example") {
   bool directed = false;
   GAR_NAMESPACE::EdgeInfo edge_info(src_label, edge_label, dst_label,
                                     edge_chunk_size, src_chunk_size,
-                                    dst_chunk_size, directed, edge_prefix);
+                                    dst_chunk_size, directed, version, edge_prefix);
   REQUIRE(edge_info.GetSrcLabel() == src_label);
   REQUIRE(edge_info.GetEdgeLabel() == edge_label);
   REQUIRE(edge_info.GetDstLabel() == dst_label);
@@ -139,7 +140,7 @@ TEST_CASE("test_construct_info_example") {
 
   // add property group & validate
   GAR_NAMESPACE::Property creationDate = {
-      "creationDate", GAR_NAMESPACE::DataType::STRING, false};
+      "creationDate", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::STRING), false};
   std::vector<GAR_NAMESPACE::Property> property_vector_3 = {creationDate};
   GAR_NAMESPACE::PropertyGroup group3(property_vector_3,
                                       GAR_NAMESPACE::FileType::PARQUET);

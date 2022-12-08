@@ -29,58 +29,80 @@ class DataType;
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-/// \brief The DataType struct to provide enum type for data type and functions
-///   to parse data type.
-struct DataType {
-  /// \brief Main data type enumeration
-  enum type {
+/// \brief Main data type enumeration
+enum class Type {
     /// Boolean as 1 bit, LSB bit-packed ordering
     BOOL = 0,
 
     /// Signed 32-bit little-endian integer
-    INT32 = 1,
+    INT32,
 
     /// Signed 64-bit little-endian integer
-    INT64 = 2,
+    INT64,
 
     /// 4-byte floating point value
-    FLOAT = 3,
+    FLOAT,
 
     /// 8-byte floating point value
-    DOUBLE = 4,
+    DOUBLE,
 
     /// UTF8 variable-length string as List<Char>
-    STRING = 5,
+    STRING,
+
+    /// User-defined data type
+    USER_DEFINED,
 
     // Leave this at the end
-    MAX_ID = 6,
-  };
+    MAX_ID,
+};
+
+/// \brief The DataType struct to provide enum type for data type and functions
+///   to parse data type.
+class DataType {
+ public:
+  DataType() : id_(Type::BOOL) {}
+
+  explicit DataType(Type id, const std::string& user_defined_type_name = "") : id_(id), user_defined_type_name_(user_defined_type_name) {}
+
+  DataType(const DataType& other) : id_(other.id_), user_defined_type_name_(other.user_defined_type_name_) {}
+
+  explicit DataType(DataType&& other) : id_(other.id_), user_defined_type_name_(std::move(other.user_defined_type_name_)) {}
+
+  inline DataType& operator=(const DataType& other) = default;
+
+  bool Equals(const DataType& other) const {
+    return id_ == other.id_ && user_defined_type_name_ == other.user_defined_type_name_;
+  }
+
+  bool operator==(const DataType& other) const { return Equals(other); }
 
   static std::shared_ptr<arrow::DataType> DataTypeToArrowDataType(
-      DataType::type type_id);
+      DataType type_id);
 
-  static DataType::type ArrowDataTypeToDataType(
+  static DataType ArrowDataTypeToDataType(
       std::shared_ptr<arrow::DataType> type);
 
-  static DataType::type StringToDataType(const std::string& str) {
-    static const std::map<std::string, DataType::type> str2type{
-        {"bool", DataType::type::BOOL},     {"int32", DataType::type::INT32},
-        {"int64", DataType::type::INT64},   {"float", DataType::type::FLOAT},
-        {"double", DataType::type::DOUBLE}, {"string", DataType::type::STRING}};
-    try {
-      return str2type.at(str.c_str());
-    } catch (const std::exception& e) {
-      throw std::runtime_error("KeyError: " + str);
+  static DataType TypeNameToDataType(const std::string& str) {
+    static const std::map<std::string, Type> str2type{
+        {"bool", Type::BOOL},     {"int32", Type::INT32},
+        {"int64", Type::INT64},   {"float", Type::FLOAT},
+        {"double", Type::DOUBLE}, {"string", Type::STRING}};
+
+    if (str2type.find(str) == str2type.end()) {
+      return DataType(Type::USER_DEFINED, str);
     }
+    return DataType(str2type.at(str.c_str()));
   }
-  static const char* DataTypeToString(DataType::type type) {
-    static const std::map<DataType::type, const char*> type2str{
-        {DataType::type::BOOL, "bool"},     {DataType::type::INT32, "int32"},
-        {DataType::type::INT64, "int64"},   {DataType::type::FLOAT, "float"},
-        {DataType::type::DOUBLE, "double"}, {DataType::type::STRING, "string"}};
-    return type2str.at(type);
-  }
-};  // struct Type
+
+  /// \brief Return the type category of the DataType.
+  Type id() const { return id_; }
+
+  std::string ToTypeName() const;
+
+ private:
+  Type id_;
+  std::string user_defined_type_name_;
+};  // struct DataType
 }  // namespace GAR_NAMESPACE_INTERNAL
 
 #endif  // GAR_UTILS_DATA_TYPE_H_

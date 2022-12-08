@@ -230,7 +230,7 @@ class VerticesBuilder {
    * @param array The constructed array.
    * @return Status: ok or Status::TypeError error.
    */
-  Status appendToArray(DataType::type type, const std::string& property_name,
+  Status appendToArray(const DataType& type, const std::string& property_name,
                        std::shared_ptr<arrow::Array>& array);  // NOLINT
 
   /**
@@ -241,7 +241,7 @@ class VerticesBuilder {
    * @param array The array to append.
    * @return Status: ok or Status::ArrowError error.
    */
-  template <DataType::type type>
+  template <Type type>
   Status tryToAppend(const std::string& property_name,
                      std::shared_ptr<arrow::Array>& array);  // NOLINT
 

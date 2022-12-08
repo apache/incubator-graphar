@@ -119,7 +119,7 @@ TEST_CASE("test_cc_using_push_example") {
 
   // extend the original vertex info and write results to gar using writer
   // construct property group
-  GAR_NAMESPACE::Property cc = {"cc-push", GAR_NAMESPACE::DataType::INT64,
+  GAR_NAMESPACE::Property cc = {"cc-push", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT64),
                                 false};
   std::vector<GAR_NAMESPACE::Property> property_vector = {cc};
   GAR_NAMESPACE::PropertyGroup group(property_vector,

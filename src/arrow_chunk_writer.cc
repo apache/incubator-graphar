@@ -433,7 +433,7 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::getOffsetTable(
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
   std::string property = GeneralParams::kOffsetCol;
   schema_vector.push_back(arrow::field(
-      property, DataType::DataTypeToArrowDataType(DataType::type::INT64)));
+      property, DataType::DataTypeToArrowDataType(DataType(Type::INT64))));
 
   int64_t global_index = 0;
   for (IdType i = begin_index; i < end_index; i++) {
