@@ -19,6 +19,7 @@ limitations under the License.
 #include <map>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "gar/utils/macros.h"
 
@@ -31,29 +32,29 @@ namespace GAR_NAMESPACE_INTERNAL {
 
 /// \brief Main data type enumeration
 enum class Type {
-    /// Boolean as 1 bit, LSB bit-packed ordering
-    BOOL = 0,
+  /// Boolean as 1 bit, LSB bit-packed ordering
+  BOOL = 0,
 
-    /// Signed 32-bit little-endian integer
-    INT32,
+  /// Signed 32-bit little-endian integer
+  INT32,
 
-    /// Signed 64-bit little-endian integer
-    INT64,
+  /// Signed 64-bit little-endian integer
+  INT64,
 
-    /// 4-byte floating point value
-    FLOAT,
+  /// 4-byte floating point value
+  FLOAT,
 
-    /// 8-byte floating point value
-    DOUBLE,
+  /// 8-byte floating point value
+  DOUBLE,
 
-    /// UTF8 variable-length string as List<Char>
-    STRING,
+  /// UTF8 variable-length string as List<Char>
+  STRING,
 
-    /// User-defined data type
-    USER_DEFINED,
+  /// User-defined data type
+  USER_DEFINED,
 
-    // Leave this at the end
-    MAX_ID,
+  // Leave this at the end
+  MAX_ID,
 };
 
 /// \brief The DataType struct to provide enum type for data type and functions
@@ -62,16 +63,22 @@ class DataType {
  public:
   DataType() : id_(Type::BOOL) {}
 
-  explicit DataType(Type id, const std::string& user_defined_type_name = "") : id_(id), user_defined_type_name_(user_defined_type_name) {}
+  explicit DataType(Type id, const std::string& user_defined_type_name = "")
+      : id_(id), user_defined_type_name_(user_defined_type_name) {}
 
-  DataType(const DataType& other) : id_(other.id_), user_defined_type_name_(other.user_defined_type_name_) {}
+  DataType(const DataType& other)
+      : id_(other.id_),
+        user_defined_type_name_(other.user_defined_type_name_) {}
 
-  explicit DataType(DataType&& other) : id_(other.id_), user_defined_type_name_(std::move(other.user_defined_type_name_)) {}
+  explicit DataType(DataType&& other)
+      : id_(other.id_),
+        user_defined_type_name_(std::move(other.user_defined_type_name_)) {}
 
   inline DataType& operator=(const DataType& other) = default;
 
   bool Equals(const DataType& other) const {
-    return id_ == other.id_ && user_defined_type_name_ == other.user_defined_type_name_;
+    return id_ == other.id_ &&
+           user_defined_type_name_ == other.user_defined_type_name_;
   }
 
   bool operator==(const DataType& other) const { return Equals(other); }

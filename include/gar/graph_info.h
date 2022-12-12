@@ -27,8 +27,8 @@ limitations under the License.
 #include "utils/result.h"
 #include "utils/status.h"
 #include "utils/utils.h"
-#include "utils/yaml.h"
 #include "utils/version_parser.h"
+#include "utils/yaml.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -36,9 +36,9 @@ class Yaml;
 
 /// Property is a struct to store the property information.
 struct Property {
-  std::string name;     // property name
-  DataType type;        // property data type
-  bool is_primary;      // primary key tag
+  std::string name;  // property name
+  DataType type;     // property data type
+  bool is_primary;   // primary key tag
 };
 
 static bool operator==(const Property& lhs, const Property& rhs) {
@@ -125,7 +125,10 @@ class VertexInfo {
   explicit VertexInfo(const std::string& label, IdType chunk_size,
                       const InfoVersion& version,
                       const std::string& prefix = "")
-      : label_(label), chunk_size_(chunk_size), version_(version), prefix_(prefix) {
+      : label_(label),
+        chunk_size_(chunk_size),
+        version_(version),
+        prefix_(prefix) {
     if (prefix_.empty()) {
       prefix_ = label_ + "/";  // default prefix
     }
@@ -322,8 +325,7 @@ class EdgeInfo {
   explicit EdgeInfo(const std::string& src_label, const std::string& edge_label,
                     const std::string& dst_label, IdType chunk_size,
                     IdType src_chunk_size, IdType dst_chunk_size, bool directed,
-                    const InfoVersion& version,
-                    const std::string& prefix = "")
+                    const InfoVersion& version, const std::string& prefix = "")
       : src_label_(src_label),
         edge_label_(edge_label),
         dst_label_(dst_label),
@@ -600,8 +602,7 @@ class EdgeInfo {
   }
 
   /// Get the data type of property
-  Result<DataType> GetPropertyType(const std::string& property) const
-      noexcept {
+  Result<DataType> GetPropertyType(const std::string& property) const noexcept {
     if (p2type_.find(property) == p2type_.end()) {
       return Status::KeyError("The property is not found.");
     }
@@ -720,8 +721,7 @@ class GraphInfo {
    * @param[in] graph_name name of graph
    * @param[in] prefix absolute path prefix to store chunk files of graph.
    */
-  explicit GraphInfo(const std::string& graph_name,
-                     const InfoVersion& version,
+  explicit GraphInfo(const std::string& graph_name, const InfoVersion& version,
                      const std::string& prefix = "./")
       : name_(graph_name), version_(version), prefix_(prefix) {}
 

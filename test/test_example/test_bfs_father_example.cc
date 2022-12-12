@@ -83,9 +83,10 @@ TEST_CASE("test_bfs_with_father_example") {
   // Append the bfs result to the vertex info as a property group
   // and write to file
   // construct property group
-  GAR_NAMESPACE::Property bfs = {"bfs", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32), false};
-  GAR_NAMESPACE::Property father = {"father", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT64),
-                                    false};
+  GAR_NAMESPACE::Property bfs = {
+      "bfs", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32), false};
+  GAR_NAMESPACE::Property father = {
+      "father", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT64), false};
   std::vector<GAR_NAMESPACE::Property> property_vector = {bfs, father};
   GAR_NAMESPACE::PropertyGroup group(property_vector,
                                      GAR_NAMESPACE::FileType::CSV);

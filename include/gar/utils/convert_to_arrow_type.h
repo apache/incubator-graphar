@@ -42,18 +42,14 @@ struct ConvertToArrowType {};
     static const char* type_to_string() { return str; }                        \
   };
 
-CONVERT_TO_ARROW_TYPE(Type::BOOL, bool, arrow::BooleanType,
-                      arrow::BooleanArray, arrow::BooleanBuilder,
-                      arrow::boolean(), "boolean")
-CONVERT_TO_ARROW_TYPE(Type::INT32, int32_t, arrow::Int32Type,
-                      arrow::Int32Array, arrow::Int32Builder, arrow::int32(),
-                      "int32")
-CONVERT_TO_ARROW_TYPE(Type::INT64, int64_t, arrow::Int64Type,
-                      arrow::Int64Array, arrow::Int64Builder, arrow::int64(),
-                      "int64")
-CONVERT_TO_ARROW_TYPE(Type::FLOAT, float, arrow::FloatType,
-                      arrow::FloatArray, arrow::FloatBuilder, arrow::float32(),
-                      "float")
+CONVERT_TO_ARROW_TYPE(Type::BOOL, bool, arrow::BooleanType, arrow::BooleanArray,
+                      arrow::BooleanBuilder, arrow::boolean(), "boolean")
+CONVERT_TO_ARROW_TYPE(Type::INT32, int32_t, arrow::Int32Type, arrow::Int32Array,
+                      arrow::Int32Builder, arrow::int32(), "int32")
+CONVERT_TO_ARROW_TYPE(Type::INT64, int64_t, arrow::Int64Type, arrow::Int64Array,
+                      arrow::Int64Builder, arrow::int64(), "int64")
+CONVERT_TO_ARROW_TYPE(Type::FLOAT, float, arrow::FloatType, arrow::FloatArray,
+                      arrow::FloatBuilder, arrow::float32(), "float")
 CONVERT_TO_ARROW_TYPE(Type::DOUBLE, double, arrow::DoubleType,
                       arrow::DoubleArray, arrow::DoubleBuilder,
                       arrow::float64(), "double")

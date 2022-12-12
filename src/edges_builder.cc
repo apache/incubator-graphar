@@ -106,11 +106,12 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::convertToTable(
   for (auto& property_group : property_groups) {
     for (auto& property : property_group.GetProperties()) {
       // add a column to schema
-      schema_vector.push_back(
-          arrow::field(property.name, DataType::DataTypeToArrowDataType(property.type)));
+      schema_vector.push_back(arrow::field(
+          property.name, DataType::DataTypeToArrowDataType(property.type)));
       // add a column to data
       std::shared_ptr<arrow::Array> array;
-      GAR_RETURN_NOT_OK(appendToArray(property.type, property.name, array, edges));
+      GAR_RETURN_NOT_OK(
+          appendToArray(property.type, property.name, array, edges));
       arrays.push_back(array);
     }
   }

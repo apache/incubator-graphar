@@ -36,8 +36,9 @@ Result<VertexInfo> VertexInfo::Load(std::shared_ptr<Yaml> yaml) {
   }
   InfoVersion version;
   if (yaml->operator[]("version")) {
-    GAR_ASSIGN_OR_RAISE(version,
-                        InfoVersion::Parse(yaml->operator[]("version").as<std::string>()));
+    GAR_ASSIGN_OR_RAISE(
+        version,
+        InfoVersion::Parse(yaml->operator[]("version").as<std::string>()));
   }
   VertexInfo vertex_info(label, chunk_size, version, prefix);
   auto property_groups = yaml->operator[]("property_groups");
@@ -122,8 +123,9 @@ Result<EdgeInfo> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
   }
   InfoVersion version;
   if (yaml->operator[]("version")) {
-    GAR_ASSIGN_OR_RAISE(version,
-                        InfoVersion::Parse(yaml->operator[]("version").as<std::string>()));
+    GAR_ASSIGN_OR_RAISE(
+        version,
+        InfoVersion::Parse(yaml->operator[]("version").as<std::string>()));
   }
 
   EdgeInfo edge_info(src_label, edge_label, dst_label, chunk_size,
@@ -256,8 +258,9 @@ Result<GraphInfo> GraphInfo::Load(const std::string& input,
   }
   InfoVersion version;
   if (graph_meta->operator[]("version")) {
-    GAR_ASSIGN_OR_RAISE(version,
-                        InfoVersion::Parse(graph_meta->operator[]("version").as<std::string>()));
+    GAR_ASSIGN_OR_RAISE(
+        version, InfoVersion::Parse(
+                     graph_meta->operator[]("version").as<std::string>()));
   }
   GraphInfo graph_info(name, version, prefix);
 

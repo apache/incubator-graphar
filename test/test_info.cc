@@ -305,13 +305,13 @@ TEST_CASE("test_graph_info_load_from_file") {
 }
 
 TEST_CASE("test_info_version") {
- std::string version_str1 = "gar/v1";
- std::cout << version_str1 << std::endl;
- GAR_NAMESPACE::InfoVersion::Parse(version_str1);
- std::string version_str2 = "gar/v2";
- std::cout << version_str2 << std::endl;
- GAR_NAMESPACE::InfoVersion::Parse(version_str2);
- std::string version_str3 = "gar/v3 (udd1, udd2)";
- std::cout << version_str3 << std::endl;
- GAR_NAMESPACE::InfoVersion::Parse(version_str3);
+  std::string version_str1 = "gar/v1";
+  std::cout << version_str1 << std::endl;
+  GAR_NAMESPACE::InfoVersion::Parse(version_str1);
+  std::string version_str2 = "gar/v2";
+  std::cout << version_str2 << std::endl;
+  GAR_NAMESPACE::InfoVersion::Parse(version_str2);
+  std::string version_str3 = "gar/v3 (udd1, udd2)";
+  std::cout << version_str3 << std::endl;
+  GAR_NAMESPACE::InfoVersion::Parse(version_str3);
 }

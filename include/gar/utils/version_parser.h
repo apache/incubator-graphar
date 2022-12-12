@@ -17,9 +17,9 @@ limitations under the License.
 #define GAR_UTILS_VERSION_PARSER_H_
 
 #include <map>
+#include <regex>  // NOLINT
 #include <string>
 #include <vector>
-#include <regex>
 
 #include "gar/utils/result.h"
 
@@ -56,7 +56,8 @@ class InfoVersion {
       return true;
     }
     // check if type_str is in user defined types
-    if (std::find(user_define_types_.begin(), user_define_types_.end(), type_str) != user_define_types_.end()) {
+    if (std::find(user_define_types_.begin(), user_define_types_.end(),
+                  type_str) != user_define_types_.end()) {
       return true;
     }
     return false;

@@ -14,7 +14,7 @@ limitations under the License.
 */
 
 #include <iostream>
-#include <regex>
+#include <regex>  // NOLINT
 #include <string>
 
 #include "gar/utils/version_parser.h"
@@ -26,7 +26,7 @@ bool is_whitespace(char ch) {
   return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n';
 }
 
-void trim(std::string& s) {
+void trim(std::string& s) {  // NOLINT
   size_t trim_left = 0;
   for (auto it = s.begin(); it != s.end(); ++it) {
     if (!is_whitespace(*it)) {
@@ -50,7 +50,8 @@ void trim(std::string& s) {
       if (trim_left == 0) {
         s.resize(s.size() - trim_right);
       } else {
-        std::string copy(s.c_str() + trim_left, s.size() - trim_left - trim_right);
+        std::string copy(s.c_str() + trim_left,
+                         s.size() - trim_left - trim_right);
         s.swap(copy);
       }
     }
@@ -70,7 +71,8 @@ int parserVersionImpl(const std::string& version_str) {
   }
 }
 
-std::vector<std::string> parseUserDefineTypesImpl(const std::string& version_str) {
+std::vector<std::string> parseUserDefineTypesImpl(
+    const std::string& version_str) {
   std::smatch match;
   std::vector<std::string> user_define_types;
   const std::regex user_define_types_regex("gar/v\\d+ *\\((.*)\\).*");
@@ -97,7 +99,8 @@ std::vector<std::string> parseUserDefineTypesImpl(const std::string& version_str
   return user_define_types;
 }
 
-Result<InfoVersion> InfoVersion::Parse(const std::string& version_str) noexcept {
+Result<InfoVersion> InfoVersion::Parse(
+    const std::string& version_str) noexcept {
   InfoVersion version;
   try {
     version.version_ = parserVersionImpl(version_str);

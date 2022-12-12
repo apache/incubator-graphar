@@ -64,11 +64,11 @@ DataType DataType::ArrowDataTypeToDataType(
 
 std::string DataType::ToTypeName() const {
   switch (id_) {
-#define TO_STRING_CASE(_id) \
-  case Type::_id: {           \
-    std::string name(GAR_STRINGIFY(_id)); \
+#define TO_STRING_CASE(_id)                                            \
+  case Type::_id: {                                                    \
+    std::string name(GAR_STRINGIFY(_id));                              \
     std::transform(name.begin(), name.end(), name.begin(), ::tolower); \
-    return name; \
+    return name;                                                       \
   }
 
     TO_STRING_CASE(BOOL)
@@ -79,10 +79,10 @@ std::string DataType::ToTypeName() const {
     TO_STRING_CASE(STRING)
 
 #undef TO_STRING_CASE
-    case Type::USER_DEFINED:
-      return user_defined_type_name_;
-    default:
-      return "unknown";
+  case Type::USER_DEFINED:
+    return user_defined_type_name_;
+  default:
+    return "unknown";
   }
 }
 

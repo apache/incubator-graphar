@@ -75,8 +75,8 @@ TEST_CASE("test_bfs_using_stream_example") {
 
   // extend the original vertex info and write results to gar using writer
   // construct property group
-  GAR_NAMESPACE::Property bfs = {"bfs-stream", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32),
-                                 false};
+  GAR_NAMESPACE::Property bfs = {
+      "bfs-stream", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32), false};
   std::vector<GAR_NAMESPACE::Property> property_vector = {bfs};
   GAR_NAMESPACE::PropertyGroup group(property_vector,
                                      GAR_NAMESPACE::FileType::PARQUET);

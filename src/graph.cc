@@ -29,9 +29,8 @@ Status CastToAny(std::shared_ptr<arrow::Array> array,
 
 template <>
 Status CastToAny<Type::STRING>(std::shared_ptr<arrow::Array> array,
-                                         std::any& any) {  // NOLINT
-  using ArrayType =
-      typename ConvertToArrowType<Type::STRING>::ArrayType;
+                               std::any& any) {  // NOLINT
+  using ArrayType = typename ConvertToArrowType<Type::STRING>::ArrayType;
   auto column = std::dynamic_pointer_cast<ArrayType>(array);
   any = column->GetString(0);
   return Status::OK();
