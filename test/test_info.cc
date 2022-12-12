@@ -303,21 +303,21 @@ TEST_CASE("test_info_version") {
   REQUIRE(info_version_2.version() == 1);
   REQUIRE(info_version_2.user_define_types() ==
           std::vector<std::string>({"t1", "t2"}));
-  REQUIRE(info_version_2.ToString() == "gar/v1 (t1, t2)");
-  REQUIRE(info_version.CheckType("t1") == true);
+  REQUIRE(info_version_2.ToString() == "gar/v1 (t1,t2)");
+  REQUIRE(info_version_2.CheckType("t1") == true);
 
   // raise error if version is not 1
   CHECK_THROWS_AS(GAR_NAMESPACE::InfoVersion(2), std::invalid_argument);
 
-  std::string version_str = "gar/v1 (t1, t2)";
+  std::string version_str = "gar/v1 (t1,t2)";
   auto info_version_result = GAR_NAMESPACE::InfoVersion::Parse(version_str);
   REQUIRE(!info_version_result.has_error());
   auto& info_version_3 = info_version_result.value();
   REQUIRE(info_version_3.version() == 1);
   REQUIRE(info_version_3.user_define_types() ==
           std::vector<std::string>({"t1", "t2"}));
-  REQUIRE(info_version_3.ToString() == "gar/v1 (t1, t2)");
-  REQUIRE(info_version.CheckType("t1") == true);
+  REQUIRE(info_version_3.ToString() == version_str);
+  REQUIRE(info_version_3.CheckType("t1") == true);
 }
 
 TEST_CASE("test_graph_info_load_from_file") {
