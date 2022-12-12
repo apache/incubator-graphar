@@ -34,15 +34,28 @@ class InfoVersion {
   /// Default constructor
   InfoVersion() : version_(version2types.rbegin()->first) {}
   /// Constructor with version
-  explicit InfoVersion(int version) : version_(version) {}
+  explicit InfoVersion(int version) : version_(version) {
+    if (version2types.find(version) == version2types.end()) {
+      throw std::invalid_argument("Unsupported version: " +
+                                  std::to_string(version));
+    }
+  }
   /// Copy constructor
   InfoVersion(const InfoVersion& other) = default;
   /// Copy assignment
   inline InfoVersion& operator=(const InfoVersion& other) = default;
 
+  /// Get version
+  int version() const { return version_; }
+
+  /// Get user defined types
+  const std::vector<std::string>& user_define_types() const {
+    return user_define_types_;
+  }
+
   /// Dump version to string
   std::string ToString() const {
-    std::string str = "gar/" + std::to_string(version_);
+    std::string str = "gar/v" + std::to_string(version_);
     if (!user_define_types_.empty()) {
       str += " (";
       for (auto& type : user_define_types_) {

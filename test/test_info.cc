@@ -291,6 +291,35 @@ TEST_CASE("test_edge_info") {
   // TODO(@acezen): test is validated
 }
 
+TEST_CASE("test_info_version") {
+  GAR_NAMESPACE::InfoVersion info_version(1);
+  REQUIRE(info_version.GetVersion() == 1);
+  REQUIRE(info_version.user_define_types() == std::vector<std::string>({}));
+  REQUIRE(info_version.ToString() == "gar/v1");
+  REQUIRE(info_version.CheckType("int32") == true);
+  REQUIRE(info_version.CheckType("date32") == false);
+
+  GAR_NAMESPACE::InfoVersion info_version_2(1, {"t1", "t2"});
+  REQUIRE(info_version_2.GetVersion() == 1);
+  REQUIRE(info_version_2.user_define_types() ==
+          std::vector<std::string>({"t1", "t2"}));
+  REQUIRE(info_version_2.ToString() == "gar/v1 (t1, t2)");
+  REQUIRE(info_version.CheckType("t1") == true);
+
+  // raise error if version is not 1
+  CHECK_THROWS_AS(GAR_NAMESPACE::InfoVersion(2), std::invalid_argument);
+
+  std::string version_str = "gar/v1 (t1, t2)";
+  auto info_version_result = GAR_NAMESPACE::InfoVersion::Parse(version_str);
+  REQUIRE(!info_version_result.has_error());
+  auto& info_version_3 = info_version_result.value();
+  REQUIRE(info_version_3.GetVersion() == 1);
+  REQUIRE(info_version_3.user_define_types() ==
+          std::vector<std::string>({"t1", "t2"}));
+  REQUIRE(info_version_3.ToString() == "gar/v1 (t1, t2)");
+  REQUIRE(info_version.CheckType("t1") == true);
+}
+
 TEST_CASE("test_graph_info_load_from_file") {
   std::string path = TEST_DATA_DIR + "/ldbc_sample/csv/ldbc_sample.graph.yml";
   auto graph_info_result = GAR_NAMESPACE::GraphInfo::Load(path);
@@ -302,16 +331,4 @@ TEST_CASE("test_graph_info_load_from_file") {
   const auto& edge_infos = graph_info.GetAllEdgeInfo();
   REQUIRE(vertex_infos.size() == 1);
   REQUIRE(edge_infos.size() == 1);
-}
-
-TEST_CASE("test_info_version") {
-  std::string version_str1 = "gar/v1";
-  std::cout << version_str1 << std::endl;
-  GAR_NAMESPACE::InfoVersion::Parse(version_str1);
-  std::string version_str2 = "gar/v2";
-  std::cout << version_str2 << std::endl;
-  GAR_NAMESPACE::InfoVersion::Parse(version_str2);
-  std::string version_str3 = "gar/v3 (udd1, udd2)";
-  std::cout << version_str3 << std::endl;
-  GAR_NAMESPACE::InfoVersion::Parse(version_str3);
 }
