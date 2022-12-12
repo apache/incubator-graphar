@@ -41,7 +41,8 @@ class InfoVersion {
     }
   }
   /// Constructor with version and user defined types
-  explicit InfoVersion(int version, const std::vector<std::string>& user_define_types)
+  explicit InfoVersion(int version,
+                       const std::vector<std::string>& user_define_types)
       : version_(version), user_define_types_(user_define_types) {
     if (version2types.find(version) == version2types.end()) {
       throw std::invalid_argument("Unsupported version: " +
