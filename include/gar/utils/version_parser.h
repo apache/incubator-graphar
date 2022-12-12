@@ -28,15 +28,19 @@ namespace GAR_NAMESPACE_INTERNAL {
 /// \brief InfoVersion is a class provide version information of info.
 class InfoVersion {
  public:
-  // inline static const std::regex version_regex{"gar/v\\d+\\"};
-  // inline static const std::regex user_define_types_regex{"\\(.*\\)"};
+  /// \brief Parse version string to InfoVersion.
   static Result<InfoVersion> Parse(const std::string& str) noexcept;
 
+  /// Default constructor
   InfoVersion() : version_(version2types.rbegin()->first) {}
+  /// Constructor with version
   explicit InfoVersion(int version) : version_(version) {}
+  /// Copy constructor
   InfoVersion(const InfoVersion& other) = default;
+  /// Copy assignment
   inline InfoVersion& operator=(const InfoVersion& other) = default;
 
+  /// Dump version to string
   std::string ToString() const {
     std::string str = "gar/" + std::to_string(version_);
     if (!user_define_types_.empty()) {
@@ -49,6 +53,7 @@ class InfoVersion {
     return str;
   }
 
+  /// Check if type is supported by version
   inline bool CheckType(const std::string& type_str) noexcept {
     auto& types = version2types.at(version_);
     // check if type_str is in supported types of version

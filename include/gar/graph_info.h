@@ -120,6 +120,7 @@ class VertexInfo {
    *
    * @param label The label of the vertex.
    * @param chunk_size number of vertex in each vertex chunk.
+   * @param version version of the vertex info.
    * @param prefix prefix of the vertex info.
    */
   explicit VertexInfo(const std::string& label, IdType chunk_size,
@@ -320,6 +321,7 @@ class EdgeInfo {
    * @param src_chunk_size number of source vertices in each vertex chunk
    * @param dst_chunk_size number of destination vertices in each vertex chunk
    * @param directed whether the edge is directed
+   * @param version version of the edge info
    * @param prefix prefix of the edge info
    */
   explicit EdgeInfo(const std::string& src_label, const std::string& edge_label,
@@ -719,6 +721,7 @@ class GraphInfo {
    *      the prefix of graph would be ./ by default.
    *
    * @param[in] graph_name name of graph
+   * @param[in] version version of graph info
    * @param[in] prefix absolute path prefix to store chunk files of graph.
    */
   explicit GraphInfo(const std::string& graph_name, const InfoVersion& version,

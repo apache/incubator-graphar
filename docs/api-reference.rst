@@ -210,3 +210,9 @@ Yaml Parser
 .. doxygenclass:: GraphArchive::Yaml
     :members:
     :undoc-members:
+
+Info Version
+
+.. doxygenclass:: GraphArchive::InfoVersion
+    :members:
+    :undoc-members:
