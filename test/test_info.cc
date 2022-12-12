@@ -293,14 +293,14 @@ TEST_CASE("test_edge_info") {
 
 TEST_CASE("test_info_version") {
   GAR_NAMESPACE::InfoVersion info_version(1);
-  REQUIRE(info_version.GetVersion() == 1);
+  REQUIRE(info_version.version() == 1);
   REQUIRE(info_version.user_define_types() == std::vector<std::string>({}));
   REQUIRE(info_version.ToString() == "gar/v1");
   REQUIRE(info_version.CheckType("int32") == true);
   REQUIRE(info_version.CheckType("date32") == false);
 
   GAR_NAMESPACE::InfoVersion info_version_2(1, {"t1", "t2"});
-  REQUIRE(info_version_2.GetVersion() == 1);
+  REQUIRE(info_version_2.version() == 1);
   REQUIRE(info_version_2.user_define_types() ==
           std::vector<std::string>({"t1", "t2"}));
   REQUIRE(info_version_2.ToString() == "gar/v1 (t1, t2)");
@@ -313,7 +313,7 @@ TEST_CASE("test_info_version") {
   auto info_version_result = GAR_NAMESPACE::InfoVersion::Parse(version_str);
   REQUIRE(!info_version_result.has_error());
   auto& info_version_3 = info_version_result.value();
-  REQUIRE(info_version_3.GetVersion() == 1);
+  REQUIRE(info_version_3.version() == 1);
   REQUIRE(info_version_3.user_define_types() ==
           std::vector<std::string>({"t1", "t2"}));
   REQUIRE(info_version_3.ToString() == "gar/v1 (t1, t2)");
