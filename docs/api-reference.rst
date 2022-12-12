@@ -212,6 +212,7 @@ Yaml Parser
     :undoc-members:
 
 Info Version
+~~~~~~~~~~~~~~~~~~~
 
 .. doxygenclass:: GraphArchive::InfoVersion
     :members:
