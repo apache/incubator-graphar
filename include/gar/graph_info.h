@@ -27,6 +27,7 @@ limitations under the License.
 #include "utils/result.h"
 #include "utils/status.h"
 #include "utils/utils.h"
+#include "utils/version_parser.h"
 #include "utils/yaml.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
@@ -35,13 +36,13 @@ class Yaml;
 
 /// Property is a struct to store the property information.
 struct Property {
-  std::string name;     // property name
-  DataType::type type;  // property data type
-  bool is_primary;      // primary key tag
+  std::string name;  // property name
+  DataType type;     // property data type
+  bool is_primary;   // primary key tag
 };
 
 static bool operator==(const Property& lhs, const Property& rhs) {
-  return (lhs.name == rhs.name) && (lhs.type == rhs.type) &&
+  return (lhs.name == rhs.name) && (lhs.type.Equals(rhs.type)) &&
          (lhs.is_primary == rhs.is_primary);
 }
 
@@ -119,11 +120,16 @@ class VertexInfo {
    *
    * @param label The label of the vertex.
    * @param chunk_size number of vertex in each vertex chunk.
+   * @param version version of the vertex info.
    * @param prefix prefix of the vertex info.
    */
   explicit VertexInfo(const std::string& label, IdType chunk_size,
+                      const InfoVersion& version,
                       const std::string& prefix = "")
-      : label_(label), chunk_size_(chunk_size), prefix_(prefix) {
+      : label_(label),
+        chunk_size_(chunk_size),
+        version_(version),
+        prefix_(prefix) {
     if (prefix_.empty()) {
       prefix_ = label_ + "/";  // default prefix
     }
@@ -157,6 +163,10 @@ class VertexInfo {
 
     property_groups_.push_back(property_group);
     for (const auto& p : property_group.GetProperties()) {
+      if (!version_.CheckType(p.type.ToTypeName())) {
+        return Status::Invalid(
+            "The property type is not supported by the version.");
+      }
       p2type_[p.name] = p.type;
       p2primary_[p.name] = p.is_primary;
       p2group_index_[p.name] = property_groups_.size() - 1;
@@ -173,6 +183,9 @@ class VertexInfo {
   /// Get the path prefix of the vertex.
   inline std::string GetPrefix() const { return prefix_; }
 
+  /// Get the version info of the vertex.
+  inline const InfoVersion& GetVersion() const { return version_; }
+
   /// Get the property groups of the vertex.
   inline const std::vector<PropertyGroup>& GetPropertyGroups() const {
     return property_groups_;
@@ -188,7 +201,7 @@ class VertexInfo {
   }
 
   /// Get the data type of property
-  inline Result<DataType::type> GetPropertyType(
+  inline Result<DataType> GetPropertyType(
       const std::string& property_name) const noexcept {
     if (p2type_.find(property_name) == p2type_.end()) {
       return Status::KeyError("The property is not found.");
@@ -285,9 +298,10 @@ class VertexInfo {
  private:
   std::string label_;
   IdType chunk_size_;
+  InfoVersion version_;
   std::string prefix_;
   std::vector<PropertyGroup> property_groups_;
-  std::map<std::string, DataType::type> p2type_;
+  std::map<std::string, DataType> p2type_;
   std::map<std::string, bool> p2primary_;
   std::map<std::string, size_t> p2group_index_;
 };
@@ -310,12 +324,13 @@ class EdgeInfo {
    * @param src_chunk_size number of source vertices in each vertex chunk
    * @param dst_chunk_size number of destination vertices in each vertex chunk
    * @param directed whether the edge is directed
+   * @param version version of the edge info
    * @param prefix prefix of the edge info
    */
   explicit EdgeInfo(const std::string& src_label, const std::string& edge_label,
                     const std::string& dst_label, IdType chunk_size,
                     IdType src_chunk_size, IdType dst_chunk_size, bool directed,
-                    const std::string& prefix = "")
+                    const InfoVersion& version, const std::string& prefix = "")
       : src_label_(src_label),
         edge_label_(edge_label),
         dst_label_(dst_label),
@@ -323,6 +338,7 @@ class EdgeInfo {
         src_chunk_size_(src_chunk_size),
         dst_chunk_size_(dst_chunk_size),
         directed_(directed),
+        version_(version),
         prefix_(prefix) {
     if (prefix_.empty()) {
       prefix_ = src_label_ + REGULAR_SEPERATOR + edge_label_ +
@@ -391,6 +407,10 @@ class EdgeInfo {
     }
     adj_list2property_groups_[adj_list_type].push_back(property_group);
     for (auto& p : property_group.GetProperties()) {
+      if (!version_.CheckType(p.type.ToTypeName())) {
+        return Status::Invalid(
+            "The property type is not supported by the version.");
+      }
       p2type_[p.name] = p.type;
       p2primary_[p.name] = p.is_primary;
       p2group_index_[p.name][adj_list_type] =
@@ -422,6 +442,9 @@ class EdgeInfo {
 
   /// Check if edge is directed.
   inline bool IsDirected() const noexcept { return directed_; }
+
+  /// Get the version info of the edge.
+  inline const InfoVersion& GetVersion() const { return version_; }
 
   /// Get path prefix of adj list type.
   inline Result<std::string> GetAdjListPrefix(AdjListType adj_list_type) const {
@@ -587,8 +610,7 @@ class EdgeInfo {
   }
 
   /// Get the data type of property
-  Result<DataType::type> GetPropertyType(const std::string& property) const
-      noexcept {
+  Result<DataType> GetPropertyType(const std::string& property) const noexcept {
     if (p2type_.find(property) == p2type_.end()) {
       return Status::KeyError("The property is not found.");
     }
@@ -687,8 +709,9 @@ class EdgeInfo {
   std::string dst_label_;
   IdType chunk_size_, src_chunk_size_, dst_chunk_size_;
   bool directed_;
+  InfoVersion version_;
   std::string prefix_;
-  std::map<std::string, DataType::type> p2type_;
+  std::map<std::string, DataType> p2type_;
   std::map<std::string, bool> p2primary_;
   std::map<std::string, std::map<AdjListType, size_t>> p2group_index_;
   std::map<AdjListType, std::string> adj_list2prefix_;
@@ -704,11 +727,12 @@ class GraphInfo {
    *      the prefix of graph would be ./ by default.
    *
    * @param[in] graph_name name of graph
+   * @param[in] version version of graph info
    * @param[in] prefix absolute path prefix to store chunk files of graph.
    */
-  explicit GraphInfo(const std::string& graph_name,
+  explicit GraphInfo(const std::string& graph_name, const InfoVersion& version,
                      const std::string& prefix = "./")
-      : name_(graph_name), prefix_(prefix) {}
+      : name_(graph_name), version_(version), prefix_(prefix) {}
 
   /**
    * @brief Loads the input file as a GraphInfo instance.
@@ -771,6 +795,9 @@ class GraphInfo {
 
   /// Get the absolute path prefix of chunk files.
   inline std::string GetPrefix() const noexcept { return prefix_; }
+
+  /// Get the version info of the edge.
+  inline const InfoVersion& GetVersion() const { return version_; }
 
   /// Get the vertex info by vertex label
   inline Result<const VertexInfo&> GetVertexInfo(const std::string& label) const
@@ -873,6 +900,7 @@ class GraphInfo {
 
  private:
   std::string name_;
+  InfoVersion version_;
   std::string prefix_;
   std::map<std::string, VertexInfo> vertex2info_;  // label -> info
   std::map<std::string, EdgeInfo>

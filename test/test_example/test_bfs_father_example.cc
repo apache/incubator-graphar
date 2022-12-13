@@ -83,9 +83,10 @@ TEST_CASE("test_bfs_with_father_example") {
   // Append the bfs result to the vertex info as a property group
   // and write to file
   // construct property group
-  GAR_NAMESPACE::Property bfs = {"bfs", GAR_NAMESPACE::DataType::INT32, false};
-  GAR_NAMESPACE::Property father = {"father", GAR_NAMESPACE::DataType::INT64,
-                                    false};
+  GAR_NAMESPACE::Property bfs = {
+      "bfs", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32), false};
+  GAR_NAMESPACE::Property father = {
+      "father", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT64), false};
   std::vector<GAR_NAMESPACE::Property> property_vector = {bfs, father};
   GAR_NAMESPACE::PropertyGroup group(property_vector,
                                      GAR_NAMESPACE::FileType::CSV);
@@ -143,9 +144,10 @@ TEST_CASE("test_bfs_with_father_example") {
   dst_label = "person";
   int edge_chunk_size = 1024, src_chunk_size = 100, dst_chunk_size = 100;
   bool directed = true;
+  GAR_NAMESPACE::InfoVersion version(1);
   GAR_NAMESPACE::EdgeInfo new_edge_info(src_label, edge_label, dst_label,
                                         edge_chunk_size, src_chunk_size,
-                                        dst_chunk_size, directed);
+                                        dst_chunk_size, directed, version);
   REQUIRE(new_edge_info
               .AddAdjList(GAR_NAMESPACE::AdjListType::ordered_by_source,
                           GAR_NAMESPACE::FileType::CSV)

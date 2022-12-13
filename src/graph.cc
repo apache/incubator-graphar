@@ -18,7 +18,7 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-template <DataType::type type>
+template <Type type>
 Status CastToAny(std::shared_ptr<arrow::Array> array,
                  std::any& any) {  // NOLINT
   using ArrayType = typename ConvertToArrowType<type>::ArrayType;
@@ -28,30 +28,29 @@ Status CastToAny(std::shared_ptr<arrow::Array> array,
 }
 
 template <>
-Status CastToAny<DataType::type::STRING>(std::shared_ptr<arrow::Array> array,
-                                         std::any& any) {  // NOLINT
-  using ArrayType =
-      typename ConvertToArrowType<DataType::type::STRING>::ArrayType;
+Status CastToAny<Type::STRING>(std::shared_ptr<arrow::Array> array,
+                               std::any& any) {  // NOLINT
+  using ArrayType = typename ConvertToArrowType<Type::STRING>::ArrayType;
   auto column = std::dynamic_pointer_cast<ArrayType>(array);
   any = column->GetString(0);
   return Status::OK();
 }
 
-Status TryToCastToAny(DataType::type type, std::shared_ptr<arrow::Array> array,
+Status TryToCastToAny(const DataType& type, std::shared_ptr<arrow::Array> array,
                       std::any& any) {  // NOLINT
-  switch (type) {
-  case DataType::type::BOOL:
-    return CastToAny<DataType::type::BOOL>(array, any);
-  case DataType::type::INT32:
-    return CastToAny<DataType::type::INT32>(array, any);
-  case DataType::type::INT64:
-    return CastToAny<DataType::type::INT64>(array, any);
-  case DataType::type::FLOAT:
-    return CastToAny<DataType::type::FLOAT>(array, any);
-  case DataType::type::DOUBLE:
-    return CastToAny<DataType::type::DOUBLE>(array, any);
-  case DataType::type::STRING:
-    return CastToAny<DataType::type::STRING>(array, any);
+  switch (type.id()) {
+  case Type::BOOL:
+    return CastToAny<Type::BOOL>(array, any);
+  case Type::INT32:
+    return CastToAny<Type::INT32>(array, any);
+  case Type::INT64:
+    return CastToAny<Type::INT64>(array, any);
+  case Type::FLOAT:
+    return CastToAny<Type::FLOAT>(array, any);
+  case Type::DOUBLE:
+    return CastToAny<Type::DOUBLE>(array, any);
+  case Type::STRING:
+    return CastToAny<Type::STRING>(array, any);
   default:
     return Status::TypeError();
   }

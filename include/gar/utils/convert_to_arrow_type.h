@@ -27,7 +27,7 @@ limitations under the License.
 namespace GAR_NAMESPACE_INTERNAL {
 
 /// \brief Struct to convert DataType to arrow::DataType.
-template <DataType::type T>
+template <Type T>
 struct ConvertToArrowType {};
 
 #define CONVERT_TO_ARROW_TYPE(type, c_type, arrow_type, array_type,            \
@@ -42,22 +42,18 @@ struct ConvertToArrowType {};
     static const char* type_to_string() { return str; }                        \
   };
 
-CONVERT_TO_ARROW_TYPE(DataType::type::BOOL, bool, arrow::BooleanType,
-                      arrow::BooleanArray, arrow::BooleanBuilder,
-                      arrow::boolean(), "boolean")
-CONVERT_TO_ARROW_TYPE(DataType::type::INT32, int32_t, arrow::Int32Type,
-                      arrow::Int32Array, arrow::Int32Builder, arrow::int32(),
-                      "int32")
-CONVERT_TO_ARROW_TYPE(DataType::type::INT64, int64_t, arrow::Int64Type,
-                      arrow::Int64Array, arrow::Int64Builder, arrow::int64(),
-                      "int64")
-CONVERT_TO_ARROW_TYPE(DataType::type::FLOAT, float, arrow::FloatType,
-                      arrow::FloatArray, arrow::FloatBuilder, arrow::float32(),
-                      "float")
-CONVERT_TO_ARROW_TYPE(DataType::type::DOUBLE, double, arrow::DoubleType,
+CONVERT_TO_ARROW_TYPE(Type::BOOL, bool, arrow::BooleanType, arrow::BooleanArray,
+                      arrow::BooleanBuilder, arrow::boolean(), "boolean")
+CONVERT_TO_ARROW_TYPE(Type::INT32, int32_t, arrow::Int32Type, arrow::Int32Array,
+                      arrow::Int32Builder, arrow::int32(), "int32")
+CONVERT_TO_ARROW_TYPE(Type::INT64, int64_t, arrow::Int64Type, arrow::Int64Array,
+                      arrow::Int64Builder, arrow::int64(), "int64")
+CONVERT_TO_ARROW_TYPE(Type::FLOAT, float, arrow::FloatType, arrow::FloatArray,
+                      arrow::FloatBuilder, arrow::float32(), "float")
+CONVERT_TO_ARROW_TYPE(Type::DOUBLE, double, arrow::DoubleType,
                       arrow::DoubleArray, arrow::DoubleBuilder,
                       arrow::float64(), "double")
-CONVERT_TO_ARROW_TYPE(DataType::type::STRING, std::string, arrow::StringType,
+CONVERT_TO_ARROW_TYPE(Type::STRING, std::string, arrow::StringType,
                       arrow::StringArray, arrow::StringBuilder, arrow::utf8(),
                       "string")
 

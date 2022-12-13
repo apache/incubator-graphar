@@ -21,6 +21,7 @@ limitations under the License.
 #include "./config.h"
 
 #include "gar/graph_info.h"
+#include "gar/utils/version_parser.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -28,13 +29,15 @@ limitations under the License.
 TEST_CASE("test_graph_info") {
   std::string graph_name = "test_graph";
   std::string prefix = "test_prefix";
-  GAR_NAMESPACE::GraphInfo graph_info(graph_name, prefix);
+  GAR_NAMESPACE::InfoVersion version(1);
+  GAR_NAMESPACE::GraphInfo graph_info(graph_name, version, prefix);
   REQUIRE(graph_info.GetName() == graph_name);
   REQUIRE(graph_info.GetPrefix() == prefix);
+  REQUIRE(graph_info.GetVersion() == version);
 
   // test add vertex and get vertex info
   REQUIRE(graph_info.GetAllVertexInfo().size() == 0);
-  GAR_NAMESPACE::VertexInfo vertex_info("test_vertex", 100,
+  GAR_NAMESPACE::VertexInfo vertex_info("test_vertex", 100, version,
                                         "test_vertex_prefix");
   auto st = graph_info.AddVertex(vertex_info);
   REQUIRE(st.ok());
@@ -52,7 +55,7 @@ TEST_CASE("test_graph_info") {
   std::string src_label = "test_vertex", edge_label = "test_edge",
               dst_label = "test_vertex";
   GAR_NAMESPACE::EdgeInfo edge_info(src_label, edge_label, dst_label, 1024, 100,
-                                    100, true);
+                                    100, true, version);
   st = graph_info.AddEdge(edge_info);
   REQUIRE(st.ok());
   REQUIRE(graph_info.GetAllEdgeInfo().size() == 1);
@@ -65,6 +68,8 @@ TEST_CASE("test_graph_info") {
   REQUIRE(graph_info.GetEdgeInfo("xxx", "xxx", "xxx").status().IsKeyError());
   // edge info already exists
   REQUIRE(graph_info.AddEdge(edge_info).IsInvalidOperation());
+
+  REQUIRE(graph_info.GetVersion() == version);
 
   // TODO(@acezen): test dump
 
@@ -80,15 +85,17 @@ TEST_CASE("test_graph_info") {
 TEST_CASE("test_vertex_info") {
   std::string label = "test_vertex";
   int chunk_size = 100;
-  GAR_NAMESPACE::VertexInfo v_info(label, chunk_size);
+  GAR_NAMESPACE::InfoVersion version(1);
+  GAR_NAMESPACE::VertexInfo v_info(label, chunk_size, version);
   REQUIRE(v_info.GetLabel() == label);
   REQUIRE(v_info.GetChunkSize() == chunk_size);
   REQUIRE(v_info.GetPrefix() == label + "/");  // default prefix is label + "/"
+  REQUIRE(v_info.GetVersion() == version);
 
   // test add property group
   GAR_NAMESPACE::Property p;
   p.name = "id";
-  p.type = GAR_NAMESPACE::DataType::INT32;
+  p.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32);
   p.is_primary = true;
   GAR_NAMESPACE::PropertyGroup pg({p}, GAR_NAMESPACE::FileType::CSV);
   REQUIRE(v_info.GetPropertyGroups().size() == 0);
@@ -145,9 +152,10 @@ TEST_CASE("test_edge_info") {
   int src_chunk_size = 100;
   int dst_chunk_size = 100;
   bool directed = true;
+  GAR_NAMESPACE::InfoVersion version(1);
   GAR_NAMESPACE::EdgeInfo edge_info(src_label, edge_label, dst_label,
                                     chunk_size, src_chunk_size, dst_chunk_size,
-                                    directed);
+                                    directed, version);
   REQUIRE(edge_info.GetSrcLabel() == src_label);
   REQUIRE(edge_info.GetEdgeLabel() == edge_label);
   REQUIRE(edge_info.GetDstLabel() == dst_label);
@@ -157,6 +165,7 @@ TEST_CASE("test_edge_info") {
   REQUIRE(edge_info.IsDirected() == directed);
   REQUIRE(edge_info.GetPrefix() ==
           src_label + "_" + edge_label + "_" + dst_label + "/");
+  REQUIRE(edge_info.GetVersion() == version);
 
   auto adj_list_type = GAR_NAMESPACE::AdjListType::ordered_by_source;
   auto adj_list_type_not_exist = GAR_NAMESPACE::AdjListType::ordered_by_dest;
@@ -215,7 +224,7 @@ TEST_CASE("test_edge_info") {
 
   GAR_NAMESPACE::Property p;
   p.name = "creationDate";
-  p.type = GAR_NAMESPACE::DataType::STRING;
+  p.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::STRING);
   p.is_primary = false;
   GAR_NAMESPACE::PropertyGroup pg({p}, file_type);
 
@@ -285,6 +294,35 @@ TEST_CASE("test_edge_info") {
   // TODO(@acezen): test extend
 
   // TODO(@acezen): test is validated
+}
+
+TEST_CASE("test_info_version") {
+  GAR_NAMESPACE::InfoVersion info_version(1);
+  REQUIRE(info_version.version() == 1);
+  REQUIRE(info_version.user_define_types() == std::vector<std::string>({}));
+  REQUIRE(info_version.ToString() == "gar/v1");
+  REQUIRE(info_version.CheckType("int32") == true);
+  REQUIRE(info_version.CheckType("date32") == false);
+
+  GAR_NAMESPACE::InfoVersion info_version_2(1, {"t1", "t2"});
+  REQUIRE(info_version_2.version() == 1);
+  REQUIRE(info_version_2.user_define_types() ==
+          std::vector<std::string>({"t1", "t2"}));
+  REQUIRE(info_version_2.ToString() == "gar/v1 (t1,t2)");
+  REQUIRE(info_version_2.CheckType("t1") == true);
+
+  // raise error if version is not 1
+  CHECK_THROWS_AS(GAR_NAMESPACE::InfoVersion(2), std::invalid_argument);
+
+  std::string version_str = "gar/v1 (t1,t2)";
+  auto info_version_result = GAR_NAMESPACE::InfoVersion::Parse(version_str);
+  REQUIRE(!info_version_result.has_error());
+  auto& info_version_3 = info_version_result.value();
+  REQUIRE(info_version_3.version() == 1);
+  REQUIRE(info_version_3.user_define_types() ==
+          std::vector<std::string>({"t1", "t2"}));
+  REQUIRE(info_version_3.ToString() == version_str);
+  REQUIRE(info_version_3.CheckType("t1") == true);
 }
 
 TEST_CASE("test_graph_info_load_from_file") {

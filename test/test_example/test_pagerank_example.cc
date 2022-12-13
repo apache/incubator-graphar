@@ -85,8 +85,8 @@ TEST_CASE("test_pagerank_example") {
 
   // extend the original vertex info and write results to gar using writer
   // construct property group
-  GAR_NAMESPACE::Property pagerank = {"pagerank",
-                                      GAR_NAMESPACE::DataType::DOUBLE, false};
+  GAR_NAMESPACE::Property pagerank = {
+      "pagerank", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::DOUBLE), false};
   std::vector<GAR_NAMESPACE::Property> property_vector = {pagerank};
   GAR_NAMESPACE::PropertyGroup group(property_vector,
                                      GAR_NAMESPACE::FileType::PARQUET);

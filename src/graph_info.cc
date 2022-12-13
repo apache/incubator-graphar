@@ -34,7 +34,13 @@ Result<VertexInfo> VertexInfo::Load(std::shared_ptr<Yaml> yaml) {
   if (yaml->operator[]("prefix")) {
     prefix = yaml->operator[]("prefix").as<std::string>();
   }
-  VertexInfo vertex_info(label, chunk_size, prefix);
+  InfoVersion version;
+  if (yaml->operator[]("version")) {
+    GAR_ASSIGN_OR_RAISE(
+        version,
+        InfoVersion::Parse(yaml->operator[]("version").as<std::string>()));
+  }
+  VertexInfo vertex_info(label, chunk_size, version, prefix);
   auto property_groups = yaml->operator[]("property_groups");
   if (property_groups) {  // property_groups exist
     for (YAML::const_iterator it = property_groups.begin();
@@ -51,7 +57,7 @@ Result<VertexInfo> VertexInfo::Load(std::shared_ptr<Yaml> yaml) {
            iit != properties.end(); ++iit) {
         Property property;
         property.name = iit->operator[]("name").as<std::string>();
-        property.type = DataType::StringToDataType(
+        property.type = DataType::TypeNameToDataType(
             iit->operator[]("data_type").as<std::string>());
         property.is_primary = iit->operator[]("is_primary").as<bool>();
         property_vec.push_back(property);
@@ -80,13 +86,13 @@ Result<std::string> VertexInfo::Dump() const noexcept {
     for (auto& p : pg.GetProperties()) {
       YAML::Node p_node;
       p_node["name"] = p.name;
-      p_node["data_type"] = DataType::DataTypeToString(p.type);
+      p_node["data_type"] = p.type.ToTypeName();
       p_node["is_primary"] = p.is_primary;
       pg_node["properties"].push_back(p_node);
     }
     node["property_groups"].push_back(pg_node);
   }
-  node["version"] = GAR_VERSION;
+  node["version"] = version_.ToString();
   return YAML::Dump(node);
 }
 
@@ -115,9 +121,15 @@ Result<EdgeInfo> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
   if (yaml->operator[]("prefix")) {
     prefix = yaml->operator[]("prefix").as<std::string>();
   }
+  InfoVersion version;
+  if (yaml->operator[]("version")) {
+    GAR_ASSIGN_OR_RAISE(
+        version,
+        InfoVersion::Parse(yaml->operator[]("version").as<std::string>()));
+  }
 
   EdgeInfo edge_info(src_label, edge_label, dst_label, chunk_size,
-                     src_chunk_size, dst_chunk_size, directed, prefix);
+                     src_chunk_size, dst_chunk_size, directed, version, prefix);
 
   auto adj_lists = yaml->operator[]("adj_lists");
   if (adj_lists) {
@@ -151,7 +163,7 @@ Result<EdgeInfo> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
                p_it != properties.end(); ++p_it) {
             Property property;
             property.name = p_it->operator[]("name").as<std::string>();
-            property.type = DataType::StringToDataType(
+            property.type = DataType::TypeNameToDataType(
                 p_it->operator[]("data_type").as<std::string>());
             property.is_primary = p_it->operator[]("is_primary").as<bool>();
             property_vec.push_back(property);
@@ -196,7 +208,7 @@ Result<std::string> EdgeInfo::Dump() const noexcept {
       for (auto& p : pg.GetProperties()) {
         YAML::Node p_node;
         p_node["name"] = p.name;
-        p_node["data_type"] = DataType::DataTypeToString(p.type);
+        p_node["data_type"] = p.type.ToTypeName();
         p_node["is_primary"] = p.is_primary;
         pg_node["properties"].push_back(p_node);
       }
@@ -204,7 +216,7 @@ Result<std::string> EdgeInfo::Dump() const noexcept {
     }
     node["adj_lists"].push_back(adj_list_node);
   }
-  node["version"] = GAR_VERSION;
+  node["version"] = version_.ToString();
   return YAML::Dump(node);
 }
 
@@ -244,7 +256,13 @@ Result<GraphInfo> GraphInfo::Load(const std::string& input,
   if (graph_meta->operator[]("prefix")) {
     prefix = graph_meta->operator[]("prefix").as<std::string>();
   }
-  GraphInfo graph_info(name, prefix);
+  InfoVersion version;
+  if (graph_meta->operator[]("version")) {
+    GAR_ASSIGN_OR_RAISE(
+        version, InfoVersion::Parse(
+                     graph_meta->operator[]("version").as<std::string>()));
+  }
+  GraphInfo graph_info(name, version, prefix);
 
   std::string no_url_path;
   GAR_ASSIGN_OR_RAISE(auto fs,
@@ -290,7 +308,7 @@ Result<std::string> GraphInfo::Dump() const noexcept {
   for (auto& path : edge_paths_) {
     node["edges"].push_back(path);
   }
-  node["version"] = GAR_VERSION;
+  node["version"] = version_.ToString();
   return YAML::Dump(node);
 }
 

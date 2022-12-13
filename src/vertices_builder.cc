@@ -20,28 +20,28 @@ namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {
 
 Status VerticesBuilder::appendToArray(
-    DataType::type type, const std::string& property_name,
+    const DataType& type, const std::string& property_name,
     std::shared_ptr<arrow::Array>& array) {  // NOLINT
-  switch (type) {
-  case DataType::type::BOOL:
-    return tryToAppend<DataType::type::BOOL>(property_name, array);
-  case DataType::type::INT32:
-    return tryToAppend<DataType::type::INT32>(property_name, array);
-  case DataType::type::INT64:
-    return tryToAppend<DataType::type::INT64>(property_name, array);
-  case DataType::type::FLOAT:
-    return tryToAppend<DataType::type::FLOAT>(property_name, array);
-  case DataType::type::DOUBLE:
-    return tryToAppend<DataType::type::DOUBLE>(property_name, array);
-  case DataType::type::STRING:
-    return tryToAppend<DataType::type::STRING>(property_name, array);
+  switch (type.id()) {
+  case Type::BOOL:
+    return tryToAppend<Type::BOOL>(property_name, array);
+  case Type::INT32:
+    return tryToAppend<Type::INT32>(property_name, array);
+  case Type::INT64:
+    return tryToAppend<Type::INT64>(property_name, array);
+  case Type::FLOAT:
+    return tryToAppend<Type::FLOAT>(property_name, array);
+  case Type::DOUBLE:
+    return tryToAppend<Type::DOUBLE>(property_name, array);
+  case Type::STRING:
+    return tryToAppend<Type::STRING>(property_name, array);
   default:
     return Status::TypeError();
   }
   return Status::TypeError();
 }
 
-template <DataType::type type>
+template <Type type>
 Status VerticesBuilder::tryToAppend(
     const std::string& property_name,
     std::shared_ptr<arrow::Array>& array) {  // NOLINT
@@ -71,12 +71,11 @@ Result<std::shared_ptr<arrow::Table>> VerticesBuilder::convertToTable() {
   for (auto& property_group : property_groups) {
     for (auto& property : property_group.GetProperties()) {
       // add a column to schema
-      DataType::type type = property.type;
-      schema_vector.push_back(
-          arrow::field(property.name, DataType::DataTypeToArrowDataType(type)));
+      schema_vector.push_back(arrow::field(
+          property.name, DataType::DataTypeToArrowDataType(property.type)));
       // add a column to data
       std::shared_ptr<arrow::Array> array;
-      appendToArray(type, property.name, array);
+      appendToArray(property.type, property.name, array);
       arrays.push_back(array);
     }
   }

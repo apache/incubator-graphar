@@ -106,14 +106,17 @@ TEST_CASE("test_bgl_cc_example") {
 
   // method 1 for writing results: construct new vertex type and write results
   // using vertex builder construct new property group
-  GAR_NAMESPACE::Property cc = {"cc", GAR_NAMESPACE::DataType::INT32, false};
+  GAR_NAMESPACE::Property cc = {
+      "cc", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32), false};
   std::vector<GAR_NAMESPACE::Property> property_vector = {cc};
   GAR_NAMESPACE::PropertyGroup group(property_vector,
                                      GAR_NAMESPACE::FileType::PARQUET);
   // construct new vertex info
   std::string vertex_label = "cc_result", vertex_prefix = "result/";
   int chunk_size = 100;
-  GAR_NAMESPACE::VertexInfo new_info(vertex_label, chunk_size, vertex_prefix);
+  GAR_NAMESPACE::InfoVersion version(1);
+  GAR_NAMESPACE::VertexInfo new_info(vertex_label, chunk_size, version,
+                                     vertex_prefix);
   REQUIRE(new_info.AddPropertyGroup(group).ok());
   // dump new vertex info
   REQUIRE(new_info.IsValidated());

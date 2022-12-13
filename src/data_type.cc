@@ -23,42 +23,66 @@ limitations under the License.
 namespace GAR_NAMESPACE_INTERNAL {
 
 std::shared_ptr<arrow::DataType> DataType::DataTypeToArrowDataType(
-    DataType::type type_id) {
-  switch (type_id) {
-  case DataType::type::BOOL:
+    DataType type) {
+  switch (type.id()) {
+  case Type::BOOL:
     return arrow::boolean();
-  case DataType::type::INT32:
+  case Type::INT32:
     return arrow::int32();
-  case DataType::type::INT64:
+  case Type::INT64:
     return arrow::int64();
-  case DataType::type::FLOAT:
+  case Type::FLOAT:
     return arrow::float32();
-  case DataType::type::DOUBLE:
+  case Type::DOUBLE:
     return arrow::float64();
-  case DataType::type::STRING:
+  case Type::STRING:
     return arrow::utf8();
   default:
     throw std::runtime_error("Unsupported data type");
   }
 }
 
-DataType::type DataType::ArrowDataTypeToDataType(
+DataType DataType::ArrowDataTypeToDataType(
     std::shared_ptr<arrow::DataType> type) {
   switch (type->id()) {
   case arrow::Type::BOOL:
-    return DataType::type::BOOL;
+    return DataType(Type::BOOL);
   case arrow::Type::INT32:
-    return DataType::type::INT32;
+    return DataType(Type::INT32);
   case arrow::Type::INT64:
-    return DataType::type::INT64;
+    return DataType(Type::INT64);
   case arrow::Type::FLOAT:
-    return DataType::type::FLOAT;
+    return DataType(Type::FLOAT);
   case arrow::Type::DOUBLE:
-    return DataType::type::DOUBLE;
+    return DataType(Type::DOUBLE);
   case arrow::Type::STRING:
-    return DataType::type::STRING;
+    return DataType(Type::STRING);
   default:
     throw std::runtime_error("Unsupported data type");
+  }
+}
+
+std::string DataType::ToTypeName() const {
+  switch (id_) {
+#define TO_STRING_CASE(_id)                                            \
+  case Type::_id: {                                                    \
+    std::string name(GAR_STRINGIFY(_id));                              \
+    std::transform(name.begin(), name.end(), name.begin(), ::tolower); \
+    return name;                                                       \
+  }
+
+    TO_STRING_CASE(BOOL)
+    TO_STRING_CASE(INT32)
+    TO_STRING_CASE(INT64)
+    TO_STRING_CASE(FLOAT)
+    TO_STRING_CASE(DOUBLE)
+    TO_STRING_CASE(STRING)
+
+#undef TO_STRING_CASE
+  case Type::USER_DEFINED:
+    return user_defined_type_name_;
+  default:
+    return "unknown";
   }
 }
 

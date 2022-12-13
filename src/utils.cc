@@ -86,5 +86,4 @@ std::string ValueGetter<std::string>::Value(const void* data, int64_t offset) {
 }
 
 }  // namespace util
-
 }  // namespace GAR_NAMESPACE_INTERNAL

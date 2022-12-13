@@ -25,7 +25,6 @@ limitations under the License.
 #include "gar/utils/result.h"
 
 #define REGULAR_SEPERATOR "_"
-#define GAR_VERSION 1
 
 namespace arrow {
 class Array;
