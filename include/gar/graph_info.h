@@ -183,6 +183,9 @@ class VertexInfo {
   /// Get the path prefix of the vertex.
   inline std::string GetPrefix() const { return prefix_; }
 
+  /// Get the version info of the vertex.
+  inline const InfoVersion& GetVersion() const { return version_; }
+
   /// Get the property groups of the vertex.
   inline const std::vector<PropertyGroup>& GetPropertyGroups() const {
     return property_groups_;
@@ -439,6 +442,9 @@ class EdgeInfo {
 
   /// Check if edge is directed.
   inline bool IsDirected() const noexcept { return directed_; }
+
+  /// Get the version info of the edge.
+  inline const InfoVersion& GetVersion() const { return version_; }
 
   /// Get path prefix of adj list type.
   inline Result<std::string> GetAdjListPrefix(AdjListType adj_list_type) const {
@@ -789,6 +795,9 @@ class GraphInfo {
 
   /// Get the absolute path prefix of chunk files.
   inline std::string GetPrefix() const noexcept { return prefix_; }
+
+  /// Get the version info of the edge.
+  inline const InfoVersion& GetVersion() const { return version_; }
 
   /// Get the vertex info by vertex label
   inline Result<const VertexInfo&> GetVertexInfo(const std::string& label) const

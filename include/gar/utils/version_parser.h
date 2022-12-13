@@ -54,6 +54,12 @@ class InfoVersion {
   /// Copy assignment
   inline InfoVersion& operator=(const InfoVersion& other) = default;
 
+  /// Check if two InfoVersion are equal
+  bool operator==(const InfoVersion& other) const {
+    return version_ == other.version_ &&
+           user_define_types_ == other.user_define_types_;
+  }
+
   /// Get version
   int version() const { return version_; }
 

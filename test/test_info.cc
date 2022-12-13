@@ -33,6 +33,7 @@ TEST_CASE("test_graph_info") {
   GAR_NAMESPACE::GraphInfo graph_info(graph_name, version, prefix);
   REQUIRE(graph_info.GetName() == graph_name);
   REQUIRE(graph_info.GetPrefix() == prefix);
+  REQUIRE(graph_info.GetVersion() == version);
 
   // test add vertex and get vertex info
   REQUIRE(graph_info.GetAllVertexInfo().size() == 0);
@@ -68,6 +69,8 @@ TEST_CASE("test_graph_info") {
   // edge info already exists
   REQUIRE(graph_info.AddEdge(edge_info).IsInvalidOperation());
 
+  REQUIRE(graph_info.GetVersion() == version);
+
   // TODO(@acezen): test dump
 
   std::string save_path(std::tmpnam(nullptr));
@@ -87,6 +90,7 @@ TEST_CASE("test_vertex_info") {
   REQUIRE(v_info.GetLabel() == label);
   REQUIRE(v_info.GetChunkSize() == chunk_size);
   REQUIRE(v_info.GetPrefix() == label + "/");  // default prefix is label + "/"
+  REQUIRE(v_info.GetVersion() == version);
 
   // test add property group
   GAR_NAMESPACE::Property p;
@@ -161,6 +165,7 @@ TEST_CASE("test_edge_info") {
   REQUIRE(edge_info.IsDirected() == directed);
   REQUIRE(edge_info.GetPrefix() ==
           src_label + "_" + edge_label + "_" + dst_label + "/");
+  REQUIRE(edge_info.GetVersion() == version);
 
   auto adj_list_type = GAR_NAMESPACE::AdjListType::ordered_by_source;
   auto adj_list_type_not_exist = GAR_NAMESPACE::AdjListType::ordered_by_dest;
