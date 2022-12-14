@@ -32,3 +32,10 @@ jobs:
         pushd spark
         mvn clean package
         popd
+
+    - name: Run test
+      run: |
+        export JAVA_HOME=${JAVA_HOME_11_X64}
+        pushd spark
+        mvn test
+        popd
