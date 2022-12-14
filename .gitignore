@@ -3,6 +3,7 @@ spark/generator/target/
 .vscode
 .idea
 .DS_store
+.DS_Store
 .cache
 
 # docs
