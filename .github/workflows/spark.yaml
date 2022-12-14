@@ -28,7 +28,7 @@ jobs:
 
     - name: Build GraphAr Spark
       run: |
-        export JAVA_HOME=${JAVA_HOME_11_X64
+        export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
         mvn clean package
         popd
