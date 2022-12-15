@@ -1,4 +1,5 @@
 name: ldbc_sample
+prefix: ./
 vertices:
   - person.vertex.yml
 edges:
