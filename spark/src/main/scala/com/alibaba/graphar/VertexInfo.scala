@@ -12,8 +12,6 @@ class VertexInfo() {
   @BeanProperty var property_groups = new java.util.ArrayList[PropertyGroup]()
   @BeanProperty var version: String = ""
 
-  val REGULAR_SEPERATOR = "_"
-
   def containPropertyGroup(property_group: PropertyGroup): Boolean = {
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
@@ -128,7 +126,7 @@ class VertexInfo() {
       val num = properties.size
       for ( j <- 0 to num - 1 ) {
         if (j > 0)
-          str += REGULAR_SEPERATOR
+          str += GeneralParams.regularSeperator
         str += properties.get(j).getName;
       }
     } else {

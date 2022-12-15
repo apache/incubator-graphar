@@ -17,8 +17,6 @@ class EdgeInfo() {
   @BeanProperty var adj_lists = new java.util.ArrayList[AdjList]()
   @BeanProperty var version: String = ""
 
-  val REGULAR_SEPERATOR = "_"
-
   def containAdjList(adj_list_type: AdjListType.Value): Boolean = {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
@@ -232,7 +230,7 @@ class EdgeInfo() {
       val num = properties.size
       for ( j <- 0 to num - 1 ) {
         if (j > 0)
-          str += REGULAR_SEPERATOR
+          str += GeneralParams.regularSeperator
         str += properties.get(j).getName;
       }
       str +=  "/"

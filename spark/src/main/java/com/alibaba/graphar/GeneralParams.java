@@ -9,5 +9,6 @@ public class GeneralParams {
     public static final String primaryCol = "_graphArPrimary";
     public static final String vertexChunkIndexCol = "_graphArVertexChunkIndex";
     public static final String edgeIndexCol = "_graphArEdgeIndex";
+    public static final String regularSeperator = "_";
 }
 
