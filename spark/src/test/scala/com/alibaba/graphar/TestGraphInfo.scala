@@ -9,12 +9,12 @@ import org.scalatest.funsuite.AnyFunSuite
 class GraphInfoSuite extends AnyFunSuite {
 
   test("load graph info") {
-    val input = getClass.getClassLoader.getResourceAsStream("ldbc_sample.graph.yml")
+    val input = getClass.getClassLoader.getResourceAsStream("gar-test/ldbc_sample/csv/ldbc_sample.graph.yml")
     val yaml = new Yaml(new Constructor(classOf[GraphInfo]))
     val graph_info = yaml.load(input).asInstanceOf[GraphInfo]
 
     assert(graph_info.getName == "ldbc_sample")
-    assert(graph_info.getPrefix == "./" )
+    assert(graph_info.getPrefix == "" )
     assert(graph_info.getVertices.size() == 1)
     val vertices = new java.util.ArrayList[String]
     vertices.add("person.vertex.yml")
@@ -27,7 +27,7 @@ class GraphInfoSuite extends AnyFunSuite {
   }
 
   test("load vertex info") {
-    val input = getClass.getClassLoader.getResourceAsStream("person.vertex.yml")
+    val input = getClass.getClassLoader.getResourceAsStream("gar-test/ldbc_sample/csv/person.vertex.yml")
     val yaml = new Yaml(new Constructor(classOf[VertexInfo]))
     val vertex_info = yaml.load(input).asInstanceOf[VertexInfo]
 
@@ -72,7 +72,7 @@ class GraphInfoSuite extends AnyFunSuite {
   }
 
   test("load edge info") {
-    val input = getClass.getClassLoader.getResourceAsStream("person_knows_person.edge.yml")
+    val input = getClass.getClassLoader.getResourceAsStream("gar-test/ldbc_sample/csv/person_knows_person.edge.yml")
     val yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
     val edge_info = yaml.load(input).asInstanceOf[EdgeInfo]
 
