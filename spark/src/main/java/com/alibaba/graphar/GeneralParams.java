@@ -1,4 +1,4 @@
-package org.alibaba.graphar;
+package com.alibaba.graphar;
 
 public class GeneralParams {
     // column name

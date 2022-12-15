@@ -1,4 +1,4 @@
-package org.alibaba.graphar
+package com.alibaba.graphar
 
 import java.io.{File, FileInputStream}
 import org.yaml.snakeyaml.Yaml
