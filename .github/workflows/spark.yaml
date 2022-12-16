@@ -1,0 +1,41 @@
+name: GraphAr Spark CI
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+    paths:
+      - 'spark/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'spark/**'
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  GraphAr-spark:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+          submodules: true
+
+    - name: Build GraphAr Spark
+      run: |
+        export JAVA_HOME=${JAVA_HOME_11_X64}
+        pushd spark
+        mvn clean package
+        popd
+
+    - name: Run test
+      run: |
+        export JAVA_HOME=${JAVA_HOME_11_X64}
+        pushd spark
+        mvn test
+        popd
