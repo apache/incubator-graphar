@@ -227,6 +227,12 @@ class EdgeInfo() {
     return str
   }
 
+  def getAdjListFilePath(vertex_chunk_index: Long, adj_list_type: AdjListType.Value) : String = {
+    var str: String = prefix + getAdjListPrefix(adj_list_type) + "adj_list/part" +
+      vertex_chunk_index.toString() + "/"
+    return str
+  }
+
   def getAdjListDirPath(adj_list_type: AdjListType.Value) : String = {
     return prefix + getAdjListPrefix(adj_list_type) + "adj_list/"
   }
