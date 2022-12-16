@@ -129,9 +129,28 @@ class VertexInfo() {
           str += GeneralParams.regularSeperator
         str += properties.get(j).getName;
       }
+      str += "/"
     } else {
       str = property_group.getPrefix
     }
     return prefix + str + "part" + chunk_index.toString() + "/chunk0"
+  }
+
+  def getDirPath(property_group: PropertyGroup): String = {
+    if (containPropertyGroup(property_group) == false)
+      throw new IllegalArgumentException
+    var str: String = ""
+    if (property_group.getPrefix == "") {
+      val properties = property_group.getProperties
+      val num = properties.size
+      for ( j <- 0 to num - 1 ) {
+        if (j > 0)
+          str += GeneralParams.regularSeperator
+        str += properties.get(j).getName;
+      }
+    } else {
+      str = property_group.getPrefix
+    }
+    return prefix + str;
   }
 }

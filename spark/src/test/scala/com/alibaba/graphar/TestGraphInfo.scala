@@ -53,6 +53,7 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(vertex_info.isPrimaryKey("id"))
     assert(vertex_info.getFilePath(property_group, 0) == "vertex/person/id/part0/chunk0")
     assert(vertex_info.getFilePath(property_group, 4) == "vertex/person/id/part4/chunk0")
+    assert(vertex_info.getDirPath(property_group) == "vertex/person/id/")
 
     assert(vertex_info.containProperty("firstName"))
     val property_group_2 = vertex_info.getPropertyGroup("firstName")
@@ -64,6 +65,7 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(vertex_info.isPrimaryKey("firstName") == false)
     assert(vertex_info.getFilePath(property_group_2, 0) == "vertex/person/firstName_lastName_gender/part0/chunk0")
     assert(vertex_info.getFilePath(property_group_2, 4) == "vertex/person/firstName_lastName_gender/part4/chunk0")
+    assert(vertex_info.getDirPath(property_group_2) == "vertex/person/firstName_lastName_gender/")
 
     assert(vertex_info.containProperty("not_exist") == false)
     assertThrows[IllegalArgumentException](vertex_info.getPropertyGroup("not_exist"))
@@ -95,8 +97,10 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(edge_info.getPropertyGroups(AdjListType.ordered_by_source).size == 1)
     assert(edge_info.getAdjListFilePath(0, 0, AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0")
     assert(edge_info.getAdjListFilePath(1, 2, AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/adj_list/part1/chunk2")
+    assert(edge_info.getAdjListDirPath(AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/adj_list/")
     assert(edge_info.getAdjListOffsetFilePath(0, AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/offset/part0/chunk0")
     assert(edge_info.getAdjListOffsetFilePath(4, AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/offset/part4/chunk0")
+    assert(edge_info.getAdjListOffsetDirPath(AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/offset/")
     val property_group = edge_info.getPropertyGroups(AdjListType.ordered_by_source).get(0)
     assert(edge_info.containPropertyGroup(property_group, AdjListType.ordered_by_source))
     val property = property_group.getProperties.get(0)
@@ -107,6 +111,7 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(edge_info.isPrimaryKey(property_name) == property.getIs_primary)
     assert(edge_info.getPropertyFilePath(property_group, AdjListType.ordered_by_source, 0, 0) == "edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0")
     assert(edge_info.getPropertyFilePath(property_group, AdjListType.ordered_by_source, 1, 2) == "edge/person_knows_person/ordered_by_source/creationDate/part1/chunk2")
+    assert(edge_info.getPropertyDirPath(property_group, AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/creationDate/")
 
     assert(edge_info.containAdjList(AdjListType.ordered_by_dest))
     assert(edge_info.getAdjListPrefix(AdjListType.ordered_by_dest) == "ordered_by_dest/")
@@ -114,8 +119,10 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(edge_info.getPropertyGroups(AdjListType.ordered_by_dest).size == 1)
     assert(edge_info.getAdjListFilePath(0, 0, AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/adj_list/part0/chunk0")
     assert(edge_info.getAdjListFilePath(1, 2, AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/adj_list/part1/chunk2")
+    assert(edge_info.getAdjListDirPath(AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/adj_list/")
     assert(edge_info.getAdjListOffsetFilePath(0, AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/offset/part0/chunk0")
     assert(edge_info.getAdjListOffsetFilePath(4, AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/offset/part4/chunk0")
+    assert(edge_info.getAdjListOffsetDirPath(AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/offset/")
     val property_group_2 = edge_info.getPropertyGroups(AdjListType.ordered_by_dest).get(0)
     assert(edge_info.containPropertyGroup(property_group_2, AdjListType.ordered_by_dest))
     val property_2 = property_group_2.getProperties.get(0)
@@ -126,6 +133,7 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(edge_info.isPrimaryKey(property_name_2) == property_2.getIs_primary)
     assert(edge_info.getPropertyFilePath(property_group_2, AdjListType.ordered_by_dest, 0, 0) == "edge/person_knows_person/ordered_by_dest/creationDate/part0/chunk0")
     assert(edge_info.getPropertyFilePath(property_group_2, AdjListType.ordered_by_dest, 1, 2) == "edge/person_knows_person/ordered_by_dest/creationDate/part1/chunk2")
+    assert(edge_info.getPropertyDirPath(property_group_2, AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/creationDate/")
 
     assert(edge_info.containAdjList(AdjListType.unordered_by_source) == false)
     assertThrows[IllegalArgumentException](edge_info.getAdjListPrefix(AdjListType.unordered_by_source))
