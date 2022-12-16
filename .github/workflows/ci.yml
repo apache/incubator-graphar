@@ -12,6 +12,7 @@ on:
       - '**.rst'
       - 'docs/**'
       - 'misc/**'
+      - 'spark/**'
   pull_request:
     branches:
       - main
@@ -21,6 +22,7 @@ on:
       - '**.rst'
       - 'docs/**'
       - 'misc/**'
+      - 'spark/**'
 
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
