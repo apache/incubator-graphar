@@ -6,26 +6,25 @@ You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
+Unless assertd by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
 #include <iostream>
+#include <unordered_set>
 
 #include "arrow/api.h"
 
-#include "../config.h"
+#include "config.h"
 #include "gar/graph.h"
 #include "gar/graph_info.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
 
-TEST_CASE("test_bfs_using_push_example") {
+int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
@@ -33,10 +32,10 @@ TEST_CASE("test_bfs_using_push_example") {
 
   // construct vertices collection
   std::string label = "person";
-  REQUIRE(graph_info.GetVertexInfo(label).status().ok());
+  assert(graph_info.GetVertexInfo(label).status().ok());
   auto maybe_vertices =
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
-  REQUIRE(maybe_vertices.status().ok());
+  assert(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
   int num_vertices = vertices.size();
   std::cout << "num_vertices: " << num_vertices << std::endl;
@@ -46,74 +45,75 @@ TEST_CASE("test_bfs_using_push_example") {
   auto maybe_edges = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
-  REQUIRE(!maybe_edges.has_error());
+  assert(!maybe_edges.has_error());
   auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_source>>(maybe_edges.value());
 
-  // run bfs algorithm
-  GAR_NAMESPACE::IdType root = 0;
-  std::vector<int32_t> distance(num_vertices);
+  // run cc algorithm
+  std::vector<GAR_NAMESPACE::IdType> component(num_vertices);
   for (GAR_NAMESPACE::IdType i = 0; i < num_vertices; i++)
-    distance[i] = (i == root ? 0 : -1);
+    component[i] = i;
   auto it_begin = edges.begin(), it_end = edges.end();
-  auto it = it_begin;
   for (int iter = 0;; iter++) {
-    GAR_NAMESPACE::IdType count = 0;
-    it.to_begin();
-    for (GAR_NAMESPACE::IdType vid = 0; vid < num_vertices; vid++) {
-      if (distance[vid] == iter) {
-        if (!it.first_src(it, vid))
-          continue;
-        // if (!it.first_src(it_begin, vid)) continue;
-        do {
-          GAR_NAMESPACE::IdType src = it.source(), dst = it.destination();
-          if (distance[dst] == -1) {
-            distance[dst] = distance[src] + 1;
-            count++;
-          }
-        } while (it.next_src());
+    std::cout << "iter " << iter << std::endl;
+    bool flag = false;
+    for (auto it = it_begin; it != it_end; ++it) {
+      GAR_NAMESPACE::IdType src = it.source(), dst = it.destination();
+      if (component[src] < component[dst]) {
+        component[dst] = component[src];
+        flag = true;
+      } else if (component[src] > component[dst]) {
+        component[src] = component[dst];
+        flag = true;
       }
     }
-    std::cout << "iter " << iter << ": " << count << " vertices." << std::endl;
-    if (count == 0)
+    if (!flag)
       break;
   }
+  // count the number of connected components
+  std::unordered_set<GAR_NAMESPACE::IdType> cc_count;
+  GAR_NAMESPACE::IdType cc_num = 0;
   for (int i = 0; i < num_vertices; i++) {
-    std::cout << i << ", distance: " << distance[i] << std::endl;
+    std::cout << i << ", component id: " << component[i] << std::endl;
+    if (cc_count.find(component[i]) == cc_count.end()) {
+      cc_count.insert(component[i]);
+      ++cc_num;
+    }
   }
+  std::cout << "Total number of components: " << cc_num << std::endl;
 
   // extend the original vertex info and write results to gar using writer
   // construct property group
-  GAR_NAMESPACE::Property bfs = {
-      "bfs-push", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32), false};
-  std::vector<GAR_NAMESPACE::Property> property_vector = {bfs};
+  GAR_NAMESPACE::Property cc = {
+      "cc", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT64), false};
+  std::vector<GAR_NAMESPACE::Property> property_vector = {cc};
   GAR_NAMESPACE::PropertyGroup group(property_vector,
                                      GAR_NAMESPACE::FileType::PARQUET);
   // extend the vertex_info
   auto maybe_vertex_info = graph_info.GetVertexInfo(label);
-  REQUIRE(maybe_vertex_info.status().ok());
+  assert(maybe_vertex_info.status().ok());
   auto vertex_info = maybe_vertex_info.value();
   auto maybe_extend_info = vertex_info.Extend(group);
-  REQUIRE(maybe_extend_info.status().ok());
+  assert(maybe_extend_info.status().ok());
   auto extend_info = maybe_extend_info.value();
   // dump the extened vertex info
-  REQUIRE(extend_info.IsValidated());
-  REQUIRE(extend_info.Dump().status().ok());
-  REQUIRE(extend_info.Save("/tmp/person-new-bfs-push.vertex.yml").ok());
+  assert(extend_info.IsValidated());
+  assert(extend_info.Dump().status().ok());
+  assert(extend_info.Save("/tmp/person-new.vertex.yml").ok());
   // construct vertex property writer
   GAR_NAMESPACE::VertexPropertyWriter writer(extend_info, "/tmp/");
   // convert results to arrow::Table
   std::vector<std::shared_ptr<arrow::Array>> arrays;
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
   schema_vector.push_back(arrow::field(
-      bfs.name, GAR_NAMESPACE::DataType::DataTypeToArrowDataType(bfs.type)));
-  arrow::Int32Builder array_builder;
-  REQUIRE(array_builder.Reserve(num_vertices).ok());
-  REQUIRE(array_builder.AppendValues(distance).ok());
+      cc.name, GAR_NAMESPACE::DataType::DataTypeToArrowDataType(cc.type)));
+  arrow::Int64Builder array_builder;
+  assert(array_builder.Reserve(num_vertices).ok());
+  assert(array_builder.AppendValues(component).ok());
   std::shared_ptr<arrow::Array> array = array_builder.Finish().ValueOrDie();
   arrays.push_back(array);
   auto schema = std::make_shared<arrow::Schema>(schema_vector);
   std::shared_ptr<arrow::Table> table = arrow::Table::Make(schema, arrays);
   // dump the results through writer
-  REQUIRE(writer.WriteTable(table, group, 0).ok());
+  assert(writer.WriteTable(table, group, 0).ok());
 }

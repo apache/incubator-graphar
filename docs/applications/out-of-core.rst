@@ -107,16 +107,16 @@ Meanwhile, BFS could be implemented in a **push**-style which only traverses the
 In some cases, it is required to record the path of BFS, that is, to maintain each vertex's predecessor (also called *father*) in the traversing tree rather than only recording the distance. The implementation of BFS with recording fathers can be found at `test_bfs_father_example.cc`_.
 
 
-.. _test_pagerank_example.cc: https://github.com/alibaba/GraphAr/blob/main/test/test_example/test_pagerank_example.cc
+.. _test_pagerank_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/pagerank_example.cc
 
-.. _test_cc_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/test/test_example/test_cc_stream_example.cc
+.. _test_cc_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/cc_stream_example.cc
 
-.. _test_cc_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/test/test_example/test_cc_push_example.cc
+.. _test_cc_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/cc_push_example.cc
 
-.. _test_bfs_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/test/test_example/test_bfs_stream_example.cc
+.. _test_bfs_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_stream_example.cc
 
-.. _test_bfs_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/test/test_example/test_bfs_push_example.cc
+.. _test_bfs_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_push_example.cc
 
-.. _test_bfs_pull_example.cc: https://github.com/alibaba/GraphAr/blob/main/test/test_example/test_bfs_pull_example.cc
+.. _test_bfs_pull_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_pull_example.cc
 
-.. _test_bfs_father_example.cc: https://github.com/alibaba/GraphAr/blob/main/test/test_example/test_bfs_father_example.cc
+.. _test_bfs_father_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_father_example.cc
