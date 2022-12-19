@@ -21,6 +21,7 @@ project(graph-archive LANGUAGES C CXX VERSION ${GAR_VERSION})
 
 option(NAMESPACE "User specific namespace, default if GraphArchive" OFF)
 option(BUILD_TESTS "Build unit test" OFF)
+option(BUILD_EXAMPLES "Build examples" OFF)
 
 if (NAMESPACE)
   add_definitions(-DGAR_NAMESPACE=${NAMESPACE})
@@ -194,18 +195,20 @@ build_gar()
 # ------------------------------------------------------------------------------
 # build example
 # ------------------------------------------------------------------------------ 
-find_package(Boost REQUIRED COMPONENTS graph)
+if (BUILD_EXAMPLES)
+    find_package(Boost REQUIRED COMPONENTS graph)
 
-file(GLOB EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/examples" "${PROJECT_SOURCE_DIR}/examples/*.cc")
-  foreach(f ${EXAMPLE_FILES})
-    string(REGEX MATCH "^(.*)\\.[^.]*$" dummy ${f})
-    set(E_NAME ${CMAKE_MATCH_1})
-    message(STATUS "Found example - " ${E_NAME})
-    add_executable(${E_NAME} examples/${E_NAME}.cc)
-    target_include_directories(${E_NAME} PRIVATE examples ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
-    include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
-    target_link_libraries(${E_NAME} PRIVATE gar)
-  endforeach()
+    file(GLOB EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/examples" "${PROJECT_SOURCE_DIR}/examples/*.cc")
+    foreach(f ${EXAMPLE_FILES})
+        string(REGEX MATCH "^(.*)\\.[^.]*$" dummy ${f})
+        set(E_NAME ${CMAKE_MATCH_1})
+        message(STATUS "Found example - " ${E_NAME})
+        add_executable(${E_NAME} examples/${E_NAME}.cc)
+        target_include_directories(${E_NAME} PRIVATE examples ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
+        include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+        target_link_libraries(${E_NAME} PRIVATE gar ${Boost_LIBRARIES})
+    endforeach()
+endif()
 
 # ------------------------------------------------------------------------------
 # Install
