@@ -24,6 +24,17 @@ namespace GAR_NAMESPACE_INTERNAL {
 
 namespace util {
 
+std::shared_ptr<arrow::ChunkedArray> GetArrowColumnByName(
+    std::shared_ptr<arrow::Table> const& table, const std::string& name) {
+  return table->GetColumnByName(name);
+}
+
+std::shared_ptr<arrow::Array> GetArrowArrayByChunkIndex(
+    std::shared_ptr<arrow::ChunkedArray> const& chunk_array,
+    int64_t chunk_index) {
+  return chunk_array->chunk(chunk_index);
+}
+
 Result<const void*> GetArrowArrayData(
     std::shared_ptr<arrow::Array> const& array) {
   if (array->type()->Equals(arrow::int8())) {

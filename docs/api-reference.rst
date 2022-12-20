@@ -81,6 +81,10 @@ Vertices Collection
     :members:
     :undoc-members:
 
+.. doxygenclass:: GraphArchive::VertexIter
+    :members:
+    :undoc-members:
+
 .. doxygenclass:: GraphArchive::VerticesCollection
     :members:
     :undoc-members:

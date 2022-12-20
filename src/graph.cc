@@ -97,4 +97,267 @@ Edge::Edge(
     }
   }
 }
+
+IdType EdgeIter::source() {
+  adj_list_reader_.seek(cur_offset_);
+  GAR_ASSIGN_OR_RAISE_ERROR(auto chunk, adj_list_reader_.GetChunk());
+  auto src_column = chunk->column(0);
+  return std::dynamic_pointer_cast<arrow::Int64Array>(src_column->chunk(0))
+      ->GetView(0);
+}
+
+IdType EdgeIter::destination() {
+  adj_list_reader_.seek(cur_offset_);
+  GAR_ASSIGN_OR_RAISE_ERROR(auto chunk, adj_list_reader_.GetChunk());
+  auto src_column = chunk->column(1);
+  return std::dynamic_pointer_cast<arrow::Int64Array>(src_column->chunk(0))
+      ->GetView(0);
+}
+
+bool EdgeIter::first_src(const EdgeIter& from, IdType id) {
+  if (from.is_end())
+    return false;
+
+  // ordered_by_dest or unordered_by_dest
+  if (adj_list_type_ == AdjListType::ordered_by_dest ||
+      adj_list_type_ == AdjListType::unordered_by_dest) {
+    if (from.global_chunk_index_ > chunk_end_ ||
+        (from.global_chunk_index_ == chunk_end_ &&
+         from.cur_offset_ > offset_of_chunk_end_)) {
+      return false;
+    }
+    if (from.global_chunk_index_ == global_chunk_index_) {
+      cur_offset_ = from.cur_offset_;
+    } else if (from.global_chunk_index_ < chunk_begin_ ||
+               (from.global_chunk_index_ == chunk_begin_ &&
+                from.cur_offset_ < offset_of_chunk_begin_)) {
+      this->to_begin();
+    } else {
+      global_chunk_index_ = from.global_chunk_index_;
+      cur_offset_ = from.cur_offset_;
+      vertex_chunk_index_ = from.vertex_chunk_index_;
+      this->refresh();
+    }
+    while (!this->is_end()) {
+      if (this->source() == id)
+        return true;
+      this->operator++();
+    }
+    return false;
+  }
+
+  // unordered_by_source
+  if (adj_list_type_ == AdjListType::unordered_by_source) {
+    IdType expect_chunk_index =
+        index_converter_->IndexPairToGlobalChunkIndex(id / src_chunk_size_, 0);
+    if (expect_chunk_index > chunk_end_)
+      return false;
+    if (from.global_chunk_index_ > chunk_end_ ||
+        (from.global_chunk_index_ == chunk_end_ &&
+         from.cur_offset_ > offset_of_chunk_end_)) {
+      return false;
+    }
+    bool need_refresh = false;
+    if (from.global_chunk_index_ == global_chunk_index_) {
+      cur_offset_ = from.cur_offset_;
+    } else if (from.global_chunk_index_ < chunk_begin_ ||
+               (from.global_chunk_index_ == chunk_begin_ &&
+                from.cur_offset_ < offset_of_chunk_begin_)) {
+      this->to_begin();
+    } else {
+      global_chunk_index_ = from.global_chunk_index_;
+      cur_offset_ = from.cur_offset_;
+      vertex_chunk_index_ = from.vertex_chunk_index_;
+      need_refresh = true;
+    }
+    if (global_chunk_index_ < expect_chunk_index) {
+      global_chunk_index_ = expect_chunk_index;
+      cur_offset_ = 0;
+      vertex_chunk_index_ = id / src_chunk_size_;
+      need_refresh = true;
+    }
+    if (need_refresh)
+      this->refresh();
+    while (!this->is_end()) {
+      if (this->source() == id)
+        return true;
+      if (vertex_chunk_index_ > id / src_chunk_size_)
+        return false;
+      this->operator++();
+    }
+    return false;
+  }
+
+  // ordered_by_source
+  auto st = offset_reader_->seek(id);
+  if (!st.ok()) {
+    return false;
+  }
+  auto maybe_offset_chunk = offset_reader_->GetChunk();
+  if (!maybe_offset_chunk.status().ok()) {
+    return false;
+  }
+  auto offset_array =
+      std::dynamic_pointer_cast<arrow::Int64Array>(maybe_offset_chunk.value());
+  auto begin_offset = static_cast<IdType>(offset_array->Value(0));
+  auto end_offset = static_cast<IdType>(offset_array->Value(1));
+  if (begin_offset >= end_offset) {
+    return false;
+  }
+  auto vertex_chunk_index_of_id = offset_reader_->GetChunkIndex();
+  auto begin_global_index = index_converter_->IndexPairToGlobalChunkIndex(
+      vertex_chunk_index_of_id, begin_offset / chunk_size_);
+  auto end_global_index = index_converter_->IndexPairToGlobalChunkIndex(
+      vertex_chunk_index_of_id, end_offset / chunk_size_);
+  if (begin_global_index <= from.global_chunk_index_ &&
+      from.global_chunk_index_ <= end_global_index) {
+    if (begin_offset < from.cur_offset_ && from.cur_offset_ < end_offset) {
+      global_chunk_index_ = from.global_chunk_index_;
+      cur_offset_ = from.cur_offset_;
+      vertex_chunk_index_ = from.vertex_chunk_index_;
+      refresh();
+      return true;
+    } else if (from.cur_offset_ <= begin_offset) {
+      global_chunk_index_ = begin_global_index;
+      cur_offset_ = begin_offset;
+      vertex_chunk_index_ = vertex_chunk_index_of_id;
+      refresh();
+      return true;
+    } else {
+      return false;
+    }
+  } else if (from.global_chunk_index_ < begin_global_index) {
+    global_chunk_index_ = begin_global_index;
+    cur_offset_ = begin_offset;
+    vertex_chunk_index_ = vertex_chunk_index_of_id;
+    refresh();
+    return true;
+  } else {
+    return false;
+  }
+}
+
+bool EdgeIter::first_dst(const EdgeIter& from, IdType id) {
+  if (from.is_end())
+    return false;
+
+  // ordered_by_source or unordered_by_source
+  if (adj_list_type_ == AdjListType::ordered_by_source ||
+      adj_list_type_ == AdjListType::unordered_by_source) {
+    if (from.global_chunk_index_ > chunk_end_ ||
+        (from.global_chunk_index_ == chunk_end_ &&
+         from.cur_offset_ > offset_of_chunk_end_)) {
+      return false;
+    }
+    if (from.global_chunk_index_ == global_chunk_index_) {
+      cur_offset_ = from.cur_offset_;
+    } else if (from.global_chunk_index_ < chunk_begin_ ||
+               (from.global_chunk_index_ == chunk_begin_ &&
+                from.cur_offset_ < offset_of_chunk_begin_)) {
+      this->to_begin();
+    } else {
+      global_chunk_index_ = from.global_chunk_index_;
+      cur_offset_ = from.cur_offset_;
+      vertex_chunk_index_ = from.vertex_chunk_index_;
+      this->refresh();
+    }
+    while (!this->is_end()) {
+      if (this->destination() == id)
+        return true;
+      this->operator++();
+    }
+    return false;
+  }
+
+  // unordered_by_dest
+  if (adj_list_type_ == AdjListType::unordered_by_dest) {
+    IdType expect_chunk_index =
+        index_converter_->IndexPairToGlobalChunkIndex(id / dst_chunk_size_, 0);
+    if (expect_chunk_index > chunk_end_)
+      return false;
+    if (from.global_chunk_index_ > chunk_end_ ||
+        (from.global_chunk_index_ == chunk_end_ &&
+         from.cur_offset_ > offset_of_chunk_end_)) {
+      return false;
+    }
+    bool need_refresh = false;
+    if (from.global_chunk_index_ == global_chunk_index_) {
+      cur_offset_ = from.cur_offset_;
+    } else if (from.global_chunk_index_ < chunk_begin_ ||
+               (from.global_chunk_index_ == chunk_begin_ &&
+                from.cur_offset_ < offset_of_chunk_begin_)) {
+      this->to_begin();
+    } else {
+      global_chunk_index_ = from.global_chunk_index_;
+      cur_offset_ = from.cur_offset_;
+      vertex_chunk_index_ = from.vertex_chunk_index_;
+      need_refresh = true;
+    }
+    if (global_chunk_index_ < expect_chunk_index) {
+      global_chunk_index_ = expect_chunk_index;
+      cur_offset_ = 0;
+      vertex_chunk_index_ = id / dst_chunk_size_;
+      need_refresh = true;
+    }
+    if (need_refresh)
+      this->refresh();
+    while (!this->is_end()) {
+      if (this->destination() == id)
+        return true;
+      if (vertex_chunk_index_ > id / dst_chunk_size_)
+        return false;
+      this->operator++();
+    }
+    return false;
+  }
+
+  // ordered_by_dest
+  auto st = offset_reader_->seek(id);
+  if (!st.ok()) {
+    return false;
+  }
+  auto maybe_offset_chunk = offset_reader_->GetChunk();
+  if (!maybe_offset_chunk.status().ok()) {
+    return false;
+  }
+  auto offset_array =
+      std::dynamic_pointer_cast<arrow::Int64Array>(maybe_offset_chunk.value());
+  auto begin_offset = static_cast<IdType>(offset_array->Value(0));
+  auto end_offset = static_cast<IdType>(offset_array->Value(1));
+  if (begin_offset >= end_offset) {
+    return false;
+  }
+  auto vertex_chunk_index_of_id = offset_reader_->GetChunkIndex();
+  auto begin_global_index = index_converter_->IndexPairToGlobalChunkIndex(
+      vertex_chunk_index_of_id, begin_offset / chunk_size_);
+  auto end_global_index = index_converter_->IndexPairToGlobalChunkIndex(
+      vertex_chunk_index_of_id, end_offset / chunk_size_);
+  if (begin_global_index <= from.global_chunk_index_ &&
+      from.global_chunk_index_ <= end_global_index) {
+    if (begin_offset < from.cur_offset_ && from.cur_offset_ < end_offset) {
+      global_chunk_index_ = from.global_chunk_index_;
+      cur_offset_ = from.cur_offset_;
+      vertex_chunk_index_ = from.vertex_chunk_index_;
+      refresh();
+      return true;
+    } else if (from.cur_offset_ <= begin_offset) {
+      global_chunk_index_ = begin_global_index;
+      cur_offset_ = begin_offset;
+      vertex_chunk_index_ = vertex_chunk_index_of_id;
+      refresh();
+      return true;
+    } else {
+      return false;
+    }
+  } else if (from.global_chunk_index_ < begin_global_index) {
+    global_chunk_index_ = begin_global_index;
+    cur_offset_ = begin_offset;
+    vertex_chunk_index_ = vertex_chunk_index_of_id;
+    refresh();
+    return true;
+  } else {
+    return false;
+  }
+}
+
 }  // namespace GAR_NAMESPACE_INTERNAL
