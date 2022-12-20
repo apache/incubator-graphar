@@ -5,7 +5,7 @@ The `Boost Graph Library (BGL) <https://cs.brown.edu/~jwicks/boost/libs/graph/do
 
 We take calculating CC as an example, to demonstrate how BGL works with GraphAr. A weakly connected component is a maximal subgraph of a graph such that for every pair of vertices in it, there is an undirected path connecting them. And the CC algorithm is to identify all such components in a graph. Learn more about `the CC algorithm <https://en.wikipedia.org/wiki/Connected_component>`_.
 
-The source code of CC based on BGL can be found at `test_bgl_example.cc`_. In this program, the graph information file is first read to get the metadata:
+The source code of CC based on BGL can be found at `bgl_example.cc`_. In this program, the graph information file is first read to get the metadata:
 
 .. code:: C++
 
@@ -90,4 +90,4 @@ Finally, we could use a **VerticesBuilder** of GraphAr to write the results to n
    builder.Dump();
 
 
-.. _test_bgl_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bgl_example.cc
+.. _bgl_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bgl_example.cc

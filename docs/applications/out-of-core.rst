@@ -14,7 +14,7 @@ These algorithms represent for different compute patterns and are usually buildi
 PageRank
 ------------------------
 
-`PageRank (PR) <https://en.wikipedia.org/wiki/PageRank>`_ is an algorithm used by Google Search to rank web pages in their search engine results. The source code of PageRank based on GraphAr located at `test_pagerank_example.cc`_, and the explanations can be found in the `Getting Started <../user-guide/getting-started.html#a-pagerank-example>`_ page.
+`PageRank (PR) <https://en.wikipedia.org/wiki/PageRank>`_ is an algorithm used by Google Search to rank web pages in their search engine results. The source code of PageRank based on GraphAr located at `pagerank_example.cc`_, and the explanations can be found in the `Getting Started <../user-guide/getting-started.html#a-pagerank-example>`_ page.
 
 Connected Components 
 ------------------------
@@ -54,7 +54,7 @@ This algorithm can be implemented based on streaming the edges via GraphAr's rea
     if (!flag) break;
   }
 
-The file `test_cc_stream_example.cc`_ located inside the source tree contains the complete implementation for this algorithm. Also, we can only process active vertices (the vertices which are updated in the last iteration) and the corresponding edges, since an inactive vertex does not need to update its neighbors for this iteration. Please refer to `test_cc_push_example.cc`_ for the complete code.
+The file `cc_stream_example.cc`_ located inside the source tree contains the complete implementation for this algorithm. Also, we can only process active vertices (the vertices which are updated in the last iteration) and the corresponding edges, since an inactive vertex does not need to update its neighbors for this iteration. Please refer to `cc_push_example.cc`_ for the complete code.
 
 .. tip:: 
 
@@ -96,27 +96,27 @@ An out-of-core BFS algorithm could be implemented based on streaming the graph d
     if (count == 0) break;
   }
 
-The above algorithm is implemented based on streaming all edges for each iteration, the source code  can be found at `test_bfs_stream_example.cc`_.
+The above algorithm is implemented based on streaming all edges for each iteration, the source code  can be found at `bfs_stream_example.cc`_.
 
-Meanwhile, BFS could be implemented in a **push**-style which only traverses the edges that from active vertices for each iteration, which is typically more efficient on real-world graphs. This implementation can be found at `test_bfs_push_example.cc`_. Similarly, we provide a BFS implementation in a **pull**-style which only traverses the edges that lead to not visited vertices (i.e., the vertices that have not been traversed), as shown in `test_bfs_pull_example.cc`_.
+Meanwhile, BFS could be implemented in a **push**-style which only traverses the edges that from active vertices for each iteration, which is typically more efficient on real-world graphs. This implementation can be found at `bfs_push_example.cc`_. Similarly, we provide a BFS implementation in a **pull**-style which only traverses the edges that lead to not visited vertices (i.e., the vertices that have not been traversed), as shown in `bfs_pull_example.cc`_.
 
 .. tip:: 
 
   In common cases of graph processing, the **push**-style is more efficient when the set of active vertices is very sparse, while the **pull**-style fits when it is dense.
 
-In some cases, it is required to record the path of BFS, that is, to maintain each vertex's predecessor (also called *father*) in the traversing tree rather than only recording the distance. The implementation of BFS with recording fathers can be found at `test_bfs_father_example.cc`_.
+In some cases, it is required to record the path of BFS, that is, to maintain each vertex's predecessor (also called *father*) in the traversing tree rather than only recording the distance. The implementation of BFS with recording fathers can be found at `bfs_father_example.cc`_.
 
 
-.. _test_pagerank_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/pagerank_example.cc
+.. _pagerank_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/pagerank_example.cc
 
-.. _test_cc_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/cc_stream_example.cc
+.. _cc_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/cc_stream_example.cc
 
-.. _test_cc_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/cc_push_example.cc
+.. _cc_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/cc_push_example.cc
 
-.. _test_bfs_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_stream_example.cc
+.. _bfs_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_stream_example.cc
 
-.. _test_bfs_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_push_example.cc
+.. _bfs_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_push_example.cc
 
-.. _test_bfs_pull_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_pull_example.cc
+.. _bfs_pull_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_pull_example.cc
 
-.. _test_bfs_father_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_father_example.cc
+.. _bfs_father_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_father_example.cc
