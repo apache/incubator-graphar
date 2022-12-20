@@ -26,9 +26,12 @@ limitations under the License.
 
 #define REGULAR_SEPERATOR "_"
 
+// forward declarations
 namespace arrow {
+class Table;
+class ChunkedArray;
 class Array;
-}
+}  // namespace arrow
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -91,6 +94,12 @@ static inline std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(
   }
   return index_pair;
 }
+
+std::shared_ptr<arrow::ChunkedArray> GetArrowColumnByName(
+    std::shared_ptr<arrow::Table> const& table, const std::string& name);
+
+std::shared_ptr<arrow::Array> GetArrowArrayByChunkIndex(
+    std::shared_ptr<arrow::ChunkedArray> const& chunk_array, int64_t chunk_index);
 
 Result<const void*> GetArrowArrayData(
     std::shared_ptr<arrow::Array> const& array);

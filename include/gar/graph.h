@@ -24,11 +24,14 @@ limitations under the License.
 #include <variant>
 #include <vector>
 
-#include "arrow/api.h"
-
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/utils/reader_utils.h"
 #include "gar/utils/utils.h"
+
+// forward declarations
+namespace arrow {
+class ChunkedArray;
+}
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -78,6 +81,8 @@ class Vertex {
   IdType id_;
   std::map<std::string, std::any> properties_;
 };
+
+
 
 /**
  * @brief Edge contains information of certain edge.
@@ -133,6 +138,92 @@ class Edge {
   std::map<std::string, std::any> properties_;
 };
 
+
+/**
+ * @brief The iterator for traversing a type of vertices.
+ *
+ */
+class VertexIter {
+ public:
+  /**
+   * Initialize the iterator.
+   *
+   * @param vertex_info The vertex info that describes the vertex type.
+   * @param prefix The absolute prefix.
+   * @param offset The current offset of the readers.
+   */
+  explicit VertexIter(const VertexInfo& vertex_info, const std::string& prefix,
+                    IdType offset) noexcept {
+    for (const auto& pg : vertex_info.GetPropertyGroups()) {
+      readers_.emplace_back(vertex_info, pg, prefix);
+    }
+    cur_offset_ = offset;
+  }
+
+  /// Copy constructor.
+  VertexIter(const VertexIter& other)
+      : readers_(other.readers_), cur_offset_(other.cur_offset_) {}
+
+  /// Construct and return the vertex of the current offset.
+  Vertex operator*() noexcept {
+    for (auto& reader : readers_) {
+      reader.seek(cur_offset_);
+    }
+    return Vertex(cur_offset_, readers_);
+  }
+
+  /// Get the vertex id of the current offset.
+  IdType id() { return cur_offset_; }
+
+  /// Get the value for a property of the current vertex.
+  template <typename T>
+  Result<T> property(const std::string& property) noexcept {
+    std::shared_ptr<arrow::ChunkedArray> column(nullptr);
+    for (auto& reader : readers_) {
+      reader.seek(cur_offset_);
+      GAR_ASSIGN_OR_RAISE(auto chunk_table, reader.GetChunk());
+      column = util::GetArrowColumnByName(chunk_table, property);
+      if (column != nullptr) {
+        break;
+      }
+    }
+    if (column != nullptr) {
+      auto array = util::GetArrowArrayByChunkIndex(column, 0);
+      GAR_ASSIGN_OR_RAISE(auto data,
+                          util::GetArrowArrayData(array));
+      return util::ValueGetter<T>::Value(data, 0);
+    }
+    return Status::KeyError("The property is not exist.");
+  }
+
+  /// The prefix increment operator.
+  VertexIter& operator++() noexcept {
+    ++cur_offset_;
+    return *this;
+  }
+
+  /// The postfix increment operator.
+  VertexIter operator++(int) {
+    VertexIter ret(*this);
+    ++cur_offset_;
+    return ret;
+  }
+
+  /// The equality operator.
+  bool operator==(const VertexIter& rhs) const noexcept {
+    return cur_offset_ == rhs.cur_offset_;
+  }
+
+  /// The inequality operator.
+  bool operator!=(const VertexIter& rhs) const noexcept {
+    return cur_offset_ != rhs.cur_offset_;
+  }
+
+ private:
+  std::vector<VertexPropertyArrowChunkReader> readers_;
+  IdType cur_offset_;
+};
+
 /**
  * @brief VerticesCollection is designed for reading a collection of vertices.
  *
@@ -159,100 +250,16 @@ class VerticesCollection {
                               fs->ReadFileToValue<IdType>(vertex_num_path));
   }
 
-  /**
-   * @brief The iterator for traversing a type of vertices.
-   *
-   */
-  class iterator {
-   public:
-    /**
-     * Initialize the iterator.
-     *
-     * @param vertex_info The vertex info that describes the vertex type.
-     * @param prefix The absolute prefix.
-     * @param offset The current offset of the readers.
-     */
-    explicit iterator(const VertexInfo& vertex_info, const std::string& prefix,
-                      IdType offset) noexcept {
-      for (const auto& pg : vertex_info.GetPropertyGroups()) {
-        readers_.emplace_back(vertex_info, pg, prefix);
-      }
-      cur_offset_ = offset;
-    }
-
-    /// Copy constructor.
-    iterator(const iterator& other)
-        : readers_(other.readers_), cur_offset_(other.cur_offset_) {}
-
-    /// Construct and return the vertex of the current offset.
-    Vertex operator*() noexcept {
-      for (auto& reader : readers_) {
-        reader.seek(cur_offset_);
-      }
-      return Vertex(cur_offset_, readers_);
-    }
-
-    /// Get the vertex id of the current offset.
-    IdType id() { return cur_offset_; }
-
-    /// Get the value for a property of the current vertex.
-    template <typename T>
-    Result<T> property(const std::string& property) noexcept {
-      std::shared_ptr<arrow::ChunkedArray> column(nullptr);
-      for (auto& reader : readers_) {
-        reader.seek(cur_offset_);
-        GAR_ASSIGN_OR_RAISE(auto chunk_table, reader.GetChunk());
-        column = chunk_table->GetColumnByName(property);
-        if (column != nullptr) {
-          break;
-        }
-      }
-      if (column != nullptr) {
-        GAR_ASSIGN_OR_RAISE(auto data,
-                            util::GetArrowArrayData(column->chunk(0)));
-        return util::ValueGetter<T>::Value(data, 0);
-      }
-      return Status::KeyError("The property is not exist.");
-    }
-
-    /// The prefix increment operator.
-    iterator& operator++() noexcept {
-      ++cur_offset_;
-      return *this;
-    }
-
-    /// The postfix increment operator.
-    iterator operator++(int) {
-      iterator ret(*this);
-      ++cur_offset_;
-      return ret;
-    }
-
-    /// The equality operator.
-    bool operator==(const iterator& rhs) const noexcept {
-      return cur_offset_ == rhs.cur_offset_;
-    }
-
-    /// The inequality operator.
-    bool operator!=(const iterator& rhs) const noexcept {
-      return cur_offset_ != rhs.cur_offset_;
-    }
-
-   private:
-    std::vector<VertexPropertyArrowChunkReader> readers_;
-    IdType cur_offset_;
-  };
-
   /// The iterator pointing to the first vertex.
-  iterator begin() noexcept { return iterator(vertex_info_, prefix_, 0); }
+  VertexIter begin() noexcept { return VertexIter(vertex_info_, prefix_, 0); }
 
   /// The iterator pointing to the past-the-end element.
-  iterator end() noexcept {
-    return iterator(vertex_info_, prefix_, vertex_num_);
+  VertexIter end() noexcept {
+    return VertexIter(vertex_info_, prefix_, vertex_num_);
   }
 
   /// The iterator pointing to the vertex with specific id.
-  iterator find(IdType id) { return iterator(vertex_info_, prefix_, id); }
+  VertexIter find(IdType id) { return VertexIter(vertex_info_, prefix_, id); }
 
   /// Get the number of vertices in the collection.
   size_t size() const noexcept { return vertex_num_; }
@@ -356,22 +363,12 @@ class EdgeIter {
   }
 
   /// Get the source vertex id for the current edge.
-  IdType source() {
-    adj_list_reader_.seek(cur_offset_);
-    GAR_ASSIGN_OR_RAISE_ERROR(auto chunk, adj_list_reader_.GetChunk());
-    auto src_column = chunk->column(0);
-    return std::dynamic_pointer_cast<arrow::Int64Array>(src_column->chunk(0))
-        ->GetView(0);
-  }
+  IdType source();
+
 
   /// Get the destination vertex id for the current edge.
-  IdType destination() {
-    adj_list_reader_.seek(cur_offset_);
-    GAR_ASSIGN_OR_RAISE_ERROR(auto chunk, adj_list_reader_.GetChunk());
-    auto src_column = chunk->column(1);
-    return std::dynamic_pointer_cast<arrow::Int64Array>(src_column->chunk(0))
-        ->GetView(0);
-  }
+  IdType destination();
+
 
   /// Get the value of a property for the current edge.
   template <typename T>
@@ -380,13 +377,14 @@ class EdgeIter {
     for (auto& reader : property_readers_) {
       reader.seek(cur_offset_);
       GAR_ASSIGN_OR_RAISE(auto chunk_table, reader.GetChunk());
-      column = chunk_table->GetColumnByName(property);
+      column = util::GetArrowColumnByName(chunk_table, property);
       if (column != nullptr) {
         break;
       }
     }
     if (column != nullptr) {
-      GAR_ASSIGN_OR_RAISE(auto data, util::GetArrowArrayData(column->chunk(0)));
+      auto array = util::GetArrowArrayByChunkIndex(column, 0);
+      GAR_ASSIGN_OR_RAISE(auto data, util::GetArrowArrayData(array));
       return util::ValueGetter<T>::Value(data, 0);
     }
     return Status::KeyError("The property is not exist.");
@@ -488,128 +486,7 @@ class EdgeIter {
    * @param id The vertex id.
    * @return If such edge is found or not.
    */
-  bool first_src(const EdgeIter& from, IdType id) {
-    if (from.is_end())
-      return false;
-
-    // ordered_by_dest or unordered_by_dest
-    if (adj_list_type_ == AdjListType::ordered_by_dest ||
-        adj_list_type_ == AdjListType::unordered_by_dest) {
-      if (from.global_chunk_index_ > chunk_end_ ||
-          (from.global_chunk_index_ == chunk_end_ &&
-           from.cur_offset_ > offset_of_chunk_end_)) {
-        return false;
-      }
-      if (from.global_chunk_index_ == global_chunk_index_) {
-        cur_offset_ = from.cur_offset_;
-      } else if (from.global_chunk_index_ < chunk_begin_ ||
-                 (from.global_chunk_index_ == chunk_begin_ &&
-                  from.cur_offset_ < offset_of_chunk_begin_)) {
-        this->to_begin();
-      } else {
-        global_chunk_index_ = from.global_chunk_index_;
-        cur_offset_ = from.cur_offset_;
-        vertex_chunk_index_ = from.vertex_chunk_index_;
-        this->refresh();
-      }
-      while (!this->is_end()) {
-        if (this->source() == id)
-          return true;
-        this->operator++();
-      }
-      return false;
-    }
-
-    // unordered_by_source
-    if (adj_list_type_ == AdjListType::unordered_by_source) {
-      IdType expect_chunk_index = index_converter_->IndexPairToGlobalChunkIndex(
-          id / src_chunk_size_, 0);
-      if (expect_chunk_index > chunk_end_)
-        return false;
-      if (from.global_chunk_index_ > chunk_end_ ||
-          (from.global_chunk_index_ == chunk_end_ &&
-           from.cur_offset_ > offset_of_chunk_end_)) {
-        return false;
-      }
-      bool need_refresh = false;
-      if (from.global_chunk_index_ == global_chunk_index_) {
-        cur_offset_ = from.cur_offset_;
-      } else if (from.global_chunk_index_ < chunk_begin_ ||
-                 (from.global_chunk_index_ == chunk_begin_ &&
-                  from.cur_offset_ < offset_of_chunk_begin_)) {
-        this->to_begin();
-      } else {
-        global_chunk_index_ = from.global_chunk_index_;
-        cur_offset_ = from.cur_offset_;
-        vertex_chunk_index_ = from.vertex_chunk_index_;
-        need_refresh = true;
-      }
-      if (global_chunk_index_ < expect_chunk_index) {
-        global_chunk_index_ = expect_chunk_index;
-        cur_offset_ = 0;
-        vertex_chunk_index_ = id / src_chunk_size_;
-        need_refresh = true;
-      }
-      if (need_refresh)
-        this->refresh();
-      while (!this->is_end()) {
-        if (this->source() == id)
-          return true;
-        if (vertex_chunk_index_ > id / src_chunk_size_)
-          return false;
-        this->operator++();
-      }
-      return false;
-    }
-
-    // ordered_by_source
-    auto st = offset_reader_->seek(id);
-    if (!st.ok()) {
-      return false;
-    }
-    auto maybe_offset_chunk = offset_reader_->GetChunk();
-    if (!maybe_offset_chunk.status().ok()) {
-      return false;
-    }
-    auto offset_array = std::dynamic_pointer_cast<arrow::Int64Array>(
-        maybe_offset_chunk.value());
-    auto begin_offset = static_cast<IdType>(offset_array->Value(0));
-    auto end_offset = static_cast<IdType>(offset_array->Value(1));
-    if (begin_offset >= end_offset) {
-      return false;
-    }
-    auto vertex_chunk_index_of_id = offset_reader_->GetChunkIndex();
-    auto begin_global_index = index_converter_->IndexPairToGlobalChunkIndex(
-        vertex_chunk_index_of_id, begin_offset / chunk_size_);
-    auto end_global_index = index_converter_->IndexPairToGlobalChunkIndex(
-        vertex_chunk_index_of_id, end_offset / chunk_size_);
-    if (begin_global_index <= from.global_chunk_index_ &&
-        from.global_chunk_index_ <= end_global_index) {
-      if (begin_offset < from.cur_offset_ && from.cur_offset_ < end_offset) {
-        global_chunk_index_ = from.global_chunk_index_;
-        cur_offset_ = from.cur_offset_;
-        vertex_chunk_index_ = from.vertex_chunk_index_;
-        refresh();
-        return true;
-      } else if (from.cur_offset_ <= begin_offset) {
-        global_chunk_index_ = begin_global_index;
-        cur_offset_ = begin_offset;
-        vertex_chunk_index_ = vertex_chunk_index_of_id;
-        refresh();
-        return true;
-      } else {
-        return false;
-      }
-    } else if (from.global_chunk_index_ < begin_global_index) {
-      global_chunk_index_ = begin_global_index;
-      cur_offset_ = begin_offset;
-      vertex_chunk_index_ = vertex_chunk_index_of_id;
-      refresh();
-      return true;
-    } else {
-      return false;
-    }
-  }
+  bool first_src(const EdgeIter& from, IdType id);
 
   /**
    * Let the input iterator to point to the first incoming edge of the
@@ -619,128 +496,7 @@ class EdgeIter {
    * @param id The vertex id.
    * @return If such edge is found or not.
    */
-  bool first_dst(const EdgeIter& from, IdType id) {
-    if (from.is_end())
-      return false;
-
-    // ordered_by_source or unordered_by_source
-    if (adj_list_type_ == AdjListType::ordered_by_source ||
-        adj_list_type_ == AdjListType::unordered_by_source) {
-      if (from.global_chunk_index_ > chunk_end_ ||
-          (from.global_chunk_index_ == chunk_end_ &&
-           from.cur_offset_ > offset_of_chunk_end_)) {
-        return false;
-      }
-      if (from.global_chunk_index_ == global_chunk_index_) {
-        cur_offset_ = from.cur_offset_;
-      } else if (from.global_chunk_index_ < chunk_begin_ ||
-                 (from.global_chunk_index_ == chunk_begin_ &&
-                  from.cur_offset_ < offset_of_chunk_begin_)) {
-        this->to_begin();
-      } else {
-        global_chunk_index_ = from.global_chunk_index_;
-        cur_offset_ = from.cur_offset_;
-        vertex_chunk_index_ = from.vertex_chunk_index_;
-        this->refresh();
-      }
-      while (!this->is_end()) {
-        if (this->destination() == id)
-          return true;
-        this->operator++();
-      }
-      return false;
-    }
-
-    // unordered_by_dest
-    if (adj_list_type_ == AdjListType::unordered_by_dest) {
-      IdType expect_chunk_index = index_converter_->IndexPairToGlobalChunkIndex(
-          id / dst_chunk_size_, 0);
-      if (expect_chunk_index > chunk_end_)
-        return false;
-      if (from.global_chunk_index_ > chunk_end_ ||
-          (from.global_chunk_index_ == chunk_end_ &&
-           from.cur_offset_ > offset_of_chunk_end_)) {
-        return false;
-      }
-      bool need_refresh = false;
-      if (from.global_chunk_index_ == global_chunk_index_) {
-        cur_offset_ = from.cur_offset_;
-      } else if (from.global_chunk_index_ < chunk_begin_ ||
-                 (from.global_chunk_index_ == chunk_begin_ &&
-                  from.cur_offset_ < offset_of_chunk_begin_)) {
-        this->to_begin();
-      } else {
-        global_chunk_index_ = from.global_chunk_index_;
-        cur_offset_ = from.cur_offset_;
-        vertex_chunk_index_ = from.vertex_chunk_index_;
-        need_refresh = true;
-      }
-      if (global_chunk_index_ < expect_chunk_index) {
-        global_chunk_index_ = expect_chunk_index;
-        cur_offset_ = 0;
-        vertex_chunk_index_ = id / dst_chunk_size_;
-        need_refresh = true;
-      }
-      if (need_refresh)
-        this->refresh();
-      while (!this->is_end()) {
-        if (this->destination() == id)
-          return true;
-        if (vertex_chunk_index_ > id / dst_chunk_size_)
-          return false;
-        this->operator++();
-      }
-      return false;
-    }
-
-    // ordered_by_dest
-    auto st = offset_reader_->seek(id);
-    if (!st.ok()) {
-      return false;
-    }
-    auto maybe_offset_chunk = offset_reader_->GetChunk();
-    if (!maybe_offset_chunk.status().ok()) {
-      return false;
-    }
-    auto offset_array = std::dynamic_pointer_cast<arrow::Int64Array>(
-        maybe_offset_chunk.value());
-    auto begin_offset = static_cast<IdType>(offset_array->Value(0));
-    auto end_offset = static_cast<IdType>(offset_array->Value(1));
-    if (begin_offset >= end_offset) {
-      return false;
-    }
-    auto vertex_chunk_index_of_id = offset_reader_->GetChunkIndex();
-    auto begin_global_index = index_converter_->IndexPairToGlobalChunkIndex(
-        vertex_chunk_index_of_id, begin_offset / chunk_size_);
-    auto end_global_index = index_converter_->IndexPairToGlobalChunkIndex(
-        vertex_chunk_index_of_id, end_offset / chunk_size_);
-    if (begin_global_index <= from.global_chunk_index_ &&
-        from.global_chunk_index_ <= end_global_index) {
-      if (begin_offset < from.cur_offset_ && from.cur_offset_ < end_offset) {
-        global_chunk_index_ = from.global_chunk_index_;
-        cur_offset_ = from.cur_offset_;
-        vertex_chunk_index_ = from.vertex_chunk_index_;
-        refresh();
-        return true;
-      } else if (from.cur_offset_ <= begin_offset) {
-        global_chunk_index_ = begin_global_index;
-        cur_offset_ = begin_offset;
-        vertex_chunk_index_ = vertex_chunk_index_of_id;
-        refresh();
-        return true;
-      } else {
-        return false;
-      }
-    } else if (from.global_chunk_index_ < begin_global_index) {
-      global_chunk_index_ = begin_global_index;
-      cur_offset_ = begin_offset;
-      vertex_chunk_index_ = vertex_chunk_index_of_id;
-      refresh();
-      return true;
-    } else {
-      return false;
-    }
-  }
+  bool first_dst(const EdgeIter& from, IdType id);
 
   /// Let the iterator to point to the begin.
   void to_begin() {
