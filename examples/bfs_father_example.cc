@@ -17,17 +17,15 @@ limitations under the License.
 
 #include "arrow/api.h"
 
-#include "../config.h"
+#include "config.h"
 #include "gar/graph.h"
 #include "gar/graph_info.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/writer/arrow_chunk_writer.h"
 #include "gar/writer/edges_builder.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
 
-TEST_CASE("test_bfs_with_father_example") {
+int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
@@ -35,10 +33,10 @@ TEST_CASE("test_bfs_with_father_example") {
 
   // get the person vertices of graph
   std::string label = "person";
-  REQUIRE(graph_info.GetVertexInfo(label).status().ok());
+  assert(graph_info.GetVertexInfo(label).status().ok());
   auto maybe_vertices =
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
-  REQUIRE(maybe_vertices.status().ok());
+  assert(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
   int num_vertices = vertices.size();
   std::cout << "num_vertices: " << num_vertices << std::endl;
@@ -48,7 +46,7 @@ TEST_CASE("test_bfs_with_father_example") {
   auto maybe_edges = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::unordered_by_source);
-  REQUIRE(!maybe_edges.has_error());
+  assert(!maybe_edges.has_error());
   auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::unordered_by_source>>(maybe_edges.value());
 
@@ -93,16 +91,16 @@ TEST_CASE("test_bfs_with_father_example") {
 
   // extend the vertex_info
   auto maybe_vertex_info = graph_info.GetVertexInfo(label);
-  REQUIRE(maybe_vertex_info.status().ok());
+  assert(maybe_vertex_info.status().ok());
   auto vertex_info = maybe_vertex_info.value();
   auto maybe_extend_info = vertex_info.Extend(group);
-  REQUIRE(maybe_extend_info.status().ok());
+  assert(maybe_extend_info.status().ok());
   auto extend_info = maybe_extend_info.value();
 
   // dump the extened vertex info
-  REQUIRE(extend_info.IsValidated());
-  REQUIRE(extend_info.Dump().status().ok());
-  REQUIRE(extend_info.Save("/tmp/person-new-bfs-father.vertex.yml").ok());
+  assert(extend_info.IsValidated());
+  assert(extend_info.Dump().status().ok());
+  assert(extend_info.Save("/tmp/person-new-bfs-father.vertex.yml").ok());
   // construct vertex property writer
   GAR_NAMESPACE::VertexPropertyWriter writer(extend_info, "file:///tmp/");
   // convert results to arrow::Table
@@ -114,20 +112,20 @@ TEST_CASE("test_bfs_with_father_example") {
       father.name,
       GAR_NAMESPACE::DataType::DataTypeToArrowDataType(father.type)));
   arrow::Int32Builder array_builder1;
-  REQUIRE(array_builder1.Reserve(num_vertices).ok());
-  REQUIRE(array_builder1.AppendValues(distance).ok());
+  assert(array_builder1.Reserve(num_vertices).ok());
+  assert(array_builder1.AppendValues(distance).ok());
   std::shared_ptr<arrow::Array> array1 = array_builder1.Finish().ValueOrDie();
   arrays.push_back(array1);
 
   arrow::Int64Builder array_builder2;
-  REQUIRE(array_builder2.Reserve(num_vertices).ok());
+  assert(array_builder2.Reserve(num_vertices).ok());
   for (int i = 0; i < num_vertices; i++) {
     if (pre[i] == -1) {
-      REQUIRE(array_builder2.AppendNull().ok());
+      assert(array_builder2.AppendNull().ok());
     } else {
       auto it = vertices.find(pre[i]);
       auto father_id = it.property<int64_t>("id").value();
-      REQUIRE(array_builder2.Append(father_id).ok());
+      assert(array_builder2.Append(father_id).ok());
     }
   }
   std::shared_ptr<arrow::Array> array2 = array_builder2.Finish().ValueOrDie();
@@ -136,7 +134,7 @@ TEST_CASE("test_bfs_with_father_example") {
   auto schema = std::make_shared<arrow::Schema>(schema_vector);
   std::shared_ptr<arrow::Table> table = arrow::Table::Make(schema, arrays);
   // dump the results through writer
-  REQUIRE(writer.WriteTable(table, group, 0).ok());
+  assert(writer.WriteTable(table, group, 0).ok());
 
   // construct a new graph
   src_label = "person";
@@ -148,14 +146,14 @@ TEST_CASE("test_bfs_with_father_example") {
   GAR_NAMESPACE::EdgeInfo new_edge_info(src_label, edge_label, dst_label,
                                         edge_chunk_size, src_chunk_size,
                                         dst_chunk_size, directed, version);
-  REQUIRE(new_edge_info
+  assert(new_edge_info
               .AddAdjList(GAR_NAMESPACE::AdjListType::ordered_by_source,
                           GAR_NAMESPACE::FileType::CSV)
               .ok());
-  REQUIRE(new_edge_info.IsValidated());
+  assert(new_edge_info.IsValidated());
   // save & dump
-  REQUIRE(!new_edge_info.Dump().has_error());
-  REQUIRE(new_edge_info.Save("/tmp/person_bfs_person.edge.yml").ok());
+  assert(!new_edge_info.Dump().has_error());
+  assert(new_edge_info.Save("/tmp/person_bfs_person.edge.yml").ok());
   GAR_NAMESPACE::builder::EdgesBuilder edges_builder(
       new_edge_info, "file:///tmp/",
       GAR_NAMESPACE::AdjListType::ordered_by_source);
@@ -163,7 +161,7 @@ TEST_CASE("test_bfs_with_father_example") {
     if (i == root || pre[i] == -1)
       continue;
     GAR_NAMESPACE::builder::Edge e(pre[i], i);
-    REQUIRE(edges_builder.AddEdge(e).ok());
+    assert(edges_builder.AddEdge(e).ok());
   }
-  REQUIRE(edges_builder.Dump().ok());
+  assert(edges_builder.Dump().ok());
 }

@@ -21,6 +21,7 @@ project(graph-archive LANGUAGES C CXX VERSION ${GAR_VERSION})
 
 option(NAMESPACE "User specific namespace, default if GraphArchive" OFF)
 option(BUILD_TESTS "Build unit test" OFF)
+option(BUILD_EXAMPLES "Build examples" OFF)
 
 if (NAMESPACE)
   add_definitions(-DGAR_NAMESPACE=${NAMESPACE})
@@ -191,6 +192,23 @@ endmacro()
 
 build_gar()
 
+# ------------------------------------------------------------------------------
+# build example
+# ------------------------------------------------------------------------------ 
+if (BUILD_EXAMPLES)
+    find_package(Boost REQUIRED COMPONENTS graph)
+
+    file(GLOB EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/examples" "${PROJECT_SOURCE_DIR}/examples/*.cc")
+    foreach(f ${EXAMPLE_FILES})
+        string(REGEX MATCH "^(.*)\\.[^.]*$" dummy ${f})
+        set(E_NAME ${CMAKE_MATCH_1})
+        message(STATUS "Found example - " ${E_NAME})
+        add_executable(${E_NAME} examples/${E_NAME}.cc)
+        target_include_directories(${E_NAME} PRIVATE examples ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
+        include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+        target_link_libraries(${E_NAME} PRIVATE gar ${Boost_LIBRARIES})
+    endforeach()
+endif()
 
 # ------------------------------------------------------------------------------
 # Install
@@ -255,15 +273,6 @@ if (BUILD_TESTS)
     add_test(test_arrow_chunk_reader SRCS test/test_arrow_chunk_reader.cc)
     add_test(test_graph SRCS test/test_graph.cc)
 
-    add_test(test_construct_info_example SRCS test/test_example/test_construct_info_example.cc)
-    add_test(test_bgl_example SRCS test/test_example/test_bgl_example.cc)
-    add_test(test_cc_push_example SRCS test/test_example/test_cc_push_example.cc)
-    add_test(test_cc_stream_example SRCS test/test_example/test_cc_stream_example.cc)
-    add_test(test_pagerank_example SRCS test/test_example/test_pagerank_example.cc)
-    add_test(test_bfs_push_example SRCS test/test_example/test_bfs_push_example.cc)
-    add_test(test_bfs_pull_example SRCS test/test_example/test_bfs_pull_example.cc)
-    add_test(test_bfs_stream_example SRCS test/test_example/test_bfs_stream_example.cc)
-    add_test(test_bfs_father_example SRCS test/test_example/test_bfs_father_example.cc)
     # enable_testing()
 endif()
 

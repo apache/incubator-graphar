@@ -174,7 +174,7 @@ A PageRank Example
 ``````````````````
 Here we will go through an example of out-of-core graph analytic algorithms based on GAR using PageRank as an example. Please look `here <https://en.wikipedia.org/wiki/PageRank>`_ if you want a detailed explanation of the PageRank algorithm.
 
-The source code can be found at `test_pagerank_example.cc`_. In this program, we first read the graph information file to get its metadata; and then, construct the vertex collection as well as the edge collection as the handle to access the graph; next, a PageRank algorithm is implemented with data for vertices cached in memory while edges are streamed through disk I/O; finally, we extend the vertex information with type "person" to include a new property named "pagerank" (a new vertex information file named *person-new-pagerank.vertex.yml* is saved) and uses the **VerticesBuilder** to write the results to new generated files.
+The source code can be found at `pagerank_example.cc`_. In this program, we first read the graph information file to get its metadata; and then, construct the vertex collection as well as the edge collection as the handle to access the graph; next, a PageRank algorithm is implemented with data for vertices cached in memory while edges are streamed through disk I/O; finally, we extend the vertex information with type "person" to include a new property named "pagerank" (a new vertex information file named *person-new-pagerank.vertex.yml* is saved) and uses the **VerticesBuilder** to write the results to new generated files.
 
 Please refer to `more examples <../applications/out-of-core.html>`_ for learning about other scenarios of working with GraphAr.
 
@@ -194,6 +194,6 @@ Please refer to `more examples <../applications/out-of-core.html>`_ for learning
 
 .. _./edge/person_knows_person/ordered_by_source/offset/part0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/part0
 
-.. _example program: https://github.com/alibaba/GraphAr/blob/main/test/test_example/test_construct_info_example.cc
+.. _example program: https://github.com/alibaba/GraphAr/blob/main/examples/construct_info_example.cc
 
-.. _test_pagerank_example.cc: https://github.com/alibaba/GraphAr/blob/main/test/test_example/test_pagerank_example.cc
+.. _pagerank_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/pagerank_example.cc

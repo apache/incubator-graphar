@@ -17,16 +17,14 @@ limitations under the License.
 
 #include "arrow/api.h"
 
-#include "../config.h"
+#include "config.h"
 #include "gar/graph.h"
 #include "gar/graph_info.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
 
-TEST_CASE("test_cc_using_push_example") {
+int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
@@ -34,10 +32,10 @@ TEST_CASE("test_cc_using_push_example") {
 
   // construct vertices collection
   std::string label = "person";
-  REQUIRE(graph_info.GetVertexInfo(label).status().ok());
+  assert(graph_info.GetVertexInfo(label).status().ok());
   auto maybe_vertices =
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
-  REQUIRE(maybe_vertices.status().ok());
+  assert(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
   int num_vertices = vertices.size();
   std::cout << "num_vertices: " << num_vertices << std::endl;
@@ -47,13 +45,13 @@ TEST_CASE("test_cc_using_push_example") {
   auto expect1 = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
-  REQUIRE(!expect1.has_error());
+  assert(!expect1.has_error());
   auto& edges1 = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_source>>(expect1.value());
   auto expect2 = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_dest);
-  REQUIRE(!expect2.has_error());
+  assert(!expect2.has_error());
   auto& edges2 = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_dest>>(expect2.value());
 
@@ -126,15 +124,15 @@ TEST_CASE("test_cc_using_push_example") {
                                      GAR_NAMESPACE::FileType::PARQUET);
   // extend the vertex_info
   auto maybe_vertex_info = graph_info.GetVertexInfo(label);
-  REQUIRE(maybe_vertex_info.status().ok());
+  assert(maybe_vertex_info.status().ok());
   auto vertex_info = maybe_vertex_info.value();
   auto maybe_extend_info = vertex_info.Extend(group);
-  REQUIRE(maybe_extend_info.status().ok());
+  assert(maybe_extend_info.status().ok());
   auto extend_info = maybe_extend_info.value();
   // dump the extened vertex info
-  REQUIRE(extend_info.IsValidated());
-  REQUIRE(extend_info.Dump().status().ok());
-  REQUIRE(extend_info.Save("/tmp/person-new-cc-push.vertex.yml").ok());
+  assert(extend_info.IsValidated());
+  assert(extend_info.Dump().status().ok());
+  assert(extend_info.Save("/tmp/person-new-cc-push.vertex.yml").ok());
   // construct vertex property writer
   GAR_NAMESPACE::VertexPropertyWriter writer(extend_info, "/tmp/");
   // convert results to arrow::Table
@@ -143,12 +141,12 @@ TEST_CASE("test_cc_using_push_example") {
   schema_vector.push_back(arrow::field(
       cc.name, GAR_NAMESPACE::DataType::DataTypeToArrowDataType(cc.type)));
   arrow::Int64Builder array_builder;
-  REQUIRE(array_builder.Reserve(num_vertices).ok());
-  REQUIRE(array_builder.AppendValues(component).ok());
+  assert(array_builder.Reserve(num_vertices).ok());
+  assert(array_builder.AppendValues(component).ok());
   std::shared_ptr<arrow::Array> array = array_builder.Finish().ValueOrDie();
   arrays.push_back(array);
   auto schema = std::make_shared<arrow::Schema>(schema_vector);
   std::shared_ptr<arrow::Table> table = arrow::Table::Make(schema, arrays);
   // dump the results through writer
-  REQUIRE(writer.WriteTable(table, group, 0).ok());
+  assert(writer.WriteTable(table, group, 0).ok());
 }

@@ -9,4 +9,7 @@ spark/target/
 # docs
 /docs/_build/
 
+# examples
+/examples/*/build
+
 
