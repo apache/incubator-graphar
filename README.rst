@@ -209,7 +209,7 @@ target linked with GraphAr C++ shared library.
     target_compile_features(my_example PRIVATE cxx_std_17)
     target_link_libraries(my_example PRIVATE ${GAR_LIBRARIES})
 
-Please refer to `examples/pagerank` for details.
+Please refer to `examples/pagerank_example.cc` for details.
 
 Contributing to GraphAr
 -----------------------
