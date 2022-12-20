@@ -148,8 +148,8 @@ bool EdgeIter::first_src(const EdgeIter& from, IdType id) {
 
   // unordered_by_source
   if (adj_list_type_ == AdjListType::unordered_by_source) {
-    IdType expect_chunk_index = index_converter_->IndexPairToGlobalChunkIndex(
-        id / src_chunk_size_, 0);
+    IdType expect_chunk_index =
+        index_converter_->IndexPairToGlobalChunkIndex(id / src_chunk_size_, 0);
     if (expect_chunk_index > chunk_end_)
       return false;
     if (from.global_chunk_index_ > chunk_end_ ||
@@ -197,8 +197,8 @@ bool EdgeIter::first_src(const EdgeIter& from, IdType id) {
   if (!maybe_offset_chunk.status().ok()) {
     return false;
   }
-  auto offset_array = std::dynamic_pointer_cast<arrow::Int64Array>(
-      maybe_offset_chunk.value());
+  auto offset_array =
+      std::dynamic_pointer_cast<arrow::Int64Array>(maybe_offset_chunk.value());
   auto begin_offset = static_cast<IdType>(offset_array->Value(0));
   auto end_offset = static_cast<IdType>(offset_array->Value(1));
   if (begin_offset >= end_offset) {
@@ -271,8 +271,8 @@ bool EdgeIter::first_dst(const EdgeIter& from, IdType id) {
 
   // unordered_by_dest
   if (adj_list_type_ == AdjListType::unordered_by_dest) {
-    IdType expect_chunk_index = index_converter_->IndexPairToGlobalChunkIndex(
-        id / dst_chunk_size_, 0);
+    IdType expect_chunk_index =
+        index_converter_->IndexPairToGlobalChunkIndex(id / dst_chunk_size_, 0);
     if (expect_chunk_index > chunk_end_)
       return false;
     if (from.global_chunk_index_ > chunk_end_ ||
@@ -320,8 +320,8 @@ bool EdgeIter::first_dst(const EdgeIter& from, IdType id) {
   if (!maybe_offset_chunk.status().ok()) {
     return false;
   }
-  auto offset_array = std::dynamic_pointer_cast<arrow::Int64Array>(
-      maybe_offset_chunk.value());
+  auto offset_array =
+      std::dynamic_pointer_cast<arrow::Int64Array>(maybe_offset_chunk.value());
   auto begin_offset = static_cast<IdType>(offset_array->Value(0));
   auto end_offset = static_cast<IdType>(offset_array->Value(1));
   if (begin_offset >= end_offset) {

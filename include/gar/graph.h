@@ -82,8 +82,6 @@ class Vertex {
   std::map<std::string, std::any> properties_;
 };
 
-
-
 /**
  * @brief Edge contains information of certain edge.
  */
@@ -138,7 +136,6 @@ class Edge {
   std::map<std::string, std::any> properties_;
 };
 
-
 /**
  * @brief The iterator for traversing a type of vertices.
  *
@@ -153,7 +150,7 @@ class VertexIter {
    * @param offset The current offset of the readers.
    */
   explicit VertexIter(const VertexInfo& vertex_info, const std::string& prefix,
-                    IdType offset) noexcept {
+                      IdType offset) noexcept {
     for (const auto& pg : vertex_info.GetPropertyGroups()) {
       readers_.emplace_back(vertex_info, pg, prefix);
     }
@@ -189,8 +186,7 @@ class VertexIter {
     }
     if (column != nullptr) {
       auto array = util::GetArrowArrayByChunkIndex(column, 0);
-      GAR_ASSIGN_OR_RAISE(auto data,
-                          util::GetArrowArrayData(array));
+      GAR_ASSIGN_OR_RAISE(auto data, util::GetArrowArrayData(array));
       return util::ValueGetter<T>::Value(data, 0);
     }
     return Status::KeyError("The property is not exist.");
@@ -365,10 +361,8 @@ class EdgeIter {
   /// Get the source vertex id for the current edge.
   IdType source();
 
-
   /// Get the destination vertex id for the current edge.
   IdType destination();
-
 
   /// Get the value of a property for the current edge.
   template <typename T>

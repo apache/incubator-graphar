@@ -99,7 +99,8 @@ std::shared_ptr<arrow::ChunkedArray> GetArrowColumnByName(
     std::shared_ptr<arrow::Table> const& table, const std::string& name);
 
 std::shared_ptr<arrow::Array> GetArrowArrayByChunkIndex(
-    std::shared_ptr<arrow::ChunkedArray> const& chunk_array, int64_t chunk_index);
+    std::shared_ptr<arrow::ChunkedArray> const& chunk_array,
+    int64_t chunk_index);
 
 Result<const void*> GetArrowArrayData(
     std::shared_ptr<arrow::Array> const& array);

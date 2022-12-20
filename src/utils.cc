@@ -30,7 +30,8 @@ std::shared_ptr<arrow::ChunkedArray> GetArrowColumnByName(
 }
 
 std::shared_ptr<arrow::Array> GetArrowArrayByChunkIndex(
-    std::shared_ptr<arrow::ChunkedArray> const& chunk_array, int64_t chunk_index) {
+    std::shared_ptr<arrow::ChunkedArray> const& chunk_array,
+    int64_t chunk_index) {
   return chunk_array->chunk(chunk_index);
 }
 
