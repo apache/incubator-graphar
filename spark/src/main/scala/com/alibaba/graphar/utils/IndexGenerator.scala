@@ -78,6 +78,28 @@ object IndexGenerator {
 
   //index helper for the Edge DataFrame
 
+  //add a column contains edge index
+  def generateEdgeIndexColumn(edgeDf: DataFrame): DataFrame = {
+    val spark = edgeDf.sparkSession
+    val schema = edgeDf.schema
+    val schema_with_index =  StructType(StructType(Seq(StructField(GeneralParams.edgeIndexCol, LongType, true)))++schema)
+    val rdd = edgeDf.rdd
+    val counts = rdd
+      .mapPartitionsWithIndex((i, ps) => Array((i, ps.size)).iterator, preservesPartitioning = true)
+      .collectAsMap()
+    val aggregatedCounts = SortedMap(counts.toSeq: _*)
+      .foldLeft((0L, Map.empty[Int, Long])) { case ((total, map), (i, c)) =>
+        (total + c, map + (i -> total))
+      }
+      ._2
+    val broadcastedCounts = spark.sparkContext.broadcast(aggregatedCounts)
+    val rdd_with_index = rdd.mapPartitionsWithIndex((i, ps) => {
+      val start = broadcastedCounts.value(i)
+      for { (p, j) <- ps.zipWithIndex } yield Row.fromSeq(Seq(start + j) ++ p.toSeq)
+    })
+    spark.createDataFrame(rdd_with_index, schema_with_index)
+  }
+
   // join the edge table with the vertex index mapping for source column
   def generateSrcIndexForEdgesFromMapping(edgeDf: DataFrame, srcColumnName: String, srcIndexMapping: DataFrame): DataFrame = {
     val spark = edgeDf.sparkSession
