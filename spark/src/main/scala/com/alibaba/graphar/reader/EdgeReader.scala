@@ -1,4 +1,7 @@
-package com.alibaba.graphar
+package com.alibaba.graphar.reader
+
+import com.alibaba.graphar.utils.{IndexGenerator}
+import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, PropertyGroup}
 
 import java.io.{File}
 import org.apache.spark.sql.{DataFrame, SparkSession}

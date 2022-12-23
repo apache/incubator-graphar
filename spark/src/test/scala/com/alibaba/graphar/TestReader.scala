@@ -1,5 +1,7 @@
 package com.alibaba.graphar
 
+import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
+
 import java.io.{File, FileInputStream}
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
