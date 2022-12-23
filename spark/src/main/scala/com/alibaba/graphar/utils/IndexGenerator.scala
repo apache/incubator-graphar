@@ -80,11 +80,11 @@ object IndexGenerator {
   def generateDstIndexForEdgesFromMapping(edgeDf: DataFrame, dstColumnName: String, dstIndexMapping: DataFrame): DataFrame = {
     val spark = edgeDf.sparkSession
     dstIndexMapping.createOrReplaceTempView("dst_vertex")
-    edgeDf.createOrReplaceTempView("edge")
+    edgeDf.createOrReplaceTempView("edges")
     val dstCol = GeneralParams.dstIndexCol;
     val indexCol = GeneralParams.vertexIndexCol;
     val dstPrimaryKey = GeneralParams.primaryCol;
-    val trans_df = spark.sql(f"select dst_vertex.$indexCol%s as $dstCol%s, edge.* from edge inner join dst_vertex on dst_vertex.$dstPrimaryKey%s=edge.$dstColumnName%s")
+    val trans_df = spark.sql(f"select dst_vertex.$indexCol%s as $dstCol%s, edges.* from edges inner join dst_vertex on dst_vertex.$dstPrimaryKey%s=edges.$dstColumnName%s")
     // drop the old dst id col
     trans_df.drop(dstColumnName)
 	}

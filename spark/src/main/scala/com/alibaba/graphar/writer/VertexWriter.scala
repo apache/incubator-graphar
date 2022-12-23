@@ -35,8 +35,7 @@ class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame) 
 
   def writeVertexProperties(propertyGroup: PropertyGroup): Unit = {
     if (chunks.isEmpty) {
-      val vertex_df_with_index = IndexGenerator.generateVertexIndexColumn(vertexDf)
-      chunks = VertexWriter.repartitionAndSort(vertex_df_with_index, vertexInfo.getChunk_size())
+      chunks = VertexWriter.repartitionAndSort(vertexDf, vertexInfo.getChunk_size())
     }
 
     // write out the chunks

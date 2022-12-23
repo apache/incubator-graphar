@@ -1,17 +1,25 @@
 package com.alibaba.graphar
 
-import java.io.{File, FileInputStream}
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
 import org.scalatest.funsuite.AnyFunSuite
+import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.spark.sql.SparkSession
 
 class GraphInfoSuite extends AnyFunSuite {
+  val spark = SparkSession.builder()
+    .enableHiveSupport()
+    .master("local[*]")
+    .getOrCreate()
 
   test("load graph info") {
-    val input = getClass.getClassLoader.getResourceAsStream("gar-test/ldbc_sample/csv/ldbc_sample.graph.yml")
-    val yaml = new Yaml(new Constructor(classOf[GraphInfo]))
-    val graph_info = yaml.load(input).asInstanceOf[GraphInfo]
+    // read graph yaml
+    val yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/ldbc_sample.graph.yml").getPath)
+    val fs = FileSystem.get(yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
+    val input = fs.open(yaml_path)
+    val graph_yaml = new Yaml(new Constructor(classOf[GraphInfo]))
+    val graph_info = graph_yaml.load(input).asInstanceOf[GraphInfo]
 
     assert(graph_info.getName == "ldbc_sample")
     assert(graph_info.getPrefix == "" )
@@ -27,7 +35,9 @@ class GraphInfoSuite extends AnyFunSuite {
   }
 
   test("load vertex info") {
-    val input = getClass.getClassLoader.getResourceAsStream("gar-test/ldbc_sample/csv/person.vertex.yml")
+    val yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person.vertex.yml").getPath)
+    val fs = FileSystem.get(yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
+    val input = fs.open(yaml_path)
     val yaml = new Yaml(new Constructor(classOf[VertexInfo]))
     val vertex_info = yaml.load(input).asInstanceOf[VertexInfo]
 
@@ -74,7 +84,9 @@ class GraphInfoSuite extends AnyFunSuite {
   }
 
   test("load edge info") {
-    val input = getClass.getClassLoader.getResourceAsStream("gar-test/ldbc_sample/csv/person_knows_person.edge.yml")
+    val yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath)
+    val fs = FileSystem.get(yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
+    val input = fs.open(yaml_path)
     val yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
     val edge_info = yaml.load(input).asInstanceOf[EdgeInfo]
 

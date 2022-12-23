@@ -1,5 +1,6 @@
 package com.alibaba.graphar.utils
 
+import java.net.URI
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.DataFrame
 import org.apache.hadoop.fs
@@ -7,7 +8,7 @@ import org.apache.hadoop.fs
 object FileSystem {
   private def renameSparkGeneratedFiles(spark: SparkSession, filePrefix: String): Unit = {
     val sc = spark.sparkContext
-    val file_system = fs.FileSystem.get(spark.sparkContext.hadoopConfiguration)
+    val file_system = fs.FileSystem.get(new URI(filePrefix), spark.sparkContext.hadoopConfiguration)
     val path_pattern = new fs.Path(filePrefix + "part*")
     val files = file_system.globStatus(path_pattern)
     for (i <- 0 until files.length) {
