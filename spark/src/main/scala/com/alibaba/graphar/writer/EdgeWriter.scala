@@ -1,6 +1,8 @@
-package com.alibaba.graphar
+package com.alibaba.graphar.writer
 
-import com.alibaba.graphar.utils.FileSystem
+import com.alibaba.graphar.utils.{FileSystem, VertexChunkPartitioner}
+import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, PropertyGroup}
+
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.rdd.OrderedRDDFunctions
 import org.apache.spark.sql.Row
@@ -115,6 +117,9 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
       val output_prefix = prefix + edgeInfo.getAdjListOffsetDirPath(adjListType) + "part" + chunk_index.toString + "/"
       if (adjListType == AdjListType.ordered_by_source) {
         val offset_chunk = chunk.select(GeneralParams.srcIndexCol).groupBy(GeneralParams.srcIndexCol).count().coalesce(1).orderBy(GeneralParams.srcIndexCol)
+        FileSystem.writeDataFrame(offset_chunk, FileType.FileTypeToString(file_type), output_prefix)
+      } else {
+        val offset_chunk = chunk.select(GeneralParams.dstIndexCol).groupBy(GeneralParams.dstIndexCol).count().coalesce(1).orderBy(GeneralParams.dstIndexCol)
         FileSystem.writeDataFrame(offset_chunk, FileType.FileTypeToString(file_type), output_prefix)
       }
       chunk_index = chunk_index + 1

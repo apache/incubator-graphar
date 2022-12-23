@@ -1,4 +1,6 @@
-package com.alibaba.graphar
+package com.alibaba.graphar.utils
+
+import com.alibaba.graphar.GeneralParams
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._

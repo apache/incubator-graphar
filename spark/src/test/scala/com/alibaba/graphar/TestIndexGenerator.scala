@@ -1,5 +1,7 @@
 package com.alibaba.graphar
 
+import com.alibaba.graphar.utils.IndexGenerator
+
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.scalatest.funsuite.AnyFunSuite
 

@@ -1,4 +1,4 @@
-package com.alibaba.graphar
+package com.alibaba.graphar.utils
 
 import org.apache.spark.sql.types._
 import org.apache.spark.Partitioner
