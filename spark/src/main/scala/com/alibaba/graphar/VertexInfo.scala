@@ -148,6 +148,7 @@ class VertexInfo() {
           str += GeneralParams.regularSeperator
         str += properties.get(j).getName;
       }
+      str += "/"
     } else {
       str = property_group.getPrefix
     }
