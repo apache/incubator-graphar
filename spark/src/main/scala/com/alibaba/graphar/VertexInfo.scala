@@ -133,7 +133,7 @@ class VertexInfo() {
     } else {
       str = property_group.getPrefix
     }
-    return prefix + str + "part" + chunk_index.toString() + "/chunk0"
+    return prefix + str + "chunk" + chunk_index.toString()
   }
 
   def getDirPath(property_group: PropertyGroup): String = {

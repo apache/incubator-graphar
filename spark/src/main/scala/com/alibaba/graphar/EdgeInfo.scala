@@ -210,8 +210,8 @@ class EdgeInfo() {
   def getAdjListOffsetFilePath(chunk_index: Long, adj_list_type: AdjListType.Value) : String = {
     if (containAdjList(adj_list_type) == false)
       throw new IllegalArgumentException
-    val str: String = prefix + getAdjListPrefix(adj_list_type) + "offset/part" +
-           chunk_index.toString() + "/chunk0"
+    val str: String = prefix + getAdjListPrefix(adj_list_type) + "offset/chunk" +
+           chunk_index.toString()
     return str
   }
 
