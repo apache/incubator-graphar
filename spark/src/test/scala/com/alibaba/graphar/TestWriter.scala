@@ -1,3 +1,18 @@
+/** Copyright 2022 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.alibaba.graphar
 
 import com.alibaba.graphar.utils.IndexGenerator
@@ -38,7 +53,22 @@ class WriterSuite extends AnyFunSuite {
 
     // create writer object for person and generate the properties with GAR format
     val writer = new VertexWriter(graph_info.getPrefix(), vertex_info, vertex_df_with_index)
+
+    // write certain property group
+    val property_group = vertex_info.getPropertyGroup("id")
+    writer.writeVertexProperties(property_group)
+    val id_chunk_path = new Path(graph_info.getPrefix() + vertex_info.getDirPath(property_group) + "chunk*")
+    val id_chunk_files = fs.globStatus(id_chunk_path)
+    assert(id_chunk_files.length == 10)
+    fs.delete(id_chunk_path, true)
     writer.writeVertexProperties()
+    val chunk_path = new Path(graph_info.getPrefix() + vertex_info.getPrefix() + "*/*")
+    val chunk_files = fs.globStatus(chunk_path)
+    assert(chunk_files.length == 20)
+
+    assertThrows[IllegalArgumentException](new VertexWriter(graph_info.getPrefix(), vertex_info, vertex_df))
+    val invalid_property_group= new PropertyGroup()
+    assertThrows[IllegalArgumentException](writer.writeVertexProperties(invalid_property_group))
 
     // close FileSystem instance
     fs.close()
@@ -68,6 +98,11 @@ class WriterSuite extends AnyFunSuite {
     // create writer object for person_knows_person and generate the adj list and properties with GAR format
     val writer = new EdgeWriter(graph_info.getPrefix(), edge_info, AdjListType.ordered_by_source, edge_df_with_index)
     writer.writeEdges()
+
+    // throw exception if not generate src index and dst index for edge dataframe
+    assertThrows[IllegalArgumentException](new EdgeWriter(graph_info.getPrefix(), edge_info, AdjListType.ordered_by_source, edge_df))
+    // throw exception if pass the adj list type not contain in edge info
+    assertThrows[IllegalArgumentException](new EdgeWriter(graph_info.getPrefix(), edge_info, AdjListType.unorded_by_dest, edge_df_with_index))
 
     // close FileSystem instance
     fs.close()

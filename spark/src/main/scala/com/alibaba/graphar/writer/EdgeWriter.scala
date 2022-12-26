@@ -1,3 +1,18 @@
+/** Copyright 2022 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.alibaba.graphar.writer
 
 import com.alibaba.graphar.utils.{FileSystem, VertexChunkPartitioner}
@@ -15,6 +30,7 @@ import scala.collection.SortedMap
 import scala.collection.mutable.ArrayBuffer
 
 object EdgeWriter {
+  // split the whole edge dataframe into chunk dataframes by vertex chunk size.
   private def split(edgeDf: DataFrame, keyColumnName: String, vertexChunkSize: Long): Seq[DataFrame] = {
     // split the dataframe to mutiple daraframes by vertex chunk
     edgeDf.cache()
@@ -27,6 +43,7 @@ object EdgeWriter {
     return chunks
   }
 
+  // repartition the chunk dataframe by edge chunk size (this is for COO)
   private def repartition(chunkDf: DataFrame, keyColumnName: String, edgeChunkSize: Long): DataFrame = {
     // repartition the dataframe by edge chunk size
     val spark = chunkDf.sparkSession
@@ -55,6 +72,7 @@ object EdgeWriter {
     spark.createDataFrame(chunks, df_schema)
   }
 
+  // repartition and sort the chunk dataframe by edge chunk size (this is for CSR/CSC)
   private def sortAndRepartition(chunkDf: DataFrame, keyColumnName: String, edgeChunkSize: Long): DataFrame = {
     // repartition the dataframe by edge chunk size
     val spark = chunkDf.sparkSession
@@ -87,11 +105,17 @@ object EdgeWriter {
 class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.Value, edgeDf: DataFrame) {
   private var chunks: Seq[DataFrame] = preprocess()
 
+  // convert the edge dataframe to chunk dataframes
   private def preprocess(): Seq[DataFrame] = {
+    // chunk if edge info contains the adj list type
+    if (edgeInfo.containAdjList(adjListType) == false) {
+      throw new IllegalArgumentException
+    }
+
     // check the src index and dst index column exist
-    val src_filed = StructField(GeneralParams.srcIndexCol, LongType)
-    val dst_filed = StructField(GeneralParams.dstIndexCol, LongType)
-    val schema = edgeDf.schema()
+    val src_filed = StructField(GeneralParams.srcIndexCol, LongType, false)
+    val dst_filed = StructField(GeneralParams.dstIndexCol, LongType, false)
+    val schema = edgeDf.schema
     if (schema.contains(src_filed) == false || schema.contains(dst_filed) == false) {
       throw new IllegalArgumentException
     }
@@ -115,6 +139,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
   }
 
+  // generate the Offset chunks files from edge dataframe for this edge type
   private def writeOffset(): Unit = {
     val file_type = edgeInfo.getAdjListFileType(adjListType)
     var chunk_index: Long = 0
@@ -131,6 +156,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
   }
 
+  // generate the chunks of AdjList from edge dataframe for this edge type
   def writeAdjList(): Unit = {
     val file_type = edgeInfo.getAdjListFileType(adjListType)
     var chunk_index: Long = 0
@@ -146,10 +172,15 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
   }
 
+  // generate the chunks of the property group from edge dataframe
   def writeEdgeProperties(propertyGroup: PropertyGroup): Unit = {
     // select the columns uses property names
     // write the rows in batch (with batch size = ChunkSize)
     // return a WriterMessge
+    if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
+      throw new IllegalArgumentException
+    }
+
     val output_prefix = prefix + edgeInfo.getPropertyDirPath(propertyGroup, adjListType)
     val property_list = ArrayBuffer[String]()
     val p_it = propertyGroup.getProperties().iterator
@@ -165,6 +196,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
   }
 
+  // generate the chunks of all property groups from edge dataframe
   def writeEdgeProperties(): Unit = {
       // select the columns uses property names
       // write the rows in batch (with batch size = ChunkSize)
@@ -177,6 +209,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
   }
 
+  // generate the chunks for the AdjList and all property groups from edge dataframe
   def writeEdges(): Unit = {
     writeAdjList()
     writeEdgeProperties()

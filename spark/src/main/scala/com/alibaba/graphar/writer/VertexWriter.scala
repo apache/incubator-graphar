@@ -1,3 +1,18 @@
+/** Copyright 2022 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.alibaba.graphar.writer
 
 import com.alibaba.graphar.utils.{FileSystem, VertexChunkPartitioner, IndexGenerator}
@@ -31,17 +46,23 @@ object VertexWriter {
 }
 
 class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame) {
-  private var chunks:DataFrame = vertexDf.sparkSession.emptyDataFrame
+  private var chunks:DataFrame = preprocess()
   private val spark = vertexDf.sparkSession
 
-  def writeVertexProperties(propertyGroup: PropertyGroup): Unit = {
+  private def preprocess() : DataFrame = {
     // check if vertex dataframe contains the index_filed
     val index_filed = StructField(GeneralParams.vertexIndexCol, LongType)
     if (vertexDf.schema.contains(index_filed) == false) {
       throw new IllegalArgumentException
     }
-    if (chunks.isEmpty) {
-      chunks = VertexWriter.repartitionAndSort(vertexDf, vertexInfo.getChunk_size())
+    return VertexWriter.repartitionAndSort(vertexDf, vertexInfo.getChunk_size())
+  }
+
+  // generate chunks of the property group for vertex dataframe
+  def writeVertexProperties(propertyGroup: PropertyGroup): Unit = {
+    // check if contains the property group
+    if (vertexInfo.containPropertyGroup(propertyGroup) == false) {
+      throw new IllegalArgumentException
     }
 
     // write out the chunks
@@ -56,6 +77,7 @@ class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame) 
     FileSystem.writeDataFrame(pg_df, propertyGroup.getFile_type(), output_prefix)
   }
 
+  // generate chunks of all property groups for vertex dataframe
   def writeVertexProperties(): Unit = {
     val property_groups = vertexInfo.getProperty_groups()
     val it = property_groups.iterator
