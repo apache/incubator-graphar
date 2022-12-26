@@ -200,6 +200,13 @@ A PR can only be merged into main by a maintainer if:
 Any maintainer is allowed to merge a PR if all of these conditions are
 met.
 
+Shipping a release (maintainers only)
+
+Maintainers need to do the following to push out a release:
+
+* Switch to the main branch and make sure it's up to date.
+
+
 Reviewing pull requests
 -----------------------
 
