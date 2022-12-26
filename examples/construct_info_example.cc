@@ -67,7 +67,7 @@ int main(int argc, char* argv[]) {
   assert(!vertex_info.IsPrimaryKey(gender.name).status().ok());
   assert(vertex_info.GetPropertyType(id.name).value() == id.type);
   assert(vertex_info.GetFilePath(group1, 0).value() ==
-          "vertex/person/id/part0/chunk0");
+          "vertex/person/id/chunk0");
 
   // extend property groups & validate
   auto result = vertex_info.Extend(group2);
@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
               .GetAdjListOffsetFilePath(
                   0, GAR_NAMESPACE::AdjListType::ordered_by_dest)
               .value() ==
-          "edge/person_knows_person/ordered_by_dest/offset/part0/chunk0");
+          "edge/person_knows_person/ordered_by_dest/offset/chunk0");
 
   // add property group & validate
   GAR_NAMESPACE::Property creationDate = {

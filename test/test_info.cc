@@ -130,7 +130,7 @@ TEST_CASE("test_vertex_info") {
   // test get file path
   auto maybe_path = v_info.GetFilePath(pg, 0);
   REQUIRE(!maybe_path.has_error());
-  REQUIRE(maybe_path.value() == expected_dir_path + "part0/chunk0");
+  REQUIRE(maybe_path.value() == expected_dir_path + "chunk0");
   // property group not exist
   REQUIRE(v_info.GetFilePath(pg2, 0).status().IsKeyError());
 
@@ -194,7 +194,7 @@ TEST_CASE("test_edge_info") {
       edge_info.GetAdjListOffsetFilePath(0, adj_list_type);
   REQUIRE(!adj_list_offset_file_path.has_error());
   REQUIRE(adj_list_offset_file_path.value() ==
-          edge_info.GetPrefix() + adj_prefix + "offset/part0/chunk0");
+          edge_info.GetPrefix() + adj_prefix + "offset/chunk0");
   auto adj_list_offset_dir_path =
       edge_info.GetAdjListOffsetDirPath(adj_list_type);
   REQUIRE(!adj_list_offset_dir_path.has_error());

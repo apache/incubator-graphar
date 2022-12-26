@@ -10,6 +10,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.Row
 import org.apache.spark.rdd.RDD
 import org.apache.spark.HashPartitioner
+import org.apache.spark.sql.types.{LongType, StructField}
 
 import scala.collection.SortedMap
 import scala.collection.mutable.ArrayBuffer
@@ -34,6 +35,11 @@ class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame) 
   private val spark = vertexDf.sparkSession
 
   def writeVertexProperties(propertyGroup: PropertyGroup): Unit = {
+    // check if vertex dataframe contains the index_filed
+    val index_filed = StructField(GeneralParams.vertexIndexCol, LongType)
+    if (vertexDf.schema.contains(index_filed) == false) {
+      throw new IllegalArgumentException
+    }
     if (chunks.isEmpty) {
       chunks = VertexWriter.repartitionAndSort(vertexDf, vertexInfo.getChunk_size())
     }

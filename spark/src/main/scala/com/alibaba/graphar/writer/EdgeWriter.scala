@@ -4,14 +4,12 @@ import com.alibaba.graphar.utils.{FileSystem, VertexChunkPartitioner}
 import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, PropertyGroup}
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.rdd.OrderedRDDFunctions
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.types.{LongType, StringType, StructField, StructType, IntegerType}
+import org.apache.spark.sql.types.{LongType, StructField}
 import org.apache.spark.util.Utils
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
-import org.apache.spark.rdd.RDD.rddToOrderedRDDFunctions
 
 import scala.collection.SortedMap
 import scala.collection.mutable.ArrayBuffer
@@ -90,6 +88,13 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
   private var chunks: Seq[DataFrame] = preprocess()
 
   private def preprocess(): Seq[DataFrame] = {
+    // check the src index and dst index column exist
+    val src_filed = StructField(GeneralParams.srcIndexCol, LongType)
+    val dst_filed = StructField(GeneralParams.dstIndexCol, LongType)
+    val schema = edgeDf.schema()
+    if (schema.contains(src_filed) == false || schema.contains(dst_filed) == false) {
+      throw new IllegalArgumentException
+    }
     var vertex_chunk_size: Long = 0
     var primaryColName: String = ""
     if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.unordered_by_source) {
@@ -114,12 +119,12 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     val file_type = edgeInfo.getAdjListFileType(adjListType)
     var chunk_index: Long = 0
     for (chunk <- chunks) {
-      val output_prefix = prefix + edgeInfo.getAdjListOffsetDirPath(adjListType) + "part" + chunk_index.toString + "/"
+      val output_prefix = prefix + edgeInfo.getAdjListOffsetDirPath(adjListType)
       if (adjListType == AdjListType.ordered_by_source) {
-        val offset_chunk = chunk.select(GeneralParams.srcIndexCol).groupBy(GeneralParams.srcIndexCol).count().coalesce(1).orderBy(GeneralParams.srcIndexCol)
+        val offset_chunk = chunk.select(GeneralParams.srcIndexCol).groupBy(GeneralParams.srcIndexCol).count().coalesce(1).orderBy(GeneralParams.srcIndexCol).select("count")
         FileSystem.writeDataFrame(offset_chunk, FileType.FileTypeToString(file_type), output_prefix)
       } else {
-        val offset_chunk = chunk.select(GeneralParams.dstIndexCol).groupBy(GeneralParams.dstIndexCol).count().coalesce(1).orderBy(GeneralParams.dstIndexCol)
+        val offset_chunk = chunk.select(GeneralParams.dstIndexCol).groupBy(GeneralParams.dstIndexCol).count().coalesce(1).orderBy(GeneralParams.dstIndexCol).select("count")
         FileSystem.writeDataFrame(offset_chunk, FileType.FileTypeToString(file_type), output_prefix)
       }
       chunk_index = chunk_index + 1

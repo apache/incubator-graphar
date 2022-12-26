@@ -22,6 +22,7 @@ object FileSystem {
     val spark = dataFrame.sparkSession
     spark.conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
     spark.conf.set("parquet.enable.summary-metadata", "false")
+    spark.conf.set("spark.sql.parquet.compression.codec", "zstd")
     dataFrame.write.mode("overwrite").format(fileType).save(outputPrefix)
     renameSparkGeneratedFiles(spark, outputPrefix)
   }

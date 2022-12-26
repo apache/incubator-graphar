@@ -21,14 +21,14 @@ class WriterSuite extends AnyFunSuite {
     val vertex_df = spark.read.option("delimiter", "|").option("header", "true").csv(file_path)
 
     // read graph yaml
-    val graph_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/ldbc_sample.graph.yml").getPath)
+    val graph_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml").getPath)
     val fs = FileSystem.get(graph_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
     val graph_input = fs.open(graph_yaml_path)
     val graph_yaml = new Yaml(new Constructor(classOf[GraphInfo]))
     val graph_info = graph_yaml.load(graph_input).asInstanceOf[GraphInfo]
 
     // read vertex yaml
-    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person.vertex.yml").getPath)
+    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/person.vertex.yml").getPath)
     val vertex_input = fs.open(vertex_yaml_path)
     val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
     val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
@@ -50,14 +50,14 @@ class WriterSuite extends AnyFunSuite {
     val edge_df = spark.read.option("delimiter", "|").option("header", "true").csv(file_path)
 
     // read graph yaml
-    val graph_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/ldbc_sample.graph.yml").getPath)
+    val graph_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml").getPath)
     val fs = FileSystem.get(graph_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
     val graph_input = fs.open(graph_yaml_path)
     val graph_yaml = new Yaml(new Constructor(classOf[GraphInfo]))
     val graph_info = graph_yaml.load(graph_input).asInstanceOf[GraphInfo]
 
     // read edge yaml
-    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath)
+    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/person_knows_person.edge.yml").getPath)
     val edge_input = fs.open(edge_yaml_path)
     val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
     val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
@@ -84,20 +84,20 @@ class WriterSuite extends AnyFunSuite {
 
 
     // read graph yaml
-    val graph_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/ldbc_sample.graph.yml").getPath)
+    val graph_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml").getPath)
     val fs = FileSystem.get(graph_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
     val graph_input = fs.open(graph_yaml_path)
     val graph_yaml = new Yaml(new Constructor(classOf[GraphInfo]))
     val graph_info = graph_yaml.load(graph_input).asInstanceOf[GraphInfo]
 
     // read vertex yaml
-    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person.vertex.yml").getPath)
+    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/person.vertex.yml").getPath)
     val vertex_input = fs.open(vertex_yaml_path)
     val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
     val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
 
     // read edge yaml
-    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath)
+    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/person_knows_person.edge.yml").getPath)
     val edge_input = fs.open(edge_yaml_path)
     val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
     val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
