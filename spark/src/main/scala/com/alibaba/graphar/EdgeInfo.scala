@@ -271,6 +271,25 @@ class EdgeInfo() {
     return str
   }
 
+  def getPropertyFilePath(property_group: PropertyGroup, adj_list_type: AdjListType.Value, vertex_chunk_index: Long) : String = {
+    if (containPropertyGroup(property_group, adj_list_type) == false)
+      throw new IllegalArgumentException
+    var str: String = property_group.getPrefix
+    if (str == "") {
+      val properties = property_group.getProperties
+      val num = properties.size
+      for ( j <- 0 to num - 1 ) {
+        if (j > 0)
+          str += GeneralParams.regularSeperator
+        str += properties.get(j).getName;
+      }
+      str +=  "/"
+    }
+    str = prefix + getAdjListPrefix(adj_list_type) + str + "part" +
+      vertex_chunk_index.toString() + "/"
+    return str
+  }
+
   def getPropertyDirPath(property_group: PropertyGroup, adj_list_type: AdjListType.Value) : String = {
     if (containPropertyGroup(property_group, adj_list_type) == false)
       throw new IllegalArgumentException

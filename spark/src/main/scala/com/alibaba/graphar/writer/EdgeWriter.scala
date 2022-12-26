@@ -144,7 +144,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     val file_type = edgeInfo.getAdjListFileType(adjListType)
     var chunk_index: Long = 0
     for (chunk <- chunks) {
-      val output_prefix = prefix + edgeInfo.getAdjListOffsetDirPath(adjListType)
+      val output_prefix = prefix + edgeInfo.getAdjListOffsetDirPath(adjListType) + "part" + chunk_index.toString + "/"
       if (adjListType == AdjListType.ordered_by_source) {
         val offset_chunk = chunk.select(GeneralParams.srcIndexCol).groupBy(GeneralParams.srcIndexCol).count().coalesce(1).orderBy(GeneralParams.srcIndexCol).select("count")
         FileSystem.writeDataFrame(offset_chunk, FileType.FileTypeToString(file_type), output_prefix)
@@ -181,7 +181,6 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
       throw new IllegalArgumentException
     }
 
-    val output_prefix = prefix + edgeInfo.getPropertyDirPath(propertyGroup, adjListType)
     val property_list = ArrayBuffer[String]()
     val p_it = propertyGroup.getProperties().iterator
     while (p_it.hasNext()) {
@@ -190,6 +189,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
     var chunk_index: Long = 0
     for (chunk <- chunks) {
+      val output_prefix = prefix + edgeInfo.getPropertyFilePath(propertyGroup, adjListType, chunk_index)
       val property_group_chunk = chunk.select(property_list.map(col): _*)
       FileSystem.writeDataFrame(property_group_chunk, propertyGroup.getFile_type(), output_prefix)
       chunk_index = chunk_index + 1

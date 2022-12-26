@@ -34,13 +34,7 @@ class WriterSuite extends AnyFunSuite {
     // read vertex dataframe
     val file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/person_0_0.csv").getPath
     val vertex_df = spark.read.option("delimiter", "|").option("header", "true").csv(file_path)
-
-    // read graph yaml
-    val graph_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml").getPath)
-    val fs = FileSystem.get(graph_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
-    val graph_input = fs.open(graph_yaml_path)
-    val graph_yaml = new Yaml(new Constructor(classOf[GraphInfo]))
-    val graph_info = graph_yaml.load(graph_input).asInstanceOf[GraphInfo]
+    val fs = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
 
     // read vertex yaml
     val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/person.vertex.yml").getPath)
@@ -52,21 +46,21 @@ class WriterSuite extends AnyFunSuite {
     val vertex_df_with_index = IndexGenerator.generateVertexIndexColumn(vertex_df)
 
     // create writer object for person and generate the properties with GAR format
-    val writer = new VertexWriter(graph_info.getPrefix(), vertex_info, vertex_df_with_index)
+    val prefix : String = "/tmp/"
+    val writer = new VertexWriter(prefix, vertex_info, vertex_df_with_index)
 
     // write certain property group
     val property_group = vertex_info.getPropertyGroup("id")
     writer.writeVertexProperties(property_group)
-    val id_chunk_path = new Path(graph_info.getPrefix() + vertex_info.getDirPath(property_group) + "chunk*")
+    val id_chunk_path = new Path(prefix + vertex_info.getDirPath(property_group) + "chunk*")
     val id_chunk_files = fs.globStatus(id_chunk_path)
     assert(id_chunk_files.length == 10)
-    fs.delete(id_chunk_path, true)
     writer.writeVertexProperties()
-    val chunk_path = new Path(graph_info.getPrefix() + vertex_info.getPrefix() + "*/*")
+    val chunk_path = new Path(prefix + vertex_info.getPrefix() + "*/*")
     val chunk_files = fs.globStatus(chunk_path)
     assert(chunk_files.length == 20)
 
-    assertThrows[IllegalArgumentException](new VertexWriter(graph_info.getPrefix(), vertex_info, vertex_df))
+    assertThrows[IllegalArgumentException](new VertexWriter(prefix, vertex_info, vertex_df))
     val invalid_property_group= new PropertyGroup()
     assertThrows[IllegalArgumentException](writer.writeVertexProperties(invalid_property_group))
 
@@ -78,31 +72,48 @@ class WriterSuite extends AnyFunSuite {
     // read edge dataframe
     val file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv").getPath
     val edge_df = spark.read.option("delimiter", "|").option("header", "true").csv(file_path)
-
-    // read graph yaml
-    val graph_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml").getPath)
-    val fs = FileSystem.get(graph_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
-    val graph_input = fs.open(graph_yaml_path)
-    val graph_yaml = new Yaml(new Constructor(classOf[GraphInfo]))
-    val graph_info = graph_yaml.load(graph_input).asInstanceOf[GraphInfo]
+    val prefix : String = "/tmp/"
+    val fs = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
 
     // read edge yaml
-    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/person_knows_person.edge.yml").getPath)
+    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath)
     val edge_input = fs.open(edge_yaml_path)
     val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
     val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
+    val adj_list_type = AdjListType.ordered_by_source
 
     // generate vertex index for edge dataframe
     val edge_df_with_index = IndexGenerator.generateSrcAndDstIndexUnitedlyForEdges(edge_df, "src", "dst")
 
     // create writer object for person_knows_person and generate the adj list and properties with GAR format
-    val writer = new EdgeWriter(graph_info.getPrefix(), edge_info, AdjListType.ordered_by_source, edge_df_with_index)
+    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, edge_df_with_index)
+
+    // test write adj list
+    writer.writeAdjList()
+    val adj_list_path_pattern = new Path(prefix + edge_info.getAdjListDirPath(adj_list_type) + "*/*")
+    val adj_list_chunk_files = fs.globStatus(adj_list_path_pattern)
+    assert(adj_list_chunk_files.length == 9)
+    val offset_path_pattern = new Path(prefix + edge_info.getAdjListOffsetDirPath(adj_list_type) + "*")
+    val offset_chunk_files = fs.globStatus(offset_path_pattern)
+    assert(offset_chunk_files.length == 7)
+
+    // test write property group
+    val property_group = edge_info.getPropertyGroup("creationDate", adj_list_type)
+    writer.writeEdgeProperties(property_group)
+    val property_group_path_pattern = new Path(prefix + edge_info.getPropertyDirPath(property_group, adj_list_type) + "*/*")
+    val property_group_chunk_files = fs.globStatus(property_group_path_pattern)
+    assert(property_group_chunk_files.length == 9)
+
+    // test write edges
     writer.writeEdges()
 
+    val invalid_property_group = new PropertyGroup()
+
+    assertThrows[IllegalArgumentException](writer.writeEdgeProperties(invalid_property_group))
     // throw exception if not generate src index and dst index for edge dataframe
-    assertThrows[IllegalArgumentException](new EdgeWriter(graph_info.getPrefix(), edge_info, AdjListType.ordered_by_source, edge_df))
+    assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.ordered_by_source, edge_df))
     // throw exception if pass the adj list type not contain in edge info
-    assertThrows[IllegalArgumentException](new EdgeWriter(graph_info.getPrefix(), edge_info, AdjListType.unorded_by_dest, edge_df_with_index))
+    assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.unordered_by_dest, edge_df_with_index))
 
     // close FileSystem instance
     fs.close()
@@ -117,22 +128,18 @@ class WriterSuite extends AnyFunSuite {
     val file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv").getPath
     val edge_df = spark.read.option("delimiter", "|").option("header", "true").csv(file_path)
 
-
-    // read graph yaml
-    val graph_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml").getPath)
-    val fs = FileSystem.get(graph_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
-    val graph_input = fs.open(graph_yaml_path)
-    val graph_yaml = new Yaml(new Constructor(classOf[GraphInfo]))
-    val graph_info = graph_yaml.load(graph_input).asInstanceOf[GraphInfo]
+    val prefix : String = "/tmp/test2/"
+    val fs = FileSystem.get(new Path(prefix).toUri(), spark.sparkContext.hadoopConfiguration)
+    val adj_list_type = AdjListType.ordered_by_source
 
     // read vertex yaml
-    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/person.vertex.yml").getPath)
+    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person.vertex.yml").getPath)
     val vertex_input = fs.open(vertex_yaml_path)
     val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
     val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
 
     // read edge yaml
-    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/person_knows_person.edge.yml").getPath)
+    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath)
     val edge_input = fs.open(edge_yaml_path)
     val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
     val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
@@ -144,7 +151,24 @@ class WriterSuite extends AnyFunSuite {
     val edge_df_with_src_dst_index = IndexGenerator.generateDstIndexForEdgesFromMapping(edge_df_with_src_index, "dst", vertex_mapping)
 
     // create writer object for person_knows_person and generate the adj list and properties with GAR format
-    val writer = new EdgeWriter(graph_info.getPrefix(), edge_info, AdjListType.ordered_by_source, edge_df_with_src_dst_index)
+    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, edge_df_with_src_dst_index)
+
+    // test write adj list
+    writer.writeAdjList()
+    val adj_list_path_pattern = new Path(prefix + edge_info.getAdjListDirPath(adj_list_type) + "*/*")
+    val adj_list_chunk_files = fs.globStatus(adj_list_path_pattern)
+    assert(adj_list_chunk_files.length == 11)
+    val offset_path_pattern = new Path(prefix + edge_info.getAdjListOffsetDirPath(adj_list_type) + "*")
+    val offset_chunk_files = fs.globStatus(offset_path_pattern)
+    assert(offset_chunk_files.length == 10)
+
+    // test write property group
+    val property_group = edge_info.getPropertyGroup("creationDate", adj_list_type)
+    writer.writeEdgeProperties(property_group)
+    val property_group_path_pattern = new Path(prefix + edge_info.getPropertyDirPath(property_group, adj_list_type) + "*/*")
+    val property_group_chunk_files = fs.globStatus(property_group_path_pattern)
+    assert(property_group_chunk_files.length == 11)
+
     writer.writeEdges()
 
     // close FileSystem instance
