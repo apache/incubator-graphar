@@ -82,7 +82,7 @@
         </dependency>
         <dependency>
             <groupId>com.aliyun.odps</groupId>
-            <artifactId>odps-spark-datasource</artifactId>
+            <artifactId>odps-spark-datasource_2.11</artifactId>
             <version>${cupid.sdk.version}</version>
             <exclusions>
                 <exclusion>
