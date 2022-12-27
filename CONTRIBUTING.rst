@@ -256,7 +256,7 @@ Focus first on the most significant aspects of the change:
 4. Is the commit message readable and correct? If it contains a breaking change
    is it clear enough?
 
-When changes are necessary, **request** them, do not **demand** them, and do not
+When changes are necessary, *request* them, do not *demand* them, and do not
 assume that the submitter already knows how to add a test or run a benchmark.
 
 Specific performance optimization techniques, coding styles, and conventions
@@ -271,13 +271,13 @@ It is always good to clearly indicate nits when you comment: e.g.
 `Nit: change foo() to bar(). But this is not blocking.`
 
 If your comments were addressed but were not folded automatically after new
-commits or if they proved to be mistaken, please, `hide them<https://docs.github.com/en/communities/moderating-comments-and-conversations/managing-disruptive-comments#hiding-a-comment>`_
+commits or if they proved to be mistaken, please, `hide them <https://docs.github.com/en/communities/moderating-comments-and-conversations/managing-disruptive-comments#hiding-a-comment>`_
 with the appropriate reason to keep the conversation flow concise and relevant.
 
 Be aware of the person behind the code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Be aware that **how** you communicate requests and reviews in your feedback can
+Be aware that *how* you communicate requests and reviews in your feedback can
 have a significant impact on the success of the pull request. Yes, we may land
 a particular change that makes GraphAr better, but the individual might just
 not want to have anything to do with GraphAr ever again. The goal is not just
@@ -343,9 +343,7 @@ Performance is not everything
 
 GraphAr has always optimized for speed of execution. If a particular change
 can be shown to make some part of GraphAr faster, it's quite likely to be
-accepted. Claims that a particular pull request will make things faster will
-almost always be met by requests for performance [benchmark results][] that
-demonstrate the improvement.
+accepted.
 
 That said, performance is not the only factor to consider. GraphAr also
 optimizes in favor of not breaking existing code in the ecosystem, and not
@@ -353,7 +351,7 @@ changing working functional code just for the sake of changing.
 
 If a particular pull request introduces a performance or functional
 regression, rather than simply rejecting the pull request, take the time to
-work **with** the contributor on improving the change. Offer feedback and
+work *with* the contributor on improving the change. Offer feedback and
 advice on what would make the pull request acceptable, and do not assume that
 the contributor should already know how to do that. Be explicit in your
 feedback.
@@ -364,7 +362,7 @@ Continuous integration testing
 All pull requests that contain changes to code must be run through
 continuous integration (CI) testing at `Github Actions<https://github.com/alibaba/GraphAr/actions>_`.
 
-The pull request changes will triggers a CI testing run. Ideally, the code change
+The pull request change will triggers a CI testing run. Ideally, the code change
 will pass ("be green") on all platform configurations supported by GraphAr.
 This means that all tests pass and there are no linting errors. In reality,
 however, it is not uncommon for the CI infrastructure itself to fail on specific
