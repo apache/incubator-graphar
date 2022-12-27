@@ -360,7 +360,7 @@ Continuous integration testing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 All pull requests that contain changes to code must be run through
-continuous integration (CI) testing at `Github Actions<https://github.com/alibaba/GraphAr/actions>_`.
+continuous integration (CI) testing at `Github Actions <https://github.com/alibaba/GraphAr/actions>_`.
 
 The pull request change will triggers a CI testing run. Ideally, the code change
 will pass ("be green") on all platform configurations supported by GraphAr.
