@@ -135,7 +135,7 @@ int main(int argc, char* argv[]) {
               .GetAdjListOffsetFilePath(
                   0, GAR_NAMESPACE::AdjListType::ordered_by_dest)
               .value() ==
-          "edge/person_knows_person/ordered_by_dest/offset/chunk0");
+          "edge/person_knows_person/ordered_by_dest/offset/part0/chunk0");
 
   // add property group & validate
   GAR_NAMESPACE::Property creationDate = {
