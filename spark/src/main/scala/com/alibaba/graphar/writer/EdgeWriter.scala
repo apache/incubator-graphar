@@ -15,7 +15,7 @@
 
 package com.alibaba.graphar.writer
 
-import com.alibaba.graphar.utils.{FileSystem, VertexChunkPartitioner}
+import com.alibaba.graphar.utils.{FileSystem, ChunkPartitioner}
 import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, PropertyGroup}
 
 import org.apache.spark.sql.SparkSession
@@ -67,7 +67,7 @@ object EdgeWriter {
       for { ((k, row), j) <- ps.zipWithIndex } yield (start + j, row)
     })
     val partition_num = Math.ceil(chunkDf.count() / edgeChunkSize.toDouble).toInt
-    val partitioner = new VertexChunkPartitioner(partition_num, edgeChunkSize)
+    val partitioner = new ChunkPartitioner(partition_num, edgeChunkSize)
     val chunks = rdd_with_eid.partitionBy(partitioner).values
     spark.createDataFrame(chunks, df_schema)
   }
@@ -96,7 +96,7 @@ object EdgeWriter {
       for { ((k, row), j) <- ps.zipWithIndex } yield (start + j, row)
     })
     val partition_num = Math.ceil(chunkDf.count() / edgeChunkSize.toDouble).toInt
-    val partitioner = new VertexChunkPartitioner(partition_num, edgeChunkSize)
+    val partitioner = new ChunkPartitioner(partition_num, edgeChunkSize)
     val chunks = rdd_with_eid.repartitionAndSortWithinPartitions(partitioner).values
     spark.createDataFrame(chunks, df_schema)
   }
@@ -174,9 +174,6 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
 
   // generate the chunks of the property group from edge dataframe
   def writeEdgeProperties(propertyGroup: PropertyGroup): Unit = {
-    // select the columns uses property names
-    // write the rows in batch (with batch size = ChunkSize)
-    // return a WriterMessge
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
       throw new IllegalArgumentException
     }
@@ -198,9 +195,6 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
 
   // generate the chunks of all property groups from edge dataframe
   def writeEdgeProperties(): Unit = {
-      // select the columns uses property names
-      // write the rows in batch (with batch size = ChunkSize)
-      // return a WriterMessge
     val property_groups = edgeInfo.getPropertyGroups(adjListType)
     val it = property_groups.iterator
     while (it.hasNext()) {

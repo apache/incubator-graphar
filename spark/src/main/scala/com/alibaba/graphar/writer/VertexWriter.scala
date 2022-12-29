@@ -15,7 +15,7 @@
 
 package com.alibaba.graphar.writer
 
-import com.alibaba.graphar.utils.{FileSystem, VertexChunkPartitioner, IndexGenerator}
+import com.alibaba.graphar.utils.{FileSystem, ChunkPartitioner, IndexGenerator}
 import com.alibaba.graphar.{GeneralParams, VertexInfo, FileType, AdjListType, PropertyGroup}
 
 import org.apache.spark.sql.SparkSession
@@ -39,7 +39,7 @@ object VertexWriter {
     val rdd = vertexDf.rdd.map(row => (row(index).asInstanceOf[Long], row))
 
     // repartition
-    val partitioner = new VertexChunkPartitioner(partition_num, chunkSize)
+    val partitioner = new ChunkPartitioner(partition_num, chunkSize)
     val chunks_rdd = rdd.repartitionAndSortWithinPartitions(partitioner).values
     vertexDf.sparkSession.createDataFrame(chunks_rdd, vertex_df_schema)
   }
