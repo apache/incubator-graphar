@@ -194,7 +194,7 @@ TEST_CASE("test_edge_info") {
       edge_info.GetAdjListOffsetFilePath(0, adj_list_type);
   REQUIRE(!adj_list_offset_file_path.has_error());
   REQUIRE(adj_list_offset_file_path.value() ==
-          edge_info.GetPrefix() + adj_prefix + "offset/part0/chunk0");
+          edge_info.GetPrefix() + adj_prefix + "offset/chunk0");
   auto adj_list_offset_dir_path =
       edge_info.GetAdjListOffsetDirPath(adj_list_type);
   REQUIRE(!adj_list_offset_dir_path.has_error());

@@ -561,8 +561,8 @@ class EdgeInfo {
     if (!ContainAdjList(adj_list_type)) {
       return Status::KeyError("The adj list type is not found in edge info.");
     }
-    return prefix_ + adj_list2prefix_.at(adj_list_type) + "offset/part" +
-           std::to_string(vertex_chunk_index) + "/chunk0";
+    return prefix_ + adj_list2prefix_.at(adj_list_type) + "offset/chunk" +
+           std::to_string(vertex_chunk_index);
   }
 
   /// Get the adj list offset chunk file directory path of adj list type
