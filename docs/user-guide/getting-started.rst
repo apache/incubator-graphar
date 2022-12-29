@@ -47,7 +47,7 @@ GAR Data Files
 Property data
 `````````````
 The vertex properties are stored in vertex property chunks with the chunk size specified by the vertex information file. Different property groups correspond to individual groups of data files.
-In our example, the property group ("first name", "last name", "gender") for vertex chunk 0 of "person" vertices are stored in `./vertex/person/firstName_lastName_gender/part0`_.
+In our example, the property group ("first name", "last name", "gender") for vertex chunk 0 of "person" vertices are stored in `./vertex/person/firstName_lastName_gender/chunk0`_.
 
 In practice of graph processing, it is common to only query a subset of columns of the properties. Thus, the column-oriented formats like Apache ORC and Apache Parquet are more efficient, which eliminate the need to read columns that are not relevant. We also provide data files in ORC and Parquet for the example graph in the `test data`_.
 
@@ -63,7 +63,7 @@ For example, the file `./edge/person_knows_person/ordered_by_source/adj_list/par
 
 .. note::
 
-  If the edges are ordered, there may be offset chunks to construct the index for accessing edges of a single vertex. It stores the start offset for each vertex's edges, see `./edge/person_knows_person/ordered_by_source/offset/part0`_ as an example.
+  If the edges are ordered, there may be offset chunks to construct the index for accessing edges of a single vertex. It stores the start offset for each vertex's edges, see `./edge/person_knows_person/ordered_by_source/offset/chunk0`_ as an example.
 
 
 How to Use GAR
@@ -184,7 +184,7 @@ Please refer to `more examples <../applications/out-of-core.html>`_ for learning
 
 .. _person_knows_person.edge.yml: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/person_knows_person.edge.yml
 
-.. _./vertex/person/firstName_lastName_gender/part0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/vertex/person/firstName_lastName_gender/part0
+.. _./vertex/person/firstName_lastName_gender/chunk0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/vertex/person/firstName_lastName_gender/chunk0
 
 .. _test data: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/
 
@@ -192,7 +192,7 @@ Please refer to `more examples <../applications/out-of-core.html>`_ for learning
 
 .. _./edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0
 
-.. _./edge/person_knows_person/ordered_by_source/offset/part0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/part0
+.. _./edge/person_knows_person/ordered_by_source/offset/chunk0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0
 
 .. _example program: https://github.com/alibaba/GraphAr/blob/main/examples/construct_info_example.cc
 
