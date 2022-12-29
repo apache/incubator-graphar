@@ -130,7 +130,7 @@ TEST_CASE("test_vertex_info") {
   // test get file path
   auto maybe_path = v_info.GetFilePath(pg, 0);
   REQUIRE(!maybe_path.has_error());
-  REQUIRE(maybe_path.value() == expected_dir_path + "part0/chunk0");
+  REQUIRE(maybe_path.value() == expected_dir_path + "chunk0");
   // property group not exist
   REQUIRE(v_info.GetFilePath(pg2, 0).status().IsKeyError());
 

@@ -254,8 +254,8 @@ class VertexInfo {
       return Status::KeyError(
           "Vertex info does not contain the property group.");
     }
-    return prefix_ + property_group.GetPrefix() + "part" +
-           std::to_string(chunk_index) + "/" + "chunk0";
+    return prefix_ + property_group.GetPrefix() + "chunk" +
+           std::to_string(chunk_index);
   }
 
   /// Get the chunk files directory path of property group
@@ -562,7 +562,7 @@ class EdgeInfo {
       return Status::KeyError("The adj list type is not found in edge info.");
     }
     return prefix_ + adj_list2prefix_.at(adj_list_type) + "offset/part" +
-           std::to_string(vertex_chunk_index) + "/" + "chunk0";
+           std::to_string(vertex_chunk_index) + "/chunk0";
   }
 
   /// Get the adj list offset chunk file directory path of adj list type

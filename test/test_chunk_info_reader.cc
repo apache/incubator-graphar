@@ -47,24 +47,24 @@ TEST_CASE("test_vertex_property_chunk_info_reader") {
   REQUIRE(maybe_chunk_path.status().ok());
   std::string chunk_path = maybe_chunk_path.value();
   REQUIRE(chunk_path ==
-          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/part0/chunk0");
+          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk0");
   REQUIRE(reader.seek(520).ok());
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
   REQUIRE(chunk_path ==
-          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/part5/chunk0");
+          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk5");
   REQUIRE(reader.next_chunk().ok());
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
   REQUIRE(chunk_path ==
-          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/part6/chunk0");
+          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk6");
   REQUIRE(reader.seek(900).ok());
   maybe_chunk_path = reader.GetChunk();
   chunk_path = maybe_chunk_path.value();
   REQUIRE(chunk_path ==
-          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/part9/chunk0");
+          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk9");
   // now is end of the chunks
   REQUIRE(reader.next_chunk().IsOutOfRange());
 

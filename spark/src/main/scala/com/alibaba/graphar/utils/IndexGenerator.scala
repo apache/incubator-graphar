@@ -1,4 +1,21 @@
-package com.alibaba.graphar
+/** Copyright 2022 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.alibaba.graphar.utils
+
+import com.alibaba.graphar.GeneralParams
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
@@ -78,11 +95,11 @@ object IndexGenerator {
   def generateDstIndexForEdgesFromMapping(edgeDf: DataFrame, dstColumnName: String, dstIndexMapping: DataFrame): DataFrame = {
     val spark = edgeDf.sparkSession
     dstIndexMapping.createOrReplaceTempView("dst_vertex")
-    edgeDf.createOrReplaceTempView("edge")
+    edgeDf.createOrReplaceTempView("edges")
     val dstCol = GeneralParams.dstIndexCol;
     val indexCol = GeneralParams.vertexIndexCol;
     val dstPrimaryKey = GeneralParams.primaryCol;
-    val trans_df = spark.sql(f"select dst_vertex.$indexCol%s as $dstCol%s, edge.* from edge inner join dst_vertex on dst_vertex.$dstPrimaryKey%s=edge.$dstColumnName%s")
+    val trans_df = spark.sql(f"select dst_vertex.$indexCol%s as $dstCol%s, edges.* from edges inner join dst_vertex on dst_vertex.$dstPrimaryKey%s=edges.$dstColumnName%s")
     // drop the old dst id col
     trans_df.drop(dstColumnName)
 	}
