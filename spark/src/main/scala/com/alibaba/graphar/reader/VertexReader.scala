@@ -15,7 +15,6 @@
 
 package com.alibaba.graphar.reader
 
-
 import com.alibaba.graphar.utils.{IndexGenerator}
 import com.alibaba.graphar.{GeneralParams, VertexInfo, FileType, PropertyGroup}
 
@@ -35,10 +34,10 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
   def readVerticesNumber(): Long = {
     val file_path = prefix + "/" + vertexInfo.getVerticesNumFilePath()
     val path = new Path(file_path)
-    val fs = FileSystem.get(path.toUri(), spark.sparkContext.hadoopConfiguration)
-    val input = fs.open(path)
+    val file_system = FileSystem.get(path.toUri(), spark.sparkContext.hadoopConfiguration)
+    val input = file_system.open(path)
     val number = java.lang.Long.reverseBytes(input.readLong())
-    input.close()
+    file_system.close()
     return number
   }
 
