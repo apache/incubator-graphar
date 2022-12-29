@@ -1,9 +1,24 @@
+/** Copyright 2022 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.alibaba.graphar.reader
 
 import com.alibaba.graphar.utils.{IndexGenerator}
 import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, PropertyGroup}
 
-import java.io.{File}
+import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
@@ -38,7 +53,9 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     if (edgeInfo.containAdjList(adjListType) == false)
       throw new IllegalArgumentException
     val file_path = prefix + "/" + edgeInfo.getAdjListFilePath(vertex_chunk_index, adjListType)
-    val chunk_number = new File(file_path).list().length
+    val file_system = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
+    val path_pattern = new Path(file_path + "chunk*")
+    val chunk_number = file_system.globStatus(path_pattern).length
     var df = spark.emptyDataFrame
     for ( i <- 0 to chunk_number - 1) {
       val new_df = readAdjListChunk(vertex_chunk_index, i)
@@ -57,7 +74,9 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     if (edgeInfo.containAdjList(adjListType) == false)
       throw new IllegalArgumentException
     val file_path = prefix + "/" + edgeInfo.getAdjListDirPath(adjListType)
-    val vertex_chunk_number = new File(file_path).list().length
+    val file_system = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
+    val path_pattern = new Path(file_path + "part*")
+    val vertex_chunk_number = file_system.globStatus(path_pattern).length
     var df = spark.emptyDataFrame
     for ( i <- 0 to vertex_chunk_number - 1) {
       val new_df = readAdjListForVertexChunk(i)
@@ -90,7 +109,9 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
     val file_path = prefix + "/" + edgeInfo.getPropertyFilePath(propertyGroup, adjListType, vertex_chunk_index)
-    val chunk_number = new File(file_path).list().length
+    val file_system = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
+    val path_pattern = new Path(file_path + "chunk*")
+    val chunk_number = file_system.globStatus(path_pattern).length
     var df = spark.emptyDataFrame
     for ( i <- 0 to chunk_number - 1) {
       val new_df = readEdgePropertyChunk(propertyGroup, vertex_chunk_index, i)
@@ -111,7 +132,9 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
     val file_path = prefix + "/" + edgeInfo.getPropertyDirPath(propertyGroup, adjListType)
-    val vertex_chunk_number = new File(file_path).list().length
+    val file_system = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
+    val path_pattern = new Path(file_path + "part*")
+    val vertex_chunk_number = file_system.globStatus(path_pattern).length
     var df = spark.emptyDataFrame
     for ( i <- 0 to vertex_chunk_number - 1) {
       val new_df = readEdgePropertiesForVertexChunk(propertyGroup, i)

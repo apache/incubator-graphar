@@ -1,24 +1,42 @@
+/** Copyright 2022 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.alibaba.graphar.reader
+
 
 import com.alibaba.graphar.utils.{IndexGenerator}
 import com.alibaba.graphar.{GeneralParams, VertexInfo, FileType, PropertyGroup}
 
-import java.io.{File, FileInputStream, DataInputStream}
+import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 
 class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) {
-  val vertices_number = readVerticesNumber()
-  val chunk_size = vertexInfo.getChunk_size()
-  var chunk_number = vertices_number / chunk_size
+  private val vertices_number = readVerticesNumber()
+  private val chunk_size = vertexInfo.getChunk_size()
+  private var chunk_number = vertices_number / chunk_size
   if (vertices_number % chunk_size != 0)
     chunk_number = chunk_number + 1
  
   // load the total number of vertices for this vertex type
   def readVerticesNumber(): Long = {
     val file_path = prefix + "/" + vertexInfo.getVerticesNumFilePath()
-    val input = new DataInputStream(new FileInputStream(file_path))
+    val path = new Path(file_path)
+    val fs = FileSystem.get(path.toUri(), spark.sparkContext.hadoopConfiguration)
+    val input = fs.open(path)
     val number = java.lang.Long.reverseBytes(input.readLong())
     input.close()
     return number
