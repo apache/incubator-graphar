@@ -172,9 +172,8 @@ When using the GAR Spark Reader, please refer to the following code.
    // read all edge chunks (including adjList and all properties)
    val edge_df = reader.readEdges()
 
-
-
 See `TestReader.scala`_ for the complete example.
+
 
 .. _TestGraphInfo.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestGraphInfo.scala
 
