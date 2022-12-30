@@ -174,7 +174,7 @@ Id Type
 Data Type
 ~~~~~~~~~~~~~~~~~~~
 
-.. doxygenstruct:: GraphArchive::DataType
+.. doxygenclass:: GraphArchive::DataType
     :members:
     :undoc-members:
 
