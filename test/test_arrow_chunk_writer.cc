@@ -79,9 +79,9 @@ TEST_CASE("test_orc_and_parquet_reader") {
   arrow::Status st;
   arrow::MemoryPool* pool = arrow::default_memory_pool();
   std::string path1 = TEST_DATA_DIR + "/ldbc_sample/orc" +
-                      "/vertex/person/firstName_lastName_gender/part1/chunk0";
+                      "/vertex/person/firstName_lastName_gender/chunk1";
   std::string path2 = TEST_DATA_DIR + "/ldbc_sample/parquet" +
-                      "/vertex/person/firstName_lastName_gender/part1/chunk0";
+                      "/vertex/person/firstName_lastName_gender/chunk1";
   arrow::io::IOContext io_context = arrow::io::default_io_context();
 
   // Open ORC file reader

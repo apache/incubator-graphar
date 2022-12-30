@@ -1,17 +1,40 @@
+/** Copyright 2022 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.alibaba.graphar
 
-import java.io.{File, FileInputStream}
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
 import org.scalatest.funsuite.AnyFunSuite
+import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.spark.sql.SparkSession
 
 class GraphInfoSuite extends AnyFunSuite {
+  val spark = SparkSession.builder()
+    .enableHiveSupport()
+    .master("local[*]")
+    .getOrCreate()
 
   test("load graph info") {
-    val input = getClass.getClassLoader.getResourceAsStream("gar-test/ldbc_sample/csv/ldbc_sample.graph.yml")
-    val yaml = new Yaml(new Constructor(classOf[GraphInfo]))
-    val graph_info = yaml.load(input).asInstanceOf[GraphInfo]
+    // read graph yaml
+    val yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/ldbc_sample.graph.yml").getPath)
+    val fs = FileSystem.get(yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
+    val input = fs.open(yaml_path)
+    val graph_yaml = new Yaml(new Constructor(classOf[GraphInfo]))
+    val graph_info = graph_yaml.load(input).asInstanceOf[GraphInfo]
 
     assert(graph_info.getName == "ldbc_sample")
     assert(graph_info.getPrefix == "" )
@@ -27,7 +50,9 @@ class GraphInfoSuite extends AnyFunSuite {
   }
 
   test("load vertex info") {
-    val input = getClass.getClassLoader.getResourceAsStream("gar-test/ldbc_sample/csv/person.vertex.yml")
+    val yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person.vertex.yml").getPath)
+    val fs = FileSystem.get(yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
+    val input = fs.open(yaml_path)
     val yaml = new Yaml(new Constructor(classOf[VertexInfo]))
     val vertex_info = yaml.load(input).asInstanceOf[VertexInfo]
 
@@ -51,8 +76,8 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(vertex_info.containPropertyGroup(property_group))
     assert(vertex_info.getPropertyType("id") == GarType.INT64)
     assert(vertex_info.isPrimaryKey("id"))
-    assert(vertex_info.getFilePath(property_group, 0) == "vertex/person/id/part0/chunk0")
-    assert(vertex_info.getFilePath(property_group, 4) == "vertex/person/id/part4/chunk0")
+    assert(vertex_info.getFilePath(property_group, 0) == "vertex/person/id/chunk0")
+    assert(vertex_info.getFilePath(property_group, 4) == "vertex/person/id/chunk4")
     assert(vertex_info.getDirPath(property_group) == "vertex/person/id/")
 
     assert(vertex_info.containProperty("firstName"))
@@ -63,8 +88,8 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(vertex_info.containPropertyGroup(property_group_2))
     assert(vertex_info.getPropertyType("firstName") == GarType.STRING)
     assert(vertex_info.isPrimaryKey("firstName") == false)
-    assert(vertex_info.getFilePath(property_group_2, 0) == "vertex/person/firstName_lastName_gender/part0/chunk0")
-    assert(vertex_info.getFilePath(property_group_2, 4) == "vertex/person/firstName_lastName_gender/part4/chunk0")
+    assert(vertex_info.getFilePath(property_group_2, 0) == "vertex/person/firstName_lastName_gender/chunk0")
+    assert(vertex_info.getFilePath(property_group_2, 4) == "vertex/person/firstName_lastName_gender/chunk4")
     assert(vertex_info.getDirPath(property_group_2) == "vertex/person/firstName_lastName_gender/")
 
     assert(vertex_info.containProperty("not_exist") == false)
@@ -74,7 +99,9 @@ class GraphInfoSuite extends AnyFunSuite {
   }
 
   test("load edge info") {
-    val input = getClass.getClassLoader.getResourceAsStream("gar-test/ldbc_sample/csv/person_knows_person.edge.yml")
+    val yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath)
+    val fs = FileSystem.get(yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
+    val input = fs.open(yaml_path)
     val yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
     val edge_info = yaml.load(input).asInstanceOf[EdgeInfo]
 
@@ -100,8 +127,8 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(edge_info.getAdjListFilePath(1, 2, AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/adj_list/part1/chunk2")
     assert(edge_info.getAdjListFilePath(1, AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/adj_list/part1/")
     assert(edge_info.getAdjListDirPath(AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/adj_list/")
-    assert(edge_info.getAdjListOffsetFilePath(0, AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/offset/part0/chunk0")
-    assert(edge_info.getAdjListOffsetFilePath(4, AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/offset/part4/chunk0")
+    assert(edge_info.getAdjListOffsetFilePath(0, AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/offset/chunk0")
+    assert(edge_info.getAdjListOffsetFilePath(4, AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/offset/chunk4")
     assert(edge_info.getAdjListOffsetDirPath(AdjListType.ordered_by_source) == "edge/person_knows_person/ordered_by_source/offset/")
     val property_group = edge_info.getPropertyGroups(AdjListType.ordered_by_source).get(0)
     assert(edge_info.containPropertyGroup(property_group, AdjListType.ordered_by_source))
@@ -124,8 +151,8 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(edge_info.getAdjListFilePath(1, 2, AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/adj_list/part1/chunk2")
     assert(edge_info.getAdjListFilePath(1, AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/adj_list/part1/")
     assert(edge_info.getAdjListDirPath(AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/adj_list/")
-    assert(edge_info.getAdjListOffsetFilePath(0, AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/offset/part0/chunk0")
-    assert(edge_info.getAdjListOffsetFilePath(4, AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/offset/part4/chunk0")
+    assert(edge_info.getAdjListOffsetFilePath(0, AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/offset/chunk0")
+    assert(edge_info.getAdjListOffsetFilePath(4, AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/offset/chunk4")
     assert(edge_info.getAdjListOffsetDirPath(AdjListType.ordered_by_dest) == "edge/person_knows_person/ordered_by_dest/offset/")
     val property_group_2 = edge_info.getPropertyGroups(AdjListType.ordered_by_dest).get(0)
     assert(edge_info.containPropertyGroup(property_group_2, AdjListType.ordered_by_dest))
