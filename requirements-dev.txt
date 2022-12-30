@@ -1,5 +1,5 @@
 breathe
-docutils==0.16
+docutils
 furo        # sphinx theme
 nbsphinx
 sphinx>=3.0.2
