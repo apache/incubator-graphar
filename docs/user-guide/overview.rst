@@ -14,7 +14,7 @@ The GraphAr project includes such topics as:
 
 - Design of the standardized file format for graph data. (see `GraphAr File Format <file-format.html>`_)
 - The C++ SDK library for reading and writing GAR files. (see `API Reference <../api-reference.html>`_)
-- A set of Apache Spark tools for generating, loading and transforming GAR files. (coming soon)
+- A set of Apache Spark tools for generating, loading and transforming GAR files. (see `GraphAr Spark Tools <spark-tool.html>`_)
 - How to use GraphAr to write graph algorithms, or to work with existing systems such as GraphScope. (see `Application Cases <../applications/out-of-core.html>`_)
 
 .. image:: ../images/overview.png

@@ -13,6 +13,7 @@
    user-guide/overview.rst
    user-guide/getting-started.rst
    user-guide/file-format.rst
+   user-guide/spark-tool.rst
 
 .. toctree::
    :maxdepth: 1
