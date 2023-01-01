@@ -217,6 +217,19 @@ Shipping a release (maintainers only)
 Maintainers need to do the following to push out a release:
 
 * Switch to the main branch and make sure it's up to date.
+* Tag the release with a version number and push it to GitHub.
+
+..code:: shell
+
+    git checkout main
+    git pull upstream main
+    git tag v0.1.0
+    git push upstream v0.1.0
+
+Note: the version number should follow `Semantic Versioning <https://semver.org/#summary>`_.
+
+* The release will be automatically built and published to GitHub by GitHub Actions.
+And you can edit the release notes on `GitHub <https://github.com/alibaba/GraphAr/releases>` to add more details.
 
 .. the reviewing part document is referred to
 .. https://github.com/nodejs/node/blob/main/doc/contributing/pull-requests.md#the-process-of-making-changes
@@ -268,7 +281,7 @@ GraphAr collaborator landing the pull request but they can also be an
 opportunity for the contributor to learn a bit more about the project.
 
 It is always good to clearly indicate nits when you comment: e.g.
-`Nit: change foo() to bar(). But this is not blocking.`
+:code:`Nit: change foo() to bar(). But this is not blocking.`
 
 If your comments were addressed but were not folded automatically after new
 commits or if they proved to be mistaken, please, `hide them <https://docs.github.com/en/communities/moderating-comments-and-conversations/managing-disruptive-comments#hiding-a-comment>`_
@@ -305,19 +318,19 @@ check with the contributor to see if they intend to continue the work before
 checking if they would mind if you took it over (especially if it just has
 nits left). When doing so, it is courteous to give the original contributor
 credit for the work they started (either by preserving their name and email
-address) in the commit log, or by using an `Author:` meta-data tag in the
+address) in the commit log, or by using an :code:`Author:` meta-data tag in the
 commit.
 
 Approving a change
 ^^^^^^^^^^^^^^^^^^^
 
 Any GraphAr core collaborator (any GitHub user with commit rights in the
-`alibaba/GraphAr` repository) is authorized to approve any other contributor's
+:code:`alibaba/GraphAr` repository) is authorized to approve any other contributor's
 work. Collaborators are not permitted to approve their own pull requests.
 
 Collaborators indicate that they have reviewed and approve of the changes in
 a pull request either by using GitHub's Approval Workflow, which is preferred,
-or by leaving an `LGTM` ("Looks Good To Me") comment.
+or by leaving an :code:`LGTM` ("Looks Good To Me") comment.
 
 When explicitly using the "Changes requested" component of the GitHub Approval
 Workflow, show empathy. That is, do not be rude or abrupt with your feedback
@@ -328,13 +341,13 @@ Most importantly, after leaving such requests, it is courteous to make yourself
 available later to check whether your comments have been addressed.
 
 If you see that requested changes have been made, you can clear another
-collaborator's `Changes requested` review.
+collaborator's :code:`Changes requested` review.
 
 Change requests that are vague, dismissive, or unconstructive may also be
 dismissed if requests for greater clarification go unanswered within a
 reasonable period of time.
 
-Use `Changes requested` to block a pull request from landing. When doing so,
+Use :code:`Changes requested` to block a pull request from landing. When doing so,
 explain why you believe the pull request should not land along with an
 explanation of what may be an acceptable alternative course, if any.
 
