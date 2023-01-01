@@ -219,7 +219,7 @@ Maintainers need to do the following to push out a release:
 * Switch to the main branch and make sure it's up to date.
 * Tag the release with a version number and push it to GitHub.
 
-..code:: shell
+.. code:: shell
 
     git checkout main
     git pull upstream main
@@ -228,8 +228,7 @@ Maintainers need to do the following to push out a release:
 
 Note: the version number should follow `Semantic Versioning <https://semver.org/#summary>`_.
 
-* The release will be automatically built and published to GitHub by GitHub Actions.
-And you can edit the release notes on `GitHub <https://github.com/alibaba/GraphAr/releases>` to add more details.
+* The release will be automatically built and published to GitHub by GitHub Actions. Yu can edit the release notes on `GitHub <https://github.com/alibaba/GraphAr/releases>` to add more details.
 
 .. the reviewing part document is referred to
 .. https://github.com/nodejs/node/blob/main/doc/contributing/pull-requests.md#the-process-of-making-changes
@@ -373,7 +372,7 @@ Continuous integration testing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 All pull requests that contain changes to code must be run through
-continuous integration (CI) testing at `Github Actions <https://github.com/alibaba/GraphAr/actions>_`.
+continuous integration (CI) testing at `Github Actions <https://github.com/alibaba/GraphAr/actions>`_.
 
 The pull request change will triggers a CI testing run. Ideally, the code change
 will pass ("be green") on all platform configurations supported by GraphAr.
