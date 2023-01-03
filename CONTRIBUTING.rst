@@ -216,22 +216,22 @@ Shipping a release (maintainers only)
 
 Maintainers need to do the following to push out a release:
 
-* Switch to the main branch and make sure it's up to date.
+1. Switch to the main branch and make sure it's up to date.
 
 .. code:: shell
 
     git checkout main
     git pull upstream main
 
-* Tag the release with a version number and push it to GitHub. Note that the version number should follow `semantic versioning <https://semver.org/#summary>`_. e.g.: v0.1.0.
+2. Tag the release with a version number and push it to GitHub. Note that the version number should follow `semantic versioning <https://semver.org/#summary>`_. e.g.: v0.1.0.
 
 .. code:: shell
 
     git tag v0.1.0
     git push upstream v0.1.0
 
-* The release draft will be automatically built to GitHub by GitHub Actions. You can edit the release notes draft on `GitHub <https://github.com/alibaba/GraphAr/releases>`_ to add more details.
-* Publish the release.
+3. The release draft will be automatically built to GitHub by GitHub Actions. You can edit the release notes draft on `GitHub <https://github.com/alibaba/GraphAr/releases>`_ to add more details.
+4. Publish the release.
 
 .. the reviewing part document is referred and derived from
 .. https://github.com/nodejs/node/blob/main/doc/contributing/pull-requests.md#the-process-of-making-changes
