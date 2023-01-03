@@ -194,7 +194,7 @@ build_gar()
 
 # ------------------------------------------------------------------------------
 # build example
-# ------------------------------------------------------------------------------ 
+# ------------------------------------------------------------------------------
 if (BUILD_EXAMPLES)
     find_package(Boost REQUIRED COMPONENTS graph)
 
@@ -305,6 +305,8 @@ if(doxygen_EXECUTABLE AND sphinx_build_EXECUTABLE)
         COMMAND ${CMAKE_COMMAND} -E make_directory _build
         COMMAND ${doxygen_EXECUTABLE}
         COMMAND ${sphinx_build_EXECUTABLE} . _build/html
+        COMMAND cd ../spark && mvn scala:doc && rm -fr ${PROJECT_SOURCE_DIR}/docs/_build/html/reference/spark-api &&
+         cp -fr target/site/scaladocs ${PROJECT_SOURCE_DIR}/docs/_build/html/reference/spark-api
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/docs
         VERBATIM
     )

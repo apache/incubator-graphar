@@ -47,6 +47,18 @@ jobs:
           make doc
           popd
 
+      - name: preview
+        uses: afc163/surge-preview@v1
+        id: preview_step
+        with:
+          surge_token: ${{ secrets.SURGE_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          dist: docs/_build/html
+          build: echo "done"
+
+      - name: Get the preview_url
+        run: echo "url => ${{ steps.preview_step.outputs.preview_url }}"
+
       - name: Commit Doc
         if: ${{ github.ref == 'refs/heads/main' && github.repository == 'alibaba/GraphAr' }}
         run: |

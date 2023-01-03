@@ -32,13 +32,13 @@ namespace GAR_NAMESPACE_INTERNAL {
 
 /// \brief Main data type enumeration
 enum class Type {
-  /// Boolean as 1 bit, LSB bit-packed ordering
+  /// Boolean
   BOOL = 0,
 
-  /// Signed 32-bit little-endian integer
+  /// Signed 32-bit integer
   INT32,
 
-  /// Signed 64-bit little-endian integer
+  /// Signed 64-bit integer
   INT64,
 
   /// 4-byte floating point value
@@ -47,7 +47,7 @@ enum class Type {
   /// 8-byte floating point value
   DOUBLE,
 
-  /// UTF8 variable-length string as List<Char>
+  /// UTF8 variable-length string
   STRING,
 
   /// User-defined data type

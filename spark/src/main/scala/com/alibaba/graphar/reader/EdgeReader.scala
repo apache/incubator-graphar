@@ -23,11 +23,25 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 
-class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.Value,spark:SparkSession) {
-  // load a single offset chunk as a DataFrame
+/** Reader for edge chunks.
+ *
+ * @constructor create a new edge reader with edge info and AdjList type.
+ * @param prefix the absolute perfix.
+ * @param edgeInfo the edge info that describes the edge type.
+ * @param adjListType the adj list type for the edge.
+ * @param spark spark session for the reader to read chunks as Spark DataFrame.
+ */
+class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.Value, spark:SparkSession) {
+  if (edgeInfo.containAdjList(adjListType) == false) {
+    throw new IllegalArgumentException
+  }
+
+  /** Load a single offset chunk as a DataFrame.
+   *
+   * @param chunk_index index of offset chunk
+   * @return offset chunk DataFrame.
+   */
   def readOffset(chunk_index: Long): DataFrame = {
-    if (edgeInfo.containAdjList(adjListType) == false)
-      throw new IllegalArgumentException
     if (adjListType != AdjListType.ordered_by_source && adjListType != AdjListType.ordered_by_dest)
       throw new IllegalArgumentException
     val file_type_in_gar = edgeInfo.getAdjListFileType(adjListType)
@@ -37,10 +51,13 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     return df
   }
 
-  // load a single AdjList chunk as a DataFrame
+  /** Load a single AdjList chunk as a DataFrame.
+   *
+   * @param vertex_chunk_index index of vertex chunk
+   * @param chunk_index index of AdjList chunk.
+   * @return AdjList chunk DataFrame
+   */
   def readAdjListChunk(vertex_chunk_index: Long, chunk_index: Long): DataFrame = {
-    if (edgeInfo.containAdjList(adjListType) == false)
-      throw new IllegalArgumentException
     val file_type_in_gar = edgeInfo.getAdjListFileType(adjListType)
     val file_type = FileType.FileTypeToString(file_type_in_gar)
     val file_path = prefix + "/" + edgeInfo.getAdjListFilePath(vertex_chunk_index, chunk_index, adjListType)
@@ -48,10 +65,13 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     return df
   }
 
-  // load all AdjList chunks for a vertex chunk as a DataFrame
+  /** Load all AdjList chunks for a vertex chunk as a DataFrame.
+   *
+   * @param vertex_chunk_index index of vertex chunk.
+   * @param addIndex flag that add edge index column or not in the final DataFrame.
+   * @return DataFrame of all AdjList chunks of vertices in given vertex chunk.
+   */
   def readAdjListForVertexChunk(vertex_chunk_index: Long, addIndex: Boolean = false): DataFrame = {
-    if (edgeInfo.containAdjList(adjListType) == false)
-      throw new IllegalArgumentException
     val file_path = prefix + "/" + edgeInfo.getAdjListFilePath(vertex_chunk_index, adjListType)
     val file_system = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
     val path_pattern = new Path(file_path + "chunk*")
@@ -69,10 +89,12 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     return df
   }
 
-  // load all AdjList chunks for this edge type as a DataFrame
+  /** Load all AdjList chunks for this edge type as a DataFrame.
+   *
+   * @param addIndex flag that add index column or not in the final DataFrame.
+   * @return DataFrame of all AdjList chunks.
+   */
   def readAllAdjList(addIndex: Boolean = false): DataFrame = {
-    if (edgeInfo.containAdjList(adjListType) == false)
-      throw new IllegalArgumentException
     val file_path = prefix + "/" + edgeInfo.getAdjListDirPath(adjListType)
     val file_system = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
     val path_pattern = new Path(file_path + "part*")
@@ -90,10 +112,15 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     return df
   }
 
-  // load a single edge property chunk as a DataFrame
+  /** Load a single edge property chunk as a DataFrame.
+   *
+   * @param propertyGroup property group.
+   * @param vertex_chunk_index index of vertex chunk.
+   * @param chunk_index index of property group chunk.
+   * @return property group chunk DataFrame. If edge info does not contain the property group,
+   *         raise an IllegalArgumentException error.
+   */
   def readEdgePropertyChunk(propertyGroup: PropertyGroup, vertex_chunk_index: Long, chunk_index: Long): DataFrame = {
-    if (edgeInfo.containAdjList(adjListType) == false)
-      throw new IllegalArgumentException
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
     val file_type = propertyGroup.getFile_type();
@@ -102,10 +129,15 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     return df
   }
 
-  // load the chunks for a property group of a vertex chunk as a DataFrame
+  /** Load the chunks for a property group of a vertex chunk as a DataFrame.
+   *
+   * @param propertyGroup property group.
+   * @param vertex_chunk_index index of vertex chunk.
+   * @param addIndex  flag that add edge index column or not in the final DataFrame.
+   * @return DataFrame that contains all property group chunks of vertices in given vertex chunk.
+   *         If edge info does not contain the property group, raise an IllegalArgumentException error.
+   */
   def readEdgePropertiesForVertexChunk(propertyGroup: PropertyGroup, vertex_chunk_index: Long, addIndex: Boolean = false): DataFrame = {
-    if (edgeInfo.containAdjList(adjListType) == false)
-      throw new IllegalArgumentException
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
     val file_path = prefix + "/" + edgeInfo.getPropertyFilePath(propertyGroup, adjListType, vertex_chunk_index)
@@ -125,10 +157,14 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     return df
   }
 
-  // load all chunks for a property group as a DataFrame
+  /** Load all chunks for a property group as a DataFrame.
+   *
+   * @param propertyGroup property group.
+   * @param addIndex flag that add edge index column or not in the final DataFrame.
+   * @return DataFrame that contains all chunks of property group.
+   *         If edge info does not contain the property group, raise an IllegalArgumentException error.
+   */
   def readEdgeProperties(propertyGroup: PropertyGroup, addIndex: Boolean = false): DataFrame = {
-    if (edgeInfo.containAdjList(adjListType) == false)
-      throw new IllegalArgumentException
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
     val file_path = prefix + "/" + edgeInfo.getPropertyDirPath(propertyGroup, adjListType)
@@ -148,10 +184,13 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     return df
   }
 
-  // load the chunks for all property groups of a vertex chunk as a DataFrame
+  /** Load the chunks for all property groups of a vertex chunk as a DataFrame.
+   *
+   * @param vertex_chunk_index index of vertex chunk.
+   * @param addIndex flag that add edge index column or not in the final DataFrame.
+   * @return DataFrame that contains all property groups chunks of a vertex chunk.
+   */
   def readAllEdgePropertiesForVertexChunk(vertex_chunk_index: Long, addIndex: Boolean = false): DataFrame = {
-    if (edgeInfo.containAdjList(adjListType) == false)
-      throw new IllegalArgumentException
     var df = spark.emptyDataFrame
     val property_groups = edgeInfo.getPropertyGroups(adjListType)
     val len: Int = property_groups.size
@@ -168,11 +207,13 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
       df = df.drop(GeneralParams.edgeIndexCol)
     return df
   }
-  
-  // load the chunks for all property groups as a DataFrame
+
+  /** Load the chunks for all property groups as a DataFrame.
+   *
+   * @param addIndex flag that add edge index column or not in the final DataFrame.
+   * @return DataFrame tha contains all property groups chunks of edge.
+   */
   def readAllEdgeProperties(addIndex: Boolean = false): DataFrame = {
-    if (edgeInfo.containAdjList(adjListType) == false)
-      throw new IllegalArgumentException
     var df = spark.emptyDataFrame
     val property_groups = edgeInfo.getPropertyGroups(adjListType)
     val len: Int = property_groups.size
@@ -190,10 +231,13 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     return df
   }
 
-  // load the chunks for the AdjList and all property groups for a vertex chunk as a DataFrame
+  /** Load the chunks for the AdjList and all property groups for a vertex chunk as a DataFrame.
+   *
+   * @param vertex_chunk_index index of vertex chunk
+   * @param addIndex flag that add edge index column or not in the final DataFrame.
+   * @return DataFrame that contains all chunks of AdjList and property groups of vertices in given vertex chunk.
+   */
   def readEdgesForVertexChunk(vertex_chunk_index: Long, addIndex: Boolean = false): DataFrame = {
-    if (edgeInfo.containAdjList(adjListType) == false)
-      throw new IllegalArgumentException
     val adjList_df = readAdjListForVertexChunk(vertex_chunk_index, true)
     val properties_df = readAllEdgePropertiesForVertexChunk(vertex_chunk_index, true)
     var df = adjList_df.join(properties_df, Seq(GeneralParams.edgeIndexCol)).sort(GeneralParams.edgeIndexCol)
@@ -202,10 +246,12 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     return df
   }
 
-  // load the chunks for the AdjList and all property groups as a DataFrame
+  /** Load the chunks for the AdjList and all property groups as a DataFrame.
+   *
+   * @param addIndex flag that add edge index column or not in the final DataFrame.
+   * @return DataFrame that contains all chunks of AdjList and property groups of edge.
+   */
   def readEdges(addIndex: Boolean = false): DataFrame = {
-    if (edgeInfo.containAdjList(adjListType) == false)
-      throw new IllegalArgumentException
     val adjList_df = readAllAdjList(true)
     val properties_df = readAllEdgeProperties(true)
     var df = adjList_df.join(properties_df, Seq(GeneralParams.edgeIndexCol)).sort(GeneralParams.edgeIndexCol);

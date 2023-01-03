@@ -20,6 +20,7 @@ import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
 
+/** Edge info is a class to store the edge meta information. */
 class EdgeInfo() {
   @BeanProperty var src_label: String = ""
   @BeanProperty var edge_label: String = ""
@@ -32,6 +33,11 @@ class EdgeInfo() {
   @BeanProperty var adj_lists = new java.util.ArrayList[AdjList]()
   @BeanProperty var version: String = ""
 
+  /** Check if the edge info supports the adj list type.
+   *
+   * @param adj_list_type adjList type in gar to check.
+   * @return true if edge info supports the adj list type, otherwise return false.
+   */
   def containAdjList(adj_list_type: AdjListType.Value): Boolean = {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
@@ -42,6 +48,12 @@ class EdgeInfo() {
     return false
   }
 
+  /** Get path prefix of adj list type.
+   *
+   * @param adj_list_type The input adj list type in gar.
+   * @return path prefix of the adj list type, if edge info not support the adj list type,
+   *         raise an IllegalArgumentException error.
+   */
   def getAdjListPrefix(adj_list_type: AdjListType.Value): String = {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
@@ -57,6 +69,12 @@ class EdgeInfo() {
     throw new IllegalArgumentException
   }
 
+  /** Get the adj list topology chunk file type of adj list type.
+   *
+   * @param adj_list_type the input adj list type.
+   * @return file format tupe in gar of the adj list type, if edge info not support the adj list type,
+   *         raise an IllegalArgumentException error.
+   */
   def getAdjListFileType(adj_list_type: AdjListType.Value): FileType.Value = {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
@@ -68,6 +86,12 @@ class EdgeInfo() {
     throw new IllegalArgumentException
   }
 
+  /** Get the property groups of adj list type.
+   *
+   * @param adj_list_type the input adj list type.
+   * @return property group of the input adj list type, if edge info not support the adj list type,
+   *         raise an IllegalArgumentException error.
+   */
   def getPropertyGroups(adj_list_type: AdjListType.Value): java.util.ArrayList[PropertyGroup] = {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
@@ -79,6 +103,14 @@ class EdgeInfo() {
     throw new IllegalArgumentException
   }
 
+  /** Check if the edge info contains the property group in cerain adj list structure.
+   *
+   * @param property_group the property group to check.
+   * @param adj_list_type the type of adj list structure.
+   * @return true if the edge info contains the property group in cerain adj list structure.
+   *         If edge info not support the given adj list type or not contains the proerpty group in the adj list structure,
+   *         return false.
+   */
   def containPropertyGroup(property_group: PropertyGroup, adj_list_type: AdjListType.Value): Boolean = {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
@@ -97,6 +129,11 @@ class EdgeInfo() {
     return false
   }
 
+  /**  Check if the edge info contains the property.
+   *
+   * @param property_name name of the property.
+   * @return true if edge info contains the property, otherwise false.
+   */
   def containProperty(property_name: String): Boolean = {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
@@ -117,6 +154,13 @@ class EdgeInfo() {
     return false
   }
 
+  /** Get property group that contains property with adj list type.
+   *
+   * @param property_name name of the property.
+   * @param adj_list_type the type of adj list structure.
+   * @return property group that contains the property. If edge info not support the adj list type,
+   *         or not find the property group that contains the property, return false.
+   */
   def getPropertyGroup(property_name: String, adj_list_type: AdjListType.Value): PropertyGroup = {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
@@ -139,6 +183,12 @@ class EdgeInfo() {
     throw new IllegalArgumentException
   }
 
+  /** Get the data type of property.
+   *
+   * @param property_name name of the property.
+   * @return data type in gar of the property. If edge info not contains the property,
+   *         raise an IllegalArgumentException error.
+   */
   def getPropertyType(property_name: String): GarType.Value = {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
@@ -159,6 +209,12 @@ class EdgeInfo() {
     throw new IllegalArgumentException
   }
 
+  /** Check the property is primary key of edge info.
+   *
+   * @param property_name name of the property.
+   * @return true if the property is the primary key of edge info, false if not.
+   *         If edge info not contains the property, raise an IllegalArgumentException error.
+   */
   def isPrimaryKey(property_name: String): Boolean = {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
@@ -179,6 +235,7 @@ class EdgeInfo() {
     throw new IllegalArgumentException
   }
 
+  /** Get Primary key of edge info. */
   def getPrimaryKey(): String = {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
@@ -199,6 +256,7 @@ class EdgeInfo() {
     return ""
   }
 
+  /** Check if the edge info is validated. */
   def isValidated(): Boolean = {
     if (src_label == "" || edge_label == "" || dst_label == "")
       return false
@@ -222,6 +280,14 @@ class EdgeInfo() {
     return true
   }
 
+  /** Get the adj list offset chunk file path of vertex chunk
+   *  the offset chunks is aligned with the vertex chunks
+   *
+   *  @param chunk_inde index of vertex chunk.
+   *  @param adj_list_type type of adj list structure.
+   *  @return the offset chunk file path. If edge info not support the adj list type,
+   *          raise an IllegalArgumentException error.
+   */
   def getAdjListOffsetFilePath(chunk_index: Long, adj_list_type: AdjListType.Value) : String = {
     if (containAdjList(adj_list_type) == false)
       throw new IllegalArgumentException
@@ -230,28 +296,63 @@ class EdgeInfo() {
     return str
   }
 
+  /** Get the adj list offset chunk file directory path of adj list type.
+   *
+   * @param adj_list_type type of adj list structure.
+   * @return the offset directory. If edge info not support the adj list type,
+   *          raise an IllegalArgumentException error.
+   */
   def getAdjListOffsetDirPath(adj_list_type: AdjListType.Value) : String = {
     if (containAdjList(adj_list_type) == false)
       throw new IllegalArgumentException
     return prefix + getAdjListPrefix(adj_list_type) + "offset/"
   }
 
+  /** Get the file path of adj list topology chunk.
+   *
+   * @param vertex_chunk_index index of vertex chunk.
+   * @param chunk_index index of edge chunk.
+   * @param adj_list_type type of adj list structure.
+   * @return adj list chunk file path.
+   */
   def getAdjListFilePath(vertex_chunk_index: Long, chunk_index: Long, adj_list_type: AdjListType.Value) : String = {
     var str: String = prefix + getAdjListPrefix(adj_list_type) + "adj_list/part" +
         vertex_chunk_index.toString() + "/chunk" + chunk_index.toString()
     return str
   }
 
+  /** Get the path of adj list topology chunk of certain vertex chunk.
+   *
+   * @param vertex_chunk_index index of vertex chunk.
+   * @param adj_list_type type of adj list structure.
+   * @return path prefix of the edge chunk of vertices of given vertex chunk.
+   */
   def getAdjListFilePath(vertex_chunk_index: Long, adj_list_type: AdjListType.Value) : String = {
     var str: String = prefix + getAdjListPrefix(adj_list_type) + "adj_list/part" +
       vertex_chunk_index.toString() + "/"
     return str
   }
 
+  /** Get the adj list topology chunk file directory path of adj list type.
+   *
+   * @param adj_list_type type of adj list structure.
+   * @return directory path of adj list type.
+   */
   def getAdjListDirPath(adj_list_type: AdjListType.Value) : String = {
     return prefix + getAdjListPrefix(adj_list_type) + "adj_list/"
   }
 
+  /** Get the chunk file path of adj list property group.
+   *  the property group chunks is aligned with the adj list topology chunks
+   *
+   * @param property_group property group
+   * @param adj_list_type type of adj list structure.
+   * @param vertex_chunk_index index of vertex chunk.
+   * @param chunk_index index of edge chunk.
+   *
+   * @return property group chunk file path. If edge info not contains the property group,
+   *         raise an IllegalArgumentException error.
+   */
   def getPropertyFilePath(property_group: PropertyGroup, adj_list_type: AdjListType.Value, vertex_chunk_index: Long, chunk_index: Long) : String = {
     if (containPropertyGroup(property_group, adj_list_type) == false)
       throw new IllegalArgumentException
@@ -271,6 +372,15 @@ class EdgeInfo() {
     return str
   }
 
+  /** Get path of adj list property group of certain vertex chunk.
+   *
+   * @param property_group property group.
+   * @param adj_list_type type of adj list structure.
+   * @param vertex_chunk_index index of vertex chunk.
+   * @return path prefix of property group chunks of of vertices of given vertex chunk.
+   *         If edge info not contains the property group,
+   *         raise an IllegalArgumentException error.
+   */
   def getPropertyFilePath(property_group: PropertyGroup, adj_list_type: AdjListType.Value, vertex_chunk_index: Long) : String = {
     if (containPropertyGroup(property_group, adj_list_type) == false)
       throw new IllegalArgumentException
@@ -290,6 +400,13 @@ class EdgeInfo() {
     return str
   }
 
+  /** Get the property group chunk file directory path of adj list type.
+   *
+   * @param property_group property group.
+   * @param adj_list_type type of adj list structure.
+   * @return directory path of property group chunks. If edge info not contains the property group,
+   *         raise an IllegalArgumentException error.
+   */
   def getPropertyDirPath(property_group: PropertyGroup, adj_list_type: AdjListType.Value) : String = {
     if (containPropertyGroup(property_group, adj_list_type) == false)
       throw new IllegalArgumentException

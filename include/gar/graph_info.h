@@ -504,7 +504,7 @@ class EdgeInfo {
   }
 
   /**
-   * @brief Return property group that contains certain property and with adj
+   * @brief Return property group that contains property and with adj
    * list type
    *
    * @param property property name

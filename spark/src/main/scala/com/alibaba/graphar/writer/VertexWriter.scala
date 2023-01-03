@@ -31,6 +31,7 @@ import scala.collection.SortedMap
 import scala.collection.mutable.ArrayBuffer
 
 
+/** Helper object for VertexWriter class. */
 object VertexWriter {
   private def repartitionAndSort(vertexDf: DataFrame, chunkSize: Long): DataFrame = {
     val vertex_df_schema = vertexDf.schema
@@ -45,6 +46,13 @@ object VertexWriter {
   }
 }
 
+/** Writer for vertex DataFrame.
+ *
+ * @constructor create a new writer for vertex DataFrame with vertex info.
+ * @param prefix the absolute prefix.
+ * @param vertexInfo the vertex info that describes the vertex type.
+ * @param vertexDf the input vertex DataFrame.
+ */
 class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame) {
   private var chunks:DataFrame = preprocess()
   private val spark = vertexDf.sparkSession
@@ -58,7 +66,10 @@ class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame) 
     return VertexWriter.repartitionAndSort(vertexDf, vertexInfo.getChunk_size())
   }
 
-  // generate chunks of the property group for vertex dataframe
+  /** Generate chunks of the property group for vertex dataframe.
+   *
+   * @param propertyGroup property group
+   */
   def writeVertexProperties(propertyGroup: PropertyGroup): Unit = {
     // check if contains the property group
     if (vertexInfo.containPropertyGroup(propertyGroup) == false) {
@@ -77,7 +88,7 @@ class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame) 
     FileSystem.writeDataFrame(pg_df, propertyGroup.getFile_type(), output_prefix)
   }
 
-  // generate chunks of all property groups for vertex dataframe
+  /** Generate chunks of all property groups for vertex dataframe. */
   def writeVertexProperties(): Unit = {
     val property_groups = vertexInfo.getProperty_groups()
     val it = property_groups.iterator

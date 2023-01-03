@@ -20,6 +20,7 @@ import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
 
+/** VertexInfo is a class to store the vertex meta information. */
 class VertexInfo() {
   @BeanProperty var label: String = ""
   @BeanProperty var chunk_size: Long = 0
@@ -27,6 +28,11 @@ class VertexInfo() {
   @BeanProperty var property_groups = new java.util.ArrayList[PropertyGroup]()
   @BeanProperty var version: String = ""
 
+  /** Check if the vertex info contains the property group.
+   *
+   * @param property_group the property group to check.
+   * @return true if the vertex info contains the property group, otherwise false.
+   */
   def containPropertyGroup(property_group: PropertyGroup): Boolean = {
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
@@ -38,6 +44,11 @@ class VertexInfo() {
     return false
   }
 
+  /** Check if the vertex info contains certain property.
+   *
+   * @param property_name name of the property.
+   * @return true if the vertex info contains the property, otherwise false.
+   */
   def containProperty(property_name: String): Boolean = {
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
@@ -53,6 +64,11 @@ class VertexInfo() {
     return false
   }
 
+  /** Get the property group that contains property.
+   *
+   * @param property_name name of the property.
+   * @return property group that contains the property, otherwise raise IllegalArgumentException error.
+   */
   def getPropertyGroup(property_name: String): PropertyGroup = {
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
@@ -68,6 +84,12 @@ class VertexInfo() {
     throw new IllegalArgumentException
   }
 
+  /** Get the data type of property.
+   *
+   * @param property_name name of the property.
+   * @return the data type in gar of the proeprty. If the vertex info does not contains the property,
+   *         raise IllegalArgumentException error.
+   */
   def getPropertyType(property_name: String): GarType.Value = {
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
@@ -83,6 +105,11 @@ class VertexInfo() {
     throw new IllegalArgumentException
   }
 
+  /** Check if the property is primary key.
+   *
+   * @param property_name name of the property to check.
+   * @return true if the property if the primary key of vertex info, otherwise return false.
+   */
   def isPrimaryKey(property_name: String): Boolean = {
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
@@ -98,6 +125,10 @@ class VertexInfo() {
     throw new IllegalArgumentException
   }
 
+  /** Get primary key of vertex info.
+   *
+   * @return name of the primary key.
+   */
   def getPrimaryKey(): String = {
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
@@ -113,6 +144,10 @@ class VertexInfo() {
     return ""
   }
 
+  /** Check if the vertex info is validated.
+   *
+   * @return true if the vertex info is validated, otherwise return false.
+   */
  def isValidated(): Boolean = {
     if (label == "" || chunk_size <= 0)
       return false
@@ -128,10 +163,17 @@ class VertexInfo() {
     return true
   }
 
+  /** Get the vertex num file path of vertex info. */
   def getVerticesNumFilePath(): String = {
     return prefix + "vertex_count"
   }
 
+  /** Get the chunk file path of property group of vertex chunk.
+   *
+   * @param property_group the property group.
+   * @param chunk_index the index of vertex chunk
+   * @return chunk file path.
+   */
   def getFilePath(property_group: PropertyGroup, chunk_index: Long): String = {
     if (containPropertyGroup(property_group) == false)
       throw new IllegalArgumentException
@@ -151,6 +193,11 @@ class VertexInfo() {
     return prefix + str + "chunk" + chunk_index.toString()
   }
 
+  /** Get the chunk files directory path of property group.
+   *
+   * @param property_group the property group.
+   * @return the dirctory path that store the chunk files of property group.
+   */
   def getDirPath(property_group: PropertyGroup): String = {
     if (containPropertyGroup(property_group) == false)
       throw new IllegalArgumentException

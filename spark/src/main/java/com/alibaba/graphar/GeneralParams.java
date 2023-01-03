@@ -15,6 +15,7 @@
 
 package com.alibaba.graphar;
 
+/** General constant parameters for graphar. */
 public class GeneralParams {
     // column name
     public static final String vertexIndexCol = "_graphArVertexIndex";
