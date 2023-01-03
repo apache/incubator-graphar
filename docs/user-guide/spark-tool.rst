@@ -37,7 +37,7 @@ Compile package:
 
    mvn package
 
-After compilation, a similar file *graphar-0.1.0-SNAPSHOT.jar* is generated in the directory *spark/target/*.
+After compilation, a similar file *graphar-0.1.0-SNAPSHOT-shaded.jar* is generated in the directory *spark/target/*.
 
 
 How to Use
