@@ -219,6 +219,7 @@ Maintainers need to do the following to push out a release:
 * Switch to the main branch and make sure it's up to date.
 
 .. code:: shell
+
     git checkout main
     git pull upstream main
 
