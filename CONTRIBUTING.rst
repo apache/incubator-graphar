@@ -217,12 +217,15 @@ Shipping a release (maintainers only)
 Maintainers need to do the following to push out a release:
 
 * Switch to the main branch and make sure it's up to date.
-* Tag the release with a version number and push it to GitHub. Note that the version number should follow `Semantic Versioning <https://semver.org/#summary>`_.
+
+.. code:: shell
+    git checkout main
+    git pull upstream main
+
+* Tag the release with a version number and push it to GitHub. Note that the version number should follow `semantic versioning <https://semver.org/#summary>`_. e.g.: v0.1.0.
 
 .. code:: shell
 
-    git checkout main
-    git pull upstream main
     git tag v0.1.0
     git push upstream v0.1.0
 
@@ -376,9 +379,8 @@ The pull request change will triggers a CI testing run. Ideally, the code change
 will pass ("be green") on all platform configurations supported by GraphAr.
 This means that all tests pass and there are no linting errors. In reality,
 however, it is not uncommon for the CI infrastructure itself to fail on specific
-platforms or for so-called "flaky" tests to fail ("be red"). It is vital to visually
-inspect the results of all failed ("red") tests to determine whether the failure
-was caused by the changes in the pull request.
+platforms ("be red"). It is vital to visually inspect the results of all failed ("red") tests
+to determine whether the failure was caused by the changes in the pull request.
 
 .. _Code of Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
 
