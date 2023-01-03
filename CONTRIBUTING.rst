@@ -17,7 +17,7 @@ the `latest version of GraphAr <https://github.com/alibaba/GraphAr/tree/main>`_ 
 your issue may already have been fixed. If not, search our `issues list <https://github.com/alibaba/GraphAr/issues>`_
 on GitHub in case a similar issue has already been opened.
 
-If you get confirmation of your bug, `file an bug issue`_ before starting to code.
+If you get confirmation of your bug, `file a bug issue`_ before starting to code.
 
 Requesting feature or enhancement
 ---------------------------------------
@@ -26,7 +26,7 @@ If you find yourself wishing for a feature that doesn't exist in GraphAr, you ar
 There are bound to be others out there with similar needs. Many of the features that GraphAr has today
 have been added because our users saw the need.
 
-`Open an feature request issue`_ on GitHub which describes the feature you would
+`Open a feature request issue`_ on GitHub which describes the feature you would
 like to see, why you need it, and how it should work.
 
 Support questions
@@ -377,7 +377,7 @@ Continuous integration testing
 All pull requests that contain changes to code must be run through
 continuous integration (CI) testing at `Github Actions <https://github.com/alibaba/GraphAr/actions>`_.
 
-The pull request change will triggers a CI testing run. Ideally, the code change
+The pull request change will trigger a CI testing run. Ideally, the code change
 will pass ("be green") on all platform configurations supported by GraphAr.
 This means that all tests pass and there are no linting errors. In reality,
 however, it is not uncommon for the CI infrastructure itself to fail on specific
@@ -386,9 +386,9 @@ to determine whether the failure was caused by the changes in the pull request.
 
 .. _Code of Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
 
-.. _file an bug issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=Bug&template=bug_report.yml&title=%5BBug%5D%3A+%3Ctitle%3E
+.. _file a bug issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=Bug&template=bug_report.yml&title=%5BBug%5D%3A+%3Ctitle%3E
 
-.. _Open an feature request issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFeat%5D
+.. _Open a feature request issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFeat%5D
 
 .. _fork GraphAr: https://help.github.com/articles/fork-a-repo
 
