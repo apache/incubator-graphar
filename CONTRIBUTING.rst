@@ -227,7 +227,7 @@ Maintainers need to do the following to push out a release:
 
 .. code:: shell
 
-    git tag v0.1.0
+    git tag -a v0.1.0 -m "GraphAr v0.1.0"
     git push upstream v0.1.0
 
 3. The release draft will be automatically built to GitHub by GitHub Actions. You can edit the release notes draft on `GitHub <https://github.com/alibaba/GraphAr/releases>`_ to add more details.
