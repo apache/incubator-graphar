@@ -230,7 +230,7 @@ Maintainers need to do the following to push out a release:
     git tag v0.1.0
     git push upstream v0.1.0
 
-* The release will be automatically built and published to GitHub by GitHub Actions. Yu can edit the release notes on `GitHub <https://github.com/alibaba/GraphAr/releases>`_ to add more details.
+* The release will be automatically built and published to GitHub by GitHub Actions. You can edit the release notes on `GitHub <https://github.com/alibaba/GraphAr/releases>`_ to add more details.
 
 .. the reviewing part document is referred and derived from
 .. https://github.com/nodejs/node/blob/main/doc/contributing/pull-requests.md#the-process-of-making-changes
