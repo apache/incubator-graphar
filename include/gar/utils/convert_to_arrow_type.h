@@ -26,7 +26,7 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-/// \brief Struct to convert DataType to arrow::DataType.
+/** Struct to convert DataType to arrow::DataType. */
 template <Type T>
 struct ConvertToArrowType {};
 

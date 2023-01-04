@@ -25,22 +25,22 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-/// \brief InfoVersion is a class provide version information of info.
+/** InfoVersion is a class provide version information of info. */
 class InfoVersion {
  public:
-  /// \brief Parse version string to InfoVersion.
+  /** Parse version string to InfoVersion. */
   static Result<InfoVersion> Parse(const std::string& str) noexcept;
 
-  /// Default constructor
+  /** Default constructor */
   InfoVersion() : version_(version2types.rbegin()->first) {}
-  /// Constructor with version
+  /** Constructor with version */
   explicit InfoVersion(int version) : version_(version) {
     if (version2types.find(version) == version2types.end()) {
       throw std::invalid_argument("Unsupported version: " +
                                   std::to_string(version));
     }
   }
-  /// Constructor with version and user defined types
+  /** Constructor with version and user defined types. */
   explicit InfoVersion(int version,
                        const std::vector<std::string>& user_define_types)
       : version_(version), user_define_types_(user_define_types) {
@@ -49,26 +49,26 @@ class InfoVersion {
                                   std::to_string(version));
     }
   }
-  /// Copy constructor
+  /** Copy constructor */
   InfoVersion(const InfoVersion& other) = default;
-  /// Copy assignment
+  /** Copy assignment */
   inline InfoVersion& operator=(const InfoVersion& other) = default;
 
-  /// Check if two InfoVersion are equal
+  /** Check if two InfoVersion are equal */
   bool operator==(const InfoVersion& other) const {
     return version_ == other.version_ &&
            user_define_types_ == other.user_define_types_;
   }
 
-  /// Get version
+  /** Get version */
   int version() const { return version_; }
 
-  /// Get user defined types
+  /** Get user defined types */
   const std::vector<std::string>& user_define_types() const {
     return user_define_types_;
   }
 
-  /// Dump version to string
+  /** Dump version to string. */
   std::string ToString() const {
     std::string str = "gar/v" + std::to_string(version_);
     if (!user_define_types_.empty()) {
@@ -81,7 +81,7 @@ class InfoVersion {
     return str;
   }
 
-  /// Check if type is supported by version
+  /** Check if type is supported by version. */
   inline bool CheckType(const std::string& type_str) noexcept {
     auto& types = version2types.at(version_);
     // check if type_str is in supported types of version

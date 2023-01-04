@@ -157,11 +157,11 @@ class VertexIter {
     cur_offset_ = offset;
   }
 
-  /// Copy constructor.
+  /** Copy constructor. */
   VertexIter(const VertexIter& other)
       : readers_(other.readers_), cur_offset_(other.cur_offset_) {}
 
-  /// Construct and return the vertex of the current offset.
+  /** Construct and return the vertex of the current offset. */
   Vertex operator*() noexcept {
     for (auto& reader : readers_) {
       reader.seek(cur_offset_);
@@ -169,10 +169,10 @@ class VertexIter {
     return Vertex(cur_offset_, readers_);
   }
 
-  /// Get the vertex id of the current offset.
+  /** Get the vertex id of the current offset. */
   IdType id() { return cur_offset_; }
 
-  /// Get the value for a property of the current vertex.
+  /** Get the value for a property of the current vertex. */
   template <typename T>
   Result<T> property(const std::string& property) noexcept {
     std::shared_ptr<arrow::ChunkedArray> column(nullptr);
@@ -192,25 +192,25 @@ class VertexIter {
     return Status::KeyError("The property is not exist.");
   }
 
-  /// The prefix increment operator.
+  /** The prefix increment operator. */
   VertexIter& operator++() noexcept {
     ++cur_offset_;
     return *this;
   }
 
-  /// The postfix increment operator.
+  /** The postfix increment operator. */
   VertexIter operator++(int) {
     VertexIter ret(*this);
     ++cur_offset_;
     return ret;
   }
 
-  /// The equality operator.
+  /** The equality operator. */
   bool operator==(const VertexIter& rhs) const noexcept {
     return cur_offset_ == rhs.cur_offset_;
   }
 
-  /// The inequality operator.
+  /** The inequality operator. */
   bool operator!=(const VertexIter& rhs) const noexcept {
     return cur_offset_ != rhs.cur_offset_;
   }
@@ -246,18 +246,18 @@ class VerticesCollection {
                               fs->ReadFileToValue<IdType>(vertex_num_path));
   }
 
-  /// The iterator pointing to the first vertex.
+  /** The iterator pointing to the first vertex. */
   VertexIter begin() noexcept { return VertexIter(vertex_info_, prefix_, 0); }
 
-  /// The iterator pointing to the past-the-end element.
+  /** The iterator pointing to the past-the-end element. */
   VertexIter end() noexcept {
     return VertexIter(vertex_info_, prefix_, vertex_num_);
   }
 
-  /// The iterator pointing to the vertex with specific id.
+  /** The iterator pointing to the vertex with specific id. */
   VertexIter find(IdType id) { return VertexIter(vertex_info_, prefix_, id); }
 
-  /// Get the number of vertices in the collection.
+  /** Get the number of vertices in the collection. */
   size_t size() const noexcept { return vertex_num_; }
 
  private:
@@ -330,7 +330,7 @@ class EdgeIter {
     }
   }
 
-  /// Copy constructor.
+  /** Copy constructor. */
   EdgeIter(const EdgeIter& other)
       : adj_list_reader_(other.adj_list_reader_),
         offset_reader_(other.offset_reader_),
@@ -349,7 +349,7 @@ class EdgeIter {
         adj_list_type_(other.adj_list_type_),
         index_converter_(other.index_converter_) {}
 
-  /// Construct and return the edge of the current offset.
+  /** Construct and return the edge of the current offset. */
   Edge operator*() {
     adj_list_reader_.seek(cur_offset_);
     for (auto& reader : property_readers_) {
@@ -358,13 +358,13 @@ class EdgeIter {
     return Edge(adj_list_reader_, property_readers_);
   }
 
-  /// Get the source vertex id for the current edge.
+  /** Get the source vertex id for the current edge. */
   IdType source();
 
-  /// Get the destination vertex id for the current edge.
+  /** Get the destination vertex id for the current edge. */
   IdType destination();
 
-  /// Get the value of a property for the current edge.
+  /** Get the value of a property for the current edge. */
   template <typename T>
   Result<T> property(const std::string& property) noexcept {
     std::shared_ptr<arrow::ChunkedArray> column(nullptr);
@@ -384,7 +384,7 @@ class EdgeIter {
     return Status::KeyError("The property is not exist.");
   }
 
-  /// The prefix increment operator.
+  /** The prefix increment operator. */
   EdgeIter& operator++() {
     if (num_row_of_chunk_ == 0) {
       adj_list_reader_.seek(cur_offset_);
@@ -424,14 +424,14 @@ class EdgeIter {
     return *this;
   }
 
-  /// The postfix increment operator.
+  /** The postfix increment operator. */
   EdgeIter operator++(int) {
     EdgeIter ret(*this);
     this->operator++();
     return ret;
   }
 
-  /// The copy assignment operator.
+  /** The copy assignment operator. */
   EdgeIter operator=(const EdgeIter& other) {
     adj_list_reader_ = other.adj_list_reader_;
     offset_reader_ = other.offset_reader_;
@@ -452,24 +452,24 @@ class EdgeIter {
     return *this;
   }
 
-  /// The equality operator.
+  /** The equality operator. */
   bool operator==(const EdgeIter& rhs) const noexcept {
     return global_chunk_index_ == rhs.global_chunk_index_ &&
            cur_offset_ == rhs.cur_offset_ &&
            adj_list_type_ == rhs.adj_list_type_;
   }
 
-  /// The inequality operator.
+  /** The inequality operator. */
   bool operator!=(const EdgeIter& rhs) const noexcept {
     return global_chunk_index_ != rhs.global_chunk_index_ ||
            cur_offset_ != rhs.cur_offset_ ||
            adj_list_type_ != rhs.adj_list_type_;
   }
 
-  /// Get the global index of the current edge chunk.
+  /** Get the global index of the current edge chunk. */
   IdType global_chunk_index() const { return global_chunk_index_; }
 
-  /// Get the current offset in the current chunk.
+  /** Get the current offset in the current chunk. */
   IdType cur_offset() const { return cur_offset_; }
 
   /**
@@ -492,7 +492,7 @@ class EdgeIter {
    */
   bool first_dst(const EdgeIter& from, IdType id);
 
-  /// Let the iterator to point to the begin.
+  /** Let the iterator to point to the begin. */
   void to_begin() {
     global_chunk_index_ = chunk_begin_;
     cur_offset_ = offset_of_chunk_begin_;
@@ -502,13 +502,13 @@ class EdgeIter {
     refresh();
   }
 
-  /// Check if the current position is the end.
+  /** Check if the current position is the end. */
   bool is_end() const {
     return global_chunk_index_ == chunk_end_ &&
            cur_offset_ == offset_of_chunk_end_;
   }
 
-  /// Point to the next edge with the same source, return false if not found.
+  /** Point to the next edge with the same source, return false if not found. */
   bool next_src() {
     if (is_end())
       return false;
@@ -535,8 +535,10 @@ class EdgeIter {
     return false;
   }
 
-  /// Point to the next edge with the same destination, return false if not
-  /// found.
+  /**
+   * Point to the next edge with the same destination, return false if not
+   * found.
+   */
   bool next_dst() {
     if (is_end())
       return false;
@@ -563,8 +565,10 @@ class EdgeIter {
     return false;
   }
 
-  /// Point to the next edge with the specific source, return false if not
-  /// found.
+  /**
+   * Point to the next edge with the specific source, return false if not
+   * found.
+   */
   bool next_src(IdType id) {
     if (is_end())
       return false;
@@ -572,8 +576,10 @@ class EdgeIter {
     return this->first_src(*this, id);
   }
 
-  /// Point to the next edge with the specific destination, return false if
-  /// not found.
+  /**
+   * Point to the next edge with the specific destination, return false if
+   * not found.
+   */
   bool next_dst(IdType id) {
     if (is_end())
       return false;
@@ -582,7 +588,7 @@ class EdgeIter {
   }
 
  private:
-  /// Refresh the readers to point to the current position.
+  // Refresh the readers to point to the current position.
   void refresh() {
     adj_list_reader_.seek_chunk_index(vertex_chunk_index_);
     adj_list_reader_.seek(cur_offset_);
@@ -623,7 +629,7 @@ class EdgeIter {
 template <>
 class EdgesCollection<AdjListType::ordered_by_source> {
  public:
-  static const AdjListType adj_list_type_ = AdjListType::ordered_by_source;
+  static const AdjListType adj_list_type_;
 
   /**
    * @brief Initialize the EdgesCollection.
@@ -731,7 +737,7 @@ class EdgesCollection<AdjListType::ordered_by_source> {
     offset_of_chunk_end_ = 0;
   }
 
-  /// The iterator pointing to the first edge.
+  /** The iterator pointing to the first edge. */
   EdgeIter begin() {
     if (begin_ == nullptr) {
       EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_,
@@ -743,7 +749,7 @@ class EdgesCollection<AdjListType::ordered_by_source> {
     return *begin_;
   }
 
-  /// The iterator pointing to the past-the-end element.
+  /** The iterator pointing to the past-the-end element. */
   EdgeIter end() {
     if (end_ == nullptr) {
       EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_,
@@ -844,7 +850,7 @@ class EdgesCollection<AdjListType::ordered_by_source> {
 template <>
 class EdgesCollection<AdjListType::ordered_by_dest> {
  public:
-  static const AdjListType adj_list_type_ = AdjListType::ordered_by_dest;
+  static const AdjListType adj_list_type_;
 
   /**
    * @brief Initialize the EdgesCollection.
@@ -952,7 +958,7 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
     offset_of_chunk_end_ = 0;
   }
 
-  /// The iterator pointing to the first edge.
+  /** The iterator pointing to the first edge. */
   EdgeIter begin() {
     if (begin_ == nullptr) {
       EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_,
@@ -964,7 +970,7 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
     return *begin_;
   }
 
-  /// The iterator pointing to the past-the-end element.
+  /** The iterator pointing to the past-the-end element. */
   EdgeIter end() {
     if (end_ == nullptr) {
       EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_,
@@ -1065,7 +1071,7 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
 template <>
 class EdgesCollection<AdjListType::unordered_by_source> {
  public:
-  static const AdjListType adj_list_type_ = AdjListType::unordered_by_source;
+  static const AdjListType adj_list_type_;
 
   /**
    * @brief Initialize the EdgesCollection.
@@ -1173,7 +1179,7 @@ class EdgesCollection<AdjListType::unordered_by_source> {
     offset_of_chunk_end_ = 0;
   }
 
-  /// The iterator pointing to the first edge.
+  /** The iterator pointing to the first edge. */
   EdgeIter begin() {
     if (begin_ == nullptr) {
       EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_,
@@ -1185,7 +1191,7 @@ class EdgesCollection<AdjListType::unordered_by_source> {
     return *begin_;
   }
 
-  /// The iterator pointing to the past-the-end element.
+  /** The iterator pointing to the past-the-end element. */
   EdgeIter end() {
     if (end_ == nullptr) {
       EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_,
@@ -1256,7 +1262,7 @@ class EdgesCollection<AdjListType::unordered_by_source> {
 template <>
 class EdgesCollection<AdjListType::unordered_by_dest> {
  public:
-  static const AdjListType adj_list_type_ = AdjListType::unordered_by_dest;
+  static const AdjListType adj_list_type_;
 
   /**
    * @brief Initialize the EdgesCollection.
@@ -1364,7 +1370,7 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
     offset_of_chunk_end_ = 0;
   }
 
-  /// The iterator pointing to the first edge.
+  /** The iterator pointing to the first edge. */
   EdgeIter begin() {
     if (begin_ == nullptr) {
       EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_,
@@ -1376,7 +1382,7 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
     return *begin_;
   }
 
-  /// The iterator pointing to the past-the-end element.
+  /** The iterator pointing to the past-the-end element. */
   EdgeIter end() {
     if (end_ == nullptr) {
       EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_,

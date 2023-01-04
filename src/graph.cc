@@ -360,4 +360,17 @@ bool EdgeIter::first_dst(const EdgeIter& from, IdType id) {
   }
 }
 
+const AdjListType
+    EdgesCollection<AdjListType::ordered_by_source>::adj_list_type_ =
+        AdjListType::ordered_by_source;
+const AdjListType
+    EdgesCollection<AdjListType::ordered_by_dest>::adj_list_type_ =
+        AdjListType::ordered_by_dest;
+const AdjListType
+    EdgesCollection<AdjListType::unordered_by_source>::adj_list_type_ =
+        AdjListType::unordered_by_source;
+const AdjListType
+    EdgesCollection<AdjListType::unordered_by_dest>::adj_list_type_ =
+        AdjListType::unordered_by_dest;
+
 }  // namespace GAR_NAMESPACE_INTERNAL

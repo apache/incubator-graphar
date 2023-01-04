@@ -1,20 +1,20 @@
-GraphAr Spark Tools
+GraphAr Spark Library
 ============================
 
 Overview
 -----------
 
-GraphAr Spark tools are provided as a library for generating, loading and transforming GAR files with Apache Spark easy. It consists of the following parts:
+GraphAr Spark library are provided for generating, loading and transforming GAR files with Apache Spark easy. It consists of the following parts:
 
-- **Information Classes**: As same with in C++ SDK, the information classes are implemented as a part of Spark tools for constructing and accessing the meta information about the graphs, vertices and edges in GraphAr.
+- **Information Classes**: As same with in C++ SDK, the information classes are implemented as a part of Spark library for constructing and accessing the meta information about the graphs, vertices and edges in GraphAr.
 - **IndexGenerator**: The IndexGenerator helps to generate the indices for vertex/edge DataFrames. In most cases, IndexGenerator is first utilized to generate the indices for a DataFrame (e.g., from primary keys), and then this DataFrame can be written into GAR files through the Writer.
 - **Writer**: The GraphAr Spark Writer provides a set of interfaces that can be used to write Spark DataFrames into GAR files. Every time it takes a DataFrame as the logical table for a type of vertices or edges, assembles the data in specified format (e.g., reorganize the edges in the CSR way) and then dumps it to standard GAR files (orc, parquet or CSV files) under the specific directory path.
 - **Reader**: The GraphAr Spark Reader provides a set of interfaces that can be used to read GAR files. It reads a set of vertices or edges at a time and assembles the result into Spark DataFrames. Similar with the Reader SDK in C++, it supports the users to specify the data they need, e.g., to read a single property group instead of all properties.
- 
+
 Use Cases
 ----------
 
-The GraphAr Spark Tools can be applied to these scenarios:
+The GraphAr Spark Library can be applied to these scenarios:
 
 - Take GAR as data sources to execute SQL queries or do graph processing (e.g., using GraphX).
 - Transform data between GAR and other data sources (e.g., Hive, Neo4j, NebulaGraph, ...).
@@ -23,10 +23,10 @@ The GraphAr Spark Tools can be applied to these scenarios:
 - Modify existing GAR data (e.g., add new vertices/edges).
 
 
-Get GraphAr Spark Tools
+Get GraphAr Spark Library
 ------------------------------
 
-Make the graphar-spark-tools directory as the current working directory:
+Make the graphar-spark-library directory as the current working directory:
 
 .. code-block:: shell
 
@@ -46,7 +46,7 @@ How to Use
 
 Information Classes
 `````````````````````
-The information classes are included in Spark tools for constructing and accessing the meta information about the graphs, vertices and edges in GraphAr. They are also used as the essential parameters for constructing readers/writers. In common cases, the information can be built from reading and parsing existing meta files (Yaml files). Also, we support to construct them in memory from nothing.
+The information classes are included in Spark library for constructing and accessing the meta information about the graphs, vertices and edges in GraphAr. They are also used as the essential parameters for constructing readers/writers. In common cases, the information can be built from reading and parsing existing meta files (Yaml files). Also, we support to construct them in memory from nothing.
 
 To build information from Yaml files, please refer to the following code.
 

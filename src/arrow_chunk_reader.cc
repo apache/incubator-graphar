@@ -112,8 +112,7 @@ AdjListArrowChunkReader::GetChunk() noexcept {
                         edge_info_.GetAdjListFilePath(
                             vertex_chunk_index_, chunk_index_, adj_list_type_));
     std::string path = prefix_ + chunk_file_path;
-    GAR_ASSIGN_OR_RAISE(auto file_type,
-                        edge_info_.GetAdjListFileType(adj_list_type_));
+    GAR_ASSIGN_OR_RAISE(auto file_type, edge_info_.GetFileType(adj_list_type_));
     GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadFileToTable(path, file_type));
   }
   IdType row_offset = seek_offset_ - chunk_index_ * edge_info_.GetChunkSize();
@@ -126,8 +125,7 @@ Result<IdType> AdjListArrowChunkReader::GetRowNumOfChunk() noexcept {
                         edge_info_.GetAdjListFilePath(
                             vertex_chunk_index_, chunk_index_, adj_list_type_));
     std::string path = prefix_ + chunk_file_path;
-    GAR_ASSIGN_OR_RAISE(auto file_type,
-                        edge_info_.GetAdjListFileType(adj_list_type_));
+    GAR_ASSIGN_OR_RAISE(auto file_type, edge_info_.GetFileType(adj_list_type_));
     GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadFileToTable(path, file_type));
   }
   return chunk_table_->num_rows();
@@ -199,8 +197,7 @@ AdjListOffsetArrowChunkReader::GetChunk() noexcept {
         auto chunk_file_path,
         edge_info_.GetAdjListOffsetFilePath(chunk_index_, adj_list_type_));
     std::string path = prefix_ + chunk_file_path;
-    GAR_ASSIGN_OR_RAISE(auto file_type,
-                        edge_info_.GetAdjListFileType(adj_list_type_));
+    GAR_ASSIGN_OR_RAISE(auto file_type, edge_info_.GetFileType(adj_list_type_));
     GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadFileToTable(path, file_type));
   }
   IdType row_offset = seek_id_ - chunk_index_ * vertex_chunk_size_;

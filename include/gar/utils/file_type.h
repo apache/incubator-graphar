@@ -23,7 +23,7 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-/// \brief Type of file format
+/** Type of file format */
 enum FileType { CSV = 0, PARQUET = 1, ORC = 2 };
 
 static inline FileType StringToFileType(const std::string& str) {

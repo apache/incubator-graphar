@@ -24,7 +24,7 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-/// \brief Adj list type enumeration for adjacency list of graph
+/** Adj list type enumeration for adjacency list of graph. */
 enum class AdjListType : std::uint8_t {
   /// collection of edges by source, but unordered, can represent COO format
   unordered_by_source = 0b00000001,

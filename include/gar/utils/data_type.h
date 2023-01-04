@@ -30,35 +30,37 @@ class DataType;
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-/// \brief Main data type enumeration
+/** @brief Main data type enumeration. */
 enum class Type {
-  /// Boolean
+  /** Boolean */
   BOOL = 0,
 
-  /// Signed 32-bit integer
+  /** Signed 32-bit integer */
   INT32,
 
-  /// Signed 64-bit integer
+  /** Signed 64-bit integer */
   INT64,
 
-  /// 4-byte floating point value
+  /** 4-byte floating point value */
   FLOAT,
 
-  /// 8-byte floating point value
+  /** 8-byte floating point value */
   DOUBLE,
 
-  /// UTF8 variable-length string
+  /** UTF8 variable-length string */
   STRING,
 
-  /// User-defined data type
+  /** User-defined data type */
   USER_DEFINED,
 
   // Leave this at the end
   MAX_ID,
 };
 
-/// \brief The DataType struct to provide enum type for data type and functions
-///   to parse data type.
+/**
+ * @brief The DataType struct to provide enum type for data type and functions
+ *   to parse data type.
+ */
 class DataType {
  public:
   DataType() : id_(Type::BOOL) {}
@@ -101,7 +103,7 @@ class DataType {
     return DataType(str2type.at(str.c_str()));
   }
 
-  /// \brief Return the type category of the DataType.
+  /** Return the type category of the DataType. */
   Type id() const { return id_; }
 
   std::string ToTypeName() const;

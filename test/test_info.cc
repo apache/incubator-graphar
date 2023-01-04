@@ -36,12 +36,12 @@ TEST_CASE("test_graph_info") {
   REQUIRE(graph_info.GetVersion() == version);
 
   // test add vertex and get vertex info
-  REQUIRE(graph_info.GetAllVertexInfo().size() == 0);
+  REQUIRE(graph_info.GetVertexInfos().size() == 0);
   GAR_NAMESPACE::VertexInfo vertex_info("test_vertex", 100, version,
                                         "test_vertex_prefix");
   auto st = graph_info.AddVertex(vertex_info);
   REQUIRE(st.ok());
-  REQUIRE(graph_info.GetAllVertexInfo().size() == 1);
+  REQUIRE(graph_info.GetVertexInfos().size() == 1);
   auto maybe_vertex_info = graph_info.GetVertexInfo("test_vertex");
   REQUIRE(!maybe_vertex_info.has_error());
   REQUIRE(maybe_vertex_info.value().GetLabel() == "test_vertex");
@@ -51,14 +51,14 @@ TEST_CASE("test_graph_info") {
   REQUIRE(graph_info.AddVertex(vertex_info).IsInvalidOperation());
 
   // test add edge and get edge info
-  REQUIRE(graph_info.GetAllEdgeInfo().size() == 0);
+  REQUIRE(graph_info.GetEdgeInfos().size() == 0);
   std::string src_label = "test_vertex", edge_label = "test_edge",
               dst_label = "test_vertex";
   GAR_NAMESPACE::EdgeInfo edge_info(src_label, edge_label, dst_label, 1024, 100,
                                     100, true, version);
   st = graph_info.AddEdge(edge_info);
   REQUIRE(st.ok());
-  REQUIRE(graph_info.GetAllEdgeInfo().size() == 1);
+  REQUIRE(graph_info.GetEdgeInfos().size() == 1);
   auto maybe_edge_info =
       graph_info.GetEdgeInfo(src_label, edge_label, dst_label);
   REQUIRE(!maybe_edge_info.has_error());
@@ -174,41 +174,31 @@ TEST_CASE("test_edge_info") {
   REQUIRE(edge_info.ContainAdjList(adj_list_type));
   // same adj list type can not be added twice
   REQUIRE(edge_info.AddAdjList(adj_list_type, file_type).IsInvalidOperation());
-  auto adj_prefix_result = edge_info.GetAdjListPrefix(adj_list_type);
-  REQUIRE(!adj_prefix_result.has_error());
-  auto adj_prefix = adj_prefix_result.value();
-  REQUIRE(adj_prefix ==
-          "ordered_by_source/");  // default prefix is adj_list_type + "/"
-  auto file_type_result = edge_info.GetAdjListFileType(adj_list_type);
+  auto file_type_result = edge_info.GetFileType(adj_list_type);
   REQUIRE(!file_type_result.has_error());
   REQUIRE(file_type_result.value() == file_type);
   auto adj_list_file_path = edge_info.GetAdjListFilePath(0, 0, adj_list_type);
   REQUIRE(!adj_list_file_path.has_error());
   REQUIRE(adj_list_file_path.value() ==
-          edge_info.GetPrefix() + adj_prefix + "adj_list/part0/chunk0");
+          edge_info.GetPrefix() + "ordered_by_source/adj_list/part0/chunk0");
   auto adj_list_dir_path = edge_info.GetAdjListDirPath(adj_list_type);
   REQUIRE(!adj_list_dir_path.has_error());
   REQUIRE(adj_list_dir_path.value() ==
-          edge_info.GetPrefix() + adj_prefix + "adj_list/");
+          edge_info.GetPrefix() + "ordered_by_source/adj_list/");
   auto adj_list_offset_file_path =
       edge_info.GetAdjListOffsetFilePath(0, adj_list_type);
   REQUIRE(!adj_list_offset_file_path.has_error());
   REQUIRE(adj_list_offset_file_path.value() ==
-          edge_info.GetPrefix() + adj_prefix + "offset/chunk0");
+          edge_info.GetPrefix() + "ordered_by_source/offset/chunk0");
   auto adj_list_offset_dir_path =
       edge_info.GetAdjListOffsetDirPath(adj_list_type);
   REQUIRE(!adj_list_offset_dir_path.has_error());
   REQUIRE(adj_list_offset_dir_path.value() ==
-          edge_info.GetPrefix() + adj_prefix + "offset/");
+          edge_info.GetPrefix() + "ordered_by_source/offset/");
 
   // adj list type not exist
   REQUIRE(!edge_info.ContainAdjList(adj_list_type_not_exist));
-  REQUIRE(edge_info.GetAdjListPrefix(adj_list_type_not_exist)
-              .status()
-              .IsKeyError());
-  REQUIRE(edge_info.GetAdjListFileType(adj_list_type_not_exist)
-              .status()
-              .IsKeyError());
+  REQUIRE(edge_info.GetFileType(adj_list_type_not_exist).status().IsKeyError());
   REQUIRE(edge_info.GetAdjListFilePath(0, 0, adj_list_type_not_exist)
               .status()
               .IsKeyError());
@@ -249,12 +239,13 @@ TEST_CASE("test_edge_info") {
   auto property_file_path =
       edge_info.GetPropertyFilePath(pg, adj_list_type, 0, 0);
   REQUIRE(!property_file_path.has_error());
-  REQUIRE(property_file_path.value() ==
-          edge_info.GetPrefix() + adj_prefix + pg.GetPrefix() + "part0/chunk0");
+  REQUIRE(property_file_path.value() == edge_info.GetPrefix() +
+                                            "ordered_by_source/" +
+                                            pg.GetPrefix() + "part0/chunk0");
   auto property_dir_path = edge_info.GetPropertyDirPath(pg, adj_list_type);
   REQUIRE(!property_dir_path.has_error());
   REQUIRE(property_dir_path.value() ==
-          edge_info.GetPrefix() + adj_prefix + pg.GetPrefix());
+          edge_info.GetPrefix() + "ordered_by_source/" + pg.GetPrefix());
 
   // test property not exist
   REQUIRE(edge_info.GetPropertyGroup("p_not_exist", adj_list_type)
@@ -332,8 +323,8 @@ TEST_CASE("test_graph_info_load_from_file") {
   auto graph_info = graph_info_result.value();
   REQUIRE(graph_info.GetName() == "ldbc_sample");
   REQUIRE(graph_info.GetPrefix() == TEST_DATA_DIR + "/ldbc_sample/csv/");
-  const auto& vertex_infos = graph_info.GetAllVertexInfo();
-  const auto& edge_infos = graph_info.GetAllEdgeInfo();
+  const auto& vertex_infos = graph_info.GetVertexInfos();
+  const auto& edge_infos = graph_info.GetEdgeInfos();
   REQUIRE(vertex_infos.size() == 1);
   REQUIRE(edge_infos.size() == 1);
 }

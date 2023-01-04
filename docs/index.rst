@@ -34,6 +34,7 @@
 .. toctree::
    :maxdepth: 1
    :caption: API Reference
+   :hidden:
 
    reference/api-reference-cpp.rst
    Spark API Reference <reference/spark-api/index>

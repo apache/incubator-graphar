@@ -29,7 +29,7 @@ class Node;
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-/// A wrapper of YAML::Node to provide functions to parse yaml.
+/** A wrapper of YAML::Node to provide functions to parse yaml. */
 class Yaml {
  public:
   explicit Yaml(std::shared_ptr<YAML::Node> root_node)
@@ -39,24 +39,32 @@ class Yaml {
 
   const YAML::Node operator[](const std::string& key) const;
 
-  /// Loads the input string as Yaml instance.
-  ///
-  ///     Return Status::YamlError if input string can not be loaded(malformed).
+  /**
+   * @brief Loads the input string as Yaml instance.
+   *
+   * Return Status::YamlError if input string can not be loaded(malformed).
+   */
   static Result<std::shared_ptr<Yaml>> Load(const std::string& input);
 
-  /// Loads the input string as Yaml instance.
-  ///
-  ///     Return Status::YamlError if input string can not be loaded(malformed).
+  /**
+   * Loads the input string as Yaml instance.
+   *
+   * Return Status::YamlError if input string can not be loaded(malformed).
+   */
   static Result<std::shared_ptr<Yaml>> Load(const char* input);
 
-  /// Loads the input stream as Yaml instance.
-  ///
-  ///     Return Status::YamlError if input string can not be loaded(malformed).
+  /**
+   * Loads the input stream as Yaml instance.
+   *
+   * Return Status::YamlError if input string can not be loaded(malformed).
+   */
   static Result<std::shared_ptr<Yaml>> Load(std::istream& input);
 
-  /// Loads the input file as a single Yaml instance.
-  ///
-  ///     Return Status::YamlError if the file can not be loaded(malformed).
+  /**
+   * Loads the input file as a single Yaml instance.
+   *
+   * Return Status::YamlError if the file can not be loaded(malformed).
+   */
   static Result<std::shared_ptr<Yaml>> LoadFile(const std::string& file_name);
 
  private:

@@ -30,7 +30,7 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-/// The chunk info reader for vertex property group.
+/** The chunk info reader for vertex property group. */
 class VertexPropertyChunkInfoReader {
  public:
   ~VertexPropertyChunkInfoReader() {}
@@ -86,9 +86,12 @@ class VertexPropertyChunkInfoReader {
     return prefix_ + chunk_file_path;
   }
 
-  ///  Sets chunk position indicator to next chunk.
-  ///     if current chunk is the last chunk, will return Status::OutOfRange
-  ///     error.
+  /**
+   * Sets chunk position indicator to next chunk.
+   *
+   * if current chunk is the last chunk, will return Status::OutOfRange
+   *   error.
+   */
   Status next_chunk() noexcept {
     if (++chunk_index_ >= chunk_num_) {
       return Status::OutOfRange();
@@ -96,7 +99,7 @@ class VertexPropertyChunkInfoReader {
     return Status::OK();
   }
 
-  /// Get the chunk number of the current vertex property group.
+  /** Get the chunk number of the current vertex property group. */
   IdType GetChunkNum() noexcept { return chunk_num_; }
 
  private:
@@ -107,7 +110,7 @@ class VertexPropertyChunkInfoReader {
   IdType chunk_num_;
 };
 
-/// The chunk info reader for adj list topology chunk.
+/** The chunk info reader for adj list topology chunk. */
 class AdjListChunkInfoReader {
  public:
   ~AdjListChunkInfoReader() {}
@@ -167,7 +170,7 @@ class AdjListChunkInfoReader {
     return Status::OK();
   }
 
-  /// Return the current chunk file path of chunk position indicator.
+  /** Return the current chunk file path of chunk position indicator. */
   Result<std::string> GetChunk() noexcept {
     GAR_ASSIGN_OR_RAISE(auto chunk_file_path,
                         edge_info_.GetAdjListFilePath(
@@ -175,9 +178,12 @@ class AdjListChunkInfoReader {
     return prefix_ + chunk_file_path;
   }
 
-  ///  Sets chunk position indicator to next chunk.
-  ///     if current chunk is the last chunk, will return Status::OutOfRange
-  ///     error.
+  /**
+   * Sets chunk position indicator to next chunk.
+   *
+   * if current chunk is the last chunk, will return Status::OutOfRange
+   *     error.
+   */
   Status next_chunk() {
     if (++chunk_index_ >= chunk_num_) {
       ++vertex_chunk_index_;
@@ -202,7 +208,9 @@ class AdjListChunkInfoReader {
   std::shared_ptr<FileSystem> fs_;
 };
 
-/// The chunk info reader for edge property group chunk.
+/**
+ * The chunk info reader for edge property group chunk.
+ */
 class AdjListPropertyChunkInfoReader {
  public:
   /**
@@ -264,7 +272,7 @@ class AdjListPropertyChunkInfoReader {
     return Status::OK();
   }
 
-  /// Return the current chunk file path of chunk position indicator.
+  /** Return the current chunk file path of chunk position indicator. */
   Result<std::string> GetChunk() noexcept {
     GAR_ASSIGN_OR_RAISE(
         auto chunk_file_path,
@@ -273,9 +281,12 @@ class AdjListPropertyChunkInfoReader {
     return prefix_ + chunk_file_path;
   }
 
-  ///  Sets chunk position indicator to next chunk.
-  ///     if current chunk is the last chunk, will return Status::OutOfRange
-  ///     error.
+  /**
+   * Sets chunk position indicator to next chunk.
+   *
+   * if current chunk is the last chunk, will return Status::OutOfRange
+   *  error.
+   */
   Status next_chunk() {
     if (++chunk_index_ >= chunk_num_) {
       ++vertex_chunk_index_;

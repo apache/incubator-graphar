@@ -33,8 +33,8 @@ int main(int argc, char* argv[]) {
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
-  assert(graph_info.GetAllVertexInfo().size() == 1);
-  assert(graph_info.GetAllEdgeInfo().size() == 1);
+  assert(graph_info.GetVertexInfos().size() == 1);
+  assert(graph_info.GetEdgeInfos().size() == 1);
 
   // construct vertices collection
   std::string label = "person";
