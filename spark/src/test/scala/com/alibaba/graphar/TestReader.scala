@@ -122,17 +122,6 @@ class ReaderSuite extends AnyFunSuite {
     assertThrows[IllegalArgumentException](reader.readEdgeProperties(invalid_property_group))
 
     val invalid_adj_list_type = AdjListType.unordered_by_dest
-    val invalid_reader = new EdgeReader(prefix, edge_info, invalid_adj_list_type, spark)
-    assertThrows[IllegalArgumentException](invalid_reader.readOffset(0))
-    assertThrows[IllegalArgumentException](invalid_reader.readAdjListChunk(0, 0))
-    assertThrows[IllegalArgumentException](invalid_reader.readAdjListForVertexChunk(0))
-    assertThrows[IllegalArgumentException](invalid_reader.readAllAdjList())
-    assertThrows[IllegalArgumentException](invalid_reader.readEdgePropertyChunk(property_group, 0, 0))
-    assertThrows[IllegalArgumentException](invalid_reader.readEdgePropertiesForVertexChunk(property_group, 0))
-    assertThrows[IllegalArgumentException](invalid_reader.readEdgeProperties(property_group))
-    assertThrows[IllegalArgumentException](invalid_reader.readAllEdgePropertiesForVertexChunk(0))
-    assertThrows[IllegalArgumentException](invalid_reader.readAllEdgeProperties())
-    assertThrows[IllegalArgumentException](invalid_reader.readEdgesForVertexChunk(0))
-    assertThrows[IllegalArgumentException](invalid_reader.readEdges())
+    assertThrows[IllegalArgumentException](new EdgeReader(prefix, edge_info, invalid_adj_list_type, spark))
   }
 }

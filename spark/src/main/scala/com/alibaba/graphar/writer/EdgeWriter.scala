@@ -29,6 +29,7 @@ import org.apache.spark.sql.functions._
 import scala.collection.SortedMap
 import scala.collection.mutable.ArrayBuffer
 
+/** Helper object for EdgeWriter class. */
 object EdgeWriter {
   // split the whole edge dataframe into chunk dataframes by vertex chunk size.
   private def split(edgeDf: DataFrame, keyColumnName: String, vertexChunkSize: Long): Seq[DataFrame] = {
@@ -102,6 +103,14 @@ object EdgeWriter {
   }
 }
 
+/** Writer for edge dataframe.
+ *
+ * @constructor create a new writer for edge dataframe with edge info.
+ * @param prefix the absolute prefix.
+ * @param edgeInfo the edge info that describes the ede type.
+ * @param adjListType the adj list type for the edge.
+ * @param edgeDf the input edge DataFrame.
+ */
 class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.Value, edgeDf: DataFrame) {
   private var chunks: Seq[DataFrame] = preprocess()
 
@@ -156,7 +165,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
   }
 
-  // generate the chunks of AdjList from edge dataframe for this edge type
+  /** Generate the chunks of AdjList from edge dataframe for this edge type. */
   def writeAdjList(): Unit = {
     val file_type = edgeInfo.getAdjListFileType(adjListType)
     var chunk_index: Long = 0
@@ -172,7 +181,10 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
   }
 
-  // generate the chunks of the property group from edge dataframe
+  /** Generate the chunks of the property group from edge dataframe.
+   *
+   * @param propertyGroup property group
+   */
   def writeEdgeProperties(propertyGroup: PropertyGroup): Unit = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
       throw new IllegalArgumentException
@@ -193,7 +205,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
   }
 
-  // generate the chunks of all property groups from edge dataframe
+  /** Generate the chunks of all property groups from edge dataframe. */
   def writeEdgeProperties(): Unit = {
     val property_groups = edgeInfo.getPropertyGroups(adjListType)
     val it = property_groups.iterator
@@ -203,7 +215,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
   }
 
-  // generate the chunks for the AdjList and all property groups from edge dataframe
+  /** Generate the chunks for the AdjList and all property groups from edge dataframe. */
   def writeEdges(): Unit = {
     writeAdjList()
     writeEdgeProperties()

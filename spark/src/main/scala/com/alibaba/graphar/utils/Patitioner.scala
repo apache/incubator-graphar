@@ -18,7 +18,13 @@ package com.alibaba.graphar.utils
 import org.apache.spark.sql.types._
 import org.apache.spark.Partitioner
 
-
+/** Partitioner for vertex/edge DataFrame to partition by chunk size.
+ *
+ * @constructor create a new chunk partitioner
+ * @param partitions partition num.
+ * @chunk_size size of vertex or edge chunk.
+ *
+ */
 class ChunkPartitioner(partitions: Int, chunk_size: Long) extends Partitioner {
   require(partitions >= 0, s"Number of partitions ($partitions) cannot be negative.")
 

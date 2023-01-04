@@ -20,6 +20,7 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.DataFrame
 import org.apache.hadoop.fs
 
+/** Helper object to write dataframe to chunk files */
 object FileSystem {
   private def renameSparkGeneratedFiles(spark: SparkSession, filePrefix: String): Unit = {
     val sc = spark.sparkContext
@@ -33,6 +34,12 @@ object FileSystem {
     }
   }
 
+  /** Write input dataframe to output path with certain file format.
+   *
+   * @param dataframe DataFrame to write out.
+   * @param fileType output file format type, the value could be csv|parquet|orc.
+   * @param outputPrefix output path prefix.
+   */
   def writeDataFrame(dataFrame: DataFrame, fileType: String, outputPrefix: String): Unit = {
     val spark = dataFrame.sparkSession
     spark.conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")

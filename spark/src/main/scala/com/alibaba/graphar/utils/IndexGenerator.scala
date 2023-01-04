@@ -27,11 +27,17 @@ import org.apache.spark.rdd.RDD
 import scala.collection.SortedMap
 import scala.collection.mutable.ArrayBuffer
 
+/** IndexGenerator is an object to help generating the indices for vertex/edge DataFrames. */
 object IndexGenerator {
 
   // index helper for the vertex DataFrame
 
-  // return a DataFrame contains two columns: vertex index & primary key
+  /** Generate a vertex index mapping from the primary key, the result DataFrame contains two columns: vertex index & primary key
+   *
+   * @param vertexDf  input vertex DataFrame.
+   * @param primaryKey the primary key of vertex
+   * @return a DataFrame contains two columns: vertex index & primary key.
+   */
   def constructVertexIndexMapping(vertexDf: DataFrame, primaryKey: String): DataFrame = {
     val spark = vertexDf.sparkSession
     val schema = vertexDf.schema
@@ -54,7 +60,11 @@ object IndexGenerator {
     spark.createDataFrame(mapping, mapping_schema).withColumnRenamed(primaryKey, GeneralParams.primaryCol)
   }
 
-  //add a column contains vertex index
+  /** Add a column contains vertex index to DataFrame
+   *
+   * @param vertexDf the input vertex DataFrame.
+   * @return DataFrame that contains a new vertex index column.
+   */
   def generateVertexIndexColumn(vertexDf: DataFrame): DataFrame = {
     val spark = vertexDf.sparkSession
     val schema = vertexDf.schema
@@ -76,9 +86,9 @@ object IndexGenerator {
     spark.createDataFrame(rdd_with_index, schema_with_index)
   }
 
-  //index helper for the Edge DataFrame
+  // index helper for the Edge DataFrame
 
-  //add a column contains edge index
+  /** Add a column contains edge index to input edge DataFrame. */
   def generateEdgeIndexColumn(edgeDf: DataFrame): DataFrame = {
     val spark = edgeDf.sparkSession
     val schema = edgeDf.schema
@@ -100,7 +110,7 @@ object IndexGenerator {
     spark.createDataFrame(rdd_with_index, schema_with_index)
   }
 
-  // join the edge table with the vertex index mapping for source column
+  /** Join the edge table with the vertex index mapping for source column. */
   def generateSrcIndexForEdgesFromMapping(edgeDf: DataFrame, srcColumnName: String, srcIndexMapping: DataFrame): DataFrame = {
     val spark = edgeDf.sparkSession
     srcIndexMapping.createOrReplaceTempView("src_vertex")
@@ -113,7 +123,7 @@ object IndexGenerator {
     trans_df.drop(srcColumnName)
 	}
 
-  // join the edge table with the vertex index mapping for destination column
+  /** Join the edge table with the vertex index mapping for destination column. */
   def generateDstIndexForEdgesFromMapping(edgeDf: DataFrame, dstColumnName: String, dstIndexMapping: DataFrame): DataFrame = {
     val spark = edgeDf.sparkSession
     dstIndexMapping.createOrReplaceTempView("dst_vertex")
@@ -126,27 +136,27 @@ object IndexGenerator {
     trans_df.drop(dstColumnName)
 	}
 
-  // join the edge table with the vertex index mapping for source & destination columns
+  /** Join the edge table with the vertex index mapping for source & destination columns. */
   def generateSrcAndDstIndexForEdgesFromMapping(edgeDf: DataFrame, srcColumnName: String, dstColumnName: String, srcIndexMapping: DataFrame, dstIndexMapping: DataFrame): DataFrame = {
     val df_with_src_index = generateSrcIndexForEdgesFromMapping(edgeDf, srcColumnName, srcIndexMapping)
     generateDstIndexForEdgesFromMapping(df_with_src_index, dstColumnName, dstIndexMapping)
 	}
 
-  // construct vertex index for source column
+  /** Construct vertex index for source column. */
   def generateSrcIndexForEdges(edgeDf: DataFrame, srcColumnName: String): DataFrame = {
     val srcDf = edgeDf.select(srcColumnName).distinct()
     val srcIndexMapping = constructVertexIndexMapping(srcDf, srcColumnName)
     generateSrcIndexForEdgesFromMapping(edgeDf, srcColumnName, srcIndexMapping)
 	}
 
-  // construct vertex index for destination column
+  /** Construct vertex index for destination column. */
   def generateDstIndexForEdges(edgeDf: DataFrame, dstColumnName: String): DataFrame = {
     val dstDf = edgeDf.select(dstColumnName).distinct()
     val dstIndexMapping = constructVertexIndexMapping(dstDf, dstColumnName)
     generateDstIndexForEdgesFromMapping(edgeDf, dstColumnName, dstIndexMapping)
 	}
 
-  // union and construct vertex index for source & destination columns
+  /** Union and construct vertex index for source & destination columns. */
   def generateSrcAndDstIndexUnitedlyForEdges(edgeDf: DataFrame, srcColumnName: String, dstColumnName: String): DataFrame = {
     val srcDf = edgeDf.select(srcColumnName)
     val dstDf = edgeDf.select(dstColumnName)

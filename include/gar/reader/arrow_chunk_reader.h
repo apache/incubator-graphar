@@ -141,7 +141,7 @@ class AdjListArrowChunkReader {
    * @brief Initialize the AdjListArrowChunkReader.
    *
    * @param edge_info The edge info that describes the edge type.
-   * @param adj_list_type The adj list type for the edges.
+   * @param adj_list_type The adj list type for the edge.
    * @param prefix The absolute prefix.
    * @param vertex_chunk_index The vertex chunk index, default is 0.
    */
