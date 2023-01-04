@@ -52,7 +52,7 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
    *
    * @param propertyGroup property group.
    * @param chunk_index index of vertex chunk.
-   * @return vertex property chunk DataFrame.
+   * @return vertex property chunk DataFrame. Raise IllegalArgumentException if the property group not contained.
    */
   def readVertexPropertyChunk(propertyGroup: PropertyGroup, chunk_index: Long): DataFrame = {
     if (vertexInfo.containPropertyGroup(propertyGroup) == false) 
