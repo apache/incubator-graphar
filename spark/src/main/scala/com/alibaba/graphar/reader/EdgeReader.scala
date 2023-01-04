@@ -30,6 +30,8 @@ import org.apache.spark.sql.functions._
  * @param edgeInfo the edge info that describes the edge type.
  * @param adjListType the adj list type for the edge.
  * @param spark spark session for the reader to read chunks as Spark DataFrame.
+ *
+ * Note that constructor would raise IllegalArgumentException if edge info does not support given adjListType.
  */
 class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.Value, spark:SparkSession) {
   if (edgeInfo.containAdjList(adjListType) == false) {
@@ -39,7 +41,8 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
   /** Load a single offset chunk as a DataFrame.
    *
    * @param chunk_index index of offset chunk
-   * @return offset chunk DataFrame.
+   * @return offset chunk DataFrame. Raise IllegalArgumentException if adjListType is not
+   *         AdjListType.ordered_by_source or AdjListType.ordered_by_dest.
    */
   def readOffset(chunk_index: Long): DataFrame = {
     if (adjListType != AdjListType.ordered_by_source && adjListType != AdjListType.ordered_by_dest)
