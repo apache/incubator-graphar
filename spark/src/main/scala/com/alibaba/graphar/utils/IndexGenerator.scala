@@ -27,12 +27,12 @@ import org.apache.spark.rdd.RDD
 import scala.collection.SortedMap
 import scala.collection.mutable.ArrayBuffer
 
-/** IndexGenerator is a object to help to generate the indices for vertex/edge DataFrames. */
+/** IndexGenerator is an object to help generating the indices for vertex/edge DataFrames. */
 object IndexGenerator {
 
   // index helper for the vertex DataFrame
 
-  /** Generate a vertex index mapping of primary key.a DataFrame contains two columns: vertex index & primary key
+  /** Generate a vertex index mapping from the primary key, the result DataFrame contains two columns: vertex index & primary key
    *
    * @param vertexDf  input vertex DataFrame.
    * @param primaryKey the primary key of vertex

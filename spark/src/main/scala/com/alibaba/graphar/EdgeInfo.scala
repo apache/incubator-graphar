@@ -72,7 +72,7 @@ class EdgeInfo() {
   /** Get the adj list topology chunk file type of adj list type.
    *
    * @param adj_list_type the input adj list type.
-   * @return file format tupe in gar of the adj list type, if edge info not support the adj list type,
+   * @return file format type in gar of the adj list type, if edge info not support the adj list type,
    *         raise an IllegalArgumentException error.
    */
   def getAdjListFileType(adj_list_type: AdjListType.Value): FileType.Value = {

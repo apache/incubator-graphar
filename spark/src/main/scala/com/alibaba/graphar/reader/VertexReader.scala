@@ -68,6 +68,7 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
    * @param propertyGroup property group.
    * @param addIndex flag that add vertex index column or not in the final DataFrame.
    * @return DataFrame that contains all chunks of property group.
+   *         Raise IllegalArgumentException if the property group not contained.
    */
   def readVertexProperties(propertyGroup: PropertyGroup, addIndex: Boolean = false): DataFrame = {
     if (vertexInfo.containPropertyGroup(propertyGroup) == false) 

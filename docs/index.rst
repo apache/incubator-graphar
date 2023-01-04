@@ -36,4 +36,4 @@
    :caption: API Reference
 
    reference/api-reference-cpp.rst
-   Spark tool API Reference <reference/spark-api/index>
+   Spark API Reference <reference/spark-api/index>

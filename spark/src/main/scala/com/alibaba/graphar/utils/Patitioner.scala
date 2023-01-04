@@ -18,7 +18,7 @@ package com.alibaba.graphar.utils
 import org.apache.spark.sql.types._
 import org.apache.spark.Partitioner
 
-/** Partioner for vertex/edge DataFrame to partition by chunk size.
+/** Partitioner for vertex/edge DataFrame to partition by chunk size.
  *
  * @constructor create a new chunk partitioner
  * @param partitions partition num.

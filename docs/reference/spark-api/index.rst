@@ -1,4 +1,4 @@
-Spark API Reference (javadoc)
-========================
+Spark API Reference (scaladoc)
+==============================
 
-Stub page for the Java reference docs; actual source is located in the spark-api/ directory.
+Stub page for the Spark reference docs; actual source is located in the spark-api/ directory.

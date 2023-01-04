@@ -194,7 +194,7 @@ class AdjList () {
   }
 }
 
-/** GraphInfo is is a class to store the graph meta information. */
+/** GraphInfo is a class to store the graph meta information. */
 class GraphInfo() {
   @BeanProperty var name: String = ""
   @BeanProperty var prefix: String = ""
