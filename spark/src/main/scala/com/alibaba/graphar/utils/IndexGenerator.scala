@@ -42,7 +42,7 @@ object IndexGenerator {
     val spark = vertexDf.sparkSession
     val schema = vertexDf.schema
     val id_index = schema.fieldIndex(primaryKey)
-    val mapping_schema = StructType(Seq(StructField(GeneralParams.vertexIndexCol, LongType, false), schema.apply(id_index)))
+    val mapping_schema = StructType(Seq(StructField(GeneralParams.vertexIndexCol, LongType), schema.apply(id_index)))
     val rdd = vertexDf.rdd
     val counts = rdd
       .mapPartitionsWithIndex((i, ps) => Array((i, ps.size)).iterator, preservesPartitioning = true)
@@ -68,7 +68,7 @@ object IndexGenerator {
   def generateVertexIndexColumn(vertexDf: DataFrame): DataFrame = {
     val spark = vertexDf.sparkSession
     val schema = vertexDf.schema
-    val schema_with_index =  StructType(StructType(Seq(StructField(GeneralParams.vertexIndexCol, LongType, true)))++schema)
+    val schema_with_index =  StructType(StructType(Seq(StructField(GeneralParams.vertexIndexCol, LongType)))++schema)
     val rdd = vertexDf.rdd
     val counts = rdd
       .mapPartitionsWithIndex((i, ps) => Array((i, ps.size)).iterator, preservesPartitioning = true)
@@ -92,7 +92,7 @@ object IndexGenerator {
   def generateEdgeIndexColumn(edgeDf: DataFrame): DataFrame = {
     val spark = edgeDf.sparkSession
     val schema = edgeDf.schema
-    val schema_with_index =  StructType(StructType(Seq(StructField(GeneralParams.edgeIndexCol, LongType, true)))++schema)
+    val schema_with_index =  StructType(StructType(Seq(StructField(GeneralParams.edgeIndexCol, LongType)))++schema)
     val rdd = edgeDf.rdd
     val counts = rdd
       .mapPartitionsWithIndex((i, ps) => Array((i, ps.size)).iterator, preservesPartitioning = true)
