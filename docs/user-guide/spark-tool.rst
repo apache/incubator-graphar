@@ -16,6 +16,7 @@ Use Cases
 
 The GraphAr Spark Tools can be applied to these scenarios:
 
+- Take GAR as data sources to execute SQL queries or do graph processing (e.g., using GraphX).
 - Transform data between GAR and other data sources (e.g., Hive, Neo4j, NebulaGraph, ...).
 - Transform GAR data between different file types (e.g., from CSV to parquet).
 - Transform GAR data between different adjList types (e.g., from COO to CSR).
@@ -174,6 +175,13 @@ When using the GAR Spark Reader, please refer to the following code.
 
 See `TestReader.scala`_ for the complete example.
 
+More examples
+``````````````````
+For more information on usage, please refer to the examples:
+
+- `ComputeExample.scala`_  includes an example to construct the graph for GraphX from reading GAR files and then run a algorithm to compute connected components;
+- `TransformExample.scala`_ is an example to show the usage of transforming the graph data between different file types or adjList types.
+
 
 .. _TestGraphInfo.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestGraphInfo.scala
 
@@ -182,3 +190,7 @@ See `TestReader.scala`_ for the complete example.
 .. _TestWriter.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestWriter.scala
 
 .. _TestReader.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestReader.scala
+
+.. _ComputeExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/ComputeExample.scala
+
+.. _TransformExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TransformExample.scala
