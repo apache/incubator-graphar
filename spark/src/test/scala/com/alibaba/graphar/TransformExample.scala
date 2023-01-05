@@ -20,9 +20,9 @@ import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
 import java.io.{File, FileInputStream}
+import scala.beans.BeanProperty
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
-import scala.beans.BeanProperty
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.hadoop.fs.{Path, FileSystem}
 import org.scalatest.funsuite.AnyFunSuite
@@ -60,7 +60,8 @@ class TransformExampleSuite extends AnyFunSuite {
     val chunk_files = fs.globStatus(chunk_path)
     assert(chunk_files.length == 20)
 
-    // close FileSystem instance
+    // clean generated files and close FileSystem instance
+    fs.delete(new Path(output_prefix + "vertex"))
     fs.close()
   }
 
@@ -91,7 +92,9 @@ class TransformExampleSuite extends AnyFunSuite {
     val offset_chunk_files = fs.globStatus(offset_path_pattern)
     assert(offset_chunk_files.length == 10)
 
-    // close FileSystem instance
+    // clean generated files and close FileSystem instance
+    fs.delete(new Path(output_prefix + "edge"))
     fs.close()
   }
+
 }

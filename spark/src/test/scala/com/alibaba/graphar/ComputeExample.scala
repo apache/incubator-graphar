@@ -18,9 +18,9 @@ package com.alibaba.graphar
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 
 import java.io.{File, FileInputStream}
+import scala.beans.BeanProperty
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
-import scala.beans.BeanProperty
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.graphx._
 import org.apache.spark.rdd.RDD
@@ -72,4 +72,5 @@ class ComputeExampleSuite extends AnyFunSuite {
     // print the result
     println(ccById.collect().mkString("\n"))
   }
+
 }
