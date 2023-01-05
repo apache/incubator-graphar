@@ -22,7 +22,7 @@ import org.apache.spark.Partitioner
  *
  * @constructor create a new chunk partitioner
  * @param partitions partition num.
- * @chunk_size size of vertex or edge chunk.
+ * @param chunk_size size of vertex or edge chunk.
  *
  */
 class ChunkPartitioner(partitions: Int, chunk_size: Long) extends Partitioner {

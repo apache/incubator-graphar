@@ -122,8 +122,8 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
 
     // check the src index and dst index column exist
-    val src_filed = StructField(GeneralParams.srcIndexCol, LongType, false)
-    val dst_filed = StructField(GeneralParams.dstIndexCol, LongType, false)
+    val src_filed = StructField(GeneralParams.srcIndexCol, LongType)
+    val dst_filed = StructField(GeneralParams.dstIndexCol, LongType)
     val schema = edgeDf.schema
     if (schema.contains(src_filed) == false || schema.contains(dst_filed) == false) {
       throw new IllegalArgumentException

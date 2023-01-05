@@ -235,6 +235,7 @@ Maintainers need to do the following to push out a release:
 
 .. the reviewing part document is referred and derived from
 .. https://github.com/nodejs/node/blob/main/doc/contributing/pull-requests.md#the-process-of-making-changes
+
 Reviewing pull requests
 -----------------------
 
