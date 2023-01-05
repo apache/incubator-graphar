@@ -46,7 +46,6 @@ object FileSystem {
    * @param outputPrefix output path prefix.
    * @param startChunkIndex the start index of chunk.
    *
-   *    raise FileAlreadyExistsException if the chunk file already exists.
    */
   def writeDataFrame(dataFrame: DataFrame, fileType: String, outputPrefix: String, startChunkIndex: Int = 0): Unit = {
     val spark = dataFrame.sparkSession
