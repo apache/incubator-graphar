@@ -48,7 +48,7 @@ class TransformExampleSuite extends AnyFunSuite {
 
     // write to parquet files
     val output_file_path = "gar-test/ldbc_sample/parquet"
-    val output_prefix : String = "/tmp/example"
+    val output_prefix : String = "/tmp/example/"
     val output_vertex_file = getClass.getClassLoader.getResourceAsStream(file_path + "/person.vertex.yml")
     val output_vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
     val output_vertex_info = output_vertex_yaml.load(output_vertex_file).asInstanceOf[VertexInfo]
@@ -78,7 +78,7 @@ class TransformExampleSuite extends AnyFunSuite {
     assert(adj_list_df.columns.size == 2)
     assert(adj_list_df.count() == 6626)
 
-    // write edge to ordered_by_source type
+    // write edges in ordered_by_source type
     val output_adj_list_type = AdjListType.ordered_by_source
     val output_prefix : String = "/tmp/example/"
     val writer = new EdgeWriter(output_prefix, edge_info, output_adj_list_type, adj_list_df)
