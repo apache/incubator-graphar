@@ -22,15 +22,20 @@ import org.apache.hadoop.fs
 
 /** Helper object to write dataframe to chunk files */
 object FileSystem {
-  private def renameSparkGeneratedFiles(spark: SparkSession, filePrefix: String): Unit = {
+  private def renameSparkGeneratedFiles(spark: SparkSession, filePrefix: String, startChunkIndex: Int): Unit = {
     val sc = spark.sparkContext
     val file_system = fs.FileSystem.get(new URI(filePrefix), spark.sparkContext.hadoopConfiguration)
     val path_pattern = new fs.Path(filePrefix + "part*")
     val files = file_system.globStatus(path_pattern)
     for (i <- 0 until files.length) {
       val file_name = files(i).getPath.getName
-      val new_file_name = "chunk" + i.toString
-      file_system.rename(new fs.Path(filePrefix + file_name), new fs.Path(filePrefix + new_file_name))
+      val new_file_name = "chunk" + (i + startChunkIndex).toString
+      val destPath = new fs.Path(filePrefix + new_file_name)
+      if (file_system.isFile(destPath)) {
+        // if chunk file already exists, overwrite it
+        file_system.delete(destPath)
+      }
+      file_system.rename(new fs.Path(filePrefix + file_name), destPath)
     }
   }
 
@@ -39,13 +44,14 @@ object FileSystem {
    * @param dataframe DataFrame to write out.
    * @param fileType output file format type, the value could be csv|parquet|orc.
    * @param outputPrefix output path prefix.
+   * @param startChunkIndex the start index of chunk.
+   *
    */
-  def writeDataFrame(dataFrame: DataFrame, fileType: String, outputPrefix: String): Unit = {
+  def writeDataFrame(dataFrame: DataFrame, fileType: String, outputPrefix: String, startChunkIndex: Int = 0): Unit = {
     val spark = dataFrame.sparkSession
     spark.conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
     spark.conf.set("parquet.enable.summary-metadata", "false")
-    // spark.conf.set("spark.sql.parquet.compression.codec", "zstd")
-    dataFrame.write.mode("overwrite").format(fileType).save(outputPrefix)
-    renameSparkGeneratedFiles(spark, outputPrefix)
+    dataFrame.write.mode("append").format(fileType).save(outputPrefix)
+    renameSparkGeneratedFiles(spark, outputPrefix, startChunkIndex)
   }
 }
