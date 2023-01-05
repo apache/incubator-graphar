@@ -152,7 +152,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
   private def writeOffset(): Unit = {
     val spark = edgeDf.sparkSession
     val file_type = edgeInfo.getAdjListFileType(adjListType)
-    var chunk_index: Long = 0
+    var chunk_index: Int = 0
     val offset_schema = StructType(Seq(StructField(GeneralParams.offsetCol, LongType)))
     val vertex_chunk_size = if (adjListType == AdjListType.ordered_by_source) edgeInfo.getSrc_chunk_size() else edgeInfo.getDst_chunk_size()
     val index_column = if (adjListType == AdjListType.ordered_by_source) GeneralParams.srcIndexCol else GeneralParams.dstIndexCol
@@ -163,7 +163,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
       val begin_index: Long = chunk_index * vertex_chunk_size;
       val end_index: Long = (chunk_index + 1) * vertex_chunk_size
       val init_count_rdd = spark.sparkContext.parallelize(begin_index to end_index).map(key => Row(key, 0L))
-      val init_count_df = spark.createDataFrame(init_count_rdd, offset_chunk.schema)
+      val init_count_df = spark.createDataFrame(init_count_rdd, edge_count_df.schema)
       // union edge count dataframe and initialized count dataframe
       val union_count_chunk = edge_count_df.unionByName(init_count_df).groupBy(index_column).agg(sum("count")).coalesce(1).orderBy(index_column).select("sum(count)")
       // calculate offset rdd from count chunk

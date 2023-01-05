@@ -23,6 +23,8 @@ import org.scalatest.funsuite.AnyFunSuite
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import org.apache.hadoop.fs.{Path, FileSystem}
+import scala.io.Source.fromFile
+
 
 class WriterSuite extends AnyFunSuite {
   val spark = SparkSession.builder()
@@ -105,8 +107,6 @@ class WriterSuite extends AnyFunSuite {
     val property_group_path_pattern = new Path(prefix + edge_info.getPropertyDirPath(property_group, adj_list_type) + "*/*")
     val property_group_chunk_files = fs.globStatus(property_group_path_pattern)
     assert(property_group_chunk_files.length == 9)
-    // clean generated files
-    // fs.delete(new Path(prefix + "edge"))
 
     // test write edges
     writer.writeEdges()
@@ -120,7 +120,7 @@ class WriterSuite extends AnyFunSuite {
     assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.unordered_by_dest, edge_df_with_index))
 
     // close FileSystem instance
-    // fs.delete(new Path(prefix + "edge"))
+    fs.delete(new Path(prefix + "edge"))
     fs.close()
   }
 
@@ -166,6 +166,12 @@ class WriterSuite extends AnyFunSuite {
     val offset_path_pattern = new Path(prefix + edge_info.getAdjListOffsetDirPath(adj_list_type) + "*")
     val offset_chunk_files = fs.globStatus(offset_path_pattern)
     assert(offset_chunk_files.length == 10)
+    // compare with correct offset chunk value
+    val offset_file_path = prefix + edge_info.getAdjListOffsetFilePath(0, adj_list_type)
+    val correct_offset_file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0").getPath
+    val generated_offset_array = fromFile(offset_file_path).getLines.toArray
+    val expected_offset_array = fromFile(correct_offset_file_path).getLines.toArray
+    assert(generated_offset_array.sameElements(expected_offset_array))
 
     // test write property group
     val property_group = edge_info.getPropertyGroup("creationDate", adj_list_type)
@@ -173,13 +179,11 @@ class WriterSuite extends AnyFunSuite {
     val property_group_path_pattern = new Path(prefix + edge_info.getPropertyDirPath(property_group, adj_list_type) + "*/*")
     val property_group_chunk_files = fs.globStatus(property_group_path_pattern)
     assert(property_group_chunk_files.length == 11)
-    // clean generated files
-    fs.delete(new Path(prefix + "edge"))
 
     writer.writeEdges()
 
     // close FileSystem instance
-    // fs.delete(new Path(prefix + "edge"))
+    fs.delete(new Path(prefix + "edge"))
     fs.close()
   }
 }
