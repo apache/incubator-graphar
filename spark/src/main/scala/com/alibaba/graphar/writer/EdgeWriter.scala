@@ -21,7 +21,7 @@ import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, Prop
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.types.{LongType, StructField}
+import org.apache.spark.sql.types.{IntegerType, LongType, StructType, StructField}
 import org.apache.spark.util.Utils
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
@@ -148,19 +148,36 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
   }
 
-  // generate the Offset chunks files from edge dataframe for this edge type
+  // generate the offset chunks files from edge dataframe for this edge type
   private def writeOffset(): Unit = {
+    val spark = edgeDf.sparkSession
     val file_type = edgeInfo.getAdjListFileType(adjListType)
-    var chunk_index: Long = 0
+    var chunk_index: Int = 0
+    val offset_schema = StructType(Seq(StructField(GeneralParams.offsetCol, LongType)))
+    val vertex_chunk_size = if (adjListType == AdjListType.ordered_by_source) edgeInfo.getSrc_chunk_size() else edgeInfo.getDst_chunk_size()
+    val index_column = if (adjListType == AdjListType.ordered_by_source) GeneralParams.srcIndexCol else GeneralParams.dstIndexCol
+    val output_prefix = prefix + edgeInfo.getAdjListOffsetDirPath(adjListType)
     for (chunk <- chunks) {
-      val output_prefix = prefix + edgeInfo.getAdjListOffsetDirPath(adjListType) + "part" + chunk_index.toString + "/"
-      if (adjListType == AdjListType.ordered_by_source) {
-        val offset_chunk = chunk.select(GeneralParams.srcIndexCol).groupBy(GeneralParams.srcIndexCol).count().coalesce(1).orderBy(GeneralParams.srcIndexCol).select("count")
-        FileSystem.writeDataFrame(offset_chunk, FileType.FileTypeToString(file_type), output_prefix)
-      } else {
-        val offset_chunk = chunk.select(GeneralParams.dstIndexCol).groupBy(GeneralParams.dstIndexCol).count().coalesce(1).orderBy(GeneralParams.dstIndexCol).select("count")
-        FileSystem.writeDataFrame(offset_chunk, FileType.FileTypeToString(file_type), output_prefix)
-      }
+      val edge_count_df = chunk.select(index_column).groupBy(index_column).count()
+      // init a edge count dataframe of vertex range [begin, end] to include isloated vertex
+      val begin_index: Long = chunk_index * vertex_chunk_size;
+      val end_index: Long = (chunk_index + 1) * vertex_chunk_size
+      val init_count_rdd = spark.sparkContext.parallelize(begin_index to end_index).map(key => Row(key, 0L))
+      val init_count_df = spark.createDataFrame(init_count_rdd, edge_count_df.schema)
+      // union edge count dataframe and initialized count dataframe
+      val union_count_chunk = edge_count_df.unionByName(init_count_df).groupBy(index_column).agg(sum("count")).coalesce(1).orderBy(index_column).select("sum(count)")
+      // calculate offset rdd from count chunk
+      val offset_rdd = union_count_chunk.rdd.mapPartitionsWithIndex((i, ps) => {
+        var sum = 0L
+        var pre_sum = 0L
+        for (row <- ps ) yield {
+          pre_sum = sum
+          sum = sum + row.getLong(0)
+          Row(pre_sum)
+        }
+      })
+      val offset_df = spark.createDataFrame(offset_rdd, offset_schema)
+      FileSystem.writeDataFrame(offset_df, FileType.FileTypeToString(file_type), output_prefix, chunk_index)
       chunk_index = chunk_index + 1
     }
   }
