@@ -18,7 +18,7 @@ The GraphAr Spark Tools can be applied to these scenarios:
 
 - Take GAR as data sources to execute SQL queries or do graph processing (e.g., using GraphX).
 - Transform data between GAR and other data sources (e.g., Hive, Neo4j, NebulaGraph, ...).
-- Transform GAR data between different file types (e.g., from CSV to parquet).
+- Transform GAR data between different file types (e.g., from ORC to parquet).
 - Transform GAR data between different adjList types (e.g., from COO to CSR).
 - Modify existing GAR data (e.g., add new vertices/edges).
 
