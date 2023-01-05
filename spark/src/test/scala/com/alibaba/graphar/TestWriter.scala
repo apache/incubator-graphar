@@ -55,6 +55,7 @@ class WriterSuite extends AnyFunSuite {
     val id_chunk_path = new Path(prefix + vertex_info.getDirPath(property_group) + "chunk*")
     val id_chunk_files = fs.globStatus(id_chunk_path)
     assert(id_chunk_files.length == 10)
+    fs.delete(new Path(prefix + "vertex"))
     writer.writeVertexProperties()
     val chunk_path = new Path(prefix + vertex_info.getPrefix() + "*/*")
     val chunk_files = fs.globStatus(chunk_path)
@@ -65,6 +66,7 @@ class WriterSuite extends AnyFunSuite {
     assertThrows[IllegalArgumentException](writer.writeVertexProperties(invalid_property_group))
 
     // close FileSystem instance
+    fs.delete(new Path(prefix + "vertex"))
     fs.close()
   }
 
@@ -103,6 +105,8 @@ class WriterSuite extends AnyFunSuite {
     val property_group_path_pattern = new Path(prefix + edge_info.getPropertyDirPath(property_group, adj_list_type) + "*/*")
     val property_group_chunk_files = fs.globStatus(property_group_path_pattern)
     assert(property_group_chunk_files.length == 9)
+    // clean generated files
+    // fs.delete(new Path(prefix + "edge"))
 
     // test write edges
     writer.writeEdges()
@@ -116,6 +120,7 @@ class WriterSuite extends AnyFunSuite {
     assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.unordered_by_dest, edge_df_with_index))
 
     // close FileSystem instance
+    // fs.delete(new Path(prefix + "edge"))
     fs.close()
   }
 
@@ -168,10 +173,13 @@ class WriterSuite extends AnyFunSuite {
     val property_group_path_pattern = new Path(prefix + edge_info.getPropertyDirPath(property_group, adj_list_type) + "*/*")
     val property_group_chunk_files = fs.globStatus(property_group_path_pattern)
     assert(property_group_chunk_files.length == 11)
+    // clean generated files
+    fs.delete(new Path(prefix + "edge"))
 
     writer.writeEdges()
 
     // close FileSystem instance
+    // fs.delete(new Path(prefix + "edge"))
     fs.close()
   }
 }
