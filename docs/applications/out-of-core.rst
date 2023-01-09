@@ -1,7 +1,7 @@
 Out-of-core Graph Algorithms
 ============================
 
-An important application case of GraphAr is to serve out-of-core graph processing scenarios. With the graph data saved as GAR files in the disk, GraphAr provides a set of reading interfaces to allow to load part of graph data into memory when needed, to conduct analytics. Though it is more convenient and efficient to maintain the complete graph in the memory (as in BGL), out-of-core graph processing makes it possible to complete analytics on the large-scale graphs using limited memory/computing resources.
+An important application case of GraphAr is to serve out-of-core graph processing scenarios. With the graph data saved as GAR files in the disk, GraphAr provides a set of reading interfaces to allow to load part of graph data into memory when needed, to conduct analytics. While it is more convenient and efficient to store the entirety of the graph in memory (as is done in BGL), out-of-core graph processing makes it possible to complete analytics on the large-scale graphs using limited memory/computing resources.
 
 The are some out-of-core graph analytic algorithms that have been implemented in GraphAr, include:
 

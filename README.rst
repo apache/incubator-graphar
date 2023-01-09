@@ -25,13 +25,13 @@ serve as a direct data source for graph processing applications.
 To achieve this, GraphAr provides:
 
 - The Graph Archive(GAR) file format: a standardized system-independent file format for storing graph data
-- Libraries: a set of libraries for reading and writing or transforming GAR files
+- Libraries: a set of libraries for reading, writing and transforming GAR files
 
 By using GraphAr, you can:
 
 - Store and persist your graph data in a system-independent way with the GAR file format
 - Easily access and generate GAR files using the libraries
-- Use the Apache Spark library to quickly manipulate and transform your GAR files
+- Utilize Apache Spark to quickly manipulate and transform your GAR files
 
 The GAR File Format
 -------------------
@@ -53,7 +53,7 @@ And each edge contains:
 - A text label that describes the relationship between the two vertices.
 - A collection of properties.
 
-The following is an example property graph containing two types of vertices "person" and "comment" and three types of edges.
+The following is an example property graph containing two types of vertices ("person" and "comment") and three types of edges.
 
 |Property Graph|
 
@@ -63,9 +63,9 @@ Vertices in GraphAr
 Logical table of vertices
 """"""""""""""""""""""""""
 
-Each type of vertices (with the same label) constructs a logical vertex table, with each vertex assigned with a global index (vertex id) starting from 0, that is, the row number of that vertex in the logical vertex table. The following example shows the layout of the logical table for vertices that with label "person".
+Each type of vertices (with the same label) constructs a logical vertex table, with each vertex assigned with a global index (vertex id) starting from 0, that is, the row number of that vertex in the logical vertex table. An example layout for a logical table of vertices under the label "person" is provided for reference.
 
-Given a vertex id as well as the vertex label, a vertex can be identified uniquely, and the properties of it can be accessed from this table. When maintaining the topology of a graph, the vertex id is used to identify the source and destination for each of the edges.
+Given a vertex id and the vertex label, a vertex is uniquely identifiable and its respective properties can be accessed from this table. The vertex id is further used to identify the source and destination vertices when maintaining the topology of the graph.
 
 |Vertex Logical Table|
 
@@ -74,7 +74,7 @@ Physical table of vertices
 
 For enhancing the reading/writing efficiency, the logical vertex table will be partitioned into multiple continuous vertex chunks. And to maintain the ability of random access, the size of vertex chunks for the same label is fixed. To support to access required properties avoiding reading all properties from the files, and to add properties for vertices without modifying the existing files, the columns of the logical table will be divided into several column groups.
 
-Take the "person" vertex table as an example, if the chunk size is set to be 500, the logical table will be separated into sub-logical-tables of 500 rows except the last one, which can be less than 500 rows.  And the columns for maintaining properties are also separated, being divided into several groups (e.g., 2 groups for our example). Therefore, there are 4 physical vertex tables in total for actually storing the example logical table, as the following figure shows.
+Take the "person" vertex table as an example, if the chunk size is set to be 500, the logical table will be separated into sub-logical-tables of 500 rows with the exception of the last one, which may have less than 500 rows.  The columns for maintaining properties will also be divided into distinct groups (e.g., 2 for our example). As a result, a total of 4 physical vertex tables are created for storing the example logical table, which can be seen from the following figure.
 
 |Vertex Physical Table|
 
@@ -85,7 +85,7 @@ Edges in GraphAr
 Logical table of edges
 """"""""""""""""""""""""""
 
-For maintaining a type of edges (that with the same triplet of the source label, edge label, and destination label), a logical edge table is established.  And in order to support quickly creating a graph from the graph storage file, the logical edge table could maintain the topology information in a way similar to CSR/CSC (learn more about `CSR/CSC <https://en.wikipedia.org/wiki/Sparse_matrix>`_), that is, the edges are ordered by the vertex id of source/destination. In this way, one offset table is required to store the start offset for each vertex's edges. And the edges with the same source/destination will be stored continuously in the logical table.
+For maintaining a type of edges (that with the same triplet of the source label, edge label, and destination label), a logical edge table is established.  And in order to support quickly creating a graph from the graph storage file, the logical edge table could maintain the topology information in a way similar to CSR/CSC (learn more about `CSR/CSC <https://en.wikipedia.org/wiki/Sparse_matrix>`_), that is, the edges are ordered by the vertex id of either source or destination. In this way, an offset table is required to store the start offset for each vertex's edges, and the edges with the same source/destination will be stored continuously in the logical table.
 
 Take the logical table for "person likes person" edges as an example, the logical edge table looks like:
 

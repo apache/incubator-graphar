@@ -63,12 +63,12 @@ Finally, we could use a **VerticesBuilder** of GraphAr to write the results to n
 
 .. code:: C++
 
-   //construct new property group
+   // construct new property group
    GraphArchive::Property cc = {"cc", GraphArchive::DataType::INT32, false};
    std::vector<GraphArchive::Property> property_vector = {cc};
    GraphArchive::PropertyGroup group(property_vector, GraphArchive::FileType::PARQUET);
 
-   //construct new vertex info
+   // construct new vertex info
    std::string vertex_label = "cc_result", vertex_prefix = "result/";
    int chunk_size = 100;
    GraphArchive::VertexInfo new_info(vertex_label, chunk_size, vertex_prefix);
@@ -79,7 +79,7 @@ Finally, we could use a **VerticesBuilder** of GraphAr to write the results to n
    typedef boost::graph_traits<Graph>::vertex_iterator vertex_iter;
    std::pair<vertex_iter, vertex_iter> vp;
 
-   //dump the results through builder
+   // dump the results through builder
    GraphArchive::builder::VerticesBuilder builder(new_info, "/tmp/");
    for (vp = boost::vertices(g); vp.first!= vp.second; ++vp.first) {
       Vertex v = *vp.first;
