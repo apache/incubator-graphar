@@ -59,9 +59,9 @@ class VertexPropertyArrowChunkReader {
         seek_id_(chunk_index * vertex_info.GetChunkSize()),
         chunk_table_(nullptr) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
+    GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
                               vertex_info.GetPathPrefix(property_group));
-    std::string base_dir = prefix_ + dir_path;
+    std::string base_dir = prefix_ + pg_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_, fs_->GetFileNumOfDir(base_dir));
   }
 
