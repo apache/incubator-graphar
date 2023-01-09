@@ -156,9 +156,9 @@ class AdjListArrowChunkReader {
         seek_offset_(0),
         chunk_table_(nullptr) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
+    GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
                               edge_info.GetAdjListPathPrefix(adj_list_type));
-    base_dir_ = prefix_ + dir_path;
+    base_dir_ = prefix_ + adj_list_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
                               fs_->GetFileNumOfDir(base_dir_));
     std::string chunk_dir =
@@ -415,9 +415,9 @@ class AdjListPropertyArrowChunkReader {
         chunk_table_(nullptr) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(
-        auto dir_path,
+        auto pg_path_prefix,
         edge_info.GetPropertyGroupPathPrefix(property_group, adj_list_type));
-    base_dir_ = prefix_ + dir_path;
+    base_dir_ = prefix_ + pg_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
                               fs_->GetFileNumOfDir(base_dir_));
     std::string chunk_dir =
