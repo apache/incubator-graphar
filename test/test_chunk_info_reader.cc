@@ -28,8 +28,8 @@ TEST_CASE("test_vertex_property_chunk_info_reader") {
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
-  REQUIRE(graph_info.GetAllVertexInfo().size() == 1);
-  REQUIRE(graph_info.GetAllEdgeInfo().size() == 1);
+  REQUIRE(graph_info.GetVertexInfos().size() == 1);
+  REQUIRE(graph_info.GetEdgeInfos().size() == 1);
 
   // construct vertex property info reader
   std::string label = "person", property_name = "id";
@@ -83,8 +83,8 @@ TEST_CASE("test_adj_list_chunk_info_reader") {
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
-  REQUIRE(graph_info.GetAllVertexInfo().size() == 1);
-  REQUIRE(graph_info.GetAllEdgeInfo().size() == 1);
+  REQUIRE(graph_info.GetVertexInfos().size() == 1);
+  REQUIRE(graph_info.GetEdgeInfos().size() == 1);
 
   // construct adj list info reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person";

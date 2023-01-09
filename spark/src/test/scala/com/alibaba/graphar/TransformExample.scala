@@ -84,11 +84,11 @@ class TransformExampleSuite extends AnyFunSuite {
     val output_prefix : String = "/tmp/example/"
     val writer = new EdgeWriter(output_prefix, edge_info, output_adj_list_type, adj_list_df)
     writer.writeAdjList()
-    val adj_list_path_pattern = new Path(output_prefix + edge_info.getAdjListDirPath(output_adj_list_type) + "*/*")
+    val adj_list_path_pattern = new Path(output_prefix + edge_info.getAdjListPathPrefix(output_adj_list_type) + "*/*")
     val fs = FileSystem.get(adj_list_path_pattern.toUri(), spark.sparkContext.hadoopConfiguration)
     val adj_list_chunk_files = fs.globStatus(adj_list_path_pattern)
     assert(adj_list_chunk_files.length == 11)
-    val offset_path_pattern = new Path(output_prefix + edge_info.getAdjListOffsetDirPath(output_adj_list_type) + "*")
+    val offset_path_pattern = new Path(output_prefix + edge_info.getOffsetPathPrefix(output_adj_list_type) + "*")
     val offset_chunk_files = fs.globStatus(offset_path_pattern)
     assert(offset_chunk_files.length == 10)
 

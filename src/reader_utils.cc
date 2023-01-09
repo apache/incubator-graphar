@@ -58,8 +58,7 @@ Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
       edge_info.GetAdjListOffsetFilePath(offset_chunk_index, adj_list_type));
   std::string out_prefix;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
-  GAR_ASSIGN_OR_RAISE(auto file_type,
-                      edge_info.GetAdjListFileType(adj_list_type));
+  GAR_ASSIGN_OR_RAISE(auto file_type, edge_info.GetFileType(adj_list_type));
   std::string path = out_prefix + offset_file_path;
   GAR_ASSIGN_OR_RAISE(auto table, fs->ReadFileToTable(path, file_type));
   auto array = std::static_pointer_cast<arrow::Int64Array>(

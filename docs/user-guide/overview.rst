@@ -13,8 +13,7 @@ GraphAr aims to serve as the standard file format for importing/exporting and pe
 The GraphAr project includes such topics as:
 
 - Design of the standardized file format for graph data. (see `GraphAr File Format <file-format.html>`_)
-- The C++ SDK library for reading and writing GAR files. (see `API Reference <../api-reference.html>`_)
-- A set of Apache Spark tools for generating, loading and transforming GAR files. (see `GraphAr Spark Tools <spark-tool.html>`_)
+- A set of libraries for reading and writing or transforming GAR files. (now the `C++ library <../reference/api-reference-cpp.html>`_ and `Spark library <spark-lib.html>`_ is available)
 - How to use GraphAr to write graph algorithms, or to work with existing systems such as GraphScope. (see `Application Cases <../applications/out-of-core.html>`_)
 
 .. image:: ../images/overview.png

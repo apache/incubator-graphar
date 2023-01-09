@@ -28,7 +28,7 @@ limitations under the License.
     }                                        \
   } while (0)
 
-/// \brief Propagate any non-successful Status to the caller
+/** @brief Propagate any non-successful Status to the caller. */
 #define GAR_RETURN_NOT_OK(status)                                    \
   do {                                                               \
     ::GAR_NAMESPACE_INTERNAL::Status __s =                           \
@@ -36,7 +36,7 @@ limitations under the License.
     GAR_RETURN_IF_(!__s.ok(), __s, GAR_STRINGIFY(status));           \
   } while (false)
 
-/// \brief Propagate any non-successful Arrow Status to the caller
+/** @brief Propagate any non-successful Arrow Status to the caller. */
 #define RETURN_NOT_ARROW_OK(status)                                           \
   do {                                                                        \
     if (GAR_PREDICT_FALSE(!status.ok())) {                                    \
@@ -51,7 +51,7 @@ limitations under the License.
     }                                             \
   } while (0)
 
-/// \brief Throw runtime error if Status not OK
+/** @brief Throw runtime error if Status not OK. */
 #define GAR_RAISE_ERROR_NOT_OK(status)                               \
   do {                                                               \
     ::GAR_NAMESPACE_INTERNAL::Status __s =                           \
@@ -61,6 +61,9 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 
+/**
+ * An enum class representing the status codes for success or error outcomes.
+ */
 enum class StatusCode : unsigned char {
   kOK = 0,
   kKeyError,
@@ -79,36 +82,42 @@ enum class StatusCode : unsigned char {
   kUnknownError,
 };
 
-/// \brief Status outcome object (success or error)
-///
-/// The Status object is an object holding the outcome of an operation.
-/// The outcome is represented as a StatusCode, either success
-/// (StatusCode::OK) or an error (any other of the StatusCode enumeration
-/// values).
-///
-/// Additionally, if an error occurred, a specific error message is generally
-/// attached.
+/** @brief Status outcome object (success or error)
+ *
+ * The Status object is an object holding the outcome of an operation.
+ * The outcome is represented as a StatusCode, either success
+ * (StatusCode::OK) or an error (any other of the StatusCode enumeration
+ * values).
+ *
+ * Additionally, if an error occurred, a specific error message is generally
+ * attached.
+ */
 class Status {
  public:
-  // Create a success status.
+  /** Create a success status. */
   Status() noexcept : state_(nullptr) {}
+  /** Destructor. */
   ~Status() noexcept {
     if (state_ != nullptr) {
       deleteState();
     }
   }
-  /// Create a status with the specified error code and message.
+  /**
+   * @brief Constructs a status with the specified error code and message.
+   * @param code The error code of the status.
+   * @param msg The error message of the status.
+   */
   Status(StatusCode code, const std::string& msg) {
     state_ = new State;
     state_->code = code;
     state_->msg = msg;
   }
-  /// Copy the specified status.
+  /** Copy the specified status. */
   inline Status(const Status& s)
       : state_((s.state_ == nullptr) ? nullptr : new State(*s.state_)) {}
-  /// Move the specified status.
+  /**  Move the specified status. */
   inline Status(Status&& s) noexcept : state_(s.state_) { s.state_ = nullptr; }
-  /// Move assignment operator.
+  /** Move assignment operator. */
   inline Status& operator=(Status&& s) noexcept {
     delete state_;
     state_ = s.state_;
@@ -116,26 +125,28 @@ class Status {
     return *this;
   }
 
-  /// Return a success status
+  /** Returns a success status. */
   inline static Status OK() { return Status(); }
 
-  /// Return an error status when some IO-related operation failed
+  /** Returns an error status when some IO-related operation failed. */
   static Status IOError(const std::string& msg = "") {
     return Status(StatusCode::kIOError, msg);
   }
 
-  /// Return an error status for failed key lookups
+  /** Returns an error status for failed key lookups. */
   static Status KeyError(const std::string& msg = "") {
     return Status(StatusCode::kKeyError, msg);
   }
 
-  /// Return an error status for failed type matches
+  /** Returns an error status for failed type matches. */
   static Status TypeError(const std::string& msg = "") {
     return Status(StatusCode::kTypeError, msg);
   }
 
-  /// Return an error status for invalid data (for example a string that fails
-  /// parsing)
+  /**
+   * Returns an error status for invalid data (for example a string that fails
+   * parsing).
+   */
   static Status Invalid(const std::string& msg = "") {
     return Status(StatusCode::kInvalid, msg);
   }
@@ -152,8 +163,10 @@ class Status {
     return Status(StatusCode::kInvalidOperation, msg);
   }
 
-  /// Return an error status for value is out of range (for example next_chunk
-  /// is out of range)
+  /**
+   * Return an error status for value is out of range (for example next_chunk
+   * is out of range)
+   */
   static Status OutOfRange(const std::string& msg = "") {
     return Status(StatusCode::kOutOfRange, msg);
   }
@@ -162,29 +175,29 @@ class Status {
     return Status(StatusCode::kEndOfChunk, msg);
   }
 
-  /// Return an error status when some yaml-cpp related operation failed
+  /** Return an error status when some yaml-cpp related operation failed. */
   static Status YamlError(const std::string& msg = "") {
     return Status(StatusCode::kYamlError, msg);
   }
 
-  /// Return an error status when some arrow-related operation failed
+  /** Return an error status when some arrow-related operation failed. */
   static Status ArrowError(const std::string& msg = "") {
     return Status(StatusCode::kArrowError, msg);
   }
 
-  /// Return an error status for unknown errors
+  /** Return an error status for unknown errors. */
   static Status UnknownError(const std::string& msg = "") {
     return Status(StatusCode::kArrowError, msg);
   }
 
-  /// Return true iff the status indicates success.
+  /** Return true iff the status indicates success. */
   bool ok() const { return (state_ == nullptr); }
 
-  /// Return true iff the status indicates a key lookup error.
+  /** Return true iff the status indicates a key lookup error. */
   bool IsKeyError() const { return code() == StatusCode::kKeyError; }
-  /// Return true iff the status indicates a type match error.
+  /** Return true iff the status indicates a type match error. */
   bool IsTypeError() const { return code() == StatusCode::kTypeError; }
-  /// Return true iff the status indicates invalid data.
+  /** Return true iff the status indicates invalid data. */
   bool IsInvalid() const { return code() == StatusCode::kInvalid; }
   bool IsInvalidValue() const { return code() == StatusCode::kInvalidValue; }
   bool IsInvalidArgument() const {
@@ -195,15 +208,15 @@ class Status {
   }
   bool IsOutOfRange() const { return code() == StatusCode::kOutOfRange; }
   bool IsEndOfChunk() const { return code() == StatusCode::kEndOfChunk; }
-  /// Return true iff the status indicates an yaml-cpp related failure.
+  /** Return true iff the status indicates an yaml-cpp related failure. */
   bool IsYamlError() const { return code() == StatusCode::kYamlError; }
-  /// Return true iff the status indicates an arrow-related failure.
+  /** Return true iff the status indicates an arrow-related failure. */
   bool IsArrowError() const { return code() == StatusCode::kArrowError; }
 
-  /// Return the StatusCode value attached to this status.
+  /** Return the StatusCode value attached to this status. */
   StatusCode code() const { return ok() ? StatusCode::kOK : state_->code; }
 
-  /// Return the specific error message attached to this status.
+  /** Return the specific error message attached to this status. */
   std::string message() const { return ok() ? "" : state_->msg; }
 
  private:

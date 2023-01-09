@@ -77,7 +77,7 @@ class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame) 
     }
 
     // write out the chunks
-    val output_prefix = prefix + vertexInfo.getDirPath(propertyGroup)
+    val output_prefix = prefix + vertexInfo.getPathPrefix(propertyGroup)
     val property_list = ArrayBuffer[String]()
     val it = propertyGroup.getProperties().iterator
     while (it.hasNext()) {

@@ -222,8 +222,7 @@ Status EdgeChunkWriter::WriteOffsetChunk(
     const std::shared_ptr<arrow::Table>& input_table,
     IdType vertex_chunk_index) const noexcept {
   GAR_RETURN_NOT_OK(Validate(input_table, vertex_chunk_index));
-  GAR_ASSIGN_OR_RAISE(auto file_type,
-                      edge_info_.GetAdjListFileType(adj_list_type_));
+  GAR_ASSIGN_OR_RAISE(auto file_type, edge_info_.GetFileType(adj_list_type_));
   GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_.GetAdjListOffsetFilePath(
                                        vertex_chunk_index, adj_list_type_));
   std::string path = prefix_ + suffix;
@@ -234,8 +233,7 @@ Status EdgeChunkWriter::WriteAdjListChunk(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     IdType chunk_index) const noexcept {
   GAR_RETURN_NOT_OK(Validate(input_table, vertex_chunk_index));
-  GAR_ASSIGN_OR_RAISE(auto file_type,
-                      edge_info_.GetAdjListFileType(adj_list_type_));
+  GAR_ASSIGN_OR_RAISE(auto file_type, edge_info_.GetFileType(adj_list_type_));
   std::vector<int> indices;
   indices.clear();
   auto schema = input_table->schema();

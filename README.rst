@@ -3,53 +3,41 @@ GraphAr
 
 |GraphAr CI| |Docs CI| |GraphAr Docs|
 
-GraphAr (short for "Graph Archive") is an open source, standard data file format with C++ SDK and Spark tools for graph data storage and retrieval.
+Welcome to GraphAr (short for "Graph Archive"), an open source, standardized file format for graph data storage and retrieval.
 
-The GraphAr project includes such modules as:
-
-- The design of the standardized file format (GAR) for graph data.
-- A C++ Library for reading and writing GAR files.
-- Apache Spark tools for generating, loading and transforming GAR files (coming soon).
-- Examples of applying GraphAr to graph processing applications or existing systems such as GraphScope.
-
-
-
+What is GraphAr?
+-----------------
 
 |Overview Pic|
 
+Graph processing serves as the essential building block for a diverse variety of
+real-world applications such as social network analytics, data mining, network routing,
+and scientific computing.
 
-Motivation
-----------
+GraphAr is a project that aims to make it easier for diverse applications and
+systems (in-memory and out-of-core storages, databases, graph computing systems, and interactive graph query frameworks)
+to build and access graph data conveniently and efficiently.
 
-Graph processing serves as the essential building block for a diverse variety of real-world applications such as social network analytics, data mining, network routing, and scientific computing.
+It can be used for importing/exporting and persistent storage of graph data,
+thereby reducing the burden on systems when working together. Additionally, it can
+serve as a direct data source for graph processing applications.
 
-GraphAr (GAR) is established to enable diverse graph applications and systems (in-memory and out-of-core storages, databases, graph computing systems and interactive graph query frameworks) to build and access the graph data conveniently and efficiently. It specifies a standardized system-independent file format for graph and provides a set of interfaces to generate and access such formatted files.
+To achieve this, GraphAr provides:
 
-GraphAr (GAR) targets two main scenarios:
+- The Graph Archive(GAR) file format: a standardized system-independent file format for storing graph data
+- Libraries: a set of libraries for reading and writing or transforming GAR files
 
-- To serve as the standard file format for importing/exporting and persistent storage of the graph data for diverse existing systems, reducing the overhead when various systems co-work.
-- To serve as the direct data source for graph processing applications.
+By using GraphAr, you can:
 
+- Store and persist your graph data in a system-independent way with the GAR file format
+- Easily access and generate GAR files using the libraries
+- Use the Apache Spark library to quickly manipulate and transform your GAR files
 
-What's in GraphAr
----------------------
-
-The **GAR** file format that defines a standard store file format for graph data.
-
-The **GAR SDK** library that contains a C++ library to provide APIs for accessing and generating the GAR format files.
-
-
-GraphAr File Format
----------------------
-
-GraphAr specifies a standardized system-independent file format (GAR) for storing property graphs.
-It uses metadata to record all the necessary information of a graph, and maintains the actual data
-in a chunked way.
-
-What is Property Graph
-^^^^^^^^^^^^^^^^^^^^^^^
-
-GraphAr is designed for representing and storing the property graphs. Graph (in discrete mathematics) is a structure made of vertices and edges. Property graph is then a type of graph model where the vertices/edges could carry a name (also called as type or label) and some properties. Since carrying additional information than non-property graphs, the property graph is able to represent connections among data scattered across diverse data databases and with different schemas. Compared with the relational database schema, the property graph excels at showing data dependencies. Therefore, it is widely-used in modeling modern applications including social network analytics, data mining, network routing, scientific computing and so on.
+The GAR File Format
+-------------------
+The GAR file format is designed for storing property graphs. It uses metadata to
+record all the necessary information of a graph, and maintains the actual data in
+a chunked way.
 
 A property graph includes vertices and edges. Each vertex contains:
 
@@ -70,7 +58,7 @@ The following is an example property graph containing two types of vertices "per
 |Property Graph|
 
 Vertices in GraphAr
-^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 Logical table of vertices
 """"""""""""""""""""""""""
@@ -123,29 +111,31 @@ Take the "person knows person" edges to illustrate, when the vertex chunk size i
 |Edge Physical Table2|
 
 
-Building SDK Steps
----------------------
+Building the Libraries
+----------------------
 
-Dependencies
-^^^^^^^^^^^^^
+Libraries are available for C++ and Spark.
 
-**GraphAr** is developed and tested on ubuntu 20.04. It should also work on other unix-like distributions. Building GraphAr requires the following softwares installed as dependencies.
+Prerequisites
+^^^^^^^^^^^^^^
+
+Basic dependencies:
 
 - A modern C++ compiler compliant with C++17 standard (g++ >= 7.1 or clang++ >= 5).
 - `CMake <https://cmake.org/>`_ (>=2.8)
 
-Here are the dependencies for optional features:
+Dependencies for optional features:
 
 - `Doxygen <https://www.doxygen.nl/index.html>`_ (>= 1.8) for generating documentation;
 - `sphinx <https://www.sphinx-doc.org/en/master/index.html>`_ for generating documentation.
 
-Extra dependencies are required by examples and unit tests:
+Extra dependencies are required by examples:
 
 - `BGL <https://www.boost.org/doc/libs/1_80_0/libs/graph/doc/index.html>`_ (>= 1.58).
 
 
-Building and install GraphAr C++ library
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Building
+^^^^^^^^^
 
 Once the required dependencies have been installed, go to the root directory of GraphAr and do an out-of-source build using CMake.
 
@@ -158,9 +148,9 @@ Once the required dependencies have been installed, go to the root directory of 
 
 **Optional**: Using a Custom Namespace
 
-The `namespace` that `gar` is defined in is configurable. By default,
-it is defined in `namespace GraphArchive`; however this can be toggled by
-setting `NAMESPACE` option with cmake:
+The :code:`namespace` is configurable. By default,
+it is defined in :code:`namespace GraphArchive`; however this can be toggled by
+setting :code:`NAMESPACE` option with cmake:
 
 .. code:: shell
 
@@ -181,7 +171,7 @@ Install the GraphAr library:
 
     sudo make install
 
-Build the documentation of GraphAr library:
+Optionally, you can build the documentation for GraphAr library:
 
 .. code-block:: shell
 
@@ -189,37 +179,17 @@ Build the documentation of GraphAr library:
     pip3 install -r ../requirements-dev.txt --user
     make doc
 
-Using GraphAr C++ library in your own project
------------------------------------------------
 
-The way we recommend to integrate the GraphAr C++ library in your own C++ project is to use
-CMake's `find_package` function for locating and integrating dependencies.
+The Spark Library
+-----------------
 
-Here is a minimal `CMakeLists.txt` that compiles a source file `my_example.cc` into an executable
-target linked with GraphAr C++ shared library.
+See `GraphAr Spark Library`_ for details about the Spark library.
 
-.. code-block:: cmake
-
-    project(MyExample)
-
-    find_package(gar REQUIRED)
-    include_directories(${GAR_INCLUDE_DIRS})
-
-    add_executable(my_example my_example.cc)
-    target_compile_features(my_example PRIVATE cxx_std_17)
-    target_link_libraries(my_example PRIVATE ${GAR_LIBRARIES})
-
-Please refer to `examples/pagerank_example.cc` for details.
 
 Contributing to GraphAr
------------------------
+----------------------------
 
-- Read the `Contribution Guide`_.
-- Please report bugs by submitting `GitHub Issues`_ or ask me anything in `Github Discussions`_.
-- Submit contributions using pull requests.
-
-Thank you in advance for your contributions to GraphAr!
-
+See `Contribution Guide`_ for details on submitting patches and the contribution workflow.
 
 License
 -------
@@ -268,6 +238,8 @@ third-party libraries may not have the same license as GraphAr.
   :alt: edge logical table2
 
 .. _GraphAr File Format: https://alibaba.github.io/GraphAr/user-guide/file-format.html
+
+.. _GraphAr Spark Library: https://alibaba.github.io/GraphAr/user-guide/spark-lib.html
 
 .. _example files: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/
 

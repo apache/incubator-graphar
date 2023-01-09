@@ -59,9 +59,9 @@ class VertexPropertyArrowChunkReader {
         seek_id_(chunk_index * vertex_info.GetChunkSize()),
         chunk_table_(nullptr) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              vertex_info.GetDirPath(property_group));
-    std::string base_dir = prefix_ + dir_path;
+    GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
+                              vertex_info.GetPathPrefix(property_group));
+    std::string base_dir = prefix_ + pg_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_, fs_->GetFileNumOfDir(base_dir));
   }
 
@@ -156,9 +156,9 @@ class AdjListArrowChunkReader {
         seek_offset_(0),
         chunk_table_(nullptr) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetAdjListDirPath(adj_list_type));
-    base_dir_ = prefix_ + dir_path;
+    GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
+                              edge_info.GetAdjListPathPrefix(adj_list_type));
+    base_dir_ = prefix_ + adj_list_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
                               fs_->GetFileNumOfDir(base_dir_));
     std::string chunk_dir =
@@ -312,7 +312,7 @@ class AdjListOffsetArrowChunkReader {
         chunk_table_(nullptr) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetAdjListOffsetDirPath(adj_list_type));
+                              edge_info.GetOffsetPathPrefix(adj_list_type));
     base_dir_ = prefix_ + dir_path;
     if (adj_list_type == AdjListType::ordered_by_source ||
         adj_list_type == AdjListType::ordered_by_dest) {
@@ -415,9 +415,9 @@ class AdjListPropertyArrowChunkReader {
         chunk_table_(nullptr) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(
-        auto dir_path,
-        edge_info.GetPropertyDirPath(property_group, adj_list_type));
-    base_dir_ = prefix_ + dir_path;
+        auto pg_path_prefix,
+        edge_info.GetPropertyGroupPathPrefix(property_group, adj_list_type));
+    base_dir_ = prefix_ + pg_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
                               fs_->GetFileNumOfDir(base_dir_));
     std::string chunk_dir =

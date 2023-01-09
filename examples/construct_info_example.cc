@@ -24,8 +24,8 @@ int main(int argc, char* argv[]) {
   // validate
   assert(graph_info.GetName() == name);
   assert(graph_info.GetPrefix() == prefix);
-  const auto& vertex_infos = graph_info.GetAllVertexInfo();
-  const auto& edge_infos = graph_info.GetAllEdgeInfo();
+  const auto& vertex_infos = graph_info.GetVertexInfos();
+  const auto& edge_infos = graph_info.GetEdgeInfos();
   assert(vertex_infos.size() == 0);
   assert(edge_infos.size() == 0);
 
@@ -85,7 +85,7 @@ int main(int argc, char* argv[]) {
 
   /*------------------add vertex info to graph------------------*/
   graph_info.AddVertex(vertex_info);
-  assert(graph_info.GetAllVertexInfo().size() == 1);
+  assert(graph_info.GetVertexInfos().size() == 1);
   assert(graph_info.GetVertexInfo(vertex_label).status().ok());
   assert(graph_info.GetVertexPropertyGroup(vertex_label, id.name).value() ==
           group1);
@@ -124,7 +124,7 @@ int main(int argc, char* argv[]) {
                           GAR_NAMESPACE::FileType::PARQUET)
               .ok());
   assert(
-      edge_info.GetAdjListFileType(GAR_NAMESPACE::AdjListType::ordered_by_dest)
+      edge_info.GetFileType(GAR_NAMESPACE::AdjListType::ordered_by_dest)
           .value() == GAR_NAMESPACE::FileType::PARQUET);
   assert(
       edge_info
@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
   assert(res1.status().ok());
   edge_info = res1.value();
   assert(edge_info
-              .GetAdjListFileType(GAR_NAMESPACE::AdjListType::ordered_by_source)
+              .GetFileType(GAR_NAMESPACE::AdjListType::ordered_by_source)
               .value() == GAR_NAMESPACE::FileType::PARQUET);
   auto res2 = edge_info.ExtendPropertyGroup(
       group3, GAR_NAMESPACE::AdjListType::ordered_by_source);
@@ -198,7 +198,7 @@ int main(int argc, char* argv[]) {
   /*------------------add edge info to graph------------------*/
   graph_info.AddEdge(edge_info);
   graph_info.AddEdgeInfoPath("person_knows_person.edge.yml");
-  assert(graph_info.GetAllEdgeInfo().size() == 1);
+  assert(graph_info.GetEdgeInfos().size() == 1);
   assert(
       graph_info.GetEdgeInfo(src_label, edge_label, dst_label).status().ok());
   assert(graph_info

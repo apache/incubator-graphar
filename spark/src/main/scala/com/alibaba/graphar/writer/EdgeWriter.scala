@@ -156,7 +156,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     val offset_schema = StructType(Seq(StructField(GeneralParams.offsetCol, LongType)))
     val vertex_chunk_size = if (adjListType == AdjListType.ordered_by_source) edgeInfo.getSrc_chunk_size() else edgeInfo.getDst_chunk_size()
     val index_column = if (adjListType == AdjListType.ordered_by_source) GeneralParams.srcIndexCol else GeneralParams.dstIndexCol
-    val output_prefix = prefix + edgeInfo.getAdjListOffsetDirPath(adjListType)
+    val output_prefix = prefix + edgeInfo.getOffsetPathPrefix(adjListType)
     for (chunk <- chunks) {
       val edge_count_df = chunk.select(index_column).groupBy(index_column).count()
       // init a edge count dataframe of vertex range [begin, end] to include isloated vertex
@@ -187,7 +187,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     val file_type = edgeInfo.getAdjListFileType(adjListType)
     var chunk_index: Long = 0
     for (chunk <- chunks) {
-      val output_prefix = prefix + edgeInfo.getAdjListFilePath(chunk_index, adjListType)
+      val output_prefix = prefix + edgeInfo.getAdjListPathPrefix(chunk_index, adjListType)
       val adj_list_chunk = chunk.select(GeneralParams.srcIndexCol, GeneralParams.dstIndexCol)
       FileSystem.writeDataFrame(adj_list_chunk, FileType.FileTypeToString(file_type), output_prefix)
       chunk_index = chunk_index + 1
@@ -215,7 +215,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
     var chunk_index: Long = 0
     for (chunk <- chunks) {
-      val output_prefix = prefix + edgeInfo.getPropertyFilePath(propertyGroup, adjListType, chunk_index)
+      val output_prefix = prefix + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType, chunk_index)
       val property_group_chunk = chunk.select(property_list.map(col): _*)
       FileSystem.writeDataFrame(property_group_chunk, propertyGroup.getFile_type(), output_prefix)
       chunk_index = chunk_index + 1
