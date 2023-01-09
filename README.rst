@@ -239,7 +239,7 @@ third-party libraries may not have the same license as GraphAr.
 
 .. _GraphAr File Format: https://alibaba.github.io/GraphAr/user-guide/file-format.html
 
-.. _GraphAr Spark Library: https://alibaba.github.io/GraphAr/user-guide/spark-tool.html
+.. _GraphAr Spark Library: https://alibaba.github.io/GraphAr/user-guide/spark-lib.html
 
 .. _example files: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/
 
