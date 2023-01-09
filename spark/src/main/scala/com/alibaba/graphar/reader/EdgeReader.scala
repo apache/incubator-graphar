@@ -76,7 +76,7 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    */
   def readAdjListForVertexChunk(vertex_chunk_index: Long, addIndex: Boolean = false): DataFrame = {
     val part_prefix = prefix + "/" + edgeInfo.getAdjListPathPrefix(vertex_chunk_index, adjListType)
-    val file_system = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
+    val file_system = FileSystem.get(new Path(part_prefix).toUri(), spark.sparkContext.hadoopConfiguration)
     val path_pattern = new Path(part_prefix + "chunk*")
     val chunk_number = file_system.globStatus(path_pattern).length
     var df = spark.emptyDataFrame
@@ -144,7 +144,7 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
     val path_prefix = prefix + "/" + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType, vertex_chunk_index)
-    val file_system = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
+    val file_system = FileSystem.get(new Path(path_prefix).toUri(), spark.sparkContext.hadoopConfiguration)
     val path_pattern = new Path(path_prefix + "chunk*")
     val chunk_number = file_system.globStatus(path_pattern).length
     var df = spark.emptyDataFrame
@@ -171,7 +171,7 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
     val property_group_prefix = prefix + "/" + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType)
-    val file_system = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
+    val file_system = FileSystem.get(new Path(property_group_prefix).toUri(), spark.sparkContext.hadoopConfiguration)
     val path_pattern = new Path(property_group_prefix + "part*")
     val vertex_chunk_number = file_system.globStatus(path_pattern).length
     var df = spark.emptyDataFrame
