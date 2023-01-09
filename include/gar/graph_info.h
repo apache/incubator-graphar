@@ -741,20 +741,6 @@ class EdgeInfo {
   }
 
   /**
-   * Get the path prefix of for the given adjacency list type.
-   * @param adj_list_type The adjacency list type.
-   * @return A Result object containing the path prefix, or a Status object
-   * indicating an error.
-   */
-  inline Result<std::string> GetPathPrefix(
-      const AdjListType& adj_list_type) const noexcept {
-    if (!ContainAdjList(adj_list_type)) {
-      return Status::KeyError("The adj list type is not found in edge info.");
-    }
-    return prefix_ + adj_list2prefix_.at(adj_list_type);
-  }
-
-  /**
    * @brief Get the file path of adj list topology chunk
    *
    * @param vertex_chunk_index the vertex chunk index
@@ -779,7 +765,7 @@ class EdgeInfo {
    * @return A Result object containing the directory, or a Status object
    * indicating an error.
    */
-  inline Result<std::string> GetTopologyPathPrefix(
+  inline Result<std::string> GetAdjListPathPrefix(
       const AdjListType& adj_list_type) const noexcept {
     if (!ContainAdjList(adj_list_type)) {
       return Status::KeyError("The adj list type is not found in edge info.");
@@ -848,8 +834,8 @@ class EdgeInfo {
    * @return A Result object containing the path prefix, or a Status object
    * indicating an error.
    */
-  inline Result<std::string> GetPathPrefix(const PropertyGroup& property_group,
-                                           AdjListType adj_list_type) const
+  inline Result<std::string> GetPropertyGroupPathPrefix(
+      const PropertyGroup& property_group, AdjListType adj_list_type) const
       noexcept {
     if (!ContainPropertyGroup(property_group, adj_list_type)) {
       return Status::KeyError(

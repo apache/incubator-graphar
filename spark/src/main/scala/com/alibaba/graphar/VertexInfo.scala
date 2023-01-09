@@ -193,12 +193,12 @@ class VertexInfo() {
     return prefix + str + "chunk" + chunk_index.toString()
   }
 
-  /** Get the chunk files directory path of property group.
+  /** Get the path prefix for the specified property group.
    *
    * @param property_group the property group.
-   * @return the dirctory path that store the chunk files of property group.
+   * @return the path prefix of the property group chunk files.
    */
-  def getDirPath(property_group: PropertyGroup): String = {
+  def getPathPrefix(property_group: PropertyGroup): String = {
     if (containPropertyGroup(property_group) == false)
       throw new IllegalArgumentException
     var str: String = ""

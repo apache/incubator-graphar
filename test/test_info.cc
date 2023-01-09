@@ -177,29 +177,26 @@ TEST_CASE("test_edge_info") {
   auto file_type_result = edge_info.GetFileType(adj_list_type);
   REQUIRE(!file_type_result.has_error());
   REQUIRE(file_type_result.value() == file_type);
-  auto adj_list_path_prefix = edge_info.GetPathPrefix(adj_list_type);
+  auto prefix_of_adj_list_type =
+      std::string(GraphArchive::AdjListTypeToString(adj_list_type)) + "/";
+  auto adj_list_path_prefix = edge_info.GetAdjListPathPrefix(adj_list_type);
   REQUIRE(!adj_list_path_prefix.has_error());
   REQUIRE(adj_list_path_prefix.value() ==
-          edge_info.GetPrefix() +
-              std::string(GraphArchive::AdjListTypeToString(adj_list_type)) +
-              "/");
-  auto adj_list_dir_path = edge_info.GetTopologyPathPrefix(adj_list_type);
-  REQUIRE(!adj_list_dir_path.has_error());
-  REQUIRE(adj_list_dir_path.value() ==
-          adj_list_path_prefix.value() + "adj_list/");
+          edge_info.GetPrefix() + prefix_of_adj_list_type + "adj_list/");
   auto adj_list_file_path = edge_info.GetAdjListFilePath(0, 0, adj_list_type);
   REQUIRE(!adj_list_file_path.has_error());
   REQUIRE(adj_list_file_path.value() ==
-          adj_list_dir_path.value() + "part0/chunk0");
-  auto adj_list_offset_dir_path = edge_info.GetOffsetPathPrefix(adj_list_type);
-  REQUIRE(!adj_list_offset_dir_path.has_error());
-  REQUIRE(adj_list_offset_dir_path.value() ==
-          adj_list_path_prefix.value() + "offset/");
+          adj_list_path_prefix.value() + "part0/chunk0");
+  auto adj_list_offset_path_prefix =
+      edge_info.GetOffsetPathPrefix(adj_list_type);
+  REQUIRE(!adj_list_offset_path_prefix.has_error());
+  REQUIRE(adj_list_offset_path_prefix.value() ==
+          edge_info.GetPrefix() + prefix_of_adj_list_type + "offset/");
   auto adj_list_offset_file_path =
       edge_info.GetAdjListOffsetFilePath(0, adj_list_type);
   REQUIRE(!adj_list_offset_file_path.has_error());
   REQUIRE(adj_list_offset_file_path.value() ==
-          adj_list_offset_dir_path.value() + "chunk0");
+          adj_list_offset_path_prefix.value() + "chunk0");
 
   // adj list type not exist
   REQUIRE(!edge_info.ContainAdjList(adj_list_type_not_exist));
@@ -207,7 +204,7 @@ TEST_CASE("test_edge_info") {
   REQUIRE(edge_info.GetAdjListFilePath(0, 0, adj_list_type_not_exist)
               .status()
               .IsKeyError());
-  REQUIRE(edge_info.GetTopologyPathPrefix(adj_list_type_not_exist)
+  REQUIRE(edge_info.GetAdjListPathPrefix(adj_list_type_not_exist)
               .status()
               .IsKeyError());
   REQUIRE(edge_info.GetAdjListOffsetFilePath(0, adj_list_type_not_exist)
@@ -241,15 +238,16 @@ TEST_CASE("test_edge_info") {
   auto is_primary_result = edge_info.IsPrimaryKey(p.name);
   REQUIRE(!is_primary_result.has_error());
   REQUIRE(is_primary_result.value() == p.is_primary);
-  auto property_dir_path = edge_info.GetPathPrefix(pg, adj_list_type);
-  REQUIRE(!property_dir_path.has_error());
-  REQUIRE(property_dir_path.value() ==
-          adj_list_path_prefix.value() + pg.GetPrefix());
+  auto property_path_path_prefix =
+      edge_info.GetPropertyGroupPathPrefix(pg, adj_list_type);
+  REQUIRE(!property_path_path_prefix.has_error());
+  REQUIRE(property_path_path_prefix.value() ==
+          edge_info.GetPrefix() + prefix_of_adj_list_type + pg.GetPrefix());
   auto property_file_path =
       edge_info.GetPropertyFilePath(pg, adj_list_type, 0, 0);
   REQUIRE(!property_file_path.has_error());
   REQUIRE(property_file_path.value() ==
-          property_dir_path.value() + "part0/chunk0");
+          property_path_path_prefix.value() + "part0/chunk0");
   // test property not exist
   REQUIRE(edge_info.GetPropertyGroup("p_not_exist", adj_list_type)
               .status()
@@ -262,7 +260,7 @@ TEST_CASE("test_edge_info") {
   REQUIRE(edge_info.GetPropertyFilePath(pg_not_exist, adj_list_type, 0, 0)
               .status()
               .IsKeyError());
-  REQUIRE(edge_info.GetPathPrefix(pg_not_exist, adj_list_type)
+  REQUIRE(edge_info.GetPropertyGroupPathPrefix(pg_not_exist, adj_list_type)
               .status()
               .IsKeyError());
 
@@ -276,7 +274,7 @@ TEST_CASE("test_edge_info") {
   REQUIRE(edge_info.GetPropertyFilePath(pg, adj_list_type_not_exist, 0, 0)
               .status()
               .IsKeyError());
-  REQUIRE(edge_info.GetPathPrefix(pg, adj_list_type_not_exist)
+  REQUIRE(edge_info.GetPropertyGroupPathPrefix(pg, adj_list_type_not_exist)
               .status()
               .IsKeyError());
 

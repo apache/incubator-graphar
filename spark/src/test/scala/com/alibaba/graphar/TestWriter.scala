@@ -54,7 +54,7 @@ class WriterSuite extends AnyFunSuite {
     // write certain property group
     val property_group = vertex_info.getPropertyGroup("id")
     writer.writeVertexProperties(property_group)
-    val id_chunk_path = new Path(prefix + vertex_info.getDirPath(property_group) + "chunk*")
+    val id_chunk_path = new Path(prefix + vertex_info.getPathPrefix(property_group) + "chunk*")
     val id_chunk_files = fs.globStatus(id_chunk_path)
     assert(id_chunk_files.length == 10)
     writer.writeVertexProperties()
@@ -93,17 +93,17 @@ class WriterSuite extends AnyFunSuite {
 
     // test write adj list
     writer.writeAdjList()
-    val adj_list_path_pattern = new Path(prefix + edge_info.getAdjListDirPath(adj_list_type) + "*/*")
+    val adj_list_path_pattern = new Path(prefix + edge_info.getAdjListPathPrefix(adj_list_type) + "*/*")
     val adj_list_chunk_files = fs.globStatus(adj_list_path_pattern)
     assert(adj_list_chunk_files.length == 9)
-    val offset_path_pattern = new Path(prefix + edge_info.getAdjListOffsetDirPath(adj_list_type) + "*")
+    val offset_path_pattern = new Path(prefix + edge_info.getOffsetPathPrefix(adj_list_type) + "*")
     val offset_chunk_files = fs.globStatus(offset_path_pattern)
     assert(offset_chunk_files.length == 7)
 
     // test write property group
     val property_group = edge_info.getPropertyGroup("creationDate", adj_list_type)
     writer.writeEdgeProperties(property_group)
-    val property_group_path_pattern = new Path(prefix + edge_info.getPropertyDirPath(property_group, adj_list_type) + "*/*")
+    val property_group_path_pattern = new Path(prefix + edge_info.getPropertyGroupPathPrefix(property_group, adj_list_type) + "*/*")
     val property_group_chunk_files = fs.globStatus(property_group_path_pattern)
     assert(property_group_chunk_files.length == 9)
 
@@ -159,10 +159,10 @@ class WriterSuite extends AnyFunSuite {
 
     // test write adj list
     writer.writeAdjList()
-    val adj_list_path_pattern = new Path(prefix + edge_info.getAdjListDirPath(adj_list_type) + "*/*")
+    val adj_list_path_pattern = new Path(prefix + edge_info.getAdjListPathPrefix(adj_list_type) + "*/*")
     val adj_list_chunk_files = fs.globStatus(adj_list_path_pattern)
     assert(adj_list_chunk_files.length == 11)
-    val offset_path_pattern = new Path(prefix + edge_info.getAdjListOffsetDirPath(adj_list_type) + "*")
+    val offset_path_pattern = new Path(prefix + edge_info.getOffsetPathPrefix(adj_list_type) + "*")
     val offset_chunk_files = fs.globStatus(offset_path_pattern)
     assert(offset_chunk_files.length == 10)
     // compare with correct offset chunk value
@@ -175,7 +175,7 @@ class WriterSuite extends AnyFunSuite {
     // test write property group
     val property_group = edge_info.getPropertyGroup("creationDate", adj_list_type)
     writer.writeEdgeProperties(property_group)
-    val property_group_path_pattern = new Path(prefix + edge_info.getPropertyDirPath(property_group, adj_list_type) + "*/*")
+    val property_group_path_pattern = new Path(prefix + edge_info.getPropertyGroupPathPrefix(property_group, adj_list_type) + "*/*")
     val property_group_chunk_files = fs.globStatus(property_group_path_pattern)
     assert(property_group_chunk_files.length == 11)
 

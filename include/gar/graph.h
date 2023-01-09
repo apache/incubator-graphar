@@ -643,7 +643,7 @@ class EdgesCollection<AdjListType::ordered_by_source> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
                               fs->GetFileNumOfDir(base_dir));
@@ -679,7 +679,7 @@ class EdgesCollection<AdjListType::ordered_by_source> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
                               fs->GetFileNumOfDir(base_dir));
@@ -713,7 +713,7 @@ class EdgesCollection<AdjListType::ordered_by_source> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     IdType vertex_chunk_num = 0;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num, fs->GetFileNumOfDir(base_dir));
@@ -864,7 +864,7 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
                               fs->GetFileNumOfDir(base_dir));
@@ -900,7 +900,7 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
                               fs->GetFileNumOfDir(base_dir));
@@ -934,7 +934,7 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     IdType vertex_chunk_num = 0;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num, fs->GetFileNumOfDir(base_dir));
@@ -1085,7 +1085,7 @@ class EdgesCollection<AdjListType::unordered_by_source> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
                               fs->GetFileNumOfDir(base_dir));
@@ -1121,7 +1121,7 @@ class EdgesCollection<AdjListType::unordered_by_source> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
                               fs->GetFileNumOfDir(base_dir));
@@ -1155,7 +1155,7 @@ class EdgesCollection<AdjListType::unordered_by_source> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     IdType vertex_chunk_num = 0;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num, fs->GetFileNumOfDir(base_dir));
@@ -1276,7 +1276,7 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     IdType vertex_chunk_num = 0;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num, fs->GetFileNumOfDir(base_dir));
@@ -1312,7 +1312,7 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
                               fs->GetFileNumOfDir(base_dir));
@@ -1346,7 +1346,7 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetTopologyPathPrefix(adj_list_type_));
+                              edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += dir_path;
     IdType vertex_chunk_num = 0;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num, fs->GetFileNumOfDir(base_dir));

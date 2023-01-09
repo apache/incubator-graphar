@@ -296,13 +296,13 @@ class EdgeInfo() {
     return str
   }
 
-  /** Get the adj list offset chunk file directory path of adj list type.
-   *
+  /** Get the path prefix of the adjacency list offset for the given
+   * adjacency list type.
    * @param adj_list_type type of adj list structure.
-   * @return the offset directory. If edge info not support the adj list type,
+   * @return the path prefix of the offset. If edge info not support the adj list type,
    *          raise an IllegalArgumentException error.
    */
-  def getAdjListOffsetDirPath(adj_list_type: AdjListType.Value) : String = {
+  def getOffsetPathPrefix(adj_list_type: AdjListType.Value) : String = {
     if (containAdjList(adj_list_type) == false)
       throw new IllegalArgumentException
     return prefix + getAdjListPrefix(adj_list_type) + "offset/"
@@ -321,24 +321,24 @@ class EdgeInfo() {
     return str
   }
 
-  /** Get the path of adj list topology chunk of certain vertex chunk.
+  /** Get the path prefix of adj list topology chunk of certain vertex chunk.
    *
    * @param vertex_chunk_index index of vertex chunk.
    * @param adj_list_type type of adj list structure.
    * @return path prefix of the edge chunk of vertices of given vertex chunk.
    */
-  def getAdjListFilePath(vertex_chunk_index: Long, adj_list_type: AdjListType.Value) : String = {
+  def getAdjListPathPrefix(vertex_chunk_index: Long, adj_list_type: AdjListType.Value) : String = {
     var str: String = prefix + getAdjListPrefix(adj_list_type) + "adj_list/part" +
       vertex_chunk_index.toString() + "/"
     return str
   }
 
-  /** Get the adj list topology chunk file directory path of adj list type.
-   *
+  /** Get the path prefix of the adjacency list topology chunk for the given
+   *  adjacency list type.
    * @param adj_list_type type of adj list structure.
-   * @return directory path of adj list type.
+   * @return path prfix of of the adjacency list topology.
    */
-  def getAdjListDirPath(adj_list_type: AdjListType.Value) : String = {
+  def getAdjListPathPrefix(adj_list_type: AdjListType.Value) : String = {
     return prefix + getAdjListPrefix(adj_list_type) + "adj_list/"
   }
 
@@ -372,7 +372,7 @@ class EdgeInfo() {
     return str
   }
 
-  /** Get path of adj list property group of certain vertex chunk.
+  /** Get path prefix of adj list property group of certain vertex chunk.
    *
    * @param property_group property group.
    * @param adj_list_type type of adj list structure.
@@ -381,7 +381,7 @@ class EdgeInfo() {
    *         If edge info not contains the property group,
    *         raise an IllegalArgumentException error.
    */
-  def getPropertyFilePath(property_group: PropertyGroup, adj_list_type: AdjListType.Value, vertex_chunk_index: Long) : String = {
+  def getPropertyGroupPathPrefix(property_group: PropertyGroup, adj_list_type: AdjListType.Value, vertex_chunk_index: Long) : String = {
     if (containPropertyGroup(property_group, adj_list_type) == false)
       throw new IllegalArgumentException
     var str: String = property_group.getPrefix
@@ -400,14 +400,14 @@ class EdgeInfo() {
     return str
   }
 
-  /** Get the property group chunk file directory path of adj list type.
-   *
+  /** Get the path prefix of the property group chunk for the given
+   * adjacency list type
    * @param property_group property group.
    * @param adj_list_type type of adj list structure.
-   * @return directory path of property group chunks. If edge info not contains the property group,
+   * @return path prefix of property group chunks. If edge info not contains the property group,
    *         raise an IllegalArgumentException error.
    */
-  def getPropertyDirPath(property_group: PropertyGroup, adj_list_type: AdjListType.Value) : String = {
+  def getPropertyGroupPathPrefix(property_group: PropertyGroup, adj_list_type: AdjListType.Value) : String = {
     if (containPropertyGroup(property_group, adj_list_type) == false)
       throw new IllegalArgumentException
     var str: String = property_group.getPrefix
