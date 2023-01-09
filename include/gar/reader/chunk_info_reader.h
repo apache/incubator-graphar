@@ -54,7 +54,7 @@ class VertexPropertyChunkInfoReader {
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              vertex_info.GetDirPath(property_group));
+                              vertex_info.GetPathPrefix(property_group));
     base_dir += dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_, fs->GetFileNumOfDir(base_dir));
   }
@@ -132,7 +132,7 @@ class AdjListChunkInfoReader {
         chunk_index_(0) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &base_dir_));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetAdjListDirPath(adj_list_type));
+                              edge_info.GetTopologyPathPrefix(adj_list_type));
     base_dir_ = prefix_ + dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
                               fs_->GetFileNumOfDir(base_dir_));
@@ -233,8 +233,7 @@ class AdjListPropertyChunkInfoReader {
         chunk_index_(0) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &base_dir_));
     GAR_ASSIGN_OR_RAISE_ERROR(
-        auto dir_path,
-        edge_info.GetPropertyDirPath(property_group, adj_list_type));
+        auto dir_path, edge_info.GetPathPrefix(property_group, adj_list_type));
     base_dir_ = prefix_ + dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
                               fs_->GetFileNumOfDir(base_dir_));

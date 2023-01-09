@@ -389,13 +389,13 @@ class VertexInfo {
   }
 
   /**
-   * Get the directory path for the specified property group.
+   * Get the path prefix for the specified property group.
    *
    * @param property_group The PropertyGroup object to get the path prefix for.
-   * @return A Result object containing the directory path, or a KeyError Status
+   * @return A Result object containing the path prefix, or a KeyError Status
    * object if the property group is not found in the vertex info.
    */
-  inline Result<std::string> GetDirPath(
+  inline Result<std::string> GetPathPrefix(
       const PropertyGroup& property_group) const noexcept {
     if (!ContainPropertyGroup(property_group)) {
       return Status::KeyError(
@@ -741,6 +741,20 @@ class EdgeInfo {
   }
 
   /**
+   * Get the path prefix of for the given adjacency list type.
+   * @param adj_list_type The adjacency list type.
+   * @return A Result object containing the path prefix, or a Status object
+   * indicating an error.
+   */
+  inline Result<std::string> GetPathPrefix(
+      const AdjListType& adj_list_type) const noexcept {
+    if (!ContainAdjList(adj_list_type)) {
+      return Status::KeyError("The adj list type is not found in edge info.");
+    }
+    return prefix_ + adj_list2prefix_.at(adj_list_type);
+  }
+
+  /**
    * @brief Get the file path of adj list topology chunk
    *
    * @param vertex_chunk_index the vertex chunk index
@@ -759,13 +773,13 @@ class EdgeInfo {
   }
 
   /**
-   * Get the directory path of the adjacency list topology chunk for the given
+   * Get the path prefix of the adjacency list topology chunk for the given
    * adjacency list type.
    * @param adj_list_type The adjacency list type.
    * @return A Result object containing the directory, or a Status object
    * indicating an error.
    */
-  inline Result<std::string> GetAdjListDirPath(
+  inline Result<std::string> GetTopologyPathPrefix(
       const AdjListType& adj_list_type) const noexcept {
     if (!ContainAdjList(adj_list_type)) {
       return Status::KeyError("The adj list type is not found in edge info.");
@@ -774,7 +788,7 @@ class EdgeInfo {
   }
 
   /**
-   * @brief Get the adj list offset chunk file path of vertex chunk
+   * @brief Get the adjacency list offset chunk file path of vertex chunk
    *    the offset chunks is aligned with the vertex chunks
    *
    * @param vertex_chunk_index index of vertex chunk
@@ -788,8 +802,14 @@ class EdgeInfo {
            std::to_string(vertex_chunk_index);
   }
 
-  /** Get the adj list offset chunk file directory path of adj list type. */
-  inline Result<std::string> GetAdjListOffsetDirPath(
+  /**
+   * Get the path prefix of the adjacency list offset chunk for the given
+   * adjacency list type.
+   * @param adj_list_type The adjacency list type.
+   * @return A Result object containing the path prefix, or a Status object
+   * indicating an error.
+   */
+  inline Result<std::string> GetOffsetPathPrefix(
       AdjListType adj_list_type) const noexcept {
     if (!ContainAdjList(adj_list_type)) {
       return Status::KeyError("The adj list type is not found in edge info.");
@@ -820,9 +840,16 @@ class EdgeInfo {
            std::to_string(edge_chunk_index);
   }
 
-  /** Get the property group chunk file directory path of adj list type. */
-  inline Result<std::string> GetPropertyDirPath(
-      const PropertyGroup& property_group, AdjListType adj_list_type) const
+  /**
+   * Get the path prefix of the property group chunk for the given
+   * adjacency list type.
+   * @param property_group property group.
+   * @param adj_list_type The adjacency list type.
+   * @return A Result object containing the path prefix, or a Status object
+   * indicating an error.
+   */
+  inline Result<std::string> GetPathPrefix(const PropertyGroup& property_group,
+                                           AdjListType adj_list_type) const
       noexcept {
     if (!ContainPropertyGroup(property_group, adj_list_type)) {
       return Status::KeyError(

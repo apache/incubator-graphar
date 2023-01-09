@@ -60,7 +60,7 @@ class VertexPropertyArrowChunkReader {
         chunk_table_(nullptr) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              vertex_info.GetDirPath(property_group));
+                              vertex_info.GetPathPrefix(property_group));
     std::string base_dir = prefix_ + dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_, fs_->GetFileNumOfDir(base_dir));
   }
@@ -157,7 +157,7 @@ class AdjListArrowChunkReader {
         chunk_table_(nullptr) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetAdjListDirPath(adj_list_type));
+                              edge_info.GetTopologyPathPrefix(adj_list_type));
     base_dir_ = prefix_ + dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
                               fs_->GetFileNumOfDir(base_dir_));
@@ -312,7 +312,7 @@ class AdjListOffsetArrowChunkReader {
         chunk_table_(nullptr) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetAdjListOffsetDirPath(adj_list_type));
+                              edge_info.GetOffsetPathPrefix(adj_list_type));
     base_dir_ = prefix_ + dir_path;
     if (adj_list_type == AdjListType::ordered_by_source ||
         adj_list_type == AdjListType::ordered_by_dest) {
@@ -415,8 +415,7 @@ class AdjListPropertyArrowChunkReader {
         chunk_table_(nullptr) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(
-        auto dir_path,
-        edge_info.GetPropertyDirPath(property_group, adj_list_type));
+        auto dir_path, edge_info.GetPathPrefix(property_group, adj_list_type));
     base_dir_ = prefix_ + dir_path;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
                               fs_->GetFileNumOfDir(base_dir_));
