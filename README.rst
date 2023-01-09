@@ -18,17 +18,20 @@ GraphAr is a project that aims to make it easier for diverse applications and
 systems (in-memory and out-of-core storages, databases, graph computing systems, and interactive graph query frameworks)
 to build and access graph data conveniently and efficiently.
 
+It can be used for importing/exporting and persistent storage of graph data,
+thereby reducing the burden on systems when working together. Additionally, it can
+serve as a direct data source for graph processing applications.
+
 To achieve this, GraphAr provides:
 
 - The Graph Archive(GAR) file format: a standardized system-independent file format for storing graph data
-- Libraries: a set of language-independent libraries for reading and writing GAR files
-- The Spark Library: a set of tools for generating, loading and transforming GAR files with Apache Spark.
+- Libraries: a set of libraries for reading and writing or transforming GAR files
 
 By using GraphAr, you can:
 
 - Store and persist your graph data in a system-independent way with the GAR file format
-- Easily access and generate GAR files using the libraries or the Spark tools
-- Use the Apache Spark tools to quickly manipulate and transform your GAR files
+- Easily access and generate GAR files using the libraries
+- Use the Apache Spark library to quickly manipulate and transform your GAR files
 
 The GAR File Format
 -------------------
@@ -108,7 +111,7 @@ Take the "person knows person" edges to illustrate, when the vertex chunk size i
 |Edge Physical Table2|
 
 
-Building the libraries
+Building the Libraries
 ----------------------
 
 Libraries are available for C++ and Spark.
@@ -180,7 +183,7 @@ Optionally, you can build the documentation for GraphAr library:
 The Spark Library
 -----------------
 
-See `GraphAr Spark Library`_ for details about Spark library.
+See `GraphAr Spark Library`_ for details about the Spark library.
 
 
 Contributing to GraphAr

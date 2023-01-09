@@ -882,7 +882,7 @@ class EdgeInfo {
   Status Save(const std::string& file_name) const;
 
   /**
-   * Returns the vertex info as a YAML formatted string.
+   * Returns the edge info as a YAML formatted string.
    *
    * @return A Result object containing the YAML string, or a Status object
    * indicating an error.
@@ -890,7 +890,7 @@ class EdgeInfo {
   Result<std::string> Dump() const noexcept;
 
   /**
-   * Returns a new VertexInfo object with the specified adjacency list type
+   * Returns a new EdgeInfo object with the specified adjacency list type
    * added to with given metadata.
    *
    * @param adj_list_type The type of the adjacency list to add.
@@ -911,7 +911,7 @@ class EdgeInfo {
   }
 
   /**
-   * Returns a new VertexInfo object with the specified property group added to
+   * Returns a new EdgeInfo object with the specified property group added to
    * given adjacency list type.
    *
    * @param property_group The PropertyGroup object to add.

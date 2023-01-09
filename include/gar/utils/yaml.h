@@ -40,7 +40,7 @@ class Yaml {
   const YAML::Node operator[](const std::string& key) const;
 
   /**
-   * @brief Loads the input string as Yaml instance.
+   * Loads the input string as Yaml instance.
    *
    * Return Status::YamlError if input string can not be loaded(malformed).
    */
