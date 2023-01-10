@@ -167,12 +167,12 @@ macro(build_gar)
     )
     target_link_libraries(gar Threads::Threads ${CMAKE_DL_LIBS})
     if(APPLE)
-        target_link_libraries(gar -Wl,-force_load arrow_static
+        target_link_libraries(gar PRIVATE -Wl,-force_load arrow_static
             "${PROJECT_BINARY_DIR}/thirdparty/yaml-cpp/libyaml-cpp.a"
             "${PARQUET_STATIC_LIB}"
             "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
     else()
-        target_link_libraries(gar -Wl,--exclude-libs,ALL -Wl,--whole-archive arrow_static
+        target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive arrow_static
             "${PROJECT_BINARY_DIR}/thirdparty/yaml-cpp/libyaml-cpp.a"
             "${PARQUET_STATIC_LIB}"
             "${ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
