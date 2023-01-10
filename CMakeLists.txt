@@ -143,6 +143,7 @@ endmacro()
 # ------------------------------------------------------------------------------
 find_package(Threads REQUIRED)
 find_yaml_cpp()
+find_package(OpenSSL QUIET)
 
 include(apache-arrow)
 build_arrow()
@@ -180,7 +181,6 @@ macro(build_gar)
 
     # if OpenSSL library exists, link the OpenSSL library.
     # OpenSSL has to be linked after ARROW_BUNDLED_DEPS_STATIC_LIB
-    find_package(OpenSSL QUIET)
     if(OPENSSL_FOUND)
         message(STATUS "OpenSSL found with ${OPENSSL_VERSION} version")
         if(OPENSSL_VERSION LESS "1.1.0")
@@ -206,8 +206,26 @@ if (BUILD_EXAMPLES)
         add_executable(${E_NAME} examples/${E_NAME}.cc)
         target_include_directories(${E_NAME} PRIVATE examples ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
         include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
-        target_link_libraries(${E_NAME} PRIVATE gar ${Boost_LIBRARIES} Threads::Threads arrow_static
-                              "${PARQUET_STATIC_LIB}" "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
+        target_link_libraries(${E_NAME} PRIVATE gar ${Boost_LIBRARIES} Threads::Threads ${CMAKE_DL_LIBS})
+        if(APPLE)
+            target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load arrow_static
+                "${PARQUET_STATIC_LIB}"
+                "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
+        else()
+            target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive arrow_static
+                "${PARQUET_STATIC_LIB}"
+                "${ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+        endif()
+
+        # if OpenSSL library exists, link the OpenSSL library.
+        # OpenSSL has to be linked after ARROW_BUNDLED_DEPS_STATIC_LIB
+        if(OPENSSL_FOUND)
+            message(STATUS "OpenSSL found with ${OPENSSL_VERSION} version")
+            if(OPENSSL_VERSION LESS "1.1.0")
+                message(ERROR "The OpenSSL must be greater than or equal to 1.1.0")
+            endif()
+            target_link_libraries(${target} PRIVATE OpenSSL::SSL)
+        endif()
     endforeach()
 endif()
 
@@ -249,8 +267,6 @@ install(EXPORT gar-targets
 # ------------------------------------------------------------------------------
 if (BUILD_TESTS)
     find_catch2()
-    add_compile_options(-DBOOST_BIND_GLOBAL_PLACEHOLDERS)
-    find_package(Boost REQUIRED COMPONENTS graph)
 
     macro(add_test target)
         set(options)
@@ -259,13 +275,31 @@ if (BUILD_TESTS)
         cmake_parse_arguments(add_test "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
         add_executable(${target} ${add_test_SRCS})
         target_compile_features(${target} PRIVATE cxx_std_17)
-        target_link_libraries(${target} PRIVATE Catch2::Catch2 gar ${Boost_LIBRARIES} Threads::Threads arrow_static
-                              "${PARQUET_STATIC_LIB}" "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
+        target_link_libraries(${target} PRIVATE Catch2::Catch2 gar Threads::Threads ${CMAKE_DL_LIBS})
+        if(APPLE)
+            target_link_libraries(${target} PRIVATE -Wl,-force_load arrow_static
+                "${PARQUET_STATIC_LIB}"
+                "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
+        else()
+            target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive arrow_static
+                "${PARQUET_STATIC_LIB}"
+                "${ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+        endif()
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
         include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
         include(CTest)
         include(Catch)
         catch_discover_tests(${target})
+
+        # if OpenSSL library exists, link the OpenSSL library.
+        # OpenSSL has to be linked after ARROW_BUNDLED_DEPS_STATIC_LIB
+        if(OPENSSL_FOUND)
+            message(STATUS "OpenSSL found with ${OPENSSL_VERSION} version")
+            if(OPENSSL_VERSION LESS "1.1.0")
+                message(ERROR "The OpenSSL must be greater than or equal to 1.1.0")
+            endif()
+            target_link_libraries(${target} PRIVATE OpenSSL::SSL)
+        endif()
     endmacro()
 
     add_test(test_info SRCS test/test_info.cc)
