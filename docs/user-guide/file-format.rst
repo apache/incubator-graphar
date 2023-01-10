@@ -6,7 +6,7 @@ What is Property Graph
 
 GraphAr is designed for representing and storing the property graphs. Graph (in discrete mathematics) is a structure made of vertices and edges. Property graph is then a type of graph model where the vertices/edges could carry a name (also called as type or label) and some properties. Since carrying additional information than non-property graphs, the property graph is able to represent connections among data scattered across diverse data databases and with different schemas. Compared with the relational database schema, the property graph excels at showing data dependencies. Therefore, it is widely-used in modeling modern applications including social network analytics, data mining, network routing, scientific computing and so on.
 
-A property graph includes vertices and edges. Each vertex contains:
+A property graph consists of vertices and edges, with each vertex contains:
 
 - A unique identifier (called vertex id or vertex index).
 - A text label that describes the vertex type.
@@ -31,7 +31,7 @@ Vertices in GraphAr
 
 Logical table of vertices 
 `````````````````````````
-Each type of vertices (with the same label) constructs a logical vertex table, with each vertex assigned with a global index (vertex id) starting from 0, that is, the row number of that vertex in the logical vertex table. An example layout for a logical table of vertices under the label "person" is provided for reference.
+Each type of vertices (with the same label) constructs a logical vertex table, with each vertex assigned with a global index (vertex id) starting from 0, corresponding to the row number of the vertex in the logical vertex table. An example layout for a logical table of vertices under the label "person" is provided for reference.
 
 Given a vertex id and the vertex label, a vertex is uniquely identifiable and its respective properties can be accessed from this table. The vertex id is further used to identify the source and destination vertices when maintaining the topology of the graph.
 
@@ -45,9 +45,9 @@ Given a vertex id and the vertex label, a vertex is uniquely identifiable and it
 
 Physical table of vertices 
 ``````````````````````````
-For enhancing the reading/writing efficiency, the logical vertex table will be partitioned into multiple continuous vertex chunks. And to maintain the ability of random access, the size of vertex chunks for the same label is fixed. To support to access required properties avoiding reading all properties from the files, and to add properties for vertices without modifying the existing files, the columns of the logical table will be divided into several column groups.
+The logical vertex table will be partitioned into multiple continuous vertex chunks for enhancing the reading/writing efficiency. To maintain the ability of random access, the size of vertex chunks for the same label is fixed. To support to access required properties avoiding reading all properties from the files, and to add properties for vertices without modifying the existing files, the columns of the logical table will be divided into several column groups.
 
-Take the "person" vertex table as an example, if the chunk size is set to be 500, the logical table will be separated into sub-logical-tables of 500 rows with the exception of the last one, which may have less than 500 rows.  The columns for maintaining properties will also be divided into distinct groups (e.g., 2 for our example). As a result, a total of 4 physical vertex tables are created for storing the example logical table, which can be seen from the following figure.
+Take the "person" vertex table as an example, if the chunk size is set to be 500, the logical table will be separated into sub-logical-tables of 500 rows with the exception of the last one, which may have less than 500 rows. The columns for maintaining properties will also be divided into distinct groups (e.g., 2 for our example). As a result, a total of 4 physical vertex tables are created for storing the example logical table, which can be seen from the following figure.
 
 .. image:: ../images/vertex_physical_table.png
    :alt: vertex physical table
@@ -73,11 +73,11 @@ According to the partition strategy and the order of the edges, edges can be one
 - The edge property tables (if there are properties on edges).
 - The offset table (optional, only required for ordered edges).
 
-Since the vertex table are partitioned into multiple chunks, the logical edge table is also partitioned into some sub-logical-tables, with each sub-logical-table contains edges that the source (if the type is **ordered_by_source** or **unordered_by_source**) or destination (if the type is **ordered_by_dest** or **unordered_by_dest**) vertices are in the same vertex chunk. After that, a sub-logical-table is further divided into edge chunks in which the number of rows is fixed (called edge chunk size). Finally, an edge chunk is separated into an adjList table and 0 or more property tables. 
+Since the vertex table are partitioned into multiple chunks, the logical edge table is also partitioned into some sub-logical-tables, with each sub-logical-table contains edges that the source (if the type is **ordered_by_source** or **unordered_by_source**) or destination (if the type is **ordered_by_dest** or **unordered_by_dest**) vertices are in the same vertex chunk. After that, a sub-logical-table is further divided into edge chunks of a predefined, fixed number of rows (referred to as edge chunk size). Finally, an edge chunk is separated into an adjList table and 0 or more property tables.
 
-Also, the partition of the offset table is aligned with the partition of the corresponding vertex table. The first row of each offset chunk is always 0, means that to start with the first row of the corresponding sub-logical-table for edges. 
+Additionally, the partition of the offset table should be in alignment with the partition of the corresponding vertex table. The first row of each offset chunk is always 0, indicating the starting point for the corresponding sub-logical-table for edges.
 
-Take the "person knows person" edges to illustrate, when the vertex chunk size is set to be 500 and the edge chunk size is 1024, the edges will be saved in the following physical tables:
+Take the "person knows person" edges to illustrate. Suppose the vertex chunk size is set to 500 and the edge chunk size is 1024, the edges will be saved in the following physical tables:
 
 .. image:: ../images/edge_physical_table1.png
    :alt: edge physical table1
@@ -94,7 +94,7 @@ File Format
 
 Information files
 `````````````````
-GraphAr uses two kinds of files to save a graph: a group of Yaml files to describe the meta information; and the data files to store actual data for vertices and edges.  
+GraphAr uses two kinds of files to store a graph: a group of Yaml files to describe meta information; and data files to store actual data for vertices and edges.  
 A graph information file which named "<name>.graph.yml" describes the meta information for a graph whose name is <name>. The content of this file includes:
 
 - the graph name;
@@ -107,7 +107,7 @@ A vertex information file which named "<label>.vertex.yml" defines a single grou
 - the vertex label;
 - the vertex chunk size;
 - the relative path for vertex data files;
-- the property groups attached: each property group has its own file type and the prefix for the path of its data files, it also lists all properties in this group, with every property contains its own name, data type and if it is the primary key;
+- the property groups attached: each property group has its own file type and the prefix for the path of its data files, it also lists all properties in this group, with every property containing its own name, data type and flagging of whether it is the primary key or not;
 - the version of GraphAr.
 
 An edge information file which named "<source label>_<edge label>_<destination label>.edge.yml" defines a single group of edges with specific label for source vertex, destination vertex and the edge. It describes the meta information for these edges, includes:
@@ -120,13 +120,13 @@ An edge information file which named "<source label>_<edge label>_<destination l
 - the version of GraphAr.
 
 .. note::
-   Please note that GraphAr supports to store multiple types of adjLists for a group of edges at the same time, e.g., a group of edges could be accessed in both CSR and CSC way, if there are two copies (one is **ordered_by_source** and the other is **ordered_by_dest**) of data exist in GraphAr. 
+   Please note that GraphAr supports the storage of multiple types of adjLists for a given group of edges, e.g., a group of edges could be accessed in both CSR and CSC way when two copies (one is **ordered_by_source** and the other is **ordered_by_dest**) of the relevant data are present in GraphAr.
 
 See also `Gar Information Files <getting-started.html#gar-information-files>`_ for an example.
 
 Data files
 ``````````
-As described earlier, each logical vertex/edge table is divided into multiple physical tables, and the physical tables will be stored in a file of one of the following formats:
+As previously mentioned, each logical vertex/edge table is divided into multiple physical tables stored in one of the following file formats:
 
 - `Apache ORC <https://orc.apache.org/>`_ 
 - `Apache Parquet <https://parquet.apache.org/>`_  
@@ -138,7 +138,7 @@ See also `Gar Data Files <getting-started.html#gar-data-files>`_ for an example.
 
 Data Types
 ``````````
-GraphAr provides a set of built-in data types that are common in real use cases and supported by most file types (ORC, Parquet, CSV), includes:
+GraphAr provides a set of built-in data types that are common in real use cases and supported by most file types (CSV, ORC, Parquet), includes:
 
 - bool
 - int32

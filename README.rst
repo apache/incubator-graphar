@@ -39,7 +39,7 @@ The GAR file format is designed for storing property graphs. It uses metadata to
 record all the necessary information of a graph, and maintains the actual data in
 a chunked way.
 
-A property graph includes vertices and edges. Each vertex contains:
+A property graph consists of vertices and edges, with each vertex contains:
 
 - A unique identifier (called vertex id or vertex index).
 - A text label that describes the vertex type.
@@ -63,7 +63,7 @@ Vertices in GraphAr
 Logical table of vertices
 """"""""""""""""""""""""""
 
-Each type of vertices (with the same label) constructs a logical vertex table, with each vertex assigned with a global index (vertex id) starting from 0, that is, the row number of that vertex in the logical vertex table. An example layout for a logical table of vertices under the label "person" is provided for reference.
+Each type of vertices (with the same label) constructs a logical vertex table, with each vertex assigned with a global index (vertex id) starting from 0, corresponding to the row number of the vertex in the logical vertex table. An example layout for a logical table of vertices under the label "person" is provided for reference.
 
 Given a vertex id and the vertex label, a vertex is uniquely identifiable and its respective properties can be accessed from this table. The vertex id is further used to identify the source and destination vertices when maintaining the topology of the graph.
 
@@ -72,9 +72,9 @@ Given a vertex id and the vertex label, a vertex is uniquely identifiable and it
 Physical table of vertices
 """"""""""""""""""""""""""
 
-For enhancing the reading/writing efficiency, the logical vertex table will be partitioned into multiple continuous vertex chunks. And to maintain the ability of random access, the size of vertex chunks for the same label is fixed. To support to access required properties avoiding reading all properties from the files, and to add properties for vertices without modifying the existing files, the columns of the logical table will be divided into several column groups.
+The logical vertex table will be partitioned into multiple continuous vertex chunks for enhancing the reading/writing efficiency. To maintain the ability of random access, the size of vertex chunks for the same label is fixed. To support to access required properties avoiding reading all properties from the files, and to add properties for vertices without modifying the existing files, the columns of the logical table will be divided into several column groups.
 
-Take the "person" vertex table as an example, if the chunk size is set to be 500, the logical table will be separated into sub-logical-tables of 500 rows with the exception of the last one, which may have less than 500 rows.  The columns for maintaining properties will also be divided into distinct groups (e.g., 2 for our example). As a result, a total of 4 physical vertex tables are created for storing the example logical table, which can be seen from the following figure.
+Take the "person" vertex table as an example, if the chunk size is set to be 500, the logical table will be separated into sub-logical-tables of 500 rows with the exception of the last one, which may have less than 500 rows. The columns for maintaining properties will also be divided into distinct groups (e.g., 2 for our example). As a result, a total of 4 physical vertex tables are created for storing the example logical table, which can be seen from the following figure.
 
 |Vertex Physical Table|
 
@@ -101,11 +101,11 @@ According to the partition strategy and the order of the edges, edges can be one
 - The edge property tables (if there are properties on edges).
 - The offset table (optional, only required for ordered edges).
 
-Since the vertex table are partitioned into multiple chunks, the logical edge table is also partitioned into some sub-logical-tables, with each sub-logical-table contains edges that the source (if the type is **ordered_by_source** or **unordered_by_source**) or destination (if the type is **ordered_by_dest** or **unordered_by_dest**) vertices are in the same vertex chunk. After that, a sub-logical-table is further divided into edge chunks in which the number of rows is fixed (called edge chunk size). Finally, an edge chunk is separated into an adjList table and 0 or more property tables.
+Since the vertex table are partitioned into multiple chunks, the logical edge table is also partitioned into some sub-logical-tables, with each sub-logical-table contains edges that the source (if the type is **ordered_by_source** or **unordered_by_source**) or destination (if the type is **ordered_by_dest** or **unordered_by_dest**) vertices are in the same vertex chunk. After that, a sub-logical-table is further divided into edge chunks of a predefined, fixed number of rows (referred to as edge chunk size). Finally, an edge chunk is separated into an adjList table and 0 or more property tables.
 
-Also, the partition of the offset table is aligned with the partition of the corresponding vertex table. The first row of each offset chunk is always 0, means that to start with the first row of the corresponding sub-logical-table for edges.
+Additionally, the partition of the offset table should be in alignment with the partition of the corresponding vertex table. The first row of each offset chunk is always 0, indicating the starting point for the corresponding sub-logical-table for edges.
 
-Take the "person knows person" edges to illustrate, when the vertex chunk size is set to be 500 and the edge chunk size is 1024, the edges will be saved in the following physical tables:
+Take the "person knows person" edges to illustrate. Suppose the vertex chunk size is set to 500 and the edge chunk size is 1024, the edges will be saved in the following physical tables:
 
 |Edge Physical Table1|
 |Edge Physical Table2|
