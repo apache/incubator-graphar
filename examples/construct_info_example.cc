@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <cassert>
+
 #include "gar/graph_info.h"
 
 
@@ -24,10 +26,8 @@ int main(int argc, char* argv[]) {
   // validate
   assert(graph_info.GetName() == name);
   assert(graph_info.GetPrefix() == prefix);
-  const auto& vertex_infos = graph_info.GetVertexInfos();
-  const auto& edge_infos = graph_info.GetEdgeInfos();
-  assert(vertex_infos.size() == 0);
-  assert(edge_infos.size() == 0);
+  assert(graph_info.GetVertexInfos().size() == 0);
+  assert(graph_info.GetEdgeInfos().size() == 0);
 
   /*------------------construct vertex info------------------*/
   std::string vertex_label = "person", vertex_prefix = "vertex/person/";
