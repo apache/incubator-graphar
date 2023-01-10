@@ -12,7 +12,7 @@ The source code of CC based on BGL can be found at `bgl_example.cc`_. In this pr
    std::string path = ... // the path of the graph information file
    auto graph_info = GraphArchive::GraphInfo::Load(path).value();
 
-And then, the vertex collection and the edge collection are established as the handle to access the graph data:
+And then, the vertex collection and the edge collection are established as the handles to access the graph data:
 
 .. code:: C++
 
@@ -21,27 +21,27 @@ And then, the vertex collection and the edge collection are established as the h
    auto maybe_edges = GraphArchive::ConstructEdgesCollection(graph_info, "person", "knows", "person", GraphArchive::AdjListType::ordered_by_source);
    auto& edges = std::get<GraphArchive::EdgesCollection<GraphArchive::AdjListType::ordered_by_source>>(maybe_edges.value());
 
-Next, we construct the in-memory graph data structure for BGL by traversing the vertices and edges via GraphAr's high-level reading interface (vertex iterator and edge iterator):
+Next, we construct the in-memory graph data structure for BGL by traversing the vertices and edges via GraphAr's high-level reading interface (the vertex iterator and the edge iterator):
 
 .. code:: C++
 
    // define the Graph type in BGL
-   typedef boost::adjacency_list<boost::vecS, //use vector to store edges
-                                 boost::vecS, //use vector to store vertices
-                                 boost::undirectedS, //undirected
-                                 boost::property<boost::vertex_name_t, int64_t>, //vertex property
-                                 boost::no_property> Graph; //no edge property
+   typedef boost::adjacency_list<boost::vecS, // use vector to store edges
+                                 boost::vecS, // use vector to store vertices
+                                 boost::undirectedS, // undirected
+                                 boost::property<boost::vertex_name_t, int64_t>, // vertex property
+                                 boost::no_property> Graph; // no edge property
    // descriptors for vertex in BGL
    typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
 
-   // declare a graph object with (num_vertices) vertices and a edge iterator
+   // declare a graph object with (num_vertices) vertices and an edge iterator
    std::vector<std::pair<GraphArchive::IdType, GraphArchive::IdType>> edges_array;
    auto it_begin = edges.begin(), it_end = edges.end();
    for (auto it = it_begin; it != it_end; ++it)
       edges_array.push_back(std::make_pair(it.source(), it.destination()));
    Graph g(edges_array.begin(), edges_array.end(), num_vertices);
 
-   // define internal vertex properties "id"
+   // define the internal vertex property "id"
    boost::property_map<Graph, boost::vertex_name_t>::type id = get(boost::vertex_name_t(), g);
    auto v_it_begin = vertices.begin(), v_it_end = vertices.end();
    for (auto it = v_it_begin; it != v_it_end; ++it) {
@@ -53,7 +53,7 @@ After that, an internal CC algorithm provided by BGL is called:
 
 .. code:: C++
 
-   // define exteneral vertex property "component"
+   // define the exteneral vertex property "component"
    std::vector<int> component(num_vertices);
    // call algorithm: cc
    int cc_num = boost::connected_components(g, &component[0]);
@@ -63,23 +63,23 @@ Finally, we could use a **VerticesBuilder** of GraphAr to write the results to n
 
 .. code:: C++
 
-   //construct new property group
+   // construct a new property group
    GraphArchive::Property cc = {"cc", GraphArchive::DataType::INT32, false};
    std::vector<GraphArchive::Property> property_vector = {cc};
    GraphArchive::PropertyGroup group(property_vector, GraphArchive::FileType::PARQUET);
 
-   //construct new vertex info
+   // construct the new vertex info
    std::string vertex_label = "cc_result", vertex_prefix = "result/";
    int chunk_size = 100;
    GraphArchive::VertexInfo new_info(vertex_label, chunk_size, vertex_prefix);
 
-   // access the vertices via index map and vertex iterator of BGL
+   // access the vertices via the index map and vertex iterator of BGL
    typedef boost::property_map<Graph, boost::vertex_index_t>::type IndexMap;
    IndexMap index = boost::get(boost::vertex_index, g);
    typedef boost::graph_traits<Graph>::vertex_iterator vertex_iter;
    std::pair<vertex_iter, vertex_iter> vp;
 
-   //dump the results through builder
+   // dump the results through the VerticesBuilder
    GraphArchive::builder::VerticesBuilder builder(new_info, "/tmp/");
    for (vp = boost::vertices(g); vp.first!= vp.second; ++vp.first) {
       Vertex v = *vp.first;

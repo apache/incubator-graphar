@@ -1,9 +1,9 @@
 Out-of-core Graph Algorithms
 ============================
 
-An important application case of GraphAr is to serve out-of-core graph processing scenarios. With the graph data saved as GAR files in the disk, GraphAr provides a set of reading interfaces to allow to load part of graph data into memory when needed, to conduct analytics. Though it is more convenient and efficient to maintain the complete graph in the memory (as in BGL), out-of-core graph processing makes it possible to complete analytics on the large-scale graphs using limited memory/computing resources.
+An important application case of GraphAr is to serve out-of-core graph processing scenarios. With the graph data saved as GAR files in the disk, GraphAr provides a set of reading interfaces to allow to load part of graph data into memory when needed, to conduct analytics. While it is more convenient and efficient to store the entirety of the graph in memory (as is done in BGL), out-of-core graph processing makes it possible to complete analytics on the large-scale graphs using limited memory/computing resources.
 
-The are some out-of-core graph analytic algorithms that have been implemented in GraphAr, include:
+The are some out-of-core graph analytic algorithms that have been implemented based on GraphAr, include:
 
 - PageRank (PR)
 - Connected Components (CC)
@@ -54,13 +54,13 @@ This algorithm can be implemented based on streaming the edges via GraphAr's rea
     if (!flag) break;
   }
 
-The file `cc_stream_example.cc`_ located inside the source tree contains the complete implementation for this algorithm. Also, we can only process active vertices (the vertices which are updated in the last iteration) and the corresponding edges, since an inactive vertex does not need to update its neighbors for this iteration. Please refer to `cc_push_example.cc`_ for the complete code.
+The file `cc_stream_example.cc`_ located inside the source tree contains the complete implementation for this algorithm. Also, we can only process active vertices (the vertices which are updated in the last iteration) and the corresponding edges for each iteration, since an inactive vertex does not need to update its neighbors. Please refer to `cc_push_example.cc`_ for the complete code.
 
 .. tip:: 
 
   In this example, two kinds of edges are used. The **ordered_by_source** edges are used to access all outgoing edges of an active vertex, and **ordered_by_dest** edges are used to access the incoming edges. In this way, all the neighbors of an active vertex can be accessed and processed. 
 
-  Although GraphAr supports to get the outgoing (or incoming) edges of a single vertex for all adjList types, it is most efficient when the type is **ordered_by_source** (or **ordered_by_dest**) since it can avoid to read redundant data.
+  Although GraphAr supports to get the outgoing (incoming) edges of a single vertex for all adjList types, it is most efficient when the type is **ordered_by_source** (**ordered_by_dest**) since it can avoid to read redundant data.
 
 Breadth First Search
 ------------------------
@@ -98,7 +98,7 @@ An out-of-core BFS algorithm could be implemented based on streaming the graph d
 
 The above algorithm is implemented based on streaming all edges for each iteration, the source code  can be found at `bfs_stream_example.cc`_.
 
-Meanwhile, BFS could be implemented in a **push**-style which only traverses the edges that from active vertices for each iteration, which is typically more efficient on real-world graphs. This implementation can be found at `bfs_push_example.cc`_. Similarly, we provide a BFS implementation in a **pull**-style which only traverses the edges that lead to not visited vertices (i.e., the vertices that have not been traversed), as shown in `bfs_pull_example.cc`_.
+Meanwhile, BFS could be implemented in a **push**-style which only traverses the edges that from active vertices for each iteration, which is typically more efficient on real-world graphs. This implementation can be found at `bfs_push_example.cc`_. Similarly, we provide a BFS implementation in a **pull**-style which only traverses the edges that lead to non-visited vertices (i.e., the vertices that have not been traversed), as shown in `bfs_pull_example.cc`_.
 
 .. tip:: 
 
