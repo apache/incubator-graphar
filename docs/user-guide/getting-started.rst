@@ -1,7 +1,7 @@
 Getting Started
 ============================
 
-This article is a quick guide that explains how to work with GraphAr (GAR). To begin with, please refer to the `Building Steps`_ to install GraphAr. After reading this article to gain a basic understanding of GraphAr, move on to `GraphAr File Format <file-format.html>`_ to explore more specific explanations of the file format, or `the C++ library <../reference/api-reference-cpp.html>`_ and `the Spark library <spark-lib.html>`_  to learn about the GraphAr libraries.
+This article is a quick guide that explains how to work with GraphAr. To begin with, please refer to the `Building Steps`_ to install GraphAr. After reading this article to gain a basic understanding of GraphAr, move on to `GraphAr File Format <file-format.html>`_ to explore more specific explanations of the file format, or `the C++ library <../reference/api-reference-cpp.html>`_ and `the Spark library <spark-lib.html>`_  to learn about the GraphAr libraries.
 
 
 GAR Information Files
@@ -51,7 +51,7 @@ In our example, the property group ("first name", "last name", "gender") for ver
 
 In practice of graph processing, it is common to only query a subset of columns of the properties. Thus, the column-oriented formats like Apache ORC and Apache Parquet are more efficient, which eliminate the need to read columns that are not relevant. We also provide data files in ORC and Parquet for the example graph in the `test data`_.
 
-Similar with vertices, the edge properties are stored in edge property chunks. For each vertex chunk, its associated edges (if the edge type is **ordered_by_source** or **unordered_by_source**, the associated edges are those in which the source vertex is in that chunk; otherwise, if the edge type is **ordered_by_dest** or **unordered_by_dest**,the associated edges are those in which the destination is in that chunk) are maintained in some edge chunks, with the size of each chunk not exceeding the edge chunk size specified in the edge information file.
+Similar with vertices, the edge properties are stored in edge property chunks. For each vertex chunk, its associated edges (if the edge type is **ordered_by_source** or **unordered_by_source**, the associated edges are those in which the source vertex is in that chunk; otherwise, if the edge type is **ordered_by_dest** or **unordered_by_dest**, the associated edges are those in which the destination is in that chunk) are maintained in some edge chunks, with the size of each chunk not exceeding the edge chunk size specified in the edge information file.
 
 For instance, the file `./edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0`_ stores the property group "creationDate" of "person_knows_person" edges for the first edge chunk of the first vertex chunk, and the adjList type of the edges is **ordered_by_source**.
 
@@ -110,7 +110,7 @@ As a simple case, the following example shows how to read all vertices with labe
   for (auto it = vertices.begin(); it != vertices.end(); ++it) {
     // get a vertex and access its data
     auto vertex = *it;
-    std::cout << "id=" << vertex.property<int64_t>("id").value() << ", firstName=" << vertex.property<std::string>("firstName").value() <<std::endl;
+    std::cout << "id=" << vertex.property<int64_t>("id").value() << ", firstName=" << vertex.property<std::string>("firstName").value() << std::endl;
   }
 
 The next example reads all edges with label "person_knows_person" from the above graph and outputs the end vertices for each edge.
@@ -124,10 +124,10 @@ The next example reads all edges with label "person_knows_person" from the above
   for (auto it = edges.begin(); it != edges.end(); ++it) {
     // get an edge and access its data
     auto edge = *it;
-    std::cout << "src=" << edge.source() << ", dst=" << edge.destination() <<  std::endl;
+    std::cout << "src=" << edge.source() << ", dst=" << edge.destination() << std::endl;
   }
 
-See also `GAR Reader API Reference <../reference/api-reference-cpp.html#readers>`_.
+See also `C++ Reader API Reference <../reference/api-reference-cpp.html#readers>`_.
 
 Write GAR files
 ```````````````
@@ -149,7 +149,7 @@ As the simplest cases, the fist example below adds vertices to **VerticesBuilder
   // add other vertices
   // ...
 
-  //write to GAR files
+  // write to GAR files
   builder.Dump();
 
 .. code:: C++
@@ -165,16 +165,16 @@ As the simplest cases, the fist example below adds vertices to **VerticesBuilder
   // add other edges
   // ...
 
-  //write to GAR files
+  // write to GAR files
   builder.Dump();
 
-See also `GAR Writer API Reference <../reference/api-reference-cpp.html#writer-and-builder>`_.
+See also `C++ Writer API Reference <../reference/api-reference-cpp.html#writer-and-builder>`_.
 
 A PageRank Example
 ``````````````````
-Here we will go through an example of out-of-core graph analytic algorithms based on GAR using PageRank as an example. Please look `here <https://en.wikipedia.org/wiki/PageRank>`_ if you want a detailed explanation of the PageRank algorithm.
+Here we will go through an example of out-of-core graph analytic algorithms based on GAR which calculates the PageRank. Please look `here <https://en.wikipedia.org/wiki/PageRank>`_ if you want a detailed explanation of the PageRank algorithm. And the source code can be found at `pagerank_example.cc`_.
 
-The source code can be found at `pagerank_example.cc`_. This program first reads in the graph information file to obtain the metadata; then, it constructs the vertex and edge collections to enable access to the graph. After that, an implementation of the PageRank algorithm is provided, with data for the vertices stored in memory, and the edges streamed through disk I/O. Finally, the vertex information with type "person" is extended to include a new property named "pagerank" (a new vertex information file named *person-new-pagerank.vertex.yml* is saved) and the **VerticesBuilder** is used to write the results to new generated data chunks.
+This program first reads in the graph information file to obtain the metadata; then, it constructs the vertex and edge collections to enable access to the graph. After that, an implementation of the PageRank algorithm is provided, with data for the vertices stored in memory, and the edges streamed through disk I/O. Finally, the vertex information with type "person" is extended to include a new property named "pagerank" (a new vertex information file named *person-new-pagerank.vertex.yml* is saved) and the **VerticesBuilder** is used to write the results to new generated data chunks.
 
 Please refer to `more examples <../applications/out-of-core.html>`_ to learn about the other available case studies utilizing GraphAr.
 
