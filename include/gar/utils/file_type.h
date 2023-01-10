@@ -14,6 +14,7 @@ limitations under the License.
 */
 
 #include <map>
+#include <stdexcept>
 #include <string>
 
 #include "gar/utils/macros.h"
