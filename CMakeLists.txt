@@ -221,7 +221,7 @@ if (BUILD_EXAMPLES)
         # if OpenSSL library exists, link the OpenSSL library.
         # OpenSSL has to be linked after ARROW_BUNDLED_DEPS_STATIC_LIB
         if(OPENSSL_FOUND)
-            target_link_libraries(${target} PRIVATE OpenSSL::SSL)
+            target_link_libraries(${E_NAME} PRIVATE OpenSSL::SSL)
         endif()
     endforeach()
 endif()
