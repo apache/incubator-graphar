@@ -165,7 +165,7 @@ macro(build_gar)
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/yaml-cpp/include>
     )
-    target_link_libraries(gar Threads::Threads ${CMAKE_DL_LIBS})
+    target_link_libraries(gar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
     if(APPLE)
         target_link_libraries(gar PRIVATE -Wl,-force_load arrow_static
             "${PROJECT_BINARY_DIR}/thirdparty/yaml-cpp/libyaml-cpp.a"
@@ -186,7 +186,7 @@ macro(build_gar)
         if(OPENSSL_VERSION LESS "1.1.0")
             message(ERROR "The OpenSSL must be greater than or equal to 1.1.0")
         endif()
-        target_link_libraries(gar OpenSSL::SSL)
+        target_link_libraries(gar PRIVATE OpenSSL::SSL)
     endif()
 endmacro()
 
