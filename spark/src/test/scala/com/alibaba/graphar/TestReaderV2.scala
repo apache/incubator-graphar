@@ -37,7 +37,8 @@ class ReaderSuite extends AnyFunSuite {
     println(read_path)
     val df = spark.read.format("com.alibaba.graphar.datasources.garparquet.GarParquetDataSource").load(read_path)
     df.show()
-    println(df.count())
+    assert(df.rdd.getNumPartitions == 10)
+    assert(df.count() == 903)
     println(df.rdd.collect().mkString("\n"))
   }
 }

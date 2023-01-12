@@ -16,6 +16,8 @@
 package com.alibaba.graphar.datasources.garparquet
 
 import scala.collection.JavaConverters._
+import scala.collection.mutable
+import scala.collection.mutable.ArrayBuffer
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
@@ -27,6 +29,7 @@ import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.expressions.Expression
 import org.apache.spark.sql.connector.read.PartitionReaderFactory
 import org.apache.spark.sql.execution.datasources.PartitioningAwareFileIndex
+import org.apache.spark.sql.execution.datasources.PartitionedFile
 import org.apache.spark.sql.execution.datasources.parquet.{ParquetOptions, ParquetReadSupport, ParquetWriteSupport}
 import org.apache.spark.sql.execution.datasources.v2.FileScan
 import org.apache.spark.sql.internal.SQLConf
@@ -34,7 +37,6 @@ import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.util.SerializableConfiguration
-
 import org.apache.spark.sql.catalyst.expressions.codegen.GenerateUnsafeProjection
 import org.apache.spark.sql.execution.datasources.FilePartition
 import org.apache.spark.sql.execution.PartitionedFileUtil
@@ -94,6 +96,64 @@ case class GarParquetScan(
       new ParquetOptions(options.asCaseSensitiveMap.asScala.toMap, sqlConf))
   }
 
+  def getFilePartitions(
+      sparkSession: SparkSession,
+      partitionedFiles: Seq[PartitionedFile]): Seq[FilePartition] = {
+    val partitions = new ArrayBuffer[FilePartition]
+    val currentFiles = new ArrayBuffer[PartitionedFile]
+
+    /** Close the current partition and move to the next. */
+    def closePartition(): Unit = {
+      if (currentFiles.nonEmpty) {
+        // Copy to a new Array.
+        val newPartition = FilePartition(partitions.size, currentFiles.toArray)
+        partitions += newPartition
+      }
+      currentFiles.clear()
+    }
+    // Assign a file to each partition
+    partitionedFiles.foreach { file =>
+      closePartition()
+      // Add the given file to the current partition.
+      currentFiles += file
+    }
+    closePartition()
+    partitions.toSeq
+  }
+
+  /*def getFilePartitions(
+      sparkSession: SparkSession,
+      partitionedFiles: Seq[PartitionedFile],
+      maxSplitBytes: Long): Seq[FilePartition] = {
+    val partitions = new ArrayBuffer[FilePartition]
+    val currentFiles = new ArrayBuffer[PartitionedFile]
+    var currentSize = 0L
+
+    /** Close the current partition and move to the next. */
+    def closePartition(): Unit = {
+      if (currentFiles.nonEmpty) {
+        // Copy to a new Array.
+        val newPartition = FilePartition(partitions.size, currentFiles.toArray)
+        partitions += newPartition
+      }
+      currentFiles.clear()
+      currentSize = 0
+    }
+
+    val openCostInBytes = sparkSession.sessionState.conf.filesOpenCostInBytes
+    // Assign files to partitions using "Next Fit Decreasing"
+    partitionedFiles.foreach { file =>
+      if (currentSize + file.length > maxSplitBytes) {
+        closePartition()
+      }
+      // Add the given file to the current partition.
+      currentSize += file.length + openCostInBytes
+      currentFiles += file
+    }
+    closePartition()
+    partitions.toSeq
+  }*/
+
   override protected def partitions: Seq[FilePartition] = {
     val selectedPartitions = fileIndex.listFiles(partitionFilters, dataFilters)
     val maxSplitBytes = FilePartition.maxSplitBytes(sparkSession, selectedPartitions)
@@ -113,7 +173,8 @@ case class GarParquetScan(
       }.toArray.sortBy(_.filePath)
     }
 
-    FilePartition.getFilePartitions(sparkSession, splitFiles, maxSplitBytes)
+    //FilePartition.getFilePartitions(sparkSession, splitFiles, maxSplitBytes)
+    getFilePartitions(sparkSession, splitFiles)
   }
 
 
