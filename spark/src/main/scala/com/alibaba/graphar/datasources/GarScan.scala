@@ -23,27 +23,23 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.apache.parquet.hadoop.ParquetInputFormat
 
-import org.apache.spark.sql.execution.datasources.v2.parquet._
-import org.apache.spark.sql.execution.datasources.v2.orc._
-import org.apache.spark.sql.execution.datasources.v2.csv._
-import org.apache.spark.sql.catalyst.csv.CSVOptions
-import org.apache.spark.sql.execution.datasources.csv.CSVDataSource
-
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.expressions.{Expression, ExprUtils}
+import org.apache.spark.sql.catalyst.csv.CSVOptions
 import org.apache.spark.sql.connector.read.PartitionReaderFactory
-import org.apache.spark.sql.execution.datasources.PartitioningAwareFileIndex
-import org.apache.spark.sql.execution.datasources.PartitionedFile
+import org.apache.spark.sql.execution.PartitionedFileUtil
+import org.apache.spark.sql.execution.datasources.{FilePartition, PartitioningAwareFileIndex, PartitionedFile}
+import org.apache.spark.sql.execution.datasources.csv.CSVDataSource
 import org.apache.spark.sql.execution.datasources.parquet.{ParquetOptions, ParquetReadSupport, ParquetWriteSupport}
 import org.apache.spark.sql.execution.datasources.v2.FileScan
+import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetPartitionReaderFactory
+import org.apache.spark.sql.execution.datasources.v2.orc.OrcPartitionReaderFactory
+import org.apache.spark.sql.execution.datasources.v2.csv.CSVPartitionReaderFactory
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.util.SerializableConfiguration
-import org.apache.spark.sql.catalyst.expressions.codegen.GenerateUnsafeProjection
-import org.apache.spark.sql.execution.datasources.FilePartition
-import org.apache.spark.sql.execution.PartitionedFileUtil
 
 case class GarScan(
     sparkSession: SparkSession,
@@ -71,10 +67,10 @@ case class GarScan(
     !readDataSchema.exists(_.name == sparkSession.sessionState.conf.columnNameOfCorruptRecord)
 
     val parsedOptions: CSVOptions = new CSVOptions(
-    options.asScala.toMap,
-    columnPruning = columnPruning,
-    sparkSession.sessionState.conf.sessionLocalTimeZone,
-    sparkSession.sessionState.conf.columnNameOfCorruptRecord)
+      options.asScala.toMap,
+      columnPruning = columnPruning,
+      sparkSession.sessionState.conf.sessionLocalTimeZone,
+      sparkSession.sessionState.conf.columnNameOfCorruptRecord)
 
     // Check a field requirement for corrupt records here to throw an exception in a driver side
     ExprUtils.verifyColumnNameOfCorruptRecord(dataSchema, parsedOptions.columnNameOfCorruptRecord)
@@ -145,7 +141,38 @@ case class GarScan(
       new ParquetOptions(options.asCaseSensitiveMap.asScala.toMap, sqlConf))
   }
 
-  def getFilePartitions(
+  /**
+   * Override "partitions" of org.apache.spark.sql.execution.datasources.v2.FileScan
+   * to disable splitting and sort the files by file paths instead of by file sizes.
+   * Note: This implementation does not support to partition attributes.
+   */
+  override protected def partitions: Seq[FilePartition] = {
+    val selectedPartitions = fileIndex.listFiles(partitionFilters, dataFilters)
+    val maxSplitBytes = FilePartition.maxSplitBytes(sparkSession, selectedPartitions)
+
+    val splitFiles = selectedPartitions.flatMap { partition =>
+      val partitionValues = partition.values
+      partition.files.flatMap { file =>
+        val filePath = file.getPath
+        PartitionedFileUtil.splitFiles(
+          sparkSession = sparkSession,
+          file = file,
+          filePath = filePath,
+          isSplitable = isSplitable(filePath),
+          maxSplitBytes = maxSplitBytes,
+          partitionValues = partitionValues
+        )
+      }.toArray.sortBy(_.filePath)
+    }
+
+    getFilePartitions(sparkSession, splitFiles)
+  }
+
+  /**
+   * Override "getFilePartitions" of org.apache.spark.sql.execution.datasources.FilePartition
+   * to assign each chunk file in GraphAr to a single partition.
+   */
+  private def getFilePartitions(
       sparkSession: SparkSession,
       partitionedFiles: Seq[PartitionedFile]): Seq[FilePartition] = {
     val partitions = new ArrayBuffer[FilePartition]
@@ -170,116 +197,19 @@ case class GarScan(
     partitions.toSeq
   }
 
-  /*def getFilePartitions(
-      sparkSession: SparkSession,
-      partitionedFiles: Seq[PartitionedFile],
-      maxSplitBytes: Long): Seq[FilePartition] = {
-    val partitions = new ArrayBuffer[FilePartition]
-    val currentFiles = new ArrayBuffer[PartitionedFile]
-    var currentSize = 0L
-
-    /** Close the current partition and move to the next. */
-    def closePartition(): Unit = {
-      if (currentFiles.nonEmpty) {
-        // Copy to a new Array.
-        val newPartition = FilePartition(partitions.size, currentFiles.toArray)
-        partitions += newPartition
-      }
-      currentFiles.clear()
-      currentSize = 0
-    }
-
-    val openCostInBytes = sparkSession.sessionState.conf.filesOpenCostInBytes
-    // Assign files to partitions using "Next Fit Decreasing"
-    partitionedFiles.foreach { file =>
-      if (currentSize + file.length > maxSplitBytes) {
-        closePartition()
-      }
-      // Add the given file to the current partition.
-      currentSize += file.length + openCostInBytes
-      currentFiles += file
-    }
-    closePartition()
-    partitions.toSeq
-  }*/
-
-  override protected def partitions: Seq[FilePartition] = {
-    val selectedPartitions = fileIndex.listFiles(partitionFilters, dataFilters)
-    val maxSplitBytes = FilePartition.maxSplitBytes(sparkSession, selectedPartitions)
-
-    val splitFiles = selectedPartitions.flatMap { partition =>
-      val partitionValues = partition.values
-      partition.files.flatMap { file =>
-        val filePath = file.getPath
-        PartitionedFileUtil.splitFiles(
-          sparkSession = sparkSession,
-          file = file,
-          filePath = filePath,
-          isSplitable = isSplitable(filePath),
-          maxSplitBytes = maxSplitBytes,
-          partitionValues = partitionValues
-        )
-      }.toArray.sortBy(_.filePath)
-    }
-
-    //FilePartition.getFilePartitions(sparkSession, splitFiles, maxSplitBytes)
-    getFilePartitions(sparkSession, splitFiles)
-  }
-
-
-  /*protected def partitions: Seq[FilePartition] = {
-    val selectedPartitions = fileIndex.listFiles(partitionFilters, dataFilters)
-    val maxSplitBytes = FilePartition.maxSplitBytes(sparkSession, selectedPartitions)
-    val partitionAttributes = fileIndex.partitionSchema.toAttributes
-    val attributeMap = partitionAttributes.map(a => normalizeName(a.name) -> a).toMap
-    val readPartitionAttributes = readPartitionSchema.map { readField =>
-      attributeMap.get(normalizeName(readField.name)).getOrElse {
-        throw QueryCompilationErrors.cannotFindPartitionColumnInPartitionSchemaError(
-          readField, fileIndex.partitionSchema)
-      }
-    }
-    lazy val partitionValueProject =
-      GenerateUnsafeProjection.generate(readPartitionAttributes, partitionAttributes)
-    val splitFiles = selectedPartitions.flatMap { partition =>
-      // Prune partition values if part of the partition columns are not required.
-      val partitionValues = if (readPartitionAttributes != partitionAttributes) {
-        partitionValueProject(partition.values).copy()
-      } else {
-        partition.values
-      }
-      partition.files.flatMap { file =>
-        val filePath = file.getPath
-        PartitionedFileUtil.splitFiles(
-          sparkSession = sparkSession,
-          file = file,
-          filePath = filePath,
-          isSplitable = isSplitable(filePath),
-          maxSplitBytes = maxSplitBytes,
-          partitionValues = partitionValues
-        )
-      }.toArray.sortBy(_.length)(implicitly[Ordering[Long]].reverse)
-    }
-
-    if (splitFiles.length == 1) {
-      val path = new Path(splitFiles(0).filePath)
-      if (!isSplitable(path) && splitFiles(0).length >
-        sparkSession.sparkContext.getConf.get(IO_WARNING_LARGEFILETHRESHOLD)) {
-        logWarning(s"Loading one large unsplittable file ${path.toString} with only one " +
-          s"partition, the reason is: ${getFileUnSplittableReason(path)}")
-      }
-    }
-
-    FilePartition.getFilePartitions(sparkSession, splitFiles, maxSplitBytes)
-  }*/
-
   override def equals(obj: Any): Boolean = obj match {
-    case p: GarScan =>
-      super.equals(p) && dataSchema == p.dataSchema && options == p.options &&
-        equivalentFilters(pushedFilters, p.pushedFilters)
+    case g: GarScan =>
+      super.equals(g) && dataSchema == g.dataSchema && options == g.options &&
+        equivalentFilters(pushedFilters, g.pushedFilters) && formatName == g.formatName
     case _ => false
   }
 
-  override def hashCode(): Int = getClass.hashCode()
+  override def hashCode(): Int = formatName match {
+    case "csv" => super.hashCode()
+    case "orc" => getClass.hashCode()
+    case "parquet" => getClass.hashCode()
+    case _ => throw new IllegalArgumentException
+  }
 
   override def description(): String = {
     super.description() + ", PushedFilters: " + seqToString(pushedFilters)

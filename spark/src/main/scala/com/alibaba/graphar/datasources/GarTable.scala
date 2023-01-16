@@ -19,18 +19,17 @@ import scala.collection.JavaConverters._
 
 import org.apache.hadoop.fs.FileStatus
 
-import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetWrite
-import org.apache.spark.sql.execution.datasources.v2.orc.OrcWrite
-import org.apache.spark.sql.execution.datasources.v2.csv.CSVWrite
-
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.connector.write.{LogicalWriteInfo, Write, WriteBuilder}
-import org.apache.spark.sql.execution.datasources.FileFormat
-import org.apache.spark.sql.execution.datasources.parquet.ParquetUtils
-import org.apache.spark.sql.execution.datasources.orc.OrcUtils
 import org.apache.spark.sql.catalyst.csv.CSVOptions
+import org.apache.spark.sql.execution.datasources.FileFormat
 import org.apache.spark.sql.execution.datasources.csv.CSVDataSource
+import org.apache.spark.sql.execution.datasources.orc.OrcUtils
+import org.apache.spark.sql.execution.datasources.parquet.ParquetUtils
 import org.apache.spark.sql.execution.datasources.v2.FileTable
+import org.apache.spark.sql.execution.datasources.v2.csv.CSVWrite
+import org.apache.spark.sql.execution.datasources.v2.orc.OrcWrite
+import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetWrite
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
@@ -52,6 +51,7 @@ case class GarTable(
       options.asScala.toMap,
       columnPruning = sparkSession.sessionState.conf.csvColumnPruning,
       sparkSession.sessionState.conf.sessionLocalTimeZone)
+
       CSVDataSource(parsedOptions).inferSchema(sparkSession, files, parsedOptions)
     }
     case "orc" => OrcUtils.inferSchema(sparkSession, files, options.asScala.toMap)
@@ -73,18 +73,18 @@ case class GarTable(
   }
 
   override def supportsDataType(dataType: DataType): Boolean = dataType match {
-    //case _: AnsiIntervalType => false
+    // case _: AnsiIntervalType => false
 
     case _: AtomicType => true
 
-    //case st: StructType => st.forall { f => supportsDataType(f.dataType) }
+    // case st: StructType => st.forall { f => supportsDataType(f.dataType) }
 
-    //case ArrayType(elementType, _) => supportsDataType(elementType)
+    // case ArrayType(elementType, _) => supportsDataType(elementType)
 
-    //case MapType(keyType, valueType, _) =>
-    //  supportsDataType(keyType) && supportsDataType(valueType)
+    // case MapType(keyType, valueType, _) =>
+    //   supportsDataType(keyType) && supportsDataType(valueType)
 
-    //case udt: UserDefinedType[_] => supportsDataType(udt.sqlType)
+    // case udt: UserDefinedType[_] => supportsDataType(udt.sqlType)
 
     case _ => false
   }
