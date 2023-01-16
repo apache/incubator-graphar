@@ -17,6 +17,7 @@ package com.alibaba.graphar.reader
 
 import com.alibaba.graphar.utils.{IndexGenerator}
 import com.alibaba.graphar.{GeneralParams, VertexInfo, FileType, PropertyGroup}
+import com.alibaba.graphar.datasources._
 
 import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -59,7 +60,7 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
       throw new IllegalArgumentException
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + "/" + vertexInfo.getFilePath(propertyGroup, chunk_index)
-    val df = spark.read.format(file_type).load(file_path)
+    val df = spark.read.option("fileFormat", file_type).format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
     return df
   }
 
@@ -73,17 +74,15 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
   def readVertexProperties(propertyGroup: PropertyGroup, addIndex: Boolean = false): DataFrame = {
     if (vertexInfo.containPropertyGroup(propertyGroup) == false) 
       throw new IllegalArgumentException
-    var df = spark.emptyDataFrame
-    for ( i <- 0L to chunk_number - 1) {
-      val new_df = readVertexPropertyChunk(propertyGroup, i)
-      if (i == 0)
-        df = new_df
-      else
-        df = df.union(new_df)
+    val file_type = propertyGroup.getFile_type()
+    val file_path = prefix + "/" + vertexInfo.getPathPrefix(propertyGroup)
+    val df = spark.read.option("fileFormat", file_type).format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
+    
+    if (addIndex) {
+      return IndexGenerator.generateVertexIndexColumn(df)
+    } else {
+      return df
     }
-    if (addIndex)
-      df = IndexGenerator.generateVertexIndexColumn(df)
-    return df
   }
 
   /** Load the chunks for all property groups as a DataFrame.
