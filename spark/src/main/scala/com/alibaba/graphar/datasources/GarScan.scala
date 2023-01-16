@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.datasources.garparquet
+package com.alibaba.graphar.datasources
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -24,9 +24,13 @@ import org.apache.hadoop.fs.Path
 import org.apache.parquet.hadoop.ParquetInputFormat
 
 import org.apache.spark.sql.execution.datasources.v2.parquet._
+import org.apache.spark.sql.execution.datasources.v2.orc._
+import org.apache.spark.sql.execution.datasources.v2.csv._
+import org.apache.spark.sql.catalyst.csv.CSVOptions
+import org.apache.spark.sql.execution.datasources.csv.CSVDataSource
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.catalyst.expressions.Expression
+import org.apache.spark.sql.catalyst.expressions.{Expression, ExprUtils}
 import org.apache.spark.sql.connector.read.PartitionReaderFactory
 import org.apache.spark.sql.execution.datasources.PartitioningAwareFileIndex
 import org.apache.spark.sql.execution.datasources.PartitionedFile
@@ -41,7 +45,7 @@ import org.apache.spark.sql.catalyst.expressions.codegen.GenerateUnsafeProjectio
 import org.apache.spark.sql.execution.datasources.FilePartition
 import org.apache.spark.sql.execution.PartitionedFileUtil
 
-case class GarParquetScan(
+case class GarScan(
     sparkSession: SparkSession,
     hadoopConf: Configuration,
     fileIndex: PartitioningAwareFileIndex,
@@ -50,11 +54,56 @@ case class GarParquetScan(
     readPartitionSchema: StructType,
     pushedFilters: Array[Filter],
     options: CaseInsensitiveStringMap,
+    formatName: String,
     partitionFilters: Seq[Expression] = Seq.empty,
     dataFilters: Seq[Expression] = Seq.empty) extends FileScan {
   override def isSplitable(path: Path): Boolean = false
 
-  override def createReaderFactory(): PartitionReaderFactory = {
+  override def createReaderFactory(): PartitionReaderFactory = formatName match {
+    case "csv" => createCSVReaderFactory()
+    case "orc" => createOrcReaderFactory()
+    case "parquet" => createParquetReaderFactory()
+    case _ => throw new IllegalArgumentException
+  }
+
+  private def createCSVReaderFactory(): PartitionReaderFactory = {
+    val columnPruning = sparkSession.sessionState.conf.csvColumnPruning &&
+    !readDataSchema.exists(_.name == sparkSession.sessionState.conf.columnNameOfCorruptRecord)
+
+    val parsedOptions: CSVOptions = new CSVOptions(
+    options.asScala.toMap,
+    columnPruning = columnPruning,
+    sparkSession.sessionState.conf.sessionLocalTimeZone,
+    sparkSession.sessionState.conf.columnNameOfCorruptRecord)
+
+    // Check a field requirement for corrupt records here to throw an exception in a driver side
+    ExprUtils.verifyColumnNameOfCorruptRecord(dataSchema, parsedOptions.columnNameOfCorruptRecord)
+    // Don't push any filter which refers to the "virtual" column which cannot present in the input.
+    // Such filters will be applied later on the upper layer.
+    val actualFilters =
+      pushedFilters.filterNot(_.references.contains(parsedOptions.columnNameOfCorruptRecord))
+
+    val caseSensitiveMap = options.asCaseSensitiveMap.asScala.toMap
+    // Hadoop Configurations are case sensitive.
+    val hadoopConf = sparkSession.sessionState.newHadoopConfWithOptions(caseSensitiveMap)
+    val broadcastedConf = sparkSession.sparkContext.broadcast(
+      new SerializableConfiguration(hadoopConf))
+    // The partition values are already truncated in `FileScan.partitions`.
+    // We should use `readPartitionSchema` as the partition schema here.
+    CSVPartitionReaderFactory(sparkSession.sessionState.conf, broadcastedConf,
+      dataSchema, readDataSchema, readPartitionSchema, parsedOptions, actualFilters)
+  }
+
+  private def createOrcReaderFactory(): PartitionReaderFactory = {
+    val broadcastedConf = sparkSession.sparkContext.broadcast(
+      new SerializableConfiguration(hadoopConf))
+    // The partition values are already truncated in `FileScan.partitions`.
+    // We should use `readPartitionSchema` as the partition schema here.
+    OrcPartitionReaderFactory(sparkSession.sessionState.conf, broadcastedConf,
+      dataSchema, readDataSchema, readPartitionSchema, pushedFilters)
+  }
+
+  private def createParquetReaderFactory(): PartitionReaderFactory = {
     val readDataSchemaAsJson = readDataSchema.json
     hadoopConf.set(ParquetInputFormat.READ_SUPPORT_CLASS, classOf[ParquetReadSupport].getName)
     hadoopConf.set(
@@ -224,7 +273,7 @@ case class GarParquetScan(
   }*/
 
   override def equals(obj: Any): Boolean = obj match {
-    case p: GarParquetScan =>
+    case p: GarScan =>
       super.equals(p) && dataSchema == p.dataSchema && options == p.options &&
         equivalentFilters(pushedFilters, p.pushedFilters)
     case _ => false

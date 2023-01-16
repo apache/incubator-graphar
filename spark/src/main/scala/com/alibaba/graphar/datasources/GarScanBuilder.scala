@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.datasources.garparquet
+package com.alibaba.graphar.datasources
 
 import scala.collection.JavaConverters._
 
@@ -30,20 +30,21 @@ import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
-case class GarParquetScanBuilder(
+case class GarScanBuilder(
     sparkSession: SparkSession,
     fileIndex: PartitioningAwareFileIndex,
     schema: StructType,
     dataSchema: StructType,
-    options: CaseInsensitiveStringMap)
-  extends FileScanBuilder(sparkSession, fileIndex, dataSchema) with SupportsPushDownFilters {
+    options: CaseInsensitiveStringMap,
+    formatName: String)
+  extends FileScanBuilder(sparkSession, fileIndex, dataSchema) {  //with SupportsPushDownFilters {
   lazy val hadoopConf = {
     val caseSensitiveMap = options.asCaseSensitiveMap.asScala.toMap
     // Hadoop Configurations are case sensitive.
     sparkSession.sessionState.newHadoopConfWithOptions(caseSensitiveMap)
   }
 
-  lazy val pushedParquetFilters = {
+  /*lazy val pushedParquetFilters = {
     val sqlConf = sparkSession.sessionState.conf
     val pushDownDate = sqlConf.parquetFilterPushDownDate
     val pushDownTimestamp = sqlConf.parquetFilterPushDownTimestamp
@@ -65,13 +66,18 @@ case class GarParquetScanBuilder(
       // whether they is convertible.
       RebaseSpec(LegacyBehaviorPolicy.CORRECTED))
     parquetFilters.convertibleFilters(this.filters).toArray
-  }
+  }*/
 
-  override protected val supportsNestedSchemaPruning: Boolean = true
+  override protected val supportsNestedSchemaPruning: Boolean = formatName match {
+    case "csv" => false
+    case "orc" => true
+    case "parquet" => true
+    case _ => throw new IllegalArgumentException
+  }
 
   private var filters: Array[Filter] = Array.empty
 
-  override def pushFilters(filters: Array[Filter]): Array[Filter] = {
+  /*override def pushFilters(filters: Array[Filter]): Array[Filter] = {
     this.filters = filters
     this.filters
   }
@@ -79,10 +85,10 @@ case class GarParquetScanBuilder(
   // Note: for Parquet, the actual filter push down happens in [[ParquetPartitionReaderFactory]].
   // It requires the Parquet physical schema to determine whether a filter is convertible.
   // All filters that can be converted to Parquet are pushed down.
-  override def pushedFilters(): Array[Filter] = pushedParquetFilters
+  override def pushedFilters(): Array[Filter] = pushedParquetFilters*/
 
   override def build(): Scan = {
-    GarParquetScan(sparkSession, hadoopConf, fileIndex, dataSchema, readDataSchema(),
-      readPartitionSchema(), pushedParquetFilters, options)
+    GarScan(sparkSession, hadoopConf, fileIndex, dataSchema, readDataSchema(),
+      readPartitionSchema(), filters, options, formatName)
   }
 }

@@ -13,34 +13,50 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.datasources.garparquet
+package com.alibaba.graphar.datasources
 
 import org.apache.spark.sql.execution.datasources.v2.parquet._
 
 import org.apache.spark.sql.connector.catalog.Table
 import org.apache.spark.sql.execution.datasources._
 import org.apache.spark.sql.execution.datasources.parquet.ParquetFileFormat
+import org.apache.spark.sql.execution.datasources.orc.OrcFileFormat
+import org.apache.spark.sql.execution.datasources.csv.CSVFileFormat
 import org.apache.spark.sql.execution.datasources.v2._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
-class GarParquetDataSource extends ParquetDataSourceV2 {
+class GarDataSource extends FileDataSourceV2 {
 
-  override def shortName(): String = "garParquet"
+  override def fallbackFileFormat: Class[_ <: FileFormat] = classOf[ParquetFileFormat]
+
+  override def shortName(): String = "gar"
 
   override def getTable(options: CaseInsensitiveStringMap): Table = {
+    println(options.get("fileFormat"))
     val paths = getPaths(options)
     val tableName = getTableName(options, paths)
     val optionsWithoutPaths = getOptionsWithoutPaths(options)
-    GarParquetTable(tableName, sparkSession, optionsWithoutPaths, paths, None, fallbackFileFormat)
+    GarTable(tableName, sparkSession, optionsWithoutPaths, paths, None, getFallbackFileFormat(options))
   }
 
   override def getTable(options: CaseInsensitiveStringMap, schema: StructType): Table = {
     val paths = getPaths(options)
     val tableName = getTableName(options, paths)
     val optionsWithoutPaths = getOptionsWithoutPaths(options)
-    GarParquetTable(
-      tableName, sparkSession, optionsWithoutPaths, paths, Some(schema), fallbackFileFormat)
+    GarTable(
+      tableName, sparkSession, optionsWithoutPaths, paths, Some(schema),  getFallbackFileFormat(options))
+  }
+
+  private def getFileTypeInString(options: CaseInsensitiveStringMap) = {
+    options.get("fileFormat")
+  }
+
+  private def getFallbackFileFormat(options: CaseInsensitiveStringMap): Class[_ <: FileFormat] = getFileTypeInString(options) match {
+      case "csv"=> classOf[CSVFileFormat]
+      case "orc" => classOf[OrcFileFormat]
+      case "parquet" => classOf[ParquetFileFormat]
+      case _ => throw new IllegalArgumentException
   }
 
 }
