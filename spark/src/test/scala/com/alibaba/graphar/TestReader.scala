@@ -40,7 +40,7 @@ class ReaderSuite extends AnyFunSuite {
     // validate reading results
     assert(df1.rdd.getNumPartitions == 10)
     assert(df1.count() == 903)
-    //println(df1.rdd.collect().mkString("\n"))
+    // println(df1.rdd.collect().mkString("\n"))
 
     // read vertex chunk files in Orc
     val orc_file_path = "gar-test/ldbc_sample/orc"
