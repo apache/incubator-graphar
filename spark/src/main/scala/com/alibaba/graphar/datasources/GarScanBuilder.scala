@@ -25,6 +25,7 @@ import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
+/** GarScanBuilder is a class to build the file scan for GarDataSource. */
 case class GarScanBuilder(
     sparkSession: SparkSession,
     fileIndex: PartitioningAwareFileIndex,
@@ -39,6 +40,7 @@ case class GarScanBuilder(
     sparkSession.sessionState.newHadoopConfWithOptions(caseSensitiveMap)
   }
 
+  // Check if the file format supports nested schema pruning.
   override protected val supportsNestedSchemaPruning: Boolean = formatName match {
     case "csv" => false
     case "orc" => true
@@ -46,15 +48,16 @@ case class GarScanBuilder(
     case _ => throw new IllegalArgumentException
   }
 
+  // Note: This scan builder does not implement "with SupportsPushDownFilters".
   private var filters: Array[Filter] = Array.empty
 
-  // Note: This scan builder does not implement "with SupportsPushDownFilters".
-  // To support pushdown filters, these two methods need to be implemented.
+  // Note: To support pushdown filters, these two methods need to be implemented.
 
   // override def pushFilters(filters: Array[Filter]): Array[Filter]
 
   // override def pushedFilters(): Array[Filter]
 
+  /** Build the file scan for GarDataSource. */
   override def build(): Scan = {
     GarScan(sparkSession, hadoopConf, fileIndex, dataSchema, readDataSchema(),
       readPartitionSchema(), filters, options, formatName)

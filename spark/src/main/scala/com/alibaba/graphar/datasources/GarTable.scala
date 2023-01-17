@@ -33,6 +33,7 @@ import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetWrite
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
+/** GarTable is a class to represent the graph data in GraphAr as a table. */
 case class GarTable(
     name: String,
     sparkSession: SparkSession,
@@ -42,9 +43,11 @@ case class GarTable(
     fallbackFileFormat: Class[_ <: FileFormat])
   extends FileTable(sparkSession, options, paths, userSpecifiedSchema) {
 
+  /** Construct a new scan builder. */
   override def newScanBuilder(options: CaseInsensitiveStringMap): GarScanBuilder =
     new GarScanBuilder(sparkSession, fileIndex, schema, dataSchema, options, formatName)
 
+  /** Infer the schema of the table through the methods of the actual file format. */
   override def inferSchema(files: Seq[FileStatus]): Option[StructType] = formatName match {
     case "csv" => {
       val parsedOptions = new CSVOptions(
@@ -59,6 +62,7 @@ case class GarTable(
     case _ => throw new IllegalArgumentException
   }
     
+  /** Construct a new write builder according to the actual file format. */
   override def newWriteBuilder(info: LogicalWriteInfo): WriteBuilder = formatName match {
     case "csv" => new WriteBuilder {
       override def build(): Write = CSVWrite(paths, formatName, supportsDataType, info)
@@ -72,6 +76,7 @@ case class GarTable(
     case _ => throw new IllegalArgumentException
   }
 
+  /** Check if a data type is supported. */
   override def supportsDataType(dataType: DataType): Boolean = dataType match {
     // case _: AnsiIntervalType => false
 
@@ -89,5 +94,6 @@ case class GarTable(
     case _ => false
   }
 
+  /** The actual file format for storing the data in GraphAr. */
   override def formatName: String = options.get("fileFormat")
 }

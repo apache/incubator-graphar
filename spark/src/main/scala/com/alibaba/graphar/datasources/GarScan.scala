@@ -41,6 +41,7 @@ import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.util.SerializableConfiguration
 
+/** GarScan is a class to implement the file scan for GarDataSource. */
 case class GarScan(
     sparkSession: SparkSession,
     hadoopConf: Configuration,
@@ -53,8 +54,11 @@ case class GarScan(
     formatName: String,
     partitionFilters: Seq[Expression] = Seq.empty,
     dataFilters: Seq[Expression] = Seq.empty) extends FileScan {
+
+  /** The gar format is not splitable. */
   override def isSplitable(path: Path): Boolean = false
 
+  /** Create the reader factory according to the actual file format. */
   override def createReaderFactory(): PartitionReaderFactory = formatName match {
     case "csv" => createCSVReaderFactory()
     case "orc" => createOrcReaderFactory()
@@ -62,6 +66,7 @@ case class GarScan(
     case _ => throw new IllegalArgumentException
   }
 
+  // Create the reader factory for the CSV format.
   private def createCSVReaderFactory(): PartitionReaderFactory = {
     val columnPruning = sparkSession.sessionState.conf.csvColumnPruning &&
     !readDataSchema.exists(_.name == sparkSession.sessionState.conf.columnNameOfCorruptRecord)
@@ -90,6 +95,7 @@ case class GarScan(
       dataSchema, readDataSchema, readPartitionSchema, parsedOptions, actualFilters)
   }
 
+  // Create the reader factory for the Orc format.
   private def createOrcReaderFactory(): PartitionReaderFactory = {
     val broadcastedConf = sparkSession.sparkContext.broadcast(
       new SerializableConfiguration(hadoopConf))
@@ -99,6 +105,7 @@ case class GarScan(
       dataSchema, readDataSchema, readPartitionSchema, pushedFilters)
   }
 
+  // Create the reader factory for the Parquet format.
   private def createParquetReaderFactory(): PartitionReaderFactory = {
     val readDataSchemaAsJson = readDataSchema.json
     hadoopConf.set(ParquetInputFormat.READ_SUPPORT_CLASS, classOf[ParquetReadSupport].getName)
@@ -197,6 +204,7 @@ case class GarScan(
     partitions.toSeq
   }
 
+  /** Check if two objects are equal. */
   override def equals(obj: Any): Boolean = obj match {
     case g: GarScan =>
       super.equals(g) && dataSchema == g.dataSchema && options == g.options &&
@@ -204,6 +212,7 @@ case class GarScan(
     case _ => false
   }
 
+  /** Get the hash code of the object. */
   override def hashCode(): Int = formatName match {
     case "csv" => super.hashCode()
     case "orc" => getClass.hashCode()
@@ -211,14 +220,17 @@ case class GarScan(
     case _ => throw new IllegalArgumentException
   }
 
+  /** Get the description string of the object. */
   override def description(): String = {
     super.description() + ", PushedFilters: " + seqToString(pushedFilters)
   }
 
+  /** Get the meata data map of the object. */
   override def getMetaData(): Map[String, String] = {
     super.getMetaData() ++ Map("PushedFilters" -> seqToString(pushedFilters))
   }
 
+  /** Construct the file scan with filters. */
   override def withFilters(
       partitionFilters: Seq[Expression], dataFilters: Seq[Expression]): FileScan =
     this.copy(partitionFilters = partitionFilters, dataFilters = dataFilters)
