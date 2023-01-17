@@ -19,7 +19,6 @@ import com.alibaba.graphar.utils.{IndexGenerator}
 import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, PropertyGroup}
 import com.alibaba.graphar.datasources._
 
-import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
@@ -232,7 +231,7 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
   def readEdges(addIndex: Boolean = false): DataFrame = {
     val adjList_df = readAllAdjList(true)
     val properties_df = readAllEdgeProperties(true)
-    var df = adjList_df.join(properties_df, Seq(GeneralParams.edgeIndexCol)).sort(GeneralParams.edgeIndexCol);
+    var df = adjList_df.join(properties_df, Seq(GeneralParams.edgeIndexCol)).sort(GeneralParams.edgeIndexCol)
     if (addIndex == false)
       df = df.drop(GeneralParams.edgeIndexCol)
     return df

@@ -178,5 +178,4 @@ class ReaderSuite extends AnyFunSuite {
     val invalid_adj_list_type = AdjListType.unordered_by_dest
     assertThrows[IllegalArgumentException](new EdgeReader(prefix, edge_info, invalid_adj_list_type, spark))
   }
-
 }
