@@ -122,7 +122,7 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
   switch (file_type) {
   case FileType::CSV: {
     auto write_options = arrow::csv::WriteOptions::Defaults();
-    write_options.include_header = false;
+    write_options.include_header = true;
     write_options.quoting_style = arrow::csv::QuotingStyle::Needed;
     GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
         auto writer, arrow::csv::MakeCSVWriter(output_stream.get(),

@@ -51,7 +51,7 @@ object FileSystem {
     val spark = dataFrame.sparkSession
     spark.conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
     spark.conf.set("parquet.enable.summary-metadata", "false")
-    dataFrame.write.mode("append").format(fileType).save(outputPrefix)
+    dataFrame.write.mode("append").option("header", "true").format(fileType).save(outputPrefix)
     renameSparkGeneratedFiles(spark, outputPrefix, startChunkIndex)
   }
 }

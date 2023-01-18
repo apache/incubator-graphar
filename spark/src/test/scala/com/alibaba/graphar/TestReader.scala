@@ -54,7 +54,7 @@ class ReaderSuite extends AnyFunSuite {
     val csv_file_path = "gar-test/ldbc_sample/csv"
     val csv_prefix = getClass.getClassLoader.getResource(csv_file_path).getPath
     val csv_read_path = csv_prefix + "/edge/person_knows_person/ordered_by_source/adj_list"
-    val df3 = spark.read.option("fileFormat", "csv").option("recursiveFileLookup", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(csv_read_path)
+    val df3 = spark.read.option("fileFormat", "csv").option("header", "true").option("recursiveFileLookup", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(csv_read_path)
     // validate reading results
     assert(df3.rdd.getNumPartitions == 11)
     assert(df3.count() == 6626)
