@@ -17,8 +17,8 @@ package com.alibaba.graphar.reader
 
 import com.alibaba.graphar.utils.{IndexGenerator}
 import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, PropertyGroup}
+import com.alibaba.graphar.datasources._
 
-import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
@@ -50,7 +50,7 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     val file_type_in_gar = edgeInfo.getAdjListFileType(adjListType)
     val file_type = FileType.FileTypeToString(file_type_in_gar)
     val file_path = prefix + "/" + edgeInfo.getAdjListOffsetFilePath(chunk_index, adjListType)
-    val df = spark.read.format(file_type).load(file_path)
+    val df = spark.read.option("fileFormat", file_type).format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
     return df
   }
 
@@ -64,7 +64,7 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     val file_type_in_gar = edgeInfo.getAdjListFileType(adjListType)
     val file_type = FileType.FileTypeToString(file_type_in_gar)
     val file_path = prefix + "/" + edgeInfo.getAdjListFilePath(vertex_chunk_index, chunk_index, adjListType)
-    val df = spark.read.format(file_type).load(file_path)
+    val df = spark.read.option("fileFormat", file_type).format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
     return df
   }
 
@@ -75,21 +75,15 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    * @return DataFrame of all AdjList chunks of vertices in given vertex chunk.
    */
   def readAdjListForVertexChunk(vertex_chunk_index: Long, addIndex: Boolean = false): DataFrame = {
-    val part_prefix = prefix + "/" + edgeInfo.getAdjListPathPrefix(vertex_chunk_index, adjListType)
-    val file_system = FileSystem.get(new Path(part_prefix).toUri(), spark.sparkContext.hadoopConfiguration)
-    val path_pattern = new Path(part_prefix + "chunk*")
-    val chunk_number = file_system.globStatus(path_pattern).length
-    var df = spark.emptyDataFrame
-    for ( i <- 0 to chunk_number - 1) {
-      val new_df = readAdjListChunk(vertex_chunk_index, i)
-      if (i == 0)
-        df = new_df
-      else
-        df = df.union(new_df)
+    val file_type_in_gar = edgeInfo.getAdjListFileType(adjListType)
+    val file_type = FileType.FileTypeToString(file_type_in_gar)
+    val file_path = prefix + "/" + edgeInfo.getAdjListPathPrefix(vertex_chunk_index, adjListType)
+    val df = spark.read.option("fileFormat", file_type).format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
+    if (addIndex) {
+      return IndexGenerator.generateEdgeIndexColumn(df)
+    } else {
+      return df
     }
-    if (addIndex)
-      df = IndexGenerator.generateEdgeIndexColumn(df)
-    return df
   }
 
   /** Load all AdjList chunks for this edge type as a DataFrame.
@@ -98,21 +92,15 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    * @return DataFrame of all AdjList chunks.
    */
   def readAllAdjList(addIndex: Boolean = false): DataFrame = {
+    val file_type_in_gar = edgeInfo.getAdjListFileType(adjListType)
+    val file_type = FileType.FileTypeToString(file_type_in_gar)
     val file_path = prefix + "/" + edgeInfo.getAdjListPathPrefix(adjListType)
-    val file_system = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
-    val path_pattern = new Path(file_path + "part*")
-    val vertex_chunk_number = file_system.globStatus(path_pattern).length
-    var df = spark.emptyDataFrame
-    for ( i <- 0 to vertex_chunk_number - 1) {
-      val new_df = readAdjListForVertexChunk(i)
-      if (i == 0)
-        df = new_df
-      else
-        df = df.union(new_df)
+    val df = spark.read.option("fileFormat", file_type).option("recursiveFileLookup", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
+    if (addIndex) {
+      return IndexGenerator.generateEdgeIndexColumn(df)
+    } else {
+      return df
     }
-    if (addIndex)
-      df = IndexGenerator.generateEdgeIndexColumn(df)
-    return df
   }
 
   /** Load a single edge property chunk as a DataFrame.
@@ -126,9 +114,9 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
   def readEdgePropertyChunk(propertyGroup: PropertyGroup, vertex_chunk_index: Long, chunk_index: Long): DataFrame = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
-    val file_type = propertyGroup.getFile_type();
+    val file_type = propertyGroup.getFile_type()
     val file_path = prefix + "/" + edgeInfo.getPropertyFilePath(propertyGroup, adjListType, vertex_chunk_index, chunk_index)
-    val df = spark.read.format(file_type).load(file_path)
+    val df = spark.read.option("fileFormat", file_type).format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
     return df
   }
 
@@ -143,21 +131,14 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
   def readEdgePropertiesForVertexChunk(propertyGroup: PropertyGroup, vertex_chunk_index: Long, addIndex: Boolean = false): DataFrame = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
-    val path_prefix = prefix + "/" + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType, vertex_chunk_index)
-    val file_system = FileSystem.get(new Path(path_prefix).toUri(), spark.sparkContext.hadoopConfiguration)
-    val path_pattern = new Path(path_prefix + "chunk*")
-    val chunk_number = file_system.globStatus(path_pattern).length
-    var df = spark.emptyDataFrame
-    for ( i <- 0 to chunk_number - 1) {
-      val new_df = readEdgePropertyChunk(propertyGroup, vertex_chunk_index, i)
-      if (i == 0)
-        df = new_df
-      else
-        df = df.union(new_df)
+    val file_type = propertyGroup.getFile_type()
+    val file_path = prefix + "/" + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType, vertex_chunk_index)
+    val df = spark.read.option("fileFormat", file_type).format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
+    if (addIndex) {
+      return IndexGenerator.generateEdgeIndexColumn(df)
+    } else {
+      return df
     }
-    if (addIndex)
-      df = IndexGenerator.generateEdgeIndexColumn(df)
-    return df
   }
 
   /** Load all chunks for a property group as a DataFrame.
@@ -170,21 +151,14 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
   def readEdgeProperties(propertyGroup: PropertyGroup, addIndex: Boolean = false): DataFrame = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
-    val property_group_prefix = prefix + "/" + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType)
-    val file_system = FileSystem.get(new Path(property_group_prefix).toUri(), spark.sparkContext.hadoopConfiguration)
-    val path_pattern = new Path(property_group_prefix + "part*")
-    val vertex_chunk_number = file_system.globStatus(path_pattern).length
-    var df = spark.emptyDataFrame
-    for ( i <- 0 to vertex_chunk_number - 1) {
-      val new_df = readEdgePropertiesForVertexChunk(propertyGroup, i)
-      if (i == 0)
-        df = new_df
-      else
-        df = df.union(new_df)
+    val file_type = propertyGroup.getFile_type()
+    val file_path = prefix + "/" + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType)
+    val df = spark.read.option("fileFormat", file_type).option("recursiveFileLookup", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
+    if (addIndex) {
+      return IndexGenerator.generateEdgeIndexColumn(df)
+    } else {
+      return df
     }
-    if (addIndex)
-      df = IndexGenerator.generateEdgeIndexColumn(df)
-    return df
   }
 
   /** Load the chunks for all property groups of a vertex chunk as a DataFrame.
@@ -257,7 +231,7 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
   def readEdges(addIndex: Boolean = false): DataFrame = {
     val adjList_df = readAllAdjList(true)
     val properties_df = readAllEdgeProperties(true)
-    var df = adjList_df.join(properties_df, Seq(GeneralParams.edgeIndexCol)).sort(GeneralParams.edgeIndexCol);
+    var df = adjList_df.join(properties_df, Seq(GeneralParams.edgeIndexCol)).sort(GeneralParams.edgeIndexCol)
     if (addIndex == false)
       df = df.drop(GeneralParams.edgeIndexCol)
     return df
