@@ -15,7 +15,7 @@
 
 package com.alibaba.graphar.reader
 
-import com.alibaba.graphar.utils.{IndexGenerator}
+import com.alibaba.graphar.utils.{IndexGenerator, DataFrameConcat}
 import com.alibaba.graphar.{GeneralParams, VertexInfo, FileType, PropertyGroup}
 import com.alibaba.graphar.datasources._
 
@@ -23,6 +23,7 @@ import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.Row
 
 /** Reader for vertex chunks.
  *
@@ -96,15 +97,16 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
       val pg: PropertyGroup = property_groups.get(i)
-      val new_df = readVertexProperties(pg, true)
+      val new_df = readVertexProperties(pg, false)
       if (i == 0)
         df = new_df
       else
-        df = df.join(new_df, Seq(GeneralParams.vertexIndexCol))
+        df = DataFrameConcat.concat(df, new_df)
     }
-    df = df.sort(GeneralParams.vertexIndexCol)
-    if (addIndex == false)
-      df = df.drop(GeneralParams.vertexIndexCol)
-    return df
+    if (addIndex) {
+      return IndexGenerator.generateVertexIndexColumn(df)
+    } else {
+      return df
+    }
   }
 }

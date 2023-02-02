@@ -15,7 +15,7 @@
 
 package com.alibaba.graphar.reader
 
-import com.alibaba.graphar.utils.{IndexGenerator}
+import com.alibaba.graphar.utils.{IndexGenerator, DataFrameConcat}
 import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, PropertyGroup}
 import com.alibaba.graphar.datasources._
 
@@ -173,16 +173,17 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
       val pg: PropertyGroup = property_groups.get(i)
-      val new_df = readEdgePropertiesForVertexChunk(pg, vertex_chunk_index, true)
+      val new_df = readEdgePropertiesForVertexChunk(pg, vertex_chunk_index, false)
       if (i == 0)
         df = new_df
       else
-        df = df.join(new_df, Seq(GeneralParams.edgeIndexCol))
+        df = DataFrameConcat.concat(df, new_df)
     }
-    df = df.sort(GeneralParams.edgeIndexCol)
-    if (addIndex == false)
-      df = df.drop(GeneralParams.edgeIndexCol)
-    return df
+    if (addIndex) {
+      return IndexGenerator.generateEdgeIndexColumn(df)
+    } else {
+      return df
+    }
   }
 
   /** Load the chunks for all property groups as a DataFrame.
@@ -196,16 +197,17 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
       val pg: PropertyGroup = property_groups.get(i)
-      val new_df = readEdgeProperties(pg, true)
+      val new_df = readEdgeProperties(pg, false)
       if (i == 0)
         df = new_df
       else
-        df = df.join(new_df, Seq(GeneralParams.edgeIndexCol))
+        df = DataFrameConcat.concat(df, new_df)
     }
-    df = df.sort(GeneralParams.edgeIndexCol)
-    if (addIndex == false)
-      df = df.drop(GeneralParams.edgeIndexCol)
-    return df
+    if (addIndex) {
+      return IndexGenerator.generateEdgeIndexColumn(df)
+    } else {
+      return df
+    }
   }
 
   /** Load the chunks for the AdjList and all property groups for a vertex chunk as a DataFrame.
@@ -215,12 +217,14 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    * @return DataFrame that contains all chunks of AdjList and property groups of vertices in given vertex chunk.
    */
   def readEdgesForVertexChunk(vertex_chunk_index: Long, addIndex: Boolean = false): DataFrame = {
-    val adjList_df = readAdjListForVertexChunk(vertex_chunk_index, true)
-    val properties_df = readAllEdgePropertiesForVertexChunk(vertex_chunk_index, true)
-    var df = adjList_df.join(properties_df, Seq(GeneralParams.edgeIndexCol)).sort(GeneralParams.edgeIndexCol)
-    if (addIndex == false)
-      df = df.drop(GeneralParams.edgeIndexCol)
-    return df
+    val adjList_df = readAdjListForVertexChunk(vertex_chunk_index, false)
+    val properties_df = readAllEdgePropertiesForVertexChunk(vertex_chunk_index, false)
+    val df = DataFrameConcat.concat(adjList_df, properties_df)
+    if (addIndex) {
+      return IndexGenerator.generateEdgeIndexColumn(df)
+    } else {
+      return df
+    }
   }
 
   /** Load the chunks for the AdjList and all property groups as a DataFrame.
@@ -229,11 +233,13 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    * @return DataFrame that contains all chunks of AdjList and property groups of edge.
    */
   def readEdges(addIndex: Boolean = false): DataFrame = {
-    val adjList_df = readAllAdjList(true)
-    val properties_df = readAllEdgeProperties(true)
-    var df = adjList_df.join(properties_df, Seq(GeneralParams.edgeIndexCol)).sort(GeneralParams.edgeIndexCol)
-    if (addIndex == false)
-      df = df.drop(GeneralParams.edgeIndexCol)
-    return df
+    val adjList_df = readAllAdjList(false)
+    val properties_df = readAllEdgeProperties(false)
+    val df = DataFrameConcat.concat(adjList_df, properties_df)
+    if (addIndex) {
+      return IndexGenerator.generateEdgeIndexColumn(df)
+    } else {
+      return df
+    }
   }
 }
