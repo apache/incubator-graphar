@@ -33,12 +33,6 @@ import org.apache.spark.sql.Row
  * @param spark spark session for the reader to read chunks as Spark DataFrame.
  */
 class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) {
-  private val vertices_number = readVerticesNumber()
-  private val chunk_size = vertexInfo.getChunk_size()
-  private var chunk_number = vertices_number / chunk_size
-  if (vertices_number % chunk_size != 0)
-    chunk_number = chunk_number + 1
- 
   /** Load the total number of vertices for this vertex type. */
   def readVerticesNumber(): Long = {
     val file_path = prefix + "/" + vertexInfo.getVerticesNumFilePath()
