@@ -72,7 +72,7 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
    * @return DataFrame that contains all chunks of property group.
    *         Raise IllegalArgumentException if the property group not contained.
    */
-  def readVertexProperties(propertyGroup: PropertyGroup, addIndex: Boolean = true): DataFrame = {
+  def readVertexPropertyGroup(propertyGroup: PropertyGroup, addIndex: Boolean = true): DataFrame = {
     if (vertexInfo.containPropertyGroup(propertyGroup) == false) 
       throw new IllegalArgumentException
     val file_type = propertyGroup.getFile_type()
@@ -86,18 +86,43 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
     }
   }
 
+  /** Load the chunks for multiple property groups as a DataFrame..
+   *
+   * @param propertyGroups  list of property groups.
+   * @param addIndex flag that add vertex index column or not in the final DataFrame.
+   * @return DataFrame that contains all chunks of property group.
+   *         Raise IllegalArgumentException if the property group not contained.
+   */
+  def readMultipleVertexPropertyGroups(propertyGroups: java.util.ArrayList[PropertyGroup], addIndex: Boolean = true): DataFrame = {
+    var df = spark.emptyDataFrame
+    val len: Int = propertyGroups.size
+    for ( i <- 0 to len - 1 ) {
+      val pg: PropertyGroup = propertyGroups.get(i)
+      val new_df = readVertexPropertyGroup(pg, false)
+      if (i == 0)
+        df = new_df
+      else
+        df = DataFrameConcat.concat(df, new_df)
+    }
+    if (addIndex) {
+      return IndexGenerator.generateVertexIndexColumn(df)
+    } else {
+      return df
+    }
+  }
+
   /** Load the chunks for all property groups as a DataFrame.
    *
    * @param addIndex flag that add vertex index column or not in the final DataFrame.
    * @return DataFrame that contains all property group chunks of vertex.
    */
-  def readAllVertexProperties(addIndex: Boolean = true): DataFrame = {
+  def readAllVertexPropertyGroups(addIndex: Boolean = true): DataFrame = {
     var df = spark.emptyDataFrame
     val property_groups = vertexInfo.getProperty_groups()
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
       val pg: PropertyGroup = property_groups.get(i)
-      val new_df = readVertexProperties(pg, false)
+      val new_df = readVertexPropertyGroup(pg, false)
       if (i == 0)
         df = new_df
       else

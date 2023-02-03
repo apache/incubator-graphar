@@ -84,16 +84,25 @@ class ReaderSuite extends AnyFunSuite {
     assert(single_chunk_df.count() == 100)
 
     // test reading chunks for a property group
-    val property_df = reader.readVertexProperties(property_group, false)
+    val property_df = reader.readVertexPropertyGroup(property_group, false)
     assert(property_df.columns.size == 3)
     assert(property_df.count() == 903)
 
+    // test reading chunks for multiple property groups
+    val property_group_1 = vertex_info.getPropertyGroup("id")
+    var property_groups = new java.util.ArrayList[PropertyGroup]()
+    property_groups.add(property_group_1)
+    property_groups.add(property_group)
+    val multiple_property_df = reader.readMultipleVertexPropertyGroups(property_groups, false)
+    assert(multiple_property_df.columns.size == 4)
+    assert(multiple_property_df.count() == 903)
+
     // test reading chunks for all property groups and optionally adding indices
-    val vertex_df = reader.readAllVertexProperties(false)
+    val vertex_df = reader.readAllVertexPropertyGroups(false)
     vertex_df.show()
     assert(vertex_df.columns.size == 4)
     assert(vertex_df.count() == 903)
-    val vertex_df_with_index = reader.readAllVertexProperties()
+    val vertex_df_with_index = reader.readAllVertexPropertyGroups()
     vertex_df_with_index.show()
     assert(vertex_df_with_index.columns.size == 5)
     assert(vertex_df_with_index.count() == 903)
@@ -101,7 +110,7 @@ class ReaderSuite extends AnyFunSuite {
     // throw an exception for non-existing property groups
     val invalid_property_group= new PropertyGroup()
     assertThrows[IllegalArgumentException](reader.readVertexPropertyChunk(invalid_property_group, 0))
-    assertThrows[IllegalArgumentException](reader.readVertexProperties(invalid_property_group))
+    assertThrows[IllegalArgumentException](reader.readVertexPropertyGroup(invalid_property_group))
   }
 
   test("read edge chunks") {
