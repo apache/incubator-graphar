@@ -24,7 +24,6 @@ import org.apache.spark.sql.Row
 
 /** Helper object to concat DataFrames */
 object DataFrameConcat {
-
   /** Concat two DataFrames.
    *
    * @param df1 The first DataFrame.

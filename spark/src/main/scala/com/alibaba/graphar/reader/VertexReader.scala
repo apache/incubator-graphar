@@ -72,7 +72,7 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
    * @return DataFrame that contains all chunks of property group.
    *         Raise IllegalArgumentException if the property group not contained.
    */
-  def readVertexProperties(propertyGroup: PropertyGroup, addIndex: Boolean = false): DataFrame = {
+  def readVertexProperties(propertyGroup: PropertyGroup, addIndex: Boolean = true): DataFrame = {
     if (vertexInfo.containPropertyGroup(propertyGroup) == false) 
       throw new IllegalArgumentException
     val file_type = propertyGroup.getFile_type()
@@ -91,7 +91,7 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
    * @param addIndex flag that add vertex index column or not in the final DataFrame.
    * @return DataFrame that contains all property group chunks of vertex.
    */
-  def readAllVertexProperties(addIndex: Boolean = false): DataFrame = {
+  def readAllVertexProperties(addIndex: Boolean = true): DataFrame = {
     var df = spark.emptyDataFrame
     val property_groups = vertexInfo.getProperty_groups()
     val len: Int = property_groups.size
