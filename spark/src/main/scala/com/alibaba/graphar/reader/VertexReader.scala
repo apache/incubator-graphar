@@ -88,7 +88,7 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
 
   /** Load the chunks for multiple property groups as a DataFrame..
    *
-   * @param propertyGroups  list of property groups.
+   * @param propertyGroups list of property groups.
    * @param addIndex flag that add vertex index column or not in the final DataFrame.
    * @return DataFrame that contains all chunks of property group.
    *         Raise IllegalArgumentException if the property group not contained.

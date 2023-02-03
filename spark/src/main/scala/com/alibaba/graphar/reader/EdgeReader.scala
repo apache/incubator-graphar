@@ -128,7 +128,7 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    * @return DataFrame that contains all property group chunks of vertices in given vertex chunk.
    *         If edge info does not contain the property group, raise an IllegalArgumentException error.
    */
-  def readEdgePropertiesForVertexChunk(propertyGroup: PropertyGroup, vertex_chunk_index: Long, addIndex: Boolean = true): DataFrame = {
+  def readEdgePropertyGroupForVertexChunk(propertyGroup: PropertyGroup, vertex_chunk_index: Long, addIndex: Boolean = true): DataFrame = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
     val file_type = propertyGroup.getFile_type()
@@ -148,12 +148,61 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    * @return DataFrame that contains all chunks of property group.
    *         If edge info does not contain the property group, raise an IllegalArgumentException error.
    */
-  def readEdgeProperties(propertyGroup: PropertyGroup, addIndex: Boolean = true): DataFrame = {
+  def readEdgePropertyGroup(propertyGroup: PropertyGroup, addIndex: Boolean = true): DataFrame = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
       throw new IllegalArgumentException
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + "/" + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType)
     val df = spark.read.option("fileFormat", file_type).option("header", "true").option("recursiveFileLookup", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
+    if (addIndex) {
+      return IndexGenerator.generateEdgeIndexColumn(df)
+    } else {
+      return df
+    }
+  }
+
+  /** Load the chunks for mutiple property groups of a vertex chunk as a DataFrame.
+   *
+   * @param propertyGroups list of property groups.
+   * @param vertex_chunk_index index of vertex chunk.
+   * @param addIndex flag that add edge index column or not in the final DataFrame.
+   * @return DataFrame that contains all property groups chunks of a vertex chunk.
+   */
+  def readMultipleEdgePropertyGroupsForVertexChunk(propertyGroups: java.util.ArrayList[PropertyGroup], vertex_chunk_index: Long, addIndex: Boolean = true): DataFrame = {
+    var df = spark.emptyDataFrame
+    val len: Int = propertyGroups.size
+    for ( i <- 0 to len - 1 ) {
+      val pg: PropertyGroup = propertyGroups.get(i)
+      val new_df = readEdgePropertyGroupForVertexChunk(pg, vertex_chunk_index, false)
+      if (i == 0)
+        df = new_df
+      else
+        df = DataFrameConcat.concat(df, new_df)
+    }
+    if (addIndex) {
+      return IndexGenerator.generateEdgeIndexColumn(df)
+    } else {
+      return df
+    }
+  }
+
+  /** Load the chunks for multiple property groups as a DataFrame.
+   *
+   * @param propertyGroups list of property groups.
+   * @param addIndex flag that add edge index column or not in the final DataFrame.
+   * @return DataFrame tha contains all property groups chunks of edge.
+   */
+  def readMultipleEdgePropertyGroups(propertyGroups: java.util.ArrayList[PropertyGroup], addIndex: Boolean = true): DataFrame = {
+    var df = spark.emptyDataFrame
+    val len: Int = propertyGroups.size
+    for ( i <- 0 to len - 1 ) {
+      val pg: PropertyGroup = propertyGroups.get(i)
+      val new_df = readEdgePropertyGroup(pg, false)
+      if (i == 0)
+        df = new_df
+      else
+        df = DataFrameConcat.concat(df, new_df)
+    }
     if (addIndex) {
       return IndexGenerator.generateEdgeIndexColumn(df)
     } else {
@@ -167,13 +216,13 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    * @param addIndex flag that add edge index column or not in the final DataFrame.
    * @return DataFrame that contains all property groups chunks of a vertex chunk.
    */
-  def readAllEdgePropertiesForVertexChunk(vertex_chunk_index: Long, addIndex: Boolean = true): DataFrame = {
+  def readAllEdgePropertyGroupsForVertexChunk(vertex_chunk_index: Long, addIndex: Boolean = true): DataFrame = {
     var df = spark.emptyDataFrame
     val property_groups = edgeInfo.getPropertyGroups(adjListType)
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
       val pg: PropertyGroup = property_groups.get(i)
-      val new_df = readEdgePropertiesForVertexChunk(pg, vertex_chunk_index, false)
+      val new_df = readEdgePropertyGroupForVertexChunk(pg, vertex_chunk_index, false)
       if (i == 0)
         df = new_df
       else
@@ -191,13 +240,13 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    * @param addIndex flag that add edge index column or not in the final DataFrame.
    * @return DataFrame tha contains all property groups chunks of edge.
    */
-  def readAllEdgeProperties(addIndex: Boolean = true): DataFrame = {
+  def readAllEdgePropertyGroups(addIndex: Boolean = true): DataFrame = {
     var df = spark.emptyDataFrame
     val property_groups = edgeInfo.getPropertyGroups(adjListType)
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
       val pg: PropertyGroup = property_groups.get(i)
-      val new_df = readEdgeProperties(pg, false)
+      val new_df = readEdgePropertyGroup(pg, false)
       if (i == 0)
         df = new_df
       else
@@ -218,7 +267,7 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    */
   def readEdgesForVertexChunk(vertex_chunk_index: Long, addIndex: Boolean = true): DataFrame = {
     val adjList_df = readAdjListForVertexChunk(vertex_chunk_index, false)
-    val properties_df = readAllEdgePropertiesForVertexChunk(vertex_chunk_index, false)
+    val properties_df = readAllEdgePropertyGroupsForVertexChunk(vertex_chunk_index, false)
     val df = DataFrameConcat.concat(adjList_df, properties_df)
     if (addIndex) {
       return IndexGenerator.generateEdgeIndexColumn(df)
@@ -234,7 +283,7 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    */
   def readEdges(addIndex: Boolean = true): DataFrame = {
     val adjList_df = readAllAdjList(false)
-    val properties_df = readAllEdgeProperties(false)
+    val properties_df = readAllEdgePropertyGroups(false)
     val df = DataFrameConcat.concat(adjList_df, properties_df)
     if (addIndex) {
       return IndexGenerator.generateEdgeIndexColumn(df)

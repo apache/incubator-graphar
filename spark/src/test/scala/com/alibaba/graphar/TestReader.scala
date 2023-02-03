@@ -141,21 +141,33 @@ class ReaderSuite extends AnyFunSuite {
     assert(adj_list_df.columns.size == 2)
     assert(adj_list_df.count() == 6626)
 
-    // test reading property group chunks
+    // test reading a single property group
     val property_group = edge_info.getPropertyGroup("creationDate", adj_list_type)
     val single_property_df = reader.readEdgePropertyChunk(property_group, 2, 0)
     assert(single_property_df.columns.size == 1)
     assert(single_property_df.count() == 1024)
-    val property_df_chunk_2 = reader.readEdgePropertiesForVertexChunk(property_group, 2, false)
+    val property_df_chunk_2 = reader.readEdgePropertyGroupForVertexChunk(property_group, 2, false)
     assert(property_df_chunk_2.columns.size == 1)
     assert(property_df_chunk_2.count() == 1077)
-    val property_df = reader.readEdgeProperties(property_group, false)
+    val property_df = reader.readEdgePropertyGroup(property_group, false)
     assert(property_df.columns.size == 1)
     assert(property_df.count() == 6626)
-    val all_property_df_chunk_2 = reader.readAllEdgePropertiesForVertexChunk(2, false)
+
+    // test reading multiple property groups
+    var property_groups = new java.util.ArrayList[PropertyGroup]()
+    property_groups.add(property_group)
+    val mutiple_property_df_chunk_2 = reader.readMultipleEdgePropertyGroupsForVertexChunk(property_groups, 2, false)
+    assert(mutiple_property_df_chunk_2.columns.size == 1)
+    assert(mutiple_property_df_chunk_2.count() == 1077)
+    val mutiple_property_df = reader.readMultipleEdgePropertyGroups(property_groups, false)
+    assert(mutiple_property_df.columns.size == 1)
+    assert(mutiple_property_df.count() == 6626)
+
+    // test reading all property groups
+    val all_property_df_chunk_2 = reader.readAllEdgePropertyGroupsForVertexChunk(2, false)
     assert(all_property_df_chunk_2.columns.size == 1)
     assert(all_property_df_chunk_2.count() == 1077)
-    val all_property_df = reader.readAllEdgeProperties(false)
+    val all_property_df = reader.readAllEdgePropertyGroups(false)
     assert(all_property_df.columns.size == 1)
     assert(all_property_df.count() == 6626)
 
@@ -180,8 +192,8 @@ class ReaderSuite extends AnyFunSuite {
     // throw an exception for non-existing property groups
     val invalid_property_group= new PropertyGroup()
     assertThrows[IllegalArgumentException](reader.readEdgePropertyChunk(invalid_property_group, 0, 0))
-    assertThrows[IllegalArgumentException](reader.readEdgePropertiesForVertexChunk(invalid_property_group, 0))
-    assertThrows[IllegalArgumentException](reader.readEdgeProperties(invalid_property_group))
+    assertThrows[IllegalArgumentException](reader.readEdgePropertyGroupForVertexChunk(invalid_property_group, 0))
+    assertThrows[IllegalArgumentException](reader.readEdgePropertyGroup(invalid_property_group))
 
     // throw an exception for non-existing adjList types
     val invalid_adj_list_type = AdjListType.unordered_by_dest

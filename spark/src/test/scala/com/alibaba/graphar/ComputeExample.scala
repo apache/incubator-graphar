@@ -42,7 +42,7 @@ class ComputeExampleSuite extends AnyFunSuite {
 
     val vertex_reader = new VertexReader(prefix, vertex_info, spark)
     val vertices_num = vertex_reader.readVerticesNumber()
-    val vertex_df = vertex_reader.readAllVertexProperties(true)
+    val vertex_df = vertex_reader.readAllVertexPropertyGroups(true)
     vertex_df.show()
     assert(vertex_df.columns.size == 5)
     assert(vertex_df.count() == vertices_num)
@@ -54,7 +54,7 @@ class ComputeExampleSuite extends AnyFunSuite {
     val adj_list_type = AdjListType.ordered_by_source
 
     val edge_reader = new EdgeReader(prefix, edge_info, adj_list_type, spark)
-    val edge_df = edge_reader.readAllAdjList()
+    val edge_df = edge_reader.readAllAdjList(false)
     edge_df.show()
     assert(edge_df.columns.size == 2)
     assert(edge_df.count() == 6626)
