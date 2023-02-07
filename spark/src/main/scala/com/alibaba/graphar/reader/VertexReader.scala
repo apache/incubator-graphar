@@ -15,7 +15,7 @@
 
 package com.alibaba.graphar.reader
 
-import com.alibaba.graphar.utils.{IndexGenerator}
+import com.alibaba.graphar.utils.{IndexGenerator, DataFrameConcat}
 import com.alibaba.graphar.{GeneralParams, VertexInfo, FileType, PropertyGroup}
 import com.alibaba.graphar.datasources._
 
@@ -23,6 +23,7 @@ import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.Row
 
 /** Reader for vertex chunks.
  *
@@ -32,12 +33,6 @@ import org.apache.spark.sql.functions._
  * @param spark spark session for the reader to read chunks as Spark DataFrame.
  */
 class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) {
-  private val vertices_number = readVerticesNumber()
-  private val chunk_size = vertexInfo.getChunk_size()
-  private var chunk_number = vertices_number / chunk_size
-  if (vertices_number % chunk_size != 0)
-    chunk_number = chunk_number + 1
- 
   /** Load the total number of vertices for this vertex type. */
   def readVerticesNumber(): Long = {
     val file_path = prefix + "/" + vertexInfo.getVerticesNumFilePath()
@@ -71,7 +66,7 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
    * @return DataFrame that contains all chunks of property group.
    *         Raise IllegalArgumentException if the property group not contained.
    */
-  def readVertexProperties(propertyGroup: PropertyGroup, addIndex: Boolean = false): DataFrame = {
+  def readVertexPropertyGroup(propertyGroup: PropertyGroup, addIndex: Boolean = true): DataFrame = {
     if (vertexInfo.containPropertyGroup(propertyGroup) == false) 
       throw new IllegalArgumentException
     val file_type = propertyGroup.getFile_type()
@@ -85,26 +80,48 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
     }
   }
 
+  /** Load the chunks for multiple property groups as a DataFrame.
+   *
+   * @param propertyGroups list of property groups.
+   * @param addIndex flag that add vertex index column or not in the final DataFrame.
+   * @return DataFrame that contains all chunks of property group.
+   *         Raise IllegalArgumentException if the property group not contained.
+   */
+  def readMultipleVertexPropertyGroups(propertyGroups: java.util.ArrayList[PropertyGroup], addIndex: Boolean = true): DataFrame = {
+    val len: Int = propertyGroups.size
+    if (len == 0)
+      return spark.emptyDataFrame
+
+    val pg0: PropertyGroup = propertyGroups.get(0)
+    val df0 = readVertexPropertyGroup(pg0, false)
+    if (len == 1)
+      return df0
+
+    var rdd = df0.rdd
+    var schema_array = df0.schema.fields
+    for ( i <- 1 to len - 1 ) {
+      val pg: PropertyGroup = propertyGroups.get(i)
+      val new_df = readVertexPropertyGroup(pg, false)
+      schema_array = Array.concat(schema_array, new_df.schema.fields)
+      rdd = DataFrameConcat.concatRdd(rdd, new_df.rdd)
+    }
+
+    val schema = StructType(schema_array)
+    val df = spark.createDataFrame(rdd, schema)
+    if (addIndex) {
+      return IndexGenerator.generateVertexIndexColumn(df)
+    } else {
+      return df
+    }
+  }
+
   /** Load the chunks for all property groups as a DataFrame.
    *
    * @param addIndex flag that add vertex index column or not in the final DataFrame.
    * @return DataFrame that contains all property group chunks of vertex.
    */
-  def readAllVertexProperties(addIndex: Boolean = false): DataFrame = {
-    var df = spark.emptyDataFrame
+  def readAllVertexPropertyGroups(addIndex: Boolean = true): DataFrame = {
     val property_groups = vertexInfo.getProperty_groups()
-    val len: Int = property_groups.size
-    for ( i <- 0 to len - 1 ) {
-      val pg: PropertyGroup = property_groups.get(i)
-      val new_df = readVertexProperties(pg, true)
-      if (i == 0)
-        df = new_df
-      else
-        df = df.join(new_df, Seq(GeneralParams.vertexIndexCol))
-    }
-    df = df.sort(GeneralParams.vertexIndexCol)
-    if (addIndex == false)
-      df = df.drop(GeneralParams.vertexIndexCol)
-    return df
+    return readMultipleVertexPropertyGroups(property_groups, addIndex)
   }
 }

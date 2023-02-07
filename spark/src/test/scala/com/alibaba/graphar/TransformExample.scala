@@ -43,7 +43,7 @@ class TransformExampleSuite extends AnyFunSuite {
 
     val reader = new VertexReader(prefix, vertex_info, spark)
     val vertices_num = reader.readVerticesNumber()
-    val vertex_df_with_index = reader.readAllVertexProperties(true)
+    val vertex_df_with_index = reader.readAllVertexPropertyGroups(true)
     assert(vertex_df_with_index.count() == vertices_num)
 
     // write to parquet files
@@ -75,7 +75,7 @@ class TransformExampleSuite extends AnyFunSuite {
 
     val adj_list_type = AdjListType.unordered_by_source
     val reader = new EdgeReader(prefix, edge_info, adj_list_type, spark)
-    val adj_list_df = reader.readAllAdjList()
+    val adj_list_df = reader.readAllAdjList(false)
     assert(adj_list_df.columns.size == 2)
     assert(adj_list_df.count() == 6626)
 

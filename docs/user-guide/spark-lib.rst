@@ -157,7 +157,7 @@ To utilize the GAR Spark reader, please refer to the following example code.
    val single_chunk_df = reader.readVertexPropertyChunk(property_group, 0)
    // ...
    // read all property chunks
-   val vertex_df = reader.readAllVertexProperties()
+   val vertex_df = reader.readAllVertexPropertyGroups()
 
    //construct the edge reader
    val edge_info = ...
