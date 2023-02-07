@@ -21,6 +21,7 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.Row
+import org.apache.spark.rdd.RDD
 
 /** Helper object to concat DataFrames */
 object DataFrameConcat {
@@ -36,5 +37,15 @@ object DataFrameConcat {
     val res_rdd = df1.rdd.zip(df2.rdd).map(pair => Row.fromSeq(pair._1.toSeq.toList ::: pair._2.toSeq.toList))
     val df = spark.createDataFrame(res_rdd, schema)
     return df
+  }
+
+  /** Concat two RDDs.
+   *
+   * @param rdd1 The first RDD.
+   * @param rdd2 The second RDD.
+   * @return The result RDD that concats the two RDDs.
+   */
+  def concatRdd(rdd1: RDD[Row], rdd2: RDD[Row]): RDD[Row] = {
+    rdd1.zip(rdd2).map(pair => Row.fromSeq(pair._1.toSeq.toList ::: pair._2.toSeq.toList))
   }
 }
