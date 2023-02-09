@@ -33,7 +33,7 @@ Result<int64_t> GetVertexChunkNum(const std::string& prefix,
                                   const VertexInfo& vertex_info) noexcept;
 
 Result<int64_t> GetEdgeChunkNum(const std::string& prefix,
-                                const EdgeInfo& edge_info
+                                const EdgeInfo& edge_info,
                                 AdjListType adj_list_type,
                                 IdType vertex_chunk_index) noexcept;
 
