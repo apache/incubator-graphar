@@ -76,7 +76,7 @@ Result<int64_t> GetVertexChunkNum(const std::string& prefix,
   std::string out_prefix;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
   std::string chunk_dir =
-      out_prefix + vertex_info.GetPathPrefix(property_groups[0]);
+      out_prefix + vertex_info.GetPathPrefix(property_groups[0]).value();
   return fs->GetFileNumOfDir(chunk_dir);
 }
 
@@ -87,8 +87,9 @@ Result<int64_t> GetEdgeChunkNum(const std::string& prefix,
   std::string out_prefix;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
   GAR_ASSIGN_OR_RAISE(auto adj_prefix, edge_info.GetAdjListPathPrefix(adj_list_type));
-  std::string chunk_dir = out_prefix + adj_prefix + "part" + std::string(vertex_chunk_index);
+  std::string chunk_dir = out_prefix + adj_prefix + "part" + std::to_string(vertex_chunk_index);
   return fs->GetFileNumOfDir(chunk_dir);
+}
 
 }  // namespace utils
 
