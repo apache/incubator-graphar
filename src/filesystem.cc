@@ -166,7 +166,7 @@ Status FileSystem::CopyFile(const std::string& src_path,
   return Status::OK();
 }
 
-Result<size_t> FileSystem::GetFileNumOfDir(const std::string& dir_path,
+Result<IdType> FileSystem::GetFileNumOfDir(const std::string& dir_path,
                                            bool recursive) const noexcept {
   arrow::fs::FileSelector file_selector;
   file_selector.base_dir = dir_path;
@@ -175,7 +175,7 @@ Result<size_t> FileSystem::GetFileNumOfDir(const std::string& dir_path,
   arrow::fs::FileInfoVector file_infos;
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(file_infos,
                                        arrow_fs_->GetFileInfo(file_selector));
-  return file_infos.size();
+  return static_cast<IdType>(file_infos.size());
 }
 
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
