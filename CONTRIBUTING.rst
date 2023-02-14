@@ -47,6 +47,22 @@ starting the implementation. There are often a number of ways to fix a problem
 and it is important to find the right approach before spending time on a PR
 that cannot be merged.
 
+Install pre-commit
+^^^^^^^^^^^^^^^^^^
+
+GraphAr use `pre-commit`_ to ensure no secrets are accidentally committed
+into the Git repository, you could first install  `pre-commit`_ by
+
+.. code:: bash
+
+    pip3 install pre-commit
+
+The configure the necessary pre-commit hooks with
+
+.. code:: bash
+
+    pre-commit install  --install-hooks
+
 Minor Fixes
 ^^^^^^^^^^^^
 
