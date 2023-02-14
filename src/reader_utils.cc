@@ -69,15 +69,14 @@ Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
 
 Result<IdType> GetVertexChunkNum(const std::string& prefix,
                                  const VertexInfo& vertex_info) noexcept {
-  const auto& property_groups = vertex_info.GetPropertyGroups();
-  if (property_groups.empty()) {
-    return 0;
-  }
   std::string out_prefix;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
-  std::string chunk_dir =
-      out_prefix + vertex_info.GetPathPrefix(property_groups[0]).value();
-  return fs->GetFileNumOfDir(chunk_dir);
+  GAR_ASSIGN_OR_RAISE(auto vertex_num_file_suffix,
+      vertex_info.GetFiGetVerticesNumFilePath());
+  std::string vertex_num_file_path = out_prefix + vertex_num_file_suffix;
+  IdType vertex_num = fs->ReadFileToValue<IdType>(vertex_num_file_path);
+  return vertex_num + vertex_info.GetChunkSize() - 1 /
+      vertex_info.GetChunkSize();
 }
 
 Result<IdType> GetEdgeChunkNum(const std::string& prefix,
