@@ -401,6 +401,8 @@ however, it is not uncommon for the CI infrastructure itself to fail on specific
 platforms ("be red"). It is vital to visually inspect the results of all failed ("red") tests
 to determine whether the failure was caused by the changes in the pull request.
 
+.. _pre-commit: https://pre-commit.com/
+
 .. _Code of Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
 
 .. _file a bug issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=Bug&template=bug_report.yml&title=%5BBug%5D%3A+%3Ctitle%3E
