@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.scalatest</groupId>
             <artifactId>scalatest_${scala.binary.version}</artifactId>
-            <version>3.1.1</version>
+            <version>3.2.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -96,6 +96,11 @@
             <artifactId>cupid-sdk</artifactId>
             <version>${cupid.sdk.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.json4s</groupId>
+            <artifactId>json4s-native_2.12</artifactId>
+            <version>3.6.0</version>
         </dependency>
     </dependencies>
     <build>

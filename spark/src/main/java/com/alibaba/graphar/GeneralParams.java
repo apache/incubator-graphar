@@ -26,5 +26,7 @@ public class GeneralParams {
     public static final String vertexChunkIndexCol = "_graphArVertexChunkIndex";
     public static final String edgeIndexCol = "_graphArEdgeIndex";
     public static final String regularSeperator = "_";
+    public static final String offsetStartChunkIndexKey = "_graphar_offste_start_chunk_index";
+    public static final String aggNumListOfEdgeChunkKey = "_graphar_agg_num_list_of_edge_chunk";
 }
 

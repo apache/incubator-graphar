@@ -15,30 +15,18 @@
 
 package com.alibaba.graphar.utils
 
-import java.net.URI
+import org.json4s._
+import org.json4s.native.Serialization.write
+
+import com.alibaba.graphar.GeneralParams
+
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.DataFrame
-import org.apache.hadoop.fs
+import org.apache.hadoop.fs.Path
+import org.apache.spark.sql.internal.SQLConf.FILE_COMMIT_PROTOCOL_CLASS
 
 /** Helper object to write dataframe to chunk files */
 object FileSystem {
-  private def renameSparkGeneratedFiles(spark: SparkSession, filePrefix: String, startChunkIndex: Int): Unit = {
-    val sc = spark.sparkContext
-    val file_system = fs.FileSystem.get(new URI(filePrefix), spark.sparkContext.hadoopConfiguration)
-    val path_pattern = new fs.Path(filePrefix + "part*")
-    val files = file_system.globStatus(path_pattern)
-    for (i <- 0 until files.length) {
-      val file_name = files(i).getPath.getName
-      val new_file_name = "chunk" + (i + startChunkIndex).toString
-      val destPath = new fs.Path(filePrefix + new_file_name)
-      if (file_system.isFile(destPath)) {
-        // if chunk file already exists, overwrite it
-        file_system.delete(destPath)
-      }
-      file_system.rename(new fs.Path(filePrefix + file_name), destPath)
-    }
-  }
-
   /** Write input dataframe to output path with certain file format.
    *
    * @param dataframe DataFrame to write out.
@@ -47,11 +35,27 @@ object FileSystem {
    * @param startChunkIndex the start index of chunk.
    *
    */
-  def writeDataFrame(dataFrame: DataFrame, fileType: String, outputPrefix: String, startChunkIndex: Int = 0): Unit = {
+  def writeDataFrame(dataFrame: DataFrame, fileType: String, outputPrefix: String, offsetStartChunkIndex: Option[Int],
+                     aggNumListOfEdgeChunk: Option[Array[Long]]): Unit = {
     val spark = dataFrame.sparkSession
     spark.conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
     spark.conf.set("parquet.enable.summary-metadata", "false")
-    dataFrame.write.mode("append").option("header", "true").format(fileType).save(outputPrefix)
-    renameSparkGeneratedFiles(spark, outputPrefix, startChunkIndex)
+    // first check the outputPrefix exist, if not, create it
+    val path = new Path(outputPrefix)
+    val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
+    if (!fs.exists(path)) {
+      fs.mkdirs(path)
+    }
+    // write offset chunks data frame
+    if (!offsetStartChunkIndex.isEmpty) {
+      return dataFrame.write.mode("append").option("fileFormat", fileType).option(GeneralParams.offsetStartChunkIndexKey, offsetStartChunkIndex.get).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
+    }
+    // write edge chunks data frame
+    if (!aggNumListOfEdgeChunk.isEmpty) {
+      implicit val formats = DefaultFormats
+      return dataFrame.write.mode("append").option("fileFormat", fileType).option(GeneralParams.aggNumListOfEdgeChunkKey, write(aggNumListOfEdgeChunk.get)).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
+    }
+    // write vertex chunks data frame
+    dataFrame.write.mode("append").option("fileFormat", fileType).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
   }
 }
