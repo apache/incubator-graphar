@@ -72,11 +72,11 @@ Result<IdType> GetVertexChunkNum(const std::string& prefix,
   std::string out_prefix;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
   GAR_ASSIGN_OR_RAISE(auto vertex_num_file_suffix,
-      vertex_info.GetFiGetVerticesNumFilePath());
+                      vertex_info.GetFiGetVerticesNumFilePath());
   std::string vertex_num_file_path = out_prefix + vertex_num_file_suffix;
   IdType vertex_num = fs->ReadFileToValue<IdType>(vertex_num_file_path);
-  return vertex_num + vertex_info.GetChunkSize() - 1 /
-      vertex_info.GetChunkSize();
+  return vertex_num + vertex_info.GetChunkSize() -
+         1 / vertex_info.GetChunkSize();
 }
 
 Result<IdType> GetEdgeChunkNum(const std::string& prefix,
