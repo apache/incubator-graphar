@@ -69,7 +69,9 @@ jobs:
           popd
 
       - name: Preview using surge
-        if: ${{ github.event_name == 'pull_request_target' && github.repository == 'alibaba/GraphAr' }}
+        # if: ${{ github.event_name == 'pull_request_target' && github.repository == 'alibaba/GraphAr' }}
+        # FIXME: Error: auth() received invalid user or password
+        if: false
         run: |
           npm install -g surge
           surge ./docs/_build/html \
