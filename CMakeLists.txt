@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 
+if(POLICY CMP0026)
+  cmake_policy(SET CMP0026 OLD)
+endif()
+
 if(POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif()
@@ -113,7 +117,8 @@ endmacro()
 macro(find_yaml_cpp)
     set(MESSAGE_QUIET ON)
     set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
-    add_subdirectory_static(thirdparty/yaml-cpp)
+    set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+    add_subdirectory_static(thirdparty/yaml-cpp EXCLUDE_FROM_ALL)
     unset(MESSAGE_QUIET)
     set(CMAKE_WARN_DEPRECATED ON CACHE BOOL "" FORCE)
 endmacro()
@@ -155,6 +160,17 @@ build_arrow()
 
 include_directories(BEFORE SYSTEM ${ARROW_INCLUDE_DIR})
 
+macro(get_target_location var target)
+  if(TARGET ${target})
+    foreach(prop LOCATION LOCATION_NOCONFIG LOCATION_DEBUG LOCATION_RELEASE)
+      get_target_property(${var} ${target} ${prop})
+      if(NOT ("${${var}}" STREQUAL "${var}-NOTFOUND"))
+        break ()
+      endif()
+    endforeach()
+  endif()
+endmacro()
+
 # ------------------------------------------------------------------------------
 # generate gar library
 # ------------------------------------------------------------------------------
@@ -163,23 +179,22 @@ macro(build_gar)
     add_library(gar SHARED ${CORE_SRC_FILES})
     install_gar_target(gar)
     target_compile_features(gar PRIVATE cxx_std_17)
-    target_include_directories(
-    gar
-    PRIVATE
-    ${PROJECT_SOURCE_DIR}/include
-    $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/yaml-cpp/include>
+    target_include_directories(gar PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+                                          $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+                                          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/yaml-cpp/include>
     )
     target_link_libraries(gar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
+    # make sure `libyaml-cpp.a` built first
+    add_dependencies(gar yaml-cpp)
+    get_target_location(YAML_CPP_LIBRARY_LOCATION yaml-cpp)
     if(APPLE)
         target_link_libraries(gar PRIVATE -Wl,-force_load arrow_static
-            "${PROJECT_BINARY_DIR}/thirdparty/yaml-cpp/libyaml-cpp.a"
+            "${YAML_CPP_LIBRARY_LOCATION}"
             "${PARQUET_STATIC_LIB}"
             "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
     else()
         target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive arrow_static
-            "${PROJECT_BINARY_DIR}/thirdparty/yaml-cpp/libyaml-cpp.a"
+            "${YAML_CPP_LIBRARY_LOCATION}"
             "${PARQUET_STATIC_LIB}"
             "${ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
     endif()
