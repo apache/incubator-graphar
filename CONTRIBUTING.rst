@@ -47,6 +47,22 @@ starting the implementation. There are often a number of ways to fix a problem
 and it is important to find the right approach before spending time on a PR
 that cannot be merged.
 
+Install pre-commit
+^^^^^^^^^^^^^^^^^^
+
+GraphAr use `pre-commit`_ to ensure no secrets are accidentally committed
+into the Git repository, you could first install  `pre-commit`_ by
+
+.. code:: bash
+
+    pip3 install pre-commit
+
+The configure the necessary pre-commit hooks with
+
+.. code:: bash
+
+    pre-commit install  --install-hooks
+
 Minor Fixes
 ^^^^^^^^^^^^
 
@@ -384,6 +400,8 @@ This means that all tests pass and there are no linting errors. In reality,
 however, it is not uncommon for the CI infrastructure itself to fail on specific
 platforms ("be red"). It is vital to visually inspect the results of all failed ("red") tests
 to determine whether the failure was caused by the changes in the pull request.
+
+.. _pre-commit: https://pre-commit.com/
 
 .. _Code of Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
 
