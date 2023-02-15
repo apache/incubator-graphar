@@ -211,7 +211,7 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     val p_it = propertyGroup.getProperties().iterator
     while (p_it.hasNext()) {
       val property = p_it.next()
-      property_list += property.getName()
+      property_list += "`" + property.getName() + "`"
     }
     var chunk_index: Long = 0
     for (chunk <- chunks) {
