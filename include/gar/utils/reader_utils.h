@@ -29,6 +29,14 @@ Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
     const EdgeInfo& edge_info, const std::string& prefix,
     AdjListType adj_list_type, IdType vid) noexcept;
 
+Result<IdType> GetVertexChunkNum(const std::string& prefix,
+                                 const VertexInfo& vertex_info) noexcept;
+
+Result<IdType> GetEdgeChunkNum(const std::string& prefix,
+                               const EdgeInfo& edge_info,
+                               AdjListType adj_list_type,
+                               IdType vertex_chunk_index) noexcept;
+
 }  // namespace utils
 }  // namespace GAR_NAMESPACE_INTERNAL
 #endif  // GAR_UTILS_READER_UTILS_H_

@@ -67,6 +67,32 @@ Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
                         static_cast<IdType>(array->Value(1)));
 }
 
+Result<IdType> GetVertexChunkNum(const std::string& prefix,
+                                 const VertexInfo& vertex_info) noexcept {
+  std::string out_prefix;
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
+  GAR_ASSIGN_OR_RAISE(auto vertex_num_file_suffix,
+                      vertex_info.GetVerticesNumFilePath());
+  std::string vertex_num_file_path = out_prefix + vertex_num_file_suffix;
+  GAR_ASSIGN_OR_RAISE(auto vertex_num,
+                      fs->ReadFileToValue<IdType>(vertex_num_file_path));
+  return (vertex_num + vertex_info.GetChunkSize() - 1) /
+         vertex_info.GetChunkSize();
+}
+
+Result<IdType> GetEdgeChunkNum(const std::string& prefix,
+                               const EdgeInfo& edge_info,
+                               AdjListType adj_list_type,
+                               IdType vertex_chunk_index) noexcept {
+  std::string out_prefix;
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
+  GAR_ASSIGN_OR_RAISE(auto adj_prefix,
+                      edge_info.GetAdjListPathPrefix(adj_list_type));
+  std::string chunk_dir =
+      out_prefix + adj_prefix + "part" + std::to_string(vertex_chunk_index);
+  return fs->GetFileNumOfDir(chunk_dir);
+}
+
 }  // namespace utils
 
 }  // namespace GAR_NAMESPACE_INTERNAL

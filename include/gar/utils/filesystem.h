@@ -113,7 +113,7 @@ class FileSystem {
    *
    * the file is not pure file, it can be a directory or other type of file.
    */
-  Result<size_t> GetFileNumOfDir(const std::string& dir_path,
+  Result<IdType> GetFileNumOfDir(const std::string& dir_path,
                                  bool recursive = false) const noexcept;
 
  private:
