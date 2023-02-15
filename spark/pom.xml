@@ -97,6 +97,11 @@
             <version>${cupid.sdk.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-connector-apache-spark_2.12</artifactId>
+            <version>5.0.0_for_spark_3</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
