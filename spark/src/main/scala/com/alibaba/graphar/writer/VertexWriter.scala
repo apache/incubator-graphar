@@ -82,7 +82,7 @@ class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame) 
     val it = propertyGroup.getProperties().iterator
     while (it.hasNext()) {
       val property = it.next()
-      property_list += property.getName()
+      property_list += "`" + property.getName() + "`"
     }
     val pg_df = chunks.select(property_list.map(col): _*)
     FileSystem.writeDataFrame(pg_df, propertyGroup.getFile_type(), output_prefix)
