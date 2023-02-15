@@ -118,7 +118,7 @@ object IndexGenerator {
     val srcCol = GeneralParams.srcIndexCol;
     val indexCol = GeneralParams.vertexIndexCol;
     val srcPrimaryKey = GeneralParams.primaryCol;
-    val trans_df = spark.sql(f"select src_vertex.$indexCol%s as $srcCol%s, edge.* from edge inner join src_vertex on src_vertex.$srcPrimaryKey%s=edge.$srcColumnName%s")
+    val trans_df = spark.sql(f"select src_vertex.`$indexCol` as `$srcCol`, edge.* from edge inner join src_vertex on src_vertex.`$srcPrimaryKey`=edge.`$srcColumnName`")
     // drop the old src id col
     trans_df.drop(srcColumnName)
 	}
@@ -131,7 +131,7 @@ object IndexGenerator {
     val dstCol = GeneralParams.dstIndexCol;
     val indexCol = GeneralParams.vertexIndexCol;
     val dstPrimaryKey = GeneralParams.primaryCol;
-    val trans_df = spark.sql(f"select dst_vertex.$indexCol%s as $dstCol%s, edges.* from edges inner join dst_vertex on dst_vertex.$dstPrimaryKey%s=edges.$dstColumnName%s")
+    val trans_df = spark.sql(f"select dst_vertex.`$indexCol` as `$dstCol`, edges.* from edges inner join dst_vertex on dst_vertex.`$dstPrimaryKey`=edges.`$dstColumnName`")
     // drop the old dst id col
     trans_df.drop(dstColumnName)
 	}
