@@ -188,12 +188,12 @@ macro(build_gar)
     add_dependencies(gar yaml-cpp)
     get_target_location(YAML_CPP_LIBRARY_LOCATION yaml-cpp)
     if(APPLE)
-        target_link_libraries(gar PRIVATE -Wl,-force_load arrow_static
+        target_link_libraries(gar PRIVATE -Wl,-force_load gar_arrow_static
             "${YAML_CPP_LIBRARY_LOCATION}"
             "${PARQUET_STATIC_LIB}"
             "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
     else()
-        target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive arrow_static
+        target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
             "${YAML_CPP_LIBRARY_LOCATION}"
             "${PARQUET_STATIC_LIB}"
             "${ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
@@ -224,11 +224,11 @@ if (BUILD_EXAMPLES)
         include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
         target_link_libraries(${E_NAME} PRIVATE gar ${Boost_LIBRARIES} Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
-            target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load arrow_static
+            target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
                 "${PARQUET_STATIC_LIB}"
                 "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
         else()
-            target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive arrow_static
+            target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
                 "${PARQUET_STATIC_LIB}"
                 "${ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
         endif()
@@ -289,11 +289,11 @@ if (BUILD_TESTS)
         target_compile_features(${target} PRIVATE cxx_std_17)
         target_link_libraries(${target} PRIVATE Catch2::Catch2 gar Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
-            target_link_libraries(${target} PRIVATE -Wl,-force_load arrow_static
+            target_link_libraries(${target} PRIVATE -Wl,-force_load gar_arrow_static
                 "${PARQUET_STATIC_LIB}"
                 "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
         else()
-            target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive arrow_static
+            target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
                 "${PARQUET_STATIC_LIB}"
                 "${ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
         endif()

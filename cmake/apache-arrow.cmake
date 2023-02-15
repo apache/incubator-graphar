@@ -75,8 +75,8 @@ function(build_arrow)
             CMAKE_ARGS "${ARROW_CMAKE_ARGS}"
             BUILD_BYPRODUCTS "${ARROW_BUILD_BYPRODUCTS}")
 
-    set(ARROW_LIBRARY_TARGET arrow_static)
-    set(PARQUET_LIBRARY_TARGET parquet_static)
+    set(ARROW_LIBRARY_TARGET gar_arrow_static)
+    set(PARQUET_LIBRARY_TARGET gar_parquet_static)
 
     file(MAKE_DIRECTORY "${ARROW_INCLUDE_DIR}")
     add_library(${ARROW_LIBRARY_TARGET} STATIC IMPORTED)
