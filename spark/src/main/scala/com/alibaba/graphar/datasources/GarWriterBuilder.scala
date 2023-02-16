@@ -15,7 +15,7 @@ import org.apache.spark.sql.catalyst.csv.CSVOptions
 import org.apache.spark.sql.catalyst.util.CompressionCodecs
 import org.apache.spark.sql.execution.datasources.csv.CsvOutputWriter
 import org.apache.spark.internal.io.FileCommitProtocol
-import org.apache.spark.sql.{AnalysisException, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util.{CaseInsensitiveMap, DateTimeUtils}
 import org.apache.spark.sql.connector.write.{BatchWrite, LogicalWriteInfo, WriteBuilder, SupportsOverwrite, SupportsTruncate}
@@ -27,14 +27,11 @@ import org.apache.spark.sql.util.SchemaUtils
 import org.apache.spark.util.SerializableConfiguration
 import org.apache.spark.sql.execution.datasources.v2.FileBatchWrite
 import org.apache.spark.sql.catalyst.expressions.AttributeReference
-import org.apache.spark.sql.sources.Filter
 
-class GarWriteBuilder(paths: Seq[String],
+abstract class GarWriteBuilder(paths: Seq[String],
                       formatName: String,
                       supportsDataType: DataType => Boolean,
-                      info: LogicalWriteInfo) extends WriteBuilder with SupportsOverwrite
-
-  with SupportsTruncate {
+                      info: LogicalWriteInfo) extends WriteBuilder {
   private val schema = info.schema()
   private val queryId = info.queryId()
   private val options = info.options()
@@ -58,28 +55,7 @@ class GarWriteBuilder(paths: Seq[String],
   def prepareWrite(sqlConf: SQLConf,
                    job: Job,
                    options: Map[String, String],
-                   dataSchema: StructType): OutputWriterFactory = {
-    val conf = job.getConfiguration
-    val csvOptions = new CSVOptions(
-      options,
-      columnPruning = sqlConf.csvColumnPruning,
-      sqlConf.sessionLocalTimeZone)
-    csvOptions.compressionCodec.foreach { codec =>
-      CompressionCodecs.setCodecConfiguration(conf, codec)
-    }
-
-    new OutputWriterFactory {
-      override def newInstance(path: String,
-                               dataSchema: StructType,
-                               context: TaskAttemptContext): OutputWriter = {
-        new CsvOutputWriter(path, dataSchema, context, csvOptions)
-      }
-
-      override def getFileExtension(context: TaskAttemptContext): String = {
-        ".csv" + CodecStreams.getCompressionExtension(context)
-      }
-    }
-  }
+                   dataSchema: StructType): OutputWriterFactory
 
   private def validateInputs(caseSensitiveAnalysis: Boolean): Unit = {
     assert(schema != null, "Missing input data schema")
@@ -90,16 +66,14 @@ class GarWriteBuilder(paths: Seq[String],
         s"got: ${paths.mkString(", ")}")
     }
     val pathName = paths.head
-    // SchemaUtils.checkColumnNameDuplication(schema.fields.map(_.name),
-    //   s"when inserting into $pathName", caseSensitiveAnalysis)
     DataSource.validateSchema(schema)
 
-    // schema.foreach { field =>
-    //   if (!supportsDataType(field.dataType)) {
-    //     throw new AnalysisException(
-    //       s"$formatName data source does not support ${field.dataType.catalogString} data type.")
-    //   }
-    // }
+    schema.foreach { field =>
+      if (!supportsDataType(field.dataType)) {
+         throw new IllegalArgumentException(
+            s"$formatName data source does not support ${field.dataType.catalogString} data type.")
+      }
+    }
   }
 
   private def getJobInstance(hadoopConf: Configuration, path: Path): Job = {
@@ -143,13 +117,5 @@ class GarWriteBuilder(paths: Seq[String],
         .getOrElse(sparkSession.sessionState.conf.sessionLocalTimeZone),
       statsTrackers = Seq(statsTracker)
     )
-  }
-
-  override def overwrite(filters: Array[Filter]): WriteBuilder = {
-    new GarWriteBuilder(paths, formatName, supportsDataType, info)
-  }
-
-  override def truncate(): WriteBuilder = {
-    new GarWriteBuilder(paths, formatName, supportsDataType, info)
   }
 }

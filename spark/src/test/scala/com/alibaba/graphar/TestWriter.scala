@@ -68,7 +68,7 @@ class WriterSuite extends AnyFunSuite {
     assertThrows[IllegalArgumentException](writer.writeVertexProperties(invalid_property_group))
 
     // clean generated files and close FileSystem instance
-    // fs.delete(new Path(prefix + "vertex"))
+    fs.delete(new Path(prefix + "vertex"))
     fs.close()
   }
 
@@ -162,44 +162,31 @@ class WriterSuite extends AnyFunSuite {
     val writer = new EdgeWriter(prefix, edge_info, adj_list_type, edge_df_with_src_dst_index)
 
     // test write adj list
+    writer.writeAdjList()
+    val adj_list_path_pattern = new Path(prefix + edge_info.getAdjListPathPrefix(adj_list_type) + "*/*")
+    val adj_list_chunk_files = fs.globStatus(adj_list_path_pattern)
+    assert(adj_list_chunk_files.length == 11)
+    val offset_path_pattern = new Path(prefix + edge_info.getOffsetPathPrefix(adj_list_type) + "*")
+    val offset_chunk_files = fs.globStatus(offset_path_pattern)
+    assert(offset_chunk_files.length == 10)
+    // compare with correct offset chunk value
+    val offset_file_path = prefix + edge_info.getAdjListOffsetFilePath(0, adj_list_type)
+    val correct_offset_file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0").getPath
+    val generated_offset_array = fromFile(offset_file_path).getLines.toArray
+    val expected_offset_array = fromFile(correct_offset_file_path).getLines.toArray
+    assert(generated_offset_array.sameElements(expected_offset_array))
+
+    // test write property group
+    val property_group = edge_info.getPropertyGroup("creationDate", adj_list_type)
+    writer.writeEdgeProperties(property_group)
+    val property_group_path_pattern = new Path(prefix + edge_info.getPropertyGroupPathPrefix(property_group, adj_list_type) + "*/*")
+    val property_group_chunk_files = fs.globStatus(property_group_path_pattern)
+    assert(property_group_chunk_files.length == 11)
+
     writer.writeEdges()
 
     // clean generated files and close FileSystem instance
     fs.delete(new Path(prefix + "edge"))
     fs.close()
-  }
-
-  test("test new edge writer") {
-    // read vertex dataframe
-    val vertex_file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/person_0_0.csv").getPath
-    val vertex_df = spark.read.option("delimiter", "|").option("header", "true").csv(vertex_file_path)
-
-    // read edge dataframe
-    val file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv").getPath
-    val edge_df = spark.read.option("delimiter", "|").option("header", "true").csv(file_path)
-
-    val prefix : String = "/tmp/"
-    val fs = FileSystem.get(new Path(prefix).toUri(), spark.sparkContext.hadoopConfiguration)
-    val adj_list_type = AdjListType.ordered_by_source
-
-    // read vertex yaml
-    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person.vertex.yml").getPath)
-    val vertex_input = fs.open(vertex_yaml_path)
-    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
-
-    // read edge yaml
-    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath)
-    val edge_input = fs.open(edge_yaml_path)
-    val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
-    val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
-
-    // construct person vertex mapping with dataframe
-    val vertex_mapping = IndexGenerator.constructVertexIndexMapping(vertex_df, vertex_info.getPrimaryKey())
-    // generate src index and dst index for edge datafram with vertex mapping
-    val edge_df_with_src_index = IndexGenerator.generateSrcIndexForEdgesFromMapping(edge_df, "src", vertex_mapping)
-    val edge_df_with_src_dst_index = IndexGenerator.generateDstIndexForEdgesFromMapping(edge_df_with_src_index, "dst", vertex_mapping)
-
-    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, edge_df_with_src_dst_index)
   }
 }

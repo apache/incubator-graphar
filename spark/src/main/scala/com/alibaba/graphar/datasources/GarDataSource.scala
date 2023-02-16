@@ -37,8 +37,6 @@ import org.apache.spark.sql.connector.expressions.Transform
 
 /** GarDataSource is a class to provide gar files as the data source for spark. */
 class GarDataSource extends TableProvider with DataSourceRegister {
-  println("Initialize GarDataSource")
-
   /** The default fallback file format is Parquet. */
   def fallbackFileFormat: Class[_ <: FileFormat] = classOf[ParquetFileFormat]
 

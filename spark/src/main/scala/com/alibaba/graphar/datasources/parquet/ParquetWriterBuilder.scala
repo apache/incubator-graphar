@@ -1,4 +1,4 @@
-package com.alibaba.graphar.datasources
+package com.alibaba.graphar.datasources.parquet
 
 import org.apache.hadoop.mapreduce.{Job, OutputCommitter, TaskAttemptContext}
 import org.apache.parquet.hadoop.{ParquetOutputCommitter, ParquetOutputFormat}
@@ -13,6 +13,8 @@ import org.apache.spark.sql.execution.datasources.{OutputWriter, OutputWriterFac
 import org.apache.spark.sql.execution.datasources.parquet._
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types._
+
+import com.alibaba.graphar.datasources.GarWriteBuilder
 
 class ParquetWriteBuilder(paths: Seq[String],
                           formatName: String,

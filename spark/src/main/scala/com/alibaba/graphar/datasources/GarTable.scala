@@ -30,6 +30,11 @@ import org.apache.spark.sql.execution.datasources.v2.FileTable
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
+import com.alibaba.graphar.datasources.csv.CSVWriteBuilder
+import com.alibaba.graphar.datasources.parquet.ParquetWriteBuilder
+import com.alibaba.graphar.datasources.orc.OrcWriteBuilder
+
+
 /** GarTable is a class to represent the graph data in GraphAr as a table. */
 case class GarTable(name: String,
                     sparkSession: SparkSession,
@@ -61,7 +66,7 @@ case class GarTable(name: String,
   /** Construct a new write builder according to the actual file format. */
   override def newWriteBuilder(info: LogicalWriteInfo): WriteBuilder = formatName match {
     case "csv" => new CSVWriteBuilder(paths, formatName, supportsDataType, info)
-    case "orc" => new GarWriteBuilder(paths, formatName, supportsDataType, info)
+    case "orc" => new OrcWriteBuilder(paths, formatName, supportsDataType, info)
     case "parquet" => new ParquetWriteBuilder(paths, formatName, supportsDataType, info)
     case _ => throw new IllegalArgumentException
   }
@@ -91,6 +96,4 @@ case class GarTable(name: String,
 
   /** The actual file format for storing the data in GraphAr. */
   override def formatName: String = options.get("fileFormat")
-
-  println(formatName)
 }

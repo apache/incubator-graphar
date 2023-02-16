@@ -25,7 +25,6 @@ import org.apache.spark.sql.types.{IntegerType, LongType, StructType, StructFiel
 import org.apache.spark.util.Utils
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.internal.SQLConf.FILE_COMMIT_PROTOCOL_CLASS
 
 import scala.collection.SortedMap
 import scala.collection.mutable.ArrayBuffer
@@ -116,6 +115,22 @@ object EdgeWriter {
  */
 class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Value, edgeDf: DataFrame) {
   private val spark: SparkSession = edgeDf.sparkSession
+
+  // validate data and info
+  private def validate(): Unit = {
+    // chunk if edge info contains the adj list type
+    if (edgeInfo.containAdjList(adjListType) == false) {
+      throw new IllegalArgumentException
+    }
+    // check the src index and dst index column exist
+    val src_filed = StructField(GeneralParams.srcIndexCol, LongType)
+    val dst_filed = StructField(GeneralParams.dstIndexCol, LongType)
+    val schema = edgeDf.schema
+    if (schema.contains(src_filed) == false || schema.contains(dst_filed) == false) {
+      throw new IllegalArgumentException
+    }
+  }
+  validate()
 
   private val edgeDfAndOffsetDf: (DataFrame,  Seq[DataFrame], Array[Long]) = EdgeWriter.repartitionAndSort(spark, edgeDf, edgeInfo, adjListType)
 

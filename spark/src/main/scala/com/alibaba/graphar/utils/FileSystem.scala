@@ -23,7 +23,6 @@ import com.alibaba.graphar.GeneralParams
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.DataFrame
 import org.apache.hadoop.fs.Path
-import org.apache.spark.sql.internal.SQLConf.FILE_COMMIT_PROTOCOL_CLASS
 
 /** Helper object to write dataframe to chunk files */
 object FileSystem {
@@ -48,14 +47,14 @@ object FileSystem {
     }
     // write offset chunks data frame
     if (!offsetStartChunkIndex.isEmpty) {
-      return dataFrame.write.mode("append").option("fileFormat", fileType).option(GeneralParams.offsetStartChunkIndexKey, offsetStartChunkIndex.get).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
+      return dataFrame.write.mode("append").option("header", "true").option("fileFormat", fileType).option(GeneralParams.offsetStartChunkIndexKey, offsetStartChunkIndex.get).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
     }
     // write edge chunks data frame
     if (!aggNumListOfEdgeChunk.isEmpty) {
       implicit val formats = DefaultFormats  // initialize a default formats for json4s
-      return dataFrame.write.mode("append").option("fileFormat", fileType).option(GeneralParams.aggNumListOfEdgeChunkKey, write(aggNumListOfEdgeChunk.get)).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
+      return dataFrame.write.mode("append").option("header", "true").option("fileFormat", fileType).option(GeneralParams.aggNumListOfEdgeChunkKey, write(aggNumListOfEdgeChunk.get)).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
     }
     // write vertex chunks data frame
-    dataFrame.write.mode("append").option("fileFormat", fileType).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
+    dataFrame.write.mode("append").option("header", "true").option("fileFormat", fileType).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
   }
 }

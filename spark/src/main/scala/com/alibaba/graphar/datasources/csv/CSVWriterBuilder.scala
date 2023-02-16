@@ -1,7 +1,6 @@
-package com.alibaba.graphar.datasources
+package com.alibaba.graphar.datasources.csv
 
 import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
-
 import org.apache.spark.sql.catalyst.csv.CSVOptions
 import org.apache.spark.sql.catalyst.util.CompressionCodecs
 import org.apache.spark.sql.connector.write.LogicalWriteInfo
@@ -9,6 +8,10 @@ import org.apache.spark.sql.execution.datasources.{CodecStreams, OutputWriter, O
 import org.apache.spark.sql.execution.datasources.csv.CsvOutputWriter
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.{DataType, StructType}
+import org.apache.spark.sql.sources.Filter
+import org.apache.spark.sql.connector.write.SupportsOverwrite
+
+import com.alibaba.graphar.datasources.GarWriteBuilder
 
 class CSVWriteBuilder(paths: Seq[String],
                       formatName: String,
