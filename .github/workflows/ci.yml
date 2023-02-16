@@ -109,7 +109,7 @@ jobs:
       run: |
         pushd build
         make -j$(nproc)
-        make ccache-stats
+        make gar-ccache-stats
         popd
 
     - name: Test
