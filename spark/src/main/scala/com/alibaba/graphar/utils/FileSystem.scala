@@ -48,14 +48,14 @@ object FileSystem {
     }
     // write offset chunks data frame
     if (!offsetStartChunkIndex.isEmpty) {
-      return dataFrame.write.mode("append").option("fileFormat", fileType).option(GeneralParams.offsetStartChunkIndexKey, offsetStartChunkIndex.get).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
+      return dataFrame.write.mode("overwite").option("fileFormat", fileType).option(GeneralParams.offsetStartChunkIndexKey, offsetStartChunkIndex.get).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
     }
     // write edge chunks data frame
     if (!aggNumListOfEdgeChunk.isEmpty) {
       implicit val formats = DefaultFormats
-      return dataFrame.write.mode("append").option("fileFormat", fileType).option(GeneralParams.aggNumListOfEdgeChunkKey, write(aggNumListOfEdgeChunk.get)).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
+      return dataFrame.write.mode("overwite").option("fileFormat", fileType).option(GeneralParams.aggNumListOfEdgeChunkKey, write(aggNumListOfEdgeChunk.get)).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
     }
     // write vertex chunks data frame
-    dataFrame.write.mode("append").option("fileFormat", fileType).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
+    dataFrame.write.mode("overwite").option("fileFormat", fileType).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
   }
 }
