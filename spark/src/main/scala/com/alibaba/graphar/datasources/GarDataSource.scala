@@ -89,7 +89,7 @@ class GarDataSource extends TableProvider with DataSourceRegister {
     val paths = getPaths(options)
     val tableName = getTableName(options, paths)
     val optionsWithoutPaths = getOptionsWithoutPaths(options)
-    GarTable(tableName, sparkSession, optionsWithoutPaths, paths, Some(schema),  getFallbackFileFormat(options))
+    GarTable(tableName, sparkSession, optionsWithoutPaths, paths, Some(schema), getFallbackFileFormat(options))
   }
 
   override def supportsExternalMetadata(): Boolean = true
@@ -105,10 +105,9 @@ class GarDataSource extends TableProvider with DataSourceRegister {
     Array.empty
   }
 
-  override def getTable(
-                         schema: StructType,
-                         partitioning: Array[Transform],
-                         properties: util.Map[String, String]): Table = {
+  override def getTable(schema: StructType,
+                        partitioning: Array[Transform],
+                        properties: util.Map[String, String]): Table = {
     // If the table is already loaded during schema inference, return it directly.
     if (t != null) {
       t

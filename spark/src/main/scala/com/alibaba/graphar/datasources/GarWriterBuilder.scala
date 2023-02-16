@@ -29,13 +29,12 @@ import org.apache.spark.sql.execution.datasources.v2.FileBatchWrite
 import org.apache.spark.sql.catalyst.expressions.AttributeReference
 import org.apache.spark.sql.sources.Filter
 
-class GarWriteBuilder(
-                        paths: Seq[String],
-                        formatName: String,
-                        supportsDataType: DataType => Boolean,
-                        info: LogicalWriteInfo) extends WriteBuilder with SupportsOverwrite
+class GarWriteBuilder(paths: Seq[String],
+                      formatName: String,
+                      supportsDataType: DataType => Boolean,
+                      info: LogicalWriteInfo) extends WriteBuilder with SupportsOverwrite
 
-with SupportsTruncate {
+  with SupportsTruncate {
   private val schema = info.schema()
   private val queryId = info.queryId()
   private val options = info.options()
@@ -111,12 +110,11 @@ with SupportsTruncate {
     job
   }
 
-  private def createWriteJobDescription(
-                                         sparkSession: SparkSession,
-                                         hadoopConf: Configuration,
-                                         job: Job,
-                                         pathName: String,
-                                         options: Map[String, String]): WriteJobDescription = {
+  private def createWriteJobDescription(sparkSession: SparkSession,
+                                        hadoopConf: Configuration,
+                                        job: Job,
+                                        pathName: String,
+                                        options: Map[String, String]): WriteJobDescription = {
     val caseInsensitiveOptions = CaseInsensitiveMap(options)
     // Note: prepareWrite has side effect. It sets "job".
     val outputWriterFactory =

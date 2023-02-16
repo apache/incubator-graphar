@@ -149,7 +149,7 @@ class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Va
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
       throw new IllegalArgumentException
     }
-    
+
     val propertyList = ArrayBuffer[String]()
     val pIter = propertyGroup.getProperties().iterator
     while (pIter.hasNext()) {

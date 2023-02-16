@@ -15,8 +15,6 @@
 
 package com.alibaba.graphar
 
-import org.json4s.native.Serialization
-
 import com.alibaba.graphar.utils.IndexGenerator
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
@@ -42,7 +40,7 @@ class WriterSuite extends AnyFunSuite {
     val fs = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
 
     // read vertex yaml
-    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person.vertex.yml").getPath)
+    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/person.vertex.yml").getPath)
     val vertex_input = fs.open(vertex_yaml_path)
     val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
     val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
@@ -70,7 +68,7 @@ class WriterSuite extends AnyFunSuite {
     assertThrows[IllegalArgumentException](writer.writeVertexProperties(invalid_property_group))
 
     // clean generated files and close FileSystem instance
-    fs.delete(new Path(prefix + "vertex"))
+    // fs.delete(new Path(prefix + "vertex"))
     fs.close()
   }
 

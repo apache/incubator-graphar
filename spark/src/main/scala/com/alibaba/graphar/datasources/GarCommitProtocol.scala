@@ -4,7 +4,6 @@ import com.alibaba.graphar.GeneralParams
 
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
-// import org.json4s.JsonAST._
 
 import org.apache.spark.internal.io.FileCommitProtocol
 import org.apache.spark.sql.execution.datasources.SQLHadoopMapReduceCommitProtocol
@@ -48,9 +47,8 @@ class GarCommitProtocol(jobId: String,
     }
     if (options.contains(GeneralParams.aggNumListOfEdgeChunkKey)) {
       val jValue = parse(options.get(GeneralParams.aggNumListOfEdgeChunkKey).get)
-      implicit val formats = DefaultFormats
+      implicit val formats = DefaultFormats  // initialize a default formats for json4s
       val aggNums: List[Int] = Extraction.extract[List[Int]](jValue)
-      println(aggNums)
       val chunkPair: (Int, Int) = GarCommitProtocol.binarySearchPair(aggNums, partitionId)
       val vertex_chunk_index: Int = chunkPair._1
       val edge_chunk_index: Int = chunkPair._2

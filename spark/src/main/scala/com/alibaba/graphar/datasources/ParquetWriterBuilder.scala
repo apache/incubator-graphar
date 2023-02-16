@@ -14,18 +14,16 @@ import org.apache.spark.sql.execution.datasources.parquet._
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types._
 
-class ParquetWriteBuilder(
-                           paths: Seq[String],
-                           formatName: String,
-                           supportsDataType: DataType => Boolean,
-                           info: LogicalWriteInfo)
+class ParquetWriteBuilder(paths: Seq[String],
+                          formatName: String,
+                          supportsDataType: DataType => Boolean,
+                          info: LogicalWriteInfo)
   extends GarWriteBuilder(paths, formatName, supportsDataType, info) with Logging {
 
-  override def prepareWrite(
-                             sqlConf: SQLConf,
-                             job: Job,
-                             options: Map[String, String],
-                             dataSchema: StructType): OutputWriterFactory = {
+  override def prepareWrite(sqlConf: SQLConf,
+                            job: Job,
+                            options: Map[String, String],
+                            dataSchema: StructType): OutputWriterFactory = {
     val parquetOptions = new ParquetOptions(options, sqlConf)
 
     val conf = ContextUtil.getConfiguration(job)
@@ -83,10 +81,9 @@ class ParquetWriteBuilder(
     }
 
     new OutputWriterFactory {
-      override def newInstance(
-                                path: String,
-                                dataSchema: StructType,
-                                context: TaskAttemptContext): OutputWriter = {
+      override def newInstance(path: String,
+                               dataSchema: StructType,
+                               context: TaskAttemptContext): OutputWriter = {
         new ParquetOutputWriter(path, context)
       }
 

@@ -10,17 +10,15 @@ import org.apache.spark.sql.execution.datasources.csv.CsvOutputWriter
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.{DataType, StructType}
 
-class CSVWriteBuilder(
-                       paths: Seq[String],
-                       formatName: String,
-                       supportsDataType: DataType => Boolean,
-                       info: LogicalWriteInfo)
+class CSVWriteBuilder(paths: Seq[String],
+                      formatName: String,
+                      supportsDataType: DataType => Boolean,
+                      info: LogicalWriteInfo)
   extends GarWriteBuilder(paths, formatName, supportsDataType, info) {
-  override def prepareWrite(
-                             sqlConf: SQLConf,
-                             job: Job,
-                             options: Map[String, String],
-                             dataSchema: StructType): OutputWriterFactory = {
+  override def prepareWrite(sqlConf: SQLConf,
+                            job: Job,
+                            options: Map[String, String],
+                            dataSchema: StructType): OutputWriterFactory = {
     val conf = job.getConfiguration
     val csvOptions = new CSVOptions(
       options,
@@ -31,10 +29,9 @@ class CSVWriteBuilder(
     }
 
     new OutputWriterFactory {
-      override def newInstance(
-                                path: String,
-                                dataSchema: StructType,
-                                context: TaskAttemptContext): OutputWriter = {
+      override def newInstance(path: String,
+                               dataSchema: StructType,
+                               context: TaskAttemptContext): OutputWriter = {
         new CsvOutputWriter(path, dataSchema, context, csvOptions)
       }
 
