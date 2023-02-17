@@ -33,9 +33,11 @@ import org.apache.spark.sql.execution.datasources.v2._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.sql.sources.DataSourceRegister
-import org.apache.spark.util.Utils
 import org.apache.spark.sql.connector.expressions.Transform
 
+import com.alibaba.graphar.utils.Utils
+
+object GarUtils
 /** GarDataSource is a class to provide gar files as the data source for spark. */
 class GarDataSource extends TableProvider with DataSourceRegister {
   /** The default fallback file format is Parquet. */
@@ -64,7 +66,8 @@ class GarDataSource extends TableProvider with DataSourceRegister {
   protected def getTableName(map: CaseInsensitiveStringMap, paths: Seq[String]): String = {
     val hadoopConf = sparkSession.sessionState.newHadoopConfWithOptions(
       map.asCaseSensitiveMap().asScala.toMap)
-    shortName() + " " + paths.map(qualifiedPathName(_, hadoopConf)).mkString(",")
+    val name = shortName() + " " + paths.map(qualifiedPathName(_, hadoopConf)).mkString(",")
+    Utils.redact(sparkSession.sessionState.conf.stringRedactionPattern, name)
   }
 
   private def qualifiedPathName(path: String, hadoopConf: Configuration): String = {

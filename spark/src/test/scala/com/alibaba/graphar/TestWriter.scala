@@ -24,7 +24,6 @@ import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import org.apache.hadoop.fs.{Path, FileSystem}
 import scala.io.Source.fromFile
-import org.apache.spark.sql.internal.SQLConf.FILE_COMMIT_PROTOCOL_CLASS
 
 
 class WriterSuite extends AnyFunSuite {
