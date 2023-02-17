@@ -1,3 +1,21 @@
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * The implementation of GarWriteBuilder is refered from FileWriteBuilder of spark 3.1.1
+ */
+
 package com.alibaba.graphar.datasources
 
 import java.util.UUID
@@ -10,15 +28,11 @@ import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
 import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
 
-import org.apache.spark.sql.execution.datasources.{CodecStreams, OutputWriter, OutputWriterFactory}
-import org.apache.spark.sql.catalyst.csv.CSVOptions
-import org.apache.spark.sql.catalyst.util.CompressionCodecs
-import org.apache.spark.sql.execution.datasources.csv.CsvOutputWriter
-import org.apache.spark.internal.io.FileCommitProtocol
+import org.apache.spark.sql.execution.datasources.{OutputWriter, OutputWriterFactory}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util.{CaseInsensitiveMap, DateTimeUtils}
-import org.apache.spark.sql.connector.write.{BatchWrite, LogicalWriteInfo, WriteBuilder, SupportsOverwrite, SupportsTruncate}
+import org.apache.spark.sql.connector.write.{BatchWrite, LogicalWriteInfo, WriteBuilder}
 import org.apache.spark.sql.execution.datasources.{BasicWriteJobStatsTracker, DataSource, OutputWriterFactory, WriteJobDescription}
 import org.apache.spark.sql.execution.metric.SQLMetric
 import org.apache.spark.sql.internal.SQLConf
@@ -93,8 +107,8 @@ abstract class GarWriteBuilder(paths: Seq[String],
     // Note: prepareWrite has side effect. It sets "job".
     val outputWriterFactory =
       prepareWrite(sparkSession.sessionState.conf, job, caseInsensitiveOptions, schema)
-    // val allColumns = schema.toAttributes
-    val allColumns: Seq[AttributeReference] = GarHadoopWriterUtils.schemaToAttributes(schema)
+    // same as schema.toAttributes if private of spark
+    val allColumns: Seq[AttributeReference] = schema.map( f => AttributeReference(f.name, f.dataType, f.nullable, f.metadata)())
     val metrics: Map[String, SQLMetric] = BasicWriteJobStatsTracker.metrics
     val serializableHadoopConf = new SerializableConfiguration(hadoopConf)
     val statsTracker = new BasicWriteJobStatsTracker(serializableHadoopConf, metrics)
