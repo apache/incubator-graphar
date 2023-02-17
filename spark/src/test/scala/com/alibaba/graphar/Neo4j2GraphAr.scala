@@ -38,14 +38,14 @@ class Neo4j2GraphArSuite extends AnyFunSuite {
     .config("spark.master", "local")
     .getOrCreate()
 
-  test("read vertices from Neo4j and write to GraphAr") {
+  test("read Person vertices from Neo4j and write to GraphAr") {
     // read vertices with label "Person" from Neo4j as a DataFrame
-    val vertex_df = spark.read.format("org.neo4j.spark.DataSource")
+    val person_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("labels", "Person")
       .load()
     // display the DataFrame and its schema
-    vertex_df.show()
-    vertex_df.printSchema()
+    person_df.show()
+    person_df.printSchema()
 
     // read vertex info yaml
     val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/neo4j/person.vertex.yml").getPath)
@@ -55,11 +55,38 @@ class Neo4j2GraphArSuite extends AnyFunSuite {
     val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
 
     // generate vertex index column for vertex dataframe
-    val vertex_df_with_index = IndexGenerator.generateVertexIndexColumn(vertex_df)
+    val person_df_with_index = IndexGenerator.generateVertexIndexColumn(person_df)
 
     // create writer object for person
     val prefix : String = "/tmp/neo4j/"
-    val writer = new VertexWriter(prefix, vertex_info, vertex_df_with_index)
+    val writer = new VertexWriter(prefix, vertex_info, person_df_with_index)
+
+    // use the DataFrame to generate GAR files
+    writer.writeVertexProperties()
+  }
+
+  test("read Movie vertices from Neo4j and write to GraphAr") {
+    // read vertices with label "Person" from Neo4j as a DataFrame
+    val movie_df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("labels", "Movie")
+      .load()
+    // display the DataFrame and its schema
+    movie_df.show()
+    movie_df.printSchema()
+
+    // read vertex info yaml
+    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/neo4j/movie.vertex.yml").getPath)
+    val fs = FileSystem.get(vertex_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
+    val vertex_input = fs.open(vertex_yaml_path)
+    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
+    val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
+
+    // generate vertex index column for vertex dataframe
+    val movie_df_with_index = IndexGenerator.generateVertexIndexColumn(movie_df)
+
+    // create writer object for person
+    val prefix : String = "/tmp/neo4j/"
+    val writer = new VertexWriter(prefix, vertex_info, movie_df_with_index)
 
     // use the DataFrame to generate GAR files
     writer.writeVertexProperties()
