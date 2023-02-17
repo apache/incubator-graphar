@@ -23,6 +23,7 @@
    applications/out-of-core.rst
    applications/bgl.rst
    applications/graphscope.rst
+   applications/spark.rst
 
 .. toctree::
    :maxdepth: 1
