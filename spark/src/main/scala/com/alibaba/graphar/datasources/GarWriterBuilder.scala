@@ -107,7 +107,7 @@ abstract class GarWriteBuilder(paths: Seq[String],
     // Note: prepareWrite has side effect. It sets "job".
     val outputWriterFactory =
       prepareWrite(sparkSession.sessionState.conf, job, caseInsensitiveOptions, schema)
-    // same as schema.toAttributes if private of spark
+    // same as schema.toAttributes which is private of spark package
     val allColumns: Seq[AttributeReference] = schema.map( f => AttributeReference(f.name, f.dataType, f.nullable, f.metadata)())
     val metrics: Map[String, SQLMetric] = BasicWriteJobStatsTracker.metrics
     val serializableHadoopConf = new SerializableConfiguration(hadoopConf)

@@ -39,7 +39,7 @@ object FileSystem {
     val spark = dataFrame.sparkSession
     spark.conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
     spark.conf.set("parquet.enable.summary-metadata", "false")
-    // first check the outputPrefix exist, if not, create it
+    // first check the outputPrefix exists, if not, create it
     val path = new Path(outputPrefix)
     val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
     if (!fs.exists(path)) {
