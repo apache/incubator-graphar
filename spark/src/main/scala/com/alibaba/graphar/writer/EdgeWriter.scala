@@ -34,12 +34,14 @@ object EdgeWriter {
   private def repartitionAndSort(spark: SparkSession,
                                  edgeDf: DataFrame,
                                  edgeInfo: EdgeInfo,
-                                 adjListType: AdjListType.Value): (DataFrame, Seq[DataFrame], Array[Long]) = {
+                                 adjListType: AdjListType.Value,
+                                 vertexNumOfPrimaryVertexLabel: Long): (DataFrame, Seq[DataFrame], Array[Long]) = {
     import spark.implicits._
     val edgeSchema = edgeDf.schema
     val colIndex = edgeSchema.fieldIndex(if (adjListType == AdjListType.ordered_by_source) GeneralParams.srcIndexCol else GeneralParams.dstIndexCol)
     val vertexChunkSize: Long = if (adjListType == AdjListType.ordered_by_source) edgeInfo.getSrc_chunk_size() else edgeInfo.getDst_chunk_size()
     val edgeChunkSize: Long = edgeInfo.getChunk_size()
+    val vertexChunkNum: Int = ((vertexNumOfPrimaryVertexLabel + vertexChunkSize - 1) / vertexChunkSize).toInt  // ceil
 
     // sort by primary key and generate continue edge id for edge records
     val sortedDfRDD = edgeDf.sort(GeneralParams.srcIndexCol).rdd
@@ -59,25 +61,32 @@ object EdgeWriter {
     })
 
     // Construct partitioner for edge chunk
-    // get edge num of vertex chunks
+    // get edge num of every vertex chunk
     val edgeNumOfVertexChunks = sortedDfRDD.mapPartitions(iterator => {
       iterator.map(row => (row(colIndex).asInstanceOf[Long] / vertexChunkSize, 1))
     }).reduceByKey(_ + _).collectAsMap()
-    val vertexChunkNum = edgeNumOfVertexChunks.size
+    // Mapping: vertex_chunk_index -> edge num of the vertex chunk
+    var edgeNumMutableMap = collection.mutable.Map(edgeNumOfVertexChunks.toSeq: _*)
+    for (i <- 0L until vertexChunkNum.toLong) {
+      if (!edgeNumMutableMap.contains(i)) {
+        edgeNumMutableMap(i) = 0
+      }
+    }
     var eidBeginOfVertexChunks = new Array[Long](vertexChunkNum + 1)  // eid begin of vertex chunks
-    var aggEdgeChunkSumOfVertexChunks = new Array[Long](vertexChunkNum + 1)  // edge chunk begin of vertex chunks
+    var aggEdgeChunkNumOfVertexChunks = new Array[Long](vertexChunkNum + 1)  // edge chunk begin of vertex chunks
     var eid: Long = 0
     var edgeChunkIndex: Long = 0
     for (i <- 0 until vertexChunkNum) {
       eidBeginOfVertexChunks(i) = eid
-      aggEdgeChunkSumOfVertexChunks(i) = edgeChunkIndex
-      eid = eid + edgeNumOfVertexChunks(i)
-      edgeChunkIndex = edgeChunkIndex + (edgeNumOfVertexChunks(i) + edgeChunkSize - 1) / edgeChunkSize
+      aggEdgeChunkNumOfVertexChunks(i) = edgeChunkIndex
+      eid = eid + edgeNumMutableMap(i)
+      edgeChunkIndex = edgeChunkIndex + (edgeNumMutableMap(i) + edgeChunkSize - 1) / edgeChunkSize
     }
     eidBeginOfVertexChunks(vertexChunkNum) = eid
-    aggEdgeChunkSumOfVertexChunks(vertexChunkNum) = edgeChunkIndex
+    aggEdgeChunkNumOfVertexChunks(vertexChunkNum) = edgeChunkIndex
+
     val partitionNum = edgeChunkIndex.toInt
-    val partitioner = new EdgeChunkPartitioner(partitionNum, eidBeginOfVertexChunks, aggEdgeChunkSumOfVertexChunks, edgeChunkSize.toInt)
+    val partitioner = new EdgeChunkPartitioner(partitionNum, eidBeginOfVertexChunks, aggEdgeChunkNumOfVertexChunks, edgeChunkSize.toInt)
 
     // repartition edge dataframe and sort within partitions
     val partitionRDD = rddWithEid.repartitionAndSortWithinPartitions(partitioner).values
@@ -107,7 +116,7 @@ object EdgeWriter {
     }}
     // cache the dataframe
     partitionEdgeDf.cache()
-    return (partitionEdgeDf, offsetDfArray, aggEdgeChunkSumOfVertexChunks)
+    return (partitionEdgeDf, offsetDfArray, aggEdgeChunkNumOfVertexChunks)
   }
 }
 
@@ -117,10 +126,12 @@ object EdgeWriter {
  * @param prefix the absolute prefix.
  * @param edgeInfo the edge info that describes the ede type.
  * @param adjListType the adj list type for the edge.
+ * @param vertexNum vertex number of the primary vertex label
  * @param edgeDf the input edge DataFrame.
  */
-class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Value, edgeDf: DataFrame) {
+class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Value, vertexNum: Long, edgeDf: DataFrame) {
   private val spark: SparkSession = edgeDf.sparkSession
+  validate()
 
   // validate data and info
   private def validate(): Unit = {
@@ -136,9 +147,9 @@ class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Va
       throw new IllegalArgumentException
     }
   }
-  validate()
 
-  private val edgeDfAndOffsetDf: (DataFrame,  Seq[DataFrame], Array[Long]) = EdgeWriter.repartitionAndSort(spark, edgeDf, edgeInfo, adjListType)
+  private val edgeDfAndOffsetDf: (DataFrame,  Seq[DataFrame], Array[Long]) =
+      EdgeWriter.repartitionAndSort(spark, edgeDf, edgeInfo, adjListType, vertexNum)
 
   // write out the generated offset chunks
   private def writeOffset(): Unit = {

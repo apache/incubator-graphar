@@ -21,6 +21,7 @@ import org.json4s.jackson.Serialization.write
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.DataFrame
 import org.apache.hadoop.fs.Path
+import org.apache.hadoop.conf.Configuration
 
 import com.alibaba.graphar.GeneralParams
 
@@ -45,6 +46,8 @@ object FileSystem {
     if (!fs.exists(path)) {
       fs.mkdirs(path)
     }
+    fs.close()
+
     // write offset chunks dataframe
     if (!offsetStartChunkIndex.isEmpty) {
       return dataFrame.write.mode("append").option("header", "true").option("fileFormat", fileType).option(GeneralParams.offsetStartChunkIndexKey, offsetStartChunkIndex.get).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
@@ -56,5 +59,13 @@ object FileSystem {
     }
     // write vertex chunks dataframe
     dataFrame.write.mode("append").option("header", "true").option("fileFormat", fileType).format("com.alibaba.graphar.datasources.GarDataSource").save(outputPrefix)
+  }
+
+  def writeValue(value: Long, outputPath: String, hadoopConfig: Configuration): Unit = {
+    val path = new Path(outputPath)
+    val fs = path.getFileSystem(hadoopConfig)
+    val output = fs.create(path, true)  // create or overwrite
+    output.writeLong(value)
+    output.close()
   }
 }

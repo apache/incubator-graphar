@@ -87,10 +87,13 @@ class WriterSuite extends AnyFunSuite {
     val adj_list_type = AdjListType.ordered_by_source
 
     // generate vertex index for edge dataframe
+    val srcDf = edge_df.select("src").withColumnRenamed("src", "vertex")
+    val dstDf = edge_df.select("dst").withColumnRenamed("dst", "vertex")
+    val vertexNum = srcDf.union(dstDf).distinct().count()
     val edge_df_with_index = IndexGenerator.generateSrcAndDstIndexUnitedlyForEdges(edge_df, "src", "dst")
 
     // create writer object for person_knows_person and generate the adj list and properties with GAR format
-    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, edge_df_with_index)
+    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, vertexNum, edge_df_with_index)
 
     // test write adj list
     writer.writeAdjList()
@@ -100,7 +103,7 @@ class WriterSuite extends AnyFunSuite {
     assert(adj_list_chunk_files.length == 9)
     val offset_path_pattern = new Path(prefix + edge_info.getOffsetPathPrefix(adj_list_type) + "*")
     val offset_chunk_files = fs.globStatus(offset_path_pattern)
-    assert(offset_chunk_files.length == 7)
+    assert(offset_chunk_files.length == 9)
 
     // test write property group
     val property_group = edge_info.getPropertyGroup("creationDate", adj_list_type)
@@ -117,9 +120,9 @@ class WriterSuite extends AnyFunSuite {
 
     assertThrows[IllegalArgumentException](writer.writeEdgeProperties(invalid_property_group))
     // throw exception if not generate src index and dst index for edge dataframe
-    assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.ordered_by_source, edge_df))
+    assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.ordered_by_source, vertexNum, edge_df))
     // throw exception if pass the adj list type not contain in edge info
-    assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.unordered_by_dest, edge_df_with_index))
+    assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.unordered_by_dest, vertexNum, edge_df_with_index))
 
     // clean generated files and close FileSystem instance
     fs.delete(new Path(prefix + "edge"))
@@ -131,6 +134,7 @@ class WriterSuite extends AnyFunSuite {
     // read vertex dataframe
     val vertex_file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/person_0_0.csv").getPath
     val vertex_df = spark.read.option("delimiter", "|").option("header", "true").csv(vertex_file_path)
+    val vertex_num = vertex_df.count()
 
     // read edge dataframe
     val file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv").getPath
@@ -159,7 +163,7 @@ class WriterSuite extends AnyFunSuite {
     val edge_df_with_src_dst_index = IndexGenerator.generateDstIndexForEdgesFromMapping(edge_df_with_src_index, "dst", vertex_mapping)
 
     // create writer object for person_knows_person and generate the adj list and properties with GAR format
-    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, edge_df_with_src_dst_index)
+    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, vertex_num, edge_df_with_src_dst_index)
 
     // test write adj list
     writer.writeAdjList()

@@ -33,10 +33,10 @@ import scala.collection.mutable.ArrayBuffer
 
 /** Helper object for VertexWriter class. */
 object VertexWriter {
-  private def repartitionAndSort(vertexDf: DataFrame, chunkSize: Long): DataFrame = {
+  private def repartitionAndSort(vertexDf: DataFrame, chunkSize: Long, vertexNum: Long): DataFrame = {
     val vertex_df_schema = vertexDf.schema
     val index = vertex_df_schema.fieldIndex(GeneralParams.vertexIndexCol)
-    val partition_num = Math.ceil(vertexDf.count / chunkSize.toDouble).toInt
+    val partition_num = ((vertexNum + chunkSize - 1) / chunkSize).toInt
     val rdd = vertexDf.rdd.map(row => (row(index).asInstanceOf[Long], row))
 
     // repartition
@@ -53,17 +53,27 @@ object VertexWriter {
  * @param vertexInfo the vertex info that describes the vertex type.
  * @param vertexDf the input vertex DataFrame.
  */
-class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame) {
-  private var chunks:DataFrame = preprocess()
+class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame, numVertices: Option[Long] = None) {
   private val spark = vertexDf.sparkSession
+  validate()
+  private val vertexNum: Long = numVertices match {
+    case None => vertexDf.count()
+    case _ => numVertices.get
+  }
 
-  private def preprocess() : DataFrame = {
+  private var chunks:DataFrame = VertexWriter.repartitionAndSort(vertexDf, vertexInfo.getChunk_size(), vertexNum)
+
+  private def validate(): Unit = {
     // check if vertex dataframe contains the index_filed
     val index_filed = StructField(GeneralParams.vertexIndexCol, LongType)
     if (vertexDf.schema.contains(index_filed) == false) {
       throw new IllegalArgumentException
     }
-    return VertexWriter.repartitionAndSort(vertexDf, vertexInfo.getChunk_size())
+  }
+
+  private def writeVertexNum(): Unit = {
+    val outputPath = prefix + vertexInfo.getVerticesNumFilePath()
+    FileSystem.writeValue(vertexNum, outputPath, spark.sparkContext.hadoopConfiguration)
   }
 
   /** Generate chunks of the property group for vertex dataframe.

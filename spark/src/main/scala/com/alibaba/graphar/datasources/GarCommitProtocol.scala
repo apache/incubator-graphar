@@ -33,7 +33,7 @@ object GarCommitProtocol {
     var mid = 0
     while (low <= high) {
       mid = (high + low) / 2;
-      if (aggNums(mid) <= key && aggNums(mid + 1) > key) {
+      if (aggNums(mid) <= key && (mid == aggNums.length - 1 || aggNums(mid + 1) > key)) {
         return (mid, key - aggNums(mid))
       } else if (aggNums(mid) > key) {
         high = mid - 1

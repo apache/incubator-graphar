@@ -70,7 +70,8 @@ class EdgeChunkPartitioner(partitions: Int, eidBeginOfVertexChunks: Array[Long],
     var mid = 0
     while (low <= high) {
       mid = (high + low) / 2;
-      if (eidBeginOfVertexChunks(mid) <= key && eidBeginOfVertexChunks(mid + 1) > key) {
+      if (eidBeginOfVertexChunks(mid) <= key &&
+        (mid == eidBeginOfVertexChunks.length - 1 || eidBeginOfVertexChunks(mid + 1) > key)) {
         return mid
       } else if (eidBeginOfVertexChunks(mid) > key) {
         high = mid - 1
