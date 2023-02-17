@@ -5,7 +5,7 @@ Integrate into GraphScope
 
 GraphScope works on a graph G fragmented via a partition strategy picked by the user and each worker maintains a fragment of G. Given a query, it posts the same query to all the workers and computes following the BSP (Bulk Synchronous Parallel) model. More specifically, each worker first executes processing against its local fragment, to compute partial answers in parallel. And then each worker may exchange partial results with other processors via synchronous message passing.
 
-To integrate GraphAr into GraphScope, we implemented *ArrowFragmentBuilder* and *ArrowFragmentWriter*. *ArrowFragmentBuilder* establishes the fragments for workers of GraphScope through reading GAR files in parallel. Conversely, *ArrowFragmentWriter* can take the GraphScope fragments and save them as GAR files. If you're interested in knowing more about the implementation, please refer to the `source code <https://github.com/acezen/v6d/tree/acezen/gsf-fragment-ev-builder/modules/graph/loader>`_.
+To integrate GraphAr into GraphScope, we implemented *ArrowFragmentBuilder* and *ArrowFragmentWriter*. *ArrowFragmentBuilder* establishes the fragments for workers of GraphScope through reading GAR files in parallel. Conversely, *ArrowFragmentWriter* can take the GraphScope fragments and save them as GAR files. If you're interested in knowing more about the implementation, please refer to the `source code <https://github.com/v6d-io/v6d/commit/0eda2067e45fbb4ac46892398af0edc84fe1c27b>`_.
 
 
 Performance Report
