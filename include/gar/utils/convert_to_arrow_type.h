@@ -53,9 +53,9 @@ CONVERT_TO_ARROW_TYPE(Type::FLOAT, float, arrow::FloatType, arrow::FloatArray,
 CONVERT_TO_ARROW_TYPE(Type::DOUBLE, double, arrow::DoubleType,
                       arrow::DoubleArray, arrow::DoubleBuilder,
                       arrow::float64(), "double")
-CONVERT_TO_ARROW_TYPE(Type::STRING, std::string, arrow::StringType,
-                      arrow::StringArray, arrow::StringBuilder, arrow::utf8(),
-                      "string")
+CONVERT_TO_ARROW_TYPE(Type::STRING, std::string, arrow::LargeStringType,
+                      arrow::LargeStringArray, arrow::LargeStringBuilder,
+                      arrow::large_utf8(), "string")
 
 }  // namespace GAR_NAMESPACE_INTERNAL
 

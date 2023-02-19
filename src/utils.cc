@@ -93,7 +93,7 @@ Result<const void*> GetArrowArrayData(
 
 std::string ValueGetter<std::string>::Value(const void* data, int64_t offset) {
   return std::string(
-      reinterpret_cast<const arrow::StringArray*>(data)->GetView(offset));
+      reinterpret_cast<const arrow::LargeStringArray*>(data)->GetView(offset));
 }
 
 }  // namespace util
