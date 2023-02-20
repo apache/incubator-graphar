@@ -47,11 +47,8 @@ class Neo4j2GraphArExample{
     person_df.printSchema()
 
     // read vertex info yaml
-    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/neo4j/person.vertex.yml").getPath)
-    val fs = FileSystem.get(vertex_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
-    val vertex_input = fs.open(vertex_yaml_path)
-    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
+    val vertex_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/person.vertex.yml").getPath
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
 
     // generate vertex index column for vertex dataframe
     val person_df_with_index = IndexGenerator.generateVertexIndexColumn(person_df)
@@ -75,11 +72,8 @@ class Neo4j2GraphArExample{
     movie_df.printSchema()
 
     // read vertex info yaml
-    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/neo4j/movie.vertex.yml").getPath)
-    val fs = FileSystem.get(vertex_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
-    val vertex_input = fs.open(vertex_yaml_path)
-    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
+    val vertex_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/movie.vertex.yml").getPath
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
 
     // generate vertex index column for vertex dataframe
     val movie_df_with_index = IndexGenerator.generateVertexIndexColumn(movie_df)
@@ -124,11 +118,8 @@ class Neo4j2GraphArExample{
     edge_df_with_src_dst_index.show()
 
     // read edge info yaml
-    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/neo4j/person_produced_movie.edge.yml").getPath)
-    val fs = FileSystem.get(edge_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
-    val edge_input = fs.open(edge_yaml_path)
-    val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
-    val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
+    val edge_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/person_produced_movie.edge.yml").getPath
+    val edge_info = EdgeInfo.loadVertexInfo(edge_yaml, spark)
 
     // create writer object for the DataFrame with indices
     val prefix : String = "/tmp/neo4j/"
