@@ -36,7 +36,7 @@ std::shared_ptr<arrow::DataType> DataType::DataTypeToArrowDataType(
   case Type::DOUBLE:
     return arrow::float64();
   case Type::STRING:
-    return arrow::utf8();
+    return arrow::large_utf8();
   default:
     throw std::runtime_error("Unsupported data type");
   }
@@ -56,6 +56,8 @@ DataType DataType::ArrowDataTypeToDataType(
   case arrow::Type::DOUBLE:
     return DataType(Type::DOUBLE);
   case arrow::Type::STRING:
+    return DataType(Type::STRING);
+  case arrow::Type::LARGE_STRING:
     return DataType(Type::STRING);
   default:
     throw std::runtime_error("Unsupported data type");
