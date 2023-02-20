@@ -158,8 +158,6 @@ endif()
 include(apache-arrow)
 build_arrow()
 
-include_directories(BEFORE SYSTEM ${ARROW_INCLUDE_DIR})
-
 macro(get_target_location var target)
   if(TARGET ${target})
     foreach(prop LOCATION LOCATION_NOCONFIG LOCATION_DEBUG LOCATION_RELEASE)
@@ -183,24 +181,26 @@ macro(build_gar)
                                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
                                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/yaml-cpp/include>
     )
+    target_include_directories(gar PRIVATE SYSTEM BEFORE ${GAR_ARROW_INCLUDE_DIR})
     target_link_libraries(gar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
+
     # make sure `libyaml-cpp.a` built first
     add_dependencies(gar yaml-cpp)
     get_target_location(YAML_CPP_LIBRARY_LOCATION yaml-cpp)
     if(APPLE)
         target_link_libraries(gar PRIVATE -Wl,-force_load gar_arrow_static
             "${YAML_CPP_LIBRARY_LOCATION}"
-            "${PARQUET_STATIC_LIB}"
-            "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
+            "${GAR_PARQUET_STATIC_LIB}"
+            "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
     else()
         target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
             "${YAML_CPP_LIBRARY_LOCATION}"
-            "${PARQUET_STATIC_LIB}"
-            "${ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+            "${GAR_PARQUET_STATIC_LIB}"
+            "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
     endif()
 
     # if OpenSSL library exists, link the OpenSSL library.
-    # OpenSSL has to be linked after ARROW_BUNDLED_DEPS_STATIC_LIB
+    # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
     if(OPENSSL_FOUND)
         target_link_libraries(gar PRIVATE OpenSSL::SSL)
     endif()
@@ -225,16 +225,16 @@ if (BUILD_EXAMPLES)
         target_link_libraries(${E_NAME} PRIVATE gar ${Boost_LIBRARIES} Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
             target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
-                "${PARQUET_STATIC_LIB}"
-                "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
+                "${GAR_PARQUET_STATIC_LIB}"
+                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
         else()
             target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
-                "${PARQUET_STATIC_LIB}"
-                "${ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+                "${GAR_PARQUET_STATIC_LIB}"
+                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
         endif()
 
         # if OpenSSL library exists, link the OpenSSL library.
-        # OpenSSL has to be linked after ARROW_BUNDLED_DEPS_STATIC_LIB
+        # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
         if(OPENSSL_FOUND)
             target_link_libraries(${E_NAME} PRIVATE OpenSSL::SSL)
         endif()
@@ -290,12 +290,12 @@ if (BUILD_TESTS)
         target_link_libraries(${target} PRIVATE Catch2::Catch2 gar Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
             target_link_libraries(${target} PRIVATE -Wl,-force_load gar_arrow_static
-                "${PARQUET_STATIC_LIB}"
-                "${ARROW_BUNDLED_DEPS_STATIC_LIB}")
+                "${GAR_PARQUET_STATIC_LIB}"
+                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
         else()
             target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
-                "${PARQUET_STATIC_LIB}"
-                "${ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+                "${GAR_PARQUET_STATIC_LIB}"
+                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
         endif()
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
         include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
@@ -304,7 +304,7 @@ if (BUILD_TESTS)
         catch_discover_tests(${target})
 
         # if OpenSSL library exists, link the OpenSSL library.
-        # OpenSSL has to be linked after ARROW_BUNDLED_DEPS_STATIC_LIB
+        # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
         if(OPENSSL_FOUND)
             target_link_libraries(${target} PRIVATE OpenSSL::SSL)
         endif()
