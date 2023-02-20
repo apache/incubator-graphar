@@ -15,7 +15,7 @@
 
 package com.alibaba.graphar.writer
 
-import com.alibaba.graphar.utils.{FileSystem, ChunkPartitioner}
+import com.alibaba.graphar.utils.{FileSystem, ChunkPartitioner, EdgeChunkPartitioner}
 import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, PropertyGroup}
 
 import org.apache.spark.sql.SparkSession
@@ -31,75 +31,96 @@ import scala.collection.mutable.ArrayBuffer
 
 /** Helper object for EdgeWriter class. */
 object EdgeWriter {
-  // split the whole edge dataframe into chunk dataframes by vertex chunk size.
-  private def split(edgeDf: DataFrame, keyColumnName: String, vertexChunkSize: Long): Seq[DataFrame] = {
-    // split the dataframe to mutiple daraframes by vertex chunk
-    edgeDf.cache()
-    val spark = edgeDf.sparkSession
+  private def repartitionAndSort(spark: SparkSession,
+                                 edgeDf: DataFrame,
+                                 edgeInfo: EdgeInfo,
+                                 adjListType: AdjListType.Value,
+                                 vertexNumOfPrimaryVertexLabel: Long): (DataFrame, Seq[DataFrame], Array[Long]) = {
     import spark.implicits._
-    val df_schema = edgeDf.schema
-    val index = df_schema.fieldIndex(keyColumnName)
-    val vertex_chunk_num = math.floor(edgeDf.agg(max(keyColumnName)).head().getLong(0) / vertexChunkSize.toDouble).toInt
-    val chunks: Seq[DataFrame] = (0 to vertex_chunk_num).map {i => edgeDf.where(edgeDf(keyColumnName) >= (i * vertexChunkSize)  and edgeDf(keyColumnName) < ((i + 1) * vertexChunkSize))}
-    return chunks
-  }
+    val edgeSchema = edgeDf.schema
+    val colName = if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.unordered_by_source) GeneralParams.srcIndexCol else GeneralParams.dstIndexCol
+    val colIndex = edgeSchema.fieldIndex(colName)
+    val vertexChunkSize: Long = if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.unordered_by_source) edgeInfo.getSrc_chunk_size() else edgeInfo.getDst_chunk_size()
+    val edgeChunkSize: Long = edgeInfo.getChunk_size()
+    val vertexChunkNum: Int = ((vertexNumOfPrimaryVertexLabel + vertexChunkSize - 1) / vertexChunkSize).toInt  // ceil
 
-  // repartition the chunk dataframe by edge chunk size (this is for COO)
-  private def repartition(chunkDf: DataFrame, keyColumnName: String, edgeChunkSize: Long): DataFrame = {
-    // repartition the dataframe by edge chunk size
-    val spark = chunkDf.sparkSession
-    import spark.implicits._
-    val df_schema = chunkDf.schema
-    val index = df_schema.fieldIndex(keyColumnName)
-    val df_rdd = chunkDf.rdd.map(row => (row(index).asInstanceOf[Long], row))
-
-    // generate global edge id for each record of dataframe
-    val parition_counts = df_rdd
+    // sort by primary key and generate continue edge id for edge records
+    val sortedDfRDD = edgeDf.sort(colName).rdd
+    // generate continue edge id for every edge
+    val partitionCounts = sortedDfRDD
       .mapPartitionsWithIndex((i, ps) => Array((i, ps.size)).iterator, preservesPartitioning = true)
       .collectAsMap()
-    val aggregatedPartitionCounts = SortedMap(parition_counts.toSeq: _*)
+    val aggregatedPartitionCounts = SortedMap(partitionCounts.toSeq: _*)
       .foldLeft((0L, Map.empty[Int, Long])) { case ((total, map), (i, c)) =>
         (total + c, map + (i -> total))
       }
       ._2
     val broadcastedPartitionCounts = spark.sparkContext.broadcast(aggregatedPartitionCounts)
-    val rdd_with_eid = df_rdd.mapPartitionsWithIndex((i, ps) => {
+    val rddWithEid = sortedDfRDD.mapPartitionsWithIndex((i, ps) => {
       val start = broadcastedPartitionCounts.value(i)
-      for { ((k, row), j) <- ps.zipWithIndex } yield (start + j, row)
+      for { (row, j) <- ps.zipWithIndex } yield (start + j, row)
     })
-    val partition_num = Math.ceil(chunkDf.count() / edgeChunkSize.toDouble).toInt
-    val partitioner = new ChunkPartitioner(partition_num, edgeChunkSize)
-    val chunks = rdd_with_eid.partitionBy(partitioner).values
-    spark.createDataFrame(chunks, df_schema)
-  }
 
-  // repartition and sort the chunk dataframe by edge chunk size (this is for CSR/CSC)
-  private def sortAndRepartition(chunkDf: DataFrame, keyColumnName: String, edgeChunkSize: Long): DataFrame = {
-    // repartition the dataframe by edge chunk size
-    val spark = chunkDf.sparkSession
-    import spark.implicits._
-    val df_schema = chunkDf.schema
-    val index = df_schema.fieldIndex(keyColumnName)
-    val rdd_ordered = chunkDf.rdd.map(row => (row(index).asInstanceOf[Long], row)).sortByKey()
-
-    // generate global edge id for each record of dataframe
-    val parition_counts = rdd_ordered
-      .mapPartitionsWithIndex((i, ps) => Array((i, ps.size)).iterator, preservesPartitioning = true)
-      .collectAsMap()
-    val aggregatedPartitionCounts = SortedMap(parition_counts.toSeq: _*)
-      .foldLeft((0L, Map.empty[Int, Long])) { case ((total, map), (i, c)) =>
-        (total + c, map + (i -> total))
+    // Construct partitioner for edge chunk
+    // get edge num of every vertex chunk
+    val edgeNumOfVertexChunks = sortedDfRDD.mapPartitions(iterator => {
+      iterator.map(row => (row(colIndex).asInstanceOf[Long] / vertexChunkSize, 1))
+    }).reduceByKey(_ + _).collectAsMap()
+    // Mapping: vertex_chunk_index -> edge num of the vertex chunk
+    var edgeNumMutableMap = collection.mutable.Map(edgeNumOfVertexChunks.toSeq: _*)
+    for (i <- 0L until vertexChunkNum.toLong) {
+      if (!edgeNumMutableMap.contains(i)) {
+        edgeNumMutableMap(i) = 0
       }
-      ._2
-    val broadcastedPartitionCounts = spark.sparkContext.broadcast(aggregatedPartitionCounts)
-    val rdd_with_eid = rdd_ordered.mapPartitionsWithIndex((i, ps) => {
-      val start = broadcastedPartitionCounts.value(i)
-      for { ((k, row), j) <- ps.zipWithIndex } yield (start + j, row)
-    })
-    val partition_num = Math.ceil(chunkDf.count() / edgeChunkSize.toDouble).toInt
-    val partitioner = new ChunkPartitioner(partition_num, edgeChunkSize)
-    val chunks = rdd_with_eid.repartitionAndSortWithinPartitions(partitioner).values
-    spark.createDataFrame(chunks, df_schema)
+    }
+    var eidBeginOfVertexChunks = new Array[Long](vertexChunkNum + 1)  // eid begin of vertex chunks
+    var aggEdgeChunkNumOfVertexChunks = new Array[Long](vertexChunkNum + 1)  // edge chunk begin of vertex chunks
+    var eid: Long = 0
+    var edgeChunkIndex: Long = 0
+    for (i <- 0 until vertexChunkNum) {
+      eidBeginOfVertexChunks(i) = eid
+      aggEdgeChunkNumOfVertexChunks(i) = edgeChunkIndex
+      eid = eid + edgeNumMutableMap(i)
+      edgeChunkIndex = edgeChunkIndex + (edgeNumMutableMap(i) + edgeChunkSize - 1) / edgeChunkSize
+    }
+    eidBeginOfVertexChunks(vertexChunkNum) = eid
+    aggEdgeChunkNumOfVertexChunks(vertexChunkNum) = edgeChunkIndex
+
+    val partitionNum = edgeChunkIndex.toInt
+    val partitioner = new EdgeChunkPartitioner(partitionNum, eidBeginOfVertexChunks, aggEdgeChunkNumOfVertexChunks, edgeChunkSize.toInt)
+
+    // repartition edge dataframe and sort within partitions
+    val partitionRDD = rddWithEid.repartitionAndSortWithinPartitions(partitioner).values
+    val partitionEdgeDf = spark.createDataFrame(partitionRDD, edgeSchema)
+    partitionEdgeDf.cache()
+
+    // generate offset dataframes
+    if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.ordered_by_dest) {
+      val edgeCountsByPrimaryKey = partitionRDD.mapPartitions(iterator => {
+        iterator.map(row => (row(colIndex).asInstanceOf[Long], 1))
+      }).reduceByKey(_ + _)
+      val offsetDfSchema = StructType(Seq(StructField(GeneralParams.offsetCol, IntegerType)))
+      val offsetDfArray: Seq[DataFrame] = (0 until vertexChunkNum).map { i => {
+        val filterRDD = edgeCountsByPrimaryKey.filter(v => v._1 / vertexChunkSize == i).map { case (k, v) => (k - i * vertexChunkSize + 1, v) }
+        val initRDD = spark.sparkContext.parallelize((0L to vertexChunkSize).map(key => (key, 0)))
+        val unionRDD = spark.sparkContext.union(filterRDD, initRDD).reduceByKey(_ + _).sortByKey(numPartitions = 1)
+        val offsetRDD = unionRDD.mapPartitionsWithIndex((i, ps) => {
+          var sum = 0
+          var preSum = 0
+          for ((k, count) <- ps) yield {
+            preSum = sum
+            sum = sum + count
+            (k, count + preSum)
+          }
+        }).map { case (k, v) => Row(v) }
+        val offsetChunk = spark.createDataFrame(offsetRDD, offsetDfSchema)
+        offsetChunk.cache()
+        offsetChunk
+      }}
+      return (partitionEdgeDf, offsetDfArray, aggEdgeChunkNumOfVertexChunks)
+    }
+    val offsetDfArray = Seq.empty[DataFrame]
+    return (partitionEdgeDf, offsetDfArray, aggEdgeChunkNumOfVertexChunks)
   }
 }
 
@@ -109,18 +130,19 @@ object EdgeWriter {
  * @param prefix the absolute prefix.
  * @param edgeInfo the edge info that describes the ede type.
  * @param adjListType the adj list type for the edge.
+ * @param vertexNum vertex number of the primary vertex label
  * @param edgeDf the input edge DataFrame.
  */
-class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.Value, edgeDf: DataFrame) {
-  private var chunks: Seq[DataFrame] = preprocess()
+class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Value, vertexNum: Long, edgeDf: DataFrame) {
+  private val spark: SparkSession = edgeDf.sparkSession
+  validate()
 
-  // convert the edge dataframe to chunk dataframes
-  private def preprocess(): Seq[DataFrame] = {
+  // validate data and info
+  private def validate(): Unit = {
     // chunk if edge info contains the adj list type
     if (edgeInfo.containAdjList(adjListType) == false) {
       throw new IllegalArgumentException
     }
-
     // check the src index and dst index column exist
     val src_filed = StructField(GeneralParams.srcIndexCol, LongType)
     val dst_filed = StructField(GeneralParams.dstIndexCol, LongType)
@@ -128,71 +150,28 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     if (schema.contains(src_filed) == false || schema.contains(dst_filed) == false) {
       throw new IllegalArgumentException
     }
-    var vertex_chunk_size: Long = 0
-    var primaryColName: String = ""
-    if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.unordered_by_source) {
-      vertex_chunk_size = edgeInfo.getSrc_chunk_size()
-      primaryColName = GeneralParams.srcIndexCol
-    } else {
-      vertex_chunk_size = edgeInfo.getDst_chunk_size()
-      primaryColName = GeneralParams.dstIndexCol
-    }
-    val edges_of_vertex_chunks = EdgeWriter.split(edgeDf, primaryColName, vertex_chunk_size)
-    val vertex_chunk_num = edges_of_vertex_chunks.length
-    if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.ordered_by_dest) {
-      val processed_chunks: Seq[DataFrame] = (0 until vertex_chunk_num).map {i => EdgeWriter.sortAndRepartition(edges_of_vertex_chunks(i), primaryColName, edgeInfo.getChunk_size())}
-      return processed_chunks
-    } else {
-      val processed_chunks: Seq[DataFrame] = (0 until vertex_chunk_num).map {i => EdgeWriter.repartition(edges_of_vertex_chunks(i), primaryColName, edgeInfo.getChunk_size())}
-      return processed_chunks
-    }
   }
 
-  // generate the offset chunks files from edge dataframe for this edge type
+  private val edgeDfAndOffsetDf: (DataFrame,  Seq[DataFrame], Array[Long]) =
+      EdgeWriter.repartitionAndSort(spark, edgeDf, edgeInfo, adjListType, vertexNum)
+
+  // write out the generated offset chunks
   private def writeOffset(): Unit = {
-    val spark = edgeDf.sparkSession
-    val file_type = edgeInfo.getAdjListFileType(adjListType)
-    var chunk_index: Int = 0
-    val offset_schema = StructType(Seq(StructField(GeneralParams.offsetCol, LongType)))
-    val vertex_chunk_size = if (adjListType == AdjListType.ordered_by_source) edgeInfo.getSrc_chunk_size() else edgeInfo.getDst_chunk_size()
-    val index_column = if (adjListType == AdjListType.ordered_by_source) GeneralParams.srcIndexCol else GeneralParams.dstIndexCol
-    val output_prefix = prefix + edgeInfo.getOffsetPathPrefix(adjListType)
-    for (chunk <- chunks) {
-      val edge_count_df = chunk.select(index_column).groupBy(index_column).count()
-      // init a edge count dataframe of vertex range [begin, end] to include isloated vertex
-      val begin_index: Long = chunk_index * vertex_chunk_size;
-      val end_index: Long = (chunk_index + 1) * vertex_chunk_size
-      val init_count_rdd = spark.sparkContext.parallelize(begin_index to end_index).map(key => Row(key, 0L))
-      val init_count_df = spark.createDataFrame(init_count_rdd, edge_count_df.schema)
-      // union edge count dataframe and initialized count dataframe
-      val union_count_chunk = edge_count_df.unionByName(init_count_df).groupBy(index_column).agg(sum("count")).coalesce(1).orderBy(index_column).select("sum(count)")
-      // calculate offset rdd from count chunk
-      val offset_rdd = union_count_chunk.rdd.mapPartitionsWithIndex((i, ps) => {
-        var sum = 0L
-        var pre_sum = 0L
-        for (row <- ps ) yield {
-          pre_sum = sum
-          sum = sum + row.getLong(0)
-          Row(pre_sum)
-        }
-      })
-      val offset_df = spark.createDataFrame(offset_rdd, offset_schema)
-      FileSystem.writeDataFrame(offset_df, FileType.FileTypeToString(file_type), output_prefix, chunk_index)
-      chunk_index = chunk_index + 1
+    var chunkIndex: Int = 0
+    val fileType = edgeInfo.getAdjListFileType(adjListType)
+    val outputPrefix = prefix + edgeInfo.getOffsetPathPrefix(adjListType)
+    for (offsetChunk <- edgeDfAndOffsetDf._2) {
+      FileSystem.writeDataFrame(offsetChunk, FileType.FileTypeToString(fileType), outputPrefix, Some(chunkIndex), None)
+      chunkIndex = chunkIndex + 1
     }
   }
 
   /** Generate the chunks of AdjList from edge dataframe for this edge type. */
   def writeAdjList(): Unit = {
-    val file_type = edgeInfo.getAdjListFileType(adjListType)
-    var chunk_index: Long = 0
-    for (chunk <- chunks) {
-      val output_prefix = prefix + edgeInfo.getAdjListPathPrefix(chunk_index, adjListType)
-      val adj_list_chunk = chunk.select(GeneralParams.srcIndexCol, GeneralParams.dstIndexCol)
-      FileSystem.writeDataFrame(adj_list_chunk, FileType.FileTypeToString(file_type), output_prefix)
-      chunk_index = chunk_index + 1
-    }
-
+    val fileType = edgeInfo.getAdjListFileType(adjListType)
+    val outputPrefix = prefix + edgeInfo.getAdjListPathPrefix(adjListType)
+    val adjListDf = edgeDfAndOffsetDf._1.select(GeneralParams.srcIndexCol, GeneralParams.dstIndexCol)
+    FileSystem.writeDataFrame(adjListDf, FileType.FileTypeToString(fileType), outputPrefix, None, Some(edgeDfAndOffsetDf._3))
     if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.ordered_by_dest) {
       writeOffset()
     }
@@ -207,19 +186,15 @@ class EdgeWriter(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
       throw new IllegalArgumentException
     }
 
-    val property_list = ArrayBuffer[String]()
-    val p_it = propertyGroup.getProperties().iterator
-    while (p_it.hasNext()) {
-      val property = p_it.next()
-      property_list += "`" + property.getName() + "`"
+    val propertyList = ArrayBuffer[String]()
+    val pIter = propertyGroup.getProperties().iterator
+    while (pIter.hasNext()) {
+      val property = pIter.next()
+      propertyList += "`" + property.getName() + "`"
     }
-    var chunk_index: Long = 0
-    for (chunk <- chunks) {
-      val output_prefix = prefix + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType, chunk_index)
-      val property_group_chunk = chunk.select(property_list.map(col): _*)
-      FileSystem.writeDataFrame(property_group_chunk, propertyGroup.getFile_type(), output_prefix)
-      chunk_index = chunk_index + 1
-    }
+    val propetyGroupDf = edgeDfAndOffsetDf._1.select(propertyList.map(col): _*)
+    val outputPrefix = prefix + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType)
+    FileSystem.writeDataFrame(propetyGroupDf, propertyGroup.getFile_type(), outputPrefix, None, Some(edgeDfAndOffsetDf._3))
   }
 
   /** Generate the chunks of all property groups from edge dataframe. */

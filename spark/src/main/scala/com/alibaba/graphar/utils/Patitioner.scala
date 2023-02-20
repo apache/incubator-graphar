@@ -46,3 +46,48 @@ class ChunkPartitioner(partitions: Int, chunk_size: Long) extends Partitioner {
 
   override def hashCode: Int = numPartitions
 }
+
+class EdgeChunkPartitioner(partitions: Int, eidBeginOfVertexChunks: Array[Long], aggEdgeChunkSumOfVertexChunks: Array[Long], edgeChunkSize: Int) extends Partitioner {
+  require(partitions >= 0, s"Number of partitions ($partitions) cannot be negative.")
+
+  def numPartitions: Int = partitions
+
+  def chunkSize: Long = edgeChunkSize.toLong
+
+  def getPartition(key: Any): Int = key match {
+    case null => 0
+    case _ => {
+      val vertexChunkIndex = binarySeach(key.asInstanceOf[Long])
+      val edgeChunkIndex = aggEdgeChunkSumOfVertexChunks(vertexChunkIndex)
+      val edgeIdBegin = eidBeginOfVertexChunks(vertexChunkIndex)
+      edgeChunkIndex.toInt + ((key.asInstanceOf[Long] - edgeIdBegin) / chunkSize).toInt
+    }
+  }
+
+  private def binarySeach(key: Long): Int = {
+    var low = 0
+    var high = eidBeginOfVertexChunks.length - 1
+    var mid = 0
+    while (low <= high) {
+      mid = (high + low) / 2;
+      if (eidBeginOfVertexChunks(mid) <= key &&
+        (mid == eidBeginOfVertexChunks.length - 1 || eidBeginOfVertexChunks(mid + 1) > key)) {
+        return mid
+      } else if (eidBeginOfVertexChunks(mid) > key) {
+        high = mid - 1
+      } else {
+        low = mid + 1
+      }
+    }
+    return low
+  }
+
+  override def equals(other: Any): Boolean = other match {
+    case h: EdgeChunkPartitioner =>
+      h.numPartitions == numPartitions
+    case _ =>
+      false
+  }
+
+  override def hashCode: Int = numPartitions
+}

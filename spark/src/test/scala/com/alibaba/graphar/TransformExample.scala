@@ -66,9 +66,16 @@ class TransformExampleSuite extends AnyFunSuite {
   }
 
   test("tranform adjList type") {
-    // read edges of unordered_by_source type
     val file_path = "gar-test/ldbc_sample/parquet"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
+    // get vertex num
+    val vertex_file = getClass.getClassLoader.getResourceAsStream(file_path + "/person.vertex.yml")
+    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
+    val vertex_info = vertex_yaml.load(vertex_file).asInstanceOf[VertexInfo]
+    // construct the vertex reader
+    val vreader = new VertexReader(prefix, vertex_info, spark)
+    val vertexNum = vreader.readVerticesNumber()
+    // read edges of unordered_by_source type
     val edge_input = getClass.getClassLoader.getResourceAsStream(file_path + "/person_knows_person.edge.yml")
     val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
     val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
@@ -82,7 +89,7 @@ class TransformExampleSuite extends AnyFunSuite {
     // write edges in ordered_by_source type
     val output_adj_list_type = AdjListType.ordered_by_source
     val output_prefix : String = "/tmp/example/"
-    val writer = new EdgeWriter(output_prefix, edge_info, output_adj_list_type, adj_list_df)
+    val writer = new EdgeWriter(output_prefix, edge_info, output_adj_list_type, vertexNum, adj_list_df)
     writer.writeAdjList()
     val adj_list_path_pattern = new Path(output_prefix + edge_info.getAdjListPathPrefix(output_adj_list_type) + "*/*")
     val fs = FileSystem.get(adj_list_path_pattern.toUri(), spark.sparkContext.hadoopConfiguration)
