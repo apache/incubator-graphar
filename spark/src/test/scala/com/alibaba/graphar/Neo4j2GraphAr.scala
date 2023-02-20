@@ -25,9 +25,8 @@ import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.apache.hadoop.fs.{Path, FileSystem}
-import org.scalatest.funsuite.AnyFunSuite
 
-class Neo4j2GraphArSuite extends AnyFunSuite {
+class Neo4j2GraphArExample{
   // connect to the Neo4j instance
   val spark = SparkSession.builder()
     .config("neo4j.url", "bolt://localhost:7687")
@@ -37,7 +36,8 @@ class Neo4j2GraphArSuite extends AnyFunSuite {
     .config("spark.master", "local")
     .getOrCreate()
 
-  test("read Person vertices from Neo4j and write to GraphAr") {
+  // read Person vertices from Neo4j and write to GraphAr
+  def testReadPersonVerticesFromNeo4j(): Unit = {
     // read vertices with label "Person" from Neo4j as a DataFrame
     val person_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("labels", "Person")
@@ -64,7 +64,8 @@ class Neo4j2GraphArSuite extends AnyFunSuite {
     writer.writeVertexProperties()
   }
 
-  test("read Movie vertices from Neo4j and write to GraphAr") {
+  // read Movie vertices from Neo4j and write to GraphAr
+  def testReadMovieVerticesFromNeo4j(): Unit = {
     // read vertices with label "Person" from Neo4j as a DataFrame
     val movie_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("labels", "Movie")
@@ -91,7 +92,8 @@ class Neo4j2GraphArSuite extends AnyFunSuite {
     writer.writeVertexProperties()
   }
 
-  test("read edges from Neo4j and write to GraphAr") {
+  // read edges from Neo4j and write to GraphAr
+  def testReadEdgesFromNeo4j(): Unit = {
     // read vertices with label "Person" from Neo4j as a DataFrame
     val person_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("labels", "Person")

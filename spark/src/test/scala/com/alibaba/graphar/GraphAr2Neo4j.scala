@@ -24,9 +24,8 @@ import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.apache.hadoop.fs.{Path, FileSystem}
-import org.scalatest.funsuite.AnyFunSuite
 
-class GraphAr2Neo4jSuite extends AnyFunSuite {
+class GraphAr2Neo4jExample {
   // connect to the Neo4j instance
   val spark = SparkSession.builder()
     .config("neo4j.url", "bolt://localhost:7687")
@@ -36,7 +35,8 @@ class GraphAr2Neo4jSuite extends AnyFunSuite {
     .config("spark.master", "local")
     .getOrCreate()
 
-  test("read Person vertices from GraphAr and write to Neo4j") {
+  // read Person vertices from GraphAr and write to Neo4j
+  def testWriteVerticesToNeo4j(): Unit = {
     // read vertex info yaml
     val file_path = getClass.getClassLoader.getResource("gar-test/neo4j/person.vertex.yml").getPath
     val vertex_yaml_path = new Path(file_path)
@@ -80,7 +80,8 @@ class GraphAr2Neo4jSuite extends AnyFunSuite {
     })
   }
 
-  test("read edges from GraphAr and write to Neo4j") {
+  // read edges from GraphAr and write to Neo4j
+  def testWriteEdgesToNeo4j(): Unit = {
     val spark_session = SparkSession.builder()
       .enableHiveSupport()
       .master("local[*]")
