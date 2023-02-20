@@ -1,9 +1,9 @@
 Co-Work with Apache Spark
 ============================
 
-`Apache Spark <https://spark.apache.org/>`_ is a multi-language engine for executing data engineering, data science, and machine learning on single-node machines or clusters. The GraphAr Spark library is developed to make integrating graphs in GraphAr with Spark easy. Utilizing this library, one can generate, load and transform GAR files efficiently. One can also use it to integrate GraphAr to other systems that work with Spark.
+`Apache Spark <https://spark.apache.org/>`_ is a multi-language engine for executing data engineering, data science, and machine learning on single-node machines or clusters. The GraphAr Spark library is developed to make the integration of GraphAr with Spark easy. This library allows users to efficiently generate, load, and transform GAR files, and to integrate GraphAr with other Spark-compatible systems. 
 
-Some examples are provided as the showcases for co-working with Apache Spark.
+Examples of this co-working integration have been provided as showcases.
 
 
 Examples
@@ -11,19 +11,19 @@ Examples
 
 Transform GAR files
 `````````````````````
-`TransformExample.scala`_ is an example for graph data conversion between different file types or different adjList types. For such cases, the original data will be first loaded as the Spark DataFrame using the GraphAr Spark Reader; and then, this DataFrame is written into generated GAR files through a GraphAr Spark Writer, following the meta data defined in a new information file.
+`TransformExample.scala`_ is an example for graph data conversion between different file types or different adjList types. To do this, the original data is first loaded into a Spark DataFrame using the GraphAr Spark Reader. Then, the DataFrame is written into generated GAR files through a GraphAr Spark Writer, following the meta data defined in a new information file.
 
 
 Compute with GraphX
 `````````````````````
-Another important scenario of using GraphAr is to take it as the data source for conducting graph computing or analytics. `ComputeExample.scala`_  includes an example for constructing the GraphX graph from GAR files and executing a connected-components computation. Also, executing queries with Spark SQL or running other graph analytic algorithms could be implemented in a similar way.
+Another important use case of GraphAr is to use it as a data source for graph computing or analytics; `ComputeExample.scala`_ provides an example of constructing a GraphX graph from reading GAR files and executing a connected-components computation. Also, executing queries with Spark SQL and running other graph analytic algorithms can be implemented in a similar fashion.
 
 
-Importing/Exporting Graphs of Neo4j
-``````````````````````````````````````````
-`Neo4j <https://neo4j.com/product/neo4j-graph-database/>`_ graph database provides a `spark connector <https://neo4j.com/docs/spark/current/overview/>`_ to integrate with Spark. Neo4j Spark Connector together with GraphAr Spark library enable us to migrate the graph data between Neo4j and GraphAr. This also a critical application case of GraphAr in which it acts as a persistent storage of the graph data in database.
+Import/Export graphs of Neo4j
+```````````````````````````````
+`Neo4j <https://neo4j.com/product/neo4j-graph-database/>`_ graph database provides a `spark connector <https://neo4j.com/docs/spark/current/overview/>`_ for integration with Spark. The Neo4j Spark Connector, combined with the GraphAr Spark library, enables us to migrate graph data between Neo4j and GraphAr. This is also a key application of GraphAr in which it acts as a persistent storage of graph data in the database.
 
-When exporting the graph data from Neo4j to GraphAr, please refer to the following code:
+When exporting graph data from Neo4j and writing to GraphAr, please refer to the following code, with `Neo4j2GraphAr.scala`_ providing a complete example.
 
 .. code:: scala
 
@@ -50,9 +50,7 @@ When exporting the graph data from Neo4j to GraphAr, please refer to the followi
   // use the DataFrame to generate GAR files
   writer.writeVertexProperties() 
 
-See `Neo4j2GraphAr.scala`_ for the complete example.
-
-The information file for the this group of vertices looks like: 
+The information file for the this group of vertices may look like: 
 
 .. code:: Yaml
 
@@ -80,12 +78,12 @@ The information file for the this group of vertices looks like:
 
 .. note::
 
-  Please note that when reading data from Neo4j with this method, the DataFrame contains all the fields contained in the nodes ((vertex properties)), plus two additional columns:
+  Please note that when reading data from Neo4j with this method, the DataFrame contains all the fields contained in the nodes (vertex properties), plus two additional columns:
 
   - <id> the internal Neo4j ID
   - <labels> a list of labels for that node
 
-And when importing data from GraphAr to create/update instances in Neo4j, please refer to the following code:
+Additionally, when importing data from GraphAr to create/update instances in Neo4j, please refer to the following code:
 
 .. code:: scala
   
@@ -101,15 +99,16 @@ And when importing data from GraphAr to create/update instances in Neo4j, please
   val labels_array = vertex_df.select("<labels>").distinct.collect.flatMap(_.toSeq)
   val vertex_df_array = labels_array.map(labels => vertex_df.where(vertex_df("<labels>") === labels))
 
-  // each time, write a group of vertices to Neo4j
+  // write a group of vertices (with the same Neo4j labels) to Neo4j each time
   vertex_df_array.foreach(df => {
     val labels = df.first().getAs[Seq[String]]("<labels>")
     var str = ""
     labels.foreach(label => {str += ":" + label})
     df.drop("<id>").drop("<labels>")
       .write.format("org.neo4j.spark.DataSource")
-      .mode(SaveMode.Append)
+      .mode(SaveMode.Overwrite)
       .option("labels", str)
+      .option("node.keys", "name")
       .save()
   })
 
@@ -117,7 +116,7 @@ See `GraphAr2Neo4j.scala`_ for the complete example.
 
 .. note::
 
-  The Neo4j Spark Connector provides different save modes and writing options, such as CREATE or MERGE. Please refer to its `documentation <https://neo4j.com/docs/spark/current/writing/>`_ for more information.
+  The Neo4j Spark Connector offers different save modes and writing options, such as Append(CREATE) or Overwrite(MERGE). Please refer to its `documentation <https://neo4j.com/docs/spark/current/writing/>`_ for more information.
 
 
 .. _TransformExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TransformExample.scala
