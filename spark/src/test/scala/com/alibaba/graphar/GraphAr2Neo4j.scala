@@ -16,9 +16,7 @@
 package com.alibaba.graphar
 
 import com.alibaba.graphar.datasources._
-import com.alibaba.graphar.utils.IndexGenerator
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
-import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
 import java.io.{File, FileInputStream}
 import org.yaml.snakeyaml.Yaml
@@ -75,8 +73,9 @@ class GraphAr2Neo4jSuite extends AnyFunSuite {
       // write the vertices to Neo4j
       df.drop("<id>").drop("<labels>")
       .write.format("org.neo4j.spark.DataSource")
-      .mode(SaveMode.Append)
+      .mode(SaveMode.Overwrite)
       .option("labels", str)
+      .option("node.keys", "name")
       .save()
     })
   }
@@ -135,7 +134,7 @@ class GraphAr2Neo4jSuite extends AnyFunSuite {
     // write the edges to Neo4j
     edge_df_with_src_dst
       .write.format("org.neo4j.spark.DataSource")
-      .mode(SaveMode.Append)
+      .mode(SaveMode.Overwrite)
       .option("relationship", "PRODUCED")
       .option("relationship.save.strategy", "keys")
       .option("relationship.source.labels", ":Person")

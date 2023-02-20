@@ -17,7 +17,6 @@ package com.alibaba.graphar
 
 import com.alibaba.graphar.datasources._
 import com.alibaba.graphar.utils.IndexGenerator
-import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
 import java.io.{File, FileInputStream}
