@@ -15,8 +15,6 @@
 
 package com.alibaba.graphar
 
-import com.alibaba.graphar.utils.FileSystem
-
 import java.io.{File, FileInputStream}
 import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{SparkSession}
@@ -194,7 +192,7 @@ class VertexInfo() {
     } else {
       str = property_group.getPrefix
     }
-    return FileSystem.toValidFileName(prefix + str + "chunk" + chunk_index.toString())
+    return prefix + str + "chunk" + chunk_index.toString()
   }
 
   /** Get the path prefix for the specified property group.
@@ -218,7 +216,7 @@ class VertexInfo() {
     } else {
       str = property_group.getPrefix
     }
-    return FileSystem.toValidFileName(prefix + str)
+    return prefix + str
   }
 }
 

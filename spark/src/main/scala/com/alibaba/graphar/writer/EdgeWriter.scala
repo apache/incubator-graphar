@@ -186,18 +186,11 @@ class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Va
       throw new IllegalArgumentException
     }
 
-    val property_list = ArrayBuffer[String]()
-    val p_it = propertyGroup.getProperties().iterator
-    while (p_it.hasNext()) {
-      val property = p_it.next()
-      property_list += "`" + property.getName() + "`"
-    }
-    var chunk_index: Long = 0
-    for (chunk <- chunks) {
-      val output_prefix = prefix + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType, chunk_index)
-      val property_group_chunk = chunk.select(property_list.map(col): _*)
-      FileSystem.writeDataFrame(property_group_chunk, propertyGroup.getFile_type(), output_prefix)
-      chunk_index = chunk_index + 1
+    val propertyList = ArrayBuffer[String]()
+    val pIter = propertyGroup.getProperties().iterator
+    while (pIter.hasNext()) {
+      val property = pIter.next()
+      propertyList += "`" + property.getName() + "`"
     }
     val propetyGroupDf = edgeDfAndOffsetDf._1.select(propertyList.map(col): _*)
     val outputPrefix = prefix + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType)
@@ -220,5 +213,4 @@ class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Va
     writeEdgeProperties()
   }
 }
-
 

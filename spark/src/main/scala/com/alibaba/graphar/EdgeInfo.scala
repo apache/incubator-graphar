@@ -15,8 +15,6 @@
 
 package com.alibaba.graphar
 
-import com.alibaba.graphar.utils.FileSystem
-
 import java.io.{File, FileInputStream}
 import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{SparkSession}
@@ -373,7 +371,7 @@ class EdgeInfo() {
     }
     str = prefix + getAdjListPrefix(adj_list_type) + str + "part" +
         vertex_chunk_index.toString() + "/chunk" + chunk_index.toString()
-    return FileSystem.toValidFileName(str)
+    return str
   }
 
   /** Get path prefix of adj list property group of certain vertex chunk.
@@ -401,7 +399,7 @@ class EdgeInfo() {
     }
     str = prefix + getAdjListPrefix(adj_list_type) + str + "part" +
       vertex_chunk_index.toString() + "/"
-    return FileSystem.toValidFileName(str)
+    return str
   }
 
   /** Get the path prefix of the property group chunk for the given
@@ -426,7 +424,7 @@ class EdgeInfo() {
       str +=  "/"
     }
     str = prefix + getAdjListPrefix(adj_list_type) + str
-    return FileSystem.toValidFileName(str)
+    return str
   }
 }
 

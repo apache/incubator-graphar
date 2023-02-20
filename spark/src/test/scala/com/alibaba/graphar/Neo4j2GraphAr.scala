@@ -132,7 +132,8 @@ class Neo4j2GraphArSuite extends AnyFunSuite {
     // create writer object for the DataFrame with indices
     val prefix : String = "/tmp/neo4j/"
     val adj_list_type = AdjListType.ordered_by_source
-    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, edge_df_with_src_dst_index)
+    val vertex_num = person_df.count()
+    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, vertex_num, edge_df_with_src_dst_index)
 
     // generate the adj list and properties with GAR format
     writer.writeEdges()
