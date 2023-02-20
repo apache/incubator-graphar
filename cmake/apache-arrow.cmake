@@ -35,58 +35,73 @@ function(build_arrow)
 
     find_package(Threads)
     # If Arrow needs to be built, the default location will be within the build tree.
-    set(ARROW_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/arrow_ep-prefix")
+    set(GAR_ARROW_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/arrow_ep-prefix")
 
-    set(ARROW_STATIC_LIBRARY_DIR "${ARROW_PREFIX}/lib")
+    set(GAR_ARROW_STATIC_LIBRARY_DIR "${GAR_ARROW_PREFIX}/lib")
 
-    set(ARROW_STATIC_LIB_FILENAME
+    set(GAR_ARROW_STATIC_LIB_FILENAME
             "${CMAKE_STATIC_LIBRARY_PREFIX}arrow${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    set(ARROW_STATIC_LIB "${ARROW_STATIC_LIBRARY_DIR}/${ARROW_STATIC_LIB_FILENAME}")
-    set(PARQUET_STATIC_LIB_FILENAME
+    set(GAR_ARROW_STATIC_LIB "${GAR_ARROW_STATIC_LIBRARY_DIR}/${GAR_ARROW_STATIC_LIB_FILENAME}")
+    set(GAR_PARQUET_STATIC_LIB_FILENAME
 	    "${CMAKE_STATIC_LIBRARY_PREFIX}parquet${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    set(PARQUET_STATIC_LIB "${ARROW_STATIC_LIBRARY_DIR}/${PARQUET_STATIC_LIB_FILENAME}" CACHE INTERNAL "parquet lib")
-    set(ARROW_BUNDLED_DEPS_STATIC_LIB_FILENAME
+    set(GAR_PARQUET_STATIC_LIB "${GAR_ARROW_STATIC_LIBRARY_DIR}/${GAR_PARQUET_STATIC_LIB_FILENAME}" CACHE INTERNAL "parquet lib")
+    set(GAR_ARROW_BUNDLED_DEPS_STATIC_LIB_FILENAME
         "${CMAKE_STATIC_LIBRARY_PREFIX}arrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    set(ARROW_BUNDLED_DEPS_STATIC_LIB
-        "${ARROW_STATIC_LIBRARY_DIR}/${ARROW_BUNDLED_DEPS_STATIC_LIB_FILENAME}" CACHE INTERNAL "bundled deps lib")
+    set(GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
+        "${GAR_ARROW_STATIC_LIBRARY_DIR}/${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB_FILENAME}" CACHE INTERNAL "bundled deps lib")
 
-    set(ARROW_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/arrow_ep-build")
-    set(ARROW_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${ARROW_PREFIX}"
-            "-DARROW_BUILD_STATIC=ON" "-DARROW_BUILD_SHARED=OFF"
-            "-DARROW_DEPENDENCY_SOURCE=BUNDLED" "-DARROW_DEPENDENCY_USE_SHARED=OFF"
-            "-DCMAKE_INSTALL_LIBDIR=lib" "-Dxsimd_SOURCE=BUNDLED"
-            "-DARROW_PARQUET=ON" "-DARROW_WITH_RE2=OFF"
-            "-DARROW_WITH_UTF8PROC=OFF" "-DARROW_WITH_RE2=OFF"
-            "-DARROW_FILESYSTEM=ON" "-DARROW_CSV=ON" "-DARROW_PYTHON=OFF"
-            "-DARROW_BUILD_BENCHMAKRS=OFF" "-DARROW_BUILD_TESTS=OFF"
-            "-DARROW_BUILD_INTEGRATION=OFF" "-DBoost_SOURCE=BUNDLED"
-            "-DARROW_ORC=ON" "-DARROW_COMPUTE=ON"
-            "-DARROW_DATASET=ON" "-DARROW_WITH_SNAPPY=OFF" "-DARROW_WITH_LZ4=OFF"
-            "-DARROW_WITH_ZSTD=ON" "-DARROW_WITH_ZLIB=OFF" "-DARROW_WITH_BROTLI=OFF" "-DARROW_WITH_BZ2=OFF")
+    set(GAR_ARROW_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/arrow_ep-build")
+    set(GAR_ARROW_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${GAR_ARROW_PREFIX}"
+                             "-DARROW_BUILD_STATIC=ON"
+                             "-DARROW_BUILD_SHARED=OFF"
+                             "-DARROW_DEPENDENCY_SOURCE=BUNDLED"
+                             "-DARROW_DEPENDENCY_USE_SHARED=OFF"
+                             "-DCMAKE_INSTALL_LIBDIR=lib"
+                             "-Dxsimd_SOURCE=BUNDLED"
+                             "-DARROW_PARQUET=ON"
+                             "-DARROW_WITH_RE2=OFF"
+                             "-DARROW_WITH_UTF8PROC=OFF"
+                             "-DARROW_WITH_RE2=OFF"
+                             "-DARROW_FILESYSTEM=ON"
+                             "-DARROW_CSV=ON"
+                             "-DARROW_PYTHON=OFF"
+                             "-DARROW_BUILD_BENCHMAKRS=OFF"
+                             "-DARROW_BUILD_TESTS=OFF"
+                             "-DARROW_BUILD_INTEGRATION=OFF"
+                             "-DBoost_SOURCE=BUNDLED"
+                             "-DARROW_ORC=ON"
+                             "-DARROW_COMPUTE=ON"
+                             "-DARROW_DATASET=ON"
+                             "-DARROW_WITH_SNAPPY=OFF"
+                             "-DARROW_WITH_LZ4=OFF"
+                             "-DARROW_WITH_ZSTD=ON"
+                             "-DARROW_WITH_ZLIB=OFF"
+                             "-DARROW_WITH_BROTLI=OFF"
+                             "-DARROW_WITH_BZ2=OFF")
 
-    set(ARROW_INCLUDE_DIR "${ARROW_PREFIX}/include" CACHE INTERNAL "arrow include directory")
-    set(ARROW_BUILD_BYPRODUCTS "${ARROW_STATIC_LIB}" "${PARQUET_STATIC_LIB}")
+    set(GAR_ARROW_INCLUDE_DIR "${GAR_ARROW_PREFIX}/include" CACHE INTERNAL "arrow include directory")
+    set(GAR_ARROW_BUILD_BYPRODUCTS "${GAR_ARROW_STATIC_LIB}" "${GAR_PARQUET_STATIC_LIB}")
 
     include(ExternalProject)
     externalproject_add(arrow_ep
             URL https://www.apache.org/dyn/closer.lua?action=download&filename=arrow/arrow-9.0.0/apache-arrow-9.0.0.tar.gz
             SOURCE_SUBDIR cpp
-            BINARY_DIR "${ARROW_BINARY_DIR}"
-            CMAKE_ARGS "${ARROW_CMAKE_ARGS}"
-            BUILD_BYPRODUCTS "${ARROW_BUILD_BYPRODUCTS}")
+            BINARY_DIR "${GAR_ARROW_BINARY_DIR}"
+            CMAKE_ARGS "${GAR_ARROW_CMAKE_ARGS}"
+            BUILD_BYPRODUCTS "${GAR_ARROW_BUILD_BYPRODUCTS}")
 
-    set(ARROW_LIBRARY_TARGET gar_arrow_static)
-    set(PARQUET_LIBRARY_TARGET gar_parquet_static)
+    set(GAR_ARROW_LIBRARY_TARGET gar_arrow_static)
+    set(GAR_PARQUET_LIBRARY_TARGET gar_parquet_static)
 
-    file(MAKE_DIRECTORY "${ARROW_INCLUDE_DIR}")
-    add_library(${ARROW_LIBRARY_TARGET} STATIC IMPORTED)
-    add_library(${PARQUET_LIBRARY_TARGET} STATIC IMPORTED)
-    set_target_properties(${ARROW_LIBRARY_TARGET}
-            PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${ARROW_INCLUDE_DIR}
-            IMPORTED_LOCATION ${ARROW_STATIC_LIB})
-    set_target_properties(${PARQUET_LIBRARY_TARGET}
-            PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${ARROW_INCLUDE_DIR}
-            IMPORTED_LOCATION ${PARQUET_STATIC_LIB})
+    file(MAKE_DIRECTORY "${GAR_ARROW_INCLUDE_DIR}")
+    add_library(${GAR_ARROW_LIBRARY_TARGET} STATIC IMPORTED)
+    add_library(${GAR_PARQUET_LIBRARY_TARGET} STATIC IMPORTED)
+    set_target_properties(${GAR_ARROW_LIBRARY_TARGET}
+            PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${GAR_ARROW_INCLUDE_DIR}
+            IMPORTED_LOCATION ${GAR_ARROW_STATIC_LIB})
+    set_target_properties(${GAR_PARQUET_LIBRARY_TARGET}
+            PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${GAR_ARROW_INCLUDE_DIR}
+            IMPORTED_LOCATION ${GAR_PARQUET_STATIC_LIB})
 
-    add_dependencies(${ARROW_LIBRARY_TARGET} arrow_ep)
+    add_dependencies(${GAR_ARROW_LIBRARY_TARGET} arrow_ep)
 endfunction()
