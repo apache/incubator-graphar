@@ -38,13 +38,14 @@ object EdgeWriter {
                                  vertexNumOfPrimaryVertexLabel: Long): (DataFrame, Seq[DataFrame], Array[Long]) = {
     import spark.implicits._
     val edgeSchema = edgeDf.schema
-    val colIndex = edgeSchema.fieldIndex(if (adjListType == AdjListType.ordered_by_source) GeneralParams.srcIndexCol else GeneralParams.dstIndexCol)
-    val vertexChunkSize: Long = if (adjListType == AdjListType.ordered_by_source) edgeInfo.getSrc_chunk_size() else edgeInfo.getDst_chunk_size()
+    val colName = if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.unordered_by_source) GeneralParams.srcIndexCol else GeneralParams.dstIndexCol
+    val colIndex = edgeSchema.fieldIndex(colName)
+    val vertexChunkSize: Long = if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.unordered_by_source) edgeInfo.getSrc_chunk_size() else edgeInfo.getDst_chunk_size()
     val edgeChunkSize: Long = edgeInfo.getChunk_size()
     val vertexChunkNum: Int = ((vertexNumOfPrimaryVertexLabel + vertexChunkSize - 1) / vertexChunkSize).toInt  // ceil
 
     // sort by primary key and generate continue edge id for edge records
-    val sortedDfRDD = edgeDf.sort(GeneralParams.srcIndexCol).rdd
+    val sortedDfRDD = edgeDf.sort(colName).rdd
     // generate continue edge id for every edge
     val partitionCounts = sortedDfRDD
       .mapPartitionsWithIndex((i, ps) => Array((i, ps.size)).iterator, preservesPartitioning = true)
@@ -91,31 +92,34 @@ object EdgeWriter {
     // repartition edge dataframe and sort within partitions
     val partitionRDD = rddWithEid.repartitionAndSortWithinPartitions(partitioner).values
     val partitionEdgeDf = spark.createDataFrame(partitionRDD, edgeSchema)
+    partitionEdgeDf.cache()
 
     // generate offset dataframes
-    val edgeCountsByPrimaryKey = partitionRDD.mapPartitions(iterator => {
-      iterator.map(row => (row(colIndex).asInstanceOf[Long], 1))
-    }).reduceByKey(_ + _)
-    val offsetDfSchema = StructType(Seq(StructField(GeneralParams.offsetCol, IntegerType)))
-    val offsetDfArray: Seq[DataFrame] = (0 until vertexChunkNum).map { i => {
-      val filterRDD = edgeCountsByPrimaryKey.filter(v => v._1 / vertexChunkSize == i).map { case (k, v) => (k - i * vertexChunkSize + 1, v)}
-      val initRDD = spark.sparkContext.parallelize((0L to vertexChunkSize).map(key => (key, 0)))
-      val unionRDD = spark.sparkContext.union(filterRDD, initRDD).reduceByKey(_ + _).sortByKey(numPartitions=1)
-      val offsetRDD = unionRDD.mapPartitionsWithIndex((i, ps) => {
-        var sum = 0
-        var preSum = 0
-        for ((k, count) <- ps ) yield {
-          preSum = sum
-          sum = sum + count
-          (k, count + preSum)
-        }
-      }).map { case (k, v) => Row(v)}
-      val offsetChunk = spark.createDataFrame(offsetRDD, offsetDfSchema)
-      offsetChunk.cache()
-      offsetChunk
-    }}
-    // cache the dataframe
-    partitionEdgeDf.cache()
+    if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.ordered_by_dest) {
+      val edgeCountsByPrimaryKey = partitionRDD.mapPartitions(iterator => {
+        iterator.map(row => (row(colIndex).asInstanceOf[Long], 1))
+      }).reduceByKey(_ + _)
+      val offsetDfSchema = StructType(Seq(StructField(GeneralParams.offsetCol, IntegerType)))
+      val offsetDfArray: Seq[DataFrame] = (0 until vertexChunkNum).map { i => {
+        val filterRDD = edgeCountsByPrimaryKey.filter(v => v._1 / vertexChunkSize == i).map { case (k, v) => (k - i * vertexChunkSize + 1, v) }
+        val initRDD = spark.sparkContext.parallelize((0L to vertexChunkSize).map(key => (key, 0)))
+        val unionRDD = spark.sparkContext.union(filterRDD, initRDD).reduceByKey(_ + _).sortByKey(numPartitions = 1)
+        val offsetRDD = unionRDD.mapPartitionsWithIndex((i, ps) => {
+          var sum = 0
+          var preSum = 0
+          for ((k, count) <- ps) yield {
+            preSum = sum
+            sum = sum + count
+            (k, count + preSum)
+          }
+        }).map { case (k, v) => Row(v) }
+        val offsetChunk = spark.createDataFrame(offsetRDD, offsetDfSchema)
+        offsetChunk.cache()
+        offsetChunk
+      }}
+      return (partitionEdgeDf, offsetDfArray, aggEdgeChunkNumOfVertexChunks)
+    }
+    val offsetDfArray = Seq.empty[DataFrame]
     return (partitionEdgeDf, offsetDfArray, aggEdgeChunkNumOfVertexChunks)
   }
 }
