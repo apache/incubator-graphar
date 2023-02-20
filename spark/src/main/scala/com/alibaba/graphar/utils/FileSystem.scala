@@ -38,8 +38,11 @@ object FileSystem {
   def writeDataFrame(dataFrame: DataFrame, fileType: String, outputPrefix: String, offsetStartChunkIndex: Option[Int],
                      aggNumListOfEdgeChunk: Option[Array[Long]]): Unit = {
     val spark = dataFrame.sparkSession
+    // TODO: Make the hard-code setting to configurable
     spark.conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
     spark.conf.set("parquet.enable.summary-metadata", "false")
+    spark.conf.set("spark.sql.orc.compression.codec", "zstd")
+    spark.conf.set("spark.sql.parquet.compression.codec", "zstd")
     // first check the outputPrefix exists, if not, create it
     val path = new Path(outputPrefix)
     val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
