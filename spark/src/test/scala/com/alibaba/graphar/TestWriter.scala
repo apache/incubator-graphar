@@ -61,6 +61,12 @@ class WriterSuite extends AnyFunSuite {
     val chunk_path = new Path(prefix + vertex_info.getPrefix() + "*/*")
     val chunk_files = fs.globStatus(chunk_path)
     assert(chunk_files.length == 20)
+    val vertex_num_path = new Path(prefix + vertex_info.getVerticesNumFilePath())
+    val vertex_num_file = fs.globStatus(vertex_num_path)
+    assert(vertex_num_file.length == 1)
+    val input = fs.open(vertex_num_path)
+    val number = java.lang.Long.reverseBytes(input.readLong())
+    assert(number.toInt == vertex_df.count())
 
     assertThrows[IllegalArgumentException](new VertexWriter(prefix, vertex_info, vertex_df))
     val invalid_property_group= new PropertyGroup()
