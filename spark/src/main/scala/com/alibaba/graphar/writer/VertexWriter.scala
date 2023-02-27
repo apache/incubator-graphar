@@ -60,6 +60,7 @@ class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame, 
     case None => vertexDf.count()
     case _ => numVertices.get
   }
+  writeVertexNum()
 
   private var chunks:DataFrame = VertexWriter.repartitionAndSort(vertexDf, vertexInfo.getChunk_size(), vertexNum)
 

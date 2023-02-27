@@ -15,8 +15,8 @@
 
 package com.alibaba.graphar
 
-import com.alibaba.graphar.utils.IndexGenerator
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
+import com.alibaba.graphar.utils
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.scalatest.funsuite.AnyFunSuite
@@ -45,7 +45,7 @@ class WriterSuite extends AnyFunSuite {
     val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
 
     // generate vertex index column for vertex dataframe
-    val vertex_df_with_index = IndexGenerator.generateVertexIndexColumn(vertex_df)
+    val vertex_df_with_index = utils.IndexGenerator.generateVertexIndexColumn(vertex_df)
 
     // create writer object for person and generate the properties with GAR format
     val prefix : String = "/tmp/"
@@ -61,6 +61,9 @@ class WriterSuite extends AnyFunSuite {
     val chunk_path = new Path(prefix + vertex_info.getPrefix() + "*/*")
     val chunk_files = fs.globStatus(chunk_path)
     assert(chunk_files.length == 20)
+    val vertex_num_path = prefix + vertex_info.getVerticesNumFilePath()
+    val number = utils.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
+    assert(number.toInt == vertex_df.count())
 
     assertThrows[IllegalArgumentException](new VertexWriter(prefix, vertex_info, vertex_df))
     val invalid_property_group= new PropertyGroup()
@@ -89,7 +92,7 @@ class WriterSuite extends AnyFunSuite {
     val srcDf = edge_df.select("src").withColumnRenamed("src", "vertex")
     val dstDf = edge_df.select("dst").withColumnRenamed("dst", "vertex")
     val vertexNum = srcDf.union(dstDf).distinct().count()
-    val edge_df_with_index = IndexGenerator.generateSrcAndDstIndexUnitedlyForEdges(edge_df, "src", "dst")
+    val edge_df_with_index = utils.IndexGenerator.generateSrcAndDstIndexUnitedlyForEdges(edge_df, "src", "dst")
 
     // create writer object for person_knows_person and generate the adj list and properties with GAR format
     val writer = new EdgeWriter(prefix, edge_info, adj_list_type, vertexNum, edge_df_with_index)
@@ -156,10 +159,10 @@ class WriterSuite extends AnyFunSuite {
     val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
 
     // construct person vertex mapping with dataframe
-    val vertex_mapping = IndexGenerator.constructVertexIndexMapping(vertex_df, vertex_info.getPrimaryKey())
+    val vertex_mapping = utils.IndexGenerator.constructVertexIndexMapping(vertex_df, vertex_info.getPrimaryKey())
     // generate src index and dst index for edge datafram with vertex mapping
-    val edge_df_with_src_index = IndexGenerator.generateSrcIndexForEdgesFromMapping(edge_df, "src", vertex_mapping)
-    val edge_df_with_src_dst_index = IndexGenerator.generateDstIndexForEdgesFromMapping(edge_df_with_src_index, "dst", vertex_mapping)
+    val edge_df_with_src_index = utils.IndexGenerator.generateSrcIndexForEdgesFromMapping(edge_df, "src", vertex_mapping)
+    val edge_df_with_src_dst_index = utils.IndexGenerator.generateDstIndexForEdgesFromMapping(edge_df_with_src_index, "dst", vertex_mapping)
 
     // create writer object for person_knows_person and generate the adj list and properties with GAR format
     val writer = new EdgeWriter(prefix, edge_info, adj_list_type, vertex_num, edge_df_with_src_dst_index)

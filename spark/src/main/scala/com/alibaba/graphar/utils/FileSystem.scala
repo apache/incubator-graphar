@@ -68,7 +68,18 @@ object FileSystem {
     val path = new Path(outputPath)
     val fs = path.getFileSystem(hadoopConfig)
     val output = fs.create(path, true)  // create or overwrite
-    output.writeLong(value)
+    // consistent with c++ library, convert to little-endian
+    output.writeLong(java.lang.Long.reverseBytes(value))
     output.close()
+  }
+
+  def readValue(inputPath: String, hadoopConfig: Configuration): Long = {
+    val path = new Path(inputPath)
+    val fs = path.getFileSystem(hadoopConfig)
+    val input = fs.open(path)
+    // consistent with c++ library, little-endian in file, convert to big-endian
+    val num = java.lang.Long.reverseBytes(input.readLong())
+    fs.close()
+    return num
   }
 }

@@ -18,8 +18,8 @@ package com.alibaba.graphar.reader
 import com.alibaba.graphar.utils.{IndexGenerator, DataFrameConcat}
 import com.alibaba.graphar.{GeneralParams, VertexInfo, FileType, PropertyGroup}
 import com.alibaba.graphar.datasources._
+import com.alibaba.graphar.utils.FileSystem
 
-import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
@@ -36,11 +36,7 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
   /** Load the total number of vertices for this vertex type. */
   def readVerticesNumber(): Long = {
     val file_path = prefix + "/" + vertexInfo.getVerticesNumFilePath()
-    val path = new Path(file_path)
-    val file_system = FileSystem.get(path.toUri(), spark.sparkContext.hadoopConfiguration)
-    val input = file_system.open(path)
-    val number = java.lang.Long.reverseBytes(input.readLong())
-    file_system.close()
+    val number = FileSystem.readValue(file_path, spark.sparkContext.hadoopConfiguration)
     return number
   }
 
