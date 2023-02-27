@@ -74,7 +74,7 @@ class VertexWriter(prefix: String, vertexInfo: VertexInfo, vertexDf: DataFrame, 
 
   private def writeVertexNum(): Unit = {
     val outputPath = prefix + vertexInfo.getVerticesNumFilePath()
-    FileSystem.writeValue(java.lang.Long.reverseBytes(vertexNum), outputPath, spark.sparkContext.hadoopConfiguration)
+    FileSystem.writeValue(vertexNum, outputPath, spark.sparkContext.hadoopConfiguration)
   }
 
   /** Generate chunks of the property group for vertex dataframe.
