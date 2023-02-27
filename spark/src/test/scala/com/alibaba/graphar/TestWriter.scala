@@ -17,6 +17,7 @@ package com.alibaba.graphar
 
 import com.alibaba.graphar.utils.IndexGenerator
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
+import com.alibaba.graphar.utils
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.scalatest.funsuite.AnyFunSuite
@@ -61,11 +62,8 @@ class WriterSuite extends AnyFunSuite {
     val chunk_path = new Path(prefix + vertex_info.getPrefix() + "*/*")
     val chunk_files = fs.globStatus(chunk_path)
     assert(chunk_files.length == 20)
-    val vertex_num_path = new Path(prefix + vertex_info.getVerticesNumFilePath())
-    val vertex_num_file = fs.globStatus(vertex_num_path)
-    assert(vertex_num_file.length == 1)
-    val input = fs.open(vertex_num_path)
-    val number = java.lang.Long.reverseBytes(input.readLong())
+    val vertex_num_path = prefix + vertex_info.getVerticesNumFilePath()
+    val number = utils.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
     assert(number.toInt == vertex_df.count())
 
     assertThrows[IllegalArgumentException](new VertexWriter(prefix, vertex_info, vertex_df))
