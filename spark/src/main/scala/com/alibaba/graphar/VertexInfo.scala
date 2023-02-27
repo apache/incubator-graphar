@@ -16,6 +16,8 @@
 package com.alibaba.graphar
 
 import java.io.{File, FileInputStream}
+import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.spark.sql.{SparkSession}
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
@@ -215,5 +217,17 @@ class VertexInfo() {
       str = property_group.getPrefix
     }
     return prefix + str;
+  }
+}
+
+/** Helper object to load vertex info files */
+object VertexInfo {
+  /** Load a yaml file from path and construct a VertexInfo from it. */
+  def loadVertexInfo(vertexInfoPath: String, spark: SparkSession): VertexInfo = {
+    val path = new Path(vertexInfoPath)
+    val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
+    val input = fs.open(path)
+    val yaml = new Yaml(new Constructor(classOf[VertexInfo]))
+    return yaml.load(input).asInstanceOf[VertexInfo]
   }
 }

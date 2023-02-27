@@ -16,6 +16,8 @@
 package com.alibaba.graphar
 
 import java.io.{File, FileInputStream}
+import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.spark.sql.{SparkSession}
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
@@ -423,5 +425,17 @@ class EdgeInfo() {
     }
     str = prefix + getAdjListPrefix(adj_list_type) + str
     return str
+  }
+}
+
+/** Helper object to load edge info files */
+object EdgeInfo {
+  /** Load a yaml file from path and construct a EdgeInfo from it. */
+  def loadEdgeInfo(edgeInfoPath: String, spark: SparkSession): EdgeInfo = {
+    val path = new Path(edgeInfoPath)
+    val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
+    val input = fs.open(path)
+    val yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
+    return yaml.load(input).asInstanceOf[EdgeInfo]
   }
 }

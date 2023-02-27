@@ -16,6 +16,8 @@
 package com.alibaba.graphar
 
 import java.io.{File, FileInputStream}
+import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.spark.sql.{SparkSession}
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
@@ -201,4 +203,24 @@ class GraphInfo() {
   @BeanProperty var vertices = new java.util.ArrayList[String]()
   @BeanProperty var edges = new java.util.ArrayList[String]()
   @BeanProperty var version: String = ""
+}
+
+/** Helper object to load graph info files */
+object GraphInfo {
+  /** Load a yaml file from path and construct a GraphInfo from it. */
+  def loadGraphInfo(graphInfoPath: String, spark: SparkSession): GraphInfo = {
+    val path = new Path(graphInfoPath)
+    val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
+    val input = fs.open(path)
+    val yaml = new Yaml(new Constructor(classOf[GraphInfo]))
+    val graph_info = yaml.load(input).asInstanceOf[GraphInfo]
+    if (graph_info.getPrefix == "") {
+      val pos = graphInfoPath.lastIndexOf('/')
+      if (pos != -1) {
+        val prefix = graphInfoPath.substring(0, pos + 1) // +1 to include the slash
+        graph_info.setPrefix(prefix)
+      }
+    }
+    return graph_info
+  }
 }
