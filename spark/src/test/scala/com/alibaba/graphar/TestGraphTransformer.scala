@@ -15,13 +15,10 @@
 
 package com.alibaba.graphar
 
-import com.alibaba.graphar.graph.GraphTransformer
 import com.alibaba.graphar.GraphInfo
+import com.alibaba.graphar.graph.GraphTransformer
 
 import java.io.{File, FileInputStream}
-import scala.beans.BeanProperty
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.hadoop.fs.{Path, FileSystem}
 import org.scalatest.funsuite.AnyFunSuite
@@ -69,7 +66,7 @@ class TestGraphTransformerSuite extends AnyFunSuite {
     val dest_path = getClass.getClassLoader.getResource("gar-test/transform/ldbc_sample.graph.yml").getPath
     val dest_graph_info = GraphInfo.loadGraphInfo(dest_path, spark)
 
-    // conduct transforming
+    // conduct transformation
     GraphTransformer.transform(source_graph_info, dest_graph_info, spark)
 
     val prefix = dest_graph_info.getPrefix

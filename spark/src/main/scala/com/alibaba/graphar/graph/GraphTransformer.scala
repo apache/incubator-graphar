@@ -18,19 +18,15 @@ package com.alibaba.graphar.graph
 import com.alibaba.graphar.{GeneralParams, AdjListType, GraphInfo, VertexInfo, EdgeInfo}
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
-import com.alibaba.graphar.datasources._
 
-import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
 
 /** The helper object for transforming graphs through the definitions of their infos. */
 object GraphTransformer {
   /** Construct the map of (vertex label -> VertexInfo) for a graph. */
-  private def constructVertexInfoMap(prefix: String, graphInfo:GraphInfo, spark: SparkSession): Map[String, VertexInfo] = {
+  private def constructVertexInfoMap(prefix: String, graphInfo: GraphInfo, spark: SparkSession): Map[String, VertexInfo] = {
     var vertex_infos_map: Map[String, VertexInfo] = Map()
     val vertices_yaml = graphInfo.getVertices
     val vertices_it = vertices_yaml.iterator
@@ -44,7 +40,7 @@ object GraphTransformer {
   }
 
   /** Construct the map of (edge label -> EdgeInfo) for a graph. */
-  private def constructEdgeInfoMap(prefix: String, graphInfo:GraphInfo, spark: SparkSession): Map[String, EdgeInfo] = {
+  private def constructEdgeInfoMap(prefix: String, graphInfo: GraphInfo, spark: SparkSession): Map[String, EdgeInfo] = {
     var edge_infos_map: Map[String, EdgeInfo] = Map()
     val edges_yaml = graphInfo.getEdges
     val edges_it = edges_yaml.iterator
@@ -58,7 +54,7 @@ object GraphTransformer {
     return edge_infos_map
   }
 
-  /** Transform the graphs following the meta defined in info files.
+  /** Transform the graphs following the meta data defined in info files.
    *
    * @param sourceGraphInfoPath The path of the graph info yaml file for the source graph.
    * @param destGraphInfoPath The path of the graph info yaml file for the destination graph.
@@ -71,11 +67,11 @@ object GraphTransformer {
     // load dest graph info
     val dest_graph_info = GraphInfo.loadGraphInfo(destGraphInfoPath, spark)
 
-    // conduct transforming
+    // conduct transformation
     transform(source_graph_info, dest_graph_info, spark)
   }
 
-  /** Transform the graphs following the meta defined in graph info objects.
+  /** Transform the graphs following the meta data defined in graph info objects.
    *
    * @param sourceGraphInfo The info object for the source graph.
    * @param destGraphInfo The info object for the destination graph.
@@ -94,19 +90,19 @@ object GraphTransformer {
     // traverse vertex infos of the destination graph
     val dest_vertices_it = destGraphInfo.getVertices.iterator
     while (dest_vertices_it.hasNext()) {
-      // get dest edge info
+      // load dest edge info
       val path = dest_prefix + dest_vertices_it.next()
       val dest_vertex_info = VertexInfo.loadVertexInfo(path, spark)
-      // get source vertex info
+      // load source vertex info
       val label = dest_vertex_info.getLabel()
       if (!source_vertex_infos_map.contains(label)) {
         throw new IllegalArgumentException
       }
       val source_vertex_info = source_vertex_infos_map(label)
-      // read vertex chunks from source graph
+      // read vertex chunks from the source graph
       val reader = new VertexReader(source_prefix, source_vertex_info, spark)
       val df = reader.readAllVertexPropertyGroups(true)
-      // write vertex chunks for dest graph
+      // write vertex chunks for the dest graph
       val writer = new VertexWriter(dest_prefix, dest_vertex_info, df)
       writer.writeVertexProperties()
     }
@@ -115,10 +111,10 @@ object GraphTransformer {
     // traverse edge infos of the destination graph
     val dest_edges_it = destGraphInfo.getEdges.iterator
     while (dest_edges_it.hasNext()) {
-      // get dest edge info
+      // load dest edge info
       val path = dest_prefix + dest_edges_it.next()
       val dest_edge_info = EdgeInfo.loadEdgeInfo(path, spark)
-      // get source edge info
+      // load source edge info
       val key = dest_edge_info.getSrc_label + GeneralParams.regularSeperator + dest_edge_info.getEdge_label + GeneralParams.regularSeperator + dest_edge_info.getDst_label
       if (!source_edge_infos_map.contains(key)) {
         throw new IllegalArgumentException
@@ -133,12 +129,13 @@ object GraphTransformer {
       while (adj_list_it.hasNext()) {
         val dest_adj_list_type = adj_list_it.next().getAdjList_type_in_gar
 
-        // load edge DataFrame
+        // load edge DataFrame from the source graph
         if (!has_loaded) {
           val source_adj_lists = source_edge_info.getAdj_lists
           var source_adj_list_type = dest_adj_list_type
-          if (!source_edge_info.containAdjList(dest_adj_list_type) && source_adj_lists.size() > 0)
-            source_adj_list_type = source_adj_lists.get(0).getAdjList_type_in_gar
+          if (!source_edge_info.containAdjList(dest_adj_list_type))
+            if (source_adj_lists.size() > 0)
+              source_adj_list_type = source_adj_lists.get(0).getAdjList_type_in_gar
           // read edge chunks from source graph
           val reader = new EdgeReader(source_prefix, source_edge_info, source_adj_list_type, spark)
           df = reader.readEdges(false)
@@ -146,15 +143,18 @@ object GraphTransformer {
         }
 
         // read vertices number
-        val vertex_label = if (dest_adj_list_type == AdjListType.ordered_by_source || dest_adj_list_type == AdjListType.unordered_by_source) dest_edge_info.getSrc_label else dest_edge_info.getDst_label
+        val vertex_label = {
+          if (dest_adj_list_type == AdjListType.ordered_by_source || dest_adj_list_type == AdjListType.unordered_by_source) 
+            dest_edge_info.getSrc_label 
+          else 
+            dest_edge_info.getDst_label
+        }
         if (!source_vertex_infos_map.contains(vertex_label)) {
           throw new IllegalArgumentException
         }
         val vertex_info = source_vertex_infos_map(vertex_label)
         val reader = new VertexReader(source_prefix, vertex_info, spark)
         val vertex_num = reader.readVerticesNumber()
-        println(vertex_label)
-        println(vertex_num)
 
         // write edge chunks for dest graph
         val writer = new EdgeWriter(dest_prefix, dest_edge_info, dest_adj_list_type, vertex_num, df)
