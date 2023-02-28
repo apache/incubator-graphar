@@ -53,12 +53,9 @@ To construct information from a Yaml file, please refer to the following example
 .. code:: scala
 
    // read graph yaml and construct information
+   val spark = ... // the Spark session
    val file_path = ... // the path to the yaml file
-   val yaml_path = new Path(file_path)
-   val fs = FileSystem.get(yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
-   val input = fs.open(yaml_path)
-   val graph_yaml = new Yaml(new Constructor(classOf[GraphInfo]))
-   val graph_info = graph_yaml.load(input).asInstanceOf[GraphInfo]
+   val graph_info = GraphInfo.loadGraphInfo(file_path, spark)
 
    // use information classes
    val vertices = graph_info.getVertices

@@ -34,11 +34,10 @@ class ComputeExampleSuite extends AnyFunSuite {
 
   test("run cc using graphx") {
     // read vertex dataframe
-    val file_path = "gar-test/ldbc_sample/parquet"
+    val file_path = "gar-test/ldbc_sample/parquet/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
-    val vertex_input = getClass.getClassLoader.getResourceAsStream(file_path + "/person.vertex.yml")
-    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
+    val vertex_yaml = getClass.getClassLoader.getResource(file_path + "person.vertex.yml").getPath
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
 
     val vertex_reader = new VertexReader(prefix, vertex_info, spark)
     val vertices_num = vertex_reader.readVerticesNumber()
@@ -48,9 +47,8 @@ class ComputeExampleSuite extends AnyFunSuite {
     assert(vertex_df.count() == vertices_num)
 
     // read edge dataframe
-    val edge_input = getClass.getClassLoader.getResourceAsStream(file_path + "/person_knows_person.edge.yml")
-    val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
-    val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
+    val edge_yaml = getClass.getClassLoader.getResource(file_path + "person_knows_person.edge.yml").getPath
+    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
     val adj_list_type = AdjListType.ordered_by_source
 
     val edge_reader = new EdgeReader(prefix, edge_info, adj_list_type, spark)

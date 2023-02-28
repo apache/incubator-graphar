@@ -33,9 +33,9 @@ class ReaderSuite extends AnyFunSuite {
 
   test("read chunk files directly") {
     // read vertex chunk files in Parquet
-    val parquet_file_path = "gar-test/ldbc_sample/parquet"
+    val parquet_file_path = "gar-test/ldbc_sample/parquet/"
     val parquet_prefix = getClass.getClassLoader.getResource(parquet_file_path).getPath
-    val parqeut_read_path = parquet_prefix + "/vertex/person/id"
+    val parqeut_read_path = parquet_prefix + "vertex/person/id"
     val df1 = spark.read.option("fileFormat", "parquet").format("com.alibaba.graphar.datasources.GarDataSource").load(parqeut_read_path)
     // validate reading results
     assert(df1.rdd.getNumPartitions == 10)
@@ -43,17 +43,17 @@ class ReaderSuite extends AnyFunSuite {
     // println(df1.rdd.collect().mkString("\n"))
 
     // read vertex chunk files in Orc
-    val orc_file_path = "gar-test/ldbc_sample/orc"
+    val orc_file_path = "gar-test/ldbc_sample/orc/"
     val orc_prefix = getClass.getClassLoader.getResource(orc_file_path).getPath
-    val orc_read_path = orc_prefix + "/vertex/person/id"
+    val orc_read_path = orc_prefix + "vertex/person/id"
     val df2 = spark.read.option("fileFormat", "orc").format("com.alibaba.graphar.datasources.GarDataSource").load(orc_read_path)
     // validate reading results
     assert(df2.rdd.collect().deep == df1.rdd.collect().deep)
 
     // read adjList chunk files recursively in CSV
-    val csv_file_path = "gar-test/ldbc_sample/csv"
+    val csv_file_path = "gar-test/ldbc_sample/csv/"
     val csv_prefix = getClass.getClassLoader.getResource(csv_file_path).getPath
-    val csv_read_path = csv_prefix + "/edge/person_knows_person/ordered_by_source/adj_list"
+    val csv_read_path = csv_prefix + "edge/person_knows_person/ordered_by_source/adj_list"
     val df3 = spark.read.option("fileFormat", "csv").option("header", "true").option("recursiveFileLookup", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(csv_read_path)
     // validate reading results
     assert(df3.rdd.getNumPartitions == 11)
@@ -65,11 +65,10 @@ class ReaderSuite extends AnyFunSuite {
 
   test("read vertex chunks") {
     // construct the vertex information
-    val file_path = "gar-test/ldbc_sample/csv"
+    val file_path = "gar-test/ldbc_sample/csv/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
-    val vertex_input = getClass.getClassLoader.getResourceAsStream(file_path + "/person.vertex.yml")
-    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
+    val vertex_yaml = getClass.getClassLoader.getResource(file_path + "person.vertex.yml").getPath
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
 
     // construct the vertex reader
     val reader = new VertexReader(prefix, vertex_info, spark)
@@ -115,11 +114,10 @@ class ReaderSuite extends AnyFunSuite {
 
   test("read edge chunks") {
     // construct the edge information
-    val file_path = "gar-test/ldbc_sample/csv"
+    val file_path = "gar-test/ldbc_sample/csv/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
-    val edge_input = getClass.getClassLoader.getResourceAsStream(file_path + "/person_knows_person.edge.yml")
-    val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
-    val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
+    val edge_yaml = getClass.getClassLoader.getResource(file_path + "person_knows_person.edge.yml").getPath
+    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
 
     // construct the edge reader
     val adj_list_type = AdjListType.ordered_by_source

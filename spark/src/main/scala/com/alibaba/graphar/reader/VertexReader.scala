@@ -50,7 +50,7 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
     if (vertexInfo.containPropertyGroup(propertyGroup) == false) 
       throw new IllegalArgumentException
     val file_type = propertyGroup.getFile_type()
-    val file_path = prefix + "/" + vertexInfo.getFilePath(propertyGroup, chunk_index)
+    val file_path = prefix + vertexInfo.getFilePath(propertyGroup, chunk_index)
     val df = spark.read.option("fileFormat", file_type).option("header", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
     return df
   }
@@ -66,7 +66,7 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
     if (vertexInfo.containPropertyGroup(propertyGroup) == false) 
       throw new IllegalArgumentException
     val file_type = propertyGroup.getFile_type()
-    val file_path = prefix + "/" + vertexInfo.getPathPrefix(propertyGroup)
+    val file_path = prefix + vertexInfo.getPathPrefix(propertyGroup)
     val df = spark.read.option("fileFormat", file_type).option("header", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
     
     if (addIndex) {

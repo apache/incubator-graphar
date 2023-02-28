@@ -35,11 +35,10 @@ class TransformExampleSuite extends AnyFunSuite {
 
   test("tranform file type") {
     // read from orc files
-    val file_path = "gar-test/ldbc_sample/orc"
+    val file_path = "gar-test/ldbc_sample/orc/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
-    val vertex_file = getClass.getClassLoader.getResourceAsStream(file_path + "/person.vertex.yml")
-    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val vertex_info = vertex_yaml.load(vertex_file).asInstanceOf[VertexInfo]
+    val vertex_yaml = getClass.getClassLoader.getResource(file_path + "person.vertex.yml").getPath
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
 
     val reader = new VertexReader(prefix, vertex_info, spark)
     val vertices_num = reader.readVerticesNumber()
@@ -47,11 +46,10 @@ class TransformExampleSuite extends AnyFunSuite {
     assert(vertex_df_with_index.count() == vertices_num)
 
     // write to parquet files
-    val output_file_path = "gar-test/ldbc_sample/parquet"
+    val output_file_path = "gar-test/ldbc_sample/parquet/"
     val output_prefix : String = "/tmp/example/"
-    val output_vertex_file = getClass.getClassLoader.getResourceAsStream(file_path + "/person.vertex.yml")
-    val output_vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val output_vertex_info = output_vertex_yaml.load(output_vertex_file).asInstanceOf[VertexInfo]
+    val output_vertex_yaml = getClass.getClassLoader.getResource(output_file_path + "person.vertex.yml").getPath
+    val output_vertex_info = VertexInfo.loadVertexInfo(output_vertex_yaml, spark)
 
     val writer = new VertexWriter(output_prefix, output_vertex_info, vertex_df_with_index)
     writer.writeVertexProperties()
@@ -66,19 +64,17 @@ class TransformExampleSuite extends AnyFunSuite {
   }
 
   test("tranform adjList type") {
-    val file_path = "gar-test/ldbc_sample/parquet"
+    val file_path = "gar-test/ldbc_sample/parquet/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
     // get vertex num
-    val vertex_file = getClass.getClassLoader.getResourceAsStream(file_path + "/person.vertex.yml")
-    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val vertex_info = vertex_yaml.load(vertex_file).asInstanceOf[VertexInfo]
+    val vertex_yaml = getClass.getClassLoader.getResource(file_path + "person.vertex.yml").getPath
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
     // construct the vertex reader
     val vreader = new VertexReader(prefix, vertex_info, spark)
     val vertexNum = vreader.readVerticesNumber()
     // read edges of unordered_by_source type
-    val edge_input = getClass.getClassLoader.getResourceAsStream(file_path + "/person_knows_person.edge.yml")
-    val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
-    val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
+    val edge_yaml = getClass.getClassLoader.getResource(file_path + "person_knows_person.edge.yml").getPath
+    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
 
     val adj_list_type = AdjListType.unordered_by_source
     val reader = new EdgeReader(prefix, edge_info, adj_list_type, spark)

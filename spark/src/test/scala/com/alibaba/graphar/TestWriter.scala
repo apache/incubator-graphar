@@ -39,10 +39,8 @@ class WriterSuite extends AnyFunSuite {
     val fs = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
 
     // read vertex yaml
-    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/person.vertex.yml").getPath)
-    val vertex_input = fs.open(vertex_yaml_path)
-    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
+    val vertex_yaml_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/person.vertex.yml").getPath
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml_path, spark)
 
     // generate vertex index column for vertex dataframe
     val vertex_df_with_index = utils.IndexGenerator.generateVertexIndexColumn(vertex_df)
@@ -82,10 +80,8 @@ class WriterSuite extends AnyFunSuite {
     val fs = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
 
     // read edge yaml
-    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath)
-    val edge_input = fs.open(edge_yaml_path)
-    val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
-    val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
+    val edge_yaml_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath
+    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml_path, spark)
     val adj_list_type = AdjListType.ordered_by_source
 
     // generate vertex index for edge dataframe
@@ -147,16 +143,12 @@ class WriterSuite extends AnyFunSuite {
     val adj_list_type = AdjListType.ordered_by_source
 
     // read vertex yaml
-    val vertex_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person.vertex.yml").getPath)
-    val vertex_input = fs.open(vertex_yaml_path)
-    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
+    val vertex_yaml_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person.vertex.yml").getPath
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml_path, spark)
 
     // read edge yaml
-    val edge_yaml_path = new Path(getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath)
-    val edge_input = fs.open(edge_yaml_path)
-    val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
-    val edge_info = edge_yaml.load(edge_input).asInstanceOf[EdgeInfo]
+    val edge_yaml_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath
+    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml_path, spark)
 
     // construct person vertex mapping with dataframe
     val vertex_mapping = utils.IndexGenerator.constructVertexIndexMapping(vertex_df, vertex_info.getPrimaryKey())
