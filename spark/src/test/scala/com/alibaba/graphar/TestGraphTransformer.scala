@@ -32,7 +32,7 @@ class TestGraphTransformerSuite extends AnyFunSuite {
   test("transform graphs by yaml paths") {
     // conduct transformation
     val source_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml").getPath
-    val dest_path = getClass.getClassLoader.getResource("gar-test/transform/ldbc_sample.graph.yml").getPath
+    val dest_path = getClass.getClassLoader.getResource("gar-test/transformer/ldbc_sample.graph.yml").getPath
     GraphTransformer.transform(source_path, dest_path, spark)
 
     val dest_graph_info = GraphInfo.loadGraphInfo(dest_path, spark)
@@ -63,7 +63,7 @@ class TestGraphTransformerSuite extends AnyFunSuite {
     val source_graph_info = GraphInfo.loadGraphInfo(source_path, spark)
 
     // load dest graph info
-    val dest_path = getClass.getClassLoader.getResource("gar-test/transform/ldbc_sample.graph.yml").getPath
+    val dest_path = getClass.getClassLoader.getResource("gar-test/transformer/ldbc_sample.graph.yml").getPath
     val dest_graph_info = GraphInfo.loadGraphInfo(dest_path, spark)
 
     // conduct transformation
