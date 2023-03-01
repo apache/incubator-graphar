@@ -31,7 +31,7 @@ object GraphWriter {
    * @param vertexInfos The map of (vertex label -> VertexInfo) for the graph.
    * @param vertexNumMap vertex num of vertices, a map of (vertex label -> vertex num)
    * @param vertexDataFrames vertex dataframes, a map of (vertex label -> DataFrame)
-   * @param spark The Spark session for the transformer.
+   * @param spark The Spark session for the writing.
    */
   private def writeAllVertices(prefix: String,
                                vertexInfos: Map[String, VertexInfo],
@@ -53,8 +53,8 @@ object GraphWriter {
    * @param edgeInfos The map of (srclabel_edgeLabel_dstLabel -> EdgeInfo) for the graph.
    * @param vertexNumMap vertex num of vertices, a map of (vertex label -> vertex num)
    * @param vertexDataFrames vertex dataframes, a map of (vertex label -> DataFrame)
-   * @param edgeDataFrames: edge dataframes, a map of (srcLabel_edgeLabel_dstLabel -> DataFrame)
-   * @param spark The Spark session for the transformer.
+   * @param edgeDataFrames edge dataframes, a map of (srcLabel_edgeLabel_dstLabel -> DataFrame)
+   * @param spark The Spark session for the writing.
    */
   private def writeAllEdges(prefix: String,
                             vertexInfos: Map[String, VertexInfo],
@@ -95,12 +95,15 @@ object GraphWriter {
 
   /** Writing the graph DataFrames to GAR with the graph info object.
    *
-   * @param graphInfoPath The graph info object of the graph.
+   * @param graphInfo The graph info object of the graph.
    * @param vertexDataFrames: vertex dataframes, a map of (vertex label -> DataFrame)
    * @param edgeDataFrames: edge dataframes, a map of (srcLabel_edgeLabel_dstLabel -> DataFrame)
-   * @param spark The Spark session for the loading.
+   * @param spark The Spark session for the writing.
    */
-  def write(graphInfo: GraphInfo, vertexDataFrames: Map[String, DataFrame], edgeDataFrames: Map[String, DataFrame], spark: SparkSession): Unit = {
+  def write(graphInfo: GraphInfo,
+            vertexDataFrames: Map[String, DataFrame],
+            edgeDataFrames: Map[String, DataFrame],
+            spark: SparkSession): Unit = {
     // get the vertex num of each vertex dataframe
     val vertex_num_map: Map[String, Long] = vertexDataFrames.map { case (k, v) => (k, v.count()) }
     val prefix = graphInfo.getPrefix
@@ -119,7 +122,7 @@ object GraphWriter {
    * @param graphInfoPath The path of the graph info yaml.
    * @param vertexDataFrames: vertex dataframes, a map of (vertex label -> DataFrame)
    * @param edgeDataFrames: edge dataframes, a map of (srcLabel_edgeLabel_dstLabel -> DataFrame)
-   * @param spark The Spark session for the loading.
+   * @param spark The Spark session for the writing.
    */
   def write(graphInfoPath: String, vertexDataFrames: Map[String, DataFrame], edgeDataFrames: Map[String, DataFrame], spark: SparkSession): Unit = {
     // load graph info

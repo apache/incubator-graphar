@@ -27,8 +27,8 @@ object GraphReader {
   /** Loads the vertex chunks as DataFrame with the vertex infos.
    *
    * @param prefix The absolute prefix.
-   * @param vertexInfos The map of (vertex label -> VertexInfo) for the graph..
-   * @param spark The Spark session for the transformer.
+   * @param vertexInfos The map of (vertex label -> VertexInfo) for the graph.
+   * @param spark The Spark session for the reading.
    * @return The map of (vertex label -> DataFrame)
    */
   private def readAllVertices(prefix: String, vertexInfos: Map[String, VertexInfo], spark: SparkSession): Map[String, DataFrame] = {
@@ -42,8 +42,8 @@ object GraphReader {
   /** Loads the edge chunks as DataFrame with the edge infos.
    *
    * @param prefix The absolute prefix.
-   * @param edgeInfos The map of (srcLabel_edgeLabel_dstlabel -> EdgeInfo) for the graph..
-   * @param spark The Spark session for the transformer.
+   * @param edgeInfos The map of (srcLabel_edgeLabel_dstlabel -> EdgeInfo) for the graph.
+   * @param spark The Spark session for the reading.
    * @return The map of (srcLabel_edgeLabel_dstlabel -> (adj_list_type_str -> DataFrame))
    */
   private def readAllEdges(prefix: String, edgeInfos: Map[String, EdgeInfo], spark: SparkSession): Map[String, Map[String, DataFrame]] = {
