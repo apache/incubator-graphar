@@ -27,13 +27,13 @@ import org.apache.spark.sql.functions._
 object GraphWriter {
   private def writeAllVertices(prefix: String,
                                vertexInfos: Map[String, VertexInfo],
-                               vertex_num_map: Map[String, Int],
+                               vertex_num_map: Map[String, Long],
                                vertexDataFrames: Map[String, DataFrame],
-                               spark: SparkSession): Map[String, DataFrame] = {
-    vertexInfos.foreach { case (label, vertexInfo) = > {
-      val vertex_num = vertex_num_map(label).toLong
-      val df_with_index = IndexGenerator.generateVertexIndexColumn((vertexDataFrames(label))
-      val writer = new VertexWriter(prefix, vertexInfo, df_with_index, vertex_num)
+                               spark: SparkSession): Unit = {
+    vertexInfos.foreach { case (label, vertexInfo) => {
+      val vertex_num = vertex_num_map(label)
+      val df_with_index = IndexGenerator.generateVertexIndexColumn(vertexDataFrames(label))
+      val writer = new VertexWriter(prefix, vertexInfo, df_with_index, Some(vertex_num))
       writer.writeVertexProperties()
     }}
   }
@@ -41,11 +41,11 @@ object GraphWriter {
   private def writeAllEdges(prefix: String,
                             vertexInfos: Map[String, VertexInfo],
                             edgeInfos: Map[String, EdgeInfo],
-                            vertex_num_map: Map[String, Int],
+                            vertex_num_map: Map[String, Long],
                             vertexDataFrames: Map[String, DataFrame],
                             edgeDataFrames: Map[String, DataFrame],
-                            spark: SparkSession): Map[String, DataFrame] = {
-    edgeInfos.foreach { case (key, edgeInfo) = > {
+                            spark: SparkSession): Unit = {
+    edgeInfos.foreach { case (key, edgeInfo) => {
       val srcLabel = edgeInfo.getSrc_label
       val dstLabel = edgeInfo.getDst_label
       val edge_key = edgeInfo.getConcatKey()
@@ -69,7 +69,7 @@ object GraphWriter {
             vertex_num_map(dstLabel)
           }
         }
-        val writer = new EdgeWriter(prefix, edgeInfo, adj_list_type, vertex_num.toLong, edge_df_with_index)
+        val writer = new EdgeWriter(prefix, edgeInfo, adj_list_type, vertex_num, edge_df_with_index)
         writer.writeEdges()
       }
     }}
@@ -77,7 +77,7 @@ object GraphWriter {
 
   def write(graphInfo: GraphInfo, vertexDataFrames: Map[String, DataFrame], edgeDataFrames: Map[String, DataFrame], spark: SparkSession): Unit = {
     // get the vertex num of each vertex dataframe
-    val vertex_num_map: Map[String, Int] = vertexDataFrames.map { case (k, v) => (k, v.count()) }
+    val vertex_num_map: Map[String, Long] = vertexDataFrames.map { case (k, v) => (k, v.count()) }
     val prefix = graphInfo.getPrefix
     val vertex_infos = graphInfo.getVertexInfos()
     val edge_infos = graphInfo.getEdgeInfos()
@@ -86,7 +86,7 @@ object GraphWriter {
     writeAllVertices(prefix, vertex_infos, vertex_num_map, vertexDataFrames, spark)
 
     // write edges
-    writeEdges(prefix, vertex_infos, edge_infos, vertex_num_map, vertexDataFrames, edgeDataFrames, spark)
+    writeAllEdges(prefix, vertex_infos, edge_infos, vertex_num_map, vertexDataFrames, edgeDataFrames, spark)
   }
 
   def write(graphInfoPath: String, vertexDataFrames: Map[String, DataFrame], edgeDataFrames: Map[String, DataFrame], spark: SparkSession): Unit = {

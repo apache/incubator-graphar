@@ -208,12 +208,11 @@ class GraphInfo() {
   var edgeInfos: Map[String, EdgeInfo] = Map[String, EdgeInfo]()
 
   def addVertexInfo(vertexInfo: VertexInfo): Unit = {
-    vertexInfos += (vertexInfo.getlabel -> vertexInfo)
+    vertexInfos += (vertexInfo.getLabel -> vertexInfo)
   }
 
   def addEdgeInfo(edgeInfo: EdgeInfo): Unit = {
-    val key = edge_info.getSrc_label + GeneralParams.regularSeperator + edge_info.getEdge_label + GeneralParams.regularSeperator + edge_info.getDst_label
-    edgeInfos += ( key -> edgeInfo)
+    edgeInfos += (edgeInfo.getConcatKey() -> edgeInfo)
   }
 
   def getVertexInfo(label: String): VertexInfo = {
