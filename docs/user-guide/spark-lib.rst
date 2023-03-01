@@ -210,6 +210,7 @@ For more information on usage, please refer to the examples:
 
 - `ComputeExample.scala`_  includes an example for constructing the GraphX graph from GAR files and executing a connected-components computation.
 - `TransformExample.scala`_ shows an example for graph data conversion between different file types or different adjList types.
+- `Neo4j2GraphAr.scala`_ and `GraphAr2Neo4j.scala`_ are examples to conduct data importing/exporting for Neo4j.
 
 
 .. _TestGraphInfo.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestGraphInfo.scala
@@ -225,3 +226,7 @@ For more information on usage, please refer to the examples:
 .. _ComputeExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/ComputeExample.scala
 
 .. _TransformExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TransformExample.scala
+
+.. _Neo4j2GraphAr.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/Neo4j2GraphAr.scala
+
+.. _GraphAr2Neo4j.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/GraphAr2Neo4j.scala

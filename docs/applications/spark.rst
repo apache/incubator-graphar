@@ -11,7 +11,7 @@ Examples
 
 Transform GAR files
 `````````````````````
-`TransformExample.scala`_ is an example for graph data conversion between different file types or different adjList types. To do this, the original data is first loaded into a Spark DataFrame using the GraphAr Spark Reader. Then, the DataFrame is written into generated GAR files through a GraphAr Spark Writer, following the meta data defined in a new information file.
+We provide an example in `TestGraphTransformer.scala`_, which demonstrates how to conduct data transformation at the graph level. `TransformExample.scala`_ is another example for graph data conversion between different file types or different adjList types, which is implemented at the vertex/edge table level. To do this, the original data is first loaded into a Spark DataFrame using the GraphAr Spark Reader. Then, the DataFrame is written into generated GAR files through a GraphAr Spark Writer, following the meta data defined in a new information file.
 
 
 Compute with GraphX
@@ -118,6 +118,8 @@ See `GraphAr2Neo4j.scala`_ for the complete example.
 
   The Neo4j Spark Connector offers different save modes and writing options, such as Append(CREATE) or Overwrite(MERGE). Please refer to its `documentation <https://neo4j.com/docs/spark/current/writing/>`_ for more information.
 
+
+.. _TestGraphTransformer.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestGraphTransformer.scala
 
 .. _TransformExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TransformExample.scala
 
