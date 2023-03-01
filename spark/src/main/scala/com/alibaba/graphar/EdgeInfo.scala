@@ -426,6 +426,10 @@ class EdgeInfo() {
     str = prefix + getAdjListPrefix(adj_list_type) + str
     return str
   }
+
+  def getConcatKey(): String = {
+    return getSrc_label + GeneralParams.regularSeperator + getEdge_label + GeneralParams.regularSeperator + getDst_label
+  }
 }
 
 /** Helper object to load edge info files */

@@ -142,6 +142,14 @@ object IndexGenerator {
     generateDstIndexForEdgesFromMapping(df_with_src_index, dstColumnName, dstIndexMapping)
 	}
 
+  /** Assumes that the first and second columns are the src and dst columns */
+  def generateSrcAndDstIndexForEdgesFromMapping(edgeDf: DataFrame, srcIndexMapping: DataFrame, dstIndexMapping: DataFrame): DataFrame = {
+    val srcColName: String = edgeDf.columns(0)
+    val dstColName: String = edgeDfcolumns(1)
+    val df_with_src_index = generateSrcIndexForEdgesFromMapping(edgeDf, srcColName, srcIndexMapping)
+    generateDstIndexForEdgesFromMapping(df_with_src_index, dstColName, dstIndexMapping)
+  }
+
   /** Construct vertex index for source column. */
   def generateSrcIndexForEdges(edgeDf: DataFrame, srcColumnName: String): DataFrame = {
     val srcDf = edgeDf.select(srcColumnName).distinct()

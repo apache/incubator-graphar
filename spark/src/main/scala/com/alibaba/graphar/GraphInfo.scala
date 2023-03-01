@@ -207,16 +207,30 @@ class GraphInfo() {
   var vertexInfos: Map[String, VertexInfo] = Map[String, VertexInfo]()
   var edgeInfos: Map[String, EdgeInfo] = Map[String, EdgeInfo]()
 
-  def addVertexInfo(label: String, vertexInfo: VertexInfo): Unit = {
-    vertexInfos += (label -> vertexInfo)
+  def addVertexInfo(vertexInfo: VertexInfo): Unit = {
+    vertexInfos += (vertexInfo.getlabel -> vertexInfo)
   }
 
-  def addEdgeInfo(label: String, edgeInfo: EdgeInfo): Unit = {
-    edgeInfos += (label -> edgeInfo)
+  def addEdgeInfo(edgeInfo: EdgeInfo): Unit = {
+    val key = edge_info.getSrc_label + GeneralParams.regularSeperator + edge_info.getEdge_label + GeneralParams.regularSeperator + edge_info.getDst_label
+    edgeInfos += ( key -> edgeInfo)
   }
 
   def getVertexInfo(label: String): VertexInfo = {
     vertexInfos(label)
+  }
+
+  def getEdgeInfo(srcLabel: String, edgeLabel: String, dstLabel: String): EdgeInfo = {
+    val key = srcLabel + GeneralParams.regularSeperator + edgeLabel + GeneralParams.regularSeperator + dstLabel
+    edgeInfos(key)
+  }
+
+  def getVertexInfos(): Map[String, VertexInfo] = {
+    return vertexInfos
+  }
+
+  def getEdgeInfos(): Map[String, EdgeInfo] = {
+    return edgeInfos
   }
 }
 
@@ -242,10 +256,8 @@ object GraphInfo {
     while (vertices_it.hasNext()) {
       val file_name = vertices_it.next()
       val path = prefix + file_name
-      println("path" + path)
       val vertex_info = VertexInfo.loadVertexInfo(path, spark)
-      println(vertex_info.getLabel)
-      graph_info.addVertexInfo(vertex_info.getLabel, vertex_info)
+      graph_info.addVertexInfo(vertex_info)
     }
     val edges_yaml = graph_info.getEdges
     val edges_it = edges_yaml.iterator
@@ -253,8 +265,7 @@ object GraphInfo {
       val file_name = edges_it.next()
       val path = prefix + file_name
       val edge_info = EdgeInfo.loadEdgeInfo(path, spark)
-      val key = edge_info.getSrc_label + GeneralParams.regularSeperator + edge_info.getEdge_label + GeneralParams.regularSeperator + edge_info.getDst_label
-      graph_info.addEdgeInfo(key, edge_info)
+      graph_info.addEdgeInfo(edge_info)
     }
     return graph_info
   }
