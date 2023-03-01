@@ -27,7 +27,7 @@ object GraphReader {
   private def readAllVertices(prefix: String, vertexInfos: Map[String, VertexInfo], spark: SparkSession): Map[String, DataFrame] = {
     val vertex_dataframes: Map[String, DataFrame] = vertexInfos.map { case (label, vertexInfo) => {
       val reader = new VertexReader(prefix, vertexInfo, spark)
-      (label, reader.readAllVertexPropertyGroups(true))
+      (label, reader.readAllVertexPropertyGroups(false))
     }}
     return vertex_dataframes
   }
@@ -38,8 +38,9 @@ object GraphReader {
       val adj_list_it = adj_lists.iterator
       var adj_list_type_edge_df_map: Map[String, DataFrame] = Map[String, DataFrame]()
       while (adj_list_it.hasNext()) {
-        val adj_list_type = adj_list_it.next().getAdjList_type_in_gar
-        val adj_list_type_str = adj_list_it.next().getAdjList_type
+        val adj_list = adj_list_it.next()
+        val adj_list_type = adj_list.getAdjList_type_in_gar
+        val adj_list_type_str = adj_list.getAdjList_type
         val reader = new EdgeReader(prefix, edgeInfo, adj_list_type, spark)
         adj_list_type_edge_df_map += (adj_list_type_str -> reader.readEdges(false))
       }
