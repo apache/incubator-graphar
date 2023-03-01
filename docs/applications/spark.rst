@@ -23,6 +23,7 @@ Import/Export graphs of Neo4j
 ```````````````````````````````
 `Neo4j <https://neo4j.com/product/neo4j-graph-database/>`_ graph database provides a `spark connector <https://neo4j.com/docs/spark/current/overview/>`_ for integration with Spark. The Neo4j Spark Connector, combined with the GraphAr Spark library, enables us to migrate graph data between Neo4j and GraphAr. This is also a key application of GraphAr in which it acts as a persistent storage of graph data in the database.
 
+We provide two example programs that demonstrate how GraphAr can be used in conjunction with Neo4j. It utilizes one of the built-in Neo4j datasets, the `Movie Graph <https://neo4j.com/developer/example-data/#built-in-examples>`_, which is a mini graph application containing actors and directors that are related through the movies they have collaborated on. The data schemas for "Person" vertices, "Movie" vertices, and "Person PRODUCED Movie" edges can be represented in GraphAr information files in the `test data <https://github.com/GraphScope/gar-test/tree/main/neo4j>`_.
 When exporting graph data from Neo4j and writing to GraphAr, please refer to the following code, with `Neo4j2GraphAr.scala`_ providing a complete example.
 
 .. code:: scala
