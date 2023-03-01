@@ -203,6 +203,34 @@ class GraphInfo() {
   @BeanProperty var vertices = new java.util.ArrayList[String]()
   @BeanProperty var edges = new java.util.ArrayList[String]()
   @BeanProperty var version: String = ""
+
+  var vertexInfos: Map[String, VertexInfo] = Map[String, VertexInfo]()
+  var edgeInfos: Map[String, EdgeInfo] = Map[String, EdgeInfo]()
+
+  def addVertexInfo(vertexInfo: VertexInfo): Unit = {
+    vertexInfos += (vertexInfo.getLabel -> vertexInfo)
+  }
+
+  def addEdgeInfo(edgeInfo: EdgeInfo): Unit = {
+    edgeInfos += (edgeInfo.getConcatKey() -> edgeInfo)
+  }
+
+  def getVertexInfo(label: String): VertexInfo = {
+    vertexInfos(label)
+  }
+
+  def getEdgeInfo(srcLabel: String, edgeLabel: String, dstLabel: String): EdgeInfo = {
+    val key = srcLabel + GeneralParams.regularSeperator + edgeLabel + GeneralParams.regularSeperator + dstLabel
+    edgeInfos(key)
+  }
+
+  def getVertexInfos(): Map[String, VertexInfo] = {
+    return vertexInfos
+  }
+
+  def getEdgeInfos(): Map[String, EdgeInfo] = {
+    return edgeInfos
+  }
 }
 
 /** Helper object to load graph info files */
@@ -220,6 +248,23 @@ object GraphInfo {
         val prefix = graphInfoPath.substring(0, pos + 1) // +1 to include the slash
         graph_info.setPrefix(prefix)
       }
+    }
+    val prefix = graph_info.getPrefix
+    val vertices_yaml = graph_info.getVertices
+    val vertices_it = vertices_yaml.iterator
+    while (vertices_it.hasNext()) {
+      val file_name = vertices_it.next()
+      val path = prefix + file_name
+      val vertex_info = VertexInfo.loadVertexInfo(path, spark)
+      graph_info.addVertexInfo(vertex_info)
+    }
+    val edges_yaml = graph_info.getEdges
+    val edges_it = edges_yaml.iterator
+    while (edges_it.hasNext()) {
+      val file_name = edges_it.next()
+      val path = prefix + file_name
+      val edge_info = EdgeInfo.loadEdgeInfo(path, spark)
+      graph_info.addEdgeInfo(edge_info)
     }
     return graph_info
   }
