@@ -25,35 +25,6 @@ import org.apache.spark.sql.functions._
 
 /** The helper object for transforming graphs through the definitions of their infos. */
 object GraphTransformer {
-  /** Construct the map of (vertex label -> VertexInfo) for a graph. */
-  private def constructVertexInfoMap(prefix: String, graphInfo: GraphInfo, spark: SparkSession): Map[String, VertexInfo] = {
-    var vertex_infos_map: Map[String, VertexInfo] = Map()
-    val vertices_yaml = graphInfo.getVertices
-    val vertices_it = vertices_yaml.iterator
-    while (vertices_it.hasNext()) {
-      val file_name = vertices_it.next()
-      val path = prefix + file_name
-      val vertex_info = VertexInfo.loadVertexInfo(path, spark)
-      vertex_infos_map += (vertex_info.getLabel -> vertex_info)
-    }
-    return vertex_infos_map
-  }
-
-  /** Construct the map of (edge label -> EdgeInfo) for a graph. */
-  private def constructEdgeInfoMap(prefix: String, graphInfo: GraphInfo, spark: SparkSession): Map[String, EdgeInfo] = {
-    var edge_infos_map: Map[String, EdgeInfo] = Map()
-    val edges_yaml = graphInfo.getEdges
-    val edges_it = edges_yaml.iterator
-    while (edges_it.hasNext()) {
-      val file_name = edges_it.next()
-      val path = prefix + file_name
-      val edge_info = EdgeInfo.loadEdgeInfo(path, spark)
-      val key = edge_info.getSrc_label + GeneralParams.regularSeperator + edge_info.getEdge_label + GeneralParams.regularSeperator + edge_info.getDst_label
-      edge_infos_map += (key -> edge_info)
-    }
-    return edge_infos_map
-  }
-
   /** Transform the vertex chunks following the meta data defined in graph info objects.
    *
    * @param sourceGraphInfo The info object for the source graph.
@@ -160,19 +131,11 @@ object GraphTransformer {
    * @param spark The Spark session for the transformer.
    */
   def transform(sourceGraphInfo: GraphInfo, destGraphInfo: GraphInfo, spark: SparkSession): Unit = {
-    val source_prefix = sourceGraphInfo.getPrefix
-    val dest_prefix = destGraphInfo.getPrefix
-
-    // construct the (vertex label -> vertex info) map for the source graph
-    val source_vertex_infos_map = constructVertexInfoMap(source_prefix, sourceGraphInfo, spark)
-    // construct the (edge label -> edge info) map for the source graph
-    val source_edge_infos_map = constructEdgeInfoMap(source_prefix, sourceGraphInfo, spark)
-
     // transform and generate vertex data chunks
-    transformAllVertices(sourceGraphInfo, destGraphInfo, source_vertex_infos_map, spark)
+    transformAllVertices(sourceGraphInfo, destGraphInfo, sourceGraphInfo.getVertexInfos(), spark)
 
     // transform and generate edge data chunks
-    transformAllEdges(sourceGraphInfo, destGraphInfo, source_vertex_infos_map, source_edge_infos_map, spark)
+    transformAllEdges(sourceGraphInfo, destGraphInfo, sourceGraphInfo.getVertexInfos(), sourceGraphInfo.getEdgeInfos(), spark)
   }
 
   /** Transform the graphs following the meta data defined in info files.
