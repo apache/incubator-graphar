@@ -170,6 +170,38 @@ To utilize the GAR Spark reader, please refer to the following example code.
 
 See `TestReader.scala`_ for the complete example.
 
+
+Graph Transformer
+``````````````````
+The Graph Transformer is a helper object in the GraphAr Spark library, designed to assist with data transformation at the graph level. It takes two GraphInfo objects (or paths of two yaml files) as inputs: one for the source graph, and one for the destination graph. The transformer will then load data from existing GAR files for the source graph, utilizing the GraphAr Spark Reader and the meta data defined in the source GraphInfo. After reorganizing the data according to the destination GraphInfo, it generates new GAR chunk files with the GraphAr Spark Writer.
+
+.. code:: scala
+
+   // transform graphs by yaml paths
+   val spark = ... // the Spark session
+   val source_path = ... // e.g., /tmp/source.graph.yml
+   val dest_path = ... // e.g., /tmp/dest.graph.yml
+   GraphTransformer.transform(source_path, dest_path, spark)
+
+   // transform graphs by information objects
+   val source_info = ...
+   val dest_info = ...
+   GraphTransformer.transform(source_info, dest_info, spark)
+
+
+We provide an example in `TestGraphTransformer.scala`_, which demonstrates how to conduct data transformation from the `source graph <https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/parquet/ldbc_sample.graph.yml>`_ to the `destination graph <https://github.com/GraphScope/gar-test/blob/main/transformer/ldbc_sample.graph.yml>`_.
+
+The Graph Transformer can be used for various purposes, including transforming GAR data between different file types (e.g. from ORC to Parquet), transforming between different adjList types (e.g. from COO to CSR), selecting properties or regrouping them, and setting a new chunk size.
+
+.. note::
+   There are certain limitations while using the Graph Transformer:
+
+   -  The vertices (or edges) of the source and destination graphs are aligned by labels, meaning each vertex/edge label included in the destination graph must have an equivalent in the source graph, in order for the related chunks to be loaded as the data source.
+   -  For each group of vertices/edges (i.e., each single label), each property included in the destination graph (defined in the relevant VertexInfo/EdgeInfo) must also be present in the source graph.
+
+   In addition, users can use the GraphAr Spark Reader/Writer to conduct data transformation more flexibly at the vertex/edge table level, as opposed to the graph level. This allows for a more granular approach to transforming data, as `TransformExample.scala`_ shows.
+
+
 More examples
 ``````````````````
 For more information on usage, please refer to the examples:
@@ -185,6 +217,8 @@ For more information on usage, please refer to the examples:
 .. _TestWriter.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestWriter.scala
 
 .. _TestReader.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestReader.scala
+
+.. _TestGraphTransformer.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestGraphTransformer.scala
 
 .. _ComputeExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/ComputeExample.scala
 
