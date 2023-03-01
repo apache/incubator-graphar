@@ -30,7 +30,7 @@ class TestGraphReaderSuite extends AnyFunSuite {
     .getOrCreate()
 
   test("read graphs by yaml paths") {
-    // conduct reader
+    // conduct reading
     val graph_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml").getPath
     val vertex_edge_df_pair = GraphReader.read(graph_path, spark)
     val vertex_dataframes = vertex_edge_df_pair._1
@@ -53,7 +53,7 @@ class TestGraphReaderSuite extends AnyFunSuite {
     val path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml").getPath
     val graph_info = GraphInfo.loadGraphInfo(path, spark)
 
-    // conduct reader
+    // conduct reading
     val vertex_edge_df_pair = GraphReader.read(graph_info, spark)
     val vertex_dataframes = vertex_edge_df_pair._1
     val edge_dataframes = vertex_edge_df_pair._2

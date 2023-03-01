@@ -46,7 +46,7 @@ class TestGraphWriterSuite extends AnyFunSuite {
     val edge_df = spark.read.option("delimiter", "|").option("header", "true").csv(file_path)
     val edge_dataframes: Map[String, DataFrame] = Map("person_knows_person" -> edge_df)
 
-    // conduct writer
+    // conduct writing
     GraphWriter.write(graph_info, vertex_dataframes, edge_dataframes, spark)
     val vertex_info = graph_info.getVertexInfo("person")
     val chunk_path = new Path(prefix + vertex_info.getPrefix() + "*/*")

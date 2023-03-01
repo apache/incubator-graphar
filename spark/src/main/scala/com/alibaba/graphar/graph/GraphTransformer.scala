@@ -76,7 +76,7 @@ object GraphTransformer {
       val path = dest_prefix + dest_edges_it.next()
       val dest_edge_info = EdgeInfo.loadEdgeInfo(path, spark)
       // load source edge info
-      val key = dest_edge_info.getSrc_label + GeneralParams.regularSeperator + dest_edge_info.getEdge_label + GeneralParams.regularSeperator + dest_edge_info.getDst_label
+      val key = dest_edge_info.getConcatKey()
       if (!sourceEdgeInfosMap.contains(key)) {
         throw new IllegalArgumentException
       }
