@@ -74,5 +74,9 @@ class TestGraphWriterSuite extends AnyFunSuite {
         }
       }
     }}
+
+    // cleaning generated files
+    fs.delete(new Path(prefix))
+    fs.close()
   }
 }
