@@ -38,7 +38,7 @@ class TestGraphWriterSuite extends AnyFunSuite {
     graph_info.setPrefix(prefix)  // avoid overwite gar-test files
     val fs = FileSystem.get(new Path(prefix).toUri(), spark.sparkContext.hadoopConfiguration)
 
-    // prepaire the dataframes
+    // prepare the dataframes
     val vertex_file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/person_0_0.csv").getPath
     val vertex_df = spark.read.option("delimiter", "|").option("header", "true").csv(vertex_file_path)
     val vertex_dataframes: Map[String, DataFrame] = Map("person" -> vertex_df)
