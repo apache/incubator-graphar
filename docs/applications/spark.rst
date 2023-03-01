@@ -88,9 +88,9 @@ Additionally, when importing data from GraphAr to create/update instances in Neo
 .. code:: scala
   
   // construct the GraphAr Spark reader
-  val spark_session = ...   // the spark session
+  val spark = ...   // the Spark session
   val prefix : String = ... // the prefix of the file path
-  val reader = new VertexReader(prefix, vertex_info, spark_session)
+  val reader = new VertexReader(prefix, vertex_info, spark)
 
   // reading chunks for all property groups
   val vertex_df = reader.readAllVertexPropertyGroups(false)

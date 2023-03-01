@@ -26,7 +26,7 @@ import scala.beans.BeanProperty
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.apache.hadoop.fs.{Path, FileSystem}
 
-class Neo4j2GraphArExample{
+class Neo4j2GraphArExample {
   // connect to the Neo4j instance
   val spark = SparkSession.builder()
     .config("neo4j.url", "bolt://localhost:7687")
@@ -119,7 +119,7 @@ class Neo4j2GraphArExample{
 
     // read edge info yaml
     val edge_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/person_produced_movie.edge.yml").getPath
-    val edge_info = EdgeInfo.loadVertexInfo(edge_yaml, spark)
+    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
 
     // create writer object for the DataFrame with indices
     val prefix : String = "/tmp/neo4j/"

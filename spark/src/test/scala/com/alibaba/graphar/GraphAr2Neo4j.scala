@@ -38,20 +38,12 @@ class GraphAr2Neo4jExample {
   // read Person vertices from GraphAr and write to Neo4j
   def testWriteVerticesToNeo4j(): Unit = {
     // read vertex info yaml
-    val file_path = getClass.getClassLoader.getResource("gar-test/neo4j/person.vertex.yml").getPath
-    val vertex_yaml_path = new Path(file_path)
-    val fs = FileSystem.get(vertex_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
-    val vertex_input = fs.open(vertex_yaml_path)
-    val vertex_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val vertex_info = vertex_yaml.load(vertex_input).asInstanceOf[VertexInfo]
+    val vertex_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/person.vertex.yml").getPath
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
 
     // construct the vertex reader
-    val spark_session = SparkSession.builder()
-      .enableHiveSupport()
-      .master("local[*]")
-      .getOrCreate()
     val prefix : String = "/tmp/neo4j/"
-    val reader = new VertexReader(prefix, vertex_info, spark_session)
+    val reader = new VertexReader(prefix, vertex_info, spark)
 
     // reading chunks for all property groups
     val vertex_df = reader.readAllVertexPropertyGroups(false)
@@ -82,38 +74,26 @@ class GraphAr2Neo4jExample {
 
   // read edges from GraphAr and write to Neo4j
   def testWriteEdgesToNeo4j(): Unit = {
-    val spark_session = SparkSession.builder()
-      .enableHiveSupport()
-      .master("local[*]")
-      .getOrCreate()
-
     // read person dataframe
-    val person_file_path = getClass.getClassLoader.getResource("gar-test/neo4j/person.vertex.yml").getPath
-    val person_yaml_path = new Path(person_file_path)
-    val fs = FileSystem.get(person_yaml_path.toUri(), spark.sparkContext.hadoopConfiguration)
-    val person_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val person_info = person_yaml.load(fs.open(person_yaml_path)).asInstanceOf[VertexInfo]
+    val person_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/person.vertex.yml").getPath
+    val person_info = VertexInfo.loadVertexInfo(person_yaml, spark)
 
     val prefix : String = "/tmp/neo4j/"
-    val person_reader = new VertexReader(prefix, person_info, spark_session)
+    val person_reader = new VertexReader(prefix, person_info, spark)
     val person_df = person_reader.readAllVertexPropertyGroups(true)
     person_df.show()
 
     // read movie dataframe
-    val movie_file_path = getClass.getClassLoader.getResource("gar-test/neo4j/movie.vertex.yml").getPath
-    val movie_yaml_path = new Path(movie_file_path)
-    val movie_yaml = new Yaml(new Constructor(classOf[VertexInfo]))
-    val movie_info = movie_yaml.load(fs.open(movie_yaml_path)).asInstanceOf[VertexInfo]
+    val movie_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/movie.vertex.yml").getPath
+    val movie_info = VertexInfo.loadVertexInfo(movie_yaml, spark)
 
-    val movie_reader = new VertexReader(prefix, movie_info, spark_session)
+    val movie_reader = new VertexReader(prefix, movie_info, spark)
     val movie_df = movie_reader.readAllVertexPropertyGroups(true)
     movie_df.show()
 
     // read Person->Produced->Movie edges
-    val edge_file_path = getClass.getClassLoader.getResource("gar-test/neo4j/person_produced_movie.edge.yml").getPath
-    val edge_yaml_path = new Path(edge_file_path)
-    val edge_yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
-    val edge_info = edge_yaml.load(fs.open(edge_yaml_path)).asInstanceOf[EdgeInfo]
+    val edge_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/person_produced_movie.edge.yml").getPath
+    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
 
     val adj_list_type = AdjListType.ordered_by_source
     val reader = new EdgeReader(prefix, edge_info, adj_list_type, spark)
