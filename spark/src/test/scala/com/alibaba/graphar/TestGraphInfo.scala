@@ -34,6 +34,9 @@ class GraphInfoSuite extends AnyFunSuite {
     val prefix = getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/").getPath
     val graph_info = GraphInfo.loadGraphInfo(yaml_path, spark)
 
+    val vertex_info = graph_info.getVertexInfo("person")
+    assert(vertex_info.getLabel == "person")
+
     assert(graph_info.getName == "ldbc_sample")
     assert(graph_info.getPrefix == prefix )
     assert(graph_info.getVertices.size() == 1)
