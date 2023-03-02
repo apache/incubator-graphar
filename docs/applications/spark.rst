@@ -115,9 +115,10 @@ Additionally, when importing data from GraphAr to create/update instances in Neo
 
 See `GraphAr2Neo4j.scala`_ for the complete example.
 
-.. note::
+.. tip::
 
-  The Neo4j Spark Connector offers different save modes and writing options, such as Append(CREATE) or Overwrite(MERGE). Please refer to its `documentation <https://neo4j.com/docs/spark/current/writing/>`_ for more information.
+  - The Neo4j Spark Connector offers different save modes and writing options, such as Append(CREATE) or Overwrite(MERGE). Please refer to its `documentation <https://neo4j.com/docs/spark/current/writing/>`_ for more information and take the most appropriate method while using.
+  - The Neo4j Spark Connector supports to use `Spark structured streaming API <https://neo4j.com/docs/spark/current/streaming/>`_, which works differently from Spark batching. One can utilize this API to read/write a stream from/to Neo4j, avoiding to maintain all data in the memory.
 
 
 .. _TestGraphTransformer.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestGraphTransformer.scala
