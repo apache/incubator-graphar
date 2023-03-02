@@ -84,7 +84,11 @@ case class GarTable(name: String,
 
     // case st: StructType => st.forall { f => supportsDataType(f.dataType) }
 
-    // case ArrayType(elementType, _) => supportsDataType(elementType)
+    case ArrayType(elementType, _) => formatName match {
+      case "orc" => supportsDataType(elementType)
+      case "parquet" => supportsDataType(elementType)
+      case _ => false
+    }
 
     // case MapType(keyType, valueType, _) =>
     //   supportsDataType(keyType) && supportsDataType(valueType)

@@ -216,7 +216,7 @@ class VertexInfo() {
     } else {
       str = property_group.getPrefix
     }
-    return prefix + str;
+    return prefix + str
   }
 }
 

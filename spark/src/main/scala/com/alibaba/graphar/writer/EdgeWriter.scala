@@ -214,4 +214,3 @@ class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Va
   }
 }
 
-
