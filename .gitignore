@@ -1,9 +1,9 @@
 /build/
+cpp/build/
 spark/target/
 .vscode
 .idea
 .DS_store
-.DS_Store
 .cache
 
 # docs

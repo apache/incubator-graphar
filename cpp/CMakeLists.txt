@@ -24,7 +24,7 @@ project(graph-archive LANGUAGES C CXX VERSION ${GAR_VERSION})
 # ------------------------------------------------------------------------------
 
 option(NAMESPACE "User specific namespace, default if GraphArchive" OFF)
-option(BUILD_TESTS "Build unit test" OFF)
+option(BUILD_TESTS "Build unit tests" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
 
 if (NAMESPACE)
