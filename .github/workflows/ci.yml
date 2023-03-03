@@ -67,7 +67,7 @@ jobs:
         # validate format
         function prepend() { while read line; do echo "${1}${line}"; done; }
 
-        make clformat
+        make gar-clformat
         GIT_DIFF=$(git diff --ignore-submodules)
         if [[ -n $GIT_DIFF ]]; then
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -91,7 +91,7 @@ jobs:
 
         function ec() { [[ "$1" == "-h" ]] && { shift && eval $* > /dev/null 2>&1; ec=$?; echo $ec; } || eval $*; ec=$?; }
 
-        ec make cpplint
+        ec make gar-cpplint
         if [[ "$ec" != "0" ]]; then
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             echo "| cpplint failures found! Run: "

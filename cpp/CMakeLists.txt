@@ -329,13 +329,13 @@ file(GLOB_RECURSE FILES_NEED_LINT "include/gar/*.h" "src/*.cc"
                                   "test/*.h" "test/*.cc"
                                   )
 
-add_custom_target(clformat
+add_custom_target(gar-clformat
                   COMMAND clang-format --style=file -i ${FILES_NEED_FORMAT}
                   COMMENT "Running clang-format."
                   VERBATIM)
 
-add_custom_target(cpplint
-        COMMAND ${PROJECT_SOURCE_DIR}/misc/cpplint.py --root=include ${FILES_NEED_LINT}
+add_custom_target(gar-cpplint
+        COMMAND ${PROJECT_SOURCE_DIR}/misc/cpplint.py --root=${PROJECT_SOURCE_DIR}/include ${FILES_NEED_LINT}
         COMMENT "Running cpplint check."
         VERBATIM)
 

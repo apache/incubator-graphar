@@ -5,7 +5,7 @@
 # from the environment for the first two.
 # Do not fail the build if there are warnings
 SPHINXOPTS    = -j8
-SPHINXBUILD  ?= python3 -m sphinx
+SPHINXBUILD  ?= sphinx-build
 SOURCEDIR     = .
 BUILDDIR      = _build
 
