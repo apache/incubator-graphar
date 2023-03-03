@@ -53,7 +53,7 @@ jobs:
       run: |
         mkdir build
         pushd build
-        cmake .. -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+        cmake ../cpp -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
         popd
 
     - name: Cpp Format and lint

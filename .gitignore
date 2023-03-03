@@ -1,15 +1,6 @@
 /build/
-cpp/build/
-spark/target/
 .vscode
 .idea
 .DS_store
 .cache
-
-# docs
-/docs/_build/
-
-# examples
-/examples/*/build
-
 
