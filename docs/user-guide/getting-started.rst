@@ -161,7 +161,7 @@ As the simplest cases, the fist example below adds vertices to **VerticesBuilder
   // add an edge (0 -> 3)
   GraphArchive::builder::Edge e(0, 3);
   e.AddProperty("creationDate", "2011-07-20T20:02:04.233+0000");
-  builder.AddVertex(e);
+  builder.AddEdge(e);
   // add other edges
   // ...
 
