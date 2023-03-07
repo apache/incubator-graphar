@@ -15,16 +15,18 @@ limitations under the License.
 
 #include <cstdlib>
 
-#include "./config.h"
+#include "./util.h"
 #include "gar/reader/chunk_info_reader.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 TEST_CASE("test_vertex_property_chunk_info_reader") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
   // read file and construct graph info
-  std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
@@ -46,25 +48,21 @@ TEST_CASE("test_vertex_property_chunk_info_reader") {
   auto maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   std::string chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path ==
-          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk0");
+  REQUIRE(chunk_path == root + "/ldbc_sample/parquet/vertex/person/id/chunk0");
   REQUIRE(reader.seek(520).ok());
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path ==
-          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk5");
+  REQUIRE(chunk_path == root + "/ldbc_sample/parquet/vertex/person/id/chunk5");
   REQUIRE(reader.next_chunk().ok());
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path ==
-          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk6");
+  REQUIRE(chunk_path == root + "/ldbc_sample/parquet/vertex/person/id/chunk6");
   REQUIRE(reader.seek(900).ok());
   maybe_chunk_path = reader.GetChunk();
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path ==
-          TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk9");
+  REQUIRE(chunk_path == root + "/ldbc_sample/parquet/vertex/person/id/chunk9");
   // now is end of the chunks
   REQUIRE(reader.next_chunk().IsOutOfRange());
 
@@ -77,9 +75,11 @@ TEST_CASE("test_vertex_property_chunk_info_reader") {
 }
 
 TEST_CASE("test_adj_list_chunk_info_reader") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
   // read file and construct graph info
-  std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
@@ -98,21 +98,21 @@ TEST_CASE("test_adj_list_chunk_info_reader") {
   auto maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   auto chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/adj_list/part0/chunk0");
   REQUIRE(reader.seek(100).ok());
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/adj_list/part0/chunk0");
   REQUIRE(reader.next_chunk().ok());
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/adj_list/part1/chunk0");
 
@@ -121,14 +121,14 @@ TEST_CASE("test_adj_list_chunk_info_reader") {
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/adj_list/part1/chunk0");
   REQUIRE(reader.seek_src(900).ok());
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/adj_list/part9/chunk0");
   REQUIRE(reader.next_chunk().IsOutOfRange());
@@ -147,7 +147,7 @@ TEST_CASE("test_adj_list_chunk_info_reader") {
   maybe_chunk_path = dst_reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_dest/adj_list/part1/chunk0");
 
@@ -157,9 +157,11 @@ TEST_CASE("test_adj_list_chunk_info_reader") {
 }
 
 TEST_CASE("test_adj_list_property_chunk_info_reader") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
   // read file and construct graph info
-  std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
@@ -183,21 +185,21 @@ TEST_CASE("test_adj_list_property_chunk_info_reader") {
   auto maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   auto chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/creationDate/part0/chunk0");
   REQUIRE(reader.seek(100).ok());
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/creationDate/part0/chunk0");
   REQUIRE(reader.next_chunk().ok());
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/creationDate/part1/chunk0");
 
@@ -206,14 +208,14 @@ TEST_CASE("test_adj_list_property_chunk_info_reader") {
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/creationDate/part1/chunk0");
   REQUIRE(reader.seek_src(900).ok());
   maybe_chunk_path = reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/creationDate/part9/chunk0");
   REQUIRE(reader.next_chunk().IsOutOfRange());
@@ -238,7 +240,7 @@ TEST_CASE("test_adj_list_property_chunk_info_reader") {
   maybe_chunk_path = dst_reader.GetChunk();
   REQUIRE(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  REQUIRE(chunk_path == TEST_DATA_DIR +
+  REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_dest/creationDate/part1/chunk0");
 

@@ -1,4 +1,4 @@
-name: GraphAr CI
+name: GraphAr C++ CI
 
 on:
   # Trigger the workflow on push or pull request,
@@ -53,7 +53,7 @@ jobs:
       run: |
         mkdir build
         pushd build
-        cmake ../cpp -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
         popd
 
     - name: Cpp Format and lint
@@ -114,5 +114,7 @@ jobs:
 
     - name: Test
       run: |
-        cd build && make test
+        cd build
+        export GAR_TEST_DATA=$PWD/../testing/
+        make test
 

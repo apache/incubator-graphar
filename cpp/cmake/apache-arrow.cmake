@@ -84,7 +84,7 @@ function(build_arrow)
 
     include(ExternalProject)
     externalproject_add(arrow_ep
-            URL https://www.apache.org/dyn/closer.lua?action=download&filename=arrow/arrow-9.0.0/apache-arrow-9.0.0.tar.gz
+            URL https://www.apache.org/dyn/closer.lua?action=download&filename=arrow/arrow-11.0.0/apache-arrow-11.0.0.tar.gz
             SOURCE_SUBDIR cpp
             BINARY_DIR "${GAR_ARROW_BINARY_DIR}"
             CMAKE_ARGS "${GAR_ARROW_CMAKE_ARGS}"
