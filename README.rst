@@ -111,74 +111,14 @@ Take the "person knows person" edges to illustrate. Suppose the vertex chunk siz
 |Edge Physical Table2|
 
 
-Building the Libraries
-----------------------
+Libraries
+----------
 
 Libraries are available for C++ and Spark.
 
-Prerequisites
+The C++ Library
 ^^^^^^^^^^^^^^
-
-Basic dependencies:
-
-- A modern C++ compiler compliant with C++17 standard (g++ >= 7.1 or clang++ >= 5).
-- `CMake <https://cmake.org/>`_ (>=2.8)
-
-Dependencies for optional features:
-
-- `Doxygen <https://www.doxygen.nl/index.html>`_ (>= 1.8) for generating documentation;
-- `sphinx <https://www.sphinx-doc.org/en/master/index.html>`_ for generating documentation.
-
-Extra dependencies are required by examples:
-
-- `BGL <https://www.boost.org/doc/libs/1_80_0/libs/graph/doc/index.html>`_ (>= 1.58).
-
-
-Building
-^^^^^^^^^
-
-Once the required dependencies have been installed, go to the root directory of GraphAr and do an out-of-source build using CMake.
-
-.. code-block:: shell
-
-    git submodule update --init
-    mkdir build && cd build
-    cmake ..
-    make -j$(nproc)
-
-**Optional**: Using a Custom Namespace
-
-The :code:`namespace` is configurable. By default,
-it is defined in :code:`namespace GraphArchive`; however this can be toggled by
-setting :code:`NAMESPACE` option with cmake:
-
-.. code:: shell
-
-    mkdir build
-    cd build
-    cmake .. -DNAMESPACE=MyNamespace
-    make -j$(nproc)
-
-Run the test with command:
-
-.. code-block:: shell
-
-    make test
-
-Install the GraphAr library:
-
-.. code-block:: shell
-
-    sudo make install
-
-Optionally, you can build the documentation for GraphAr library:
-
-.. code-block:: shell
-
-    # assume doxygen and sphinx has been installed.
-    pip3 install -r ../requirements-dev.txt --user
-    make doc
-
+See `GraphAr C++ Library`_ for details about the building of the C++ library.
 
 The Spark Library
 -----------------
@@ -240,6 +180,8 @@ third-party libraries may not have the same license as GraphAr.
 .. _GraphAr File Format: https://alibaba.github.io/GraphAr/user-guide/file-format.html
 
 .. _GraphAr Spark Library: https://alibaba.github.io/GraphAr/user-guide/spark-lib.html
+
+.. _GraphAr C++ Library: https://github.com/alibaba/GraphAr/tree/main/cpp
 
 .. _example files: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/
 
