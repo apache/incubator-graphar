@@ -71,6 +71,6 @@ The API document is generated in the directory ``spark/target/site/scaladocs``.
 How to use
 ^^^^^^^^^^^
 
-    Please refer to our `GraphAr Spark Library Documentation`_.
+Please refer to our `GraphAr Spark Library Documentation`_.
 
 .. _GraphAr Spark Library Documentation: https://alibaba.github.io/GraphAr/user-guide/spark-lib.html
