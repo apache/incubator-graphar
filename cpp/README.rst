@@ -29,12 +29,11 @@ Building requires:
 
 Dependencies for optional features:
 
-* `Doxygen <https://www.doxygen.nl/index.html>`_ (>= 1.8) for generating documentation;
-* `sphinx <https://www.sphinx-doc.org/en/master/index.html>`_ for generating documentation.
+* `Doxygen <https://www.doxygen.nl/index.html>`_ (>= 1.8) for generating documentation
 
 Extra dependencies are required by examples:
 
-* `BGL <https://www.boost.org/doc/libs/1_80_0/libs/graph/doc/index.html>`_ (>= 1.58).
+* `BGL <https://www.boost.org/doc/libs/1_80_0/libs/graph/doc/index.html>`_ (>= 1.58)
 
 
 Building
@@ -112,4 +111,4 @@ Building the API document with Doxgen:
     $ doxgen
     $ popd
 
-The API document is generate in in the directory ``cpp/apidoc/html``.
+The API document is generated in the directory ``cpp/apidoc/html``.

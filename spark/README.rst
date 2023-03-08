@@ -57,6 +57,17 @@ Build and run certain unit test:
     $ mvn clean test -Dsuites='com.alibaba.graphar.GraphInfoSuite load graph info'  # run the `load graph info` test of test suite
 
 
+Generate API document
+^^^^^^^^^^^^^^^^^^^^
+
+Building the API document with maven:
+
+.. code-block:: shell
+
+    $ mvn scala:doc
+
+The API document is generated in the directory ``spark/target/site/scaladocs``.
+
 How to use
 ^^^^^^^^^^^
 
