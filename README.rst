@@ -121,7 +121,7 @@ The C++ Library
 See `GraphAr C++ Library`_ for details about the building of the C++ library.
 
 The Spark Library
------------------
+^^^^^^^^^^^^^^^^^
 
 See `GraphAr Spark Library`_ for details about the Spark library.
 
