@@ -9,7 +9,7 @@ Building GraphAr C++
 System setup
 ^^^^^^^^^^^^
 
-GraphAr uses CMake as a build configuration system. We recommend building
+GraphAr C++ uses CMake as a build configuration system. We recommend building
 out-of-source. If you are not familiar with this terminology:
 
 * **In-source build**: ``cmake`` is invoked directly from the ``cpp``
@@ -23,7 +23,7 @@ out-of-source. If you are not familiar with this terminology:
 Building requires:
 
 * A C++17-enabled compiler. On Linux, gcc 7.1 and higher should be
-  sufficient. For MacOS, at least clang5 is required.
+  sufficient. For MacOS, at least clang5 is required
 * CMake 3.5 or higher
 * On Linux and macOS, ``make`` build utilities
 
