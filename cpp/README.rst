@@ -1,6 +1,6 @@
 GraphAr C++
 ============
-This directory contains the code and build system for the GraphAr C++ libraries.
+This directory contains the code and build system for the GraphAr C++ library.
 
 
 Building GraphAr C++
@@ -23,7 +23,7 @@ out-of-source. If you are not familiar with this terminology:
 Building requires:
 
 * A C++17-enabled compiler. On Linux, gcc 7.1 and higher should be
-  sufficient. For MacOS, at least clang5 is required
+  sufficient. For MacOS, at least clang 5 is required
 * CMake 3.5 or higher
 * On Linux and macOS, ``make`` build utilities
 
@@ -49,7 +49,7 @@ repository and navigated to the ``cpp`` subdirectory:
     $ git submodule update --init
     $ cd GraphAr/cpp
 
-Minimal release build:
+Release build:
 
 .. code-block::
 
@@ -58,7 +58,7 @@ Minimal release build:
     $ cmake ..
     $ make -j8       # if you have 8 CPU cores, otherwise adjust
 
-Minimal build with a custom namespace:
+Build with a custom namespace:
 
 The :code:`namespace` is configurable. By default,
 it is defined in :code:`namespace GraphArchive`; however this can be toggled by
@@ -71,7 +71,7 @@ setting :code:`NAMESPACE` option with cmake:
     $ cmake .. -DNAMESPACE=MyNamespace
     $ make -j8       # if you have 8 CPU cores, otherwise adjust
 
-Minimal debug build with unit tests:
+Debug build with unit tests:
 
 .. code-block:: shell
 
@@ -82,7 +82,7 @@ Minimal debug build with unit tests:
     $ make -j8       # if you have 8 CPU cores, otherwise adjust
     $ make test      # to run the tests
 
-Minimal build with examples:
+Build with examples:
 
 .. code-block:: shell
 
@@ -99,4 +99,17 @@ After the building, you can install the GraphAr C++ library with:
 
 .. code-block:: shell
 
-    sudo make install
+    $ sudo make install
+
+Generate API document
+^^^^^^^^^^^^^^^^^^^^^
+
+Building the API document with Doxgen:
+
+.. code-block:: shell
+
+    $ pushd apidoc
+    $ doxgen
+    $ popd
+
+The API document is generate in in the directory ``cpp/apidoc/html``.

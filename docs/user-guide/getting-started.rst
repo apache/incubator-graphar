@@ -194,6 +194,6 @@ Please refer to `more examples <../applications/out-of-core.html>`_ to learn abo
 
 .. _./edge/person_knows_person/ordered_by_source/offset/chunk0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0
 
-.. _example program: https://github.com/alibaba/GraphAr/blob/main/examples/construct_info_example.cc
+.. _example program: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/construct_info_example.cc
 
-.. _pagerank_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/pagerank_example.cc
+.. _pagerank_example.cc: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/pagerank_example.cc

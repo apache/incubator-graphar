@@ -179,7 +179,7 @@ third-party libraries may not have the same license as GraphAr.
 
 .. _GraphAr File Format: https://alibaba.github.io/GraphAr/user-guide/file-format.html
 
-.. _GraphAr Spark Library: https://alibaba.github.io/GraphAr/user-guide/spark-lib.html
+.. _GraphAr Spark Library: https://github.com/alibaba/GraphAr/tree/main/spark
 
 .. _GraphAr C++ Library: https://github.com/alibaba/GraphAr/tree/main/cpp
 

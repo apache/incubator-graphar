@@ -1,6 +1,6 @@
 GraphAr Spark
 =============
-This directory contains the code and build system for the GraphAr Spark libraries.
+This directory contains the code and build system for the GraphAr Spark library.
 
 
 Building GraphAr Spark
@@ -13,8 +13,8 @@ GraphAr Spark uses maven as a package build system.
 
 Building requires:
 
-* Jdk 8.0 or higher
-* Maven or higher
+* JDK 8 or higher
+* Maven 3.2.0 or higher
 
 Building
 ^^^^^^^^^
@@ -55,3 +55,11 @@ Build and run certain unit test:
 
     $ mvn clean test -Dsuites='com.alibaba.graphar.GraphInfoSuite'   # run the GraphInfo test suite
     $ mvn clean test -Dsuites='com.alibaba.graphar.GraphInfoSuite load graph info'  # run the `load graph info` test of test suite
+
+
+How to use
+^^^^^^^^^^^
+
+    Please refer to our `GraphAr Spark Library Documentation_`.
+
+.. _GraphAr Spark Library Documentation: https://alibaba.github.io/GraphAr/user-guide/spark-lib.html
