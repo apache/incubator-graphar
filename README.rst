@@ -114,7 +114,9 @@ Take the "person knows person" edges to illustrate. Suppose the vertex chunk siz
 Libraries
 ----------
 
-Libraries are available for C++ and Spark.
+Libraries are provided for reading, writing and transforming files in GraphAr,
+now the C++ library and the Spark library are available. And we are going to
+provide libraries for more programming languages.
 
 The C++ Library
 ^^^^^^^^^^^^^^^

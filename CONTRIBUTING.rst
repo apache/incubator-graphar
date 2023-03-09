@@ -99,7 +99,7 @@ Now initialize the submodules of GraphAr:
 
     $ git submodule update --init
 
-For C++ Library, Check that the system has the `GraphAr C++ Dependencies`_.
+For the C++ Library, Check that the system has the `GraphAr C++ Dependencies`_.
 
 Then you can do an out-of-source build using CMake and build the test suite:
 
@@ -116,7 +116,7 @@ Now you should be able to run the test suite:
 
     $ make test
 
-For Spark Library, Check that the system has the `GraphAr Spark Dependencies`_.
+For the Spark Library, Check that the system has the `GraphAr Spark Dependencies`_.
 
 Then you build and run test suite using Maven:
 
