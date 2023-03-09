@@ -4,7 +4,6 @@
 # You can set these variables from the command line, and also
 # from the environment for the first two.
 # Do not fail the build if there are warnings
-SHELL 		 := /bin/bash
 SPHINXOPTS    = -j8
 SPHINXBUILD  ?= sphinx-build
 SOURCEDIR     = .
@@ -32,15 +31,13 @@ clean:
 
 .PHONY: cpp-apidoc
 cpp-apidoc:
-	pushd $(ROOTDIR)/cpp/apidoc && \
-	$(DOXYGEN) Doxyfile && \
-	popd
+	cd $(ROOTDIR)/cpp/apidoc && \
+	$(DOXYGEN) Doxyfile
 
 .PHONY: spark-apidoc
 spark-apidoc:
-	pushd $(ROOTDIR)/spark && \
-	mvn scala:doc && \
-	popd
+	cd $(ROOTDIR)/spark && \
+	mvn scala:doc
 
 .PHONY: html
 html: cpp-apidoc spark-apidoc
