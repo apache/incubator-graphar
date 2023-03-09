@@ -28,7 +28,7 @@ limitations under the License.
 #include "arrow/util/uri.h"
 #include "parquet/arrow/writer.h"
 
-#include "./config.h"
+#include "./util.h"
 #include "gar/graph_info.h"
 #include "gar/writer/arrow_chunk_writer.h"
 #include "gar/writer/edges_builder.h"
@@ -38,15 +38,18 @@ limitations under the License.
 #include <catch2/catch.hpp>
 
 TEST_CASE("test_vertices_builder") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
   std::string vertex_meta_file =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person.vertex.yml";
+      root + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = GAR_NAMESPACE::VertexInfo::Load(vertex_meta).value();
   GAR_NAMESPACE::IdType start_index = 0;
   GAR_NAMESPACE::builder::VerticesBuilder builder(vertex_info, "/tmp/",
                                                   start_index);
 
-  std::ifstream fp(TEST_DATA_DIR + "/ldbc_sample/person_0_0.csv");
+  std::ifstream fp(root + "/ldbc_sample/person_0_0.csv");
   std::string line;
   getline(fp, line);
   int m = 4;
@@ -78,7 +81,7 @@ TEST_CASE("test_vertices_builder") {
   }
   REQUIRE(builder.Dump().ok());
 
-  auto fs = arrow::fs::FileSystemFromUriOrPath(TEST_DATA_DIR).ValueOrDie();
+  auto fs = arrow::fs::FileSystemFromUriOrPath(root).ValueOrDie();
   auto input =
       fs->OpenInputStream("/tmp/vertex/person/vertex_count").ValueOrDie();
   auto num = input->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
@@ -87,14 +90,17 @@ TEST_CASE("test_vertices_builder") {
 }
 
 TEST_CASE("test_edges_builder") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
   std::string edge_meta_file =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
+      root + "/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
   auto edge_meta = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = GAR_NAMESPACE::EdgeInfo::Load(edge_meta).value();
   GAR_NAMESPACE::builder::EdgesBuilder builder(
       edge_info, "/tmp/", GraphArchive::AdjListType::ordered_by_dest, 903);
 
-  std::ifstream fp(TEST_DATA_DIR + "/ldbc_sample/person_knows_person_0_0.csv");
+  std::ifstream fp(root + "/ldbc_sample/person_knows_person_0_0.csv");
   std::string line;
   getline(fp, line);
   std::vector<std::string> names;

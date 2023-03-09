@@ -16,7 +16,7 @@ PageRank
 
 `PageRank (PR) <https://en.wikipedia.org/wiki/PageRank>`_ is an algorithm used by Google Search to rank web pages in their search engine results. The source code of PageRank based on GraphAr located at `pagerank_example.cc`_, and the explanations can be found in the `Getting Started <../user-guide/getting-started.html#a-pagerank-example>`_ page.
 
-Connected Components 
+Connected Components
 ------------------------
 
 A weakly connected component is a maximal subgraph of a graph such that for every pair of vertices in it, there is an undirected path connecting them. And `Connected Components (CC) <https://en.wikipedia.org/wiki/Connected_component>`_ is an algorithm to identify all weakly connected components in a graph. `CC based on BGL <bgl.html>`_ is provided in GraphAr, also, we implement out-of-core algorithms for this application.
@@ -35,7 +35,7 @@ This algorithm can be implemented based on streaming the edges via GraphAr's rea
   std::vector<GraphArchive::IdType> component(num_vertices);
   for (GraphArchive::IdType i = 0; i < num_vertices; i++)
     component[i] = i;
-  
+
   // stream all edges for each iteration
   for (int iter = 0; ; iter++) {
     bool flag = false;
@@ -56,9 +56,9 @@ This algorithm can be implemented based on streaming the edges via GraphAr's rea
 
 The file `cc_stream_example.cc`_ located inside the source tree contains the complete implementation for this algorithm. Also, we can only process active vertices (the vertices which are updated in the last iteration) and the corresponding edges for each iteration, since an inactive vertex does not need to update its neighbors. Please refer to `cc_push_example.cc`_ for the complete code.
 
-.. tip:: 
+.. tip::
 
-  In this example, two kinds of edges are used. The **ordered_by_source** edges are used to access all outgoing edges of an active vertex, and **ordered_by_dest** edges are used to access the incoming edges. In this way, all the neighbors of an active vertex can be accessed and processed. 
+  In this example, two kinds of edges are used. The **ordered_by_source** edges are used to access all outgoing edges of an active vertex, and **ordered_by_dest** edges are used to access the incoming edges. In this way, all the neighbors of an active vertex can be accessed and processed.
 
   Although GraphAr supports to get the outgoing (incoming) edges of a single vertex for all adjList types, it is most efficient when the type is **ordered_by_source** (**ordered_by_dest**) since it can avoid to read redundant data.
 
@@ -100,23 +100,23 @@ The above algorithm is implemented based on streaming all edges for each iterati
 
 Meanwhile, BFS could be implemented in a **push**-style which only traverses the edges that from active vertices for each iteration, which is typically more efficient on real-world graphs. This implementation can be found at `bfs_push_example.cc`_. Similarly, we provide a BFS implementation in a **pull**-style which only traverses the edges that lead to non-visited vertices (i.e., the vertices that have not been traversed), as shown in `bfs_pull_example.cc`_.
 
-.. tip:: 
+.. tip::
 
   In common cases of graph processing, the **push**-style is more efficient when the set of active vertices is very sparse, while the **pull**-style fits when it is dense.
 
 In some cases, it is required to record the path of BFS, that is, to maintain each vertex's predecessor (also called *father*) in the traversing tree rather than only recording the distance. The implementation of BFS with recording fathers can be found at `bfs_father_example.cc`_.
 
 
-.. _pagerank_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/pagerank_example.cc
+.. _pagerank_example.cc: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/pagerank_example.cc
 
-.. _cc_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/cc_stream_example.cc
+.. _cc_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/cc_stream_example.cc
 
-.. _cc_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/cc_push_example.cc
+.. _cc_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/cc_push_example.cc
 
-.. _bfs_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_stream_example.cc
+.. _bfs_stream_example.cc: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/bfs_stream_example.cc
 
-.. _bfs_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_push_example.cc
+.. _bfs_push_example.cc: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/bfs_push_example.cc
 
-.. _bfs_pull_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_pull_example.cc
+.. _bfs_pull_example.cc: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/bfs_pull_example.cc
 
-.. _bfs_father_example.cc: https://github.com/alibaba/GraphAr/blob/main/examples/bfs_father_example.cc
+.. _bfs_father_example.cc: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/bfs_father_example.cc

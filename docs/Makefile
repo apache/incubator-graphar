@@ -3,10 +3,16 @@
 
 # You can set these variables from the command line, and also
 # from the environment for the first two.
-SPHINXOPTS    ?=
-SPHINXBUILD   ?= sphinx-build
+# Do not fail the build if there are warnings
+SPHINXOPTS    = -j8
+SPHINXBUILD  ?= sphinx-build
 SOURCEDIR     = .
 BUILDDIR      = _build
+
+# Internal variables.
+ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(SPHINXOPTS) $(SOURCEDIR)
+DOXYGEN = doxygen
+ROOTDIR = ..
 
 # Put it first so that "make" without argument is like "make help".
 help:
@@ -19,6 +25,26 @@ help:
 %: Makefile
 	@$(SPHINXBUILD) -M $@ "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-doxygen:
-	@mkdir -p _build
-	@doxygen Doxyfile
+.PHONY: clean
+clean:
+	rm -rf $(BUILDDIR)/*
+
+.PHONY: cpp-apidoc
+cpp-apidoc:
+	pushd $(ROOTDIR)/cpp/apidoc && \
+	$(DOXYGEN) Doxyfile && \
+	popd
+
+.PHONY: spark-apidoc
+spark-apidoc:
+	pushd $(ROOTDIR)/spark && \
+	mvn scala:doc && \
+	popd
+
+.PHONY: html
+html: cpp-apidoc spark-apidoc
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	rm -fr $(BUILDDIR)/html/reference/spark-api
+	cp -fr $(ROOTDIR)/spark/target/site/scaladocs $(BUILDDIR)/html/reference/spark-api
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

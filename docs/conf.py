@@ -45,7 +45,7 @@ extensions = [
 
 # breathe
 breathe_projects = {
-    'GraphAr': os.path.abspath('./_build/doxygen/xml'),
+    'GraphAr': os.path.abspath('../cpp/apidoc/xml'),
 }
 breathe_default_project = 'GraphAr'
 breathe_debug_trace_directives = True

@@ -1,4 +1,4 @@
-name: GraphAr CI
+name: GraphAr C++ CI
 
 on:
   # Trigger the workflow on push or pull request,
@@ -53,7 +53,7 @@ jobs:
       run: |
         mkdir build
         pushd build
-        cmake .. -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
         popd
 
     - name: Cpp Format and lint
@@ -67,7 +67,7 @@ jobs:
         # validate format
         function prepend() { while read line; do echo "${1}${line}"; done; }
 
-        make clformat
+        make gar-clformat
         GIT_DIFF=$(git diff --ignore-submodules)
         if [[ -n $GIT_DIFF ]]; then
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -91,7 +91,7 @@ jobs:
 
         function ec() { [[ "$1" == "-h" ]] && { shift && eval $* > /dev/null 2>&1; ec=$?; echo $ec; } || eval $*; ec=$?; }
 
-        ec make cpplint
+        ec make gar-cpplint
         if [[ "$ec" != "0" ]]; then
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             echo "| cpplint failures found! Run: "
@@ -114,5 +114,7 @@ jobs:
 
     - name: Test
       run: |
-        cd build && make test
+        cd build
+        export GAR_TEST_DATA=$PWD/../testing/
+        make test
 

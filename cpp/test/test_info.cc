@@ -18,7 +18,7 @@ limitations under the License.
 #include <filesystem>
 #include <iostream>
 
-#include "./config.h"
+#include "./util.h"
 
 #include "gar/graph_info.h"
 #include "gar/utils/version_parser.h"
@@ -318,12 +318,15 @@ TEST_CASE("test_info_version") {
 }
 
 TEST_CASE("test_graph_info_load_from_file") {
-  std::string path = TEST_DATA_DIR + "/ldbc_sample/csv/ldbc_sample.graph.yml";
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
+  std::string path = root + "/ldbc_sample/csv/ldbc_sample.graph.yml";
   auto graph_info_result = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(!graph_info_result.has_error());
   auto graph_info = graph_info_result.value();
   REQUIRE(graph_info.GetName() == "ldbc_sample");
-  REQUIRE(graph_info.GetPrefix() == TEST_DATA_DIR + "/ldbc_sample/csv/");
+  REQUIRE(graph_info.GetPrefix() == root + "/ldbc_sample/csv/");
   const auto& vertex_infos = graph_info.GetVertexInfos();
   const auto& edge_infos = graph_info.GetEdgeInfos();
   REQUIRE(vertex_infos.size() == 1);

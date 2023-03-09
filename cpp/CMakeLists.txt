@@ -24,7 +24,7 @@ project(graph-archive LANGUAGES C CXX VERSION ${GAR_VERSION})
 # ------------------------------------------------------------------------------
 
 option(NAMESPACE "User specific namespace, default if GraphArchive" OFF)
-option(BUILD_TESTS "Build unit test" OFF)
+option(BUILD_TESTS "Build unit tests" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
 
 if (NAMESPACE)
@@ -329,36 +329,28 @@ file(GLOB_RECURSE FILES_NEED_LINT "include/gar/*.h" "src/*.cc"
                                   "test/*.h" "test/*.cc"
                                   )
 
-add_custom_target(clformat
+add_custom_target(gar-clformat
                   COMMAND clang-format --style=file -i ${FILES_NEED_FORMAT}
                   COMMENT "Running clang-format."
                   VERBATIM)
 
-add_custom_target(cpplint
-        COMMAND ${PROJECT_SOURCE_DIR}/misc/cpplint.py --root=include ${FILES_NEED_LINT}
+add_custom_target(gar-cpplint
+        COMMAND ${PROJECT_SOURCE_DIR}/misc/cpplint.py --root=${PROJECT_SOURCE_DIR}/include ${FILES_NEED_LINT}
         COMMENT "Running cpplint check."
         VERBATIM)
 
 # ------------------------------------------------------------------------------
-# build docs
+# build cpp api doc
 # ------------------------------------------------------------------------------
 find_program(doxygen_EXECUTABLE doxygen NO_CMAKE_SYSTEM_PATH)
-find_program(sphinx_build_EXECUTABLE sphinx-build NO_CMAKE_SYSTEM_PATH)
-if(doxygen_EXECUTABLE AND sphinx_build_EXECUTABLE)
-    add_custom_target(doc
-        COMMAND ${CMAKE_COMMAND} -E make_directory _build
+if(doxygen_EXECUTABLE)
+    add_custom_target(gar-cpp-doc
         COMMAND ${doxygen_EXECUTABLE}
-        COMMAND ${sphinx_build_EXECUTABLE} . _build/html
-        COMMAND cd ../spark && mvn scala:doc && rm -fr ${PROJECT_SOURCE_DIR}/docs/_build/html/reference/spark-api &&
-         cp -fr target/site/scaladocs ${PROJECT_SOURCE_DIR}/docs/_build/html/reference/spark-api
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/docs
+        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/apidoc
         VERBATIM
     )
 else()
     if(NOT doxygen_EXECUTABLE)
         message(STATUS "Cannot find the doxygen executable.")
-    endif()
-    if(NOT sphinx_build_EXECUTABLE)
-        message(STATUS "Cannot find the sphinx-build executable.")
     endif()
 endif()

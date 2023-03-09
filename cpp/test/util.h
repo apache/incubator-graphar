@@ -16,10 +16,21 @@ limitations under the License.
 #include <filesystem>
 #include <string>
 
-#ifndef TEST_CONFIG_H_
-#define TEST_CONFIG_H_
+#include "gar/utils/status.h"
 
-static const std::string TEST_DATA_DIR =  // NOLINT
-    std::filesystem::path(__FILE__).parent_path().string() + "/gar-test";
+#ifndef CPP_TEST_UTIL_H_
+#define CPP_TEST_UTIL_H_
 
-#endif  // TEST_CONFIG_H_
+// Return the value of the GAR_TEST_DATA environment variable or return error
+// Status
+GAR_NAMESPACE::Status GetTestResourceRoot(std::string* out) {
+  const char* c_root = std::getenv("GAR_TEST_DATA");
+  if (!c_root) {
+    return GAR_NAMESPACE::Status::IOError(
+        "Test resources not found, set GAR_TEST_DATA to <repo root>/testing");
+  }
+  *out = std::string(c_root);
+  return GAR_NAMESPACE::Status::OK();
+}
+
+#endif  // CPP_TEST_UTIL_H_

@@ -55,13 +55,13 @@ into the Git repository, you could first install  `pre-commit`_ by
 
 .. code:: bash
 
-    pip3 install pre-commit
+    $ pip3 install pre-commit
 
 The configure the necessary pre-commit hooks with
 
 .. code:: bash
 
-    pre-commit install  --install-hooks
+    $ pre-commit install  --install-hooks
 
 Minor Fixes
 ^^^^^^^^^^^^
@@ -86,7 +86,7 @@ A good branch name would be (where issue #42 is the ticket you're working on):
 
 .. code:: shell
 
-    git checkout -b 42-add-chinese-translations
+    $ git checkout -b 42-add-chinese-translations
 
 Get the test suite running
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -97,22 +97,33 @@ Now initialize the submodules of GraphAr:
 
 .. code:: shell
 
-    git submodule update --init
+    $ git submodule update --init
+
+For the C++ Library, Check that the system has the `GraphAr C++ Dependencies`_.
 
 Then you can do an out-of-source build using CMake and build the test suite:
 
 .. code:: shell
 
-    mkdir build
-    cd build
-    cmake .. -DBUILD_TESTS=ON
-    make -j$(nproc)
+    $ mkdir build
+    $ cd build
+    $ cmake ../cpp -DBUILD_TESTS=ON
+    $ make -j$(nproc)
 
 Now you should be able to run the test suite:
 
 .. code:: shell
 
-    make test
+    $ make test
+
+For the Spark Library, Check that the system has the `GraphAr Spark Dependencies`_.
+
+Then you build and run test suite using Maven:
+
+.. code:: shell
+
+    $ cd spark
+    $ mvn test
 
 How to generate the document
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -123,9 +134,10 @@ The documentation is generated using Doxygen and sphinx. You can build GraphAr's
 
 .. code:: shell
 
-    make doc
+    $ cd docs
+    $ make html
 
-The HTML documentation will be available under `docs/_build/html`.
+The HTML documentation will be available under ``docs/_build/html``.
 
 Implement your fix or feature
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -143,13 +155,15 @@ You can format your code by the command:
 
 .. code:: shell
 
-    make clformat
+    $ cd build
+    $ make gar-clformat
 
 You can check & fix style issues by running the *cpplint* linter with the command:
 
 .. code:: shell
 
-    make cpplint
+    $ cd build
+    $ make gar-cpplint
 
 Submitting your changes
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -173,17 +187,17 @@ up to date with GraphAr's main branch:
 
 .. code:: shell
 
-    git remote add upstream https://github.com/alibaba/GraphAr.git
-    git checkout main
-    git pull upstream main
+    $ git remote add upstream https://github.com/alibaba/GraphAr.git
+    $ git checkout main
+    $ git pull upstream main
 
 Then update your feature branch from your local copy of main, and push it!
 
 .. code:: shell
 
-    git checkout 42-add-chinese-translations
-    git rebase main
-    git push --set-upstream origin 42-add-chinese-translations
+    $ git checkout 42-add-chinese-translations
+    $ git rebase main
+    $ git push --set-upstream origin 42-add-chinese-translations
 
 Finally, go to GitHub and `make a Pull Request`_ :D
 
@@ -206,9 +220,9 @@ To learn more about rebasing in Git, there are a lot of `good <http://git-scm.co
 
 .. code:: shell
 
-    git checkout 42-add-chinese-translations
-    git pull --rebase upstream main
-    git push --force-with-lease 42-add-chinese-translations
+    $ git checkout 42-add-chinese-translations
+    $ git pull --rebase upstream main
+    $ git push --force-with-lease 42-add-chinese-translations
 
 Feel free to post a comment in the pull request to ping reviewers if you are awaiting an answer
 on something. If you encounter words or acronyms that seem unfamiliar, refer to this `glossary`_.
@@ -236,15 +250,15 @@ Maintainers need to do the following to push out a release:
 
 .. code:: shell
 
-    git checkout main
-    git pull upstream main
+    $ git checkout main
+    $ git pull upstream main
 
 2. Tag the release with a version number and push it to GitHub. Note that the version number should follow `semantic versioning <https://semver.org/#summary>`_. e.g.: v0.1.0.
 
 .. code:: shell
 
-    git tag -a v0.1.0 -m "GraphAr v0.1.0"
-    git push upstream v0.1.0
+    $ git tag -a v0.1.0 -m "GraphAr v0.1.0"
+    $ git push upstream v0.1.0
 
 3. The release draft will be automatically built to GitHub by GitHub Actions. You can edit the release notes draft on `GitHub <https://github.com/alibaba/GraphAr/releases>`_ to add more details.
 4. Publish the release.
@@ -419,7 +433,9 @@ to determine whether the failure was caused by the changes in the pull request.
 
 .. _interactive rebase: https://help.github.com/en/github/using-git/about-git-rebase
 
-.. _GraphAr Dependencies: https://github.com/alibaba/GraphAr#dependencies
+.. _GraphAr C++ Dependencies: https://github.com/alibaba/GraphAr/tree/main/cpp#system-setup
+
+.. _GraphAr Spark Dependencies: https://github.com/alibaba/GraphAr/tree/main/spark#system-setup
 
 .. _Contributor License Agreement: https://cla-assistant.io/alibaba/GraphAr
 

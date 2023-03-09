@@ -1,0 +1,5 @@
+/build/
+/examples/*/build/
+
+apidoc/html
+apidoc/xml

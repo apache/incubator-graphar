@@ -58,14 +58,12 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ca-certificates cmake doxygen python3-pip
-          sudo pip3 install -r requirements-dev.txt
+          sudo pip3 install -r docs/requirements.txt
 
       - name: Generate Doc
         run: |
-          mkdir build
-          pushd build
-          cmake ..
-          make doc
+          pushd docs
+          make html
           popd
 
       - name: Preview using surge

@@ -24,7 +24,7 @@ limitations under the License.
 #include "arrow/util/uri.h"
 #include "parquet/arrow/writer.h"
 
-#include "./config.h"
+#include "./util.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
@@ -32,9 +32,11 @@ limitations under the License.
 #include <catch2/catch.hpp>
 
 TEST_CASE("test_vertex_property_arrow_chunk_reader") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
   // read file and construct graph info
-  std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
@@ -89,9 +91,11 @@ TEST_CASE("test_vertex_property_arrow_chunk_reader") {
 }
 
 TEST_CASE("test_adj_list_arrow_chunk_reader") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
   // read file and construct graph info
-  std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
@@ -142,8 +146,10 @@ TEST_CASE("test_adj_list_arrow_chunk_reader") {
 }
 
 TEST_CASE("test_adj_list_property_arrow_chunk_reader") {
-  std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
@@ -196,9 +202,11 @@ TEST_CASE("test_adj_list_property_arrow_chunk_reader") {
 }
 
 TEST_CASE("test_read_adj_list_offset_chunk_example") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
   // read file and construct graph info
-  std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();

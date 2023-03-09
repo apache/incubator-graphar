@@ -27,7 +27,7 @@ limitations under the License.
 #include "parquet/arrow/reader.h"
 #include "parquet/arrow/writer.h"
 
-#include "./config.h"
+#include "./util.h"
 #include "gar/graph_info.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
@@ -35,8 +35,11 @@ limitations under the License.
 #include <catch2/catch.hpp>
 
 TEST_CASE("test_vertex_property_wrtier_from_file") {
-  REQUIRE(!TEST_DATA_DIR.empty());
-  std::string path = TEST_DATA_DIR + "/ldbc_sample/person_0_0.csv";
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
+  REQUIRE(!root.empty());
+  std::string path = root + "/ldbc_sample/person_0_0.csv";
   arrow::io::IOContext io_context = arrow::io::default_io_context();
 
   auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
@@ -61,7 +64,7 @@ TEST_CASE("test_vertex_property_wrtier_from_file") {
   std::cout << table->num_rows() << ' ' << table->num_columns() << std::endl;
 
   std::string vertex_meta_file =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person.vertex.yml";
+      root + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = GAR_NAMESPACE::VertexInfo::Load(vertex_meta).value();
   REQUIRE(vertex_info.GetLabel() == "person");
@@ -76,11 +79,14 @@ TEST_CASE("test_vertex_property_wrtier_from_file") {
 }
 
 TEST_CASE("test_orc_and_parquet_reader") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
   arrow::Status st;
   arrow::MemoryPool* pool = arrow::default_memory_pool();
-  std::string path1 = TEST_DATA_DIR + "/ldbc_sample/orc" +
+  std::string path1 = root + "/ldbc_sample/orc" +
                       "/vertex/person/firstName_lastName_gender/chunk1";
-  std::string path2 = TEST_DATA_DIR + "/ldbc_sample/parquet" +
+  std::string path2 = root + "/ldbc_sample/parquet" +
                       "/vertex/person/firstName_lastName_gender/chunk1";
   arrow::io::IOContext io_context = arrow::io::default_io_context();
 
@@ -115,9 +121,12 @@ TEST_CASE("test_orc_and_parquet_reader") {
 }
 
 TEST_CASE("test_edge_chunk_writer") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
   arrow::Status st;
   arrow::MemoryPool* pool = arrow::default_memory_pool();
-  std::string path = TEST_DATA_DIR +
+  std::string path = root +
                      "/ldbc_sample/parquet/edge/person_knows_person/"
                      "unordered_by_source/adj_list/part0/chunk0";
   auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
@@ -140,7 +149,7 @@ TEST_CASE("test_edge_chunk_writer") {
 
   // Write edges of vertex chunk 0 to files
   std::string edge_meta_file =
-      TEST_DATA_DIR + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
+      root + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
   auto edge_meta = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = GAR_NAMESPACE::EdgeInfo::Load(edge_meta).value();
   GAR_NAMESPACE::EdgeChunkWriter writer(

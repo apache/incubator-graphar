@@ -15,16 +15,18 @@ limitations under the License.
 
 #include <iostream>
 
-#include "./config.h"
+#include "./util.h"
 #include "gar/graph.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 TEST_CASE("test_vertices_collection") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
   // read file and construct graph info
-  std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
@@ -50,8 +52,10 @@ TEST_CASE("test_vertices_collection") {
 }
 
 TEST_CASE("test_edges_collection", "[Slow]") {
-  std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
 
