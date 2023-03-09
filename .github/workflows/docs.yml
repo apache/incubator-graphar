@@ -23,6 +23,9 @@ on:
       - main
       - docs
       - dev/docs
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
