@@ -91,8 +91,6 @@ A good branch name would be (where issue #42 is the ticket you're working on):
 Get the test suite running
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Make sure your system has the required dependencies for GraphAr. See the `GraphAr Dependencies`_ for more details.
-
 Now initialize the submodules of GraphAr:
 
 .. code:: shell

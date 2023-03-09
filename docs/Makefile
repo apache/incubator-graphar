@@ -31,15 +31,13 @@ clean:
 
 .PHONY: cpp-apidoc
 cpp-apidoc:
-	pushd $(ROOTDIR)/cpp/apidoc && \
-	$(DOXYGEN) Doxyfile && \
-	popd
+	cd $(ROOTDIR)/cpp/apidoc && \
+	$(DOXYGEN) Doxyfile
 
 .PHONY: spark-apidoc
 spark-apidoc:
-	pushd $(ROOTDIR)/spark && \
-	mvn scala:doc && \
-	popd
+	cd $(ROOTDIR)/spark && \
+	mvn scala:doc
 
 .PHONY: html
 html: cpp-apidoc spark-apidoc

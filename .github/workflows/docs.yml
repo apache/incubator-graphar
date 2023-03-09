@@ -35,9 +35,13 @@ jobs:
         with:
           node-version: 16
 
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
         with:
+          repository: ${{github.event.pull_request.head.repo.full_name}}
+          ref: ${{github.event.pull_request.head.ref}}
           submodules: true
+          fetch-depth: 0
 
       - name: Leave the comment on pull request when started
         if: ${{ github.event_name == 'pull_request_target' }}
