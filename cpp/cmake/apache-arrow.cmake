@@ -72,6 +72,7 @@ function(build_arrow)
                              "-DARROW_ORC=ON"
                              "-DARROW_COMPUTE=ON"
                              "-DARROW_DATASET=ON"
+                             "-DARROW_JEMALLOC=OFF"
                              "-DARROW_WITH_SNAPPY=OFF"
                              "-DARROW_WITH_LZ4=OFF"
                              "-DARROW_WITH_ZSTD=ON"
