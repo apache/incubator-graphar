@@ -109,7 +109,7 @@ jobs:
           body-include: '<!-- Sticky Pull Request Comment: Surge Preview build -->'
 
       - name: Commit Doc
-        if: ${{ github.ref == 'refs/heads/main' && github.repository == 'alibaba/GraphAr' }}
+        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && github.repository == 'alibaba/GraphAr' }}
         run: |
           git config user.email github-actions@github.com
           git config user.name github-actions
