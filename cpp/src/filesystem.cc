@@ -155,6 +155,7 @@ Result<T> FileSystem::ReadFileToValue(const std::string& path) const noexcept {
                                        arrow_fs_->OpenInputStream(path));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto bytes,
                                        input->Read(sizeof(T), &ret));
+  ARROW_UNUSED(bytes);
   return ret;
 }
 

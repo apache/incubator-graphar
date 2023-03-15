@@ -3,4 +3,6 @@
 .idea
 .DS_store
 .cache
+.ccls-cache
 
+compile_commands.json
