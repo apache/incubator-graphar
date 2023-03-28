@@ -98,7 +98,7 @@ Result<std::string> VertexInfo::Dump() const noexcept {
 
 Status VertexInfo::Save(const std::string& path) const {
   std::string no_url_path;
-  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(path, &no_url_path));
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUri(path, &no_url_path));
   GAR_ASSIGN_OR_RAISE(auto yaml_content, this->Dump());
   return fs->WriteValueToFile(yaml_content, path);
 }
@@ -222,34 +222,37 @@ Result<std::string> EdgeInfo::Dump() const noexcept {
 
 Status EdgeInfo::Save(const std::string& path) const {
   std::string no_url_path;
-  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(path, &no_url_path));
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUri(path, &no_url_path));
   GAR_ASSIGN_OR_RAISE(auto yaml_content, this->Dump());
   return fs->WriteValueToFile(yaml_content, path);
 }
 
+namespace {
+
 static std::string PathToDirectory(const std::string& path) {
-  const size_t last_slash_idx = path.rfind('/');
-  if (std::string::npos != last_slash_idx) {
-    return path.substr(0, last_slash_idx + 1);  // +1 to include the slash
+  if (path.rfind("s3://", 0) != 0) {
+    int t = path.find_last_of('?');
+    std::string prefix = path.substr(0, t);
+    std::string suffix = path.substr(t);
+    const size_t last_slash_idx = prefix.rfind('/');
+    if (std::string::npos != last_slash_idx) {
+      return prefix.substr(0, last_slash_idx + 1) + suffix;
+    }
+  } else {
+    const size_t last_slash_idx = path.rfind('/');
+    if (std::string::npos != last_slash_idx) {
+      return path.substr(0, last_slash_idx + 1);  // +1 to include the slash
+    }
   }
   return path;
 }
 
-Result<GraphInfo> GraphInfo::Load(const std::string& path) {
-  std::string no_url_path;
-  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(path, &no_url_path));
-  GAR_ASSIGN_OR_RAISE(auto yaml_content,
-                      fs->ReadFileToValue<std::string>(no_url_path));
-  std::string path_dir = PathToDirectory(path);
-  return GraphInfo::Load(yaml_content, path_dir);
-}
-
-Result<GraphInfo> GraphInfo::Load(const std::string& input,
-                                  const std::string& relative_location) {
-  GAR_ASSIGN_OR_RAISE(auto graph_meta, Yaml::Load(input));
-  std::string name = "graph";
-  std::string prefix =
-      relative_location;  // default chunk file prefix is relative location
+static Result<GraphInfo> ConstructGraphInfo(
+    std::shared_ptr<Yaml> graph_meta, const std::string& default_name,
+    const std::string& default_prefix, const std::shared_ptr<FileSystem> fs,
+    const std::string& no_url_path) {
+  std::string name = default_name;
+  std::string prefix = default_prefix;
   if (graph_meta->operator[]("name")) {
     name = graph_meta->operator[]("name").as<std::string>();
   }
@@ -264,9 +267,6 @@ Result<GraphInfo> GraphInfo::Load(const std::string& input,
   }
   GraphInfo graph_info(name, version, prefix);
 
-  std::string no_url_path;
-  GAR_ASSIGN_OR_RAISE(auto fs,
-                      FileSystemFromUriOrPath(relative_location, &no_url_path));
   const auto& vertices = graph_meta->operator[]("vertices");
   if (vertices) {
     for (YAML::const_iterator it = vertices.begin(); it != vertices.end();
@@ -293,6 +293,32 @@ Result<GraphInfo> GraphInfo::Load(const std::string& input,
   return graph_info;
 }
 
+}  // namespace
+
+Result<GraphInfo> GraphInfo::Load(const std::string& path) {
+  std::string no_url_path;
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUri(path, &no_url_path));
+  GAR_ASSIGN_OR_RAISE(auto yaml_content,
+                      fs->ReadFileToValue<std::string>(no_url_path));
+  GAR_ASSIGN_OR_RAISE(auto graph_meta, Yaml::Load(input));
+  std::string default_name = "graph";
+  std::string default_prefix = PathToDirectory(path);
+  return ConstructGraphInfo(graph_meta, default_name, default_prefix, fs,
+                            no_url_path);
+}
+
+Result<GraphInfo> GraphInfo::Load(const std::string& input,
+                                  const std::string& relative_location) {
+  GAR_ASSIGN_OR_RAISE(auto graph_meta, Yaml::Load(input));
+  std::string default_name = "graph";
+  std::string default_prefix =
+      relative_location;  // default chunk file prefix is relative location
+  std::string no_url_path;
+  GAR_ASSIGN_OR_RAISE(fs, FileSystemFromUri(relative_location, &no_url_path));
+  return ConstructGraphInfo(graph_meta, default_name, default_prefix, fs,
+                            no_url_path);
+}
+
 Result<std::string> GraphInfo::Dump() const noexcept {
   if (!IsValidated()) {
     return Status::Invalid();
@@ -314,7 +340,7 @@ Result<std::string> GraphInfo::Dump() const noexcept {
 
 Status GraphInfo::Save(const std::string& path) const {
   std::string no_url_path;
-  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(path, &no_url_path));
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUri(path, &no_url_path));
   GAR_ASSIGN_OR_RAISE(auto yaml_content, this->Dump());
   return fs->WriteValueToFile(yaml_content, no_url_path);
 }

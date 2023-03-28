@@ -73,6 +73,12 @@ static Status CastToLargeOffsetArray(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(out, arrow::ChunkedArray::Make(chunks));
   return Status::OK();
 }
+
+Result<Uri> ParseFileSystemUri(const std::string& uri) {
+  Uri uri;
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(uri.Parse(uri_string));
+  return std::move(uri);
+}
 }  // namespace detail
 
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
@@ -260,10 +266,25 @@ Result<IdType> FileSystem::GetFileNumOfDir(const std::string& dir_path,
   return static_cast<IdType>(file_infos.size());
 }
 
-Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
-    const std::string& uri, std::string* out_path) {
+Result<std::shared_ptr<FileSystem>> FileSystemFromUri(
+    const std::string& uri_string, std::string* out_path) {
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
-      auto arrow_fs, arrow::fs::FileSystemFromUriOrPath(uri, out_path));
+      auto arrow_fs, arrow::fs::FileSystemFromUri(uri_string));
+
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto uri,
+                                       detail::ParseFileSystemUri(uri));
+  if (out_path != nullptr) {
+    if (uri.scheme == "file" || uri.scheme == "hdfs") {
+      *out_path = uri.path();
+    } else if (uri.schema == "s3" || uri.schema == "gs") {
+      // bucket name is the host, path is the path
+      // the arrow parser would delete the trailing slash which we don't want to
+      *out_path = uri.host() + uri.path();
+    } else {
+      return Status::Invalid("Unrecognized filesystem type in URI: ",
+                             uri_string);
+    }
+  }
   return std::make_shared<FileSystem>(arrow_fs);
 }
 

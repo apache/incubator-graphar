@@ -58,12 +58,12 @@ class VertexPropertyArrowChunkReader {
         chunk_index_(chunk_index),
         seek_id_(chunk_index * vertex_info.GetChunkSize()),
         chunk_table_(nullptr) {
-    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
+    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUri(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
                               vertex_info.GetPathPrefix(property_group));
     std::string base_dir = prefix_ + pg_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
-                              utils::GetVertexChunkNum(prefix_, vertex_info_));
+                              utils::GetVertexChunkNum(prefix_, vertex_info));
   }
 
   /**
@@ -156,7 +156,7 @@ class AdjListArrowChunkReader {
         chunk_index_(0),
         seek_offset_(0),
         chunk_table_(nullptr) {
-    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
+    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUri(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
                               edge_info.GetAdjListPathPrefix(adj_list_type));
     base_dir_ = prefix_ + adj_list_path_prefix;
@@ -313,7 +313,7 @@ class AdjListOffsetArrowChunkReader {
         chunk_index_(0),
         seek_id_(0),
         chunk_table_(nullptr) {
-    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
+    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUri(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
                               edge_info.GetOffsetPathPrefix(adj_list_type));
     base_dir_ = prefix_ + dir_path;
@@ -416,7 +416,7 @@ class AdjListPropertyArrowChunkReader {
         chunk_index_(0),
         seek_offset_(0),
         chunk_table_(nullptr) {
-    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
+    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUri(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(
         auto pg_path_prefix,
         edge_info.GetPropertyGroupPathPrefix(property_group, adj_list_type));

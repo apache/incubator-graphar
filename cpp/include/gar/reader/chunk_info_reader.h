@@ -51,8 +51,7 @@ class VertexPropertyChunkInfoReader {
         chunk_index_(0) {
     // init vertex chunk num
     std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
-                              FileSystemFromUriOrPath(prefix, &base_dir));
+    GAR_ASSIGN_OR_RAISE_ERROR(auto fs, FileSystemFromUri(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
                               vertex_info.GetPathPrefix(property_group));
     base_dir += pg_path_prefix;
@@ -131,7 +130,7 @@ class AdjListChunkInfoReader {
         prefix_(prefix),
         vertex_chunk_index_(0),
         chunk_index_(0) {
-    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &base_dir_));
+    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUri(prefix, &base_dir_));
     GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
                               edge_info.GetAdjListPathPrefix(adj_list_type));
     base_dir_ = prefix_ + adj_list_path_prefix;
@@ -233,7 +232,7 @@ class AdjListPropertyChunkInfoReader {
         prefix_(prefix),
         vertex_chunk_index_(0),
         chunk_index_(0) {
-    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &base_dir_));
+    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUri(prefix, &base_dir_));
     GAR_ASSIGN_OR_RAISE_ERROR(
         auto pg_path_prefix,
         edge_info.GetPropertyGroupPathPrefix(property_group, adj_list_type));

@@ -63,7 +63,7 @@ class VertexPropertyWriter {
       : vertex_info_(vertex_info),
         prefix_(prefix),
         validate_level_(validate_level) {
-    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
+    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUri(prefix, &prefix_));
   }
 
   /**
@@ -192,7 +192,7 @@ class EdgeChunkWriter {
       : edge_info_(edge_info),
         adj_list_type_(adj_list_type),
         validate_level_(validate_level) {
-    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
+    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUri(prefix, &prefix_));
     chunk_size_ = edge_info_.GetChunkSize();
     switch (adj_list_type) {
     case AdjListType::unordered_by_source:
