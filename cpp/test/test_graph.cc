@@ -37,6 +37,7 @@ TEST_CASE("test_vertices_collection") {
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
   REQUIRE(!maybe_vertices_collection.has_error());
   auto& vertices = maybe_vertices_collection.value();
+  auto count = 0;
   for (auto it = vertices.begin(); it != vertices.end(); ++it) {
     // access data through iterator directly
     std::cout << it.id() << ", id=" << it.property<int64_t>("id").value()
@@ -48,7 +49,13 @@ TEST_CASE("test_vertices_collection") {
               << ", id=" << vertex.property<int64_t>("id").value()
               << ", firstName="
               << vertex.property<std::string>("firstName").value() << std::endl;
+    count++;
   }
+  auto it_last = vertices.begin() + (count - 1);
+  std::cout << it_last.id()
+            << ", id=" << it_last.property<int64_t>("id").value()
+            << ", firstName="
+            << it_last.property<std::string>("firstName").value() << std::endl;
 }
 
 TEST_CASE("test_edges_collection", "[Slow]") {
