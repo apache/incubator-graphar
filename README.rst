@@ -167,7 +167,7 @@ third-party libraries may not have the same license as GraphAr.
 .. |GraphAr Docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
    :target: https://alibaba.github.io/GraphAr/
 
-.. |Discord | image:: https://img.shields.io/discord/1088377726634836051.svg?logo=discord&logoColor=fff&label=Discord&color=7389d8
+.. |Discord| image:: https://img.shields.io/discord/1088377726634836051.svg?logo=discord&logoColor=fff&label=Discord&color=7389d8
    :target: https://discord.gg/XPsfd4ShCu
 
 .. |Overview Pic| image:: https://alibaba.github.io/GraphAr/_images/overview.png
