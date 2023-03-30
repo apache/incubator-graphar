@@ -4,7 +4,7 @@ This directory contains the code and build system for the GraphAr Spark library.
 
 
 Building GraphAr Spark
---------------------
+----------------------
 
 System setup
 ^^^^^^^^^^^^^
@@ -69,7 +69,7 @@ Building the API document with maven:
 The API document is generated in the directory ``spark/target/site/scaladocs``.
 
 How to use
-^^^^^^^^^^^
+-----------
 
 Please refer to our `GraphAr Spark Library Documentation`_.
 
