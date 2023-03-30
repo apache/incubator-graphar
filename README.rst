@@ -1,7 +1,7 @@
 GraphAr
 ========
 
-|GraphAr CI| |Docs CI| |GraphAr Docs|
+|GraphAr CI| |Docs CI| |GraphAr Docs| |Discord|
 
 Welcome to GraphAr (short for "Graph Archive"), an open source, standardized file format for graph data storage and retrieval.
 
@@ -128,10 +128,26 @@ The Spark Library
 See `GraphAr Spark Library`_ for details about the Spark library.
 
 
-Contributing to GraphAr
-----------------------------
+Contributing
+-------------
 
-See `Contribution Guide`_ for details on submitting patches and the contribution workflow.
+Contributing Guidelines
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Read through our `contribution guidelines`_ to learn about our submission process, coding rules, and more.
+
+Code of Conduct
+^^^^^^^^^^^^^^^^
+
+Help us keep GraphAr open and inclusive. Please read and follow our `Code of Conduct`_.
+
+Community
+---------
+
+Join the conversation and help the community.
+
+- `Discord`_
+
 
 License
 -------
@@ -150,6 +166,9 @@ third-party libraries may not have the same license as GraphAr.
 
 .. |GraphAr Docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
    :target: https://alibaba.github.io/GraphAr/
+
+.. |Discord | image:: https://img.shields.io/discord/1088377726634836051.svg?logo=discord&logoColor=fff&label=Discord&color=7389d8
+   :target: https://discord.gg/XPsfd4ShCu
 
 .. |Overview Pic| image:: https://alibaba.github.io/GraphAr/_images/overview.png
   :width: 650
@@ -187,7 +206,11 @@ third-party libraries may not have the same license as GraphAr.
 
 .. _example files: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/
 
-.. _Contribution Guide: https://alibaba.github.io/GraphAr/user-guide/contributing.html
+.. _contribution guidelines: https://alibaba.github.io/GraphAr/user-guide/contributing.html
+
+.. _Code of Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
+
+.. _Discord: https://discord.gg/XPsfd4ShCu
 
 .. _GitHub Issues: https://github.com/alibaba/GraphAr/issues/new
 
