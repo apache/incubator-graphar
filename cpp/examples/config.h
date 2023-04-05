@@ -20,6 +20,11 @@ limitations under the License.
 #define TEST_CONFIG_H_
 
 static const std::string TEST_DATA_DIR =  // NOLINT
-    std::filesystem::path(__FILE__).parent_path().parent_path().string() + "/test/gar-test";
+    std::filesystem::path(__FILE__)
+        .parent_path()
+        .parent_path()
+        .parent_path()
+        .string() +
+    "/test/gar-test";
 
 #endif  // TEST_CONFIG_H_
