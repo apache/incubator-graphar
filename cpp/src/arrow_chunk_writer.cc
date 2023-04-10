@@ -193,7 +193,6 @@ Status EdgeChunkWriter::WriteEdgesNum(IdType vertex_chunk_index,
   GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_.GetEdgesNumFilePath(
                                        vertex_chunk_index, adj_list_type_));
   std::string path = prefix_ + suffix;
-  std::cout << path << std::endl;
   return fs_->WriteValueToFile<IdType>(count, path);
 }
 

@@ -280,6 +280,18 @@ class EdgesBuilder {
             writer.WriteOffsetChunk(offset_table, vertex_chunk_index));
       }
     }
+    // dump the edge nums
+    IdType vertex_chunk_num =
+        (num_vertices_ + vertex_chunk_size_ - 1) / vertex_chunk_size_;
+    for (IdType vertex_chunk_index = 0; vertex_chunk_index < vertex_chunk_num;
+         vertex_chunk_index++) {
+      if (edges_.find(vertex_chunk_index) == edges_.end()) {
+        GAR_RETURN_NOT_OK(writer.WriteEdgesNum(vertex_chunk_index, 0));
+      } else {
+        GAR_RETURN_NOT_OK(writer.WriteEdgesNum(
+            vertex_chunk_index, edges_[vertex_chunk_index].size()));
+      }
+    }
     // dump the edges
     for (auto& chunk_edges : edges_) {
       IdType vertex_chunk_index = chunk_edges.first;
