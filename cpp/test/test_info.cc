@@ -288,7 +288,9 @@ TEST_CASE("test_edge_info") {
   // edge count file path
   auto maybe_path = edge_info.GetEdgesNumFilePath(0, adj_list_type);
   REQUIRE(!maybe_path.has_error());
-  REQUIRE(maybe_path.value() == edge_info.GetPrefix() + prefix_of_adj_list_type + "adj_list/part0/edge_count");
+  REQUIRE(maybe_path.value() == edge_info.GetPrefix() +
+                                    prefix_of_adj_list_type +
+                                    "adj_list/part0/edge_count");
 
   // test save
   std::string save_path(std::tmpnam(nullptr));

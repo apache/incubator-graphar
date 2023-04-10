@@ -158,19 +158,12 @@ TEST_CASE("test_edge_chunk_writer") {
 
   // Write number of edges for vertex chunk 0
   REQUIRE(writer.WriteEdgesNum(0, table->num_rows()).ok());
-  std::shared_ptr<arrow::io::InputStream> input2 = fs->OpenInputStream("/tmp/edge/person_knows_person/ordered_by_source/adj_list/part0/edge_count").ValueOrDie();
+  std::shared_ptr<arrow::io::InputStream> input2 =
+      fs->OpenInputStream(
+            "/tmp/edge/person_knows_person/ordered_by_source/adj_list/part0/"
+            "edge_count")
+          .ValueOrDie();
   auto num = input2->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
   GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
   REQUIRE((*ptr) == table->num_rows());
-
-  /*std::string edge_meta_file1 =
-      root + "/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
-  auto edge_meta1 = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file1).value();
-  auto edge_info1 = GAR_NAMESPACE::EdgeInfo::Load(edge_meta1).value();
-  GAR_NAMESPACE::EdgeChunkWriter writer2(
-      edge_info1, root + "/ldbc_sample/parquet/", GAR_NAMESPACE::AdjListType::unordered_by_source);
-  GAR_NAMESPACE::IdType num_edges[10] = {667, 644, 1078, 752, 638, 796, 609, 741, 698, 4};
-  for (auto i = 0; i < 10; i++) {
-    writer2.WriteEdgesNum(i, num_edges[i]);
-  }*/
 }
