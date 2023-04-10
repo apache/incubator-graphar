@@ -160,8 +160,7 @@ TEST_CASE("test_edge_chunk_writer") {
   REQUIRE(writer.WriteEdgesNum(0, table->num_rows()).ok());
   std::shared_ptr<arrow::io::InputStream> input2 =
       fs->OpenInputStream(
-            "/tmp/edge/person_knows_person/ordered_by_source/adj_list/"
-            "edge_count0")
+            "/tmp/edge/person_knows_person/ordered_by_source/edge_count0")
           .ValueOrDie();
   auto num = input2->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
   GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
