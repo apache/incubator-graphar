@@ -24,7 +24,6 @@ limitations under the License.
 #include "gar/writer/arrow_chunk_writer.h"
 #include "gar/writer/edges_builder.h"
 
-
 int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
@@ -147,9 +146,9 @@ int main(int argc, char* argv[]) {
                                         edge_chunk_size, src_chunk_size,
                                         dst_chunk_size, directed, version);
   assert(new_edge_info
-              .AddAdjList(GAR_NAMESPACE::AdjListType::ordered_by_source,
-                          GAR_NAMESPACE::FileType::CSV)
-              .ok());
+             .AddAdjList(GAR_NAMESPACE::AdjListType::ordered_by_source,
+                         GAR_NAMESPACE::FileType::CSV)
+             .ok());
   assert(new_edge_info.IsValidated());
   // save & dump
   assert(!new_edge_info.Dump().has_error());

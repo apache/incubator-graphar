@@ -62,7 +62,8 @@ class VertexPropertyArrowChunkReader {
     GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
                               vertex_info.GetPathPrefix(property_group));
     std::string base_dir = prefix_ + pg_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_, utils::GetVertexChunkNum(prefix_, vertex_info_));
+    GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
+                              utils::GetVertexChunkNum(prefix_, vertex_info_));
   }
 
   /**
@@ -161,7 +162,9 @@ class AdjListArrowChunkReader {
     base_dir_ = prefix_ + adj_list_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
                               fs_->GetFileNumOfDir(base_dir_));
-    GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_, vertex_chunk_index_));
+    GAR_ASSIGN_OR_RAISE_ERROR(
+        chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                           vertex_chunk_index_));
   }
 
   /**
@@ -240,7 +243,10 @@ class AdjListArrowChunkReader {
         return Status::OutOfRange();
       }
       chunk_index_ = 0;
-      GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_, vertex_chunk_index_));
+      GAR_ASSIGN_OR_RAISE_ERROR(
+          chunk_num_,
+          utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                 vertex_chunk_index_));
     }
     seek_offset_ = chunk_index_ * edge_info_.GetChunkSize();
     chunk_table_.reset();
@@ -257,7 +263,10 @@ class AdjListArrowChunkReader {
   Status seek_chunk_index(IdType vertex_chunk_index, IdType chunk_index = 0) {
     if (vertex_chunk_index_ != vertex_chunk_index) {
       vertex_chunk_index_ = vertex_chunk_index;
-      GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_, vertex_chunk_index_));
+      GAR_ASSIGN_OR_RAISE_ERROR(
+          chunk_num_,
+          utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                 vertex_chunk_index_));
       chunk_table_.reset();
     }
     if (chunk_index_ != chunk_index) {
@@ -414,7 +423,9 @@ class AdjListPropertyArrowChunkReader {
     base_dir_ = prefix_ + pg_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
                               fs_->GetFileNumOfDir(base_dir_));
-    GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_, vertex_chunk_index_));
+    GAR_ASSIGN_OR_RAISE_ERROR(
+        chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                           vertex_chunk_index_));
   }
 
   /**
@@ -490,7 +501,10 @@ class AdjListPropertyArrowChunkReader {
         return Status::OutOfRange();
       }
       chunk_index_ = 0;
-      GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_, vertex_chunk_index_));
+      GAR_ASSIGN_OR_RAISE_ERROR(
+          chunk_num_,
+          utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                 vertex_chunk_index_));
     }
     seek_offset_ = chunk_index_ * edge_info_.GetChunkSize();
     chunk_table_.reset();
@@ -507,7 +521,10 @@ class AdjListPropertyArrowChunkReader {
   Status seek_chunk_index(IdType vertex_chunk_index, IdType chunk_index = 0) {
     if (vertex_chunk_index_ != vertex_chunk_index) {
       vertex_chunk_index_ = vertex_chunk_index;
-      GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_, vertex_chunk_index_));
+      GAR_ASSIGN_OR_RAISE_ERROR(
+          chunk_num_,
+          utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                 vertex_chunk_index_));
       chunk_table_.reset();
     }
     if (chunk_index_ != chunk_index) {

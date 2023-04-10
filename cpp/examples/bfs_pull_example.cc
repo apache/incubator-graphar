@@ -22,7 +22,6 @@ limitations under the License.
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
-
 int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
