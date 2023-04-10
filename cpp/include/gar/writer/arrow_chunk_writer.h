@@ -262,6 +262,14 @@ class EdgeChunkWriter {
   }
 
   /**
+   * @brief Write the number of edges into the file.
+   *
+   * @param count The number of edges.
+   * @return Status: ok or error.
+   */
+  Status WriteEdgesNum(IdType vertex_chunk_index, const IdType& count) const noexcept;
+
+  /**
    * @brief Copy a file as a offset chunk.
    *
    * @param file_name The file to copy.

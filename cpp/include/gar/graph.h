@@ -657,9 +657,8 @@ class EdgesCollection<AdjListType::ordered_by_source> {
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     chunk_end_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));                      
       chunk_end_ += edge_chunk_nums[i];
     }
     index_converter_ =
@@ -692,9 +691,8 @@ class EdgesCollection<AdjListType::ordered_by_source> {
                               fs->GetFileNumOfDir(base_dir));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
     }
     index_converter_ =
         std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
@@ -728,9 +726,8 @@ class EdgesCollection<AdjListType::ordered_by_source> {
     chunk_begin_ = 0;
     chunk_end_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));      
       if (i < vertex_chunk_index) {
         chunk_begin_ += edge_chunk_nums[i];
       }
@@ -878,9 +875,8 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     chunk_end_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));      
       chunk_end_ += edge_chunk_nums[i];
     }
     index_converter_ =
@@ -913,9 +909,8 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
                               fs->GetFileNumOfDir(base_dir));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));      
     }
     index_converter_ =
         std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
@@ -949,9 +944,8 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
     chunk_begin_ = 0;
     chunk_end_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));      
       if (i < vertex_chunk_index) {
         chunk_begin_ += edge_chunk_nums[i];
       }
@@ -1099,9 +1093,8 @@ class EdgesCollection<AdjListType::unordered_by_source> {
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     chunk_end_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));      
       chunk_end_ += edge_chunk_nums[i];
     }
     index_converter_ =
@@ -1134,9 +1127,8 @@ class EdgesCollection<AdjListType::unordered_by_source> {
                               fs->GetFileNumOfDir(base_dir));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));      
     }
     index_converter_ =
         std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
@@ -1170,9 +1162,8 @@ class EdgesCollection<AdjListType::unordered_by_source> {
     chunk_begin_ = 0;
     chunk_end_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));      
       if (i < vertex_chunk_index) {
         chunk_begin_ += edge_chunk_nums[i];
       }
@@ -1290,9 +1281,8 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     chunk_end_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));      
       chunk_end_ += edge_chunk_nums[i];
     }
     index_converter_ =
@@ -1325,9 +1315,8 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
                               fs->GetFileNumOfDir(base_dir));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));      
     }
     index_converter_ =
         std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
@@ -1361,9 +1350,8 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
     chunk_begin_ = 0;
     chunk_end_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      std::string chunk_dir = base_dir + "/part" + std::to_string(i);
       GAR_ASSIGN_OR_RAISE_ERROR(edge_chunk_nums[i],
-                                fs->GetFileNumOfDir(chunk_dir));
+                                utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));      
       if (i < vertex_chunk_index) {
         chunk_begin_ += edge_chunk_nums[i];
       }

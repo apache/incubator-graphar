@@ -133,6 +133,10 @@ TEST_CASE("test_vertex_info") {
   REQUIRE(maybe_path.value() == expected_dir_path + "chunk0");
   // property group not exist
   REQUIRE(v_info.GetFilePath(pg2, 0).status().IsKeyError());
+  // vertex count file path
+  auto maybe_path2 = v_info.GetVerticesNumFilePath();
+  REQUIRE(!maybe_path2.has_error());
+  REQUIRE(maybe_path2.value() == v_info.GetPrefix() + "vertex_count");
 
   // TODO(@acezen): test dump
 
@@ -277,6 +281,14 @@ TEST_CASE("test_edge_info") {
   REQUIRE(edge_info.GetPropertyGroupPathPrefix(pg, adj_list_type_not_exist)
               .status()
               .IsKeyError());
+  REQUIRE(edge_info.GetEdgesNumFilePath(0, adj_list_type_not_exist)
+              .status()
+              .IsKeyError());
+
+  // edge count file path
+  auto maybe_path = edge_info.GetEdgesNumFilePath(0, adj_list_type);
+  REQUIRE(!maybe_path.has_error());
+  REQUIRE(maybe_path.value() == edge_info.GetPrefix() + prefix_of_adj_list_type + "adj_list/part0/edge_count");
 
   // test save
   std::string save_path(std::tmpnam(nullptr));

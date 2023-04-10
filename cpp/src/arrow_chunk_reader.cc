@@ -59,9 +59,7 @@ Status AdjListArrowChunkReader::seek_src(IdType id) noexcept {
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
-    std::string chunk_dir =
-        base_dir_ + "/part" + std::to_string(vertex_chunk_index_);
-    GAR_ASSIGN_OR_RAISE(chunk_num_, fs_->GetFileNumOfDir(chunk_dir));
+    GAR_ASSIGN_OR_RAISE(chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_, vertex_chunk_index_));
     chunk_table_.reset();
   }
 
@@ -89,9 +87,7 @@ Status AdjListArrowChunkReader::seek_dst(IdType id) noexcept {
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
-    std::string chunk_dir =
-        base_dir_ + "/part" + std::to_string(vertex_chunk_index_);
-    GAR_ASSIGN_OR_RAISE(chunk_num_, fs_->GetFileNumOfDir(chunk_dir));
+    GAR_ASSIGN_OR_RAISE(chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_, vertex_chunk_index_));
     chunk_table_.reset();
   }
 
@@ -144,9 +140,7 @@ Status AdjListPropertyArrowChunkReader::seek_src(IdType id) noexcept {
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
-    std::string chunk_dir =
-        base_dir_ + "/part" + std::to_string(vertex_chunk_index_);
-    GAR_ASSIGN_OR_RAISE(chunk_num_, fs_->GetFileNumOfDir(chunk_dir));
+    GAR_ASSIGN_OR_RAISE(chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_, vertex_chunk_index_));
     chunk_table_.reset();
   }
 
@@ -174,9 +168,7 @@ Status AdjListPropertyArrowChunkReader::seek_dst(IdType id) noexcept {
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
-    std::string chunk_dir =
-        base_dir_ + "/part" + std::to_string(vertex_chunk_index_);
-    GAR_ASSIGN_OR_RAISE(chunk_num_, fs_->GetFileNumOfDir(chunk_dir));
+    GAR_ASSIGN_OR_RAISE(chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_, vertex_chunk_index_));
     chunk_table_.reset();
   }
 
