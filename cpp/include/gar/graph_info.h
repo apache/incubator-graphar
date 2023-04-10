@@ -752,8 +752,7 @@ class EdgeInfo {
     if (!ContainAdjList(adj_list_type)) {
       return Status::KeyError("The adj list type is not found in edge info.");
     }
-    return prefix_ + adj_list2prefix_.at(adj_list_type) + "adj_list/part" +
-           std::to_string(vertex_chunk_index) + "/" + "edge_count";
+    return prefix_ + adj_list2prefix_.at(adj_list_type) + "edge_count" + std::to_string(vertex_chunk_index);
   }
 
   /**
