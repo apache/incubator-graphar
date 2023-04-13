@@ -636,7 +636,8 @@ class EdgesCollection<AdjListType::ordered_by_source> {
    * @param vertex_chunk_end The index of the end vertex chunk (not included).
    */
   EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType vertex_chunk_begin = 0, IdType vertex_chunk_end =  std::numeric_limits<int64_t>::max())
+                  IdType vertex_chunk_begin = 0,
+                  IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
@@ -793,7 +794,8 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
    * @param vertex_chunk_end The index of the end vertex chunk (not included).
    */
   EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType vertex_chunk_begin = 0, IdType vertex_chunk_end =  std::numeric_limits<int64_t>::max())
+                  IdType vertex_chunk_begin = 0,
+                  IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
@@ -950,7 +952,8 @@ class EdgesCollection<AdjListType::unordered_by_source> {
    * @param vertex_chunk_end The index of the end vertex chunk (not included).
    */
   EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType vertex_chunk_begin = 0, IdType vertex_chunk_end =  std::numeric_limits<int64_t>::max())
+                  IdType vertex_chunk_begin = 0,
+                  IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
@@ -1080,7 +1083,8 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
    * @param vertex_chunk_end The index of the end vertex chunk (not included).
    */
   EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType vertex_chunk_begin = 0, IdType vertex_chunk_end =  std::numeric_limits<int64_t>::max())
+                  IdType vertex_chunk_begin = 0,
+                  IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
@@ -1227,7 +1231,8 @@ static inline Result<Edges> ConstructEdgesCollection(
     const GraphInfo& graph_info, const std::string& src_label,
     const std::string& edge_label, const std::string& dst_label,
     AdjListType adj_list_type, const IdType vertex_chunk_begin = 0,
-    const IdType vertex_chunk_end = std::numeric_limits<int64_t>::max()) noexcept {
+    const IdType vertex_chunk_end =
+        std::numeric_limits<int64_t>::max()) noexcept {
   EdgeInfo edge_info;
   GAR_ASSIGN_OR_RAISE(edge_info,
                       graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
