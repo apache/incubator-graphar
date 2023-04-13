@@ -74,6 +74,7 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_source>>(expect.value());
   auto end = edges.end();
+  GAR_NAMESPACE::IdType count = 0;
   for (auto it = edges.begin(); it != end; ++it) {
     // access data through iterator directly
     std::cout << "src=" << it.source() << ", dst=" << it.destination()
@@ -81,7 +82,26 @@ TEST_CASE("test_edges_collection", "[Slow]") {
     auto edge = *it;
     std::cout << "src=" << edge.source() << ", dst=" << edge.destination()
               << std::endl;
+    count++;
   }
+  std::cout << "edge_count=" << count << std::endl;
+  REQUIRE(edges.size() == count);
+
+  // iterate edges of vertex chunk [2, 4)
+  auto expect1 = GAR_NAMESPACE::ConstructEdgesCollection(
+      graph_info, src_label, edge_label, dst_label,
+      GAR_NAMESPACE::AdjListType::ordered_by_dest, 2, 4);
+  REQUIRE(!expect1.has_error());
+  auto& edges1 = std::get<GAR_NAMESPACE::EdgesCollection<
+      GAR_NAMESPACE::AdjListType::ordered_by_dest>>(expect1.value());
+  auto end1 = edges1.end();
+  GAR_NAMESPACE::IdType count1 = 0;
+  for (auto it = edges1.begin(); it != end1; ++it) {
+    count1++;
+  }
+  std::cout << "edge_count=" << count1 << std::endl;
+  REQUIRE(edges1.size() == count1);
+
   // iterate all edges
   auto expect2 = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
@@ -90,9 +110,13 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   auto& edges2 = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_source>>(expect2.value());
   auto end2 = edges2.end();
+  GAR_NAMESPACE::IdType count2 = 0;
   for (auto it = edges2.begin(); it != end2; ++it) {
     auto edge = *it;
     std::cout << "src=" << edge.source() << ", dst=" << edge.destination()
               << std::endl;
+    count2++;
   }
+  std::cout << "edge_count=" << count2 << std::endl;
+  REQUIRE(edges2.size() == count2);
 }

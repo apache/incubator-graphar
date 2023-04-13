@@ -95,6 +95,20 @@ Result<IdType> GetEdgeChunkNum(const std::string& prefix,
   return (edge_num + edge_info.GetChunkSize() - 1) / edge_info.GetChunkSize();
 }
 
+Result<IdType> GetEdgeNum(const std::string& prefix, const EdgeInfo& edge_info,
+                          AdjListType adj_list_type,
+                          IdType vertex_chunk_index) noexcept {
+  std::string out_prefix;
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
+  GAR_ASSIGN_OR_RAISE(
+      auto edge_num_file_suffix,
+      edge_info.GetEdgesNumFilePath(vertex_chunk_index, adj_list_type));
+  std::string edge_num_file_path = out_prefix + edge_num_file_suffix;
+  GAR_ASSIGN_OR_RAISE(auto edge_num,
+                      fs->ReadFileToValue<IdType>(edge_num_file_path));
+  return edge_num;
+}
+
 }  // namespace utils
 
 }  // namespace GAR_NAMESPACE_INTERNAL
