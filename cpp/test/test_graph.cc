@@ -119,4 +119,26 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   }
   std::cout << "edge_count=" << count2 << std::endl;
   REQUIRE(edges2.size() == count2);
+
+  // empty collection
+  auto expect3 = GAR_NAMESPACE::ConstructEdgesCollection(
+      graph_info, src_label, edge_label, dst_label,
+      GAR_NAMESPACE::AdjListType::unordered_by_source, 5, 5);
+  REQUIRE(!expect2.has_error());
+  auto& edges3 = std::get<GAR_NAMESPACE::EdgesCollection<
+      GAR_NAMESPACE::AdjListType::unordered_by_source>>(expect3.value());
+  auto end3 = edges3.end();
+  GAR_NAMESPACE::IdType count3 = 0;
+  for (auto it = edges3.begin(); it != end3; ++it) {
+    count3++;
+  }
+  std::cout << "edge_count=" << count3 << std::endl;
+  REQUIRE(count3 == 0);
+  REQUIRE(edges3.size() == 0);
+
+  // invalid adjlist type
+  auto expect4 = GAR_NAMESPACE::ConstructEdgesCollection(
+      graph_info, src_label, edge_label, dst_label,
+      GAR_NAMESPACE::AdjListType::unordered_by_dest);
+  REQUIRE(expect4.status().IsInvalid());
 }

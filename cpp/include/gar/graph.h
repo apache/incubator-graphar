@@ -502,9 +502,7 @@ class EdgeIter {
   }
 
   /** Check if the current position is the end. */
-  bool is_end() const {
-    return global_chunk_index_ == chunk_end_ && cur_offset_ == 0;
-  }
+  bool is_end() const { return global_chunk_index_ >= chunk_end_; }
 
   /** Point to the next edge with the same source, return false if not found. */
   bool next_src() {
@@ -1237,6 +1235,9 @@ static inline Result<Edges> ConstructEdgesCollection(
   EdgeInfo edge_info;
   GAR_ASSIGN_OR_RAISE(edge_info,
                       graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
+  if (!edge_info.ContainAdjList(adj_list_type)) {
+    return Status::Invalid("Invalid adj list type");
+  }
   switch (adj_list_type) {
   case AdjListType::ordered_by_source:
     return EdgesCollection<AdjListType::ordered_by_source>(
