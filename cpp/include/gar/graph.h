@@ -17,6 +17,7 @@ limitations under the License.
 #define GAR_GRAPH_H_
 
 #include <any>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
