@@ -181,7 +181,7 @@ macro(build_gar)
                                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
                                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/yaml-cpp/include>
     )
-    target_include_directories(gar PRIVATE SYSTEM BEFORE ${GAR_ARROW_INCLUDE_DIR})
+    target_include_directories(gar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
     target_link_libraries(gar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
 
     # make sure `libyaml-cpp.a` built first
@@ -221,7 +221,8 @@ if (BUILD_EXAMPLES)
         message(STATUS "Found example - " ${E_NAME})
         add_executable(${E_NAME} examples/${E_NAME}.cc)
         target_include_directories(${E_NAME} PRIVATE examples ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
-        include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+        target_include_directories(${E_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
+        target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
         target_link_libraries(${E_NAME} PRIVATE gar ${Boost_LIBRARIES} Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
             target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
@@ -298,7 +299,7 @@ if (BUILD_TESTS)
                 "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
         endif()
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
-        include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
+        target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
         include(CTest)
         include(Catch)
         catch_discover_tests(${target})
