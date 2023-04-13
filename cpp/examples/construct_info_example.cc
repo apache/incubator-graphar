@@ -17,7 +17,6 @@ limitations under the License.
 
 #include "gar/graph_info.h"
 
-
 int main(int argc, char* argv[]) {
   /*------------------construct graph info------------------*/
   std::string name = "graph", prefix = "file:///tmp/";
@@ -67,7 +66,7 @@ int main(int argc, char* argv[]) {
   assert(!vertex_info.IsPrimaryKey(gender.name).status().ok());
   assert(vertex_info.GetPropertyType(id.name).value() == id.type);
   assert(vertex_info.GetFilePath(group1, 0).value() ==
-          "vertex/person/id/chunk0");
+         "vertex/person/id/chunk0");
 
   // extend property groups & validate
   auto result = vertex_info.Extend(group2);
@@ -88,7 +87,7 @@ int main(int argc, char* argv[]) {
   assert(graph_info.GetVertexInfos().size() == 1);
   assert(graph_info.GetVertexInfo(vertex_label).status().ok());
   assert(graph_info.GetVertexPropertyGroup(vertex_label, id.name).value() ==
-          group1);
+         group1);
   assert(
       graph_info.GetVertexPropertyGroup(vertex_label, firstName.name).value() ==
       group2);
@@ -114,28 +113,27 @@ int main(int argc, char* argv[]) {
   assert(!edge_info.ContainAdjList(
       GAR_NAMESPACE::AdjListType::unordered_by_source));
   assert(edge_info
-              .AddAdjList(GAR_NAMESPACE::AdjListType::unordered_by_source,
-                          GAR_NAMESPACE::FileType::PARQUET)
-              .ok());
+             .AddAdjList(GAR_NAMESPACE::AdjListType::unordered_by_source,
+                         GAR_NAMESPACE::FileType::PARQUET)
+             .ok());
   assert(edge_info.ContainAdjList(
       GAR_NAMESPACE::AdjListType::unordered_by_source));
   assert(edge_info
-              .AddAdjList(GAR_NAMESPACE::AdjListType::ordered_by_dest,
-                          GAR_NAMESPACE::FileType::PARQUET)
-              .ok());
-  assert(
-      edge_info.GetFileType(GAR_NAMESPACE::AdjListType::ordered_by_dest)
-          .value() == GAR_NAMESPACE::FileType::PARQUET);
+             .AddAdjList(GAR_NAMESPACE::AdjListType::ordered_by_dest,
+                         GAR_NAMESPACE::FileType::PARQUET)
+             .ok());
+  assert(edge_info.GetFileType(GAR_NAMESPACE::AdjListType::ordered_by_dest)
+             .value() == GAR_NAMESPACE::FileType::PARQUET);
   assert(
       edge_info
           .GetAdjListFilePath(0, 0, GAR_NAMESPACE::AdjListType::ordered_by_dest)
           .value() ==
       "edge/person_knows_person/ordered_by_dest/adj_list/part0/chunk0");
   assert(edge_info
-              .GetAdjListOffsetFilePath(
-                  0, GAR_NAMESPACE::AdjListType::ordered_by_dest)
-              .value() ==
-          "edge/person_knows_person/ordered_by_dest/offset/part0/chunk0");
+             .GetAdjListOffsetFilePath(
+                 0, GAR_NAMESPACE::AdjListType::ordered_by_dest)
+             .value() ==
+         "edge/person_knows_person/ordered_by_dest/offset/chunk0");
 
   // add property group & validate
   GAR_NAMESPACE::Property creationDate = {
@@ -148,25 +146,24 @@ int main(int argc, char* argv[]) {
       group3, GAR_NAMESPACE::AdjListType::unordered_by_source));
   assert(!edge_info.ContainProperty(creationDate.name));
   assert(edge_info
-              .AddPropertyGroup(group3,
-                                GAR_NAMESPACE::AdjListType::unordered_by_source)
-              .ok());
+             .AddPropertyGroup(group3,
+                               GAR_NAMESPACE::AdjListType::unordered_by_source)
+             .ok());
   assert(edge_info.ContainPropertyGroup(
       group3, GAR_NAMESPACE::AdjListType::unordered_by_source));
   assert(edge_info.ContainProperty(creationDate.name));
-  assert(
-      edge_info
-          .GetPropertyGroups(GAR_NAMESPACE::AdjListType::unordered_by_source)
-          .value()[0] == group3);
   assert(edge_info
-              .GetPropertyGroup(creationDate.name,
-                                GAR_NAMESPACE::AdjListType::unordered_by_source)
-              .value() == group3);
+             .GetPropertyGroups(GAR_NAMESPACE::AdjListType::unordered_by_source)
+             .value()[0] == group3);
+  assert(edge_info
+             .GetPropertyGroup(creationDate.name,
+                               GAR_NAMESPACE::AdjListType::unordered_by_source)
+             .value() == group3);
   assert(!edge_info
-               .GetPropertyGroup(creationDate.name,
-                                 GAR_NAMESPACE::AdjListType::ordered_by_source)
-               .status()
-               .ok());
+              .GetPropertyGroup(creationDate.name,
+                                GAR_NAMESPACE::AdjListType::ordered_by_source)
+              .status()
+              .ok());
   assert(
       edge_info
           .GetPropertyFilePath(
@@ -174,9 +171,9 @@ int main(int argc, char* argv[]) {
           .value() ==
       "edge/person_knows_person/unordered_by_source/creationDate/part0/chunk0");
   assert(edge_info.GetPropertyType(creationDate.name).value() ==
-          creationDate.type);
+         creationDate.type);
   assert(edge_info.IsPrimaryKey(creationDate.name).value() ==
-          creationDate.is_primary);
+         creationDate.is_primary);
 
   // extend & validate
   auto res1 =
@@ -184,9 +181,8 @@ int main(int argc, char* argv[]) {
                               GAR_NAMESPACE::FileType::PARQUET);
   assert(res1.status().ok());
   edge_info = res1.value();
-  assert(edge_info
-              .GetFileType(GAR_NAMESPACE::AdjListType::ordered_by_source)
-              .value() == GAR_NAMESPACE::FileType::PARQUET);
+  assert(edge_info.GetFileType(GAR_NAMESPACE::AdjListType::ordered_by_source)
+             .value() == GAR_NAMESPACE::FileType::PARQUET);
   auto res2 = edge_info.ExtendPropertyGroup(
       group3, GAR_NAMESPACE::AdjListType::ordered_by_source);
   assert(res2.status().ok());
@@ -202,10 +198,10 @@ int main(int argc, char* argv[]) {
   assert(
       graph_info.GetEdgeInfo(src_label, edge_label, dst_label).status().ok());
   assert(graph_info
-              .GetEdgePropertyGroup(
-                  src_label, edge_label, dst_label, creationDate.name,
-                  GAR_NAMESPACE::AdjListType::unordered_by_source)
-              .value() == group3);
+             .GetEdgePropertyGroup(
+                 src_label, edge_label, dst_label, creationDate.name,
+                 GAR_NAMESPACE::AdjListType::unordered_by_source)
+             .value() == group3);
   assert(graph_info.IsValidated());
 
   // save & dump

@@ -188,6 +188,14 @@ Status EdgeChunkWriter::Validate(
   return Status::OK();
 }
 
+Status EdgeChunkWriter::WriteEdgesNum(IdType vertex_chunk_index,
+                                      const IdType& count) const noexcept {
+  GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_.GetEdgesNumFilePath(
+                                       vertex_chunk_index, adj_list_type_));
+  std::string path = prefix_ + suffix;
+  return fs_->WriteValueToFile<IdType>(count, path);
+}
+
 Status EdgeChunkWriter::WriteOffsetChunk(const std::string& file_name,
                                          IdType vertex_chunk_index) const
     noexcept {

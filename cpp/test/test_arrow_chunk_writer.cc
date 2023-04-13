@@ -155,4 +155,14 @@ TEST_CASE("test_edge_chunk_writer") {
   GAR_NAMESPACE::EdgeChunkWriter writer(
       edge_info, "/tmp/", GAR_NAMESPACE::AdjListType::ordered_by_source);
   REQUIRE(writer.SortAndWriteAdjListTable(table, 0, 0).ok());
+
+  // Write number of edges for vertex chunk 0
+  REQUIRE(writer.WriteEdgesNum(0, table->num_rows()).ok());
+  std::shared_ptr<arrow::io::InputStream> input2 =
+      fs->OpenInputStream(
+            "/tmp/edge/person_knows_person/ordered_by_source/edge_count0")
+          .ValueOrDie();
+  auto num = input2->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
+  GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
+  REQUIRE((*ptr) == table->num_rows());
 }
