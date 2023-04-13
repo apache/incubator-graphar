@@ -69,7 +69,7 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   // iterate edges of vertex chunk 0
   auto expect = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::ordered_by_source, 0);
+      GAR_NAMESPACE::AdjListType::ordered_by_source, 0, 1);
   REQUIRE(!expect.has_error());
   auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_source>>(expect.value());
