@@ -223,6 +223,13 @@ class EdgeChunkWriter {
   }
 
   /**
+   * @brief Get the validate level.
+   *
+   * @return The validate level of this writer.
+   */
+  inline ValidateLevel GetValidateLevel() const { return validate_level_; }
+
+  /**
    * @brief Check if the writer operation for offset is allowed.
    *
    * @param input_table The input table containing data.

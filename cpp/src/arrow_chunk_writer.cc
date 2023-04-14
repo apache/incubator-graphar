@@ -84,15 +84,15 @@ Status VertexPropertyWriter::Validate(
   if (validate_level == ValidateLevel::default_validate)
     validate_level = validate_level_;
   // no validate
-  if (validate_level_ == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
   // weak validate
   if (input_table->num_rows() > vertex_info_.GetChunkSize())
     return Status::OutOfRange();
   if (!vertex_info_.ContainPropertyGroup(property_group))
-    return Status::Invalid("invalid property group");
+    return Status::InvalidOperation("invalid property group");
   if (chunk_index < 0)
-    return Status::Invalid("invalid chunk index");
+    return Status::InvalidOperation("invalid chunk index");
   // strong validate
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
