@@ -41,7 +41,8 @@ namespace GAR_NAMESPACE_INTERNAL {
 enum class ValidateLevel : char {
   default_validate = -1,
   no_validate = 0,
-  with_validate = 1
+  weak_validate = 1,
+  strong_validate = 2
 };
 
 /**
@@ -249,17 +250,7 @@ class EdgeChunkWriter {
       const std::shared_ptr<arrow::Table>& input_table,
       const PropertyGroup& property_group, IdType vertex_chunk_index,
       ValidateLevel validate_level = ValidateLevel::default_validate) const
-      noexcept {
-    if (validate_level == ValidateLevel::default_validate)
-      validate_level = validate_level_;
-    if (validate_level == ValidateLevel::no_validate)
-      return Status::OK();
-    if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_))
-      return Status::InvalidOperation("invalid property group");
-    GAR_RETURN_NOT_OK(
-        Validate(input_table, vertex_chunk_index, validate_level));
-    return Status::OK();
-  }
+      noexcept;
 
   /**
    * @brief Write the number of edges into the file.

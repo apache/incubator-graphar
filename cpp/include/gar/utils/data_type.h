@@ -85,6 +85,8 @@ class DataType {
 
   bool operator==(const DataType& other) const { return Equals(other); }
 
+  bool operator!=(const DataType& other) const { return !Equals(other); }
+
   static std::shared_ptr<arrow::DataType> DataTypeToArrowDataType(
       DataType type_id);
 

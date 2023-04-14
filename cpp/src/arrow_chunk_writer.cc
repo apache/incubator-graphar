@@ -83,15 +83,30 @@ Status VertexPropertyWriter::Validate(
   // use the writer's validate level
   if (validate_level == ValidateLevel::default_validate)
     validate_level = validate_level_;
-  // validate
+  // no validate
   if (validate_level_ == ValidateLevel::no_validate)
     return Status::OK();
+  // weak validate
   if (input_table->num_rows() > vertex_info_.GetChunkSize())
     return Status::OutOfRange();
   if (!vertex_info_.ContainPropertyGroup(property_group))
     return Status::Invalid("invalid property group");
   if (chunk_index < 0)
     return Status::Invalid("invalid chunk index");
+  // strong validate
+  if (validate_level == ValidateLevel::strong_validate) {
+    auto schema = input_table->schema();
+    for (auto& property : property_group.GetProperties()) {
+      int indice = schema->GetFieldIndex(property.name);
+      if (indice == -1)
+        return Status::InvalidOperation("property: " + property.name +
+                                        " not found");
+      auto field = schema->field(indice);
+      if (DataType::ArrowDataTypeToDataType(field->type()) != property.type)
+        return Status::InvalidOperation("invalid data type for property: " +
+                                        property.name);
+    }
+  }
   return Status::OK();
 }
 
@@ -190,6 +205,22 @@ Status EdgeChunkWriter::Validate(
     return Status::InvalidOperation("invalid vertex chunk index");
   return Status::OK();
 }
+
+Status EdgeChunkWriter::Validate(
+      const std::shared_ptr<arrow::Table>& input_table,
+      const PropertyGroup& property_group, IdType vertex_chunk_index,
+      ValidateLevel validate_level) const
+      noexcept {
+    if (validate_level == ValidateLevel::default_validate)
+      validate_level = validate_level_;
+    if (validate_level == ValidateLevel::no_validate)
+      return Status::OK();
+    if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_))
+      return Status::InvalidOperation("invalid property group");
+    GAR_RETURN_NOT_OK(
+        Validate(input_table, vertex_chunk_index, validate_level));
+    return Status::OK();
+  }
 
 Status EdgeChunkWriter::WriteEdgesNum(IdType vertex_chunk_index,
                                       const IdType& count) const noexcept {
