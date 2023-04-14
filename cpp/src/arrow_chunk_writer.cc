@@ -207,20 +207,18 @@ Status EdgeChunkWriter::Validate(
 }
 
 Status EdgeChunkWriter::Validate(
-      const std::shared_ptr<arrow::Table>& input_table,
-      const PropertyGroup& property_group, IdType vertex_chunk_index,
-      ValidateLevel validate_level) const
-      noexcept {
-    if (validate_level == ValidateLevel::default_validate)
-      validate_level = validate_level_;
-    if (validate_level == ValidateLevel::no_validate)
-      return Status::OK();
-    if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_))
-      return Status::InvalidOperation("invalid property group");
-    GAR_RETURN_NOT_OK(
-        Validate(input_table, vertex_chunk_index, validate_level));
+    const std::shared_ptr<arrow::Table>& input_table,
+    const PropertyGroup& property_group, IdType vertex_chunk_index,
+    ValidateLevel validate_level) const noexcept {
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
-  }
+  if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_))
+    return Status::InvalidOperation("invalid property group");
+  GAR_RETURN_NOT_OK(Validate(input_table, vertex_chunk_index, validate_level));
+  return Status::OK();
+}
 
 Status EdgeChunkWriter::WriteEdgesNum(IdType vertex_chunk_index,
                                       const IdType& count) const noexcept {
