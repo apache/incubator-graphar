@@ -17,6 +17,7 @@ limitations under the License.
 #define GAR_GRAPH_H_
 
 #include <any>
+#include <limits>
 #include <map>
 #include <memory>
 #include <string>
@@ -296,15 +297,12 @@ class EdgeIter {
    * @param offset The current offset in the current edge chunk.
    * @param chunk_begin The index of the first chunk.
    * @param chunk_end The index of the last chunk.
-   * @param offset_of_chunk_begin The begin offset of the first chunk.
-   * @param offset_of_chunk_end The end offset of the last chunk.
    * @param index_converter The converter for transforming the edge chunk
    * indices.
    */
   explicit EdgeIter(const EdgeInfo& edge_info, const std::string& prefix,
                     AdjListType adj_list_type, IdType global_chunk_index,
                     IdType offset, IdType chunk_begin, IdType chunk_end,
-                    IdType offset_of_chunk_begin, IdType offset_of_chunk_end,
                     std::shared_ptr<util::IndexConverter> index_converter)
       : adj_list_reader_(
             edge_info, adj_list_type, prefix,
@@ -318,8 +316,6 @@ class EdgeIter {
         num_row_of_chunk_(0),
         chunk_begin_(chunk_begin),
         chunk_end_(chunk_end),
-        offset_of_chunk_begin_(offset_of_chunk_begin),
-        offset_of_chunk_end_(offset_of_chunk_end),
         adj_list_type_(adj_list_type),
         index_converter_(index_converter) {
     vertex_chunk_index_ =
@@ -351,8 +347,6 @@ class EdgeIter {
         num_row_of_chunk_(other.num_row_of_chunk_),
         chunk_begin_(other.chunk_begin_),
         chunk_end_(other.chunk_end_),
-        offset_of_chunk_begin_(other.offset_of_chunk_begin_),
-        offset_of_chunk_end_(other.offset_of_chunk_end_),
         adj_list_type_(other.adj_list_type_),
         index_converter_(other.index_converter_) {}
 
@@ -452,8 +446,6 @@ class EdgeIter {
     num_row_of_chunk_ = other.num_row_of_chunk_;
     chunk_begin_ = other.chunk_begin_;
     chunk_end_ = other.chunk_end_;
-    offset_of_chunk_begin_ = other.offset_of_chunk_begin_;
-    offset_of_chunk_end_ = other.offset_of_chunk_end_;
     adj_list_type_ = other.adj_list_type_;
     index_converter_ = other.index_converter_;
     return *this;
@@ -502,7 +494,7 @@ class EdgeIter {
   /** Let the iterator to point to the begin. */
   void to_begin() {
     global_chunk_index_ = chunk_begin_;
-    cur_offset_ = offset_of_chunk_begin_;
+    cur_offset_ = 0;
     vertex_chunk_index_ =
         index_converter_->GlobalChunkIndexToIndexPair(global_chunk_index_)
             .first;
@@ -510,10 +502,7 @@ class EdgeIter {
   }
 
   /** Check if the current position is the end. */
-  bool is_end() const {
-    return global_chunk_index_ == chunk_end_ &&
-           cur_offset_ == offset_of_chunk_end_;
-  }
+  bool is_end() const { return global_chunk_index_ >= chunk_end_; }
 
   /** Point to the next edge with the same source, return false if not found. */
   bool next_src() {
@@ -618,7 +607,6 @@ class EdgeIter {
   IdType dst_chunk_size_;
   IdType num_row_of_chunk_;
   IdType chunk_begin_, chunk_end_;
-  IdType offset_of_chunk_begin_, offset_of_chunk_end_;
   AdjListType adj_list_type_;
   std::shared_ptr<util::IndexConverter> index_converter_;
 
@@ -639,82 +627,16 @@ class EdgesCollection<AdjListType::ordered_by_source> {
   static const AdjListType adj_list_type_;
 
   /**
-   * @brief Initialize the EdgesCollection.
-   *
-   * @param edge_info The edge info that describes the edge type.
-   * @param prefix The absolute prefix.
-   */
-  EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix)
-      : edge_info_(edge_info), prefix_(prefix), chunk_begin_(0) {
-    std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
-                              FileSystemFromUriOrPath(prefix, &base_dir));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
-                              edge_info.GetAdjListPathPrefix(adj_list_type_));
-    base_dir += adj_list_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
-                              fs->GetFileNumOfDir(base_dir));
-    std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
-    chunk_end_ = 0;
-    for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      GAR_ASSIGN_OR_RAISE_ERROR(
-          edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
-      chunk_end_ += edge_chunk_nums[i];
-    }
-    index_converter_ =
-        std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ = 0;
-    offset_of_chunk_end_ = 0;
-  }
-
-  /**
    * @brief Initialize the EdgesCollection with a range of chunks.
    *
    * @param edge_info The edge info that describes the edge type.
    * @param prefix The absolute prefix.
-   * @param chunk_begin The global index of the begin chunk.
-   * @param chunk_end The global index of the end chunk.
+   * @param vertex_chunk_begin The index of the begin vertex chunk.
+   * @param vertex_chunk_end The index of the end vertex chunk (not included).
    */
   EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType chunk_begin, IdType chunk_end)
-      : edge_info_(edge_info),
-        prefix_(prefix),
-        chunk_begin_(chunk_begin),
-        chunk_end_(chunk_end) {
-    std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
-                              FileSystemFromUriOrPath(prefix, &base_dir));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
-                              edge_info.GetAdjListPathPrefix(adj_list_type_));
-    base_dir += adj_list_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
-                              fs->GetFileNumOfDir(base_dir));
-    std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
-    for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      GAR_ASSIGN_OR_RAISE_ERROR(
-          edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
-    }
-    index_converter_ =
-        std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ =
-        index_converter_->GlobalChunkIndexToIndexPair(chunk_begin).second *
-        edge_info.GetChunkSize();
-    offset_of_chunk_end_ =
-        index_converter_->GlobalChunkIndexToIndexPair(chunk_end).second *
-        edge_info.GetChunkSize();
-  }
-
-  /**
-   * @brief Initialize the EdgesCollection for a vertex chunk.
-   *
-   * @param edge_info The edge info that describes the edge type.
-   * @param prefix The absolute prefix.
-   * @param vertex_chunk_index The index of the vertex chunk.
-   */
-  EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType vertex_chunk_index)
+                  IdType vertex_chunk_begin = 0,
+                  IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
@@ -722,35 +644,40 @@ class EdgesCollection<AdjListType::ordered_by_source> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
                               edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += adj_list_path_prefix;
-    IdType vertex_chunk_num = 0;
-    GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num, fs->GetFileNumOfDir(base_dir));
+    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
+                              fs->GetFileNumOfDir(base_dir));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
+    if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
+      vertex_chunk_end = vertex_chunk_num;
+    }
     chunk_begin_ = 0;
     chunk_end_ = 0;
+    edge_num_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
       GAR_ASSIGN_OR_RAISE_ERROR(
           edge_chunk_nums[i],
           utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
-      if (i < vertex_chunk_index) {
+      if (i < vertex_chunk_begin) {
         chunk_begin_ += edge_chunk_nums[i];
+        chunk_end_ += edge_chunk_nums[i];
       }
-      if (i == vertex_chunk_index) {
-        chunk_end_ = chunk_begin_ + edge_chunk_nums[i];
+      if (i >= vertex_chunk_begin && i < vertex_chunk_end) {
+        chunk_end_ += edge_chunk_nums[i];
+        GAR_ASSIGN_OR_RAISE_ERROR(
+            auto chunk_edge_num_,
+            utils::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
+        edge_num_ += chunk_edge_num_;
       }
     }
     index_converter_ =
         std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ = 0;
-    offset_of_chunk_end_ = 0;
   }
 
   /** The iterator pointing to the first edge. */
   EdgeIter begin() {
     if (begin_ == nullptr) {
-      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_,
-                    offset_of_chunk_begin_, chunk_begin_, chunk_end_,
-                    offset_of_chunk_begin_, offset_of_chunk_end_,
-                    index_converter_);
+      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_, 0,
+                    chunk_begin_, chunk_end_, index_converter_);
       begin_ = std::make_shared<EdgeIter>(iter);
     }
     return *begin_;
@@ -759,10 +686,8 @@ class EdgesCollection<AdjListType::ordered_by_source> {
   /** The iterator pointing to the past-the-end element. */
   EdgeIter end() {
     if (end_ == nullptr) {
-      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_,
-                    offset_of_chunk_end_, chunk_begin_, chunk_end_,
-                    offset_of_chunk_begin_, offset_of_chunk_end_,
-                    index_converter_);
+      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_, 0,
+                    chunk_begin_, chunk_end_, index_converter_);
       end_ = std::make_shared<EdgeIter>(iter);
     }
     return *end_;
@@ -797,23 +722,20 @@ class EdgesCollection<AdjListType::ordered_by_source> {
     if (begin_global_chunk_index > from.global_chunk_index_) {
       return EdgeIter(edge_info_, prefix_, adj_list_type_,
                       begin_global_chunk_index, begin_offset, chunk_begin_,
-                      chunk_end_, offset_of_chunk_begin_, offset_of_chunk_end_,
-                      index_converter_);
+                      chunk_end_, index_converter_);
     } else if (end_global_chunk_index < from.global_chunk_index_) {
       return this->end();
     } else {
       if (begin_offset > from.cur_offset_) {
         return EdgeIter(edge_info_, prefix_, adj_list_type_,
                         begin_global_chunk_index, begin_offset, chunk_begin_,
-                        chunk_end_, offset_of_chunk_begin_,
-                        offset_of_chunk_end_, index_converter_);
+                        chunk_end_, index_converter_);
       } else if (end_offset <= from.cur_offset_) {
         return this->end();
       } else {
         return EdgeIter(edge_info_, prefix_, adj_list_type_,
                         from.global_chunk_index_, from.cur_offset_,
-                        chunk_begin_, chunk_end_, offset_of_chunk_begin_,
-                        offset_of_chunk_end_, index_converter_);
+                        chunk_begin_, chunk_end_, index_converter_);
       }
     }
     return this->end();
@@ -840,13 +762,16 @@ class EdgesCollection<AdjListType::ordered_by_source> {
     return iter;
   }
 
+  /** Get the number of edges in the collection. */
+  size_t size() const noexcept { return edge_num_; }
+
  private:
   EdgeInfo edge_info_;
   std::string prefix_;
   IdType chunk_begin_, chunk_end_;
-  IdType offset_of_chunk_begin_, offset_of_chunk_end_;
   std::shared_ptr<util::IndexConverter> index_converter_;
   std::shared_ptr<EdgeIter> begin_, end_;
+  IdType edge_num_;
 };
 
 /**
@@ -860,82 +785,16 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
   static const AdjListType adj_list_type_;
 
   /**
-   * @brief Initialize the EdgesCollection.
-   *
-   * @param edge_info The edge info that describes the edge type.
-   * @param prefix The absolute prefix.
-   */
-  EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix)
-      : edge_info_(edge_info), prefix_(prefix), chunk_begin_(0) {
-    std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
-                              FileSystemFromUriOrPath(prefix, &base_dir));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
-                              edge_info.GetAdjListPathPrefix(adj_list_type_));
-    base_dir += adj_list_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
-                              fs->GetFileNumOfDir(base_dir));
-    std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
-    chunk_end_ = 0;
-    for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      GAR_ASSIGN_OR_RAISE_ERROR(
-          edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
-      chunk_end_ += edge_chunk_nums[i];
-    }
-    index_converter_ =
-        std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ = 0;
-    offset_of_chunk_end_ = 0;
-  }
-
-  /**
    * @brief Initialize the EdgesCollection with a range of chunks.
    *
    * @param edge_info The edge info that describes the edge type.
    * @param prefix The absolute prefix.
-   * @param chunk_begin The global index of the begin chunk.
-   * @param chunk_end The global index of the end chunk.
+   * @param vertex_chunk_begin The index of the begin vertex chunk.
+   * @param vertex_chunk_end The index of the end vertex chunk (not included).
    */
   EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType chunk_begin, IdType chunk_end)
-      : edge_info_(edge_info),
-        prefix_(prefix),
-        chunk_begin_(chunk_begin),
-        chunk_end_(chunk_end) {
-    std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
-                              FileSystemFromUriOrPath(prefix, &base_dir));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
-                              edge_info.GetAdjListPathPrefix(adj_list_type_));
-    base_dir += adj_list_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
-                              fs->GetFileNumOfDir(base_dir));
-    std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
-    for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      GAR_ASSIGN_OR_RAISE_ERROR(
-          edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
-    }
-    index_converter_ =
-        std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ =
-        index_converter_->GlobalChunkIndexToIndexPair(chunk_begin).second *
-        edge_info.GetChunkSize();
-    offset_of_chunk_end_ =
-        index_converter_->GlobalChunkIndexToIndexPair(chunk_end).second *
-        edge_info.GetChunkSize();
-  }
-
-  /**
-   * @brief Initialize the EdgesCollection for a vertex chunk.
-   *
-   * @param edge_info The edge info that describes the edge type.
-   * @param prefix The absolute prefix.
-   * @param vertex_chunk_index The index of the vertex chunk.
-   */
-  EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType vertex_chunk_index)
+                  IdType vertex_chunk_begin = 0,
+                  IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
@@ -943,35 +802,40 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
                               edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += adj_list_path_prefix;
-    IdType vertex_chunk_num = 0;
-    GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num, fs->GetFileNumOfDir(base_dir));
+    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
+                              fs->GetFileNumOfDir(base_dir));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
+    if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
+      vertex_chunk_end = vertex_chunk_num;
+    }
     chunk_begin_ = 0;
     chunk_end_ = 0;
+    edge_num_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
       GAR_ASSIGN_OR_RAISE_ERROR(
           edge_chunk_nums[i],
           utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
-      if (i < vertex_chunk_index) {
+      if (i < vertex_chunk_begin) {
         chunk_begin_ += edge_chunk_nums[i];
+        chunk_end_ += edge_chunk_nums[i];
       }
-      if (i == vertex_chunk_index) {
-        chunk_end_ = chunk_begin_ + edge_chunk_nums[i];
+      if (i >= vertex_chunk_begin && i < vertex_chunk_end) {
+        chunk_end_ += edge_chunk_nums[i];
+        GAR_ASSIGN_OR_RAISE_ERROR(
+            auto chunk_edge_num_,
+            utils::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
+        edge_num_ += chunk_edge_num_;
       }
     }
     index_converter_ =
         std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ = 0;
-    offset_of_chunk_end_ = 0;
   }
 
   /** The iterator pointing to the first edge. */
   EdgeIter begin() {
     if (begin_ == nullptr) {
-      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_,
-                    offset_of_chunk_begin_, chunk_begin_, chunk_end_,
-                    offset_of_chunk_begin_, offset_of_chunk_end_,
-                    index_converter_);
+      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_, 0,
+                    chunk_begin_, chunk_end_, index_converter_);
       begin_ = std::make_shared<EdgeIter>(iter);
     }
     return *begin_;
@@ -980,10 +844,8 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
   /** The iterator pointing to the past-the-end element. */
   EdgeIter end() {
     if (end_ == nullptr) {
-      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_,
-                    offset_of_chunk_end_, chunk_begin_, chunk_end_,
-                    offset_of_chunk_begin_, offset_of_chunk_end_,
-                    index_converter_);
+      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_, 0,
+                    chunk_begin_, chunk_end_, index_converter_);
       end_ = std::make_shared<EdgeIter>(iter);
     }
     return *end_;
@@ -1039,35 +901,35 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
     if (begin_global_chunk_index > from.global_chunk_index_) {
       return EdgeIter(edge_info_, prefix_, adj_list_type_,
                       begin_global_chunk_index, begin_offset, chunk_begin_,
-                      chunk_end_, offset_of_chunk_begin_, offset_of_chunk_end_,
-                      index_converter_);
+                      chunk_end_, index_converter_);
     } else if (end_global_chunk_index < from.global_chunk_index_) {
       return this->end();
     } else {
       if (begin_offset >= from.cur_offset_) {
         return EdgeIter(edge_info_, prefix_, adj_list_type_,
                         begin_global_chunk_index, begin_offset, chunk_begin_,
-                        chunk_end_, offset_of_chunk_begin_,
-                        offset_of_chunk_end_, index_converter_);
+                        chunk_end_, index_converter_);
       } else if (end_offset <= from.cur_offset_) {
         return this->end();
       } else {
         return EdgeIter(edge_info_, prefix_, adj_list_type_,
                         from.global_chunk_index_, from.cur_offset_,
-                        chunk_begin_, chunk_end_, offset_of_chunk_begin_,
-                        offset_of_chunk_end_, index_converter_);
+                        chunk_begin_, chunk_end_, index_converter_);
       }
     }
     return this->end();
   }
 
+  /** Get the number of edges in the collection. */
+  size_t size() const noexcept { return edge_num_; }
+
  private:
   EdgeInfo edge_info_;
   std::string prefix_;
   IdType chunk_begin_, chunk_end_;
-  IdType offset_of_chunk_begin_, offset_of_chunk_end_;
   std::shared_ptr<util::IndexConverter> index_converter_;
   std::shared_ptr<EdgeIter> begin_, end_;
+  IdType edge_num_;
 };
 
 /**
@@ -1081,82 +943,16 @@ class EdgesCollection<AdjListType::unordered_by_source> {
   static const AdjListType adj_list_type_;
 
   /**
-   * @brief Initialize the EdgesCollection.
-   *
-   * @param edge_info The edge info that describes the edge type.
-   * @param prefix The absolute prefix.
-   */
-  EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix)
-      : edge_info_(edge_info), prefix_(prefix), chunk_begin_(0) {
-    std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
-                              FileSystemFromUriOrPath(prefix, &base_dir));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
-                              edge_info.GetAdjListPathPrefix(adj_list_type_));
-    base_dir += adj_list_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
-                              fs->GetFileNumOfDir(base_dir));
-    std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
-    chunk_end_ = 0;
-    for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      GAR_ASSIGN_OR_RAISE_ERROR(
-          edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
-      chunk_end_ += edge_chunk_nums[i];
-    }
-    index_converter_ =
-        std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ = 0;
-    offset_of_chunk_end_ = 0;
-  }
-
-  /**
    * @brief Initialize the EdgesCollection with a range of chunks.
    *
    * @param edge_info The edge info that describes the edge type.
    * @param prefix The absolute prefix.
-   * @param chunk_begin The global index of the begin chunk.
-   * @param chunk_end The global index of the end chunk.
+   * @param vertex_chunk_begin The index of the begin vertex chunk.
+   * @param vertex_chunk_end The index of the end vertex chunk (not included).
    */
   EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType chunk_begin, IdType chunk_end)
-      : edge_info_(edge_info),
-        prefix_(prefix),
-        chunk_begin_(chunk_begin),
-        chunk_end_(chunk_end) {
-    std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
-                              FileSystemFromUriOrPath(prefix, &base_dir));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
-                              edge_info.GetAdjListPathPrefix(adj_list_type_));
-    base_dir += adj_list_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
-                              fs->GetFileNumOfDir(base_dir));
-    std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
-    for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      GAR_ASSIGN_OR_RAISE_ERROR(
-          edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
-    }
-    index_converter_ =
-        std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ =
-        index_converter_->GlobalChunkIndexToIndexPair(chunk_begin).second *
-        edge_info.GetChunkSize();
-    offset_of_chunk_end_ =
-        index_converter_->GlobalChunkIndexToIndexPair(chunk_end).second *
-        edge_info.GetChunkSize();
-  }
-
-  /**
-   * @brief Initialize the EdgesCollection for a vertex chunk.
-   *
-   * @param edge_info The edge info that describes the edge type.
-   * @param prefix The absolute prefix.
-   * @param vertex_chunk_index The index of the vertex chunk.
-   */
-  EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType vertex_chunk_index)
+                  IdType vertex_chunk_begin = 0,
+                  IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
@@ -1164,35 +960,40 @@ class EdgesCollection<AdjListType::unordered_by_source> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
                               edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += adj_list_path_prefix;
-    IdType vertex_chunk_num = 0;
-    GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num, fs->GetFileNumOfDir(base_dir));
+    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
+                              fs->GetFileNumOfDir(base_dir));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
+    if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
+      vertex_chunk_end = vertex_chunk_num;
+    }
     chunk_begin_ = 0;
     chunk_end_ = 0;
+    edge_num_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
       GAR_ASSIGN_OR_RAISE_ERROR(
           edge_chunk_nums[i],
           utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
-      if (i < vertex_chunk_index) {
+      if (i < vertex_chunk_begin) {
         chunk_begin_ += edge_chunk_nums[i];
+        chunk_end_ += edge_chunk_nums[i];
       }
-      if (i == vertex_chunk_index) {
-        chunk_end_ = chunk_begin_ + edge_chunk_nums[i];
+      if (i >= vertex_chunk_begin && i < vertex_chunk_end) {
+        chunk_end_ += edge_chunk_nums[i];
+        GAR_ASSIGN_OR_RAISE_ERROR(
+            auto chunk_edge_num_,
+            utils::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
+        edge_num_ += chunk_edge_num_;
       }
     }
     index_converter_ =
         std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ = 0;
-    offset_of_chunk_end_ = 0;
   }
 
   /** The iterator pointing to the first edge. */
   EdgeIter begin() {
     if (begin_ == nullptr) {
-      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_,
-                    offset_of_chunk_begin_, chunk_begin_, chunk_end_,
-                    offset_of_chunk_begin_, offset_of_chunk_end_,
-                    index_converter_);
+      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_, 0,
+                    chunk_begin_, chunk_end_, index_converter_);
       begin_ = std::make_shared<EdgeIter>(iter);
     }
     return *begin_;
@@ -1201,10 +1002,8 @@ class EdgesCollection<AdjListType::unordered_by_source> {
   /** The iterator pointing to the past-the-end element. */
   EdgeIter end() {
     if (end_ == nullptr) {
-      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_,
-                    offset_of_chunk_end_, chunk_begin_, chunk_end_,
-                    offset_of_chunk_begin_, offset_of_chunk_end_,
-                    index_converter_);
+      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_, 0,
+                    chunk_begin_, chunk_end_, index_converter_);
       end_ = std::make_shared<EdgeIter>(iter);
     }
     return *end_;
@@ -1252,13 +1051,16 @@ class EdgesCollection<AdjListType::unordered_by_source> {
     return iter;
   }
 
+  /** Get the number of edges in the collection. */
+  size_t size() const noexcept { return edge_num_; }
+
  private:
   EdgeInfo edge_info_;
   std::string prefix_;
   IdType chunk_begin_, chunk_end_;
-  IdType offset_of_chunk_begin_, offset_of_chunk_end_;
   std::shared_ptr<util::IndexConverter> index_converter_;
   std::shared_ptr<EdgeIter> begin_, end_;
+  IdType edge_num_;
 };
 
 /**
@@ -1272,49 +1074,17 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
   static const AdjListType adj_list_type_;
 
   /**
-   * @brief Initialize the EdgesCollection.
-   *
-   * @param edge_info The edge info that describes the edge type.
-   * @param prefix The absolute prefix.
-   */
-  EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix)
-      : edge_info_(edge_info), prefix_(prefix), chunk_begin_(0) {
-    std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
-                              FileSystemFromUriOrPath(prefix, &base_dir));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
-                              edge_info.GetAdjListPathPrefix(adj_list_type_));
-    base_dir += adj_list_path_prefix;
-    IdType vertex_chunk_num = 0;
-    GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num, fs->GetFileNumOfDir(base_dir));
-    std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
-    chunk_end_ = 0;
-    for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      GAR_ASSIGN_OR_RAISE_ERROR(
-          edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
-      chunk_end_ += edge_chunk_nums[i];
-    }
-    index_converter_ =
-        std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ = 0;
-    offset_of_chunk_end_ = 0;
-  }
-
-  /**
    * @brief Initialize the EdgesCollection with a range of chunks.
    *
    * @param edge_info The edge info that describes the edge type.
    * @param prefix The absolute prefix.
-   * @param chunk_begin The global index of the begin chunk.
-   * @param chunk_end The global index of the end chunk.
+   * @param vertex_chunk_begin The index of the begin vertex chunk.
+   * @param vertex_chunk_end The index of the end vertex chunk (not included).
    */
   EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType chunk_begin, IdType chunk_end)
-      : edge_info_(edge_info),
-        prefix_(prefix),
-        chunk_begin_(chunk_begin),
-        chunk_end_(chunk_end) {
+                  IdType vertex_chunk_begin = 0,
+                  IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
+      : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
                               FileSystemFromUriOrPath(prefix, &base_dir));
@@ -1324,66 +1094,37 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
     GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
                               fs->GetFileNumOfDir(base_dir));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
-    for (IdType i = 0; i < vertex_chunk_num; ++i) {
-      GAR_ASSIGN_OR_RAISE_ERROR(
-          edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
+    if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
+      vertex_chunk_end = vertex_chunk_num;
     }
-    index_converter_ =
-        std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ =
-        index_converter_->GlobalChunkIndexToIndexPair(chunk_begin).second *
-        edge_info.GetChunkSize();
-    offset_of_chunk_end_ =
-        index_converter_->GlobalChunkIndexToIndexPair(chunk_end).second *
-        edge_info.GetChunkSize();
-  }
-
-  /**
-   * @brief Initialize the EdgesCollection for a vertex chunk.
-   *
-   * @param edge_info The edge info that describes the edge type.
-   * @param prefix The absolute prefix.
-   * @param vertex_chunk_index The index of the vertex chunk.
-   */
-  EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
-                  IdType vertex_chunk_index)
-      : edge_info_(edge_info), prefix_(prefix) {
-    std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
-                              FileSystemFromUriOrPath(prefix, &base_dir));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetAdjListPathPrefix(adj_list_type_));
-    base_dir += dir_path;
-    IdType vertex_chunk_num = 0;
-    GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num, fs->GetFileNumOfDir(base_dir));
-    std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     chunk_begin_ = 0;
     chunk_end_ = 0;
+    edge_num_ = 0;
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
       GAR_ASSIGN_OR_RAISE_ERROR(
           edge_chunk_nums[i],
           utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
-      if (i < vertex_chunk_index) {
+      if (i < vertex_chunk_begin) {
         chunk_begin_ += edge_chunk_nums[i];
+        chunk_end_ += edge_chunk_nums[i];
       }
-      if (i == vertex_chunk_index) {
-        chunk_end_ = chunk_begin_ + edge_chunk_nums[i];
+      if (i >= vertex_chunk_begin && i < vertex_chunk_end) {
+        chunk_end_ += edge_chunk_nums[i];
+        GAR_ASSIGN_OR_RAISE_ERROR(
+            auto chunk_edge_num_,
+            utils::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
+        edge_num_ += chunk_edge_num_;
       }
     }
     index_converter_ =
         std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
-    offset_of_chunk_begin_ = 0;
-    offset_of_chunk_end_ = 0;
   }
 
   /** The iterator pointing to the first edge. */
   EdgeIter begin() {
     if (begin_ == nullptr) {
-      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_,
-                    offset_of_chunk_begin_, chunk_begin_, chunk_end_,
-                    offset_of_chunk_begin_, offset_of_chunk_end_,
-                    index_converter_);
+      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_, 0,
+                    chunk_begin_, chunk_end_, index_converter_);
       begin_ = std::make_shared<EdgeIter>(iter);
     }
     return *begin_;
@@ -1392,10 +1133,8 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
   /** The iterator pointing to the past-the-end element. */
   EdgeIter end() {
     if (end_ == nullptr) {
-      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_,
-                    offset_of_chunk_end_, chunk_begin_, chunk_end_,
-                    offset_of_chunk_begin_, offset_of_chunk_end_,
-                    index_converter_);
+      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_, 0,
+                    chunk_begin_, chunk_end_, index_converter_);
       end_ = std::make_shared<EdgeIter>(iter);
     }
     return *end_;
@@ -1443,13 +1182,16 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
     return iter;
   }
 
+  /** Get the number of edges in the collection. */
+  size_t size() const noexcept { return edge_num_; }
+
  private:
   EdgeInfo edge_info_;
   std::string prefix_;
   IdType chunk_begin_, chunk_end_;
-  IdType offset_of_chunk_begin_, offset_of_chunk_end_;
   std::shared_ptr<util::IndexConverter> index_converter_;
   std::shared_ptr<EdgeIter> begin_, end_;
+  IdType edge_num_;
 };
 
 typedef std::variant<EdgesCollection<AdjListType::ordered_by_source>,
@@ -1473,42 +1215,6 @@ static inline Result<VerticesCollection> ConstructVerticesCollection(
 }
 
 /**
- * @brief Construct the collection for a type of edges.
- *
- * @param graph_info The GraphInfo for the graph.
- * @param src_label The source vertex label.
- * @param edge_label The edge label.
- * @param dst_label The destination vertex label.
- * @param adj_list_type The adjList type.
- * @return The constructed collection or error.
- */
-static inline Result<Edges> ConstructEdgesCollection(
-    const GraphInfo& graph_info, const std::string& src_label,
-    const std::string& edge_label, const std::string& dst_label,
-    AdjListType adj_list_type) noexcept {
-  EdgeInfo edge_info;
-  GAR_ASSIGN_OR_RAISE(edge_info,
-                      graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
-  switch (adj_list_type) {
-  case AdjListType::ordered_by_source:
-    return EdgesCollection<AdjListType::ordered_by_source>(
-        edge_info, graph_info.GetPrefix());
-  case AdjListType::ordered_by_dest:
-    return EdgesCollection<AdjListType::ordered_by_dest>(
-        edge_info, graph_info.GetPrefix());
-  case AdjListType::unordered_by_source:
-    return EdgesCollection<AdjListType::unordered_by_source>(
-        edge_info, graph_info.GetPrefix());
-  case AdjListType::unordered_by_dest:
-    return EdgesCollection<AdjListType::unordered_by_dest>(
-        edge_info, graph_info.GetPrefix());
-  default:
-    return Status::Invalid("Invalid adj list type");
-  }
-  return Status::Invalid("Invalid adj list type");
-}
-
-/**
  * @brief Construct the collection for a range of edges.
  *
  * @param graph_info The GraphInfo for the graph.
@@ -1516,68 +1222,39 @@ static inline Result<Edges> ConstructEdgesCollection(
  * @param edge_label The edge label.
  * @param dst_label The destination vertex label.
  * @param adj_list_type The adjList type.
- * @param chunk_begin The global index of the begin chunk.
- * @param chunk_end The global index of the end chunk.
+ * @param vertex_chunk_begin The index of the begin vertex chunk.
+ * @param vertex_chunk_end The index of the end vertex chunk (not included).
  * @return The constructed collection or error.
  */
 static inline Result<Edges> ConstructEdgesCollection(
     const GraphInfo& graph_info, const std::string& src_label,
     const std::string& edge_label, const std::string& dst_label,
-    AdjListType adj_list_type, const IdType chunk_begin,
-    const IdType chunk_end) noexcept {
+    AdjListType adj_list_type, const IdType vertex_chunk_begin = 0,
+    const IdType vertex_chunk_end =
+        std::numeric_limits<int64_t>::max()) noexcept {
   EdgeInfo edge_info;
   GAR_ASSIGN_OR_RAISE(edge_info,
                       graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
-  switch (adj_list_type) {
-  case AdjListType::ordered_by_source:
-    return EdgesCollection<AdjListType::ordered_by_source>(
-        edge_info, graph_info.GetPrefix(), chunk_begin, chunk_end);
-  case AdjListType::ordered_by_dest:
-    return EdgesCollection<AdjListType::ordered_by_dest>(
-        edge_info, graph_info.GetPrefix(), chunk_begin, chunk_end);
-  case AdjListType::unordered_by_source:
-    return EdgesCollection<AdjListType::unordered_by_source>(
-        edge_info, graph_info.GetPrefix(), chunk_begin, chunk_end);
-  case AdjListType::unordered_by_dest:
-    return EdgesCollection<AdjListType::unordered_by_dest>(
-        edge_info, graph_info.GetPrefix(), chunk_begin, chunk_end);
-  default:
+  if (!edge_info.ContainAdjList(adj_list_type)) {
     return Status::Invalid("Invalid adj list type");
   }
-  return Status::Invalid("Invalid adj list type");
-}
-
-/**
- * @brief Construct the collection for edges of a vertex chunk.
- *
- * @param graph_info The GraphInfo for this graph.
- * @param src_label The source vertex label.
- * @param edge_label The edge label.
- * @param dst_label The destination vertex label.
- * @param adj_list_type The adjList type.
- * @param vertex_chunk_index The index of the vertex chunk.
- * @return The constructed collection or error.
- */
-static inline Result<Edges> ConstructEdgesCollection(
-    const GraphInfo& graph_info, const std::string& src_label,
-    const std::string& edge_label, const std::string& dst_label,
-    AdjListType adj_list_type, IdType vertex_chunk_index) noexcept {
-  EdgeInfo edge_info;
-  GAR_ASSIGN_OR_RAISE(edge_info,
-                      graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
   switch (adj_list_type) {
   case AdjListType::ordered_by_source:
     return EdgesCollection<AdjListType::ordered_by_source>(
-        edge_info, graph_info.GetPrefix(), vertex_chunk_index);
+        edge_info, graph_info.GetPrefix(), vertex_chunk_begin,
+        vertex_chunk_end);
   case AdjListType::ordered_by_dest:
     return EdgesCollection<AdjListType::ordered_by_dest>(
-        edge_info, graph_info.GetPrefix(), vertex_chunk_index);
+        edge_info, graph_info.GetPrefix(), vertex_chunk_begin,
+        vertex_chunk_end);
   case AdjListType::unordered_by_source:
     return EdgesCollection<AdjListType::unordered_by_source>(
-        edge_info, graph_info.GetPrefix(), vertex_chunk_index);
+        edge_info, graph_info.GetPrefix(), vertex_chunk_begin,
+        vertex_chunk_end);
   case AdjListType::unordered_by_dest:
     return EdgesCollection<AdjListType::unordered_by_dest>(
-        edge_info, graph_info.GetPrefix(), vertex_chunk_index);
+        edge_info, graph_info.GetPrefix(), vertex_chunk_begin,
+        vertex_chunk_end);
   default:
     return Status::Invalid("Invalid adj list type");
   }

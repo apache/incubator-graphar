@@ -37,6 +37,10 @@ Result<IdType> GetEdgeChunkNum(const std::string& prefix,
                                AdjListType adj_list_type,
                                IdType vertex_chunk_index) noexcept;
 
+Result<IdType> GetEdgeNum(const std::string& prefix, const EdgeInfo& edge_info,
+                          AdjListType adj_list_type,
+                          IdType vertex_chunk_index) noexcept;
+
 }  // namespace utils
 }  // namespace GAR_NAMESPACE_INTERNAL
 #endif  // GAR_UTILS_READER_UTILS_H_

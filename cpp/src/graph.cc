@@ -121,16 +121,12 @@ bool EdgeIter::first_src(const EdgeIter& from, IdType id) {
   // ordered_by_dest or unordered_by_dest
   if (adj_list_type_ == AdjListType::ordered_by_dest ||
       adj_list_type_ == AdjListType::unordered_by_dest) {
-    if (from.global_chunk_index_ > chunk_end_ ||
-        (from.global_chunk_index_ == chunk_end_ &&
-         from.cur_offset_ > offset_of_chunk_end_)) {
+    if (from.global_chunk_index_ >= chunk_end_) {
       return false;
     }
     if (from.global_chunk_index_ == global_chunk_index_) {
       cur_offset_ = from.cur_offset_;
-    } else if (from.global_chunk_index_ < chunk_begin_ ||
-               (from.global_chunk_index_ == chunk_begin_ &&
-                from.cur_offset_ < offset_of_chunk_begin_)) {
+    } else if (from.global_chunk_index_ < chunk_begin_) {
       this->to_begin();
     } else {
       global_chunk_index_ = from.global_chunk_index_;
@@ -152,17 +148,13 @@ bool EdgeIter::first_src(const EdgeIter& from, IdType id) {
         index_converter_->IndexPairToGlobalChunkIndex(id / src_chunk_size_, 0);
     if (expect_chunk_index > chunk_end_)
       return false;
-    if (from.global_chunk_index_ > chunk_end_ ||
-        (from.global_chunk_index_ == chunk_end_ &&
-         from.cur_offset_ > offset_of_chunk_end_)) {
+    if (from.global_chunk_index_ >= chunk_end_) {
       return false;
     }
     bool need_refresh = false;
     if (from.global_chunk_index_ == global_chunk_index_) {
       cur_offset_ = from.cur_offset_;
-    } else if (from.global_chunk_index_ < chunk_begin_ ||
-               (from.global_chunk_index_ == chunk_begin_ &&
-                from.cur_offset_ < offset_of_chunk_begin_)) {
+    } else if (from.global_chunk_index_ < chunk_begin_) {
       this->to_begin();
     } else {
       global_chunk_index_ = from.global_chunk_index_;
@@ -244,16 +236,12 @@ bool EdgeIter::first_dst(const EdgeIter& from, IdType id) {
   // ordered_by_source or unordered_by_source
   if (adj_list_type_ == AdjListType::ordered_by_source ||
       adj_list_type_ == AdjListType::unordered_by_source) {
-    if (from.global_chunk_index_ > chunk_end_ ||
-        (from.global_chunk_index_ == chunk_end_ &&
-         from.cur_offset_ > offset_of_chunk_end_)) {
+    if (from.global_chunk_index_ >= chunk_end_) {
       return false;
     }
     if (from.global_chunk_index_ == global_chunk_index_) {
       cur_offset_ = from.cur_offset_;
-    } else if (from.global_chunk_index_ < chunk_begin_ ||
-               (from.global_chunk_index_ == chunk_begin_ &&
-                from.cur_offset_ < offset_of_chunk_begin_)) {
+    } else if (from.global_chunk_index_ < chunk_begin_) {
       this->to_begin();
     } else {
       global_chunk_index_ = from.global_chunk_index_;
@@ -275,17 +263,13 @@ bool EdgeIter::first_dst(const EdgeIter& from, IdType id) {
         index_converter_->IndexPairToGlobalChunkIndex(id / dst_chunk_size_, 0);
     if (expect_chunk_index > chunk_end_)
       return false;
-    if (from.global_chunk_index_ > chunk_end_ ||
-        (from.global_chunk_index_ == chunk_end_ &&
-         from.cur_offset_ > offset_of_chunk_end_)) {
+    if (from.global_chunk_index_ >= chunk_end_) {
       return false;
     }
     bool need_refresh = false;
     if (from.global_chunk_index_ == global_chunk_index_) {
       cur_offset_ = from.cur_offset_;
-    } else if (from.global_chunk_index_ < chunk_begin_ ||
-               (from.global_chunk_index_ == chunk_begin_ &&
-                from.cur_offset_ < offset_of_chunk_begin_)) {
+    } else if (from.global_chunk_index_ < chunk_begin_) {
       this->to_begin();
     } else {
       global_chunk_index_ = from.global_chunk_index_;
