@@ -103,8 +103,8 @@ Status VertexPropertyWriter::Validate(
                                         " not found");
       auto field = schema->field(indice);
       if (DataType::ArrowDataTypeToDataType(field->type()) != property.type)
-        return Status::InvalidOperation("invalid data type for property: " +
-                                        property.name);
+        return Status::TypeError("invalid data type for property: " +
+                                 property.name);
     }
   }
   return Status::OK();
@@ -202,7 +202,14 @@ Status EdgeChunkWriter::Validate(
   // weak validate
   if (!edge_info_.ContainAdjList(adj_list_type_))
     return Status::InvalidOperation("invalid adj list type");
-  if (input_table->num_rows() > edge_info_.GetChunkSize())
+  if (adj_list_type_ != AdjListType::ordered_by_source &&
+      adj_list_type_ != AdjListType::ordered_by_dest)
+    return Status::InvalidOperation("invalid adj list type");
+  if (adj_list_type_ == AdjListType::ordered_by_source &&
+      input_table->num_rows() > edge_info_.GetSrcChunkSize() + 1)
+    return Status::OutOfRange();
+  if (adj_list_type_ == AdjListType::ordered_by_dest &&
+      input_table->num_rows() > edge_info_.GetDstChunkSize() + 1)
     return Status::OutOfRange();
   if (vertex_chunk_index < 0)
     return Status::InvalidOperation("invalid vertex chunk index");
@@ -214,7 +221,7 @@ Status EdgeChunkWriter::Validate(
       return Status::InvalidOperation("offsets not provided");
     auto field = schema->field(index);
     if (field->type()->id() != arrow::Type::INT64)
-      return Status::InvalidOperation("invalid data type for offsets");
+      return Status::TypeError("invalid data type for offsets");
   }
   return Status::OK();
 }
@@ -245,13 +252,13 @@ Status EdgeChunkWriter::Validate(
       return Status::InvalidOperation("sources not provided");
     auto field = schema->field(index);
     if (field->type()->id() != arrow::Type::INT64)
-      return Status::InvalidOperation("invalid data type for sources");
+      return Status::TypeError("invalid data type for sources");
     index = schema->GetFieldIndex(GeneralParams::kDstIndexCol);
     if (index == -1)
       return Status::InvalidOperation("destinations not provided");
     field = schema->field(index);
     if (field->type()->id() != arrow::Type::INT64)
-      return Status::InvalidOperation("invalid data type for destinations");
+      return Status::TypeError("invalid data type for destinations");
   }
   return Status::OK();
 }
@@ -287,8 +294,8 @@ Status EdgeChunkWriter::Validate(
                                         " not found");
       auto field = schema->field(indice);
       if (DataType::ArrowDataTypeToDataType(field->type()) != property.type)
-        return Status::InvalidOperation("invalid data type for property: " +
-                                        property.name);
+        return Status::TypeError("invalid data type for property: " +
+                                 property.name);
     }
   }
   return Status::OK();
@@ -486,7 +493,6 @@ Status EdgeChunkWriter::SortAndWriteAdjListTable(
   GAR_ASSIGN_OR_RAISE(
       auto response_table,
       sortTable(input_table, getSortColumnName(adj_list_type_)));
-
   if (adj_list_type_ == AdjListType::ordered_by_source ||
       adj_list_type_ == AdjListType::ordered_by_dest) {
     GAR_ASSIGN_OR_RAISE(
@@ -495,7 +501,6 @@ Status EdgeChunkWriter::SortAndWriteAdjListTable(
                        vertex_chunk_index));
     GAR_RETURN_NOT_OK(WriteOffsetChunk(offset_table, vertex_chunk_index));
   }
-
   return WriteAdjListTable(response_table, vertex_chunk_index,
                            start_chunk_index);
 }
