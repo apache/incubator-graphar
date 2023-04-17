@@ -19,16 +19,22 @@ limitations under the License.
 #ifndef CPP_GRIN_EXAMPLE_CONFIG_H_
 #define CPP_GRIN_EXAMPLE_CONFIG_H_
 
-static const std::string TEST_DATA_DIR =  // NOLINT
-    std::filesystem::path(__FILE__).parent_path().string() + "/test_data";
-
-static const std::string TEST_DATA_SMALL_DIR =  // NOLINT
+static const std::string TEST_DATA_PATH =  // NOLINT
     std::filesystem::path(__FILE__)
         .parent_path()
         .parent_path()
         .parent_path()
         .parent_path()
         .string() +
-    "/testing";
+    "/testing/ldbc/ldbc.graph.yml";
+
+static const std::string TEST_DATA_SMALL_PATH =  // NOLINT
+    std::filesystem::path(__FILE__)
+        .parent_path()
+        .parent_path()
+        .parent_path()
+        .parent_path()
+        .string() +
+    "/testing/ldbc_sample/parquet/ldbc_sample.graph.yml";
 
 #endif  // CPP_GRIN_EXAMPLE_CONFIG_H_

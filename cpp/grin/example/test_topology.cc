@@ -190,8 +190,7 @@ void test_topology_adjlist(GRIN_GRAPH graph) {
 
 int main(int argc, char* argv[]) {
   // get graph from graph info of GraphAr
-  std::string path =
-      TEST_DATA_SMALL_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string path = TEST_DATA_PATH;
   std::cout << "GraphInfo path = " << path << std::endl;
 
   char** args = new char*[1];
