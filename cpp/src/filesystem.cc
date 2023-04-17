@@ -266,14 +266,15 @@ Result<IdType> FileSystem::GetFileNumOfDir(const std::string& dir_path,
   return static_cast<IdType>(file_infos.size());
 }
 
-Result<std::shared_ptr<FileSystem>> FileSystemFromUri(
+Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri_string, std::string* out_path) {
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
-      auto arrow_fs, arrow::fs::FileSystemFromUri(uri_string));
+      auto arrow_fs, arrow::fs::FileSystemFromUriOrPath(uri_string));
 
   GAR_ASSIGN_OR_RAISE(auto uri, detail::ParseFileSystemUri(uri_string));
   if (out_path != nullptr) {
-    if (uri.scheme() == "file" || uri.scheme() == "hdfs") {
+    if (uri.scheme() == "file" || uri.scheme() == "hdfs" ||
+        uri.scheme().empty()) {
       *out_path = uri.path();
     } else if (uri.scheme() == "s3" || uri.scheme() == "gs") {
       // bucket name is the host, path is the path

@@ -345,3 +345,19 @@ TEST_CASE("test_graph_info_load_from_file") {
   REQUIRE(vertex_infos.size() == 1);
   REQUIRE(edge_infos.size() == 1);
 }
+
+TEST_CASE("test_graph_info_load_from_s3") {
+  std::string path = "s3://graphar/ldbc/ldbc.graph.yml" +
+      "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
+  auto graph_info_result = GAR_NAMESPACE::GraphInfo::Load(path);
+  if (graph_info_result.has_error()) {
+    std::cout << graph_info_result.status().message() << std::endl;
+  }
+  REQUIRE(!graph_info_result.has_error());
+  auto graph_info = graph_info_result.value();
+  REQUIRE(graph_info.GetName() == "ldbc");
+  const auto& vertex_infos = graph_info.GetVertexInfos();
+  const auto& edge_infos = graph_info.GetEdgeInfos();
+  REQUIRE(vertex_infos.size() == 8);
+  REQUIRE(edge_infos.size() == 23);
+}

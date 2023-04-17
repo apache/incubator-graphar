@@ -230,7 +230,7 @@ Status EdgeInfo::Save(const std::string& path) const {
 namespace {
 
 static std::string PathToDirectory(const std::string& path) {
-  if (path.rfind("s3://", 0) != 0) {
+  if (path.rfind("s3://", 0) == 0) {
     int t = path.find_last_of('?');
     std::string prefix = path.substr(0, t);
     std::string suffix = path.substr(t);
@@ -303,6 +303,9 @@ Result<GraphInfo> GraphInfo::Load(const std::string& path) {
   GAR_ASSIGN_OR_RAISE(auto graph_meta, Yaml::Load(yaml_content));
   std::string default_name = "graph";
   std::string default_prefix = PathToDirectory(path);
+  no_url_path = PathToDirectory(no_url_path);
+  std::cout << "default_prefix: " << default_prefix << std::endl;
+  std::cout << "no_url_path: " << no_url_path << std::endl;
   return ConstructGraphInfo(graph_meta, default_name, default_prefix, fs,
                             no_url_path);
 }
