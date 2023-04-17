@@ -236,7 +236,8 @@ class AdjListArrowChunkReader {
    */
   Status next_chunk() {
     Status st;
-    if (++chunk_index_ >= chunk_num_) {
+    ++chunk_index_;
+    while (chunk_index_ >= chunk_num_) {
       st = Status::EndOfChunk();
       ++vertex_chunk_index_;
       if (vertex_chunk_index_ >= vertex_chunk_num_) {
@@ -494,7 +495,8 @@ class AdjListPropertyArrowChunkReader {
    */
   Status next_chunk() {
     Status st;
-    if (++chunk_index_ >= chunk_num_) {
+    ++chunk_index_;
+    while (chunk_index_ >= chunk_num_) {
       st = Status::EndOfChunk();
       ++vertex_chunk_index_;
       if (vertex_chunk_index_ >= vertex_chunk_num_) {
