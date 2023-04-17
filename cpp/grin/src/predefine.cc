@@ -117,6 +117,7 @@ GRIN_GRAPH get_graph_by_info_path(const std::string& path) {
     }
     graph->edge_type_num++;
   }
+  graph->tot_edge_num = __grin_get_edge_num(graph, 0, graph->edge_type_num);
   return graph;
 }
 
@@ -174,72 +175,44 @@ size_t __grin_get_edge_num(GRIN_GRAPH_T* _g, unsigned type_begin,
       res += _g->edge_num[type_id];
       continue;
     }
-
-    auto src_label = _g->vertex_types[_g->src_type_ids[type_id]];
-    auto dst_label = _g->vertex_types[_g->dst_type_ids[type_id]];
-    auto edge_label = _g->edge_types[type_id];
     _g->edge_num[type_id] = 0;
 
     if (_g->edges_collections[type_id].find(
             GAR_NAMESPACE::AdjListType::ordered_by_source) !=
         _g->edges_collections[type_id].end()) {
       auto adj_list_type = GAR_NAMESPACE::AdjListType::ordered_by_source;
-      auto edge_info =
-          _g->graph_info.GetEdgeInfo(src_label, edge_label, dst_label).value();
-      auto vertex_type_id = _g->src_type_ids[type_id];
-      auto vertex_num = _g->vertex_offsets[vertex_type_id + 1] -
-                        _g->vertex_offsets[vertex_type_id];
-      auto vertex_chunk_size = edge_info.GetSrcChunkSize();
-      GAR_NAMESPACE::IdType vid = 0;
-      while (vid < vertex_num) {
-        vid += vertex_chunk_size;
-        if (vid > vertex_num)
-          vid = vertex_num;
-        auto result = GAR_NAMESPACE::utils::GetAdjListOffsetOfVertex(
-            edge_info, _g->graph_info.GetPrefix(), adj_list_type, vid - 1);
-        _g->edge_num[type_id] += result.value().second;
-      }
+      _g->edge_num[type_id] =
+          std::get<GAR_NAMESPACE::EdgesCollection<
+              GAR_NAMESPACE::AdjListType::ordered_by_source>>(
+              _g->edges_collections[type_id].at(adj_list_type))
+              .size();
     } else if (_g->edges_collections[type_id].find(
                    GAR_NAMESPACE::AdjListType::ordered_by_dest) !=
                _g->edges_collections[type_id].end()) {
       auto adj_list_type = GAR_NAMESPACE::AdjListType::ordered_by_dest;
-      auto edge_info =
-          _g->graph_info.GetEdgeInfo(src_label, edge_label, dst_label).value();
-      auto vertex_type_id = _g->dst_type_ids[type_id];
-      auto vertex_num = _g->vertex_offsets[vertex_type_id + 1] -
-                        _g->vertex_offsets[vertex_type_id];
-      auto vertex_chunk_size = edge_info.GetDstChunkSize();
-      GAR_NAMESPACE::IdType vid = 0;
-      while (vid < vertex_num) {
-        vid += vertex_chunk_size;
-        if (vid > vertex_num)
-          vid = vertex_num;
-        auto result = GAR_NAMESPACE::utils::GetAdjListOffsetOfVertex(
-            edge_info, _g->graph_info.GetPrefix(), adj_list_type, vid - 1);
-        _g->edge_num[type_id] += result.value().second;
-      }
+      _g->edge_num[type_id] =
+          std::get<GAR_NAMESPACE::EdgesCollection<
+              GAR_NAMESPACE::AdjListType::ordered_by_dest>>(
+              _g->edges_collections[type_id].at(adj_list_type))
+              .size();
     } else if (_g->edges_collections[type_id].find(
                    GAR_NAMESPACE::AdjListType::unordered_by_source) !=
                _g->edges_collections[type_id].end()) {
       auto adj_list_type = GAR_NAMESPACE::AdjListType::unordered_by_source;
-      auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
-          GAR_NAMESPACE::AdjListType::unordered_by_source>>(
-          _g->edges_collections[type_id].at(adj_list_type));
-      auto it = edges.begin(), it_end = edges.end();
-      while (it != it_end) {
-        it++;
-        _g->edge_num[type_id]++;
-      }
-    } else {
+      _g->edge_num[type_id] =
+          std::get<GAR_NAMESPACE::EdgesCollection<
+              GAR_NAMESPACE::AdjListType::unordered_by_source>>(
+              _g->edges_collections[type_id].at(adj_list_type))
+              .size();
+    } else if (_g->edges_collections[type_id].find(
+                   GAR_NAMESPACE::AdjListType::unordered_by_dest) !=
+               _g->edges_collections[type_id].end()) {
       auto adj_list_type = GAR_NAMESPACE::AdjListType::unordered_by_dest;
-      auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
-          GAR_NAMESPACE::AdjListType::unordered_by_dest>>(
-          _g->edges_collections[type_id].at(adj_list_type));
-      auto it = edges.begin(), it_end = edges.end();
-      while (it != it_end) {
-        it++;
-        _g->edge_num[type_id]++;
-      }
+      _g->edge_num[type_id] =
+          std::get<GAR_NAMESPACE::EdgesCollection<
+              GAR_NAMESPACE::AdjListType::unordered_by_dest>>(
+              _g->edges_collections[type_id].at(adj_list_type))
+              .size();
     }
     res += _g->edge_num[type_id];
   }

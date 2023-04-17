@@ -57,7 +57,7 @@ struct GRIN_GRAPH_T {
   explicit GRIN_GRAPH_T(GAR_NAMESPACE::GraphInfo graph_info_)
       : graph_info(graph_info_),
         tot_vertex_num(0),
-        tot_edge_num(-1),
+        tot_edge_num(0),
         vertex_type_num(0),
         edge_type_num(0),
         unique_edge_type_num(0) {}

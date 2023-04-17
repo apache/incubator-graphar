@@ -44,9 +44,8 @@ size_t grin_get_vertex_num(GRIN_GRAPH g) {
 
 size_t grin_get_edge_num(GRIN_GRAPH g) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  if (_g->tot_edge_num == -1)
-    _g->tot_edge_num = __grin_get_edge_num(_g, 0, _g->edge_type_num);
-  return _g->tot_edge_num;
+  size_t result = _g->tot_edge_num;
+  return result;
 }
 
 // Vertex
