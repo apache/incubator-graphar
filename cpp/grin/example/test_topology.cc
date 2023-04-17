@@ -17,10 +17,19 @@ limitations under the License.
 
 #include "grin/example/config.h"
 
+#include "grin/include/proto/message.h"
 #include "grin/include/topology/adjacentlist.h"
 #include "grin/include/topology/edgelist.h"
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
+
+void test_protobuf() {
+  std::cout << "\n++++ test protobuf ++++" << std::endl;
+
+  std::cout << grin_get_static_storage_feature_msg() << std::endl;
+
+  std::cout << "---- test protobuf ----" << std::endl;
+}
 
 void test_topology_structure(GRIN_GRAPH graph) {
   std::cout << "\n++++ test topology: structure ++++" << std::endl;
@@ -182,13 +191,16 @@ void test_topology_adjlist(GRIN_GRAPH graph) {
 int main(int argc, char* argv[]) {
   // get graph from graph info of GraphAr
   std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+      TEST_DATA_SMALL_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   std::cout << "GraphInfo path = " << path << std::endl;
 
   char** args = new char*[1];
   args[0] = new char[path.length() + 1];
   snprintf(args[0], path.length() + 1, "%s", path.c_str());
   GRIN_GRAPH graph = grin_get_graph_from_storage(1, args);
+
+  // test protobuf
+  test_protobuf();
 
   // test topology structure
   test_topology_structure(graph);
