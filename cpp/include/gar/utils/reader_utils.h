@@ -30,8 +30,7 @@ Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
     AdjListType adj_list_type, IdType vid) noexcept;
 
 Result<IdType> GetVertexChunkNum(
-    const std::string& prefix, const VertexInfo& vertex_info,
-    std::shared_ptr<FileSystem> fs = nullptr) noexcept;
+    const std::string& prefix, const VertexInfo& vertex_info) noexcept;
 
 Result<IdType> GetEdgeChunkNum(const std::string& prefix,
                                const EdgeInfo& edge_info,
