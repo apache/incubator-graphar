@@ -26,6 +26,7 @@ project(graph-archive LANGUAGES C CXX VERSION ${GAR_VERSION})
 option(NAMESPACE "User specific namespace, default if GraphArchive" OFF)
 option(BUILD_TESTS "Build unit tests" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_GRIN "Build grin" OFF)
 
 if (NAMESPACE)
   add_definitions(-DGAR_NAMESPACE=${NAMESPACE})
@@ -218,6 +219,10 @@ macro(build_gar)
 endmacro()
 
 build_gar()
+
+if(BUILD_GRIN)
+    add_subdirectory(grin)
+endif()
 
 # ------------------------------------------------------------------------------
 # build example
