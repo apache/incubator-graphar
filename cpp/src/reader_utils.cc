@@ -68,10 +68,9 @@ Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
 }
 
 Result<IdType> GetVertexChunkNum(const std::string& prefix,
-                                 const VertexInfo& vertex_info,
-                                 std::shared_ptr<FileSystem> fs) noexcept {
+                                 const VertexInfo& vertex_info) noexcept {
   std::string out_prefix;
-  GAR_ASSIGN_OR_RAISE(fs, FileSystemFromUriOrPath(prefix, &out_prefix));
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
   GAR_ASSIGN_OR_RAISE(auto vertex_num_file_suffix,
                       vertex_info.GetVerticesNumFilePath());
   std::string vertex_num_file_path = out_prefix + vertex_num_file_suffix;
