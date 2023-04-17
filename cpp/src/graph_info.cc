@@ -300,7 +300,7 @@ Result<GraphInfo> GraphInfo::Load(const std::string& path) {
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUri(path, &no_url_path));
   GAR_ASSIGN_OR_RAISE(auto yaml_content,
                       fs->ReadFileToValue<std::string>(no_url_path));
-  GAR_ASSIGN_OR_RAISE(auto graph_meta, Yaml::Load(input));
+  GAR_ASSIGN_OR_RAISE(auto graph_meta, Yaml::Load(yaml_content));
   std::string default_name = "graph";
   std::string default_prefix = PathToDirectory(path);
   return ConstructGraphInfo(graph_meta, default_name, default_prefix, fs,
@@ -314,7 +314,8 @@ Result<GraphInfo> GraphInfo::Load(const std::string& input,
   std::string default_prefix =
       relative_location;  // default chunk file prefix is relative location
   std::string no_url_path;
-  GAR_ASSIGN_OR_RAISE(fs, FileSystemFromUri(relative_location, &no_url_path));
+  GAR_ASSIGN_OR_RAISE(
+      auto fs, FileSystemFromUri(relative_location, &no_url_path));
   return ConstructGraphInfo(graph_meta, default_name, default_prefix, fs,
                             no_url_path);
 }

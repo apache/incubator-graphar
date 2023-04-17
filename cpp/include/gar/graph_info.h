@@ -1244,7 +1244,6 @@ class GraphInfo {
       edge2info_;  // "person_knows_person" ->  EdgeInfo of (person, knows,
                    // person)
   std::vector<std::string> vertex_paths_, edge_paths_;
-  std::vector <
 };
 
 }  // namespace GAR_NAMESPACE_INTERNAL

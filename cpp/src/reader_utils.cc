@@ -100,7 +100,7 @@ Result<IdType> GetEdgeNum(const std::string& prefix, const EdgeInfo& edge_info,
                           AdjListType adj_list_type,
                           IdType vertex_chunk_index) noexcept {
   std::string out_prefix;
-  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUri(prefix, &out_prefix));
   GAR_ASSIGN_OR_RAISE(
       auto edge_num_file_suffix,
       edge_info.GetEdgesNumFilePath(vertex_chunk_index, adj_list_type));

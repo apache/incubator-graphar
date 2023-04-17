@@ -74,9 +74,9 @@ static Status CastToLargeOffsetArray(
   return Status::OK();
 }
 
-Result<Uri> ParseFileSystemUri(const std::string& uri) {
-  Uri uri;
-  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(uri.Parse(uri_string));
+Result<arrow::internal::Uri> ParseFileSystemUri(const std::string& uri_string) {
+  arrow::internal::Uri uri;
+  RETURN_NOT_ARROW_OK(uri.Parse(uri_string));
   return std::move(uri);
 }
 }  // namespace detail
@@ -271,17 +271,16 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUri(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
       auto arrow_fs, arrow::fs::FileSystemFromUri(uri_string));
 
-  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto uri,
-                                       detail::ParseFileSystemUri(uri));
+  GAR_ASSIGN_OR_RAISE(auto uri, detail::ParseFileSystemUri(uri_string));
   if (out_path != nullptr) {
-    if (uri.scheme == "file" || uri.scheme == "hdfs") {
+    if (uri.scheme() == "file" || uri.scheme() == "hdfs") {
       *out_path = uri.path();
-    } else if (uri.schema == "s3" || uri.schema == "gs") {
+    } else if (uri.scheme() == "s3" || uri.scheme() == "gs") {
       // bucket name is the host, path is the path
       // the arrow parser would delete the trailing slash which we don't want to
       *out_path = uri.host() + uri.path();
     } else {
-      return Status::Invalid("Unrecognized filesystem type in URI: ",
+      return Status::Invalid("Unrecognized filesystem type in URI: " +
                              uri_string);
     }
   }
