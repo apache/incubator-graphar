@@ -47,7 +47,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update -y
-        sudo apt-get install -y libboost-graph-dev ccache libcurl-dev
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
 
     - name: CMake
       run: |

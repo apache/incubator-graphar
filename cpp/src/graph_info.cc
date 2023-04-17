@@ -98,7 +98,7 @@ Result<std::string> VertexInfo::Dump() const noexcept {
 
 Status VertexInfo::Save(const std::string& path) const {
   std::string no_url_path;
-  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUri(path, &no_url_path));
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(path, &no_url_path));
   GAR_ASSIGN_OR_RAISE(auto yaml_content, this->Dump());
   return fs->WriteValueToFile(yaml_content, path);
 }
@@ -222,7 +222,7 @@ Result<std::string> EdgeInfo::Dump() const noexcept {
 
 Status EdgeInfo::Save(const std::string& path) const {
   std::string no_url_path;
-  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUri(path, &no_url_path));
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(path, &no_url_path));
   GAR_ASSIGN_OR_RAISE(auto yaml_content, this->Dump());
   return fs->WriteValueToFile(yaml_content, path);
 }
@@ -297,7 +297,7 @@ static Result<GraphInfo> ConstructGraphInfo(
 
 Result<GraphInfo> GraphInfo::Load(const std::string& path) {
   std::string no_url_path;
-  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUri(path, &no_url_path));
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(path, &no_url_path));
   GAR_ASSIGN_OR_RAISE(auto yaml_content,
                       fs->ReadFileToValue<std::string>(no_url_path));
   GAR_ASSIGN_OR_RAISE(auto graph_meta, Yaml::Load(yaml_content));
@@ -317,8 +317,8 @@ Result<GraphInfo> GraphInfo::Load(const std::string& input,
   std::string default_prefix =
       relative_location;  // default chunk file prefix is relative location
   std::string no_url_path;
-  GAR_ASSIGN_OR_RAISE(
-      auto fs, FileSystemFromUri(relative_location, &no_url_path));
+  GAR_ASSIGN_OR_RAISE(auto fs,
+                      FileSystemFromUriOrPath(relative_location, &no_url_path));
   return ConstructGraphInfo(graph_meta, default_name, default_prefix, fs,
                             no_url_path);
 }
@@ -344,7 +344,7 @@ Result<std::string> GraphInfo::Dump() const noexcept {
 
 Status GraphInfo::Save(const std::string& path) const {
   std::string no_url_path;
-  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUri(path, &no_url_path));
+  GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(path, &no_url_path));
   GAR_ASSIGN_OR_RAISE(auto yaml_content, this->Dump());
   return fs->WriteValueToFile(yaml_content, no_url_path);
 }

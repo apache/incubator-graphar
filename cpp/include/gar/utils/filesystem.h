@@ -123,7 +123,7 @@ class FileSystem {
 /**
  * @brief Create a new FileSystem by URI
  *
- * wrapper of arrow::fs::FileSystemFromUri
+ * wrapper of arrow::fs::FileSystemFromUriOrPath
  *
  * Recognized schemes are "file", "mock", "hdfs", "viewfs", "s3",
  * "gs" and "gcs".
@@ -131,7 +131,7 @@ class FileSystem {
  * in addition also recognize non-URIs, and treat them as local filesystem
  * paths. Only absolute local filesystem paths are allowed.
  */
-Result<std::shared_ptr<FileSystem>> FileSystemFromUri(
+Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri, std::string* out_path = nullptr);
 
 }  // namespace GAR_NAMESPACE_INTERNAL

@@ -245,7 +245,8 @@ class VerticesCollection {
       : vertex_info_(vertex_info), prefix_(prefix) {
     // get the vertex num
     std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs, FileSystemFromUri(prefix, &base_dir));
+    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
+                              FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto file_path,
                               vertex_info.GetVerticesNumFilePath());
     std::string vertex_num_path = base_dir + file_path;
@@ -638,7 +639,8 @@ class EdgesCollection<AdjListType::ordered_by_source> {
                   IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs, FileSystemFromUri(prefix, &base_dir));
+    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
+                              FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
                               edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += adj_list_path_prefix;
@@ -795,7 +797,8 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
                   IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs, FileSystemFromUri(prefix, &base_dir));
+    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
+                              FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
                               edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += adj_list_path_prefix;
@@ -952,7 +955,8 @@ class EdgesCollection<AdjListType::unordered_by_source> {
                   IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs, FileSystemFromUri(prefix, &base_dir));
+    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
+                              FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
                               edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += adj_list_path_prefix;
@@ -1082,7 +1086,8 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
                   IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
     std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs, FileSystemFromUri(prefix, &base_dir));
+    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
+                              FileSystemFromUriOrPath(prefix, &base_dir));
     GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
                               edge_info.GetAdjListPathPrefix(adj_list_type_));
     base_dir += adj_list_path_prefix;
