@@ -29,6 +29,6 @@ static const std::string TEST_DATA_SMALL_DIR =  // NOLINT
         .parent_path()
         .parent_path()
         .string() +
-    "/test/gar-test";
+    "/testing";
 
 #endif  // CPP_GRIN_EXAMPLE_CONFIG_H_

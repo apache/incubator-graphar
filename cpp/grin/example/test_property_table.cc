@@ -27,7 +27,7 @@ limitations under the License.
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
 
-void test_porperty_table_row(GRIN_GRAPH graph) {
+void test_property_table_row(GRIN_GRAPH graph) {
   std::cout << "\n++++ test property: table (row) ++++" << std::endl;
 
   // create row
@@ -65,7 +65,7 @@ void test_porperty_table_row(GRIN_GRAPH graph) {
   std::cout << "---- test property: table (row) completed ----" << std::endl;
 }
 
-void test_porperty_table_vertex(GRIN_GRAPH graph) {
+void test_property_table_vertex(GRIN_GRAPH graph) {
   std::cout << "\n++++ test property: table (vertex) ++++" << std::endl;
 
   // get vertex type list
@@ -159,7 +159,7 @@ void test_porperty_table_vertex(GRIN_GRAPH graph) {
   std::cout << "---- test property: table (vertex) completed ----" << std::endl;
 }
 
-void test_porperty_table_edge(GRIN_GRAPH graph) {
+void test_property_table_edge(GRIN_GRAPH graph) {
   std::cout << "\n++++ test property: table (edge) ++++" << std::endl;
 
   // get edge type list
@@ -265,13 +265,13 @@ int main(int argc, char* argv[]) {
   GRIN_GRAPH graph = grin_get_graph_from_storage(1, args);
 
   // test property table row
-  test_porperty_table_row(graph);
+  test_property_table_row(graph);
 
   // test property table vertex
-  test_porperty_table_vertex(graph);
+  test_property_table_vertex(graph);
 
   // test property table edge
-  test_porperty_table_edge(graph);
+  test_property_table_edge(graph);
 
   // destroy graph
   grin_destroy_graph(graph);

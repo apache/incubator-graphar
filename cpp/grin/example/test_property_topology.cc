@@ -24,7 +24,7 @@ limitations under the License.
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
 
-void test_porperty_topology_vertex(GRIN_GRAPH graph) {
+void test_property_topology_vertex(GRIN_GRAPH graph) {
   std::cout << "\n++++ test property: topology (vertex) ++++" << std::endl;
 
   // get vertex type list
@@ -221,7 +221,7 @@ int main(int argc, char* argv[]) {
   GRIN_GRAPH graph = grin_get_graph_from_storage(1, args);
 
   // test property topology (vertex)
-  test_porperty_topology_vertex(graph);
+  test_property_topology_vertex(graph);
 
   // test property topology (edge)
   test_property_topology_edge(graph);
