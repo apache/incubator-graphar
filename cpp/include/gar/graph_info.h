@@ -34,6 +34,8 @@ namespace GAR_NAMESPACE_INTERNAL {
 
 class Yaml;
 
+class FileSystem;
+
 /**
  * Property is a struct to store the property information for a group.
  */

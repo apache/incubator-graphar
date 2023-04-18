@@ -122,8 +122,11 @@ Status VertexPropertyWriter::WriteChunk(
   auto schema = input_table->schema();
   for (auto& property : property_group.GetProperties()) {
     int indice = schema->GetFieldIndex(property.name);
-    if (indice == -1)
-      return Status::InvalidOperation("invalid property");
+    if (indice == -1) {
+      std::string msg = "invalid property: " + property.name +
+                        " vertex: " + vertex_info_.GetLabel();
+      return Status::InvalidOperation(msg);
+    }
     indices.push_back(indice);
   }
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto in_table,
@@ -274,8 +277,11 @@ Status EdgeChunkWriter::WritePropertyChunk(
   auto schema = input_table->schema();
   for (auto& property : property_group.GetProperties()) {
     int indice = schema->GetFieldIndex(property.name);
-    if (indice == -1)
-      return Status::InvalidOperation("invalid property");
+    if (indice == -1) {
+      std::string msg = "invalid property: " + property.name +
+                        " edge: " + edge_info_.GetEdgeLabel();
+      return Status::InvalidOperation(msg);
+    }
     indices.push_back(indice);
   }
   auto in_table = input_table->SelectColumns(indices).ValueOrDie();

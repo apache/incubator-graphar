@@ -63,7 +63,7 @@ class VertexPropertyArrowChunkReader {
                               vertex_info.GetPathPrefix(property_group));
     std::string base_dir = prefix_ + pg_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
-                              utils::GetVertexChunkNum(prefix_, vertex_info_));
+                              utils::GetVertexChunkNum(prefix_, vertex_info));
   }
 
   /**

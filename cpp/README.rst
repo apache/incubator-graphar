@@ -26,6 +26,7 @@ Building requires:
   sufficient. For MacOS, at least clang 5 is required
 * CMake 3.5 or higher
 * On Linux and macOS, ``make`` build utilities
+* curl-devel (Linux) or curl (macOS), for s3 filesystem support
 
 Dependencies for optional features:
 

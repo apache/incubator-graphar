@@ -73,6 +73,12 @@ static Status CastToLargeOffsetArray(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(out, arrow::ChunkedArray::Make(chunks));
   return Status::OK();
 }
+
+Result<arrow::internal::Uri> ParseFileSystemUri(const std::string& uri_string) {
+  arrow::internal::Uri uri;
+  RETURN_NOT_ARROW_OK(uri.Parse(uri_string));
+  return std::move(uri);
+}
 }  // namespace detail
 
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
@@ -173,8 +179,8 @@ Result<std::string> FileSystem::ReadFileToValue(const std::string& path) const
 template <typename T>
 Status FileSystem::WriteValueToFile(const T& value,
                                     const std::string& path) const noexcept {
-  RETURN_NOT_ARROW_OK(
-      arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
+  // try to create the directory, oss filesystem may not support this, ignore
+  ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto ofstream,
                                        arrow_fs_->OpenOutputStream(path));
   RETURN_NOT_ARROW_OK(ofstream->Write(&value, sizeof(T)));
@@ -185,8 +191,8 @@ Status FileSystem::WriteValueToFile(const T& value,
 template <>
 Status FileSystem::WriteValueToFile(const std::string& value,
                                     const std::string& path) const noexcept {
-  RETURN_NOT_ARROW_OK(
-      arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
+  // try to create the directory, oss filesystem may not support this, ignore
+  ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto ofstream,
                                        arrow_fs_->OpenOutputStream(path));
   RETURN_NOT_ARROW_OK(ofstream->Write(value.c_str(), value.size()));
@@ -197,8 +203,8 @@ Status FileSystem::WriteValueToFile(const std::string& value,
 Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
                                     FileType file_type,
                                     const std::string& path) const noexcept {
-  RETURN_NOT_ARROW_OK(
-      arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
+  // try to create the directory, oss filesystem may not support this, ignore
+  ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto output_stream,
                                        arrow_fs_->OpenOutputStream(path));
   switch (file_type) {
@@ -242,7 +248,8 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
 
 Status FileSystem::CopyFile(const std::string& src_path,
                             const std::string& dst_path) const noexcept {
-  RETURN_NOT_ARROW_OK(
+  // try to create the directory, oss filesystem may not support this, ignore
+  ARROW_UNUSED(
       arrow_fs_->CreateDir(dst_path.substr(0, dst_path.find_last_of("/"))));
   RETURN_NOT_ARROW_OK(arrow_fs_->CopyFile(src_path, dst_path));
   return Status::OK();
@@ -261,9 +268,31 @@ Result<IdType> FileSystem::GetFileNumOfDir(const std::string& dir_path,
 }
 
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
-    const std::string& uri, std::string* out_path) {
+    const std::string& uri_string, std::string* out_path) {
+  if (arrow::fs::internal::DetectAbsolutePath(uri_string)) {
+    // if the uri_string is an absolute path, we need to create a local file
+    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
+        auto arrow_fs,
+        arrow::fs::FileSystemFromUriOrPath(uri_string, out_path));
+    return std::make_shared<FileSystem>(arrow_fs);
+  }
+
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
-      auto arrow_fs, arrow::fs::FileSystemFromUriOrPath(uri, out_path));
+      auto arrow_fs, arrow::fs::FileSystemFromUriOrPath(uri_string));
+  GAR_ASSIGN_OR_RAISE(auto uri, detail::ParseFileSystemUri(uri_string));
+  if (out_path != nullptr) {
+    if (uri.scheme() == "file" || uri.scheme() == "hdfs" ||
+        uri.scheme().empty()) {
+      *out_path = uri.path();
+    } else if (uri.scheme() == "s3" || uri.scheme() == "gs") {
+      // bucket name is the host, path is the path
+      // the arrow parser would delete the trailing slash which we don't want to
+      *out_path = uri.host() + uri.path();
+    } else {
+      return Status::Invalid("Unrecognized filesystem type in URI: " +
+                             uri_string);
+    }
+  }
   return std::make_shared<FileSystem>(arrow_fs);
 }
 

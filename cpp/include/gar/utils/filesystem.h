@@ -123,7 +123,7 @@ class FileSystem {
 /**
  * @brief Create a new FileSystem by URI
  *
- * wrapper of arrow::fs::FileSystemFromUri
+ * wrapper of arrow::fs::FileSystemFromUriOrPath
  *
  * Recognized schemes are "file", "mock", "hdfs", "viewfs", "s3",
  * "gs" and "gcs".

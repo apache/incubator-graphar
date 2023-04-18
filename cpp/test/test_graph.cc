@@ -74,7 +74,7 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_source>>(expect.value());
   auto end = edges.end();
-  GAR_NAMESPACE::IdType count = 0;
+  size_t count = 0;
   for (auto it = edges.begin(); it != end; ++it) {
     // access data through iterator directly
     std::cout << "src=" << it.source() << ", dst=" << it.destination()
@@ -95,7 +95,7 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   auto& edges1 = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_dest>>(expect1.value());
   auto end1 = edges1.end();
-  GAR_NAMESPACE::IdType count1 = 0;
+  size_t count1 = 0;
   for (auto it = edges1.begin(); it != end1; ++it) {
     count1++;
   }
@@ -110,7 +110,7 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   auto& edges2 = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_source>>(expect2.value());
   auto end2 = edges2.end();
-  GAR_NAMESPACE::IdType count2 = 0;
+  size_t count2 = 0;
   for (auto it = edges2.begin(); it != end2; ++it) {
     auto edge = *it;
     std::cout << "src=" << edge.source() << ", dst=" << edge.destination()
@@ -128,7 +128,7 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   auto& edges3 = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::unordered_by_source>>(expect3.value());
   auto end3 = edges3.end();
-  GAR_NAMESPACE::IdType count3 = 0;
+  size_t count3 = 0;
   for (auto it = edges3.begin(); it != end3; ++it) {
     count3++;
   }
