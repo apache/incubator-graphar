@@ -180,7 +180,7 @@ template <typename T>
 Status FileSystem::WriteValueToFile(const T& value,
                                     const std::string& path) const noexcept {
   // try to create the directory, oss filesystem may not support this, ignore
-  arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/")));
+  ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto ofstream,
                                        arrow_fs_->OpenOutputStream(path));
   RETURN_NOT_ARROW_OK(ofstream->Write(&value, sizeof(T)));
