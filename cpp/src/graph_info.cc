@@ -304,8 +304,6 @@ Result<GraphInfo> GraphInfo::Load(const std::string& path) {
   std::string default_name = "graph";
   std::string default_prefix = PathToDirectory(path);
   no_url_path = PathToDirectory(no_url_path);
-  std::cout << "default_prefix: " << default_prefix << std::endl;
-  std::cout << "no_url_path: " << no_url_path << std::endl;
   return ConstructGraphInfo(graph_meta, default_name, default_prefix, fs,
                             no_url_path);
 }
