@@ -234,7 +234,8 @@ TEST_CASE("test_edge_chunk_writer") {
   // Invalid data type
   REQUIRE(writer.WritePropertyChunk(tmp_table, pg2, 0, 0).IsTypeError());
   auto edge_num = input2->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
-  GAR_NAMESPACE::IdType* edge_num_ptr = (GAR_NAMESPACE::IdType*) edge_num->data();
+  GAR_NAMESPACE::IdType* edge_num_ptr =
+      (GAR_NAMESPACE::IdType*) edge_num->data();
   REQUIRE((*edge_num_ptr) == table->num_rows());
 
   // Write number of vertices
@@ -244,6 +245,7 @@ TEST_CASE("test_edge_chunk_writer") {
             "/tmp/edge/person_knows_person/ordered_by_source/vertex_count")
           .ValueOrDie();
   auto vertex_num = input3->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
-  GAR_NAMESPACE::IdType* vertex_num_ptr = (GAR_NAMESPACE::IdType*) vertex_num->data();
+  GAR_NAMESPACE::IdType* vertex_num_ptr =
+      (GAR_NAMESPACE::IdType*) vertex_num->data();
   REQUIRE((*vertex_num_ptr) == 903);
 }

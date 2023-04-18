@@ -160,8 +160,9 @@ class AdjListArrowChunkReader {
     GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
                               edge_info.GetAdjListPathPrefix(adj_list_type));
     base_dir_ = prefix_ + adj_list_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
-                              utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+    GAR_ASSIGN_OR_RAISE_ERROR(
+        vertex_chunk_num_,
+        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     GAR_ASSIGN_OR_RAISE_ERROR(
         chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
                                            vertex_chunk_index_));
@@ -320,8 +321,9 @@ class AdjListOffsetArrowChunkReader {
     base_dir_ = prefix_ + dir_path;
     if (adj_list_type == AdjListType::ordered_by_source ||
         adj_list_type == AdjListType::ordered_by_dest) {
-      GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
-                              utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+      GAR_ASSIGN_OR_RAISE_ERROR(
+          vertex_chunk_num_,
+          utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
       vertex_chunk_size_ = adj_list_type == AdjListType::ordered_by_source
                                ? edge_info_.GetSrcChunkSize()
                                : edge_info_.GetDstChunkSize();
@@ -422,8 +424,9 @@ class AdjListPropertyArrowChunkReader {
         auto pg_path_prefix,
         edge_info.GetPropertyGroupPathPrefix(property_group, adj_list_type));
     base_dir_ = prefix_ + pg_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(vertex_chunk_num_,
-                              utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+    GAR_ASSIGN_OR_RAISE_ERROR(
+        vertex_chunk_num_,
+        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     GAR_ASSIGN_OR_RAISE_ERROR(
         chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
                                            vertex_chunk_index_));

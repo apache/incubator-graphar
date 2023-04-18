@@ -346,7 +346,8 @@ Status EdgeChunkWriter::WriteEdgesNum(IdType vertex_chunk_index,
 }
 
 Status EdgeChunkWriter::WriteVerticesNum(const IdType& count) const noexcept {
-  GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_.GetVerticesNumFilePath(adj_list_type_));
+  GAR_ASSIGN_OR_RAISE(auto suffix,
+                      edge_info_.GetVerticesNumFilePath(adj_list_type_));
   std::string path = prefix_ + suffix;
   return fs_->WriteValueToFile<IdType>(count, path);
 }

@@ -81,7 +81,7 @@ Result<IdType> GetVertexChunkNum(const std::string& prefix,
 }
 
 Result<IdType> GetVertexNum(const std::string& prefix,
-                                 const VertexInfo& vertex_info) noexcept {
+                            const VertexInfo& vertex_info) noexcept {
   std::string out_prefix;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
   GAR_ASSIGN_OR_RAISE(auto vertex_num_file_suffix,
@@ -93,18 +93,18 @@ Result<IdType> GetVertexNum(const std::string& prefix,
 }
 
 Result<IdType> GetVertexChunkNum(const std::string& prefix,
-                               const EdgeInfo& edge_info,
-                               AdjListType adj_list_type) noexcept {
+                                 const EdgeInfo& edge_info,
+                                 AdjListType adj_list_type) noexcept {
   std::string out_prefix;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
-  GAR_ASSIGN_OR_RAISE(
-      auto vertex_num_file_suffix,
-      edge_info.GetVerticesNumFilePath(adj_list_type));
+  GAR_ASSIGN_OR_RAISE(auto vertex_num_file_suffix,
+                      edge_info.GetVerticesNumFilePath(adj_list_type));
   std::string vertex_num_file_path = out_prefix + vertex_num_file_suffix;
   GAR_ASSIGN_OR_RAISE(auto vertex_num,
                       fs->ReadFileToValue<IdType>(vertex_num_file_path));
-  IdType chunk_size;                 
-  if (adj_list_type == AdjListType::ordered_by_source || adj_list_type == AdjListType::unordered_by_source) {
+  IdType chunk_size;
+  if (adj_list_type == AdjListType::ordered_by_source ||
+      adj_list_type == AdjListType::unordered_by_source) {
     chunk_size = edge_info.GetSrcChunkSize();
   } else {
     chunk_size = edge_info.GetDstChunkSize();
@@ -112,13 +112,13 @@ Result<IdType> GetVertexChunkNum(const std::string& prefix,
   return (vertex_num + chunk_size - 1) / chunk_size;
 }
 
-Result<IdType> GetVertexNum(const std::string& prefix, const EdgeInfo& edge_info,
-                          AdjListType adj_list_type) noexcept {
+Result<IdType> GetVertexNum(const std::string& prefix,
+                            const EdgeInfo& edge_info,
+                            AdjListType adj_list_type) noexcept {
   std::string out_prefix;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
-  GAR_ASSIGN_OR_RAISE(
-      auto vertex_num_file_suffix,
-      edge_info.GetVerticesNumFilePath(adj_list_type));
+  GAR_ASSIGN_OR_RAISE(auto vertex_num_file_suffix,
+                      edge_info.GetVerticesNumFilePath(adj_list_type));
   std::string vertex_num_file_path = out_prefix + vertex_num_file_suffix;
   GAR_ASSIGN_OR_RAISE(auto vertex_num,
                       fs->ReadFileToValue<IdType>(vertex_num_file_path));

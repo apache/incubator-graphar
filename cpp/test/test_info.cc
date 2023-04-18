@@ -287,7 +287,7 @@ TEST_CASE("test_edge_info") {
               .IsKeyError());
   REQUIRE(edge_info.GetVerticesNumFilePath(adj_list_type_not_exist)
               .status()
-              .IsKeyError());            
+              .IsKeyError());
 
   // edge count file path
   auto maybe_path = edge_info.GetEdgesNumFilePath(0, adj_list_type);

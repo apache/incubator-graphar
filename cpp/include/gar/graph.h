@@ -638,8 +638,9 @@ class EdgesCollection<AdjListType::ordered_by_source> {
                   IdType vertex_chunk_begin = 0,
                   IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
-    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
-                              utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+    GAR_ASSIGN_OR_RAISE_ERROR(
+        auto vertex_chunk_num,
+        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
       vertex_chunk_end = vertex_chunk_num;
@@ -790,8 +791,9 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
                   IdType vertex_chunk_begin = 0,
                   IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
-    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
-                              utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+    GAR_ASSIGN_OR_RAISE_ERROR(
+        auto vertex_chunk_num,
+        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
       vertex_chunk_end = vertex_chunk_num;
@@ -942,8 +944,9 @@ class EdgesCollection<AdjListType::unordered_by_source> {
                   IdType vertex_chunk_begin = 0,
                   IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
-    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
-                              utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+    GAR_ASSIGN_OR_RAISE_ERROR(
+        auto vertex_chunk_num,
+        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
       vertex_chunk_end = vertex_chunk_num;
@@ -1067,8 +1070,9 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
                   IdType vertex_chunk_begin = 0,
                   IdType vertex_chunk_end = std::numeric_limits<int64_t>::max())
       : edge_info_(edge_info), prefix_(prefix) {
-    GAR_ASSIGN_OR_RAISE_ERROR(auto vertex_chunk_num,
-                              utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+    GAR_ASSIGN_OR_RAISE_ERROR(
+        auto vertex_chunk_num,
+        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
       vertex_chunk_end = vertex_chunk_num;
