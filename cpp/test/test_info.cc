@@ -362,13 +362,4 @@ TEST_CASE("test_graph_info_load_from_s3") {
   const auto& edge_infos = graph_info.GetEdgeInfos();
   REQUIRE(vertex_infos.size() == 8);
   REQUIRE(edge_infos.size() == 23);
-
-  std::string out_path;
-  auto fs = GraphArchive::FileSystemFromUriOrPath(path, &out_path).value();
-  std::cout << "out_path: " << out_path << std::endl;
-  auto ret = fs->GetFileNumOfDir("graphar/ldbc//");
-  if (ret.has_error()) {
-    std::cout << ret.status().message() << std::endl;
-  }
-  std::cout << "file num: " << ret.value() << std::endl;
 }
