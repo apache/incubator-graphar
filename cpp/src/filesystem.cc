@@ -192,7 +192,7 @@ template <>
 Status FileSystem::WriteValueToFile(const std::string& value,
                                     const std::string& path) const noexcept {
   // try to create the directory, oss filesystem may not support this, ignore
-  arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/")));
+  ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto ofstream,
                                        arrow_fs_->OpenOutputStream(path));
   RETURN_NOT_ARROW_OK(ofstream->Write(value.c_str(), value.size()));
@@ -204,7 +204,7 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
                                     FileType file_type,
                                     const std::string& path) const noexcept {
   // try to create the directory, oss filesystem may not support this, ignore
-  arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/")));
+  ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto output_stream,
                                        arrow_fs_->OpenOutputStream(path));
   switch (file_type) {
@@ -249,7 +249,8 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
 Status FileSystem::CopyFile(const std::string& src_path,
                             const std::string& dst_path) const noexcept {
   // try to create the directory, oss filesystem may not support this, ignore
-  arrow_fs_->CreateDir(dst_path.substr(0, dst_path.find_last_of("/")));
+  ARROW_UNUSED(
+      arrow_fs_->CreateDir(dst_path.substr(0, dst_path.find_last_of("/"))));
   RETURN_NOT_ARROW_OK(arrow_fs_->CopyFile(src_path, dst_path));
   return Status::OK();
 }
