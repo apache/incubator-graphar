@@ -186,7 +186,8 @@ class AdjListChunkInfoReader {
    *     error.
    */
   Status next_chunk() {
-    if (++chunk_index_ >= chunk_num_) {
+    ++chunk_index_;
+    while (chunk_index_ >= chunk_num_) {
       ++vertex_chunk_index_;
       if (vertex_chunk_index_ >= vertex_chunk_num_) {
         return Status::OutOfRange();
@@ -290,7 +291,8 @@ class AdjListPropertyChunkInfoReader {
    *  error.
    */
   Status next_chunk() {
-    if (++chunk_index_ >= chunk_num_) {
+    ++chunk_index_;
+    while (chunk_index_ >= chunk_num_) {
       ++vertex_chunk_index_;
       if (vertex_chunk_index_ >= vertex_chunk_num_) {
         return Status::OutOfRange();
