@@ -83,15 +83,37 @@ Status VertexPropertyWriter::Validate(
   // use the writer's validate level
   if (validate_level == ValidateLevel::default_validate)
     validate_level = validate_level_;
-  // validate
-  if (validate_level_ == ValidateLevel::no_validate)
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
+  // weak validate
   if (input_table->num_rows() > vertex_info_.GetChunkSize())
-    return Status::OutOfRange();
+    return Status::OutOfRange(
+        "the number of rows in the input table is larger than the vertex chunk "
+        "size");
   if (!vertex_info_.ContainPropertyGroup(property_group))
-    return Status::Invalid("invalid property group");
+    return Status::InvalidOperation(
+        "the property group does not exist in the vertex info");
   if (chunk_index < 0)
-    return Status::Invalid("invalid chunk index");
+    return Status::InvalidOperation("invalid vertex chunk index");
+  // strong validate
+  if (validate_level == ValidateLevel::strong_validate) {
+    auto schema = input_table->schema();
+    for (auto& property : property_group.GetProperties()) {
+      int indice = schema->GetFieldIndex(property.name);
+      if (indice == -1)
+        return Status::InvalidOperation("property: " + property.name +
+                                        " not found");
+      auto field = schema->field(indice);
+      if (DataType::ArrowDataTypeToDataType(field->type()) != property.type) {
+        std::string err_msg =
+            "invalid data type for property: " + property.name +
+            ", defined as " + property.type.ToTypeName() + ", but got " +
+            DataType::ArrowDataTypeToDataType(field->type()).ToTypeName();
+        return Status::TypeError(err_msg);
+      }
+    }
+  }
   return Status::OK();
 }
 
@@ -178,16 +200,140 @@ Status VertexPropertyWriter::WriteTable(
 Status EdgeChunkWriter::Validate(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     ValidateLevel validate_level) const noexcept {
+  // use the writer's validate level
   if (validate_level == ValidateLevel::default_validate)
     validate_level = validate_level_;
+  // no validate
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
+  // weak validate
   if (!edge_info_.ContainAdjList(adj_list_type_))
-    return Status::InvalidOperation("invalid adj list type");
+    return Status::InvalidOperation(
+        "the adj list type " +
+        std::string(AdjListTypeToString(adj_list_type_)) +
+        "  does not exist in the edge info");
+  if (adj_list_type_ != AdjListType::ordered_by_source &&
+      adj_list_type_ != AdjListType::ordered_by_dest)
+    return Status::InvalidOperation(
+        "the adj list type has to be ordered_by_source or ordered_by_dest, but "
+        "got " +
+        std::string(AdjListTypeToString(adj_list_type_)));
+  if (adj_list_type_ == AdjListType::ordered_by_source &&
+      input_table->num_rows() > edge_info_.GetSrcChunkSize() + 1)
+    return Status::OutOfRange(
+        "the number of rows in the input table is larger than the offset table "
+        "size for a vertex chunk");
+  if (adj_list_type_ == AdjListType::ordered_by_dest &&
+      input_table->num_rows() > edge_info_.GetDstChunkSize() + 1)
+    return Status::OutOfRange(
+        "the number of rows in the input table is larger than the offset table "
+        "size for a vertex chunk");
+  if (vertex_chunk_index < 0)
+    return Status::InvalidOperation("invalid vertex chunk index");
+  // strong validate
+  if (validate_level == ValidateLevel::strong_validate) {
+    auto schema = input_table->schema();
+    int index = schema->GetFieldIndex(GeneralParams::kOffsetCol);
+    if (index == -1)
+      return Status::InvalidOperation("the offset column is not provided");
+    auto field = schema->field(index);
+    if (field->type()->id() != arrow::Type::INT64)
+      return Status::TypeError(
+          "the data type for offset column should be INT64, but got " +
+          field->type()->name());
+  }
+  return Status::OK();
+}
+
+Status EdgeChunkWriter::Validate(
+    const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
+    IdType chunk_index, ValidateLevel validate_level) const noexcept {
+  // use the writer's validate level
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
+    return Status::OK();
+  // weak validate
+  if (!edge_info_.ContainAdjList(adj_list_type_))
+    return Status::InvalidOperation(
+        "the adj list type " +
+        std::string(AdjListTypeToString(adj_list_type_)) +
+        "  does not exist in the edge info");
+  if (input_table->num_rows() > edge_info_.GetChunkSize())
+    return Status::OutOfRange(
+        "the number of rows in the input table is larger than the edge chunk "
+        "size");
+  if (vertex_chunk_index < 0)
+    return Status::InvalidOperation("invalid vertex chunk index");
+  if (chunk_index < 0)
+    return Status::InvalidOperation("invalid edge chunk index");
+  // stong validate
+  if (validate_level == ValidateLevel::strong_validate) {
+    auto schema = input_table->schema();
+    int index = schema->GetFieldIndex(GeneralParams::kSrcIndexCol);
+    if (index == -1)
+      return Status::InvalidOperation("the source column is not provided");
+    auto field = schema->field(index);
+    if (field->type()->id() != arrow::Type::INT64)
+      return Status::TypeError(
+          "the data type for source column should be INT64, but got " +
+          field->type()->name());
+    index = schema->GetFieldIndex(GeneralParams::kDstIndexCol);
+    if (index == -1)
+      return Status::InvalidOperation("the destination column is not provided");
+    field = schema->field(index);
+    if (field->type()->id() != arrow::Type::INT64)
+      return Status::TypeError(
+          "the data type for destination  column should be INT64, but got " +
+          field->type()->name());
+  }
+  return Status::OK();
+}
+
+Status EdgeChunkWriter::Validate(
+    const std::shared_ptr<arrow::Table>& input_table,
+    const PropertyGroup& property_group, IdType vertex_chunk_index,
+    IdType chunk_index, ValidateLevel validate_level) const noexcept {
+  // use the writer's validate level
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
+    return Status::OK();
+  // weak validate
+  if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_))
+    return Status::InvalidOperation(
+        "the property group does not exist in the edge info");
+  if (!edge_info_.ContainAdjList(adj_list_type_))
+    return Status::InvalidOperation(
+        "the adj list type " +
+        std::string(AdjListTypeToString(adj_list_type_)) +
+        "  does not exist in the edge info");
   if (input_table->num_rows() > edge_info_.GetChunkSize())
     return Status::OutOfRange();
   if (vertex_chunk_index < 0)
     return Status::InvalidOperation("invalid vertex chunk index");
+  if (chunk_index < 0)
+    return Status::InvalidOperation("invalid edge chunk index");
+  // strong validate
+  if (validate_level == ValidateLevel::strong_validate) {
+    auto schema = input_table->schema();
+    for (auto& property : property_group.GetProperties()) {
+      int indice = schema->GetFieldIndex(property.name);
+      if (indice == -1)
+        return Status::InvalidOperation("property: " + property.name +
+                                        " not found");
+      auto field = schema->field(indice);
+      if (DataType::ArrowDataTypeToDataType(field->type()) != property.type) {
+        std::string err_msg =
+            "invalid data type for property: " + property.name +
+            ", defined as " + property.type.ToTypeName() + ", but got " +
+            DataType::ArrowDataTypeToDataType(field->type()).ToTypeName();
+        return Status::TypeError(err_msg);
+      }
+    }
+  }
   return Status::OK();
 }
 
@@ -234,27 +380,32 @@ Status EdgeChunkWriter::WriteOffsetChunk(
     IdType vertex_chunk_index) const noexcept {
   GAR_RETURN_NOT_OK(Validate(input_table, vertex_chunk_index));
   GAR_ASSIGN_OR_RAISE(auto file_type, edge_info_.GetFileType(adj_list_type_));
+  auto schema = input_table->schema();
+  int index = schema->GetFieldIndex(GeneralParams::kOffsetCol);
+  if (index == -1)
+    return Status::InvalidOperation("the offset column is not provided");
+  auto in_table = input_table->SelectColumns({index}).ValueOrDie();
   GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_.GetAdjListOffsetFilePath(
                                        vertex_chunk_index, adj_list_type_));
   std::string path = prefix_ + suffix;
-  return fs_->WriteTableToFile(input_table, file_type, path);
+  return fs_->WriteTableToFile(in_table, file_type, path);
 }
 
 Status EdgeChunkWriter::WriteAdjListChunk(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     IdType chunk_index) const noexcept {
-  GAR_RETURN_NOT_OK(Validate(input_table, vertex_chunk_index));
+  GAR_RETURN_NOT_OK(Validate(input_table, vertex_chunk_index, chunk_index));
   GAR_ASSIGN_OR_RAISE(auto file_type, edge_info_.GetFileType(adj_list_type_));
   std::vector<int> indices;
   indices.clear();
   auto schema = input_table->schema();
   int index = schema->GetFieldIndex(GeneralParams::kSrcIndexCol);
   if (index == -1)
-    return Status::InvalidOperation("sources not provided");
+    return Status::InvalidOperation("the source column is not provided");
   indices.push_back(index);
   index = schema->GetFieldIndex(GeneralParams::kDstIndexCol);
   if (index == -1)
-    return Status::InvalidOperation("destinations not provided");
+    return Status::InvalidOperation("the destination column is not provided");
   indices.push_back(index);
   auto in_table = input_table->SelectColumns(indices).ValueOrDie();
 
@@ -269,7 +420,8 @@ Status EdgeChunkWriter::WritePropertyChunk(
     const std::shared_ptr<arrow::Table>& input_table,
     const PropertyGroup& property_group, IdType vertex_chunk_index,
     IdType chunk_index) const noexcept {
-  GAR_RETURN_NOT_OK(Validate(input_table, property_group, vertex_chunk_index));
+  GAR_RETURN_NOT_OK(
+      Validate(input_table, property_group, vertex_chunk_index, chunk_index));
   auto file_type = property_group.GetFileType();
 
   std::vector<int> indices;
@@ -374,7 +526,6 @@ Status EdgeChunkWriter::SortAndWriteAdjListTable(
   GAR_ASSIGN_OR_RAISE(
       auto response_table,
       sortTable(input_table, getSortColumnName(adj_list_type_)));
-
   if (adj_list_type_ == AdjListType::ordered_by_source ||
       adj_list_type_ == AdjListType::ordered_by_dest) {
     GAR_ASSIGN_OR_RAISE(
@@ -383,7 +534,6 @@ Status EdgeChunkWriter::SortAndWriteAdjListTable(
                        vertex_chunk_index));
     GAR_RETURN_NOT_OK(WriteOffsetChunk(offset_table, vertex_chunk_index));
   }
-
   return WriteAdjListTable(response_table, vertex_chunk_index,
                            start_chunk_index);
 }

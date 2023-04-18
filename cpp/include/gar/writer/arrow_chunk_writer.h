@@ -41,7 +41,8 @@ namespace GAR_NAMESPACE_INTERNAL {
 enum class ValidateLevel : char {
   default_validate = -1,
   no_validate = 0,
-  with_validate = 1
+  weak_validate = 1,
+  strong_validate = 2
 };
 
 /**
@@ -222,7 +223,14 @@ class EdgeChunkWriter {
   }
 
   /**
-   * @brief Check if the writer operation (for adj list or offset) is allowed.
+   * @brief Get the validate level.
+   *
+   * @return The validate level of this writer.
+   */
+  inline ValidateLevel GetValidateLevel() const { return validate_level_; }
+
+  /**
+   * @brief Check if the writer operation for offset is allowed.
    *
    * @param input_table The input table containing data.
    * @param vertex_chunk_index The index of the vertex chunk.
@@ -236,30 +244,36 @@ class EdgeChunkWriter {
                       ValidateLevel::default_validate) const noexcept;
 
   /**
+   * @brief Check if the writer operation for adj list is allowed.
+   *
+   * @param input_table The input table containing data.
+   * @param vertex_chunk_index The index of the vertex chunk.
+   * @param chunk_index The index of the edge chunk inside the vertex chunk.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
+   * @return Status: ok or error.
+   */
+  Status Validate(const std::shared_ptr<arrow::Table>& input_table,
+                  IdType vertex_chunk_index, IdType chunk_index,
+                  ValidateLevel validate_level =
+                      ValidateLevel::default_validate) const noexcept;
+
+  /**
    * @brief Check if the writer operation (for property group) is allowed.
    *
    * @param input_table The input table containing data.
    * @param property_group The property group to write.
    * @param vertex_chunk_index The index of the vertex chunk.
+   * @param chunk_index The index of the edge chunk inside the vertex chunk.
    * @param validate_level The validate level for this operation,
    * which is the writer's validate level by default.
    * @return Status: ok or error.
    */
-  Status Validate(
-      const std::shared_ptr<arrow::Table>& input_table,
-      const PropertyGroup& property_group, IdType vertex_chunk_index,
-      ValidateLevel validate_level = ValidateLevel::default_validate) const
-      noexcept {
-    if (validate_level == ValidateLevel::default_validate)
-      validate_level = validate_level_;
-    if (validate_level == ValidateLevel::no_validate)
-      return Status::OK();
-    if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_))
-      return Status::InvalidOperation("invalid property group");
-    GAR_RETURN_NOT_OK(
-        Validate(input_table, vertex_chunk_index, validate_level));
-    return Status::OK();
-  }
+  Status Validate(const std::shared_ptr<arrow::Table>& input_table,
+                  const PropertyGroup& property_group,
+                  IdType vertex_chunk_index, IdType chunk_index,
+                  ValidateLevel validate_level =
+                      ValidateLevel::default_validate) const noexcept;
 
   /**
    * @brief Write the number of edges into the file.

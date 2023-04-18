@@ -76,6 +76,37 @@ TEST_CASE("test_vertex_property_wrtier_from_file") {
   auto num = input->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
   GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
   REQUIRE((*ptr) == table->num_rows());
+
+  // Set validate level
+  REQUIRE(writer.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::no_validate);
+  writer.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  REQUIRE(writer.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::strong_validate);
+  // Validate operation
+  REQUIRE(writer.WriteTable(table, 0).ok());
+
+  // Out of range
+  REQUIRE(writer.WriteChunk(table, 0).IsOutOfRange());
+  // Invalid chunk id
+  auto chunk = table->Slice(0, vertex_info.GetChunkSize());
+  REQUIRE(writer.WriteChunk(chunk, -1).IsInvalidOperation());
+  // Invalid property group
+  GAR_NAMESPACE::Property p1;
+  p1.name = "invalid_property";
+  p1.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32);
+  GAR_NAMESPACE::PropertyGroup pg1({p1}, GAR_NAMESPACE::FileType::CSV);
+  REQUIRE(writer.WriteTable(table, pg1, 0).IsInvalidOperation());
+  // Property not found in table
+  std::shared_ptr<arrow::Table> tmp_table =
+      table->RenameColumns({"original_id", "firstName", "lastName", "id"})
+          .ValueOrDie();
+  GAR_NAMESPACE::PropertyGroup pg2 =
+      vertex_info.GetPropertyGroup("firstName").value();
+  REQUIRE(writer.WriteTable(tmp_table, pg2, 0).IsInvalidOperation());
+  // Invalid data type
+  GAR_NAMESPACE::PropertyGroup pg3 = vertex_info.GetPropertyGroup("id").value();
+  REQUIRE(writer.WriteTable(tmp_table, pg3, 0).IsTypeError());
 }
 
 TEST_CASE("test_orc_and_parquet_reader") {
@@ -152,8 +183,8 @@ TEST_CASE("test_edge_chunk_writer") {
       root + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
   auto edge_meta = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = GAR_NAMESPACE::EdgeInfo::Load(edge_meta).value();
-  GAR_NAMESPACE::EdgeChunkWriter writer(
-      edge_info, "/tmp/", GAR_NAMESPACE::AdjListType::ordered_by_source);
+  auto adj_list_type = GAR_NAMESPACE::AdjListType::ordered_by_source;
+  GAR_NAMESPACE::EdgeChunkWriter writer(edge_info, "/tmp/", adj_list_type);
   REQUIRE(writer.SortAndWriteAdjListTable(table, 0, 0).ok());
 
   // Write number of edges for vertex chunk 0
@@ -165,4 +196,41 @@ TEST_CASE("test_edge_chunk_writer") {
   auto num = input2->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
   GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
   REQUIRE((*ptr) == table->num_rows());
+
+  // Set validate level
+  REQUIRE(writer.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::no_validate);
+  writer.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  REQUIRE(writer.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::strong_validate);
+  // Validate operation
+  REQUIRE(writer.SortAndWriteAdjListTable(table, 0, 0).ok());
+
+  // Out of range
+  REQUIRE(writer.WriteOffsetChunk(table, 0).IsOutOfRange());
+  // Invalid chunk id
+  REQUIRE(writer.WriteAdjListChunk(table, -1, 0).IsInvalidOperation());
+  REQUIRE(writer.WriteAdjListChunk(table, 0, -1).IsInvalidOperation());
+  // Invalid adj list type
+  auto invalid_adj_list_type = GAR_NAMESPACE::AdjListType::unordered_by_dest;
+  GAR_NAMESPACE::EdgeChunkWriter writer2(edge_info, "/tmp/",
+                                         invalid_adj_list_type);
+  writer2.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  REQUIRE(writer2.WriteAdjListChunk(table, 0, 0).IsInvalidOperation());
+  // Invalid property group
+  GAR_NAMESPACE::Property p1;
+  p1.name = "invalid_property";
+  p1.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32);
+  GAR_NAMESPACE::PropertyGroup pg1({p1}, GAR_NAMESPACE::FileType::CSV);
+  REQUIRE(writer.WritePropertyChunk(table, pg1, 0, 0).IsInvalidOperation());
+  // Property not found in table
+  GAR_NAMESPACE::PropertyGroup pg2 =
+      edge_info.GetPropertyGroup("creationDate", adj_list_type).value();
+  REQUIRE(writer.WritePropertyChunk(table, pg2, 0, 0).IsInvalidOperation());
+  // Required columns not found
+  std::shared_ptr<arrow::Table> tmp_table =
+      table->RenameColumns({"creationDate", "tmp_property"}).ValueOrDie();
+  REQUIRE(writer.WriteAdjListChunk(tmp_table, 0, 0).IsInvalidOperation());
+  // Invalid data type
+  REQUIRE(writer.WritePropertyChunk(tmp_table, pg2, 0, 0).IsTypeError());
 }
