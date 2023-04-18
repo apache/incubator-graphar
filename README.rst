@@ -5,7 +5,7 @@ GraphAr
 
 Welcome to GraphAr (short for "Graph Archive"), an open source, standardized file format for graph data storage and retrieval.
 
-:mega: Join our `Weekly Community Meeting`_ to learn more about GraphAr and get involved!
+Join our `Weekly Community Meeting`_ to learn more about GraphAr and get involved! :trumpet:
 
 What is GraphAr?
 -----------------
