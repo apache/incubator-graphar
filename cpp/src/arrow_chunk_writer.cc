@@ -360,8 +360,6 @@ Status EdgeChunkWriter::WriteTable(
     IdType start_chunk_index) const noexcept {
   int64_t length = input_table->num_rows();
   IdType chunk_index = start_chunk_index;
-  RETURN_NOT_ARROW_OK(
-      arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   for (int64_t offset = 0; offset < length;
        offset += chunk_size_, chunk_index++) {
     auto in_chunk = input_table->Slice(offset, chunk_size_);

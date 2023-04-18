@@ -22,6 +22,7 @@ limitations under the License.
 
 #include "gar/graph_info.h"
 #include "gar/utils/version_parser.h"
+#include "gar/utils/filesystem.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -354,9 +355,6 @@ TEST_CASE("test_graph_info_load_from_s3") {
       "s3://graphar/ldbc/ldbc.graph.yml"
       "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
   auto graph_info_result = GAR_NAMESPACE::GraphInfo::Load(path);
-  if (graph_info_result.has_error()) {
-    std::cout << graph_info_result.status().message() << std::endl;
-  }
   REQUIRE(!graph_info_result.has_error());
   auto graph_info = graph_info_result.value();
   REQUIRE(graph_info.GetName() == "ldbc");
@@ -364,4 +362,13 @@ TEST_CASE("test_graph_info_load_from_s3") {
   const auto& edge_infos = graph_info.GetEdgeInfos();
   REQUIRE(vertex_infos.size() == 8);
   REQUIRE(edge_infos.size() == 23);
+
+  std::string out_path;
+  auto fs = GraphArchive::FileSystemFromUriOrPath(path, &out_path).value();
+  std::cout << "out_path: " << out_path << std::endl;
+  auto ret = fs->GetFileNumOfDir("graphar/ldbc//");
+  if (ret.has_error()) {
+    std::cout << ret.status().message() << std::endl;
+  }
+  std::cout << "file num: " << ret.value() << std::endl;
 }
