@@ -743,9 +743,24 @@ class EdgeInfo {
   }
 
   /**
-   * Get the file path for the number of edgess.
+   * Get the file path for the number of vertices.
+   * 
+   * @param adj_list_type The adjacency list type.
+   * @return A Result object containing the file path for the number of edges,
+   * or a Status object indicating an error.
+   */
+  inline Result<std::string> GetVerticesNumFilePath(AdjListType adj_list_type) const noexcept {
+    if (!ContainAdjList(adj_list_type)) {
+      return Status::KeyError("The adj list type is not found in edge info.");
+    }
+    return prefix_ + adj_list2prefix_.at(adj_list_type) + "vertex_count";
+  }
+
+  /**
+   * Get the file path for the number of edges.
    *
    * @param vertex_chunk_index the vertex chunk index
+   * @param adj_list_type The adjacency list type.
    * @return A Result object containing the file path for the number of edges,
    * or a Status object indicating an error.
    */

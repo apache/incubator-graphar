@@ -233,4 +233,17 @@ TEST_CASE("test_edge_chunk_writer") {
   REQUIRE(writer.WriteAdjListChunk(tmp_table, 0, 0).IsInvalidOperation());
   // Invalid data type
   REQUIRE(writer.WritePropertyChunk(tmp_table, pg2, 0, 0).IsTypeError());
+  auto edge_num = input2->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
+  GAR_NAMESPACE::IdType* edge_num_ptr = (GAR_NAMESPACE::IdType*) edge_num->data();
+  REQUIRE((*edge_num_ptr) == table->num_rows());
+
+  // Write number of vertices
+  REQUIRE(writer.WriteVerticesNum(903).ok());
+  std::shared_ptr<arrow::io::InputStream> input3 =
+      fs->OpenInputStream(
+            "/tmp/edge/person_knows_person/ordered_by_source/vertex_count")
+          .ValueOrDie();
+  auto vertex_num = input3->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
+  GAR_NAMESPACE::IdType* vertex_num_ptr = (GAR_NAMESPACE::IdType*) vertex_num->data();
+  REQUIRE((*vertex_num_ptr) == 903);
 }

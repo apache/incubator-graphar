@@ -285,12 +285,21 @@ TEST_CASE("test_edge_info") {
   REQUIRE(edge_info.GetEdgesNumFilePath(0, adj_list_type_not_exist)
               .status()
               .IsKeyError());
+  REQUIRE(edge_info.GetVerticesNumFilePath(adj_list_type_not_exist)
+              .status()
+              .IsKeyError());            
 
   // edge count file path
   auto maybe_path = edge_info.GetEdgesNumFilePath(0, adj_list_type);
   REQUIRE(!maybe_path.has_error());
   REQUIRE(maybe_path.value() ==
           edge_info.GetPrefix() + prefix_of_adj_list_type + "edge_count0");
+
+  // vertex count file path
+  auto maybe_path_2 = edge_info.GetVerticesNumFilePath(adj_list_type);
+  REQUIRE(!maybe_path_2.has_error());
+  REQUIRE(maybe_path_2.value() ==
+          edge_info.GetPrefix() + prefix_of_adj_list_type + "vertex_count");
 
   // test save
   std::string save_path(std::tmpnam(nullptr));
