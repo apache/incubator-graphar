@@ -5,6 +5,8 @@ GraphAr
 
 Welcome to GraphAr (short for "Graph Archive"), an open source, standardized file format for graph data storage and retrieval.
 
+Join our `Weekly Community Meeting`_ to learn more about GraphAr and get involved! :trumpet:
+
 What is GraphAr?
 -----------------
 
@@ -147,6 +149,7 @@ Community
 Join the conversation and help the community.
 
 - `Discord`_
+- `Weekly Community Meeting`_
 
 
 License
@@ -211,6 +214,8 @@ third-party libraries may not have the same license as GraphAr.
 .. _Code of Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
 
 .. _Discord: https://discord.gg/XPsfd4ShCu
+
+.. _Weekly Community Meeting: https://github.com/alibaba/GraphAr/wiki/GraphAr-Weekly-Community-Meeting
 
 .. _GitHub Issues: https://github.com/alibaba/GraphAr/issues/new
 
