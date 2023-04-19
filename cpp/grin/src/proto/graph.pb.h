@@ -19,19 +19,19 @@
 #error regenerate this file with a newer version of protoc.
 #endif
 
+#include <google/protobuf/port_undef.inc>
+#include <google/protobuf/io/coded_stream.h>
 #include <google/protobuf/arena.h>
 #include <google/protobuf/arenastring.h>
+#include <google/protobuf/generated_message_bases.h>
+#include <google/protobuf/generated_message_util.h>
+#include <google/protobuf/metadata_lite.h>
+#include <google/protobuf/generated_message_reflection.h>
+#include <google/protobuf/message.h>
+#include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
 #include <google/protobuf/generated_enum_reflection.h>
-#include <google/protobuf/generated_message_bases.h>
-#include <google/protobuf/generated_message_reflection.h>
-#include <google/protobuf/generated_message_util.h>
-#include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/message.h>
-#include <google/protobuf/metadata_lite.h>
-#include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/unknown_field_set.h>
-#include <google/protobuf/port_undef.inc>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_graph_2eproto
@@ -45,13 +45,11 @@ PROTOBUF_NAMESPACE_CLOSE
 struct TableStruct_graph_2eproto {
   static const uint32_t offsets[];
 };
-extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable
-    descriptor_table_graph_2eproto;
+extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_graph_2eproto;
 namespace grin {
 class EdgePropertyFeature;
 struct EdgePropertyFeatureDefaultTypeInternal;
-extern EdgePropertyFeatureDefaultTypeInternal
-    _EdgePropertyFeature_default_instance_;
+extern EdgePropertyFeatureDefaultTypeInternal _EdgePropertyFeature_default_instance_;
 class Graph;
 struct GraphDefaultTypeInternal;
 extern GraphDefaultTypeInternal _Graph_default_instance_;
@@ -60,8 +58,7 @@ struct IndexFeatureDefaultTypeInternal;
 extern IndexFeatureDefaultTypeInternal _IndexFeature_default_instance_;
 class MirrorPartitionListFeature;
 struct MirrorPartitionListFeatureDefaultTypeInternal;
-extern MirrorPartitionListFeatureDefaultTypeInternal
-    _MirrorPartitionListFeature_default_instance_;
+extern MirrorPartitionListFeatureDefaultTypeInternal _MirrorPartitionListFeature_default_instance_;
 class PartitionFeature;
 struct PartitionFeatureDefaultTypeInternal;
 extern PartitionFeatureDefaultTypeInternal _PartitionFeature_default_instance_;
@@ -82,40 +79,20 @@ struct TopologyFeatureDefaultTypeInternal;
 extern TopologyFeatureDefaultTypeInternal _TopologyFeature_default_instance_;
 class VertexPropertyFeature;
 struct VertexPropertyFeatureDefaultTypeInternal;
-extern VertexPropertyFeatureDefaultTypeInternal
-    _VertexPropertyFeature_default_instance_;
+extern VertexPropertyFeatureDefaultTypeInternal _VertexPropertyFeature_default_instance_;
 }  // namespace grin
 PROTOBUF_NAMESPACE_OPEN
-template <>
-::grin::EdgePropertyFeature*
-Arena::CreateMaybeMessage<::grin::EdgePropertyFeature>(Arena*);
-template <>
-::grin::Graph* Arena::CreateMaybeMessage<::grin::Graph>(Arena*);
-template <>
-::grin::IndexFeature* Arena::CreateMaybeMessage<::grin::IndexFeature>(Arena*);
-template <>
-::grin::MirrorPartitionListFeature*
-Arena::CreateMaybeMessage<::grin::MirrorPartitionListFeature>(Arena*);
-template <>
-::grin::PartitionFeature* Arena::CreateMaybeMessage<::grin::PartitionFeature>(
-    Arena*);
-template <>
-::grin::PredicateFeature* Arena::CreateMaybeMessage<::grin::PredicateFeature>(
-    Arena*);
-template <>
-::grin::PropertyFeature* Arena::CreateMaybeMessage<::grin::PropertyFeature>(
-    Arena*);
-template <>
-::grin::Statistics* Arena::CreateMaybeMessage<::grin::Statistics>(Arena*);
-template <>
-::grin::StorageFeature* Arena::CreateMaybeMessage<::grin::StorageFeature>(
-    Arena*);
-template <>
-::grin::TopologyFeature* Arena::CreateMaybeMessage<::grin::TopologyFeature>(
-    Arena*);
-template <>
-::grin::VertexPropertyFeature*
-Arena::CreateMaybeMessage<::grin::VertexPropertyFeature>(Arena*);
+template<> ::grin::EdgePropertyFeature* Arena::CreateMaybeMessage<::grin::EdgePropertyFeature>(Arena*);
+template<> ::grin::Graph* Arena::CreateMaybeMessage<::grin::Graph>(Arena*);
+template<> ::grin::IndexFeature* Arena::CreateMaybeMessage<::grin::IndexFeature>(Arena*);
+template<> ::grin::MirrorPartitionListFeature* Arena::CreateMaybeMessage<::grin::MirrorPartitionListFeature>(Arena*);
+template<> ::grin::PartitionFeature* Arena::CreateMaybeMessage<::grin::PartitionFeature>(Arena*);
+template<> ::grin::PredicateFeature* Arena::CreateMaybeMessage<::grin::PredicateFeature>(Arena*);
+template<> ::grin::PropertyFeature* Arena::CreateMaybeMessage<::grin::PropertyFeature>(Arena*);
+template<> ::grin::Statistics* Arena::CreateMaybeMessage<::grin::Statistics>(Arena*);
+template<> ::grin::StorageFeature* Arena::CreateMaybeMessage<::grin::StorageFeature>(Arena*);
+template<> ::grin::TopologyFeature* Arena::CreateMaybeMessage<::grin::TopologyFeature>(Arena*);
+template<> ::grin::VertexPropertyFeature* Arena::CreateMaybeMessage<::grin::VertexPropertyFeature>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace grin {
 
@@ -123,10 +100,8 @@ enum ListRetrieval : int {
   LR_NA = 0,
   LR_ARRAY_LIKE = 1,
   LR_ITERATOR = 2,
-  ListRetrieval_INT_MIN_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<int32_t>::min(),
-  ListRetrieval_INT_MAX_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<int32_t>::max()
+  ListRetrieval_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  ListRetrieval_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool ListRetrieval_IsValid(int value);
 constexpr ListRetrieval ListRetrieval_MIN = LR_NA;
@@ -134,18 +109,18 @@ constexpr ListRetrieval ListRetrieval_MAX = LR_ITERATOR;
 constexpr int ListRetrieval_ARRAYSIZE = ListRetrieval_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ListRetrieval_descriptor();
-template <typename T>
+template<typename T>
 inline const std::string& ListRetrieval_Name(T enum_t_value) {
-  static_assert(
-      ::std::is_same<T, ListRetrieval>::value || ::std::is_integral<T>::value,
-      "Incorrect type passed to function ListRetrieval_Name.");
+  static_assert(::std::is_same<T, ListRetrieval>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function ListRetrieval_Name.");
   return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
-      ListRetrieval_descriptor(), enum_t_value);
+    ListRetrieval_descriptor(), enum_t_value);
 }
-inline bool ListRetrieval_Parse(::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
-                                ListRetrieval* value) {
+inline bool ListRetrieval_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, ListRetrieval* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<ListRetrieval>(
-      ListRetrieval_descriptor(), name, value);
+    ListRetrieval_descriptor(), name, value);
 }
 enum GraphPartitionStrategy : int {
   GPS_NA = 0,
@@ -153,82 +128,67 @@ enum GraphPartitionStrategy : int {
   GPS_EDGE_CUT = 2,
   GPS_VERTEX_CUT = 3,
   GPS_HYBRID_CUT = 4,
-  GraphPartitionStrategy_INT_MIN_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<int32_t>::min(),
-  GraphPartitionStrategy_INT_MAX_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<int32_t>::max()
+  GraphPartitionStrategy_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  GraphPartitionStrategy_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool GraphPartitionStrategy_IsValid(int value);
 constexpr GraphPartitionStrategy GraphPartitionStrategy_MIN = GPS_NA;
 constexpr GraphPartitionStrategy GraphPartitionStrategy_MAX = GPS_HYBRID_CUT;
 constexpr int GraphPartitionStrategy_ARRAYSIZE = GraphPartitionStrategy_MAX + 1;
 
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
-GraphPartitionStrategy_descriptor();
-template <typename T>
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* GraphPartitionStrategy_descriptor();
+template<typename T>
 inline const std::string& GraphPartitionStrategy_Name(T enum_t_value) {
-  static_assert(
-      ::std::is_same<T, GraphPartitionStrategy>::value ||
-          ::std::is_integral<T>::value,
-      "Incorrect type passed to function GraphPartitionStrategy_Name.");
+  static_assert(::std::is_same<T, GraphPartitionStrategy>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function GraphPartitionStrategy_Name.");
   return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
-      GraphPartitionStrategy_descriptor(), enum_t_value);
+    GraphPartitionStrategy_descriptor(), enum_t_value);
 }
 inline bool GraphPartitionStrategy_Parse(
-    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
-    GraphPartitionStrategy* value) {
-  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<
-      GraphPartitionStrategy>(GraphPartitionStrategy_descriptor(), name, value);
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, GraphPartitionStrategy* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<GraphPartitionStrategy>(
+    GraphPartitionStrategy_descriptor(), name, value);
 }
 enum PropertyDataPartitionStrategy : int {
   PDPS_NA = 0,
   PDPS_MASTER_ONLY = 1,
   PDPS_REPLICATE_MASTER_MIRROR = 2,
   PDPS_SPLIT_MASTER_MIRROR = 3,
-  PropertyDataPartitionStrategy_INT_MIN_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<int32_t>::min(),
-  PropertyDataPartitionStrategy_INT_MAX_SENTINEL_DO_NOT_USE_ =
-      std::numeric_limits<int32_t>::max()
+  PropertyDataPartitionStrategy_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  PropertyDataPartitionStrategy_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
 };
 bool PropertyDataPartitionStrategy_IsValid(int value);
-constexpr PropertyDataPartitionStrategy PropertyDataPartitionStrategy_MIN =
-    PDPS_NA;
-constexpr PropertyDataPartitionStrategy PropertyDataPartitionStrategy_MAX =
-    PDPS_SPLIT_MASTER_MIRROR;
-constexpr int PropertyDataPartitionStrategy_ARRAYSIZE =
-    PropertyDataPartitionStrategy_MAX + 1;
+constexpr PropertyDataPartitionStrategy PropertyDataPartitionStrategy_MIN = PDPS_NA;
+constexpr PropertyDataPartitionStrategy PropertyDataPartitionStrategy_MAX = PDPS_SPLIT_MASTER_MIRROR;
+constexpr int PropertyDataPartitionStrategy_ARRAYSIZE = PropertyDataPartitionStrategy_MAX + 1;
 
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
-PropertyDataPartitionStrategy_descriptor();
-template <typename T>
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* PropertyDataPartitionStrategy_descriptor();
+template<typename T>
 inline const std::string& PropertyDataPartitionStrategy_Name(T enum_t_value) {
-  static_assert(
-      ::std::is_same<T, PropertyDataPartitionStrategy>::value ||
-          ::std::is_integral<T>::value,
-      "Incorrect type passed to function PropertyDataPartitionStrategy_Name.");
+  static_assert(::std::is_same<T, PropertyDataPartitionStrategy>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function PropertyDataPartitionStrategy_Name.");
   return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
-      PropertyDataPartitionStrategy_descriptor(), enum_t_value);
+    PropertyDataPartitionStrategy_descriptor(), enum_t_value);
 }
 inline bool PropertyDataPartitionStrategy_Parse(
-    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name,
-    PropertyDataPartitionStrategy* value) {
-  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<
-      PropertyDataPartitionStrategy>(PropertyDataPartitionStrategy_descriptor(),
-                                     name, value);
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, PropertyDataPartitionStrategy* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<PropertyDataPartitionStrategy>(
+    PropertyDataPartitionStrategy_descriptor(), name, value);
 }
 // ===================================================================
 
-class TopologyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.TopologyFeature)
-                                                                       */
-{
+class TopologyFeature final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.TopologyFeature) */ {
  public:
   inline TopologyFeature() : TopologyFeature(nullptr) {}
   ~TopologyFeature() override;
-  explicit PROTOBUF_CONSTEXPR TopologyFeature(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR TopologyFeature(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   TopologyFeature(const TopologyFeature& from);
-  TopologyFeature(TopologyFeature&& from) noexcept : TopologyFeature() {
+  TopologyFeature(TopologyFeature&& from) noexcept
+    : TopologyFeature() {
     *this = ::std::move(from);
   }
 
@@ -237,12 +197,11 @@ class TopologyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@proto
     return *this;
   }
   inline TopologyFeature& operator=(TopologyFeature&& from) noexcept {
-    if (this == &from)
-      return *this;
+    if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
-#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
         && GetOwningArena() != nullptr
-#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
     ) {
       InternalSwap(&from);
     } else {
@@ -265,81 +224,74 @@ class TopologyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@proto
   }
   static inline const TopologyFeature* internal_default_instance() {
     return reinterpret_cast<const TopologyFeature*>(
-        &_TopologyFeature_default_instance_);
+               &_TopologyFeature_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 0;
+  static constexpr int kIndexInFileMessages =
+    0;
 
-  friend void swap(TopologyFeature& a, TopologyFeature& b) { a.Swap(&b); }
+  friend void swap(TopologyFeature& a, TopologyFeature& b) {
+    a.Swap(&b);
+  }
   inline void Swap(TopologyFeature* other) {
-    if (other == this)
-      return;
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
         GetOwningArena() == other->GetOwningArena()) {
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
   void UnsafeArenaSwap(TopologyFeature* other) {
-    if (other == this)
-      return;
+    if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
 
-  TopologyFeature* New(
-      ::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  TopologyFeature* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<TopologyFeature>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
   void CopyFrom(const TopologyFeature& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const TopologyFeature& from) {
+  void MergeFrom( const TopologyFeature& from) {
     TopologyFeature::MergeImpl(*this, from);
   }
-
- private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
-                        const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-
- public:
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
-  const char* _InternalParse(
-      const char* ptr,
-      ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   uint8_t* _InternalSerialize(
-      uint8_t* target,
-      ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
 
- private:
+  private:
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(TopologyFeature* other);
 
- private:
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "grin.TopologyFeature";
   }
-
- protected:
+  protected:
   explicit TopologyFeature(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                           bool is_message_owned = false);
+                       bool is_message_owned = false);
+  public:
 
- public:
   static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData* GetClassData() const final;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
 
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
 
@@ -360,140 +312,114 @@ class TopologyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@proto
   };
   // repeated .grin.ListRetrieval vertex_list_retrievals = 7;
   int vertex_list_retrievals_size() const;
-
- private:
+  private:
   int _internal_vertex_list_retrievals_size() const;
-
- public:
+  public:
   void clear_vertex_list_retrievals();
-
- private:
+  private:
   ::grin::ListRetrieval _internal_vertex_list_retrievals(int index) const;
   void _internal_add_vertex_list_retrievals(::grin::ListRetrieval value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
-  _internal_mutable_vertex_list_retrievals();
-
- public:
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* _internal_mutable_vertex_list_retrievals();
+  public:
   ::grin::ListRetrieval vertex_list_retrievals(int index) const;
   void set_vertex_list_retrievals(int index, ::grin::ListRetrieval value);
   void add_vertex_list_retrievals(::grin::ListRetrieval value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& vertex_list_retrievals()
-      const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& vertex_list_retrievals() const;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* mutable_vertex_list_retrievals();
 
   // repeated .grin.ListRetrieval edge_list_retrievals = 8;
   int edge_list_retrievals_size() const;
-
- private:
+  private:
   int _internal_edge_list_retrievals_size() const;
-
- public:
+  public:
   void clear_edge_list_retrievals();
-
- private:
+  private:
   ::grin::ListRetrieval _internal_edge_list_retrievals(int index) const;
   void _internal_add_edge_list_retrievals(::grin::ListRetrieval value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
-  _internal_mutable_edge_list_retrievals();
-
- public:
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* _internal_mutable_edge_list_retrievals();
+  public:
   ::grin::ListRetrieval edge_list_retrievals(int index) const;
   void set_edge_list_retrievals(int index, ::grin::ListRetrieval value);
   void add_edge_list_retrievals(::grin::ListRetrieval value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& edge_list_retrievals()
-      const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& edge_list_retrievals() const;
   ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* mutable_edge_list_retrievals();
 
   // repeated .grin.ListRetrieval adjacent_list_retrievals = 9;
   int adjacent_list_retrievals_size() const;
-
- private:
+  private:
   int _internal_adjacent_list_retrievals_size() const;
-
- public:
+  public:
   void clear_adjacent_list_retrievals();
-
- private:
+  private:
   ::grin::ListRetrieval _internal_adjacent_list_retrievals(int index) const;
   void _internal_add_adjacent_list_retrievals(::grin::ListRetrieval value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
-  _internal_mutable_adjacent_list_retrievals();
-
- public:
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* _internal_mutable_adjacent_list_retrievals();
+  public:
   ::grin::ListRetrieval adjacent_list_retrievals(int index) const;
   void set_adjacent_list_retrievals(int index, ::grin::ListRetrieval value);
   void add_adjacent_list_retrievals(::grin::ListRetrieval value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& adjacent_list_retrievals()
-      const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
-  mutable_adjacent_list_retrievals();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& adjacent_list_retrievals() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* mutable_adjacent_list_retrievals();
 
   // bool grin_assume_has_directed_graph = 1;
   void clear_grin_assume_has_directed_graph();
   bool grin_assume_has_directed_graph() const;
   void set_grin_assume_has_directed_graph(bool value);
-
- private:
+  private:
   bool _internal_grin_assume_has_directed_graph() const;
   void _internal_set_grin_assume_has_directed_graph(bool value);
+  public:
 
- public:
   // bool grin_assume_has_undirected_graph = 2;
   void clear_grin_assume_has_undirected_graph();
   bool grin_assume_has_undirected_graph() const;
   void set_grin_assume_has_undirected_graph(bool value);
-
- private:
+  private:
   bool _internal_grin_assume_has_undirected_graph() const;
   void _internal_set_grin_assume_has_undirected_graph(bool value);
+  public:
 
- public:
   // bool grin_assume_has_multi_edge_graph = 3;
   void clear_grin_assume_has_multi_edge_graph();
   bool grin_assume_has_multi_edge_graph() const;
   void set_grin_assume_has_multi_edge_graph(bool value);
-
- private:
+  private:
   bool _internal_grin_assume_has_multi_edge_graph() const;
   void _internal_set_grin_assume_has_multi_edge_graph(bool value);
+  public:
 
- public:
   // bool grin_with_vertex_original_id = 4;
   void clear_grin_with_vertex_original_id();
   bool grin_with_vertex_original_id() const;
   void set_grin_with_vertex_original_id(bool value);
-
- private:
+  private:
   bool _internal_grin_with_vertex_original_id() const;
   void _internal_set_grin_with_vertex_original_id(bool value);
+  public:
 
- public:
   // bool grin_with_vertex_data = 5;
   void clear_grin_with_vertex_data();
   bool grin_with_vertex_data() const;
   void set_grin_with_vertex_data(bool value);
-
- private:
+  private:
   bool _internal_grin_with_vertex_data() const;
   void _internal_set_grin_with_vertex_data(bool value);
+  public:
 
- public:
   // bool grin_with_edge_data = 6;
   void clear_grin_with_edge_data();
   bool grin_with_edge_data() const;
   void set_grin_with_edge_data(bool value);
-
- private:
+  private:
   bool _internal_grin_with_edge_data() const;
   void _internal_set_grin_with_edge_data(bool value);
+  public:
 
- public:
   // @@protoc_insertion_point(class_scope:grin.TopologyFeature)
  private:
   class _Internal;
 
-  template <typename T>
-  friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
@@ -511,42 +437,34 @@ class TopologyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@proto
     bool grin_with_edge_data_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
-  union {
-    Impl_ _impl_;
-  };
+  union { Impl_ _impl_; };
   friend struct ::TableStruct_graph_2eproto;
 };
 // -------------------------------------------------------------------
 
-class MirrorPartitionListFeature final
-    : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.MirrorPartitionListFeature)
-                                               */
-{
+class MirrorPartitionListFeature final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.MirrorPartitionListFeature) */ {
  public:
   inline MirrorPartitionListFeature() : MirrorPartitionListFeature(nullptr) {}
   ~MirrorPartitionListFeature() override;
-  explicit PROTOBUF_CONSTEXPR MirrorPartitionListFeature(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR MirrorPartitionListFeature(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   MirrorPartitionListFeature(const MirrorPartitionListFeature& from);
   MirrorPartitionListFeature(MirrorPartitionListFeature&& from) noexcept
-      : MirrorPartitionListFeature() {
+    : MirrorPartitionListFeature() {
     *this = ::std::move(from);
   }
 
-  inline MirrorPartitionListFeature& operator=(
-      const MirrorPartitionListFeature& from) {
+  inline MirrorPartitionListFeature& operator=(const MirrorPartitionListFeature& from) {
     CopyFrom(from);
     return *this;
   }
-  inline MirrorPartitionListFeature& operator=(
-      MirrorPartitionListFeature&& from) noexcept {
-    if (this == &from)
-      return *this;
+  inline MirrorPartitionListFeature& operator=(MirrorPartitionListFeature&& from) noexcept {
+    if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
-#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
         && GetOwningArena() != nullptr
-#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
     ) {
       InternalSwap(&from);
     } else {
@@ -569,84 +487,74 @@ class MirrorPartitionListFeature final
   }
   static inline const MirrorPartitionListFeature* internal_default_instance() {
     return reinterpret_cast<const MirrorPartitionListFeature*>(
-        &_MirrorPartitionListFeature_default_instance_);
+               &_MirrorPartitionListFeature_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 1;
+  static constexpr int kIndexInFileMessages =
+    1;
 
-  friend void swap(MirrorPartitionListFeature& a,
-                   MirrorPartitionListFeature& b) {
+  friend void swap(MirrorPartitionListFeature& a, MirrorPartitionListFeature& b) {
     a.Swap(&b);
   }
   inline void Swap(MirrorPartitionListFeature* other) {
-    if (other == this)
-      return;
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
         GetOwningArena() == other->GetOwningArena()) {
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
   void UnsafeArenaSwap(MirrorPartitionListFeature* other) {
-    if (other == this)
-      return;
+    if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
 
-  MirrorPartitionListFeature* New(
-      ::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  MirrorPartitionListFeature* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<MirrorPartitionListFeature>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
   void CopyFrom(const MirrorPartitionListFeature& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const MirrorPartitionListFeature& from) {
+  void MergeFrom( const MirrorPartitionListFeature& from) {
     MirrorPartitionListFeature::MergeImpl(*this, from);
   }
-
- private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
-                        const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-
- public:
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
-  const char* _InternalParse(
-      const char* ptr,
-      ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   uint8_t* _InternalSerialize(
-      uint8_t* target,
-      ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
 
- private:
+  private:
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(MirrorPartitionListFeature* other);
 
- private:
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "grin.MirrorPartitionListFeature";
   }
-
- protected:
+  protected:
   explicit MirrorPartitionListFeature(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                                      bool is_message_owned = false);
+                       bool is_message_owned = false);
+  public:
 
- public:
   static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData* GetClassData() const final;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
 
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
 
@@ -664,48 +572,43 @@ class MirrorPartitionListFeature final
   void clear_grin_trait_master_vertex_mirror_partition_list();
   bool grin_trait_master_vertex_mirror_partition_list() const;
   void set_grin_trait_master_vertex_mirror_partition_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_master_vertex_mirror_partition_list() const;
   void _internal_set_grin_trait_master_vertex_mirror_partition_list(bool value);
+  public:
 
- public:
   // bool grin_trait_mirror_vertex_mirror_partition_list = 2;
   void clear_grin_trait_mirror_vertex_mirror_partition_list();
   bool grin_trait_mirror_vertex_mirror_partition_list() const;
   void set_grin_trait_mirror_vertex_mirror_partition_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_mirror_vertex_mirror_partition_list() const;
   void _internal_set_grin_trait_mirror_vertex_mirror_partition_list(bool value);
+  public:
 
- public:
   // bool grin_trait_master_edge_mirror_partition_list = 3;
   void clear_grin_trait_master_edge_mirror_partition_list();
   bool grin_trait_master_edge_mirror_partition_list() const;
   void set_grin_trait_master_edge_mirror_partition_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_master_edge_mirror_partition_list() const;
   void _internal_set_grin_trait_master_edge_mirror_partition_list(bool value);
+  public:
 
- public:
   // bool grin_trait_mirror_edge_mirror_partition_list = 4;
   void clear_grin_trait_mirror_edge_mirror_partition_list();
   bool grin_trait_mirror_edge_mirror_partition_list() const;
   void set_grin_trait_mirror_edge_mirror_partition_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_mirror_edge_mirror_partition_list() const;
   void _internal_set_grin_trait_mirror_edge_mirror_partition_list(bool value);
+  public:
 
- public:
   // @@protoc_insertion_point(class_scope:grin.MirrorPartitionListFeature)
  private:
   class _Internal;
 
-  template <typename T>
-  friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
@@ -715,24 +618,21 @@ class MirrorPartitionListFeature final
     bool grin_trait_mirror_edge_mirror_partition_list_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
-  union {
-    Impl_ _impl_;
-  };
+  union { Impl_ _impl_; };
   friend struct ::TableStruct_graph_2eproto;
 };
 // -------------------------------------------------------------------
 
-class PartitionFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.PartitionFeature)
-                                                                        */
-{
+class PartitionFeature final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.PartitionFeature) */ {
  public:
   inline PartitionFeature() : PartitionFeature(nullptr) {}
   ~PartitionFeature() override;
-  explicit PROTOBUF_CONSTEXPR PartitionFeature(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR PartitionFeature(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   PartitionFeature(const PartitionFeature& from);
-  PartitionFeature(PartitionFeature&& from) noexcept : PartitionFeature() {
+  PartitionFeature(PartitionFeature&& from) noexcept
+    : PartitionFeature() {
     *this = ::std::move(from);
   }
 
@@ -741,12 +641,11 @@ class PartitionFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@prot
     return *this;
   }
   inline PartitionFeature& operator=(PartitionFeature&& from) noexcept {
-    if (this == &from)
-      return *this;
+    if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
-#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
         && GetOwningArena() != nullptr
-#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
     ) {
       InternalSwap(&from);
     } else {
@@ -769,81 +668,74 @@ class PartitionFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@prot
   }
   static inline const PartitionFeature* internal_default_instance() {
     return reinterpret_cast<const PartitionFeature*>(
-        &_PartitionFeature_default_instance_);
+               &_PartitionFeature_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 2;
+  static constexpr int kIndexInFileMessages =
+    2;
 
-  friend void swap(PartitionFeature& a, PartitionFeature& b) { a.Swap(&b); }
+  friend void swap(PartitionFeature& a, PartitionFeature& b) {
+    a.Swap(&b);
+  }
   inline void Swap(PartitionFeature* other) {
-    if (other == this)
-      return;
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
         GetOwningArena() == other->GetOwningArena()) {
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
   void UnsafeArenaSwap(PartitionFeature* other) {
-    if (other == this)
-      return;
+    if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
 
-  PartitionFeature* New(
-      ::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  PartitionFeature* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<PartitionFeature>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
   void CopyFrom(const PartitionFeature& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const PartitionFeature& from) {
+  void MergeFrom( const PartitionFeature& from) {
     PartitionFeature::MergeImpl(*this, from);
   }
-
- private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
-                        const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-
- public:
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
-  const char* _InternalParse(
-      const char* ptr,
-      ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   uint8_t* _InternalSerialize(
-      uint8_t* target,
-      ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
 
- private:
+  private:
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(PartitionFeature* other);
 
- private:
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "grin.PartitionFeature";
   }
-
- protected:
+  protected:
   explicit PartitionFeature(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                            bool is_message_owned = false);
+                       bool is_message_owned = false);
+  public:
 
- public:
   static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData* GetClassData() const final;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
 
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
 
@@ -868,161 +760,135 @@ class PartitionFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@prot
   };
   // .grin.MirrorPartitionListFeature mirror_partition_list_feature = 7;
   bool has_mirror_partition_list_feature() const;
-
- private:
+  private:
   bool _internal_has_mirror_partition_list_feature() const;
-
- public:
+  public:
   void clear_mirror_partition_list_feature();
-  const ::grin::MirrorPartitionListFeature& mirror_partition_list_feature()
-      const;
-  PROTOBUF_NODISCARD ::grin::MirrorPartitionListFeature*
-  release_mirror_partition_list_feature();
+  const ::grin::MirrorPartitionListFeature& mirror_partition_list_feature() const;
+  PROTOBUF_NODISCARD ::grin::MirrorPartitionListFeature* release_mirror_partition_list_feature();
   ::grin::MirrorPartitionListFeature* mutable_mirror_partition_list_feature();
-  void set_allocated_mirror_partition_list_feature(
-      ::grin::MirrorPartitionListFeature* mirror_partition_list_feature);
-
- private:
-  const ::grin::MirrorPartitionListFeature&
-  _internal_mirror_partition_list_feature() const;
-  ::grin::MirrorPartitionListFeature*
-  _internal_mutable_mirror_partition_list_feature();
-
- public:
+  void set_allocated_mirror_partition_list_feature(::grin::MirrorPartitionListFeature* mirror_partition_list_feature);
+  private:
+  const ::grin::MirrorPartitionListFeature& _internal_mirror_partition_list_feature() const;
+  ::grin::MirrorPartitionListFeature* _internal_mutable_mirror_partition_list_feature();
+  public:
   void unsafe_arena_set_allocated_mirror_partition_list_feature(
       ::grin::MirrorPartitionListFeature* mirror_partition_list_feature);
-  ::grin::MirrorPartitionListFeature*
-  unsafe_arena_release_mirror_partition_list_feature();
+  ::grin::MirrorPartitionListFeature* unsafe_arena_release_mirror_partition_list_feature();
 
   // .grin.GraphPartitionStrategy graph_partition_strategy = 1;
   void clear_graph_partition_strategy();
   ::grin::GraphPartitionStrategy graph_partition_strategy() const;
   void set_graph_partition_strategy(::grin::GraphPartitionStrategy value);
-
- private:
+  private:
   ::grin::GraphPartitionStrategy _internal_graph_partition_strategy() const;
-  void _internal_set_graph_partition_strategy(
-      ::grin::GraphPartitionStrategy value);
+  void _internal_set_graph_partition_strategy(::grin::GraphPartitionStrategy value);
+  public:
 
- public:
   // bool grin_trait_natural_id_for_partition = 2;
   void clear_grin_trait_natural_id_for_partition();
   bool grin_trait_natural_id_for_partition() const;
   void set_grin_trait_natural_id_for_partition(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_natural_id_for_partition() const;
   void _internal_set_grin_trait_natural_id_for_partition(bool value);
+  public:
 
- public:
   // bool grin_enable_vertex_ref = 3;
   void clear_grin_enable_vertex_ref();
   bool grin_enable_vertex_ref() const;
   void set_grin_enable_vertex_ref(bool value);
-
- private:
+  private:
   bool _internal_grin_enable_vertex_ref() const;
   void _internal_set_grin_enable_vertex_ref(bool value);
+  public:
 
- public:
   // bool grin_enable_edge_ref = 4;
   void clear_grin_enable_edge_ref();
   bool grin_enable_edge_ref() const;
   void set_grin_enable_edge_ref(bool value);
-
- private:
+  private:
   bool _internal_grin_enable_edge_ref() const;
   void _internal_set_grin_enable_edge_ref(bool value);
+  public:
 
- public:
   // bool grin_trait_select_master_for_vertex_list = 8;
   void clear_grin_trait_select_master_for_vertex_list();
   bool grin_trait_select_master_for_vertex_list() const;
   void set_grin_trait_select_master_for_vertex_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_select_master_for_vertex_list() const;
   void _internal_set_grin_trait_select_master_for_vertex_list(bool value);
+  public:
 
- public:
   // .grin.PropertyDataPartitionStrategy vertex_data = 5;
   void clear_vertex_data();
   ::grin::PropertyDataPartitionStrategy vertex_data() const;
   void set_vertex_data(::grin::PropertyDataPartitionStrategy value);
-
- private:
+  private:
   ::grin::PropertyDataPartitionStrategy _internal_vertex_data() const;
   void _internal_set_vertex_data(::grin::PropertyDataPartitionStrategy value);
+  public:
 
- public:
   // .grin.PropertyDataPartitionStrategy edge_data = 6;
   void clear_edge_data();
   ::grin::PropertyDataPartitionStrategy edge_data() const;
   void set_edge_data(::grin::PropertyDataPartitionStrategy value);
-
- private:
+  private:
   ::grin::PropertyDataPartitionStrategy _internal_edge_data() const;
   void _internal_set_edge_data(::grin::PropertyDataPartitionStrategy value);
+  public:
 
- public:
   // bool grin_trait_select_partition_for_vertex_list = 9;
   void clear_grin_trait_select_partition_for_vertex_list();
   bool grin_trait_select_partition_for_vertex_list() const;
   void set_grin_trait_select_partition_for_vertex_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_select_partition_for_vertex_list() const;
   void _internal_set_grin_trait_select_partition_for_vertex_list(bool value);
+  public:
 
- public:
   // bool grin_trait_select_master_for_edge_list = 10;
   void clear_grin_trait_select_master_for_edge_list();
   bool grin_trait_select_master_for_edge_list() const;
   void set_grin_trait_select_master_for_edge_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_select_master_for_edge_list() const;
   void _internal_set_grin_trait_select_master_for_edge_list(bool value);
+  public:
 
- public:
   // bool grin_trait_select_partition_for_edge_list = 11;
   void clear_grin_trait_select_partition_for_edge_list();
   bool grin_trait_select_partition_for_edge_list() const;
   void set_grin_trait_select_partition_for_edge_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_select_partition_for_edge_list() const;
   void _internal_set_grin_trait_select_partition_for_edge_list(bool value);
+  public:
 
- public:
   // bool grin_trait_select_master_neighbor_for_adjacent_list = 12;
   void clear_grin_trait_select_master_neighbor_for_adjacent_list();
   bool grin_trait_select_master_neighbor_for_adjacent_list() const;
   void set_grin_trait_select_master_neighbor_for_adjacent_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_select_master_neighbor_for_adjacent_list() const;
-  void _internal_set_grin_trait_select_master_neighbor_for_adjacent_list(
-      bool value);
+  void _internal_set_grin_trait_select_master_neighbor_for_adjacent_list(bool value);
+  public:
 
- public:
   // bool grin_trait_select_neighbor_partition_for_adjacent_list = 13;
   void clear_grin_trait_select_neighbor_partition_for_adjacent_list();
   bool grin_trait_select_neighbor_partition_for_adjacent_list() const;
   void set_grin_trait_select_neighbor_partition_for_adjacent_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_select_neighbor_partition_for_adjacent_list() const;
-  void _internal_set_grin_trait_select_neighbor_partition_for_adjacent_list(
-      bool value);
+  void _internal_set_grin_trait_select_neighbor_partition_for_adjacent_list(bool value);
+  public:
 
- public:
   // @@protoc_insertion_point(class_scope:grin.PartitionFeature)
  private:
   class _Internal;
 
-  template <typename T>
-  friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
@@ -1041,26 +907,21 @@ class PartitionFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@prot
     bool grin_trait_select_neighbor_partition_for_adjacent_list_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
-  union {
-    Impl_ _impl_;
-  };
+  union { Impl_ _impl_; };
   friend struct ::TableStruct_graph_2eproto;
 };
 // -------------------------------------------------------------------
 
-class VertexPropertyFeature final
-    : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.VertexPropertyFeature)
-                                               */
-{
+class VertexPropertyFeature final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.VertexPropertyFeature) */ {
  public:
   inline VertexPropertyFeature() : VertexPropertyFeature(nullptr) {}
   ~VertexPropertyFeature() override;
-  explicit PROTOBUF_CONSTEXPR VertexPropertyFeature(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR VertexPropertyFeature(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   VertexPropertyFeature(const VertexPropertyFeature& from);
   VertexPropertyFeature(VertexPropertyFeature&& from) noexcept
-      : VertexPropertyFeature() {
+    : VertexPropertyFeature() {
     *this = ::std::move(from);
   }
 
@@ -1068,14 +929,12 @@ class VertexPropertyFeature final
     CopyFrom(from);
     return *this;
   }
-  inline VertexPropertyFeature& operator=(
-      VertexPropertyFeature&& from) noexcept {
-    if (this == &from)
-      return *this;
+  inline VertexPropertyFeature& operator=(VertexPropertyFeature&& from) noexcept {
+    if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
-#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
         && GetOwningArena() != nullptr
-#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
     ) {
       InternalSwap(&from);
     } else {
@@ -1098,83 +957,74 @@ class VertexPropertyFeature final
   }
   static inline const VertexPropertyFeature* internal_default_instance() {
     return reinterpret_cast<const VertexPropertyFeature*>(
-        &_VertexPropertyFeature_default_instance_);
+               &_VertexPropertyFeature_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 3;
+  static constexpr int kIndexInFileMessages =
+    3;
 
   friend void swap(VertexPropertyFeature& a, VertexPropertyFeature& b) {
     a.Swap(&b);
   }
   inline void Swap(VertexPropertyFeature* other) {
-    if (other == this)
-      return;
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
         GetOwningArena() == other->GetOwningArena()) {
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
   void UnsafeArenaSwap(VertexPropertyFeature* other) {
-    if (other == this)
-      return;
+    if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
 
-  VertexPropertyFeature* New(
-      ::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  VertexPropertyFeature* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<VertexPropertyFeature>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
   void CopyFrom(const VertexPropertyFeature& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const VertexPropertyFeature& from) {
+  void MergeFrom( const VertexPropertyFeature& from) {
     VertexPropertyFeature::MergeImpl(*this, from);
   }
-
- private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
-                        const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-
- public:
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
-  const char* _InternalParse(
-      const char* ptr,
-      ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   uint8_t* _InternalSerialize(
-      uint8_t* target,
-      ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
 
- private:
+  private:
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(VertexPropertyFeature* other);
 
- private:
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "grin.VertexPropertyFeature";
   }
-
- protected:
+  protected:
   explicit VertexPropertyFeature(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                                 bool is_message_owned = false);
+                       bool is_message_owned = false);
+  public:
 
- public:
   static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData* GetClassData() const final;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
 
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
 
@@ -1196,88 +1046,79 @@ class VertexPropertyFeature final
   void clear_grin_with_vertex_property();
   bool grin_with_vertex_property() const;
   void set_grin_with_vertex_property(bool value);
-
- private:
+  private:
   bool _internal_grin_with_vertex_property() const;
   void _internal_set_grin_with_vertex_property(bool value);
+  public:
 
- public:
   // bool grin_with_vertex_property_name = 2;
   void clear_grin_with_vertex_property_name();
   bool grin_with_vertex_property_name() const;
   void set_grin_with_vertex_property_name(bool value);
-
- private:
+  private:
   bool _internal_grin_with_vertex_property_name() const;
   void _internal_set_grin_with_vertex_property_name(bool value);
+  public:
 
- public:
   // bool grin_with_vertex_type_name = 3;
   void clear_grin_with_vertex_type_name();
   bool grin_with_vertex_type_name() const;
   void set_grin_with_vertex_type_name(bool value);
-
- private:
+  private:
   bool _internal_grin_with_vertex_type_name() const;
   void _internal_set_grin_with_vertex_type_name(bool value);
+  public:
 
- public:
   // bool grin_enable_vertex_property_table = 4;
   void clear_grin_enable_vertex_property_table();
   bool grin_enable_vertex_property_table() const;
   void set_grin_enable_vertex_property_table(bool value);
-
- private:
+  private:
   bool _internal_grin_enable_vertex_property_table() const;
   void _internal_set_grin_enable_vertex_property_table(bool value);
+  public:
 
- public:
   // bool grin_enable_vertex_primary_keys = 5;
   void clear_grin_enable_vertex_primary_keys();
   bool grin_enable_vertex_primary_keys() const;
   void set_grin_enable_vertex_primary_keys(bool value);
-
- private:
+  private:
   bool _internal_grin_enable_vertex_primary_keys() const;
   void _internal_set_grin_enable_vertex_primary_keys(bool value);
+  public:
 
- public:
   // bool grin_trait_natural_id_for_vertex_type = 6;
   void clear_grin_trait_natural_id_for_vertex_type();
   bool grin_trait_natural_id_for_vertex_type() const;
   void set_grin_trait_natural_id_for_vertex_type(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_natural_id_for_vertex_type() const;
   void _internal_set_grin_trait_natural_id_for_vertex_type(bool value);
+  public:
 
- public:
   // bool grin_trait_natural_id_for_vertex_property = 7;
   void clear_grin_trait_natural_id_for_vertex_property();
   bool grin_trait_natural_id_for_vertex_property() const;
   void set_grin_trait_natural_id_for_vertex_property(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_natural_id_for_vertex_property() const;
   void _internal_set_grin_trait_natural_id_for_vertex_property(bool value);
+  public:
 
- public:
   // bool grin_assume_by_type_vertex_original_id = 8;
   void clear_grin_assume_by_type_vertex_original_id();
   bool grin_assume_by_type_vertex_original_id() const;
   void set_grin_assume_by_type_vertex_original_id(bool value);
-
- private:
+  private:
   bool _internal_grin_assume_by_type_vertex_original_id() const;
   void _internal_set_grin_assume_by_type_vertex_original_id(bool value);
+  public:
 
- public:
   // @@protoc_insertion_point(class_scope:grin.VertexPropertyFeature)
  private:
   class _Internal;
 
-  template <typename T>
-  friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
@@ -1291,25 +1132,21 @@ class VertexPropertyFeature final
     bool grin_assume_by_type_vertex_original_id_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
-  union {
-    Impl_ _impl_;
-  };
+  union { Impl_ _impl_; };
   friend struct ::TableStruct_graph_2eproto;
 };
 // -------------------------------------------------------------------
 
-class EdgePropertyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.EdgePropertyFeature)
-                                                                           */
-{
+class EdgePropertyFeature final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.EdgePropertyFeature) */ {
  public:
   inline EdgePropertyFeature() : EdgePropertyFeature(nullptr) {}
   ~EdgePropertyFeature() override;
-  explicit PROTOBUF_CONSTEXPR EdgePropertyFeature(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR EdgePropertyFeature(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   EdgePropertyFeature(const EdgePropertyFeature& from);
   EdgePropertyFeature(EdgePropertyFeature&& from) noexcept
-      : EdgePropertyFeature() {
+    : EdgePropertyFeature() {
     *this = ::std::move(from);
   }
 
@@ -1318,12 +1155,11 @@ class EdgePropertyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@p
     return *this;
   }
   inline EdgePropertyFeature& operator=(EdgePropertyFeature&& from) noexcept {
-    if (this == &from)
-      return *this;
+    if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
-#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
         && GetOwningArena() != nullptr
-#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
     ) {
       InternalSwap(&from);
     } else {
@@ -1346,83 +1182,74 @@ class EdgePropertyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@p
   }
   static inline const EdgePropertyFeature* internal_default_instance() {
     return reinterpret_cast<const EdgePropertyFeature*>(
-        &_EdgePropertyFeature_default_instance_);
+               &_EdgePropertyFeature_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 4;
+  static constexpr int kIndexInFileMessages =
+    4;
 
   friend void swap(EdgePropertyFeature& a, EdgePropertyFeature& b) {
     a.Swap(&b);
   }
   inline void Swap(EdgePropertyFeature* other) {
-    if (other == this)
-      return;
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
         GetOwningArena() == other->GetOwningArena()) {
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
   void UnsafeArenaSwap(EdgePropertyFeature* other) {
-    if (other == this)
-      return;
+    if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
 
-  EdgePropertyFeature* New(
-      ::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  EdgePropertyFeature* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<EdgePropertyFeature>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
   void CopyFrom(const EdgePropertyFeature& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const EdgePropertyFeature& from) {
+  void MergeFrom( const EdgePropertyFeature& from) {
     EdgePropertyFeature::MergeImpl(*this, from);
   }
-
- private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
-                        const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-
- public:
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
-  const char* _InternalParse(
-      const char* ptr,
-      ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   uint8_t* _InternalSerialize(
-      uint8_t* target,
-      ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
 
- private:
+  private:
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(EdgePropertyFeature* other);
 
- private:
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "grin.EdgePropertyFeature";
   }
-
- protected:
+  protected:
   explicit EdgePropertyFeature(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                               bool is_message_owned = false);
+                       bool is_message_owned = false);
+  public:
 
- public:
   static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData* GetClassData() const final;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
 
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
 
@@ -1443,78 +1270,70 @@ class EdgePropertyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@p
   void clear_grin_with_edge_property();
   bool grin_with_edge_property() const;
   void set_grin_with_edge_property(bool value);
-
- private:
+  private:
   bool _internal_grin_with_edge_property() const;
   void _internal_set_grin_with_edge_property(bool value);
+  public:
 
- public:
   // bool grin_with_edge_property_name = 2;
   void clear_grin_with_edge_property_name();
   bool grin_with_edge_property_name() const;
   void set_grin_with_edge_property_name(bool value);
-
- private:
+  private:
   bool _internal_grin_with_edge_property_name() const;
   void _internal_set_grin_with_edge_property_name(bool value);
+  public:
 
- public:
   // bool grin_with_edge_type_name = 3;
   void clear_grin_with_edge_type_name();
   bool grin_with_edge_type_name() const;
   void set_grin_with_edge_type_name(bool value);
-
- private:
+  private:
   bool _internal_grin_with_edge_type_name() const;
   void _internal_set_grin_with_edge_type_name(bool value);
+  public:
 
- public:
   // bool grin_enable_edge_property_table = 4;
   void clear_grin_enable_edge_property_table();
   bool grin_enable_edge_property_table() const;
   void set_grin_enable_edge_property_table(bool value);
-
- private:
+  private:
   bool _internal_grin_enable_edge_property_table() const;
   void _internal_set_grin_enable_edge_property_table(bool value);
+  public:
 
- public:
   // bool grin_enable_edge_primary_keys = 5;
   void clear_grin_enable_edge_primary_keys();
   bool grin_enable_edge_primary_keys() const;
   void set_grin_enable_edge_primary_keys(bool value);
-
- private:
+  private:
   bool _internal_grin_enable_edge_primary_keys() const;
   void _internal_set_grin_enable_edge_primary_keys(bool value);
+  public:
 
- public:
   // bool grin_trait_natural_id_for_edge_type = 6;
   void clear_grin_trait_natural_id_for_edge_type();
   bool grin_trait_natural_id_for_edge_type() const;
   void set_grin_trait_natural_id_for_edge_type(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_natural_id_for_edge_type() const;
   void _internal_set_grin_trait_natural_id_for_edge_type(bool value);
+  public:
 
- public:
   // bool grin_trait_natural_id_for_edge_property = 7;
   void clear_grin_trait_natural_id_for_edge_property();
   bool grin_trait_natural_id_for_edge_property() const;
   void set_grin_trait_natural_id_for_edge_property(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_natural_id_for_edge_property() const;
   void _internal_set_grin_trait_natural_id_for_edge_property(bool value);
+  public:
 
- public:
   // @@protoc_insertion_point(class_scope:grin.EdgePropertyFeature)
  private:
   class _Internal;
 
-  template <typename T>
-  friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
@@ -1527,24 +1346,21 @@ class EdgePropertyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@p
     bool grin_trait_natural_id_for_edge_property_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
-  union {
-    Impl_ _impl_;
-  };
+  union { Impl_ _impl_; };
   friend struct ::TableStruct_graph_2eproto;
 };
 // -------------------------------------------------------------------
 
-class PropertyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.PropertyFeature)
-                                                                       */
-{
+class PropertyFeature final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.PropertyFeature) */ {
  public:
   inline PropertyFeature() : PropertyFeature(nullptr) {}
   ~PropertyFeature() override;
-  explicit PROTOBUF_CONSTEXPR PropertyFeature(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR PropertyFeature(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   PropertyFeature(const PropertyFeature& from);
-  PropertyFeature(PropertyFeature&& from) noexcept : PropertyFeature() {
+  PropertyFeature(PropertyFeature&& from) noexcept
+    : PropertyFeature() {
     *this = ::std::move(from);
   }
 
@@ -1553,12 +1369,11 @@ class PropertyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@proto
     return *this;
   }
   inline PropertyFeature& operator=(PropertyFeature&& from) noexcept {
-    if (this == &from)
-      return *this;
+    if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
-#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
         && GetOwningArena() != nullptr
-#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
     ) {
       InternalSwap(&from);
     } else {
@@ -1581,81 +1396,74 @@ class PropertyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@proto
   }
   static inline const PropertyFeature* internal_default_instance() {
     return reinterpret_cast<const PropertyFeature*>(
-        &_PropertyFeature_default_instance_);
+               &_PropertyFeature_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 5;
+  static constexpr int kIndexInFileMessages =
+    5;
 
-  friend void swap(PropertyFeature& a, PropertyFeature& b) { a.Swap(&b); }
+  friend void swap(PropertyFeature& a, PropertyFeature& b) {
+    a.Swap(&b);
+  }
   inline void Swap(PropertyFeature* other) {
-    if (other == this)
-      return;
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
         GetOwningArena() == other->GetOwningArena()) {
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
   void UnsafeArenaSwap(PropertyFeature* other) {
-    if (other == this)
-      return;
+    if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
 
-  PropertyFeature* New(
-      ::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  PropertyFeature* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<PropertyFeature>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
   void CopyFrom(const PropertyFeature& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const PropertyFeature& from) {
+  void MergeFrom( const PropertyFeature& from) {
     PropertyFeature::MergeImpl(*this, from);
   }
-
- private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
-                        const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-
- public:
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
-  const char* _InternalParse(
-      const char* ptr,
-      ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   uint8_t* _InternalSerialize(
-      uint8_t* target,
-      ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
 
- private:
+  private:
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(PropertyFeature* other);
 
- private:
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "grin.PropertyFeature";
   }
-
- protected:
+  protected:
   explicit PropertyFeature(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                           bool is_message_owned = false);
+                       bool is_message_owned = false);
+  public:
 
- public:
   static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData* GetClassData() const final;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
 
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
 
@@ -1679,49 +1487,36 @@ class PropertyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@proto
   };
   // .grin.VertexPropertyFeature vertex_property_feature = 2;
   bool has_vertex_property_feature() const;
-
- private:
+  private:
   bool _internal_has_vertex_property_feature() const;
-
- public:
+  public:
   void clear_vertex_property_feature();
   const ::grin::VertexPropertyFeature& vertex_property_feature() const;
-  PROTOBUF_NODISCARD ::grin::VertexPropertyFeature*
-  release_vertex_property_feature();
+  PROTOBUF_NODISCARD ::grin::VertexPropertyFeature* release_vertex_property_feature();
   ::grin::VertexPropertyFeature* mutable_vertex_property_feature();
-  void set_allocated_vertex_property_feature(
-      ::grin::VertexPropertyFeature* vertex_property_feature);
-
- private:
-  const ::grin::VertexPropertyFeature& _internal_vertex_property_feature()
-      const;
+  void set_allocated_vertex_property_feature(::grin::VertexPropertyFeature* vertex_property_feature);
+  private:
+  const ::grin::VertexPropertyFeature& _internal_vertex_property_feature() const;
   ::grin::VertexPropertyFeature* _internal_mutable_vertex_property_feature();
-
- public:
+  public:
   void unsafe_arena_set_allocated_vertex_property_feature(
       ::grin::VertexPropertyFeature* vertex_property_feature);
   ::grin::VertexPropertyFeature* unsafe_arena_release_vertex_property_feature();
 
   // .grin.EdgePropertyFeature edge_property_feature = 3;
   bool has_edge_property_feature() const;
-
- private:
+  private:
   bool _internal_has_edge_property_feature() const;
-
- public:
+  public:
   void clear_edge_property_feature();
   const ::grin::EdgePropertyFeature& edge_property_feature() const;
-  PROTOBUF_NODISCARD ::grin::EdgePropertyFeature*
-  release_edge_property_feature();
+  PROTOBUF_NODISCARD ::grin::EdgePropertyFeature* release_edge_property_feature();
   ::grin::EdgePropertyFeature* mutable_edge_property_feature();
-  void set_allocated_edge_property_feature(
-      ::grin::EdgePropertyFeature* edge_property_feature);
-
- private:
+  void set_allocated_edge_property_feature(::grin::EdgePropertyFeature* edge_property_feature);
+  private:
   const ::grin::EdgePropertyFeature& _internal_edge_property_feature() const;
   ::grin::EdgePropertyFeature* _internal_mutable_edge_property_feature();
-
- public:
+  public:
   void unsafe_arena_set_allocated_edge_property_feature(
       ::grin::EdgePropertyFeature* edge_property_feature);
   ::grin::EdgePropertyFeature* unsafe_arena_release_edge_property_feature();
@@ -1730,110 +1525,97 @@ class PropertyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@proto
   void clear_vertex_property();
   ::grin::PropertyDataPartitionStrategy vertex_property() const;
   void set_vertex_property(::grin::PropertyDataPartitionStrategy value);
-
- private:
+  private:
   ::grin::PropertyDataPartitionStrategy _internal_vertex_property() const;
-  void _internal_set_vertex_property(
-      ::grin::PropertyDataPartitionStrategy value);
+  void _internal_set_vertex_property(::grin::PropertyDataPartitionStrategy value);
+  public:
 
- public:
   // .grin.PropertyDataPartitionStrategy edge_property = 5;
   void clear_edge_property();
   ::grin::PropertyDataPartitionStrategy edge_property() const;
   void set_edge_property(::grin::PropertyDataPartitionStrategy value);
-
- private:
+  private:
   ::grin::PropertyDataPartitionStrategy _internal_edge_property() const;
   void _internal_set_edge_property(::grin::PropertyDataPartitionStrategy value);
+  public:
 
- public:
   // bool grin_enable_row = 1;
   void clear_grin_enable_row();
   bool grin_enable_row() const;
   void set_grin_enable_row(bool value);
-
- private:
+  private:
   bool _internal_grin_enable_row() const;
   void _internal_set_grin_enable_row(bool value);
+  public:
 
- public:
   // bool grin_assume_column_store_for_vertex_property = 6;
   void clear_grin_assume_column_store_for_vertex_property();
   bool grin_assume_column_store_for_vertex_property() const;
   void set_grin_assume_column_store_for_vertex_property(bool value);
-
- private:
+  private:
   bool _internal_grin_assume_column_store_for_vertex_property() const;
   void _internal_set_grin_assume_column_store_for_vertex_property(bool value);
+  public:
 
- public:
   // bool grin_assume_column_store_for_edge_property = 7;
   void clear_grin_assume_column_store_for_edge_property();
   bool grin_assume_column_store_for_edge_property() const;
   void set_grin_assume_column_store_for_edge_property(bool value);
-
- private:
+  private:
   bool _internal_grin_assume_column_store_for_edge_property() const;
   void _internal_set_grin_assume_column_store_for_edge_property(bool value);
+  public:
 
- public:
   // bool grin_trait_select_type_for_vertex_list = 8;
   void clear_grin_trait_select_type_for_vertex_list();
   bool grin_trait_select_type_for_vertex_list() const;
   void set_grin_trait_select_type_for_vertex_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_select_type_for_vertex_list() const;
   void _internal_set_grin_trait_select_type_for_vertex_list(bool value);
+  public:
 
- public:
   // bool grin_trait_select_type_for_edge_list = 9;
   void clear_grin_trait_select_type_for_edge_list();
   bool grin_trait_select_type_for_edge_list() const;
   void set_grin_trait_select_type_for_edge_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_select_type_for_edge_list() const;
   void _internal_set_grin_trait_select_type_for_edge_list(bool value);
+  public:
 
- public:
   // bool grin_trait_select_neighbor_type_for_adjacent_list = 10;
   void clear_grin_trait_select_neighbor_type_for_adjacent_list();
   bool grin_trait_select_neighbor_type_for_adjacent_list() const;
   void set_grin_trait_select_neighbor_type_for_adjacent_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_select_neighbor_type_for_adjacent_list() const;
-  void _internal_set_grin_trait_select_neighbor_type_for_adjacent_list(
-      bool value);
+  void _internal_set_grin_trait_select_neighbor_type_for_adjacent_list(bool value);
+  public:
 
- public:
   // bool grin_trait_select_edge_type_for_adjacent_list = 11;
   void clear_grin_trait_select_edge_type_for_adjacent_list();
   bool grin_trait_select_edge_type_for_adjacent_list() const;
   void set_grin_trait_select_edge_type_for_adjacent_list(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_select_edge_type_for_adjacent_list() const;
   void _internal_set_grin_trait_select_edge_type_for_adjacent_list(bool value);
+  public:
 
- public:
   // bool grin_trait_specific_vev_relation = 12;
   void clear_grin_trait_specific_vev_relation();
   bool grin_trait_specific_vev_relation() const;
   void set_grin_trait_specific_vev_relation(bool value);
-
- private:
+  private:
   bool _internal_grin_trait_specific_vev_relation() const;
   void _internal_set_grin_trait_specific_vev_relation(bool value);
+  public:
 
- public:
   // @@protoc_insertion_point(class_scope:grin.PropertyFeature)
  private:
   class _Internal;
 
-  template <typename T>
-  friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
@@ -1851,24 +1633,21 @@ class PropertyFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@proto
     bool grin_trait_specific_vev_relation_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
-  union {
-    Impl_ _impl_;
-  };
+  union { Impl_ _impl_; };
   friend struct ::TableStruct_graph_2eproto;
 };
 // -------------------------------------------------------------------
 
-class IndexFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.IndexFeature)
-                                                                    */
-{
+class IndexFeature final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.IndexFeature) */ {
  public:
   inline IndexFeature() : IndexFeature(nullptr) {}
   ~IndexFeature() override;
-  explicit PROTOBUF_CONSTEXPR IndexFeature(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR IndexFeature(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   IndexFeature(const IndexFeature& from);
-  IndexFeature(IndexFeature&& from) noexcept : IndexFeature() {
+  IndexFeature(IndexFeature&& from) noexcept
+    : IndexFeature() {
     *this = ::std::move(from);
   }
 
@@ -1877,12 +1656,11 @@ class IndexFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_i
     return *this;
   }
   inline IndexFeature& operator=(IndexFeature&& from) noexcept {
-    if (this == &from)
-      return *this;
+    if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
-#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
         && GetOwningArena() != nullptr
-#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
     ) {
       InternalSwap(&from);
     } else {
@@ -1905,81 +1683,74 @@ class IndexFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_i
   }
   static inline const IndexFeature* internal_default_instance() {
     return reinterpret_cast<const IndexFeature*>(
-        &_IndexFeature_default_instance_);
+               &_IndexFeature_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 6;
+  static constexpr int kIndexInFileMessages =
+    6;
 
-  friend void swap(IndexFeature& a, IndexFeature& b) { a.Swap(&b); }
+  friend void swap(IndexFeature& a, IndexFeature& b) {
+    a.Swap(&b);
+  }
   inline void Swap(IndexFeature* other) {
-    if (other == this)
-      return;
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
         GetOwningArena() == other->GetOwningArena()) {
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
   void UnsafeArenaSwap(IndexFeature* other) {
-    if (other == this)
-      return;
+    if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
 
-  IndexFeature* New(
-      ::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  IndexFeature* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<IndexFeature>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
   void CopyFrom(const IndexFeature& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const IndexFeature& from) {
+  void MergeFrom( const IndexFeature& from) {
     IndexFeature::MergeImpl(*this, from);
   }
-
- private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
-                        const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-
- public:
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
-  const char* _InternalParse(
-      const char* ptr,
-      ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   uint8_t* _InternalSerialize(
-      uint8_t* target,
-      ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
 
- private:
+  private:
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(IndexFeature* other);
 
- private:
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "grin.IndexFeature";
   }
-
- protected:
+  protected:
   explicit IndexFeature(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                        bool is_message_owned = false);
+                       bool is_message_owned = false);
+  public:
 
- public:
   static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData* GetClassData() const final;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
 
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
 
@@ -1996,38 +1767,34 @@ class IndexFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_i
   void clear_grin_with_vertex_label();
   bool grin_with_vertex_label() const;
   void set_grin_with_vertex_label(bool value);
-
- private:
+  private:
   bool _internal_grin_with_vertex_label() const;
   void _internal_set_grin_with_vertex_label(bool value);
+  public:
 
- public:
   // bool grin_with_edge_label = 2;
   void clear_grin_with_edge_label();
   bool grin_with_edge_label() const;
   void set_grin_with_edge_label(bool value);
-
- private:
+  private:
   bool _internal_grin_with_edge_label() const;
   void _internal_set_grin_with_edge_label(bool value);
+  public:
 
- public:
   // bool grin_assume_all_vertex_list_sorted = 3;
   void clear_grin_assume_all_vertex_list_sorted();
   bool grin_assume_all_vertex_list_sorted() const;
   void set_grin_assume_all_vertex_list_sorted(bool value);
-
- private:
+  private:
   bool _internal_grin_assume_all_vertex_list_sorted() const;
   void _internal_set_grin_assume_all_vertex_list_sorted(bool value);
+  public:
 
- public:
   // @@protoc_insertion_point(class_scope:grin.IndexFeature)
  private:
   class _Internal;
 
-  template <typename T>
-  friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
@@ -2036,24 +1803,20 @@ class IndexFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_i
     bool grin_assume_all_vertex_list_sorted_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
-  union {
-    Impl_ _impl_;
-  };
+  union { Impl_ _impl_; };
   friend struct ::TableStruct_graph_2eproto;
 };
 // -------------------------------------------------------------------
 
-class PredicateFeature final
-    : public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:grin.PredicateFeature)
-                                                                */
-{
+class PredicateFeature final :
+    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:grin.PredicateFeature) */ {
  public:
   inline PredicateFeature() : PredicateFeature(nullptr) {}
-  explicit PROTOBUF_CONSTEXPR PredicateFeature(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR PredicateFeature(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   PredicateFeature(const PredicateFeature& from);
-  PredicateFeature(PredicateFeature&& from) noexcept : PredicateFeature() {
+  PredicateFeature(PredicateFeature&& from) noexcept
+    : PredicateFeature() {
     *this = ::std::move(from);
   }
 
@@ -2062,12 +1825,11 @@ class PredicateFeature final
     return *this;
   }
   inline PredicateFeature& operator=(PredicateFeature&& from) noexcept {
-    if (this == &from)
-      return *this;
+    if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
-#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
         && GetOwningArena() != nullptr
-#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
     ) {
       InternalSwap(&from);
     } else {
@@ -2090,36 +1852,36 @@ class PredicateFeature final
   }
   static inline const PredicateFeature* internal_default_instance() {
     return reinterpret_cast<const PredicateFeature*>(
-        &_PredicateFeature_default_instance_);
+               &_PredicateFeature_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 7;
+  static constexpr int kIndexInFileMessages =
+    7;
 
-  friend void swap(PredicateFeature& a, PredicateFeature& b) { a.Swap(&b); }
+  friend void swap(PredicateFeature& a, PredicateFeature& b) {
+    a.Swap(&b);
+  }
   inline void Swap(PredicateFeature* other) {
-    if (other == this)
-      return;
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
         GetOwningArena() == other->GetOwningArena()) {
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
   void UnsafeArenaSwap(PredicateFeature* other) {
-    if (other == this)
-      return;
+    if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
 
-  PredicateFeature* New(
-      ::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  PredicateFeature* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<PredicateFeature>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyFrom;
@@ -2130,21 +1892,20 @@ class PredicateFeature final
   void MergeFrom(const PredicateFeature& from) {
     ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl(*this, from);
   }
+  public:
 
- public:
- private:
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "grin.PredicateFeature";
   }
-
- protected:
+  protected:
   explicit PredicateFeature(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                            bool is_message_owned = false);
+                       bool is_message_owned = false);
+  public:
 
- public:
   static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData* GetClassData() const final;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
 
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
 
@@ -2156,26 +1917,25 @@ class PredicateFeature final
  private:
   class _Internal;
 
-  template <typename T>
-  friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  struct Impl_ {};
+  struct Impl_ {
+  };
   friend struct ::TableStruct_graph_2eproto;
 };
 // -------------------------------------------------------------------
 
-class StorageFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.StorageFeature)
-                                                                      */
-{
+class StorageFeature final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.StorageFeature) */ {
  public:
   inline StorageFeature() : StorageFeature(nullptr) {}
   ~StorageFeature() override;
-  explicit PROTOBUF_CONSTEXPR StorageFeature(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR StorageFeature(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   StorageFeature(const StorageFeature& from);
-  StorageFeature(StorageFeature&& from) noexcept : StorageFeature() {
+  StorageFeature(StorageFeature&& from) noexcept
+    : StorageFeature() {
     *this = ::std::move(from);
   }
 
@@ -2184,12 +1944,11 @@ class StorageFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc
     return *this;
   }
   inline StorageFeature& operator=(StorageFeature&& from) noexcept {
-    if (this == &from)
-      return *this;
+    if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
-#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
         && GetOwningArena() != nullptr
-#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
     ) {
       InternalSwap(&from);
     } else {
@@ -2221,81 +1980,74 @@ class StorageFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc
 
   static inline const StorageFeature* internal_default_instance() {
     return reinterpret_cast<const StorageFeature*>(
-        &_StorageFeature_default_instance_);
+               &_StorageFeature_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 8;
+  static constexpr int kIndexInFileMessages =
+    8;
 
-  friend void swap(StorageFeature& a, StorageFeature& b) { a.Swap(&b); }
+  friend void swap(StorageFeature& a, StorageFeature& b) {
+    a.Swap(&b);
+  }
   inline void Swap(StorageFeature* other) {
-    if (other == this)
-      return;
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
         GetOwningArena() == other->GetOwningArena()) {
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
   void UnsafeArenaSwap(StorageFeature* other) {
-    if (other == this)
-      return;
+    if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
   }
 
   // implements Message ----------------------------------------------
 
-  StorageFeature* New(
-      ::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+  StorageFeature* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
     return CreateMaybeMessage<StorageFeature>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
   void CopyFrom(const StorageFeature& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const StorageFeature& from) {
+  void MergeFrom( const StorageFeature& from) {
     StorageFeature::MergeImpl(*this, from);
   }
-
- private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
-                        const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-
- public:
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
-  const char* _InternalParse(
-      const char* ptr,
-      ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   uint8_t* _InternalSerialize(
-      uint8_t* target,
-      ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
 
- private:
+  private:
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(StorageFeature* other);
 
- private:
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "grin.StorageFeature";
   }
-
- protected:
+  protected:
   explicit StorageFeature(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                          bool is_message_owned = false);
+                       bool is_message_owned = false);
+  public:
 
- public:
   static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData* GetClassData() const final;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
 
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
 
@@ -2312,114 +2064,90 @@ class StorageFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc
   };
   // .grin.TopologyFeature topology_feature = 1;
   bool has_topology_feature() const;
-
- private:
+  private:
   bool _internal_has_topology_feature() const;
-
- public:
+  public:
   void clear_topology_feature();
   const ::grin::TopologyFeature& topology_feature() const;
   PROTOBUF_NODISCARD ::grin::TopologyFeature* release_topology_feature();
   ::grin::TopologyFeature* mutable_topology_feature();
-  void set_allocated_topology_feature(
-      ::grin::TopologyFeature* topology_feature);
-
- private:
+  void set_allocated_topology_feature(::grin::TopologyFeature* topology_feature);
+  private:
   const ::grin::TopologyFeature& _internal_topology_feature() const;
   ::grin::TopologyFeature* _internal_mutable_topology_feature();
-
- public:
+  public:
   void unsafe_arena_set_allocated_topology_feature(
       ::grin::TopologyFeature* topology_feature);
   ::grin::TopologyFeature* unsafe_arena_release_topology_feature();
 
   // .grin.PartitionFeature partition_feature = 2;
   bool has_partition_feature() const;
-
- private:
+  private:
   bool _internal_has_partition_feature() const;
-
- public:
+  public:
   void clear_partition_feature();
   const ::grin::PartitionFeature& partition_feature() const;
   PROTOBUF_NODISCARD ::grin::PartitionFeature* release_partition_feature();
   ::grin::PartitionFeature* mutable_partition_feature();
-  void set_allocated_partition_feature(
-      ::grin::PartitionFeature* partition_feature);
-
- private:
+  void set_allocated_partition_feature(::grin::PartitionFeature* partition_feature);
+  private:
   const ::grin::PartitionFeature& _internal_partition_feature() const;
   ::grin::PartitionFeature* _internal_mutable_partition_feature();
-
- public:
+  public:
   void unsafe_arena_set_allocated_partition_feature(
       ::grin::PartitionFeature* partition_feature);
   ::grin::PartitionFeature* unsafe_arena_release_partition_feature();
 
   // .grin.PropertyFeature property_feature = 3;
   bool has_property_feature() const;
-
- private:
+  private:
   bool _internal_has_property_feature() const;
-
- public:
+  public:
   void clear_property_feature();
   const ::grin::PropertyFeature& property_feature() const;
   PROTOBUF_NODISCARD ::grin::PropertyFeature* release_property_feature();
   ::grin::PropertyFeature* mutable_property_feature();
-  void set_allocated_property_feature(
-      ::grin::PropertyFeature* property_feature);
-
- private:
+  void set_allocated_property_feature(::grin::PropertyFeature* property_feature);
+  private:
   const ::grin::PropertyFeature& _internal_property_feature() const;
   ::grin::PropertyFeature* _internal_mutable_property_feature();
-
- public:
+  public:
   void unsafe_arena_set_allocated_property_feature(
       ::grin::PropertyFeature* property_feature);
   ::grin::PropertyFeature* unsafe_arena_release_property_feature();
 
   // .grin.IndexFeature index_feature = 4;
   bool has_index_feature() const;
-
- private:
+  private:
   bool _internal_has_index_feature() const;
-
- public:
+  public:
   void clear_index_feature();
   const ::grin::IndexFeature& index_feature() const;
   PROTOBUF_NODISCARD ::grin::IndexFeature* release_index_feature();
   ::grin::IndexFeature* mutable_index_feature();
   void set_allocated_index_feature(::grin::IndexFeature* index_feature);
-
- private:
+  private:
   const ::grin::IndexFeature& _internal_index_feature() const;
   ::grin::IndexFeature* _internal_mutable_index_feature();
-
- public:
+  public:
   void unsafe_arena_set_allocated_index_feature(
       ::grin::IndexFeature* index_feature);
   ::grin::IndexFeature* unsafe_arena_release_index_feature();
 
   // .grin.PredicateFeature predicate_feature = 5;
   bool has_predicate_feature() const;
-
- private:
+  private:
   bool _internal_has_predicate_feature() const;
-
- public:
+  public:
   void clear_predicate_feature();
   const ::grin::PredicateFeature& predicate_feature() const;
   PROTOBUF_NODISCARD ::grin::PredicateFeature* release_predicate_feature();
   ::grin::PredicateFeature* mutable_predicate_feature();
-  void set_allocated_predicate_feature(
-      ::grin::PredicateFeature* predicate_feature);
-
- private:
+  void set_allocated_predicate_feature(::grin::PredicateFeature* predicate_feature);
+  private:
   const ::grin::PredicateFeature& _internal_predicate_feature() const;
   ::grin::PredicateFeature* _internal_mutable_predicate_feature();
-
- public:
+  public:
   void unsafe_arena_set_allocated_predicate_feature(
       ::grin::PredicateFeature* predicate_feature);
   ::grin::PredicateFeature* unsafe_arena_release_predicate_feature();
@@ -2438,14 +2166,13 @@ class StorageFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc
   inline bool has_specific_feature() const;
   inline void clear_has_specific_feature();
 
-  template <typename T>
-  friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
     union SpecificFeatureUnion {
       constexpr SpecificFeatureUnion() : _constinit_{} {}
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
+        ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
       ::grin::TopologyFeature* topology_feature_;
       ::grin::PartitionFeature* partition_feature_;
       ::grin::PropertyFeature* property_feature_;
@@ -2454,25 +2181,23 @@ class StorageFeature final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc
     } specific_feature_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
     uint32_t _oneof_case_[1];
+
   };
-  union {
-    Impl_ _impl_;
-  };
+  union { Impl_ _impl_; };
   friend struct ::TableStruct_graph_2eproto;
 };
 // -------------------------------------------------------------------
 
-class Statistics final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.Statistics)
-                                                                  */
-{
+class Statistics final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.Statistics) */ {
  public:
   inline Statistics() : Statistics(nullptr) {}
   ~Statistics() override;
-  explicit PROTOBUF_CONSTEXPR Statistics(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR Statistics(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   Statistics(const Statistics& from);
-  Statistics(Statistics&& from) noexcept : Statistics() {
+  Statistics(Statistics&& from) noexcept
+    : Statistics() {
     *this = ::std::move(from);
   }
 
@@ -2481,12 +2206,11 @@ class Statistics final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_ins
     return *this;
   }
   inline Statistics& operator=(Statistics&& from) noexcept {
-    if (this == &from)
-      return *this;
+    if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
-#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
         && GetOwningArena() != nullptr
-#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
     ) {
       InternalSwap(&from);
     } else {
@@ -2508,28 +2232,30 @@ class Statistics final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_ins
     return *internal_default_instance();
   }
   static inline const Statistics* internal_default_instance() {
-    return reinterpret_cast<const Statistics*>(&_Statistics_default_instance_);
+    return reinterpret_cast<const Statistics*>(
+               &_Statistics_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 9;
+  static constexpr int kIndexInFileMessages =
+    9;
 
-  friend void swap(Statistics& a, Statistics& b) { a.Swap(&b); }
+  friend void swap(Statistics& a, Statistics& b) {
+    a.Swap(&b);
+  }
   inline void Swap(Statistics* other) {
-    if (other == this)
-      return;
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
         GetOwningArena() == other->GetOwningArena()) {
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
   void UnsafeArenaSwap(Statistics* other) {
-    if (other == this)
-      return;
+    if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
   }
@@ -2542,44 +2268,39 @@ class Statistics final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_ins
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
   void CopyFrom(const Statistics& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const Statistics& from) { Statistics::MergeImpl(*this, from); }
-
- private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
-                        const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-
- public:
+  void MergeFrom( const Statistics& from) {
+    Statistics::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
-  const char* _InternalParse(
-      const char* ptr,
-      ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   uint8_t* _InternalSerialize(
-      uint8_t* target,
-      ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
 
- private:
+  private:
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Statistics* other);
 
- private:
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "grin.Statistics";
   }
-
- protected:
+  protected:
   explicit Statistics(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                      bool is_message_owned = false);
+                       bool is_message_owned = false);
+  public:
 
- public:
   static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData* GetClassData() const final;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
 
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
 
@@ -2598,58 +2319,52 @@ class Statistics final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_ins
   void clear_vertex_count();
   int32_t vertex_count() const;
   void set_vertex_count(int32_t value);
-
- private:
+  private:
   int32_t _internal_vertex_count() const;
   void _internal_set_vertex_count(int32_t value);
+  public:
 
- public:
   // int32 edge_count = 2;
   void clear_edge_count();
   int32_t edge_count() const;
   void set_edge_count(int32_t value);
-
- private:
+  private:
   int32_t _internal_edge_count() const;
   void _internal_set_edge_count(int32_t value);
+  public:
 
- public:
   // int32 partition_count = 3;
   void clear_partition_count();
   int32_t partition_count() const;
   void set_partition_count(int32_t value);
-
- private:
+  private:
   int32_t _internal_partition_count() const;
   void _internal_set_partition_count(int32_t value);
+  public:
 
- public:
   // int32 vertex_type_count = 4;
   void clear_vertex_type_count();
   int32_t vertex_type_count() const;
   void set_vertex_type_count(int32_t value);
-
- private:
+  private:
   int32_t _internal_vertex_type_count() const;
   void _internal_set_vertex_type_count(int32_t value);
+  public:
 
- public:
   // int32 edge_type_count = 5;
   void clear_edge_type_count();
   int32_t edge_type_count() const;
   void set_edge_type_count(int32_t value);
-
- private:
+  private:
   int32_t _internal_edge_type_count() const;
   void _internal_set_edge_type_count(int32_t value);
+  public:
 
- public:
   // @@protoc_insertion_point(class_scope:grin.Statistics)
  private:
   class _Internal;
 
-  template <typename T>
-  friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
@@ -2660,36 +2375,34 @@ class Statistics final : public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_ins
     int32_t edge_type_count_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
-  union {
-    Impl_ _impl_;
-  };
+  union { Impl_ _impl_; };
   friend struct ::TableStruct_graph_2eproto;
 };
 // -------------------------------------------------------------------
 
-class Graph final
-    : public ::PROTOBUF_NAMESPACE_ID::
-          Message /* @@protoc_insertion_point(class_definition:grin.Graph) */ {
+class Graph final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:grin.Graph) */ {
  public:
   inline Graph() : Graph(nullptr) {}
   ~Graph() override;
-  explicit PROTOBUF_CONSTEXPR Graph(
-      ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  explicit PROTOBUF_CONSTEXPR Graph(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
   Graph(const Graph& from);
-  Graph(Graph&& from) noexcept : Graph() { *this = ::std::move(from); }
+  Graph(Graph&& from) noexcept
+    : Graph() {
+    *this = ::std::move(from);
+  }
 
   inline Graph& operator=(const Graph& from) {
     CopyFrom(from);
     return *this;
   }
   inline Graph& operator=(Graph&& from) noexcept {
-    if (this == &from)
-      return *this;
+    if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()
-#ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
         && GetOwningArena() != nullptr
-#endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
     ) {
       InternalSwap(&from);
     } else {
@@ -2711,28 +2424,30 @@ class Graph final
     return *internal_default_instance();
   }
   static inline const Graph* internal_default_instance() {
-    return reinterpret_cast<const Graph*>(&_Graph_default_instance_);
+    return reinterpret_cast<const Graph*>(
+               &_Graph_default_instance_);
   }
-  static constexpr int kIndexInFileMessages = 10;
+  static constexpr int kIndexInFileMessages =
+    10;
 
-  friend void swap(Graph& a, Graph& b) { a.Swap(&b); }
+  friend void swap(Graph& a, Graph& b) {
+    a.Swap(&b);
+  }
   inline void Swap(Graph* other) {
-    if (other == this)
-      return;
-#ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() != nullptr &&
         GetOwningArena() == other->GetOwningArena()) {
-#else   // PROTOBUF_FORCE_COPY_IN_SWAP
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
     if (GetOwningArena() == other->GetOwningArena()) {
-#endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
       InternalSwap(other);
     } else {
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
   void UnsafeArenaSwap(Graph* other) {
-    if (other == this)
-      return;
+    if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
   }
@@ -2745,44 +2460,39 @@ class Graph final
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
   void CopyFrom(const Graph& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const Graph& from) { Graph::MergeImpl(*this, from); }
-
- private:
-  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg,
-                        const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
-
- public:
+  void MergeFrom( const Graph& from) {
+    Graph::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
   size_t ByteSizeLong() const final;
-  const char* _InternalParse(
-      const char* ptr,
-      ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
   uint8_t* _InternalSerialize(
-      uint8_t* target,
-      ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
   int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
 
- private:
+  private:
   void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
   void SharedDtor();
   void SetCachedSize(int size) const final;
   void InternalSwap(Graph* other);
 
- private:
+  private:
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
     return "grin.Graph";
   }
-
- protected:
+  protected:
   explicit Graph(::PROTOBUF_NAMESPACE_ID::Arena* arena,
-                 bool is_message_owned = false);
+                       bool is_message_owned = false);
+  public:
 
- public:
   static const ClassData _class_data_;
-  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData* GetClassData() const final;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
 
   ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
 
@@ -2798,25 +2508,21 @@ class Graph final
   };
   // repeated .grin.StorageFeature features = 3;
   int features_size() const;
-
- private:
+  private:
   int _internal_features_size() const;
-
- public:
+  public:
   void clear_features();
   ::grin::StorageFeature* mutable_features(int index);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<::grin::StorageFeature>*
-  mutable_features();
-
- private:
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::grin::StorageFeature >*
+      mutable_features();
+  private:
   const ::grin::StorageFeature& _internal_features(int index) const;
   ::grin::StorageFeature* _internal_add_features();
-
- public:
+  public:
   const ::grin::StorageFeature& features(int index) const;
   ::grin::StorageFeature* add_features();
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<::grin::StorageFeature>&
-  features() const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::grin::StorageFeature >&
+      features() const;
 
   // string uri = 1;
   void clear_uri();
@@ -2826,14 +2532,12 @@ class Graph final
   std::string* mutable_uri();
   PROTOBUF_NODISCARD std::string* release_uri();
   void set_allocated_uri(std::string* uri);
-
- private:
+  private:
   const std::string& _internal_uri() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_uri(
-      const std::string& value);
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_uri(const std::string& value);
   std::string* _internal_mutable_uri();
+  public:
 
- public:
   // string grin_version = 2;
   void clear_grin_version();
   const std::string& grin_version() const;
@@ -2842,62 +2546,55 @@ class Graph final
   std::string* mutable_grin_version();
   PROTOBUF_NODISCARD std::string* release_grin_version();
   void set_allocated_grin_version(std::string* grin_version);
-
- private:
+  private:
   const std::string& _internal_grin_version() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_grin_version(
-      const std::string& value);
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_grin_version(const std::string& value);
   std::string* _internal_mutable_grin_version();
+  public:
 
- public:
   // .grin.Statistics statistics = 4;
   bool has_statistics() const;
-
- private:
+  private:
   bool _internal_has_statistics() const;
-
- public:
+  public:
   void clear_statistics();
   const ::grin::Statistics& statistics() const;
   PROTOBUF_NODISCARD ::grin::Statistics* release_statistics();
   ::grin::Statistics* mutable_statistics();
   void set_allocated_statistics(::grin::Statistics* statistics);
-
- private:
+  private:
   const ::grin::Statistics& _internal_statistics() const;
   ::grin::Statistics* _internal_mutable_statistics();
-
- public:
-  void unsafe_arena_set_allocated_statistics(::grin::Statistics* statistics);
+  public:
+  void unsafe_arena_set_allocated_statistics(
+      ::grin::Statistics* statistics);
   ::grin::Statistics* unsafe_arena_release_statistics();
 
   // @@protoc_insertion_point(class_scope:grin.Graph)
  private:
   class _Internal;
 
-  template <typename T>
-  friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
-    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<::grin::StorageFeature> features_;
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::grin::StorageFeature > features_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr uri_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr grin_version_;
     ::grin::Statistics* statistics_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
-  union {
-    Impl_ _impl_;
-  };
+  union { Impl_ _impl_; };
   friend struct ::TableStruct_graph_2eproto;
 };
 // ===================================================================
 
+
 // ===================================================================
 
 #ifdef __GNUC__
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif  // __GNUC__
 // TopologyFeature
 
@@ -2912,8 +2609,8 @@ inline bool TopologyFeature::grin_assume_has_directed_graph() const {
   // @@protoc_insertion_point(field_get:grin.TopologyFeature.grin_assume_has_directed_graph)
   return _internal_grin_assume_has_directed_graph();
 }
-inline void TopologyFeature::_internal_set_grin_assume_has_directed_graph(
-    bool value) {
+inline void TopologyFeature::_internal_set_grin_assume_has_directed_graph(bool value) {
+  
   _impl_.grin_assume_has_directed_graph_ = value;
 }
 inline void TopologyFeature::set_grin_assume_has_directed_graph(bool value) {
@@ -2925,16 +2622,15 @@ inline void TopologyFeature::set_grin_assume_has_directed_graph(bool value) {
 inline void TopologyFeature::clear_grin_assume_has_undirected_graph() {
   _impl_.grin_assume_has_undirected_graph_ = false;
 }
-inline bool TopologyFeature::_internal_grin_assume_has_undirected_graph()
-    const {
+inline bool TopologyFeature::_internal_grin_assume_has_undirected_graph() const {
   return _impl_.grin_assume_has_undirected_graph_;
 }
 inline bool TopologyFeature::grin_assume_has_undirected_graph() const {
   // @@protoc_insertion_point(field_get:grin.TopologyFeature.grin_assume_has_undirected_graph)
   return _internal_grin_assume_has_undirected_graph();
 }
-inline void TopologyFeature::_internal_set_grin_assume_has_undirected_graph(
-    bool value) {
+inline void TopologyFeature::_internal_set_grin_assume_has_undirected_graph(bool value) {
+  
   _impl_.grin_assume_has_undirected_graph_ = value;
 }
 inline void TopologyFeature::set_grin_assume_has_undirected_graph(bool value) {
@@ -2946,16 +2642,15 @@ inline void TopologyFeature::set_grin_assume_has_undirected_graph(bool value) {
 inline void TopologyFeature::clear_grin_assume_has_multi_edge_graph() {
   _impl_.grin_assume_has_multi_edge_graph_ = false;
 }
-inline bool TopologyFeature::_internal_grin_assume_has_multi_edge_graph()
-    const {
+inline bool TopologyFeature::_internal_grin_assume_has_multi_edge_graph() const {
   return _impl_.grin_assume_has_multi_edge_graph_;
 }
 inline bool TopologyFeature::grin_assume_has_multi_edge_graph() const {
   // @@protoc_insertion_point(field_get:grin.TopologyFeature.grin_assume_has_multi_edge_graph)
   return _internal_grin_assume_has_multi_edge_graph();
 }
-inline void TopologyFeature::_internal_set_grin_assume_has_multi_edge_graph(
-    bool value) {
+inline void TopologyFeature::_internal_set_grin_assume_has_multi_edge_graph(bool value) {
+  
   _impl_.grin_assume_has_multi_edge_graph_ = value;
 }
 inline void TopologyFeature::set_grin_assume_has_multi_edge_graph(bool value) {
@@ -2974,8 +2669,8 @@ inline bool TopologyFeature::grin_with_vertex_original_id() const {
   // @@protoc_insertion_point(field_get:grin.TopologyFeature.grin_with_vertex_original_id)
   return _internal_grin_with_vertex_original_id();
 }
-inline void TopologyFeature::_internal_set_grin_with_vertex_original_id(
-    bool value) {
+inline void TopologyFeature::_internal_set_grin_with_vertex_original_id(bool value) {
+  
   _impl_.grin_with_vertex_original_id_ = value;
 }
 inline void TopologyFeature::set_grin_with_vertex_original_id(bool value) {
@@ -2995,6 +2690,7 @@ inline bool TopologyFeature::grin_with_vertex_data() const {
   return _internal_grin_with_vertex_data();
 }
 inline void TopologyFeature::_internal_set_grin_with_vertex_data(bool value) {
+  
   _impl_.grin_with_vertex_data_ = value;
 }
 inline void TopologyFeature::set_grin_with_vertex_data(bool value) {
@@ -3014,6 +2710,7 @@ inline bool TopologyFeature::grin_with_edge_data() const {
   return _internal_grin_with_edge_data();
 }
 inline void TopologyFeature::_internal_set_grin_with_edge_data(bool value) {
+  
   _impl_.grin_with_edge_data_ = value;
 }
 inline void TopologyFeature::set_grin_with_edge_data(bool value) {
@@ -3031,27 +2728,21 @@ inline int TopologyFeature::vertex_list_retrievals_size() const {
 inline void TopologyFeature::clear_vertex_list_retrievals() {
   _impl_.vertex_list_retrievals_.Clear();
 }
-inline ::grin::ListRetrieval TopologyFeature::_internal_vertex_list_retrievals(
-    int index) const {
-  return static_cast<::grin::ListRetrieval>(
-      _impl_.vertex_list_retrievals_.Get(index));
+inline ::grin::ListRetrieval TopologyFeature::_internal_vertex_list_retrievals(int index) const {
+  return static_cast< ::grin::ListRetrieval >(_impl_.vertex_list_retrievals_.Get(index));
 }
-inline ::grin::ListRetrieval TopologyFeature::vertex_list_retrievals(
-    int index) const {
+inline ::grin::ListRetrieval TopologyFeature::vertex_list_retrievals(int index) const {
   // @@protoc_insertion_point(field_get:grin.TopologyFeature.vertex_list_retrievals)
   return _internal_vertex_list_retrievals(index);
 }
-inline void TopologyFeature::set_vertex_list_retrievals(
-    int index, ::grin::ListRetrieval value) {
+inline void TopologyFeature::set_vertex_list_retrievals(int index, ::grin::ListRetrieval value) {
   _impl_.vertex_list_retrievals_.Set(index, value);
   // @@protoc_insertion_point(field_set:grin.TopologyFeature.vertex_list_retrievals)
 }
-inline void TopologyFeature::_internal_add_vertex_list_retrievals(
-    ::grin::ListRetrieval value) {
+inline void TopologyFeature::_internal_add_vertex_list_retrievals(::grin::ListRetrieval value) {
   _impl_.vertex_list_retrievals_.Add(value);
 }
-inline void TopologyFeature::add_vertex_list_retrievals(
-    ::grin::ListRetrieval value) {
+inline void TopologyFeature::add_vertex_list_retrievals(::grin::ListRetrieval value) {
   _internal_add_vertex_list_retrievals(value);
   // @@protoc_insertion_point(field_add:grin.TopologyFeature.vertex_list_retrievals)
 }
@@ -3080,27 +2771,21 @@ inline int TopologyFeature::edge_list_retrievals_size() const {
 inline void TopologyFeature::clear_edge_list_retrievals() {
   _impl_.edge_list_retrievals_.Clear();
 }
-inline ::grin::ListRetrieval TopologyFeature::_internal_edge_list_retrievals(
-    int index) const {
-  return static_cast<::grin::ListRetrieval>(
-      _impl_.edge_list_retrievals_.Get(index));
+inline ::grin::ListRetrieval TopologyFeature::_internal_edge_list_retrievals(int index) const {
+  return static_cast< ::grin::ListRetrieval >(_impl_.edge_list_retrievals_.Get(index));
 }
-inline ::grin::ListRetrieval TopologyFeature::edge_list_retrievals(
-    int index) const {
+inline ::grin::ListRetrieval TopologyFeature::edge_list_retrievals(int index) const {
   // @@protoc_insertion_point(field_get:grin.TopologyFeature.edge_list_retrievals)
   return _internal_edge_list_retrievals(index);
 }
-inline void TopologyFeature::set_edge_list_retrievals(
-    int index, ::grin::ListRetrieval value) {
+inline void TopologyFeature::set_edge_list_retrievals(int index, ::grin::ListRetrieval value) {
   _impl_.edge_list_retrievals_.Set(index, value);
   // @@protoc_insertion_point(field_set:grin.TopologyFeature.edge_list_retrievals)
 }
-inline void TopologyFeature::_internal_add_edge_list_retrievals(
-    ::grin::ListRetrieval value) {
+inline void TopologyFeature::_internal_add_edge_list_retrievals(::grin::ListRetrieval value) {
   _impl_.edge_list_retrievals_.Add(value);
 }
-inline void TopologyFeature::add_edge_list_retrievals(
-    ::grin::ListRetrieval value) {
+inline void TopologyFeature::add_edge_list_retrievals(::grin::ListRetrieval value) {
   _internal_add_edge_list_retrievals(value);
   // @@protoc_insertion_point(field_add:grin.TopologyFeature.edge_list_retrievals)
 }
@@ -3129,27 +2814,21 @@ inline int TopologyFeature::adjacent_list_retrievals_size() const {
 inline void TopologyFeature::clear_adjacent_list_retrievals() {
   _impl_.adjacent_list_retrievals_.Clear();
 }
-inline ::grin::ListRetrieval
-TopologyFeature::_internal_adjacent_list_retrievals(int index) const {
-  return static_cast<::grin::ListRetrieval>(
-      _impl_.adjacent_list_retrievals_.Get(index));
+inline ::grin::ListRetrieval TopologyFeature::_internal_adjacent_list_retrievals(int index) const {
+  return static_cast< ::grin::ListRetrieval >(_impl_.adjacent_list_retrievals_.Get(index));
 }
-inline ::grin::ListRetrieval TopologyFeature::adjacent_list_retrievals(
-    int index) const {
+inline ::grin::ListRetrieval TopologyFeature::adjacent_list_retrievals(int index) const {
   // @@protoc_insertion_point(field_get:grin.TopologyFeature.adjacent_list_retrievals)
   return _internal_adjacent_list_retrievals(index);
 }
-inline void TopologyFeature::set_adjacent_list_retrievals(
-    int index, ::grin::ListRetrieval value) {
+inline void TopologyFeature::set_adjacent_list_retrievals(int index, ::grin::ListRetrieval value) {
   _impl_.adjacent_list_retrievals_.Set(index, value);
   // @@protoc_insertion_point(field_set:grin.TopologyFeature.adjacent_list_retrievals)
 }
-inline void TopologyFeature::_internal_add_adjacent_list_retrievals(
-    ::grin::ListRetrieval value) {
+inline void TopologyFeature::_internal_add_adjacent_list_retrievals(::grin::ListRetrieval value) {
   _impl_.adjacent_list_retrievals_.Add(value);
 }
-inline void TopologyFeature::add_adjacent_list_retrievals(
-    ::grin::ListRetrieval value) {
+inline void TopologyFeature::add_adjacent_list_retrievals(::grin::ListRetrieval value) {
   _internal_add_adjacent_list_retrievals(value);
   // @@protoc_insertion_point(field_add:grin.TopologyFeature.adjacent_list_retrievals)
 }
@@ -3173,105 +2852,81 @@ TopologyFeature::mutable_adjacent_list_retrievals() {
 // MirrorPartitionListFeature
 
 // bool grin_trait_master_vertex_mirror_partition_list = 1;
-inline void MirrorPartitionListFeature::
-    clear_grin_trait_master_vertex_mirror_partition_list() {
+inline void MirrorPartitionListFeature::clear_grin_trait_master_vertex_mirror_partition_list() {
   _impl_.grin_trait_master_vertex_mirror_partition_list_ = false;
 }
-inline bool MirrorPartitionListFeature::
-    _internal_grin_trait_master_vertex_mirror_partition_list() const {
+inline bool MirrorPartitionListFeature::_internal_grin_trait_master_vertex_mirror_partition_list() const {
   return _impl_.grin_trait_master_vertex_mirror_partition_list_;
 }
-inline bool
-MirrorPartitionListFeature::grin_trait_master_vertex_mirror_partition_list()
-    const {
+inline bool MirrorPartitionListFeature::grin_trait_master_vertex_mirror_partition_list() const {
   // @@protoc_insertion_point(field_get:grin.MirrorPartitionListFeature.grin_trait_master_vertex_mirror_partition_list)
   return _internal_grin_trait_master_vertex_mirror_partition_list();
 }
-inline void MirrorPartitionListFeature::
-    _internal_set_grin_trait_master_vertex_mirror_partition_list(bool value) {
+inline void MirrorPartitionListFeature::_internal_set_grin_trait_master_vertex_mirror_partition_list(bool value) {
+  
   _impl_.grin_trait_master_vertex_mirror_partition_list_ = value;
 }
-inline void
-MirrorPartitionListFeature::set_grin_trait_master_vertex_mirror_partition_list(
-    bool value) {
+inline void MirrorPartitionListFeature::set_grin_trait_master_vertex_mirror_partition_list(bool value) {
   _internal_set_grin_trait_master_vertex_mirror_partition_list(value);
   // @@protoc_insertion_point(field_set:grin.MirrorPartitionListFeature.grin_trait_master_vertex_mirror_partition_list)
 }
 
 // bool grin_trait_mirror_vertex_mirror_partition_list = 2;
-inline void MirrorPartitionListFeature::
-    clear_grin_trait_mirror_vertex_mirror_partition_list() {
+inline void MirrorPartitionListFeature::clear_grin_trait_mirror_vertex_mirror_partition_list() {
   _impl_.grin_trait_mirror_vertex_mirror_partition_list_ = false;
 }
-inline bool MirrorPartitionListFeature::
-    _internal_grin_trait_mirror_vertex_mirror_partition_list() const {
+inline bool MirrorPartitionListFeature::_internal_grin_trait_mirror_vertex_mirror_partition_list() const {
   return _impl_.grin_trait_mirror_vertex_mirror_partition_list_;
 }
-inline bool
-MirrorPartitionListFeature::grin_trait_mirror_vertex_mirror_partition_list()
-    const {
+inline bool MirrorPartitionListFeature::grin_trait_mirror_vertex_mirror_partition_list() const {
   // @@protoc_insertion_point(field_get:grin.MirrorPartitionListFeature.grin_trait_mirror_vertex_mirror_partition_list)
   return _internal_grin_trait_mirror_vertex_mirror_partition_list();
 }
-inline void MirrorPartitionListFeature::
-    _internal_set_grin_trait_mirror_vertex_mirror_partition_list(bool value) {
+inline void MirrorPartitionListFeature::_internal_set_grin_trait_mirror_vertex_mirror_partition_list(bool value) {
+  
   _impl_.grin_trait_mirror_vertex_mirror_partition_list_ = value;
 }
-inline void
-MirrorPartitionListFeature::set_grin_trait_mirror_vertex_mirror_partition_list(
-    bool value) {
+inline void MirrorPartitionListFeature::set_grin_trait_mirror_vertex_mirror_partition_list(bool value) {
   _internal_set_grin_trait_mirror_vertex_mirror_partition_list(value);
   // @@protoc_insertion_point(field_set:grin.MirrorPartitionListFeature.grin_trait_mirror_vertex_mirror_partition_list)
 }
 
 // bool grin_trait_master_edge_mirror_partition_list = 3;
-inline void MirrorPartitionListFeature::
-    clear_grin_trait_master_edge_mirror_partition_list() {
+inline void MirrorPartitionListFeature::clear_grin_trait_master_edge_mirror_partition_list() {
   _impl_.grin_trait_master_edge_mirror_partition_list_ = false;
 }
-inline bool MirrorPartitionListFeature::
-    _internal_grin_trait_master_edge_mirror_partition_list() const {
+inline bool MirrorPartitionListFeature::_internal_grin_trait_master_edge_mirror_partition_list() const {
   return _impl_.grin_trait_master_edge_mirror_partition_list_;
 }
-inline bool
-MirrorPartitionListFeature::grin_trait_master_edge_mirror_partition_list()
-    const {
+inline bool MirrorPartitionListFeature::grin_trait_master_edge_mirror_partition_list() const {
   // @@protoc_insertion_point(field_get:grin.MirrorPartitionListFeature.grin_trait_master_edge_mirror_partition_list)
   return _internal_grin_trait_master_edge_mirror_partition_list();
 }
-inline void MirrorPartitionListFeature::
-    _internal_set_grin_trait_master_edge_mirror_partition_list(bool value) {
+inline void MirrorPartitionListFeature::_internal_set_grin_trait_master_edge_mirror_partition_list(bool value) {
+  
   _impl_.grin_trait_master_edge_mirror_partition_list_ = value;
 }
-inline void
-MirrorPartitionListFeature::set_grin_trait_master_edge_mirror_partition_list(
-    bool value) {
+inline void MirrorPartitionListFeature::set_grin_trait_master_edge_mirror_partition_list(bool value) {
   _internal_set_grin_trait_master_edge_mirror_partition_list(value);
   // @@protoc_insertion_point(field_set:grin.MirrorPartitionListFeature.grin_trait_master_edge_mirror_partition_list)
 }
 
 // bool grin_trait_mirror_edge_mirror_partition_list = 4;
-inline void MirrorPartitionListFeature::
-    clear_grin_trait_mirror_edge_mirror_partition_list() {
+inline void MirrorPartitionListFeature::clear_grin_trait_mirror_edge_mirror_partition_list() {
   _impl_.grin_trait_mirror_edge_mirror_partition_list_ = false;
 }
-inline bool MirrorPartitionListFeature::
-    _internal_grin_trait_mirror_edge_mirror_partition_list() const {
+inline bool MirrorPartitionListFeature::_internal_grin_trait_mirror_edge_mirror_partition_list() const {
   return _impl_.grin_trait_mirror_edge_mirror_partition_list_;
 }
-inline bool
-MirrorPartitionListFeature::grin_trait_mirror_edge_mirror_partition_list()
-    const {
+inline bool MirrorPartitionListFeature::grin_trait_mirror_edge_mirror_partition_list() const {
   // @@protoc_insertion_point(field_get:grin.MirrorPartitionListFeature.grin_trait_mirror_edge_mirror_partition_list)
   return _internal_grin_trait_mirror_edge_mirror_partition_list();
 }
-inline void MirrorPartitionListFeature::
-    _internal_set_grin_trait_mirror_edge_mirror_partition_list(bool value) {
+inline void MirrorPartitionListFeature::_internal_set_grin_trait_mirror_edge_mirror_partition_list(bool value) {
+  
   _impl_.grin_trait_mirror_edge_mirror_partition_list_ = value;
 }
-inline void
-MirrorPartitionListFeature::set_grin_trait_mirror_edge_mirror_partition_list(
-    bool value) {
+inline void MirrorPartitionListFeature::set_grin_trait_mirror_edge_mirror_partition_list(bool value) {
   _internal_set_grin_trait_mirror_edge_mirror_partition_list(value);
   // @@protoc_insertion_point(field_set:grin.MirrorPartitionListFeature.grin_trait_mirror_edge_mirror_partition_list)
 }
@@ -3284,22 +2939,18 @@ MirrorPartitionListFeature::set_grin_trait_mirror_edge_mirror_partition_list(
 inline void PartitionFeature::clear_graph_partition_strategy() {
   _impl_.graph_partition_strategy_ = 0;
 }
-inline ::grin::GraphPartitionStrategy
-PartitionFeature::_internal_graph_partition_strategy() const {
-  return static_cast<::grin::GraphPartitionStrategy>(
-      _impl_.graph_partition_strategy_);
+inline ::grin::GraphPartitionStrategy PartitionFeature::_internal_graph_partition_strategy() const {
+  return static_cast< ::grin::GraphPartitionStrategy >(_impl_.graph_partition_strategy_);
 }
-inline ::grin::GraphPartitionStrategy
-PartitionFeature::graph_partition_strategy() const {
+inline ::grin::GraphPartitionStrategy PartitionFeature::graph_partition_strategy() const {
   // @@protoc_insertion_point(field_get:grin.PartitionFeature.graph_partition_strategy)
   return _internal_graph_partition_strategy();
 }
-inline void PartitionFeature::_internal_set_graph_partition_strategy(
-    ::grin::GraphPartitionStrategy value) {
+inline void PartitionFeature::_internal_set_graph_partition_strategy(::grin::GraphPartitionStrategy value) {
+  
   _impl_.graph_partition_strategy_ = value;
 }
-inline void PartitionFeature::set_graph_partition_strategy(
-    ::grin::GraphPartitionStrategy value) {
+inline void PartitionFeature::set_graph_partition_strategy(::grin::GraphPartitionStrategy value) {
   _internal_set_graph_partition_strategy(value);
   // @@protoc_insertion_point(field_set:grin.PartitionFeature.graph_partition_strategy)
 }
@@ -3308,20 +2959,18 @@ inline void PartitionFeature::set_graph_partition_strategy(
 inline void PartitionFeature::clear_grin_trait_natural_id_for_partition() {
   _impl_.grin_trait_natural_id_for_partition_ = false;
 }
-inline bool PartitionFeature::_internal_grin_trait_natural_id_for_partition()
-    const {
+inline bool PartitionFeature::_internal_grin_trait_natural_id_for_partition() const {
   return _impl_.grin_trait_natural_id_for_partition_;
 }
 inline bool PartitionFeature::grin_trait_natural_id_for_partition() const {
   // @@protoc_insertion_point(field_get:grin.PartitionFeature.grin_trait_natural_id_for_partition)
   return _internal_grin_trait_natural_id_for_partition();
 }
-inline void PartitionFeature::_internal_set_grin_trait_natural_id_for_partition(
-    bool value) {
+inline void PartitionFeature::_internal_set_grin_trait_natural_id_for_partition(bool value) {
+  
   _impl_.grin_trait_natural_id_for_partition_ = value;
 }
-inline void PartitionFeature::set_grin_trait_natural_id_for_partition(
-    bool value) {
+inline void PartitionFeature::set_grin_trait_natural_id_for_partition(bool value) {
   _internal_set_grin_trait_natural_id_for_partition(value);
   // @@protoc_insertion_point(field_set:grin.PartitionFeature.grin_trait_natural_id_for_partition)
 }
@@ -3338,6 +2987,7 @@ inline bool PartitionFeature::grin_enable_vertex_ref() const {
   return _internal_grin_enable_vertex_ref();
 }
 inline void PartitionFeature::_internal_set_grin_enable_vertex_ref(bool value) {
+  
   _impl_.grin_enable_vertex_ref_ = value;
 }
 inline void PartitionFeature::set_grin_enable_vertex_ref(bool value) {
@@ -3357,6 +3007,7 @@ inline bool PartitionFeature::grin_enable_edge_ref() const {
   return _internal_grin_enable_edge_ref();
 }
 inline void PartitionFeature::_internal_set_grin_enable_edge_ref(bool value) {
+  
   _impl_.grin_enable_edge_ref_ = value;
 }
 inline void PartitionFeature::set_grin_enable_edge_ref(bool value) {
@@ -3365,151 +3016,130 @@ inline void PartitionFeature::set_grin_enable_edge_ref(bool value) {
 }
 
 // .grin.PropertyDataPartitionStrategy vertex_data = 5;
-inline void PartitionFeature::clear_vertex_data() { _impl_.vertex_data_ = 0; }
-inline ::grin::PropertyDataPartitionStrategy
-PartitionFeature::_internal_vertex_data() const {
-  return static_cast<::grin::PropertyDataPartitionStrategy>(
-      _impl_.vertex_data_);
+inline void PartitionFeature::clear_vertex_data() {
+  _impl_.vertex_data_ = 0;
 }
-inline ::grin::PropertyDataPartitionStrategy PartitionFeature::vertex_data()
-    const {
+inline ::grin::PropertyDataPartitionStrategy PartitionFeature::_internal_vertex_data() const {
+  return static_cast< ::grin::PropertyDataPartitionStrategy >(_impl_.vertex_data_);
+}
+inline ::grin::PropertyDataPartitionStrategy PartitionFeature::vertex_data() const {
   // @@protoc_insertion_point(field_get:grin.PartitionFeature.vertex_data)
   return _internal_vertex_data();
 }
-inline void PartitionFeature::_internal_set_vertex_data(
-    ::grin::PropertyDataPartitionStrategy value) {
+inline void PartitionFeature::_internal_set_vertex_data(::grin::PropertyDataPartitionStrategy value) {
+  
   _impl_.vertex_data_ = value;
 }
-inline void PartitionFeature::set_vertex_data(
-    ::grin::PropertyDataPartitionStrategy value) {
+inline void PartitionFeature::set_vertex_data(::grin::PropertyDataPartitionStrategy value) {
   _internal_set_vertex_data(value);
   // @@protoc_insertion_point(field_set:grin.PartitionFeature.vertex_data)
 }
 
 // .grin.PropertyDataPartitionStrategy edge_data = 6;
-inline void PartitionFeature::clear_edge_data() { _impl_.edge_data_ = 0; }
-inline ::grin::PropertyDataPartitionStrategy
-PartitionFeature::_internal_edge_data() const {
-  return static_cast<::grin::PropertyDataPartitionStrategy>(_impl_.edge_data_);
+inline void PartitionFeature::clear_edge_data() {
+  _impl_.edge_data_ = 0;
 }
-inline ::grin::PropertyDataPartitionStrategy PartitionFeature::edge_data()
-    const {
+inline ::grin::PropertyDataPartitionStrategy PartitionFeature::_internal_edge_data() const {
+  return static_cast< ::grin::PropertyDataPartitionStrategy >(_impl_.edge_data_);
+}
+inline ::grin::PropertyDataPartitionStrategy PartitionFeature::edge_data() const {
   // @@protoc_insertion_point(field_get:grin.PartitionFeature.edge_data)
   return _internal_edge_data();
 }
-inline void PartitionFeature::_internal_set_edge_data(
-    ::grin::PropertyDataPartitionStrategy value) {
+inline void PartitionFeature::_internal_set_edge_data(::grin::PropertyDataPartitionStrategy value) {
+  
   _impl_.edge_data_ = value;
 }
-inline void PartitionFeature::set_edge_data(
-    ::grin::PropertyDataPartitionStrategy value) {
+inline void PartitionFeature::set_edge_data(::grin::PropertyDataPartitionStrategy value) {
   _internal_set_edge_data(value);
   // @@protoc_insertion_point(field_set:grin.PartitionFeature.edge_data)
 }
 
 // .grin.MirrorPartitionListFeature mirror_partition_list_feature = 7;
-inline bool PartitionFeature::_internal_has_mirror_partition_list_feature()
-    const {
-  return this != internal_default_instance() &&
-         _impl_.mirror_partition_list_feature_ != nullptr;
+inline bool PartitionFeature::_internal_has_mirror_partition_list_feature() const {
+  return this != internal_default_instance() && _impl_.mirror_partition_list_feature_ != nullptr;
 }
 inline bool PartitionFeature::has_mirror_partition_list_feature() const {
   return _internal_has_mirror_partition_list_feature();
 }
 inline void PartitionFeature::clear_mirror_partition_list_feature() {
-  if (GetArenaForAllocation() == nullptr &&
-      _impl_.mirror_partition_list_feature_ != nullptr) {
+  if (GetArenaForAllocation() == nullptr && _impl_.mirror_partition_list_feature_ != nullptr) {
     delete _impl_.mirror_partition_list_feature_;
   }
   _impl_.mirror_partition_list_feature_ = nullptr;
 }
-inline const ::grin::MirrorPartitionListFeature&
-PartitionFeature::_internal_mirror_partition_list_feature() const {
-  const ::grin::MirrorPartitionListFeature* p =
-      _impl_.mirror_partition_list_feature_;
-  return p != nullptr
-             ? *p
-             : reinterpret_cast<const ::grin::MirrorPartitionListFeature&>(
-                   ::grin::_MirrorPartitionListFeature_default_instance_);
+inline const ::grin::MirrorPartitionListFeature& PartitionFeature::_internal_mirror_partition_list_feature() const {
+  const ::grin::MirrorPartitionListFeature* p = _impl_.mirror_partition_list_feature_;
+  return p != nullptr ? *p : reinterpret_cast<const ::grin::MirrorPartitionListFeature&>(
+      ::grin::_MirrorPartitionListFeature_default_instance_);
 }
-inline const ::grin::MirrorPartitionListFeature&
-PartitionFeature::mirror_partition_list_feature() const {
+inline const ::grin::MirrorPartitionListFeature& PartitionFeature::mirror_partition_list_feature() const {
   // @@protoc_insertion_point(field_get:grin.PartitionFeature.mirror_partition_list_feature)
   return _internal_mirror_partition_list_feature();
 }
-inline void
-PartitionFeature::unsafe_arena_set_allocated_mirror_partition_list_feature(
+inline void PartitionFeature::unsafe_arena_set_allocated_mirror_partition_list_feature(
     ::grin::MirrorPartitionListFeature* mirror_partition_list_feature) {
   if (GetArenaForAllocation() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(
-        _impl_.mirror_partition_list_feature_);
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.mirror_partition_list_feature_);
   }
   _impl_.mirror_partition_list_feature_ = mirror_partition_list_feature;
   if (mirror_partition_list_feature) {
+    
   } else {
+    
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:grin.PartitionFeature.mirror_partition_list_feature)
 }
-inline ::grin::MirrorPartitionListFeature*
-PartitionFeature::release_mirror_partition_list_feature() {
-  ::grin::MirrorPartitionListFeature* temp =
-      _impl_.mirror_partition_list_feature_;
+inline ::grin::MirrorPartitionListFeature* PartitionFeature::release_mirror_partition_list_feature() {
+  
+  ::grin::MirrorPartitionListFeature* temp = _impl_.mirror_partition_list_feature_;
   _impl_.mirror_partition_list_feature_ = nullptr;
 #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
-  auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
   temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  if (GetArenaForAllocation() == nullptr) {
-    delete old;
-  }
-#else   // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
   if (GetArenaForAllocation() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
 #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
   return temp;
 }
-inline ::grin::MirrorPartitionListFeature*
-PartitionFeature::unsafe_arena_release_mirror_partition_list_feature() {
+inline ::grin::MirrorPartitionListFeature* PartitionFeature::unsafe_arena_release_mirror_partition_list_feature() {
   // @@protoc_insertion_point(field_release:grin.PartitionFeature.mirror_partition_list_feature)
-
-  ::grin::MirrorPartitionListFeature* temp =
-      _impl_.mirror_partition_list_feature_;
+  
+  ::grin::MirrorPartitionListFeature* temp = _impl_.mirror_partition_list_feature_;
   _impl_.mirror_partition_list_feature_ = nullptr;
   return temp;
 }
-inline ::grin::MirrorPartitionListFeature*
-PartitionFeature::_internal_mutable_mirror_partition_list_feature() {
+inline ::grin::MirrorPartitionListFeature* PartitionFeature::_internal_mutable_mirror_partition_list_feature() {
+  
   if (_impl_.mirror_partition_list_feature_ == nullptr) {
-    auto* p = CreateMaybeMessage<::grin::MirrorPartitionListFeature>(
-        GetArenaForAllocation());
+    auto* p = CreateMaybeMessage<::grin::MirrorPartitionListFeature>(GetArenaForAllocation());
     _impl_.mirror_partition_list_feature_ = p;
   }
   return _impl_.mirror_partition_list_feature_;
 }
-inline ::grin::MirrorPartitionListFeature*
-PartitionFeature::mutable_mirror_partition_list_feature() {
-  ::grin::MirrorPartitionListFeature* _msg =
-      _internal_mutable_mirror_partition_list_feature();
+inline ::grin::MirrorPartitionListFeature* PartitionFeature::mutable_mirror_partition_list_feature() {
+  ::grin::MirrorPartitionListFeature* _msg = _internal_mutable_mirror_partition_list_feature();
   // @@protoc_insertion_point(field_mutable:grin.PartitionFeature.mirror_partition_list_feature)
   return _msg;
 }
-inline void PartitionFeature::set_allocated_mirror_partition_list_feature(
-    ::grin::MirrorPartitionListFeature* mirror_partition_list_feature) {
+inline void PartitionFeature::set_allocated_mirror_partition_list_feature(::grin::MirrorPartitionListFeature* mirror_partition_list_feature) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
   if (message_arena == nullptr) {
     delete _impl_.mirror_partition_list_feature_;
   }
   if (mirror_partition_list_feature) {
     ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
-            mirror_partition_list_feature);
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(mirror_partition_list_feature);
     if (message_arena != submessage_arena) {
-      mirror_partition_list_feature =
-          ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-              message_arena, mirror_partition_list_feature, submessage_arena);
+      mirror_partition_list_feature = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, mirror_partition_list_feature, submessage_arena);
     }
-
+    
   } else {
+    
   }
   _impl_.mirror_partition_list_feature_ = mirror_partition_list_feature;
   // @@protoc_insertion_point(field_set_allocated:grin.PartitionFeature.mirror_partition_list_feature)
@@ -3519,47 +3149,38 @@ inline void PartitionFeature::set_allocated_mirror_partition_list_feature(
 inline void PartitionFeature::clear_grin_trait_select_master_for_vertex_list() {
   _impl_.grin_trait_select_master_for_vertex_list_ = false;
 }
-inline bool
-PartitionFeature::_internal_grin_trait_select_master_for_vertex_list() const {
+inline bool PartitionFeature::_internal_grin_trait_select_master_for_vertex_list() const {
   return _impl_.grin_trait_select_master_for_vertex_list_;
 }
 inline bool PartitionFeature::grin_trait_select_master_for_vertex_list() const {
   // @@protoc_insertion_point(field_get:grin.PartitionFeature.grin_trait_select_master_for_vertex_list)
   return _internal_grin_trait_select_master_for_vertex_list();
 }
-inline void
-PartitionFeature::_internal_set_grin_trait_select_master_for_vertex_list(
-    bool value) {
+inline void PartitionFeature::_internal_set_grin_trait_select_master_for_vertex_list(bool value) {
+  
   _impl_.grin_trait_select_master_for_vertex_list_ = value;
 }
-inline void PartitionFeature::set_grin_trait_select_master_for_vertex_list(
-    bool value) {
+inline void PartitionFeature::set_grin_trait_select_master_for_vertex_list(bool value) {
   _internal_set_grin_trait_select_master_for_vertex_list(value);
   // @@protoc_insertion_point(field_set:grin.PartitionFeature.grin_trait_select_master_for_vertex_list)
 }
 
 // bool grin_trait_select_partition_for_vertex_list = 9;
-inline void
-PartitionFeature::clear_grin_trait_select_partition_for_vertex_list() {
+inline void PartitionFeature::clear_grin_trait_select_partition_for_vertex_list() {
   _impl_.grin_trait_select_partition_for_vertex_list_ = false;
 }
-inline bool
-PartitionFeature::_internal_grin_trait_select_partition_for_vertex_list()
-    const {
+inline bool PartitionFeature::_internal_grin_trait_select_partition_for_vertex_list() const {
   return _impl_.grin_trait_select_partition_for_vertex_list_;
 }
-inline bool PartitionFeature::grin_trait_select_partition_for_vertex_list()
-    const {
+inline bool PartitionFeature::grin_trait_select_partition_for_vertex_list() const {
   // @@protoc_insertion_point(field_get:grin.PartitionFeature.grin_trait_select_partition_for_vertex_list)
   return _internal_grin_trait_select_partition_for_vertex_list();
 }
-inline void
-PartitionFeature::_internal_set_grin_trait_select_partition_for_vertex_list(
-    bool value) {
+inline void PartitionFeature::_internal_set_grin_trait_select_partition_for_vertex_list(bool value) {
+  
   _impl_.grin_trait_select_partition_for_vertex_list_ = value;
 }
-inline void PartitionFeature::set_grin_trait_select_partition_for_vertex_list(
-    bool value) {
+inline void PartitionFeature::set_grin_trait_select_partition_for_vertex_list(bool value) {
   _internal_set_grin_trait_select_partition_for_vertex_list(value);
   // @@protoc_insertion_point(field_set:grin.PartitionFeature.grin_trait_select_partition_for_vertex_list)
 }
@@ -3568,99 +3189,78 @@ inline void PartitionFeature::set_grin_trait_select_partition_for_vertex_list(
 inline void PartitionFeature::clear_grin_trait_select_master_for_edge_list() {
   _impl_.grin_trait_select_master_for_edge_list_ = false;
 }
-inline bool PartitionFeature::_internal_grin_trait_select_master_for_edge_list()
-    const {
+inline bool PartitionFeature::_internal_grin_trait_select_master_for_edge_list() const {
   return _impl_.grin_trait_select_master_for_edge_list_;
 }
 inline bool PartitionFeature::grin_trait_select_master_for_edge_list() const {
   // @@protoc_insertion_point(field_get:grin.PartitionFeature.grin_trait_select_master_for_edge_list)
   return _internal_grin_trait_select_master_for_edge_list();
 }
-inline void
-PartitionFeature::_internal_set_grin_trait_select_master_for_edge_list(
-    bool value) {
+inline void PartitionFeature::_internal_set_grin_trait_select_master_for_edge_list(bool value) {
+  
   _impl_.grin_trait_select_master_for_edge_list_ = value;
 }
-inline void PartitionFeature::set_grin_trait_select_master_for_edge_list(
-    bool value) {
+inline void PartitionFeature::set_grin_trait_select_master_for_edge_list(bool value) {
   _internal_set_grin_trait_select_master_for_edge_list(value);
   // @@protoc_insertion_point(field_set:grin.PartitionFeature.grin_trait_select_master_for_edge_list)
 }
 
 // bool grin_trait_select_partition_for_edge_list = 11;
-inline void
-PartitionFeature::clear_grin_trait_select_partition_for_edge_list() {
+inline void PartitionFeature::clear_grin_trait_select_partition_for_edge_list() {
   _impl_.grin_trait_select_partition_for_edge_list_ = false;
 }
-inline bool
-PartitionFeature::_internal_grin_trait_select_partition_for_edge_list() const {
+inline bool PartitionFeature::_internal_grin_trait_select_partition_for_edge_list() const {
   return _impl_.grin_trait_select_partition_for_edge_list_;
 }
-inline bool PartitionFeature::grin_trait_select_partition_for_edge_list()
-    const {
+inline bool PartitionFeature::grin_trait_select_partition_for_edge_list() const {
   // @@protoc_insertion_point(field_get:grin.PartitionFeature.grin_trait_select_partition_for_edge_list)
   return _internal_grin_trait_select_partition_for_edge_list();
 }
-inline void
-PartitionFeature::_internal_set_grin_trait_select_partition_for_edge_list(
-    bool value) {
+inline void PartitionFeature::_internal_set_grin_trait_select_partition_for_edge_list(bool value) {
+  
   _impl_.grin_trait_select_partition_for_edge_list_ = value;
 }
-inline void PartitionFeature::set_grin_trait_select_partition_for_edge_list(
-    bool value) {
+inline void PartitionFeature::set_grin_trait_select_partition_for_edge_list(bool value) {
   _internal_set_grin_trait_select_partition_for_edge_list(value);
   // @@protoc_insertion_point(field_set:grin.PartitionFeature.grin_trait_select_partition_for_edge_list)
 }
 
 // bool grin_trait_select_master_neighbor_for_adjacent_list = 12;
-inline void
-PartitionFeature::clear_grin_trait_select_master_neighbor_for_adjacent_list() {
+inline void PartitionFeature::clear_grin_trait_select_master_neighbor_for_adjacent_list() {
   _impl_.grin_trait_select_master_neighbor_for_adjacent_list_ = false;
 }
-inline bool PartitionFeature::
-    _internal_grin_trait_select_master_neighbor_for_adjacent_list() const {
+inline bool PartitionFeature::_internal_grin_trait_select_master_neighbor_for_adjacent_list() const {
   return _impl_.grin_trait_select_master_neighbor_for_adjacent_list_;
 }
-inline bool
-PartitionFeature::grin_trait_select_master_neighbor_for_adjacent_list() const {
+inline bool PartitionFeature::grin_trait_select_master_neighbor_for_adjacent_list() const {
   // @@protoc_insertion_point(field_get:grin.PartitionFeature.grin_trait_select_master_neighbor_for_adjacent_list)
   return _internal_grin_trait_select_master_neighbor_for_adjacent_list();
 }
-inline void PartitionFeature::
-    _internal_set_grin_trait_select_master_neighbor_for_adjacent_list(
-        bool value) {
+inline void PartitionFeature::_internal_set_grin_trait_select_master_neighbor_for_adjacent_list(bool value) {
+  
   _impl_.grin_trait_select_master_neighbor_for_adjacent_list_ = value;
 }
-inline void
-PartitionFeature::set_grin_trait_select_master_neighbor_for_adjacent_list(
-    bool value) {
+inline void PartitionFeature::set_grin_trait_select_master_neighbor_for_adjacent_list(bool value) {
   _internal_set_grin_trait_select_master_neighbor_for_adjacent_list(value);
   // @@protoc_insertion_point(field_set:grin.PartitionFeature.grin_trait_select_master_neighbor_for_adjacent_list)
 }
 
 // bool grin_trait_select_neighbor_partition_for_adjacent_list = 13;
-inline void PartitionFeature::
-    clear_grin_trait_select_neighbor_partition_for_adjacent_list() {
+inline void PartitionFeature::clear_grin_trait_select_neighbor_partition_for_adjacent_list() {
   _impl_.grin_trait_select_neighbor_partition_for_adjacent_list_ = false;
 }
-inline bool PartitionFeature::
-    _internal_grin_trait_select_neighbor_partition_for_adjacent_list() const {
+inline bool PartitionFeature::_internal_grin_trait_select_neighbor_partition_for_adjacent_list() const {
   return _impl_.grin_trait_select_neighbor_partition_for_adjacent_list_;
 }
-inline bool
-PartitionFeature::grin_trait_select_neighbor_partition_for_adjacent_list()
-    const {
+inline bool PartitionFeature::grin_trait_select_neighbor_partition_for_adjacent_list() const {
   // @@protoc_insertion_point(field_get:grin.PartitionFeature.grin_trait_select_neighbor_partition_for_adjacent_list)
   return _internal_grin_trait_select_neighbor_partition_for_adjacent_list();
 }
-inline void PartitionFeature::
-    _internal_set_grin_trait_select_neighbor_partition_for_adjacent_list(
-        bool value) {
+inline void PartitionFeature::_internal_set_grin_trait_select_neighbor_partition_for_adjacent_list(bool value) {
+  
   _impl_.grin_trait_select_neighbor_partition_for_adjacent_list_ = value;
 }
-inline void
-PartitionFeature::set_grin_trait_select_neighbor_partition_for_adjacent_list(
-    bool value) {
+inline void PartitionFeature::set_grin_trait_select_neighbor_partition_for_adjacent_list(bool value) {
   _internal_set_grin_trait_select_neighbor_partition_for_adjacent_list(value);
   // @@protoc_insertion_point(field_set:grin.PartitionFeature.grin_trait_select_neighbor_partition_for_adjacent_list)
 }
@@ -3680,8 +3280,8 @@ inline bool VertexPropertyFeature::grin_with_vertex_property() const {
   // @@protoc_insertion_point(field_get:grin.VertexPropertyFeature.grin_with_vertex_property)
   return _internal_grin_with_vertex_property();
 }
-inline void VertexPropertyFeature::_internal_set_grin_with_vertex_property(
-    bool value) {
+inline void VertexPropertyFeature::_internal_set_grin_with_vertex_property(bool value) {
+  
   _impl_.grin_with_vertex_property_ = value;
 }
 inline void VertexPropertyFeature::set_grin_with_vertex_property(bool value) {
@@ -3693,20 +3293,18 @@ inline void VertexPropertyFeature::set_grin_with_vertex_property(bool value) {
 inline void VertexPropertyFeature::clear_grin_with_vertex_property_name() {
   _impl_.grin_with_vertex_property_name_ = false;
 }
-inline bool VertexPropertyFeature::_internal_grin_with_vertex_property_name()
-    const {
+inline bool VertexPropertyFeature::_internal_grin_with_vertex_property_name() const {
   return _impl_.grin_with_vertex_property_name_;
 }
 inline bool VertexPropertyFeature::grin_with_vertex_property_name() const {
   // @@protoc_insertion_point(field_get:grin.VertexPropertyFeature.grin_with_vertex_property_name)
   return _internal_grin_with_vertex_property_name();
 }
-inline void VertexPropertyFeature::_internal_set_grin_with_vertex_property_name(
-    bool value) {
+inline void VertexPropertyFeature::_internal_set_grin_with_vertex_property_name(bool value) {
+  
   _impl_.grin_with_vertex_property_name_ = value;
 }
-inline void VertexPropertyFeature::set_grin_with_vertex_property_name(
-    bool value) {
+inline void VertexPropertyFeature::set_grin_with_vertex_property_name(bool value) {
   _internal_set_grin_with_vertex_property_name(value);
   // @@protoc_insertion_point(field_set:grin.VertexPropertyFeature.grin_with_vertex_property_name)
 }
@@ -3715,16 +3313,15 @@ inline void VertexPropertyFeature::set_grin_with_vertex_property_name(
 inline void VertexPropertyFeature::clear_grin_with_vertex_type_name() {
   _impl_.grin_with_vertex_type_name_ = false;
 }
-inline bool VertexPropertyFeature::_internal_grin_with_vertex_type_name()
-    const {
+inline bool VertexPropertyFeature::_internal_grin_with_vertex_type_name() const {
   return _impl_.grin_with_vertex_type_name_;
 }
 inline bool VertexPropertyFeature::grin_with_vertex_type_name() const {
   // @@protoc_insertion_point(field_get:grin.VertexPropertyFeature.grin_with_vertex_type_name)
   return _internal_grin_with_vertex_type_name();
 }
-inline void VertexPropertyFeature::_internal_set_grin_with_vertex_type_name(
-    bool value) {
+inline void VertexPropertyFeature::_internal_set_grin_with_vertex_type_name(bool value) {
+  
   _impl_.grin_with_vertex_type_name_ = value;
 }
 inline void VertexPropertyFeature::set_grin_with_vertex_type_name(bool value) {
@@ -3736,21 +3333,18 @@ inline void VertexPropertyFeature::set_grin_with_vertex_type_name(bool value) {
 inline void VertexPropertyFeature::clear_grin_enable_vertex_property_table() {
   _impl_.grin_enable_vertex_property_table_ = false;
 }
-inline bool VertexPropertyFeature::_internal_grin_enable_vertex_property_table()
-    const {
+inline bool VertexPropertyFeature::_internal_grin_enable_vertex_property_table() const {
   return _impl_.grin_enable_vertex_property_table_;
 }
 inline bool VertexPropertyFeature::grin_enable_vertex_property_table() const {
   // @@protoc_insertion_point(field_get:grin.VertexPropertyFeature.grin_enable_vertex_property_table)
   return _internal_grin_enable_vertex_property_table();
 }
-inline void
-VertexPropertyFeature::_internal_set_grin_enable_vertex_property_table(
-    bool value) {
+inline void VertexPropertyFeature::_internal_set_grin_enable_vertex_property_table(bool value) {
+  
   _impl_.grin_enable_vertex_property_table_ = value;
 }
-inline void VertexPropertyFeature::set_grin_enable_vertex_property_table(
-    bool value) {
+inline void VertexPropertyFeature::set_grin_enable_vertex_property_table(bool value) {
   _internal_set_grin_enable_vertex_property_table(value);
   // @@protoc_insertion_point(field_set:grin.VertexPropertyFeature.grin_enable_vertex_property_table)
 }
@@ -3759,99 +3353,78 @@ inline void VertexPropertyFeature::set_grin_enable_vertex_property_table(
 inline void VertexPropertyFeature::clear_grin_enable_vertex_primary_keys() {
   _impl_.grin_enable_vertex_primary_keys_ = false;
 }
-inline bool VertexPropertyFeature::_internal_grin_enable_vertex_primary_keys()
-    const {
+inline bool VertexPropertyFeature::_internal_grin_enable_vertex_primary_keys() const {
   return _impl_.grin_enable_vertex_primary_keys_;
 }
 inline bool VertexPropertyFeature::grin_enable_vertex_primary_keys() const {
   // @@protoc_insertion_point(field_get:grin.VertexPropertyFeature.grin_enable_vertex_primary_keys)
   return _internal_grin_enable_vertex_primary_keys();
 }
-inline void
-VertexPropertyFeature::_internal_set_grin_enable_vertex_primary_keys(
-    bool value) {
+inline void VertexPropertyFeature::_internal_set_grin_enable_vertex_primary_keys(bool value) {
+  
   _impl_.grin_enable_vertex_primary_keys_ = value;
 }
-inline void VertexPropertyFeature::set_grin_enable_vertex_primary_keys(
-    bool value) {
+inline void VertexPropertyFeature::set_grin_enable_vertex_primary_keys(bool value) {
   _internal_set_grin_enable_vertex_primary_keys(value);
   // @@protoc_insertion_point(field_set:grin.VertexPropertyFeature.grin_enable_vertex_primary_keys)
 }
 
 // bool grin_trait_natural_id_for_vertex_type = 6;
-inline void
-VertexPropertyFeature::clear_grin_trait_natural_id_for_vertex_type() {
+inline void VertexPropertyFeature::clear_grin_trait_natural_id_for_vertex_type() {
   _impl_.grin_trait_natural_id_for_vertex_type_ = false;
 }
-inline bool
-VertexPropertyFeature::_internal_grin_trait_natural_id_for_vertex_type() const {
+inline bool VertexPropertyFeature::_internal_grin_trait_natural_id_for_vertex_type() const {
   return _impl_.grin_trait_natural_id_for_vertex_type_;
 }
-inline bool VertexPropertyFeature::grin_trait_natural_id_for_vertex_type()
-    const {
+inline bool VertexPropertyFeature::grin_trait_natural_id_for_vertex_type() const {
   // @@protoc_insertion_point(field_get:grin.VertexPropertyFeature.grin_trait_natural_id_for_vertex_type)
   return _internal_grin_trait_natural_id_for_vertex_type();
 }
-inline void
-VertexPropertyFeature::_internal_set_grin_trait_natural_id_for_vertex_type(
-    bool value) {
+inline void VertexPropertyFeature::_internal_set_grin_trait_natural_id_for_vertex_type(bool value) {
+  
   _impl_.grin_trait_natural_id_for_vertex_type_ = value;
 }
-inline void VertexPropertyFeature::set_grin_trait_natural_id_for_vertex_type(
-    bool value) {
+inline void VertexPropertyFeature::set_grin_trait_natural_id_for_vertex_type(bool value) {
   _internal_set_grin_trait_natural_id_for_vertex_type(value);
   // @@protoc_insertion_point(field_set:grin.VertexPropertyFeature.grin_trait_natural_id_for_vertex_type)
 }
 
 // bool grin_trait_natural_id_for_vertex_property = 7;
-inline void
-VertexPropertyFeature::clear_grin_trait_natural_id_for_vertex_property() {
+inline void VertexPropertyFeature::clear_grin_trait_natural_id_for_vertex_property() {
   _impl_.grin_trait_natural_id_for_vertex_property_ = false;
 }
-inline bool
-VertexPropertyFeature::_internal_grin_trait_natural_id_for_vertex_property()
-    const {
+inline bool VertexPropertyFeature::_internal_grin_trait_natural_id_for_vertex_property() const {
   return _impl_.grin_trait_natural_id_for_vertex_property_;
 }
-inline bool VertexPropertyFeature::grin_trait_natural_id_for_vertex_property()
-    const {
+inline bool VertexPropertyFeature::grin_trait_natural_id_for_vertex_property() const {
   // @@protoc_insertion_point(field_get:grin.VertexPropertyFeature.grin_trait_natural_id_for_vertex_property)
   return _internal_grin_trait_natural_id_for_vertex_property();
 }
-inline void
-VertexPropertyFeature::_internal_set_grin_trait_natural_id_for_vertex_property(
-    bool value) {
+inline void VertexPropertyFeature::_internal_set_grin_trait_natural_id_for_vertex_property(bool value) {
+  
   _impl_.grin_trait_natural_id_for_vertex_property_ = value;
 }
-inline void
-VertexPropertyFeature::set_grin_trait_natural_id_for_vertex_property(
-    bool value) {
+inline void VertexPropertyFeature::set_grin_trait_natural_id_for_vertex_property(bool value) {
   _internal_set_grin_trait_natural_id_for_vertex_property(value);
   // @@protoc_insertion_point(field_set:grin.VertexPropertyFeature.grin_trait_natural_id_for_vertex_property)
 }
 
 // bool grin_assume_by_type_vertex_original_id = 8;
-inline void
-VertexPropertyFeature::clear_grin_assume_by_type_vertex_original_id() {
+inline void VertexPropertyFeature::clear_grin_assume_by_type_vertex_original_id() {
   _impl_.grin_assume_by_type_vertex_original_id_ = false;
 }
-inline bool
-VertexPropertyFeature::_internal_grin_assume_by_type_vertex_original_id()
-    const {
+inline bool VertexPropertyFeature::_internal_grin_assume_by_type_vertex_original_id() const {
   return _impl_.grin_assume_by_type_vertex_original_id_;
 }
-inline bool VertexPropertyFeature::grin_assume_by_type_vertex_original_id()
-    const {
+inline bool VertexPropertyFeature::grin_assume_by_type_vertex_original_id() const {
   // @@protoc_insertion_point(field_get:grin.VertexPropertyFeature.grin_assume_by_type_vertex_original_id)
   return _internal_grin_assume_by_type_vertex_original_id();
 }
-inline void
-VertexPropertyFeature::_internal_set_grin_assume_by_type_vertex_original_id(
-    bool value) {
+inline void VertexPropertyFeature::_internal_set_grin_assume_by_type_vertex_original_id(bool value) {
+  
   _impl_.grin_assume_by_type_vertex_original_id_ = value;
 }
-inline void VertexPropertyFeature::set_grin_assume_by_type_vertex_original_id(
-    bool value) {
+inline void VertexPropertyFeature::set_grin_assume_by_type_vertex_original_id(bool value) {
   _internal_set_grin_assume_by_type_vertex_original_id(value);
   // @@protoc_insertion_point(field_set:grin.VertexPropertyFeature.grin_assume_by_type_vertex_original_id)
 }
@@ -3871,8 +3444,8 @@ inline bool EdgePropertyFeature::grin_with_edge_property() const {
   // @@protoc_insertion_point(field_get:grin.EdgePropertyFeature.grin_with_edge_property)
   return _internal_grin_with_edge_property();
 }
-inline void EdgePropertyFeature::_internal_set_grin_with_edge_property(
-    bool value) {
+inline void EdgePropertyFeature::_internal_set_grin_with_edge_property(bool value) {
+  
   _impl_.grin_with_edge_property_ = value;
 }
 inline void EdgePropertyFeature::set_grin_with_edge_property(bool value) {
@@ -3884,16 +3457,15 @@ inline void EdgePropertyFeature::set_grin_with_edge_property(bool value) {
 inline void EdgePropertyFeature::clear_grin_with_edge_property_name() {
   _impl_.grin_with_edge_property_name_ = false;
 }
-inline bool EdgePropertyFeature::_internal_grin_with_edge_property_name()
-    const {
+inline bool EdgePropertyFeature::_internal_grin_with_edge_property_name() const {
   return _impl_.grin_with_edge_property_name_;
 }
 inline bool EdgePropertyFeature::grin_with_edge_property_name() const {
   // @@protoc_insertion_point(field_get:grin.EdgePropertyFeature.grin_with_edge_property_name)
   return _internal_grin_with_edge_property_name();
 }
-inline void EdgePropertyFeature::_internal_set_grin_with_edge_property_name(
-    bool value) {
+inline void EdgePropertyFeature::_internal_set_grin_with_edge_property_name(bool value) {
+  
   _impl_.grin_with_edge_property_name_ = value;
 }
 inline void EdgePropertyFeature::set_grin_with_edge_property_name(bool value) {
@@ -3912,8 +3484,8 @@ inline bool EdgePropertyFeature::grin_with_edge_type_name() const {
   // @@protoc_insertion_point(field_get:grin.EdgePropertyFeature.grin_with_edge_type_name)
   return _internal_grin_with_edge_type_name();
 }
-inline void EdgePropertyFeature::_internal_set_grin_with_edge_type_name(
-    bool value) {
+inline void EdgePropertyFeature::_internal_set_grin_with_edge_type_name(bool value) {
+  
   _impl_.grin_with_edge_type_name_ = value;
 }
 inline void EdgePropertyFeature::set_grin_with_edge_type_name(bool value) {
@@ -3925,20 +3497,18 @@ inline void EdgePropertyFeature::set_grin_with_edge_type_name(bool value) {
 inline void EdgePropertyFeature::clear_grin_enable_edge_property_table() {
   _impl_.grin_enable_edge_property_table_ = false;
 }
-inline bool EdgePropertyFeature::_internal_grin_enable_edge_property_table()
-    const {
+inline bool EdgePropertyFeature::_internal_grin_enable_edge_property_table() const {
   return _impl_.grin_enable_edge_property_table_;
 }
 inline bool EdgePropertyFeature::grin_enable_edge_property_table() const {
   // @@protoc_insertion_point(field_get:grin.EdgePropertyFeature.grin_enable_edge_property_table)
   return _internal_grin_enable_edge_property_table();
 }
-inline void EdgePropertyFeature::_internal_set_grin_enable_edge_property_table(
-    bool value) {
+inline void EdgePropertyFeature::_internal_set_grin_enable_edge_property_table(bool value) {
+  
   _impl_.grin_enable_edge_property_table_ = value;
 }
-inline void EdgePropertyFeature::set_grin_enable_edge_property_table(
-    bool value) {
+inline void EdgePropertyFeature::set_grin_enable_edge_property_table(bool value) {
   _internal_set_grin_enable_edge_property_table(value);
   // @@protoc_insertion_point(field_set:grin.EdgePropertyFeature.grin_enable_edge_property_table)
 }
@@ -3947,16 +3517,15 @@ inline void EdgePropertyFeature::set_grin_enable_edge_property_table(
 inline void EdgePropertyFeature::clear_grin_enable_edge_primary_keys() {
   _impl_.grin_enable_edge_primary_keys_ = false;
 }
-inline bool EdgePropertyFeature::_internal_grin_enable_edge_primary_keys()
-    const {
+inline bool EdgePropertyFeature::_internal_grin_enable_edge_primary_keys() const {
   return _impl_.grin_enable_edge_primary_keys_;
 }
 inline bool EdgePropertyFeature::grin_enable_edge_primary_keys() const {
   // @@protoc_insertion_point(field_get:grin.EdgePropertyFeature.grin_enable_edge_primary_keys)
   return _internal_grin_enable_edge_primary_keys();
 }
-inline void EdgePropertyFeature::_internal_set_grin_enable_edge_primary_keys(
-    bool value) {
+inline void EdgePropertyFeature::_internal_set_grin_enable_edge_primary_keys(bool value) {
+  
   _impl_.grin_enable_edge_primary_keys_ = value;
 }
 inline void EdgePropertyFeature::set_grin_enable_edge_primary_keys(bool value) {
@@ -3968,46 +3537,38 @@ inline void EdgePropertyFeature::set_grin_enable_edge_primary_keys(bool value) {
 inline void EdgePropertyFeature::clear_grin_trait_natural_id_for_edge_type() {
   _impl_.grin_trait_natural_id_for_edge_type_ = false;
 }
-inline bool EdgePropertyFeature::_internal_grin_trait_natural_id_for_edge_type()
-    const {
+inline bool EdgePropertyFeature::_internal_grin_trait_natural_id_for_edge_type() const {
   return _impl_.grin_trait_natural_id_for_edge_type_;
 }
 inline bool EdgePropertyFeature::grin_trait_natural_id_for_edge_type() const {
   // @@protoc_insertion_point(field_get:grin.EdgePropertyFeature.grin_trait_natural_id_for_edge_type)
   return _internal_grin_trait_natural_id_for_edge_type();
 }
-inline void
-EdgePropertyFeature::_internal_set_grin_trait_natural_id_for_edge_type(
-    bool value) {
+inline void EdgePropertyFeature::_internal_set_grin_trait_natural_id_for_edge_type(bool value) {
+  
   _impl_.grin_trait_natural_id_for_edge_type_ = value;
 }
-inline void EdgePropertyFeature::set_grin_trait_natural_id_for_edge_type(
-    bool value) {
+inline void EdgePropertyFeature::set_grin_trait_natural_id_for_edge_type(bool value) {
   _internal_set_grin_trait_natural_id_for_edge_type(value);
   // @@protoc_insertion_point(field_set:grin.EdgePropertyFeature.grin_trait_natural_id_for_edge_type)
 }
 
 // bool grin_trait_natural_id_for_edge_property = 7;
-inline void
-EdgePropertyFeature::clear_grin_trait_natural_id_for_edge_property() {
+inline void EdgePropertyFeature::clear_grin_trait_natural_id_for_edge_property() {
   _impl_.grin_trait_natural_id_for_edge_property_ = false;
 }
-inline bool
-EdgePropertyFeature::_internal_grin_trait_natural_id_for_edge_property() const {
+inline bool EdgePropertyFeature::_internal_grin_trait_natural_id_for_edge_property() const {
   return _impl_.grin_trait_natural_id_for_edge_property_;
 }
-inline bool EdgePropertyFeature::grin_trait_natural_id_for_edge_property()
-    const {
+inline bool EdgePropertyFeature::grin_trait_natural_id_for_edge_property() const {
   // @@protoc_insertion_point(field_get:grin.EdgePropertyFeature.grin_trait_natural_id_for_edge_property)
   return _internal_grin_trait_natural_id_for_edge_property();
 }
-inline void
-EdgePropertyFeature::_internal_set_grin_trait_natural_id_for_edge_property(
-    bool value) {
+inline void EdgePropertyFeature::_internal_set_grin_trait_natural_id_for_edge_property(bool value) {
+  
   _impl_.grin_trait_natural_id_for_edge_property_ = value;
 }
-inline void EdgePropertyFeature::set_grin_trait_natural_id_for_edge_property(
-    bool value) {
+inline void EdgePropertyFeature::set_grin_trait_natural_id_for_edge_property(bool value) {
   _internal_set_grin_trait_natural_id_for_edge_property(value);
   // @@protoc_insertion_point(field_set:grin.EdgePropertyFeature.grin_trait_natural_id_for_edge_property)
 }
@@ -4028,6 +3589,7 @@ inline bool PropertyFeature::grin_enable_row() const {
   return _internal_grin_enable_row();
 }
 inline void PropertyFeature::_internal_set_grin_enable_row(bool value) {
+  
   _impl_.grin_enable_row_ = value;
 }
 inline void PropertyFeature::set_grin_enable_row(bool value) {
@@ -4037,101 +3599,89 @@ inline void PropertyFeature::set_grin_enable_row(bool value) {
 
 // .grin.VertexPropertyFeature vertex_property_feature = 2;
 inline bool PropertyFeature::_internal_has_vertex_property_feature() const {
-  return this != internal_default_instance() &&
-         _impl_.vertex_property_feature_ != nullptr;
+  return this != internal_default_instance() && _impl_.vertex_property_feature_ != nullptr;
 }
 inline bool PropertyFeature::has_vertex_property_feature() const {
   return _internal_has_vertex_property_feature();
 }
 inline void PropertyFeature::clear_vertex_property_feature() {
-  if (GetArenaForAllocation() == nullptr &&
-      _impl_.vertex_property_feature_ != nullptr) {
+  if (GetArenaForAllocation() == nullptr && _impl_.vertex_property_feature_ != nullptr) {
     delete _impl_.vertex_property_feature_;
   }
   _impl_.vertex_property_feature_ = nullptr;
 }
-inline const ::grin::VertexPropertyFeature&
-PropertyFeature::_internal_vertex_property_feature() const {
+inline const ::grin::VertexPropertyFeature& PropertyFeature::_internal_vertex_property_feature() const {
   const ::grin::VertexPropertyFeature* p = _impl_.vertex_property_feature_;
-  return p != nullptr ? *p
-                      : reinterpret_cast<const ::grin::VertexPropertyFeature&>(
-                            ::grin::_VertexPropertyFeature_default_instance_);
+  return p != nullptr ? *p : reinterpret_cast<const ::grin::VertexPropertyFeature&>(
+      ::grin::_VertexPropertyFeature_default_instance_);
 }
-inline const ::grin::VertexPropertyFeature&
-PropertyFeature::vertex_property_feature() const {
+inline const ::grin::VertexPropertyFeature& PropertyFeature::vertex_property_feature() const {
   // @@protoc_insertion_point(field_get:grin.PropertyFeature.vertex_property_feature)
   return _internal_vertex_property_feature();
 }
 inline void PropertyFeature::unsafe_arena_set_allocated_vertex_property_feature(
     ::grin::VertexPropertyFeature* vertex_property_feature) {
   if (GetArenaForAllocation() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(
-        _impl_.vertex_property_feature_);
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.vertex_property_feature_);
   }
   _impl_.vertex_property_feature_ = vertex_property_feature;
   if (vertex_property_feature) {
+    
   } else {
+    
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:grin.PropertyFeature.vertex_property_feature)
 }
-inline ::grin::VertexPropertyFeature*
-PropertyFeature::release_vertex_property_feature() {
+inline ::grin::VertexPropertyFeature* PropertyFeature::release_vertex_property_feature() {
+  
   ::grin::VertexPropertyFeature* temp = _impl_.vertex_property_feature_;
   _impl_.vertex_property_feature_ = nullptr;
 #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
-  auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
   temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  if (GetArenaForAllocation() == nullptr) {
-    delete old;
-  }
-#else   // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
   if (GetArenaForAllocation() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
 #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
   return temp;
 }
-inline ::grin::VertexPropertyFeature*
-PropertyFeature::unsafe_arena_release_vertex_property_feature() {
+inline ::grin::VertexPropertyFeature* PropertyFeature::unsafe_arena_release_vertex_property_feature() {
   // @@protoc_insertion_point(field_release:grin.PropertyFeature.vertex_property_feature)
-
+  
   ::grin::VertexPropertyFeature* temp = _impl_.vertex_property_feature_;
   _impl_.vertex_property_feature_ = nullptr;
   return temp;
 }
-inline ::grin::VertexPropertyFeature*
-PropertyFeature::_internal_mutable_vertex_property_feature() {
+inline ::grin::VertexPropertyFeature* PropertyFeature::_internal_mutable_vertex_property_feature() {
+  
   if (_impl_.vertex_property_feature_ == nullptr) {
-    auto* p = CreateMaybeMessage<::grin::VertexPropertyFeature>(
-        GetArenaForAllocation());
+    auto* p = CreateMaybeMessage<::grin::VertexPropertyFeature>(GetArenaForAllocation());
     _impl_.vertex_property_feature_ = p;
   }
   return _impl_.vertex_property_feature_;
 }
-inline ::grin::VertexPropertyFeature*
-PropertyFeature::mutable_vertex_property_feature() {
-  ::grin::VertexPropertyFeature* _msg =
-      _internal_mutable_vertex_property_feature();
+inline ::grin::VertexPropertyFeature* PropertyFeature::mutable_vertex_property_feature() {
+  ::grin::VertexPropertyFeature* _msg = _internal_mutable_vertex_property_feature();
   // @@protoc_insertion_point(field_mutable:grin.PropertyFeature.vertex_property_feature)
   return _msg;
 }
-inline void PropertyFeature::set_allocated_vertex_property_feature(
-    ::grin::VertexPropertyFeature* vertex_property_feature) {
+inline void PropertyFeature::set_allocated_vertex_property_feature(::grin::VertexPropertyFeature* vertex_property_feature) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
   if (message_arena == nullptr) {
     delete _impl_.vertex_property_feature_;
   }
   if (vertex_property_feature) {
     ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
-            vertex_property_feature);
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(vertex_property_feature);
     if (message_arena != submessage_arena) {
-      vertex_property_feature =
-          ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-              message_arena, vertex_property_feature, submessage_arena);
+      vertex_property_feature = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, vertex_property_feature, submessage_arena);
     }
-
+    
   } else {
+    
   }
   _impl_.vertex_property_feature_ = vertex_property_feature;
   // @@protoc_insertion_point(field_set_allocated:grin.PropertyFeature.vertex_property_feature)
@@ -4139,100 +3689,89 @@ inline void PropertyFeature::set_allocated_vertex_property_feature(
 
 // .grin.EdgePropertyFeature edge_property_feature = 3;
 inline bool PropertyFeature::_internal_has_edge_property_feature() const {
-  return this != internal_default_instance() &&
-         _impl_.edge_property_feature_ != nullptr;
+  return this != internal_default_instance() && _impl_.edge_property_feature_ != nullptr;
 }
 inline bool PropertyFeature::has_edge_property_feature() const {
   return _internal_has_edge_property_feature();
 }
 inline void PropertyFeature::clear_edge_property_feature() {
-  if (GetArenaForAllocation() == nullptr &&
-      _impl_.edge_property_feature_ != nullptr) {
+  if (GetArenaForAllocation() == nullptr && _impl_.edge_property_feature_ != nullptr) {
     delete _impl_.edge_property_feature_;
   }
   _impl_.edge_property_feature_ = nullptr;
 }
-inline const ::grin::EdgePropertyFeature&
-PropertyFeature::_internal_edge_property_feature() const {
+inline const ::grin::EdgePropertyFeature& PropertyFeature::_internal_edge_property_feature() const {
   const ::grin::EdgePropertyFeature* p = _impl_.edge_property_feature_;
-  return p != nullptr ? *p
-                      : reinterpret_cast<const ::grin::EdgePropertyFeature&>(
-                            ::grin::_EdgePropertyFeature_default_instance_);
+  return p != nullptr ? *p : reinterpret_cast<const ::grin::EdgePropertyFeature&>(
+      ::grin::_EdgePropertyFeature_default_instance_);
 }
-inline const ::grin::EdgePropertyFeature&
-PropertyFeature::edge_property_feature() const {
+inline const ::grin::EdgePropertyFeature& PropertyFeature::edge_property_feature() const {
   // @@protoc_insertion_point(field_get:grin.PropertyFeature.edge_property_feature)
   return _internal_edge_property_feature();
 }
 inline void PropertyFeature::unsafe_arena_set_allocated_edge_property_feature(
     ::grin::EdgePropertyFeature* edge_property_feature) {
   if (GetArenaForAllocation() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(
-        _impl_.edge_property_feature_);
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.edge_property_feature_);
   }
   _impl_.edge_property_feature_ = edge_property_feature;
   if (edge_property_feature) {
+    
   } else {
+    
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:grin.PropertyFeature.edge_property_feature)
 }
-inline ::grin::EdgePropertyFeature*
-PropertyFeature::release_edge_property_feature() {
+inline ::grin::EdgePropertyFeature* PropertyFeature::release_edge_property_feature() {
+  
   ::grin::EdgePropertyFeature* temp = _impl_.edge_property_feature_;
   _impl_.edge_property_feature_ = nullptr;
 #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
-  auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
   temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  if (GetArenaForAllocation() == nullptr) {
-    delete old;
-  }
-#else   // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
   if (GetArenaForAllocation() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
 #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
   return temp;
 }
-inline ::grin::EdgePropertyFeature*
-PropertyFeature::unsafe_arena_release_edge_property_feature() {
+inline ::grin::EdgePropertyFeature* PropertyFeature::unsafe_arena_release_edge_property_feature() {
   // @@protoc_insertion_point(field_release:grin.PropertyFeature.edge_property_feature)
-
+  
   ::grin::EdgePropertyFeature* temp = _impl_.edge_property_feature_;
   _impl_.edge_property_feature_ = nullptr;
   return temp;
 }
-inline ::grin::EdgePropertyFeature*
-PropertyFeature::_internal_mutable_edge_property_feature() {
+inline ::grin::EdgePropertyFeature* PropertyFeature::_internal_mutable_edge_property_feature() {
+  
   if (_impl_.edge_property_feature_ == nullptr) {
-    auto* p = CreateMaybeMessage<::grin::EdgePropertyFeature>(
-        GetArenaForAllocation());
+    auto* p = CreateMaybeMessage<::grin::EdgePropertyFeature>(GetArenaForAllocation());
     _impl_.edge_property_feature_ = p;
   }
   return _impl_.edge_property_feature_;
 }
-inline ::grin::EdgePropertyFeature*
-PropertyFeature::mutable_edge_property_feature() {
+inline ::grin::EdgePropertyFeature* PropertyFeature::mutable_edge_property_feature() {
   ::grin::EdgePropertyFeature* _msg = _internal_mutable_edge_property_feature();
   // @@protoc_insertion_point(field_mutable:grin.PropertyFeature.edge_property_feature)
   return _msg;
 }
-inline void PropertyFeature::set_allocated_edge_property_feature(
-    ::grin::EdgePropertyFeature* edge_property_feature) {
+inline void PropertyFeature::set_allocated_edge_property_feature(::grin::EdgePropertyFeature* edge_property_feature) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
   if (message_arena == nullptr) {
     delete _impl_.edge_property_feature_;
   }
   if (edge_property_feature) {
     ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(
-            edge_property_feature);
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(edge_property_feature);
     if (message_arena != submessage_arena) {
-      edge_property_feature =
-          ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-              message_arena, edge_property_feature, submessage_arena);
+      edge_property_feature = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, edge_property_feature, submessage_arena);
     }
-
+    
   } else {
+    
   }
   _impl_.edge_property_feature_ = edge_property_feature;
   // @@protoc_insertion_point(field_set_allocated:grin.PropertyFeature.edge_property_feature)
@@ -4242,22 +3781,18 @@ inline void PropertyFeature::set_allocated_edge_property_feature(
 inline void PropertyFeature::clear_vertex_property() {
   _impl_.vertex_property_ = 0;
 }
-inline ::grin::PropertyDataPartitionStrategy
-PropertyFeature::_internal_vertex_property() const {
-  return static_cast<::grin::PropertyDataPartitionStrategy>(
-      _impl_.vertex_property_);
+inline ::grin::PropertyDataPartitionStrategy PropertyFeature::_internal_vertex_property() const {
+  return static_cast< ::grin::PropertyDataPartitionStrategy >(_impl_.vertex_property_);
 }
-inline ::grin::PropertyDataPartitionStrategy PropertyFeature::vertex_property()
-    const {
+inline ::grin::PropertyDataPartitionStrategy PropertyFeature::vertex_property() const {
   // @@protoc_insertion_point(field_get:grin.PropertyFeature.vertex_property)
   return _internal_vertex_property();
 }
-inline void PropertyFeature::_internal_set_vertex_property(
-    ::grin::PropertyDataPartitionStrategy value) {
+inline void PropertyFeature::_internal_set_vertex_property(::grin::PropertyDataPartitionStrategy value) {
+  
   _impl_.vertex_property_ = value;
 }
-inline void PropertyFeature::set_vertex_property(
-    ::grin::PropertyDataPartitionStrategy value) {
+inline void PropertyFeature::set_vertex_property(::grin::PropertyDataPartitionStrategy value) {
   _internal_set_vertex_property(value);
   // @@protoc_insertion_point(field_set:grin.PropertyFeature.vertex_property)
 }
@@ -4266,73 +3801,58 @@ inline void PropertyFeature::set_vertex_property(
 inline void PropertyFeature::clear_edge_property() {
   _impl_.edge_property_ = 0;
 }
-inline ::grin::PropertyDataPartitionStrategy
-PropertyFeature::_internal_edge_property() const {
-  return static_cast<::grin::PropertyDataPartitionStrategy>(
-      _impl_.edge_property_);
+inline ::grin::PropertyDataPartitionStrategy PropertyFeature::_internal_edge_property() const {
+  return static_cast< ::grin::PropertyDataPartitionStrategy >(_impl_.edge_property_);
 }
-inline ::grin::PropertyDataPartitionStrategy PropertyFeature::edge_property()
-    const {
+inline ::grin::PropertyDataPartitionStrategy PropertyFeature::edge_property() const {
   // @@protoc_insertion_point(field_get:grin.PropertyFeature.edge_property)
   return _internal_edge_property();
 }
-inline void PropertyFeature::_internal_set_edge_property(
-    ::grin::PropertyDataPartitionStrategy value) {
+inline void PropertyFeature::_internal_set_edge_property(::grin::PropertyDataPartitionStrategy value) {
+  
   _impl_.edge_property_ = value;
 }
-inline void PropertyFeature::set_edge_property(
-    ::grin::PropertyDataPartitionStrategy value) {
+inline void PropertyFeature::set_edge_property(::grin::PropertyDataPartitionStrategy value) {
   _internal_set_edge_property(value);
   // @@protoc_insertion_point(field_set:grin.PropertyFeature.edge_property)
 }
 
 // bool grin_assume_column_store_for_vertex_property = 6;
-inline void
-PropertyFeature::clear_grin_assume_column_store_for_vertex_property() {
+inline void PropertyFeature::clear_grin_assume_column_store_for_vertex_property() {
   _impl_.grin_assume_column_store_for_vertex_property_ = false;
 }
-inline bool
-PropertyFeature::_internal_grin_assume_column_store_for_vertex_property()
-    const {
+inline bool PropertyFeature::_internal_grin_assume_column_store_for_vertex_property() const {
   return _impl_.grin_assume_column_store_for_vertex_property_;
 }
-inline bool PropertyFeature::grin_assume_column_store_for_vertex_property()
-    const {
+inline bool PropertyFeature::grin_assume_column_store_for_vertex_property() const {
   // @@protoc_insertion_point(field_get:grin.PropertyFeature.grin_assume_column_store_for_vertex_property)
   return _internal_grin_assume_column_store_for_vertex_property();
 }
-inline void
-PropertyFeature::_internal_set_grin_assume_column_store_for_vertex_property(
-    bool value) {
+inline void PropertyFeature::_internal_set_grin_assume_column_store_for_vertex_property(bool value) {
+  
   _impl_.grin_assume_column_store_for_vertex_property_ = value;
 }
-inline void PropertyFeature::set_grin_assume_column_store_for_vertex_property(
-    bool value) {
+inline void PropertyFeature::set_grin_assume_column_store_for_vertex_property(bool value) {
   _internal_set_grin_assume_column_store_for_vertex_property(value);
   // @@protoc_insertion_point(field_set:grin.PropertyFeature.grin_assume_column_store_for_vertex_property)
 }
 
 // bool grin_assume_column_store_for_edge_property = 7;
-inline void
-PropertyFeature::clear_grin_assume_column_store_for_edge_property() {
+inline void PropertyFeature::clear_grin_assume_column_store_for_edge_property() {
   _impl_.grin_assume_column_store_for_edge_property_ = false;
 }
-inline bool
-PropertyFeature::_internal_grin_assume_column_store_for_edge_property() const {
+inline bool PropertyFeature::_internal_grin_assume_column_store_for_edge_property() const {
   return _impl_.grin_assume_column_store_for_edge_property_;
 }
-inline bool PropertyFeature::grin_assume_column_store_for_edge_property()
-    const {
+inline bool PropertyFeature::grin_assume_column_store_for_edge_property() const {
   // @@protoc_insertion_point(field_get:grin.PropertyFeature.grin_assume_column_store_for_edge_property)
   return _internal_grin_assume_column_store_for_edge_property();
 }
-inline void
-PropertyFeature::_internal_set_grin_assume_column_store_for_edge_property(
-    bool value) {
+inline void PropertyFeature::_internal_set_grin_assume_column_store_for_edge_property(bool value) {
+  
   _impl_.grin_assume_column_store_for_edge_property_ = value;
 }
-inline void PropertyFeature::set_grin_assume_column_store_for_edge_property(
-    bool value) {
+inline void PropertyFeature::set_grin_assume_column_store_for_edge_property(bool value) {
   _internal_set_grin_assume_column_store_for_edge_property(value);
   // @@protoc_insertion_point(field_set:grin.PropertyFeature.grin_assume_column_store_for_edge_property)
 }
@@ -4341,21 +3861,18 @@ inline void PropertyFeature::set_grin_assume_column_store_for_edge_property(
 inline void PropertyFeature::clear_grin_trait_select_type_for_vertex_list() {
   _impl_.grin_trait_select_type_for_vertex_list_ = false;
 }
-inline bool PropertyFeature::_internal_grin_trait_select_type_for_vertex_list()
-    const {
+inline bool PropertyFeature::_internal_grin_trait_select_type_for_vertex_list() const {
   return _impl_.grin_trait_select_type_for_vertex_list_;
 }
 inline bool PropertyFeature::grin_trait_select_type_for_vertex_list() const {
   // @@protoc_insertion_point(field_get:grin.PropertyFeature.grin_trait_select_type_for_vertex_list)
   return _internal_grin_trait_select_type_for_vertex_list();
 }
-inline void
-PropertyFeature::_internal_set_grin_trait_select_type_for_vertex_list(
-    bool value) {
+inline void PropertyFeature::_internal_set_grin_trait_select_type_for_vertex_list(bool value) {
+  
   _impl_.grin_trait_select_type_for_vertex_list_ = value;
 }
-inline void PropertyFeature::set_grin_trait_select_type_for_vertex_list(
-    bool value) {
+inline void PropertyFeature::set_grin_trait_select_type_for_vertex_list(bool value) {
   _internal_set_grin_trait_select_type_for_vertex_list(value);
   // @@protoc_insertion_point(field_set:grin.PropertyFeature.grin_trait_select_type_for_vertex_list)
 }
@@ -4364,73 +3881,58 @@ inline void PropertyFeature::set_grin_trait_select_type_for_vertex_list(
 inline void PropertyFeature::clear_grin_trait_select_type_for_edge_list() {
   _impl_.grin_trait_select_type_for_edge_list_ = false;
 }
-inline bool PropertyFeature::_internal_grin_trait_select_type_for_edge_list()
-    const {
+inline bool PropertyFeature::_internal_grin_trait_select_type_for_edge_list() const {
   return _impl_.grin_trait_select_type_for_edge_list_;
 }
 inline bool PropertyFeature::grin_trait_select_type_for_edge_list() const {
   // @@protoc_insertion_point(field_get:grin.PropertyFeature.grin_trait_select_type_for_edge_list)
   return _internal_grin_trait_select_type_for_edge_list();
 }
-inline void PropertyFeature::_internal_set_grin_trait_select_type_for_edge_list(
-    bool value) {
+inline void PropertyFeature::_internal_set_grin_trait_select_type_for_edge_list(bool value) {
+  
   _impl_.grin_trait_select_type_for_edge_list_ = value;
 }
-inline void PropertyFeature::set_grin_trait_select_type_for_edge_list(
-    bool value) {
+inline void PropertyFeature::set_grin_trait_select_type_for_edge_list(bool value) {
   _internal_set_grin_trait_select_type_for_edge_list(value);
   // @@protoc_insertion_point(field_set:grin.PropertyFeature.grin_trait_select_type_for_edge_list)
 }
 
 // bool grin_trait_select_neighbor_type_for_adjacent_list = 10;
-inline void
-PropertyFeature::clear_grin_trait_select_neighbor_type_for_adjacent_list() {
+inline void PropertyFeature::clear_grin_trait_select_neighbor_type_for_adjacent_list() {
   _impl_.grin_trait_select_neighbor_type_for_adjacent_list_ = false;
 }
-inline bool
-PropertyFeature::_internal_grin_trait_select_neighbor_type_for_adjacent_list()
-    const {
+inline bool PropertyFeature::_internal_grin_trait_select_neighbor_type_for_adjacent_list() const {
   return _impl_.grin_trait_select_neighbor_type_for_adjacent_list_;
 }
-inline bool PropertyFeature::grin_trait_select_neighbor_type_for_adjacent_list()
-    const {
+inline bool PropertyFeature::grin_trait_select_neighbor_type_for_adjacent_list() const {
   // @@protoc_insertion_point(field_get:grin.PropertyFeature.grin_trait_select_neighbor_type_for_adjacent_list)
   return _internal_grin_trait_select_neighbor_type_for_adjacent_list();
 }
-inline void PropertyFeature::
-    _internal_set_grin_trait_select_neighbor_type_for_adjacent_list(
-        bool value) {
+inline void PropertyFeature::_internal_set_grin_trait_select_neighbor_type_for_adjacent_list(bool value) {
+  
   _impl_.grin_trait_select_neighbor_type_for_adjacent_list_ = value;
 }
-inline void
-PropertyFeature::set_grin_trait_select_neighbor_type_for_adjacent_list(
-    bool value) {
+inline void PropertyFeature::set_grin_trait_select_neighbor_type_for_adjacent_list(bool value) {
   _internal_set_grin_trait_select_neighbor_type_for_adjacent_list(value);
   // @@protoc_insertion_point(field_set:grin.PropertyFeature.grin_trait_select_neighbor_type_for_adjacent_list)
 }
 
 // bool grin_trait_select_edge_type_for_adjacent_list = 11;
-inline void
-PropertyFeature::clear_grin_trait_select_edge_type_for_adjacent_list() {
+inline void PropertyFeature::clear_grin_trait_select_edge_type_for_adjacent_list() {
   _impl_.grin_trait_select_edge_type_for_adjacent_list_ = false;
 }
-inline bool
-PropertyFeature::_internal_grin_trait_select_edge_type_for_adjacent_list()
-    const {
+inline bool PropertyFeature::_internal_grin_trait_select_edge_type_for_adjacent_list() const {
   return _impl_.grin_trait_select_edge_type_for_adjacent_list_;
 }
-inline bool PropertyFeature::grin_trait_select_edge_type_for_adjacent_list()
-    const {
+inline bool PropertyFeature::grin_trait_select_edge_type_for_adjacent_list() const {
   // @@protoc_insertion_point(field_get:grin.PropertyFeature.grin_trait_select_edge_type_for_adjacent_list)
   return _internal_grin_trait_select_edge_type_for_adjacent_list();
 }
-inline void
-PropertyFeature::_internal_set_grin_trait_select_edge_type_for_adjacent_list(
-    bool value) {
+inline void PropertyFeature::_internal_set_grin_trait_select_edge_type_for_adjacent_list(bool value) {
+  
   _impl_.grin_trait_select_edge_type_for_adjacent_list_ = value;
 }
-inline void PropertyFeature::set_grin_trait_select_edge_type_for_adjacent_list(
-    bool value) {
+inline void PropertyFeature::set_grin_trait_select_edge_type_for_adjacent_list(bool value) {
   _internal_set_grin_trait_select_edge_type_for_adjacent_list(value);
   // @@protoc_insertion_point(field_set:grin.PropertyFeature.grin_trait_select_edge_type_for_adjacent_list)
 }
@@ -4439,16 +3941,15 @@ inline void PropertyFeature::set_grin_trait_select_edge_type_for_adjacent_list(
 inline void PropertyFeature::clear_grin_trait_specific_vev_relation() {
   _impl_.grin_trait_specific_vev_relation_ = false;
 }
-inline bool PropertyFeature::_internal_grin_trait_specific_vev_relation()
-    const {
+inline bool PropertyFeature::_internal_grin_trait_specific_vev_relation() const {
   return _impl_.grin_trait_specific_vev_relation_;
 }
 inline bool PropertyFeature::grin_trait_specific_vev_relation() const {
   // @@protoc_insertion_point(field_get:grin.PropertyFeature.grin_trait_specific_vev_relation)
   return _internal_grin_trait_specific_vev_relation();
 }
-inline void PropertyFeature::_internal_set_grin_trait_specific_vev_relation(
-    bool value) {
+inline void PropertyFeature::_internal_set_grin_trait_specific_vev_relation(bool value) {
+  
   _impl_.grin_trait_specific_vev_relation_ = value;
 }
 inline void PropertyFeature::set_grin_trait_specific_vev_relation(bool value) {
@@ -4472,6 +3973,7 @@ inline bool IndexFeature::grin_with_vertex_label() const {
   return _internal_grin_with_vertex_label();
 }
 inline void IndexFeature::_internal_set_grin_with_vertex_label(bool value) {
+  
   _impl_.grin_with_vertex_label_ = value;
 }
 inline void IndexFeature::set_grin_with_vertex_label(bool value) {
@@ -4491,6 +3993,7 @@ inline bool IndexFeature::grin_with_edge_label() const {
   return _internal_grin_with_edge_label();
 }
 inline void IndexFeature::_internal_set_grin_with_edge_label(bool value) {
+  
   _impl_.grin_with_edge_label_ = value;
 }
 inline void IndexFeature::set_grin_with_edge_label(bool value) {
@@ -4509,8 +4012,8 @@ inline bool IndexFeature::grin_assume_all_vertex_list_sorted() const {
   // @@protoc_insertion_point(field_get:grin.IndexFeature.grin_assume_all_vertex_list_sorted)
   return _internal_grin_assume_all_vertex_list_sorted();
 }
-inline void IndexFeature::_internal_set_grin_assume_all_vertex_list_sorted(
-    bool value) {
+inline void IndexFeature::_internal_set_grin_assume_all_vertex_list_sorted(bool value) {
+  
   _impl_.grin_assume_all_vertex_list_sorted_ = value;
 }
 inline void IndexFeature::set_grin_assume_all_vertex_list_sorted(bool value) {
@@ -4558,19 +4061,16 @@ inline ::grin::TopologyFeature* StorageFeature::release_topology_feature() {
     return nullptr;
   }
 }
-inline const ::grin::TopologyFeature&
-StorageFeature::_internal_topology_feature() const {
+inline const ::grin::TopologyFeature& StorageFeature::_internal_topology_feature() const {
   return _internal_has_topology_feature()
-             ? *_impl_.specific_feature_.topology_feature_
-             : reinterpret_cast<::grin::TopologyFeature&>(
-                   ::grin::_TopologyFeature_default_instance_);
+      ? *_impl_.specific_feature_.topology_feature_
+      : reinterpret_cast< ::grin::TopologyFeature&>(::grin::_TopologyFeature_default_instance_);
 }
 inline const ::grin::TopologyFeature& StorageFeature::topology_feature() const {
   // @@protoc_insertion_point(field_get:grin.StorageFeature.topology_feature)
   return _internal_topology_feature();
 }
-inline ::grin::TopologyFeature*
-StorageFeature::unsafe_arena_release_topology_feature() {
+inline ::grin::TopologyFeature* StorageFeature::unsafe_arena_release_topology_feature() {
   // @@protoc_insertion_point(field_unsafe_arena_release:grin.StorageFeature.topology_feature)
   if (_internal_has_topology_feature()) {
     clear_has_specific_feature();
@@ -4581,8 +4081,7 @@ StorageFeature::unsafe_arena_release_topology_feature() {
     return nullptr;
   }
 }
-inline void StorageFeature::unsafe_arena_set_allocated_topology_feature(
-    ::grin::TopologyFeature* topology_feature) {
+inline void StorageFeature::unsafe_arena_set_allocated_topology_feature(::grin::TopologyFeature* topology_feature) {
   clear_specific_feature();
   if (topology_feature) {
     set_has_topology_feature();
@@ -4590,13 +4089,11 @@ inline void StorageFeature::unsafe_arena_set_allocated_topology_feature(
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:grin.StorageFeature.topology_feature)
 }
-inline ::grin::TopologyFeature*
-StorageFeature::_internal_mutable_topology_feature() {
+inline ::grin::TopologyFeature* StorageFeature::_internal_mutable_topology_feature() {
   if (!_internal_has_topology_feature()) {
     clear_specific_feature();
     set_has_topology_feature();
-    _impl_.specific_feature_.topology_feature_ =
-        CreateMaybeMessage<::grin::TopologyFeature>(GetArenaForAllocation());
+    _impl_.specific_feature_.topology_feature_ = CreateMaybeMessage< ::grin::TopologyFeature >(GetArenaForAllocation());
   }
   return _impl_.specific_feature_.topology_feature_;
 }
@@ -4628,8 +4125,7 @@ inline ::grin::PartitionFeature* StorageFeature::release_partition_feature() {
   // @@protoc_insertion_point(field_release:grin.StorageFeature.partition_feature)
   if (_internal_has_partition_feature()) {
     clear_has_specific_feature();
-    ::grin::PartitionFeature* temp =
-        _impl_.specific_feature_.partition_feature_;
+    ::grin::PartitionFeature* temp = _impl_.specific_feature_.partition_feature_;
     if (GetArenaForAllocation() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
@@ -4639,33 +4135,27 @@ inline ::grin::PartitionFeature* StorageFeature::release_partition_feature() {
     return nullptr;
   }
 }
-inline const ::grin::PartitionFeature&
-StorageFeature::_internal_partition_feature() const {
+inline const ::grin::PartitionFeature& StorageFeature::_internal_partition_feature() const {
   return _internal_has_partition_feature()
-             ? *_impl_.specific_feature_.partition_feature_
-             : reinterpret_cast<::grin::PartitionFeature&>(
-                   ::grin::_PartitionFeature_default_instance_);
+      ? *_impl_.specific_feature_.partition_feature_
+      : reinterpret_cast< ::grin::PartitionFeature&>(::grin::_PartitionFeature_default_instance_);
 }
-inline const ::grin::PartitionFeature& StorageFeature::partition_feature()
-    const {
+inline const ::grin::PartitionFeature& StorageFeature::partition_feature() const {
   // @@protoc_insertion_point(field_get:grin.StorageFeature.partition_feature)
   return _internal_partition_feature();
 }
-inline ::grin::PartitionFeature*
-StorageFeature::unsafe_arena_release_partition_feature() {
+inline ::grin::PartitionFeature* StorageFeature::unsafe_arena_release_partition_feature() {
   // @@protoc_insertion_point(field_unsafe_arena_release:grin.StorageFeature.partition_feature)
   if (_internal_has_partition_feature()) {
     clear_has_specific_feature();
-    ::grin::PartitionFeature* temp =
-        _impl_.specific_feature_.partition_feature_;
+    ::grin::PartitionFeature* temp = _impl_.specific_feature_.partition_feature_;
     _impl_.specific_feature_.partition_feature_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void StorageFeature::unsafe_arena_set_allocated_partition_feature(
-    ::grin::PartitionFeature* partition_feature) {
+inline void StorageFeature::unsafe_arena_set_allocated_partition_feature(::grin::PartitionFeature* partition_feature) {
   clear_specific_feature();
   if (partition_feature) {
     set_has_partition_feature();
@@ -4673,13 +4163,11 @@ inline void StorageFeature::unsafe_arena_set_allocated_partition_feature(
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:grin.StorageFeature.partition_feature)
 }
-inline ::grin::PartitionFeature*
-StorageFeature::_internal_mutable_partition_feature() {
+inline ::grin::PartitionFeature* StorageFeature::_internal_mutable_partition_feature() {
   if (!_internal_has_partition_feature()) {
     clear_specific_feature();
     set_has_partition_feature();
-    _impl_.specific_feature_.partition_feature_ =
-        CreateMaybeMessage<::grin::PartitionFeature>(GetArenaForAllocation());
+    _impl_.specific_feature_.partition_feature_ = CreateMaybeMessage< ::grin::PartitionFeature >(GetArenaForAllocation());
   }
   return _impl_.specific_feature_.partition_feature_;
 }
@@ -4721,19 +4209,16 @@ inline ::grin::PropertyFeature* StorageFeature::release_property_feature() {
     return nullptr;
   }
 }
-inline const ::grin::PropertyFeature&
-StorageFeature::_internal_property_feature() const {
+inline const ::grin::PropertyFeature& StorageFeature::_internal_property_feature() const {
   return _internal_has_property_feature()
-             ? *_impl_.specific_feature_.property_feature_
-             : reinterpret_cast<::grin::PropertyFeature&>(
-                   ::grin::_PropertyFeature_default_instance_);
+      ? *_impl_.specific_feature_.property_feature_
+      : reinterpret_cast< ::grin::PropertyFeature&>(::grin::_PropertyFeature_default_instance_);
 }
 inline const ::grin::PropertyFeature& StorageFeature::property_feature() const {
   // @@protoc_insertion_point(field_get:grin.StorageFeature.property_feature)
   return _internal_property_feature();
 }
-inline ::grin::PropertyFeature*
-StorageFeature::unsafe_arena_release_property_feature() {
+inline ::grin::PropertyFeature* StorageFeature::unsafe_arena_release_property_feature() {
   // @@protoc_insertion_point(field_unsafe_arena_release:grin.StorageFeature.property_feature)
   if (_internal_has_property_feature()) {
     clear_has_specific_feature();
@@ -4744,8 +4229,7 @@ StorageFeature::unsafe_arena_release_property_feature() {
     return nullptr;
   }
 }
-inline void StorageFeature::unsafe_arena_set_allocated_property_feature(
-    ::grin::PropertyFeature* property_feature) {
+inline void StorageFeature::unsafe_arena_set_allocated_property_feature(::grin::PropertyFeature* property_feature) {
   clear_specific_feature();
   if (property_feature) {
     set_has_property_feature();
@@ -4753,13 +4237,11 @@ inline void StorageFeature::unsafe_arena_set_allocated_property_feature(
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:grin.StorageFeature.property_feature)
 }
-inline ::grin::PropertyFeature*
-StorageFeature::_internal_mutable_property_feature() {
+inline ::grin::PropertyFeature* StorageFeature::_internal_mutable_property_feature() {
   if (!_internal_has_property_feature()) {
     clear_specific_feature();
     set_has_property_feature();
-    _impl_.specific_feature_.property_feature_ =
-        CreateMaybeMessage<::grin::PropertyFeature>(GetArenaForAllocation());
+    _impl_.specific_feature_.property_feature_ = CreateMaybeMessage< ::grin::PropertyFeature >(GetArenaForAllocation());
   }
   return _impl_.specific_feature_.property_feature_;
 }
@@ -4801,19 +4283,16 @@ inline ::grin::IndexFeature* StorageFeature::release_index_feature() {
     return nullptr;
   }
 }
-inline const ::grin::IndexFeature& StorageFeature::_internal_index_feature()
-    const {
+inline const ::grin::IndexFeature& StorageFeature::_internal_index_feature() const {
   return _internal_has_index_feature()
-             ? *_impl_.specific_feature_.index_feature_
-             : reinterpret_cast<::grin::IndexFeature&>(
-                   ::grin::_IndexFeature_default_instance_);
+      ? *_impl_.specific_feature_.index_feature_
+      : reinterpret_cast< ::grin::IndexFeature&>(::grin::_IndexFeature_default_instance_);
 }
 inline const ::grin::IndexFeature& StorageFeature::index_feature() const {
   // @@protoc_insertion_point(field_get:grin.StorageFeature.index_feature)
   return _internal_index_feature();
 }
-inline ::grin::IndexFeature*
-StorageFeature::unsafe_arena_release_index_feature() {
+inline ::grin::IndexFeature* StorageFeature::unsafe_arena_release_index_feature() {
   // @@protoc_insertion_point(field_unsafe_arena_release:grin.StorageFeature.index_feature)
   if (_internal_has_index_feature()) {
     clear_has_specific_feature();
@@ -4824,8 +4303,7 @@ StorageFeature::unsafe_arena_release_index_feature() {
     return nullptr;
   }
 }
-inline void StorageFeature::unsafe_arena_set_allocated_index_feature(
-    ::grin::IndexFeature* index_feature) {
+inline void StorageFeature::unsafe_arena_set_allocated_index_feature(::grin::IndexFeature* index_feature) {
   clear_specific_feature();
   if (index_feature) {
     set_has_index_feature();
@@ -4837,8 +4315,7 @@ inline ::grin::IndexFeature* StorageFeature::_internal_mutable_index_feature() {
   if (!_internal_has_index_feature()) {
     clear_specific_feature();
     set_has_index_feature();
-    _impl_.specific_feature_.index_feature_ =
-        CreateMaybeMessage<::grin::IndexFeature>(GetArenaForAllocation());
+    _impl_.specific_feature_.index_feature_ = CreateMaybeMessage< ::grin::IndexFeature >(GetArenaForAllocation());
   }
   return _impl_.specific_feature_.index_feature_;
 }
@@ -4870,8 +4347,7 @@ inline ::grin::PredicateFeature* StorageFeature::release_predicate_feature() {
   // @@protoc_insertion_point(field_release:grin.StorageFeature.predicate_feature)
   if (_internal_has_predicate_feature()) {
     clear_has_specific_feature();
-    ::grin::PredicateFeature* temp =
-        _impl_.specific_feature_.predicate_feature_;
+    ::grin::PredicateFeature* temp = _impl_.specific_feature_.predicate_feature_;
     if (GetArenaForAllocation() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
@@ -4881,33 +4357,27 @@ inline ::grin::PredicateFeature* StorageFeature::release_predicate_feature() {
     return nullptr;
   }
 }
-inline const ::grin::PredicateFeature&
-StorageFeature::_internal_predicate_feature() const {
+inline const ::grin::PredicateFeature& StorageFeature::_internal_predicate_feature() const {
   return _internal_has_predicate_feature()
-             ? *_impl_.specific_feature_.predicate_feature_
-             : reinterpret_cast<::grin::PredicateFeature&>(
-                   ::grin::_PredicateFeature_default_instance_);
+      ? *_impl_.specific_feature_.predicate_feature_
+      : reinterpret_cast< ::grin::PredicateFeature&>(::grin::_PredicateFeature_default_instance_);
 }
-inline const ::grin::PredicateFeature& StorageFeature::predicate_feature()
-    const {
+inline const ::grin::PredicateFeature& StorageFeature::predicate_feature() const {
   // @@protoc_insertion_point(field_get:grin.StorageFeature.predicate_feature)
   return _internal_predicate_feature();
 }
-inline ::grin::PredicateFeature*
-StorageFeature::unsafe_arena_release_predicate_feature() {
+inline ::grin::PredicateFeature* StorageFeature::unsafe_arena_release_predicate_feature() {
   // @@protoc_insertion_point(field_unsafe_arena_release:grin.StorageFeature.predicate_feature)
   if (_internal_has_predicate_feature()) {
     clear_has_specific_feature();
-    ::grin::PredicateFeature* temp =
-        _impl_.specific_feature_.predicate_feature_;
+    ::grin::PredicateFeature* temp = _impl_.specific_feature_.predicate_feature_;
     _impl_.specific_feature_.predicate_feature_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void StorageFeature::unsafe_arena_set_allocated_predicate_feature(
-    ::grin::PredicateFeature* predicate_feature) {
+inline void StorageFeature::unsafe_arena_set_allocated_predicate_feature(::grin::PredicateFeature* predicate_feature) {
   clear_specific_feature();
   if (predicate_feature) {
     set_has_predicate_feature();
@@ -4915,13 +4385,11 @@ inline void StorageFeature::unsafe_arena_set_allocated_predicate_feature(
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:grin.StorageFeature.predicate_feature)
 }
-inline ::grin::PredicateFeature*
-StorageFeature::_internal_mutable_predicate_feature() {
+inline ::grin::PredicateFeature* StorageFeature::_internal_mutable_predicate_feature() {
   if (!_internal_has_predicate_feature()) {
     clear_specific_feature();
     set_has_predicate_feature();
-    _impl_.specific_feature_.predicate_feature_ =
-        CreateMaybeMessage<::grin::PredicateFeature>(GetArenaForAllocation());
+    _impl_.specific_feature_.predicate_feature_ = CreateMaybeMessage< ::grin::PredicateFeature >(GetArenaForAllocation());
   }
   return _impl_.specific_feature_.predicate_feature_;
 }
@@ -4937,8 +4405,7 @@ inline bool StorageFeature::has_specific_feature() const {
 inline void StorageFeature::clear_has_specific_feature() {
   _impl_._oneof_case_[0] = SPECIFIC_FEATURE_NOT_SET;
 }
-inline StorageFeature::SpecificFeatureCase
-StorageFeature::specific_feature_case() const {
+inline StorageFeature::SpecificFeatureCase StorageFeature::specific_feature_case() const {
   return StorageFeature::SpecificFeatureCase(_impl_._oneof_case_[0]);
 }
 // -------------------------------------------------------------------
@@ -4946,7 +4413,9 @@ StorageFeature::specific_feature_case() const {
 // Statistics
 
 // int32 vertex_count = 1;
-inline void Statistics::clear_vertex_count() { _impl_.vertex_count_ = 0; }
+inline void Statistics::clear_vertex_count() {
+  _impl_.vertex_count_ = 0;
+}
 inline int32_t Statistics::_internal_vertex_count() const {
   return _impl_.vertex_count_;
 }
@@ -4955,6 +4424,7 @@ inline int32_t Statistics::vertex_count() const {
   return _internal_vertex_count();
 }
 inline void Statistics::_internal_set_vertex_count(int32_t value) {
+  
   _impl_.vertex_count_ = value;
 }
 inline void Statistics::set_vertex_count(int32_t value) {
@@ -4963,7 +4433,9 @@ inline void Statistics::set_vertex_count(int32_t value) {
 }
 
 // int32 edge_count = 2;
-inline void Statistics::clear_edge_count() { _impl_.edge_count_ = 0; }
+inline void Statistics::clear_edge_count() {
+  _impl_.edge_count_ = 0;
+}
 inline int32_t Statistics::_internal_edge_count() const {
   return _impl_.edge_count_;
 }
@@ -4972,6 +4444,7 @@ inline int32_t Statistics::edge_count() const {
   return _internal_edge_count();
 }
 inline void Statistics::_internal_set_edge_count(int32_t value) {
+  
   _impl_.edge_count_ = value;
 }
 inline void Statistics::set_edge_count(int32_t value) {
@@ -4980,7 +4453,9 @@ inline void Statistics::set_edge_count(int32_t value) {
 }
 
 // int32 partition_count = 3;
-inline void Statistics::clear_partition_count() { _impl_.partition_count_ = 0; }
+inline void Statistics::clear_partition_count() {
+  _impl_.partition_count_ = 0;
+}
 inline int32_t Statistics::_internal_partition_count() const {
   return _impl_.partition_count_;
 }
@@ -4989,6 +4464,7 @@ inline int32_t Statistics::partition_count() const {
   return _internal_partition_count();
 }
 inline void Statistics::_internal_set_partition_count(int32_t value) {
+  
   _impl_.partition_count_ = value;
 }
 inline void Statistics::set_partition_count(int32_t value) {
@@ -5008,6 +4484,7 @@ inline int32_t Statistics::vertex_type_count() const {
   return _internal_vertex_type_count();
 }
 inline void Statistics::_internal_set_vertex_type_count(int32_t value) {
+  
   _impl_.vertex_type_count_ = value;
 }
 inline void Statistics::set_vertex_type_count(int32_t value) {
@@ -5016,7 +4493,9 @@ inline void Statistics::set_vertex_type_count(int32_t value) {
 }
 
 // int32 edge_type_count = 5;
-inline void Statistics::clear_edge_type_count() { _impl_.edge_type_count_ = 0; }
+inline void Statistics::clear_edge_type_count() {
+  _impl_.edge_type_count_ = 0;
+}
 inline int32_t Statistics::_internal_edge_type_count() const {
   return _impl_.edge_type_count_;
 }
@@ -5025,6 +4504,7 @@ inline int32_t Statistics::edge_type_count() const {
   return _internal_edge_type_count();
 }
 inline void Statistics::_internal_set_edge_type_count(int32_t value) {
+  
   _impl_.edge_type_count_ = value;
 }
 inline void Statistics::set_edge_type_count(int32_t value) {
@@ -5037,14 +4517,18 @@ inline void Statistics::set_edge_type_count(int32_t value) {
 // Graph
 
 // string uri = 1;
-inline void Graph::clear_uri() { _impl_.uri_.ClearToEmpty(); }
+inline void Graph::clear_uri() {
+  _impl_.uri_.ClearToEmpty();
+}
 inline const std::string& Graph::uri() const {
   // @@protoc_insertion_point(field_get:grin.Graph.uri)
   return _internal_uri();
 }
 template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE void Graph::set_uri(ArgT0&& arg0, ArgT... args) {
-  _impl_.uri_.Set(static_cast<ArgT0&&>(arg0), args..., GetArenaForAllocation());
+inline PROTOBUF_ALWAYS_INLINE
+void Graph::set_uri(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.uri_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
   // @@protoc_insertion_point(field_set:grin.Graph.uri)
 }
 inline std::string* Graph::mutable_uri() {
@@ -5056,9 +4540,11 @@ inline const std::string& Graph::_internal_uri() const {
   return _impl_.uri_.Get();
 }
 inline void Graph::_internal_set_uri(const std::string& value) {
+  
   _impl_.uri_.Set(value, GetArenaForAllocation());
 }
 inline std::string* Graph::_internal_mutable_uri() {
+  
   return _impl_.uri_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Graph::release_uri() {
@@ -5067,28 +4553,32 @@ inline std::string* Graph::release_uri() {
 }
 inline void Graph::set_allocated_uri(std::string* uri) {
   if (uri != nullptr) {
+    
   } else {
+    
   }
   _impl_.uri_.SetAllocated(uri, GetArenaForAllocation());
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (_impl_.uri_.IsDefault()) {
     _impl_.uri_.Set("", GetArenaForAllocation());
   }
-#endif  // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:grin.Graph.uri)
 }
 
 // string grin_version = 2;
-inline void Graph::clear_grin_version() { _impl_.grin_version_.ClearToEmpty(); }
+inline void Graph::clear_grin_version() {
+  _impl_.grin_version_.ClearToEmpty();
+}
 inline const std::string& Graph::grin_version() const {
   // @@protoc_insertion_point(field_get:grin.Graph.grin_version)
   return _internal_grin_version();
 }
 template <typename ArgT0, typename... ArgT>
-inline PROTOBUF_ALWAYS_INLINE void Graph::set_grin_version(ArgT0&& arg0,
-                                                           ArgT... args) {
-  _impl_.grin_version_.Set(static_cast<ArgT0&&>(arg0), args...,
-                           GetArenaForAllocation());
+inline PROTOBUF_ALWAYS_INLINE
+void Graph::set_grin_version(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.grin_version_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
   // @@protoc_insertion_point(field_set:grin.Graph.grin_version)
 }
 inline std::string* Graph::mutable_grin_version() {
@@ -5100,9 +4590,11 @@ inline const std::string& Graph::_internal_grin_version() const {
   return _impl_.grin_version_.Get();
 }
 inline void Graph::_internal_set_grin_version(const std::string& value) {
+  
   _impl_.grin_version_.Set(value, GetArenaForAllocation());
 }
 inline std::string* Graph::_internal_mutable_grin_version() {
+  
   return _impl_.grin_version_.Mutable(GetArenaForAllocation());
 }
 inline std::string* Graph::release_grin_version() {
@@ -5111,14 +4603,16 @@ inline std::string* Graph::release_grin_version() {
 }
 inline void Graph::set_allocated_grin_version(std::string* grin_version) {
   if (grin_version != nullptr) {
+    
   } else {
+    
   }
   _impl_.grin_version_.SetAllocated(grin_version, GetArenaForAllocation());
 #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (_impl_.grin_version_.IsDefault()) {
     _impl_.grin_version_.Set("", GetArenaForAllocation());
   }
-#endif  // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   // @@protoc_insertion_point(field_set_allocated:grin.Graph.grin_version)
 }
 
@@ -5126,19 +4620,22 @@ inline void Graph::set_allocated_grin_version(std::string* grin_version) {
 inline int Graph::_internal_features_size() const {
   return _impl_.features_.size();
 }
-inline int Graph::features_size() const { return _internal_features_size(); }
-inline void Graph::clear_features() { _impl_.features_.Clear(); }
+inline int Graph::features_size() const {
+  return _internal_features_size();
+}
+inline void Graph::clear_features() {
+  _impl_.features_.Clear();
+}
 inline ::grin::StorageFeature* Graph::mutable_features(int index) {
   // @@protoc_insertion_point(field_mutable:grin.Graph.features)
   return _impl_.features_.Mutable(index);
 }
-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<::grin::StorageFeature>*
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::grin::StorageFeature >*
 Graph::mutable_features() {
   // @@protoc_insertion_point(field_mutable_list:grin.Graph.features)
   return &_impl_.features_;
 }
-inline const ::grin::StorageFeature& Graph::_internal_features(
-    int index) const {
+inline const ::grin::StorageFeature& Graph::_internal_features(int index) const {
   return _impl_.features_.Get(index);
 }
 inline const ::grin::StorageFeature& Graph::features(int index) const {
@@ -5153,7 +4650,7 @@ inline ::grin::StorageFeature* Graph::add_features() {
   // @@protoc_insertion_point(field_add:grin.Graph.features)
   return _add;
 }
-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<::grin::StorageFeature>&
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::grin::StorageFeature >&
 Graph::features() const {
   // @@protoc_insertion_point(field_list:grin.Graph.features)
   return _impl_.features_;
@@ -5163,7 +4660,9 @@ Graph::features() const {
 inline bool Graph::_internal_has_statistics() const {
   return this != internal_default_instance() && _impl_.statistics_ != nullptr;
 }
-inline bool Graph::has_statistics() const { return _internal_has_statistics(); }
+inline bool Graph::has_statistics() const {
+  return _internal_has_statistics();
+}
 inline void Graph::clear_statistics() {
   if (GetArenaForAllocation() == nullptr && _impl_.statistics_ != nullptr) {
     delete _impl_.statistics_;
@@ -5172,9 +4671,8 @@ inline void Graph::clear_statistics() {
 }
 inline const ::grin::Statistics& Graph::_internal_statistics() const {
   const ::grin::Statistics* p = _impl_.statistics_;
-  return p != nullptr ? *p
-                      : reinterpret_cast<const ::grin::Statistics&>(
-                            ::grin::_Statistics_default_instance_);
+  return p != nullptr ? *p : reinterpret_cast<const ::grin::Statistics&>(
+      ::grin::_Statistics_default_instance_);
 }
 inline const ::grin::Statistics& Graph::statistics() const {
   // @@protoc_insertion_point(field_get:grin.Graph.statistics)
@@ -5183,25 +4681,25 @@ inline const ::grin::Statistics& Graph::statistics() const {
 inline void Graph::unsafe_arena_set_allocated_statistics(
     ::grin::Statistics* statistics) {
   if (GetArenaForAllocation() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(
-        _impl_.statistics_);
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.statistics_);
   }
   _impl_.statistics_ = statistics;
   if (statistics) {
+    
   } else {
+    
   }
   // @@protoc_insertion_point(field_unsafe_arena_set_allocated:grin.Graph.statistics)
 }
 inline ::grin::Statistics* Graph::release_statistics() {
+  
   ::grin::Statistics* temp = _impl_.statistics_;
   _impl_.statistics_ = nullptr;
 #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
-  auto* old = reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
   temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  if (GetArenaForAllocation() == nullptr) {
-    delete old;
-  }
-#else   // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
   if (GetArenaForAllocation() != nullptr) {
     temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
   }
@@ -5210,12 +4708,13 @@ inline ::grin::Statistics* Graph::release_statistics() {
 }
 inline ::grin::Statistics* Graph::unsafe_arena_release_statistics() {
   // @@protoc_insertion_point(field_release:grin.Graph.statistics)
-
+  
   ::grin::Statistics* temp = _impl_.statistics_;
   _impl_.statistics_ = nullptr;
   return temp;
 }
 inline ::grin::Statistics* Graph::_internal_mutable_statistics() {
+  
   if (_impl_.statistics_ == nullptr) {
     auto* p = CreateMaybeMessage<::grin::Statistics>(GetArenaForAllocation());
     _impl_.statistics_ = p;
@@ -5239,15 +4738,16 @@ inline void Graph::set_allocated_statistics(::grin::Statistics* statistics) {
       statistics = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
           message_arena, statistics, submessage_arena);
     }
-
+    
   } else {
+    
   }
   _impl_.statistics_ = statistics;
   // @@protoc_insertion_point(field_set_allocated:grin.Graph.statistics)
 }
 
 #ifdef __GNUC__
-#pragma GCC diagnostic pop
+  #pragma GCC diagnostic pop
 #endif  // __GNUC__
 // -------------------------------------------------------------------
 
@@ -5269,31 +4769,26 @@ inline void Graph::set_allocated_statistics(::grin::Statistics* statistics) {
 
 // -------------------------------------------------------------------
 
+
 // @@protoc_insertion_point(namespace_scope)
 
 }  // namespace grin
 
 PROTOBUF_NAMESPACE_OPEN
 
+template <> struct is_proto_enum< ::grin::ListRetrieval> : ::std::true_type {};
 template <>
-struct is_proto_enum<::grin::ListRetrieval> : ::std::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor<::grin::ListRetrieval>() {
+inline const EnumDescriptor* GetEnumDescriptor< ::grin::ListRetrieval>() {
   return ::grin::ListRetrieval_descriptor();
 }
+template <> struct is_proto_enum< ::grin::GraphPartitionStrategy> : ::std::true_type {};
 template <>
-struct is_proto_enum<::grin::GraphPartitionStrategy> : ::std::true_type {};
-template <>
-inline const EnumDescriptor*
-GetEnumDescriptor<::grin::GraphPartitionStrategy>() {
+inline const EnumDescriptor* GetEnumDescriptor< ::grin::GraphPartitionStrategy>() {
   return ::grin::GraphPartitionStrategy_descriptor();
 }
+template <> struct is_proto_enum< ::grin::PropertyDataPartitionStrategy> : ::std::true_type {};
 template <>
-struct is_proto_enum<::grin::PropertyDataPartitionStrategy> : ::std::true_type {
-};
-template <>
-inline const EnumDescriptor*
-GetEnumDescriptor<::grin::PropertyDataPartitionStrategy>() {
+inline const EnumDescriptor* GetEnumDescriptor< ::grin::PropertyDataPartitionStrategy>() {
   return ::grin::PropertyDataPartitionStrategy_descriptor();
 }
 
