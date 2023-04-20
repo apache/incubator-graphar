@@ -33,6 +33,8 @@ struct GRIN_VERTEX_T {
       : id(_id), type_id(_type_id) {}
 };
 
+typedef GAR_NAMESPACE::IdType GRIN_VERTEX_ORIGINAL_ID_T;
+
 struct GRIN_EDGE_T {
   GAR_NAMESPACE::EdgeIter iter;
   unsigned type_id;

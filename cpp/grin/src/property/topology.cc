@@ -52,9 +52,14 @@ size_t grin_get_total_edge_num_by_type(GRIN_PARTITIONED_GRAPH, GRIN_EDGE_TYPE);
 #endif
 
 #ifdef GRIN_ASSUME_BY_TYPE_VERTEX_ORIGINAL_ID
-GRIN_VERTEX grin_get_vertex_from_original_id_by_type(GRIN_GRAPH,
-                                                     GRIN_VERTEX_TYPE,
-                                                     GRIN_VERTEX_ORIGINAL_ID);
+GRIN_VERTEX grin_get_vertex_from_original_id_by_type(GRIN_GRAPH g,
+                                                     GRIN_VERTEX_TYPE vtype,
+                                                     GRIN_VERTEX_ORIGINAL_ID oid) { 
+  auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);   
+  auto _oid = static_cast<GRIN_VERTEX_ORIGINAL_ID_T*>(oid); 
+  auto v = new GRIN_VERTEX_T(*_oid, *_vtype);
+  return v;                                                 
+}
 #endif
 
 #ifdef GRIN_TRAIT_SELECT_TYPE_FOR_VERTEX_LIST

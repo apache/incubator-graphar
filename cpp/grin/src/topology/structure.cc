@@ -61,11 +61,19 @@ bool grin_equal_vertex(GRIN_GRAPH g, GRIN_VERTEX v1, GRIN_VERTEX v2) {
 }
 
 #ifdef GRIN_WITH_VERTEX_ORIGINAL_ID
-void grin_destroy_vertex_original_id(GRIN_GRAPH, GRIN_VERTEX_ORIGINAL_ID);
+void grin_destroy_vertex_original_id(GRIN_GRAPH g, GRIN_VERTEX_ORIGINAL_ID oid) {
+  auto _oid = static_cast<GRIN_VERTEX_ORIGINAL_ID_T*>(oid);
+  delete _oid;
+}
 
-GRIN_DATATYPE grin_get_vertex_original_id_type(GRIN_GRAPH);
+GRIN_DATATYPE grin_get_vertex_original_id_type(GRIN_GRAPH g) {
+  return GRIN_DATATYPE::Int64;
+}
 
-GRIN_VERTEX_ORIGINAL_ID grin_get_vertex_original_id(GRIN_GRAPH, GRIN_VERTEX);
+GRIN_VERTEX_ORIGINAL_ID grin_get_vertex_original_id(GRIN_GRAPH g, GRIN_VERTEX v) {
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  return new GRIN_VERTEX_ORIGINAL_ID_T(_v->id);
+}
 #endif
 
 #if defined(GRIN_WITH_VERTEX_ORIGINAL_ID) && \
