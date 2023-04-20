@@ -379,7 +379,21 @@ TEST_CASE("test_graph_info_load_ldbc") {
   REQUIRE(edge_infos.size() == 23);
 }
 
-/*
+TEST_CASE("test_vertex_info_xxx") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
+  std::string vertex_meta_file =
+      root + "/ldbc_sample/parquet/" + "person.vertex.yml";
+  auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
+  auto maybe_vertex_info = GAR_NAMESPACE::VertexInfo::Load(vertex_meta);
+  if (maybe_vertex_info.has_error()) {
+    std::cout << maybe_vertex_info.status().message() << std::endl;
+  }
+  auto vertex_info = maybe_vertex_info.value();
+  REQUIRE(vertex_info.GetLabel() == "person");
+}
+
 TEST_CASE("test_graph_info_load_from_s3") {
   std::string path =
       "s3://graphar/ldbc/ldbc.graph.yml"
@@ -393,4 +407,3 @@ TEST_CASE("test_graph_info_load_from_s3") {
   REQUIRE(vertex_infos.size() == 8);
   REQUIRE(edge_infos.size() == 23);
 }
-*/

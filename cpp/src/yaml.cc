@@ -46,7 +46,7 @@ Result<std::shared_ptr<Yaml>> Yaml::Load(std::iostream& input) {
 Result<std::shared_ptr<Yaml>> Yaml::LoadFile(const std::string& file_name) {
   std::shared_ptr<Yaml::Node> root_node = std::make_shared<Yaml::Node>();
   try {
-    ::Yaml::Parse(*root_node, file_name.c_str(), file_name.size());
+    ::Yaml::Parse(*root_node, file_name.c_str());
   } catch (::Yaml::Exception& e) { return Status::YamlError(e.what()); }
   return std::make_shared<Yaml>(root_node);
 }
