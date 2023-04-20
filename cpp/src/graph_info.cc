@@ -15,7 +15,7 @@ limitations under the License.
 
 #include <iostream>
 
-#include "yaml-cpp/yaml.h"
+#include "yaml/Yaml.hpp"
 
 #include "gar/graph_info.h"
 #include "gar/utils/filesystem.h"
@@ -27,39 +27,41 @@ Result<VertexInfo> VertexInfo::Load(std::shared_ptr<Yaml> yaml) {
   if (yaml == nullptr) {
     return Status::YamlError("yaml is nullptr");
   }
-  std::string label = yaml->operator[]("label").as<std::string>();
+  std::string label = yaml->operator[]("label").As<std::string>();
   IdType chunk_size =
-      static_cast<IdType>(yaml->operator[]("chunk_size").as<int64_t>());
+      static_cast<IdType>(yaml->operator[]("chunk_size").As<int64_t>());
   std::string prefix;
-  if (yaml->operator[]("prefix")) {
-    prefix = yaml->operator[]("prefix").as<std::string>();
+  if (!yaml->operator[]("prefix").IsNone()) {
+    prefix = yaml->operator[]("prefix").As<std::string>();
   }
   InfoVersion version;
-  if (yaml->operator[]("version")) {
+  if (!yaml->operator[]("version").IsNone()) {
     GAR_ASSIGN_OR_RAISE(
         version,
-        InfoVersion::Parse(yaml->operator[]("version").as<std::string>()));
+        InfoVersion::Parse(yaml->operator[]("version").As<std::string>()));
   }
   VertexInfo vertex_info(label, chunk_size, version, prefix);
   auto property_groups = yaml->operator[]("property_groups");
-  if (property_groups) {  // property_groups exist
-    for (YAML::const_iterator it = property_groups.begin();
-         it != property_groups.end(); ++it) {
+  if (!property_groups.IsNone()) {  // property_groups exist
+    for (auto it = property_groups.Begin();
+         it != property_groups.End(); it++) {
       std::string pg_prefix;
-      if (it->operator[]("prefix")) {
-        pg_prefix = it->operator[]("prefix").as<std::string>();
+      auto& node = (*it).second;
+      if (!node["prefix"].IsNone()) {
+        pg_prefix = node["prefix"].As<std::string>();
       }
       auto file_type =
-          StringToFileType(it->operator[]("file_type").as<std::string>());
+          StringToFileType(node["file_type"].As<std::string>());
       std::vector<Property> property_vec;
-      auto& properties = it->operator[]("properties");
-      for (YAML::const_iterator iit = properties.begin();
-           iit != properties.end(); ++iit) {
+      auto& properties = node["properties"];
+      for (auto iit = properties.Begin();
+           iit != properties.End(); iit++) {
         Property property;
-        property.name = iit->operator[]("name").as<std::string>();
+        auto& p_node = (*iit).second;
+        property.name = p_node["name"].As<std::string>();
         property.type = DataType::TypeNameToDataType(
-            iit->operator[]("data_type").as<std::string>());
-        property.is_primary = iit->operator[]("is_primary").as<bool>();
+            p_node["data_type"].As<std::string>());
+        property.is_primary = p_node["is_primary"].As<bool>();
         property_vec.push_back(property);
       }
       PropertyGroup pg(property_vec, file_type, pg_prefix);
@@ -73,27 +75,31 @@ Result<std::string> VertexInfo::Dump() const noexcept {
   if (!IsValidated()) {
     return Status::Invalid();
   }
-  YAML::Node node;
+  ::Yaml::Node node;
   node["label"] = label_;
-  node["chunk_size"] = chunk_size_;
+  node["chunk_size"] = std::to_string(chunk_size_);
   node["prefix"] = prefix_;
   for (const auto& pg : property_groups_) {
-    YAML::Node pg_node;
+    Yaml::Node pg_node;
     if (!pg.GetPrefix().empty()) {
       pg_node["prefix"] = pg.GetPrefix();
     }
     pg_node["file_type"] = FileTypeToString(pg.GetFileType());
     for (auto& p : pg.GetProperties()) {
-      YAML::Node p_node;
+      Yaml::Node p_node;
       p_node["name"] = p.name;
       p_node["data_type"] = p.type.ToTypeName();
-      p_node["is_primary"] = p.is_primary;
-      pg_node["properties"].push_back(p_node);
+      p_node["is_primary"] = p.is_primary ? "true" : "false";
+      pg_node["properties"].PushBack();
+      pg_node["properties"][pg_node["properties"].Size() - 1] = p_node;
     }
-    node["property_groups"].push_back(pg_node);
+    node["property_groups"].PushBack();
+    node["property_groups"][node["property_groups"].Size() - 1] = pg_node;
   }
   node["version"] = version_.ToString();
-  return YAML::Dump(node);
+  std::string dump_string;
+  ::Yaml::Serialize(node, dump_string);
+  return dump_string;
 }
 
 Status VertexInfo::Save(const std::string& path) const {
@@ -107,65 +113,68 @@ Result<EdgeInfo> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
   if (yaml == nullptr) {
     return Status::YamlError("yaml is nullptr");
   }
-  std::string src_label = yaml->operator[]("src_label").as<std::string>();
-  std::string edge_label = yaml->operator[]("edge_label").as<std::string>();
-  std::string dst_label = yaml->operator[]("dst_label").as<std::string>();
+  std::string src_label = yaml->operator[]("src_label").As<std::string>();
+  std::string edge_label = yaml->operator[]("edge_label").As<std::string>();
+  std::string dst_label = yaml->operator[]("dst_label").As<std::string>();
   IdType chunk_size =
-      static_cast<IdType>(yaml->operator[]("chunk_size").as<int64_t>());
+      static_cast<IdType>(yaml->operator[]("chunk_size").As<int64_t>());
   IdType src_chunk_size =
-      static_cast<IdType>(yaml->operator[]("src_chunk_size").as<int64_t>());
+      static_cast<IdType>(yaml->operator[]("src_chunk_size").As<int64_t>());
   IdType dst_chunk_size =
-      static_cast<IdType>(yaml->operator[]("dst_chunk_size").as<int64_t>());
-  bool directed = yaml->operator[]("directed").as<bool>();
+      static_cast<IdType>(yaml->operator[]("dst_chunk_size").As<int64_t>());
+  bool directed = yaml->operator[]("directed").As<bool>();
   std::string prefix;
-  if (yaml->operator[]("prefix")) {
-    prefix = yaml->operator[]("prefix").as<std::string>();
+  if (!yaml->operator[]("prefix").IsNone()) {
+    prefix = yaml->operator[]("prefix").As<std::string>();
   }
   InfoVersion version;
-  if (yaml->operator[]("version")) {
+  if (!yaml->operator[]("version").IsNone()) {
     GAR_ASSIGN_OR_RAISE(
         version,
-        InfoVersion::Parse(yaml->operator[]("version").as<std::string>()));
+        InfoVersion::Parse(yaml->operator[]("version").As<std::string>()));
   }
 
   EdgeInfo edge_info(src_label, edge_label, dst_label, chunk_size,
                      src_chunk_size, dst_chunk_size, directed, version, prefix);
 
   auto adj_lists = yaml->operator[]("adj_lists");
-  if (adj_lists) {
-    for (YAML::const_iterator it = adj_lists.begin(); it != adj_lists.end();
-         ++it) {
-      auto ordered = it->operator[]("ordered").as<bool>();
-      auto aligned = it->operator[]("aligned_by").as<std::string>();
+  if (adj_lists.IsSequence()) {
+    for (auto it = adj_lists.Begin(); it != adj_lists.End();
+         it++) {
+      auto& node = (*it).second;
+      auto ordered = node["ordered"].As<bool>();
+      auto aligned = node["aligned_by"].As<std::string>();
       auto adj_list_type = OrderedAlignedToAdjListType(ordered, aligned);
       auto file_type =
-          StringToFileType(it->operator[]("file_type").as<std::string>());
+          StringToFileType(node["file_type"].As<std::string>());
       std::string adj_list_prefix;
-      if (it->operator[]("prefix")) {
-        adj_list_prefix = it->operator[]("prefix").as<std::string>();
+      if (!node["prefix"].IsNone()) {
+        adj_list_prefix = node["prefix"].As<std::string>();
       }
       GAR_RETURN_NOT_OK(
           edge_info.AddAdjList(adj_list_type, file_type, adj_list_prefix));
 
-      auto property_groups = it->operator[]("property_groups");
-      if (property_groups) {  // property_groups exist
-        for (YAML::const_iterator pg_it = property_groups.begin();
-             pg_it != property_groups.end(); ++pg_it) {
+      auto property_groups = node["property_groups"];
+      if (!property_groups.IsNone()) {  // property_groups exist
+        for (auto pg_it = property_groups.Begin();
+             pg_it != property_groups.End(); pg_it++) {
+          auto& pg_node = (*pg_it).second;
           std::string pg_prefix;
-          if (pg_it->operator[]("prefix")) {
-            pg_prefix = pg_it->operator[]("prefix").as<std::string>();
+          if (!pg_node["prefix"].IsNone()) {
+            pg_prefix = pg_node["prefix"].As<std::string>();
           }
           auto file_type = StringToFileType(
-              pg_it->operator[]("file_type").as<std::string>());
-          auto properties = pg_it->operator[]("properties");
+              pg_node["file_type"].As<std::string>());
+          auto properties = pg_node["properties"];
           std::vector<Property> property_vec;
-          for (YAML::const_iterator p_it = properties.begin();
-               p_it != properties.end(); ++p_it) {
+          for (auto p_it = properties.Begin();
+               p_it != properties.End(); p_it++) {
+            auto& p_node = (*p_it).second;
             Property property;
-            property.name = p_it->operator[]("name").as<std::string>();
+            property.name = p_node["name"].As<std::string>();
             property.type = DataType::TypeNameToDataType(
-                p_it->operator[]("data_type").as<std::string>());
-            property.is_primary = p_it->operator[]("is_primary").as<bool>();
+                p_node["data_type"].As<std::string>());
+            property.is_primary = p_node["is_primary"].As<bool>();
             property_vec.push_back(property);
           }
           PropertyGroup pg(property_vec, file_type, pg_prefix);
@@ -181,43 +190,49 @@ Result<std::string> EdgeInfo::Dump() const noexcept {
   if (!IsValidated()) {
     return Status::Invalid();
   }
-  YAML::Node node;
+  ::Yaml::Node node;
   node["src_label"] = src_label_;
   node["edge_label"] = edge_label_;
   node["dst_label"] = dst_label_;
-  node["chunk_size"] = chunk_size_;
-  node["src_chunk_size"] = src_chunk_size_;
-  node["dst_chunk_size"] = dst_chunk_size_;
+  node["chunk_size"] = std::to_string(chunk_size_);
+  node["src_chunk_size"] = std::to_string(src_chunk_size_);
+  node["dst_chunk_size"] = std::to_string(dst_chunk_size_);
   node["prefix"] = prefix_;
-  node["directed"] = directed_;
+  node["directed"] = directed_ ? "true" : "false";
   for (const auto& item : adj_list2prefix_) {
-    YAML::Node adj_list_node;
+    ::Yaml::Node adj_list_node;
     auto adj_list_type = item.first;
     auto pair = AdjListTypeToOrderedAligned(adj_list_type);
-    adj_list_node["ordered"] = pair.first;
+    adj_list_node["ordered"] = pair.first ? "true" : "false";
     adj_list_node["aligned_by"] = pair.second;
     adj_list_node["prefix"] = adj_list2prefix_.at(adj_list_type);
     adj_list_node["file_type"] =
         FileTypeToString(adj_list2file_type_.at(adj_list_type));
     for (const auto& pg : adj_list2property_groups_.at(adj_list_type)) {
-      YAML::Node pg_node;
+      ::Yaml::Node pg_node;
       if (!pg.GetPrefix().empty()) {
         pg_node["prefix"] = pg.GetPrefix();
       }
       pg_node["file_type"] = FileTypeToString(pg.GetFileType());
       for (auto& p : pg.GetProperties()) {
-        YAML::Node p_node;
+        ::Yaml::Node p_node;
         p_node["name"] = p.name;
         p_node["data_type"] = p.type.ToTypeName();
-        p_node["is_primary"] = p.is_primary;
-        pg_node["properties"].push_back(p_node);
+        p_node["is_primary"] = p.is_primary ? "true" : "false";
+        pg_node["properties"].PushBack();
+        pg_node["properties"][pg_node["properties"].Size() - 1] = p_node;
       }
-      adj_list_node["property_groups"].push_back(pg_node);
+      adj_list_node["property_groups"].PushBack();
+      adj_list_node["property_groups"]
+                   [adj_list_node["property_groups"].Size() - 1] = pg_node;
     }
-    node["adj_lists"].push_back(adj_list_node);
+    node["adj_lists"].PushBack();
+    node["adj_lists"][node["adj_lists"].Size() - 1] = adj_list_node;
   }
   node["version"] = version_.ToString();
-  return YAML::Dump(node);
+  std::string dump_string;
+  ::Yaml::Serialize(node, dump_string);
+  return dump_string;
 }
 
 Status EdgeInfo::Save(const std::string& path) const {
@@ -253,25 +268,24 @@ static Result<GraphInfo> ConstructGraphInfo(
     const std::string& no_url_path) {
   std::string name = default_name;
   std::string prefix = default_prefix;
-  if (graph_meta->operator[]("name")) {
-    name = graph_meta->operator[]("name").as<std::string>();
+  if (!graph_meta->operator[]("name").IsNone()) {
+    name = graph_meta->operator[]("name").As<std::string>();
   }
-  if (graph_meta->operator[]("prefix")) {
-    prefix = graph_meta->operator[]("prefix").as<std::string>();
+  if (!graph_meta->operator[]("prefix").IsNone()) {
+    prefix = graph_meta->operator[]("prefix").As<std::string>();
   }
   InfoVersion version;
-  if (graph_meta->operator[]("version")) {
+  if (!graph_meta->operator[]("version").IsNone()) {
     GAR_ASSIGN_OR_RAISE(
         version, InfoVersion::Parse(
-                     graph_meta->operator[]("version").as<std::string>()));
+                     graph_meta->operator[]("version").As<std::string>()));
   }
   GraphInfo graph_info(name, version, prefix);
 
   const auto& vertices = graph_meta->operator[]("vertices");
-  if (vertices) {
-    for (YAML::const_iterator it = vertices.begin(); it != vertices.end();
-         ++it) {
-      std::string vertex_meta_file = no_url_path + it->as<std::string>();
+  if (vertices.IsSequence()) {
+    for (auto it = vertices.Begin(); it != vertices.End(); it++) {
+      std::string vertex_meta_file = no_url_path + (*it).second.As<std::string>();
       GAR_ASSIGN_OR_RAISE(auto input,
                           fs->ReadFileToValue<std::string>(vertex_meta_file));
       GAR_ASSIGN_OR_RAISE(auto vertex_meta, Yaml::Load(input));
@@ -280,9 +294,9 @@ static Result<GraphInfo> ConstructGraphInfo(
     }
   }
   const auto& edges = graph_meta->operator[]("edges");
-  if (edges) {
-    for (YAML::const_iterator it = edges.begin(); it != edges.end(); ++it) {
-      std::string edge_meta_file = no_url_path + it->as<std::string>();
+  if (edges.IsSequence()) {
+    for (auto it = edges.Begin(); it != edges.End(); it++) {
+      std::string edge_meta_file = no_url_path + (*it).second.As<std::string>();
       GAR_ASSIGN_OR_RAISE(auto input,
                           fs->ReadFileToValue<std::string>(edge_meta_file));
       GAR_ASSIGN_OR_RAISE(auto edge_meta, Yaml::Load(input));
@@ -325,19 +339,23 @@ Result<std::string> GraphInfo::Dump() const noexcept {
   if (!IsValidated()) {
     return Status::Invalid();
   }
-  YAML::Node node;
+  ::Yaml::Node node;
   node["name"] = name_;
   node["prefix"] = prefix_;
   node["vertices"];
   node["edges"];
   for (auto& path : vertex_paths_) {
-    node["vertices"].push_back(path);
+    node["vertices"].PushBack();
+    node["vertices"][node["vertices"].Size() - 1] = path;
   }
   for (auto& path : edge_paths_) {
-    node["edges"].push_back(path);
+    node["edges"].PushBack();
+    node["edges"][node["edges"].Size() - 1] = path;
   }
   node["version"] = version_.ToString();
-  return YAML::Dump(node);
+  std::string dump_string;
+  ::Yaml::Serialize(node, dump_string);
+  return dump_string;
 }
 
 Status GraphInfo::Save(const std::string& path) const {

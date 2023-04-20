@@ -147,7 +147,7 @@ endmacro()
 # building or find third party library
 # ------------------------------------------------------------------------------
 find_package(Threads REQUIRED)
-find_yaml_cpp()
+# find_yaml_cpp()
 find_package(OpenSSL QUIET)
 if (APPLE)
     find_package(curl REQUIRED)
@@ -178,20 +178,20 @@ endmacro()
 # generate gar library
 # ------------------------------------------------------------------------------
 macro(build_gar)
-    file(GLOB_RECURSE CORE_SRC_FILES "src/*.cc")
+    file(GLOB_RECURSE CORE_SRC_FILES "src/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
     add_library(gar SHARED ${CORE_SRC_FILES})
     install_gar_target(gar)
     target_compile_features(gar PRIVATE cxx_std_17)
     target_include_directories(gar PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
                                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-                                          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/yaml-cpp/include>
+                                          $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml>
     )
     target_include_directories(gar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
     target_link_libraries(gar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
 
     # make sure `libyaml-cpp.a` built first
-    add_dependencies(gar yaml-cpp)
-    get_target_location(YAML_CPP_LIBRARY_LOCATION yaml-cpp)
+    # add_dependencies(gar yaml-cpp)
+    # get_target_location(YAML_CPP_LIBRARY_LOCATION yaml-cpp)
     if(APPLE)
         target_link_libraries(gar PRIVATE -Wl,-force_load gar_arrow_static
             "${YAML_CPP_LIBRARY_LOCATION}"

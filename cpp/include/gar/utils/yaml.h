@@ -23,21 +23,23 @@ limitations under the License.
 #include "gar/utils/result.h"
 
 // forward declaration
-namespace YAML {
+namespace Yaml {
 class Node;
 }
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-/** A wrapper of YAML::Node to provide functions to parse yaml. */
+/** A wrapper of ::Yaml::Node to provide functions to parse yaml. */
 class Yaml {
  public:
-  explicit Yaml(std::shared_ptr<YAML::Node> root_node)
+  using Node = ::Yaml::Node;
+
+  explicit Yaml(std::shared_ptr<Node> root_node)
       : root_node_(root_node) {}
 
   ~Yaml() = default;
 
-  const YAML::Node operator[](const std::string& key) const;
+  const Node operator[](const std::string& key) const;
 
   /**
    * Loads the input string as Yaml instance.
@@ -47,18 +49,11 @@ class Yaml {
   static Result<std::shared_ptr<Yaml>> Load(const std::string& input);
 
   /**
-   * Loads the input string as Yaml instance.
-   *
-   * Return Status::YamlError if input string can not be loaded(malformed).
-   */
-  static Result<std::shared_ptr<Yaml>> Load(const char* input);
-
-  /**
    * Loads the input stream as Yaml instance.
    *
    * Return Status::YamlError if input string can not be loaded(malformed).
    */
-  static Result<std::shared_ptr<Yaml>> Load(std::istream& input);
+  static Result<std::shared_ptr<Yaml>> Load(std::iostream& input);
 
   /**
    * Loads the input file as a single Yaml instance.
@@ -68,7 +63,7 @@ class Yaml {
   static Result<std::shared_ptr<Yaml>> LoadFile(const std::string& file_name);
 
  private:
-  std::shared_ptr<YAML::Node> root_node_;
+  std::shared_ptr<Node> root_node_;
 };
 
 }  // namespace GAR_NAMESPACE_INTERNAL

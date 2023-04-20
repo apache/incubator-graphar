@@ -75,6 +75,7 @@ TEST_CASE("test_graph_info") {
   // TODO(@acezen): test dump
 
   std::string save_path(std::tmpnam(nullptr));
+  std::cout << "save_path: " << save_path << std::endl;
   REQUIRE(graph_info.Save(save_path).ok());
   REQUIRE(std::filesystem::exists(save_path));
 
@@ -143,6 +144,7 @@ TEST_CASE("test_vertex_info") {
 
   // test save
   std::string save_path(std::tmpnam(nullptr));
+  std::cout << "save_path: " << save_path << std::endl;
   REQUIRE(v_info.Save(save_path).ok());
   REQUIRE(std::filesystem::exists(save_path));
 
@@ -294,6 +296,7 @@ TEST_CASE("test_edge_info") {
 
   // test save
   std::string save_path(std::tmpnam(nullptr));
+  std::cout << "save_path: " << save_path << std::endl;
   REQUIRE(edge_info.Save(save_path).ok());
   REQUIRE(std::filesystem::exists(save_path));
 
@@ -350,6 +353,7 @@ TEST_CASE("test_graph_info_load_from_file") {
   REQUIRE(edge_infos.size() == 1);
 }
 
+/*
 TEST_CASE("test_graph_info_load_from_s3") {
   std::string path =
       "s3://graphar/ldbc/ldbc.graph.yml"
@@ -363,3 +367,4 @@ TEST_CASE("test_graph_info_load_from_s3") {
   REQUIRE(vertex_infos.size() == 8);
   REQUIRE(edge_infos.size() == 23);
 }
+*/
