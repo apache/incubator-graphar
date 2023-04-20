@@ -147,7 +147,6 @@ endmacro()
 # building or find third party library
 # ------------------------------------------------------------------------------
 find_package(Threads REQUIRED)
-# find_yaml_cpp()
 find_package(OpenSSL QUIET)
 if (APPLE)
     find_package(curl REQUIRED)
@@ -189,9 +188,6 @@ macro(build_gar)
     target_include_directories(gar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
     target_link_libraries(gar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
 
-    # make sure `libyaml-cpp.a` built first
-    # add_dependencies(gar yaml-cpp)
-    # get_target_location(YAML_CPP_LIBRARY_LOCATION yaml-cpp)
     if(APPLE)
         target_link_libraries(gar PRIVATE -Wl,-force_load gar_arrow_static
             "${YAML_CPP_LIBRARY_LOCATION}"
