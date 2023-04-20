@@ -23,12 +23,12 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-const Yaml::Node Yaml::operator[](const std::string& key) const {
+const ::Yaml::Node Yaml::operator[](const std::string& key) const {
   return root_node_->operator[](key);
 }
 
 Result<std::shared_ptr<Yaml>> Yaml::Load(const std::string& input) {
-  std::shared_ptr<Yaml::Node> root_node = std::make_shared<Yaml::Node>();
+  std::shared_ptr<::Yaml::Node> root_node = std::make_shared<::Yaml::Node>();
   try {
     ::Yaml::Parse(*root_node, input);
   } catch (::Yaml::Exception& e) { return Status::YamlError(e.what()); }
@@ -36,7 +36,7 @@ Result<std::shared_ptr<Yaml>> Yaml::Load(const std::string& input) {
 }
 
 Result<std::shared_ptr<Yaml>> Yaml::Load(std::iostream& input) {
-  std::shared_ptr<Yaml::Node> root_node = std::make_shared<Yaml::Node>();
+  std::shared_ptr<::Yaml::Node> root_node = std::make_shared<::Yaml::Node>();
   try {
     ::Yaml::Parse(*root_node, input);
   } catch (::Yaml::Exception& e) { return Status::YamlError(e.what()); }
@@ -44,7 +44,7 @@ Result<std::shared_ptr<Yaml>> Yaml::Load(std::iostream& input) {
 }
 
 Result<std::shared_ptr<Yaml>> Yaml::LoadFile(const std::string& file_name) {
-  std::shared_ptr<Yaml::Node> root_node = std::make_shared<Yaml::Node>();
+  std::shared_ptr<::Yaml::Node> root_node = std::make_shared<::Yaml::Node>();
   try {
     ::Yaml::Parse(*root_node, file_name.c_str());
   } catch (::Yaml::Exception& e) { return Status::YamlError(e.what()); }

@@ -32,13 +32,12 @@ namespace GAR_NAMESPACE_INTERNAL {
 /** A wrapper of ::Yaml::Node to provide functions to parse yaml. */
 class Yaml {
  public:
-  using Node = ::Yaml::Node;
-
-  explicit Yaml(std::shared_ptr<Node> root_node) : root_node_(root_node) {}
+  explicit Yaml(std::shared_ptr<::Yaml::Node> root_node)
+      : root_node_(root_node) {}
 
   ~Yaml() = default;
 
-  const Node operator[](const std::string& key) const;
+  const ::Yaml::Node operator[](const std::string& key) const;
 
   /**
    * Loads the input string as Yaml instance.
@@ -62,7 +61,7 @@ class Yaml {
   static Result<std::shared_ptr<Yaml>> LoadFile(const std::string& file_name);
 
  private:
-  std::shared_ptr<Node> root_node_;
+  std::shared_ptr<::Yaml::Node> root_node_;
 };
 
 }  // namespace GAR_NAMESPACE_INTERNAL

@@ -77,13 +77,13 @@ Result<std::string> VertexInfo::Dump() const noexcept {
   node["chunk_size"] = std::to_string(chunk_size_);
   node["prefix"] = prefix_;
   for (const auto& pg : property_groups_) {
-    Yaml::Node pg_node;
+    ::Yaml::Node pg_node;
     if (!pg.GetPrefix().empty()) {
       pg_node["prefix"] = pg.GetPrefix();
     }
     pg_node["file_type"] = FileTypeToString(pg.GetFileType());
     for (auto& p : pg.GetProperties()) {
-      Yaml::Node p_node;
+      ::Yaml::Node p_node;
       p_node["name"] = p.name;
       p_node["data_type"] = p.type.ToTypeName();
       p_node["is_primary"] = p.is_primary ? "true" : "false";
