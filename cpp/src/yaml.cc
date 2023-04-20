@@ -21,7 +21,6 @@ limitations under the License.
 #include "gar/utils/result.h"
 #include "gar/utils/yaml.h"
 
-
 namespace GAR_NAMESPACE_INTERNAL {
 
 const Yaml::Node Yaml::operator[](const std::string& key) const {

@@ -41,6 +41,7 @@ TEST_CASE("test_graph_info") {
   GAR_NAMESPACE::VertexInfo vertex_info("test_vertex", 100, version,
                                         "test_vertex_prefix");
   auto st = graph_info.AddVertex(vertex_info);
+  graph_info.AddVertexInfoPath("/tmp/test_vertex.vertex.yml");
   REQUIRE(st.ok());
   REQUIRE(graph_info.GetVertexInfos().size() == 1);
   auto maybe_vertex_info = graph_info.GetVertexInfo("test_vertex");
@@ -58,6 +59,7 @@ TEST_CASE("test_graph_info") {
   GAR_NAMESPACE::EdgeInfo edge_info(src_label, edge_label, dst_label, 1024, 100,
                                     100, true, version);
   st = graph_info.AddEdge(edge_info);
+  graph_info.AddEdgeInfoPath("/tmp/test_edge.edge.yml");
   REQUIRE(st.ok());
   REQUIRE(graph_info.GetEdgeInfos().size() == 1);
   auto maybe_edge_info =
@@ -108,6 +110,13 @@ TEST_CASE("test_vertex_info") {
   // same property can not be put in different property group
   REQUIRE(v_info.AddPropertyGroup(pg2).IsInvalidOperation());
   REQUIRE(v_info.GetPropertyGroups().size() == 1);
+
+  GAR_NAMESPACE::Property p2;
+  p2.name = "name";
+  p2.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::STRING);
+  p2.is_primary = false;
+  GAR_NAMESPACE::PropertyGroup pg3({p2}, GAR_NAMESPACE::FileType::CSV);
+  REQUIRE(v_info.AddPropertyGroup(pg3).ok());
 
   // test get property meta
   REQUIRE(v_info.GetPropertyType(p.name) == p.type);
@@ -351,6 +360,23 @@ TEST_CASE("test_graph_info_load_from_file") {
   const auto& edge_infos = graph_info.GetEdgeInfos();
   REQUIRE(vertex_infos.size() == 1);
   REQUIRE(edge_infos.size() == 1);
+}
+
+TEST_CASE("test_graph_info_load_ldbc") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
+  std::string path = root + "/ldbc/ldbc.graph.yml";
+  auto graph_info_result = GAR_NAMESPACE::GraphInfo::Load(path);
+  if (graph_info_result.has_error()) {
+    std::cout << graph_info_result.status().message() << std::endl;
+  }
+  auto graph_info = graph_info_result.value();
+  REQUIRE(graph_info.GetName() == "ldbc");
+  const auto& vertex_infos = graph_info.GetVertexInfos();
+  const auto& edge_infos = graph_info.GetEdgeInfos();
+  REQUIRE(vertex_infos.size() == 8);
+  REQUIRE(edge_infos.size() == 23);
 }
 
 /*

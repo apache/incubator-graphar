@@ -34,8 +34,7 @@ class Yaml {
  public:
   using Node = ::Yaml::Node;
 
-  explicit Yaml(std::shared_ptr<Node> root_node)
-      : root_node_(root_node) {}
+  explicit Yaml(std::shared_ptr<Node> root_node) : root_node_(root_node) {}
 
   ~Yaml() = default;
 

@@ -43,24 +43,21 @@ Result<VertexInfo> VertexInfo::Load(std::shared_ptr<Yaml> yaml) {
   VertexInfo vertex_info(label, chunk_size, version, prefix);
   auto property_groups = yaml->operator[]("property_groups");
   if (!property_groups.IsNone()) {  // property_groups exist
-    for (auto it = property_groups.Begin();
-         it != property_groups.End(); it++) {
+    for (auto it = property_groups.Begin(); it != property_groups.End(); it++) {
       std::string pg_prefix;
       auto& node = (*it).second;
       if (!node["prefix"].IsNone()) {
         pg_prefix = node["prefix"].As<std::string>();
       }
-      auto file_type =
-          StringToFileType(node["file_type"].As<std::string>());
+      auto file_type = StringToFileType(node["file_type"].As<std::string>());
       std::vector<Property> property_vec;
       auto& properties = node["properties"];
-      for (auto iit = properties.Begin();
-           iit != properties.End(); iit++) {
+      for (auto iit = properties.Begin(); iit != properties.End(); iit++) {
         Property property;
         auto& p_node = (*iit).second;
         property.name = p_node["name"].As<std::string>();
-        property.type = DataType::TypeNameToDataType(
-            p_node["data_type"].As<std::string>());
+        property.type =
+            DataType::TypeNameToDataType(p_node["data_type"].As<std::string>());
         property.is_primary = p_node["is_primary"].As<bool>();
         property_vec.push_back(property);
       }
@@ -139,14 +136,12 @@ Result<EdgeInfo> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
 
   auto adj_lists = yaml->operator[]("adj_lists");
   if (adj_lists.IsSequence()) {
-    for (auto it = adj_lists.Begin(); it != adj_lists.End();
-         it++) {
+    for (auto it = adj_lists.Begin(); it != adj_lists.End(); it++) {
       auto& node = (*it).second;
       auto ordered = node["ordered"].As<bool>();
       auto aligned = node["aligned_by"].As<std::string>();
       auto adj_list_type = OrderedAlignedToAdjListType(ordered, aligned);
-      auto file_type =
-          StringToFileType(node["file_type"].As<std::string>());
+      auto file_type = StringToFileType(node["file_type"].As<std::string>());
       std::string adj_list_prefix;
       if (!node["prefix"].IsNone()) {
         adj_list_prefix = node["prefix"].As<std::string>();
@@ -163,12 +158,12 @@ Result<EdgeInfo> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
           if (!pg_node["prefix"].IsNone()) {
             pg_prefix = pg_node["prefix"].As<std::string>();
           }
-          auto file_type = StringToFileType(
-              pg_node["file_type"].As<std::string>());
+          auto file_type =
+              StringToFileType(pg_node["file_type"].As<std::string>());
           auto properties = pg_node["properties"];
           std::vector<Property> property_vec;
-          for (auto p_it = properties.Begin();
-               p_it != properties.End(); p_it++) {
+          for (auto p_it = properties.Begin(); p_it != properties.End();
+               p_it++) {
             auto& p_node = (*p_it).second;
             Property property;
             property.name = p_node["name"].As<std::string>();
@@ -285,7 +280,8 @@ static Result<GraphInfo> ConstructGraphInfo(
   const auto& vertices = graph_meta->operator[]("vertices");
   if (vertices.IsSequence()) {
     for (auto it = vertices.Begin(); it != vertices.End(); it++) {
-      std::string vertex_meta_file = no_url_path + (*it).second.As<std::string>();
+      std::string vertex_meta_file =
+          no_url_path + (*it).second.As<std::string>();
       GAR_ASSIGN_OR_RAISE(auto input,
                           fs->ReadFileToValue<std::string>(vertex_meta_file));
       GAR_ASSIGN_OR_RAISE(auto vertex_meta, Yaml::Load(input));
