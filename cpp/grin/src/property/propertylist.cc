@@ -12,6 +12,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+#include <set>
 
 #include "grin/include/property/propertylist.h"
 #include "grin/src/predefine.h"
@@ -85,6 +86,7 @@ GRIN_EDGE_PROPERTY_LIST grin_get_edge_property_list_by_type(
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _etype = static_cast<GRIN_EDGE_TYPE_T*>(etype);
   auto epl = new GRIN_EDGE_PROPERTY_LIST_T();
+  std::set<GRIN_EDGE_PROPERTY_T> edge_properties;
   for (auto etype = 0; etype < _g->edge_type_num; ++etype) {
     if (_g->unique_edge_type_ids[etype] > *_etype)
       break;
@@ -98,8 +100,10 @@ GRIN_EDGE_PROPERTY_LIST grin_get_edge_property_list_by_type(
     auto adj_list_type = _g->edges_collections[etype].begin()->first;
     for (auto& group : edge_info.GetPropertyGroups(adj_list_type).value()) {
       for (auto& property : group.GetProperties()) {
-        GRIN_EDGE_PROPERTY_T ep(etype, property.name,
-                                GARToDataType(property.type));
+        GRIN_EDGE_PROPERTY_T ep(*_etype, property.name, GARToDataType(property.type));
+        if (edge_properties.find(ep) != edge_properties.end())
+          continue;
+        edge_properties.insert(ep);
         epl->push_back(ep);
       }
     }

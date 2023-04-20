@@ -192,6 +192,14 @@ struct GRIN_EDGE_PROPERTY_T {
   GRIN_EDGE_PROPERTY_T(unsigned _type_id, std::string _name,
                        GRIN_DATATYPE _type)
       : type_id(_type_id), name(_name), type(_type) {}
+  bool operator==(const GRIN_EDGE_PROPERTY_T& other) const {
+    return type_id == other.type_id && name == other.name && type == other.type;
+  }
+  bool operator<(const GRIN_EDGE_PROPERTY_T& other) const {
+    return type_id < other.type_id ||
+           (type_id == other.type_id && name < other.name) ||
+           (type_id == other.type_id && name == other.name && type < other.type);
+  }
 };
 typedef std::vector<GRIN_EDGE_PROPERTY_T> GRIN_EDGE_PROPERTY_LIST_T;
 struct GRIN_EDGE_PROPERTY_TABLE_T {

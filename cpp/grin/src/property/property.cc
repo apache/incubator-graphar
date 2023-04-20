@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <set>
+
 #include "grin/include/property/property.h"
 #include "grin/src/predefine.h"
 
@@ -57,13 +59,72 @@ GRIN_VERTEX_PROPERTY_LIST grin_get_vertex_properties_by_name(GRIN_GRAPH g,
 #endif
 
 #ifdef GRIN_WITH_EDGE_PROPERTY_NAME
-const char* grin_get_edge_property_name(GRIN_GRAPH, GRIN_EDGE_PROPERTY);
+const char* grin_get_edge_property_name(GRIN_GRAPH g, GRIN_EDGE_PROPERTY ep) {
+  auto _ep = static_cast<GRIN_EDGE_PROPERTY_T*>(ep);
+  auto s = _ep->name;
+  int len = s.length() + 1;
+  char* out = new char[len];
+  snprintf(out, len, "%s", s.c_str());
+  return out; 
+}
 
-GRIN_EDGE_PROPERTY grin_get_edge_property_by_name(GRIN_GRAPH, GRIN_EDGE_TYPE,
-                                                  const char* name);
+GRIN_EDGE_PROPERTY grin_get_edge_property_by_name(GRIN_GRAPH g, GRIN_EDGE_TYPE etype,
+                                                  const char* name) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _etype = static_cast<GRIN_EDGE_TYPE_T*>(etype);
+  auto s = std::string(name);
+  std::set<GRIN_EDGE_PROPERTY_T> edge_properties;
+  for (auto etype = 0; etype < _g->edge_type_num; ++etype) {
+    if (_g->unique_edge_type_ids[etype] > *_etype)
+      break;
+    if (_g->unique_edge_type_ids[etype] < *_etype)
+      continue;
+    auto edge_info = _g->graph_info
+                         .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[etype]],
+                                      _g->edge_types[etype],
+                                      _g->vertex_types[_g->dst_type_ids[etype]])
+                         .value();
+    if (!edge_info.ContainProperty(s))
+      continue;
+    auto gar_type = edge_info.GetPropertyType(s).value();
+    auto grin_type = GARToDataType(gar_type);
+    GRIN_EDGE_PROPERTY_T ep(*_etype, s, grin_type);
+    if (edge_properties.find(ep) != edge_properties.end())
+      continue;
+    edge_properties.insert(ep);
+  }
+  if (edge_properties.size() == 0 || edge_properties.size() > 1)
+    return GRIN_NULL_EDGE_PROPERTY;
+  auto ep = new GRIN_EDGE_PROPERTY_T(edge_properties.begin()->type_id,
+                                     edge_properties.begin()->name,
+                                     edge_properties.begin()->type);
+  return ep;
+}
 
-GRIN_EDGE_PROPERTY_LIST grin_get_edge_properties_by_name(GRIN_GRAPH,
-                                                         const char* name);
+GRIN_EDGE_PROPERTY_LIST grin_get_edge_properties_by_name(GRIN_GRAPH g,
+                                                         const char* name) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto s = std::string(name);
+  auto epl = new GRIN_EDGE_PROPERTY_LIST_T();
+  std::set<GRIN_EDGE_PROPERTY_T> edge_properties;
+  for (auto etype = 0; etype < _g->edge_type_num; ++etype) {
+    auto edge_info = _g->graph_info
+                         .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[etype]],
+                                      _g->edge_types[etype],
+                                      _g->vertex_types[_g->dst_type_ids[etype]])
+                         .value();
+    if (!edge_info.ContainProperty(s))
+      continue;
+    auto gar_type = edge_info.GetPropertyType(s).value();
+    auto grin_type = GARToDataType(gar_type);
+    GRIN_EDGE_PROPERTY_T ep(_g->unique_edge_type_ids[etype], s, grin_type);
+    if (edge_properties.find(ep) != edge_properties.end())
+      continue;
+    edge_properties.insert(ep);
+    epl->push_back(ep);
+  }
+  return epl;                                                        
+}
 #endif
 
 #ifdef GRIN_WITH_VERTEX_PROPERTY
@@ -99,8 +160,7 @@ bool grin_equal_edge_property(GRIN_GRAPH g, GRIN_EDGE_PROPERTY ep1,
                               GRIN_EDGE_PROPERTY ep2) {
   auto _ep1 = static_cast<GRIN_EDGE_PROPERTY_T*>(ep1);
   auto _ep2 = static_cast<GRIN_EDGE_PROPERTY_T*>(ep2);
-  return (_ep1->type_id == _ep2->type_id && _ep1->name == _ep2->name &&
-          _ep1->type == _ep2->type);
+  return (_ep1->type_id == _ep2->type_id && _ep1->name == _ep2->name && _ep1->type == _ep2->type);
 }
 
 void grin_destroy_edge_property(GRIN_GRAPH g, GRIN_EDGE_PROPERTY ep) {
@@ -116,9 +176,8 @@ GRIN_DATATYPE grin_get_edge_property_data_type(GRIN_GRAPH g,
 
 GRIN_EDGE_TYPE grin_get_edge_property_edge_type(GRIN_GRAPH g,
                                                 GRIN_EDGE_PROPERTY ep) {
-  auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _ep = static_cast<GRIN_EDGE_PROPERTY_T*>(ep);
-  auto et = new GRIN_EDGE_TYPE_T(_g->unique_edge_type_ids[_ep->type_id]);
+  auto et = new GRIN_EDGE_TYPE_T(_ep->type_id);
   return et;
 }
 #endif

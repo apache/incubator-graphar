@@ -240,12 +240,13 @@ GRIN_EDGE_PROPERTY_TABLE grin_get_edge_property_table_by_type(
 const void* grin_get_value_from_edge_property_table(
     GRIN_GRAPH g, GRIN_EDGE_PROPERTY_TABLE ept, GRIN_EDGE e,
     GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _ept = static_cast<GRIN_EDGE_PROPERTY_TABLE_T*>(ept);
   auto _e = static_cast<GRIN_EDGE_T*>(e);
   auto _ep = static_cast<GRIN_EDGE_PROPERTY_T*>(ep);
   if (_e->type_id < _ept->type_begin || _e->type_id >= _ept->type_end)
     return NULL;
-  if (_e->type_id != _ep->type_id)
+  if (_g->unique_edge_type_ids[_e->type_id] != _ep->type_id)
     return NULL;
   switch (_ep->type) {
   case GRIN_DATATYPE::Int32: {
@@ -282,6 +283,7 @@ GRIN_ROW grin_get_row_from_edge_property_table(GRIN_GRAPH g,
                                                GRIN_EDGE_PROPERTY_TABLE ept,
                                                GRIN_EDGE e,
                                                GRIN_EDGE_PROPERTY_LIST epl) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _ept = static_cast<GRIN_EDGE_PROPERTY_TABLE_T*>(ept);
   auto _e = static_cast<GRIN_EDGE_T*>(e);
   auto _epl = static_cast<GRIN_EDGE_PROPERTY_LIST_T*>(epl);
@@ -290,7 +292,7 @@ GRIN_ROW grin_get_row_from_edge_property_table(GRIN_GRAPH g,
 
   auto r = new GRIN_ROW_T();
   for (auto& _ep : *_epl) {
-    if (_ep.type_id != _e->type_id) {
+    if (_ep.type_id != _g->unique_edge_type_ids[_e->type_id]) {
       grin_destroy_row(g, r);
       return GRIN_NULL_ROW;
     }
