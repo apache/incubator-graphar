@@ -105,7 +105,7 @@ void test_vertex_property_list(GRIN_GRAPH graph) {
 
 void test_edge_property(GRIN_GRAPH graph, GRIN_EDGE_PROPERTY property,
                         GRIN_EDGE_TYPE edge_type) {
-  // get property name 
+  // get property name
   auto name = grin_get_edge_property_name(graph, property);
   std::cout << "name of edge property: " << name << std::endl;
 

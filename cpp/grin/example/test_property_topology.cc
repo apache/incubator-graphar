@@ -60,7 +60,8 @@ void test_property_topology_vertex(GRIN_GRAPH graph) {
     // check oid
     auto vertex1 = grin_get_vertex_from_list(graph, select_vertex_list, 0);
     auto oid = grin_get_vertex_original_id(graph, vertex1);
-    auto vertex2 = grin_get_vertex_from_original_id_by_type(graph, vertex_type, oid);
+    auto vertex2 =
+        grin_get_vertex_from_original_id_by_type(graph, vertex_type, oid);
     assert(grin_equal_vertex(graph, vertex1, vertex2) == true);
 
     // destroy

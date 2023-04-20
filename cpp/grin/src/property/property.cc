@@ -65,10 +65,11 @@ const char* grin_get_edge_property_name(GRIN_GRAPH g, GRIN_EDGE_PROPERTY ep) {
   int len = s.length() + 1;
   char* out = new char[len];
   snprintf(out, len, "%s", s.c_str());
-  return out; 
+  return out;
 }
 
-GRIN_EDGE_PROPERTY grin_get_edge_property_by_name(GRIN_GRAPH g, GRIN_EDGE_TYPE etype,
+GRIN_EDGE_PROPERTY grin_get_edge_property_by_name(GRIN_GRAPH g,
+                                                  GRIN_EDGE_TYPE etype,
                                                   const char* name) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _etype = static_cast<GRIN_EDGE_TYPE_T*>(etype);
@@ -123,7 +124,7 @@ GRIN_EDGE_PROPERTY_LIST grin_get_edge_properties_by_name(GRIN_GRAPH g,
     edge_properties.insert(ep);
     epl->push_back(ep);
   }
-  return epl;                                                        
+  return epl;
 }
 #endif
 
@@ -160,7 +161,8 @@ bool grin_equal_edge_property(GRIN_GRAPH g, GRIN_EDGE_PROPERTY ep1,
                               GRIN_EDGE_PROPERTY ep2) {
   auto _ep1 = static_cast<GRIN_EDGE_PROPERTY_T*>(ep1);
   auto _ep2 = static_cast<GRIN_EDGE_PROPERTY_T*>(ep2);
-  return (_ep1->type_id == _ep2->type_id && _ep1->name == _ep2->name && _ep1->type == _ep2->type);
+  return (_ep1->type_id == _ep2->type_id && _ep1->name == _ep2->name &&
+          _ep1->type == _ep2->type);
 }
 
 void grin_destroy_edge_property(GRIN_GRAPH g, GRIN_EDGE_PROPERTY ep) {

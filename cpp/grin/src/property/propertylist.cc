@@ -100,7 +100,8 @@ GRIN_EDGE_PROPERTY_LIST grin_get_edge_property_list_by_type(
     auto adj_list_type = _g->edges_collections[etype].begin()->first;
     for (auto& group : edge_info.GetPropertyGroups(adj_list_type).value()) {
       for (auto& property : group.GetProperties()) {
-        GRIN_EDGE_PROPERTY_T ep(*_etype, property.name, GARToDataType(property.type));
+        GRIN_EDGE_PROPERTY_T ep(*_etype, property.name,
+                                GARToDataType(property.type));
         if (edge_properties.find(ep) != edge_properties.end())
           continue;
         edge_properties.insert(ep);
