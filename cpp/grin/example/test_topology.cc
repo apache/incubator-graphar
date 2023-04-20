@@ -58,6 +58,13 @@ void test_topology_vertexlist(GRIN_GRAPH graph) {
   assert(grin_equal_vertex(graph, v0, v0) == true);
   assert(grin_equal_vertex(graph, v0, v1) == false);
   assert(v2 == GRIN_NULL_VERTEX);
+  auto oid = grin_get_vertex_original_id(graph, v0);
+  auto type = grin_get_vertex_original_id_type(graph);
+  if (type == GRIN_DATATYPE::Int64) {
+    std::cout << "oid of vertex 0 = "
+              << *static_cast<const std::int64_t*>(oid) << std::endl;
+  }
+  grin_destroy_vertex_original_id(graph, oid);
   grin_destroy_vertex(graph, v0);
   grin_destroy_vertex(graph, v1);
 

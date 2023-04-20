@@ -57,7 +57,16 @@ void test_property_topology_vertex(GRIN_GRAPH graph) {
               << std::endl;
     assert(grin_get_vertex_list_size(graph, select_vertex_list) == m);
 
+    // check oid
+    auto vertex1 = grin_get_vertex_from_list(graph, select_vertex_list, 0);
+    auto oid = grin_get_vertex_original_id(graph, vertex1);
+    auto vertex2 = grin_get_vertex_from_original_id_by_type(graph, vertex_type, oid);
+    assert(grin_equal_vertex(graph, vertex1, vertex2) == true);
+
     // destroy
+    grin_destroy_vertex_original_id(graph, oid);
+    grin_destroy_vertex(graph, vertex1);
+    grin_destroy_vertex(graph, vertex2);
     grin_destroy_name(graph, name);
     grin_destroy_vertex_type(graph, vertex_type);
     grin_destroy_vertex_list(graph, select_vertex_list);
