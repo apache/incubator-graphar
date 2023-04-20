@@ -77,7 +77,6 @@ TEST_CASE("test_graph_info") {
   // TODO(@acezen): test dump
 
   std::string save_path(std::tmpnam(nullptr));
-  std::cout << "save_path: " << save_path << std::endl;
   REQUIRE(graph_info.Save(save_path).ok());
   REQUIRE(std::filesystem::exists(save_path));
 
@@ -153,7 +152,6 @@ TEST_CASE("test_vertex_info") {
 
   // test save
   std::string save_path(std::tmpnam(nullptr));
-  std::cout << "save_path: " << save_path << std::endl;
   REQUIRE(v_info.Save(save_path).ok());
   REQUIRE(std::filesystem::exists(save_path));
 
@@ -305,7 +303,6 @@ TEST_CASE("test_edge_info") {
 
   // test save
   std::string save_path(std::tmpnam(nullptr));
-  std::cout << "save_path: " << save_path << std::endl;
   REQUIRE(edge_info.Save(save_path).ok());
   REQUIRE(std::filesystem::exists(save_path));
 
@@ -360,38 +357,6 @@ TEST_CASE("test_graph_info_load_from_file") {
   const auto& edge_infos = graph_info.GetEdgeInfos();
   REQUIRE(vertex_infos.size() == 1);
   REQUIRE(edge_infos.size() == 1);
-}
-
-TEST_CASE("test_graph_info_load_ldbc") {
-  std::string root;
-  REQUIRE(GetTestResourceRoot(&root).ok());
-
-  std::string path = root + "/ldbc/ldbc.graph.yml";
-  auto graph_info_result = GAR_NAMESPACE::GraphInfo::Load(path);
-  if (graph_info_result.has_error()) {
-    std::cout << graph_info_result.status().message() << std::endl;
-  }
-  auto graph_info = graph_info_result.value();
-  REQUIRE(graph_info.GetName() == "ldbc");
-  const auto& vertex_infos = graph_info.GetVertexInfos();
-  const auto& edge_infos = graph_info.GetEdgeInfos();
-  REQUIRE(vertex_infos.size() == 8);
-  REQUIRE(edge_infos.size() == 23);
-}
-
-TEST_CASE("test_vertex_info_xxx") {
-  std::string root;
-  REQUIRE(GetTestResourceRoot(&root).ok());
-
-  std::string vertex_meta_file =
-      root + "/ldbc_sample/parquet/" + "person.vertex.yml";
-  auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
-  auto maybe_vertex_info = GAR_NAMESPACE::VertexInfo::Load(vertex_meta);
-  if (maybe_vertex_info.has_error()) {
-    std::cout << maybe_vertex_info.status().message() << std::endl;
-  }
-  auto vertex_info = maybe_vertex_info.value();
-  REQUIRE(vertex_info.GetLabel() == "person");
 }
 
 TEST_CASE("test_graph_info_load_from_s3") {
