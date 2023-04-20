@@ -105,6 +105,10 @@ void test_vertex_property_list(GRIN_GRAPH graph) {
 
 void test_edge_property(GRIN_GRAPH graph, GRIN_EDGE_PROPERTY property,
                         GRIN_EDGE_TYPE edge_type) {
+  // get property name 
+  auto name = grin_get_edge_property_name(graph, property);
+  std::cout << "name of edge property: " << name << std::endl;
+
   // get property data type
   auto data_type = grin_get_edge_property_data_type(graph, property);
   std::cout << "data type of edge property: " << data_type << std::endl;
@@ -113,8 +117,20 @@ void test_edge_property(GRIN_GRAPH graph, GRIN_EDGE_PROPERTY property,
   auto edge_type2 = grin_get_edge_property_edge_type(graph, property);
   assert(grin_equal_edge_type(graph, edge_type, edge_type2) == true);
 
+  // get edge property by name
+  auto property2 = grin_get_edge_property_by_name(graph, edge_type, name);
+  assert(grin_equal_edge_property(graph, property, property2) == true);
+
+  // get edge properties by name
+  auto property_list = grin_get_edge_properties_by_name(graph, name);
+  auto n = grin_get_edge_property_list_size(graph, property_list);
+  std::cout << "number of edge properties with this name: " << n << std::endl;
+
   // destroy
+  grin_destroy_name(graph, name);
   grin_destroy_edge_type(graph, edge_type2);
+  grin_destroy_edge_property(graph, property2);
+  grin_destroy_edge_property_list(graph, property_list);
 }
 
 void test_edge_property_list(GRIN_GRAPH graph) {
