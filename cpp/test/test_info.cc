@@ -41,6 +41,7 @@ TEST_CASE("test_graph_info") {
   GAR_NAMESPACE::VertexInfo vertex_info("test_vertex", 100, version,
                                         "test_vertex_prefix");
   auto st = graph_info.AddVertex(vertex_info);
+  graph_info.AddVertexInfoPath("/tmp/test_vertex.vertex.yml");
   REQUIRE(st.ok());
   REQUIRE(graph_info.GetVertexInfos().size() == 1);
   auto maybe_vertex_info = graph_info.GetVertexInfo("test_vertex");
@@ -58,6 +59,7 @@ TEST_CASE("test_graph_info") {
   GAR_NAMESPACE::EdgeInfo edge_info(src_label, edge_label, dst_label, 1024, 100,
                                     100, true, version);
   st = graph_info.AddEdge(edge_info);
+  graph_info.AddEdgeInfoPath("/tmp/test_edge.edge.yml");
   REQUIRE(st.ok());
   REQUIRE(graph_info.GetEdgeInfos().size() == 1);
   auto maybe_edge_info =
@@ -107,6 +109,13 @@ TEST_CASE("test_vertex_info") {
   // same property can not be put in different property group
   REQUIRE(v_info.AddPropertyGroup(pg2).IsInvalidOperation());
   REQUIRE(v_info.GetPropertyGroups().size() == 1);
+
+  GAR_NAMESPACE::Property p2;
+  p2.name = "name";
+  p2.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::STRING);
+  p2.is_primary = false;
+  GAR_NAMESPACE::PropertyGroup pg3({p2}, GAR_NAMESPACE::FileType::CSV);
+  REQUIRE(v_info.AddPropertyGroup(pg3).ok());
 
   // test get property meta
   REQUIRE(v_info.GetPropertyType(p.name) == p.type);
