@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
   assert(new_edge_info.Save("/tmp/person_bfs_person.edge.yml").ok());
   GAR_NAMESPACE::builder::EdgesBuilder edges_builder(
       new_edge_info, "file:///tmp/",
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
+      GAR_NAMESPACE::AdjListType::ordered_by_source, num_vertices);
   for (int i = 0; i < num_vertices; i++) {
     if (i == root || pre[i] == -1)
       continue;
