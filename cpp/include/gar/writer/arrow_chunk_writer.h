@@ -285,6 +285,14 @@ class EdgeChunkWriter {
       noexcept;
 
   /**
+   * @brief Write the number of vertices into the file.
+   *
+   * @param count The number of vertices.
+   * @return Status: ok or error.
+   */
+  Status WriteVerticesNum(const IdType& count) const noexcept;
+
+  /**
    * @brief Copy a file as a offset chunk.
    *
    * @param file_name The file to copy.

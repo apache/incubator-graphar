@@ -32,6 +32,17 @@ Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
 Result<IdType> GetVertexChunkNum(const std::string& prefix,
                                  const VertexInfo& vertex_info) noexcept;
 
+Result<IdType> GetVertexNum(const std::string& prefix,
+                            const VertexInfo& vertex_info) noexcept;
+
+Result<IdType> GetVertexChunkNum(const std::string& prefix,
+                                 const EdgeInfo& edge_info,
+                                 AdjListType adj_list_type) noexcept;
+
+Result<IdType> GetVertexNum(const std::string& prefix,
+                            const EdgeInfo& edge_info,
+                            AdjListType adj_list_type) noexcept;
+
 Result<IdType> GetEdgeChunkNum(const std::string& prefix,
                                const EdgeInfo& edge_info,
                                AdjListType adj_list_type,

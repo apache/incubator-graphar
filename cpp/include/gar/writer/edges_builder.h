@@ -148,10 +148,8 @@ class EdgesBuilder {
    * @param adj_list_type The adj list type of the edges.
    * @param num_vertices The total number of vertices for source or destination.
    */
-  explicit EdgesBuilder(
-      const EdgeInfo edge_info, const std::string& prefix,
-      AdjListType adj_list_type = AdjListType::unordered_by_source,
-      IdType num_vertices = -1)
+  explicit EdgesBuilder(const EdgeInfo edge_info, const std::string& prefix,
+                        AdjListType adj_list_type, IdType num_vertices)
       : edge_info_(edge_info),
         prefix_(prefix),
         adj_list_type_(adj_list_type),
@@ -253,15 +251,13 @@ class EdgesBuilder {
     // construct the writer
     EdgeChunkWriter writer(edge_info_, prefix_, adj_list_type_);
     // construct empty edge collections for vertex chunks without edges
-    if (num_vertices_ != -1) {
-      IdType num_vertex_chunks =
-          (num_vertices_ + vertex_chunk_size_ - 1) / vertex_chunk_size_;
-      for (IdType i = 0; i < num_vertex_chunks; i++)
-        if (edges_.find(i) == edges_.end()) {
-          std::vector<Edge> empty_chunk_edges;
-          edges_[i] = empty_chunk_edges;
-        }
-    }
+    IdType num_vertex_chunks =
+        (num_vertices_ + vertex_chunk_size_ - 1) / vertex_chunk_size_;
+    for (IdType i = 0; i < num_vertex_chunks; i++)
+      if (edges_.find(i) == edges_.end()) {
+        std::vector<Edge> empty_chunk_edges;
+        edges_[i] = empty_chunk_edges;
+      }
     // dump the offsets
     if (adj_list_type_ == AdjListType::ordered_by_source ||
         adj_list_type_ == AdjListType::ordered_by_dest) {
@@ -280,6 +276,8 @@ class EdgesBuilder {
             writer.WriteOffsetChunk(offset_table, vertex_chunk_index));
       }
     }
+    // dump the vertex num
+    GAR_RETURN_NOT_OK(writer.WriteVerticesNum(num_vertices_));
     // dump the edge nums
     IdType vertex_chunk_num =
         (num_vertices_ + vertex_chunk_size_ - 1) / vertex_chunk_size_;

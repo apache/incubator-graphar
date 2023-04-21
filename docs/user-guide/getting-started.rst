@@ -156,7 +156,8 @@ As the simplest cases, the fist example below adds vertices to **VerticesBuilder
 
   edge_info = ...
   prefix = ...
-  GraphArchive::builder::EdgesBuilder builder(edge_info, prefix, GraphArchive::AdjListType::ordered_by_source);
+  vertices_num = ...
+  GraphArchive::builder::EdgesBuilder builder(edge_info, prefix, GraphArchive::AdjListType::ordered_by_source, vertices_num);
 
   // add an edge (0 -> 3)
   GraphArchive::builder::Edge e(0, 3);
