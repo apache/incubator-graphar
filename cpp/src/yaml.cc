@@ -16,46 +16,38 @@ limitations under the License.
 #include <memory>
 #include <string>
 
-#include "yaml-cpp/yaml.h"
+#include "yaml/Yaml.hpp"
 
 #include "gar/utils/result.h"
 #include "gar/utils/yaml.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-const YAML::Node Yaml::operator[](const std::string& key) const {
+const ::Yaml::Node Yaml::operator[](const std::string& key) const {
   return root_node_->operator[](key);
 }
 
 Result<std::shared_ptr<Yaml>> Yaml::Load(const std::string& input) {
-  std::shared_ptr<YAML::Node> root_node;
+  std::shared_ptr<::Yaml::Node> root_node = std::make_shared<::Yaml::Node>();
   try {
-    root_node = std::make_shared<YAML::Node>(YAML::Load(input));
-  } catch (YAML::Exception& e) { return Status::YamlError(e.what()); }
+    ::Yaml::Parse(*root_node, input);
+  } catch (::Yaml::Exception& e) { return Status::YamlError(e.what()); }
   return std::make_shared<Yaml>(root_node);
 }
 
-Result<std::shared_ptr<Yaml>> Yaml::Load(const char* input) {
-  std::shared_ptr<YAML::Node> root_node;
+Result<std::shared_ptr<Yaml>> Yaml::Load(std::iostream& input) {
+  std::shared_ptr<::Yaml::Node> root_node = std::make_shared<::Yaml::Node>();
   try {
-    root_node = std::make_shared<YAML::Node>(YAML::Load(input));
-  } catch (YAML::Exception& e) { return Status::YamlError(e.what()); }
-  return std::make_shared<Yaml>(root_node);
-}
-
-Result<std::shared_ptr<Yaml>> Yaml::Load(std::istream& input) {
-  std::shared_ptr<YAML::Node> root_node;
-  try {
-    root_node = std::make_shared<YAML::Node>(YAML::Load(input));
-  } catch (YAML::Exception& e) { return Status::YamlError(e.what()); }
+    ::Yaml::Parse(*root_node, input);
+  } catch (::Yaml::Exception& e) { return Status::YamlError(e.what()); }
   return std::make_shared<Yaml>(root_node);
 }
 
 Result<std::shared_ptr<Yaml>> Yaml::LoadFile(const std::string& file_name) {
-  std::shared_ptr<YAML::Node> root_node;
+  std::shared_ptr<::Yaml::Node> root_node = std::make_shared<::Yaml::Node>();
   try {
-    root_node = std::make_shared<YAML::Node>(YAML::LoadFile(file_name));
-  } catch (YAML::Exception& e) { return Status::YamlError(e.what()); }
+    ::Yaml::Parse(*root_node, file_name.c_str());
+  } catch (::Yaml::Exception& e) { return Status::YamlError(e.what()); }
   return std::make_shared<Yaml>(root_node);
 }
 
