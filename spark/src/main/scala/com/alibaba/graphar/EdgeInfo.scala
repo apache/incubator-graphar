@@ -282,10 +282,38 @@ class EdgeInfo() {
     return true
   }
 
+  /** Get the vertex num file path
+   *
+   *  @param adj_list_type type of adj list structure.
+   *  @return the vertex num file path. If edge info not support the adj list type,
+   *          raise an IllegalArgumentException error.
+   */
+  def getVerticesNumFilePath(adj_list_type: AdjListType.Value): String = {
+    if (containAdjList(adj_list_type) == false)
+      throw new IllegalArgumentException
+    val str: String = prefix + getAdjListPrefix(adj_list_type) + "vertex_count"
+    return str
+  }
+
+  /** Get the edge num file path of the vertex chunk
+   *
+   *  @param chunk_index index of vertex chunk.
+   *  @param adj_list_type type of adj list structure.
+   *  @return the edge num file path. If edge info not support the adj list type,
+   *          raise an IllegalArgumentException error.
+   */
+  def getEdgesNumFilePath(chunk_index: Long, adj_list_type: AdjListType.Value): String = {
+    if (containAdjList(adj_list_type) == false)
+      throw new IllegalArgumentException
+    val str: String = prefix + getAdjListPrefix(adj_list_type) + "edge_count" +
+           chunk_index.toString()
+    return str
+  }
+
   /** Get the adj list offset chunk file path of vertex chunk
    *  the offset chunks is aligned with the vertex chunks
    *
-   *  @param chunk_inde index of vertex chunk.
+   *  @param chunk_index index of vertex chunk.
    *  @param adj_list_type type of adj list structure.
    *  @return the offset chunk file path. If edge info not support the adj list type,
    *          raise an IllegalArgumentException error.
