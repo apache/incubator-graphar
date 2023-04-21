@@ -18,6 +18,7 @@ package com.alibaba.graphar.reader
 import com.alibaba.graphar.utils.{IndexGenerator, DataFrameConcat}
 import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, PropertyGroup}
 import com.alibaba.graphar.datasources._
+import com.alibaba.graphar.utils.FileSystem
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
@@ -36,6 +37,43 @@ import org.apache.spark.sql.functions._
 class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.Value, spark:SparkSession) {
   if (edgeInfo.containAdjList(adjListType) == false) {
     throw new IllegalArgumentException
+  }
+
+  /** Load the total number of src/dst vertices for this edge type. */
+  def readVerticesNumber(): Long = {
+    val file_path = prefix + "/" + edgeInfo.getVerticesNumFilePath(adjListType)
+    val number = FileSystem.readValue(file_path, spark.sparkContext.hadoopConfiguration)
+    return number
+  }
+
+  /** Load the chunk number of src/dst vertices. */
+  def readVertexChunkNumber(): Long = {
+    val vertices_number = readVerticesNumber
+    var vertex_chunk_size = edgeInfo.getSrc_chunk_size
+    if (adjListType == AdjListType.ordered_by_dest || adjListType == AdjListType.unordered_by_dest)
+      vertex_chunk_size = edgeInfo.getDst_chunk_size
+    val vertex_chunk_number = (vertices_number + vertex_chunk_size - 1) / vertex_chunk_size
+    return vertex_chunk_number
+  }
+
+  /** Load the number of edges for the vertex chunk.
+   *
+   * @param chunk_index index of vertex chunk
+   * @return the number of edges
+   */
+  def readEdgesNumber(chunk_index: Long): Long = {
+    val file_path = prefix + "/" + edgeInfo.getEdgesNumFilePath(chunk_index, adjListType)
+    val number = FileSystem.readValue(file_path, spark.sparkContext.hadoopConfiguration)
+    return number
+  }
+
+  /** Load the total number of edges for this edge type. */
+  def readEdgesNumber(): Long = {
+    val vertex_chunk_number = readVertexChunkNumber
+    var number: Long  = 0
+    for (i <- 0L until vertex_chunk_number)
+      number += readEdgesNumber(i)
+    return number
   }
 
   /** Load a single offset chunk as a DataFrame.

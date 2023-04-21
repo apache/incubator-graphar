@@ -123,6 +123,12 @@ class ReaderSuite extends AnyFunSuite {
     val adj_list_type = AdjListType.ordered_by_source
     val reader = new EdgeReader(prefix, edge_info, adj_list_type, spark)
 
+    // test reading the number of vertices & edges
+    assert(reader.readVerticesNumber() == 903)
+    assert(reader.readVertexChunkNumber() == 10)
+    assert(reader.readEdgesNumber(2) == 1077)
+    assert(reader.readEdgesNumber() == 6626)
+
     // test reading a offset chunk
     val offset_df = reader.readOffset(0)
     assert(offset_df.columns.size == 1)
