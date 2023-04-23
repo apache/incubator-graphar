@@ -3,7 +3,7 @@ GraphAr
 
 |GraphAr CI| |Docs CI| |GraphAr Docs| |Discord|
 
-GraphAr is a file format with built-in graph semantic designed for graph data storage and retrieving.
+GraphAr is a file format with built-in graph semantic that is designed for graph data storage and retrieving.
 
 Join our `Weekly Community Meeting`_ to learn more about GraphAr and get involved! :trumpet:
 
