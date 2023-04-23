@@ -295,6 +295,19 @@ class EdgeInfo() {
     return str
   }
 
+  /** Get the path prefix of the edge num file path
+   *
+   *  @param adj_list_type type of adj list structure.
+   *  @return the edge num file path. If edge info not support the adj list type,
+   *          raise an IllegalArgumentException error.
+   */
+  def getEdgesNumPathPrefix(adj_list_type: AdjListType.Value): String = {
+    if (containAdjList(adj_list_type) == false)
+      throw new IllegalArgumentException
+    val str: String = prefix + getAdjListPrefix(adj_list_type) + "edge_count"
+    return str
+  }
+
   /** Get the edge num file path of the vertex chunk
    *
    *  @param chunk_index index of vertex chunk.
