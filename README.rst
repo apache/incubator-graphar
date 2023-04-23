@@ -3,7 +3,7 @@ GraphAr
 
 |GraphAr CI| |Docs CI| |GraphAr Docs| |Discord|
 
-Welcome to GraphAr (short for "Graph Archive"), an open source, standardized file format for graph data storage and retrieval.
+GraphAr is a xxx file format for graph data storage and retrieval.
 
 Join our `Weekly Community Meeting`_ to learn more about GraphAr and get involved! :trumpet:
 
