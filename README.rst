@@ -196,11 +196,11 @@ third-party libraries may not have the same license as GraphAr.
 .. |Discord| image:: https://img.shields.io/discord/1088377726634836051.svg?logo=discord&logoColor=fff&label=Discord&color=7389d8
    :target: https://discord.gg/XPsfd4ShCu
 
-.. |Overview Pic| image:: file:///Users/weibin/Dev/GraphAr/docs/_build/html/_images/overview.png
+.. |Overview Pic| image:: https://alibaba.github.io/GraphAr/_images/overview.png
   :width: 650
   :alt: Overview
 
-.. |Property Graph| image:: file:///Users/weibin/Dev/GraphAr/docs/_build/html/_images/property_graph.png
+.. |Property Graph| image:: https://alibaba.github.io/GraphAr/_images/property_graph.png
   :width: 650
   :alt: property graph
 
