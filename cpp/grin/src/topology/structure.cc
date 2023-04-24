@@ -136,7 +136,7 @@ void grin_destroy_edge(GRIN_GRAPH g, GRIN_EDGE e) {
 GRIN_VERTEX grin_get_edge_src(GRIN_GRAPH g, GRIN_EDGE e) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _e = static_cast<GRIN_EDGE_T*>(e);
-  auto v = new GRIN_VERTEX_T(_e->iter.source(), _g->src_type_ids[_e->type_id]);
+  auto v = new GRIN_VERTEX_T(_e->edge.source(), _g->src_type_ids[_e->type_id]);
   return v;
 }
 
@@ -144,7 +144,7 @@ GRIN_VERTEX grin_get_edge_dst(GRIN_GRAPH g, GRIN_EDGE e) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _e = static_cast<GRIN_EDGE_T*>(e);
   auto v =
-      new GRIN_VERTEX_T(_e->iter.destination(), _g->dst_type_ids[_e->type_id]);
+      new GRIN_VERTEX_T(_e->edge.destination(), _g->dst_type_ids[_e->type_id]);
   return v;
 }
 

@@ -250,24 +250,24 @@ const void* grin_get_value_from_edge_property_table(
     return NULL;
   switch (_ep->type) {
   case GRIN_DATATYPE::Int32: {
-    auto value = new int32_t(_e->iter.property<int32_t>(_ep->name).value());
+    auto value = new int32_t(_e->edge.property<int32_t>(_ep->name).value());
     return value;
   }
   case GRIN_DATATYPE::Int64: {
-    auto value = new int64_t(_e->iter.property<int64_t>(_ep->name).value());
+    auto value = new int64_t(_e->edge.property<int64_t>(_ep->name).value());
     return value;
   }
   case GRIN_DATATYPE::Float: {
-    auto value = new float(_e->iter.property<float>(_ep->name).value());
+    auto value = new float(_e->edge.property<float>(_ep->name).value());
     return value;
   }
   case GRIN_DATATYPE::Double: {
-    auto value = new double(_e->iter.property<double>(_ep->name).value());
+    auto value = new double(_e->edge.property<double>(_ep->name).value());
     return value;
   }
   case GRIN_DATATYPE::String: {
     auto value =
-        new std::string(_e->iter.property<std::string>(_ep->name).value());
+        new std::string(_e->edge.property<std::string>(_ep->name).value());
     return value;
   }
   default:
@@ -299,27 +299,27 @@ GRIN_ROW grin_get_row_from_edge_property_table(GRIN_GRAPH g,
 
     switch (_ep.type) {
     case GRIN_DATATYPE::Int32: {
-      auto value = _e->iter.property<int32_t>(_ep.name).value();
+      auto value = _e->edge.property<int32_t>(_ep.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::Int64: {
-      auto value = _e->iter.property<int64_t>(_ep.name).value();
+      auto value = _e->edge.property<int64_t>(_ep.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::Float: {
-      auto value = _e->iter.property<float>(_ep.name).value();
+      auto value = _e->edge.property<float>(_ep.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::Double: {
-      auto value = _e->iter.property<double>(_ep.name).value();
+      auto value = _e->edge.property<double>(_ep.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::String: {
-      auto value = _e->iter.property<std::string>(_ep.name).value();
+      auto value = _e->edge.property<std::string>(_ep.name).value();
       r->push_back(value);
       break;
     }

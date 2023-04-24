@@ -141,7 +141,7 @@ bool grin_is_edge_list_end(GRIN_GRAPH g, GRIN_EDGE_LIST_ITERATOR eli) {
 
 GRIN_EDGE grin_get_edge_from_iter(GRIN_GRAPH g, GRIN_EDGE_LIST_ITERATOR eli) {
   auto _eli = static_cast<GRIN_EDGE_LIST_ITERATOR_T*>(eli);
-  auto e = new GRIN_EDGE_T(_eli->iter, _eli->current_type);
+  auto e = new GRIN_EDGE_T(*_eli->iter, _eli->current_type);
   return e;
 }
 #endif

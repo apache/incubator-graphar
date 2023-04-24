@@ -36,10 +36,10 @@ struct GRIN_VERTEX_T {
 typedef GAR_NAMESPACE::IdType GRIN_VERTEX_ORIGINAL_ID_T;
 
 struct GRIN_EDGE_T {
-  GAR_NAMESPACE::EdgeIter iter;
+  GAR_NAMESPACE::Edge edge;
   unsigned type_id;
-  GRIN_EDGE_T(GAR_NAMESPACE::EdgeIter _iter, unsigned _type_id)
-      : iter(_iter), type_id(_type_id) {}
+  GRIN_EDGE_T(GAR_NAMESPACE::Edge _edge, unsigned _type_id)
+      : edge(_edge), type_id(_type_id) {}
 };
 
 struct GRIN_GRAPH_T {

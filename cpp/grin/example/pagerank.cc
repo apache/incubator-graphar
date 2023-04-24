@@ -27,7 +27,7 @@ limitations under the License.
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
 
-void run_pagerank(GRIN_GRAPH graph) {
+void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
   std::cout << "++++ Run PageRank algorithm with GRIN ++++" << std::endl;
 
   // initialize parameters and the graph
@@ -97,31 +97,33 @@ void run_pagerank(GRIN_GRAPH graph) {
   }
 
   // output results
-  for (size_t i = 0; i < num_vertices; i++) {
-    // get vertex
-    auto v = grin_get_vertex_from_list(graph, vertex_list, i);
+  if (print_result) {
+    for (size_t i = 0; i < num_vertices; i++) {
+      // get vertex
+      auto v = grin_get_vertex_from_list(graph, vertex_list, i);
 
-    // get property "id" of vertex
-    auto type = grin_get_vertex_type(graph, v);
-    auto table = grin_get_vertex_property_table_by_type(graph, type);
-    auto property = grin_get_vertex_property_by_name(graph, type, "id");
-    auto data_type = grin_get_vertex_property_data_type(graph, property);
-    auto value =
-        grin_get_value_from_vertex_property_table(graph, table, v, property);
+      // get property "id" of vertex
+      auto type = grin_get_vertex_type(graph, v);
+      auto table = grin_get_vertex_property_table_by_type(graph, type);
+      auto property = grin_get_vertex_property_by_name(graph, type, "id");
+      auto data_type = grin_get_vertex_property_data_type(graph, property);
+      auto value =
+          grin_get_value_from_vertex_property_table(graph, table, v, property);
 
-    // output
-    std::cout << "vertex " << i;
-    if (data_type == GRIN_DATATYPE::Int64) {
-      std::cout << ", id = " << *static_cast<const int64_t*>(value);
+      // output
+      std::cout << "vertex " << i;
+      if (data_type == GRIN_DATATYPE::Int64) {
+        std::cout << ", id = " << *static_cast<const int64_t*>(value);
+      }
+      std::cout << ", pagerank value = " << pr_curr[i] << std::endl;
+
+      // destroy
+      grin_destroy_value(graph, data_type, value);
+      grin_destroy_vertex_property(graph, property);
+      grin_destroy_vertex_property_table(graph, table);
+      grin_destroy_vertex_type(graph, type);
+      grin_destroy_vertex(graph, v);
     }
-    std::cout << ", pagerank value = " << pr_curr[i] << std::endl;
-
-    // destroy
-    grin_destroy_value(graph, data_type, value);
-    grin_destroy_vertex_property(graph, property);
-    grin_destroy_vertex_property_table(graph, table);
-    grin_destroy_vertex_type(graph, type);
-    grin_destroy_vertex(graph, v);
   }
 
   grin_destroy_edge_list(graph, edge_list);
