@@ -3,16 +3,16 @@ GraphAr
 
 |GraphAr CI| |Docs CI| |GraphAr Docs| |Discord|
 
-GraphAr is a file format with built-in graph semantic that is designed for graph data storage and retrieving.
+Welcome to GraphAr (short for "Graph Archive"), an open source, standardized file format for graph data storage and retrieval.
 
-Join our `Weekly Community Meeting`_ to learn more about GraphAr and get involved! :trumpet:
+📢 Join our `Weekly Community Meeting`_ to learn more about GraphAr and get involved!
 
 What is GraphAr?
 -----------------
 
 |
 
-.. image:: file:///Users/weibin/Dev/GraphAr/docs/_build/html/_images/overview.png
+.. image:: https://alibaba.github.io/GraphAr/_images/overview.png
   :width: 770
   :align: center
   :alt: Overview
@@ -64,9 +64,10 @@ And each edge contains:
 
 The following is an example property graph containing two types of vertices ("person" and "comment") and three types of edges.
 
-.. image:: https://alibaba.github.io/GraphAr/_images/vertex_logical_table.png
+.. image:: https://alibaba.github.io/GraphAr/_images/property_graph.png
+  :width: 700
   :align: center
-  :alt: vertex logical table
+  :alt: property graph
 
 Vertices in GraphAr
 ^^^^^^^^^^^^^^^^^^^
@@ -78,7 +79,10 @@ Each type of vertices (with the same label) constructs a logical vertex table, w
 
 Given a vertex id and the vertex label, a vertex is uniquely identifiable and its respective properties can be accessed from this table. The vertex id is further used to identify the source and destination vertices when maintaining the topology of the graph.
 
-|Vertex Logical Table|
+.. image:: https://alibaba.github.io/GraphAr/_images/vertex_logical_table.png
+  :width: 700
+  :align: center
+  :alt: vertex logical table
 
 Physical table of vertices
 """"""""""""""""""""""""""
@@ -87,8 +91,10 @@ The logical vertex table will be partitioned into multiple continuous vertex chu
 
 Take the "person" vertex table as an example, if the chunk size is set to be 500, the logical table will be separated into sub-logical-tables of 500 rows with the exception of the last one, which may have less than 500 rows. The columns for maintaining properties will also be divided into distinct groups (e.g., 2 for our example). As a result, a total of 4 physical vertex tables are created for storing the example logical table, which can be seen from the following figure.
 
-|Vertex Physical Table|
-
+.. image:: https://alibaba.github.io/GraphAr/_images/vertex_physical_table.png
+  :width: 700
+  :align: center
+  :alt: vertex physical table
 
 Edges in GraphAr
 ^^^^^^^^^^^^^^^^
@@ -100,8 +106,10 @@ For maintaining a type of edges (that with the same triplet of the source label,
 
 Take the logical table for "person likes person" edges as an example, the logical edge table looks like:
 
-|Edge Logical Table|
-
+.. image:: https://alibaba.github.io/GraphAr/_images/edge_logical_table.png
+  :width: 700
+  :align: center
+  :alt: edge logical table
 
 Physical table of edges
 """"""""""""""""""""""""""
@@ -118,9 +126,15 @@ Additionally, the partition of the offset table should be in alignment with the 
 
 Take the "person knows person" edges to illustrate. Suppose the vertex chunk size is set to 500 and the edge chunk size is 1024, the edges will be saved in the following physical tables:
 
-|Edge Physical Table1|
-|Edge Physical Table2|
+.. image:: https://alibaba.github.io/GraphAr/_images/edge_physical_table1.png
+  :width: 700
+  :align: center
+  :alt: edge logical table1
 
+.. image:: https://alibaba.github.io/GraphAr/_images/edge_physical_table2.png
+  :width: 700
+  :align: center
+  :alt: edge logical table2
 
 Libraries
 ----------
