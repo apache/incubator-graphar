@@ -196,34 +196,6 @@ third-party libraries may not have the same license as GraphAr.
 .. |Discord| image:: https://img.shields.io/discord/1088377726634836051.svg?logo=discord&logoColor=fff&label=Discord&color=7389d8
    :target: https://discord.gg/XPsfd4ShCu
 
-.. |Overview Pic| image:: https://alibaba.github.io/GraphAr/_images/overview.png
-  :width: 650
-  :alt: Overview
-
-.. |Property Graph| image:: https://alibaba.github.io/GraphAr/_images/property_graph.png
-  :width: 650
-  :alt: property graph
-
-.. |Vertex Logical Table| image:: https://alibaba.github.io/GraphAr/_images/vertex_logical_table.png
-  :width: 650
-  :alt: vertex logical table
-
-.. |Vertex Physical Table| image:: https://alibaba.github.io/GraphAr/_images/vertex_physical_table.png
-  :width: 650
-  :alt: vertex physical table
-
-.. |Edge Logical Table| image:: https://alibaba.github.io/GraphAr/_images/edge_logical_table.png
-  :width: 650
-  :alt: edge logical table
-
-.. |Edge Physical Table1| image:: https://alibaba.github.io/GraphAr/_images/edge_physical_table1.png
-  :width: 650
-  :alt: edge logical table1
-
-.. |Edge Physical Table2| image:: https://alibaba.github.io/GraphAr/_images/edge_physical_table2.png
-  :width: 650
-  :alt: edge logical table2
-
 .. _GraphAr File Format: https://alibaba.github.io/GraphAr/user-guide/file-format.html
 
 .. _GraphAr Spark Library: https://github.com/alibaba/GraphAr/tree/main/spark
