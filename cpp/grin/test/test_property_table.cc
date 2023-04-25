@@ -15,7 +15,7 @@ limitations under the License.
 
 #include <iostream>
 
-#include "grin/example/config.h"
+#include "grin/test/config.h"
 
 #include "grin/include/property/property.h"
 #include "grin/include/property/propertylist.h"

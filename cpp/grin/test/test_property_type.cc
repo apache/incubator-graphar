@@ -15,7 +15,7 @@ limitations under the License.
 
 #include <iostream>
 
-#include "grin/example/config.h"
+#include "grin/test/config.h"
 
 #include "grin/include/property/type.h"
 #include "grin/include/topology/edgelist.h"

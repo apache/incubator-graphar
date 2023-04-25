@@ -16,8 +16,8 @@ limitations under the License.
 #include <filesystem>
 #include <string>
 
-#ifndef CPP_GRIN_EXAMPLE_CONFIG_H_
-#define CPP_GRIN_EXAMPLE_CONFIG_H_
+#ifndef CPP_GRIN_TEST_CONFIG_H_
+#define CPP_GRIN_TEST_CONFIG_H_
 
 static const std::string TEST_DATA_PATH =  // NOLINT
     std::filesystem::path(__FILE__)
@@ -37,4 +37,4 @@ static const std::string TEST_DATA_SMALL_PATH =  // NOLINT
         .string() +
     "/testing/ldbc_sample/parquet/ldbc_sample.graph.yml";
 
-#endif  // CPP_GRIN_EXAMPLE_CONFIG_H_
+#endif  // CPP_GRIN_TEST_CONFIG_H_

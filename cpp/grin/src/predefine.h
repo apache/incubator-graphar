@@ -39,7 +39,7 @@ struct GRIN_EDGE_T {
   GAR_NAMESPACE::Edge edge;
   unsigned type_id;
   GRIN_EDGE_T(GAR_NAMESPACE::Edge _edge, unsigned _type_id)
-      : edge(_edge), type_id(_type_id) {}
+      : edge(std::move(_edge)), type_id(_type_id) {}
 };
 
 struct GRIN_GRAPH_T {
