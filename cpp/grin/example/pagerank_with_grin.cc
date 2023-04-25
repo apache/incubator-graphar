@@ -14,9 +14,10 @@ limitations under the License.
 */
 
 #include <iostream>
+#include <chrono>
 #include <vector>
 
-#include "grin/example/config.h"
+#include "grin/test/config.h"
 
 #include "grin/include/index/order.h"
 #include "grin/include/property/property.h"
@@ -32,7 +33,7 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
 
   // initialize parameters and the graph
   const double damping = 0.85;
-  const int max_iters = 10;
+  const int max_iters = 20;
   const size_t num_vertices = grin_get_vertex_num(graph);
   auto vertex_list = grin_get_vertex_list(graph);
   auto edge_list = grin_get_edge_list(graph);
@@ -47,19 +48,20 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
   }
 
   // initiliaze out degree of vertices
-  for (size_t i = 0; i < num_vertices; i++) {
-    out_degree[i] = 0;
-    auto v = grin_get_vertex_from_list(graph, vertex_list, i);
-    auto adj_list = grin_get_adjacent_list(graph, GRIN_DIRECTION::OUT, v);
-    auto it = grin_get_adjacent_list_begin(graph, adj_list);
-    while (grin_is_adjacent_list_end(graph, it) == false) {
-      out_degree[i]++;
-      grin_get_next_adjacent_list_iter(graph, it);
-    }
-    grin_destroy_adjacent_list_iter(graph, it);
-    grin_destroy_adjacent_list(graph, adj_list);
-    grin_destroy_vertex(graph, v);
+  auto it = grin_get_edge_list_begin(graph, edge_list);
+  while (grin_is_edge_list_end(graph, it) == false) {
+    auto e = grin_get_edge_from_iter(graph, it);
+    auto v1 = grin_get_edge_src(graph, e);
+    auto src =
+        grin_get_position_of_vertex_from_sorted_list(graph, vertex_list, v1);
+    out_degree[src]++;
+
+    grin_destroy_vertex(graph, v1);
+    grin_destroy_edge(graph, e);
+
+    grin_get_next_edge_list_iter(graph, it);
   }
+  grin_destroy_edge_list_iter(graph, it);
 
   // run pagerank algorithm for #max_iters iterators
   for (int iter = 0; iter < max_iters; iter++) {
@@ -98,6 +100,7 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
 
   // output results
   if (print_result) {
+    std::cout << "num_vertices: " << num_vertices << std::endl;
     for (size_t i = 0; i < num_vertices; i++) {
       // get vertex
       auto v = grin_get_vertex_from_list(graph, vertex_list, i);
@@ -140,10 +143,23 @@ int main(int argc, char* argv[]) {
   char** args = new char*[1];
   args[0] = new char[path.length() + 1];
   snprintf(args[0], path.length() + 1, "%s", path.c_str());
+  auto init_start = std::chrono::high_resolution_clock::now();
   GRIN_GRAPH graph = grin_get_graph_from_storage(1, args);
+  auto init_end = std::chrono::high_resolution_clock::now();
+  auto init_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+      init_end - init_start);
 
   // run pagerank algorithm
+  auto run_start = std::chrono::high_resolution_clock::now();
   run_pagerank(graph);
+  auto run_end = std::chrono::high_resolution_clock::now();
+  auto run_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+      run_end - run_start);
+
+  // output execution time
+  std::cout << "Init time for PageRank with GRIN = " << init_time.count() << " ms" << std::endl;
+  std::cout << "Run time for PageRank with GRIN = " << run_time.count() << " ms" << std::endl;
+  std::cout << "Totoal time for PageRank with GRIN = " << init_time.count() + run_time.count() << " ms" << std::endl;
 
   return 0;
 }
