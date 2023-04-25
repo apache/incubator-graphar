@@ -76,7 +76,7 @@ class WriterSuite extends AnyFunSuite {
     // read edge dataframe
     val file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv").getPath
     val edge_df = spark.read.option("delimiter", "|").option("header", "true").csv(file_path)
-    val prefix : String = "/tmp/"
+    val prefix : String = "/tmp/test1/"
     val fs = FileSystem.get(new Path(file_path).toUri(), spark.sparkContext.hadoopConfiguration)
 
     // read edge yaml
@@ -87,21 +87,34 @@ class WriterSuite extends AnyFunSuite {
     // generate vertex index for edge dataframe
     val srcDf = edge_df.select("src").withColumnRenamed("src", "vertex")
     val dstDf = edge_df.select("dst").withColumnRenamed("dst", "vertex")
-    val vertexNum = srcDf.union(dstDf).distinct().count()
+    val vertex_num = srcDf.union(dstDf).distinct().count()
+    val vertex_chunk_size = edge_info.getSrc_chunk_size()
+    val vertex_chunk_num = (vertex_num + vertex_chunk_size - 1) / vertex_chunk_size
     val edge_df_with_index = utils.IndexGenerator.generateSrcAndDstIndexUnitedlyForEdges(edge_df, "src", "dst")
 
     // create writer object for person_knows_person and generate the adj list and properties with GAR format
-    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, vertexNum, edge_df_with_index)
+    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, vertex_num, edge_df_with_index)
 
     // test write adj list
     writer.writeAdjList()
 
+    // validate vertex number & edge number
+    val vertex_num_path = prefix + edge_info.getVerticesNumFilePath(adj_list_type)
+    val number = utils.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
+    assert(number.toInt == vertex_num)
+    val edge_num_path_pattern = new Path(prefix + edge_info.getEdgesNumPathPrefix(adj_list_type) + "*")
+    val edge_num_files = fs.globStatus(edge_num_path_pattern)
+    assert(edge_num_files.length == vertex_chunk_num)
+    val edge_num = edge_num_files.map(file => utils.FileSystem.readValue(file.getPath().toString(), spark.sparkContext.hadoopConfiguration).toInt).sum
+    assert(edge_num == edge_df.count())
+
+    // validate number of chunk files
     val adj_list_path_pattern = new Path(prefix + edge_info.getAdjListPathPrefix(adj_list_type) + "*/*")
     val adj_list_chunk_files = fs.globStatus(adj_list_path_pattern)
     assert(adj_list_chunk_files.length == 9)
     val offset_path_pattern = new Path(prefix + edge_info.getOffsetPathPrefix(adj_list_type) + "*")
     val offset_chunk_files = fs.globStatus(offset_path_pattern)
-    assert(offset_chunk_files.length == 9)
+    assert(offset_chunk_files.length == vertex_chunk_num)
 
     // test write property group
     val property_group = edge_info.getPropertyGroup("creationDate", adj_list_type)
@@ -118,9 +131,9 @@ class WriterSuite extends AnyFunSuite {
 
     assertThrows[IllegalArgumentException](writer.writeEdgeProperties(invalid_property_group))
     // throw exception if not generate src index and dst index for edge dataframe
-    assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.ordered_by_source, vertexNum, edge_df))
+    assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.ordered_by_source, vertex_num, edge_df))
     // throw exception if pass the adj list type not contain in edge info
-    assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.unordered_by_dest, vertexNum, edge_df_with_index))
+    assertThrows[IllegalArgumentException](new EdgeWriter(prefix, edge_info, AdjListType.unordered_by_dest, vertex_num, edge_df_with_index))
 
     // clean generated files and close FileSystem instance
     fs.delete(new Path(prefix + "edge"))
@@ -149,6 +162,8 @@ class WriterSuite extends AnyFunSuite {
     // read edge yaml
     val edge_yaml_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml").getPath
     val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml_path, spark)
+    val vertex_chunk_size = edge_info.getSrc_chunk_size()
+    val vertex_chunk_num = (vertex_num + vertex_chunk_size - 1) / vertex_chunk_size
 
     // construct person vertex mapping with dataframe
     val vertex_mapping = utils.IndexGenerator.constructVertexIndexMapping(vertex_df, vertex_info.getPrimaryKey())
@@ -161,12 +176,25 @@ class WriterSuite extends AnyFunSuite {
 
     // test write adj list
     writer.writeAdjList()
+
+    // validate vertex number & edge number
+    val vertex_num_path = prefix + edge_info.getVerticesNumFilePath(adj_list_type)
+    val number = utils.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
+    assert(number.toInt == vertex_num)
+    val edge_num_path_pattern = new Path(prefix + edge_info.getEdgesNumPathPrefix(adj_list_type) + "*")
+    val edge_num_files = fs.globStatus(edge_num_path_pattern)
+    assert(edge_num_files.length == vertex_chunk_num)
+    val edge_num = edge_num_files.map(file => utils.FileSystem.readValue(file.getPath().toString(), spark.sparkContext.hadoopConfiguration).toInt).sum
+    assert(edge_num == edge_df.count())
+
+    // validate adj list chunks
     val adj_list_path_pattern = new Path(prefix + edge_info.getAdjListPathPrefix(adj_list_type) + "*/*")
     val adj_list_chunk_files = fs.globStatus(adj_list_path_pattern)
     assert(adj_list_chunk_files.length == 11)
+    // validate offset chunks
     val offset_path_pattern = new Path(prefix + edge_info.getOffsetPathPrefix(adj_list_type) + "*")
     val offset_chunk_files = fs.globStatus(offset_path_pattern)
-    assert(offset_chunk_files.length == 10)
+    assert(offset_chunk_files.length == vertex_chunk_num)
     // compare with correct offset chunk value
     val offset_file_path = prefix + edge_info.getAdjListOffsetFilePath(0, adj_list_type)
     val correct_offset_file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0").getPath
