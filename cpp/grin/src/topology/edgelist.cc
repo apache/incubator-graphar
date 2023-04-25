@@ -15,6 +15,7 @@ limitations under the License.
 
 #include "grin/include/topology/edgelist.h"
 #include "grin/src/predefine.h"
+#include <iostream>
 
 #ifdef GRIN_ENABLE_EDGE_LIST
 GRIN_EDGE_LIST grin_get_edge_list(GRIN_GRAPH g) {
@@ -87,10 +88,10 @@ void grin_destroy_edge_list_iter(GRIN_GRAPH g, GRIN_EDGE_LIST_ITERATOR eli) {
 void grin_get_next_edge_list_iter(GRIN_GRAPH g, GRIN_EDGE_LIST_ITERATOR eli) {
   if (eli == GRIN_NULL_LIST_ITERATOR)
     return;
-  auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _eli = static_cast<GRIN_EDGE_LIST_ITERATOR_T*>(eli);
-  _eli->iter++;
+  ++_eli->iter;
   if (_eli->iter.is_end()) {
+    auto _g = static_cast<GRIN_GRAPH_T*>(g);
     _eli->current_type++;
     if (_eli->current_type >= _eli->type_end)
       return;
