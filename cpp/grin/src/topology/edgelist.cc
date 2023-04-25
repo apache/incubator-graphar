@@ -15,7 +15,6 @@ limitations under the License.
 
 #include "grin/include/topology/edgelist.h"
 #include "grin/src/predefine.h"
-#include <iostream>
 
 #ifdef GRIN_ENABLE_EDGE_LIST
 GRIN_EDGE_LIST grin_get_edge_list(GRIN_GRAPH g) {

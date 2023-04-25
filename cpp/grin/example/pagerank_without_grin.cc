@@ -23,7 +23,8 @@ limitations under the License.
 
 #include "grin/test/config.h"
 
-void run_pagerank(GAR_NAMESPACE::GraphInfo graph_info, bool print_result = false) {
+void run_pagerank(GAR_NAMESPACE::GraphInfo graph_info,
+                  bool print_result = false) {
   std::cout << "++++ Run PageRank algorithm without GRIN ++++" << std::endl;
 
   // construct vertices collection
@@ -59,7 +60,6 @@ void run_pagerank(GAR_NAMESPACE::GraphInfo graph_info, bool print_result = false
   for (auto it = it_begin; it != it_end; ++it) {
     GAR_NAMESPACE::Edge edge = *it;
     GAR_NAMESPACE::IdType src = edge.source();
-    //GAR_NAMESPACE::IdType src = it.source();
     out_degree[src]++;
   }
   for (int iter = 0; iter < max_iters; iter++) {
@@ -68,7 +68,6 @@ void run_pagerank(GAR_NAMESPACE::GraphInfo graph_info, bool print_result = false
       GAR_NAMESPACE::Edge edge = *it;
       GAR_NAMESPACE::IdType src = edge.source();
       GAR_NAMESPACE::IdType dst = edge.destination();
-      //GAR_NAMESPACE::IdType src = it.source(), dst = it.destination();
       pr_next[dst] += pr_curr[src] / out_degree[src];
     }
     for (GAR_NAMESPACE::IdType i = 0; i < num_vertices; i++) {
@@ -86,7 +85,9 @@ void run_pagerank(GAR_NAMESPACE::GraphInfo graph_info, bool print_result = false
     std::cout << "num_vertices: " << num_vertices << std::endl;
     auto it = vertices.begin();
     for (size_t i = 0; i < num_vertices; i++) {
-      std::cout << "vertex " << i << ", id = " << it.property<int64_t>("id").value() << ", pagerank value = " << pr_curr[i] << std::endl;
+      std::cout << "vertex " << i
+                << ", id = " << it.property<int64_t>("id").value()
+                << ", pagerank value = " << pr_curr[i] << std::endl;
       ++it;
     }
   }
@@ -107,5 +108,6 @@ int main(int argc, char* argv[]) {
   auto run_time = std::chrono::duration_cast<std::chrono::milliseconds>(
       run_end - run_start);
 
-  std::cout << "Run time for PageRank without GRIN = " << run_time.count() << " ms" << std::endl;
+  std::cout << "Run time for PageRank without GRIN = " << run_time.count()
+            << " ms" << std::endl;
 }

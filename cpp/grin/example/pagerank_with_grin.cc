@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <iostream>
 #include <chrono>
+#include <iostream>
 #include <vector>
 
 #include "grin/test/config.h"
@@ -157,9 +157,12 @@ int main(int argc, char* argv[]) {
       run_end - run_start);
 
   // output execution time
-  std::cout << "Init time for PageRank with GRIN = " << init_time.count() << " ms" << std::endl;
-  std::cout << "Run time for PageRank with GRIN = " << run_time.count() << " ms" << std::endl;
-  std::cout << "Totoal time for PageRank with GRIN = " << init_time.count() + run_time.count() << " ms" << std::endl;
+  std::cout << "Init time for PageRank with GRIN = " << init_time.count()
+            << " ms" << std::endl;
+  std::cout << "Run time for PageRank with GRIN = " << run_time.count() << " ms"
+            << std::endl;
+  std::cout << "Totoal time for PageRank with GRIN = "
+            << init_time.count() + run_time.count() << " ms" << std::endl;
 
   return 0;
 }
