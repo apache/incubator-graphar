@@ -44,8 +44,9 @@ class EdgeInfo() {
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
       val adj_list = adj_lists.get(k)
-      if (adj_list.getAdjList_type_in_gar == adj_list_type)
+      if (adj_list.getAdjList_type_in_gar == adj_list_type) {
         return true
+      }
     }
     return false
   }
@@ -260,10 +261,12 @@ class EdgeInfo() {
 
   /** Check if the edge info is validated. */
   def isValidated(): Boolean = {
-    if (src_label == "" || edge_label == "" || dst_label == "")
+    if (src_label == "" || edge_label == "" || dst_label == "") {
       return false
-    if (chunk_size <= 0 || src_chunk_size <= 0 || dst_chunk_size <= 0)
+    }
+    if (chunk_size <= 0 || src_chunk_size <= 0 || dst_chunk_size <= 0) {
       return false
+    }
     val tot: Int = adj_lists.size
     for ( k <- 0 to tot - 1 ) {
       val adj_list = adj_lists.get(k)
@@ -274,25 +277,71 @@ class EdgeInfo() {
         val pg: PropertyGroup = property_groups.get(i)
         val properties = pg.getProperties
         val num = properties.size
-        if (num == 0)
+        if (num == 0) {
           return false
+        }
         val pg_file_type = pg.getFile_type_in_gar
       }
     }
     return true
   }
 
+  /** Get the vertex num file path
+   *
+   *  @param adj_list_type type of adj list structure.
+   *  @return the vertex num file path. If edge info not support the adj list type,
+   *          raise an IllegalArgumentException error.
+   */
+  def getVerticesNumFilePath(adj_list_type: AdjListType.Value): String = {
+    if (containAdjList(adj_list_type) == false) {
+      throw new IllegalArgumentException
+    }
+    val str: String = prefix + getAdjListPrefix(adj_list_type) + "vertex_count"
+    return str
+  }
+
+  /** Get the path prefix of the edge num file path
+   *
+   *  @param adj_list_type type of adj list structure.
+   *  @return the edge num file path. If edge info not support the adj list type,
+   *          raise an IllegalArgumentException error.
+   */
+  def getEdgesNumPathPrefix(adj_list_type: AdjListType.Value): String = {
+    if (containAdjList(adj_list_type) == false) {
+      throw new IllegalArgumentException
+    }
+    val str: String = prefix + getAdjListPrefix(adj_list_type) + "edge_count"
+    return str
+  }
+
+  /** Get the edge num file path of the vertex chunk
+   *
+   *  @param chunk_index index of vertex chunk.
+   *  @param adj_list_type type of adj list structure.
+   *  @return the edge num file path. If edge info not support the adj list type,
+   *          raise an IllegalArgumentException error.
+   */
+  def getEdgesNumFilePath(chunk_index: Long, adj_list_type: AdjListType.Value): String = {
+    if (containAdjList(adj_list_type) == false) {
+      throw new IllegalArgumentException
+    }
+    val str: String = prefix + getAdjListPrefix(adj_list_type) + "edge_count" +
+           chunk_index.toString()
+    return str
+  }
+
   /** Get the adj list offset chunk file path of vertex chunk
    *  the offset chunks is aligned with the vertex chunks
    *
-   *  @param chunk_inde index of vertex chunk.
+   *  @param chunk_index index of vertex chunk.
    *  @param adj_list_type type of adj list structure.
    *  @return the offset chunk file path. If edge info not support the adj list type,
    *          raise an IllegalArgumentException error.
    */
   def getAdjListOffsetFilePath(chunk_index: Long, adj_list_type: AdjListType.Value) : String = {
-    if (containAdjList(adj_list_type) == false)
+    if (containAdjList(adj_list_type) == false) {
       throw new IllegalArgumentException
+    }
     val str: String = prefix + getAdjListPrefix(adj_list_type) + "offset/chunk" +
            chunk_index.toString()
     return str
@@ -305,8 +354,9 @@ class EdgeInfo() {
    *          raise an IllegalArgumentException error.
    */
   def getOffsetPathPrefix(adj_list_type: AdjListType.Value) : String = {
-    if (containAdjList(adj_list_type) == false)
+    if (containAdjList(adj_list_type) == false) {
       throw new IllegalArgumentException
+    }
     return prefix + getAdjListPrefix(adj_list_type) + "offset/"
   }
 

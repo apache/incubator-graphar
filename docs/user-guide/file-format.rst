@@ -23,6 +23,8 @@ And each edge contains:
 The following is an example property graph containing two types of vertices ("person" and "comment") and three types of edges.
 
 .. image:: ../images/property_graph.png
+   :width: 700
+   :align: center
    :alt: property graph
 
 
@@ -36,6 +38,8 @@ Each type of vertices (with the same label) constructs a logical vertex table, w
 Given a vertex id and the vertex label, a vertex is uniquely identifiable and its respective properties can be accessed from this table. The vertex id is further used to identify the source and destination vertices when maintaining the topology of the graph.
 
 .. image:: ../images/vertex_logical_table.png
+   :width: 650
+   :align: center
    :alt: vertex logical table
 
 .. note::
@@ -50,6 +54,8 @@ The logical vertex table will be partitioned into multiple continuous vertex chu
 Take the "person" vertex table as an example, if the chunk size is set to be 500, the logical table will be separated into sub-logical-tables of 500 rows with the exception of the last one, which may have less than 500 rows. The columns for maintaining properties will also be divided into distinct groups (e.g., 2 for our example). As a result, a total of 4 physical vertex tables are created for storing the example logical table, which can be seen from the following figure.
 
 .. image:: ../images/vertex_physical_table.png
+   :width: 650
+   :align: center
    :alt: vertex physical table
 
 
@@ -63,6 +69,8 @@ For maintaining a type of edges (that with the same triplet of the source label,
 Take the logical table for "person likes person" edges as an example, the logical edge table looks like:
 
 .. image:: ../images/edge_logical_table.png
+   :width: 650
+   :align: center
    :alt: edge logical table
 
 Physical table of edges
@@ -80,8 +88,13 @@ Additionally, the partition of the offset table should be in alignment with the 
 Take the "person knows person" edges to illustrate. Suppose the vertex chunk size is set to 500 and the edge chunk size is 1024, the edges will be saved in the following physical tables:
 
 .. image:: ../images/edge_physical_table1.png
+   :width: 650
+   :align: center
    :alt: edge physical table1
+
 .. image:: ../images/edge_physical_table2.png
+   :width: 650
+   :align: center
    :alt: edge physical table2
 
 .. tip::

@@ -52,10 +52,12 @@ class ComputeExampleSuite extends AnyFunSuite {
     val adj_list_type = AdjListType.ordered_by_source
 
     val edge_reader = new EdgeReader(prefix, edge_info, adj_list_type, spark)
+    val edges_num = edge_reader.readEdgesNumber()
     val edge_df = edge_reader.readAllAdjList(false)
     edge_df.show()
+    assert(edge_reader.readVerticesNumber() == vertices_num)
     assert(edge_df.columns.size == 2)
-    assert(edge_df.count() == 6626)
+    assert(edge_df.count() == edges_num)
 
     // construct the graph for GraphX
     val vertex_rdd: VertexRDD[String] = VertexRDD(vertex_df.rdd.map(i => (i(0).asInstanceOf[Number].longValue, i(1).toString)))
