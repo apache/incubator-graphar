@@ -122,12 +122,7 @@ Edges Collection
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::ConstructEdgesCollection(const GraphInfo &graph_info, const std::string &src_label, const std::string &edge_label, const std::string &dst_label, AdjListType adj_list_type) noexcept
-
-.. doxygenfunction:: GraphArchive::ConstructEdgesCollection(const GraphInfo &graph_info, const std::string &src_label, const std::string &edge_label, const std::string &dst_label, AdjListType adj_list_type, const IdType chunk_begin, const IdType chunk_end) noexcept
-
-.. doxygenfunction:: GraphArchive::ConstructEdgesCollection(const GraphInfo &graph_info, const std::string &src_label, const std::string &edge_label, const std::string &dst_label, AdjListType adj_list_type, IdType vertex_chunk_index) noexcept
-
+.. doxygenfunction:: GraphArchive::ConstructEdgesCollection
 
 Writer and Builder
 ---------------------
