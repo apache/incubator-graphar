@@ -151,15 +151,17 @@ class VertexInfo() {
    * @return true if the vertex info is validated, otherwise return false.
    */
  def isValidated(): Boolean = {
-    if (label == "" || chunk_size <= 0)
+    if (label == "" || chunk_size <= 0) {
       return false
+    }
     val len: Int = property_groups.size
     for ( i <- 0 to len - 1 ) {
       val pg: PropertyGroup = property_groups.get(i)
       val properties = pg.getProperties
       val num = properties.size
-      if (num == 0)
+      if (num == 0) {
         return false
+      }
       val file_type = pg.getFile_type_in_gar
     }
     return true
@@ -177,15 +179,17 @@ class VertexInfo() {
    * @return chunk file path.
    */
   def getFilePath(property_group: PropertyGroup, chunk_index: Long): String = {
-    if (containPropertyGroup(property_group) == false)
+    if (containPropertyGroup(property_group) == false) {
       throw new IllegalArgumentException
+    }
     var str: String = ""
     if (property_group.getPrefix == "") {
       val properties = property_group.getProperties
       val num = properties.size
       for ( j <- 0 to num - 1 ) {
-        if (j > 0)
+        if (j > 0) {
           str += GeneralParams.regularSeperator
+        }
         str += properties.get(j).getName;
       }
       str += "/"
@@ -201,8 +205,9 @@ class VertexInfo() {
    * @return the path prefix of the property group chunk files.
    */
   def getPathPrefix(property_group: PropertyGroup): String = {
-    if (containPropertyGroup(property_group) == false)
+    if (containPropertyGroup(property_group) == false) {
       throw new IllegalArgumentException
+    }
     var str: String = ""
     if (property_group.getPrefix == "") {
       val properties = property_group.getProperties

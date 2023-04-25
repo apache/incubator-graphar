@@ -47,8 +47,9 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
    * @return vertex property chunk DataFrame. Raise IllegalArgumentException if the property group not contained.
    */
   def readVertexPropertyChunk(propertyGroup: PropertyGroup, chunk_index: Long): DataFrame = {
-    if (vertexInfo.containPropertyGroup(propertyGroup) == false) 
+    if (vertexInfo.containPropertyGroup(propertyGroup) == false) {
       throw new IllegalArgumentException
+    }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + vertexInfo.getFilePath(propertyGroup, chunk_index)
     val df = spark.read.option("fileFormat", file_type).option("header", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
@@ -63,8 +64,9 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
    *         Raise IllegalArgumentException if the property group not contained.
    */
   def readVertexPropertyGroup(propertyGroup: PropertyGroup, addIndex: Boolean = true): DataFrame = {
-    if (vertexInfo.containPropertyGroup(propertyGroup) == false) 
+    if (vertexInfo.containPropertyGroup(propertyGroup) == false) {
       throw new IllegalArgumentException
+    }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + vertexInfo.getPathPrefix(propertyGroup)
     val df = spark.read.option("fileFormat", file_type).option("header", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
@@ -85,13 +87,15 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
    */
   def readMultipleVertexPropertyGroups(propertyGroups: java.util.ArrayList[PropertyGroup], addIndex: Boolean = true): DataFrame = {
     val len: Int = propertyGroups.size
-    if (len == 0)
+    if (len == 0) {
       return spark.emptyDataFrame
+    }
 
     val pg0: PropertyGroup = propertyGroups.get(0)
     val df0 = readVertexPropertyGroup(pg0, false)
-    if (len == 1)
+    if (len == 1) {
       return df0
+    }
 
     var rdd = df0.rdd
     var schema_array = df0.schema.fields

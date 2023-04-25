@@ -50,8 +50,9 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
   def readVertexChunkNumber(): Long = {
     val vertices_number = readVerticesNumber
     var vertex_chunk_size = edgeInfo.getSrc_chunk_size
-    if (adjListType == AdjListType.ordered_by_dest || adjListType == AdjListType.unordered_by_dest)
+    if (adjListType == AdjListType.ordered_by_dest || adjListType == AdjListType.unordered_by_dest) {
       vertex_chunk_size = edgeInfo.getDst_chunk_size
+    }
     val vertex_chunk_number = (vertices_number + vertex_chunk_size - 1) / vertex_chunk_size
     return vertex_chunk_number
   }
@@ -71,8 +72,9 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
   def readEdgesNumber(): Long = {
     val vertex_chunk_number = readVertexChunkNumber
     var number: Long  = 0
-    for (i <- 0L until vertex_chunk_number)
+    for (i <- 0L until vertex_chunk_number) {
       number += readEdgesNumber(i)
+    }
     return number
   }
 
@@ -83,8 +85,9 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    *         AdjListType.ordered_by_source or AdjListType.ordered_by_dest.
    */
   def readOffset(chunk_index: Long): DataFrame = {
-    if (adjListType != AdjListType.ordered_by_source && adjListType != AdjListType.ordered_by_dest)
+    if (adjListType != AdjListType.ordered_by_source && adjListType != AdjListType.ordered_by_dest) {
       throw new IllegalArgumentException
+    }
     val file_type_in_gar = edgeInfo.getAdjListFileType(adjListType)
     val file_type = FileType.FileTypeToString(file_type_in_gar)
     val file_path = prefix + edgeInfo.getAdjListOffsetFilePath(chunk_index, adjListType)
@@ -150,8 +153,9 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    *         raise an IllegalArgumentException error.
    */
   def readEdgePropertyChunk(propertyGroup: PropertyGroup, vertex_chunk_index: Long, chunk_index: Long): DataFrame = {
-    if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
+    if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
       throw new IllegalArgumentException
+    }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + edgeInfo.getPropertyFilePath(propertyGroup, adjListType, vertex_chunk_index, chunk_index)
     val df = spark.read.option("fileFormat", file_type).option("header", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
@@ -167,8 +171,9 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    *         If edge info does not contain the property group, raise an IllegalArgumentException error.
    */
   def readEdgePropertyGroupForVertexChunk(propertyGroup: PropertyGroup, vertex_chunk_index: Long, addIndex: Boolean = true): DataFrame = {
-    if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
+    if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
       throw new IllegalArgumentException
+    }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType, vertex_chunk_index)
     val df = spark.read.option("fileFormat", file_type).option("header", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
@@ -187,8 +192,9 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    *         If edge info does not contain the property group, raise an IllegalArgumentException error.
    */
   def readEdgePropertyGroup(propertyGroup: PropertyGroup, addIndex: Boolean = true): DataFrame = {
-    if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false)
+    if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
       throw new IllegalArgumentException
+    }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType)
     val df = spark.read.option("fileFormat", file_type).option("header", "true").option("recursiveFileLookup", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
@@ -208,13 +214,15 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    */
   def readMultipleEdgePropertyGroupsForVertexChunk(propertyGroups: java.util.ArrayList[PropertyGroup], vertex_chunk_index: Long, addIndex: Boolean = true): DataFrame = {
     val len: Int = propertyGroups.size
-    if (len == 0)
+    if (len == 0) {
       return spark.emptyDataFrame
+    }
 
     val pg0: PropertyGroup = propertyGroups.get(0)
     val df0 = readEdgePropertyGroupForVertexChunk(pg0, vertex_chunk_index, false)
-    if (len == 1)
+    if (len == 1) {
       return df0
+    }
 
     var rdd = df0.rdd
     var schema_array = df0.schema.fields
@@ -242,13 +250,15 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    */
   def readMultipleEdgePropertyGroups(propertyGroups: java.util.ArrayList[PropertyGroup], addIndex: Boolean = true): DataFrame = {
     val len: Int = propertyGroups.size
-    if (len == 0)
+    if (len == 0) {
       return spark.emptyDataFrame
+    }
 
     val pg0: PropertyGroup = propertyGroups.get(0)
     val df0 = readEdgePropertyGroup(pg0, false)
-    if (len == 1)
+    if (len == 1) {
       return df0
+    }
 
     var rdd = df0.rdd
     var schema_array = df0.schema.fields
