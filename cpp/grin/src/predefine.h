@@ -116,7 +116,7 @@ struct GRIN_EDGE_LIST_ITERATOR_T {
       : type_begin(_type_begin),
         type_end(_type_end),
         current_type(_current_type),
-        iter(_iter) {}
+        iter(std::move(_iter)) {}
 };
 #endif
 
@@ -162,7 +162,7 @@ struct GRIN_ADJACENT_LIST_ITERATOR_T {
         vtype_begin(_vtype_begin),
         vtype_end(_vtype_end),
         current_etype(_current_etype),
-        iter(_iter) {}
+        iter(std::move(_iter)) {}
 };
 #endif
 

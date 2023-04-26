@@ -65,7 +65,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             GAR_NAMESPACE::AdjListType::ordered_by_dest>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_al->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -81,7 +81,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             GAR_NAMESPACE::AdjListType::unordered_by_dest>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_al->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -97,7 +97,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             GAR_NAMESPACE::AdjListType::ordered_by_source>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_al->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -113,7 +113,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             GAR_NAMESPACE::AdjListType::unordered_by_source>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_al->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -139,7 +139,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             GAR_NAMESPACE::AdjListType::ordered_by_source>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_al->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -155,7 +155,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             GAR_NAMESPACE::AdjListType::unordered_by_source>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_al->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -171,7 +171,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             GAR_NAMESPACE::AdjListType::ordered_by_dest>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_al->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -187,7 +187,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             GAR_NAMESPACE::AdjListType::unordered_by_dest>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_al->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -239,10 +239,10 @@ void grin_get_next_adjacent_list_iter(GRIN_GRAPH g,
             GAR_NAMESPACE::AdjListType::ordered_by_dest>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_ali->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
-          _ali->iter = iter;
+          _ali->iter = std::move(iter);
           return;
         }
       }
@@ -253,10 +253,10 @@ void grin_get_next_adjacent_list_iter(GRIN_GRAPH g,
             GAR_NAMESPACE::AdjListType::unordered_by_dest>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_ali->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
-          _ali->iter = iter;
+          _ali->iter = std::move(iter);
           return;
         }
       }
@@ -267,10 +267,10 @@ void grin_get_next_adjacent_list_iter(GRIN_GRAPH g,
             GAR_NAMESPACE::AdjListType::ordered_by_source>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_ali->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
-          _ali->iter = iter;
+          _ali->iter = std::move(iter);
           return;
         }
       }
@@ -281,10 +281,10 @@ void grin_get_next_adjacent_list_iter(GRIN_GRAPH g,
             GAR_NAMESPACE::AdjListType::unordered_by_source>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_ali->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
-          _ali->iter = iter;
+          _ali->iter = std::move(iter);
           return;
         }
       }
@@ -304,10 +304,10 @@ void grin_get_next_adjacent_list_iter(GRIN_GRAPH g,
             GAR_NAMESPACE::AdjListType::ordered_by_source>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_ali->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
-          _ali->iter = iter;
+          _ali->iter = std::move(iter);
           return;
         }
       }
@@ -318,10 +318,10 @@ void grin_get_next_adjacent_list_iter(GRIN_GRAPH g,
             GAR_NAMESPACE::AdjListType::unordered_by_source>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_ali->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
-          _ali->iter = iter;
+          _ali->iter = std::move(iter);
           return;
         }
       }
@@ -332,10 +332,10 @@ void grin_get_next_adjacent_list_iter(GRIN_GRAPH g,
             GAR_NAMESPACE::AdjListType::ordered_by_dest>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_ali->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
-          _ali->iter = iter;
+          _ali->iter = std::move(iter);
           return;
         }
       }
@@ -346,10 +346,10 @@ void grin_get_next_adjacent_list_iter(GRIN_GRAPH g,
             GAR_NAMESPACE::AdjListType::unordered_by_dest>>(
             _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_ali->v.id, edges.begin());
-        if (iter == edges.end()) {
+        if (iter.is_end()) {
           continue;
         } else {
-          _ali->iter = iter;
+          _ali->iter = std::move(iter);
           return;
         }
       }
