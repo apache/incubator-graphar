@@ -135,8 +135,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sudo yum update -y
-        sudo yum install -y libboost-graph-dev ccache libcurl-devel openssl-devel
+        yum update -y
+        yum install -y libboost-graph-dev ccache libcurl-devel openssl-devel
 
     - name: CMake
       run: |
