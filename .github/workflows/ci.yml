@@ -141,7 +141,7 @@ jobs:
         popd
         yum update -y
         dnf groupinstall -y "Development Tools"
-        yum install -y boost-devel ccache libcurl-devel openssl-devel cmake
+        yum install -y boost-devel libcurl-devel openssl-devel cmake
 
     - name: CMake
       run: |
@@ -154,5 +154,4 @@ jobs:
       run: |
         pushd build
         make -j$(nproc)
-        make gar-ccache-stats
         popd
