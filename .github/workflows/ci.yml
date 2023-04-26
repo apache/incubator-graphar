@@ -125,14 +125,6 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Cache for ccache
-      uses: actions/cache@v3
-      with:
-        path: ~/.ccache
-        key: ${{ matrix.os }}-build-ccache-${{ hashFiles('**/git-modules.txt') }}
-        restore-keys: |
-          ${{ matrix.os }}-build-ccache-
-
     - name: Install dependencies
       run: |
         pushd /etc/yum.repos.d/
@@ -143,15 +135,10 @@ jobs:
         dnf groupinstall -y "Development Tools"
         yum install -y boost-devel libcurl-devel openssl-devel cmake
 
-    - name: CMake
+    - name: Build GraphAr
       run: |
         mkdir build
         pushd build
         cmake ../cpp
-        popd
-
-    - name: Build GraphAr
-      run: |
-        pushd build
         make -j$(nproc)
         popd
