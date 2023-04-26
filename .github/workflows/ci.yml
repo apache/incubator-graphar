@@ -118,3 +118,40 @@ jobs:
         export GAR_TEST_DATA=$PWD/../testing/
         make test
 
+
+jobs:
+  GraphAr-on-centos8:
+    runs-on: ubuntu-22.04
+    container:
+      image: centos:latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          submodules: true
+
+    - name: Cache for ccache
+      uses: actions/cache@v3
+      with:
+        path: ~/.ccache
+        key: ${{ matrix.os }}-build-ccache-${{ hashFiles('**/git-modules.txt') }}
+        restore-keys: |
+          ${{ matrix.os }}-build-ccache-
+
+    - name: Install dependencies
+      run: |
+        sudo yum update -y
+        sudo yum install -y libboost-graph-dev ccache libcurl-devel openssl-devel
+
+    - name: CMake
+      run: |
+        mkdir build
+        pushd build
+        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+        popd
+
+    - name: Build GraphAr
+      run: |
+        pushd build
+        make -j$(nproc)
+        make gar-ccache-stats
+        popd
