@@ -140,7 +140,7 @@ jobs:
         sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
         popd
         yum update -y
-        yum install -y libboost-graph-dev ccache libcurl-devel openssl-devel
+        yum install -y boost-devel ccache libcurl-devel openssl-devel
 
     - name: CMake
       run: |
