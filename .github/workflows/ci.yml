@@ -118,8 +118,6 @@ jobs:
         export GAR_TEST_DATA=$PWD/../testing/
         make test
 
-
-jobs:
   GraphAr-on-centos8:
     runs-on: ubuntu-22.04
     container:
