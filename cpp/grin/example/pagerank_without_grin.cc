@@ -18,9 +18,6 @@ limitations under the License.
 
 #include "gar/graph.h"
 #include "gar/graph_info.h"
-#include "gar/reader/arrow_chunk_reader.h"
-#include "gar/writer/arrow_chunk_writer.h"
-
 #include "grin/test/config.h"
 
 void run_pagerank(GAR_NAMESPACE::GraphInfo graph_info,
@@ -110,4 +107,6 @@ int main(int argc, char* argv[]) {
 
   std::cout << "Run time for PageRank without GRIN = " << run_time.count()
             << " ms" << std::endl;
+
+  return 0;
 }

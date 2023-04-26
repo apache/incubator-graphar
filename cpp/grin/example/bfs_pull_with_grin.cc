@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
   auto init_time = std::chrono::duration_cast<std::chrono::milliseconds>(
       init_end - init_start);
 
-  // run pagerank algorithm
+  // run bfs algorithm
   auto run_start = std::chrono::high_resolution_clock::now();
   run_bfs(graph);
   auto run_end = std::chrono::high_resolution_clock::now();
