@@ -124,8 +124,6 @@ jobs:
       image: centos:latest
     steps:
     - uses: actions/checkout@v3
-      with:
-          submodules: true
 
     - name: Cache for ccache
       uses: actions/cache@v3
@@ -144,7 +142,7 @@ jobs:
       run: |
         mkdir build
         pushd build
-        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+        cmake ../cpp
         popd
 
     - name: Build GraphAr
