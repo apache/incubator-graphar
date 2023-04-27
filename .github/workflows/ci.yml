@@ -118,3 +118,27 @@ jobs:
         export GAR_TEST_DATA=$PWD/../testing/
         make test
 
+  GraphAr-on-centos8:
+    runs-on: ubuntu-22.04
+    container:
+      image: centos:latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        pushd /etc/yum.repos.d/
+        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+        popd
+        yum update -y
+        dnf groupinstall -y "Development Tools"
+        yum install -y boost-devel libcurl-devel openssl-devel cmake
+
+    - name: Build GraphAr
+      run: |
+        mkdir build
+        pushd build
+        cmake ../cpp
+        make -j$(nproc)
+        popd
