@@ -50,8 +50,8 @@ GRIN_VERTEX_PROPERTY_LIST grin_get_primary_keys_by_vertex_type(
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);
   auto type_id = *_vtype;
-  auto type_name = _g->vertex_types[type_id];
-  auto vertex_info = _g->graph_info.GetVertexInfo(type_name).value();
+  auto& type_name = _g->vertex_types[type_id];
+  auto& vertex_info = _g->graph_info.GetVertexInfo(type_name).value();
   auto vpl = new GRIN_VERTEX_PROPERTY_LIST_T();
   for (auto& group : vertex_info.GetPropertyGroups()) {
     for (auto& property : group.GetProperties()) {
@@ -74,14 +74,13 @@ GRIN_VERTEX grin_get_vertex_by_primary_keys(GRIN_GRAPH g,
   auto _vpl = static_cast<GRIN_VERTEX_PROPERTY_LIST_T*>(vpl);
   if (_vpl->size() == 0)
     return GRIN_NULL_VERTEX;
-  auto type_id = *_vtype;
-  auto& vertices = _g->vertices_collections[type_id];
+  auto& vertices = _g->vertices_collections[*_vtype];
   auto it_end = vertices.end();
   for (auto it = vertices.begin(); it != it_end; it++) {
     bool flag = true;
     unsigned idx = 0;
     for (auto& property : *_vpl) {
-      auto name = property.name;
+      auto& name = property.name;
       auto type = property.type;
       auto value = grin_get_value_from_row(g, r, type, idx);
       idx++;
@@ -115,7 +114,7 @@ GRIN_VERTEX grin_get_vertex_by_primary_keys(GRIN_GRAPH g,
         break;
       }
       case GRIN_DATATYPE::String: {
-        auto p1 = *static_cast<std::string const*>(value);
+        auto p1 = std::string(static_cast<const char*>(value));
         auto p2 = it.property<std::string>(name).value();
         if (p1 != p2)
           flag = false;
@@ -128,7 +127,7 @@ GRIN_VERTEX grin_get_vertex_by_primary_keys(GRIN_GRAPH g,
         break;
     }
     if (flag) {
-      auto v = new GRIN_VERTEX_T(it.id(), type_id);
+      auto v = new GRIN_VERTEX_T(it.id(), *_vtype);
       return v;
     }
   }

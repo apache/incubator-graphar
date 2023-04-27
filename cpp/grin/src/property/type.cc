@@ -84,7 +84,7 @@ GRIN_VERTEX_TYPE grin_get_vertex_type_from_list(GRIN_GRAPH g,
 const char* grin_get_vertex_type_name(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _vt = static_cast<GRIN_VERTEX_TYPE_T*>(vt);
-  auto s = _g->vertex_types[*_vt];
+  auto& s = _g->vertex_types[*_vt];
   int len = s.length() + 1;
   char* out = new char[len];
   snprintf(out, len, "%s", s.c_str());
@@ -183,7 +183,7 @@ GRIN_EDGE_TYPE grin_get_edge_type_from_list(GRIN_GRAPH g,
 const char* grin_get_edge_type_name(GRIN_GRAPH g, GRIN_EDGE_TYPE et) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _et = static_cast<GRIN_EDGE_TYPE_T*>(et);
-  auto s = _g->unique_edge_types[*_et];
+  auto& s = _g->unique_edge_types[*_et];
   int len = s.length() + 1;
   char* out = new char[len];
   snprintf(out, len, "%s", s.c_str());
@@ -224,7 +224,7 @@ GRIN_VERTEX_TYPE_LIST grin_get_src_types_from_edge_type(GRIN_GRAPH g,
     else if (_g->unique_edge_type_ids[i] < *_et)
       continue;
     else
-      vtl->push_back(GRIN_VERTEX_TYPE_T(_g->src_type_ids[i]));
+      vtl->push_back(_g->src_type_ids[i]);
   }
   return vtl;
 }
@@ -240,7 +240,7 @@ GRIN_VERTEX_TYPE_LIST grin_get_dst_types_from_edge_type(GRIN_GRAPH g,
     else if (_g->unique_edge_type_ids[i] < *_et)
       continue;
     else
-      vtl->push_back(GRIN_VERTEX_TYPE_T(_g->dst_type_ids[i]));
+      vtl->push_back(_g->dst_type_ids[i]);
   }
   return vtl;
 }
@@ -253,8 +253,7 @@ GRIN_EDGE_TYPE_LIST grin_get_edge_types_from_vertex_type_pair(
   auto etl = new GRIN_EDGE_TYPE_LIST_T();
   for (auto i = 0; i < _g->edge_type_num; i++) {
     if (_g->src_type_ids[i] == *_v1 && _g->dst_type_ids[i] == *_v2) {
-      auto et_id = _g->unique_edge_type_ids[i];
-      etl->push_back(GRIN_EDGE_TYPE_T(et_id));
+      etl->push_back(_g->unique_edge_type_ids[i]);
     }
   }
   return etl;

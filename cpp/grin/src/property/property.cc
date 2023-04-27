@@ -25,7 +25,7 @@ extern "C" {
 const char* grin_get_vertex_property_name(GRIN_GRAPH g,
                                           GRIN_VERTEX_PROPERTY vp) {
   auto _vp = static_cast<GRIN_VERTEX_PROPERTY_T*>(vp);
-  auto s = _vp->name;
+  auto& s = _vp->name;
   int len = s.length() + 1;
   char* out = new char[len];
   snprintf(out, len, "%s", s.c_str());
@@ -38,7 +38,7 @@ GRIN_VERTEX_PROPERTY grin_get_vertex_property_by_name(GRIN_GRAPH g,
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);
   auto s = std::string(name);
-  auto vertex_info =
+  auto& vertex_info =
       _g->graph_info.GetVertexInfo(_g->vertex_types[*_vtype]).value();
   if (!vertex_info.ContainProperty(s))
     return GRIN_NULL_VERTEX_PROPERTY;
@@ -53,7 +53,7 @@ GRIN_VERTEX_PROPERTY_LIST grin_get_vertex_properties_by_name(GRIN_GRAPH g,
   auto s = std::string(name);
   auto vpl = new GRIN_VERTEX_PROPERTY_LIST_T();
   for (auto vtype = 0; vtype < _g->vertex_type_num; ++vtype) {
-    auto vertex_info =
+    auto& vertex_info =
         _g->graph_info.GetVertexInfo(_g->vertex_types[vtype]).value();
     if (vertex_info.ContainProperty(s))
       vpl->push_back(GRIN_VERTEX_PROPERTY_T(
@@ -71,7 +71,7 @@ GRIN_VERTEX_PROPERTY_LIST grin_get_vertex_properties_by_name(GRIN_GRAPH g,
 #ifdef GRIN_WITH_EDGE_PROPERTY_NAME
 const char* grin_get_edge_property_name(GRIN_GRAPH g, GRIN_EDGE_PROPERTY ep) {
   auto _ep = static_cast<GRIN_EDGE_PROPERTY_T*>(ep);
-  auto s = _ep->name;
+  auto& s = _ep->name;
   int len = s.length() + 1;
   char* out = new char[len];
   snprintf(out, len, "%s", s.c_str());
@@ -90,16 +90,16 @@ GRIN_EDGE_PROPERTY grin_get_edge_property_by_name(GRIN_GRAPH g,
       break;
     if (_g->unique_edge_type_ids[etype] < *_etype)
       continue;
-    auto edge_info = _g->graph_info
-                         .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[etype]],
-                                      _g->edge_types[etype],
-                                      _g->vertex_types[_g->dst_type_ids[etype]])
-                         .value();
+    auto& edge_info =
+        _g->graph_info
+            .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[etype]],
+                         _g->edge_types[etype],
+                         _g->vertex_types[_g->dst_type_ids[etype]])
+            .value();
     if (!edge_info.ContainProperty(s))
       continue;
-    auto gar_type = edge_info.GetPropertyType(s).value();
-    auto grin_type = GARToDataType(gar_type);
-    GRIN_EDGE_PROPERTY_T ep(*_etype, s, grin_type);
+    auto data_type = GARToDataType(edge_info.GetPropertyType(s).value());
+    GRIN_EDGE_PROPERTY_T ep(*_etype, s, data_type);
     if (edge_properties.find(ep) != edge_properties.end())
       continue;
     edge_properties.insert(ep);
@@ -119,16 +119,16 @@ GRIN_EDGE_PROPERTY_LIST grin_get_edge_properties_by_name(GRIN_GRAPH g,
   auto epl = new GRIN_EDGE_PROPERTY_LIST_T();
   std::set<GRIN_EDGE_PROPERTY_T> edge_properties;
   for (auto etype = 0; etype < _g->edge_type_num; ++etype) {
-    auto edge_info = _g->graph_info
-                         .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[etype]],
-                                      _g->edge_types[etype],
-                                      _g->vertex_types[_g->dst_type_ids[etype]])
-                         .value();
+    auto& edge_info =
+        _g->graph_info
+            .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[etype]],
+                         _g->edge_types[etype],
+                         _g->vertex_types[_g->dst_type_ids[etype]])
+            .value();
     if (!edge_info.ContainProperty(s))
       continue;
-    auto gar_type = edge_info.GetPropertyType(s).value();
-    auto grin_type = GARToDataType(gar_type);
-    GRIN_EDGE_PROPERTY_T ep(_g->unique_edge_type_ids[etype], s, grin_type);
+    auto data_type = GARToDataType(edge_info.GetPropertyType(s).value());
+    GRIN_EDGE_PROPERTY_T ep(_g->unique_edge_type_ids[etype], s, data_type);
     if (edge_properties.find(ep) != edge_properties.end())
       continue;
     edge_properties.insert(ep);

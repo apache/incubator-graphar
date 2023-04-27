@@ -39,8 +39,7 @@ size_t grin_get_edge_num_by_type(GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
     else
       type_end = i + 1;
   }
-  auto res = __grin_get_edge_num(_g, type_begin, type_end);
-  return res;
+  return __grin_get_edge_num(_g, type_begin, type_end);
 }
 #endif
 

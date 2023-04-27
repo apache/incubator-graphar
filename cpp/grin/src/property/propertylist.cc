@@ -25,8 +25,8 @@ GRIN_VERTEX_PROPERTY_LIST grin_get_vertex_property_list_by_type(
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);
   auto type_id = *_vtype;
-  auto type_name = _g->vertex_types[type_id];
-  auto vertex_info = _g->graph_info.GetVertexInfo(type_name).value();
+  auto& type_name = _g->vertex_types[type_id];
+  auto& vertex_info = _g->graph_info.GetVertexInfo(type_name).value();
   auto vpl = new GRIN_VERTEX_PROPERTY_LIST_T();
   for (auto& group : vertex_info.GetPropertyGroups()) {
     for (auto& property : group.GetProperties()) {
@@ -94,11 +94,12 @@ GRIN_EDGE_PROPERTY_LIST grin_get_edge_property_list_by_type(
       break;
     if (_g->unique_edge_type_ids[etype] < *_etype)
       continue;
-    auto edge_info = _g->graph_info
-                         .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[etype]],
-                                      _g->edge_types[etype],
-                                      _g->vertex_types[_g->dst_type_ids[etype]])
-                         .value();
+    auto& edge_info =
+        _g->graph_info
+            .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[etype]],
+                         _g->edge_types[etype],
+                         _g->vertex_types[_g->dst_type_ids[etype]])
+            .value();
     auto adj_list_type = _g->edges_collections[etype].begin()->first;
     for (auto& group : edge_info.GetPropertyGroups(adj_list_type).value()) {
       for (auto& property : group.GetProperties()) {

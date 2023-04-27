@@ -126,8 +126,7 @@ const void* grin_get_value_from_vertex_property_table(
   if (_vp->type_id != _vpt->vtype || _v->type_id != _vpt->vtype)
     return NULL;
   auto& vertices = _g->vertices_collections[_vp->type_id];
-  auto vertex_id = _v->id;
-  auto it = vertices.begin() + vertex_id;
+  auto it = vertices.begin() + _v->id;
   switch (_vp->type) {
   case GRIN_DATATYPE::Int32: {
     auto value = new int32_t(it.property<int32_t>(_vp->name).value());
@@ -171,13 +170,12 @@ GRIN_ROW grin_get_row_from_vertex_property_table(
   if (_v->type_id != _vpt->vtype)
     return GRIN_NULL_ROW;
   auto& vertices = _g->vertices_collections[_v->type_id];
-  auto vertex_id = _v->id;
-  auto it = vertices.begin() + vertex_id;
+  auto it = vertices.begin() + _v->id;
 
   auto r = new GRIN_ROW_T();
   for (auto& _vp : *_vpl) {
     if (_vp.type_id != _v->type_id) {
-      grin_destroy_row(g, r);
+      delete r;
       return GRIN_NULL_ROW;
     }
 
@@ -204,11 +202,11 @@ GRIN_ROW grin_get_row_from_vertex_property_table(
     }
     case GRIN_DATATYPE::String: {
       auto value = it.property<std::string>(_vp.name).value();
-      r->push_back(value);
+      r->push_back(std::move(value));
       break;
     }
     default: {
-      grin_destroy_row(g, r);
+      delete r;
       return GRIN_NULL_ROW;
     }
     }
@@ -305,7 +303,7 @@ GRIN_ROW grin_get_row_from_edge_property_table(GRIN_GRAPH g,
   auto r = new GRIN_ROW_T();
   for (auto& _ep : *_epl) {
     if (_ep.type_id != _g->unique_edge_type_ids[_e->type_id]) {
-      grin_destroy_row(g, r);
+      delete r;
       return GRIN_NULL_ROW;
     }
 
@@ -332,11 +330,11 @@ GRIN_ROW grin_get_row_from_edge_property_table(GRIN_GRAPH g,
     }
     case GRIN_DATATYPE::String: {
       auto value = _e->edge.property<std::string>(_ep.name).value();
-      r->push_back(value);
+      r->push_back(std::move(value));
       break;
     }
     default: {
-      grin_destroy_row(g, r);
+      delete r;
       return GRIN_NULL_ROW;
     }
     }
