@@ -59,7 +59,7 @@ struct GRIN_GRAPH_T {
   std::vector<std::map<GAR_NAMESPACE::AdjListType, GAR_NAMESPACE::Edges>>
       edges_collections;
   explicit GRIN_GRAPH_T(GAR_NAMESPACE::GraphInfo graph_info_)
-      : graph_info(graph_info_),
+      : graph_info(std::move(graph_info_)),
         tot_vertex_num(0),
         tot_edge_num(0),
         vertex_type_num(0),
@@ -177,7 +177,7 @@ struct GRIN_VERTEX_PROPERTY_T {
   GRIN_DATATYPE type;
   GRIN_VERTEX_PROPERTY_T(unsigned _type_id, std::string _name,
                          GRIN_DATATYPE _type)
-      : type_id(_type_id), name(_name), type(_type) {}
+      : type_id(_type_id), name(std::move(_name)), type(_type) {}
 };
 typedef std::vector<GRIN_VERTEX_PROPERTY_T> GRIN_VERTEX_PROPERTY_LIST_T;
 struct GRIN_VERTEX_PROPERTY_TABLE_T {
@@ -195,7 +195,7 @@ struct GRIN_EDGE_PROPERTY_T {
   GRIN_DATATYPE type;
   GRIN_EDGE_PROPERTY_T(unsigned _type_id, std::string _name,
                        GRIN_DATATYPE _type)
-      : type_id(_type_id), name(_name), type(_type) {}
+      : type_id(_type_id), name(std::move(_name)), type(_type) {}
   bool operator==(const GRIN_EDGE_PROPERTY_T& other) const {
     return type_id == other.type_id && name == other.name && type == other.type;
   }
