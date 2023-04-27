@@ -28,6 +28,11 @@ extern "C" {
 #include "gar/graph.h"
 #include "gar/graph_info.h"
 
+#define GAR_ORDERED_BY_SOURCE GAR_NAMESPACE::AdjListType::ordered_by_source
+#define GAR_ORDERED_BY_DEST GAR_NAMESPACE::AdjListType::ordered_by_dest
+#define GAR_UNORDERED_BY_SOURCE GAR_NAMESPACE::AdjListType::unordered_by_source
+#define GAR_UNORDERED_BY_DEST GAR_NAMESPACE::AdjListType::unordered_by_dest
+
 struct GRIN_VERTEX_T {
   GAR_NAMESPACE::IdType id;
   unsigned type_id;

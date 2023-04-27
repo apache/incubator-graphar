@@ -19,11 +19,6 @@ limitations under the License.
 
 #include "grin/src/predefine.h"
 
-#define ordered_by_source GAR_NAMESPACE::AdjListType::ordered_by_source
-#define ordered_by_dest GAR_NAMESPACE::AdjListType::ordered_by_dest
-#define unordered_by_source GAR_NAMESPACE::AdjListType::unordered_by_source
-#define unordered_by_dest GAR_NAMESPACE::AdjListType::unordered_by_dest
-
 bool cmp(const GAR_NAMESPACE::EdgeInfo& info1,
          const GAR_NAMESPACE::EdgeInfo& info2) {
   return info1.GetEdgeLabel() < info2.GetEdgeLabel();
@@ -84,16 +79,7 @@ GRIN_GRAPH get_graph_by_info_path(const std::string& path) {
     std::map<GAR_NAMESPACE::AdjListType, GAR_NAMESPACE::Edges> edge_map;
     graph->edges_collections.push_back(edge_map);
 
-    GAR_NAMESPACE::AdjListType adj_list_type = ordered_by_source;
-    if (edge_info.ContainAdjList(ordered_by_source)) {
-      auto maybe_edges_collection = GAR_NAMESPACE::ConstructEdgesCollection(
-          graph->graph_info, src_label, edge_label, dst_label, adj_list_type);
-      auto& edges = maybe_edges_collection.value();
-      graph->edges_collections[graph->edge_type_num].insert(
-          {adj_list_type, std::move(edges)});
-    }
-
-    adj_list_type = ordered_by_dest;
+    GAR_NAMESPACE::AdjListType adj_list_type = GAR_ORDERED_BY_SOURCE;
     if (edge_info.ContainAdjList(adj_list_type)) {
       auto maybe_edges_collection = GAR_NAMESPACE::ConstructEdgesCollection(
           graph->graph_info, src_label, edge_label, dst_label, adj_list_type);
@@ -102,7 +88,7 @@ GRIN_GRAPH get_graph_by_info_path(const std::string& path) {
           {adj_list_type, std::move(edges)});
     }
 
-    adj_list_type = unordered_by_source;
+    adj_list_type = GAR_ORDERED_BY_DEST;
     if (edge_info.ContainAdjList(adj_list_type)) {
       auto maybe_edges_collection = GAR_NAMESPACE::ConstructEdgesCollection(
           graph->graph_info, src_label, edge_label, dst_label, adj_list_type);
@@ -111,7 +97,16 @@ GRIN_GRAPH get_graph_by_info_path(const std::string& path) {
           {adj_list_type, std::move(edges)});
     }
 
-    adj_list_type = unordered_by_dest;
+    adj_list_type = GAR_UNORDERED_BY_SOURCE;
+    if (edge_info.ContainAdjList(adj_list_type)) {
+      auto maybe_edges_collection = GAR_NAMESPACE::ConstructEdgesCollection(
+          graph->graph_info, src_label, edge_label, dst_label, adj_list_type);
+      auto& edges = maybe_edges_collection.value();
+      graph->edges_collections[graph->edge_type_num].insert(
+          {adj_list_type, std::move(edges)});
+    }
+
+    adj_list_type = GAR_UNORDERED_BY_DEST;
     if (edge_info.ContainAdjList(adj_list_type)) {
       auto maybe_edges_collection = GAR_NAMESPACE::ConstructEdgesCollection(
           graph->graph_info, src_label, edge_label, dst_label, adj_list_type);
@@ -181,29 +176,29 @@ size_t __grin_get_edge_num(GRIN_GRAPH_T* _g, unsigned type_begin,
     }
     _g->edge_num[type_id] = 0;
 
-    if (_g->edges_collections[type_id].find(ordered_by_source) !=
+    if (_g->edges_collections[type_id].find(GAR_ORDERED_BY_SOURCE) !=
         _g->edges_collections[type_id].end()) {
       _g->edge_num[type_id] =
-          std::get<GAR_NAMESPACE::EdgesCollection<ordered_by_source>>(
-              _g->edges_collections[type_id].at(ordered_by_source))
+          std::get<GAR_NAMESPACE::EdgesCollection<GAR_ORDERED_BY_SOURCE>>(
+              _g->edges_collections[type_id].at(GAR_ORDERED_BY_SOURCE))
               .size();
-    } else if (_g->edges_collections[type_id].find(ordered_by_dest) !=
+    } else if (_g->edges_collections[type_id].find(GAR_ORDERED_BY_DEST) !=
                _g->edges_collections[type_id].end()) {
       _g->edge_num[type_id] =
-          std::get<GAR_NAMESPACE::EdgesCollection<ordered_by_dest>>(
-              _g->edges_collections[type_id].at(ordered_by_dest))
+          std::get<GAR_NAMESPACE::EdgesCollection<GAR_ORDERED_BY_DEST>>(
+              _g->edges_collections[type_id].at(GAR_ORDERED_BY_DEST))
               .size();
-    } else if (_g->edges_collections[type_id].find(unordered_by_source) !=
+    } else if (_g->edges_collections[type_id].find(GAR_UNORDERED_BY_SOURCE) !=
                _g->edges_collections[type_id].end()) {
       _g->edge_num[type_id] =
-          std::get<GAR_NAMESPACE::EdgesCollection<unordered_by_source>>(
-              _g->edges_collections[type_id].at(unordered_by_source))
+          std::get<GAR_NAMESPACE::EdgesCollection<GAR_UNORDERED_BY_SOURCE>>(
+              _g->edges_collections[type_id].at(GAR_UNORDERED_BY_SOURCE))
               .size();
-    } else if (_g->edges_collections[type_id].find(unordered_by_dest) !=
+    } else if (_g->edges_collections[type_id].find(GAR_UNORDERED_BY_DEST) !=
                _g->edges_collections[type_id].end()) {
       _g->edge_num[type_id] =
-          std::get<GAR_NAMESPACE::EdgesCollection<unordered_by_dest>>(
-              _g->edges_collections[type_id].at(unordered_by_dest))
+          std::get<GAR_NAMESPACE::EdgesCollection<GAR_UNORDERED_BY_DEST>>(
+              _g->edges_collections[type_id].at(GAR_UNORDERED_BY_DEST))
               .size();
     }
     res += _g->edge_num[type_id];
