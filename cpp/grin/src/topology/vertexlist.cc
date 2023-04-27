@@ -75,9 +75,9 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _vli = static_cast<GRIN_VERTEX_LIST_ITERATOR_T*>(vli);
   _vli->current_offset++;
-  if (_vli->current_type < _vli->type_end &&
-      _vli->current_offset >= _g->vertex_offsets[_vli->current_type + 1] -
-                                  _g->vertex_offsets[_vli->current_type]) {
+  while (_vli->current_type < _vli->type_end &&
+         _vli->current_offset >= _g->vertex_offsets[_vli->current_type + 1] -
+                                     _g->vertex_offsets[_vli->current_type]) {
     _vli->current_type++;
     _vli->current_offset = 0;
   }
@@ -86,12 +86,8 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
 bool grin_is_vertex_list_end(GRIN_GRAPH g, GRIN_VERTEX_LIST_ITERATOR vli) {
   if (vli == GRIN_NULL_LIST_ITERATOR)
     return true;
-  auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _vli = static_cast<GRIN_VERTEX_LIST_ITERATOR_T*>(vli);
-  return ((_vli->current_type >= _vli->type_end) ||
-          (_vli->current_type == _vli->type_end - 1 &&
-           _vli->current_offset >= _g->vertex_offsets[_vli->current_type + 1] -
-                                       _g->vertex_offsets[_vli->current_type]));
+  return _vli->current_type >= _vli->type_end;
 }
 
 GRIN_VERTEX grin_get_vertex_from_iter(GRIN_GRAPH g,
