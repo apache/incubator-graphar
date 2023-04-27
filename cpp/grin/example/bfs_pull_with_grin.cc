@@ -19,6 +19,7 @@ limitations under the License.
 
 #include "grin/test/config.h"
 
+extern "C" {
 #include "grin/include/index/order.h"
 #include "grin/include/property/property.h"
 #include "grin/include/property/propertytable.h"
@@ -27,6 +28,7 @@ limitations under the License.
 #include "grin/include/topology/edgelist.h"
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
+}
 
 void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
   std::cout << "++++ Run BFS (pull) algorithm with GRIN ++++" << std::endl;

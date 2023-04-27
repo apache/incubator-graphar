@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "grin/test/config.h"
 
+extern "C" {
 #include "grin/include/index/order.h"
 #include "grin/include/property/property.h"
 #include "grin/include/property/propertytable.h"
@@ -28,6 +29,7 @@ limitations under the License.
 #include "grin/include/topology/edgelist.h"
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
+}
 
 void run_cc(GRIN_GRAPH graph, bool print_result = false) {
   std::cout << "++++ Run CC (push) algorithm with GRIN ++++" << std::endl;
