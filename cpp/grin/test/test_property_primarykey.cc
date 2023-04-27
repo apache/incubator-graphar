@@ -17,6 +17,7 @@ limitations under the License.
 
 #include "grin/test/config.h"
 
+extern "C" {
 #include "grin/include/property/primarykey.h"
 #include "grin/include/property/property.h"
 #include "grin/include/property/propertylist.h"
@@ -26,6 +27,7 @@ limitations under the License.
 #include "grin/include/topology/edgelist.h"
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
+}
 
 void test_property_primarykey(GRIN_GRAPH graph) {
   std::cout << "\n++++ test property: primarykey ++++" << std::endl;

@@ -17,11 +17,13 @@ limitations under the License.
 
 #include "grin/test/config.h"
 
+extern "C" {
 #include "grin/include/proto/message.h"
 #include "grin/include/topology/adjacentlist.h"
 #include "grin/include/topology/edgelist.h"
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
+}
 
 void test_protobuf() {
   std::cout << "\n++++ test protobuf ++++" << std::endl;

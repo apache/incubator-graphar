@@ -17,9 +17,11 @@ limitations under the License.
 
 #include "grin/test/config.h"
 
+extern "C" {
 #include "grin/include/index/order.h"
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
+}
 
 void test_index_order(GRIN_GRAPH graph) {
   std::cout << "\n++++ test index: order ++++" << std::endl;

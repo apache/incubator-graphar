@@ -17,12 +17,14 @@ limitations under the License.
 
 #include "grin/test/config.h"
 
+extern "C" {
 #include "grin/include/property/topology.h"
 #include "grin/include/property/type.h"
 #include "grin/include/topology/adjacentlist.h"
 #include "grin/include/topology/edgelist.h"
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
+}
 
 void test_property_topology_vertex(GRIN_GRAPH graph) {
   std::cout << "\n++++ test property: topology (vertex) ++++" << std::endl;

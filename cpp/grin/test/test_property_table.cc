@@ -17,6 +17,7 @@ limitations under the License.
 
 #include "grin/test/config.h"
 
+extern "C" {
 #include "grin/include/property/property.h"
 #include "grin/include/property/propertylist.h"
 #include "grin/include/property/propertytable.h"
@@ -26,6 +27,7 @@ limitations under the License.
 #include "grin/include/topology/edgelist.h"
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
+}
 
 void test_property_table_row(GRIN_GRAPH graph) {
   std::cout << "\n++++ test property: table (row) ++++" << std::endl;
@@ -35,12 +37,12 @@ void test_property_table_row(GRIN_GRAPH graph) {
 
   // insert value to row
   int32_t value0 = 0;
-  std::string value1 = "Test String";
+  const char* value1 = "Test String";
   std::cout << "put value0: " << value0 << std::endl;
   std::cout << "put value1: " << value1 << std::endl;
   assert(grin_insert_value_to_row(graph, row, GRIN_DATATYPE::Int32, &value0) ==
          true);
-  assert(grin_insert_value_to_row(graph, row, GRIN_DATATYPE::String, &value1) ==
+  assert(grin_insert_value_to_row(graph, row, GRIN_DATATYPE::String, value1) ==
          true);
 
   // get value from row
@@ -50,10 +52,9 @@ void test_property_table_row(GRIN_GRAPH graph) {
   // check value
   std::cout << "get value0: " << *static_cast<const int32_t*>(value0_)
             << std::endl;
-  std::cout << "get value1: " << *static_cast<const std::string*>(value1_)
-            << std::endl;
+  std::cout << "get value1: " << static_cast<const char*>(value1_) << std::endl;
   assert(*static_cast<const int32_t*>(value0_) == value0);
-  assert(*static_cast<const std::string*>(value1_) == value1);
+  assert(strcmp(static_cast<const char*>(value1_), value1) == 0);
 
   // destroy value
   grin_destroy_value(graph, GRIN_DATATYPE::Int32, value0_);
@@ -127,11 +128,11 @@ void test_property_table_vertex(GRIN_GRAPH graph) {
 
       // check value from row and from table (string)
       if (data_type == GRIN_DATATYPE::String) {
-        assert(*static_cast<const std::string*>(value1) ==
-               *static_cast<const std::string*>(value2));
+        assert(strcmp(static_cast<const char*>(value1),
+                      static_cast<const char*>(value2)) == 0);
         std::cout << "value of property \"" << name
                   << "\" for vertex 0 of vertex type " << i << ": "
-                  << *static_cast<const std::string*>(value1) << std::endl;
+                  << static_cast<const char*>(value1) << std::endl;
         std::cout << "check values from row and from table are equal (string)"
                   << std::endl;
       }
@@ -220,11 +221,11 @@ void test_property_table_edge(GRIN_GRAPH graph) {
 
       // check value from row and from table (string)
       if (data_type == GRIN_DATATYPE::String) {
-        assert(*static_cast<const std::string*>(value1) ==
-               *static_cast<const std::string*>(value2));
+        assert(strcmp(static_cast<const char*>(value1),
+                      static_cast<const char*>(value2)) == 0);
         std::cout << "value of property \"" << name
                   << "\" for edge 0 of edge type " << i << ": "
-                  << *static_cast<const std::string*>(value1) << std::endl;
+                  << static_cast<const char*>(value1) << std::endl;
         std::cout << "check values from row and from table are equal (string)"
                   << std::endl;
       }
