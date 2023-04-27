@@ -13,7 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+extern "C" {
 #include "grin/include/property/propertytable.h"
+}
 #include "grin/src/predefine.h"
 
 #ifdef GRIN_ENABLE_ROW
@@ -40,8 +42,13 @@ const void* grin_get_value_from_row(GRIN_GRAPH g, GRIN_ROW r,
     return new float(std::any_cast<float>((*_r)[idx]));
   case GRIN_DATATYPE::Double:
     return new double(std::any_cast<double>((*_r)[idx]));
-  case GRIN_DATATYPE::String:
-    return new std::string(std::any_cast<std::string>((*_r)[idx]));
+  case GRIN_DATATYPE::String: {
+    auto&& s = std::any_cast<std::string>((*_r)[idx]);
+    int len = s.length() + 1;
+    char* out = new char[len];
+    snprintf(out, len, "%s", s.c_str());
+    return out;
+  }
   case GRIN_DATATYPE::Date32:
     return new int32_t(std::any_cast<int32_t>((*_r)[idx]));
   case GRIN_DATATYPE::Date64:
@@ -80,7 +87,7 @@ bool grin_insert_value_to_row(GRIN_GRAPH g, GRIN_ROW r, GRIN_DATATYPE type,
     _r->push_back(*static_cast<const double*>(value));
     return true;
   case GRIN_DATATYPE::String:
-    _r->push_back(*static_cast<const std::string*>(value));
+    _r->push_back(std::string(static_cast<const char*>(value)));
     return true;
   case GRIN_DATATYPE::Date32:
     _r->push_back(*static_cast<const int32_t*>(value));
@@ -139,8 +146,11 @@ const void* grin_get_value_from_vertex_property_table(
     return value;
   }
   case GRIN_DATATYPE::String: {
-    auto value = new std::string(it.property<std::string>(_vp->name).value());
-    return value;
+    auto s = it.property<std::string>(_vp->name).value();
+    int len = s.length() + 1;
+    char* out = new char[len];
+    snprintf(out, len, "%s", s.c_str());
+    return out;
   }
   default:
     return NULL;
@@ -266,9 +276,11 @@ const void* grin_get_value_from_edge_property_table(
     return value;
   }
   case GRIN_DATATYPE::String: {
-    auto value =
-        new std::string(_e->edge.property<std::string>(_ep->name).value());
-    return value;
+    auto s = _e->edge.property<std::string>(_ep->name).value();
+    int len = s.length() + 1;
+    char* out = new char[len];
+    snprintf(out, len, "%s", s.c_str());
+    return out;
   }
   default:
     return NULL;
