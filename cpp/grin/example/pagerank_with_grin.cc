@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <chrono>
+#include <ctime>
 #include <iostream>
 #include <vector>
 
@@ -145,26 +145,22 @@ int main(int argc, char* argv[]) {
   char** args = new char*[1];
   args[0] = new char[path.length() + 1];
   snprintf(args[0], path.length() + 1, "%s", path.c_str());
-  auto init_start = std::chrono::high_resolution_clock::now();
+  auto init_start = clock();
   GRIN_GRAPH graph = grin_get_graph_from_storage(1, args);
-  auto init_end = std::chrono::high_resolution_clock::now();
-  auto init_time = std::chrono::duration_cast<std::chrono::milliseconds>(
-      init_end - init_start);
+  auto init_time = 1000.0 * (clock() - init_start) / CLOCKS_PER_SEC;
 
   // run pagerank algorithm
-  auto run_start = std::chrono::high_resolution_clock::now();
+  auto run_start = clock();
   run_pagerank(graph);
-  auto run_end = std::chrono::high_resolution_clock::now();
-  auto run_time = std::chrono::duration_cast<std::chrono::milliseconds>(
-      run_end - run_start);
+  auto run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
 
   // output execution time
-  std::cout << "Init time for PageRank with GRIN = " << init_time.count()
-            << " ms" << std::endl;
-  std::cout << "Run time for PageRank with GRIN = " << run_time.count() << " ms"
+  std::cout << "Init time for PageRank with GRIN = " << init_time << " ms"
             << std::endl;
-  std::cout << "Totoal time for PageRank with GRIN = "
-            << init_time.count() + run_time.count() << " ms" << std::endl;
+  std::cout << "Run time for PageRank with GRIN = " << run_time << " ms"
+            << std::endl;
+  std::cout << "Totoal time for PageRank with GRIN = " << init_time + run_time
+            << " ms" << std::endl;
 
   return 0;
 }
