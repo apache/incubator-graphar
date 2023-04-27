@@ -14,7 +14,9 @@ limitations under the License.
 */
 #include <set>
 
+extern "C" {
 #include "grin/include/property/propertylist.h"
+}
 #include "grin/src/predefine.h"
 
 #ifdef GRIN_WITH_VERTEX_PROPERTY

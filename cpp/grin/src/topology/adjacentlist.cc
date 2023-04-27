@@ -13,7 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+extern "C" {
 #include "grin/include/topology/adjacentlist.h"
+}
 #include "grin/src/predefine.h"
 
 #ifdef GRIN_ENABLE_ADJACENT_LIST

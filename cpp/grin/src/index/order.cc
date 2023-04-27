@@ -13,7 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+extern "C" {
 #include "grin/include/index/order.h"
+}
 #include "grin/src/predefine.h"
 
 #ifdef GRIN_ASSUME_ALL_VERTEX_LIST_SORTED

@@ -15,8 +15,10 @@ limitations under the License.
 
 #include <utility>
 
+extern "C" {
 #include "grin/include/property/primarykey.h"
 #include "grin/include/property/propertytable.h"
+}
 #include "grin/src/predefine.h"
 
 #ifdef GRIN_ENABLE_VERTEX_PRIMARY_KEYS

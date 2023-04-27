@@ -16,7 +16,9 @@ limitations under the License.
 #include <google/protobuf/util/json_util.h>
 
 #include "./graph.pb.h"
+extern "C" {
 #include "grin/include/proto/message.h"
+}
 #include "grin/src/predefine.h"
 
 const char* grin_get_static_storage_feature_msg() {

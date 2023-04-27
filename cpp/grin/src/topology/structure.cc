@@ -13,7 +13,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+extern "C" {
 #include "grin/include/topology/structure.h"
+}
 #include "grin/src/predefine.h"
 
 GRIN_GRAPH grin_get_graph_from_storage(int argc, char** argv) {
@@ -106,7 +108,7 @@ void grin_destroy_value(GRIN_GRAPH g, GRIN_DATATYPE type, const void* value) {
     delete static_cast<double const*>(value);
     break;
   case GRIN_DATATYPE::String:
-    delete static_cast<std::string const*>(value);
+    delete[] static_cast<char const*>(value);
     break;
   case GRIN_DATATYPE::Date32:
     delete static_cast<int32_t const*>(value);
