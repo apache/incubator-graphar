@@ -35,6 +35,26 @@ foreach(f ${TEST_FILES})
 endforeach()
 
 # ------------------------------------------------------------------------------
+# build C tests
+# ------------------------------------------------------------------------------
+file(GLOB C_TEST_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/c_test" "${PROJECT_SOURCE_DIR}/grin/c_test/*.c")
+
+foreach(f ${C_TEST_FILES})
+    string(REGEX MATCH "^(.*)\\.[^.]*$" dummy ${f})
+    set(E_NAME ${CMAKE_MATCH_1})
+    message(STATUS "Found C test - " ${E_NAME})
+    add_executable(C_${E_NAME} c_test/${E_NAME}.c)
+    target_include_directories(C_${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${Protobuf_INCLUDE_DIRS})
+    target_link_libraries(C_${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES})
+
+    # if OpenSSL library exists, link the OpenSSL library.
+    # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
+    if(OPENSSL_FOUND)
+        target_link_libraries(C_${E_NAME} PRIVATE OpenSSL::SSL)
+    endif()
+endforeach()
+
+# ------------------------------------------------------------------------------
 # build examples
 # ------------------------------------------------------------------------------
 file(GLOB EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/example" "${PROJECT_SOURCE_DIR}/grin/example/*.cc")
