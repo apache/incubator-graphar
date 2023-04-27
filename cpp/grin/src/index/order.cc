@@ -32,18 +32,16 @@ bool grin_smaller_vertex(GRIN_GRAPH g, GRIN_VERTEX v1, GRIN_VERTEX v2) {
 size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
                                                     GRIN_VERTEX_LIST vl,
                                                     GRIN_VERTEX v) {
-  auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
   auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
-  auto vtype = _v->type_id;
-  size_t pos;
-  if (vtype < _vl->type_begin || vtype >= _vl->type_end)
+  if (_v->type_id < _vl->type_begin || _v->type_id >= _vl->type_end)
     return GRIN_NULL_SIZE;
-  auto offset = _g->vertex_offsets[vtype] + _v->id;
-  if (offset < _g->vertex_offsets[vtype + 1]) {
-    pos = offset - _g->vertex_offsets[_vl->type_begin];
-    return pos;
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  size_t offset = _g->vertex_offsets[_v->type_id] + _v->id;
+  if (offset < _g->vertex_offsets[_v->type_id + 1]) {
+    return offset - _g->vertex_offsets[_vl->type_begin];
+  } else {
+    return GRIN_NULL_SIZE;
   }
-  return GRIN_NULL_SIZE;
 }
 #endif
