@@ -52,6 +52,12 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
     auto property_list =
         grin_get_vertex_property_list_by_type(graph, vertex_type);
     size_t vpn = grin_get_vertex_property_list_size(graph, property_list);
+    std::vector<GRIN_EDGE_PROPERTY> properties;
+    for (auto idx = 0; idx < vpn; idx++) {
+      auto property =
+          grin_get_vertex_property_from_list(graph, property_list, idx);
+      properties.push_back(property);
+    }
 
     // get property table
     auto table = grin_get_vertex_property_table_by_type(graph, vertex_type);
@@ -63,14 +69,11 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
     auto it = grin_get_vertex_list_begin(graph, select_vertex_list);
     while (grin_is_vertex_list_end(graph, it) == false) {
       auto v = grin_get_vertex_from_iter(graph, it);
-      // get row from property table
-      auto r = grin_get_row_from_vertex_property_table(graph, table, v,
-                                                       property_list);
       for (auto idx = 0; idx < vpn; idx++) {
-        auto property =
-            grin_get_vertex_property_from_list(graph, property_list, idx);
+        auto property = properties[idx];
         auto data_type = grin_get_vertex_property_data_type(graph, property);
-        auto value = grin_get_value_from_row(graph, r, data_type, idx);
+        auto value = grin_get_value_from_vertex_property_table(graph, table, v,
+                                                               property);
         if (print_result) {
           switch (data_type) {
           case GRIN_DATATYPE::Int32: {
@@ -97,14 +100,12 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
             std::cout << "Unsupported data type." << std::endl;
           }
         }
-        grin_destroy_vertex_property(graph, property);
         grin_destroy_value(graph, data_type, value);
       }
       if (print_result) {
         std::cout << std::endl;
       }
       grin_destroy_vertex(graph, v);
-      grin_destroy_row(graph, r);
       grin_get_next_vertex_list_iter(graph, it);
     }
 
@@ -116,6 +117,9 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
     grin_destroy_vertex_list(graph, select_vertex_list);
     grin_destroy_vertex_property_table(graph, table);
     grin_destroy_vertex_property_list(graph, property_list);
+    for (auto property : properties) {
+      grin_destroy_vertex_property(graph, property);
+    }
   }
 
   // destroy vertex list
@@ -160,14 +164,11 @@ void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
     auto it = grin_get_edge_list_begin(graph, select_edge_list);
     while (grin_is_edge_list_end(graph, it) == false) {
       auto e = grin_get_edge_from_iter(graph, it);
-      // get row from property table
-      auto r =
-          grin_get_row_from_edge_property_table(graph, table, e, property_list);
       for (auto idx = 0; idx < epn; idx++) {
         auto property = properties[idx];
-        //    grin_get_edge_property_from_list(graph, property_list, idx);
         auto data_type = grin_get_edge_property_data_type(graph, property);
-        auto value = grin_get_value_from_row(graph, r, data_type, idx);
+        auto value =
+            grin_get_value_from_edge_property_table(graph, table, e, property);
         if (print_result) {
           switch (data_type) {
           case GRIN_DATATYPE::Int32: {
@@ -200,7 +201,6 @@ void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
         std::cout << std::endl;
       }
       grin_destroy_edge(graph, e);
-      grin_destroy_row(graph, r);
       grin_get_next_edge_list_iter(graph, it);
     }
     std::cout << std::endl;
@@ -234,12 +234,12 @@ int main(int argc, char* argv[]) {
 
   // test vertex properties
   auto run_start = clock();
-  test_vertex_properties(graph, true);
+  test_vertex_properties(graph);
   auto vertex_run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
 
   // test edge properties
   run_start = clock();
-  test_edge_properties(graph, true);
+  test_edge_properties(graph);
   auto edge_run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
 
   // print run time

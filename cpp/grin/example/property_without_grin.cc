@@ -170,12 +170,12 @@ int main(int argc, char* argv[]) {
 
   // test vertex properties
   auto run_start = clock();
-  test_vertex_properties(graph_info, true);
+  test_vertex_properties(graph_info);
   auto vertex_run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
 
   // test edge properties
   run_start = clock();
-  test_edge_properties(graph_info, true);
+  test_edge_properties(graph_info);
   auto edge_run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
 
   // print run time
