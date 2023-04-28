@@ -35,7 +35,7 @@ object EdgeWriter {
                                  edgeDf: DataFrame,
                                  edgeInfo: EdgeInfo,
                                  adjListType: AdjListType.Value,
-                                 vertexNumOfPrimaryVertexLabel: Long): (DataFrame, Seq[DataFrame], Array[Long]) = {
+                                 vertexNumOfPrimaryVertexLabel: Long): (DataFrame, Seq[DataFrame], Array[Long], Map[Long, Int]) = {
     import spark.implicits._
     val edgeSchema = edgeDf.schema
     val colName = if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.unordered_by_source) GeneralParams.srcIndexCol else GeneralParams.dstIndexCol
@@ -117,10 +117,10 @@ object EdgeWriter {
         offsetChunk.cache()
         offsetChunk
       }}
-      return (partitionEdgeDf, offsetDfArray, aggEdgeChunkNumOfVertexChunks)
+      return (partitionEdgeDf, offsetDfArray, aggEdgeChunkNumOfVertexChunks, edgeNumMutableMap.toMap)
     }
     val offsetDfArray = Seq.empty[DataFrame]
-    return (partitionEdgeDf, offsetDfArray, aggEdgeChunkNumOfVertexChunks)
+    return (partitionEdgeDf, offsetDfArray, aggEdgeChunkNumOfVertexChunks, edgeNumMutableMap.toMap)
   }
 }
 
@@ -136,6 +136,7 @@ object EdgeWriter {
 class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Value, vertexNum: Long, edgeDf: DataFrame) {
   private val spark: SparkSession = edgeDf.sparkSession
   validate()
+  writeVertexNum()
 
   // validate data and info
   private def validate(): Unit = {
@@ -152,8 +153,24 @@ class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Va
     }
   }
 
-  private val edgeDfAndOffsetDf: (DataFrame,  Seq[DataFrame], Array[Long]) =
+  private def writeVertexNum(): Unit = {
+    val outputPath = prefix + edgeInfo.getVerticesNumFilePath(adjListType)
+    FileSystem.writeValue(vertexNum, outputPath, spark.sparkContext.hadoopConfiguration)
+  }
+
+  private val edgeDfAndOffsetDf: (DataFrame,  Seq[DataFrame], Array[Long], Map[Long, Int]) =
       EdgeWriter.repartitionAndSort(spark, edgeDf, edgeInfo, adjListType, vertexNum)
+
+  // write out the edge number
+  private def writeEdgeNum(): Unit = {
+    val vertexChunkSize: Long = if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.unordered_by_source) edgeInfo.getSrc_chunk_size() else edgeInfo.getDst_chunk_size()
+    val vertexChunkNum: Int = ((vertexNum + vertexChunkSize - 1) / vertexChunkSize).toInt
+    for (i <- 0 until vertexChunkNum) {
+      val edgeNumber = edgeDfAndOffsetDf._4(i)
+      val outputPath = prefix + edgeInfo.getEdgesNumFilePath(i, adjListType)
+      FileSystem.writeValue(edgeNumber, outputPath, spark.sparkContext.hadoopConfiguration)
+    }
+  }
 
   // write out the generated offset chunks
   private def writeOffset(): Unit = {
@@ -175,6 +192,7 @@ class EdgeWriter(prefix: String, edgeInfo: EdgeInfo, adjListType: AdjListType.Va
     if (adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.ordered_by_dest) {
       writeOffset()
     }
+    writeEdgeNum()
   }
 
   /** Generate the chunks of the property group from edge dataframe.
