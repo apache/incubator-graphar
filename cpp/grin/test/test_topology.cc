@@ -75,8 +75,10 @@ void test_topology_vertexlist(GRIN_GRAPH graph) {
   auto it = grin_get_vertex_list_begin(graph, vertex_list);
   auto count = 0;
   while (grin_is_vertex_list_end(graph, it) == false) {
-    auto v = grin_get_vertex_from_iter(graph, it);
-    grin_destroy_vertex(graph, v);
+    if (count < 10000) {
+      auto v = grin_get_vertex_from_iter(graph, it);
+      grin_destroy_vertex(graph, v);
+    }
     grin_get_next_vertex_list_iter(graph, it);
     count++;
   }

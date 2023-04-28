@@ -51,21 +51,21 @@ void test_property_primarykey(GRIN_GRAPH graph) {
               << std::endl;
 
     // get row from property table
-    std::cout << "get row from property table for vertex 0" << std::endl;
+    std::cout << "get row from property table for vertex A" << std::endl;
     auto vertex_list = grin_get_vertex_list(graph);
     auto select_vertex_list =
         grin_select_type_for_vertex_list(graph, vertex_type, vertex_list);
-    auto vertex = grin_get_vertex_from_list(graph, select_vertex_list, 0);
+    auto vertex = grin_get_vertex_from_list(graph, select_vertex_list, 100);
     auto vertex_table =
         grin_get_vertex_property_table_by_type(graph, vertex_type);
     auto row = grin_get_row_from_vertex_property_table(graph, vertex_table,
                                                        vertex, property_list);
 
     // get vertex from primary keys
-    std::cout << "get vertex 1 from primary keys" << std::endl;
+    std::cout << "get vertex B from primary keys" << std::endl;
     auto vertex2 = grin_get_vertex_by_primary_keys(graph, vertex_type, row);
     assert(grin_equal_vertex(graph, vertex, vertex2) == true);
-    std::cout << "vertex 0 and vertex 1 are equal" << std::endl;
+    std::cout << "vertex A and verter B are equal" << std::endl;
 
     // destroy
     grin_destroy_vertex_property_list(graph, property_list);
