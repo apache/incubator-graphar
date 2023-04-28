@@ -36,8 +36,12 @@ extern "C" {
 struct GRIN_VERTEX_T {
   GAR_NAMESPACE::IdType id;
   unsigned type_id;
+  std::optional<GAR_NAMESPACE::Vertex> vertex;
   GRIN_VERTEX_T(GAR_NAMESPACE::IdType _id, unsigned _type_id)
       : id(_id), type_id(_type_id) {}
+  GRIN_VERTEX_T(GAR_NAMESPACE::IdType _id, unsigned _type_id,
+                GAR_NAMESPACE::Vertex _vertex)
+      : id(_id), type_id(_type_id), vertex(std::move(_vertex)) {}
 };
 
 typedef GAR_NAMESPACE::IdType GRIN_VERTEX_ORIGINAL_ID_T;
@@ -92,13 +96,16 @@ struct GRIN_VERTEX_LIST_ITERATOR_T {
   unsigned type_end;
   unsigned current_type;
   GAR_NAMESPACE::IdType current_offset;
+  GAR_NAMESPACE::VertexIter iter;
   GRIN_VERTEX_LIST_ITERATOR_T(unsigned _type_begin, unsigned _type_end,
                               unsigned _current_type,
-                              GAR_NAMESPACE::IdType _current_offset)
+                              GAR_NAMESPACE::IdType _current_offset,
+                              GAR_NAMESPACE::VertexIter _iter)
       : type_begin(_type_begin),
         type_end(_type_end),
         current_type(_current_type),
-        current_offset(_current_offset) {}
+        current_offset(_current_offset),
+        iter(std::move(_iter)) {}
 };
 #endif
 

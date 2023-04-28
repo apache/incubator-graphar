@@ -58,9 +58,11 @@ GRIN_VERTEX grin_get_vertex_from_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl,
 #ifdef GRIN_ENABLE_VERTEX_LIST_ITERATOR
 GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
                                                      GRIN_VERTEX_LIST vl) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
-  auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(_vl->type_begin, _vl->type_end,
-                                             _vl->type_begin, 0);
+  auto& vertices = _g->vertices_collections[_vl->type_begin];
+  auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(
+      _vl->type_begin, _vl->type_end, _vl->type_begin, 0, vertices.begin());
   return vli;
 }
 
@@ -74,12 +76,17 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
                                     GRIN_VERTEX_LIST_ITERATOR vli) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _vli = static_cast<GRIN_VERTEX_LIST_ITERATOR_T*>(vli);
-  _vli->current_offset++;
+  ++_vli->current_offset;
+  ++_vli->iter;
   while (_vli->current_type < _vli->type_end &&
          _vli->current_offset >= _g->vertex_offsets[_vli->current_type + 1] -
                                      _g->vertex_offsets[_vli->current_type]) {
     _vli->current_type++;
     _vli->current_offset = 0;
+    if (_vli->current_type < _vli->type_end) {
+      auto& vertices = _g->vertices_collections[_vli->current_type];
+      _vli->iter = vertices.begin();
+    }
   }
 }
 
@@ -93,7 +100,8 @@ bool grin_is_vertex_list_end(GRIN_GRAPH g, GRIN_VERTEX_LIST_ITERATOR vli) {
 GRIN_VERTEX grin_get_vertex_from_iter(GRIN_GRAPH g,
                                       GRIN_VERTEX_LIST_ITERATOR vli) {
   auto _vli = static_cast<GRIN_VERTEX_LIST_ITERATOR_T*>(vli);
-  auto v = new GRIN_VERTEX_T(_vli->current_offset, _vli->current_type);
+  auto v =
+      new GRIN_VERTEX_T(_vli->current_offset, _vli->current_type, *_vli->iter);
   return v;
 }
 #endif
