@@ -245,9 +245,9 @@ int main(int argc, char* argv[]) {
   // print run time
   std::cout << "Init time for building graph with GRIN = " << init_time << " ms"
             << std::endl;
-  std::cout << "Run time for vertex properties without GRIN = "
+  std::cout << "Run time for vertex properties with GRIN = "
             << vertex_run_time << " ms" << std::endl;
-  std::cout << "Run time for edge properties without GRIN = " << edge_run_time
+  std::cout << "Run time for edge properties with GRIN = " << edge_run_time
             << " ms" << std::endl;
 
   return 0;

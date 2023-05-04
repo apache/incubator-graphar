@@ -55,14 +55,29 @@ GRIN_EDGE_TYPE get_one_edge_type(GRIN_GRAPH g) {
 
 GRIN_VERTEX get_one_vertex(GRIN_GRAPH g) {
   GRIN_VERTEX_LIST vl = grin_get_vertex_list(g);
+#ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
   GRIN_VERTEX v = grin_get_vertex_from_list(g, vl, 0);
+#else
+  GRIN_VERTEX_LIST_ITERATOR vli = grin_get_vertex_list_begin(g, vl);
+  GRIN_VERTEX v = grin_get_vertex_from_iter(g, vli);
+  grin_destroy_vertex_list_iter(g, vli);
+#endif
   grin_destroy_vertex_list(g, vl);
   return v;
 }
 
 GRIN_VERTEX get_vertex_marco(GRIN_GRAPH g) {
   GRIN_VERTEX_LIST vl = grin_get_vertex_list(g);
+#ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
   GRIN_VERTEX v = grin_get_vertex_from_list(g, vl, 3);
+#else
+  GRIN_VERTEX_LIST_ITERATOR vli = grin_get_vertex_list_begin(g, vl);
+  for (int i = 0; i < 3; ++i) {
+    grin_get_next_vertex_list_iter(g, vli);
+  }
+  GRIN_VERTEX v = grin_get_vertex_from_iter(g, vli);
+  grin_destroy_vertex_list_iter(g, vli);
+#endif
   grin_destroy_vertex_list(g, vl);
   return v;
 }
@@ -245,12 +260,18 @@ void test_property_topology(int argc, char** argv) {
 
 #ifdef GRIN_ENABLE_VERTEX_LIST
   GRIN_VERTEX_LIST vl = grin_get_vertex_list(g);
+
+#ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
   size_t vl_size = grin_get_vertex_list_size(g, vl);
   printf("vertex list size: %zu\n", vl_size);
+#endif
 
+#ifdef GRIN_TRAIT_SELECT_TYPE_FOR_VERTEX_LIST
   GRIN_VERTEX_LIST typed_vl = grin_select_type_for_vertex_list(g, vt, vl);
-  size_t typed_vl_size = grin_get_vertex_list_size(g, typed_vl);
   size_t typed_vnum = grin_get_vertex_num_by_type(g, vt);
+
+#ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
+  size_t typed_vl_size = grin_get_vertex_list_size(g, typed_vl);
   printf("vertex number under type: %zu %zu\n", typed_vl_size, typed_vnum);
 
   for (size_t j = 0; j < typed_vl_size; ++j) {
@@ -262,7 +283,26 @@ void test_property_topology(int argc, char** argv) {
     grin_destroy_vertex_type(g, v_type);
     grin_destroy_vertex(g, v);
   }
+#else
+  GRIN_VERTEX_LIST_ITERATOR vli = grin_get_vertex_list_begin(g, typed_vl);
+  size_t typed_vl_size2 = 0;
+  while (grin_is_vertex_list_end(g, vli) == false) {
+    ++typed_vl_size2;
+    GRIN_VERTEX v = grin_get_vertex_from_iter(g, vli);
+    GRIN_VERTEX_TYPE v_type = grin_get_vertex_type(g, v);
+    if (!grin_equal_vertex_type(g, v_type, vt)) {
+      printf("vertex type not match\n");
+    }
+    grin_destroy_vertex_type(g, v_type);
+    grin_destroy_vertex(g, v);
+    grin_get_next_vertex_list_iter(g, vli);
+  }
+  printf("vertex number under type: %zu %zu\n", typed_vl_size2, typed_vnum);
+  grin_destroy_vertex_list_iter(g, vli);
+#endif
+
   grin_destroy_vertex_list(g, typed_vl);
+#endif
   grin_destroy_vertex_list(g, vl);
 #endif
 
@@ -336,13 +376,25 @@ void test_property_vertex_table(int argc, char** argv) {
 
     GRIN_VERTEX_LIST vl = grin_get_vertex_list(g);
     GRIN_VERTEX_LIST typed_vl = grin_select_type_for_vertex_list(g, vt, vl);
-    size_t typed_vl_size = grin_get_vertex_list_size(g, typed_vl);
+    size_t typed_vl_size = 
+#ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
+    grin_get_vertex_list_size(g, typed_vl);
+#else
+    grin_get_vertex_num_by_type(g, vt);
+#endif
     size_t vpl_size = grin_get_vertex_property_list_size(g, vpl);
     printf("vertex list size: %zu vertex property list size: %zu\n",
            typed_vl_size, vpl_size);
 
+#ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
     for (size_t i = 0; i < typed_vl_size; ++i) {
       GRIN_VERTEX v = grin_get_vertex_from_list(g, typed_vl, i);
+#else
+    GRIN_VERTEX_LIST_ITERATOR vli = grin_get_vertex_list_begin(g, typed_vl);
+    size_t i = 0;
+    while (grin_is_vertex_list_end(g, vli) == 0) {
+      GRIN_VERTEX v = grin_get_vertex_from_iter(g, vli);
+#endif
       GRIN_ROW row = grin_get_row_from_vertex_property_table(g, vpt, v, vpl);
       for (size_t j = 0; j < vpl_size; ++j) {
         GRIN_VERTEX_PROPERTY vp = grin_get_vertex_property_from_list(g, vpl, j);
@@ -389,7 +441,14 @@ void test_property_vertex_table(int argc, char** argv) {
       }
       grin_destroy_row(g, row);
       grin_destroy_vertex(g, v);
+#ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
     }
+#else
+      grin_get_next_vertex_list_iter(g, vli);
+      ++i;
+    }
+    grin_destroy_vertex_list_iter(g, vli);
+#endif
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_PROPERTY
     GRIN_VERTEX_PROPERTY vp3 =
