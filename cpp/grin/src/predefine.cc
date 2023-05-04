@@ -75,7 +75,7 @@ GRIN_GRAPH get_graph_by_info_path(const std::string& path) {
     graph->dst_type_ids.push_back(dst_type_id);
     graph->unique_edge_type_ids.push_back(unique_edge_type_id);
     graph->edge_types.push_back(edge_label);
-    graph->edge_num.push_back(-1);
+    graph->edge_num.push_back(0);
     std::map<GAR_NAMESPACE::AdjListType, GAR_NAMESPACE::Edges> edge_map;
     graph->edges_collections.push_back(edge_map);
 
@@ -170,11 +170,10 @@ size_t __grin_get_edge_num(GRIN_GRAPH_T* _g, unsigned type_begin,
   for (auto type_id = type_begin; type_id < type_end; type_id++) {
     if (type_id >= _g->edge_type_num)
       break;
-    if (_g->edge_num[type_id] != -1) {
+    if (_g->edge_num[type_id] != 0) {
       res += _g->edge_num[type_id];
       continue;
     }
-    _g->edge_num[type_id] = 0;
 
     if (_g->edges_collections[type_id].find(GAR_ORDERED_BY_SOURCE) !=
         _g->edges_collections[type_id].end()) {
