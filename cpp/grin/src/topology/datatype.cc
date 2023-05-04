@@ -42,7 +42,7 @@ double grin_get_double(const void* ptr) {
   return *static_cast<const double*>(ptr);
 }
 
-char* grin_get_string(const void* ptr) {
+const char* grin_get_string(const void* ptr) {
   const char* s = static_cast<const char*>(ptr);
   int len = strlen(s) + 1;
   char* out = new char[len];
