@@ -285,9 +285,9 @@ void test_property_topology(int argc, char** argv) {
   }
 #else
   GRIN_VERTEX_LIST_ITERATOR vli = grin_get_vertex_list_begin(g, typed_vl);
-  size_t typed_vl_size2 = 0;
+  size_t typed_vl_size = 0;
   while (grin_is_vertex_list_end(g, vli) == false) {
-    ++typed_vl_size2;
+    ++typed_vl_size;
     GRIN_VERTEX v = grin_get_vertex_from_iter(g, vli);
     GRIN_VERTEX_TYPE v_type = grin_get_vertex_type(g, v);
     if (!grin_equal_vertex_type(g, v_type, vt)) {
@@ -297,7 +297,7 @@ void test_property_topology(int argc, char** argv) {
     grin_destroy_vertex(g, v);
     grin_get_next_vertex_list_iter(g, vli);
   }
-  printf("vertex number under type: %zu %zu\n", typed_vl_size2, typed_vnum);
+  printf("vertex number under type: %zu %zu\n", typed_vl_size, typed_vnum);
   grin_destroy_vertex_list_iter(g, vli);
 #endif
 
@@ -330,12 +330,12 @@ void test_property_topology(int argc, char** argv) {
   printf("edge list size: %zu\n", el_size);
 #endif
 
+#ifdef GRIN_TRAIT_SELECT_TYPE_FOR_EDGE_LIST
   GRIN_EDGE_LIST typed_el = grin_select_type_for_edge_list(g, et, el);
+  size_t typed_enum = grin_get_edge_num_by_type(g, et);
+
 #ifdef GRIN_ENABLE_EDGE_LIST_ARRAY
   size_t typed_el_size = grin_get_edge_list_size(g, typed_el);
-#endif
-  size_t typed_enum = grin_get_edge_num_by_type(g, et);
-#ifdef GRIN_ENABLE_EDGE_LIST_ARRAY
   printf("edge number under type: %zu %zu\n", typed_el_size, typed_enum);
 
   for (size_t j = 0; j < typed_el_size; ++j) {
@@ -347,8 +347,26 @@ void test_property_topology(int argc, char** argv) {
     grin_destroy_edge_type(g, e_type);
     grin_destroy_edge(g, e);
   }
+#else
+  GRIN_EDGE_LIST_ITERATOR eli = grin_get_edge_list_begin(g, typed_el);
+  size_t typed_el_size = 0;
+  while (grin_is_edge_list_end(g, eli) == false) {
+    ++typed_el_size;
+    GRIN_EDGE e = grin_get_edge_from_iter(g, eli);
+    GRIN_EDGE_TYPE e_type = grin_get_edge_type(g, e);
+    if (!grin_equal_edge_type(g, e_type, et)) {
+      printf("edge type not match\n");
+    }
+    grin_destroy_edge_type(g, e_type);
+    grin_destroy_edge(g, e);
+    grin_get_next_edge_list_iter(g, eli);
+  }
+  printf("edge number under type: %zu %zu\n", typed_el_size, typed_enum);
+  grin_destroy_edge_list_iter(g, eli);
 #endif
+
   grin_destroy_edge_list(g, typed_el);
+#endif
   grin_destroy_edge_list(g, el);
 #endif
 
@@ -376,11 +394,10 @@ void test_property_vertex_table(int argc, char** argv) {
 
     GRIN_VERTEX_LIST vl = grin_get_vertex_list(g);
     GRIN_VERTEX_LIST typed_vl = grin_select_type_for_vertex_list(g, vt, vl);
-    size_t typed_vl_size = 
 #ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
-    grin_get_vertex_list_size(g, typed_vl);
+    size_t typed_vl_size = grin_get_vertex_list_size(g, typed_vl);
 #else
-    grin_get_vertex_num_by_type(g, vt);
+    size_t typed_vl_size = grin_get_vertex_num_by_type(g, vt);
 #endif
     size_t vpl_size = grin_get_vertex_property_list_size(g, vpl);
     printf("vertex list size: %zu vertex property list size: %zu\n",
@@ -515,6 +532,7 @@ void test_property_vertex_table(int argc, char** argv) {
 }
 
 void test_property_edge_table(int argc, char** argv) {
+  printf("------------ Edge property table ------------\n");
   GRIN_GRAPH g = get_graph(argc, argv);
   // edge
   GRIN_VERTEX v = get_vertex_marco(g);
@@ -530,20 +548,28 @@ void test_property_edge_table(int argc, char** argv) {
 
   for (size_t i = 0; i < etl_size; ++i) {
     GRIN_EDGE_TYPE et = grin_get_edge_type_from_list(g, etl, i);
-    GRIN_ADJACENT_LIST al1 = grin_select_edge_type_for_adjacent_list(g, et, al);
-#ifdef GRIN_ENABLE_ADJACENT_LIST_ARRAY
-    size_t al1_size = grin_get_adjacent_list_size(g, al1);
-    printf("selected adjacent list size: %zu\n", al1_size);
-#endif
-
     GRIN_EDGE_PROPERTY_TABLE ept = grin_get_edge_property_table_by_type(g, et);
     GRIN_EDGE_PROPERTY_LIST epl = grin_get_edge_property_list_by_type(g, et);
     size_t epl_size = grin_get_edge_property_list_size(g, epl);
     printf("edge property list size: %zu\n", epl_size);
 
+#ifdef GRIN_TRAIT_SELECT_EDGE_TYPE_FOR_ADJACENT_LIST
+    GRIN_ADJACENT_LIST al1 = grin_select_edge_type_for_adjacent_list(g, et, al);
+
+#ifdef GRIN_ENABLE_ADJACENT_LIST_ARRAY
+    size_t al1_size = grin_get_adjacent_list_size(g, al1);
+    printf("selected adjacent list size: %zu\n", al1_size);
+#endif
+
 #ifdef GRIN_ENABLE_ADJACENT_LIST_ARRAY
     for (size_t j = 0; j < al1_size; ++j) {
       GRIN_EDGE e = grin_get_edge_from_adjacent_list(g, al1, j);
+#else
+    GRIN_ADJACENT_LIST_ITERATOR ali = grin_get_adjacent_list_begin(g, al1);
+    size_t j = 0;
+    while (grin_is_adjacent_list_end(g, ali) == false) {
+      GRIN_EDGE e = grin_get_edge_from_adjacent_list_iter(g, ali);
+#endif
       GRIN_EDGE_TYPE et1 = grin_get_edge_type(g, e);
       if (!grin_equal_edge_type(g, et, et1)) {
         printf("edge type does not match\n");
@@ -593,9 +619,18 @@ void test_property_edge_table(int argc, char** argv) {
       grin_destroy_row(g, row);
       grin_destroy_edge_type(g, et1);
       grin_destroy_edge(g, e);
+
+#ifdef GRIN_ENABLE_ADJACENT_LIST_ARRAY
     }
+#else
+      grin_get_next_adjacent_list_iter(g, ali);
+      ++j;
+    }
+    grin_destroy_adjacent_list_iter(g, ali);
 #endif
+
     grin_destroy_adjacent_list(g, al1);
+#endif
 
     for (size_t j = 0; j < epl_size; ++j) {
       GRIN_EDGE_PROPERTY ep = grin_get_edge_property_from_list(g, epl, j);
@@ -684,6 +719,9 @@ void test_property_edge_table(int argc, char** argv) {
 }
 
 void test_property_primary_key(int argc, char** argv) {
+  printf(
+      "+++++++++++++++++++++ Test property/primary key "
+      "+++++++++++++++++++++\n");
   GRIN_GRAPH g = get_graph(argc, argv);
   GRIN_VERTEX_TYPE_LIST vtl = grin_get_vertex_types_with_primary_keys(g);
   size_t vtl_size = grin_get_vertex_type_list_size(g, vtl);
