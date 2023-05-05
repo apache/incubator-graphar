@@ -191,10 +191,6 @@ struct GRIN_VERTEX_PROPERTY_T {
       : type_id(_type_id), name(std::move(_name)), type(_type) {}
 };
 typedef std::vector<GRIN_VERTEX_PROPERTY_T> GRIN_VERTEX_PROPERTY_LIST_T;
-struct GRIN_VERTEX_PROPERTY_TABLE_T {
-  unsigned vtype;
-  explicit GRIN_VERTEX_PROPERTY_TABLE_T(unsigned _vtype) : vtype(_vtype) {}
-};
 #endif
 
 #ifdef GRIN_WITH_EDGE_PROPERTY

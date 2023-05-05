@@ -852,7 +852,7 @@ typedef unsigned GRIN_VERTEX_TYPE;
 typedef void* GRIN_VERTEX_TYPE_LIST;
 typedef void* GRIN_VERTEX_PROPERTY;
 typedef void* GRIN_VERTEX_PROPERTY_LIST;
-typedef void* GRIN_VERTEX_PROPERTY_TABLE;
+typedef unsigned GRIN_VERTEX_PROPERTY_TABLE;
 #endif
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_TYPE

@@ -105,24 +105,21 @@ bool grin_insert_value_to_row(GRIN_GRAPH g, GRIN_ROW r, GRIN_DATATYPE type,
 #ifdef GRIN_ENABLE_VERTEX_PROPERTY_TABLE
 void grin_destroy_vertex_property_table(GRIN_GRAPH g,
                                         GRIN_VERTEX_PROPERTY_TABLE vpt) {
-  auto _vpt = static_cast<GRIN_VERTEX_PROPERTY_TABLE_T*>(vpt);
-  delete _vpt;
+  return;
 }
 
 GRIN_VERTEX_PROPERTY_TABLE grin_get_vertex_property_table_by_type(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
-  auto vpt = new GRIN_VERTEX_PROPERTY_TABLE_T(vtype);
-  return vpt;
+  return vtype;
 }
 
 const void* grin_get_value_from_vertex_property_table(
     GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
     GRIN_VERTEX_PROPERTY vp) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _vpt = static_cast<GRIN_VERTEX_PROPERTY_TABLE_T*>(vpt);
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
   auto _vp = static_cast<GRIN_VERTEX_PROPERTY_T*>(vp);
-  if (_vp->type_id != _vpt->vtype || _v->type_id != _vpt->vtype)
+  if (_vp->type_id != vpt || _v->type_id != vpt)
     return NULL;
 
   // properties are stored in vertex
@@ -200,10 +197,9 @@ GRIN_ROW grin_get_row_from_vertex_property_table(
     GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
     GRIN_VERTEX_PROPERTY_LIST vpl) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _vpt = static_cast<GRIN_VERTEX_PROPERTY_TABLE_T*>(vpt);
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
   auto _vpl = static_cast<GRIN_VERTEX_PROPERTY_LIST_T*>(vpl);
-  if (_v->type_id != _vpt->vtype)
+  if (_v->type_id != vpt)
     return GRIN_NULL_ROW;
   auto r = new GRIN_ROW_T();
 
