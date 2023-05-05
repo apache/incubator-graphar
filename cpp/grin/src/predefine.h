@@ -118,16 +118,19 @@ struct GRIN_EDGE_LIST_ITERATOR_T {
 
 #ifdef GRIN_ENABLE_ADJACENT_LIST
 struct GRIN_ADJACENT_LIST_T {
-  GRIN_VERTEX_T v;
+  GAR_NAMESPACE::IdType vid;
+  unsigned vtype_id;
   GRIN_DIRECTION dir;
   unsigned etype_begin;
   unsigned etype_end;
   unsigned vtype_begin;
   unsigned vtype_end;
-  GRIN_ADJACENT_LIST_T(GRIN_VERTEX_T _v, GRIN_DIRECTION _dir,
-                       unsigned _etype_begin, unsigned _etype_end,
-                       unsigned _vtype_begin, unsigned _vtype_end)
-      : v(_v),
+  GRIN_ADJACENT_LIST_T(GAR_NAMESPACE::IdType _vid, unsigned _vtype_id,
+                       GRIN_DIRECTION _dir, unsigned _etype_begin,
+                       unsigned _etype_end, unsigned _vtype_begin,
+                       unsigned _vtype_end)
+      : vid(_vid),
+        vtype_id(_vtype_id),
         dir(_dir),
         etype_begin(_etype_begin),
         etype_end(_etype_end),
@@ -138,7 +141,8 @@ struct GRIN_ADJACENT_LIST_T {
 
 #ifdef GRIN_ENABLE_ADJACENT_LIST_ITERATOR
 struct GRIN_ADJACENT_LIST_ITERATOR_T {
-  GRIN_VERTEX_T v;
+  GAR_NAMESPACE::IdType vid;
+  unsigned vtype_id;
   GRIN_DIRECTION dir;
   unsigned etype_begin;
   unsigned etype_end;
@@ -146,12 +150,13 @@ struct GRIN_ADJACENT_LIST_ITERATOR_T {
   unsigned vtype_end;
   unsigned current_etype;
   GAR_NAMESPACE::EdgeIter iter;
-  GRIN_ADJACENT_LIST_ITERATOR_T(GRIN_VERTEX_T _v, GRIN_DIRECTION _dir,
-                                unsigned _etype_begin, unsigned _etype_end,
-                                unsigned _vtype_begin, unsigned _vtype_end,
-                                unsigned _current_etype,
+  GRIN_ADJACENT_LIST_ITERATOR_T(GAR_NAMESPACE::IdType _vid, unsigned _vtype_id,
+                                GRIN_DIRECTION _dir, unsigned _etype_begin,
+                                unsigned _etype_end, unsigned _vtype_begin,
+                                unsigned _vtype_end, unsigned _current_etype,
                                 GAR_NAMESPACE::EdgeIter _iter)
-      : v(_v),
+      : vid(_vid),
+        vtype_id(_vtype_id),
         dir(_dir),
         etype_begin(_etype_begin),
         etype_end(_etype_end),

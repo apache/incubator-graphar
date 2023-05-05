@@ -93,8 +93,9 @@ GRIN_EDGE_LIST grin_select_type_for_edge_list(GRIN_GRAPH g,
 GRIN_ADJACENT_LIST grin_select_neighbor_type_for_adjacent_list(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype, GRIN_ADJACENT_LIST al) {
   auto _al = static_cast<GRIN_ADJACENT_LIST_T*>(al);
-  auto fal = new GRIN_ADJACENT_LIST_T(_al->v, _al->dir, _al->etype_begin,
-                                      _al->etype_end, vtype, vtype + 1);
+  auto fal = new GRIN_ADJACENT_LIST_T(_al->vid, _al->vtype_id, _al->dir,
+                                      _al->etype_begin, _al->etype_end, vtype,
+                                      vtype + 1);
   return fal;
 }
 #endif
@@ -115,8 +116,9 @@ GRIN_ADJACENT_LIST grin_select_edge_type_for_adjacent_list(
   }
   if (type_begin >= type_end)
     return GRIN_NULL_LIST;
-  auto fal = new GRIN_ADJACENT_LIST_T(_al->v, _al->dir, type_begin, type_end, 0,
-                                      _g->vertex_type_num);
+  auto fal =
+      new GRIN_ADJACENT_LIST_T(_al->vid, _al->vtype_id, _al->dir, type_begin,
+                               type_end, 0, _g->vertex_type_num);
   return fal;
 }
 #endif
