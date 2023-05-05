@@ -213,12 +213,6 @@ struct GRIN_EDGE_PROPERTY_T {
   }
 };
 typedef std::vector<GRIN_EDGE_PROPERTY_T> GRIN_EDGE_PROPERTY_LIST_T;
-struct GRIN_EDGE_PROPERTY_TABLE_T {
-  unsigned type_begin;
-  unsigned type_end;
-  GRIN_EDGE_PROPERTY_TABLE_T(unsigned _type_begin, unsigned _type_end)
-      : type_begin(_type_begin), type_end(_type_end) {}
-};
 #endif
 
 #if defined(GRIN_WITH_VERTEX_PROPERTY) || defined(GRIN_WITH_EDGE_PROPERTY)

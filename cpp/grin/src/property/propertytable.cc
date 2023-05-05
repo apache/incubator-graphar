@@ -300,8 +300,7 @@ GRIN_ROW grin_get_vertex_row(GRIN_GRAPH, GRIN_VERTEX,
 #ifdef GRIN_ENABLE_EDGE_PROPERTY_TABLE
 void grin_destroy_edge_property_table(GRIN_GRAPH g,
                                       GRIN_EDGE_PROPERTY_TABLE ept) {
-  auto _ept = static_cast<GRIN_EDGE_PROPERTY_TABLE_T*>(ept);
-  delete _ept;
+  return;
 }
 
 GRIN_EDGE_PROPERTY_TABLE grin_get_edge_property_table_by_type(
@@ -316,18 +315,16 @@ GRIN_EDGE_PROPERTY_TABLE grin_get_edge_property_table_by_type(
     else
       type_end = i + 1;
   }
-  auto ept = new GRIN_EDGE_PROPERTY_TABLE_T(type_begin, type_end);
-  return ept;
+  return {type_begin, type_end};
 }
 
 const void* grin_get_value_from_edge_property_table(
     GRIN_GRAPH g, GRIN_EDGE_PROPERTY_TABLE ept, GRIN_EDGE e,
     GRIN_EDGE_PROPERTY ep) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _ept = static_cast<GRIN_EDGE_PROPERTY_TABLE_T*>(ept);
   auto _e = static_cast<GRIN_EDGE_T*>(e);
   auto _ep = static_cast<GRIN_EDGE_PROPERTY_T*>(ep);
-  if (_e->type_id < _ept->type_begin || _e->type_id >= _ept->type_end)
+  if (_e->type_id < ept.type_begin || _e->type_id >= ept.type_end)
     return NULL;
   if (_g->unique_edge_type_ids[_e->type_id] != _ep->type_id)
     return NULL;
@@ -369,10 +366,9 @@ GRIN_ROW grin_get_row_from_edge_property_table(GRIN_GRAPH g,
                                                GRIN_EDGE e,
                                                GRIN_EDGE_PROPERTY_LIST epl) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _ept = static_cast<GRIN_EDGE_PROPERTY_TABLE_T*>(ept);
   auto _e = static_cast<GRIN_EDGE_T*>(e);
   auto _epl = static_cast<GRIN_EDGE_PROPERTY_LIST_T*>(epl);
-  if (_e->type_id < _ept->type_begin || _e->type_id >= _ept->type_end)
+  if (_e->type_id < ept.type_begin || _e->type_id >= ept.type_end)
     return GRIN_NULL_ROW;
 
   auto r = new GRIN_ROW_T();
