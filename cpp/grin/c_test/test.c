@@ -415,7 +415,7 @@ void test_property_vertex_table(int argc, char** argv) {
       GRIN_ROW row = grin_get_row_from_vertex_property_table(g, vpt, v, vpl);
       for (size_t j = 0; j < vpl_size; ++j) {
         GRIN_VERTEX_PROPERTY vp = grin_get_vertex_property_from_list(g, vpl, j);
-        GRIN_VERTEX_PROPERTY vt1 = grin_get_vertex_property_vertex_type(g, vp);
+        GRIN_VERTEX_TYPE vt1 = grin_get_vertex_property_vertex_type(g, vp);
         if (!grin_equal_vertex_type(g, vt, vt1)) {
           printf("vertex type not match by property\n");
         }
