@@ -16,6 +16,7 @@ limitations under the License.
 extern "C" {
 #include "grin/include/property/propertytable.h"
 }
+#include <iostream>
 #include "grin/src/predefine.h"
 
 #ifdef GRIN_ENABLE_ROW
@@ -122,63 +123,37 @@ const void* grin_get_value_from_vertex_property_table(
   if (_vp->type_id != vpt || _v->type_id != vpt)
     return NULL;
 
-  // properties are stored in vertex
-  if (_v->vertex.has_value()) {
-    switch (_vp->type) {
-    case GRIN_DATATYPE::Int32: {
-      auto value =
-          new int32_t(_v->vertex.value().property<int32_t>(_vp->name).value());
-      return value;
-    }
-    case GRIN_DATATYPE::Int64: {
-      auto value =
-          new int64_t(_v->vertex.value().property<int64_t>(_vp->name).value());
-      return value;
-    }
-    case GRIN_DATATYPE::Float: {
-      auto value =
-          new float(_v->vertex.value().property<float>(_vp->name).value());
-      return value;
-    }
-    case GRIN_DATATYPE::Double: {
-      auto value =
-          new double(_v->vertex.value().property<double>(_vp->name).value());
-      return value;
-    }
-    case GRIN_DATATYPE::String: {
-      auto s = _v->vertex.value().property<std::string>(_vp->name).value();
-      int len = s.length() + 1;
-      char* out = new char[len];
-      snprintf(out, len, "%s", s.c_str());
-      return out;
-    }
-    default:
-      return NULL;
-    }
+  // properties are not stored in vertex
+  if (_v->vertex.has_value() == false) {
+    auto& vertices = _g->vertices_collections[_vp->type_id];
+    auto it = vertices.begin() + _v->id;
+    _v->vertex = *it;
   }
 
-  // properties are not stored in vertex
-  auto& vertices = _g->vertices_collections[_vp->type_id];
-  auto it = vertices.begin() + _v->id;
+  // properties are stored in vertex
   switch (_vp->type) {
   case GRIN_DATATYPE::Int32: {
-    auto value = new int32_t(it.property<int32_t>(_vp->name).value());
+    auto value =
+        new int32_t(_v->vertex.value().property<int32_t>(_vp->name).value());
     return value;
   }
   case GRIN_DATATYPE::Int64: {
-    auto value = new int64_t(it.property<int64_t>(_vp->name).value());
+    auto value =
+        new int64_t(_v->vertex.value().property<int64_t>(_vp->name).value());
     return value;
   }
   case GRIN_DATATYPE::Float: {
-    auto value = new float(it.property<float>(_vp->name).value());
+    auto value =
+        new float(_v->vertex.value().property<float>(_vp->name).value());
     return value;
   }
   case GRIN_DATATYPE::Double: {
-    auto value = new double(it.property<double>(_vp->name).value());
+    auto value =
+        new double(_v->vertex.value().property<double>(_vp->name).value());
     return value;
   }
   case GRIN_DATATYPE::String: {
-    auto s = it.property<std::string>(_vp->name).value();
+    auto s = _v->vertex.value().property<std::string>(_vp->name).value();
     int len = s.length() + 1;
     char* out = new char[len];
     snprintf(out, len, "%s", s.c_str());
@@ -187,6 +162,7 @@ const void* grin_get_value_from_vertex_property_table(
   default:
     return NULL;
   }
+
   return NULL;
 }
 
@@ -203,88 +179,50 @@ GRIN_ROW grin_get_row_from_vertex_property_table(
     return GRIN_NULL_ROW;
   auto r = new GRIN_ROW_T();
 
-  if (_v->vertex.has_value()) {
-    // properties are stored in vertex
-    for (auto& _vp : *_vpl) {
-      if (_vp.type_id != _v->type_id) {
-        delete r;
-        return GRIN_NULL_ROW;
-      }
-
-      switch (_vp.type) {
-      case GRIN_DATATYPE::Int32: {
-        auto value = _v->vertex.value().property<int32_t>(_vp.name).value();
-        r->push_back(value);
-        break;
-      }
-      case GRIN_DATATYPE::Int64: {
-        auto value = _v->vertex.value().property<int64_t>(_vp.name).value();
-        r->push_back(value);
-        break;
-      }
-      case GRIN_DATATYPE::Float: {
-        auto value = _v->vertex.value().property<float>(_vp.name).value();
-        r->push_back(value);
-        break;
-      }
-      case GRIN_DATATYPE::Double: {
-        auto value = _v->vertex.value().property<double>(_vp.name).value();
-        r->push_back(value);
-        break;
-      }
-      case GRIN_DATATYPE::String: {
-        auto value = _v->vertex.value().property<std::string>(_vp.name).value();
-        r->push_back(std::move(value));
-        break;
-      }
-      default: {
-        delete r;
-        return GRIN_NULL_ROW;
-      }
-      }
-    }
-
-  } else {
-    // properties are not stored in vertex
+  // properties are not stored in vertex
+  if (_v->vertex.has_value() == false) {
     auto& vertices = _g->vertices_collections[_v->type_id];
     auto it = vertices.begin() + _v->id;
-    for (auto& _vp : *_vpl) {
-      if (_vp.type_id != _v->type_id) {
-        delete r;
-        return GRIN_NULL_ROW;
-      }
+    _v->vertex = *it;
+  }
 
-      switch (_vp.type) {
-      case GRIN_DATATYPE::Int32: {
-        auto value = it.property<int32_t>(_vp.name).value();
-        r->push_back(value);
-        break;
-      }
-      case GRIN_DATATYPE::Int64: {
-        auto value = it.property<int64_t>(_vp.name).value();
-        r->push_back(value);
-        break;
-      }
-      case GRIN_DATATYPE::Float: {
-        auto value = it.property<float>(_vp.name).value();
-        r->push_back(value);
-        break;
-      }
-      case GRIN_DATATYPE::Double: {
-        auto value = it.property<double>(_vp.name).value();
-        r->push_back(value);
-        break;
-      }
-      case GRIN_DATATYPE::String: {
-        auto value = it.property<std::string>(_vp.name).value();
-        r->push_back(std::move(value));
-        break;
-      }
-      default: {
-        delete r;
-        return GRIN_NULL_ROW;
-      }
-      }
+  // properties are stored in vertex
+  for (auto& _vp : *_vpl) {
+    if (_vp.type_id != _v->type_id) {
+      delete r;
+      return GRIN_NULL_ROW;
+    }
+
+    switch (_vp.type) {
+    case GRIN_DATATYPE::Int32: {
+      auto value = _v->vertex.value().property<int32_t>(_vp.name).value();
+      r->push_back(value);
+      break;
+    }
+    case GRIN_DATATYPE::Int64: {
+      auto value = _v->vertex.value().property<int64_t>(_vp.name).value();
+      r->push_back(value);
+      break;
+    }
+    case GRIN_DATATYPE::Float: {
+      auto value = _v->vertex.value().property<float>(_vp.name).value();
+      r->push_back(value);
+      break;
+    }
+    case GRIN_DATATYPE::Double: {
+      auto value = _v->vertex.value().property<double>(_vp.name).value();
+      r->push_back(value);
+      break;
+    }
+    case GRIN_DATATYPE::String: {
+      auto value = _v->vertex.value().property<std::string>(_vp.name).value();
+      r->push_back(std::move(value));
+      break;
+    }
+    default: {
+      delete r;
+      return GRIN_NULL_ROW;
+    }
     }
   }
   return r;
