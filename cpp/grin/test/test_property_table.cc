@@ -194,8 +194,8 @@ void test_property_table_edge(GRIN_GRAPH graph) {
       // get property from property list
       auto property = grin_get_edge_property_from_list(graph, property_list, 0);
 
-      auto name = grin_get_vertex_property_name(graph, property);
-      auto data_type = grin_get_vertex_property_data_type(graph, property);
+      auto name = grin_get_edge_property_name(graph, property);
+      auto data_type = grin_get_edge_property_data_type(graph, property);
       std::cout << "get value of property \"" << name << "\" for edge 0"
                 << std::endl;
 
@@ -233,7 +233,7 @@ void test_property_table_edge(GRIN_GRAPH graph) {
       // destroy
       grin_destroy_row(graph, r);
       grin_destroy_edge(graph, edge);
-      grin_destroy_vertex_property(graph, property);
+      grin_destroy_edge_property(graph, property);
       grin_destroy_name(graph, name);
       grin_destroy_value(graph, data_type, value1);
       grin_destroy_value(graph, data_type, value2);

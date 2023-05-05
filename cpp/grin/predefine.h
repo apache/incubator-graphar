@@ -805,7 +805,6 @@ typedef struct {
   unsigned type_begin;
   unsigned type_end;
 } GRIN_VERTEX_LIST;
-#define GRIN_NULL_VERTEX_LIST (GRIN_VERTEX_LIST){0, 0}
 #endif
 
 #ifdef GRIN_ENABLE_VERTEX_LIST_ITERATOR
@@ -829,7 +828,6 @@ typedef struct {
   unsigned type_begin;
   unsigned type_end;
 } GRIN_EDGE_LIST;
-#define GRIN_NULL_EDGE_LIST (GRIN_EDGE_LIST){0, 0}
 #endif
 
 #ifdef GRIN_ENABLE_EDGE_LIST_ITERATOR

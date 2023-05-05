@@ -52,7 +52,7 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
     auto property_list =
         grin_get_vertex_property_list_by_type(graph, vertex_type);
     size_t vpn = grin_get_vertex_property_list_size(graph, property_list);
-    std::vector<GRIN_EDGE_PROPERTY> properties;
+    std::vector<GRIN_VERTEX_PROPERTY> properties;
     for (auto idx = 0; idx < vpn; idx++) {
       auto property =
           grin_get_vertex_property_from_list(graph, property_list, idx);

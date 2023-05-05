@@ -64,7 +64,7 @@ GRIN_VERTEX_LIST grin_select_type_for_vertex_list(GRIN_GRAPH g,
                                                   GRIN_VERTEX_TYPE vtype,
                                                   GRIN_VERTEX_LIST vl) {
   if (vl.type_begin > vtype || vl.type_end <= vtype)
-    return GRIN_NULL_VERTEX_LIST;
+    return {vl.type_end, vl.type_end};
   return {vtype, vtype + 1};
 }
 #endif
@@ -84,7 +84,7 @@ GRIN_EDGE_LIST grin_select_type_for_edge_list(GRIN_GRAPH g,
       type_end = i + 1;
   }
   if (type_begin >= type_end)
-    return GRIN_NULL_EDGE_LIST;
+    return {el.type_end, el.type_end};
   return {type_begin, type_end};
 }
 #endif
