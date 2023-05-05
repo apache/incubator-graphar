@@ -52,6 +52,8 @@ GRIN_VERTEX grin_get_vertex_from_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl,
 GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
                                                      GRIN_VERTEX_LIST vl) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  if (vl.type_begin >= _g->vertex_type_num)
+    return GRIN_NULL_LIST_ITERATOR;
   auto& vertices = _g->vertices_collections[vl.type_begin];
   auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(
       vl.type_begin, vl.type_end, vl.type_begin, 0, vertices.begin());

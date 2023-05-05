@@ -38,7 +38,8 @@ GRIN_EDGE_LIST_ITERATOR grin_get_edge_list_begin(GRIN_GRAPH g,
                                                  GRIN_EDGE_LIST el) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto type_id = el.type_begin;
-  if (_g->edges_collections[type_id].size() == 0)
+  if (type_id >= _g->edge_type_num ||
+      _g->edges_collections[type_id].size() == 0)
     return GRIN_NULL_LIST_ITERATOR;
   auto adj_list_type = _g->edges_collections[type_id].begin()->first;
   switch (adj_list_type) {
