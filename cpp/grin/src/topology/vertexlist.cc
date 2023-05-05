@@ -24,16 +24,13 @@ GRIN_VERTEX_LIST grin_get_vertex_list(GRIN_GRAPH g) {
   return {0, _g->vertex_type_num};
 }
 
-void grin_destroy_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
-  return;
-}
+void grin_destroy_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) { return; }
 #endif
 
 #ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
 size_t grin_get_vertex_list_size(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  return _g->vertex_offsets[vl.type_end] -
-         _g->vertex_offsets[vl.type_begin];
+  return _g->vertex_offsets[vl.type_end] - _g->vertex_offsets[vl.type_begin];
 }
 
 GRIN_VERTEX grin_get_vertex_from_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl,

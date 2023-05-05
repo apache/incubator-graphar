@@ -88,12 +88,11 @@ GRIN_EDGE_PROPERTY grin_get_edge_property_by_name(GRIN_GRAPH g,
       break;
     if (_g->unique_edge_type_ids[et] < etype)
       continue;
-    auto& edge_info =
-        _g->graph_info
-            .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[et]],
-                         _g->edge_types[et],
-                         _g->vertex_types[_g->dst_type_ids[et]])
-            .value();
+    auto& edge_info = _g->graph_info
+                          .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[et]],
+                                       _g->edge_types[et],
+                                       _g->vertex_types[_g->dst_type_ids[et]])
+                          .value();
     if (!edge_info.ContainProperty(s))
       continue;
     auto data_type = GARToDataType(edge_info.GetPropertyType(s).value());

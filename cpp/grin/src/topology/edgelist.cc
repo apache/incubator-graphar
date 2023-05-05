@@ -24,9 +24,7 @@ GRIN_EDGE_LIST grin_get_edge_list(GRIN_GRAPH g) {
   return {0, _g->edge_type_num};
 }
 
-void grin_destroy_edge_list(GRIN_GRAPH g, GRIN_EDGE_LIST el) {
-  return;
-}
+void grin_destroy_edge_list(GRIN_GRAPH g, GRIN_EDGE_LIST el) { return; }
 #endif
 
 #ifdef GRIN_ENABLE_EDGE_LIST_ARRAY

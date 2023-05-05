@@ -91,12 +91,11 @@ GRIN_EDGE_PROPERTY_LIST grin_get_edge_property_list_by_type(
       break;
     if (_g->unique_edge_type_ids[et] < etype)
       continue;
-    auto& edge_info =
-        _g->graph_info
-            .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[et]],
-                         _g->edge_types[et],
-                         _g->vertex_types[_g->dst_type_ids[et]])
-            .value();
+    auto& edge_info = _g->graph_info
+                          .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[et]],
+                                       _g->edge_types[et],
+                                       _g->vertex_types[_g->dst_type_ids[et]])
+                          .value();
     auto adj_list_type = _g->edges_collections[et].begin()->first;
     for (auto& group : edge_info.GetPropertyGroups(adj_list_type).value()) {
       for (auto& property : group.GetProperties()) {

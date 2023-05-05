@@ -30,9 +30,7 @@ GRIN_VERTEX_TYPE grin_get_vertex_type(GRIN_GRAPH g, GRIN_VERTEX v) {
   return _v->type_id;
 }
 
-void grin_destroy_vertex_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt) {
-  return;
-}
+void grin_destroy_vertex_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt) { return; }
 
 // Vertex type list
 GRIN_VERTEX_TYPE_LIST grin_get_vertex_type_list(GRIN_GRAPH g) {
@@ -119,9 +117,7 @@ GRIN_EDGE_TYPE grin_get_edge_type(GRIN_GRAPH g, GRIN_EDGE e) {
   return _g->unique_edge_type_ids[_e->type_id];
 }
 
-void grin_destroy_edge_type(GRIN_GRAPH g, GRIN_EDGE_TYPE et) {
-  return;
-}
+void grin_destroy_edge_type(GRIN_GRAPH g, GRIN_EDGE_TYPE et) { return; }
 
 // Edge type list
 GRIN_EDGE_TYPE_LIST grin_get_edge_type_list(GRIN_GRAPH g) {
