@@ -111,8 +111,7 @@ void grin_destroy_vertex_property_table(GRIN_GRAPH g,
 
 GRIN_VERTEX_PROPERTY_TABLE grin_get_vertex_property_table_by_type(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
-  auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);
-  auto vpt = new GRIN_VERTEX_PROPERTY_TABLE_T(*_vtype);
+  auto vpt = new GRIN_VERTEX_PROPERTY_TABLE_T(vtype);
   return vpt;
 }
 
@@ -312,12 +311,11 @@ void grin_destroy_edge_property_table(GRIN_GRAPH g,
 GRIN_EDGE_PROPERTY_TABLE grin_get_edge_property_table_by_type(
     GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _etype = static_cast<GRIN_EDGE_TYPE_T*>(etype);
   unsigned type_begin = 0, type_end = 0;
   for (auto i = 0; i < _g->edge_type_num; i++) {
-    if (_g->unique_edge_type_ids[i] > *_etype)
+    if (_g->unique_edge_type_ids[i] > etype)
       break;
-    else if (_g->unique_edge_type_ids[i] < *_etype)
+    else if (_g->unique_edge_type_ids[i] < etype)
       type_begin = i + 1;
     else
       type_end = i + 1;

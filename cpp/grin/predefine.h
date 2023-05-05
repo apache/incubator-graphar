@@ -771,9 +771,9 @@ typedef enum {
 /** @brief Null edge reference (invalid return value) */
 #define GRIN_NULL_EDGE_REF NULL
 /** @brief Non-existing vertex type (invalid return value) */
-#define GRIN_NULL_VERTEX_TYPE NULL
+#define GRIN_NULL_VERTEX_TYPE (unsigned)~0
 /** @brief Non-existing edge type (invalid return value) */
-#define GRIN_NULL_EDGE_TYPE NULL
+#define GRIN_NULL_EDGE_TYPE (unsigned)~0
 /** @brief Non-existing vertex property (invalid return value) */
 #define GRIN_NULL_VERTEX_PROPERTY NULL
 /** @brief Non-existing vertex property (invalid return value) */
@@ -848,7 +848,7 @@ typedef void* GRIN_EDGE_REF;
 
 
 #ifdef GRIN_WITH_VERTEX_PROPERTY
-typedef void* GRIN_VERTEX_TYPE;
+typedef unsigned GRIN_VERTEX_TYPE;
 typedef void* GRIN_VERTEX_TYPE_LIST;
 typedef void* GRIN_VERTEX_PROPERTY;
 typedef void* GRIN_VERTEX_PROPERTY_LIST;
@@ -864,7 +864,7 @@ typedef unsigned GRIN_VERTEX_PROPERTY_ID;
 #endif
 
 #ifdef GRIN_WITH_EDGE_PROPERTY
-typedef void* GRIN_EDGE_TYPE;
+typedef unsigned GRIN_EDGE_TYPE;
 typedef void* GRIN_EDGE_TYPE_LIST;
 typedef void* GRIN_VEV_TYPE;
 typedef void* GRIN_VEV_TYPE_LIST;

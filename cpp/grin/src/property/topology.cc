@@ -21,20 +21,18 @@ extern "C" {
 #ifdef GRIN_WITH_VERTEX_PROPERTY
 size_t grin_get_vertex_num_by_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);
-  return _g->vertex_offsets[*_vtype + 1] - _g->vertex_offsets[*_vtype];
+  return _g->vertex_offsets[vtype + 1] - _g->vertex_offsets[vtype];
 }
 #endif
 
 #ifdef GRIN_WITH_EDGE_PROPERTY
 size_t grin_get_edge_num_by_type(GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _etype = static_cast<GRIN_EDGE_TYPE_T*>(etype);
   unsigned type_begin = 0, type_end = 0;
   for (auto i = 0; i < _g->edge_type_num; i++) {
-    if (_g->unique_edge_type_ids[i] > *_etype)
+    if (_g->unique_edge_type_ids[i] > etype)
       break;
-    else if (_g->unique_edge_type_ids[i] < *_etype)
+    else if (_g->unique_edge_type_ids[i] < etype)
       type_begin = i + 1;
     else
       type_end = i + 1;
@@ -55,9 +53,8 @@ size_t grin_get_total_edge_num_by_type(GRIN_PARTITIONED_GRAPH, GRIN_EDGE_TYPE);
 #ifdef GRIN_ASSUME_BY_TYPE_VERTEX_ORIGINAL_ID
 GRIN_VERTEX grin_get_vertex_from_original_id_by_type(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype, GRIN_VERTEX_ORIGINAL_ID oid) {
-  auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);
   auto _oid = static_cast<GRIN_VERTEX_ORIGINAL_ID_T*>(oid);
-  auto v = new GRIN_VERTEX_T(*_oid, *_vtype);
+  auto v = new GRIN_VERTEX_T(*_oid, vtype);
   return v;
 }
 #endif
@@ -66,11 +63,10 @@ GRIN_VERTEX grin_get_vertex_from_original_id_by_type(
 GRIN_VERTEX_LIST grin_select_type_for_vertex_list(GRIN_GRAPH g,
                                                   GRIN_VERTEX_TYPE vtype,
                                                   GRIN_VERTEX_LIST vl) {
-  auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);
   auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
-  if (_vl->type_begin > *_vtype || _vl->type_end <= *_vtype)
+  if (_vl->type_begin > vtype || _vl->type_end <= vtype)
     return GRIN_NULL_LIST;
-  auto fvl = new GRIN_VERTEX_LIST_T(*_vtype, *_vtype + 1);
+  auto fvl = new GRIN_VERTEX_LIST_T(vtype, vtype + 1);
   return fvl;
 }
 #endif
@@ -80,13 +76,12 @@ GRIN_EDGE_LIST grin_select_type_for_edge_list(GRIN_GRAPH g,
                                               GRIN_EDGE_TYPE etype,
                                               GRIN_EDGE_LIST el) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _etype = static_cast<GRIN_EDGE_TYPE_T*>(etype);
   auto _el = static_cast<GRIN_EDGE_LIST_T*>(el);
   unsigned type_begin = _el->type_begin, type_end = _el->type_end;
   for (auto i = _el->type_begin; i < _el->type_end; i++) {
-    if (_g->unique_edge_type_ids[i] > *_etype)
+    if (_g->unique_edge_type_ids[i] > etype)
       break;
-    else if (_g->unique_edge_type_ids[i] < *_etype)
+    else if (_g->unique_edge_type_ids[i] < etype)
       type_begin = i + 1;
     else
       type_end = i + 1;
@@ -101,10 +96,9 @@ GRIN_EDGE_LIST grin_select_type_for_edge_list(GRIN_GRAPH g,
 #ifdef GRIN_TRAIT_SELECT_NEIGHBOR_TYPE_FOR_ADJACENT_LIST
 GRIN_ADJACENT_LIST grin_select_neighbor_type_for_adjacent_list(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype, GRIN_ADJACENT_LIST al) {
-  auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);
   auto _al = static_cast<GRIN_ADJACENT_LIST_T*>(al);
   auto fal = new GRIN_ADJACENT_LIST_T(_al->v, _al->dir, _al->etype_begin,
-                                      _al->etype_end, *_vtype, *_vtype + 1);
+                                      _al->etype_end, vtype, vtype + 1);
   return fal;
 }
 #endif
@@ -113,13 +107,12 @@ GRIN_ADJACENT_LIST grin_select_neighbor_type_for_adjacent_list(
 GRIN_ADJACENT_LIST grin_select_edge_type_for_adjacent_list(
     GRIN_GRAPH g, GRIN_EDGE_TYPE etype, GRIN_ADJACENT_LIST al) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _etype = static_cast<GRIN_EDGE_TYPE_T*>(etype);
   auto _al = static_cast<GRIN_ADJACENT_LIST_T*>(al);
   unsigned type_begin = _al->etype_begin, type_end = _al->etype_end;
   for (auto i = _al->etype_begin; i < _al->etype_end; i++) {
-    if (_g->unique_edge_type_ids[i] > *_etype)
+    if (_g->unique_edge_type_ids[i] > etype)
       break;
-    else if (_g->unique_edge_type_ids[i] < *_etype)
+    else if (_g->unique_edge_type_ids[i] < etype)
       type_begin = i + 1;
     else
       type_end = i + 1;

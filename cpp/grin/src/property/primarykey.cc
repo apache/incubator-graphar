@@ -48,15 +48,13 @@ GRIN_VERTEX_TYPE_LIST grin_get_vertex_types_with_primary_keys(GRIN_GRAPH g) {
 GRIN_VERTEX_PROPERTY_LIST grin_get_primary_keys_by_vertex_type(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);
-  auto type_id = *_vtype;
-  auto& type_name = _g->vertex_types[type_id];
+  auto& type_name = _g->vertex_types[vtype];
   auto& vertex_info = _g->graph_info.GetVertexInfo(type_name).value();
   auto vpl = new GRIN_VERTEX_PROPERTY_LIST_T();
   for (auto& group : vertex_info.GetPropertyGroups()) {
     for (auto& property : group.GetProperties()) {
       if (property.is_primary) {
-        GRIN_VERTEX_PROPERTY_T vp(type_id, property.name,
+        GRIN_VERTEX_PROPERTY_T vp(vtype, property.name,
                                   GARToDataType(property.type));
         vpl->push_back(vp);
       }
@@ -69,12 +67,11 @@ GRIN_VERTEX grin_get_vertex_by_primary_keys(GRIN_GRAPH g,
                                             GRIN_VERTEX_TYPE vtype,
                                             GRIN_ROW r) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);
   auto vpl = grin_get_primary_keys_by_vertex_type(g, vtype);
   auto _vpl = static_cast<GRIN_VERTEX_PROPERTY_LIST_T*>(vpl);
   if (_vpl->size() == 0)
     return GRIN_NULL_VERTEX;
-  auto& vertices = _g->vertices_collections[*_vtype];
+  auto& vertices = _g->vertices_collections[vtype];
   auto it_end = vertices.end();
   for (auto it = vertices.begin(); it != it_end; it++) {
     bool flag = true;
@@ -127,7 +124,7 @@ GRIN_VERTEX grin_get_vertex_by_primary_keys(GRIN_GRAPH g,
         break;
     }
     if (flag) {
-      auto v = new GRIN_VERTEX_T(it.id(), *_vtype);
+      auto v = new GRIN_VERTEX_T(it.id(), vtype);
       return v;
     }
   }

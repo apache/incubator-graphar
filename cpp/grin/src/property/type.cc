@@ -22,20 +22,16 @@ extern "C" {
 // Vertex type
 bool grin_equal_vertex_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt1,
                             GRIN_VERTEX_TYPE vt2) {
-  auto _vt1 = static_cast<GRIN_VERTEX_TYPE_T*>(vt1);
-  auto _vt2 = static_cast<GRIN_VERTEX_TYPE_T*>(vt2);
-  return (*_vt1 == *_vt2);
+  return (vt1 == vt2);
 }
 
 GRIN_VERTEX_TYPE grin_get_vertex_type(GRIN_GRAPH g, GRIN_VERTEX v) {
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
-  auto vt = new GRIN_VERTEX_TYPE_T(_v->type_id);
-  return vt;
+  return _v->type_id;
 }
 
 void grin_destroy_vertex_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt) {
-  auto _vt = static_cast<GRIN_VERTEX_TYPE_T*>(vt);
-  delete _vt;
+  return;
 }
 
 // Vertex type list
@@ -61,8 +57,7 @@ GRIN_VERTEX_TYPE_LIST grin_create_vertex_type_list(GRIN_GRAPH g) {
 bool grin_insert_vertex_type_to_list(GRIN_GRAPH g, GRIN_VERTEX_TYPE_LIST vtl,
                                      GRIN_VERTEX_TYPE vt) {
   auto _vtl = static_cast<GRIN_VERTEX_TYPE_LIST_T*>(vtl);
-  auto _vt = static_cast<GRIN_VERTEX_TYPE_T*>(vt);
-  _vtl->push_back(*_vt);
+  _vtl->push_back(vt);
   return true;
 }
 
@@ -75,16 +70,14 @@ GRIN_VERTEX_TYPE grin_get_vertex_type_from_list(GRIN_GRAPH g,
                                                 GRIN_VERTEX_TYPE_LIST vtl,
                                                 size_t idx) {
   auto _vtl = static_cast<GRIN_VERTEX_TYPE_LIST_T*>(vtl);
-  auto vt = new GRIN_VERTEX_TYPE_T((*_vtl)[idx]);
-  return vt;
+  return (*_vtl)[idx];
 }
 #endif
 
 #ifdef GRIN_WITH_VERTEX_TYPE_NAME
 const char* grin_get_vertex_type_name(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _vt = static_cast<GRIN_VERTEX_TYPE_T*>(vt);
-  auto& s = _g->vertex_types[*_vt];
+  auto& s = _g->vertex_types[vt];
   int len = s.length() + 1;
   char* out = new char[len];
   snprintf(out, len, "%s", s.c_str());
@@ -97,21 +90,19 @@ GRIN_VERTEX_TYPE grin_get_vertex_type_by_name(GRIN_GRAPH g, const char* name) {
   auto it = std::find(_g->vertex_types.begin(), _g->vertex_types.end(), s);
   if (it == _g->vertex_types.end())
     return GRIN_NULL_VERTEX_TYPE;
-  auto vt = new GRIN_VERTEX_TYPE_T(it - _g->vertex_types.begin());
-  return vt;
+  else
+    return it - _g->vertex_types.begin();
 }
 #endif
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_TYPE
 GRIN_VERTEX_TYPE_ID grin_get_vertex_type_id(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt) {
-  auto _vt = static_cast<GRIN_VERTEX_TYPE_T*>(vt);
-  return *_vt;
+  return vt;
 }
 
 GRIN_VERTEX_TYPE grin_get_vertex_type_from_id(GRIN_GRAPH g,
                                               GRIN_VERTEX_TYPE_ID vti) {
-  auto vt = new GRIN_VERTEX_TYPE_T(vti);
-  return vt;
+  return vti;
 }
 #endif
 
@@ -119,22 +110,17 @@ GRIN_VERTEX_TYPE grin_get_vertex_type_from_id(GRIN_GRAPH g,
 // Edge type
 bool grin_equal_edge_type(GRIN_GRAPH g, GRIN_EDGE_TYPE et1,
                           GRIN_EDGE_TYPE et2) {
-  auto _et1 = static_cast<GRIN_EDGE_TYPE_T*>(et1);
-  auto _et2 = static_cast<GRIN_EDGE_TYPE_T*>(et2);
-  return (*_et1 == *_et2);
+  return (et1 == et2);
 }
 
 GRIN_EDGE_TYPE grin_get_edge_type(GRIN_GRAPH g, GRIN_EDGE e) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _e = static_cast<GRIN_EDGE_T*>(e);
-  auto et_id = _g->unique_edge_type_ids[_e->type_id];
-  auto et = new GRIN_EDGE_TYPE_T(et_id);
-  return et;
+  return _g->unique_edge_type_ids[_e->type_id];
 }
 
 void grin_destroy_edge_type(GRIN_GRAPH g, GRIN_EDGE_TYPE et) {
-  auto _et = static_cast<GRIN_EDGE_TYPE_T*>(et);
-  delete _et;
+  return;
 }
 
 // Edge type list
@@ -160,8 +146,7 @@ GRIN_EDGE_TYPE_LIST grin_create_edge_type_list(GRIN_GRAPH g) {
 bool grin_insert_edge_type_to_list(GRIN_GRAPH g, GRIN_EDGE_TYPE_LIST etl,
                                    GRIN_EDGE_TYPE et) {
   auto _etl = static_cast<GRIN_EDGE_TYPE_LIST_T*>(etl);
-  auto _et = static_cast<GRIN_EDGE_TYPE_T*>(et);
-  _etl->push_back(*_et);
+  _etl->push_back(et);
   return true;
 }
 
@@ -174,16 +159,14 @@ GRIN_EDGE_TYPE grin_get_edge_type_from_list(GRIN_GRAPH g,
                                             GRIN_EDGE_TYPE_LIST etl,
                                             size_t idx) {
   auto _etl = static_cast<GRIN_EDGE_TYPE_LIST_T*>(etl);
-  auto et = new GRIN_EDGE_TYPE_T((*_etl)[idx]);
-  return et;
+  return (*_etl)[idx];
 }
 #endif
 
 #ifdef GRIN_WITH_EDGE_TYPE_NAME
 const char* grin_get_edge_type_name(GRIN_GRAPH g, GRIN_EDGE_TYPE et) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _et = static_cast<GRIN_EDGE_TYPE_T*>(et);
-  auto& s = _g->unique_edge_types[*_et];
+  auto& s = _g->unique_edge_types[et];
   int len = s.length() + 1;
   char* out = new char[len];
   snprintf(out, len, "%s", s.c_str());
@@ -195,20 +178,17 @@ GRIN_EDGE_TYPE grin_get_edge_type_by_name(GRIN_GRAPH g, const char* name) {
   auto s = std::string(name);
   if (_g->unique_edge_type_2_ids.find(s) == _g->unique_edge_type_2_ids.end())
     return GRIN_NULL_EDGE_TYPE;
-  auto et = new GRIN_EDGE_TYPE_T(_g->unique_edge_type_2_ids.at(s));
-  return et;
+  return _g->unique_edge_type_2_ids.at(s);
 }
 #endif
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_EDGE_TYPE
 GRIN_EDGE_TYPE_ID grin_get_edge_type_id(GRIN_GRAPH g, GRIN_EDGE_TYPE et) {
-  auto _et = static_cast<GRIN_EDGE_TYPE_T*>(et);
-  return *_et;
+  return et;
 }
 
 GRIN_EDGE_TYPE grin_get_edge_type_from_id(GRIN_GRAPH g, GRIN_EDGE_TYPE_ID eti) {
-  auto et = new GRIN_EDGE_TYPE_T(eti);
-  return et;
+  return eti;
 }
 #endif
 
@@ -216,12 +196,11 @@ GRIN_EDGE_TYPE grin_get_edge_type_from_id(GRIN_GRAPH g, GRIN_EDGE_TYPE_ID eti) {
 GRIN_VERTEX_TYPE_LIST grin_get_src_types_from_edge_type(GRIN_GRAPH g,
                                                         GRIN_EDGE_TYPE et) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _et = static_cast<GRIN_EDGE_TYPE_T*>(et);
   auto vtl = new GRIN_VERTEX_TYPE_LIST_T();
   for (auto i = 0; i < _g->edge_type_num; i++) {
-    if (_g->unique_edge_type_ids[i] > *_et)
+    if (_g->unique_edge_type_ids[i] > et)
       break;
-    else if (_g->unique_edge_type_ids[i] < *_et)
+    else if (_g->unique_edge_type_ids[i] < et)
       continue;
     else
       vtl->push_back(_g->src_type_ids[i]);
@@ -232,12 +211,11 @@ GRIN_VERTEX_TYPE_LIST grin_get_src_types_from_edge_type(GRIN_GRAPH g,
 GRIN_VERTEX_TYPE_LIST grin_get_dst_types_from_edge_type(GRIN_GRAPH g,
                                                         GRIN_EDGE_TYPE et) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _et = static_cast<GRIN_EDGE_TYPE_T*>(et);
   auto vtl = new GRIN_VERTEX_TYPE_LIST_T();
   for (auto i = 0; i < _g->edge_type_num; i++) {
-    if (_g->unique_edge_type_ids[i] > *_et)
+    if (_g->unique_edge_type_ids[i] > et)
       break;
-    else if (_g->unique_edge_type_ids[i] < *_et)
+    else if (_g->unique_edge_type_ids[i] < et)
       continue;
     else
       vtl->push_back(_g->dst_type_ids[i]);
@@ -248,11 +226,9 @@ GRIN_VERTEX_TYPE_LIST grin_get_dst_types_from_edge_type(GRIN_GRAPH g,
 GRIN_EDGE_TYPE_LIST grin_get_edge_types_from_vertex_type_pair(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE src_vt, GRIN_VERTEX_TYPE dst_vt) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _v1 = static_cast<GRIN_VERTEX_TYPE_T*>(src_vt);
-  auto _v2 = static_cast<GRIN_VERTEX_TYPE_T*>(dst_vt);
   auto etl = new GRIN_EDGE_TYPE_LIST_T();
   for (auto i = 0; i < _g->edge_type_num; i++) {
-    if (_g->src_type_ids[i] == *_v1 && _g->dst_type_ids[i] == *_v2) {
+    if (_g->src_type_ids[i] == src_vt && _g->dst_type_ids[i] == dst_vt) {
       etl->push_back(_g->unique_edge_type_ids[i]);
     }
   }

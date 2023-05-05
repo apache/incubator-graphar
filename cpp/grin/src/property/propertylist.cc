@@ -23,14 +23,12 @@ extern "C" {
 GRIN_VERTEX_PROPERTY_LIST grin_get_vertex_property_list_by_type(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _vtype = static_cast<GRIN_VERTEX_TYPE_T*>(vtype);
-  auto type_id = *_vtype;
-  auto& type_name = _g->vertex_types[type_id];
+  auto& type_name = _g->vertex_types[vtype];
   auto& vertex_info = _g->graph_info.GetVertexInfo(type_name).value();
   auto vpl = new GRIN_VERTEX_PROPERTY_LIST_T();
   for (auto& group : vertex_info.GetPropertyGroups()) {
     for (auto& property : group.GetProperties()) {
-      GRIN_VERTEX_PROPERTY_T vp(type_id, property.name,
+      GRIN_VERTEX_PROPERTY_T vp(vtype, property.name,
                                 GARToDataType(property.type));
       vpl->push_back(vp);
     }
@@ -86,24 +84,23 @@ GRIN_VERTEX_PROPERTY_ID grin_get_vertex_property_id(GRIN_GRAPH,
 GRIN_EDGE_PROPERTY_LIST grin_get_edge_property_list_by_type(
     GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _etype = static_cast<GRIN_EDGE_TYPE_T*>(etype);
   auto epl = new GRIN_EDGE_PROPERTY_LIST_T();
   std::set<GRIN_EDGE_PROPERTY_T> edge_properties;
-  for (auto etype = 0; etype < _g->edge_type_num; ++etype) {
-    if (_g->unique_edge_type_ids[etype] > *_etype)
+  for (auto et = 0; et < _g->edge_type_num; ++et) {
+    if (_g->unique_edge_type_ids[et] > etype)
       break;
-    if (_g->unique_edge_type_ids[etype] < *_etype)
+    if (_g->unique_edge_type_ids[et] < etype)
       continue;
     auto& edge_info =
         _g->graph_info
-            .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[etype]],
-                         _g->edge_types[etype],
-                         _g->vertex_types[_g->dst_type_ids[etype]])
+            .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[et]],
+                         _g->edge_types[et],
+                         _g->vertex_types[_g->dst_type_ids[et]])
             .value();
-    auto adj_list_type = _g->edges_collections[etype].begin()->first;
+    auto adj_list_type = _g->edges_collections[et].begin()->first;
     for (auto& group : edge_info.GetPropertyGroups(adj_list_type).value()) {
       for (auto& property : group.GetProperties()) {
-        GRIN_EDGE_PROPERTY_T ep(*_etype, property.name,
+        GRIN_EDGE_PROPERTY_T ep(etype, property.name,
                                 GARToDataType(property.type));
         if (edge_properties.find(ep) != edge_properties.end())
           continue;

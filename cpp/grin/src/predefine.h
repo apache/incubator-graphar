@@ -181,7 +181,6 @@ struct GRIN_ADJACENT_LIST_ITERATOR_T {
 #endif
 
 #ifdef GRIN_WITH_VERTEX_PROPERTY
-typedef unsigned GRIN_VERTEX_TYPE_T;
 typedef std::vector<unsigned> GRIN_VERTEX_TYPE_LIST_T;
 struct GRIN_VERTEX_PROPERTY_T {
   unsigned type_id;
@@ -199,7 +198,6 @@ struct GRIN_VERTEX_PROPERTY_TABLE_T {
 #endif
 
 #ifdef GRIN_WITH_EDGE_PROPERTY
-typedef unsigned GRIN_EDGE_TYPE_T;
 typedef std::vector<unsigned> GRIN_EDGE_TYPE_LIST_T;
 struct GRIN_EDGE_PROPERTY_T {
   unsigned type_id;
