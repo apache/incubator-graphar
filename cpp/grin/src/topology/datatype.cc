@@ -26,11 +26,11 @@ unsigned int grin_get_uint32(const void* ptr) {
   return *static_cast<const uint32_t*>(ptr);
 }
 
-long int grin_get_int64(const void* ptr) {
+long long int grin_get_int64(const void* ptr) {
   return *static_cast<const int64_t*>(ptr);
 }
 
-unsigned long int grin_get_uint64(const void* ptr) {
+unsigned long long int grin_get_uint64(const void* ptr) {
   return *static_cast<const uint64_t*>(ptr);
 }
 
