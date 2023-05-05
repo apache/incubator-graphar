@@ -801,11 +801,15 @@ typedef void* GRIN_VERTEX_DATA;
 #endif
 
 #ifdef GRIN_ENABLE_VERTEX_LIST
-typedef void* GRIN_VERTEX_LIST;                 
+typedef struct {
+  unsigned type_begin;
+  unsigned type_end;
+} GRIN_VERTEX_LIST;
+#define GRIN_NULL_VERTEX_LIST (GRIN_VERTEX_LIST){0, 0}
 #endif
 
 #ifdef GRIN_ENABLE_VERTEX_LIST_ITERATOR
-typedef void* GRIN_VERTEX_LIST_ITERATOR;         
+typedef void* GRIN_VERTEX_LIST_ITERATOR;
 #endif
 
 #ifdef GRIN_ENABLE_ADJACENT_LIST
@@ -813,7 +817,7 @@ typedef void* GRIN_ADJACENT_LIST;
 #endif
 
 #ifdef GRIN_ENABLE_ADJACENT_LIST_ITERATOR
-typedef void* GRIN_ADJACENT_LIST_ITERATOR;       
+typedef void* GRIN_ADJACENT_LIST_ITERATOR;
 #endif
 
 #ifdef GRIN_WITH_EDGE_DATA
@@ -821,7 +825,11 @@ typedef void* GRIN_EDGE_DATA;
 #endif
 
 #ifdef GRIN_ENABLE_EDGE_LIST
-typedef void* GRIN_EDGE_LIST;                   
+typedef struct {
+  unsigned type_begin;
+  unsigned type_end;
+} GRIN_EDGE_LIST;
+#define GRIN_NULL_EDGE_LIST (GRIN_EDGE_LIST){0, 0}
 #endif
 
 #ifdef GRIN_ENABLE_EDGE_LIST_ITERATOR

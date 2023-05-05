@@ -63,11 +63,9 @@ GRIN_VERTEX grin_get_vertex_from_original_id_by_type(
 GRIN_VERTEX_LIST grin_select_type_for_vertex_list(GRIN_GRAPH g,
                                                   GRIN_VERTEX_TYPE vtype,
                                                   GRIN_VERTEX_LIST vl) {
-  auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
-  if (_vl->type_begin > vtype || _vl->type_end <= vtype)
-    return GRIN_NULL_LIST;
-  auto fvl = new GRIN_VERTEX_LIST_T(vtype, vtype + 1);
-  return fvl;
+  if (vl.type_begin > vtype || vl.type_end <= vtype)
+    return GRIN_NULL_VERTEX_LIST;
+  return {vtype, vtype + 1};
 }
 #endif
 
@@ -76,9 +74,8 @@ GRIN_EDGE_LIST grin_select_type_for_edge_list(GRIN_GRAPH g,
                                               GRIN_EDGE_TYPE etype,
                                               GRIN_EDGE_LIST el) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _el = static_cast<GRIN_EDGE_LIST_T*>(el);
-  unsigned type_begin = _el->type_begin, type_end = _el->type_end;
-  for (auto i = _el->type_begin; i < _el->type_end; i++) {
+  unsigned type_begin = el.type_begin, type_end = el.type_end;
+  for (auto i = el.type_begin; i < el.type_end; i++) {
     if (_g->unique_edge_type_ids[i] > etype)
       break;
     else if (_g->unique_edge_type_ids[i] < etype)
@@ -87,9 +84,8 @@ GRIN_EDGE_LIST grin_select_type_for_edge_list(GRIN_GRAPH g,
       type_end = i + 1;
   }
   if (type_begin >= type_end)
-    return GRIN_NULL_LIST;
-  auto fel = new GRIN_EDGE_LIST_T(type_begin, type_end);
-  return fel;
+    return GRIN_NULL_EDGE_LIST;
+  return {type_begin, type_end};
 }
 #endif
 

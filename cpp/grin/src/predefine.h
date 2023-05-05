@@ -57,9 +57,9 @@ struct GRIN_GRAPH_T {
   GAR_NAMESPACE::GraphInfo graph_info;
   size_t tot_vertex_num;
   size_t tot_edge_num;
-  size_t vertex_type_num;
-  size_t edge_type_num;
-  size_t unique_edge_type_num;
+  unsigned vertex_type_num;
+  unsigned edge_type_num;
+  unsigned unique_edge_type_num;
   std::vector<size_t> vertex_offsets, edge_num;
   std::vector<std::string> vertex_types, edge_types, unique_edge_types;
   std::map<std::string, unsigned> unique_edge_type_2_ids;
@@ -81,15 +81,6 @@ std::string GetDataTypeName(GRIN_DATATYPE);
 GRIN_DATATYPE GARToDataType(GAR_NAMESPACE::DataType);
 size_t __grin_get_edge_num(GRIN_GRAPH_T*, unsigned, unsigned);
 
-#ifdef GRIN_ENABLE_VERTEX_LIST
-struct GRIN_VERTEX_LIST_T {
-  unsigned type_begin;
-  unsigned type_end;
-  GRIN_VERTEX_LIST_T(unsigned _type_begin, unsigned _type_end)
-      : type_begin(_type_begin), type_end(_type_end) {}
-};
-#endif
-
 #ifdef GRIN_ENABLE_VERTEX_LIST_ITERATOR
 struct GRIN_VERTEX_LIST_ITERATOR_T {
   unsigned type_begin;
@@ -106,15 +97,6 @@ struct GRIN_VERTEX_LIST_ITERATOR_T {
         current_type(_current_type),
         current_offset(_current_offset),
         iter(std::move(_iter)) {}
-};
-#endif
-
-#ifdef GRIN_ENABLE_EDGE_LIST
-struct GRIN_EDGE_LIST_T {
-  unsigned type_begin;
-  unsigned type_end;
-  GRIN_EDGE_LIST_T(unsigned _type_begin, unsigned _type_end)
-      : type_begin(_type_begin), type_end(_type_end) {}
 };
 #endif
 

@@ -21,32 +21,28 @@ extern "C" {
 #ifdef GRIN_ENABLE_VERTEX_LIST
 GRIN_VERTEX_LIST grin_get_vertex_list(GRIN_GRAPH g) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto vl = new GRIN_VERTEX_LIST_T(0, _g->vertex_type_num);
-  return vl;
+  return {0, _g->vertex_type_num};
 }
 
 void grin_destroy_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
-  auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
-  delete _vl;
+  return;
 }
 #endif
 
 #ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
 size_t grin_get_vertex_list_size(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
-  return _g->vertex_offsets[_vl->type_end] -
-         _g->vertex_offsets[_vl->type_begin];
+  return _g->vertex_offsets[vl.type_end] -
+         _g->vertex_offsets[vl.type_begin];
 }
 
 GRIN_VERTEX grin_get_vertex_from_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl,
                                       size_t idx) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
-  for (auto i = _vl->type_begin; i < _vl->type_end; i++) {
-    if (idx < _g->vertex_offsets[i + 1] - _g->vertex_offsets[_vl->type_begin]) {
+  for (auto i = vl.type_begin; i < vl.type_end; i++) {
+    if (idx < _g->vertex_offsets[i + 1] - _g->vertex_offsets[vl.type_begin]) {
       auto _idx =
-          idx + _g->vertex_offsets[_vl->type_begin] - _g->vertex_offsets[i];
+          idx + _g->vertex_offsets[vl.type_begin] - _g->vertex_offsets[i];
       auto v = new GRIN_VERTEX_T(_idx, i);
       return v;
     }
@@ -59,10 +55,9 @@ GRIN_VERTEX grin_get_vertex_from_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl,
 GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
                                                      GRIN_VERTEX_LIST vl) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
-  auto& vertices = _g->vertices_collections[_vl->type_begin];
+  auto& vertices = _g->vertices_collections[vl.type_begin];
   auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(
-      _vl->type_begin, _vl->type_end, _vl->type_begin, 0, vertices.begin());
+      vl.type_begin, vl.type_end, vl.type_begin, 0, vertices.begin());
   return vli;
 }
 

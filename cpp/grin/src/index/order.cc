@@ -33,13 +33,12 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
                                                     GRIN_VERTEX_LIST vl,
                                                     GRIN_VERTEX v) {
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
-  auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
-  if (_v->type_id < _vl->type_begin || _v->type_id >= _vl->type_end)
+  if (_v->type_id < vl.type_begin || _v->type_id >= vl.type_end)
     return GRIN_NULL_SIZE;
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   size_t offset = _g->vertex_offsets[_v->type_id] + _v->id;
   if (offset < _g->vertex_offsets[_v->type_id + 1]) {
-    return offset - _g->vertex_offsets[_vl->type_begin];
+    return offset - _g->vertex_offsets[vl.type_begin];
   } else {
     return GRIN_NULL_SIZE;
   }
