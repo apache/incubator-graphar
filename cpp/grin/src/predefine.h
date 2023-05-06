@@ -64,6 +64,7 @@ struct GRIN_GRAPH_T {
   std::vector<std::string> vertex_types, edge_types, unique_edge_types;
   std::map<std::string, unsigned> unique_edge_type_2_ids;
   std::vector<unsigned> src_type_ids, dst_type_ids, unique_edge_type_ids;
+  std::vector<unsigned> unique_edge_type_begin_type;
   std::vector<GAR_NAMESPACE::VerticesCollection> vertices_collections;
   std::vector<std::map<GAR_NAMESPACE::AdjListType, GAR_NAMESPACE::Edges>>
       edges_collections;

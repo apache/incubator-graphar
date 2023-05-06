@@ -84,13 +84,12 @@ GRIN_VERTEX_PROPERTY_ID grin_get_vertex_property_id(GRIN_GRAPH,
 GRIN_EDGE_PROPERTY_LIST grin_get_edge_property_list_by_type(
     GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  if (etype >= _g->unique_edge_type_num)
+    return GRIN_NULL_LIST;
   auto epl = new GRIN_EDGE_PROPERTY_LIST_T();
   std::set<GRIN_EDGE_PROPERTY_T> edge_properties;
-  for (auto et = 0; et < _g->edge_type_num; ++et) {
-    if (_g->unique_edge_type_ids[et] > etype)
-      break;
-    if (_g->unique_edge_type_ids[et] < etype)
-      continue;
+  for (auto et = _g->unique_edge_type_begin_type[etype];
+       et < _g->unique_edge_type_begin_type[etype + 1]; ++et) {
     auto& edge_info = _g->graph_info
                           .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[et]],
                                        _g->edge_types[et],

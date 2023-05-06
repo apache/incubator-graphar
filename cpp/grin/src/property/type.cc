@@ -192,14 +192,12 @@ GRIN_EDGE_TYPE grin_get_edge_type_from_id(GRIN_GRAPH g, GRIN_EDGE_TYPE_ID eti) {
 GRIN_VERTEX_TYPE_LIST grin_get_src_types_from_edge_type(GRIN_GRAPH g,
                                                         GRIN_EDGE_TYPE et) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  if (et >= _g->unique_edge_type_num)
+    return GRIN_NULL_LIST;
   auto vtl = new GRIN_VERTEX_TYPE_LIST_T();
-  for (auto i = 0; i < _g->edge_type_num; i++) {
-    if (_g->unique_edge_type_ids[i] > et)
-      break;
-    else if (_g->unique_edge_type_ids[i] < et)
-      continue;
-    else
-      vtl->push_back(_g->src_type_ids[i]);
+  for (auto i = _g->unique_edge_type_begin_type[et];
+       i < _g->unique_edge_type_begin_type[et + 1]; i++) {
+    vtl->push_back(_g->src_type_ids[i]);
   }
   return vtl;
 }
@@ -207,14 +205,12 @@ GRIN_VERTEX_TYPE_LIST grin_get_src_types_from_edge_type(GRIN_GRAPH g,
 GRIN_VERTEX_TYPE_LIST grin_get_dst_types_from_edge_type(GRIN_GRAPH g,
                                                         GRIN_EDGE_TYPE et) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  if (et >= _g->unique_edge_type_num)
+    return GRIN_NULL_LIST;
   auto vtl = new GRIN_VERTEX_TYPE_LIST_T();
-  for (auto i = 0; i < _g->edge_type_num; i++) {
-    if (_g->unique_edge_type_ids[i] > et)
-      break;
-    else if (_g->unique_edge_type_ids[i] < et)
-      continue;
-    else
-      vtl->push_back(_g->dst_type_ids[i]);
+  for (auto i = _g->unique_edge_type_begin_type[et];
+       i < _g->unique_edge_type_begin_type[et + 1]; i++) {
+    vtl->push_back(_g->dst_type_ids[i]);
   }
   return vtl;
 }

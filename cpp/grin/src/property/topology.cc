@@ -28,15 +28,10 @@ size_t grin_get_vertex_num_by_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
 #ifdef GRIN_WITH_EDGE_PROPERTY
 size_t grin_get_edge_num_by_type(GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  unsigned type_begin = 0, type_end = 0;
-  for (auto i = 0; i < _g->edge_type_num; i++) {
-    if (_g->unique_edge_type_ids[i] > etype)
-      break;
-    else if (_g->unique_edge_type_ids[i] < etype)
-      type_begin = i + 1;
-    else
-      type_end = i + 1;
-  }
+  if (etype >= _g->unique_edge_type_num)
+    return GRIN_NULL_SIZE;
+  unsigned type_begin = _g->unique_edge_type_begin_type[etype],
+           type_end = _g->unique_edge_type_begin_type[etype + 1];
   return __grin_get_edge_num(_g, type_begin, type_end);
 }
 #endif
@@ -74,15 +69,12 @@ GRIN_EDGE_LIST grin_select_type_for_edge_list(GRIN_GRAPH g,
                                               GRIN_EDGE_TYPE etype,
                                               GRIN_EDGE_LIST el) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  unsigned type_begin = el.type_begin, type_end = el.type_end;
-  for (auto i = el.type_begin; i < el.type_end; i++) {
-    if (_g->unique_edge_type_ids[i] > etype)
-      break;
-    else if (_g->unique_edge_type_ids[i] < etype)
-      type_begin = i + 1;
-    else
-      type_end = i + 1;
-  }
+  if (etype >= _g->unique_edge_type_num)
+    return {el.type_end, el.type_end};
+  unsigned type_begin =
+      std::max(_g->unique_edge_type_begin_type[etype], el.type_begin);
+  unsigned type_end =
+      std::min(_g->unique_edge_type_begin_type[etype + 1], el.type_end);
   if (type_begin >= type_end)
     return {el.type_end, el.type_end};
   return {type_begin, type_end};
@@ -105,15 +97,12 @@ GRIN_ADJACENT_LIST grin_select_edge_type_for_adjacent_list(
     GRIN_GRAPH g, GRIN_EDGE_TYPE etype, GRIN_ADJACENT_LIST al) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _al = static_cast<GRIN_ADJACENT_LIST_T*>(al);
-  unsigned type_begin = _al->etype_begin, type_end = _al->etype_end;
-  for (auto i = _al->etype_begin; i < _al->etype_end; i++) {
-    if (_g->unique_edge_type_ids[i] > etype)
-      break;
-    else if (_g->unique_edge_type_ids[i] < etype)
-      type_begin = i + 1;
-    else
-      type_end = i + 1;
-  }
+  if (etype >= _g->unique_edge_type_num)
+    return GRIN_NULL_LIST;
+  unsigned type_begin =
+      std::max(_g->unique_edge_type_begin_type[etype], _al->etype_begin);
+  unsigned type_end =
+      std::min(_g->unique_edge_type_begin_type[etype + 1], _al->etype_end);
   if (type_begin >= type_end)
     return GRIN_NULL_LIST;
   auto fal =

@@ -35,6 +35,7 @@ GRIN_GRAPH get_graph_by_info_path(const std::string& path) {
   graph->vertex_types.clear();
   graph->vertex_offsets.clear();
   graph->vertex_offsets.push_back(0);
+  graph->unique_edge_type_begin_type.clear();
 
   for (const auto& [label, vertex_info] : graph->graph_info.GetVertexInfos()) {
     auto maybe_vertices_collection =
@@ -62,6 +63,7 @@ GRIN_GRAPH get_graph_by_info_path(const std::string& path) {
       graph->unique_edge_type_2_ids.insert(
           {edge_label, graph->unique_edge_type_num});
       graph->unique_edge_type_num++;
+      graph->unique_edge_type_begin_type.push_back(graph->edge_type_num);
     }
 
     unsigned src_type_id = std::find(graph->vertex_types.begin(),
@@ -116,6 +118,7 @@ GRIN_GRAPH get_graph_by_info_path(const std::string& path) {
     }
     graph->edge_type_num++;
   }
+  graph->unique_edge_type_begin_type.push_back(graph->edge_type_num);
   graph->tot_edge_num = __grin_get_edge_num(graph, 0, graph->edge_type_num);
   return graph;
 }
