@@ -213,6 +213,12 @@ class VertexIter {
     return ret;
   }
 
+  /** The add-assign operator. */
+  VertexIter& operator+=(IdType offset) {
+    cur_offset_ += offset;
+    return *this;
+  }
+
   /** The equality operator. */
   bool operator==(const VertexIter& rhs) const noexcept {
     return cur_offset_ == rhs.cur_offset_;

@@ -56,6 +56,17 @@ TEST_CASE("test_vertices_collection") {
             << ", id=" << it_last.property<int64_t>("id").value()
             << ", firstName="
             << it_last.property<std::string>("firstName").value() << std::endl;
+  auto it_begin = it_last + (1 - count);
+
+  auto it = vertices.begin();
+  it += (count - 1);
+  REQUIRE(it.id() == it_last.id());
+  REQUIRE(it.property<int64_t>("id").value() ==
+          it_last.property<int64_t>("id").value());
+  it += (1 - count);
+  REQUIRE(it.id() == it_begin.id());
+  REQUIRE(it.property<int64_t>("id").value() ==
+          it_begin.property<int64_t>("id").value());
 }
 
 TEST_CASE("test_edges_collection", "[Slow]") {
