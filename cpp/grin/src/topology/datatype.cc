@@ -49,3 +49,24 @@ const char* grin_get_string(const void* ptr) {
   snprintf(out, len, "%s", s);
   return out;
 }
+
+const void* grin_put_int32(int value) { return new int32_t(value); }
+
+const void* grin_put_uint32(unsigned int value) { return new uint32_t(value); }
+
+const void* grin_put_int64(long long int value) { return new int64_t(value); }
+
+const void* grin_put_uint64(unsigned long long int value) {
+  return new uint64_t(value);
+}
+
+const void* grin_put_float(float value) { return new float(value); }
+
+const void* grin_put_double(double value) { return new double(value); }
+
+const void* grin_put_string(const char* value) {
+  int len = strlen(value) + 1;
+  char* out = new char[len];
+  snprintf(out, len, "%s", value);
+  return out;
+}
