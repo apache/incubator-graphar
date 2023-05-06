@@ -384,8 +384,8 @@ void test_property_vertex_table(int argc, char** argv) {
   printf("------------ Vertex property table ------------\n");
   GRIN_VERTEX_TYPE_LIST vtl = grin_get_vertex_type_list(g);
   size_t vtl_size = grin_get_vertex_type_list_size(g, vtl);
-  for (size_t i = 0; i < vtl_size; ++i) {
-    GRIN_VERTEX_TYPE vt = grin_get_vertex_type_from_list(g, vtl, i);
+  for (size_t vt_index = 0; vt_index < vtl_size; ++vt_index) {
+    GRIN_VERTEX_TYPE vt = grin_get_vertex_type_from_list(g, vtl, vt_index);
 
     GRIN_VERTEX_PROPERTY_LIST vpl =
         grin_get_vertex_property_list_by_type(g, vt);
