@@ -14,7 +14,6 @@ limitations under the License.
 */
 
 #include <iostream>
-#include <set>
 
 extern "C" {
 #include "grin/include/property/property.h"

@@ -219,6 +219,8 @@ GRIN_GRAPH get_graph_by_info_path(const std::string&);
 std::string GetDataTypeName(GRIN_DATATYPE);
 GRIN_DATATYPE GARToDataType(GAR_NAMESPACE::DataType);
 size_t __grin_get_edge_num(GRIN_GRAPH_T*, unsigned, unsigned);
+void __grin_init_vertices_collections(GRIN_GRAPH_T*);
+void __grin_init_edges_collections(GRIN_GRAPH_T*);
 void __grin_init_vertex_properties(GRIN_GRAPH_T*);
 void __grin_init_edge_properties(GRIN_GRAPH_T*);
 
