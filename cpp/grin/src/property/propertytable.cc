@@ -119,41 +119,41 @@ const void* grin_get_value_from_vertex_property_table(
     GRIN_VERTEX_PROPERTY vp) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
-  auto _vp = static_cast<GRIN_VERTEX_PROPERTY_T*>(vp);
-  if (_vp->type_id != vpt || _v->type_id != vpt)
+  auto& property = _g->vertex_properties[vp];
+  if (property.type_id != vpt || _v->type_id != vpt)
     return NULL;
 
   // properties are not stored in vertex
   if (_v->vertex.has_value() == false) {
-    auto& vertices = _g->vertices_collections[_vp->type_id];
+    auto& vertices = _g->vertices_collections[property.type_id];
     auto it = vertices.begin() + _v->id;
     _v->vertex = *it;
   }
 
   // properties are stored in vertex
-  switch (_vp->type) {
+  switch (property.type) {
   case GRIN_DATATYPE::Int32: {
-    auto value =
-        new int32_t(_v->vertex.value().property<int32_t>(_vp->name).value());
+    auto value = new int32_t(
+        _v->vertex.value().property<int32_t>(property.name).value());
     return value;
   }
   case GRIN_DATATYPE::Int64: {
-    auto value =
-        new int64_t(_v->vertex.value().property<int64_t>(_vp->name).value());
+    auto value = new int64_t(
+        _v->vertex.value().property<int64_t>(property.name).value());
     return value;
   }
   case GRIN_DATATYPE::Float: {
     auto value =
-        new float(_v->vertex.value().property<float>(_vp->name).value());
+        new float(_v->vertex.value().property<float>(property.name).value());
     return value;
   }
   case GRIN_DATATYPE::Double: {
     auto value =
-        new double(_v->vertex.value().property<double>(_vp->name).value());
+        new double(_v->vertex.value().property<double>(property.name).value());
     return value;
   }
   case GRIN_DATATYPE::String: {
-    auto s = _v->vertex.value().property<std::string>(_vp->name).value();
+    auto s = _v->vertex.value().property<std::string>(property.name).value();
     int len = s.length() + 1;
     char* out = new char[len];
     snprintf(out, len, "%s", s.c_str());
@@ -187,35 +187,37 @@ GRIN_ROW grin_get_row_from_vertex_property_table(
   }
 
   // properties are stored in vertex
-  for (auto& _vp : *_vpl) {
-    if (_vp.type_id != _v->type_id) {
+  for (auto& vp : *_vpl) {
+    auto& property = _g->vertex_properties[vp];
+    if (property.type_id != _v->type_id) {
       delete r;
       return GRIN_NULL_ROW;
     }
 
-    switch (_vp.type) {
+    switch (property.type) {
     case GRIN_DATATYPE::Int32: {
-      auto value = _v->vertex.value().property<int32_t>(_vp.name).value();
+      auto value = _v->vertex.value().property<int32_t>(property.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::Int64: {
-      auto value = _v->vertex.value().property<int64_t>(_vp.name).value();
+      auto value = _v->vertex.value().property<int64_t>(property.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::Float: {
-      auto value = _v->vertex.value().property<float>(_vp.name).value();
+      auto value = _v->vertex.value().property<float>(property.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::Double: {
-      auto value = _v->vertex.value().property<double>(_vp.name).value();
+      auto value = _v->vertex.value().property<double>(property.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::String: {
-      auto value = _v->vertex.value().property<std::string>(_vp.name).value();
+      auto value =
+          _v->vertex.value().property<std::string>(property.name).value();
       r->push_back(std::move(value));
       break;
     }
@@ -251,30 +253,30 @@ const void* grin_get_value_from_edge_property_table(
     GRIN_EDGE_PROPERTY ep) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _e = static_cast<GRIN_EDGE_T*>(e);
-  auto _ep = static_cast<GRIN_EDGE_PROPERTY_T*>(ep);
   if (_g->unique_edge_type_ids[_e->type_id] != ept)
     return NULL;
-  if (_g->unique_edge_type_ids[_e->type_id] != _ep->type_id)
+  auto& property = _g->edge_properties[ep];
+  if (_g->unique_edge_type_ids[_e->type_id] != property.type_id)
     return NULL;
-  switch (_ep->type) {
+  switch (property.type) {
   case GRIN_DATATYPE::Int32: {
-    auto value = new int32_t(_e->edge.property<int32_t>(_ep->name).value());
+    auto value = new int32_t(_e->edge.property<int32_t>(property.name).value());
     return value;
   }
   case GRIN_DATATYPE::Int64: {
-    auto value = new int64_t(_e->edge.property<int64_t>(_ep->name).value());
+    auto value = new int64_t(_e->edge.property<int64_t>(property.name).value());
     return value;
   }
   case GRIN_DATATYPE::Float: {
-    auto value = new float(_e->edge.property<float>(_ep->name).value());
+    auto value = new float(_e->edge.property<float>(property.name).value());
     return value;
   }
   case GRIN_DATATYPE::Double: {
-    auto value = new double(_e->edge.property<double>(_ep->name).value());
+    auto value = new double(_e->edge.property<double>(property.name).value());
     return value;
   }
   case GRIN_DATATYPE::String: {
-    auto s = _e->edge.property<std::string>(_ep->name).value();
+    auto s = _e->edge.property<std::string>(property.name).value();
     int len = s.length() + 1;
     char* out = new char[len];
     snprintf(out, len, "%s", s.c_str());
@@ -300,35 +302,36 @@ GRIN_ROW grin_get_row_from_edge_property_table(GRIN_GRAPH g,
     return GRIN_NULL_ROW;
 
   auto r = new GRIN_ROW_T();
-  for (auto& _ep : *_epl) {
-    if (_g->unique_edge_type_ids[_e->type_id] != _ep.type_id) {
+  for (auto& ep : *_epl) {
+    auto& property = _g->edge_properties[ep];
+    if (_g->unique_edge_type_ids[_e->type_id] != property.type_id) {
       delete r;
       return GRIN_NULL_ROW;
     }
 
-    switch (_ep.type) {
+    switch (property.type) {
     case GRIN_DATATYPE::Int32: {
-      auto value = _e->edge.property<int32_t>(_ep.name).value();
+      auto value = _e->edge.property<int32_t>(property.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::Int64: {
-      auto value = _e->edge.property<int64_t>(_ep.name).value();
+      auto value = _e->edge.property<int64_t>(property.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::Float: {
-      auto value = _e->edge.property<float>(_ep.name).value();
+      auto value = _e->edge.property<float>(property.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::Double: {
-      auto value = _e->edge.property<double>(_ep.name).value();
+      auto value = _e->edge.property<double>(property.name).value();
       r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::String: {
-      auto value = _e->edge.property<std::string>(_ep.name).value();
+      auto value = _e->edge.property<std::string>(property.name).value();
       r->push_back(std::move(value));
       break;
     }

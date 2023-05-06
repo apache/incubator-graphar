@@ -25,22 +25,14 @@ extern "C" {
 GRIN_VERTEX_TYPE_LIST grin_get_vertex_types_with_primary_keys(GRIN_GRAPH g) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto vtl = new GRIN_VERTEX_TYPE_LIST_T();
-  unsigned type_id = 0;
-  for (const auto& [label, vertex_info] : _g->graph_info.GetVertexInfos()) {
-    bool flag = false;
-    for (auto& group : vertex_info.GetPropertyGroups()) {
-      for (auto& property : group.GetProperties()) {
-        if (property.is_primary) {
-          flag = true;
-          break;
-        }
-      }
-      if (flag)
+  for (unsigned vtype = 0; vtype < _g->vertex_type_num; vtype++) {
+    for (unsigned property_id = _g->vertex_property_offsets[vtype];
+         property_id < _g->vertex_property_offsets[vtype + 1]; property_id++) {
+      if (_g->vertex_properties[property_id].is_primary) {
+        vtl->push_back(vtype);
         break;
+      }
     }
-    if (flag)
-      vtl->push_back(type_id);
-    type_id++;
   }
   return vtl;
 }
@@ -48,17 +40,13 @@ GRIN_VERTEX_TYPE_LIST grin_get_vertex_types_with_primary_keys(GRIN_GRAPH g) {
 GRIN_VERTEX_PROPERTY_LIST grin_get_primary_keys_by_vertex_type(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto& type_name = _g->vertex_types[vtype];
-  auto& vertex_info = _g->graph_info.GetVertexInfo(type_name).value();
+  if (vtype >= _g->vertex_type_num)
+    return GRIN_NULL_LIST;
   auto vpl = new GRIN_VERTEX_PROPERTY_LIST_T();
-  for (auto& group : vertex_info.GetPropertyGroups()) {
-    for (auto& property : group.GetProperties()) {
-      if (property.is_primary) {
-        GRIN_VERTEX_PROPERTY_T vp(vtype, property.name,
-                                  GARToDataType(property.type));
-        vpl->push_back(vp);
-      }
-    }
+  for (unsigned i = _g->vertex_property_offsets[vtype];
+       i < _g->vertex_property_offsets[vtype + 1]; ++i) {
+    if (_g->vertex_properties[i].is_primary)
+      vpl->push_back(i);
   }
   return vpl;
 }
@@ -76,7 +64,8 @@ GRIN_VERTEX grin_get_vertex_by_primary_keys(GRIN_GRAPH g,
   for (auto it = vertices.begin(); it != it_end; it++) {
     bool flag = true;
     unsigned idx = 0;
-    for (auto& property : *_vpl) {
+    for (auto& vp : *_vpl) {
+      auto& property = _g->vertex_properties[vp];
       auto& name = property.name;
       auto type = property.type;
       auto value = grin_get_value_from_row(g, r, type, idx);

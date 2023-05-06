@@ -120,6 +120,8 @@ GRIN_GRAPH get_graph_by_info_path(const std::string& path) {
   }
   graph->unique_edge_type_begin_type.push_back(graph->edge_type_num);
   graph->tot_edge_num = __grin_get_edge_num(graph, 0, graph->edge_type_num);
+  __grin_init_vertex_properties(graph);
+  __grin_init_edge_properties(graph);
   return graph;
 }
 
@@ -206,4 +208,64 @@ size_t __grin_get_edge_num(GRIN_GRAPH_T* _g, unsigned type_begin,
     res += _g->edge_num[type_id];
   }
   return res;
+}
+
+void __grin_init_vertex_properties(GRIN_GRAPH_T* _g) {
+  _g->vertex_properties.clear();
+  _g->vertex_property_offsets.clear();
+  _g->vertex_property_name_2_ids.clear();
+  unsigned property_id = 0, vtype = 0;
+  for (const auto& [label, vertex_info] : _g->graph_info.GetVertexInfos()) {
+    _g->vertex_property_offsets.push_back(property_id);
+    std::map<std::string, unsigned> name_2_id;
+    for (auto& group : vertex_info.GetPropertyGroups()) {
+      for (auto& property : group.GetProperties()) {
+        GRIN_VERTEX_PROPERTY_T vp(vtype, property.name,
+                                  GARToDataType(property.type),
+                                  property.is_primary);
+        _g->vertex_properties.push_back(vp);
+        name_2_id.insert({property.name, property_id});
+        property_id++;
+      }
+    }
+    _g->vertex_property_name_2_ids.push_back(name_2_id);
+    vtype++;
+  }
+  _g->vertex_property_offsets.push_back(property_id);
+}
+
+void __grin_init_edge_properties(GRIN_GRAPH_T* _g) {
+  _g->edge_properties.clear();
+  _g->edge_property_offsets.clear();
+  _g->edge_property_name_2_ids.clear();
+  unsigned property_id = 0;
+
+  for (unsigned etype = 0; etype < _g->unique_edge_type_num; etype++) {
+    _g->edge_property_offsets.push_back(property_id);
+    std::map<std::string, unsigned> name_2_id;
+    for (auto et = _g->unique_edge_type_begin_type[etype];
+         et < _g->unique_edge_type_begin_type[etype + 1]; ++et) {
+      auto& edge_info = _g->graph_info
+                            .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[et]],
+                                         _g->edge_types[et],
+                                         _g->vertex_types[_g->dst_type_ids[et]])
+                            .value();
+      auto adj_list_type = _g->edges_collections[et].begin()->first;
+      for (auto& group : edge_info.GetPropertyGroups(adj_list_type).value()) {
+        for (auto& property : group.GetProperties()) {
+          GRIN_EDGE_PROPERTY_T ep(etype, property.name,
+                                  GARToDataType(property.type));
+          if (name_2_id.find(property.name) != name_2_id.end()) {
+            // TODO: throw exception
+            continue;
+          }
+          _g->edge_properties.push_back(ep);
+          name_2_id.insert({property.name, property_id});
+          property_id++;
+        }
+      }
+    }
+    _g->edge_property_name_2_ids.push_back(name_2_id);
+  }
+  _g->edge_property_offsets.push_back(property_id);
 }

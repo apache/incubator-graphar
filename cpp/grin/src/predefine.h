@@ -53,35 +53,6 @@ struct GRIN_EDGE_T {
       : edge(std::move(_edge)), type_id(_type_id) {}
 };
 
-struct GRIN_GRAPH_T {
-  GAR_NAMESPACE::GraphInfo graph_info;
-  size_t tot_vertex_num;
-  size_t tot_edge_num;
-  unsigned vertex_type_num;
-  unsigned edge_type_num;
-  unsigned unique_edge_type_num;
-  std::vector<size_t> vertex_offsets, edge_num;
-  std::vector<std::string> vertex_types, edge_types, unique_edge_types;
-  std::map<std::string, unsigned> unique_edge_type_2_ids;
-  std::vector<unsigned> src_type_ids, dst_type_ids, unique_edge_type_ids;
-  std::vector<unsigned> unique_edge_type_begin_type;
-  std::vector<GAR_NAMESPACE::VerticesCollection> vertices_collections;
-  std::vector<std::map<GAR_NAMESPACE::AdjListType, GAR_NAMESPACE::Edges>>
-      edges_collections;
-  explicit GRIN_GRAPH_T(GAR_NAMESPACE::GraphInfo graph_info_)
-      : graph_info(std::move(graph_info_)),
-        tot_vertex_num(0),
-        tot_edge_num(0),
-        vertex_type_num(0),
-        edge_type_num(0),
-        unique_edge_type_num(0) {}
-};
-
-GRIN_GRAPH get_graph_by_info_path(const std::string&);
-std::string GetDataTypeName(GRIN_DATATYPE);
-GRIN_DATATYPE GARToDataType(GAR_NAMESPACE::DataType);
-size_t __grin_get_edge_num(GRIN_GRAPH_T*, unsigned, unsigned);
-
 #ifdef GRIN_ENABLE_VERTEX_LIST_ITERATOR
 struct GRIN_VERTEX_LIST_ITERATOR_T {
   unsigned type_begin;
@@ -174,11 +145,15 @@ struct GRIN_VERTEX_PROPERTY_T {
   unsigned type_id;
   std::string name;
   GRIN_DATATYPE type;
+  bool is_primary;
   GRIN_VERTEX_PROPERTY_T(unsigned _type_id, std::string _name,
-                         GRIN_DATATYPE _type)
-      : type_id(_type_id), name(std::move(_name)), type(_type) {}
+                         GRIN_DATATYPE _type, bool _is_primary)
+      : type_id(_type_id),
+        name(std::move(_name)),
+        type(_type),
+        is_primary(_is_primary) {}
 };
-typedef std::vector<GRIN_VERTEX_PROPERTY_T> GRIN_VERTEX_PROPERTY_LIST_T;
+typedef std::vector<unsigned> GRIN_VERTEX_PROPERTY_LIST_T;
 #endif
 
 #ifdef GRIN_WITH_EDGE_PROPERTY
@@ -200,11 +175,51 @@ struct GRIN_EDGE_PROPERTY_T {
             type < other.type);
   }
 };
-typedef std::vector<GRIN_EDGE_PROPERTY_T> GRIN_EDGE_PROPERTY_LIST_T;
+typedef std::vector<unsigned> GRIN_EDGE_PROPERTY_LIST_T;
 #endif
 
 #if defined(GRIN_WITH_VERTEX_PROPERTY) || defined(GRIN_WITH_EDGE_PROPERTY)
 typedef std::vector<std::any> GRIN_ROW_T;
 #endif
+
+struct GRIN_GRAPH_T {
+  GAR_NAMESPACE::GraphInfo graph_info;
+  size_t tot_vertex_num;
+  size_t tot_edge_num;
+  unsigned vertex_type_num;
+  unsigned edge_type_num;
+  unsigned unique_edge_type_num;
+  std::vector<size_t> vertex_offsets, edge_num;
+  // types
+  std::vector<std::string> vertex_types, edge_types, unique_edge_types;
+  std::map<std::string, unsigned> unique_edge_type_2_ids;
+  std::vector<unsigned> src_type_ids, dst_type_ids, unique_edge_type_ids;
+  std::vector<unsigned> unique_edge_type_begin_type;
+  // vertices & edges
+  std::vector<GAR_NAMESPACE::VerticesCollection> vertices_collections;
+  std::vector<std::map<GAR_NAMESPACE::AdjListType, GAR_NAMESPACE::Edges>>
+      edges_collections;
+  // properties
+  std::vector<GRIN_VERTEX_PROPERTY_T> vertex_properties;
+  std::vector<GRIN_EDGE_PROPERTY_T> edge_properties;
+  std::vector<unsigned> vertex_property_offsets, edge_property_offsets;
+  std::vector<std::map<std::string, unsigned>> vertex_property_name_2_ids,
+      edge_property_name_2_ids;
+  // constructor
+  explicit GRIN_GRAPH_T(GAR_NAMESPACE::GraphInfo graph_info_)
+      : graph_info(std::move(graph_info_)),
+        tot_vertex_num(0),
+        tot_edge_num(0),
+        vertex_type_num(0),
+        edge_type_num(0),
+        unique_edge_type_num(0) {}
+};
+
+GRIN_GRAPH get_graph_by_info_path(const std::string&);
+std::string GetDataTypeName(GRIN_DATATYPE);
+GRIN_DATATYPE GARToDataType(GAR_NAMESPACE::DataType);
+size_t __grin_get_edge_num(GRIN_GRAPH_T*, unsigned, unsigned);
+void __grin_init_vertex_properties(GRIN_GRAPH_T*);
+void __grin_init_edge_properties(GRIN_GRAPH_T*);
 
 #endif  // CPP_GRIN_SRC_PREDEFINE_H_

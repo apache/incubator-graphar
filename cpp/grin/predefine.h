@@ -660,12 +660,14 @@ typedef enum {
 #define GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_TYPE
 #define GRIN_ENABLE_VERTEX_PROPERTY_TABLE
 #define GRIN_ENABLE_VERTEX_PRIMARY_KEYS
+#define GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_PROPERTY
 #define GRIN_ASSUME_BY_TYPE_VERTEX_ORIGINAL_ID
 #define GRIN_WITH_EDGE_PROPERTY
 #define GRIN_WITH_EDGE_PROPERTY_NAME
 #define GRIN_WITH_EDGE_TYPE_NAME
 #define GRIN_TRAIT_NATURAL_ID_FOR_EDGE_TYPE
 #define GRIN_ENABLE_EDGE_PROPERTY_TABLE
+#define GRIN_TRAIT_NATURAL_ID_FOR_EDGE_PROPERTY
 #define GRIN_TRAIT_SELECT_TYPE_FOR_VERTEX_LIST
 #define GRIN_TRAIT_SELECT_TYPE_FOR_EDGE_LIST
 #define GRIN_TRAIT_SELECT_NEIGHBOR_TYPE_FOR_ADJACENT_LIST
@@ -775,9 +777,9 @@ typedef enum {
 /** @brief Non-existing edge type (invalid return value) */
 #define GRIN_NULL_EDGE_TYPE (unsigned)~0
 /** @brief Non-existing vertex property (invalid return value) */
-#define GRIN_NULL_VERTEX_PROPERTY NULL
+#define GRIN_NULL_VERTEX_PROPERTY (unsigned)~0
 /** @brief Non-existing vertex property (invalid return value) */
-#define GRIN_NULL_EDGE_PROPERTY NULL
+#define GRIN_NULL_EDGE_PROPERTY (unsigned)~0
 /** @brief Null row (invalid return value) */
 #define GRIN_NULL_ROW NULL
 /** @brief Null natural id of any kind (invalid return value) */
@@ -856,7 +858,7 @@ typedef void* GRIN_EDGE_REF;
 #ifdef GRIN_WITH_VERTEX_PROPERTY
 typedef unsigned GRIN_VERTEX_TYPE;
 typedef void* GRIN_VERTEX_TYPE_LIST;
-typedef void* GRIN_VERTEX_PROPERTY;
+typedef unsigned GRIN_VERTEX_PROPERTY;
 typedef void* GRIN_VERTEX_PROPERTY_LIST;
 typedef unsigned GRIN_VERTEX_PROPERTY_TABLE;
 #endif
@@ -874,7 +876,7 @@ typedef unsigned GRIN_EDGE_TYPE;
 typedef void* GRIN_EDGE_TYPE_LIST;
 typedef void* GRIN_VEV_TYPE;
 typedef void* GRIN_VEV_TYPE_LIST;
-typedef void* GRIN_EDGE_PROPERTY;
+typedef unsigned GRIN_EDGE_PROPERTY;
 typedef void* GRIN_EDGE_PROPERTY_LIST;
 typedef unsigned GRIN_EDGE_PROPERTY_TABLE;
 #endif

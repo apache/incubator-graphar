@@ -23,15 +23,12 @@ extern "C" {
 GRIN_VERTEX_PROPERTY_LIST grin_get_vertex_property_list_by_type(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto& type_name = _g->vertex_types[vtype];
-  auto& vertex_info = _g->graph_info.GetVertexInfo(type_name).value();
+  if (vtype >= _g->vertex_type_num)
+    return GRIN_NULL_LIST;
   auto vpl = new GRIN_VERTEX_PROPERTY_LIST_T();
-  for (auto& group : vertex_info.GetPropertyGroups()) {
-    for (auto& property : group.GetProperties()) {
-      GRIN_VERTEX_PROPERTY_T vp(vtype, property.name,
-                                GARToDataType(property.type));
-      vpl->push_back(vp);
-    }
+  for (unsigned i = _g->vertex_property_offsets[vtype];
+       i < _g->vertex_property_offsets[vtype + 1]; ++i) {
+    vpl->push_back(i);
   }
   return vpl;
 }
@@ -45,8 +42,7 @@ size_t grin_get_vertex_property_list_size(GRIN_GRAPH g,
 GRIN_VERTEX_PROPERTY grin_get_vertex_property_from_list(
     GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_LIST vpl, size_t idx) {
   auto _vpl = static_cast<GRIN_VERTEX_PROPERTY_LIST_T*>(vpl);
-  auto vp = new GRIN_VERTEX_PROPERTY_T((*_vpl)[idx]);
-  return vp;
+  return (*_vpl)[idx];
 }
 
 GRIN_VERTEX_PROPERTY_LIST grin_create_vertex_property_list(GRIN_GRAPH g) {
@@ -64,20 +60,36 @@ bool grin_insert_vertex_property_to_list(GRIN_GRAPH g,
                                          GRIN_VERTEX_PROPERTY_LIST vpl,
                                          GRIN_VERTEX_PROPERTY vp) {
   auto _vpl = static_cast<GRIN_VERTEX_PROPERTY_LIST_T*>(vpl);
-  auto _vp = static_cast<GRIN_VERTEX_PROPERTY_T*>(vp);
-  _vpl->push_back(*_vp);
+  _vpl->push_back(vp);
   return true;
 }
 #endif
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_PROPERTY
-GRIN_VERTEX_PROPERTY grin_get_vertex_property_from_id(GRIN_GRAPH,
-                                                      GRIN_VERTEX_TYPE,
-                                                      GRIN_VERTEX_PROPERTY_ID);
+GRIN_VERTEX_PROPERTY grin_get_vertex_property_from_id(
+    GRIN_GRAPH g, GRIN_VERTEX_TYPE vt, GRIN_VERTEX_PROPERTY_ID vpi) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  if (vt >= _g->vertex_type_num)
+    return GRIN_NULL_VERTEX_PROPERTY;
+  auto vp = vpi + _g->vertex_property_offsets[vt];
+  if (vp < _g->vertex_property_offsets[vt + 1])
+    return vp;
+  else
+    return GRIN_NULL_VERTEX_PROPERTY;
+}
 
-GRIN_VERTEX_PROPERTY_ID grin_get_vertex_property_id(GRIN_GRAPH,
-                                                    GRIN_VERTEX_TYPE,
-                                                    GRIN_VERTEX_PROPERTY);
+GRIN_VERTEX_PROPERTY_ID grin_get_vertex_property_id(GRIN_GRAPH g,
+                                                    GRIN_VERTEX_TYPE vt,
+                                                    GRIN_VERTEX_PROPERTY vp) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  if (vt >= _g->vertex_type_num)
+    return GRIN_NULL_NATURAL_ID;
+  if (vp >= _g->vertex_property_offsets[vt] &&
+      vp < _g->vertex_property_offsets[vt + 1])
+    return vp - _g->vertex_property_offsets[vt];
+  else
+    return GRIN_NULL_NATURAL_ID;
+}
 #endif
 
 #ifdef GRIN_WITH_EDGE_PROPERTY
@@ -87,25 +99,9 @@ GRIN_EDGE_PROPERTY_LIST grin_get_edge_property_list_by_type(
   if (etype >= _g->unique_edge_type_num)
     return GRIN_NULL_LIST;
   auto epl = new GRIN_EDGE_PROPERTY_LIST_T();
-  std::set<GRIN_EDGE_PROPERTY_T> edge_properties;
-  for (auto et = _g->unique_edge_type_begin_type[etype];
-       et < _g->unique_edge_type_begin_type[etype + 1]; ++et) {
-    auto& edge_info = _g->graph_info
-                          .GetEdgeInfo(_g->vertex_types[_g->src_type_ids[et]],
-                                       _g->edge_types[et],
-                                       _g->vertex_types[_g->dst_type_ids[et]])
-                          .value();
-    auto adj_list_type = _g->edges_collections[et].begin()->first;
-    for (auto& group : edge_info.GetPropertyGroups(adj_list_type).value()) {
-      for (auto& property : group.GetProperties()) {
-        GRIN_EDGE_PROPERTY_T ep(etype, property.name,
-                                GARToDataType(property.type));
-        if (edge_properties.find(ep) != edge_properties.end())
-          continue;
-        edge_properties.insert(ep);
-        epl->push_back(ep);
-      }
-    }
+  for (unsigned i = _g->edge_property_offsets[etype];
+       i < _g->edge_property_offsets[etype + 1]; ++i) {
+    epl->push_back(i);
   }
   return epl;
 }
@@ -120,8 +116,7 @@ GRIN_EDGE_PROPERTY grin_get_edge_property_from_list(GRIN_GRAPH g,
                                                     GRIN_EDGE_PROPERTY_LIST epl,
                                                     size_t idx) {
   auto _epl = static_cast<GRIN_EDGE_PROPERTY_LIST_T*>(epl);
-  auto ep = new GRIN_EDGE_PROPERTY_T((*_epl)[idx]);
-  return ep;
+  return (*_epl)[idx];
 }
 
 GRIN_EDGE_PROPERTY_LIST grin_create_edge_property_list(GRIN_GRAPH g) {
@@ -139,16 +134,34 @@ bool grin_insert_edge_property_to_list(GRIN_GRAPH g,
                                        GRIN_EDGE_PROPERTY_LIST epl,
                                        GRIN_EDGE_PROPERTY ep) {
   auto _epl = static_cast<GRIN_EDGE_PROPERTY_LIST_T*>(epl);
-  auto _ep = static_cast<GRIN_EDGE_PROPERTY_T*>(ep);
-  _epl->push_back(*_ep);
+  _epl->push_back(ep);
   return true;
 }
 #endif
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_EDGE_PROPERTY
-GRIN_EDGE_PROPERTY grin_get_edge_property_from_id(GRIN_GRAPH, GRIN_EDGE_TYPE,
-                                                  GRIN_EDGE_PROPERTY_ID);
+GRIN_EDGE_PROPERTY grin_get_edge_property_from_id(GRIN_GRAPH g,
+                                                  GRIN_EDGE_TYPE et,
+                                                  GRIN_EDGE_PROPERTY_ID epi) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  if (et >= _g->unique_edge_type_num)
+    return GRIN_NULL_EDGE_PROPERTY;
+  auto ep = epi + _g->edge_property_offsets[et];
+  if (ep < _g->edge_property_offsets[et + 1])
+    return ep;
+  else
+    return GRIN_NULL_EDGE_PROPERTY;
+}
 
-GRIN_EDGE_PROPERTY_ID grin_get_edge_property_id(GRIN_GRAPH, GRIN_EDGE_TYPE,
-                                                GRIN_EDGE_PROPERTY);
+GRIN_EDGE_PROPERTY_ID grin_get_edge_property_id(GRIN_GRAPH g, GRIN_EDGE_TYPE et,
+                                                GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  if (et >= _g->unique_edge_type_num)
+    return GRIN_NULL_NATURAL_ID;
+  if (ep >= _g->edge_property_offsets[et] &&
+      ep < _g->edge_property_offsets[et + 1])
+    return ep - _g->edge_property_offsets[et];
+  else
+    return GRIN_NULL_NATURAL_ID;
+}
 #endif
