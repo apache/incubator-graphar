@@ -876,10 +876,7 @@ typedef void* GRIN_VEV_TYPE;
 typedef void* GRIN_VEV_TYPE_LIST;
 typedef void* GRIN_EDGE_PROPERTY;
 typedef void* GRIN_EDGE_PROPERTY_LIST;
-typedef struct {
-  unsigned type_begin;
-  unsigned type_end;
-} GRIN_EDGE_PROPERTY_TABLE;
+typedef unsigned GRIN_EDGE_PROPERTY_TABLE;
 #endif
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_EDGE_TYPE

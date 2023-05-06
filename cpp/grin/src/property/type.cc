@@ -22,7 +22,7 @@ extern "C" {
 // Vertex type
 bool grin_equal_vertex_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt1,
                             GRIN_VERTEX_TYPE vt2) {
-  return (vt1 == vt2);
+  return vt1 == vt2;
 }
 
 GRIN_VERTEX_TYPE grin_get_vertex_type(GRIN_GRAPH g, GRIN_VERTEX v) {
