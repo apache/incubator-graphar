@@ -12,7 +12,6 @@
 #include "../include/property/topology.h"
 #include "../include/property/type.h"
 #include "../include/topology/adjacentlist.h"
-#include "../include/topology/datatype.h"
 #include "../include/topology/edgelist.h"
 #include "../include/topology/structure.h"
 #include "../include/topology/vertexlist.h"
@@ -392,7 +391,12 @@ void test_property_vertex_table(int argc, char** argv) {
     GRIN_VERTEX_PROPERTY_TABLE vpt =
         grin_get_vertex_property_table_by_type(g, vt);
 
+#ifdef GRIN_TRAIT_SELECT_MASTER_FOR_VERTEX_LIST
+    GRIN_VERTEX_LIST all_vl = grin_get_vertex_list(g);
+    GRIN_VERTEX_LIST vl = grin_select_master_for_vertex_list(g, all_vl);
+#else
     GRIN_VERTEX_LIST vl = grin_get_vertex_list(g);
+#endif
     GRIN_VERTEX_LIST typed_vl = grin_select_type_for_vertex_list(g, vt, vl);
 #ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
     size_t typed_vl_size = grin_get_vertex_list_size(g, typed_vl);
