@@ -62,6 +62,62 @@ const void* grin_get_value_from_row(GRIN_GRAPH g, GRIN_ROW r,
   return NULL;
 }
 
+int grin_get_int32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  return std::any_cast<int32_t>((*_r)[idx]);
+}
+
+unsigned int grin_get_uint32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  return std::any_cast<uint32_t>((*_r)[idx]);
+}
+
+long long int grin_get_int64_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  return std::any_cast<int64_t>((*_r)[idx]);
+}
+
+unsigned long long int grin_get_uint64_from_row(GRIN_GRAPH g, GRIN_ROW r,
+                                                size_t idx) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  return std::any_cast<uint64_t>((*_r)[idx]);
+}
+
+float grin_get_float_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  return std::any_cast<float>((*_r)[idx]);
+}
+
+double grin_get_double_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  return std::any_cast<double>((*_r)[idx]);
+}
+
+const char* grin_get_string_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  auto&& s = std::any_cast<std::string>((*_r)[idx]);
+  int len = s.length() + 1;
+  char* out = new char[len];
+  snprintf(out, len, "%s", s.c_str());
+  return out;
+}
+
+int grin_get_date32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  return std::any_cast<int32_t>((*_r)[idx]);
+}
+
+int grin_get_time32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  return std::any_cast<int32_t>((*_r)[idx]);
+}
+
+long long int grin_get_timestamp64_from_row(GRIN_GRAPH g, GRIN_ROW r,
+                                            size_t idx) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  return std::any_cast<int64_t>((*_r)[idx]);
+}
+
 GRIN_ROW grin_create_row(GRIN_GRAPH g) {
   auto r = new GRIN_ROW_T();
   return r;
@@ -105,6 +161,68 @@ bool grin_insert_value_to_row(GRIN_GRAPH g, GRIN_ROW r, GRIN_DATATYPE type,
     return false;
   }
   return false;
+}
+
+bool grin_insert_int32_to_row(GRIN_GRAPH g, GRIN_ROW r, int value) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  _r->push_back(static_cast<int32_t>(value));
+  return true;
+}
+
+bool grin_insert_uint32_to_row(GRIN_GRAPH g, GRIN_ROW r, unsigned int value) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  _r->push_back(static_cast<uint32_t>(value));
+  return true;
+}
+
+bool grin_insert_int64_to_row(GRIN_GRAPH g, GRIN_ROW r, long long int value) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  _r->push_back(static_cast<int64_t>(value));
+  return true;
+}
+
+bool grin_insert_uint64_to_row(GRIN_GRAPH g, GRIN_ROW r,
+                               unsigned long long int value) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  _r->push_back(static_cast<uint64_t>(value));
+  return true;
+}
+
+bool grin_insert_float_to_row(GRIN_GRAPH g, GRIN_ROW r, float value) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  _r->push_back(static_cast<float>(value));
+  return true;
+}
+
+bool grin_insert_double_to_row(GRIN_GRAPH g, GRIN_ROW r, double value) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  _r->push_back(static_cast<double>(value));
+  return true;
+}
+
+bool grin_insert_string_to_row(GRIN_GRAPH g, GRIN_ROW r, const char* value) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  _r->push_back(std::string(value));
+  return true;
+}
+
+bool grin_insert_date32_to_row(GRIN_GRAPH g, GRIN_ROW r, int value) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  _r->push_back(static_cast<int32_t>(value));
+  return true;
+}
+
+bool grin_insert_time32_to_row(GRIN_GRAPH g, GRIN_ROW r, int value) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  _r->push_back(static_cast<int32_t>(value));
+  return true;
+}
+
+bool grin_insert_timestamp64_to_row(GRIN_GRAPH g, GRIN_ROW r,
+                                    long long int value) {
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+  _r->push_back(static_cast<int64_t>(value));
+  return true;
 }
 #endif
 
@@ -171,6 +289,193 @@ const void* grin_get_value_from_vertex_property_table(
   return NULL;
 }
 
+int grin_get_int32_from_vertex_property_table(GRIN_GRAPH g,
+                                              GRIN_VERTEX_PROPERTY_TABLE vpt,
+                                              GRIN_VERTEX v,
+                                              GRIN_VERTEX_PROPERTY vp) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  auto& property = _g->vertex_properties[vp];
+
+  // check valid
+
+  if (_v->vertex.has_value() == false) {
+    auto& vertices = _g->vertices_collections[property.type_id];
+    auto it = vertices.begin() + _v->id;
+    _v->vertex = *it;
+  }
+  return _v->vertex.value().property<int32_t>(property.name).value();
+}
+
+unsigned int grin_get_uint32_from_vertex_property_table(
+    GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
+    GRIN_VERTEX_PROPERTY vp) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  auto& property = _g->vertex_properties[vp];
+
+  // check valid
+
+  // properties are not stored in vertex
+  if (_v->vertex.has_value() == false) {
+    auto& vertices = _g->vertices_collections[property.type_id];
+    auto it = vertices.begin() + _v->id;
+    _v->vertex = *it;
+  }
+  return _v->vertex.value().property<uint32_t>(property.name).value();
+}
+
+long long int grin_get_int64_from_vertex_property_table(
+    GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
+    GRIN_VERTEX_PROPERTY vp) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  auto& property = _g->vertex_properties[vp];
+
+  // check valid
+
+  // properties are not stored in vertex
+  if (_v->vertex.has_value() == false) {
+    auto& vertices = _g->vertices_collections[property.type_id];
+    auto it = vertices.begin() + _v->id;
+    _v->vertex = *it;
+  }
+  return _v->vertex.value().property<int64_t>(property.name).value();
+}
+
+unsigned long long int grin_get_uint64_from_vertex_property_table(
+    GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
+    GRIN_VERTEX_PROPERTY vp) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  auto& property = _g->vertex_properties[vp];
+
+  // check valid
+
+  // properties are not stored in vertex
+  if (_v->vertex.has_value() == false) {
+    auto& vertices = _g->vertices_collections[property.type_id];
+    auto it = vertices.begin() + _v->id;
+    _v->vertex = *it;
+  }
+  return _v->vertex.value().property<uint64_t>(property.name).value();
+}
+
+float grin_get_float_from_vertex_property_table(GRIN_GRAPH g,
+                                                GRIN_VERTEX_PROPERTY_TABLE vpt,
+                                                GRIN_VERTEX v,
+                                                GRIN_VERTEX_PROPERTY vp) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  auto& property = _g->vertex_properties[vp];
+
+  // check valid
+
+  // properties are not stored in vertex
+  if (_v->vertex.has_value() == false) {
+    auto& vertices = _g->vertices_collections[property.type_id];
+    auto it = vertices.begin() + _v->id;
+    _v->vertex = *it;
+  }
+  return _v->vertex.value().property<float>(property.name).value();
+}
+
+double grin_get_double_from_vertex_property_table(
+    GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
+    GRIN_VERTEX_PROPERTY vp) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  auto& property = _g->vertex_properties[vp];
+
+  // check valid
+
+  // properties are not stored in vertex
+  if (_v->vertex.has_value() == false) {
+    auto& vertices = _g->vertices_collections[property.type_id];
+    auto it = vertices.begin() + _v->id;
+    _v->vertex = *it;
+  }
+  return _v->vertex.value().property<double>(property.name).value();
+}
+
+const char* grin_get_string_from_vertex_property_table(
+    GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
+    GRIN_VERTEX_PROPERTY vp) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  auto& property = _g->vertex_properties[vp];
+
+  // check valid
+
+  // properties are not stored in vertex
+  if (_v->vertex.has_value() == false) {
+    auto& vertices = _g->vertices_collections[property.type_id];
+    auto it = vertices.begin() + _v->id;
+    _v->vertex = *it;
+  }
+  auto s = _v->vertex.value().property<std::string>(property.name).value();
+  int len = s.length() + 1;
+  char* out = new char[len];
+  snprintf(out, len, "%s", s.c_str());
+  return out;
+}
+
+int grin_get_date32_from_vertex_property_table(GRIN_GRAPH g,
+                                               GRIN_VERTEX_PROPERTY_TABLE vpt,
+                                               GRIN_VERTEX v,
+                                               GRIN_VERTEX_PROPERTY vp) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  auto& property = _g->vertex_properties[vp];
+
+  // check valid
+
+  // properties are not stored in vertex
+  if (_v->vertex.has_value() == false) {
+    auto& vertices = _g->vertices_collections[property.type_id];
+    auto it = vertices.begin() + _v->id;
+    _v->vertex = *it;
+  }
+  return _v->vertex.value().property<int32_t>(property.name).value();
+}
+
+int grin_get_time32_from_vertex_property_table(GRIN_GRAPH g,
+                                               GRIN_VERTEX_PROPERTY_TABLE vpt,
+                                               GRIN_VERTEX v,
+                                               GRIN_VERTEX_PROPERTY vp) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  auto& property = _g->vertex_properties[vp];
+
+  // check valid
+
+  // properties are not stored in vertex
+  if (_v->vertex.has_value() == false) {
+    auto& vertices = _g->vertices_collections[property.type_id];
+    auto it = vertices.begin() + _v->id;
+    _v->vertex = *it;
+  }
+  return _v->vertex.value().property<int32_t>(property.name).value();
+}
+
+long long int grin_get_timestamp64_from_vertex_property_table(
+    GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
+    GRIN_VERTEX_PROPERTY vp) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  auto& property = _g->vertex_properties[vp];
+
+  // check valid
+
+  // properties are not stored in vertex
+  if (_v->vertex.has_value() == false) {
+    auto& vertices = _g->vertices_collections[property.type_id];
+    auto it = vertices.begin() + _v->id;
+    _v->vertex = *it;
+  }
+  return _v->vertex.value().property<int64_t>(property.name).value();
+}
+
 #endif
 
 #if defined(GRIN_ENABLE_VERTEX_PROPERTY_TABLE) && defined(GRIN_ENABLE_ROW)
@@ -234,6 +539,7 @@ GRIN_ROW grin_get_row_from_vertex_property_table(
   }
   return r;
 }
+
 #endif
 
 #if !defined(GRIN_ASSUME_COLUMN_STORE_FOR_VERTEX_PROPERTY) && \
@@ -291,6 +597,115 @@ const void* grin_get_value_from_edge_property_table(
     return NULL;
   }
   return NULL;
+}
+
+int grin_get_int32_from_edge_property_table(GRIN_GRAPH g,
+                                            GRIN_EDGE_PROPERTY_TABLE ept,
+                                            GRIN_EDGE e,
+                                            GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _e = static_cast<GRIN_EDGE_T*>(e);
+  auto& property = _g->edge_properties[ep];
+  // check valid
+  return _e->edge.property<int32_t>(property.name).value();
+}
+
+unsigned int grin_get_uint32_from_edge_property_table(
+    GRIN_GRAPH g, GRIN_EDGE_PROPERTY_TABLE ept, GRIN_EDGE e,
+    GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _e = static_cast<GRIN_EDGE_T*>(e);
+  auto& property = _g->edge_properties[ep];
+  // check valid
+  return _e->edge.property<uint32_t>(property.name).value();
+}
+
+long long int grin_get_int64_from_edge_property_table(
+    GRIN_GRAPH g, GRIN_EDGE_PROPERTY_TABLE ept, GRIN_EDGE e,
+    GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _e = static_cast<GRIN_EDGE_T*>(e);
+  auto& property = _g->edge_properties[ep];
+  // check valid
+  return _e->edge.property<int64_t>(property.name).value();
+}
+
+unsigned long long int grin_get_uint64_from_edge_property_table(
+    GRIN_GRAPH g, GRIN_EDGE_PROPERTY_TABLE ept, GRIN_EDGE e,
+    GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _e = static_cast<GRIN_EDGE_T*>(e);
+  auto& property = _g->edge_properties[ep];
+  // check valid
+  return _e->edge.property<uint64_t>(property.name).value();
+}
+
+float grin_get_float_from_edge_property_table(GRIN_GRAPH g,
+                                              GRIN_EDGE_PROPERTY_TABLE ept,
+                                              GRIN_EDGE e,
+                                              GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _e = static_cast<GRIN_EDGE_T*>(e);
+  auto& property = _g->edge_properties[ep];
+  // check valid
+  return _e->edge.property<float>(property.name).value();
+}
+
+double grin_get_double_from_edge_property_table(GRIN_GRAPH g,
+                                                GRIN_EDGE_PROPERTY_TABLE ept,
+                                                GRIN_EDGE e,
+                                                GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _e = static_cast<GRIN_EDGE_T*>(e);
+  auto& property = _g->edge_properties[ep];
+  // check valid
+  return _e->edge.property<double>(property.name).value();
+}
+
+const char* grin_get_string_from_edge_property_table(
+    GRIN_GRAPH g, GRIN_EDGE_PROPERTY_TABLE ept, GRIN_EDGE e,
+    GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _e = static_cast<GRIN_EDGE_T*>(e);
+  auto& property = _g->edge_properties[ep];
+  // check valid
+  auto s = _e->edge.property<std::string>(property.name).value();
+  int len = s.length() + 1;
+  char* out = new char[len];
+  snprintf(out, len, "%s", s.c_str());
+  return out;
+}
+
+int grin_get_date32_from_edge_property_table(GRIN_GRAPH g,
+                                             GRIN_EDGE_PROPERTY_TABLE ept,
+                                             GRIN_EDGE e,
+                                             GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _e = static_cast<GRIN_EDGE_T*>(e);
+  auto& property = _g->edge_properties[ep];
+  // check valid
+  return _e->edge.property<int32_t>(property.name).value();
+}
+
+int grin_get_time32_from_edge_property_table(GRIN_GRAPH g,
+                                             GRIN_EDGE_PROPERTY_TABLE ept,
+                                             GRIN_EDGE e,
+                                             GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _e = static_cast<GRIN_EDGE_T*>(e);
+  auto& property = _g->edge_properties[ep];
+  // check valid
+  return _e->edge.property<int32_t>(property.name).value();
+}
+
+long long int grin_get_timestamp64_from_edge_property_table(
+    GRIN_GRAPH g, GRIN_EDGE_PROPERTY_TABLE ept, GRIN_EDGE e,
+    GRIN_EDGE_PROPERTY ep) {
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _e = static_cast<GRIN_EDGE_T*>(e);
+  auto& property = _g->edge_properties[ep];
+  // check valid
+  return _e->edge.property<int64_t>(property.name).value();
 }
 
 #endif
