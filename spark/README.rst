@@ -9,6 +9,8 @@ Building GraphAr Spark
 System setup
 ^^^^^^^^^^^^^
 
+First, install Spark as documented on `their website`_. Currently, the GraphAr Spark library supports Spark 3.2+ with Scala 2.12.
+
 GraphAr Spark uses maven as a package build system.
 
 Building requires:
@@ -75,3 +77,5 @@ How to use
 Please refer to our `GraphAr Spark Library Documentation`_.
 
 .. _GraphAr Spark Library Documentation: https://alibaba.github.io/GraphAr/user-guide/spark-lib.html
+
+.. _their website: https://spark.apache.org/downloads.html
