@@ -757,6 +757,7 @@ class PartitionFeature final :
     kGrinTraitSelectPartitionForEdgeListFieldNumber = 11,
     kGrinTraitSelectMasterNeighborForAdjacentListFieldNumber = 12,
     kGrinTraitSelectNeighborPartitionForAdjacentListFieldNumber = 13,
+    kGrinTraitFastVertexRefFieldNumber = 14,
   };
   // .grin.MirrorPartitionListFeature mirror_partition_list_feature = 7;
   bool has_mirror_partition_list_feature() const;
@@ -884,6 +885,15 @@ class PartitionFeature final :
   void _internal_set_grin_trait_select_neighbor_partition_for_adjacent_list(bool value);
   public:
 
+  // bool grin_trait_fast_vertex_ref = 14;
+  void clear_grin_trait_fast_vertex_ref();
+  bool grin_trait_fast_vertex_ref() const;
+  void set_grin_trait_fast_vertex_ref(bool value);
+  private:
+  bool _internal_grin_trait_fast_vertex_ref() const;
+  void _internal_set_grin_trait_fast_vertex_ref(bool value);
+  public:
+
   // @@protoc_insertion_point(class_scope:grin.PartitionFeature)
  private:
   class _Internal;
@@ -905,6 +915,7 @@ class PartitionFeature final :
     bool grin_trait_select_partition_for_edge_list_;
     bool grin_trait_select_master_neighbor_for_adjacent_list_;
     bool grin_trait_select_neighbor_partition_for_adjacent_list_;
+    bool grin_trait_fast_vertex_ref_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -3263,6 +3274,26 @@ inline void PartitionFeature::_internal_set_grin_trait_select_neighbor_partition
 inline void PartitionFeature::set_grin_trait_select_neighbor_partition_for_adjacent_list(bool value) {
   _internal_set_grin_trait_select_neighbor_partition_for_adjacent_list(value);
   // @@protoc_insertion_point(field_set:grin.PartitionFeature.grin_trait_select_neighbor_partition_for_adjacent_list)
+}
+
+// bool grin_trait_fast_vertex_ref = 14;
+inline void PartitionFeature::clear_grin_trait_fast_vertex_ref() {
+  _impl_.grin_trait_fast_vertex_ref_ = false;
+}
+inline bool PartitionFeature::_internal_grin_trait_fast_vertex_ref() const {
+  return _impl_.grin_trait_fast_vertex_ref_;
+}
+inline bool PartitionFeature::grin_trait_fast_vertex_ref() const {
+  // @@protoc_insertion_point(field_get:grin.PartitionFeature.grin_trait_fast_vertex_ref)
+  return _internal_grin_trait_fast_vertex_ref();
+}
+inline void PartitionFeature::_internal_set_grin_trait_fast_vertex_ref(bool value) {
+  
+  _impl_.grin_trait_fast_vertex_ref_ = value;
+}
+inline void PartitionFeature::set_grin_trait_fast_vertex_ref(bool value) {
+  _internal_set_grin_trait_fast_vertex_ref(value);
+  // @@protoc_insertion_point(field_set:grin.PartitionFeature.grin_trait_fast_vertex_ref)
 }
 
 // -------------------------------------------------------------------
