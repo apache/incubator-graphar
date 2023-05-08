@@ -20,7 +20,6 @@ limitations under the License.
 extern "C" {
 #include "grin/include/proto/message.h"
 #include "grin/include/topology/adjacentlist.h"
-#include "grin/include/topology/datatype.h"
 #include "grin/include/topology/edgelist.h"
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
@@ -200,27 +199,6 @@ void test_topology_adjlist(GRIN_GRAPH graph) {
   std::cout << "---- test topology: adjlist ----" << std::endl;
 }
 
-void test_data_type(GRIN_GRAPH graph) {
-  std::cout << "\n++++ test topology: data type ++++" << std::endl;
-
-  int32_t int32 = 0;
-  assert(grin_get_int32(&int32) == int32);
-  uint32_t uint32 = 0;
-  assert(grin_get_uint32(&uint32) == uint32);
-  int64_t int64 = 0;
-  assert(grin_get_int64(&int64) == int64);
-  uint64_t uint64 = 0;
-  assert(grin_get_uint64(&uint64) == uint64);
-  float float32 = 0;
-  assert(grin_get_float(&float32) == float32);
-  double float64 = 0;
-  assert(grin_get_double(&float64) == float64);
-  char str[] = "Test String";
-  assert(strcmp(grin_get_string(str), str) == 0);
-
-  std::cout << "---- test topology: data type ----" << std::endl;
-}
-
 int main(int argc, char* argv[]) {
   // get graph from graph info of GraphAr
   std::string path = TEST_DATA_PATH;
@@ -245,9 +223,6 @@ int main(int argc, char* argv[]) {
 
   // test topology adjlist
   test_topology_adjlist(graph);
-
-  // test data type
-  test_data_type(graph);
 
   // destroy graph
   grin_destroy_graph(graph);
