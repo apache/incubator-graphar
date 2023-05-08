@@ -25,8 +25,9 @@ repository and navigated to the ``spark`` subdirectory:
 .. code-block::
 
     $ git clone https://github.com/alibaba/GraphAr.git
+    $ cd GraphAr
     $ git submodule update --init
-    $ cd GraphAr/spark
+    $ cd spark
 
 Build the package:
 

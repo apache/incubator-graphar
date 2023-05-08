@@ -179,7 +179,7 @@ This program first reads in the graph information file to obtain the metadata; t
 
 Please refer to `more examples <../applications/out-of-core.html>`_ to learn about the other available case studies utilizing GraphAr.
 
-.. _Building Steps: https://github.com/alibaba/GraphAr/blob/main/README.rst
+.. _Building Steps: https://github.com/alibaba/GraphAr/blob/main/README.rst#building-libraries
 
 .. _person.vertex.yml: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/person.vertex.yml
 
