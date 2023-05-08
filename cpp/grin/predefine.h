@@ -49,7 +49,8 @@ typedef enum {
   Double = 6,         ///< double
   String = 7,         ///< string
   Date32 = 8,         ///< short date
-  Date64 = 9,         ///< long date
+  Time32 = 9,         ///< Time32
+  Timestamp64 = 10,   ///< Timestamp
 } GRIN_DATATYPE;
 
 /* Section 1: Toplogy */
@@ -358,6 +359,7 @@ typedef enum {
 #undef GRIN_ENABLE_GRAPH_PARTITION
 #undef GRIN_TRAIT_NATURAL_ID_FOR_PARTITION
 #undef GRIN_ENABLE_VERTEX_REF
+#undef GRIN_TRAIT_FAST_VERTEX_REF
 #undef GRIN_ENABLE_EDGE_REF
 #undef GRIN_ASSUME_ALL_REPLICATE_PARTITION
 #undef GRIN_ASSUME_EDGE_CUT_PARTITION

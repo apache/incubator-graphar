@@ -113,7 +113,10 @@ void grin_destroy_value(GRIN_GRAPH g, GRIN_DATATYPE type, const void* value) {
   case GRIN_DATATYPE::Date32:
     delete static_cast<int32_t const*>(value);
     break;
-  case GRIN_DATATYPE::Date64:
+  case GRIN_DATATYPE::Time32:
+    delete static_cast<int32_t const*>(value);
+    break;
+  case GRIN_DATATYPE::Timestamp64:
     delete static_cast<int64_t const*>(value);
     break;
   default:

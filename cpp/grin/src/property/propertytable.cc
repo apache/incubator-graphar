@@ -52,7 +52,9 @@ const void* grin_get_value_from_row(GRIN_GRAPH g, GRIN_ROW r,
   }
   case GRIN_DATATYPE::Date32:
     return new int32_t(std::any_cast<int32_t>((*_r)[idx]));
-  case GRIN_DATATYPE::Date64:
+  case GRIN_DATATYPE::Time32:
+    return new int32_t(std::any_cast<int32_t>((*_r)[idx]));
+  case GRIN_DATATYPE::Timestamp64:
     return new int64_t(std::any_cast<int64_t>((*_r)[idx]));
   default:
     return NULL;
@@ -93,7 +95,10 @@ bool grin_insert_value_to_row(GRIN_GRAPH g, GRIN_ROW r, GRIN_DATATYPE type,
   case GRIN_DATATYPE::Date32:
     _r->push_back(*static_cast<const int32_t*>(value));
     return true;
-  case GRIN_DATATYPE::Date64:
+  case GRIN_DATATYPE::Time32:
+    _r->push_back(*static_cast<const int32_t*>(value));
+    return true;
+  case GRIN_DATATYPE::Timestamp64:
     _r->push_back(*static_cast<const int64_t*>(value));
     return true;
   default:
