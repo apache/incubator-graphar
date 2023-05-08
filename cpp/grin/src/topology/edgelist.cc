@@ -21,10 +21,14 @@ extern "C" {
 #ifdef GRIN_ENABLE_EDGE_LIST
 GRIN_EDGE_LIST grin_get_edge_list(GRIN_GRAPH g) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  return {0, _g->edge_type_num};
+  auto el = new GRIN_EDGE_LIST_T(0, _g->edge_type_num);
+  return el;
 }
 
-void grin_destroy_edge_list(GRIN_GRAPH g, GRIN_EDGE_LIST el) { return; }
+void grin_destroy_edge_list(GRIN_GRAPH g, GRIN_EDGE_LIST el) {
+  auto _el = static_cast<GRIN_EDGE_LIST_T*>(el);
+  delete _el;
+}
 #endif
 
 #ifdef GRIN_ENABLE_EDGE_LIST_ARRAY
@@ -37,7 +41,8 @@ GRIN_EDGE grin_get_edge_from_list(GRIN_GRAPH, GRIN_EDGE_LIST, size_t);
 GRIN_EDGE_LIST_ITERATOR grin_get_edge_list_begin(GRIN_GRAPH g,
                                                  GRIN_EDGE_LIST el) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto type_id = el.type_begin;
+  auto _el = static_cast<GRIN_EDGE_LIST_T*>(el);
+  auto type_id = _el->type_begin;
   if (type_id >= _g->edge_type_num ||
       _g->edges_collections[type_id].size() == 0)
     return GRIN_NULL_LIST_ITERATOR;
@@ -45,25 +50,25 @@ GRIN_EDGE_LIST_ITERATOR grin_get_edge_list_begin(GRIN_GRAPH g,
   switch (adj_list_type) {
   case GAR_ORDERED_BY_SOURCE:
     return new GRIN_EDGE_LIST_ITERATOR_T(
-        el.type_begin, el.type_end, el.type_begin,
+        _el->type_begin, _el->type_end, _el->type_begin,
         std::get<GAR_NAMESPACE::EdgesCollection<GAR_ORDERED_BY_SOURCE>>(
             _g->edges_collections[type_id].at(adj_list_type))
             .begin());
   case GAR_ORDERED_BY_DEST:
     return new GRIN_EDGE_LIST_ITERATOR_T(
-        el.type_begin, el.type_end, el.type_begin,
+        _el->type_begin, _el->type_end, _el->type_begin,
         std::get<GAR_NAMESPACE::EdgesCollection<GAR_ORDERED_BY_DEST>>(
             _g->edges_collections[type_id].at(adj_list_type))
             .begin());
   case GAR_UNORDERED_BY_SOURCE:
     return new GRIN_EDGE_LIST_ITERATOR_T(
-        el.type_begin, el.type_end, el.type_begin,
+        _el->type_begin, _el->type_end, _el->type_begin,
         std::get<GAR_NAMESPACE::EdgesCollection<GAR_UNORDERED_BY_SOURCE>>(
             _g->edges_collections[type_id].at(adj_list_type))
             .begin());
   case GAR_UNORDERED_BY_DEST:
     return new GRIN_EDGE_LIST_ITERATOR_T(
-        el.type_begin, el.type_end, el.type_begin,
+        _el->type_begin, _el->type_end, _el->type_begin,
         std::get<GAR_NAMESPACE::EdgesCollection<GAR_UNORDERED_BY_DEST>>(
             _g->edges_collections[type_id].at(adj_list_type))
             .begin());

@@ -53,6 +53,15 @@ struct GRIN_EDGE_T {
       : edge(std::move(_edge)), type_id(_type_id) {}
 };
 
+#ifdef GRIN_ENABLE_VERTEX_LIST
+struct GRIN_VERTEX_LIST_T {
+  unsigned type_begin;
+  unsigned type_end;
+  GRIN_VERTEX_LIST_T(unsigned _type_begin, unsigned _type_end)
+      : type_begin(_type_begin), type_end(_type_end) {}
+};
+#endif
+
 #ifdef GRIN_ENABLE_VERTEX_LIST_ITERATOR
 struct GRIN_VERTEX_LIST_ITERATOR_T {
   unsigned type_begin;
@@ -69,6 +78,15 @@ struct GRIN_VERTEX_LIST_ITERATOR_T {
         current_type(_current_type),
         current_offset(_current_offset),
         iter(std::move(_iter)) {}
+};
+#endif
+
+#ifdef GRIN_ENABLE_EDGE_LIST
+struct GRIN_EDGE_LIST_T {
+  unsigned type_begin;
+  unsigned type_end;
+  GRIN_EDGE_LIST_T(unsigned _type_begin, unsigned _type_end)
+      : type_begin(_type_begin), type_end(_type_end) {}
 };
 #endif
 

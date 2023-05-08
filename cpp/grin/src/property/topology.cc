@@ -58,9 +58,11 @@ GRIN_VERTEX grin_get_vertex_from_original_id_by_type(
 GRIN_VERTEX_LIST grin_select_type_for_vertex_list(GRIN_GRAPH g,
                                                   GRIN_VERTEX_TYPE vtype,
                                                   GRIN_VERTEX_LIST vl) {
-  if (vl.type_begin > vtype || vl.type_end <= vtype)
-    return {vl.type_end, vl.type_end};
-  return {vtype, vtype + 1};
+  auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
+  if (_vl->type_begin > vtype || _vl->type_end <= vtype)
+    return GRIN_NULL_LIST;
+  auto fvl = new GRIN_VERTEX_LIST_T(vtype, vtype + 1);
+  return fvl;
 }
 #endif
 
@@ -69,15 +71,17 @@ GRIN_EDGE_LIST grin_select_type_for_edge_list(GRIN_GRAPH g,
                                               GRIN_EDGE_TYPE etype,
                                               GRIN_EDGE_LIST el) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _el = static_cast<GRIN_EDGE_LIST_T*>(el);
   if (etype >= _g->unique_edge_type_num)
-    return {el.type_end, el.type_end};
+    return GRIN_NULL_LIST;
   unsigned type_begin =
-      std::max(_g->unique_edge_type_begin_type[etype], el.type_begin);
+      std::max(_g->unique_edge_type_begin_type[etype], _el->type_begin);
   unsigned type_end =
-      std::min(_g->unique_edge_type_begin_type[etype + 1], el.type_end);
+      std::min(_g->unique_edge_type_begin_type[etype + 1], _el->type_end);
   if (type_begin >= type_end)
-    return {el.type_end, el.type_end};
-  return {type_begin, type_end};
+    return GRIN_NULL_LIST;
+  auto fel = new GRIN_EDGE_LIST_T(type_begin, type_end);
+  return fel;
 }
 #endif
 

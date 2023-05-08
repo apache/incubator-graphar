@@ -805,10 +805,7 @@ typedef void* GRIN_VERTEX_DATA;
 #endif
 
 #ifdef GRIN_ENABLE_VERTEX_LIST
-typedef struct {
-  unsigned type_begin;
-  unsigned type_end;
-} GRIN_VERTEX_LIST;
+typedef void* GRIN_VERTEX_LIST;
 #endif
 
 #ifdef GRIN_ENABLE_VERTEX_LIST_ITERATOR
@@ -828,10 +825,7 @@ typedef void* GRIN_EDGE_DATA;
 #endif
 
 #ifdef GRIN_ENABLE_EDGE_LIST
-typedef struct {
-  unsigned type_begin;
-  unsigned type_end;
-} GRIN_EDGE_LIST;
+typedef void* GRIN_EDGE_LIST;
 #endif
 
 #ifdef GRIN_ENABLE_EDGE_LIST_ITERATOR
