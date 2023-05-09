@@ -16,6 +16,8 @@
 #include "../include/topology/structure.h"
 #include "../include/topology/vertexlist.h"
 
+extern __thread GRIN_ERROR_CODE grin_error_code;
+
 GRIN_GRAPH get_graph(int argc, char** argv) {
 #ifdef GRIN_ENABLE_GRAPH_PARTITION
   GRIN_PARTITIONED_GRAPH pg =
@@ -448,6 +450,11 @@ void test_property_vertex_table(int argc, char** argv) {
         GRIN_DATATYPE dt = grin_get_vertex_property_data_type(g, vp);
         const void* pv =
             grin_get_value_from_vertex_property_table(g, vpt, v, vp);
+        if (grin_error_code == GRIN_NO_ERROR) {
+          printf("(Correct) no error\n");
+        } else {
+          printf("(Wrong) error code: %d\n", grin_error_code);
+        }
         const void* rv = grin_get_value_from_row(g, row, dt, j);
         if (dt == Int64) {
           printf("vp_id %u v%zu %s value: %ld %ld\n", id, i, vp_name,
@@ -785,12 +792,32 @@ void test_property_primary_key(int argc, char** argv) {
   }
 }
 
+void test_error_code(int argc, char** argv) {
+  printf("+++++++++++++++++++++ Test error code +++++++++++++++++++++\n");
+  GRIN_GRAPH g = get_graph(argc, argv);
+
+  GRIN_VERTEX_TYPE vt1 = grin_get_vertex_type_by_name(g, "person");
+  GRIN_VERTEX_TYPE vt2 = grin_get_vertex_type_by_name(g, "software");
+  GRIN_VERTEX_PROPERTY vp = grin_get_vertex_property_by_name(g, vt2, "lang");
+  GRIN_VERTEX_PROPERTY_TABLE vpt =
+      grin_get_vertex_property_table_by_type(g, vt1);
+  GRIN_VERTEX v = get_one_vertex(g);
+
+  const void* value = grin_get_value_from_vertex_property_table(g, vpt, v, vp);
+  if (grin_error_code == GRIN_INVALID_VALUE) {
+    printf("(Correct) invalid value\n");
+  } else {
+    printf("(Wrong) error code: %d\n", grin_error_code);
+  }
+}
+
 void test_property(int argc, char** argv) {
   test_property_type(argc, argv);
   test_property_topology(argc, argv);
   test_property_vertex_table(argc, argv);
   test_property_edge_table(argc, argv);
   test_property_primary_key(argc, argv);
+  test_error_code(argc, argv);
 }
 
 int main(int argc, char** argv) {
