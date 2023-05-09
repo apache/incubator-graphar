@@ -136,8 +136,8 @@ Take the "person knows person" edges to illustrate. Suppose the vertex chunk siz
   :align: center
   :alt: edge logical table2
 
-Libraries
-----------
+Building Libraries
+------------------
 
 Libraries are provided for reading, writing and transforming files in GraphAr,
 now the C++ library and the Spark library are available. And we are going to
