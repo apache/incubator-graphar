@@ -28,9 +28,9 @@ __thread GRIN_ERROR_CODE grin_error_code;
     _v->vertex = *it;                                       \
   }
 
-#define __grin_check_row(r, x)            \
+#define __grin_check_row(_r, x)           \
   grin_error_code = GRIN_NO_ERROR;        \
-  if (r == GRIN_NULL_ROW) {               \
+  if (idx >= _r->size()) {                \
     grin_error_code = GRIN_INVALID_VALUE; \
     return x;                             \
   }
@@ -62,12 +62,9 @@ void grin_destroy_row(GRIN_GRAPH g, GRIN_ROW r) {
 
 const void* grin_get_value_from_row(GRIN_GRAPH g, GRIN_ROW r,
                                     GRIN_DATATYPE type, size_t idx) {
-  __grin_check_row(r, NULL);
   auto _r = static_cast<GRIN_ROW_T*>(r);
-  if (idx >= _r->size()) {
-    grin_error_code = GRIN_INVALID_VALUE;
-    return NULL;
-  }
+  __grin_check_row(_r, NULL);
+
   switch (type) {
   case GRIN_DATATYPE::Int32:
     return new int32_t(std::any_cast<int32_t>((*_r)[idx]));
@@ -101,45 +98,45 @@ const void* grin_get_value_from_row(GRIN_GRAPH g, GRIN_ROW r,
 }
 
 int grin_get_int32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
-  __grin_check_row(r, 0);
   auto _r = static_cast<GRIN_ROW_T*>(r);
+  __grin_check_row(_r, 0);
   return std::any_cast<int32_t>((*_r)[idx]);
 }
 
 unsigned int grin_get_uint32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
-  __grin_check_row(r, 0);
   auto _r = static_cast<GRIN_ROW_T*>(r);
+  __grin_check_row(_r, 0);
   return std::any_cast<uint32_t>((*_r)[idx]);
 }
 
 long long int grin_get_int64_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
-  __grin_check_row(r, 0);
   auto _r = static_cast<GRIN_ROW_T*>(r);
+  __grin_check_row(_r, 0);
   return std::any_cast<int64_t>((*_r)[idx]);
 }
 
 unsigned long long int grin_get_uint64_from_row(GRIN_GRAPH g, GRIN_ROW r,
                                                 size_t idx) {
-  __grin_check_row(r, 0);
   auto _r = static_cast<GRIN_ROW_T*>(r);
+  __grin_check_row(_r, 0);
   return std::any_cast<uint64_t>((*_r)[idx]);
 }
 
 float grin_get_float_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
-  __grin_check_row(r, 0);
   auto _r = static_cast<GRIN_ROW_T*>(r);
+  __grin_check_row(_r, 0);
   return std::any_cast<float>((*_r)[idx]);
 }
 
 double grin_get_double_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
-  __grin_check_row(r, 0);
   auto _r = static_cast<GRIN_ROW_T*>(r);
+  __grin_check_row(_r, 0);
   return std::any_cast<double>((*_r)[idx]);
 }
 
 const char* grin_get_string_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
-  __grin_check_row(r, NULL);
   auto _r = static_cast<GRIN_ROW_T*>(r);
+  __grin_check_row(_r, NULL);
   auto&& s = std::any_cast<std::string>((*_r)[idx]);
   int len = s.length() + 1;
   char* out = new char[len];
@@ -148,21 +145,21 @@ const char* grin_get_string_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
 }
 
 int grin_get_date32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
-  __grin_check_row(r, 0);
   auto _r = static_cast<GRIN_ROW_T*>(r);
+  __grin_check_row(_r, 0);
   return std::any_cast<int32_t>((*_r)[idx]);
 }
 
 int grin_get_time32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
-  __grin_check_row(r, 0);
   auto _r = static_cast<GRIN_ROW_T*>(r);
+  __grin_check_row(_r, 0);
   return std::any_cast<int32_t>((*_r)[idx]);
 }
 
 long long int grin_get_timestamp64_from_row(GRIN_GRAPH g, GRIN_ROW r,
                                             size_t idx) {
-  __grin_check_row(r, 0);
   auto _r = static_cast<GRIN_ROW_T*>(r);
+  __grin_check_row(_r, 0);
   return std::any_cast<int64_t>((*_r)[idx]);
 }
 
