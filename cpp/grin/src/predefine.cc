@@ -285,7 +285,7 @@ void __grin_init_edge_properties(GRIN_GRAPH_T* graph) {
           GRIN_EDGE_PROPERTY_T ep(etype, property.name,
                                   GARToDataType(property.type));
           if (name_2_id.find(property.name) != name_2_id.end()) {
-            // TODO: throw exception
+            // TODO(lixuecliare): throw exception
             continue;
           }
           graph->edge_properties.push_back(ep);
