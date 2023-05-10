@@ -15,6 +15,27 @@ target_include_directories(gar-grin SYSTEM BEFORE PUBLIC include ${Protobuf_INCL
 target_link_libraries(gar-grin PUBLIC gar ${Protobuf_LIBRARIES})
 
 # ------------------------------------------------------------------------------
+# complile protobuf to generate cpp files
+# ------------------------------------------------------------------------------
+set(DST_DIR "${PROJECT_SOURCE_DIR}/grin/src/proto/")
+
+list(APPEND PROTO_FLAGS -I${PROJECT_SOURCE_DIR}/grin/include/proto/)
+
+file(GLOB PROTO_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/include/proto" "${PROJECT_SOURCE_DIR}/grin/include/proto/*.proto")
+set(PROTO_SRCS "")
+set(PROTO_HDRS "")
+
+foreach(f ${PROTO_FILES})
+    get_filename_component(FIL_WE ${f} NAME_WE)
+    list(APPEND PROTO_SRCS "${DST_DIR}/${FIL_WE}.pb.cc")
+    list(APPEND PROTO_HDRS "${DST_DIR}/${FIL_WE}.pb.h")
+
+    execute_process(COMMAND ${Protobuf_PROTOC_EXECUTABLE} ${PROTO_FLAGS} --cpp_out=${DST_DIR} ${f})
+endforeach()
+
+set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
+
+# ------------------------------------------------------------------------------
 # build tests
 # ------------------------------------------------------------------------------
 file(GLOB TEST_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/test" "${PROJECT_SOURCE_DIR}/grin/test/*.cc")
