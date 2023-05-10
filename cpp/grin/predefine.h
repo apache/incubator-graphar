@@ -389,7 +389,15 @@ typedef enum {
 // GRIN_END
 
 // GRIN_STORAGE_ENABLE
-// [IMPORTANT] Enable all the features of the storage here
+#define GRIN_ENABLE_GRAPH_PARTITION
+#define GRIN_TRAIT_NATURAL_ID_FOR_PARTITION
+#define GRIN_ENABLE_VERTEX_REF
+#define GRIN_TRAIT_FAST_VERTEX_REF
+#define GRIN_ASSUME_ALL_REPLICATE_PARTITION
+#define GRIN_TRAIT_MASTER_VERTEX_MIRROR_PARTITION_LIST
+#define GRIN_TRAIT_MIRROR_VERTEX_MIRROR_PARTITION_LIST
+#define GRIN_TRAIT_SELECT_MASTER_FOR_VERTEX_LIST
+#define GRIN_TRAIT_SELECT_PARTITION_FOR_VERTEX_LIST
 // GRIN_END
 
 // GRIN_FEATURE_DEPENDENCY
@@ -777,7 +785,7 @@ typedef enum {
 /** @brief Null list iterator of any kind (invalid return value) */
 #define GRIN_NULL_LIST_ITERATOR NULL
 /** @brief Non-existing partition (invalid return value) */
-#define GRIN_NULL_PARTITION NULL
+#define GRIN_NULL_PARTITION (unsigned)~0
 /** @brief Null vertex reference (invalid return value) */
 #define GRIN_NULL_VERTEX_REF NULL
 /** @brief Null edge reference (invalid return value) */
@@ -842,7 +850,7 @@ typedef void* GRIN_EDGE_LIST_ITERATOR;
 
 #ifdef GRIN_ENABLE_GRAPH_PARTITION
 typedef void* GRIN_PARTITIONED_GRAPH;
-typedef void* GRIN_PARTITION;
+typedef unsigned GRIN_PARTITION;
 typedef void* GRIN_PARTITION_LIST;
 #endif
 

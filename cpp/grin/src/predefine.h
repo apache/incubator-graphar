@@ -200,7 +200,18 @@ typedef std::vector<unsigned> GRIN_EDGE_PROPERTY_LIST_T;
 typedef std::vector<std::any> GRIN_ROW_T;
 #endif
 
+#ifdef GRIN_ENABLE_GRAPH_PARTITION
+struct GRIN_PARTITIONED_GRAPH_T {
+  std::string info_path;
+  unsigned partition_num;
+  GRIN_PARTITIONED_GRAPH_T(std::string _info_path, unsigned _partition_num = 1)
+      : info_path(_info_path), partition_num(_partition_num) {}
+};
+typedef std::vector<unsigned> GRIN_PARTITION_LIST_T;
+#endif
+
 struct GRIN_GRAPH_T {
+  // statistics
   GAR_NAMESPACE::GraphInfo graph_info;
   size_t tot_vertex_num;
   size_t tot_edge_num;
@@ -223,6 +234,9 @@ struct GRIN_GRAPH_T {
   std::vector<unsigned> vertex_property_offsets, edge_property_offsets;
   std::vector<std::map<std::string, unsigned>> vertex_property_name_2_ids,
       edge_property_name_2_ids;
+  // partitions
+  unsigned partition_num;
+  unsigned partition_id;
   // constructor
   explicit GRIN_GRAPH_T(GAR_NAMESPACE::GraphInfo graph_info_)
       : graph_info(std::move(graph_info_)),
@@ -230,10 +244,12 @@ struct GRIN_GRAPH_T {
         tot_edge_num(0),
         vertex_type_num(0),
         edge_type_num(0),
-        unique_edge_type_num(0) {}
+        unique_edge_type_num(0),
+        partition_num(1),
+        partition_id(0) {}
 };
 
-GRIN_GRAPH get_graph_by_info_path(const std::string&);
+GRIN_GRAPH_T* get_graph_by_info_path(const std::string&);
 std::string GetDataTypeName(GRIN_DATATYPE);
 GRIN_DATATYPE GARToDataType(GAR_NAMESPACE::DataType);
 size_t __grin_get_edge_num(GRIN_GRAPH_T*, unsigned, unsigned);

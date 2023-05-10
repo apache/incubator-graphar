@@ -70,7 +70,7 @@ bool cmp(const GAR_NAMESPACE::EdgeInfo& info1,
   return info1.GetEdgeLabel() < info2.GetEdgeLabel();
 }
 
-GRIN_GRAPH get_graph_by_info_path(const std::string& path) {
+GRIN_GRAPH_T* get_graph_by_info_path(const std::string& path) {
   // construct graph
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   if (maybe_graph_info.has_error())
