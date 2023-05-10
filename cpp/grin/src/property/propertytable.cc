@@ -15,11 +15,10 @@ limitations under the License.
 
 extern "C" {
 #include "grin/include/property/propertytable.h"
+#include "grin/include/common/error.h"
 }
 #include <iostream>
 #include "grin/src/predefine.h"
-
-__thread GRIN_ERROR_CODE grin_error_code;
 
 #define __grin_get_gar_vertex(_v)                           \
   if (_v->vertex.has_value() == false) {                    \

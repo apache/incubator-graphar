@@ -29,7 +29,7 @@ extern "C" {
 void test_vertex_property(GRIN_GRAPH graph, GRIN_VERTEX_PROPERTY property,
                           GRIN_VERTEX_TYPE vertex_type) {
   // get property name
-  auto name = grin_get_vertex_property_name(graph, property);
+  auto name = grin_get_vertex_property_name(graph, vertex_type, property);
   std::cout << "name of vertex property: " << name << std::endl;
 
   // get property data type
@@ -37,12 +37,17 @@ void test_vertex_property(GRIN_GRAPH graph, GRIN_VERTEX_PROPERTY property,
   std::cout << "data type of vertex property: " << data_type << std::endl;
 
   // get vertex type from property
-  auto vertex_type2 = grin_get_vertex_property_vertex_type(graph, property);
+  auto vertex_type2 = grin_get_vertex_type_from_property(graph, property);
   assert(grin_equal_vertex_type(graph, vertex_type, vertex_type2) == true);
 
   // get vertex property by name
   auto property2 = grin_get_vertex_property_by_name(graph, vertex_type, name);
   assert(grin_equal_vertex_property(graph, property, property2) == true);
+
+  // get vertex property by id
+  auto id = grin_get_vertex_property_id(graph, vertex_type, property);
+  auto property3 = grin_get_vertex_property_by_id(graph, vertex_type, id);
+  assert(grin_equal_vertex_property(graph, property, property3) == true);
 
   // get vertex properties by name
   auto property_list = grin_get_vertex_properties_by_name(graph, name);
@@ -51,6 +56,7 @@ void test_vertex_property(GRIN_GRAPH graph, GRIN_VERTEX_PROPERTY property,
 
   // destroy
   grin_destroy_vertex_property(graph, property2);
+  grin_destroy_vertex_property(graph, property3);
   grin_destroy_name(graph, name);
   grin_destroy_vertex_type(graph, vertex_type2);
   grin_destroy_vertex_property_list(graph, property_list);
@@ -108,7 +114,7 @@ void test_vertex_property_list(GRIN_GRAPH graph) {
 void test_edge_property(GRIN_GRAPH graph, GRIN_EDGE_PROPERTY property,
                         GRIN_EDGE_TYPE edge_type) {
   // get property name
-  auto name = grin_get_edge_property_name(graph, property);
+  auto name = grin_get_edge_property_name(graph, edge_type, property);
   std::cout << "name of edge property: " << name << std::endl;
 
   // get property data type
@@ -116,12 +122,17 @@ void test_edge_property(GRIN_GRAPH graph, GRIN_EDGE_PROPERTY property,
   std::cout << "data type of edge property: " << data_type << std::endl;
 
   // get edge type from property
-  auto edge_type2 = grin_get_edge_property_edge_type(graph, property);
+  auto edge_type2 = grin_get_edge_type_from_property(graph, property);
   assert(grin_equal_edge_type(graph, edge_type, edge_type2) == true);
 
   // get edge property by name
   auto property2 = grin_get_edge_property_by_name(graph, edge_type, name);
   assert(grin_equal_edge_property(graph, property, property2) == true);
+
+  // get edge property by id
+  auto id = grin_get_edge_property_id(graph, edge_type, property);
+  auto property3 = grin_get_edge_property_by_id(graph, edge_type, id);
+  assert(grin_equal_edge_property(graph, property, property3) == true);
 
   // get edge properties by name
   auto property_list = grin_get_edge_properties_by_name(graph, name);
@@ -132,6 +143,7 @@ void test_edge_property(GRIN_GRAPH graph, GRIN_EDGE_PROPERTY property,
   grin_destroy_name(graph, name);
   grin_destroy_edge_type(graph, edge_type2);
   grin_destroy_edge_property(graph, property2);
+  grin_destroy_edge_property(graph, property3);
   grin_destroy_edge_property_list(graph, property_list);
 }
 

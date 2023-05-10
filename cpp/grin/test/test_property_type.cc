@@ -52,7 +52,7 @@ void test_property_type_vertex(GRIN_GRAPH graph) {
 
   // vertex type id
   auto id = grin_get_vertex_type_id(graph, vertex_type0);
-  auto vertex_type5 = grin_get_vertex_type_from_id(graph, id);
+  auto vertex_type5 = grin_get_vertex_type_by_id(graph, id);
   assert(grin_equal_vertex_type(graph, vertex_type0, vertex_type5) == true);
 
   // destroy vertex type
@@ -117,7 +117,7 @@ void test_property_type_edge(GRIN_GRAPH graph) {
 
     // edge type id
     auto id = grin_get_edge_type_id(graph, edge_type);
-    auto edge_type4 = grin_get_edge_type_from_id(graph, id);
+    auto edge_type4 = grin_get_edge_type_by_id(graph, id);
     assert(grin_equal_edge_type(graph, edge_type, edge_type4) == true);
 
     // destroy edge type
@@ -170,8 +170,8 @@ void test_property_type_vertex_and_edge(GRIN_GRAPH graph) {
     auto edge_type = grin_get_edge_type_from_list(graph, edge_type_list, 0);
 
     // get vertex types from edge type
-    auto src_type_list = grin_get_src_types_from_edge_type(graph, edge_type);
-    auto dst_type_list = grin_get_dst_types_from_edge_type(graph, edge_type);
+    auto src_type_list = grin_get_src_types_by_edge_type(graph, edge_type);
+    auto dst_type_list = grin_get_dst_types_by_edge_type(graph, edge_type);
     assert(grin_get_vertex_type_list_size(graph, src_type_list) ==
            grin_get_vertex_type_list_size(graph, dst_type_list));
     std::cout << "size of vertex type list from edge type = "
@@ -182,7 +182,7 @@ void test_property_type_vertex_and_edge(GRIN_GRAPH graph) {
     auto src_type = grin_get_vertex_type_from_list(graph, src_type_list, 0);
     auto dst_type = grin_get_vertex_type_from_list(graph, dst_type_list, 0);
     auto edge_type_list_2 =
-        grin_get_edge_types_from_vertex_type_pair(graph, src_type, dst_type);
+        grin_get_edge_types_by_vertex_type_pair(graph, src_type, dst_type);
     std::cout << "size of edge type list from vertex type pair = "
               << grin_get_edge_type_list_size(graph, edge_type_list_2)
               << std::endl;

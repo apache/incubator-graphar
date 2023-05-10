@@ -102,8 +102,8 @@ void test_topology_edgelist(GRIN_GRAPH graph) {
     // methods on edge (only get 10000 times)
     if (count < 10000) {
       auto e = grin_get_edge_from_iter(graph, it);
-      auto v1 = grin_get_edge_src(graph, e);
-      auto v2 = grin_get_edge_dst(graph, e);
+      auto v1 = grin_get_src_vertex_from_edge(graph, e);
+      auto v2 = grin_get_dst_vertex_from_edge(graph, e);
       grin_destroy_vertex(graph, v1);
       grin_destroy_vertex(graph, v2);
       grin_destroy_edge(graph, e);
@@ -134,8 +134,8 @@ void test_topology_adjlist_in(GRIN_GRAPH graph) {
   auto count = 0;
   while (grin_is_adjacent_list_end(graph, it) == false) {
     auto e = grin_get_edge_from_adjacent_list_iter(graph, it);
-    auto v1 = grin_get_edge_src(graph, e);
-    auto v2 = grin_get_edge_dst(graph, e);
+    auto v1 = grin_get_src_vertex_from_edge(graph, e);
+    auto v2 = grin_get_dst_vertex_from_edge(graph, e);
     auto nbr = grin_get_neighbor_from_adjacent_list_iter(graph, it);
 
     // check src & dst
@@ -167,8 +167,8 @@ void test_topology_adjlist_out(GRIN_GRAPH graph) {
   auto count = 0;
   while (grin_is_adjacent_list_end(graph, it) == false) {
     auto e = grin_get_edge_from_adjacent_list_iter(graph, it);
-    auto v1 = grin_get_edge_src(graph, e);
-    auto v2 = grin_get_edge_dst(graph, e);
+    auto v1 = grin_get_src_vertex_from_edge(graph, e);
+    auto v2 = grin_get_dst_vertex_from_edge(graph, e);
     auto nbr = grin_get_neighbor_from_adjacent_list_iter(graph, it);
 
     // check src & dst

@@ -53,7 +53,7 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
   auto it = grin_get_edge_list_begin(graph, edge_list);
   while (grin_is_edge_list_end(graph, it) == false) {
     auto e = grin_get_edge_from_iter(graph, it);
-    auto v1 = grin_get_edge_src(graph, e);
+    auto v1 = grin_get_src_vertex_from_edge(graph, e);
     auto src =
         grin_get_position_of_vertex_from_sorted_list(graph, vertex_list, v1);
     out_degree[src]++;
@@ -73,8 +73,8 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
     auto it = grin_get_edge_list_begin(graph, edge_list);
     while (grin_is_edge_list_end(graph, it) == false) {
       auto e = grin_get_edge_from_iter(graph, it);
-      auto v1 = grin_get_edge_src(graph, e);
-      auto v2 = grin_get_edge_dst(graph, e);
+      auto v1 = grin_get_src_vertex_from_edge(graph, e);
+      auto v2 = grin_get_dst_vertex_from_edge(graph, e);
       auto src =
           grin_get_position_of_vertex_from_sorted_list(graph, vertex_list, v1);
       auto dst =
