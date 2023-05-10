@@ -69,7 +69,7 @@ void test_partition_partition(GRIN_PARTITIONED_GRAPH pg) {
     // get local graph from partition
     auto partition = grin_get_partition_from_list(pg, partition_list, i);
     auto info = grin_get_partition_info(pg, partition);
-    std::cout << static_cast<const char*>(info) << std::endl;
+    std::cout << "Partition " << static_cast<const char*>(info) << std::endl;
     auto graph = grin_get_local_graph_by_partition(pg, partition);
     // check information of local graph
     assert(graph != GRIN_NULL_GRAPH);
