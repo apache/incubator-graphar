@@ -38,7 +38,7 @@ size_t grin_get_edge_num_by_type(GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
 
 #if defined(GRIN_ENABLE_GRAPH_PARTITION) && defined(GRIN_WITH_VERTEX_PROPERTY)
 size_t grin_get_total_vertex_num_by_type(GRIN_PARTITIONED_GRAPH,
-                                         GRIN_VERTEX_TYPE) {}
+                                         GRIN_VERTEX_TYPE);
 #endif
 
 #if defined(GRIN_ENABLE_GRAPH_PARTITION) && defined(GRIN_WITH_EDGE_PROPERTY)
