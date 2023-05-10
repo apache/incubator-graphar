@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <glog/logging.h>
 #include <google/protobuf/util/json_util.h>
 
 #include "./graph.pb.h"
@@ -132,9 +133,9 @@ const char* grin_get_static_storage_feature_msg() {
         grin::GraphPartitionStrategy::GPS_VERTEX_CUT);
     cnt++;
 #endif
-    /* if (cnt > 1) {
+    if (cnt > 1) {
       LOG(ERROR) << "More than one partition strategy is enabled";
-    } */
+    }
 #endif
 
 #ifdef GRIN_feature_NATURAL_ID_FOR_PARTITION

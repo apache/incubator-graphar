@@ -2,6 +2,8 @@
 
 find_package(Protobuf REQUIRED)
 
+find_package(glog REQUIRED)
+
 file(GLOB_RECURSE GAR_GRIN_SRC_FILES "src/*.cc")
 
 message(${GAR_GRIN_SRC_FILES})
@@ -12,7 +14,7 @@ target_compile_features(gar-grin PUBLIC cxx_std_17)
 
 target_include_directories(gar-grin SYSTEM BEFORE PUBLIC include ${Protobuf_INCLUDE_DIRS})
 
-target_link_libraries(gar-grin PUBLIC gar ${Protobuf_LIBRARIES})
+target_link_libraries(gar-grin PUBLIC gar ${Protobuf_LIBRARIES} glog::glog)
 
 # ------------------------------------------------------------------------------
 # complile protobuf to generate cpp files
@@ -46,7 +48,7 @@ foreach(f ${TEST_FILES})
     message(STATUS "Found test - " ${E_NAME})
     add_executable(${E_NAME} test/${E_NAME}.cc)
     target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${Protobuf_INCLUDE_DIRS})
-    target_link_libraries(${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES})
+    target_link_libraries(${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog)
 
     # if OpenSSL library exists, link the OpenSSL library.
     # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
@@ -66,7 +68,7 @@ foreach(f ${C_TEST_FILES})
     message(STATUS "Found C test - " ${E_NAME})
     add_executable(C_${E_NAME} c_test/${E_NAME}.c)
     target_include_directories(C_${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${Protobuf_INCLUDE_DIRS})
-    target_link_libraries(C_${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES})
+    target_link_libraries(C_${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog)
 
     # if OpenSSL library exists, link the OpenSSL library.
     # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
@@ -86,7 +88,7 @@ foreach(f ${EXAMPLE_FILES})
     message(STATUS "Found example - " ${E_NAME})
     add_executable(${E_NAME} example/${E_NAME}.cc)
     target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${Protobuf_INCLUDE_DIRS})
-    target_link_libraries(${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES})
+    target_link_libraries(${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog)
 
     # if OpenSSL library exists, link the OpenSSL library.
     # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
