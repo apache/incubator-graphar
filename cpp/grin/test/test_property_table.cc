@@ -58,11 +58,10 @@ void test_property_table_row(GRIN_GRAPH graph) {
   auto value1_ = grin_get_value_from_row(graph, row, GRIN_DATATYPE::String, 1);
   auto invalid_value =
       grin_get_value_from_row(graph, row, GRIN_DATATYPE::String, 100);
-  assert(grin_get_last_error_code() == GRIN_INVALID_VALUE &&
-         invalid_value == NULL);
+  assert(grin_get_last_error_code() == INVALID_VALUE && invalid_value == NULL);
   auto value2_ = grin_get_uint64_from_row(graph, row, 2);
   auto value3_ = grin_get_double_from_row(graph, row, 3);
-  assert(grin_get_last_error_code() == GRIN_NO_ERROR);
+  assert(grin_get_last_error_code() == NO_ERROR);
 
   // check value
   std::cout << "get value0: " << *static_cast<const int32_t*>(value0_)
@@ -150,7 +149,7 @@ void test_property_table_vertex(GRIN_GRAPH graph) {
         auto value1_ = grin_get_string_from_row(graph, r, 0);
         auto value2_ = grin_get_string_from_vertex_property_table(
             graph, table, vertex, property);
-        assert(grin_get_last_error_code() == GRIN_NO_ERROR);
+        assert(grin_get_last_error_code() == NO_ERROR);
         assert(strcmp(static_cast<const char*>(value1), value1_) == 0);
         assert(strcmp(static_cast<const char*>(value2), value2_) == 0);
 
@@ -239,7 +238,7 @@ void test_property_table_edge(GRIN_GRAPH graph) {
         auto value1_ = grin_get_int64_from_row(graph, r, 0);
         auto value2_ = grin_get_int64_from_edge_property_table(graph, table,
                                                                edge, property);
-        assert(grin_get_last_error_code() == GRIN_NO_ERROR);
+        assert(grin_get_last_error_code() == NO_ERROR);
         assert(*static_cast<const int64_t*>(value1) == value1_);
         assert(*static_cast<const int64_t*>(value2) == value2_);
 

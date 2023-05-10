@@ -449,7 +449,7 @@ void test_property_vertex_table(int argc, char** argv) {
         GRIN_DATATYPE dt = grin_get_vertex_property_data_type(g, vp);
         const void* pv =
             grin_get_value_from_vertex_property_table(g, vpt, v, vp);
-        if (grin_get_last_error_code() == GRIN_NO_ERROR) {
+        if (grin_get_last_error_code() == NO_ERROR) {
           printf("(Correct) no error\n");
         } else {
           printf("(Wrong) error code: %d\n", grin_get_last_error_code());
@@ -802,7 +802,7 @@ void test_error_code(int argc, char** argv) {
   GRIN_VERTEX v = get_one_vertex(g);
 
   const void* value = grin_get_value_from_vertex_property_table(g, vpt, v, vp);
-  if (grin_get_last_error_code() == GRIN_INVALID_VALUE) {
+  if (grin_get_last_error_code() == INVALID_VALUE) {
     printf("(Correct) invalid value\n");
   } else {
     printf("(Wrong) error code: %d\n", grin_get_last_error_code());

@@ -27,29 +27,29 @@ extern "C" {
     _v->vertex = *it;                                       \
   }
 
-#define __grin_check_row(_r, x)           \
-  grin_error_code = GRIN_NO_ERROR;        \
-  if (idx >= _r->size()) {                \
-    grin_error_code = GRIN_INVALID_VALUE; \
-    return x;                             \
+#define __grin_check_row(_r, x)      \
+  grin_error_code = NO_ERROR;        \
+  if (idx >= _r->size()) {           \
+    grin_error_code = INVALID_VALUE; \
+    return x;                        \
   }
 
 #define __grin_check_vertex_property(_v, x)            \
-  grin_error_code = GRIN_NO_ERROR;                     \
+  grin_error_code = NO_ERROR;                          \
   if (property.type_id != vpt || _v->type_id != vpt) { \
-    grin_error_code = GRIN_INVALID_VALUE;              \
+    grin_error_code = INVALID_VALUE;                   \
     return x;                                          \
   }
 
 #define __grin_check_edge_property(_e, x)                          \
-  grin_error_code = GRIN_NO_ERROR;                                 \
+  grin_error_code = NO_ERROR;                                      \
   if (_e->type_id >= _g->edge_type_num ||                          \
       _g->unique_edge_type_ids[_e->type_id] != ept) {              \
-    grin_error_code = GRIN_INVALID_VALUE;                          \
+    grin_error_code = INVALID_VALUE;                               \
     return x;                                                      \
   }                                                                \
   if (_g->unique_edge_type_ids[_e->type_id] != property.type_id) { \
-    grin_error_code = GRIN_INVALID_VALUE;                          \
+    grin_error_code = INVALID_VALUE;                               \
     return x;                                                      \
   }
 
@@ -91,7 +91,7 @@ const void* grin_get_value_from_row(GRIN_GRAPH g, GRIN_ROW r,
   case GRIN_DATATYPE::Timestamp64:
     return new int64_t(std::any_cast<int64_t>((*_r)[idx]));
   default:
-    grin_error_code = GRIN_UNKNOWN_DATATYPE;
+    grin_error_code = UNKNOWN_DATATYPE;
     return NULL;
   }
 }
@@ -319,7 +319,7 @@ const void* grin_get_value_from_vertex_property_table(
     return out;
   }
   default:
-    grin_error_code = GRIN_UNKNOWN_DATATYPE;
+    grin_error_code = UNKNOWN_DATATYPE;
     return NULL;
   }
 }
@@ -551,7 +551,7 @@ const void* grin_get_value_from_edge_property_table(
     return out;
   }
   default:
-    grin_error_code = GRIN_UNKNOWN_DATATYPE;
+    grin_error_code = UNKNOWN_DATATYPE;
     return NULL;
   }
   return NULL;
