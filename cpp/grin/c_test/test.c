@@ -249,15 +249,6 @@ void test_property_topology(int argc, char** argv) {
   const char* vt_name = grin_get_vertex_type_name(g, vt);
   const char* et_name = grin_get_edge_type_name(g, et);
 
-#ifdef GRIN_ENABLE_GRAPH_PARTITION
-  GRIN_PARTITIONED_GRAPH pg = get_partitioend_graph(argc, argv);
-  size_t tvnum = grin_get_total_vertex_num_by_type(pg, vt);
-  printf("total vertex num of %s: %zu\n", vt_name, tvnum);
-  size_t tenum = grin_get_total_edge_num_by_type(pg, et);
-  printf("total edge num of %s: %zu\n", et_name, tenum);
-  grin_destroy_partitioned_graph(pg);
-#endif
-
 #ifdef GRIN_ENABLE_VERTEX_LIST
   GRIN_VERTEX_LIST vl = grin_get_vertex_list(g);
 
@@ -307,19 +298,20 @@ void test_property_topology(int argc, char** argv) {
 #endif
 
 #ifdef GRIN_ASSUME_BY_TYPE_VERTEX_ORIGINAL_ID
-  GRIN_DATATYPE dt = grin_get_vertex_original_id_type(g);
+  GRIN_DATATYPE dt = grin_get_vertex_original_id_data_type(g);
   if (dt == Int64) {
-    long int v0id = 4;
-    GRIN_VERTEX v0 = grin_get_vertex_by_original_id_by_type(g, vt, &v0id);
+    long long int v0id = 4;
+    GRIN_VERTEX v0 = grin_get_vertex_by_original_id_by_type(g, vt, dt, &v0id);
     if (v0 == GRIN_NULL_VERTEX) {
-      printf("(Wrong) vertex of id %ld can not be found\n", v0id);
+      printf("(Wrong) vertex of id %lld can not be found\n", v0id);
     } else {
-      printf("vertex of original id %ld found\n", v0id);
-      GRIN_VERTEX_ORIGINAL_ID oid0 = grin_get_vertex_original_id(g, v0);
-      printf("get vertex original id: %ld\n", *((long int*) oid0));
-      grin_destroy_vertex_original_id(g, oid0);
+      printf("vertex of original id %lld found\n", v0id);
+      const void* oid0 = grin_get_vertex_original_id_value(g, v0);
+      printf("get vertex original id: %lld\n", *((long long int*) oid0));
     }
     grin_destroy_vertex(g, v0);
+  } else {
+    printf("(Wrong) vertex original id type not int64\n");
   }
 #endif
 
@@ -767,10 +759,14 @@ void test_property_primary_key(int argc, char** argv) {
         if (v == GRIN_NULL_VERTEX) {
           printf("(Wrong) vertex of primary keys %zu does not exist\n", j);
         } else {
-          GRIN_VERTEX_ORIGINAL_ID oid0 = grin_get_vertex_original_id(g, v);
-          printf("(Correct) vertex of primary keys %zu exists %ld\n", j,
-                 *((long int*) oid0));
-          grin_destroy_vertex_original_id(g, oid0);
+          GRIN_DATATYPE dt0 = grin_get_vertex_original_id_data_type(g);
+          const void* oid0 = grin_get_vertex_original_id_value(g, v);
+          if (dt0 == Int64) {
+            printf("(Correct) vertex of primary keys %zu exists %lld\n", j,
+                   *((long long int*) oid0));
+          } else {
+            printf("(Wrong) unmatch original id type\n");
+          }
           grin_destroy_vertex(g, v);
         }
       } else {
