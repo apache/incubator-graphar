@@ -326,7 +326,7 @@ void __grin_init_partitions(GRIN_GRAPH_T* graph, unsigned partition_num,
           vid += x * chunk_size;
         }
       }
-      offsets.push_back(vertex_num);
+      offsets.push_back(vid);
       graph->partitioned_vertex_offsets.push_back(offsets);
     }
   }
@@ -351,10 +351,13 @@ unsigned __grin_get_master_partition_id(GRIN_GRAPH_T* g,
     return 0;
   if (g->partition_strategy == SEGMENTED_PARTITION) {
     int l = 0, r = g->partition_num - 1;
-    while (l < r) {
+    while (l <= r) {
       int mid = (l + r) >> 1;
-      if (id < g->partitioned_vertex_offsets[type_id][mid + 1]) {
-        r = mid;
+      if (id >= g->partitioned_vertex_offsets[type_id][mid] &&
+          id < g->partitioned_vertex_offsets[type_id][mid + 1]) {
+        return mid;
+      } else if (id < g->partitioned_vertex_offsets[type_id][mid]) {
+        r = mid - 1;
       } else {
         l = mid + 1;
       }

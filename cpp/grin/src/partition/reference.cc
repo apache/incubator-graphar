@@ -46,7 +46,7 @@ GRIN_PARTITION grin_get_master_partition_from_vertex_ref(GRIN_GRAPH g,
 const char* grin_serialize_vertex_ref(GRIN_GRAPH g, GRIN_VERTEX_REF vr) {
   auto _vr = static_cast<GRIN_VERTEX_REF_T*>(vr);
   std::stringstream ss;
-  ss << _vr->id << _vr->type_id;
+  ss << _vr->id << ' ' << _vr->type_id;
   int len = ss.str().length() + 1;
   char* out = new char[len];
   snprintf(out, len, "%s", ss.str().c_str());
@@ -59,7 +59,7 @@ void grin_destroy_serialized_vertex_ref(GRIN_GRAPH g, const char* msg) {
 
 GRIN_VERTEX_REF grin_deserialize_to_vertex_ref(GRIN_GRAPH g, const char* msg) {
   std::stringstream ss(msg);
-  GRIN_VERTEX_ORIGINAL_ID_T id;
+  GAR_NAMESPACE::IdType id;
   unsigned type_id;
   ss >> id >> type_id;
   return new GRIN_VERTEX_REF_T(id, type_id);

@@ -44,8 +44,6 @@ struct GRIN_VERTEX_T {
       : id(_id), type_id(_type_id), vertex(std::move(_vertex)) {}
 };
 
-typedef GAR_NAMESPACE::IdType GRIN_VERTEX_ORIGINAL_ID_T;
-
 struct GRIN_EDGE_T {
   GAR_NAMESPACE::Edge edge;
   unsigned type_id;

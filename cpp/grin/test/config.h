@@ -19,8 +19,6 @@ limitations under the License.
 #ifndef CPP_GRIN_TEST_CONFIG_H_
 #define CPP_GRIN_TEST_CONFIG_H_
 
-#define PARTITION_NUMBER 4
-
 static const std::string TEST_DATA_PATH =  // NOLINT
     std::filesystem::path(__FILE__)
         .parent_path()

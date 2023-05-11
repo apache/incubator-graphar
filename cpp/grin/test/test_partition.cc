@@ -88,10 +88,11 @@ void test_partition_partition(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
 }
 
 int main(int argc, char* argv[]) {
-  // partition number = 1
+  // partition number = 1, stragey = segmented
   std::string path = TEST_DATA_PATH;
   uint32_t partition_num = 1;
   std::cout << "GraphInfo path = " << path << std::endl;
+  std::cout << "Partition strategy = segmented" << std::endl;
   std::cout << "Partition number = " << partition_num << std::endl;
 
   // get partitioned graph from graph info of GraphAr
@@ -103,10 +104,11 @@ int main(int argc, char* argv[]) {
   // test partitioned graph
   test_partition_partition(pg, partition_num);
 
-  // partition number = 2
-  partition_num = PARTITION_NUMBER;
+  // partition number = 4, stragety = hash
+  partition_num = 4;
   std::cout << std::endl;
   std::cout << "GraphInfo path = " << path << std::endl;
+  std::cout << "Partition strategy = hash" << std::endl;
   std::cout << "Partition number = " << partition_num << std::endl;
 
   // get partitioned graph from graph info of GraphAr
