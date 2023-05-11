@@ -74,7 +74,7 @@ GRIN_GRAPH_T* get_graph_by_info_path(const std::string& path) {
   // construct graph
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   if (maybe_graph_info.has_error())
-    return GRIN_NULL_GRAPH;
+    return NULL;
   auto graph_info = maybe_graph_info.value();
   auto graph = new GRIN_GRAPH_T(graph_info);
 
@@ -135,6 +135,7 @@ void __grin_init_vertices_collections(GRIN_GRAPH_T* graph) {
   graph->vertex_offsets.clear();
   graph->vertex_offsets.push_back(0);
   graph->tot_vertex_num = 0;
+  graph->vertex_chunk_size.clear();
 
   for (const auto& [label, vertex_info] : graph->graph_info.GetVertexInfos()) {
     auto maybe_vertices_collection =
@@ -144,6 +145,7 @@ void __grin_init_vertices_collections(GRIN_GRAPH_T* graph) {
     graph->tot_vertex_num += vertices.size();
     graph->vertex_offsets.push_back(graph->tot_vertex_num);
     graph->vertices_collections.push_back(std::move(vertices));
+    graph->vertex_chunk_size.push_back(vertex_info.GetChunkSize());
   }
 }
 
@@ -297,4 +299,68 @@ void __grin_init_edge_properties(GRIN_GRAPH_T* graph) {
     graph->edge_property_name_2_ids.push_back(name_2_id);
   }
   graph->edge_property_offsets.push_back(property_id);
+}
+
+void __grin_init_partitions(GRIN_GRAPH_T* graph, unsigned partition_num,
+                            unsigned partition_id,
+                            GAR_PARTITION_STRATEGY partition_strategy) {
+  graph->partition_num = partition_num;
+  graph->partition_id = partition_id;
+  graph->partition_strategy = partition_strategy;
+  if (partition_strategy == SEGMENTED_PARTITION) {
+    graph->partitioned_vertex_offsets.clear();
+    for (auto i = 0; i < graph->vertex_type_num; i++) {
+      std::vector<size_t> offsets;
+      offsets.clear();
+      auto vertex_num = graph->vertex_offsets[i + 1] - graph->vertex_offsets[i];
+      auto chunk_size = graph->vertex_chunk_size[i];
+      auto chunk_num = (vertex_num + chunk_size - 1) / chunk_size;
+      auto x = chunk_num / partition_num;
+      auto y = chunk_num % partition_num;
+      auto vid = 0;
+      for (auto pid = 0; pid < partition_num; pid++) {
+        offsets.push_back(vid);
+        if (pid < y) {
+          vid += (x + 1) * chunk_size;
+        } else {
+          vid += x * chunk_size;
+        }
+      }
+      offsets.push_back(vertex_num);
+      graph->partitioned_vertex_offsets.push_back(offsets);
+    }
+  }
+}
+
+int64_t __gin_generate_int64_from_id_and_type(GAR_NAMESPACE::IdType id,
+                                              unsigned type_id) {
+  return (id << 10) | static_cast<int32_t>(type_id);
+}
+
+std::pair<GAR_NAMESPACE::IdType, unsigned>
+__gin_generate_id_and_type_from_int64(int64_t svr) {
+  auto _type_id = static_cast<unsigned>(svr & 0x3FF);
+  auto _id = ((svr >> 10) & 0x3FFFFFFF);
+  return {_id, _type_id};
+}
+
+unsigned __grin_get_master_partition_id(GRIN_GRAPH_T* g,
+                                        GAR_NAMESPACE::IdType id,
+                                        unsigned type_id) {
+  if (g->partition_num == 1)  // no partition
+    return 0;
+  if (g->partition_strategy == SEGMENTED_PARTITION) {
+    int l = 0, r = g->partition_num - 1;
+    while (l < r) {
+      int mid = (l + r) >> 1;
+      if (id < g->partitioned_vertex_offsets[type_id][mid + 1]) {
+        r = mid;
+      } else {
+        l = mid + 1;
+      }
+    }
+    return l;
+  } else {  // HASH_PARTITION
+    return (id % g->partition_num);
+  }
 }

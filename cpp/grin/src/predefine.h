@@ -258,6 +258,8 @@ struct GRIN_GRAPH_T {
   unsigned partition_num;
   unsigned partition_id;
   GAR_PARTITION_STRATEGY partition_strategy;
+  std::vector<size_t> vertex_chunk_size;
+  std::vector<std::vector<size_t>> partitioned_vertex_offsets;
   // constructor
   explicit GRIN_GRAPH_T(GAR_NAMESPACE::GraphInfo graph_info_)
       : graph_info(std::move(graph_info_)),
@@ -281,6 +283,8 @@ void __grin_init_edges_collections(GRIN_GRAPH_T*);
 void __grin_init_vertex_properties(GRIN_GRAPH_T*);
 void __grin_init_edge_properties(GRIN_GRAPH_T*);
 // partition related functions
+void __grin_init_partitions(GRIN_GRAPH_T*, unsigned, unsigned,
+                            GAR_PARTITION_STRATEGY);
 int64_t __gin_generate_int64_from_id_and_type(GAR_NAMESPACE::IdType, unsigned);
 std::pair<GAR_NAMESPACE::IdType, unsigned>
     __gin_generate_id_and_type_from_int64(int64_t);

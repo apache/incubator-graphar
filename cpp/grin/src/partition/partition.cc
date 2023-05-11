@@ -114,10 +114,9 @@ GRIN_GRAPH grin_get_local_graph_by_partition(GRIN_PARTITIONED_GRAPH pg,
   if (p >= _pg->partition_num)
     return GRIN_NULL_GRAPH;
   auto graph = get_graph_by_info_path(_pg->info_path);
-  if (graph != GRIN_NULL_GRAPH) {
-    graph->partition_num = _pg->partition_num;
-    graph->partition_id = p;
-    graph->partition_strategy = _pg->partition_strategy;
+  if (graph != NULL) {
+    __grin_init_partitions(graph, _pg->partition_num, p,
+                           _pg->partition_strategy);
   }
   return graph;
 }
