@@ -37,9 +37,13 @@ size_t grin_get_edge_num_by_type(GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
 #endif
 
 #ifdef GRIN_ASSUME_BY_TYPE_VERTEX_ORIGINAL_ID
-GRIN_VERTEX grin_get_vertex_by_original_id_by_type(
-    GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype, GRIN_VERTEX_ORIGINAL_ID oid) {
-  auto _oid = static_cast<GRIN_VERTEX_ORIGINAL_ID_T*>(oid);
+GRIN_VERTEX grin_get_vertex_by_original_id_by_type(GRIN_GRAPH g,
+                                                   GRIN_VERTEX_TYPE vtype,
+                                                   GRIN_DATATYPE type,
+                                                   const void* oid) {
+  if (type != GRIN_DATATYPE::Int64)
+    return GRIN_NULL_VERTEX;
+  auto _oid = static_cast<const int64_t*>(oid);
   auto v = new GRIN_VERTEX_T(*_oid, vtype);
   return v;
 }

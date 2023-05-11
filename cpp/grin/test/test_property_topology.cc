@@ -61,13 +61,14 @@ void test_property_topology_vertex(GRIN_GRAPH graph) {
 
     // check oid
     auto vertex1 = grin_get_vertex_from_list(graph, select_vertex_list, 0);
-    auto oid = grin_get_vertex_original_id(graph, vertex1);
+    auto oid = grin_get_vertex_original_id_value(graph, vertex1);
+    auto type = grin_get_vertex_original_id_data_type(graph);
     auto vertex2 =
-        grin_get_vertex_by_original_id_by_type(graph, vertex_type, oid);
+        grin_get_vertex_by_original_id_by_type(graph, vertex_type, type, oid);
     assert(grin_equal_vertex(graph, vertex1, vertex2) == true);
 
     // destroy
-    grin_destroy_vertex_original_id(graph, oid);
+    grin_destroy_value(graph, type, oid);
     grin_destroy_vertex(graph, vertex1);
     grin_destroy_vertex(graph, vertex2);
     grin_destroy_name(graph, name);
