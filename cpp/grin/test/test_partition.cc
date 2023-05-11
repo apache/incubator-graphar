@@ -22,19 +22,19 @@ extern "C" {
 #include "grin/include/topology/structure.h"
 }
 
-void test_partition_partition(GRIN_PARTITIONED_GRAPH pg) {
+void test_partition_partition(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
   std::cout << "\n++++ test partition: partition ++++" << std::endl;
 
   // check partition number
   assert(pg != GRIN_NULL_GRAPH);
   auto partition_num = grin_get_total_partitions_number(pg);
-  assert(partition_num == PARTITION_NUMBER);
+  assert(partition_num == n);
 
   // check partition list
   auto partition_list = grin_get_local_partition_list(pg);
   assert(partition_list != GRIN_NULL_LIST);
   auto partition_list_size = grin_get_partition_list_size(pg, partition_list);
-  assert(partition_list_size == PARTITION_NUMBER);
+  assert(partition_list_size == n);
 
   // check create new partition list
   auto new_partition_list = grin_create_partition_list(pg);
@@ -88,24 +88,44 @@ void test_partition_partition(GRIN_PARTITIONED_GRAPH pg) {
 }
 
 int main(int argc, char* argv[]) {
-  // get partitioned graph from graph info of GraphAr
+  // partition number = 1
   std::string path = TEST_DATA_PATH;
-  uint32_t partition_num = PARTITION_NUMBER;
+  uint32_t partition_num = 1;
   std::cout << "GraphInfo path = " << path << std::endl;
   std::cout << "Partition number = " << partition_num << std::endl;
 
-  char** args = new char*[2];
+  // get partitioned graph from graph info of GraphAr
+  char** args = new char*[1];
   args[0] = new char[path.length() + 1];
   snprintf(args[0], path.length() + 1, "%s", path.c_str());
-  args[1] = new char[2];
-  snprintf(args[1], 2, "%d", partition_num);
-  GRIN_PARTITIONED_GRAPH pg = grin_get_partitioned_graph_from_storage(2, args);
+  GRIN_PARTITIONED_GRAPH pg = grin_get_partitioned_graph_from_storage(1, args);
 
   // test partitioned graph
-  test_partition_partition(pg);
+  test_partition_partition(pg, partition_num);
+
+  // partition number = 2
+  partition_num = PARTITION_NUMBER;
+  std::cout << std::endl;
+  std::cout << "GraphInfo path = " << path << std::endl;
+  std::cout << "Partition number = " << partition_num << std::endl;
+
+  // get partitioned graph from graph info of GraphAr
+  char** args2 = new char*[3];
+  args2[0] = new char[path.length() + 1];
+  snprintf(args2[0], path.length() + 1, "%s", path.c_str());
+  args2[1] = new char[2];
+  snprintf(args2[1], 2, "%d", partition_num);
+  args2[2] = new char[2];
+  uint32_t strategy = 1;
+  snprintf(args2[2], 2, "%d", strategy);
+  GRIN_PARTITIONED_GRAPH pg2 = grin_get_partitioned_graph_from_storage(3, args2);
+
+  // test partitioned graph
+  test_partition_partition(pg2, partition_num);
 
   // destroy partitioned graph
   grin_destroy_partitioned_graph(pg);
+  grin_destroy_partitioned_graph(pg2);
 
   return 0;
 }

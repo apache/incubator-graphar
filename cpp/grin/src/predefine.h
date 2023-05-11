@@ -201,13 +201,33 @@ typedef std::vector<std::any> GRIN_ROW_T;
 #endif
 
 #ifdef GRIN_ENABLE_GRAPH_PARTITION
+typedef enum {
+  SEGMENTED_PARTITION = 0,
+  HASH_PARTITION = 1,
+  PARTITION_STRATEGY_MAX = 2
+} GAR_PARTITION_STRATEGY;
+
 struct GRIN_PARTITIONED_GRAPH_T {
   std::string info_path;
   unsigned partition_num;
-  GRIN_PARTITIONED_GRAPH_T(std::string _info_path, unsigned _partition_num = 1)
-      : info_path(_info_path), partition_num(_partition_num) {}
+  GAR_PARTITION_STRATEGY partition_strategy;
+  GRIN_PARTITIONED_GRAPH_T(
+      std::string _info_path, unsigned _partition_num = 1,
+      GAR_PARTITION_STRATEGY _partition_strategy = SEGMENTED_PARTITION)
+      : info_path(_info_path),
+        partition_num(_partition_num),
+        partition_strategy(_partition_strategy) {}
 };
 typedef std::vector<unsigned> GRIN_PARTITION_LIST_T;
+#endif
+
+#ifdef GRIN_ENABLE_VERTEX_REF
+struct GRIN_VERTEX_REF_T {
+  GAR_NAMESPACE::IdType id;
+  unsigned type_id;
+  GRIN_VERTEX_REF_T(GAR_NAMESPACE::IdType _id, unsigned _type_id)
+      : id(_id), type_id(_type_id) {}
+};
 #endif
 
 struct GRIN_GRAPH_T {
@@ -237,6 +257,7 @@ struct GRIN_GRAPH_T {
   // partitions
   unsigned partition_num;
   unsigned partition_id;
+  GAR_PARTITION_STRATEGY partition_strategy;
   // constructor
   explicit GRIN_GRAPH_T(GAR_NAMESPACE::GraphInfo graph_info_)
       : graph_info(std::move(graph_info_)),
@@ -246,16 +267,24 @@ struct GRIN_GRAPH_T {
         edge_type_num(0),
         unique_edge_type_num(0),
         partition_num(1),
-        partition_id(0) {}
+        partition_id(0),
+        partition_strategy(SEGMENTED_PARTITION) {}
 };
 
 GRIN_GRAPH_T* get_graph_by_info_path(const std::string&);
 std::string GetDataTypeName(GRIN_DATATYPE);
 GRIN_DATATYPE GARToDataType(GAR_NAMESPACE::DataType);
 size_t __grin_get_edge_num(GRIN_GRAPH_T*, unsigned, unsigned);
+// init functions
 void __grin_init_vertices_collections(GRIN_GRAPH_T*);
 void __grin_init_edges_collections(GRIN_GRAPH_T*);
 void __grin_init_vertex_properties(GRIN_GRAPH_T*);
 void __grin_init_edge_properties(GRIN_GRAPH_T*);
+// partition related functions
+int64_t __gin_generate_int64_from_id_and_type(GAR_NAMESPACE::IdType, unsigned);
+std::pair<GAR_NAMESPACE::IdType, unsigned>
+    __gin_generate_id_and_type_from_int64(int64_t);
+unsigned __grin_get_master_partition_id(GRIN_GRAPH_T*, GAR_NAMESPACE::IdType,
+                                        unsigned);
 
 #endif  // CPP_GRIN_SRC_PREDEFINE_H_

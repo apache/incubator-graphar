@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <sstream>
+
 extern "C" {
 #include "grin/include/partition/partition.h"
 }
@@ -23,10 +25,17 @@ GRIN_PARTITIONED_GRAPH grin_get_partitioned_graph_from_storage(int argc,
                                                                char** argv) {
   if (argc < 1)
     return GRIN_NULL_GRAPH;
-  if (argc > 1)
-    return new GRIN_PARTITIONED_GRAPH_T(argv[0], std::stoi(argv[1]));
-  else
+  else if (argc == 1)
     return new GRIN_PARTITIONED_GRAPH_T(argv[0]);
+  else if (argc == 2)
+    return new GRIN_PARTITIONED_GRAPH_T(argv[0], std::stoi(argv[1]));
+  else {
+    if (std::stoi(argv[2]) >= PARTITION_STRATEGY_MAX)
+      return GRIN_NULL_GRAPH;
+    return new GRIN_PARTITIONED_GRAPH_T(
+        argv[0], std::stoi(argv[1]),
+        static_cast<GAR_PARTITION_STRATEGY>(std::stoi(argv[2])));
+  }
 }
 
 void grin_destroy_partitioned_graph(GRIN_PARTITIONED_GRAPH pg) {
@@ -89,10 +98,13 @@ void grin_destroy_partition(GRIN_PARTITIONED_GRAPH pg, GRIN_PARTITION p) {
 
 const void* grin_get_partition_info(GRIN_PARTITIONED_GRAPH pg,
                                     GRIN_PARTITION p) {
-  std::string s = std::to_string(p);
-  int len = s.length() + 1;
+  std::stringstream ss;
+  auto _pg = static_cast<GRIN_PARTITIONED_GRAPH_T*>(pg);
+  ss << "partition_strategy: " << _pg->partition_strategy;
+  ss << "; partition: " << p;
+  int len = ss.str().length() + 1;
   char* out = new char[len];
-  snprintf(out, len, "%s", s.c_str());
+  snprintf(out, len, "%s", ss.str().c_str());
   return out;
 }
 
@@ -105,6 +117,7 @@ GRIN_GRAPH grin_get_local_graph_by_partition(GRIN_PARTITIONED_GRAPH pg,
   if (graph != GRIN_NULL_GRAPH) {
     graph->partition_num = _pg->partition_num;
     graph->partition_id = p;
+    graph->partition_strategy = _pg->partition_strategy;
   }
   return graph;
 }

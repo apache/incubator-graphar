@@ -812,10 +812,6 @@ typedef void* GRIN_GRAPH;
 typedef void* GRIN_VERTEX;                     
 typedef void* GRIN_EDGE;                       
 
-#ifdef GRIN_WITH_VERTEX_ORIGINAL_ID
-typedef void* GRIN_VERTEX_ORIGINAL_ID;                   
-#endif
-
 #ifdef GRIN_WITH_VERTEX_DATA
 typedef void* GRIN_VERTEX_DATA;                 
 #endif
