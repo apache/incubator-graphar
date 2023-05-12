@@ -309,9 +309,9 @@ void __grin_init_partitions(GRIN_GRAPH_T*, unsigned, unsigned,
                             GAR_PARTITION_STRATEGY);
 
 // serialize & deserialize vertex
-int64_t __gin_generate_int64_from_id_and_type(GAR_NAMESPACE::IdType, unsigned);
+int64_t __grin_generate_int64_from_id_and_type(GAR_NAMESPACE::IdType, unsigned);
 std::pair<GAR_NAMESPACE::IdType, unsigned>
-    __gin_generate_id_and_type_from_int64(int64_t);
+    __grin_generate_id_and_type_from_int64(int64_t);
 
 // mapping between vertices with partitions
 unsigned __grin_get_master_partition_id(GRIN_GRAPH_T*, GAR_NAMESPACE::IdType,
