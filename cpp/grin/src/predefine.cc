@@ -317,16 +317,16 @@ void __grin_init_partitions(GRIN_GRAPH_T* graph, unsigned partition_num,
       auto chunk_num = (vertex_num + chunk_size - 1) / chunk_size;
       auto x = chunk_num / partition_num;
       auto y = chunk_num % partition_num;
-      auto vid = 0;
+      size_t vid = 0;
       for (auto pid = 0; pid < partition_num; pid++) {
-        offsets.push_back(vid);
+        offsets.push_back(std::min(vid, vertex_num));
         if (pid < y) {
           vid += (x + 1) * chunk_size;
         } else {
           vid += x * chunk_size;
         }
       }
-      offsets.push_back(vid);
+      offsets.push_back(std::min(vid, vertex_num));
       graph->partitioned_vertex_offsets.push_back(offsets);
     }
   }
