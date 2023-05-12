@@ -37,11 +37,49 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
   if (_v->type_id < _vl->type_begin || _v->type_id >= _vl->type_end)
     return GRIN_NULL_SIZE;
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  size_t offset = _g->vertex_offsets[_v->type_id] + _v->id;
-  if (offset < _g->vertex_offsets[_v->type_id + 1]) {
-    return offset - _g->vertex_offsets[_vl->type_begin];
-  } else {
-    return GRIN_NULL_SIZE;
+
+  if (_vl->partition_type == ALL_PARTITION) {  // all partition
+    size_t offset = _g->vertex_offsets[_v->type_id] + _v->id;
+    if (offset < _g->vertex_offsets[_v->type_id + 1]) {
+      return offset - _g->vertex_offsets[_vl->type_begin];
+    } else {
+      return GRIN_NULL_SIZE;
+    }
   }
+
+  if (_vl->partition_type == ONE_PARTITION) {  // one partition
+    size_t offset = 0;
+    for (auto i = _vl->type_begin; i < _v->type_id; i++) {
+      auto partitioned_vertex_num = __grin_get_paritioned_vertex_num(
+          _g, i, _vl->partition_id, _g->partition_strategy);
+      offset += partitioned_vertex_num;
+    }
+    offset += __grin_get_partitioned_vertex_id_from_vertex_id(
+        _g, _v->type_id, _vl->partition_id, _g->partition_strategy, _v->id);
+    return offset;
+  }
+
+  if (_vl->partition_type == ALL_BUT_ONE_PARTITION) {  // all but one
+    size_t offset = 0;
+    for (auto i = _vl->type_begin; i < _v->type_id; i++) {
+      auto vertex_num = _g->vertex_offsets[i + 1] - _g->vertex_offsets[i];
+      auto partitioned_vertex_num = __grin_get_paritioned_vertex_num(
+          _g, i, _vl->partition_id, _g->partition_strategy);
+      offset += vertex_num - partitioned_vertex_num;
+    }
+    auto partition_id = __grin_get_master_partition_id(_g, _v->id, _v->type_id);
+    for (auto j = 0; j < partition_id; j++) {
+      if (j == _vl->partition_id)
+        continue;
+      auto partitioned_vertex_num = __grin_get_paritioned_vertex_num(
+          _g, _v->type_id, j, _g->partition_strategy);
+      offset += partitioned_vertex_num;
+    }
+    offset += __grin_get_partitioned_vertex_id_from_vertex_id(
+        _g, _v->type_id, partition_id, _g->partition_strategy, _v->id);
+    return offset;
+  }
+
+  return GRIN_NULL_SIZE;  // undefined
 }
 #endif

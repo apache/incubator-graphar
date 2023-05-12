@@ -56,7 +56,8 @@ GRIN_VERTEX_LIST grin_select_type_for_vertex_list(GRIN_GRAPH g,
   auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
   if (_vl->type_begin > vtype || _vl->type_end <= vtype)
     return GRIN_NULL_LIST;
-  auto fvl = new GRIN_VERTEX_LIST_T(vtype, vtype + 1);
+  auto fvl = new GRIN_VERTEX_LIST_T(vtype, vtype + 1, _vl->partition_type,
+                                    _vl->partition_id);
   return fvl;
 }
 #endif

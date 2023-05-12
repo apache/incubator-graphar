@@ -344,19 +344,19 @@ __gin_generate_id_and_type_from_int64(int64_t svr) {
   return {_id, _type_id};
 }
 
-unsigned __grin_get_master_partition_id(GRIN_GRAPH_T* g,
+unsigned __grin_get_master_partition_id(GRIN_GRAPH_T* graph,
                                         GAR_NAMESPACE::IdType id,
                                         unsigned type_id) {
-  if (g->partition_num == 1)  // no partition
+  if (graph->partition_num == 1)  // no partition
     return 0;
-  if (g->partition_strategy == SEGMENTED_PARTITION) {
-    int l = 0, r = g->partition_num - 1;
+  if (graph->partition_strategy == SEGMENTED_PARTITION) {
+    int l = 0, r = graph->partition_num - 1;
     while (l <= r) {
       int mid = (l + r) >> 1;
-      if (id >= g->partitioned_vertex_offsets[type_id][mid] &&
-          id < g->partitioned_vertex_offsets[type_id][mid + 1]) {
+      if (id >= graph->partitioned_vertex_offsets[type_id][mid] &&
+          id < graph->partitioned_vertex_offsets[type_id][mid + 1]) {
         return mid;
-      } else if (id < g->partitioned_vertex_offsets[type_id][mid]) {
+      } else if (id < graph->partitioned_vertex_offsets[type_id][mid]) {
         r = mid - 1;
       } else {
         l = mid + 1;
@@ -364,6 +364,76 @@ unsigned __grin_get_master_partition_id(GRIN_GRAPH_T* g,
     }
     return l;
   } else {  // HASH_PARTITION
-    return (id % g->partition_num);
+    return (id % graph->partition_num);
+  }
+}
+
+size_t __grin_get_paritioned_vertex_num(
+    GRIN_GRAPH_T* graph, unsigned vtype, unsigned partition_id,
+    GAR_PARTITION_STRATEGY partition_strategy) {
+  auto vertex_num =
+      graph->vertex_offsets[vtype + 1] - graph->vertex_offsets[vtype];
+  if (partition_strategy == SEGMENTED_PARTITION) {
+    return graph->partitioned_vertex_offsets[vtype][partition_id + 1] -
+           graph->partitioned_vertex_offsets[vtype][partition_id];
+  } else {  // HASH_PARTITION
+    auto partitioned_vertex_num = vertex_num / graph->partition_num;
+    if (partition_id < vertex_num % graph->partition_num)
+      partitioned_vertex_num++;
+    return partitioned_vertex_num;
+  }
+}
+
+GAR_NAMESPACE::IdType __grin_get_vertex_id_from_partitioned_vertex_id(
+    GRIN_GRAPH_T* graph, unsigned vtype, unsigned partition_id,
+    GAR_PARTITION_STRATEGY partition_strategy,
+    GAR_NAMESPACE::IdType id_in_parition) {
+  if (partition_strategy == SEGMENTED_PARTITION) {
+    return graph->partitioned_vertex_offsets[vtype][partition_id] +
+           id_in_parition;
+  } else {  // HASH_PARTITION
+    return graph->partition_num * id_in_parition + partition_id;
+  }
+}
+
+GAR_NAMESPACE::IdType __grin_get_partitioned_vertex_id_from_vertex_id(
+    GRIN_GRAPH_T* graph, unsigned vtype, unsigned partition_id,
+    GAR_PARTITION_STRATEGY partition_strategy, GAR_NAMESPACE::IdType vid) {
+  if (partition_strategy == SEGMENTED_PARTITION) {
+    return vid - graph->partitioned_vertex_offsets[vtype][partition_id];
+  } else {  // HASH_PARTITION
+    return vid / graph->partition_num;
+  }
+}
+
+GAR_NAMESPACE::IdType __grin_get_first_vertex_id_in_partition(
+    GRIN_GRAPH_T* graph, unsigned vtype, unsigned partition_id,
+    GAR_PARTITION_STRATEGY partition_strategy) {
+  if (partition_strategy == SEGMENTED_PARTITION) {
+    auto p = graph->partitioned_vertex_offsets[vtype][partition_id];
+    if (p >= graph->vertex_offsets[vtype + 1])
+      return -1;
+    return p;
+  } else {  // HASH_PARTITION
+    auto p = partition_id;
+    if (p >= graph->vertex_offsets[vtype + 1])
+      return -1;
+    return p;
+  }
+}
+
+GAR_NAMESPACE::IdType __grin_get_next_vertex_id_in_partition(
+    GRIN_GRAPH_T* graph, unsigned vtype, unsigned partition_id,
+    GAR_PARTITION_STRATEGY partition_strategy, GAR_NAMESPACE::IdType vid) {
+  if (partition_strategy == SEGMENTED_PARTITION) {
+    auto p = vid + 1;
+    if (p >= graph->partitioned_vertex_offsets[vtype][partition_id + 1])
+      return -1;
+    return p;
+  } else {  // HASH_PARTITION
+    auto p = vid + graph->partition_num;
+    if (p >= graph->vertex_offsets[vtype + 1])
+      return -1;
+    return p;
   }
 }

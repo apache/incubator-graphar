@@ -52,11 +52,29 @@ struct GRIN_EDGE_T {
 };
 
 #ifdef GRIN_ENABLE_VERTEX_LIST
+
+#ifdef GRIN_ENABLE_GRAPH_PARTITION
+typedef enum {
+  ALL_PARTITION = 0,
+  ONE_PARTITION = 1,
+  ALL_BUT_ONE_PARTITION = 2,
+  PARTITION_TYPE_MAX = 3
+} PARTITION_TYPE_IN_VERTEX_LIST;
+#endif
+
 struct GRIN_VERTEX_LIST_T {
   unsigned type_begin;
   unsigned type_end;
-  GRIN_VERTEX_LIST_T(unsigned _type_begin, unsigned _type_end)
-      : type_begin(_type_begin), type_end(_type_end) {}
+  PARTITION_TYPE_IN_VERTEX_LIST partition_type;
+  unsigned partition_id;
+  GRIN_VERTEX_LIST_T(
+      unsigned _type_begin, unsigned _type_end,
+      PARTITION_TYPE_IN_VERTEX_LIST _partition_type = ALL_PARTITION,
+      unsigned _partition_id = 0)
+      : type_begin(_type_begin),
+        type_end(_type_end),
+        partition_type(_partition_type),
+        partition_id(_partition_id) {}
 };
 #endif
 
@@ -64,15 +82,20 @@ struct GRIN_VERTEX_LIST_T {
 struct GRIN_VERTEX_LIST_ITERATOR_T {
   unsigned type_begin;
   unsigned type_end;
+  PARTITION_TYPE_IN_VERTEX_LIST partition_type;
+  unsigned partition_id;
   unsigned current_type;
   GAR_NAMESPACE::IdType current_offset;
   GAR_NAMESPACE::VertexIter iter;
   GRIN_VERTEX_LIST_ITERATOR_T(unsigned _type_begin, unsigned _type_end,
-                              unsigned _current_type,
+                              PARTITION_TYPE_IN_VERTEX_LIST _partition_type,
+                              unsigned _partition_id, unsigned _current_type,
                               GAR_NAMESPACE::IdType _current_offset,
                               GAR_NAMESPACE::VertexIter _iter)
       : type_begin(_type_begin),
         type_end(_type_end),
+        partition_type(_partition_type),
+        partition_id(_partition_id),
         current_type(_current_type),
         current_offset(_current_offset),
         iter(std::move(_iter)) {}
@@ -271,22 +294,40 @@ struct GRIN_GRAPH_T {
         partition_strategy(SEGMENTED_PARTITION) {}
 };
 
+// basic functions
 GRIN_GRAPH_T* get_graph_by_info_path(const std::string&);
 std::string GetDataTypeName(GRIN_DATATYPE);
 GRIN_DATATYPE GARToDataType(GAR_NAMESPACE::DataType);
 size_t __grin_get_edge_num(GRIN_GRAPH_T*, unsigned, unsigned);
-// init functions
+
+// graph init functions
 void __grin_init_vertices_collections(GRIN_GRAPH_T*);
 void __grin_init_edges_collections(GRIN_GRAPH_T*);
 void __grin_init_vertex_properties(GRIN_GRAPH_T*);
 void __grin_init_edge_properties(GRIN_GRAPH_T*);
-// partition related functions
 void __grin_init_partitions(GRIN_GRAPH_T*, unsigned, unsigned,
                             GAR_PARTITION_STRATEGY);
+
+// serialize & deserialize vertex
 int64_t __gin_generate_int64_from_id_and_type(GAR_NAMESPACE::IdType, unsigned);
 std::pair<GAR_NAMESPACE::IdType, unsigned>
     __gin_generate_id_and_type_from_int64(int64_t);
+
+// mapping between vertices with partitions
 unsigned __grin_get_master_partition_id(GRIN_GRAPH_T*, GAR_NAMESPACE::IdType,
                                         unsigned);
+size_t __grin_get_paritioned_vertex_num(GRIN_GRAPH_T*, unsigned, unsigned,
+                                        GAR_PARTITION_STRATEGY);
+GAR_NAMESPACE::IdType __grin_get_vertex_id_from_partitioned_vertex_id(
+    GRIN_GRAPH_T*, unsigned, unsigned, GAR_PARTITION_STRATEGY,
+    GAR_NAMESPACE::IdType);
+GAR_NAMESPACE::IdType __grin_get_partitioned_vertex_id_from_vertex_id(
+    GRIN_GRAPH_T*, unsigned, unsigned, GAR_PARTITION_STRATEGY,
+    GAR_NAMESPACE::IdType);
+GAR_NAMESPACE::IdType __grin_get_first_vertex_id_in_partition(
+    GRIN_GRAPH_T*, unsigned, unsigned, GAR_PARTITION_STRATEGY);
+GAR_NAMESPACE::IdType __grin_get_next_vertex_id_in_partition(
+    GRIN_GRAPH_T*, unsigned, unsigned, GAR_PARTITION_STRATEGY,
+    GAR_NAMESPACE::IdType);
 
 #endif  // CPP_GRIN_SRC_PREDEFINE_H_
