@@ -32,15 +32,17 @@ Make the graphar-spark-library directory as the current working directory:
 
 .. code-block:: shell
 
-   cd spark/
+   cd GraphAr/spark/
 
 Compile package:
 
 .. code-block:: shell
 
-   mvn package
+   mvn clean package -DskipTests
 
-After compilation, a similar file *graphar-0.1.0-SNAPSHOT-shaded.jar* is generated in the directory *spark/target/*.
+After compilation, a similar file *graphar-x.x.x-SNAPSHOT-shaded.jar* is generated in the directory *spark/target/*.
+
+Please refer to the `building steps <https://github.com/alibaba/GraphAr/tree/main/spark>`_ for more details.
 
 
 How to Use

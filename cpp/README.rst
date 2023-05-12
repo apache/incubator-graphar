@@ -46,8 +46,9 @@ repository and navigated to the ``cpp`` subdirectory:
 .. code-block::
 
     $ git clone https://github.com/alibaba/GraphAr.git
+    $ cd GraphAr
     $ git submodule update --init
-    $ cd GraphAr/cpp
+    $ cd cpp
 
 Release build:
 
@@ -68,7 +69,7 @@ setting :code:`NAMESPACE` option with cmake:
 
     $ mkdir build
     $ cd build
-    $ cmake .. -DNAMESPACE=MyNamespace
+    $ cmake -DNAMESPACE=MyNamespace ..
     $ make -j8       # if you have 8 CPU cores, otherwise adjust
 
 Debug build with unit tests:
@@ -91,6 +92,7 @@ Build with examples:
     $ cd build-examples
     $ cmake -DBUILD_EXAMPLES=ON ..
     $ make -j8       # if you have 8 CPU cores, otherwise adjust
+    $ ./bgl_example  # run the BGL example
 
 Install
 ^^^^^^^^^
@@ -108,8 +110,17 @@ Building the API document with Doxgen:
 
 .. code-block:: shell
 
+    $ cd GraphAr/cpp
     $ pushd apidoc
     $ doxgen
     $ popd
 
 The API document is generated in the directory ``cpp/apidoc/html``.
+
+
+How to use
+-----------
+
+Please refer to our `GraphAr C++ API Reference`_.
+
+.. _GraphAr C++ API Reference: https://alibaba.github.io/GraphAr/reference/api-reference-cpp.html
