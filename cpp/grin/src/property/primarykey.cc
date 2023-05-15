@@ -71,38 +71,37 @@ GRIN_VERTEX grin_get_vertex_by_primary_keys(GRIN_GRAPH g,
       auto& property = _g->vertex_properties[vp];
       auto& name = property.name;
       auto type = property.type;
-      idx++;
       switch (type) {
       case GRIN_DATATYPE::Int32: {
-        auto p1 = std::any_cast<int32_t>((*_r)[idx]);
+        auto p1 = std::any_cast<int32_t>((*_r)[idx++]);
         auto p2 = it.property<int32_t>(name).value();
         if (p1 != p2)
           flag = false;
         break;
       }
       case GRIN_DATATYPE::Int64: {
-        auto p1 = std::any_cast<int64_t>((*_r)[idx]);
+        auto p1 = std::any_cast<int64_t>((*_r)[idx++]);
         auto p2 = it.property<int64_t>(name).value();
         if (p1 != p2)
           flag = false;
         break;
       }
       case GRIN_DATATYPE::Float: {
-        auto p1 = std::any_cast<float>((*_r)[idx]);
+        auto p1 = std::any_cast<float>((*_r)[idx++]);
         auto p2 = it.property<float>(name).value();
         if (p1 != p2)
           flag = false;
         break;
       }
       case GRIN_DATATYPE::Double: {
-        auto p1 = std::any_cast<double>((*_r)[idx]);
+        auto p1 = std::any_cast<double>((*_r)[idx++]);
         auto p2 = it.property<double>(name).value();
         if (p1 != p2)
           flag = false;
         break;
       }
       case GRIN_DATATYPE::String: {
-        auto&& p1 = std::any_cast<std::string>((*_r)[idx]);
+        auto&& p1 = std::any_cast<std::string>((*_r)[idx++]);
         auto p2 = it.property<std::string>(name).value();
         if (p1 != p2)
           flag = false;

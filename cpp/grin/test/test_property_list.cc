@@ -33,7 +33,7 @@ void test_vertex_property(GRIN_GRAPH graph, GRIN_VERTEX_PROPERTY property,
   std::cout << "name of vertex property: " << name << std::endl;
 
   // get property data type
-  auto data_type = grin_get_vertex_property_data_type(graph, property);
+  auto data_type = grin_get_vertex_property_datatype(graph, property);
   std::cout << "data type of vertex property: " << data_type << std::endl;
 
   // get vertex type from property
@@ -57,7 +57,6 @@ void test_vertex_property(GRIN_GRAPH graph, GRIN_VERTEX_PROPERTY property,
   // destroy
   grin_destroy_vertex_property(graph, property2);
   grin_destroy_vertex_property(graph, property3);
-  grin_destroy_name(graph, name);
   grin_destroy_vertex_type(graph, vertex_type2);
   grin_destroy_vertex_property_list(graph, property_list);
 }
@@ -118,7 +117,7 @@ void test_edge_property(GRIN_GRAPH graph, GRIN_EDGE_PROPERTY property,
   std::cout << "name of edge property: " << name << std::endl;
 
   // get property data type
-  auto data_type = grin_get_edge_property_data_type(graph, property);
+  auto data_type = grin_get_edge_property_datatype(graph, property);
   std::cout << "data type of edge property: " << data_type << std::endl;
 
   // get edge type from property
@@ -140,7 +139,6 @@ void test_edge_property(GRIN_GRAPH graph, GRIN_EDGE_PROPERTY property,
   std::cout << "number of edge properties with this name: " << n << std::endl;
 
   // destroy
-  grin_destroy_name(graph, name);
   grin_destroy_edge_type(graph, edge_type2);
   grin_destroy_edge_property(graph, property2);
   grin_destroy_edge_property(graph, property3);

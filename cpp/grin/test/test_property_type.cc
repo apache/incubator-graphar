@@ -48,7 +48,6 @@ void test_property_type_vertex(GRIN_GRAPH graph) {
   assert(grin_equal_vertex_type(graph, vertex_type0, vertex_type3) == true);
   auto vertex_type4 = grin_get_vertex_type_by_name(graph, "invalid");
   assert(vertex_type4 == GRIN_NULL_VERTEX_TYPE);
-  grin_destroy_name(graph, name);
 
   // vertex type id
   auto id = grin_get_vertex_type_id(graph, vertex_type0);
@@ -80,7 +79,6 @@ void test_property_type_vertex(GRIN_GRAPH graph) {
     std::cout << "name of vertex type " << i << ": " << name << std::endl;
     // destroy
     grin_destroy_vertex_type(graph, vertex_type);
-    grin_destroy_name(graph, name);
   }
 
   size_t m = grin_get_vertex_type_list_size(graph, new_vertex_type_list);
@@ -113,7 +111,6 @@ void test_property_type_edge(GRIN_GRAPH graph) {
     auto edge_type3 = grin_get_edge_type_by_name(graph, "invalid");
 
     assert(edge_type3 == GRIN_NULL_EDGE_TYPE);
-    grin_destroy_name(graph, name);
 
     // edge type id
     auto id = grin_get_edge_type_id(graph, edge_type);
@@ -145,7 +142,6 @@ void test_property_type_edge(GRIN_GRAPH graph) {
     auto name = grin_get_edge_type_name(graph, edge_type);
     std::cout << "name of edge type " << i << ": " << name << std::endl;
     // destroy
-    grin_destroy_name(graph, name);
     grin_destroy_edge_type(graph, edge_type);
   }
 

@@ -19,6 +19,7 @@ limitations under the License.
 
 extern "C" {
 #include "grin/include/index/order.h"
+#include "grin/include/index/original_id.h"
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
 }
@@ -42,7 +43,47 @@ void test_index_order(GRIN_GRAPH graph) {
   assert(pos0 == idx0);
   assert(pos1 == idx1);
 
+  // destroy
+  grin_destroy_vertex(graph, v0);
+  grin_destroy_vertex(graph, v1);
+  grin_destroy_vertex_list(graph, vertex_list);
+
   std::cout << "---- test index: order completed ----" << std::endl;
+}
+
+void test_original_id(GRIN_GRAPH graph) {
+  std::cout << "\n++++ test index: original id ++++" << std::endl;
+
+  std::cout << "test vertex original id" << std::endl;
+  auto vertex_list = grin_get_vertex_list(graph);
+  size_t idx0 = 0, idx1 = 1;
+  auto v0 = grin_get_vertex_from_list(graph, vertex_list, idx0);
+  auto v1 = grin_get_vertex_from_list(graph, vertex_list, idx1);
+
+  // orignal id datatype
+  auto type = grin_get_vertex_original_id_datatype(graph);
+  assert(type == GRIN_DATATYPE::Int64);
+
+  // get original id of vertex
+  auto oid0 = grin_get_vertex_original_id_of_int64(graph, v0);
+  auto oid1 = grin_get_vertex_original_id_of_int64(graph, v1);
+  std::cout << "original id of v0 = " << oid0 << std::endl;
+  std::cout << "original id of v1 = " << oid1 << std::endl;
+
+  // get vertex by original id
+  auto v0_from_oid = grin_get_vertex_by_original_id_of_int64(graph, oid0);
+  auto v1_from_oid = grin_get_vertex_by_original_id_of_int64(graph, oid1);
+  assert(grin_equal_vertex(graph, v0, v0_from_oid) == true);
+  assert(grin_equal_vertex(graph, v1, v1_from_oid) == true);
+
+  // destroy
+  grin_destroy_vertex(graph, v0);
+  grin_destroy_vertex(graph, v1);
+  grin_destroy_vertex(graph, v0_from_oid);
+  grin_destroy_vertex(graph, v1_from_oid);
+  grin_destroy_vertex_list(graph, vertex_list);
+
+  std::cout << "---- test index: original id completed ----" << std::endl;
 }
 
 int main(int argc, char* argv[]) {
@@ -57,6 +98,9 @@ int main(int argc, char* argv[]) {
 
   // test index order
   test_index_order(graph);
+
+  // test original id
+  test_original_id(graph);
 
   // destroy graph
   grin_destroy_graph(graph);

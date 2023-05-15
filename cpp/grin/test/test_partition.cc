@@ -120,7 +120,8 @@ int main(int argc, char* argv[]) {
   args2[2] = new char[2];
   uint32_t strategy = 1;
   snprintf(args2[2], 2, "%d", strategy);
-  GRIN_PARTITIONED_GRAPH pg2 = grin_get_partitioned_graph_from_storage(3, args2);
+  GRIN_PARTITIONED_GRAPH pg2 =
+      grin_get_partitioned_graph_from_storage(3, args2);
 
   // test partitioned graph
   test_partition_partition(pg2, partition_num);

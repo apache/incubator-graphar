@@ -24,10 +24,6 @@ const char* grin_get_vertex_property_name(GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype,
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto& s = _g->vertex_properties[vp].name;
   return s.c_str();
-  // int len = s.length() + 1;
-  // char* out = new char[len];
-  // snprintf(out, len, "%s", s.c_str());
-  // return out;
 }
 
 GRIN_VERTEX_PROPERTY grin_get_vertex_property_by_name(GRIN_GRAPH g,
@@ -67,10 +63,6 @@ const char* grin_get_edge_property_name(GRIN_GRAPH g, GRIN_EDGE_TYPE etype,
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto& s = _g->edge_properties[ep].name;
   return s.c_str();
-  // int len = s.length() + 1;
-  // char* out = new char[len];
-  // snprintf(out, len, "%s", s.c_str());
-  // return out;
 }
 
 GRIN_EDGE_PROPERTY grin_get_edge_property_by_name(GRIN_GRAPH g,

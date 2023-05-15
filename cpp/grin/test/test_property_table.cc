@@ -40,45 +40,38 @@ void test_property_table_row(GRIN_GRAPH graph) {
   int32_t value0 = 0;
   const char* value1 = "Test String";
   uint64_t value2 = 2;
-  double value3 = 3.0;
+  double value3 = 3.3;
 
   std::cout << "put value0: " << value0 << std::endl;
   std::cout << "put value1: " << value1 << std::endl;
   std::cout << "put value2: " << value2 << std::endl;
   std::cout << "put value3: " << value3 << std::endl;
-  assert(grin_insert_value_to_row(graph, row, GRIN_DATATYPE::Int32, &value0) ==
-         true);
-  assert(grin_insert_value_to_row(graph, row, GRIN_DATATYPE::String, value1) ==
-         true);
+  assert(grin_insert_int32_to_row(graph, row, value0) == true);
+  assert(grin_insert_string_to_row(graph, row, value1) == true);
   assert(grin_insert_uint64_to_row(graph, row, value2) == true);
   assert(grin_insert_double_to_row(graph, row, value3) == true);
 
   // get value from row
-  auto value0_ = grin_get_value_from_row(graph, row, GRIN_DATATYPE::Int32, 0);
-  auto value1_ = grin_get_value_from_row(graph, row, GRIN_DATATYPE::String, 1);
-  auto invalid_value =
-      grin_get_value_from_row(graph, row, GRIN_DATATYPE::String, 100);
-  assert(grin_get_last_error_code() == INVALID_VALUE && invalid_value == NULL);
+  auto value0_ = grin_get_int32_from_row(graph, row, 0);
+  auto value1_ = grin_get_string_from_row(graph, row, 1);
+  auto invalid_value = grin_get_float_from_row(graph, row, 100);
+  assert(grin_get_last_error_code() == INVALID_VALUE && invalid_value == 0.0);
   auto value2_ = grin_get_uint64_from_row(graph, row, 2);
   auto value3_ = grin_get_double_from_row(graph, row, 3);
   assert(grin_get_last_error_code() == NO_ERROR);
 
   // check value
-  std::cout << "get value0: " << *static_cast<const int32_t*>(value0_)
-            << std::endl;
-  std::cout << "get value1: " << static_cast<const char*>(value1_) << std::endl;
+  std::cout << "get value0: " << value0_ << std::endl;
+  std::cout << "get value1: " << value1_ << std::endl;
   std::cout << "get value2: " << value2_ << std::endl;
   std::cout << "get value3: " << value3_ << std::endl;
-  assert(*static_cast<const int32_t*>(value0_) == value0);
-  assert(strcmp(static_cast<const char*>(value1_), value1) == 0);
+  assert(value0_ == value0);
+  assert(strcmp(value1_, value1) == 0);
   assert(value2_ == value2);
   assert(value3_ == value3);
 
-  // destroy value
-  grin_destroy_value(graph, GRIN_DATATYPE::Int32, value0_);
-  grin_destroy_value(graph, GRIN_DATATYPE::String, value1_);
-
-  // destroy row
+  // destroy
+  grin_destroy_string_value(graph, value1_);
   grin_destroy_row(graph, row);
 
   std::cout << "---- test property: table (row) completed ----" << std::endl;
@@ -120,55 +113,50 @@ void test_property_table_vertex(GRIN_GRAPH graph) {
       auto property =
           grin_get_vertex_property_from_list(graph, property_list, 0);
       auto name = grin_get_vertex_property_name(graph, vertex_type, property);
-      auto data_type = grin_get_vertex_property_data_type(graph, property);
+      auto data_type = grin_get_vertex_property_datatype(graph, property);
       std::cout << "get value of property \"" << name << "\" for vertex 0"
                 << std::endl;
 
       // get row from property table
       auto r = grin_get_row_from_vertex_property_table(graph, table, vertex,
                                                        property_list);
-      auto value1 = grin_get_value_from_row(graph, r, data_type, 0);
-
-      // get vertex property value from table
-      auto value2 = grin_get_value_from_vertex_property_table(graph, table,
-                                                              vertex, property);
 
       // check value from row and from table (int64)
       if (data_type == GRIN_DATATYPE::Int64) {
-        assert(*static_cast<const int64_t*>(value1) ==
-               *static_cast<const int64_t*>(value2));
+        auto value1 = grin_get_int64_from_row(graph, r, 0);
+        auto value2 = grin_get_int64_from_vertex_property_table(
+            graph, table, vertex, property);
+        assert(value1 == value2);
         std::cout << "value of property \"" << name
-                  << "\" for vertex 0 of vertex type " << i << ": "
-                  << *static_cast<const int64_t*>(value1) << std::endl;
+                  << "\" for vertex 0 of vertex type " << i << ": " << value1
+                  << std::endl;
         std::cout << "check values from row and from table are equal (int64)"
                   << std::endl;
       }
 
       // check value from row and from table (string)
       if (data_type == GRIN_DATATYPE::String) {
-        auto value1_ = grin_get_string_from_row(graph, r, 0);
-        auto value2_ = grin_get_string_from_vertex_property_table(
+        auto value1 = grin_get_string_from_row(graph, r, 0);
+        auto value2 = grin_get_string_from_vertex_property_table(
             graph, table, vertex, property);
         assert(grin_get_last_error_code() == NO_ERROR);
-        assert(strcmp(static_cast<const char*>(value1), value1_) == 0);
-        assert(strcmp(static_cast<const char*>(value2), value2_) == 0);
+        assert(strcmp(value1, value2) == 0);
 
-        assert(strcmp(static_cast<const char*>(value1),
-                      static_cast<const char*>(value2)) == 0);
         std::cout << "value of property \"" << name
-                  << "\" for vertex 0 of vertex type " << i << ": "
-                  << static_cast<const char*>(value1) << std::endl;
+                  << "\" for vertex 0 of vertex type " << i << ": " << value1
+                  << std::endl;
         std::cout << "check values from row and from table are equal (string)"
                   << std::endl;
+
+        // destroy
+        grin_destroy_string_value(graph, value1);
+        grin_destroy_string_value(graph, value2);
       }
 
       // destroy
       grin_destroy_row(graph, r);
       grin_destroy_vertex(graph, vertex);
       grin_destroy_vertex_property(graph, property);
-      grin_destroy_name(graph, name);
-      grin_destroy_value(graph, data_type, value1);
-      grin_destroy_value(graph, data_type, value2);
     }
 
     // destroy
@@ -220,55 +208,50 @@ void test_property_table_edge(GRIN_GRAPH graph) {
       auto property = grin_get_edge_property_from_list(graph, property_list, 0);
 
       auto name = grin_get_edge_property_name(graph, edge_type, property);
-      auto data_type = grin_get_edge_property_data_type(graph, property);
+      auto data_type = grin_get_edge_property_datatype(graph, property);
       std::cout << "get value of property \"" << name << "\" for edge 0"
                 << std::endl;
 
       // get row from property table
       auto r = grin_get_row_from_edge_property_table(graph, table, edge,
                                                      property_list);
-      auto value1 = grin_get_value_from_row(graph, r, data_type, 0);
-
-      // get edge property value from table
-      auto value2 =
-          grin_get_value_from_edge_property_table(graph, table, edge, property);
 
       // check value from row and from table (int64)
       if (data_type == GRIN_DATATYPE::Int64) {
-        auto value1_ = grin_get_int64_from_row(graph, r, 0);
-        auto value2_ = grin_get_int64_from_edge_property_table(graph, table,
-                                                               edge, property);
+        auto value1 = grin_get_int64_from_row(graph, r, 0);
+        auto value2 = grin_get_int64_from_edge_property_table(graph, table,
+                                                              edge, property);
         assert(grin_get_last_error_code() == NO_ERROR);
-        assert(*static_cast<const int64_t*>(value1) == value1_);
-        assert(*static_cast<const int64_t*>(value2) == value2_);
-
-        assert(*static_cast<const int64_t*>(value1) ==
-               *static_cast<const int64_t*>(value2));
+        assert(value1 == value2);
         std::cout << "value of property \"" << name
-                  << "\" for edge 0 of edge type " << i << ": "
-                  << *static_cast<const std::int64_t*>(value1) << std::endl;
+                  << "\" for edge 0 of edge type " << i << ": " << value1
+                  << std::endl;
         std::cout << "check values from row and from table are equal (int64)"
                   << std::endl;
       }
 
       // check value from row and from table (string)
       if (data_type == GRIN_DATATYPE::String) {
-        assert(strcmp(static_cast<const char*>(value1),
-                      static_cast<const char*>(value2)) == 0);
+        auto value1 = grin_get_string_from_row(graph, r, 0);
+        auto value2 = grin_get_string_from_edge_property_table(graph, table,
+                                                               edge, property);
+        assert(grin_get_last_error_code() == NO_ERROR);
+        assert(strcmp(value1, value2) == 0);
         std::cout << "value of property \"" << name
-                  << "\" for edge 0 of edge type " << i << ": "
-                  << static_cast<const char*>(value1) << std::endl;
+                  << "\" for edge 0 of edge type " << i << ": " << value1
+                  << std::endl;
         std::cout << "check values from row and from table are equal (string)"
                   << std::endl;
+
+        // destroy
+        grin_destroy_string_value(graph, value1);
+        grin_destroy_string_value(graph, value2);
       }
 
       // destroy
       grin_destroy_row(graph, r);
       grin_destroy_edge(graph, edge);
       grin_destroy_edge_property(graph, property);
-      grin_destroy_name(graph, name);
-      grin_destroy_value(graph, data_type, value1);
-      grin_destroy_value(graph, data_type, value2);
     }
 
     // destroy

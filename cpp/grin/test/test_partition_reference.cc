@@ -24,7 +24,8 @@ extern "C" {
 #include "grin/include/topology/vertexlist.h"
 }
 
-void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph, GRIN_VERTEX v) {
+void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph,
+                     GRIN_VERTEX v) {
   std::cout << "\n== test vertex ref ==" << std::endl;
 
   // check vertex ref
@@ -36,15 +37,16 @@ void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph, GRIN_VERTEX v)
   auto msg = grin_serialize_vertex_ref(graph, vr);
   std::cout << "serialized vertex ref = " << msg << std::endl;
   auto vr_from_msg = grin_deserialize_to_vertex_ref(graph, msg);
-  auto v_from_vr_from_msg =
-      grin_get_vertex_from_vertex_ref(graph, vr_from_msg);
+  auto v_from_vr_from_msg = grin_get_vertex_from_vertex_ref(graph, vr_from_msg);
   assert(grin_equal_vertex(graph, v, v_from_vr_from_msg) == true);
 
   // serialize & deserialize vertex ref as int64
   auto int64_msg = grin_serialize_vertex_ref_as_int64(graph, vr);
-  std::cout << "serialized vertex ref as int64 = " << int64_msg <<std::endl;
-  auto vr_from_int64_msg = grin_deserialize_int64_to_vertex_ref(graph, int64_msg);
-  auto v_from_vr_from_int64_msg = grin_get_vertex_from_vertex_ref(graph, vr_from_int64_msg);
+  std::cout << "serialized vertex ref as int64 = " << int64_msg << std::endl;
+  auto vr_from_int64_msg =
+      grin_deserialize_int64_to_vertex_ref(graph, int64_msg);
+  auto v_from_vr_from_int64_msg =
+      grin_get_vertex_from_vertex_ref(graph, vr_from_int64_msg);
   assert(grin_equal_vertex(graph, v, v_from_vr_from_int64_msg) == true);
 
   // check master or mirror
@@ -59,17 +61,19 @@ void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph, GRIN_VERTEX v)
   // get master partition id
   auto master_partition = grin_get_master_partition_from_vertex_ref(graph, vr);
   auto master_partition_id = grin_get_partition_id(pg, master_partition);
-  std::cout << "master partition id = " << master_partition_id <<std::endl;
+  std::cout << "master partition id = " << master_partition_id << std::endl;
   // get mirror_partition_list
   if (is_master) {
-    assert(grin_get_mirror_vertex_mirror_partition_list(graph, v)== GRIN_NULL_LIST);
-    auto partition_list = grin_get_master_vertex_mirror_partition_list(graph, v);
+    assert(grin_get_mirror_vertex_mirror_partition_list(graph, v) ==
+           GRIN_NULL_LIST);
+    auto partition_list =
+        grin_get_master_vertex_mirror_partition_list(graph, v);
 
     std::cout << "mirror partition ids = ";
     auto partition_list_size = grin_get_partition_list_size(pg, partition_list);
     for (auto i = 0; i < partition_list_size; ++i) {
       auto partition = grin_get_partition_from_list(pg, partition_list, i);
-      auto partition_id = grin_get_partition_id(pg,partition);
+      auto partition_id = grin_get_partition_id(pg, partition);
       std::cout << " " << partition_id;
       grin_destroy_partition(pg, partition);
     }
@@ -78,14 +82,16 @@ void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph, GRIN_VERTEX v)
     grin_destroy_partition_list(pg, partition_list);
 
   } else {
-    assert(grin_get_master_vertex_mirror_partition_list(graph, v)== GRIN_NULL_LIST);
-    auto partition_list = grin_get_mirror_vertex_mirror_partition_list(graph, v);
+    assert(grin_get_master_vertex_mirror_partition_list(graph, v) ==
+           GRIN_NULL_LIST);
+    auto partition_list =
+        grin_get_mirror_vertex_mirror_partition_list(graph, v);
 
     std::cout << "mirror partition ids = ";
     auto partition_list_size = grin_get_partition_list_size(pg, partition_list);
     for (auto i = 0; i < partition_list_size; ++i) {
       auto partition = grin_get_partition_from_list(pg, partition_list, i);
-      auto partition_id = grin_get_partition_id(pg,partition);
+      auto partition_id = grin_get_partition_id(pg, partition);
       std::cout << " " << partition_id;
       grin_destroy_partition(pg, partition);
     }
@@ -174,7 +180,8 @@ int main(int argc, char* argv[]) {
   args2[2] = new char[2];
   uint32_t strategy = 1;
   snprintf(args2[2], 2, "%d", strategy);
-  GRIN_PARTITIONED_GRAPH pg2 = grin_get_partitioned_graph_from_storage(3, args2);
+  GRIN_PARTITIONED_GRAPH pg2 =
+      grin_get_partitioned_graph_from_storage(3, args2);
 
   // test partitioned graph
   test_partition_reference(pg2, partition_num);
