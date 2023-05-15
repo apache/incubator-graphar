@@ -13,8 +13,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <iostream>
-
 extern "C" {
 #include "grin/include/property/property.h"
 }
@@ -25,10 +23,11 @@ const char* grin_get_vertex_property_name(GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype,
                                           GRIN_VERTEX_PROPERTY vp) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto& s = _g->vertex_properties[vp].name;
-  int len = s.length() + 1;
-  char* out = new char[len];
-  snprintf(out, len, "%s", s.c_str());
-  return out;
+  return s.c_str();
+  // int len = s.length() + 1;
+  // char* out = new char[len];
+  // snprintf(out, len, "%s", s.c_str());
+  // return out;
 }
 
 GRIN_VERTEX_PROPERTY grin_get_vertex_property_by_name(GRIN_GRAPH g,
@@ -67,10 +66,11 @@ const char* grin_get_edge_property_name(GRIN_GRAPH g, GRIN_EDGE_TYPE etype,
                                         GRIN_EDGE_PROPERTY ep) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto& s = _g->edge_properties[ep].name;
-  int len = s.length() + 1;
-  char* out = new char[len];
-  snprintf(out, len, "%s", s.c_str());
-  return out;
+  return s.c_str();
+  // int len = s.length() + 1;
+  // char* out = new char[len];
+  // snprintf(out, len, "%s", s.c_str());
+  // return out;
 }
 
 GRIN_EDGE_PROPERTY grin_get_edge_property_by_name(GRIN_GRAPH g,
@@ -114,8 +114,8 @@ void grin_destroy_vertex_property(GRIN_GRAPH g, GRIN_VERTEX_PROPERTY vp) {
   return;
 }
 
-GRIN_DATATYPE grin_get_vertex_property_data_type(GRIN_GRAPH g,
-                                                 GRIN_VERTEX_PROPERTY vp) {
+GRIN_DATATYPE grin_get_vertex_property_datatype(GRIN_GRAPH g,
+                                                GRIN_VERTEX_PROPERTY vp) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   return _g->vertex_properties[vp].type;
 }
@@ -135,8 +135,8 @@ bool grin_equal_edge_property(GRIN_GRAPH g, GRIN_EDGE_PROPERTY ep1,
 
 void grin_destroy_edge_property(GRIN_GRAPH g, GRIN_EDGE_PROPERTY ep) { return; }
 
-GRIN_DATATYPE grin_get_edge_property_data_type(GRIN_GRAPH g,
-                                               GRIN_EDGE_PROPERTY ep) {
+GRIN_DATATYPE grin_get_edge_property_datatype(GRIN_GRAPH g,
+                                              GRIN_EDGE_PROPERTY ep) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   return _g->edge_properties[ep].type;
 }

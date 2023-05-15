@@ -76,10 +76,11 @@ GRIN_VERTEX_TYPE grin_get_vertex_type_from_list(GRIN_GRAPH g,
 const char* grin_get_vertex_type_name(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto& s = _g->vertex_types[vt];
-  int len = s.length() + 1;
-  char* out = new char[len];
-  snprintf(out, len, "%s", s.c_str());
-  return out;
+  return s.c_str();
+  // int len = s.length() + 1;
+  // char* out = new char[len];
+  // snprintf(out, len, "%s", s.c_str());
+  // return out;
 }
 
 GRIN_VERTEX_TYPE grin_get_vertex_type_by_name(GRIN_GRAPH g, const char* name) {
@@ -163,10 +164,11 @@ GRIN_EDGE_TYPE grin_get_edge_type_from_list(GRIN_GRAPH g,
 const char* grin_get_edge_type_name(GRIN_GRAPH g, GRIN_EDGE_TYPE et) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto& s = _g->unique_edge_types[et];
-  int len = s.length() + 1;
-  char* out = new char[len];
-  snprintf(out, len, "%s", s.c_str());
-  return out;
+  return s.c_str();
+  // int len = s.length() + 1;
+  // char* out = new char[len];
+  // snprintf(out, len, "%s", s.c_str());
+  // return out;
 }
 
 GRIN_EDGE_TYPE grin_get_edge_type_by_name(GRIN_GRAPH g, const char* name) {

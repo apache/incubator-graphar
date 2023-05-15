@@ -57,8 +57,11 @@ GRIN_VERTEX grin_get_vertex_by_primary_keys(GRIN_GRAPH g,
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto vpl = grin_get_primary_keys_by_vertex_type(g, vtype);
   auto _vpl = static_cast<GRIN_VERTEX_PROPERTY_LIST_T*>(vpl);
-  if (_vpl->size() == 0)
+  if (_vpl->size() == 0 || r == GRIN_NULL_ROW)
     return GRIN_NULL_VERTEX;
+  auto _r = static_cast<GRIN_ROW_T*>(r);
+
+  // traverse all vertices
   auto& vertices = _g->vertices_collections[vtype];
   auto it_end = vertices.end();
   for (auto it = vertices.begin(); it != it_end; it++) {
@@ -68,39 +71,38 @@ GRIN_VERTEX grin_get_vertex_by_primary_keys(GRIN_GRAPH g,
       auto& property = _g->vertex_properties[vp];
       auto& name = property.name;
       auto type = property.type;
-      auto value = grin_get_value_from_row(g, r, type, idx);
       idx++;
       switch (type) {
       case GRIN_DATATYPE::Int32: {
-        auto p1 = *static_cast<int32_t const*>(value);
+        auto p1 = std::any_cast<int32_t>((*_r)[idx]);
         auto p2 = it.property<int32_t>(name).value();
         if (p1 != p2)
           flag = false;
         break;
       }
       case GRIN_DATATYPE::Int64: {
-        auto p1 = *static_cast<int64_t const*>(value);
+        auto p1 = std::any_cast<int64_t>((*_r)[idx]);
         auto p2 = it.property<int64_t>(name).value();
         if (p1 != p2)
           flag = false;
         break;
       }
       case GRIN_DATATYPE::Float: {
-        auto p1 = *static_cast<float const*>(value);
+        auto p1 = std::any_cast<float>((*_r)[idx]);
         auto p2 = it.property<float>(name).value();
         if (p1 != p2)
           flag = false;
         break;
       }
       case GRIN_DATATYPE::Double: {
-        auto p1 = *static_cast<double const*>(value);
+        auto p1 = std::any_cast<double>((*_r)[idx]);
         auto p2 = it.property<double>(name).value();
         if (p1 != p2)
           flag = false;
         break;
       }
       case GRIN_DATATYPE::String: {
-        auto p1 = std::string(static_cast<const char*>(value));
+        auto&& p1 = std::any_cast<std::string>((*_r)[idx]);
         auto p2 = it.property<std::string>(name).value();
         if (p1 != p2)
           flag = false;

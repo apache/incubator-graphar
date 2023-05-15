@@ -53,47 +53,14 @@ extern "C" {
     return x;                                                      \
   }
 
+void grin_destroy_string_value(GRIN_GRAPH g, const char* value) {
+  delete[] value;
+}
+
 #ifdef GRIN_ENABLE_ROW
 void grin_destroy_row(GRIN_GRAPH g, GRIN_ROW r) {
   auto _r = static_cast<GRIN_ROW_T*>(r);
   delete _r;
-}
-
-const void* grin_get_value_from_row(GRIN_GRAPH g, GRIN_ROW r,
-                                    GRIN_DATATYPE type, size_t idx) {
-  auto _r = static_cast<GRIN_ROW_T*>(r);
-  __grin_check_row(_r, NULL);
-
-  switch (type) {
-  case GRIN_DATATYPE::Int32:
-    return new int32_t(std::any_cast<int32_t>((*_r)[idx]));
-  case GRIN_DATATYPE::UInt32:
-    return new uint32_t(std::any_cast<uint32_t>((*_r)[idx]));
-  case GRIN_DATATYPE::Int64:
-    return new int64_t(std::any_cast<int64_t>((*_r)[idx]));
-  case GRIN_DATATYPE::UInt64:
-    return new uint64_t(std::any_cast<uint64_t>((*_r)[idx]));
-  case GRIN_DATATYPE::Float:
-    return new float(std::any_cast<float>((*_r)[idx]));
-  case GRIN_DATATYPE::Double:
-    return new double(std::any_cast<double>((*_r)[idx]));
-  case GRIN_DATATYPE::String: {
-    auto&& s = std::any_cast<std::string>((*_r)[idx]);
-    int len = s.length() + 1;
-    char* out = new char[len];
-    snprintf(out, len, "%s", s.c_str());
-    return out;
-  }
-  case GRIN_DATATYPE::Date32:
-    return new int32_t(std::any_cast<int32_t>((*_r)[idx]));
-  case GRIN_DATATYPE::Time32:
-    return new int32_t(std::any_cast<int32_t>((*_r)[idx]));
-  case GRIN_DATATYPE::Timestamp64:
-    return new int64_t(std::any_cast<int64_t>((*_r)[idx]));
-  default:
-    grin_error_code = UNKNOWN_DATATYPE;
-    return NULL;
-  }
 }
 
 int grin_get_int32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
@@ -167,46 +134,6 @@ GRIN_ROW grin_create_row(GRIN_GRAPH g) {
   return r;
 }
 
-bool grin_insert_value_to_row(GRIN_GRAPH g, GRIN_ROW r, GRIN_DATATYPE type,
-                              const void* value) {
-  auto _r = static_cast<GRIN_ROW_T*>(r);
-  switch (type) {
-  case GRIN_DATATYPE::Int32:
-    _r->push_back(*static_cast<const int32_t*>(value));
-    return true;
-  case GRIN_DATATYPE::UInt32:
-    _r->push_back(*static_cast<const uint32_t*>(value));
-    return true;
-  case GRIN_DATATYPE::Int64:
-    _r->push_back(*static_cast<const int64_t*>(value));
-    return true;
-  case GRIN_DATATYPE::UInt64:
-    _r->push_back(*static_cast<const uint64_t*>(value));
-    return true;
-  case GRIN_DATATYPE::Float:
-    _r->push_back(*static_cast<const float*>(value));
-    return true;
-  case GRIN_DATATYPE::Double:
-    _r->push_back(*static_cast<const double*>(value));
-    return true;
-  case GRIN_DATATYPE::String:
-    _r->push_back(std::string(static_cast<const char*>(value)));
-    return true;
-  case GRIN_DATATYPE::Date32:
-    _r->push_back(*static_cast<const int32_t*>(value));
-    return true;
-  case GRIN_DATATYPE::Time32:
-    _r->push_back(*static_cast<const int32_t*>(value));
-    return true;
-  case GRIN_DATATYPE::Timestamp64:
-    _r->push_back(*static_cast<const int64_t*>(value));
-    return true;
-  default:
-    return false;
-  }
-  return false;
-}
-
 bool grin_insert_int32_to_row(GRIN_GRAPH g, GRIN_ROW r, int value) {
   auto _r = static_cast<GRIN_ROW_T*>(r);
   _r->push_back(value);
@@ -270,6 +197,11 @@ bool grin_insert_timestamp64_to_row(GRIN_GRAPH g, GRIN_ROW r,
 }
 #endif
 
+#if defined(GRIN_ENABLE_ROW) && defined(GRIN_TRAIT_CONST_VALUE_PTR)
+const void* grin_get_value_from_row(GRIN_GRAPH, GRIN_ROW, GRIN_DATATYPE,
+                                    size_t);
+#endif
+
 #ifdef GRIN_ENABLE_VERTEX_PROPERTY_TABLE
 void grin_destroy_vertex_property_table(GRIN_GRAPH g,
                                         GRIN_VERTEX_PROPERTY_TABLE vpt) {
@@ -279,49 +211,6 @@ void grin_destroy_vertex_property_table(GRIN_GRAPH g,
 GRIN_VERTEX_PROPERTY_TABLE grin_get_vertex_property_table_by_type(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
   return vtype;
-}
-
-const void* grin_get_value_from_vertex_property_table(
-    GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
-    GRIN_VERTEX_PROPERTY vp) {
-  auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _v = static_cast<GRIN_VERTEX_T*>(v);
-  auto& property = _g->vertex_properties[vp];
-  __grin_check_vertex_property(_v, NULL);
-  __grin_get_gar_vertex(_v);
-
-  switch (property.type) {
-  case GRIN_DATATYPE::Int32: {
-    auto value = new int32_t(
-        _v->vertex.value().property<int32_t>(property.name).value());
-    return value;
-  }
-  case GRIN_DATATYPE::Int64: {
-    auto value = new int64_t(
-        _v->vertex.value().property<int64_t>(property.name).value());
-    return value;
-  }
-  case GRIN_DATATYPE::Float: {
-    auto value =
-        new float(_v->vertex.value().property<float>(property.name).value());
-    return value;
-  }
-  case GRIN_DATATYPE::Double: {
-    auto value =
-        new double(_v->vertex.value().property<double>(property.name).value());
-    return value;
-  }
-  case GRIN_DATATYPE::String: {
-    auto s = _v->vertex.value().property<std::string>(property.name).value();
-    int len = s.length() + 1;
-    char* out = new char[len];
-    snprintf(out, len, "%s", s.c_str());
-    return out;
-  }
-  default:
-    grin_error_code = UNKNOWN_DATATYPE;
-    return NULL;
-  }
 }
 
 int grin_get_int32_from_vertex_property_table(GRIN_GRAPH g,
@@ -441,7 +330,12 @@ long long int grin_get_timestamp64_from_vertex_property_table(
   __grin_get_gar_vertex(_v);
   return _v->vertex.value().property<int64_t>(property.name).value();
 }
+#endif
 
+#if defined(GRIN_ENABLE_VERTEX_PROPERTY_TABLE) && \
+    defined(GRIN_TRAIT_CONST_VALUE_PTR)
+const void* grin_get_value_from_vertex_property_table(
+    GRIN_GRAPH, GRIN_VERTEX_PROPERTY_TABLE, GRIN_VERTEX, GRIN_VERTEX_PROPERTY);
 #endif
 
 #if defined(GRIN_ENABLE_VERTEX_PROPERTY_TABLE) && defined(GRIN_ENABLE_ROW)
@@ -516,45 +410,6 @@ void grin_destroy_edge_property_table(GRIN_GRAPH g,
 GRIN_EDGE_PROPERTY_TABLE grin_get_edge_property_table_by_type(
     GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
   return etype;
-}
-
-const void* grin_get_value_from_edge_property_table(
-    GRIN_GRAPH g, GRIN_EDGE_PROPERTY_TABLE ept, GRIN_EDGE e,
-    GRIN_EDGE_PROPERTY ep) {
-  auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _e = static_cast<GRIN_EDGE_T*>(e);
-  auto& property = _g->edge_properties[ep];
-  __grin_check_edge_property(_e, NULL);
-
-  switch (property.type) {
-  case GRIN_DATATYPE::Int32: {
-    auto value = new int32_t(_e->edge.property<int32_t>(property.name).value());
-    return value;
-  }
-  case GRIN_DATATYPE::Int64: {
-    auto value = new int64_t(_e->edge.property<int64_t>(property.name).value());
-    return value;
-  }
-  case GRIN_DATATYPE::Float: {
-    auto value = new float(_e->edge.property<float>(property.name).value());
-    return value;
-  }
-  case GRIN_DATATYPE::Double: {
-    auto value = new double(_e->edge.property<double>(property.name).value());
-    return value;
-  }
-  case GRIN_DATATYPE::String: {
-    auto s = _e->edge.property<std::string>(property.name).value();
-    int len = s.length() + 1;
-    char* out = new char[len];
-    snprintf(out, len, "%s", s.c_str());
-    return out;
-  }
-  default:
-    grin_error_code = UNKNOWN_DATATYPE;
-    return NULL;
-  }
-  return NULL;
 }
 
 int grin_get_int32_from_edge_property_table(GRIN_GRAPH g,
@@ -665,7 +520,14 @@ long long int grin_get_timestamp64_from_edge_property_table(
   __grin_check_edge_property(_e, 0);
   return _e->edge.property<int64_t>(property.name).value();
 }
+#endif
 
+#if defined(GRIN_ENABLE_EDGE_PROPERTY_TABLE) && \
+    defined(GRIN_TRAIT_CONST_VALUE_PTR)
+const void* grin_get_value_from_edge_property_table(GRIN_GRAPH,
+                                                    GRIN_EDGE_PROPERTY_TABLE,
+                                                    GRIN_EDGE,
+                                                    GRIN_EDGE_PROPERTY);
 #endif
 
 #if defined(GRIN_ENABLE_EDGE_PROPERTY_TABLE) && defined(GRIN_ENABLE_ROW)
