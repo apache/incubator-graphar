@@ -23,14 +23,15 @@ GRIN_DATATYPE grin_get_vertex_original_id_datatype(GRIN_GRAPH g) {
 }
 
 #ifdef GRIN_ENABLE_VERTEX_ORIGINAL_ID_OF_INT64
-long long int grin_get_vertex_original_id_of_int64(GRIN_GRAPH g,
+long long int grin_get_vertex_original_id_of_int64(GRIN_GRAPH g,  // NOLINT
                                                    GRIN_VERTEX v) {
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
   return __grin_generate_int64_from_id_and_type(_v->id, _v->type_id);
 }
 
-GRIN_VERTEX grin_get_vertex_by_original_id_of_int64(GRIN_GRAPH g,
-                                                    long long int oid) {
+GRIN_VERTEX grin_get_vertex_by_original_id_of_int64(
+    GRIN_GRAPH g,
+    long long int oid) {  // NOLINT
   auto pair = __grin_generate_id_and_type_from_int64(oid);
   auto v = new GRIN_VERTEX_T(pair.first, pair.second);
   return v;

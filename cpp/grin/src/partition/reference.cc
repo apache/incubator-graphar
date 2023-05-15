@@ -81,14 +81,15 @@ bool grin_is_mirror_vertex(GRIN_GRAPH g, GRIN_VERTEX v) {
 #endif
 
 #ifdef GRIN_TRAIT_FAST_VERTEX_REF
-long long int grin_serialize_vertex_ref_as_int64(GRIN_GRAPH g,
+long long int grin_serialize_vertex_ref_as_int64(GRIN_GRAPH g,  // NOLINT
                                                  GRIN_VERTEX_REF vr) {
   auto _vr = static_cast<GRIN_VERTEX_REF_T*>(vr);
   return __grin_generate_int64_from_id_and_type(_vr->id, _vr->type_id);
 }
 
-GRIN_VERTEX_REF grin_deserialize_int64_to_vertex_ref(GRIN_GRAPH g,
-                                                     long long int svr) {
+GRIN_VERTEX_REF grin_deserialize_int64_to_vertex_ref(
+    GRIN_GRAPH g,
+    long long int svr) {  // NOLINT
   auto pair = __grin_generate_id_and_type_from_int64(svr);
   return new GRIN_VERTEX_REF_T(pair.first, pair.second);
 }

@@ -17,7 +17,6 @@ extern "C" {
 #include "grin/include/property/propertytable.h"
 #include "grin/include/common/error.h"
 }
-#include <iostream>
 #include "grin/src/predefine.h"
 
 #define __grin_get_gar_vertex(_v)                           \
@@ -73,13 +72,15 @@ unsigned int grin_get_uint32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
   return std::any_cast<uint32_t>((*_r)[idx]);
 }
 
-long long int grin_get_int64_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
+long long int grin_get_int64_from_row(GRIN_GRAPH g, GRIN_ROW r,
+                                      size_t idx) {  // NOLINT
   auto _r = static_cast<GRIN_ROW_T*>(r);
   __grin_check_row(_r, 0);
   return std::any_cast<int64_t>((*_r)[idx]);
 }
 
-unsigned long long int grin_get_uint64_from_row(GRIN_GRAPH g, GRIN_ROW r,
+unsigned long long int grin_get_uint64_from_row(GRIN_GRAPH g,
+                                                GRIN_ROW r,  // NOLINT
                                                 size_t idx) {
   auto _r = static_cast<GRIN_ROW_T*>(r);
   __grin_check_row(_r, 0);
@@ -116,7 +117,7 @@ int grin_get_time32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
   return std::any_cast<int32_t>((*_r)[idx]);
 }
 
-long long int grin_get_timestamp64_from_row(GRIN_GRAPH g, GRIN_ROW r,
+long long int grin_get_timestamp64_from_row(GRIN_GRAPH g, GRIN_ROW r,  // NOLINT
                                             size_t idx) {
   auto _r = static_cast<GRIN_ROW_T*>(r);
   __grin_check_row(_r, 0);
@@ -140,14 +141,15 @@ bool grin_insert_uint32_to_row(GRIN_GRAPH g, GRIN_ROW r, unsigned int value) {
   return true;
 }
 
-bool grin_insert_int64_to_row(GRIN_GRAPH g, GRIN_ROW r, long long int value) {
+bool grin_insert_int64_to_row(GRIN_GRAPH g, GRIN_ROW r,
+                              long long int value) {  // NOLINT
   auto _r = static_cast<GRIN_ROW_T*>(r);
   _r->push_back(value);
   return true;
 }
 
 bool grin_insert_uint64_to_row(GRIN_GRAPH g, GRIN_ROW r,
-                               unsigned long long int value) {
+                               unsigned long long int value) {  // NOLINT
   auto _r = static_cast<GRIN_ROW_T*>(r);
   _r->push_back(value);
   return true;
@@ -184,7 +186,7 @@ bool grin_insert_time32_to_row(GRIN_GRAPH g, GRIN_ROW r, int value) {
 }
 
 bool grin_insert_timestamp64_to_row(GRIN_GRAPH g, GRIN_ROW r,
-                                    long long int value) {
+                                    long long int value) {  // NOLINT
   auto _r = static_cast<GRIN_ROW_T*>(r);
   _r->push_back(value);
   return true;
@@ -230,7 +232,7 @@ unsigned int grin_get_uint32_from_vertex_property_table(
   return _v->vertex.value().property<uint32_t>(property.name).value();
 }
 
-long long int grin_get_int64_from_vertex_property_table(
+long long int grin_get_int64_from_vertex_property_table(  // NOLINT
     GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
     GRIN_VERTEX_PROPERTY vp) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
@@ -241,7 +243,7 @@ long long int grin_get_int64_from_vertex_property_table(
   return _v->vertex.value().property<int64_t>(property.name).value();
 }
 
-unsigned long long int grin_get_uint64_from_vertex_property_table(
+unsigned long long int grin_get_uint64_from_vertex_property_table(  // NOLINT
     GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
     GRIN_VERTEX_PROPERTY vp) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
@@ -313,7 +315,7 @@ int grin_get_time32_from_vertex_property_table(GRIN_GRAPH g,
   return _v->vertex.value().property<int32_t>(property.name).value();
 }
 
-long long int grin_get_timestamp64_from_vertex_property_table(
+long long int grin_get_timestamp64_from_vertex_property_table(  // NOLINT
     GRIN_GRAPH g, GRIN_VERTEX_PROPERTY_TABLE vpt, GRIN_VERTEX v,
     GRIN_VERTEX_PROPERTY vp) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
@@ -426,7 +428,7 @@ unsigned int grin_get_uint32_from_edge_property_table(
   return _e->edge.property<uint32_t>(property.name).value();
 }
 
-long long int grin_get_int64_from_edge_property_table(
+long long int grin_get_int64_from_edge_property_table(  // NOLINT
     GRIN_GRAPH g, GRIN_EDGE_PROPERTY_TABLE ept, GRIN_EDGE e,
     GRIN_EDGE_PROPERTY ep) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
@@ -436,7 +438,7 @@ long long int grin_get_int64_from_edge_property_table(
   return _e->edge.property<int64_t>(property.name).value();
 }
 
-unsigned long long int grin_get_uint64_from_edge_property_table(
+unsigned long long int grin_get_uint64_from_edge_property_table(  // NOLINT
     GRIN_GRAPH g, GRIN_EDGE_PROPERTY_TABLE ept, GRIN_EDGE e,
     GRIN_EDGE_PROPERTY ep) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
@@ -500,7 +502,7 @@ int grin_get_time32_from_edge_property_table(GRIN_GRAPH g,
   return _e->edge.property<int32_t>(property.name).value();
 }
 
-long long int grin_get_timestamp64_from_edge_property_table(
+long long int grin_get_timestamp64_from_edge_property_table(  // NOLINT
     GRIN_GRAPH g, GRIN_EDGE_PROPERTY_TABLE ept, GRIN_EDGE e,
     GRIN_EDGE_PROPERTY ep) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
