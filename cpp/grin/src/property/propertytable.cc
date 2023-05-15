@@ -54,7 +54,8 @@ extern "C" {
   }
 
 void grin_destroy_string_value(GRIN_GRAPH g, const char* value) {
-  delete[] value;
+  if (value != NULL)
+    delete[] value;
 }
 
 #ifdef GRIN_ENABLE_ROW

@@ -443,6 +443,7 @@ void test_property_vertex_table(int argc, char** argv) {
         const char* vp_name = "unknown";
 #endif
         GRIN_DATATYPE dt = grin_get_vertex_property_datatype(g, vp);
+#ifdef GRIN_TRAIT_CONST_VALUE_PTR
         const void* pv =
             grin_get_value_from_vertex_property_table(g, vpt, v, vp);
         if (grin_get_last_error_code() == NO_ERROR) {
@@ -460,6 +461,31 @@ void test_property_vertex_table(int argc, char** argv) {
         }
         // grin_destroy_value(g, dt, pv);
         // grin_destroy_value(g, dt, rv);
+#else
+        if (dt == Int64) {
+          long long int pv =
+              grin_get_int64_from_vertex_property_table(g, vpt, v, vp);
+          if (grin_get_last_error_code() == NO_ERROR) {
+            printf("(Correct) no error\n");
+          } else {
+            printf("(Wrong) error code: %d\n", grin_get_last_error_code());
+          }
+          long long int rv = grin_get_int64_from_row(g, row, j);
+          printf("vp_id %u v%zu %s value: %lld %lld\n", id, i, vp_name, pv, rv);
+        } else if (dt == String) {
+          const char* pv =
+              grin_get_string_from_vertex_property_table(g, vpt, v, vp);
+          if (grin_get_last_error_code() == NO_ERROR) {
+            printf("(Correct) no error\n");
+          } else {
+            printf("(Wrong) error code: %d\n", grin_get_last_error_code());
+          }
+          const char* rv = grin_get_string_from_row(g, row, j);
+          printf("vp_id %u v%zu %s value: %s %s\n", id, i, vp_name, pv, rv);
+          grin_destroy_string_value(g, pv);
+          grin_destroy_string_value(g, rv);
+        }
+#endif
         grin_destroy_vertex_property(g, vp);
       }
       grin_destroy_row(g, row);
@@ -603,6 +629,7 @@ void test_property_edge_table(int argc, char** argv) {
         unsigned int id = ~0;
 #endif
         GRIN_DATATYPE dt = grin_get_edge_property_datatype(g, ep);
+#ifdef GRIN_TRAIT_CONST_VALUE_PTR
         const void* pv = grin_get_value_from_edge_property_table(g, ept, e, ep);
         const void* rv = grin_get_value_from_row(g, row, dt, k);
         if (dt == Int64) {
@@ -619,6 +646,25 @@ void test_property_edge_table(int argc, char** argv) {
         // grin_destroy_name(g, ep_name);
         // grin_destroy_value(g, dt, pv);
         // grin_destroy_value(g, dt, rv);
+#else
+        if (dt == Int64) {
+          long long int pv =
+              grin_get_int64_from_edge_property_table(g, ept, e, ep);
+          long long int rv = grin_get_int64_from_row(g, row, k);
+          printf("ep_id %u e%zu %s value: %lld %lld\n", id, j, ep_name, pv, rv);
+        } else if (dt == String) {
+          const char* pv =
+              grin_get_string_from_edge_property_table(g, ept, e, ep);
+          const char* rv = grin_get_string_from_row(g, row, k);
+          printf("ep_id %u e%zu %s value: %s %s\n", id, j, ep_name, pv, rv);
+          grin_destroy_string_value(g, pv);
+          grin_destroy_string_value(g, rv);
+        } else if (dt == Double) {
+          double pv = grin_get_double_from_edge_property_table(g, ept, e, ep);
+          double rv = grin_get_double_from_row(g, row, k);
+          printf("ep_id %u e%zu %s value: %f %f\n", id, j, ep_name, pv, rv);
+        }
+#endif
       }
 
       grin_destroy_row(g, row);
@@ -797,7 +843,11 @@ void test_error_code(int argc, char** argv) {
       grin_get_vertex_property_table_by_type(g, vt1);
   GRIN_VERTEX v = get_one_vertex(g);
 
+#ifdef GRIN_TRAIT_CONST_VALUE_PTR
   const void* value = grin_get_value_from_vertex_property_table(g, vpt, v, vp);
+#else
+  const char* value = grin_get_string_from_vertex_property_table(g, vpt, v, vp);
+#endif
   if (grin_get_last_error_code() == INVALID_VALUE) {
     printf("(Correct) invalid value\n");
   } else {
