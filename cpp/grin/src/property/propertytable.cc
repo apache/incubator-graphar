@@ -53,10 +53,7 @@ extern "C" {
     return x;                                                      \
   }
 
-void grin_destroy_string_value(GRIN_GRAPH g, const char* value) {
-  if (value != NULL)
-    delete[] value;
-}
+void grin_destroy_string_value(GRIN_GRAPH g, const char* value) {}
 
 #ifdef GRIN_ENABLE_ROW
 void grin_destroy_row(GRIN_GRAPH g, GRIN_ROW r) {
@@ -104,11 +101,7 @@ double grin_get_double_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
 const char* grin_get_string_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
   auto _r = static_cast<GRIN_ROW_T*>(r);
   __grin_check_row(_r, NULL);
-  auto&& s = std::any_cast<std::string>((*_r)[idx]);
-  int len = s.length() + 1;
-  char* out = new char[len];
-  snprintf(out, len, "%s", s.c_str());
-  return out;
+  return std::any_cast<const std::string&>((*_r)[idx]).c_str();
 }
 
 int grin_get_date32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
@@ -290,11 +283,10 @@ const char* grin_get_string_from_vertex_property_table(
   auto& property = _g->vertex_properties[vp];
   __grin_check_vertex_property(_v, NULL);
   __grin_get_gar_vertex(_v);
-  auto s = _v->vertex.value().property<std::string>(property.name).value();
-  int len = s.length() + 1;
-  char* out = new char[len];
-  snprintf(out, len, "%s", s.c_str());
-  return out;
+  return _v->vertex.value()
+      .property<const std::string&>(property.name)
+      .value()
+      .c_str();
 }
 
 int grin_get_date32_from_vertex_property_table(GRIN_GRAPH g,
@@ -483,11 +475,7 @@ const char* grin_get_string_from_edge_property_table(
   auto _e = static_cast<GRIN_EDGE_T*>(e);
   auto& property = _g->edge_properties[ep];
   __grin_check_edge_property(_e, NULL);
-  auto s = _e->edge.property<std::string>(property.name).value();
-  int len = s.length() + 1;
-  char* out = new char[len];
-  snprintf(out, len, "%s", s.c_str());
-  return out;
+  return _e->edge.property<const std::string&>(property.name).value().c_str();
 }
 
 int grin_get_date32_from_edge_property_table(GRIN_GRAPH g,
