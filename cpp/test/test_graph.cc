@@ -49,6 +49,12 @@ TEST_CASE("test_vertices_collection") {
               << ", id=" << vertex.property<int64_t>("id").value()
               << ", firstName="
               << vertex.property<std::string>("firstName").value() << std::endl;
+    // access data reference through vertex
+    REQUIRE(vertex.property<int64_t>("id").value() ==
+            vertex.property<const int64_t&>("id").value());
+    REQUIRE(vertex.property<std::string>("firstName").value() ==
+            vertex.property<const std::string&>("firstName").value());
+    REQUIRE(vertex.property<const std::string&>("id").has_error());
     count++;
   }
   auto it_last = vertices.begin() + (count - 1);
@@ -88,11 +94,18 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   size_t count = 0;
   for (auto it = edges.begin(); it != end; ++it) {
     // access data through iterator directly
-    std::cout << "src=" << it.source() << ", dst=" << it.destination()
-              << std::endl;
+    std::cout << "src=" << it.source() << ", dst=" << it.destination() << " ";
+    // access data through edge
     auto edge = *it;
-    std::cout << "src=" << edge.source() << ", dst=" << edge.destination()
+    REQUIRE(edge.source() == it.source());
+    REQUIRE(edge.destination() == it.destination());
+    std::cout << "creationDate="
+              << edge.property<std::string>("creationDate").value()
               << std::endl;
+    // access data reference through edge
+    REQUIRE(edge.property<std::string>("creationDate").value() ==
+            edge.property<const std::string&>("creationDate").value());
+    REQUIRE(edge.property<const int64_t&>("creationDate").has_error());
     count++;
   }
   std::cout << "edge_count=" << count << std::endl;

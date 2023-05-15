@@ -66,16 +66,15 @@ class Vertex {
    */
   template <typename T>
   inline Result<T> property(const std::string& property) noexcept {
-    T ret;
     if (properties_.find(property) == properties_.end()) {
       return Status::KeyError("The property is not exist.");
     }
     try {
-      ret = std::any_cast<T>(properties_[property]);
+      T ret = std::any_cast<T>(properties_[property]);
+      return ret;
     } catch (const std::bad_any_cast& e) {
       return Status::TypeError("The property type is not match.");
     }
-    return ret;
   }
 
  private:
@@ -120,16 +119,15 @@ class Edge {
    */
   template <typename T>
   inline Result<T> property(const std::string& property) noexcept {
-    T ret;
     if (properties_.find(property) == properties_.end()) {
       return Status::KeyError("The property is not exist.");
     }
     try {
-      ret = std::any_cast<T>(properties_[property]);
+      T ret = std::any_cast<T>(properties_[property]);
+      return ret;
     } catch (const std::bad_any_cast& e) {
       return Status::TypeError("The property type is not match.");
     }
-    return ret;
   }
 
  private:
