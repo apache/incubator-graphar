@@ -819,6 +819,8 @@ typedef enum {
 #define GRIN_NULL_NATURAL_ID (unsigned)~0
 /** @brief Null size (invalid return value) */
 #define GRIN_NULL_SIZE (unsigned)~0
+/** @breif Null name (invalid return value) */
+#define GRIN_NULL_NAME NULL
 ///@}
 
 
