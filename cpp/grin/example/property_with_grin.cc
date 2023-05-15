@@ -64,37 +64,48 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
       for (auto idx = 0; idx < vpn; idx++) {
         auto property =
             grin_get_vertex_property_from_list(graph, property_list, idx);
-        auto data_type = grin_get_vertex_property_data_type(graph, property);
-        auto value = grin_get_value_from_vertex_property_table(graph, table, v,
-                                                               property);
-        if (print_result) {
-          switch (data_type) {
-          case GRIN_DATATYPE::Int32: {
-            std::cout << *static_cast<const int32_t*>(value) << "; ";
-            break;
-          }
-          case GRIN_DATATYPE::Int64: {
-            std::cout << *static_cast<const int64_t*>(value) << "; ";
-            break;
-          }
-          case GRIN_DATATYPE::Float: {
-            std::cout << *static_cast<const float*>(value) << "; ";
-            break;
-          }
-          case GRIN_DATATYPE::Double: {
-            std::cout << *static_cast<const double*>(value) << "; ";
-            break;
-          }
-          case GRIN_DATATYPE::String: {
-            std::cout << static_cast<const char*>(value) << "; ";
-            break;
-          }
-          default:
-            std::cout << "Unsupported data type." << std::endl;
-          }
+        auto data_type = grin_get_vertex_property_datatype(graph, property);
+        switch (data_type) {
+        case GRIN_DATATYPE::Int32: {
+          auto value = grin_get_int32_from_vertex_property_table(graph, table,
+                                                                 v, property);
+          if (print_result)
+            std::cout << value << "; ";
+          break;
+        }
+        case GRIN_DATATYPE::Int64: {
+          auto value = grin_get_int64_from_vertex_property_table(graph, table,
+                                                                 v, property);
+          if (print_result)
+            std::cout << value << "; ";
+          break;
+        }
+        case GRIN_DATATYPE::Float: {
+          auto value = grin_get_float_from_vertex_property_table(graph, table,
+                                                                 v, property);
+          if (print_result)
+            std::cout << value << "; ";
+          break;
+        }
+        case GRIN_DATATYPE::Double: {
+          auto value = grin_get_double_from_vertex_property_table(graph, table,
+                                                                  v, property);
+          if (print_result)
+            std::cout << value << "; ";
+          break;
+        }
+        case GRIN_DATATYPE::String: {
+          auto value = grin_get_string_from_vertex_property_table(graph, table,
+                                                                  v, property);
+          if (print_result)
+            std::cout << value << "; ";
+          grin_destroy_string_value(graph, value);
+          break;
+        }
+        default:
+          std::cout << "Unsupported data type." << std::endl;
         }
         grin_destroy_vertex_property(graph, property);
-        grin_destroy_value(graph, data_type, value);
       }
       if (print_result) {
         std::cout << std::endl;
@@ -106,7 +117,6 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
     std::cout << std::endl;
     // destroy
     grin_destroy_vertex_list_iter(graph, it);
-    grin_destroy_name(graph, label);
     grin_destroy_vertex_type(graph, vertex_type);
     grin_destroy_vertex_list(graph, select_vertex_list);
     grin_destroy_vertex_property_table(graph, table);
@@ -152,36 +162,47 @@ void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
       for (auto idx = 0; idx < epn; idx++) {
         auto property =
             grin_get_edge_property_from_list(graph, property_list, idx);
-        auto data_type = grin_get_edge_property_data_type(graph, property);
-        auto value =
-            grin_get_value_from_edge_property_table(graph, table, e, property);
-        if (print_result) {
-          switch (data_type) {
-          case GRIN_DATATYPE::Int32: {
-            std::cout << *static_cast<const int32_t*>(value) << "; ";
-            break;
-          }
-          case GRIN_DATATYPE::Int64: {
-            std::cout << *static_cast<const int64_t*>(value) << "; ";
-            break;
-          }
-          case GRIN_DATATYPE::Float: {
-            std::cout << *static_cast<const float*>(value) << "; ";
-            break;
-          }
-          case GRIN_DATATYPE::Double: {
-            std::cout << *static_cast<const double*>(value) << "; ";
-            break;
-          }
-          case GRIN_DATATYPE::String: {
-            std::cout << static_cast<const char*>(value) << "; ";
-            break;
-          }
-          default:
-            std::cout << "Unsupported data type." << std::endl;
-          }
+        auto data_type = grin_get_edge_property_datatype(graph, property);
+        switch (data_type) {
+        case GRIN_DATATYPE::Int32: {
+          auto value = grin_get_int32_from_edge_property_table(graph, table, e,
+                                                               property);
+          if (print_result)
+            std::cout << value << "; ";
+          break;
         }
-        grin_destroy_value(graph, data_type, value);
+        case GRIN_DATATYPE::Int64: {
+          auto value = grin_get_int64_from_edge_property_table(graph, table, e,
+                                                               property);
+          if (print_result)
+            std::cout << value << "; ";
+          break;
+        }
+        case GRIN_DATATYPE::Float: {
+          auto value = grin_get_float_from_edge_property_table(graph, table, e,
+                                                               property);
+          if (print_result)
+            std::cout << value << "; ";
+          break;
+        }
+        case GRIN_DATATYPE::Double: {
+          auto value = grin_get_double_from_edge_property_table(graph, table, e,
+                                                                property);
+          if (print_result)
+            std::cout << value << "; ";
+          break;
+        }
+        case GRIN_DATATYPE::String: {
+          auto value = grin_get_string_from_edge_property_table(graph, table, e,
+                                                                property);
+          if (print_result)
+            std::cout << value << "; ";
+          grin_destroy_string_value(graph, value);
+          break;
+        }
+        default:
+          std::cout << "Unsupported data type." << std::endl;
+        }
         grin_destroy_edge_property(graph, property);
       }
       if (print_result) {
@@ -194,7 +215,6 @@ void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
 
     // destroy
     grin_destroy_edge_list_iter(graph, it);
-    grin_destroy_name(graph, label);
     grin_destroy_edge_type(graph, edge_type);
     grin_destroy_edge_list(graph, select_edge_list);
     grin_destroy_edge_property_table(graph, table);

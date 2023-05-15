@@ -344,6 +344,28 @@ __grin_generate_id_and_type_from_int64(int64_t svr) {
   return {_id, _type_id};
 }
 
+GAR_NAMESPACE::IdType __grin_get_vertex_id_from_partitioned_vertex_id(
+    GRIN_GRAPH_T* graph, unsigned vtype, unsigned partition_id,
+    GAR_PARTITION_STRATEGY partition_strategy,
+    GAR_NAMESPACE::IdType id_in_parition) {
+  if (partition_strategy == SEGMENTED_PARTITION) {
+    return graph->partitioned_vertex_offsets[vtype][partition_id] +
+           id_in_parition;
+  } else {  // HASH_PARTITION
+    return graph->partition_num * id_in_parition + partition_id;
+  }
+}
+
+GAR_NAMESPACE::IdType __grin_get_partitioned_vertex_id_from_vertex_id(
+    GRIN_GRAPH_T* graph, unsigned vtype, unsigned partition_id,
+    GAR_PARTITION_STRATEGY partition_strategy, GAR_NAMESPACE::IdType vid) {
+  if (partition_strategy == SEGMENTED_PARTITION) {
+    return vid - graph->partitioned_vertex_offsets[vtype][partition_id];
+  } else {  // HASH_PARTITION
+    return vid / graph->partition_num;
+  }
+}
+
 unsigned __grin_get_master_partition_id(GRIN_GRAPH_T* graph,
                                         GAR_NAMESPACE::IdType id,
                                         unsigned type_id) {
@@ -381,28 +403,6 @@ size_t __grin_get_paritioned_vertex_num(
     if (partition_id < vertex_num % graph->partition_num)
       partitioned_vertex_num++;
     return partitioned_vertex_num;
-  }
-}
-
-GAR_NAMESPACE::IdType __grin_get_vertex_id_from_partitioned_vertex_id(
-    GRIN_GRAPH_T* graph, unsigned vtype, unsigned partition_id,
-    GAR_PARTITION_STRATEGY partition_strategy,
-    GAR_NAMESPACE::IdType id_in_parition) {
-  if (partition_strategy == SEGMENTED_PARTITION) {
-    return graph->partitioned_vertex_offsets[vtype][partition_id] +
-           id_in_parition;
-  } else {  // HASH_PARTITION
-    return graph->partition_num * id_in_parition + partition_id;
-  }
-}
-
-GAR_NAMESPACE::IdType __grin_get_partitioned_vertex_id_from_vertex_id(
-    GRIN_GRAPH_T* graph, unsigned vtype, unsigned partition_id,
-    GAR_PARTITION_STRATEGY partition_strategy, GAR_NAMESPACE::IdType vid) {
-  if (partition_strategy == SEGMENTED_PARTITION) {
-    return vid - graph->partitioned_vertex_offsets[vtype][partition_id];
-  } else {  // HASH_PARTITION
-    return vid / graph->partition_num;
   }
 }
 

@@ -21,7 +21,7 @@ limitations under the License.
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/include/index/order.h"
+#include "grin/include/index/original_id.h"
 #include "grin/include/property/property.h"
 #include "grin/include/property/propertytable.h"
 #include "grin/include/property/type.h"
@@ -64,8 +64,7 @@ void run_cc(GRIN_GRAPH graph, bool print_result = false) {
         while (grin_is_adjacent_list_end(graph, it_out) == false) {
           // get neighbor
           auto nbr = grin_get_neighbor_from_adjacent_list_iter(graph, it_out);
-          auto nbr_id = grin_get_position_of_vertex_from_sorted_list(
-              graph, vertex_list, nbr);
+          auto nbr_id = grin_get_vertex_original_id_of_int64(graph, nbr);
           grin_destroy_vertex(graph, nbr);
           // update
           if (component[vid] < component[nbr_id]) {
@@ -84,8 +83,7 @@ void run_cc(GRIN_GRAPH graph, bool print_result = false) {
         while (grin_is_adjacent_list_end(graph, it_in) == false) {
           // get neighbor
           auto nbr = grin_get_neighbor_from_adjacent_list_iter(graph, it_in);
-          auto nbr_id = grin_get_position_of_vertex_from_sorted_list(
-              graph, vertex_list, nbr);
+          auto nbr_id = grin_get_vertex_original_id_of_int64(graph, nbr);
           grin_destroy_vertex(graph, nbr);
           // update
           if (component[vid] < component[nbr_id]) {

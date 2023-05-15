@@ -313,17 +313,19 @@ int64_t __grin_generate_int64_from_id_and_type(GAR_NAMESPACE::IdType, unsigned);
 std::pair<GAR_NAMESPACE::IdType, unsigned>
     __grin_generate_id_and_type_from_int64(int64_t);
 
-// mapping between vertices with partitions
-unsigned __grin_get_master_partition_id(GRIN_GRAPH_T*, GAR_NAMESPACE::IdType,
-                                        unsigned);
-size_t __grin_get_paritioned_vertex_num(GRIN_GRAPH_T*, unsigned, unsigned,
-                                        GAR_PARTITION_STRATEGY);
+// mapping between vertex id and partitioned vertex id
 GAR_NAMESPACE::IdType __grin_get_vertex_id_from_partitioned_vertex_id(
     GRIN_GRAPH_T*, unsigned, unsigned, GAR_PARTITION_STRATEGY,
     GAR_NAMESPACE::IdType);
 GAR_NAMESPACE::IdType __grin_get_partitioned_vertex_id_from_vertex_id(
     GRIN_GRAPH_T*, unsigned, unsigned, GAR_PARTITION_STRATEGY,
     GAR_NAMESPACE::IdType);
+
+// mapping between vertices with partitions
+unsigned __grin_get_master_partition_id(GRIN_GRAPH_T*, GAR_NAMESPACE::IdType,
+                                        unsigned);
+size_t __grin_get_paritioned_vertex_num(GRIN_GRAPH_T*, unsigned, unsigned,
+                                        GAR_PARTITION_STRATEGY);
 GAR_NAMESPACE::IdType __grin_get_first_vertex_id_in_partition(
     GRIN_GRAPH_T*, unsigned, unsigned, GAR_PARTITION_STRATEGY);
 GAR_NAMESPACE::IdType __grin_get_next_vertex_id_in_partition(

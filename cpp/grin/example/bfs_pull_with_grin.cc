@@ -20,7 +20,7 @@ limitations under the License.
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/include/index/order.h"
+#include "grin/include/index/original_id.h"
 #include "grin/include/property/property.h"
 #include "grin/include/property/propertytable.h"
 #include "grin/include/property/type.h"
@@ -56,8 +56,7 @@ void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
         while (grin_is_adjacent_list_end(graph, it) == false) {
           // get neighbor
           auto nbr = grin_get_neighbor_from_adjacent_list_iter(graph, it);
-          auto nbr_id = grin_get_position_of_vertex_from_sorted_list(
-              graph, vertex_list, nbr);
+          auto nbr_id = grin_get_vertex_original_id_of_int64(graph, nbr);
           grin_destroy_vertex(graph, nbr);
           // update
           if (distance[nbr_id] == iter) {
@@ -82,32 +81,31 @@ void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
   // output results
   if (print_result) {
     std::cout << "num_vertices: " << num_vertices << std::endl;
+    auto type = grin_get_vertex_type_by_name(graph, "person");
+    auto table = grin_get_vertex_property_table_by_type(graph, type);
+    auto property = grin_get_vertex_property_by_name(graph, type, "id");
+    auto data_type = grin_get_vertex_property_datatype(graph, property);
+
     for (size_t i = 0; i < num_vertices; i++) {
       // get vertex
       auto v = grin_get_vertex_from_list(graph, vertex_list, i);
-
-      // get property "id" of vertex
-      auto type = grin_get_vertex_type(graph, v);
-      auto table = grin_get_vertex_property_table_by_type(graph, type);
-      auto property = grin_get_vertex_property_by_name(graph, type, "id");
-      auto data_type = grin_get_vertex_property_data_type(graph, property);
-      auto value =
-          grin_get_value_from_vertex_property_table(graph, table, v, property);
-
       // output
       std::cout << "vertex " << i;
       if (data_type == GRIN_DATATYPE::Int64) {
-        std::cout << ", id = " << *static_cast<const int64_t*>(value);
+        // get property "id" of vertex
+        auto value = grin_get_int64_from_vertex_property_table(graph, table, v,
+                                                               property);
+        std::cout << ", id = " << value;
       }
       std::cout << ", distance = " << distance[i] << std::endl;
-
-      // destroy
-      grin_destroy_value(graph, data_type, value);
-      grin_destroy_vertex_property(graph, property);
-      grin_destroy_vertex_property_table(graph, table);
-      grin_destroy_vertex_type(graph, type);
+      // destroy vertex
       grin_destroy_vertex(graph, v);
     }
+
+    // destroy
+    grin_destroy_vertex_property(graph, property);
+    grin_destroy_vertex_property_table(graph, table);
+    grin_destroy_vertex_type(graph, type);
   }
 
   grin_destroy_vertex_list(graph, vertex_list);
