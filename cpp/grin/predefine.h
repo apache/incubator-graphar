@@ -789,8 +789,6 @@ typedef enum {
  * Macros for Null(invalid) values
  */
 ///@{
-/** @brief Null data type (undefined data type) */
-#define GRIN_NULL_DATATYPE Undefined
 /** @brief Null graph (invalid return value) */
 #define GRIN_NULL_GRAPH NULL
 /** @brief Non-existing vertex (invalid return value) */
