@@ -47,6 +47,8 @@ void test_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
   // destroy vertex list iter
   grin_destroy_vertex_list_iter(g, vl_iter);
 
+  std::cout << "(Correct) check vertex list succeed" << std::endl;
+
   // test vertex order in list
   if (vl_size > 200) {
     size_t idx0 = 100, idx1 = 200;
@@ -63,7 +65,7 @@ void test_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
     grin_destroy_vertex(g, v1);
   }
 
-  std::cout << "(Correct) check vertex list succeed" << std::endl;
+  std::cout << "(Correct) check vertex order succeed" << std::endl;
 }
 
 void test_select_type_for_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
