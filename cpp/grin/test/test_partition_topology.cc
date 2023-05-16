@@ -18,6 +18,7 @@ limitations under the License.
 #include "grin/test/config.h"
 
 extern "C" {
+#include "grin/include/index/order.h"
 #include "grin/include/index/original_id.h"
 #include "grin/include/partition/partition.h"
 #include "grin/include/partition/reference.h"
@@ -38,16 +39,31 @@ void test_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
     auto v1 = grin_get_vertex_from_iter(g, vl_iter);
     assert(grin_equal_vertex(g, v0, v1) == true);
     grin_get_next_vertex_list_iter(g, vl_iter);
+    // destroy vertex
     grin_destroy_vertex(g, v0);
     grin_destroy_vertex(g, v1);
   }
   assert(grin_is_vertex_list_end(g, vl_iter) == true);
-
-  // destroy
+  // destroy vertex list iter
   grin_destroy_vertex_list_iter(g, vl_iter);
 
-  std::cout << "(Correct) check vertex list through array & iter succeed"
-            << std::endl;
+  // test vertex order in list
+  if (vl_size > 200) {
+    size_t idx0 = 100, idx1 = 200;
+    auto v0 = grin_get_vertex_from_list(g, vl, idx0);
+    auto v1 = grin_get_vertex_from_list(g, vl, idx1);
+    assert(grin_smaller_vertex(g, v0, v1) == true);
+    assert(grin_smaller_vertex(g, v1, v0) == false);
+    size_t pos0 = grin_get_position_of_vertex_from_sorted_list(g, vl, v0);
+    size_t pos1 = grin_get_position_of_vertex_from_sorted_list(g, vl, v1);
+    assert(pos0 == idx0);
+    assert(pos1 == idx1);
+    // destroy vertex
+    grin_destroy_vertex(g, v0);
+    grin_destroy_vertex(g, v1);
+  }
+
+  std::cout << "(Correct) check vertex list succeed" << std::endl;
 }
 
 void test_select_type_for_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
