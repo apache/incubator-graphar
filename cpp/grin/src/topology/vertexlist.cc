@@ -36,30 +36,29 @@ size_t grin_get_vertex_list_size(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
 
-  if (_vl->partition_type == ALL_PARTITION) {  // all partition
+  // all partition
+  if (_vl->partition_type == ALL_PARTITION) {
     return _g->vertex_offsets[_vl->type_end] -
            _g->vertex_offsets[_vl->type_begin];
   }
 
-  if (_vl->partition_type == ONE_PARTITION) {  // one partition
-    auto partition_id = _vl->partition_id;
+  // one partition
+  if (_vl->partition_type == ONE_PARTITION) {
     auto tot_size = 0;
     for (auto i = _vl->type_begin; i < _vl->type_end; i++) {
-      auto partitioned_vertex_num = __grin_get_paritioned_vertex_num(
-          _g, i, partition_id, _g->partition_strategy);
-      tot_size += partitioned_vertex_num;
+      tot_size += __grin_get_vertex_num_in_partition(_g, i, _vl->partition_id,
+                                                     _g->partition_strategy);
     }
     return tot_size;
   }
 
-  if (_vl->partition_type == ALL_BUT_ONE_PARTITION) {  // all but one
-    auto partition_id = _vl->partition_id;
+  // all but one partition
+  if (_vl->partition_type == ALL_BUT_ONE_PARTITION) {
     auto tot_size = 0;
     for (auto i = _vl->type_begin; i < _vl->type_end; i++) {
-      auto vertex_num = _g->vertex_offsets[i + 1] - _g->vertex_offsets[i];
-      auto partitioned_vertex_num = __grin_get_paritioned_vertex_num(
-          _g, i, partition_id, _g->partition_strategy);
-      tot_size += vertex_num - partitioned_vertex_num;
+      tot_size += _g->vertex_offsets[i + 1] - _g->vertex_offsets[i];
+      tot_size -= __grin_get_vertex_num_in_partition(_g, i, _vl->partition_id,
+                                                     _g->partition_strategy);
     }
     return tot_size;
   }
@@ -71,7 +70,9 @@ GRIN_VERTEX grin_get_vertex_from_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl,
                                       size_t idx) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
-  if (_vl->partition_type == ALL_PARTITION) {  // all parititon
+
+  // all partition
+  if (_vl->partition_type == ALL_PARTITION) {
     for (auto i = _vl->type_begin; i < _vl->type_end; i++) {
       if (idx <
           _g->vertex_offsets[i + 1] - _g->vertex_offsets[_vl->type_begin]) {
@@ -81,14 +82,17 @@ GRIN_VERTEX grin_get_vertex_from_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl,
         return v;
       }
     }
+    return GRIN_NULL_VERTEX;
   }
 
-  if (_vl->partition_type == ONE_PARTITION) {  // one partition
+  // one partition
+  if (_vl->partition_type == ONE_PARTITION) {
     auto partition_id = _vl->partition_id;
     auto cur = 0;
     for (auto i = _vl->type_begin; i < _vl->type_end; i++) {
-      auto partitioned_vertex_num = __grin_get_paritioned_vertex_num(
+      auto partitioned_vertex_num = __grin_get_vertex_num_in_partition(
           _g, i, partition_id, _g->partition_strategy);
+      // in this type
       if (idx < cur + partitioned_vertex_num) {
         auto _idx = __grin_get_vertex_id_from_partitioned_vertex_id(
             _g, i, partition_id, _g->partition_strategy, idx - cur);
@@ -100,30 +104,34 @@ GRIN_VERTEX grin_get_vertex_from_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl,
     return GRIN_NULL_VERTEX;
   }
 
-  if (_vl->partition_type == ALL_BUT_ONE_PARTITION) {  // all but one
+  // all but one partition
+  if (_vl->partition_type == ALL_BUT_ONE_PARTITION) {
     auto partition_id = _vl->partition_id;
     auto cur = 0;
     for (auto i = _vl->type_begin; i < _vl->type_end; i++) {
-      auto vertex_num = _g->vertex_offsets[i + 1] - _g->vertex_offsets[i];
-      auto partitioned_vertex_num = __grin_get_paritioned_vertex_num(
+      auto partitioned_vertex_num =
+          _g->vertex_offsets[i + 1] - _g->vertex_offsets[i];
+      partitioned_vertex_num -= __grin_get_vertex_num_in_partition(
           _g, i, partition_id, _g->partition_strategy);
-      if (idx < cur + vertex_num - partitioned_vertex_num) {
-        auto tmp = 0;
+      // in this type
+      if (idx < cur + partitioned_vertex_num) {
+        auto cur_type_num = 0;
         for (auto j = 0; j < _g->partition_num; j++) {
           if (j == partition_id)
-            continue;
-          auto j_vertex_num = __grin_get_paritioned_vertex_num(
+            continue;  // skip invalid partition
+          auto parition_j_num = __grin_get_vertex_num_in_partition(
               _g, i, j, _g->partition_strategy);
-          if (idx < cur + tmp + j_vertex_num) {
+          // in this partition
+          if (idx < cur + cur_type_num + parition_j_num) {
             auto _idx = __grin_get_vertex_id_from_partitioned_vertex_id(
-                _g, i, j, _g->partition_strategy, idx - cur - tmp);
+                _g, i, j, _g->partition_strategy, idx - cur - cur_type_num);
             auto v = new GRIN_VERTEX_T(_idx, i);
             return v;
           }
-          tmp += j_vertex_num;
+          cur_type_num += parition_j_num;
         }
       }
-      cur += vertex_num - partitioned_vertex_num;
+      cur += partitioned_vertex_num;
     }
     return GRIN_NULL_VERTEX;
   }
@@ -152,8 +160,8 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
     // find first non-empty valid type & partition
     auto vtype = _vl->type_begin;
     while (vtype < _vl->type_end) {
-      if (__grin_get_paritioned_vertex_num(_g, vtype, _vl->partition_id,
-                                           _g->partition_strategy) == 0)
+      if (__grin_get_vertex_num_in_partition(_g, vtype, _vl->partition_id,
+                                             _g->partition_strategy) == 0)
         vtype++;
       else
         break;
@@ -178,8 +186,8 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
     auto partition_id = 0;
     while (vtype < _vl->type_end) {
       if (partition_id == _vl->partition_id ||
-          __grin_get_paritioned_vertex_num(_g, vtype, partition_id,
-                                           _g->partition_strategy) == 0) {
+          __grin_get_vertex_num_in_partition(_g, vtype, partition_id,
+                                             _g->partition_strategy) == 0) {
         partition_id++;
         if (partition_id == _g->partition_num) {
           vtype++;
@@ -243,9 +251,11 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
       while (_vli->current_type < _vli->type_end) {
         _vli->current_type++;
         _vli->current_offset = 0;
-        if (__grin_get_paritioned_vertex_num(_g, _vli->current_type,
-                                             _vli->partition_id,
-                                             _g->partition_strategy) == 0)
+        if (_vli->current_type == _vli->type_end)
+          break;
+        if (__grin_get_vertex_num_in_partition(_g, _vli->current_type,
+                                               _vli->partition_id,
+                                               _g->partition_strategy) == 0)
           continue;
         else
           break;
@@ -262,23 +272,25 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
   }
 
   if (_vli->partition_type == ALL_BUT_ONE_PARTITION) {  // all but one
+    auto partition_id = __grin_get_master_partition_id(_g, _vli->current_offset,
+                                                       _vli->current_type);
     auto idx = __grin_get_next_vertex_id_in_partition(
-        _g, _vli->current_type, _vli->partition_id, _g->partition_strategy,
+        _g, _vli->current_type, partition_id, _g->partition_strategy,
         _vli->current_offset);
     if (idx != -1) {  // next vertex in this partition
       _vli->iter += idx - _vli->current_offset;
       _vli->current_offset = idx;
     } else {
       // find next valid parititon in this type
-      auto partition_id = __grin_get_master_partition_id(
-          _g, _vli->current_offset, _vli->current_type);
       while (partition_id < _g->partition_num) {
         partition_id++;
+        if (partition_id == _g->partition_num)
+          break;
         if (partition_id == _vli->partition_id)
           continue;  // skip invalid partition
-        if (__grin_get_paritioned_vertex_num(_g, _vli->current_type,
-                                             partition_id,
-                                             _g->partition_strategy) == 0)
+        if (__grin_get_vertex_num_in_partition(_g, _vli->current_type,
+                                               partition_id,
+                                               _g->partition_strategy) == 0)
           continue;  // skip empty partition
         break;
       }
@@ -293,9 +305,11 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
         while (_vli->current_type < _vli->type_end) {
           _vli->current_type++;
           _vli->current_offset = 0;
+          if (_vli->current_type == _vli->type_end)
+            break;
           auto vertex_num = _g->vertex_offsets[_vli->current_type + 1] -
                             _g->vertex_offsets[_vli->current_type];
-          auto partitioned_vertex_num = __grin_get_paritioned_vertex_num(
+          auto partitioned_vertex_num = __grin_get_vertex_num_in_partition(
               _g, _vli->current_type, _vli->partition_id,
               _g->partition_strategy);
           if (vertex_num - partitioned_vertex_num == 0)
@@ -308,19 +322,23 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
           // find first non-empty valid partition
           auto partition_id = 0;
           while (partition_id < _g->partition_num) {
-            if (partition_id == _vli->partition_id)
+            if (partition_id == _vli->partition_id) {
+              partition_id++;
               continue;  // skip invalid partition
-            if (__grin_get_paritioned_vertex_num(_g, _vli->current_type,
-                                                 partition_id,
-                                                 _g->partition_strategy) == 0)
+            }
+            if (__grin_get_vertex_num_in_partition(
+                    _g, _vli->current_type, partition_id,
+                    _g->partition_strategy) == 0) {
+              partition_id++;
               continue;  // skip empty partition
-            break;
-            partition_id++;
+            } else {
+              break;
+            }
           }
           if (partition_id == _g->partition_num)
             return;
           // find first vertex in this partition
-          auto& vertices = _g->vertices_collections[_vli->type_begin];
+          auto& vertices = _g->vertices_collections[_vli->current_type];
           auto idx = __grin_get_first_vertex_id_in_partition(
               _g, _vli->current_type, partition_id, _g->partition_strategy);
           _vli->current_offset = idx;
