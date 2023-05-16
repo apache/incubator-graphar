@@ -411,12 +411,12 @@ GAR_NAMESPACE::IdType __grin_get_first_vertex_id_in_partition(
     GAR_PARTITION_STRATEGY partition_strategy) {
   if (partition_strategy == SEGMENTED_PARTITION) {
     auto p = graph->partitioned_vertex_offsets[vtype][partition_id];
-    if (p >= graph->vertex_offsets[vtype + 1])
+    if (p >= graph->vertex_offsets[vtype + 1] - graph->vertex_offsets[vtype])
       return -1;
     return p;
   } else {  // HASH_PARTITION
     auto p = partition_id;
-    if (p >= graph->vertex_offsets[vtype + 1])
+    if (p >= graph->vertex_offsets[vtype + 1] - graph->vertex_offsets[vtype])
       return -1;
     return p;
   }
@@ -432,7 +432,7 @@ GAR_NAMESPACE::IdType __grin_get_next_vertex_id_in_partition(
     return p;
   } else {  // HASH_PARTITION
     auto p = vid + graph->partition_num;
-    if (p >= graph->vertex_offsets[vtype + 1])
+    if (p >= graph->vertex_offsets[vtype + 1] - graph->vertex_offsets[vtype])
       return -1;
     return p;
   }
