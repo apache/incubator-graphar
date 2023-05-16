@@ -62,10 +62,11 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
       return GRIN_NULL_SIZE;  // not in this vertex list
 
     size_t offset = 0;
+    // previous vertex types
     for (auto i = _vl->type_begin; i < _v->type_id; i++) {
-      offset += __grin_get_vertex_num_in_partition(_g, i, _vl->partition_id,
-                                                   _g->partition_strategy);
+      offset += _g->partitioned_vertex_num[i][_vl->partition_id];
     }
+    // in the same vertex type
     offset += __grin_get_partitioned_vertex_id_from_vertex_id(
         _g, _v->type_id, _vl->partition_id, _g->partition_strategy, _v->id);
     return offset;
@@ -80,15 +81,13 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
     // previous vertex types
     for (auto i = _vl->type_begin; i < _v->type_id; i++) {
       offset += _g->vertex_offsets[i + 1] - _g->vertex_offsets[i];
-      offset -= __grin_get_vertex_num_in_partition(_g, i, _vl->partition_id,
-                                                   _g->partition_strategy);
+      offset -= _g->partitioned_vertex_num[i][_vl->partition_id];
     }
     // previous partitions of the same vertex type
     for (auto j = 0; j < partition_id; j++) {
       if (j == _vl->partition_id)
         continue;  // skip the partition
-      offset += __grin_get_vertex_num_in_partition(_g, _v->type_id, j,
-                                                   _g->partition_strategy);
+      offset += _g->partitioned_vertex_num[_v->type_id][j];
     }
     // in the same partition of the same vertex type
     offset += __grin_get_partitioned_vertex_id_from_vertex_id(

@@ -286,6 +286,7 @@ struct GRIN_GRAPH_T {
   GAR_PARTITION_STRATEGY partition_strategy;
   std::vector<size_t> vertex_chunk_size;
   std::vector<std::vector<size_t>> partitioned_vertex_offsets;
+  std::vector<std::vector<size_t>> partitioned_vertex_num;
 
   // constructor for graph
   explicit GRIN_GRAPH_T(GAR_NAMESPACE::GraphInfo graph_info_)
