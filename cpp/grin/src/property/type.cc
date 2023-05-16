@@ -19,7 +19,6 @@ extern "C" {
 #include "grin/src/predefine.h"
 
 #ifdef GRIN_WITH_VERTEX_PROPERTY
-// Vertex type
 bool grin_equal_vertex_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt1,
                             GRIN_VERTEX_TYPE vt2) {
   return vt1 == vt2;
@@ -32,7 +31,6 @@ GRIN_VERTEX_TYPE grin_get_vertex_type(GRIN_GRAPH g, GRIN_VERTEX v) {
 
 void grin_destroy_vertex_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt) { return; }
 
-// Vertex type list
 GRIN_VERTEX_TYPE_LIST grin_get_vertex_type_list(GRIN_GRAPH g) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto vtl = new GRIN_VERTEX_TYPE_LIST_T();
@@ -77,10 +75,6 @@ const char* grin_get_vertex_type_name(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto& s = _g->vertex_types[vt];
   return s.c_str();
-  // int len = s.length() + 1;
-  // char* out = new char[len];
-  // snprintf(out, len, "%s", s.c_str());
-  // return out;
 }
 
 GRIN_VERTEX_TYPE grin_get_vertex_type_by_name(GRIN_GRAPH g, const char* name) {
@@ -106,7 +100,6 @@ GRIN_VERTEX_TYPE grin_get_vertex_type_by_id(GRIN_GRAPH g,
 #endif
 
 #ifdef GRIN_WITH_EDGE_PROPERTY
-// Edge type
 bool grin_equal_edge_type(GRIN_GRAPH g, GRIN_EDGE_TYPE et1,
                           GRIN_EDGE_TYPE et2) {
   return (et1 == et2);
@@ -120,7 +113,6 @@ GRIN_EDGE_TYPE grin_get_edge_type(GRIN_GRAPH g, GRIN_EDGE e) {
 
 void grin_destroy_edge_type(GRIN_GRAPH g, GRIN_EDGE_TYPE et) { return; }
 
-// Edge type list
 GRIN_EDGE_TYPE_LIST grin_get_edge_type_list(GRIN_GRAPH g) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto etl = new GRIN_EDGE_TYPE_LIST_T();
@@ -165,10 +157,6 @@ const char* grin_get_edge_type_name(GRIN_GRAPH g, GRIN_EDGE_TYPE et) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto& s = _g->unique_edge_types[et];
   return s.c_str();
-  // int len = s.length() + 1;
-  // char* out = new char[len];
-  // snprintf(out, len, "%s", s.c_str());
-  // return out;
 }
 
 GRIN_EDGE_TYPE grin_get_edge_type_by_name(GRIN_GRAPH g, const char* name) {

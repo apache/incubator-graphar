@@ -17,7 +17,6 @@ limitations under the License.
 
 extern "C" {
 #include "grin/include/property/primarykey.h"
-#include "grin/include/property/propertytable.h"
 }
 #include "grin/src/predefine.h"
 
