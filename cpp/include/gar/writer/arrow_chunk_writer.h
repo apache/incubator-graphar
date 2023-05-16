@@ -39,10 +39,10 @@ namespace GAR_NAMESPACE_INTERNAL {
  * @brief The level for validating writing operations.
  */
 enum class ValidateLevel : char {
-  default_validate = -1,
-  no_validate = 0,
-  weak_validate = 1,
-  strong_validate = 2
+  default_validate = 0,
+  no_validate = 1,
+  weak_validate = 2,
+  strong_validate = 3
 };
 
 /**
