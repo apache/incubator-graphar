@@ -72,16 +72,15 @@ unsigned int grin_get_uint32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
   return std::any_cast<uint32_t>((*_r)[idx]);
 }
 
-long long int grin_get_int64_from_row(GRIN_GRAPH g, GRIN_ROW r,
-                                      size_t idx) {  // NOLINT
+long long int grin_get_int64_from_row(GRIN_GRAPH g,  // NOLINT
+                                      GRIN_ROW r, size_t idx) {
   auto _r = static_cast<GRIN_ROW_T*>(r);
   __grin_check_row(_r, 0);
   return std::any_cast<int64_t>((*_r)[idx]);
 }
 
-unsigned long long int grin_get_uint64_from_row(GRIN_GRAPH g,
-                                                GRIN_ROW r,  // NOLINT
-                                                size_t idx) {
+unsigned long long int grin_get_uint64_from_row(GRIN_GRAPH g,  // NOLINT
+                                                GRIN_ROW r, size_t idx) {
   auto _r = static_cast<GRIN_ROW_T*>(r);
   __grin_check_row(_r, 0);
   return std::any_cast<uint64_t>((*_r)[idx]);
