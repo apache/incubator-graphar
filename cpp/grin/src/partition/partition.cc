@@ -115,8 +115,8 @@ GRIN_GRAPH grin_get_local_graph_by_partition(GRIN_PARTITIONED_GRAPH pg,
     return GRIN_NULL_GRAPH;
   auto graph = get_graph_by_info_path(_pg->info_path);
   if (graph != NULL) {
-    __grin_init_partitions(graph, _pg->partition_num, p,
-                           _pg->partition_strategy);
+    __grin_init_graph_partitions(graph, _pg->partition_num, p,
+                                 _pg->partition_strategy);
   }
   return graph;
 }

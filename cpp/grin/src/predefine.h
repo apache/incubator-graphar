@@ -33,6 +33,8 @@ extern "C" {
 #define GAR_UNORDERED_BY_SOURCE GAR_NAMESPACE::AdjListType::unordered_by_source
 #define GAR_UNORDERED_BY_DEST GAR_NAMESPACE::AdjListType::unordered_by_dest
 
+// topology related structures
+
 struct GRIN_VERTEX_T {
   GAR_NAMESPACE::IdType id;
   unsigned type_id;
@@ -52,15 +54,12 @@ struct GRIN_EDGE_T {
 };
 
 #ifdef GRIN_ENABLE_VERTEX_LIST
-
-#ifdef GRIN_ENABLE_GRAPH_PARTITION
 typedef enum {
   ALL_PARTITION = 0,
   ONE_PARTITION = 1,
   ALL_BUT_ONE_PARTITION = 2,
   PARTITION_TYPE_MAX = 3
 } PARTITION_TYPE_IN_VERTEX_LIST;
-#endif
 
 struct GRIN_VERTEX_LIST_T {
   unsigned type_begin;
@@ -178,8 +177,9 @@ struct GRIN_ADJACENT_LIST_ITERATOR_T {
 };
 #endif
 
+// property related structures
+
 #ifdef GRIN_WITH_VERTEX_PROPERTY
-typedef std::vector<unsigned> GRIN_VERTEX_TYPE_LIST_T;
 struct GRIN_VERTEX_PROPERTY_T {
   unsigned type_id;
   std::string name;
@@ -192,11 +192,11 @@ struct GRIN_VERTEX_PROPERTY_T {
         type(_type),
         is_primary(_is_primary) {}
 };
+typedef std::vector<unsigned> GRIN_VERTEX_TYPE_LIST_T;
 typedef std::vector<unsigned> GRIN_VERTEX_PROPERTY_LIST_T;
 #endif
 
 #ifdef GRIN_WITH_EDGE_PROPERTY
-typedef std::vector<unsigned> GRIN_EDGE_TYPE_LIST_T;
 struct GRIN_EDGE_PROPERTY_T {
   unsigned type_id;
   std::string name;
@@ -214,12 +214,15 @@ struct GRIN_EDGE_PROPERTY_T {
             type < other.type);
   }
 };
+typedef std::vector<unsigned> GRIN_EDGE_TYPE_LIST_T;
 typedef std::vector<unsigned> GRIN_EDGE_PROPERTY_LIST_T;
 #endif
 
-#if defined(GRIN_WITH_VERTEX_PROPERTY) || defined(GRIN_WITH_EDGE_PROPERTY)
+#ifdef GRIN_ENABLE_ROW
 typedef std::vector<std::any> GRIN_ROW_T;
 #endif
+
+// partition related structures
 
 #ifdef GRIN_ENABLE_GRAPH_PARTITION
 typedef enum {
@@ -251,6 +254,8 @@ struct GRIN_VERTEX_REF_T {
 };
 #endif
 
+// definition of grin graph
+
 struct GRIN_GRAPH_T {
   // statistics
   GAR_NAMESPACE::GraphInfo graph_info;
@@ -260,28 +265,29 @@ struct GRIN_GRAPH_T {
   unsigned edge_type_num;
   unsigned unique_edge_type_num;
   std::vector<size_t> vertex_offsets, edge_num;
-  // types
+  // vertex/edge types
   std::vector<std::string> vertex_types, edge_types, unique_edge_types;
   std::map<std::string, unsigned> unique_edge_type_2_ids;
   std::vector<unsigned> src_type_ids, dst_type_ids, unique_edge_type_ids;
   std::vector<unsigned> unique_edge_type_begin_type;
-  // vertices & edges
+  // vertex/edge collections
   std::vector<GAR_NAMESPACE::VerticesCollection> vertices_collections;
   std::vector<std::map<GAR_NAMESPACE::AdjListType, GAR_NAMESPACE::Edges>>
       edges_collections;
-  // properties
+  // vertex/edge properties
   std::vector<GRIN_VERTEX_PROPERTY_T> vertex_properties;
   std::vector<GRIN_EDGE_PROPERTY_T> edge_properties;
   std::vector<unsigned> vertex_property_offsets, edge_property_offsets;
   std::vector<std::map<std::string, unsigned>> vertex_property_name_2_ids,
       edge_property_name_2_ids;
-  // partitions
+  // graph partitions
   unsigned partition_num;
   unsigned partition_id;
   GAR_PARTITION_STRATEGY partition_strategy;
   std::vector<size_t> vertex_chunk_size;
   std::vector<std::vector<size_t>> partitioned_vertex_offsets;
-  // constructor
+
+  // constructor for graph
   explicit GRIN_GRAPH_T(GAR_NAMESPACE::GraphInfo graph_info_)
       : graph_info(std::move(graph_info_)),
         tot_vertex_num(0),
@@ -294,10 +300,12 @@ struct GRIN_GRAPH_T {
         partition_strategy(SEGMENTED_PARTITION) {}
 };
 
-// basic functions
-GRIN_GRAPH_T* get_graph_by_info_path(const std::string&);
+// functions declaration
+
+// utils functions
 std::string GetDataTypeName(GRIN_DATATYPE);
 GRIN_DATATYPE GARToDataType(GAR_NAMESPACE::DataType);
+GRIN_GRAPH_T* get_graph_by_info_path(const std::string&);
 size_t __grin_get_edge_num(GRIN_GRAPH_T*, unsigned, unsigned);
 
 // graph init functions
@@ -305,8 +313,8 @@ void __grin_init_vertices_collections(GRIN_GRAPH_T*);
 void __grin_init_edges_collections(GRIN_GRAPH_T*);
 void __grin_init_vertex_properties(GRIN_GRAPH_T*);
 void __grin_init_edge_properties(GRIN_GRAPH_T*);
-void __grin_init_partitions(GRIN_GRAPH_T*, unsigned, unsigned,
-                            GAR_PARTITION_STRATEGY);
+void __grin_init_graph_partitions(GRIN_GRAPH_T*, unsigned, unsigned,
+                                  GAR_PARTITION_STRATEGY);
 
 // serialize & deserialize vertex
 int64_t __grin_generate_int64_from_id_and_type(GAR_NAMESPACE::IdType, unsigned);
@@ -324,8 +332,8 @@ GAR_NAMESPACE::IdType __grin_get_partitioned_vertex_id_from_vertex_id(
 // mapping between vertices with partitions
 unsigned __grin_get_master_partition_id(GRIN_GRAPH_T*, GAR_NAMESPACE::IdType,
                                         unsigned);
-size_t __grin_get_paritioned_vertex_num(GRIN_GRAPH_T*, unsigned, unsigned,
-                                        GAR_PARTITION_STRATEGY);
+size_t __grin_get_vertex_num_in_partition(GRIN_GRAPH_T*, unsigned, unsigned,
+                                          GAR_PARTITION_STRATEGY);
 GAR_NAMESPACE::IdType __grin_get_first_vertex_id_in_partition(
     GRIN_GRAPH_T*, unsigned, unsigned, GAR_PARTITION_STRATEGY);
 GAR_NAMESPACE::IdType __grin_get_next_vertex_id_in_partition(

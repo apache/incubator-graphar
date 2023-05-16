@@ -50,7 +50,7 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
   if (_vl->partition_type == ONE_PARTITION) {  // one partition
     size_t offset = 0;
     for (auto i = _vl->type_begin; i < _v->type_id; i++) {
-      auto partitioned_vertex_num = __grin_get_paritioned_vertex_num(
+      auto partitioned_vertex_num = __grin_get_vertex_num_in_partition(
           _g, i, _vl->partition_id, _g->partition_strategy);
       offset += partitioned_vertex_num;
     }
@@ -63,7 +63,7 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
     size_t offset = 0;
     for (auto i = _vl->type_begin; i < _v->type_id; i++) {
       auto vertex_num = _g->vertex_offsets[i + 1] - _g->vertex_offsets[i];
-      auto partitioned_vertex_num = __grin_get_paritioned_vertex_num(
+      auto partitioned_vertex_num = __grin_get_vertex_num_in_partition(
           _g, i, _vl->partition_id, _g->partition_strategy);
       offset += vertex_num - partitioned_vertex_num;
     }
@@ -71,7 +71,7 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
     for (auto j = 0; j < partition_id; j++) {
       if (j == _vl->partition_id)
         continue;
-      auto partitioned_vertex_num = __grin_get_paritioned_vertex_num(
+      auto partitioned_vertex_num = __grin_get_vertex_num_in_partition(
           _g, _v->type_id, j, _g->partition_strategy);
       offset += partitioned_vertex_num;
     }

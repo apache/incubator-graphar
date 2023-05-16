@@ -301,9 +301,9 @@ void __grin_init_edge_properties(GRIN_GRAPH_T* graph) {
   graph->edge_property_offsets.push_back(property_id);
 }
 
-void __grin_init_partitions(GRIN_GRAPH_T* graph, unsigned partition_num,
-                            unsigned partition_id,
-                            GAR_PARTITION_STRATEGY partition_strategy) {
+void __grin_init_graph_partitions(GRIN_GRAPH_T* graph, unsigned partition_num,
+                                  unsigned partition_id,
+                                  GAR_PARTITION_STRATEGY partition_strategy) {
   graph->partition_num = partition_num;
   graph->partition_id = partition_id;
   graph->partition_strategy = partition_strategy;
@@ -390,7 +390,7 @@ unsigned __grin_get_master_partition_id(GRIN_GRAPH_T* graph,
   }
 }
 
-size_t __grin_get_paritioned_vertex_num(
+size_t __grin_get_vertex_num_in_partition(
     GRIN_GRAPH_T* graph, unsigned vtype, unsigned partition_id,
     GAR_PARTITION_STRATEGY partition_strategy) {
   auto vertex_num =
