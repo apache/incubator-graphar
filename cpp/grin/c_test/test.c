@@ -598,7 +598,9 @@ void test_property_edge_table(int argc, char** argv) {
 
   for (size_t i = 0; i < etl_size; ++i) {
     GRIN_EDGE_TYPE et = grin_get_edge_type_from_list(g, etl, i);
+#ifdef GRIN_ENABLE_EDGE_PROPERTY_TABLE
     GRIN_EDGE_PROPERTY_TABLE ept = grin_get_edge_property_table_by_type(g, et);
+#endif
     GRIN_EDGE_PROPERTY_LIST epl = grin_get_edge_property_list_by_type(g, et);
     size_t epl_size = grin_get_edge_property_list_size(g, epl);
     printf("edge property list size: %zu\n", epl_size);
@@ -624,8 +626,11 @@ void test_property_edge_table(int argc, char** argv) {
       if (!grin_equal_edge_type(g, et, et1)) {
         printf("edge type does not match\n");
       }
-
+#ifdef GRIN_ENABLE_EDGE_PROPERTY_TABLE
       GRIN_ROW row = grin_get_row_from_edge_property_table(g, ept, e, epl);
+#else
+      GRIN_ROW row = grin_get_edge_row(g, e, epl);
+#endif
       for (size_t k = 0; k < epl_size; ++k) {
         GRIN_EDGE_PROPERTY ep = grin_get_edge_property_from_list(g, epl, k);
         GRIN_EDGE_TYPE et2 = grin_get_edge_type_from_property(g, ep);
@@ -648,9 +653,11 @@ void test_property_edge_table(int argc, char** argv) {
         unsigned int id = ~0;
 #endif
         GRIN_DATATYPE dt = grin_get_edge_property_datatype(g, ep);
+#ifdef GRIN_ENABLE_EDGE_PROPERTY_TABLE
 #ifdef GRIN_TRAIT_CONST_VALUE_PTR
         const void* pv = grin_get_value_from_edge_property_table(g, ept, e, ep);
         const void* rv = grin_get_value_from_row(g, row, dt, k);
+
         if (dt == Int64) {
           printf("ep_id %u e%zu %s value: %ld %ld\n", id, j, ep_name,
                  *((long int*) pv), *((long int*) rv));
@@ -683,6 +690,23 @@ void test_property_edge_table(int argc, char** argv) {
           double rv = grin_get_double_from_row(g, row, k);
           printf("ep_id %u e%zu %s value: %f %f\n", id, j, ep_name, pv, rv);
         }
+#endif
+#else
+        const void* rv = grin_get_value_from_row(g, row, dt, k);
+
+        if (dt == Int64) {
+          printf("ep_id %u e%zu %s value: %ld\n", id, j, ep_name,
+                 *((long int*) rv));
+        } else if (dt == String) {
+          printf("ep_id %u e%zu %s value: %s\n", id, j, ep_name, (char*) rv);
+        } else if (dt == Double) {
+          printf("ep_id %u e%zu %s value: %f\n", id, j, ep_name,
+                 *((double*) rv));
+        }
+        grin_destroy_edge_property(g, ep);
+        // grin_destroy_name(g, ep_name);
+        // grin_destroy_value(g, dt, pv);
+        // grin_destroy_value(g, dt, rv);
 #endif
       }
 
@@ -788,6 +812,7 @@ void test_property_edge_table(int argc, char** argv) {
   grin_destroy_graph(g);
 }
 
+#ifdef GRIN_ENABLE_VERTEX_PRIMARY_KEYS
 void test_property_primary_key(int argc, char** argv) {
   printf(
       "+++++++++++++++++++++ Test property/primary key "
@@ -850,6 +875,7 @@ void test_property_primary_key(int argc, char** argv) {
     grin_destroy_vertex_type(g, vt);
   }
 }
+#endif
 
 void test_error_code(int argc, char** argv) {
   printf("+++++++++++++++++++++ Test error code +++++++++++++++++++++\n");
@@ -879,7 +905,9 @@ void test_property(int argc, char** argv) {
   test_property_topology(argc, argv);
   test_property_vertex_table(argc, argv);
   test_property_edge_table(argc, argv);
+#ifdef GRIN_ENABLE_VERTEX_PRIMARY_KEYS
   test_property_primary_key(argc, argv);
+#endif
   test_error_code(argc, argv);
 }
 
@@ -890,8 +918,8 @@ void test_partition_reference(int argc, char** argv) {
   GRIN_PARTITION p0 = get_partition(argc, argv);
 
   GRIN_VERTEX_LIST vlist = grin_get_vertex_list(g);
-  GRIN_VERTEX_LIST_ITERATOR vli = grin_get_vertex_list_begin(g, vlist);
   GRIN_VERTEX_LIST mvlist = grin_select_master_for_vertex_list(g, vlist);
+  GRIN_VERTEX_LIST_ITERATOR vli = grin_get_vertex_list_begin(g, mvlist);
   grin_destroy_vertex_list(g, vlist);
 
   size_t cnt = 0;
