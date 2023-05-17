@@ -62,7 +62,7 @@ Result<std::shared_ptr<arrow::Table>> ExecutePlanAndCollectAsTable(
   // translate sink_gen (async) to sink_reader (sync)
   std::shared_ptr<arrow::RecordBatchReader> sink_reader =
       arrow_acero_namespace::MakeGeneratorReader(schema, std::move(sink_gen),
-                                          exec_context.memory_pool());
+                                                 exec_context.memory_pool());
 
   // validate the ExecPlan
   RETURN_NOT_ARROW_OK(plan->Validate());
@@ -659,10 +659,10 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::sortTable(
   auto exec_context = arrow::compute::default_exec_context();
   auto plan = arrow_acero_namespace::ExecPlan::Make(exec_context).ValueOrDie();
   int max_batch_size = 2;
-  auto table_source_options =
-      arrow_acero_namespace::TableSourceNodeOptions{input_table, max_batch_size};
-  auto source = arrow_acero_namespace::MakeExecNode("table_source", plan.get(), {},
-                                             table_source_options)
+  auto table_source_options = arrow_acero_namespace::TableSourceNodeOptions{
+      input_table, max_batch_size};
+  auto source = arrow_acero_namespace::MakeExecNode("table_source", plan.get(),
+                                                    {}, table_source_options)
                     .ValueOrDie();
   AsyncGeneratorType sink_gen;
   if (!arrow_acero_namespace::MakeExecNode(
