@@ -17,7 +17,11 @@ limitations under the License.
 
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
+#include "arrow/acero/exec_plan.h"
+#else
 #include "arrow/compute/exec/exec_plan.h"
+#endif
 #include "arrow/dataset/dataset.h"
 #include "arrow/dataset/file_base.h"
 #include "arrow/dataset/file_parquet.h"
@@ -28,6 +32,12 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 // common methods
+
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
+namespace arrow_acero_namespace = arrow::acero;
+#else
+namespace arrow_acero_namespace = arrow::compute;
+#endif
 
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 10000000
 using AsyncGeneratorType =
@@ -47,17 +57,21 @@ using AsyncGeneratorType =
  */
 Result<std::shared_ptr<arrow::Table>> ExecutePlanAndCollectAsTable(
     const arrow::compute::ExecContext& exec_context,
-    std::shared_ptr<arrow::compute::ExecPlan> plan,
+    std::shared_ptr<arrow_acero_namespace::ExecPlan> plan,
     std::shared_ptr<arrow::Schema> schema, AsyncGeneratorType sink_gen) {
   // translate sink_gen (async) to sink_reader (sync)
   std::shared_ptr<arrow::RecordBatchReader> sink_reader =
-      arrow::compute::MakeGeneratorReader(schema, std::move(sink_gen),
-                                          exec_context.memory_pool());
+      arrow_acero_namespace::MakeGeneratorReader(schema, std::move(sink_gen),
+                                                 exec_context.memory_pool());
 
   // validate the ExecPlan
   RETURN_NOT_ARROW_OK(plan->Validate());
   //  start the ExecPlan
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
+  plan->StartProducing();  // arrow 12.0.0 or later return void, not Status
+#else
   RETURN_NOT_ARROW_OK(plan->StartProducing());
+#endif
 
   // collect sink_reader into a Table
   std::shared_ptr<arrow::Table> response_table;
@@ -643,17 +657,17 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::sortTable(
     const std::shared_ptr<arrow::Table>& input_table,
     const std::string& column_name) {
   auto exec_context = arrow::compute::default_exec_context();
-  auto plan = arrow::compute::ExecPlan::Make(exec_context).ValueOrDie();
+  auto plan = arrow_acero_namespace::ExecPlan::Make(exec_context).ValueOrDie();
   int max_batch_size = 2;
-  auto table_source_options =
-      arrow::compute::TableSourceNodeOptions{input_table, max_batch_size};
-  auto source = arrow::compute::MakeExecNode("table_source", plan.get(), {},
-                                             table_source_options)
+  auto table_source_options = arrow_acero_namespace::TableSourceNodeOptions{
+      input_table, max_batch_size};
+  auto source = arrow_acero_namespace::MakeExecNode("table_source", plan.get(),
+                                                    {}, table_source_options)
                     .ValueOrDie();
   AsyncGeneratorType sink_gen;
-  if (!arrow::compute::MakeExecNode(
+  if (!arrow_acero_namespace::MakeExecNode(
            "order_by_sink", plan.get(), {source},
-           arrow::compute::OrderBySinkNodeOptions{
+           arrow_acero_namespace::OrderBySinkNodeOptions{
                arrow::compute::SortOptions{{arrow::compute::SortKey{
                    column_name, arrow::compute::SortOrder::Ascending}}},
                &sink_gen})
