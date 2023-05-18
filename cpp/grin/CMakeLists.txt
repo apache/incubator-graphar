@@ -4,8 +4,6 @@ find_package(Protobuf REQUIRED)
 
 find_package(glog REQUIRED)
 
-find_package(MPI REQUIRED)
-
 file(GLOB_RECURSE GAR_GRIN_SRC_FILES "src/*.cc")
 
 message(${GAR_GRIN_SRC_FILES})
@@ -82,6 +80,8 @@ endforeach()
 # ------------------------------------------------------------------------------
 # build examples
 # ------------------------------------------------------------------------------
+find_package(MPI REQUIRED)
+
 file(GLOB EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/example" "${PROJECT_SOURCE_DIR}/grin/example/*.cc")
 
 foreach(f ${EXAMPLE_FILES})
