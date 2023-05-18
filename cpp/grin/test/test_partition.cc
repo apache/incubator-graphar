@@ -100,6 +100,8 @@ int main(int argc, char* argv[]) {
   args[0] = new char[path.length() + 1];
   snprintf(args[0], path.length() + 1, "%s", path.c_str());
   GRIN_PARTITIONED_GRAPH pg = grin_get_partitioned_graph_from_storage(1, args);
+  delete[] args[0];
+  delete[] args;
 
   // test partitioned graph
   test_partition_partition(pg, partition_num);
@@ -122,6 +124,10 @@ int main(int argc, char* argv[]) {
   snprintf(args2[2], sizeof(args2[2]), "%d", strategy);
   GRIN_PARTITIONED_GRAPH pg2 =
       grin_get_partitioned_graph_from_storage(3, args2);
+  delete[] args2[0];
+  delete[] args2[1];
+  delete[] args2[2];
+  delete[] args2;
 
   // test partitioned graph
   test_partition_partition(pg2, partition_num);

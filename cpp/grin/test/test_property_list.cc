@@ -200,6 +200,8 @@ int main(int argc, char* argv[]) {
   args[0] = new char[path.length() + 1];
   snprintf(args[0], path.length() + 1, "%s", path.c_str());
   GRIN_GRAPH graph = grin_get_graph_from_storage(1, args);
+  delete[] args[0];
+  delete[] args;
 
   // test vertex property list
   test_vertex_property_list(graph);

@@ -123,6 +123,8 @@ int main(int argc, char* argv[]) {
   snprintf(args[0], path.length() + 1, "%s", path.c_str());
   auto init_start = clock();
   GRIN_GRAPH graph = grin_get_graph_from_storage(1, args);
+  delete[] args[0];
+  delete[] args;
   auto init_time = 1000.0 * (clock() - init_start) / CLOCKS_PER_SEC;
 
   // run bfs algorithm
