@@ -57,7 +57,7 @@ For instance, the file `./edge/person_knows_person/ordered_by_source/creationDat
 
 AdjList data
 ````````````
-The adjList in GAR describes the topology structure, i.e., the source vertex id and the destination vertex id for each of a group of edges. As explained in `Edges in GraphAr <file-format.html#edges-in-graphar>`_, the edges are separated into edge chunks, and each edge chunk has its own adjList table and 0 or more property tables.
+The adjList in GAR describes the topology structure, i.e., the internal id of the source vertex and the destination vertex for each of a group of edges. As explained in `Edges in GraphAr <file-format.html#edges-in-graphar>`_, the edges are separated into edge chunks, and each edge chunk has its own adjList table and 0 or more property tables.
 
 For example, the file `./edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0`_ saves the adjList of "person_knows_person" edges for the first edge chunk of the first vertex chunk, and the adjList type of the edges is "ordered_by_source". This adjList table consists of only two columns: one for the source and one for the destination; it can be saved in CSV, ORC, or Parquet files.
 
