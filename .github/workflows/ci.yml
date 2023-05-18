@@ -50,9 +50,9 @@ jobs:
         # install the latest arrow deb to test arrow
         wget -c https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
             -P /tmp/
-        apt-get install -y -V /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
+        sudo apt-get install -y -V /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
         sudo apt-get update -y
-        apt-get install -y libarrow-dev
+        sudo apt-get install -y libarrow-dev
         sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
 
     - name: CMake
