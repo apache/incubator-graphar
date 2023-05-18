@@ -191,10 +191,12 @@ macro(build_gar)
     if(APPLE)
         target_link_libraries(gar PRIVATE -Wl,-force_load gar_arrow_static
             "${GAR_PARQUET_STATIC_LIB}"
+            "${GAR_ACERO_STATIC_LIB}"
             "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
     else()
         target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
             "${GAR_PARQUET_STATIC_LIB}"
+            "${GAR_ARROW_ACERO_STATIC_LIB}"
             "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
     endif()
 
