@@ -920,10 +920,15 @@ void test_partition_reference(int argc, char** argv) {
   GRIN_GRAPH g = get_graph(argc, argv);
   GRIN_PARTITION p0 = get_partition(argc, argv);
 
+#ifdef GRIN_TRAIT_SELECT_MASTER_FOR_VERTEX_LIST
   GRIN_VERTEX_LIST vlist = grin_get_vertex_list(g);
   GRIN_VERTEX_LIST mvlist = grin_select_master_for_vertex_list(g, vlist);
   GRIN_VERTEX_LIST_ITERATOR vli = grin_get_vertex_list_begin(g, mvlist);
   grin_destroy_vertex_list(g, vlist);
+#else
+  GRIN_VERTEX_LIST mvlist = grin_get_vertex_list(g);
+  GRIN_VERTEX_LIST_ITERATOR vli = grin_get_vertex_list_begin(g, mvlist);
+#endif
 
   size_t cnt = 0;
   while (!grin_is_vertex_list_end(g, vli)) {
@@ -985,6 +990,9 @@ void test_topology_structure(int argc, char** argv) {
 }
 
 void test_topology_adjacent_list(int argc, char** argv, GRIN_DIRECTION dir) {
+  printf(
+      "+++++++++++++++++++++ Test topology/adjacent_list "
+      "+++++++++++++++++++++\n");
   GRIN_GRAPH g = get_graph(argc, argv);
 
   GRIN_VERTEX_LIST vl = grin_get_vertex_list(g);
