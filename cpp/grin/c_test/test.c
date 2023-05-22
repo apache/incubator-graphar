@@ -931,6 +931,7 @@ void test_partition_reference(int argc, char** argv) {
 #endif
 
   size_t cnt = 0;
+  size_t mcnt = 0;
   while (!grin_is_vertex_list_end(g, vli)) {
     cnt++;
     GRIN_VERTEX v = grin_get_vertex_from_iter(g, vli);
@@ -948,13 +949,19 @@ void test_partition_reference(int argc, char** argv) {
       printf("vertex not match\n");
     }
 
-    if (grin_is_master_vertex(g, v) && !grin_is_mirror_vertex(g, v)) {
+    if (grin_is_master_vertex(g, v)) {
+      mcnt++;
       GRIN_PARTITION p = grin_get_master_partition_from_vertex_ref(g, vref);
       if (!grin_equal_partition(g, p, p0)) {
-        printf("partition not match\n");
+        printf("(Wrong) partition not match\n");
+      }
+    } else if (grin_is_mirror_vertex(g, v)) {
+      GRIN_PARTITION p = grin_get_master_partition_from_vertex_ref(g, vref);
+      if (grin_equal_partition(g, p, p0)) {
+        printf("(Wrong) partition match\n");
       }
     } else {
-      printf("(Wrong) test only has one partition\n");
+      printf("(Wrong) vertex other than master or mirror\n");
     }
 
     grin_destroy_vertex_ref(g, vref);
@@ -965,8 +972,10 @@ void test_partition_reference(int argc, char** argv) {
 
 #ifdef GRIN_ENABLE_VERTEX_LIST_ARRAY
   size_t mvlist_size = grin_get_vertex_list_size(g, mvlist);
-  if (mvlist_size != cnt) {
+  if (mvlist_size != mcnt) {
     printf("(Wrong) master vertex list size not match\n");
+  } else {
+    printf("Master vertex number: %zu\n", mcnt);
   }
 #endif
 
@@ -1004,6 +1013,13 @@ void test_topology_adjacent_list(int argc, char** argv, GRIN_DIRECTION dir) {
 
   while (!grin_is_vertex_list_end(g, vli)) {
     GRIN_VERTEX v = grin_get_vertex_from_iter(g, vli);
+#ifdef GRIN_ENABLE_GRAPH_PARTITION
+    if (!grin_is_master_vertex(g, v)) {
+      grin_destroy_vertex(g, v);
+      grin_get_next_vertex_list_iter(g, vli);
+      continue;
+    }
+#endif
     GRIN_ADJACENT_LIST al = grin_get_adjacent_list(g, dir, v);
     for (size_t i = 0; i <= etl_size; ++i) {
       GRIN_ADJACENT_LIST al1 = al;
