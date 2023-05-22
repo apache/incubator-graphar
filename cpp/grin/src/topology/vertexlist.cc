@@ -111,20 +111,27 @@ GRIN_VERTEX grin_get_vertex_from_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl,
       partitioned_vertex_num -= _g->partitioned_vertex_num[i][partition_id];
       // in this type
       if (idx < cur + partitioned_vertex_num) {
-        auto cur_type_num = 0;
-        for (auto j = 0; j < _g->partition_num; j++) {
-          if (j == partition_id)
-            continue;  // skip invalid partition
-          auto parition_j_num = _g->partitioned_vertex_num[i][j];
+        int l = 0, r = _g->partition_num - 1;
+        while (l <= r) {
+          int mid = (l + r) >> 1;
+          int pre_num = _g->partitioned_vertex_offsets[i][mid];
+          if (mid > partition_id)
+            pre_num -= _g->partitioned_vertex_num[i][partition_id];
+          auto cur_num =
+              (mid == partition_id ? 0 : _g->partitioned_vertex_num[i][mid]);
           // in this partition
-          if (idx < cur + cur_type_num + parition_j_num) {
+          if (idx >= cur + pre_num && idx < cur + pre_num + cur_num) {
             auto _idx = __grin_get_vertex_id_from_partitioned_vertex_id(
-                _g, i, j, _g->partition_strategy, idx - cur - cur_type_num);
+                _g, i, mid, _g->partition_strategy, idx - cur - pre_num);
             auto v = new GRIN_VERTEX_T(_idx, i);
             return v;
+          } else if (idx < cur + pre_num) {
+            r = mid - 1;
+          } else {
+            l = mid + 1;
           }
-          cur_type_num += parition_j_num;
         }
+        return GRIN_NULL_VERTEX;
       }
       cur += partitioned_vertex_num;
     }
