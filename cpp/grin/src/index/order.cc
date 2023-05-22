@@ -22,14 +22,16 @@ extern "C" {
 bool grin_smaller_vertex(GRIN_GRAPH g, GRIN_VERTEX v1, GRIN_VERTEX v2) {
   auto _v1 = static_cast<GRIN_VERTEX_T*>(v1);
   auto _v2 = static_cast<GRIN_VERTEX_T*>(v2);
-  if (_v1->type_id != _v2->type_id)
+  if (_v1->type_id != _v2->type_id)  // compare type id first
     return _v1->type_id < _v2->type_id;
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto p1 = __grin_get_master_partition_id(_g, _v1->id, _v1->type_id);
-  auto p2 = __grin_get_master_partition_id(_g, _v2->id, _v2->type_id);
-  if (p1 != p2)
-    return p1 < p2;
-  return _v1->id < _v2->id;
+  if (_g->partition_strategy != SEGMENTED_PARTITION) {  // compare partition id
+    auto p1 = __grin_get_master_partition_id(_g, _v1->id, _v1->type_id);
+    auto p2 = __grin_get_master_partition_id(_g, _v2->id, _v2->type_id);
+    if (p1 != p2)
+      return p1 < p2;
+  }
+  return _v1->id < _v2->id;  // compare vertex id
 }
 #endif
 
