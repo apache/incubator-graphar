@@ -28,6 +28,8 @@ GRIN_PARTITIONED_GRAPH grin_get_partitioned_graph_from_storage(int argc,
   } else if (argc == 1) {
     return new GRIN_PARTITIONED_GRAPH_T(argv[0]);
   } else if (argc == 2) {
+    if (std::stoi(argv[1]) <= 0)
+      return GRIN_NULL_GRAPH;
     return new GRIN_PARTITIONED_GRAPH_T(argv[0], std::stoi(argv[1]));
   } else {
     if (std::stoi(argv[2]) >= PARTITION_STRATEGY_MAX)
