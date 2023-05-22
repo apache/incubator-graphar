@@ -331,6 +331,26 @@ void __grin_init_graph_partitions(GRIN_GRAPH_T* graph, unsigned partition_num,
       offsets.push_back(std::min(vid, vertex_num));
       graph->partitioned_vertex_offsets.push_back(offsets);
     }
+  } else {  // HASH_PARTITION
+    graph->partitioned_vertex_offsets.clear();
+    for (auto i = 0; i < graph->vertex_type_num; i++) {
+      std::vector<size_t> offsets;
+      offsets.clear();
+      auto vertex_num = graph->vertex_offsets[i + 1] - graph->vertex_offsets[i];
+      auto x = vertex_num / partition_num;
+      auto y = vertex_num % partition_num;
+      size_t vid = 0;
+      for (auto pid = 0; pid < partition_num; pid++) {
+        offsets.push_back(std::min(vid, vertex_num));
+        if (pid < y) {
+          vid += (x + 1);
+        } else {
+          vid += x;
+        }
+      }
+      offsets.push_back(std::min(vid, vertex_num));
+      graph->partitioned_vertex_offsets.push_back(offsets);
+    }
   }
 
   // initialize partitioned vertex num
@@ -339,8 +359,8 @@ void __grin_init_graph_partitions(GRIN_GRAPH_T* graph, unsigned partition_num,
     std::vector<size_t> vertex_num;
     vertex_num.clear();
     for (auto pid = 0; pid < partition_num; pid++) {
-      vertex_num.push_back(__grin_get_vertex_num_in_partition(
-          graph, i, pid, partition_strategy));
+      vertex_num.push_back(graph->partitioned_vertex_offsets[i][pid + 1] -
+                           graph->partitioned_vertex_offsets[i][pid]);
     }
     graph->partitioned_vertex_num.push_back(vertex_num);
   }
@@ -401,22 +421,6 @@ unsigned __grin_get_master_partition_id(GRIN_GRAPH_T* graph,
     return l;
   } else {  // HASH_PARTITION
     return (id % graph->partition_num);
-  }
-}
-
-size_t __grin_get_vertex_num_in_partition(
-    GRIN_GRAPH_T* graph, unsigned vtype, unsigned partition_id,
-    GAR_PARTITION_STRATEGY partition_strategy) {
-  if (partition_strategy == SEGMENTED_PARTITION) {
-    return graph->partitioned_vertex_offsets[vtype][partition_id + 1] -
-           graph->partitioned_vertex_offsets[vtype][partition_id];
-  } else {  // HASH_PARTITION
-    auto vertex_num =
-        graph->vertex_offsets[vtype + 1] - graph->vertex_offsets[vtype];
-    auto partitioned_vertex_num = vertex_num / graph->partition_num;
-    if (partition_id < vertex_num % graph->partition_num)
-      partitioned_vertex_num++;
-    return partitioned_vertex_num;
   }
 }
 

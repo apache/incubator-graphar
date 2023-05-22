@@ -330,8 +330,6 @@ GAR_NAMESPACE::IdType __grin_get_partitioned_vertex_id_from_vertex_id(
 // mapping between vertices with partitions
 unsigned __grin_get_master_partition_id(GRIN_GRAPH_T*, GAR_NAMESPACE::IdType,
                                         unsigned);
-size_t __grin_get_vertex_num_in_partition(GRIN_GRAPH_T*, unsigned, unsigned,
-                                          GAR_PARTITION_STRATEGY);
 GAR_NAMESPACE::IdType __grin_get_first_vertex_id_in_partition(
     GRIN_GRAPH_T*, unsigned, unsigned, GAR_PARTITION_STRATEGY);
 GAR_NAMESPACE::IdType __grin_get_next_vertex_id_in_partition(

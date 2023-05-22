@@ -86,11 +86,14 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
       offset -= _g->partitioned_vertex_num[i][_vl->partition_id];
     }
     // previous partitions of the same vertex type
-    for (auto j = 0; j < partition_id; j++) {
-      if (j == _vl->partition_id)
-        continue;  // skip the partition
-      offset += _g->partitioned_vertex_num[_v->type_id][j];
-    }
+    offset =
+        _g->partitioned_vertex_offsets
+            [_v->type_id]
+            [partition_id];  // offset of the first vertex in this partition
+    if (partition_id > _vl->partition_id)
+      offset -=
+          _g->partitioned_vertex_num[_v->type_id]
+                                    [_vl->partition_id];  // invalid partition
     // in the same partition of the same vertex type
     offset += __grin_get_partitioned_vertex_id_from_vertex_id(
         _g, _v->type_id, partition_id, _g->partition_strategy, _v->id);
