@@ -245,15 +245,6 @@ struct GRIN_PARTITIONED_GRAPH_T {
 typedef std::vector<unsigned> GRIN_PARTITION_LIST_T;
 #endif
 
-#ifdef GRIN_ENABLE_VERTEX_REF
-struct GRIN_VERTEX_REF_T {
-  GAR_NAMESPACE::IdType id;
-  unsigned type_id;
-  GRIN_VERTEX_REF_T(GAR_NAMESPACE::IdType _id, unsigned _type_id)
-      : id(_id), type_id(_type_id) {}
-};
-#endif
-
 // definition of grin graph
 
 struct GRIN_GRAPH_T {

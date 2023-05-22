@@ -802,7 +802,7 @@ typedef enum {
 /** @brief Non-existing partition (invalid return value) */
 #define GRIN_NULL_PARTITION (unsigned)~0
 /** @brief Null vertex reference (invalid return value) */
-#define GRIN_NULL_VERTEX_REF NULL
+#define GRIN_NULL_VERTEX_REF -1
 /** @brief Null edge reference (invalid return value) */
 #define GRIN_NULL_EDGE_REF NULL
 /** @brief Non-existing vertex type (invalid return value) */
@@ -872,7 +872,7 @@ typedef unsigned GRIN_PARTITION_ID;
 #endif
 
 #ifdef GRIN_ENABLE_VERTEX_REF
-typedef void* GRIN_VERTEX_REF;
+typedef long long int GRIN_VERTEX_REF;
 #endif
 
 #ifdef GRIN_ENABLE_EDGE_REF

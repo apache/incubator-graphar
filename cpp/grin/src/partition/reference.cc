@@ -23,30 +23,26 @@ extern "C" {
 #ifdef GRIN_ENABLE_VERTEX_REF
 GRIN_VERTEX_REF grin_get_vertex_ref_by_vertex(GRIN_GRAPH g, GRIN_VERTEX v) {
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
-  return new GRIN_VERTEX_REF_T(_v->id, _v->type_id);
+  return __grin_generate_int64_from_id_and_type(_v->id, _v->type_id);
 }
 
-void grin_destroy_vertex_ref(GRIN_GRAPH g, GRIN_VERTEX_REF vr) {
-  auto _vr = static_cast<GRIN_VERTEX_REF_T*>(vr);
-  delete _vr;
-}
+void grin_destroy_vertex_ref(GRIN_GRAPH g, GRIN_VERTEX_REF vr) { return; }
 
 GRIN_VERTEX grin_get_vertex_from_vertex_ref(GRIN_GRAPH g, GRIN_VERTEX_REF vr) {
-  auto _vr = static_cast<GRIN_VERTEX_REF_T*>(vr);
-  return new GRIN_VERTEX_T(_vr->id, _vr->type_id);
+  auto pair = __grin_generate_id_and_type_from_int64(vr);
+  return new GRIN_VERTEX_T(pair.first, pair.second);
 }
 
 GRIN_PARTITION grin_get_master_partition_from_vertex_ref(GRIN_GRAPH g,
                                                          GRIN_VERTEX_REF vr) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _vr = static_cast<GRIN_VERTEX_REF_T*>(vr);
-  return __grin_get_master_partition_id(_g, _vr->id, _vr->type_id);
+  auto pair = __grin_generate_id_and_type_from_int64(vr);
+  return __grin_get_master_partition_id(_g, pair.first, pair.second);
 }
 
 const char* grin_serialize_vertex_ref(GRIN_GRAPH g, GRIN_VERTEX_REF vr) {
-  auto _vr = static_cast<GRIN_VERTEX_REF_T*>(vr);
   std::stringstream ss;
-  ss << _vr->id << ' ' << _vr->type_id;
+  ss << vr;
   int len = ss.str().length() + 1;
   char* out = new char[len];
   snprintf(out, len, "%s", ss.str().c_str());
@@ -59,10 +55,9 @@ void grin_destroy_serialized_vertex_ref(GRIN_GRAPH g, const char* msg) {
 
 GRIN_VERTEX_REF grin_deserialize_to_vertex_ref(GRIN_GRAPH g, const char* msg) {
   std::stringstream ss(msg);
-  GAR_NAMESPACE::IdType id;
-  unsigned type_id;
-  ss >> id >> type_id;
-  return new GRIN_VERTEX_REF_T(id, type_id);
+  long long int vr;  // NOLINT
+  ss >> vr;
+  return vr;
 }
 
 bool grin_is_master_vertex(GRIN_GRAPH g, GRIN_VERTEX v) {
@@ -83,15 +78,13 @@ bool grin_is_mirror_vertex(GRIN_GRAPH g, GRIN_VERTEX v) {
 #ifdef GRIN_TRAIT_FAST_VERTEX_REF
 long long int grin_serialize_vertex_ref_as_int64(GRIN_GRAPH g,  // NOLINT
                                                  GRIN_VERTEX_REF vr) {
-  auto _vr = static_cast<GRIN_VERTEX_REF_T*>(vr);
-  return __grin_generate_int64_from_id_and_type(_vr->id, _vr->type_id);
+  return vr;
 }
 
 GRIN_VERTEX_REF grin_deserialize_int64_to_vertex_ref(
     GRIN_GRAPH g,
     long long int svr) {  // NOLINT
-  auto pair = __grin_generate_id_and_type_from_int64(svr);
-  return new GRIN_VERTEX_REF_T(pair.first, pair.second);
+  return svr;
 }
 #endif
 
