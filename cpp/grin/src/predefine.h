@@ -65,7 +65,8 @@ struct GRIN_VERTEX_LIST_T {
   unsigned type_begin;
   unsigned type_end;
   PARTITION_TYPE_IN_VERTEX_LIST partition_type;
-  unsigned partition_id;
+  unsigned partition_id;  // only used when partition_type is
+                          // ONE_PARTITION/ALL_BUT_ONE_PARTITION
   GRIN_VERTEX_LIST_T(
       unsigned _type_begin, unsigned _type_end,
       PARTITION_TYPE_IN_VERTEX_LIST _partition_type = ALL_PARTITION,
@@ -82,13 +83,17 @@ struct GRIN_VERTEX_LIST_ITERATOR_T {
   unsigned type_begin;
   unsigned type_end;
   PARTITION_TYPE_IN_VERTEX_LIST partition_type;
-  unsigned partition_id;
+  unsigned partition_id;  // only used when partition_type is
+                          // ONE_PARTITION/ALL_BUT_ONE_PARTITION
   unsigned current_type;
+  unsigned current_partition_id;  // only used when partition_type is
+                                  // ALL_BUT_ONE_PARTITION
   GAR_NAMESPACE::IdType current_offset;
   GAR_NAMESPACE::VertexIter iter;
   GRIN_VERTEX_LIST_ITERATOR_T(unsigned _type_begin, unsigned _type_end,
                               PARTITION_TYPE_IN_VERTEX_LIST _partition_type,
                               unsigned _partition_id, unsigned _current_type,
+                              unsigned _current_partition_id,
                               GAR_NAMESPACE::IdType _current_offset,
                               GAR_NAMESPACE::VertexIter _iter)
       : type_begin(_type_begin),
@@ -96,6 +101,7 @@ struct GRIN_VERTEX_LIST_ITERATOR_T {
         partition_type(_partition_type),
         partition_id(_partition_id),
         current_type(_current_type),
+        current_partition_id(_current_partition_id),
         current_offset(_current_offset),
         iter(std::move(_iter)) {}
 };

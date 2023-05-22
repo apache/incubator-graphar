@@ -148,7 +148,7 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
     auto& vertices = _g->vertices_collections[_vl->type_begin];
     auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(
         _vl->type_begin, _vl->type_end, _vl->partition_type, _vl->partition_id,
-        _vl->type_begin, 0, vertices.begin());
+        _vl->type_begin, 0, 0, vertices.begin());
     return vli;
   }
 
@@ -172,7 +172,7 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
                                                        _g->partition_strategy);
     auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(
         _vl->type_begin, _vl->type_end, _vl->partition_type, _vl->partition_id,
-        vtype, idx, vertices.begin() + idx);
+        vtype, partition_id, idx, vertices.begin() + idx);
     return vli;
   }
 
@@ -201,7 +201,7 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
                                                        _g->partition_strategy);
     auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(
         _vl->type_begin, _vl->type_end, _vl->partition_type, _vl->partition_id,
-        vtype, idx, vertices.begin() + idx);
+        vtype, partition_id, idx, vertices.begin() + idx);
     return vli;
   }
 
@@ -272,8 +272,7 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
 
   // all but one partition
   if (_vli->partition_type == ALL_BUT_ONE_PARTITION) {
-    auto partition_id = __grin_get_master_partition_id(_g, _vli->current_offset,
-                                                       _vli->current_type);
+    auto partition_id = _vli->current_partition_id;
     auto idx = __grin_get_next_vertex_id_in_partition(
         _g, _vli->current_type, partition_id, _g->partition_strategy,
         _vli->current_offset);
@@ -297,6 +296,7 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
         auto idx = __grin_get_first_vertex_id_in_partition(
             _g, _vli->current_type, partition_id, _g->partition_strategy);
         _vli->iter += idx - _vli->current_offset;
+        _vli->current_partition_id = partition_id;
         _vli->current_offset = idx;
       } else {  // go to next type
         // find first non-empty valid type & partition
@@ -322,6 +322,7 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
           auto& vertices = _g->vertices_collections[_vli->current_type];
           auto idx = __grin_get_first_vertex_id_in_partition(
               _g, _vli->current_type, partition_id, _g->partition_strategy);
+          _vli->current_partition_id = partition_id;
           _vli->current_offset = idx;
           _vli->iter = vertices.begin() + idx;
         }

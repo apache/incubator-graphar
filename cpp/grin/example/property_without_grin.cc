@@ -15,8 +15,6 @@ limitations under the License.
 
 #include <ctime>
 #include <iostream>
-#include <unordered_set>
-#include <vector>
 
 #include "gar/graph.h"
 #include "gar/graph_info.h"
