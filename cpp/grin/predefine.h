@@ -419,12 +419,13 @@ typedef enum {
  */
 ///@{
 /** @ingroup PropertyMacros
- * @brief Enable the pure data structure Row, which is used in primary keys and tables.
+ * @brief Enable the pure data structure Row
 */
 #define GRIN_ENABLE_ROW
 
 /** @ingroup PropertyMacros
- * @brief Enable the pure data structure Row, which is used in primary keys and tables.
+ * @brief This trait is used to indicate the storage can return a pointer to the
+ * value of a property.
 */
 #define GRIN_TRAIT_CONST_VALUE_PTR
 
@@ -452,12 +453,6 @@ typedef enum {
  * It follows the design of natural ID trait in GRIN.
 */
 #define GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_TYPE
-
-/** @ingroup PropertyMacros
- * @brief Enable the vertex property table structure, from where the value of property
- * can be fetched using vertex as row index and property as column index.
-*/
-#define GRIN_ENABLE_VERTEX_PROPERTY_TABLE
 
 /** @ingroup PropertyMacros
  * @brief There are primary keys for vertices. Vertex primary keys is
@@ -510,12 +505,6 @@ typedef enum {
  * It follows the design of natural ID trait in GRIN.
 */
 #define GRIN_TRAIT_NATURAL_ID_FOR_EDGE_TYPE
-
-/** @ingroup PropertyMacros
- * @brief Enable the edge property table structure, from where the value of property
- * can be fetched using edge as row index and property as column index.
-*/
-#define GRIN_ENABLE_EDGE_PROPERTY_TABLE
 
 /** @ingroup PropertyMacros
  * @brief There are primary keys for edges. Edge primary keys is
@@ -618,18 +607,6 @@ typedef enum {
  * @brief Assume full property values of an edge are split among master and mirror edges. 
 */
 #define GRIN_ASSUME_SPLIT_MASTER_MIRROR_PARTITION_FOR_EDGE_PROPERTY
-
-/** @ingroup PropetyAssumptionMacros
- * @brief The storage uses column store for vertex properties.
- * This enables efficient property selections for vertices.
-*/
-#define GRIN_ASSUME_COLUMN_STORE_FOR_VERTEX_PROPERTY
-
-/** @ingroup PropetyAssumptionMacros
- * @brief The storage uses column store for edge properties.
- * This enables efficient property selections for edges.
-*/
-#define GRIN_ASSUME_COLUMN_STORE_FOR_EDGE_PROPERTY
 ///@}
 
 #ifndef GRIN_DOXYGEN_SKIP
@@ -640,14 +617,12 @@ typedef enum {
 #undef GRIN_WITH_VERTEX_PROPERTY_NAME
 #undef GRIN_WITH_VERTEX_TYPE_NAME
 #undef GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_TYPE
-#undef GRIN_ENABLE_VERTEX_PROPERTY_TABLE
 #undef GRIN_ENABLE_VERTEX_PRIMARY_KEYS
 #undef GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_PROPERTY
 #undef GRIN_WITH_EDGE_PROPERTY
 #undef GRIN_WITH_EDGE_PROPERTY_NAME
 #undef GRIN_WITH_EDGE_TYPE_NAME
 #undef GRIN_TRAIT_NATURAL_ID_FOR_EDGE_TYPE
-#undef GRIN_ENABLE_EDGE_PROPERTY_TABLE
 #undef GRIN_ENABLE_EDGE_PRIMARY_KEYS
 #undef GRIN_TRAIT_NATURAL_ID_FOR_EDGE_PROPERTY
 #undef GRIN_TRAIT_SELECT_TYPE_FOR_VERTEX_LIST
@@ -661,8 +636,6 @@ typedef enum {
 #undef GRIN_ASSUME_MASTER_ONLY_PARTITION_FOR_EDGE_PROPERTY
 #undef GRIN_ASSUME_REPLICATE_MASTER_MIRROR_PARTITION_FOR_EDGE_PROPERTY
 #undef GRIN_ASSUME_SPLIT_MASTER_MIRROR_PARTITION_FOR_EDGE_PROPERTY
-#undef GRIN_ASSUME_COLUMN_STORE_FOR_VERTEX_PROPERTY
-#undef GRIN_ASSUME_COLUMN_STORE_FOR_EDGE_PROPERTY
 // GRIN_END
 
 // GRIN_STORAGE_ENABLE
@@ -671,7 +644,6 @@ typedef enum {
 #define GRIN_WITH_VERTEX_PROPERTY_NAME
 #define GRIN_WITH_VERTEX_TYPE_NAME
 #define GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_TYPE
-#define GRIN_ENABLE_VERTEX_PROPERTY_TABLE
 #define GRIN_ENABLE_VERTEX_PRIMARY_KEYS
 #define GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_PROPERTY
 #define GRIN_ASSUME_BY_TYPE_VERTEX_ORIGINAL_ID
@@ -679,14 +651,11 @@ typedef enum {
 #define GRIN_WITH_EDGE_PROPERTY_NAME
 #define GRIN_WITH_EDGE_TYPE_NAME
 #define GRIN_TRAIT_NATURAL_ID_FOR_EDGE_TYPE
-#define GRIN_ENABLE_EDGE_PROPERTY_TABLE
 #define GRIN_TRAIT_NATURAL_ID_FOR_EDGE_PROPERTY
 #define GRIN_TRAIT_SELECT_TYPE_FOR_VERTEX_LIST
 #define GRIN_TRAIT_SELECT_TYPE_FOR_EDGE_LIST
 #define GRIN_TRAIT_SELECT_NEIGHBOR_TYPE_FOR_ADJACENT_LIST
 #define GRIN_TRAIT_SELECT_EDGE_TYPE_FOR_ADJACENT_LIST
-#define GRIN_ASSUME_COLUMN_STORE_FOR_VERTEX_PROPERTY
-#define GRIN_ASSUME_COLUMN_STORE_FOR_EDGE_PROPERTY
 // GRIN_END
 
 // GRIN_FEATURE_DEPENDENCY
@@ -885,7 +854,6 @@ typedef unsigned GRIN_VERTEX_TYPE;
 typedef void* GRIN_VERTEX_TYPE_LIST;
 typedef unsigned GRIN_VERTEX_PROPERTY;
 typedef void* GRIN_VERTEX_PROPERTY_LIST;
-typedef unsigned GRIN_VERTEX_PROPERTY_TABLE;
 #endif
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_VERTEX_TYPE
@@ -903,7 +871,6 @@ typedef void* GRIN_VEV_TYPE;
 typedef void* GRIN_VEV_TYPE_LIST;
 typedef unsigned GRIN_EDGE_PROPERTY;
 typedef void* GRIN_EDGE_PROPERTY_LIST;
-typedef unsigned GRIN_EDGE_PROPERTY_TABLE;
 #endif
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_EDGE_TYPE
