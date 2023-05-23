@@ -71,8 +71,8 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
-              _al->vid, _al->vtype_id, _al->dir, _al->etype_begin,
-              _al->etype_end, _al->vtype_begin, _al->vtype_end, i, iter);
+              _al->vid, _al->vtype_id, _al->dir, _al->etype_end,
+              _al->vtype_begin, _al->vtype_end, i, iter);
           return ali;
         }
       }
@@ -87,8 +87,8 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
-              _al->vid, _al->vtype_id, _al->dir, _al->etype_begin,
-              _al->etype_end, _al->vtype_begin, _al->vtype_end, i, iter);
+              _al->vid, _al->vtype_id, _al->dir, _al->etype_end,
+              _al->vtype_begin, _al->vtype_end, i, iter);
           return ali;
         }
       }
@@ -103,8 +103,8 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
-              _al->vid, _al->vtype_id, _al->dir, _al->etype_begin,
-              _al->etype_end, _al->vtype_begin, _al->vtype_end, i, iter);
+              _al->vid, _al->vtype_id, _al->dir, _al->etype_end,
+              _al->vtype_begin, _al->vtype_end, i, iter);
           return ali;
         }
       }
@@ -119,8 +119,8 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
-              _al->vid, _al->vtype_id, _al->dir, _al->etype_begin,
-              _al->etype_end, _al->vtype_begin, _al->vtype_end, i, iter);
+              _al->vid, _al->vtype_id, _al->dir, _al->etype_end,
+              _al->vtype_begin, _al->vtype_end, i, iter);
           return ali;
         }
       }
@@ -145,8 +145,8 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
-              _al->vid, _al->vtype_id, _al->dir, _al->etype_begin,
-              _al->etype_end, _al->vtype_begin, _al->vtype_end, i, iter);
+              _al->vid, _al->vtype_id, _al->dir, _al->etype_end,
+              _al->vtype_begin, _al->vtype_end, i, iter);
           return ali;
         }
       }
@@ -161,8 +161,8 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
-              _al->vid, _al->vtype_id, _al->dir, _al->etype_begin,
-              _al->etype_end, _al->vtype_begin, _al->vtype_end, i, iter);
+              _al->vid, _al->vtype_id, _al->dir, _al->etype_end,
+              _al->vtype_begin, _al->vtype_end, i, iter);
           return ali;
         }
       }
@@ -177,8 +177,8 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
-              _al->vid, _al->vtype_id, _al->dir, _al->etype_begin,
-              _al->etype_end, _al->vtype_begin, _al->vtype_end, i, iter);
+              _al->vid, _al->vtype_id, _al->dir, _al->etype_end,
+              _al->vtype_begin, _al->vtype_end, i, iter);
           return ali;
         }
       }
@@ -193,8 +193,8 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
-              _al->vid, _al->vtype_id, _al->dir, _al->etype_begin,
-              _al->etype_end, _al->vtype_begin, _al->vtype_end, i, iter);
+              _al->vid, _al->vtype_id, _al->dir, _al->etype_end,
+              _al->vtype_begin, _al->vtype_end, i, iter);
           return ali;
         }
       }

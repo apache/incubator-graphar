@@ -154,8 +154,8 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
   if (_vl->partition_type == ALL_PARTITION) {
     auto& vertices = _g->vertices_collections[_vl->type_begin];
     auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(
-        _vl->type_begin, _vl->type_end, _vl->partition_type, _vl->partition_id,
-        _vl->type_begin, 0, 0, vertices.begin());
+        _vl->type_end, _vl->partition_type, _vl->partition_id, _vl->type_begin,
+        0, 0, vertices.begin());
     return vli;
   }
 
@@ -178,8 +178,8 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
     auto idx = __grin_get_first_vertex_id_in_partition(_g, vtype, partition_id,
                                                        _g->partition_strategy);
     auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(
-        _vl->type_begin, _vl->type_end, _vl->partition_type, _vl->partition_id,
-        vtype, partition_id, idx, vertices.begin() + idx);
+        _vl->type_end, _vl->partition_type, _vl->partition_id, vtype,
+        partition_id, idx, vertices.begin() + idx);
     return vli;
   }
 
@@ -207,8 +207,8 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
     auto idx = __grin_get_first_vertex_id_in_partition(_g, vtype, partition_id,
                                                        _g->partition_strategy);
     auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(
-        _vl->type_begin, _vl->type_end, _vl->partition_type, _vl->partition_id,
-        vtype, partition_id, idx, vertices.begin() + idx);
+        _vl->type_end, _vl->partition_type, _vl->partition_id, vtype,
+        partition_id, idx, vertices.begin() + idx);
     return vli;
   }
 

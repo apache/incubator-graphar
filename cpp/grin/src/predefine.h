@@ -80,7 +80,6 @@ struct GRIN_VERTEX_LIST_T {
 
 #ifdef GRIN_ENABLE_VERTEX_LIST_ITERATOR
 struct GRIN_VERTEX_LIST_ITERATOR_T {
-  unsigned type_begin;
   unsigned type_end;
   PARTITION_TYPE_IN_VERTEX_LIST partition_type;
   unsigned partition_id;  // only used when partition_type is
@@ -90,14 +89,13 @@ struct GRIN_VERTEX_LIST_ITERATOR_T {
                                   // ALL_BUT_ONE_PARTITION
   GAR_NAMESPACE::IdType current_offset;
   GAR_NAMESPACE::VertexIter iter;
-  GRIN_VERTEX_LIST_ITERATOR_T(unsigned _type_begin, unsigned _type_end,
+  GRIN_VERTEX_LIST_ITERATOR_T(unsigned _type_end,
                               PARTITION_TYPE_IN_VERTEX_LIST _partition_type,
                               unsigned _partition_id, unsigned _current_type,
                               unsigned _current_partition_id,
                               GAR_NAMESPACE::IdType _current_offset,
                               GAR_NAMESPACE::VertexIter _iter)
-      : type_begin(_type_begin),
-        type_end(_type_end),
+      : type_end(_type_end),
         partition_type(_partition_type),
         partition_id(_partition_id),
         current_type(_current_type),
@@ -118,15 +116,12 @@ struct GRIN_EDGE_LIST_T {
 
 #ifdef GRIN_ENABLE_EDGE_LIST_ITERATOR
 struct GRIN_EDGE_LIST_ITERATOR_T {
-  unsigned type_begin;
   unsigned type_end;
   unsigned current_type;
   GAR_NAMESPACE::EdgeIter iter;
-  GRIN_EDGE_LIST_ITERATOR_T(unsigned _type_begin, unsigned _type_end,
-                            unsigned _current_type,
+  GRIN_EDGE_LIST_ITERATOR_T(unsigned _type_end, unsigned _current_type,
                             GAR_NAMESPACE::EdgeIter _iter)
-      : type_begin(_type_begin),
-        type_end(_type_end),
+      : type_end(_type_end),
         current_type(_current_type),
         iter(std::move(_iter)) {}
 };
@@ -160,21 +155,19 @@ struct GRIN_ADJACENT_LIST_ITERATOR_T {
   GAR_NAMESPACE::IdType vid;
   unsigned vtype_id;
   GRIN_DIRECTION dir;
-  unsigned etype_begin;
   unsigned etype_end;
   unsigned vtype_begin;
   unsigned vtype_end;
   unsigned current_etype;
   GAR_NAMESPACE::EdgeIter iter;
   GRIN_ADJACENT_LIST_ITERATOR_T(GAR_NAMESPACE::IdType _vid, unsigned _vtype_id,
-                                GRIN_DIRECTION _dir, unsigned _etype_begin,
-                                unsigned _etype_end, unsigned _vtype_begin,
-                                unsigned _vtype_end, unsigned _current_etype,
+                                GRIN_DIRECTION _dir, unsigned _etype_end,
+                                unsigned _vtype_begin, unsigned _vtype_end,
+                                unsigned _current_etype,
                                 GAR_NAMESPACE::EdgeIter _iter)
       : vid(_vid),
         vtype_id(_vtype_id),
         dir(_dir),
-        etype_begin(_etype_begin),
         etype_end(_etype_end),
         vtype_begin(_vtype_begin),
         vtype_end(_vtype_end),
