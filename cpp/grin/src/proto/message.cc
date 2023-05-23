@@ -134,7 +134,7 @@ const char* grin_get_static_storage_feature_msg() {
     }
 #endif
 
-#ifdef GRIN_feature_NATURAL_ID_FOR_PARTITION
+#ifdef GRIN_TRAIT_NATURAL_ID_FOR_PARTITION
     feature->set_grin_trait_natural_id_for_partition(true);
 #endif
 
@@ -248,10 +248,6 @@ const char* grin_get_static_storage_feature_msg() {
     vfeature->set_grin_with_vertex_type_name(true);
 #endif
 
-#ifdef GRIN_ENABLE_VERTEX_PROPERTY_TABLE
-    vfeature->set_grin_enable_vertex_property_table(true);
-#endif
-
 #ifdef GRIN_ENABLE_VERTEX_PRIMARY_KEYS
     vfeature->set_grin_enable_vertex_primary_keys(true);
 #endif
@@ -277,10 +273,6 @@ const char* grin_get_static_storage_feature_msg() {
     efeature->set_grin_with_edge_type_name(true);
 #endif
 
-#ifdef GRIN_ENABLE_EDGE_PROPERTY_TABLE
-    efeature->set_grin_enable_edge_property_table(true);
-#endif
-
 #ifdef GRIN_ENABLE_EDGE_PRIMARY_KEYS
     efeature->set_grin_enable_edge_primary_keys(true);
 #endif
@@ -291,14 +283,6 @@ const char* grin_get_static_storage_feature_msg() {
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_EDGE_PROPERTY
     efeature->set_grin_trait_natural_id_for_edge_property(true);
-#endif
-
-#ifdef GRIN_ASSUME_COLUMN_STORE_FOR_VERTEX_PROPERTY
-    feature->set_grin_assume_column_store_for_vertex_property(true);
-#endif
-
-#ifdef GRIN_ASSUME_COLUMN_STORE_FOR_EDGE_PROPERTY
-    feature->set_grin_assume_column_store_for_edge_property(true);
 #endif
 
 #ifdef GRIN_TRAIT_SELECT_TYPE_FOR_VERTEX_LIST
