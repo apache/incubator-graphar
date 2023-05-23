@@ -21,9 +21,9 @@ extern "C" {
 #include "grin/include/property/primarykey.h"
 #include "grin/include/property/property.h"
 #include "grin/include/property/propertylist.h"
+#include "grin/include/property/row.h"
 #include "grin/include/property/topology.h"
 #include "grin/include/property/type.h"
-#include "grin/include/property/row.h"
 #include "grin/include/topology/edgelist.h"
 #include "grin/include/topology/structure.h"
 #include "grin/include/topology/vertexlist.h"
@@ -36,15 +36,14 @@ void test_property_primarykey(GRIN_GRAPH graph) {
   auto primary_vertex_type_list =
       grin_get_vertex_types_with_primary_keys(graph);
   size_t n = grin_get_vertex_type_list_size(graph, primary_vertex_type_list);
-  std::cout << "number of vertex types with primary keys: "
-            << n
-            << std::endl;
+  std::cout << "number of vertex types with primary keys: " << n << std::endl;
 
   for (auto idx = 0; idx < n; ++idx) {
     // get vertex type
     auto vertex_type =
         grin_get_vertex_type_from_list(graph, primary_vertex_type_list, idx);
-    std::cout << "\n---- test vertex type with primary key: " << grin_get_vertex_type_name(graph, vertex_type) << " ----"
+    std::cout << "\n---- test vertex type with primary key: "
+              << grin_get_vertex_type_name(graph, vertex_type) << " ----"
               << std::endl;
 
     // get the property list for primary key
@@ -64,9 +63,12 @@ void test_property_primarykey(GRIN_GRAPH graph) {
     auto property_list_size =
         grin_get_vertex_property_list_size(graph, property_list);
     for (auto i = 0; i < property_list_size; ++i) {
-      auto property = grin_get_vertex_property_from_list(graph, property_list, i);
-      assert(grin_get_vertex_property_datatype(graph, property) == GRIN_DATATYPE::Int64);
-      auto value = grin_get_vertex_property_value_of_int64(graph, vertex, property);
+      auto property =
+          grin_get_vertex_property_from_list(graph, property_list, i);
+      assert(grin_get_vertex_property_datatype(graph, property) ==
+             GRIN_DATATYPE::Int64);
+      auto value =
+          grin_get_vertex_property_value_of_int64(graph, vertex, property);
       assert(grin_insert_int64_to_row(graph, row, value) == true);
       grin_destroy_vertex_property(graph, property);
     }

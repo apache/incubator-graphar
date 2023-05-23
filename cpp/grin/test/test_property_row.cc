@@ -19,9 +19,9 @@ limitations under the License.
 
 extern "C" {
 #include "grin/include/common/error.h"
-#include "grin/include/property/row.h"
 #include "grin/include/property/property.h"
 #include "grin/include/property/propertylist.h"
+#include "grin/include/property/row.h"
 #include "grin/include/property/topology.h"
 #include "grin/include/property/type.h"
 #include "grin/include/topology/adjacentlist.h"
@@ -120,8 +120,8 @@ void test_property_vertex(GRIN_GRAPH graph) {
       // check value from row and from property (int64)
       if (data_type == GRIN_DATATYPE::Int64) {
         auto value1 = grin_get_int64_from_row(graph, r, 0);
-        auto value2 = grin_get_vertex_property_value_of_int64(
-            graph, vertex, property);
+        auto value2 =
+            grin_get_vertex_property_value_of_int64(graph, vertex, property);
         assert(value1 == value2);
         std::cout << "value of property \"" << name
                   << "\" for vertex 0 of vertex type " << i << ": " << value1
@@ -133,16 +133,17 @@ void test_property_vertex(GRIN_GRAPH graph) {
       // check value from row and from property (string)
       if (data_type == GRIN_DATATYPE::String) {
         auto value1 = grin_get_string_from_row(graph, r, 0);
-        auto value2 = grin_get_vertex_property_value_of_string(
-            graph, vertex, property);
+        auto value2 =
+            grin_get_vertex_property_value_of_string(graph, vertex, property);
         assert(grin_get_last_error_code() == NO_ERROR);
         assert(strcmp(value1, value2) == 0);
 
         std::cout << "value of property \"" << name
                   << "\" for vertex 0 of vertex type " << i << ": " << value1
                   << std::endl;
-        std::cout << "check values from row and from property are equal (string)"
-                  << std::endl;
+        std::cout
+            << "check values from row and from property are equal (string)"
+            << std::endl;
 
         // destroy
         grin_destroy_string_value(graph, value1);
@@ -210,7 +211,8 @@ void test_property_edge(GRIN_GRAPH graph) {
       // check value from row and from property (int64)
       if (data_type == GRIN_DATATYPE::Int64) {
         auto value1 = grin_get_int64_from_row(graph, r, 0);
-        auto value2 = grin_get_edge_property_value_of_int64(graph, edge, property);
+        auto value2 =
+            grin_get_edge_property_value_of_int64(graph, edge, property);
         assert(grin_get_last_error_code() == NO_ERROR);
         assert(value1 == value2);
         std::cout << "value of property \"" << name
@@ -223,14 +225,16 @@ void test_property_edge(GRIN_GRAPH graph) {
       // check value from row and from property (string)
       if (data_type == GRIN_DATATYPE::String) {
         auto value1 = grin_get_string_from_row(graph, r, 0);
-        auto value2 = grin_get_edge_property_value_of_string(graph, edge, property);
+        auto value2 =
+            grin_get_edge_property_value_of_string(graph, edge, property);
         assert(grin_get_last_error_code() == NO_ERROR);
         assert(strcmp(value1, value2) == 0);
         std::cout << "value of property \"" << name
                   << "\" for edge 0 of edge type " << i << ": " << value1
                   << std::endl;
-        std::cout << "check values from row and from property are equal (string)"
-                  << std::endl;
+        std::cout
+            << "check values from row and from property are equal (string)"
+            << std::endl;
 
         // destroy
         grin_destroy_string_value(graph, value1);
