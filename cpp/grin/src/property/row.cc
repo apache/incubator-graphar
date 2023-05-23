@@ -14,8 +14,8 @@ limitations under the License.
 */
 
 extern "C" {
-#include "grin/include/common/error.h"
 #include "grin/include/property/row.h"
+#include "grin/include/common/error.h"
 }
 #include "grin/src/predefine.h"
 
