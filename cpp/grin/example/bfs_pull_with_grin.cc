@@ -22,7 +22,6 @@ limitations under the License.
 extern "C" {
 #include "grin/include/index/original_id.h"
 #include "grin/include/property/property.h"
-#include "grin/include/property/propertytable.h"
 #include "grin/include/property/type.h"
 #include "grin/include/topology/adjacentlist.h"
 #include "grin/include/topology/edgelist.h"
@@ -82,7 +81,6 @@ void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
   if (print_result) {
     std::cout << "num_vertices: " << num_vertices << std::endl;
     auto type = grin_get_vertex_type_by_name(graph, "person");
-    auto table = grin_get_vertex_property_table_by_type(graph, type);
     auto property = grin_get_vertex_property_by_name(graph, type, "id");
     auto data_type = grin_get_vertex_property_datatype(graph, property);
 
@@ -93,8 +91,8 @@ void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
       std::cout << "vertex " << i;
       if (data_type == GRIN_DATATYPE::Int64) {
         // get property "id" of vertex
-        auto value = grin_get_int64_from_vertex_property_table(graph, table, v,
-                                                               property);
+        auto value =
+            grin_get_vertex_property_value_of_int64(graph, v, property);
         std::cout << ", id = " << value;
       }
       std::cout << ", distance = " << distance[i] << std::endl;
@@ -104,7 +102,6 @@ void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
 
     // destroy
     grin_destroy_vertex_property(graph, property);
-    grin_destroy_vertex_property_table(graph, table);
     grin_destroy_vertex_type(graph, type);
   }
 

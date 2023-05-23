@@ -21,7 +21,6 @@ limitations under the License.
 extern "C" {
 #include "grin/include/property/property.h"
 #include "grin/include/property/propertylist.h"
-#include "grin/include/property/propertytable.h"
 #include "grin/include/property/topology.h"
 #include "grin/include/property/type.h"
 #include "grin/include/topology/adjacentlist.h"
@@ -51,10 +50,8 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
     auto property_list =
         grin_get_vertex_property_list_by_type(graph, vertex_type);
     size_t vpn = grin_get_vertex_property_list_size(graph, property_list);
-    // get property table
-    auto table = grin_get_vertex_property_table_by_type(graph, vertex_type);
 
-    // select vertex list
+    // select type for vertex list
     auto select_vertex_list =
         grin_select_type_for_vertex_list(graph, vertex_type, vertex_list);
 
@@ -67,36 +64,36 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
         auto data_type = grin_get_vertex_property_datatype(graph, property);
         switch (data_type) {
         case GRIN_DATATYPE::Int32: {
-          auto value = grin_get_int32_from_vertex_property_table(graph, table,
-                                                                 v, property);
+          auto value =
+              grin_get_vertex_property_value_of_int32(graph, v, property);
           if (print_result)
             std::cout << value << "; ";
           break;
         }
         case GRIN_DATATYPE::Int64: {
-          auto value = grin_get_int64_from_vertex_property_table(graph, table,
-                                                                 v, property);
+          auto value =
+              grin_get_vertex_property_value_of_int64(graph, v, property);
           if (print_result)
             std::cout << value << "; ";
           break;
         }
         case GRIN_DATATYPE::Float: {
-          auto value = grin_get_float_from_vertex_property_table(graph, table,
-                                                                 v, property);
+          auto value =
+              grin_get_vertex_property_value_of_float(graph, v, property);
           if (print_result)
             std::cout << value << "; ";
           break;
         }
         case GRIN_DATATYPE::Double: {
-          auto value = grin_get_double_from_vertex_property_table(graph, table,
-                                                                  v, property);
+          auto value =
+              grin_get_vertex_property_value_of_double(graph, v, property);
           if (print_result)
             std::cout << value << "; ";
           break;
         }
         case GRIN_DATATYPE::String: {
-          auto value = grin_get_string_from_vertex_property_table(graph, table,
-                                                                  v, property);
+          auto value =
+              grin_get_vertex_property_value_of_string(graph, v, property);
           if (print_result)
             std::cout << value << "; ";
           grin_destroy_string_value(graph, value);
@@ -119,7 +116,6 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
     grin_destroy_vertex_list_iter(graph, it);
     grin_destroy_vertex_type(graph, vertex_type);
     grin_destroy_vertex_list(graph, select_vertex_list);
-    grin_destroy_vertex_property_table(graph, table);
     grin_destroy_vertex_property_list(graph, property_list);
   }
 
@@ -149,10 +145,7 @@ void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
     auto property_list = grin_get_edge_property_list_by_type(graph, edge_type);
     size_t epn = grin_get_edge_property_list_size(graph, property_list);
 
-    // get property table
-    auto table = grin_get_edge_property_table_by_type(graph, edge_type);
-
-    // select edge list
+    // select type for edge list
     auto select_edge_list =
         grin_select_type_for_edge_list(graph, edge_type, edge_list);
 
@@ -165,36 +158,36 @@ void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
         auto data_type = grin_get_edge_property_datatype(graph, property);
         switch (data_type) {
         case GRIN_DATATYPE::Int32: {
-          auto value = grin_get_int32_from_edge_property_table(graph, table, e,
-                                                               property);
+          auto value =
+              grin_get_edge_property_value_of_int32(graph, e, property);
           if (print_result)
             std::cout << value << "; ";
           break;
         }
         case GRIN_DATATYPE::Int64: {
-          auto value = grin_get_int64_from_edge_property_table(graph, table, e,
-                                                               property);
+          auto value =
+              grin_get_edge_property_value_of_int64(graph, e, property);
           if (print_result)
             std::cout << value << "; ";
           break;
         }
         case GRIN_DATATYPE::Float: {
-          auto value = grin_get_float_from_edge_property_table(graph, table, e,
-                                                               property);
+          auto value =
+              grin_get_edge_property_value_of_float(graph, e, property);
           if (print_result)
             std::cout << value << "; ";
           break;
         }
         case GRIN_DATATYPE::Double: {
-          auto value = grin_get_double_from_edge_property_table(graph, table, e,
-                                                                property);
+          auto value =
+              grin_get_edge_property_value_of_double(graph, e, property);
           if (print_result)
             std::cout << value << "; ";
           break;
         }
         case GRIN_DATATYPE::String: {
-          auto value = grin_get_string_from_edge_property_table(graph, table, e,
-                                                                property);
+          auto value =
+              grin_get_edge_property_value_of_string(graph, e, property);
           if (print_result)
             std::cout << value << "; ";
           grin_destroy_string_value(graph, value);
@@ -217,7 +210,6 @@ void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
     grin_destroy_edge_list_iter(graph, it);
     grin_destroy_edge_type(graph, edge_type);
     grin_destroy_edge_list(graph, select_edge_list);
-    grin_destroy_edge_property_table(graph, table);
     grin_destroy_edge_property_list(graph, property_list);
   }
 

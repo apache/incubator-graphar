@@ -23,7 +23,6 @@ limitations under the License.
 extern "C" {
 #include "grin/include/index/original_id.h"
 #include "grin/include/property/property.h"
-#include "grin/include/property/propertytable.h"
 #include "grin/include/property/type.h"
 #include "grin/include/topology/adjacentlist.h"
 #include "grin/include/topology/edgelist.h"
