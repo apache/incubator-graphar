@@ -15,7 +15,7 @@ limitations under the License.
 
 #include <cassert>
 
-#include "config.h"
+#include "./config.h"
 #include "gar/graph_info.h"
 
 int main(int argc, char* argv[]) {

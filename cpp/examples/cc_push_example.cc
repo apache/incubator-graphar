@@ -17,7 +17,7 @@ limitations under the License.
 
 #include "arrow/api.h"
 
-#include "config.h"
+#include "./config.h"
 #include "gar/graph.h"
 #include "gar/graph_info.h"
 #include "gar/reader/arrow_chunk_reader.h"
