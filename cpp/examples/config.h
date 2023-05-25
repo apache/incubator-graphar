@@ -19,6 +19,39 @@ limitations under the License.
 #ifndef TEST_CONFIG_H_
 #define TEST_CONFIG_H_
 
+// Define a new macro that is just like the standard C assert macro,
+// except that it works even in optimized builds (where NDEBUG is
+// defined) and it prints the failed assertion to stderr.
+#ifndef ASSERT
+#define ASSERT(x)                                                       \
+    if (!(x)) {                                                         \
+        char buf[2048];                                                 \
+        snprintf (buf, 2048, "Assertion failed in \"%s\", line %d\n"    \
+                 "\tProbable bug in software.\n",                       \
+                 __FILE__, __LINE__);                                   \
+        ABORT (buf);                                                    \
+    }                                                                   \
+    else   // This 'else' exists to catch the user's following semicolon
+#endif
+
+// Define a new macro that is just like the standard C abort macro, 
+// except that it prints the failed assertion to stderr.
+#ifndef ABORT
+#define ABORT(msg)                                                      \
+    do {                                                                \
+        fprintf (stderr, "%s", msg);                                    \
+        fflush (stderr);                                                \
+        abort ();                                                       \
+    } while (0)
+#endif
+
+// DASSERT is like ASSERT, but it only works in debug builds.
+#ifdef DEBUG
+# define DASSERT(x) ASSERT(x)
+#else
+# define DASSERT(x)
+#endif
+
 static const std::string TEST_DATA_DIR =  // NOLINT
     std::filesystem::path(__FILE__)
         .parent_path()

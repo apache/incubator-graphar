@@ -31,10 +31,10 @@ int main(int argc, char* argv[]) {
 
   // construct vertices collection
   std::string label = "person";
-  assert(graph_info.GetVertexInfo(label).status().ok());
+  ASSERT(graph_info.GetVertexInfo(label).status().ok());
   auto maybe_vertices =
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
-  assert(maybe_vertices.status().ok());
+  ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
   int num_vertices = vertices.size();
   std::cout << "num_vertices: " << num_vertices << std::endl;
@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
   auto maybe_edges = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
-  assert(!maybe_edges.has_error());
+  ASSERT(!maybe_edges.has_error());
   auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_source>>(maybe_edges.value());
 
@@ -90,15 +90,15 @@ int main(int argc, char* argv[]) {
                                      GAR_NAMESPACE::FileType::PARQUET);
   // extend the vertex_info
   auto maybe_vertex_info = graph_info.GetVertexInfo(label);
-  assert(maybe_vertex_info.status().ok());
+  ASSERT(maybe_vertex_info.status().ok());
   auto vertex_info = maybe_vertex_info.value();
   auto maybe_extend_info = vertex_info.Extend(group);
-  assert(maybe_extend_info.status().ok());
+  ASSERT(maybe_extend_info.status().ok());
   auto extend_info = maybe_extend_info.value();
   // dump the extened vertex info
-  assert(extend_info.IsValidated());
-  assert(extend_info.Dump().status().ok());
-  assert(extend_info.Save("/tmp/person-new.vertex.yml").ok());
+  ASSERT(extend_info.IsValidated());
+  ASSERT(extend_info.Dump().status().ok());
+  ASSERT(extend_info.Save("/tmp/person-new.vertex.yml").ok());
   // construct vertex property writer
   GAR_NAMESPACE::VertexPropertyWriter writer(extend_info, "/tmp/");
   // convert results to arrow::Table
@@ -107,12 +107,12 @@ int main(int argc, char* argv[]) {
   schema_vector.push_back(arrow::field(
       cc.name, GAR_NAMESPACE::DataType::DataTypeToArrowDataType(cc.type)));
   arrow::Int64Builder array_builder;
-  assert(array_builder.Reserve(num_vertices).ok());
-  assert(array_builder.AppendValues(component).ok());
+  ASSERT(array_builder.Reserve(num_vertices).ok());
+  ASSERT(array_builder.AppendValues(component).ok());
   std::shared_ptr<arrow::Array> array = array_builder.Finish().ValueOrDie();
   arrays.push_back(array);
   auto schema = std::make_shared<arrow::Schema>(schema_vector);
   std::shared_ptr<arrow::Table> table = arrow::Table::Make(schema, arrays);
   // dump the results through writer
-  assert(writer.WriteTable(table, group, 0).ok());
+  ASSERT(writer.WriteTable(table, group, 0).ok());
 }
