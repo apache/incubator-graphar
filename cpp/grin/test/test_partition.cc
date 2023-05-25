@@ -42,8 +42,9 @@ void test_partition_partition(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
   for (auto i = 0; i < partition_list_size; ++i) {
     // get & insert partition
     auto partition = grin_get_partition_from_list(pg, partition_list, i);
-    assert(grin_insert_partition_to_list(pg, new_partition_list, partition) ==
-           true);
+    auto status =
+        grin_insert_partition_to_list(pg, new_partition_list, partition);
+    assert(status == true);
     // check & destroy partition
     auto partition_from_new_list =
         grin_get_partition_from_list(pg, new_partition_list, i);

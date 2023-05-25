@@ -69,7 +69,8 @@ void test_property_primarykey(GRIN_GRAPH graph) {
              GRIN_DATATYPE::Int64);
       auto value =
           grin_get_vertex_property_value_of_int64(graph, vertex, property);
-      assert(grin_insert_int64_to_row(graph, row, value) == true);
+      auto status = grin_insert_int64_to_row(graph, row, value);
+      assert(status == true);
       grin_destroy_vertex_property(graph, property);
     }
 

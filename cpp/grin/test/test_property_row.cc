@@ -46,10 +46,14 @@ void test_property_row(GRIN_GRAPH graph) {
   std::cout << "put value1: " << value1 << std::endl;
   std::cout << "put value2: " << value2 << std::endl;
   std::cout << "put value3: " << value3 << std::endl;
-  assert(grin_insert_int32_to_row(graph, row, value0) == true);
-  assert(grin_insert_string_to_row(graph, row, value1) == true);
-  assert(grin_insert_uint64_to_row(graph, row, value2) == true);
-  assert(grin_insert_double_to_row(graph, row, value3) == true);
+  auto status = grin_insert_int32_to_row(graph, row, value0);
+  assert(status == true);
+  status = grin_insert_string_to_row(graph, row, value1);
+  assert(status == true);
+  status = grin_insert_uint64_to_row(graph, row, value2);
+  assert(status == true);
+  status = grin_insert_double_to_row(graph, row, value3);
+  assert(status == true);
 
   // get value from row
   auto value0_ = grin_get_int32_from_row(graph, row, 0);

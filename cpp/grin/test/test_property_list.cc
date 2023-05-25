@@ -88,8 +88,9 @@ void test_vertex_property_list(GRIN_GRAPH graph) {
       // test methods on property
       test_vertex_property(graph, property, vertex_type);
       // insert property to property list
-      assert(grin_insert_vertex_property_to_list(graph, new_property_list,
-                                                 property) == true);
+      auto status = grin_insert_vertex_property_to_list(
+          graph, new_property_list, property);
+      assert(status == true);
       // destroy property
       grin_destroy_vertex_property(graph, property);
     }
@@ -169,8 +170,9 @@ void test_edge_property_list(GRIN_GRAPH graph) {
       // test methods on property
       test_edge_property(graph, property, edge_type);
       // insert property to property list
-      assert(grin_insert_edge_property_to_list(graph, new_property_list,
-                                               property) == true);
+      auto status =
+          grin_insert_edge_property_to_list(graph, new_property_list, property);
+      assert(status == true);
       // destroy property
       grin_destroy_edge_property(graph, property);
     }
