@@ -23,33 +23,33 @@ limitations under the License.
 // except that it works even in optimized builds (where NDEBUG is
 // defined) and it prints the failed assertion to stderr.
 #ifndef ASSERT
-#define ASSERT(x)                                                       \
-    if (!(x)) {                                                         \
-        char buf[2048];                                                 \
-        snprintf (buf, 2048, "Assertion failed in \"%s\", line %d\n"    \
-                 "\tProbable bug in software.\n",                       \
-                 __FILE__, __LINE__);                                   \
-        ABORT (buf);                                                    \
-    }                                                                   \
-    else   // This 'else' exists to catch the user's following semicolon
+#define ASSERT(x)                                    \
+  if (!(x)) {                                        \
+    char buf[2048];                                  \
+    snprintf(buf, 2048,                              \
+             "Assertion failed in \"%s\", line %d\n" \
+             "\tProbable bug in software.\n",        \
+             __FILE__, __LINE__);                    \
+    ABORT(buf);                                      \
+  } else  // This 'else' exists to catch the user's following semicolon
 #endif
 
-// Define a new macro that is just like the standard C abort macro, 
+// Define a new macro that is just like the standard C abort macro,
 // except that it prints the failed assertion to stderr.
 #ifndef ABORT
-#define ABORT(msg)                                                      \
-    do {                                                                \
-        fprintf (stderr, "%s", msg);                                    \
-        fflush (stderr);                                                \
-        abort ();                                                       \
-    } while (0)
+#define ABORT(msg)              \
+  do {                          \
+    fprintf(stderr, "%s", msg); \
+    fflush(stderr);             \
+    abort();                    \
+  } while (0)
 #endif
 
 // DASSERT is like ASSERT, but it only works in debug builds.
 #ifdef DEBUG
-# define DASSERT(x) ASSERT(x)
+#define DASSERT(x) ASSERT(x)
 #else
-# define DASSERT(x)
+#define DASSERT(x)
 #endif
 
 static const std::string TEST_DATA_DIR =  // NOLINT
