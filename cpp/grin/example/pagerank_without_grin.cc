@@ -44,7 +44,7 @@ void run_pagerank(GAR_NAMESPACE::GraphInfo graph_info,
 
   // run pagerank algorithm
   const double damping = 0.85;
-  const int max_iters = 20;
+  const int max_iters = 50;
   std::vector<double> pr_curr(num_vertices);
   std::vector<double> pr_next(num_vertices);
   std::vector<GAR_NAMESPACE::IdType> out_degree(num_vertices);

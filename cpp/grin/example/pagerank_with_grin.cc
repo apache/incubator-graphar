@@ -34,7 +34,7 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
 
   // initialize parameters and the graph
   const double damping = 0.85;
-  const int max_iters = 20;
+  const int max_iters = 50;
   const size_t num_vertices = grin_get_vertex_num(graph);
   auto edge_list = grin_get_edge_list(graph);
 
