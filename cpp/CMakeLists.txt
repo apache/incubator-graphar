@@ -338,10 +338,11 @@ endif()
 # Format code & cpplint
 # ------------------------------------------------------------------------------
 file(GLOB_RECURSE FILES_NEED_FORMAT "include/gar/*.h" "src/*.cc"
-                                    "test/*.h" "test/*.cc")
+                                    "test/*.h" "test/*.cc"
+                                    "examples/*.h" "examples/*.cc")
 file(GLOB_RECURSE FILES_NEED_LINT "include/gar/*.h" "src/*.cc"
                                   "test/*.h" "test/*.cc"
-                                  )
+                                  "examples/*.h" "examples/*.cc")
 
 add_custom_target(gar-clformat
                   COMMAND clang-format --style=file -i ${FILES_NEED_FORMAT}
