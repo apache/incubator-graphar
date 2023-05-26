@@ -106,7 +106,7 @@ After the building, you can install the GraphAr C++ library with:
 Generate API document
 ^^^^^^^^^^^^^^^^^^^^^
 
-Building the API document with Doxgen:
+Building the API document with Doxygen:
 
 .. code-block:: shell
 

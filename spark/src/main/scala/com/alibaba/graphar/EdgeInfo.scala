@@ -106,12 +106,12 @@ class EdgeInfo() {
     throw new IllegalArgumentException
   }
 
-  /** Check if the edge info contains the property group in cerain adj list structure.
+  /** Check if the edge info contains the property group in certain adj list structure.
    *
    * @param property_group the property group to check.
    * @param adj_list_type the type of adj list structure.
-   * @return true if the edge info contains the property group in cerain adj list structure.
-   *         If edge info not support the given adj list type or not contains the proerpty group in the adj list structure,
+   * @return true if the edge info contains the property group in certain adj list structure.
+   *         If edge info not support the given adj list type or not contains the property group in the adj list structure,
    *         return false.
    */
   def containPropertyGroup(property_group: PropertyGroup, adj_list_type: AdjListType.Value): Boolean = {
@@ -388,7 +388,7 @@ class EdgeInfo() {
   /** Get the path prefix of the adjacency list topology chunk for the given
    *  adjacency list type.
    * @param adj_list_type type of adj list structure.
-   * @return path prfix of of the adjacency list topology.
+   * @return path prefix of of the adjacency list topology.
    */
   def getAdjListPathPrefix(adj_list_type: AdjListType.Value) : String = {
     return prefix + getAdjListPrefix(adj_list_type) + "adj_list/"

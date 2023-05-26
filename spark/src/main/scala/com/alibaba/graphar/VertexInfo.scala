@@ -89,7 +89,7 @@ class VertexInfo() {
   /** Get the data type of property.
    *
    * @param property_name name of the property.
-   * @return the data type in gar of the proeprty. If the vertex info does not contains the property,
+   * @return the data type in gar of the property. If the vertex info does not contains the property,
    *         raise IllegalArgumentException error.
    */
   def getPropertyType(property_name: String): GarType.Value = {
