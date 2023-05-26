@@ -31,7 +31,7 @@ The file `person.vertex.yml`_ located inside the test data contains an example o
 
 Edge information
 ````````````````
-Each edge information file defines a single type of edges with specific labels for the source vertex, destination vertex and the edge, e.g., "person_konws_person" in this case. It defines the meta information such as the edge chunk size, the source vertex chunk size, the destination vertex chunk size, if the edges are directed or not, the relative file path for edge data files, the adjLists and the version of GraphAr. The file `person_knows_person.edge.yml`_ located inside the test data contains an example of the edge information file.
+Each edge information file defines a single type of edges with specific labels for the source vertex, destination vertex and the edge, e.g., "person_knows_person" in this case. It defines the meta information such as the edge chunk size, the source vertex chunk size, the destination vertex chunk size, if the edges are directed or not, the relative file path for edge data files, the adjLists and the version of GraphAr. The file `person_knows_person.edge.yml`_ located inside the test data contains an example of the edge information file.
 
 In GAR format, separate data files are used to store the structure (called adjList) and the properties for edges. The adjList type can be either of **unordered_by_source**, **unordered_by_dest**, **ordered_by_source** or **ordered_by_dest** (see `Edges in GraphAr <file-format.html#edges-in-graphar>`_ for more). For a specific type of adjList, the meta information includes its file path prefix, the file type, as well as all the property groups attached.
 

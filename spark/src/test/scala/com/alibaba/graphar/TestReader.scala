@@ -35,8 +35,8 @@ class ReaderSuite extends AnyFunSuite {
     // read vertex chunk files in Parquet
     val parquet_file_path = "gar-test/ldbc_sample/parquet/"
     val parquet_prefix = getClass.getClassLoader.getResource(parquet_file_path).getPath
-    val parqeut_read_path = parquet_prefix + "vertex/person/id"
-    val df1 = spark.read.option("fileFormat", "parquet").format("com.alibaba.graphar.datasources.GarDataSource").load(parqeut_read_path)
+    val parquet_read_path = parquet_prefix + "vertex/person/id"
+    val df1 = spark.read.option("fileFormat", "parquet").format("com.alibaba.graphar.datasources.GarDataSource").load(parquet_read_path)
     // validate reading results
     assert(df1.rdd.getNumPartitions == 10)
     assert(df1.count() == 903)
@@ -160,12 +160,12 @@ class ReaderSuite extends AnyFunSuite {
     // test reading multiple property groups
     var property_groups = new java.util.ArrayList[PropertyGroup]()
     property_groups.add(property_group)
-    val mutiple_property_df_chunk_2 = reader.readMultipleEdgePropertyGroupsForVertexChunk(property_groups, 2, false)
-    assert(mutiple_property_df_chunk_2.columns.size == 1)
-    assert(mutiple_property_df_chunk_2.count() == 1077)
-    val mutiple_property_df = reader.readMultipleEdgePropertyGroups(property_groups, false)
-    assert(mutiple_property_df.columns.size == 1)
-    assert(mutiple_property_df.count() == 6626)
+    val multiple_property_df_chunk_2 = reader.readMultipleEdgePropertyGroupsForVertexChunk(property_groups, 2, false)
+    assert(multiple_property_df_chunk_2.columns.size == 1)
+    assert(multiple_property_df_chunk_2.count() == 1077)
+    val multiple_property_df = reader.readMultipleEdgePropertyGroups(property_groups, false)
+    assert(multiple_property_df.columns.size == 1)
+    assert(multiple_property_df.count() == 6626)
 
     // test reading all property groups
     val all_property_df_chunk_2 = reader.readAllEdgePropertyGroupsForVertexChunk(2, false)

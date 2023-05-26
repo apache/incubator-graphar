@@ -33,7 +33,7 @@ class TransformExampleSuite extends AnyFunSuite {
     .master("local[*]")
     .getOrCreate()
 
-  test("tranform file type") {
+  test("transform file type") {
     // read from orc files
     val file_path = "gar-test/ldbc_sample/orc/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
@@ -63,7 +63,7 @@ class TransformExampleSuite extends AnyFunSuite {
     fs.close()
   }
 
-  test("tranform adjList type") {
+  test("transform adjList type") {
     val file_path = "gar-test/ldbc_sample/parquet/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
     // get vertex num

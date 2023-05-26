@@ -34,7 +34,7 @@ limitations under the License.
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-TEST_CASE("test_vertex_property_wrtier_from_file") {
+TEST_CASE("test_vertex_property_writer_from_file") {
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
 

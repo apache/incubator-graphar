@@ -27,7 +27,7 @@ import org.apache.spark.sql.functions._
 /** Reader for edge chunks.
  *
  * @constructor create a new edge reader with edge info and AdjList type.
- * @param prefix the absolute perfix.
+ * @param prefix the absolute prefix.
  * @param edgeInfo the edge info that describes the edge type.
  * @param adjListType the adj list type for the edge.
  * @param spark spark session for the reader to read chunks as Spark DataFrame.
@@ -205,7 +205,7 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     }
   }
 
-  /** Load the chunks for mutiple property groups of a vertex chunk as a DataFrame.
+  /** Load the chunks for multiple property groups of a vertex chunk as a DataFrame.
    *
    * @param propertyGroups list of property groups.
    * @param vertex_chunk_index index of vertex chunk.
