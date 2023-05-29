@@ -658,9 +658,8 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::sortTable(
     const std::string& column_name) {
   auto exec_context = arrow::compute::default_exec_context();
   auto plan = arrow_acero_namespace::ExecPlan::Make(exec_context).ValueOrDie();
-  int max_batch_size = 2;
-  auto table_source_options = arrow_acero_namespace::TableSourceNodeOptions{
-      input_table, max_batch_size};
+  auto table_source_options =
+      arrow_acero_namespace::TableSourceNodeOptions{input_table};
   auto source = arrow_acero_namespace::MakeExecNode("table_source", plan.get(),
                                                     {}, table_source_options)
                     .ValueOrDie();
