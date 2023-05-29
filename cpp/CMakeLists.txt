@@ -8,6 +8,10 @@ if(POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif()
 
+if(POLICY CMP0069)
+  cmake_policy(SET CMP0069 NEW)
+endif()
+
 # Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
   cmake_policy(SET CMP0135 NEW)
@@ -27,6 +31,7 @@ option(NAMESPACE "User specific namespace, default if GraphArchive" OFF)
 option(BUILD_TESTS "Build unit tests" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_GRIN "Build grin" OFF)
+option(USE_LTO "Using IPO/LTO support for link-time optimization" OFF)
 
 if (NAMESPACE)
   add_definitions(-DGAR_NAMESPACE=${NAMESPACE})

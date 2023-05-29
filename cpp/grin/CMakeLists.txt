@@ -80,6 +80,17 @@ endforeach()
 # ------------------------------------------------------------------------------
 # build examples
 # ------------------------------------------------------------------------------
+if(USE_LTO AND CMAKE_VERSION VERSION_GREATER "3.9" AND CMAKE_BUILD_TYPE STREQUAL "Release")
+    include(CheckIPOSupported)
+    check_ipo_supported(RESULT lpo_supported OUTPUT lpo_supported_error)
+    if(lpo_supported)
+        message(STATUS "IPO / LTO enabled")
+        # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    else()
+        message(STATUS "IPO / LTO not supported: '${lpo_supported_error}'")
+    endif()
+endif()
+
 find_package(MPI REQUIRED)
 
 file(GLOB EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/example" "${PROJECT_SOURCE_DIR}/grin/example/*.cc")
@@ -88,9 +99,11 @@ foreach(f ${EXAMPLE_FILES})
     string(REGEX MATCH "^(.*)\\.[^.]*$" dummy ${f})
     set(E_NAME ${CMAKE_MATCH_1})
     message(STATUS "Found GRIN example - " ${E_NAME})
-    add_executable(${E_NAME} example/${E_NAME}.cc)
+    add_executable(${E_NAME} example/${E_NAME}.cc ${GAR_GRIN_SRC_FILES})
     target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${Protobuf_INCLUDE_DIRS} ${MPI_INCLUDE_PATH})
-    target_link_libraries(${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog ${MPI_LIBRARIES})
+    set_property(TARGET ${E_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    target_link_libraries(${E_NAME} PRIVATE gar Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog ${MPI_LIBRARIES})
+    # target_link_libraries(${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog ${MPI_LIBRARIES})
 
     # if OpenSSL library exists, link the OpenSSL library.
     # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
