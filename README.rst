@@ -176,7 +176,7 @@ to GraphAr itself or GraphAr integrations in other projects, we'd be happy to ha
 
 - Join the mailing list: send an email to `graphar+subscribe@googlegroups.com <mailto:graphar+subscribe@googlegroups.com>`_.
   Share your ideas and use cases for the project.
-- Follow our activity on `GitHub Issues`_.
+- Follow our activity on `GitHub issues <https://github.com/alibaba/GraphAr/issues>`.
 - Join our `Weekly Community Meeting`_
 
 
@@ -198,7 +198,7 @@ third-party libraries may not have the same license as GraphAr.
 .. |GraphAr Docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
    :target: https://alibaba.github.io/GraphAr/
 
-.. |Good First Issue| image: https://img.shields.io/github/labels/alibaba/GraphAr/Good%20First%20Issue?color=green&label=Contribute%20&style=flat-square
+.. |Good First Issue| image:: https://img.shields.io/github/labels/alibaba/GraphAr/Good%20First%20Issue?color=green&label=Contribute%20&style=plastic
    :target: https://github.com/alibaba/GraphAr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
 
 .. _GraphAr File Format: https://alibaba.github.io/GraphAr/user-guide/file-format.html
