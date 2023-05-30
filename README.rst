@@ -1,7 +1,7 @@
 GraphAr
 ========
 
-|GraphAr CI| |Docs CI| |GraphAr Docs| |Discord|
+|GraphAr CI| |Docs CI| |GraphAr Docs| |Good First Issue|
 
 Welcome to GraphAr (short for "Graph Archive"), an open source, standardized file format for graph data storage and retrieval.
 
@@ -168,13 +168,16 @@ Code of Conduct
 
 Help us keep GraphAr open and inclusive. Please read and follow our `Code of Conduct`_.
 
-Community
----------
+Getting involved
+----------------
 
-Join the conversation and help the community.
+Join the conversation and help the community. Even if you do not plan to contribute
+to GraphAr itself or GraphAr integrations in other projects, we'd be happy to have you involved
 
-- `Discord`_
-- `Weekly Community Meeting`_
+- Join the mailing list: send an email to `graphar+subscribe@googlegroups.com <mailto:graphar+subscribe@googlegroups.com>`_.
+  Share your ideas and use cases for the project.
+- Follow our activity on `GitHub Issues`_.
+- Join our `Weekly Community Meeting`_
 
 
 License
@@ -195,8 +198,8 @@ third-party libraries may not have the same license as GraphAr.
 .. |GraphAr Docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
    :target: https://alibaba.github.io/GraphAr/
 
-.. |Discord| image:: https://img.shields.io/discord/1088377726634836051.svg?logo=discord&logoColor=fff&label=Discord&color=7389d8
-   :target: https://discord.gg/XPsfd4ShCu
+.. |Good First Issue| image: https://img.shields.io/github/labels/alibaba/GraphAr/Good%20First%20Issue?color=green&label=Contribute%20&style=flat-square
+   :target: https://github.com/alibaba/GraphAr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
 
 .. _GraphAr File Format: https://alibaba.github.io/GraphAr/user-guide/file-format.html
 
