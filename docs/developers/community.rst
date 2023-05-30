@@ -20,6 +20,7 @@ Tags Conversation
 """""""""""""""""
 The mailing list follow the convention of prefixing subjects with one or more tags in order to
 clarify the scope and purpose of messages. For example:
+
 - [ANNOUNCE] GraphAr 0.1.0 released
 - [DISCUSS][C++] How to implement a new API in C++?
 - [DISCUSS][Format] How to support partition pruning?
@@ -27,16 +28,17 @@ clarify the scope and purpose of messages. For example:
 
 When emailing to the mail list, please prefix the subject line with one or more tags.
 Depending the topic of your email, tags may include one or more:
+
 - Supported Environments: e.g., [C++], [Spark], [Java], etc.
 - Specifications: e.g., [Format], [Reader], [Writer], [API], etc.
 
 You may also prefix your subject line with [DISCUSS] if your email is intended to prompt a discussion
 rather than get an answer to a specific question.
 
-Slack Workspace
-^^^^^^^^^^^^^^^
+Slack
+^^^^^^
 If you are not used to communicate with mailing list, you can also join the
-`GraphAr Slack Workspace`_ to chat with other GraphAr users and developers.
+`GraphAr Slack`_ to chat with other GraphAr users and developers.
 
 GitHub Issues
 ^^^^^^^^^^^^^
@@ -51,6 +53,7 @@ These discussions usually focus on topics of interest to developers who are cont
 but we welcome users of GraphAr to join.
 
 The community meeting runs weekly, every Tuesday at 7:00 PM (UTC+8). The meeting is hosted on Ali Meeting.
+
 See the `community meeting notes`_ for the next meeting.
 
 
@@ -63,6 +66,6 @@ See the `contribution guidelines <https://github.com/alibaba/GraphAr/tree/main/C
 
 .. _GraphAr mailing list: https://groups.google.com/g/graphar
 
-.. _GraphAr Slack Workspace: https://join.slack.com/t/grapharworkspace/shared_invite/zt-1wh5vo828-yxs0MlXYBPBBNvjOGhL4kQ
+.. _GraphAr Slack: https://join.slack.com/t/grapharworkspace/shared_invite/zt-1wh5vo828-yxs0MlXYBPBBNvjOGhL4kQ
 
 .. _community meeting notes: https://github.com/alibaba/GraphAr/wiki/Community-Meeting-Agenda
