@@ -101,7 +101,9 @@ foreach(f ${EXAMPLE_FILES})
     message(STATUS "Found GRIN example - " ${E_NAME})
     add_executable(${E_NAME} example/${E_NAME}.cc ${GAR_GRIN_SRC_FILES})
     target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${Protobuf_INCLUDE_DIRS} ${MPI_INCLUDE_PATH})
+    # enable LTO for building examples
     set_property(TARGET ${E_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    # link to gar instead of gar-grin
     target_link_libraries(${E_NAME} PRIVATE gar Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog ${MPI_LIBRARIES})
     # target_link_libraries(${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog ${MPI_LIBRARIES})
 
