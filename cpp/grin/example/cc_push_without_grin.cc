@@ -20,13 +20,13 @@ limitations under the License.
 
 #include "gar/graph.h"
 #include "gar/graph_info.h"
-#include "grin/test/config.h"
+#include "grin/example/config.h"
 
 void run_cc(GAR_NAMESPACE::GraphInfo graph_info, bool print_result = false) {
   std::cout << "++++ Run CC (push) algorithm without GRIN ++++" << std::endl;
 
   // construct vertices collection
-  std::string label = "person";
+  std::string label = CC_VERTEX_TYPE;
   assert(graph_info.GetVertexInfo(label).status().ok());
   auto maybe_vertices =
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
@@ -35,7 +35,8 @@ void run_cc(GAR_NAMESPACE::GraphInfo graph_info, bool print_result = false) {
   int num_vertices = vertices.size();
 
   // construct edges collection
-  std::string src_label = "person", edge_label = "knows", dst_label = "person";
+  std::string src_label = CC_SRC_TYPE, edge_label = CC_EDGE_TYPE,
+              dst_label = CC_DST_TYPE;
   auto expect1 = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
@@ -120,7 +121,7 @@ void run_cc(GAR_NAMESPACE::GraphInfo graph_info, bool print_result = false) {
 
 int main(int argc, char* argv[]) {
   // read file and construct graph info
-  std::string path = TEST_DATA_SMALL_PATH;
+  std::string path = CC_TEST_DATA_PATH;
   std::cout << "GraphInfo path = " << path << std::endl;
   auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
 

@@ -16,7 +16,7 @@ limitations under the License.
 #include <ctime>
 #include <iostream>
 
-#include "grin/test/config.h"
+#include "grin/example/config.h"
 
 extern "C" {
 #include "grin/include/property/property.h"
@@ -218,7 +218,7 @@ void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
 
 int main(int argc, char* argv[]) {
   // get graph from graph info of GraphAr
-  std::string path = TEST_DATA_PATH;
+  std::string path = PROPERTY_TEST_DATA_PATH;
   std::cout << "GraphInfo path = " << path << std::endl;
 
   char** args = new char*[1];

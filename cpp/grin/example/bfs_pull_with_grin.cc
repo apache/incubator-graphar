@@ -17,7 +17,7 @@ limitations under the License.
 #include <iostream>
 #include <vector>
 
-#include "grin/test/config.h"
+#include "grin/example/config.h"
 
 extern "C" {
 #include "grin/include/index/original_id.h"
@@ -112,7 +112,7 @@ void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
 
 int main(int argc, char* argv[]) {
   // get graph from graph info of GraphAr
-  std::string path = TEST_DATA_SMALL_PATH;
+  std::string path = BFS_TEST_DATA_PATH;
   std::cout << "GraphInfo path = " << path << std::endl;
 
   char** args = new char*[1];

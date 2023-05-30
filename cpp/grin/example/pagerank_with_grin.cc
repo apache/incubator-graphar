@@ -17,7 +17,7 @@ limitations under the License.
 #include <iostream>
 #include <vector>
 
-#include "grin/test/config.h"
+#include "grin/example/config.h"
 
 extern "C" {
 #include "grin/include/index/original_id.h"
@@ -132,7 +132,7 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
 
 int main(int argc, char* argv[]) {
   // get graph from graph info of GraphAr
-  std::string path = TEST_DATA_SMALL_PATH;
+  std::string path = PR_TEST_DATA_PATH;
   std::cout << "GraphInfo path = " << path << std::endl;
 
   char** args = new char*[1];

@@ -18,7 +18,7 @@ limitations under the License.
 
 #include "gar/graph.h"
 #include "gar/graph_info.h"
-#include "grin/test/config.h"
+#include "grin/example/config.h"
 
 void test_vertex_properties(GAR_NAMESPACE::GraphInfo graph_info,
                             bool print_result = false) {
@@ -162,7 +162,7 @@ void test_edge_properties(GAR_NAMESPACE::GraphInfo graph_info,
 
 int main(int argc, char* argv[]) {
   // read file and construct graph info
-  std::string path = TEST_DATA_PATH;
+  std::string path = PROPERTY_TEST_DATA_PATH;
   std::cout << "GraphInfo path = " << path << std::endl;
   auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
 

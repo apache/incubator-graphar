@@ -18,14 +18,14 @@ limitations under the License.
 
 #include "gar/graph.h"
 #include "gar/graph_info.h"
-#include "grin/test/config.h"
+#include "grin/example/config.h"
 
 void run_bfs(GAR_NAMESPACE::GraphInfo graph_info,
              GAR_NAMESPACE::IdType root = 0, bool print_result = false) {
   std::cout << "++++ Run BFS (pull) algorithm without GRIN ++++" << std::endl;
 
   // construct vertices collection
-  std::string label = "person";
+  std::string label = BFS_VERTEX_TYPE;
   assert(graph_info.GetVertexInfo(label).status().ok());
   auto maybe_vertices =
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
@@ -34,7 +34,8 @@ void run_bfs(GAR_NAMESPACE::GraphInfo graph_info,
   int num_vertices = vertices.size();
 
   // construct edges collection
-  std::string src_label = "person", edge_label = "knows", dst_label = "person";
+  std::string src_label = BFS_SRC_TYPE, edge_label = BFS_EDGE_TYPE,
+              dst_label = BFS_DST_TYPE;
   auto maybe_edges = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_dest);
@@ -76,7 +77,7 @@ void run_bfs(GAR_NAMESPACE::GraphInfo graph_info,
     auto it = vertices.begin();
     for (size_t i = 0; i < num_vertices; i++) {
       std::cout << "vertex " << i
-                << ", id = " << it.property<int64_t>("id").value()
+                << ", id = " << it.property<int64_t>(VERTEX_OID_NAME).value()
                 << ", distance = " << distance[i] << std::endl;
       ++it;
     }
@@ -87,7 +88,7 @@ void run_bfs(GAR_NAMESPACE::GraphInfo graph_info,
 
 int main(int argc, char* argv[]) {
   // read file and construct graph info
-  std::string path = TEST_DATA_SMALL_PATH;
+  std::string path = BFS_TEST_DATA_PATH;
   std::cout << "GraphInfo path = " << path << std::endl;
   auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
 

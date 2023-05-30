@@ -19,7 +19,7 @@ limitations under the License.
 #include <iostream>
 #include <vector>
 
-#include "grin/test/config.h"
+#include "grin/example/config.h"
 
 extern "C" {
 #include "grin/include/index/original_id.h"
@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
   is_master = (pid == 0);
 
   // set graph info path and partition number
-  std::string path = TEST_DATA_SMALL_PATH;
+  std::string path = DIS_PR_TEST_DATA_PATH;
   // set partition number = n_procs, stragey = segmented
   uint32_t partition_num = n_procs;
   if (is_master) {
