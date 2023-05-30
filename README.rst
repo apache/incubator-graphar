@@ -177,7 +177,7 @@ to GraphAr itself or GraphAr integrations in other projects, we'd be happy to ha
 - Join the mailing list: send an email to `graphar+subscribe@googlegroups.com <mailto:graphar+subscribe@googlegroups.com>`_.
   Share your ideas and use cases for the project.
 - Join the `GraphAr Slack`_ channel.
-- Follow our activity on `GitHub issues <https://github.com/alibaba/GraphAr/issues>_`.
+- Follow our activity on `GitHub issues <https://github.com/alibaba/GraphAr/issues>`_.
 - Join our `Weekly Community Meeting`_.
 
 Read through our `community introduction`_ to learn about our communication channels, governance, and more.
