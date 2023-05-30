@@ -27,10 +27,11 @@
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contribution Guide
+   :caption: Development
    :hidden:
 
-   user-guide/contributing.rst
+   developers/community.rst
+   developers/contributing.rst
 
 .. toctree::
    :maxdepth: 1
