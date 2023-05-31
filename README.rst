@@ -1,7 +1,7 @@
 GraphAr
 ========
 
-|GraphAr CI| |Docs CI| |GraphAr Docs| |Discord|
+|GraphAr CI| |Docs CI| |GraphAr Docs| |Good First Issue|
 
 Welcome to GraphAr (short for "Graph Archive"), an open source, standardized file format for graph data storage and retrieval.
 
@@ -168,13 +168,19 @@ Code of Conduct
 
 Help us keep GraphAr open and inclusive. Please read and follow our `Code of Conduct`_.
 
-Community
----------
+Getting Involved
+----------------
 
-Join the conversation and help the community.
+Join the conversation and help the community. Even if you do not plan to contribute
+to GraphAr itself or GraphAr integrations in other projects, we'd be happy to have you involved.
 
-- `Discord`_
-- `Weekly Community Meeting`_
+- Join the mailing list: send an email to `graphar+subscribe@googlegroups.com <mailto:graphar+subscribe@googlegroups.com>`_.
+  Share your ideas and use cases for the project.
+- Join the `GraphAr Slack`_ channel.
+- Follow our activity on `GitHub issues <https://github.com/alibaba/GraphAr/issues>`_.
+- Join our `Weekly Community Meeting`_.
+
+Read through our `community introduction`_ to learn about our communication channels, governance, and more.
 
 
 License
@@ -195,8 +201,8 @@ third-party libraries may not have the same license as GraphAr.
 .. |GraphAr Docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
    :target: https://alibaba.github.io/GraphAr/
 
-.. |Discord| image:: https://img.shields.io/discord/1088377726634836051.svg?logo=discord&logoColor=fff&label=Discord&color=7389d8
-   :target: https://discord.gg/XPsfd4ShCu
+.. |Good First Issue| image:: https://img.shields.io/github/labels/alibaba/GraphAr/Good%20First%20Issue?color=green&label=Contribute%20&style=plastic
+   :target: https://github.com/alibaba/GraphAr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
 
 .. _GraphAr File Format: https://alibaba.github.io/GraphAr/user-guide/file-format.html
 
@@ -206,13 +212,15 @@ third-party libraries may not have the same license as GraphAr.
 
 .. _example files: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/
 
-.. _contribution guidelines: https://alibaba.github.io/GraphAr/user-guide/contributing.html
+.. _contribution guidelines: https://github.com/alibaba/GraphAr/tree/main/CONTRIBUTING.rst
 
 .. _Code of Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
 
-.. _Discord: https://discord.gg/XPsfd4ShCu
+.. _GraphAr Slack: https://join.slack.com/t/grapharworkspace/shared_invite/zt-1wh5vo828-yxs0MlXYBPBBNvjOGhL4kQ
 
 .. _Weekly Community Meeting: https://github.com/alibaba/GraphAr/wiki/GraphAr-Weekly-Community-Meeting
+
+.. _community introduction: https://github.com/alibaba/GraphAr/tree/main/docs/developers/community.rst
 
 .. _GitHub Issues: https://github.com/alibaba/GraphAr/issues/new
 
