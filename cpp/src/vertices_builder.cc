@@ -19,6 +19,94 @@ limitations under the License.
 namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {
 
+Status VerticesBuilder::Validate(const Vertex& v, IdType index,
+                                 ValidateLevel validate_level) const {
+  // use the builder's validate level
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
+    return Status::OK();
+
+  // weak validate
+  // can not add new vertices after dumping
+  if (is_saved_) {
+    return Status::InvalidOperation("can not add new vertices after dumping");
+  }
+  // the start vertex index must be aligned with the chunk size
+  if (start_vertex_index_ % vertex_info_.GetChunkSize() != 0) {
+    return Status::InvalidOperation(
+        "the start vertex index must be aligned "
+        "with the chunk size");
+  }
+  // the vertex index must larger than start index
+  if (index != -1 && index < start_vertex_index_)
+    return Status::InvalidOperation(
+        "the vertex index must be larger than start index");
+
+  // strong validate
+  if (validate_level == ValidateLevel::strong_validate) {
+    for (auto& property : v.GetProperties()) {
+      // check if the property is contained
+      if (!vertex_info_.ContainProperty(property.first))
+        return Status::InvalidOperation(
+            "invalid property name which is not "
+            "contained in the vertex info");
+      // check if the property type is correct
+      auto type = vertex_info_.GetPropertyType(property.first).value();
+      bool invalid_type = false;
+      switch (type.id()) {
+      case Type::BOOL:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::BOOL>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      case Type::INT32:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::INT32>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      case Type::INT64:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::INT64>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      case Type::FLOAT:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::FLOAT>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      case Type::DOUBLE:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::DOUBLE>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      case Type::STRING:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::STRING>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      default:
+        return Status::TypeError("unsupported property type");
+      }
+      if (invalid_type) {
+        std::string err_msg =
+            "invalid data type for property: " + property.first +
+            ", defined as " + type.ToTypeName() + ", but got " +
+            property.second.type().name();
+        return Status::TypeError(err_msg);
+      }
+    }
+  }
+  return Status::OK();
+}
+
 Status VerticesBuilder::appendToArray(
     const DataType& type, const std::string& property_name,
     std::shared_ptr<arrow::Array>& array) {  // NOLINT
