@@ -48,12 +48,8 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
 
   // all partition
   if (_vl->partition_type == ALL_PARTITION) {
-    size_t offset = _g->vertex_offsets[_v->type_id] + _v->id;
-    if (offset < _g->vertex_offsets[_v->type_id + 1]) {
-      return offset - _g->vertex_offsets[_vl->type_begin];
-    } else {
-      return GRIN_NULL_SIZE;
-    }
+    return _g->vertex_offsets[_v->type_id] + _v->id -
+           _g->vertex_offsets[_vl->type_begin];
   }
 
   auto partition_id = __grin_get_master_partition_id(_g, _v->id, _v->type_id);
