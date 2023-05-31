@@ -16,7 +16,7 @@ Send an email to `graphar+subscribe@googlegroups.com <mailto:graphar+subscribe@g
 to subscribe to the mailing list.
 
 
-Tags Convention
+Tag Convention
 """""""""""""""""
 The mailing list follow the convention of prefixing subjects with one or more tags in order to
 clarify the scope and purpose of messages. For example:
