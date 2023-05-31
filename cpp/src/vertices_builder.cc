@@ -50,7 +50,7 @@ Status VerticesBuilder::Validate(const Vertex& v, IdType index,
       // check if the property is contained
       if (!vertex_info_.ContainProperty(property.first))
         return Status::InvalidOperation(
-            "invalid property name which is not "
+            "invalid property name: " + property.first + ", which is not "
             "contained in the vertex info");
       // check if the property type is correct
       auto type = vertex_info_.GetPropertyType(property.first).value();

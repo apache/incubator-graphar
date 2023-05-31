@@ -172,6 +172,7 @@ class VerticesBuilder {
   Status Validate(
       const Vertex& v, IdType index = -1,
       ValidateLevel validate_level = ValidateLevel::default_validate) const;
+
   /**
    * @brief Add a vertex with the given index.
    *
