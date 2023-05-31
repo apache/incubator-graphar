@@ -23,6 +23,7 @@ limitations under the License.
 extern "C" {
 #include "grin/include/index/original_id.h"
 #include "grin/include/property/property.h"
+#include "grin/include/property/topology.h"
 #include "grin/include/property/type.h"
 #include "grin/include/topology/adjacentlist.h"
 #include "grin/include/topology/edgelist.h"
@@ -34,8 +35,14 @@ void run_cc(GRIN_GRAPH graph, bool print_result = false) {
   std::cout << "++++ Run CC (push) algorithm with GRIN ++++" << std::endl;
 
   // initialize parameters and the graph
-  const size_t num_vertices = grin_get_vertex_num(graph);
-  auto vertex_list = grin_get_vertex_list(graph);
+  // select vertex type
+  auto vtype = grin_get_vertex_type_by_name(graph, CC_VERTEX_TYPE.c_str());
+  auto all_vertex_list = grin_get_vertex_list(graph);
+  auto vertex_list =
+      grin_select_type_for_vertex_list(graph, vtype, all_vertex_list);
+  const size_t num_vertices = grin_get_vertex_num_by_type(graph, vtype);
+  // select edge type
+  auto etype = grin_get_edge_type_by_name(graph, CC_EDGE_TYPE.c_str());
 
   // initialize
   std::vector<size_t> component(num_vertices);
@@ -57,13 +64,16 @@ void run_cc(GRIN_GRAPH graph, bool print_result = false) {
         // get vertex
         auto v = grin_get_vertex_from_list(graph, vertex_list, vid);
         // find outgoing edges and update neighbors
-        auto adj_list_out =
+        auto all_adj_list_out =
             grin_get_adjacent_list(graph, GRIN_DIRECTION::OUT, v);
+        auto adj_list_out = grin_select_edge_type_for_adjacent_list(
+            graph, etype, all_adj_list_out);
         auto it_out = grin_get_adjacent_list_begin(graph, adj_list_out);
         while (grin_is_adjacent_list_end(graph, it_out) == false) {
           // get neighbor
           auto nbr = grin_get_neighbor_from_adjacent_list_iter(graph, it_out);
-          auto nbr_id = grin_get_vertex_original_id_of_int64(graph, nbr);
+          auto nbr_id = gar_get_internal_id_from_original_id(
+              grin_get_vertex_original_id_of_int64(graph, nbr));
           grin_destroy_vertex(graph, nbr);
           // update
           if (component[vid] < component[nbr_id]) {
@@ -77,12 +87,16 @@ void run_cc(GRIN_GRAPH graph, bool print_result = false) {
         }
 
         // find incoming edges and update neighbors
-        auto adj_list_in = grin_get_adjacent_list(graph, GRIN_DIRECTION::IN, v);
+        auto all_adj_list_in =
+            grin_get_adjacent_list(graph, GRIN_DIRECTION::IN, v);
+        auto adj_list_in = grin_select_edge_type_for_adjacent_list(
+            graph, etype, all_adj_list_in);
         auto it_in = grin_get_adjacent_list_begin(graph, adj_list_in);
         while (grin_is_adjacent_list_end(graph, it_in) == false) {
           // get neighbor
           auto nbr = grin_get_neighbor_from_adjacent_list_iter(graph, it_in);
-          auto nbr_id = grin_get_vertex_original_id_of_int64(graph, nbr);
+          auto nbr_id = gar_get_internal_id_from_original_id(
+              grin_get_vertex_original_id_of_int64(graph, nbr));
           grin_destroy_vertex(graph, nbr);
           // update
           if (component[vid] < component[nbr_id]) {
@@ -97,9 +111,9 @@ void run_cc(GRIN_GRAPH graph, bool print_result = false) {
 
         // destroy
         grin_destroy_vertex(graph, v);
-        grin_destroy_adjacent_list(graph, adj_list_out);
+        grin_destroy_adjacent_list(graph, all_adj_list_out);
         grin_destroy_adjacent_list_iter(graph, it_out);
-        grin_destroy_adjacent_list(graph, adj_list_in);
+        grin_destroy_adjacent_list(graph, all_adj_list_in);
         grin_destroy_adjacent_list_iter(graph, it_in);
       }
     }
@@ -122,6 +136,9 @@ void run_cc(GRIN_GRAPH graph, bool print_result = false) {
   }
 
   grin_destroy_vertex_list(graph, vertex_list);
+  grin_destroy_vertex_list(graph, all_vertex_list);
+  grin_destroy_vertex_type(graph, vtype);
+  grin_destroy_edge_type(graph, etype);
 
   std::cout << "---- Run CC (push) algorithm completed ----" << std::endl;
 }

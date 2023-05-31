@@ -21,7 +21,8 @@ limitations under the License.
 #include "grin/example/config.h"
 
 void run_bfs(GAR_NAMESPACE::GraphInfo graph_info,
-             GAR_NAMESPACE::IdType root = 0, bool print_result = false) {
+             GAR_NAMESPACE::IdType root = BFS_ROOT_ID,
+             bool print_result = false) {
   std::cout << "++++ Run BFS (pull) algorithm without GRIN ++++" << std::endl;
 
   // construct vertices collection
@@ -34,8 +35,8 @@ void run_bfs(GAR_NAMESPACE::GraphInfo graph_info,
   int num_vertices = vertices.size();
 
   // construct edges collection
-  std::string src_label = BFS_SRC_TYPE, edge_label = BFS_EDGE_TYPE,
-              dst_label = BFS_DST_TYPE;
+  std::string src_label = BFS_VERTEX_TYPE, edge_label = BFS_EDGE_TYPE,
+              dst_label = BFS_VERTEX_TYPE;
   auto maybe_edges = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_dest);
@@ -94,7 +95,7 @@ int main(int argc, char* argv[]) {
 
   // run BFS (push) algorithm
   auto run_start = clock();
-  run_bfs(graph_info);
+  run_bfs(graph_info, BFS_ROOT_ID);
   auto run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
 
   std::cout << "Run time for BFS (pull) without GRIN = " << run_time << " ms"

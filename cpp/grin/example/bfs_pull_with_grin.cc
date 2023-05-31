@@ -22,6 +22,7 @@ limitations under the License.
 extern "C" {
 #include "grin/include/index/original_id.h"
 #include "grin/include/property/property.h"
+#include "grin/include/property/topology.h"
 #include "grin/include/property/type.h"
 #include "grin/include/topology/adjacentlist.h"
 #include "grin/include/topology/edgelist.h"
@@ -29,12 +30,18 @@ extern "C" {
 #include "grin/include/topology/vertexlist.h"
 }
 
-void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
+void run_bfs(GRIN_GRAPH graph, size_t root = BFS_ROOT_ID,
+             bool print_result = false) {
   std::cout << "++++ Run BFS (pull) algorithm with GRIN ++++" << std::endl;
 
-  // initialize parameters and the graph
-  const size_t num_vertices = grin_get_vertex_num(graph);
-  auto vertex_list = grin_get_vertex_list(graph);
+  // select vertex type
+  auto vtype = grin_get_vertex_type_by_name(graph, BFS_VERTEX_TYPE.c_str());
+  auto all_vertex_list = grin_get_vertex_list(graph);
+  auto vertex_list =
+      grin_select_type_for_vertex_list(graph, vtype, all_vertex_list);
+  const size_t num_vertices = grin_get_vertex_num_by_type(graph, vtype);
+  // select edge type
+  auto etype = grin_get_edge_type_by_name(graph, BFS_EDGE_TYPE.c_str());
 
   // initialize BFS value of vertices
   std::vector<int32_t> distance(num_vertices);
@@ -50,12 +57,16 @@ void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
         auto v = grin_get_vertex_from_list(graph, vertex_list, i);
 
         // get incoming edges of v and update it
-        auto adj_list = grin_get_adjacent_list(graph, GRIN_DIRECTION::IN, v);
+        auto all_adj_list =
+            grin_get_adjacent_list(graph, GRIN_DIRECTION::IN, v);
+        auto adj_list =
+            grin_select_edge_type_for_adjacent_list(graph, etype, all_adj_list);
         auto it = grin_get_adjacent_list_begin(graph, adj_list);
         while (grin_is_adjacent_list_end(graph, it) == false) {
           // get neighbor
           auto nbr = grin_get_neighbor_from_adjacent_list_iter(graph, it);
-          auto nbr_id = grin_get_vertex_original_id_of_int64(graph, nbr);
+          auto nbr_id = gar_get_internal_id_from_original_id(
+              grin_get_vertex_original_id_of_int64(graph, nbr));
           grin_destroy_vertex(graph, nbr);
           // update
           if (distance[nbr_id] == iter) {
@@ -69,6 +80,7 @@ void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
         // destroy
         grin_destroy_vertex(graph, v);
         grin_destroy_adjacent_list(graph, adj_list);
+        grin_destroy_adjacent_list(graph, all_adj_list);
         grin_destroy_adjacent_list_iter(graph, it);
       }
     }
@@ -80,13 +92,15 @@ void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
   // output results
   if (print_result) {
     std::cout << "num_vertices: " << num_vertices << std::endl;
-    auto type = grin_get_vertex_type_by_name(graph, "person");
-    auto property = grin_get_vertex_property_by_name(graph, type, "id");
+    auto property =
+        grin_get_vertex_property_by_name(graph, vtype, VERTEX_OID_NAME.c_str());
     auto data_type = grin_get_vertex_property_datatype(graph, property);
 
-    for (size_t i = 0; i < num_vertices; i++) {
+    auto it = grin_get_vertex_list_begin(graph, vertex_list);
+    size_t i = 0;
+    while (grin_is_vertex_list_end(graph, it) == false) {
       // get vertex
-      auto v = grin_get_vertex_from_list(graph, vertex_list, i);
+      auto v = grin_get_vertex_from_iter(graph, it);
       // output
       std::cout << "vertex " << i;
       if (data_type == GRIN_DATATYPE::Int64) {
@@ -98,14 +112,18 @@ void run_bfs(GRIN_GRAPH graph, size_t root = 0, bool print_result = false) {
       std::cout << ", distance = " << distance[i] << std::endl;
       // destroy vertex
       grin_destroy_vertex(graph, v);
+      grin_get_next_vertex_list_iter(graph, it);
+      i++;
     }
 
     // destroy
     grin_destroy_vertex_property(graph, property);
-    grin_destroy_vertex_type(graph, type);
   }
 
   grin_destroy_vertex_list(graph, vertex_list);
+  grin_destroy_vertex_list(graph, all_vertex_list);
+  grin_destroy_vertex_type(graph, vtype);
+  grin_destroy_edge_type(graph, etype);
 
   std::cout << "---- Run BFS (pull) algorithm completed ----" << std::endl;
 }
@@ -126,7 +144,7 @@ int main(int argc, char* argv[]) {
 
   // run bfs algorithm
   auto run_start = clock();
-  run_bfs(graph);
+  run_bfs(graph, BFS_ROOT_ID);
   auto run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
 
   // output execution time

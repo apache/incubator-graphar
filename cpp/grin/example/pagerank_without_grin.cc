@@ -34,8 +34,8 @@ void run_pagerank(GAR_NAMESPACE::GraphInfo graph_info,
   int num_vertices = vertices.size();
 
   // construct edges collection
-  std::string src_label = PR_SRC_TYPE, edge_label = PR_EDGE_TYPE,
-              dst_label = PR_DST_TYPE;
+  std::string src_label = PR_VERTEX_TYPE, edge_label = PR_EDGE_TYPE,
+              dst_label = PR_VERTEX_TYPE;
   auto maybe_edges = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
@@ -45,7 +45,7 @@ void run_pagerank(GAR_NAMESPACE::GraphInfo graph_info,
 
   // run pagerank algorithm
   const double damping = 0.85;
-  const int max_iters = 50;
+  const int max_iters = PR_MAX_ITERS;
   std::vector<double> pr_curr(num_vertices);
   std::vector<double> pr_next(num_vertices);
   std::vector<GAR_NAMESPACE::IdType> out_degree(num_vertices);

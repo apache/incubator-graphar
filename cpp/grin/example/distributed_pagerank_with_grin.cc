@@ -51,7 +51,7 @@ GRIN_GRAPH init(GRIN_PARTITIONED_GRAPH partitioned_graph, int pid = 0) {
 void run_pagerank(GRIN_PARTITIONED_GRAPH graph, bool print_result = false) {
   // initialize parameters
   const double damping = 0.85;
-  const int max_iters = 20;
+  const int max_iters = DIS_PR_MAX_ITERS;
   // get vertex list & select by vertex type
   auto all_vertex_list = grin_get_vertex_list(graph);
   auto vtype = grin_get_vertex_type_by_name(graph, DIS_PR_VERTEX_TYPE.c_str());

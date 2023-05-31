@@ -19,6 +19,8 @@ limitations under the License.
 #ifndef CPP_GRIN_EXAMPLE_CONFIG_H_
 #define CPP_GRIN_EXAMPLE_CONFIG_H_
 
+#define gar_get_internal_id_from_original_id(x) (x & 0xFFFFF)
+
 static const std::string TEST_DATA_PATH =  // NOLINT
     std::filesystem::path(__FILE__)
         .parent_path()
@@ -39,25 +41,24 @@ static const std::string TEST_DATA_SMALL_PATH =  // NOLINT
 
 static const std::string VERTEX_OID_NAME = "id";
 
-static const std::string PR_VERTEX_TYPE = "person";
-static const std::string PR_EDGE_TYPE = "knows";
-static const std::string PR_SRC_TYPE = "person";
-static const std::string PR_DST_TYPE = "person";
-static const std::string PR_TEST_DATA_PATH = TEST_DATA_SMALL_PATH;
+static const std::string PR_VERTEX_TYPE = "comment";
+static const std::string PR_EDGE_TYPE = "replyOf";
+static const std::string PR_TEST_DATA_PATH = TEST_DATA_PATH;
+static const int PR_MAX_ITERS = 30;
 
 static const std::string BFS_VERTEX_TYPE = "person";
 static const std::string BFS_EDGE_TYPE = "knows";
-static const std::string BFS_SRC_TYPE = "person";
-static const std::string BFS_DST_TYPE = "person";
 static const std::string BFS_TEST_DATA_PATH = TEST_DATA_SMALL_PATH;
+static const int64_t BFS_ROOT_ID = 0;
 
 static const std::string CC_VERTEX_TYPE = "person";
 static const std::string CC_EDGE_TYPE = "knows";
-static const std::string CC_SRC_TYPE = "person";
-static const std::string CC_DST_TYPE = "person";
 static const std::string CC_TEST_DATA_PATH = TEST_DATA_SMALL_PATH;
 
+static const std::string DIS_PR_VERTEX_TYPE = "person";
+static const std::string DIS_PR_EDGE_TYPE = "knows";
 static const std::string DIS_PR_TEST_DATA_PATH = TEST_DATA_SMALL_PATH;
+static const int DIS_PR_MAX_ITERS = 10;
 
 static const std::string PROPERTY_TEST_DATA_PATH = TEST_DATA_PATH;
 
