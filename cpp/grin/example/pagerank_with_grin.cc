@@ -18,9 +18,9 @@ limitations under the License.
 #include <vector>
 
 #include "grin/example/config.h"
+#include "grin/predefine.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "index/order.h"
 #include "index/original_id.h"
 #include "property/property.h"

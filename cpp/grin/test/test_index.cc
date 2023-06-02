@@ -15,16 +15,16 @@ limitations under the License.
 
 #include <iostream>
 
+#include "grin/predefine.h"
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "index/order.h"
 #include "index/original_id.h"
+#include "property/topology.h"
+#include "property/type.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-#include "property/type.h"
-#include "property/topology.h"
 }
 
 void test_index_order(GRIN_GRAPH graph) {
@@ -36,16 +36,16 @@ void test_index_order(GRIN_GRAPH graph) {
   size_t idx0 = 0, idx1 = 1;
   auto v0 = grin_get_vertex_from_list(graph, vertex_list, idx0);
   auto v1 = grin_get_vertex_from_list(graph, vertex_list, idx1);
-  assert(grin_smaller_vertex(graph, v0, v1) == true);
-  assert(grin_smaller_vertex(graph, v1, v0) == false);
+  ASSERT(grin_smaller_vertex(graph, v0, v1) == true);
+  ASSERT(grin_smaller_vertex(graph, v1, v0) == false);
 
   std::cout << "test get position of vertex from sorted list" << std::endl;
   size_t pos0 =
       grin_get_position_of_vertex_from_sorted_list(graph, vertex_list, v0);
   size_t pos1 =
       grin_get_position_of_vertex_from_sorted_list(graph, vertex_list, v1);
-  assert(pos0 == idx0);
-  assert(pos1 == idx1);
+  ASSERT(pos0 == idx0);
+  ASSERT(pos1 == idx1);
 
   // destroy
   grin_destroy_vertex(graph, v0);
@@ -68,7 +68,7 @@ void test_original_id(GRIN_GRAPH graph) {
 
   // orignal id datatype
   auto type = grin_get_vertex_original_id_datatype(graph);
-  assert(type == GRIN_DATATYPE::Int64);
+  ASSERT(type == GRIN_DATATYPE::Int64);
 
   // get original id of vertex
   auto oid0 = grin_get_vertex_original_id_of_int64(graph, v0);
@@ -79,8 +79,8 @@ void test_original_id(GRIN_GRAPH graph) {
   // get vertex by original id
   auto v0_from_oid = grin_get_vertex_by_original_id_of_int64(graph, oid0);
   auto v1_from_oid = grin_get_vertex_by_original_id_of_int64(graph, oid1);
-  assert(grin_equal_vertex(graph, v0, v0_from_oid) == true);
-  assert(grin_equal_vertex(graph, v1, v1_from_oid) == true);
+  ASSERT(grin_equal_vertex(graph, v0, v0_from_oid) == true);
+  ASSERT(grin_equal_vertex(graph, v1, v1_from_oid) == true);
 
   // destroy
   grin_destroy_vertex(graph, v0);

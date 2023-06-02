@@ -15,17 +15,17 @@ limitations under the License.
 
 #include <iostream>
 
+#include "grin/predefine.h"
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "common/message.h"
+#include "property/topology.h"
+#include "property/type.h"
 #include "topology/adjacentlist.h"
 #include "topology/edgelist.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-#include "property/topology.h"
-#include "property/type.h"
 }
 
 void test_protobuf() {
@@ -39,7 +39,7 @@ void test_protobuf() {
 void test_topology_structure(GRIN_GRAPH graph) {
   std::cout << "\n++++ test topology: structure ++++" << std::endl;
 
-  assert(grin_is_multigraph(graph) == true);
+  ASSERT(grin_is_multigraph(graph) == true);
 
   std::cout << "---- test topology: structure ----" << std::endl;
 }
@@ -57,9 +57,9 @@ void test_topology_vertexlist(GRIN_GRAPH graph) {
   auto v0 = grin_get_vertex_from_list(graph, vertex_list, 0);
   auto v1 = grin_get_vertex_from_list(graph, vertex_list, 1);
   auto v2 = grin_get_vertex_from_list(graph, vertex_list, 100000000);
-  assert(grin_equal_vertex(graph, v0, v0) == true);
-  assert(grin_equal_vertex(graph, v0, v1) == false);
-  assert(v2 == GRIN_NULL_VERTEX);
+  ASSERT(grin_equal_vertex(graph, v0, v0) == true);
+  ASSERT(grin_equal_vertex(graph, v0, v1) == false);
+  ASSERT(v2 == GRIN_NULL_VERTEX);
 
   grin_destroy_vertex(graph, v0);
   grin_destroy_vertex(graph, v1);
@@ -75,7 +75,7 @@ void test_topology_vertexlist(GRIN_GRAPH graph) {
     grin_get_next_vertex_list_iter(graph, it);
     count++;
   }
-  assert(count == n);
+  ASSERT(count == n);
   grin_destroy_vertex_list_iter(graph, it);
 
   // destroy vertex list
@@ -126,7 +126,8 @@ void test_topology_adjlist_in(GRIN_GRAPH graph) {
   auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
   auto etype = grin_get_edge_type_by_name(graph, "knows");
   auto v = grin_get_vertex_from_list(graph, vertex_list, 201);
-  auto adj_list = grin_get_adjacent_list_by_edge_type(graph, GRIN_DIRECTION::IN, v, etype);
+  auto adj_list =
+      grin_get_adjacent_list_by_edge_type(graph, GRIN_DIRECTION::IN, v, etype);
 
   // iterate adj list
   auto it = grin_get_adjacent_list_begin(graph, adj_list);
@@ -138,8 +139,8 @@ void test_topology_adjlist_in(GRIN_GRAPH graph) {
     auto nbr = grin_get_neighbor_from_adjacent_list_iter(graph, it);
 
     // check src & dst
-    assert(grin_equal_vertex(graph, v1, nbr) == true);
-    assert(grin_equal_vertex(graph, v2, v) == true);
+    ASSERT(grin_equal_vertex(graph, v1, nbr) == true);
+    ASSERT(grin_equal_vertex(graph, v2, v) == true);
 
     grin_destroy_vertex(graph, v1);
     grin_destroy_vertex(graph, v2);
@@ -165,7 +166,8 @@ void test_topology_adjlist_out(GRIN_GRAPH graph) {
   auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
   auto etype = grin_get_edge_type_by_name(graph, "knows");
   auto v = grin_get_vertex_from_list(graph, vertex_list, 297);
-  auto adj_list = grin_get_adjacent_list_by_edge_type(graph, GRIN_DIRECTION::OUT, v, etype);
+  auto adj_list =
+      grin_get_adjacent_list_by_edge_type(graph, GRIN_DIRECTION::OUT, v, etype);
 
   // iterate adj list
   auto it = grin_get_adjacent_list_begin(graph, adj_list);
@@ -177,8 +179,8 @@ void test_topology_adjlist_out(GRIN_GRAPH graph) {
     auto nbr = grin_get_neighbor_from_adjacent_list_iter(graph, it);
 
     // check src & dst
-    assert(grin_equal_vertex(graph, v1, v) == true);
-    assert(grin_equal_vertex(graph, v2, nbr) == true);
+    ASSERT(grin_equal_vertex(graph, v1, v) == true);
+    ASSERT(grin_equal_vertex(graph, v2, nbr) == true);
 
     grin_destroy_vertex(graph, v1);
     grin_destroy_vertex(graph, v2);

@@ -21,9 +21,7 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-extern "C" {
 #include "grin/predefine.h"
-}
 
 #include "gar/graph.h"
 #include "gar/graph_info.h"

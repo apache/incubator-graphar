@@ -15,10 +15,10 @@ limitations under the License.
 
 #include <iostream>
 
+#include "grin/predefine.h"
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "property/topology.h"
 #include "property/type.h"
 #include "topology/adjacentlist.h"
@@ -48,12 +48,11 @@ void test_property_topology_vertex(GRIN_GRAPH graph) {
               << std::endl;
 
     // select vertex list
-    auto select_vertex_list =
-        grin_get_vertex_list_by_type(graph, vertex_type);
+    auto select_vertex_list = grin_get_vertex_list_by_type(graph, vertex_type);
     std::cout << "size of vertex list of vertex type " << i << " = "
               << grin_get_vertex_list_size(graph, select_vertex_list)
               << std::endl;
-    assert(grin_get_vertex_list_size(graph, select_vertex_list) == m);
+    ASSERT(grin_get_vertex_list_size(graph, select_vertex_list) == m);
 
     // destroy
     grin_destroy_vertex_type(graph, vertex_type);
@@ -86,15 +85,14 @@ void test_property_topology_edge(GRIN_GRAPH graph) {
     std::cout << "name of edge type " << i << ": " << name << std::endl;
 
     // select edge list
-    auto select_edge_list =
-        grin_get_edge_list_by_type(graph, edge_type);
+    auto select_edge_list = grin_get_edge_list_by_type(graph, edge_type);
     auto it = grin_get_edge_list_begin(graph, select_edge_list);
     auto count = 0;
     while (grin_is_edge_list_end(graph, it) == false) {
       grin_get_next_edge_list_iter(graph, it);
       count++;
     }
-    assert(count == m);
+    ASSERT(count == m);
     std::cout << "size of edge list of edge type " << i << " = " << m
               << std::endl;
 
@@ -137,8 +135,8 @@ void test_property_topology_adj_list(GRIN_GRAPH graph) {
     auto edge_type = grin_get_edge_type_from_list(graph, edge_type_list, i);
 
     // get adj list by edge type
-    auto select_adj_list =
-        grin_get_adjacent_list_by_edge_type(graph, GRIN_DIRECTION::IN, v, edge_type);
+    auto select_adj_list = grin_get_adjacent_list_by_edge_type(
+        graph, GRIN_DIRECTION::IN, v, edge_type);
     auto adj_list_it = grin_get_adjacent_list_begin(graph, select_adj_list);
     auto adj_list_size = 0;
     while (grin_is_adjacent_list_end(graph, adj_list_it) == false) {

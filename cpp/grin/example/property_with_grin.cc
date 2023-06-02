@@ -17,9 +17,9 @@ limitations under the License.
 #include <iostream>
 
 #include "grin/example/config.h"
+#include "grin/predefine.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "property/property.h"
 #include "property/propertylist.h"
 #include "property/topology.h"
@@ -139,8 +139,7 @@ void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
     size_t epn = grin_get_edge_property_list_size(graph, property_list);
 
     // select type for edge list
-    auto select_edge_list =
-        grin_get_edge_list_by_type(graph, edge_type);
+    auto select_edge_list = grin_get_edge_list_by_type(graph, edge_type);
 
     auto it = grin_get_edge_list_begin(graph, select_edge_list);
     while (grin_is_edge_list_end(graph, it) == false) {

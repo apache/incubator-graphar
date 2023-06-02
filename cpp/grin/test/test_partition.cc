@@ -15,10 +15,10 @@ limitations under the License.
 
 #include <iostream>
 
+#include "grin/predefine.h"
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "partition/partition.h"
 #include "topology/structure.h"
 }
@@ -27,34 +27,34 @@ void test_partition_partition(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
   std::cout << "\n++++ test partition: partition ++++" << std::endl;
 
   // check partition number
-  assert(pg != GRIN_NULL_GRAPH);
+  ASSERT(pg != GRIN_NULL_GRAPH);
   auto partition_num = grin_get_total_partitions_number(pg);
-  assert(partition_num == n);
+  ASSERT(partition_num == n);
 
   // check partition list
   auto partition_list = grin_get_local_partition_list(pg);
-  assert(partition_list != GRIN_NULL_LIST);
+  ASSERT(partition_list != GRIN_NULL_LIST);
   auto partition_list_size = grin_get_partition_list_size(pg, partition_list);
-  assert(partition_list_size == n);
+  ASSERT(partition_list_size == n);
 
   // check create new partition list
   auto new_partition_list = grin_create_partition_list(pg);
-  assert(new_partition_list != GRIN_NULL_LIST);
+  ASSERT(new_partition_list != GRIN_NULL_LIST);
   for (auto i = 0; i < partition_list_size; ++i) {
     // get & insert partition
     auto partition = grin_get_partition_from_list(pg, partition_list, i);
     auto status =
         grin_insert_partition_to_list(pg, new_partition_list, partition);
-    assert(status == true);
+    ASSERT(status == true);
     // check & destroy partition
     auto partition_from_new_list =
         grin_get_partition_from_list(pg, new_partition_list, i);
-    assert(grin_equal_partition(pg, partition, partition_from_new_list) ==
+    ASSERT(grin_equal_partition(pg, partition, partition_from_new_list) ==
            true);
     grin_destroy_partition(pg, partition);
     grin_destroy_partition(pg, partition_from_new_list);
   }
-  assert(grin_get_partition_list_size(pg, new_partition_list) ==
+  ASSERT(grin_get_partition_list_size(pg, new_partition_list) ==
          partition_list_size);
   grin_destroy_partition_list(pg, new_partition_list);
 
@@ -62,7 +62,7 @@ void test_partition_partition(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
   auto partition_a = grin_get_partition_from_list(pg, partition_list, 0);
   auto id = grin_get_partition_id(pg, partition_a);
   auto partition_b = grin_get_partition_by_id(pg, id);
-  assert(grin_equal_partition(pg, partition_a, partition_b) == true);
+  ASSERT(grin_equal_partition(pg, partition_a, partition_b) == true);
   grin_destroy_partition(pg, partition_a);
   grin_destroy_partition(pg, partition_b);
 
@@ -73,7 +73,7 @@ void test_partition_partition(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
     auto info = grin_get_partition_info(pg, partition);
     std::cout << "Partition " << static_cast<const char*>(info) << std::endl;
     auto graph = grin_get_local_graph_by_partition(pg, partition);
-    assert(graph != GRIN_NULL_GRAPH);
+    ASSERT(graph != GRIN_NULL_GRAPH);
     // destroy
     grin_destroy_partition(pg, partition);
     grin_destroy_graph(graph);

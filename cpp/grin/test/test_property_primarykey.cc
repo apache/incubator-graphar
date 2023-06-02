@@ -15,10 +15,10 @@ limitations under the License.
 
 #include <iostream>
 
+#include "grin/predefine.h"
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "property/primarykey.h"
 #include "property/property.h"
 #include "property/propertylist.h"
@@ -65,19 +65,19 @@ void test_property_primarykey(GRIN_GRAPH graph) {
     for (auto i = 0; i < property_list_size; ++i) {
       auto property =
           grin_get_vertex_property_from_list(graph, property_list, i);
-      assert(grin_get_vertex_property_datatype(graph, property) ==
+      ASSERT(grin_get_vertex_property_datatype(graph, property) ==
              GRIN_DATATYPE::Int64);
       auto value =
           grin_get_vertex_property_value_of_int64(graph, vertex, property);
       auto status = grin_insert_int64_to_row(graph, row, value);
-      assert(status == true);
+      ASSERT(status == true);
       grin_destroy_vertex_property(graph, property);
     }
 
     // get vertex from primary key
     std::cout << "get vertex B from primary key" << std::endl;
     auto vertex2 = grin_get_vertex_by_primary_keys(graph, vertex_type, row);
-    assert(grin_equal_vertex(graph, vertex, vertex2) == true);
+    ASSERT(grin_equal_vertex(graph, vertex, vertex2) == true);
     std::cout << "(Correct) vertex A and vertex B are equal" << std::endl;
 
     // destroy

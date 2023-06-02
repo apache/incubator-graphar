@@ -15,10 +15,10 @@ limitations under the License.
 
 #include <iostream>
 
+#include "grin/predefine.h"
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "common/error.h"
 #include "property/property.h"
 #include "property/propertylist.h"
@@ -48,32 +48,32 @@ void test_property_row(GRIN_GRAPH graph) {
   std::cout << "put value2: " << value2 << std::endl;
   std::cout << "put value3: " << value3 << std::endl;
   auto status = grin_insert_int32_to_row(graph, row, value0);
-  assert(status == true);
+  ASSERT(status == true);
   status = grin_insert_string_to_row(graph, row, value1);
-  assert(status == true);
+  ASSERT(status == true);
   status = grin_insert_uint64_to_row(graph, row, value2);
-  assert(status == true);
+  ASSERT(status == true);
   status = grin_insert_double_to_row(graph, row, value3);
-  assert(status == true);
+  ASSERT(status == true);
 
   // get value from row
   auto value0_ = grin_get_int32_from_row(graph, row, 0);
   auto value1_ = grin_get_string_from_row(graph, row, 1);
   auto invalid_value = grin_get_float_from_row(graph, row, 100);
-  assert(grin_get_last_error_code() == INVALID_VALUE && invalid_value == 0.0);
+  ASSERT(grin_get_last_error_code() == INVALID_VALUE && invalid_value == 0.0);
   auto value2_ = grin_get_uint64_from_row(graph, row, 2);
   auto value3_ = grin_get_double_from_row(graph, row, 3);
-  assert(grin_get_last_error_code() == NO_ERROR);
+  ASSERT(grin_get_last_error_code() == NO_ERROR);
 
   // check value
   std::cout << "get value0: " << value0_ << std::endl;
   std::cout << "get value1: " << value1_ << std::endl;
   std::cout << "get value2: " << value2_ << std::endl;
   std::cout << "get value3: " << value3_ << std::endl;
-  assert(value0_ == value0);
-  assert(strcmp(value1_, value1) == 0);
-  assert(value2_ == value2);
-  assert(value3_ == value3);
+  ASSERT(value0_ == value0);
+  ASSERT(strcmp(value1_, value1) == 0);
+  ASSERT(value2_ == value2);
+  ASSERT(value3_ == value3);
 
   // destroy
   grin_destroy_string_value(graph, value1_);
@@ -96,8 +96,7 @@ void test_property_vertex(GRIN_GRAPH graph) {
         grin_get_vertex_type_from_list(graph, vertex_type_list, i);
 
     // select type for vertex list
-    auto select_vertex_list =
-        grin_get_vertex_list_by_type(graph, vertex_type);
+    auto select_vertex_list = grin_get_vertex_list_by_type(graph, vertex_type);
 
     // get property list by vertex type
     auto property_list =
@@ -124,7 +123,7 @@ void test_property_vertex(GRIN_GRAPH graph) {
         auto value1 = grin_get_int64_from_row(graph, r, 0);
         auto value2 =
             grin_get_vertex_property_value_of_int64(graph, vertex, property);
-        assert(value1 == value2);
+        ASSERT(value1 == value2);
         std::cout << "value of property \"" << name
                   << "\" for vertex 0 of vertex type " << i << ": " << value1
                   << std::endl;
@@ -137,8 +136,8 @@ void test_property_vertex(GRIN_GRAPH graph) {
         auto value1 = grin_get_string_from_row(graph, r, 0);
         auto value2 =
             grin_get_vertex_property_value_of_string(graph, vertex, property);
-        assert(grin_get_last_error_code() == NO_ERROR);
-        assert(strcmp(value1, value2) == 0);
+        ASSERT(grin_get_last_error_code() == NO_ERROR);
+        ASSERT(strcmp(value1, value2) == 0);
 
         std::cout << "value of property \"" << name
                   << "\" for vertex 0 of vertex type " << i << ": " << value1
@@ -183,8 +182,7 @@ void test_property_edge(GRIN_GRAPH graph) {
     auto edge_type = grin_get_edge_type_from_list(graph, edge_type_list, i);
 
     // select type for edge list
-    auto select_edge_list =
-        grin_get_edge_list_by_type(graph, edge_type);
+    auto select_edge_list = grin_get_edge_list_by_type(graph, edge_type);
 
     // get property list by edge type
     auto property_list = grin_get_edge_property_list_by_type(graph, edge_type);
@@ -211,8 +209,8 @@ void test_property_edge(GRIN_GRAPH graph) {
         auto value1 = grin_get_int64_from_row(graph, r, 0);
         auto value2 =
             grin_get_edge_property_value_of_int64(graph, edge, property);
-        assert(grin_get_last_error_code() == NO_ERROR);
-        assert(value1 == value2);
+        ASSERT(grin_get_last_error_code() == NO_ERROR);
+        ASSERT(value1 == value2);
         std::cout << "value of property \"" << name
                   << "\" for edge 0 of edge type " << i << ": " << value1
                   << std::endl;
@@ -225,8 +223,8 @@ void test_property_edge(GRIN_GRAPH graph) {
         auto value1 = grin_get_string_from_row(graph, r, 0);
         auto value2 =
             grin_get_edge_property_value_of_string(graph, edge, property);
-        assert(grin_get_last_error_code() == NO_ERROR);
-        assert(strcmp(value1, value2) == 0);
+        ASSERT(grin_get_last_error_code() == NO_ERROR);
+        ASSERT(strcmp(value1, value2) == 0);
         std::cout << "value of property \"" << name
                   << "\" for edge 0 of edge type " << i << ": " << value1
                   << std::endl;

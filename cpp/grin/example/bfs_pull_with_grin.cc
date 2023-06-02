@@ -18,9 +18,9 @@ limitations under the License.
 #include <vector>
 
 #include "grin/example/config.h"
+#include "grin/predefine.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "index/original_id.h"
 #include "property/property.h"
 #include "property/topology.h"
@@ -56,7 +56,8 @@ void run_bfs(GRIN_GRAPH graph, size_t root = BFS_ROOT_ID,
         auto v = grin_get_vertex_from_list(graph, vertex_list, i);
 
         // get incoming edges of v and update it
-        auto adj_list = grin_get_adjacent_list_by_edge_type(graph, GRIN_DIRECTION::IN, v, etype);
+        auto adj_list = grin_get_adjacent_list_by_edge_type(
+            graph, GRIN_DIRECTION::IN, v, etype);
         auto it = grin_get_adjacent_list_begin(graph, adj_list);
         while (grin_is_adjacent_list_end(graph, it) == false) {
           // get neighbor

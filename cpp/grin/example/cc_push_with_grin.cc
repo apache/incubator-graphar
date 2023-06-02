@@ -19,9 +19,9 @@ limitations under the License.
 #include <vector>
 
 #include "grin/example/config.h"
+#include "grin/predefine.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "index/original_id.h"
 #include "property/property.h"
 #include "property/topology.h"
@@ -38,8 +38,7 @@ void run_cc(GRIN_GRAPH graph, bool print_result = false) {
   // initialize parameters and the graph
   // select vertex type
   auto vtype = grin_get_vertex_type_by_name(graph, CC_VERTEX_TYPE.c_str());
-  auto vertex_list =
-      grin_get_vertex_list_by_type(graph, vtype);
+  auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
   const size_t num_vertices = grin_get_vertex_num_by_type(graph, vtype);
   // select edge type
   auto etype = grin_get_edge_type_by_name(graph, CC_EDGE_TYPE.c_str());
@@ -64,8 +63,8 @@ void run_cc(GRIN_GRAPH graph, bool print_result = false) {
         // get vertex
         auto v = grin_get_vertex_from_list(graph, vertex_list, vid);
         // find outgoing edges and update neighbors
-         auto adj_list_out = grin_get_adjacent_list_by_edge_type(
-             graph, GRIN_DIRECTION::OUT, v, etype);
+        auto adj_list_out = grin_get_adjacent_list_by_edge_type(
+            graph, GRIN_DIRECTION::OUT, v, etype);
         auto it_out = grin_get_adjacent_list_begin(graph, adj_list_out);
         while (grin_is_adjacent_list_end(graph, it_out) == false) {
           // get neighbor

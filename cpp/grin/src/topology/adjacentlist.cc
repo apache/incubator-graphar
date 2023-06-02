@@ -19,7 +19,8 @@ extern "C" {
 }
 
 #if defined(GRIN_ENABLE_ADJACENT_LIST) && !defined(GRIN_WITH_EDGE_PROPERTY)
-GRIN_ADJACENT_LIST grin_get_adjacent_list(GRIN_GRAPH, GRIN_DIRECTION, GRIN_VERTEX);
+GRIN_ADJACENT_LIST grin_get_adjacent_list(GRIN_GRAPH, GRIN_DIRECTION,
+                                          GRIN_VERTEX);
 #endif
 
 #ifdef GRIN_ENABLE_ADJACENT_LIST

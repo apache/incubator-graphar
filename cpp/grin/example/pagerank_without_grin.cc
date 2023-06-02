@@ -26,10 +26,10 @@ void run_pagerank(GAR_NAMESPACE::GraphInfo graph_info,
 
   // construct vertices collection
   std::string label = PR_VERTEX_TYPE;
-  assert(graph_info.GetVertexInfo(label).status().ok());
+  ASSERT(graph_info.GetVertexInfo(label).status().ok());
   auto maybe_vertices =
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
-  assert(maybe_vertices.status().ok());
+  ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
   int num_vertices = vertices.size();
 
@@ -39,7 +39,7 @@ void run_pagerank(GAR_NAMESPACE::GraphInfo graph_info,
   auto maybe_edges = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
-  assert(!maybe_edges.has_error());
+  ASSERT(!maybe_edges.has_error());
   auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_source>>(maybe_edges.value());
 

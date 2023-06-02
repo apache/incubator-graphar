@@ -15,8 +15,8 @@ limitations under the License.
 
 #include "grin/src/predefine.h"
 extern "C" {
-#include "property/property.h"
 #include "common/error.h"
+#include "property/property.h"
 }
 
 #define __grin_get_gar_vertex(_v)                           \

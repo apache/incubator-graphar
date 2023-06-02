@@ -27,10 +27,10 @@ void run_cc(GAR_NAMESPACE::GraphInfo graph_info, bool print_result = false) {
 
   // construct vertices collection
   std::string label = CC_VERTEX_TYPE;
-  assert(graph_info.GetVertexInfo(label).status().ok());
+  (graph_info.GetVertexInfo(label).status().ok());
   auto maybe_vertices =
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
-  assert(maybe_vertices.status().ok());
+  ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
   int num_vertices = vertices.size();
 
@@ -40,13 +40,13 @@ void run_cc(GAR_NAMESPACE::GraphInfo graph_info, bool print_result = false) {
   auto expect1 = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
-  assert(!expect1.has_error());
+  ASSERT(!expect1.has_error());
   auto& edges1 = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_source>>(expect1.value());
   auto expect2 = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_dest);
-  assert(!expect2.has_error());
+  ASSERT(!expect2.has_error());
   auto& edges2 = std::get<GAR_NAMESPACE::EdgesCollection<
       GAR_NAMESPACE::AdjListType::ordered_by_dest>>(expect2.value());
 

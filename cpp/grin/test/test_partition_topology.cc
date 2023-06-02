@@ -15,10 +15,10 @@ limitations under the License.
 
 #include <iostream>
 
+#include "grin/predefine.h"
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "index/order.h"
 #include "index/original_id.h"
 #include "partition/partition.h"
@@ -36,15 +36,15 @@ void test_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
   auto vl_iter = grin_get_vertex_list_begin(g, vl);
   for (auto i = 0; i < vl_size; ++i) {
     auto v0 = grin_get_vertex_from_list(g, vl, i);
-    assert(grin_is_vertex_list_end(g, vl_iter) == false);
+    ASSERT(grin_is_vertex_list_end(g, vl_iter) == false);
     auto v1 = grin_get_vertex_from_iter(g, vl_iter);
-    assert(grin_equal_vertex(g, v0, v1) == true);
+    ASSERT(grin_equal_vertex(g, v0, v1) == true);
     grin_get_next_vertex_list_iter(g, vl_iter);
     // destroy vertex
     grin_destroy_vertex(g, v0);
     grin_destroy_vertex(g, v1);
   }
-  assert(grin_is_vertex_list_end(g, vl_iter) == true);
+  ASSERT(grin_is_vertex_list_end(g, vl_iter) == true);
   // destroy vertex list iter
   grin_destroy_vertex_list_iter(g, vl_iter);
 
@@ -55,12 +55,12 @@ void test_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
     size_t idx0 = 100, idx1 = 200;
     auto v0 = grin_get_vertex_from_list(g, vl, idx0);
     auto v1 = grin_get_vertex_from_list(g, vl, idx1);
-    assert(grin_smaller_vertex(g, v0, v1) == true);
-    assert(grin_smaller_vertex(g, v1, v0) == false);
+    ASSERT(grin_smaller_vertex(g, v0, v1) == true);
+    ASSERT(grin_smaller_vertex(g, v1, v0) == false);
     size_t pos0 = grin_get_position_of_vertex_from_sorted_list(g, vl, v0);
     size_t pos1 = grin_get_position_of_vertex_from_sorted_list(g, vl, v1);
-    assert(pos0 == idx0);
-    assert(pos1 == idx1);
+    ASSERT(pos0 == idx0);
+    ASSERT(pos1 == idx1);
     // destroy vertex
     grin_destroy_vertex(g, v0);
     grin_destroy_vertex(g, v1);
@@ -73,9 +73,9 @@ void test_partition_topology(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
   std::cout << "\n++++ test partition: topology ++++" << std::endl;
 
   // check partition number
-  assert(pg != GRIN_NULL_GRAPH);
+  ASSERT(pg != GRIN_NULL_GRAPH);
   auto partition_num = grin_get_total_partitions_number(pg);
-  assert(partition_num == n);
+  ASSERT(partition_num == n);
 
   for (auto partition_id = 0; partition_id < n; ++partition_id) {
     std::cout << "\n== test partition " << partition_id << " ==" << std::endl;
@@ -113,7 +113,7 @@ void test_partition_topology(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
     }
 
     // check vertex number
-    assert(vertex_list_size ==
+    ASSERT(vertex_list_size ==
            master_vertex_list_size + mirror_vertex_list_size);
 
     // select by partition

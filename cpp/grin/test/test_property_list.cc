@@ -15,10 +15,10 @@ limitations under the License.
 
 #include <iostream>
 
+#include "grin/predefine.h"
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "property/property.h"
 #include "property/propertylist.h"
 #include "property/type.h"
@@ -39,16 +39,16 @@ void test_vertex_property(GRIN_GRAPH graph, GRIN_VERTEX_PROPERTY property,
 
   // get vertex type from property
   auto vertex_type2 = grin_get_vertex_type_from_property(graph, property);
-  assert(grin_equal_vertex_type(graph, vertex_type, vertex_type2) == true);
+  ASSERT(grin_equal_vertex_type(graph, vertex_type, vertex_type2) == true);
 
   // get vertex property by name
   auto property2 = grin_get_vertex_property_by_name(graph, vertex_type, name);
-  assert(grin_equal_vertex_property(graph, property, property2) == true);
+  ASSERT(grin_equal_vertex_property(graph, property, property2) == true);
 
   // get vertex property by id
   auto id = grin_get_vertex_property_id(graph, vertex_type, property);
   auto property3 = grin_get_vertex_property_by_id(graph, vertex_type, id);
-  assert(grin_equal_vertex_property(graph, property, property3) == true);
+  ASSERT(grin_equal_vertex_property(graph, property, property3) == true);
 
   // get vertex properties by name
   auto property_list = grin_get_vertex_properties_by_name(graph, name);
@@ -91,13 +91,13 @@ void test_vertex_property_list(GRIN_GRAPH graph) {
       // insert property to property list
       auto status = grin_insert_vertex_property_to_list(
           graph, new_property_list, property);
-      assert(status == true);
+      ASSERT(status == true);
       // destroy property
       grin_destroy_vertex_property(graph, property);
     }
 
     // compare size
-    assert(grin_get_vertex_property_list_size(graph, new_property_list) == n);
+    ASSERT(grin_get_vertex_property_list_size(graph, new_property_list) == n);
 
     // destroy
     grin_destroy_vertex_type(graph, vertex_type);
@@ -124,16 +124,16 @@ void test_edge_property(GRIN_GRAPH graph, GRIN_EDGE_PROPERTY property,
 
   // get edge type from property
   auto edge_type2 = grin_get_edge_type_from_property(graph, property);
-  assert(grin_equal_edge_type(graph, edge_type, edge_type2) == true);
+  ASSERT(grin_equal_edge_type(graph, edge_type, edge_type2) == true);
 
   // get edge property by name
   auto property2 = grin_get_edge_property_by_name(graph, edge_type, name);
-  assert(grin_equal_edge_property(graph, property, property2) == true);
+  ASSERT(grin_equal_edge_property(graph, property, property2) == true);
 
   // get edge property by id
   auto id = grin_get_edge_property_id(graph, edge_type, property);
   auto property3 = grin_get_edge_property_by_id(graph, edge_type, id);
-  assert(grin_equal_edge_property(graph, property, property3) == true);
+  ASSERT(grin_equal_edge_property(graph, property, property3) == true);
 
   // get edge properties by name
   auto property_list = grin_get_edge_properties_by_name(graph, name);
@@ -173,13 +173,13 @@ void test_edge_property_list(GRIN_GRAPH graph) {
       // insert property to property list
       auto status =
           grin_insert_edge_property_to_list(graph, new_property_list, property);
-      assert(status == true);
+      ASSERT(status == true);
       // destroy property
       grin_destroy_edge_property(graph, property);
     }
 
     // compare size
-    assert(grin_get_edge_property_list_size(graph, new_property_list) == n);
+    ASSERT(grin_get_edge_property_list_size(graph, new_property_list) == n);
 
     // destroy
     grin_destroy_edge_type(graph, edge_type);

@@ -15,16 +15,16 @@ limitations under the License.
 
 #include <iostream>
 
+#include "grin/predefine.h"
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/predefine.h"
 #include "partition/partition.h"
 #include "partition/reference.h"
+#include "property/topology.h"
+#include "property/type.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-#include "property/type.h"
-#include "property/topology.h"
 }
 
 void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph,
@@ -34,14 +34,14 @@ void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph,
   // check vertex ref
   auto vr = grin_get_vertex_ref_by_vertex(graph, v);
   auto v_from_vr = grin_get_vertex_from_vertex_ref(graph, vr);
-  assert(grin_equal_vertex(graph, v, v_from_vr) == true);
+  ASSERT(grin_equal_vertex(graph, v, v_from_vr) == true);
 
   // serialize & deserialize vertex ref
   auto msg = grin_serialize_vertex_ref(graph, vr);
   std::cout << "serialized vertex ref = " << msg << std::endl;
   auto vr_from_msg = grin_deserialize_to_vertex_ref(graph, msg);
   auto v_from_vr_from_msg = grin_get_vertex_from_vertex_ref(graph, vr_from_msg);
-  assert(grin_equal_vertex(graph, v, v_from_vr_from_msg) == true);
+  ASSERT(grin_equal_vertex(graph, v, v_from_vr_from_msg) == true);
 
   // serialize & deserialize vertex ref as int64
   auto int64_msg = grin_serialize_vertex_ref_as_int64(graph, vr);
@@ -50,12 +50,12 @@ void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph,
       grin_deserialize_int64_to_vertex_ref(graph, int64_msg);
   auto v_from_vr_from_int64_msg =
       grin_get_vertex_from_vertex_ref(graph, vr_from_int64_msg);
-  assert(grin_equal_vertex(graph, v, v_from_vr_from_int64_msg) == true);
+  ASSERT(grin_equal_vertex(graph, v, v_from_vr_from_int64_msg) == true);
 
   // check master or mirror
   auto is_master = grin_is_master_vertex(graph, v);
   auto is_mirror = grin_is_mirror_vertex(graph, v);
-  assert((is_master || is_mirror) && !(is_master && is_mirror));
+  ASSERT((is_master || is_mirror) && !(is_master && is_mirror));
   if (is_master) {
     std::cout << "vertex is master, ";
   } else {
@@ -67,7 +67,7 @@ void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph,
   std::cout << "master partition id = " << master_partition_id << std::endl;
   // get mirror_partition_list
   if (is_master) {
-    assert(grin_get_mirror_vertex_mirror_partition_list(graph, v) ==
+    ASSERT(grin_get_mirror_vertex_mirror_partition_list(graph, v) ==
            GRIN_NULL_LIST);
     auto partition_list =
         grin_get_master_vertex_mirror_partition_list(graph, v);
@@ -85,7 +85,7 @@ void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph,
     grin_destroy_partition_list(pg, partition_list);
 
   } else {
-    assert(grin_get_master_vertex_mirror_partition_list(graph, v) ==
+    ASSERT(grin_get_master_vertex_mirror_partition_list(graph, v) ==
            GRIN_NULL_LIST);
     auto partition_list =
         grin_get_mirror_vertex_mirror_partition_list(graph, v);
@@ -118,9 +118,9 @@ void test_partition_reference(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
   std::cout << "\n++++ test partition: reference ++++" << std::endl;
 
   // check partition number
-  assert(pg != GRIN_NULL_GRAPH);
+  ASSERT(pg != GRIN_NULL_GRAPH);
   auto partition_num = grin_get_total_partitions_number(pg);
-  assert(partition_num == n);
+  ASSERT(partition_num == n);
 
   // create a local graph
   auto partition0 = grin_get_partition_by_id(pg, 0);

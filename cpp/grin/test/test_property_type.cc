@@ -15,12 +15,12 @@ limitations under the License.
 
 #include <iostream>
 
+#include "grin/predefine.h"
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/predefine.h"
-#include "property/type.h"
 #include "property/topology.h"
+#include "property/type.h"
 #include "topology/edgelist.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
@@ -42,20 +42,20 @@ void test_property_type_vertex(GRIN_GRAPH graph) {
   grin_destroy_vertex_list(graph, vertex_list);
 
   // compare
-  assert(grin_equal_vertex_type(graph, vertex_type0, vertex_type0) == true);
+  ASSERT(grin_equal_vertex_type(graph, vertex_type0, vertex_type0) == true);
 
   // vertex type name
   auto name = grin_get_vertex_type_name(graph, vertex_type0);
   std::cout << "vertex type name of vertex 0: " << name << std::endl;
   auto vertex_type3 = grin_get_vertex_type_by_name(graph, name);
-  assert(grin_equal_vertex_type(graph, vertex_type0, vertex_type3) == true);
+  ASSERT(grin_equal_vertex_type(graph, vertex_type0, vertex_type3) == true);
   auto vertex_type4 = grin_get_vertex_type_by_name(graph, "invalid");
-  assert(vertex_type4 == GRIN_NULL_VERTEX_TYPE);
+  ASSERT(vertex_type4 == GRIN_NULL_VERTEX_TYPE);
 
   // vertex type id
   auto id = grin_get_vertex_type_id(graph, vertex_type0);
   auto vertex_type5 = grin_get_vertex_type_by_id(graph, id);
-  assert(grin_equal_vertex_type(graph, vertex_type0, vertex_type5) == true);
+  ASSERT(grin_equal_vertex_type(graph, vertex_type0, vertex_type5) == true);
 
   // destroy vertex type
   grin_destroy_vertex_type(graph, vertex_type0);
@@ -86,7 +86,7 @@ void test_property_type_vertex(GRIN_GRAPH graph) {
 
   size_t m = grin_get_vertex_type_list_size(graph, new_vertex_type_list);
   std::cout << "size of new vertex type list = " << m << std::endl;
-  assert(m == n);
+  ASSERT(m == n);
 
   // destroy vertex type list
   grin_destroy_vertex_type_list(graph, vertex_type_list);
@@ -106,21 +106,21 @@ void test_property_type_edge(GRIN_GRAPH graph) {
     // get edge type from edge & compare
     auto edge_type = grin_get_edge_type(graph, e);
     grin_destroy_edge(graph, e);
-    assert(grin_equal_edge_type(graph, edge_type, edge_type) == true);
+    ASSERT(grin_equal_edge_type(graph, edge_type, edge_type) == true);
 
     // edge type name
     auto name = grin_get_edge_type_name(graph, edge_type);
     std::cout << "edge type name of edge 0: " << name << std::endl;
     auto edge_type2 = grin_get_edge_type_by_name(graph, name);
-    assert(grin_equal_edge_type(graph, edge_type, edge_type2) == true);
+    ASSERT(grin_equal_edge_type(graph, edge_type, edge_type2) == true);
     auto edge_type3 = grin_get_edge_type_by_name(graph, "invalid");
 
-    assert(edge_type3 == GRIN_NULL_EDGE_TYPE);
+    ASSERT(edge_type3 == GRIN_NULL_EDGE_TYPE);
 
     // edge type id
     auto id = grin_get_edge_type_id(graph, edge_type);
     auto edge_type4 = grin_get_edge_type_by_id(graph, id);
-    assert(grin_equal_edge_type(graph, edge_type, edge_type4) == true);
+    ASSERT(grin_equal_edge_type(graph, edge_type, edge_type4) == true);
 
     // destroy edge type
     grin_destroy_edge_type(graph, edge_type);
@@ -152,7 +152,7 @@ void test_property_type_edge(GRIN_GRAPH graph) {
 
   size_t m = grin_get_edge_type_list_size(graph, new_edge_type_list);
   std::cout << "size of new edge type list = " << m << std::endl;
-  assert(m == n);
+  ASSERT(m == n);
 
   // destroy edge type list
   grin_destroy_edge_type_list(graph, edge_type_list);
@@ -174,7 +174,7 @@ void test_property_type_vertex_and_edge(GRIN_GRAPH graph) {
     // get vertex types from edge type
     auto src_type_list = grin_get_src_types_by_edge_type(graph, edge_type);
     auto dst_type_list = grin_get_dst_types_by_edge_type(graph, edge_type);
-    assert(grin_get_vertex_type_list_size(graph, src_type_list) ==
+    ASSERT(grin_get_vertex_type_list_size(graph, src_type_list) ==
            grin_get_vertex_type_list_size(graph, dst_type_list));
     std::cout << "size of vertex type list from edge type = "
               << grin_get_vertex_type_list_size(graph, dst_type_list)

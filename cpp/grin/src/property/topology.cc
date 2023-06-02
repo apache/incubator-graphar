@@ -37,7 +37,8 @@ size_t grin_get_edge_num_by_type(GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
 #endif
 
 #if defined(GRIN_ENABLE_VERTEX_LIST) && defined(GRIN_WITH_VERTEX_PROPERTY)
-GRIN_VERTEX_LIST grin_get_vertex_list_by_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
+GRIN_VERTEX_LIST grin_get_vertex_list_by_type(GRIN_GRAPH g,
+                                              GRIN_VERTEX_TYPE vtype) {
   auto vl = new GRIN_VERTEX_LIST_T(vtype, vtype + 1);
   return vl;
 }
@@ -48,21 +49,26 @@ GRIN_EDGE_LIST grin_get_edge_list_by_type(GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   if (etype >= _g->unique_edge_type_num)
     return GRIN_NULL_LIST;
-  auto el = new GRIN_EDGE_LIST_T(_g->unique_edge_type_begin_type[etype], _g->unique_edge_type_begin_type[etype + 1]);
+  auto el = new GRIN_EDGE_LIST_T(_g->unique_edge_type_begin_type[etype],
+                                 _g->unique_edge_type_begin_type[etype + 1]);
   return el;
 }
 #endif
 
 #if defined(GRIN_ENABLE_ADJACENT_LIST) && defined(GRIN_WITH_EDGE_PROPERTY)
-GRIN_ADJACENT_LIST grin_get_adjacent_list_by_edge_type(GRIN_GRAPH g, GRIN_DIRECTION d, GRIN_VERTEX v, GRIN_EDGE_TYPE etype) {
+GRIN_ADJACENT_LIST grin_get_adjacent_list_by_edge_type(GRIN_GRAPH g,
+                                                       GRIN_DIRECTION d,
+                                                       GRIN_VERTEX v,
+                                                       GRIN_EDGE_TYPE etype) {
   if (d == GRIN_DIRECTION::BOTH)
     return GRIN_NULL_LIST;
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
   if (etype >= _g->unique_edge_type_num)
     return GRIN_NULL_LIST;
-  auto al =
-      new GRIN_ADJACENT_LIST_T(_v->id, _v->type_id, d, _g->unique_edge_type_begin_type[etype], _g->unique_edge_type_begin_type[etype + 1], 0, _g->vertex_type_num);
+  auto al = new GRIN_ADJACENT_LIST_T(
+      _v->id, _v->type_id, d, _g->unique_edge_type_begin_type[etype],
+      _g->unique_edge_type_begin_type[etype + 1], 0, _g->vertex_type_num);
   return al;
 }
 #endif
