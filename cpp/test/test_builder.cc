@@ -38,9 +38,11 @@ limitations under the License.
 #include <catch2/catch.hpp>
 
 TEST_CASE("test_vertices_builder") {
+  std::cout << "Test vertex builder" << std::endl;
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
 
+  // construct vertex builder
   std::string vertex_meta_file =
       root + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
@@ -49,6 +51,28 @@ TEST_CASE("test_vertices_builder") {
   GAR_NAMESPACE::builder::VerticesBuilder builder(vertex_info, "/tmp/",
                                                   start_index);
 
+  // set validate level
+  REQUIRE(builder.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::no_validate);
+  builder.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  REQUIRE(builder.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::strong_validate);
+
+  // check different validate levels
+  GAR_NAMESPACE::builder::Vertex v;
+  v.AddProperty("id", "id_of_string");
+  REQUIRE(
+      builder.Validate(v, 0, GAR_NAMESPACE::ValidateLevel::no_validate).ok());
+  REQUIRE(
+      builder.Validate(v, 0, GAR_NAMESPACE::ValidateLevel::weak_validate).ok());
+  REQUIRE(builder.Validate(v, -2, GAR_NAMESPACE::ValidateLevel::weak_validate)
+              .IsInvalidOperation());
+  REQUIRE(builder.Validate(v, 0, GAR_NAMESPACE::ValidateLevel::strong_validate)
+              .IsTypeError());
+  v.AddProperty("invalid_name", "invalid_value");
+  REQUIRE(builder.Validate(v, 0).IsInvalidOperation());
+
+  // add vertices
   std::ifstream fp(root + "/ldbc_sample/person_0_0.csv");
   std::string line;
   getline(fp, line);
@@ -60,7 +84,6 @@ TEST_CASE("test_vertices_builder") {
     getline(readstr, name, '|');
     names.push_back(name);
   }
-  int index = 0;
   while (getline(fp, line)) {
     std::string val;
     std::istringstream readstr(line);
@@ -76,11 +99,16 @@ TEST_CASE("test_vertices_builder") {
         v.AddProperty(names[i], val);
       }
     }
-    index++;
     REQUIRE(builder.AddVertex(v).ok());
   }
+
+  // dump
   REQUIRE(builder.Dump().ok());
 
+  // can not add new vertices after dumping
+  REQUIRE(builder.AddVertex(v).IsInvalidOperation());
+
+  // check the number of vertices
   auto fs = arrow::fs::FileSystemFromUriOrPath(root).ValueOrDie();
   auto input =
       fs->OpenInputStream("/tmp/vertex/person/vertex_count").ValueOrDie();
@@ -90,9 +118,11 @@ TEST_CASE("test_vertices_builder") {
 }
 
 TEST_CASE("test_edges_builder") {
+  std::cout << "Test edge builder" << std::endl;
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
 
+  // construct edge builder
   std::string edge_meta_file =
       root + "/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
   auto edge_meta = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file).value();
@@ -100,6 +130,25 @@ TEST_CASE("test_edges_builder") {
   GAR_NAMESPACE::builder::EdgesBuilder builder(
       edge_info, "/tmp/", GraphArchive::AdjListType::ordered_by_dest, 903);
 
+  // set validate level
+  REQUIRE(builder.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::no_validate);
+  builder.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  REQUIRE(builder.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::strong_validate);
+
+  // check different validate levels
+  GAR_NAMESPACE::builder::Edge e(0, 1);
+  e.AddProperty("creationDate", 2020);
+  REQUIRE(builder.Validate(e, GAR_NAMESPACE::ValidateLevel::no_validate).ok());
+  REQUIRE(
+      builder.Validate(e, GAR_NAMESPACE::ValidateLevel::weak_validate).ok());
+  REQUIRE(builder.Validate(e, GAR_NAMESPACE::ValidateLevel::strong_validate)
+              .IsTypeError());
+  e.AddProperty("invalid_name", "invalid_value");
+  REQUIRE(builder.Validate(e).IsInvalidOperation());
+
+  // add edges
   std::ifstream fp(root + "/ldbc_sample/person_knows_person_0_0.csv");
   std::string line;
   getline(fp, line);
@@ -128,6 +177,10 @@ TEST_CASE("test_edges_builder") {
       }
     }
   }
-  std::cout << "Test edge builder" << std::endl;
+
+  // dump
   REQUIRE(builder.Dump().ok());
+
+  // can not add new edges after dumping
+  REQUIRE(builder.AddEdge(e).IsInvalidOperation());
 }

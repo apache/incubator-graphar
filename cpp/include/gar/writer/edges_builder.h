@@ -147,13 +147,17 @@ class EdgesBuilder {
    * @param prefix The absolute prefix.
    * @param adj_list_type The adj list type of the edges.
    * @param num_vertices The total number of vertices for source or destination.
+   * @param validate_level The validate level, with no validate by default.
    */
-  explicit EdgesBuilder(const EdgeInfo edge_info, const std::string& prefix,
-                        AdjListType adj_list_type, IdType num_vertices)
+  explicit EdgesBuilder(
+      const EdgeInfo edge_info, const std::string& prefix,
+      AdjListType adj_list_type, IdType num_vertices,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate)
       : edge_info_(edge_info),
         prefix_(prefix),
         adj_list_type_(adj_list_type),
-        num_vertices_(num_vertices) {
+        num_vertices_(num_vertices),
+        validate_level_(validate_level) {
     edges_.clear();
     num_edges_ = 0;
     is_saved_ = false;
@@ -176,27 +180,31 @@ class EdgesBuilder {
   }
 
   /**
+   * @brief Set the validate level.
+   *
+   * @param validate_level The validate level to set.
+   */
+  inline void SetValidateLevel(const ValidateLevel& validate_level) {
+    validate_level_ = validate_level;
+  }
+
+  /**
+   * @brief Get the validate level.
+   *
+   * @return The validate level of this writer.
+   */
+  inline ValidateLevel GetValidateLevel() const { return validate_level_; }
+
+  /**
    * @brief Check if adding an edge is allowed.
    *
    * @param e The edge to add.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
    * @return Status: ok or status::InvalidOperation error.
    */
-  Status Validate(const Edge& e) {
-    // can not add new edges
-    if (is_saved_) {
-      return Status::InvalidOperation("can not add new edges after dumping");
-    }
-    // invalid adj list type
-    if (!edge_info_.ContainAdjList(adj_list_type_)) {
-      return Status::InvalidOperation("invalid adj list type");
-    }
-    // contain invalid properties
-    for (auto& property : e.GetProperties()) {
-      if (!edge_info_.ContainProperty(property.first))
-        return Status::InvalidOperation("invalid property");
-    }
-    return Status::OK();
-  }
+  Status Validate(const Edge& e, ValidateLevel validate_level =
+                                     ValidateLevel::default_validate) const;
 
   /**
    * @brief Get the vertex chunk index of a given edge.
@@ -249,7 +257,8 @@ class EdgesBuilder {
    */
   Status Dump() {
     // construct the writer
-    EdgeChunkWriter writer(edge_info_, prefix_, adj_list_type_);
+    EdgeChunkWriter writer(edge_info_, prefix_, adj_list_type_,
+                           validate_level_);
     // construct empty edge collections for vertex chunks without edges
     IdType num_vertex_chunks =
         (num_vertices_ + vertex_chunk_size_ - 1) / vertex_chunk_size_;
@@ -372,6 +381,7 @@ class EdgesBuilder {
   IdType num_vertices_;
   IdType num_edges_;
   bool is_saved_;
+  ValidateLevel validate_level_;
 };
 
 }  // namespace builder
