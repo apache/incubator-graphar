@@ -68,7 +68,7 @@ GRIN_ADJACENT_LIST grin_get_adjacent_list_by_edge_type(GRIN_GRAPH g,
     return GRIN_NULL_LIST;
   auto al = new GRIN_ADJACENT_LIST_T(
       _v->id, _v->type_id, d, _g->unique_edge_type_begin_type[etype],
-      _g->unique_edge_type_begin_type[etype + 1], 0, _g->vertex_type_num);
+      _g->unique_edge_type_begin_type[etype + 1]);
   return al;
 }
 #endif
