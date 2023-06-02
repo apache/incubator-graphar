@@ -24,12 +24,12 @@ set(DST_DIR "${PROJECT_SOURCE_DIR}/grin/src/common/")
 list(APPEND PROTO_FLAGS -I${PROJECT_SOURCE_DIR}/thirdparty/grin/proto/)
 
 file(GLOB PROTO_FILES RELATIVE "${PROJECT_SOURCE_DIR}/thirdparty/grin/proto" "${PROJECT_SOURCE_DIR}/thirdparty/grin/proto/*.proto")
-message(${PROTO_FILES})
 
 set(PROTO_SRCS "")
 set(PROTO_HDRS "")
 
 foreach(f ${PROTO_FILES})
+    message(STATUS "Found proto - " ${f})
     get_filename_component(FIL_WE ${f} NAME_WE)
     list(APPEND PROTO_SRCS "${DST_DIR}/${FIL_WE}.pb.cc")
     list(APPEND PROTO_HDRS "${DST_DIR}/${FIL_WE}.pb.h")
@@ -95,9 +95,12 @@ endif()
 
 find_package(MPI REQUIRED)
 
-file(GLOB EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/example" "${PROJECT_SOURCE_DIR}/grin/example/*.cc")
+file(GLOB WITH_GRIN_EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/example" "${PROJECT_SOURCE_DIR}/grin/example/*_with_grin.cc")
 
-foreach(f ${EXAMPLE_FILES})
+file(GLOB WITHOUT_GRIN_EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/example" "${PROJECT_SOURCE_DIR}/grin/example/*_without_grin.cc")
+
+# build examples without grin
+foreach(f ${WITH_GRIN_EXAMPLE_FILES})
     string(REGEX MATCH "^(.*)\\.[^.]*$" dummy ${f})
     set(E_NAME ${CMAKE_MATCH_1})
     message(STATUS "Found GRIN example - " ${E_NAME})
@@ -105,9 +108,28 @@ foreach(f ${EXAMPLE_FILES})
     target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/thirdparty/grin/include ${Protobuf_INCLUDE_DIRS} ${MPI_INCLUDE_PATH})
     # enable LTO for building examples
     set_property(TARGET ${E_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-    # link to gar instead of gar-grin
+    # link to gar instead of gar-grin for performance
     target_link_libraries(${E_NAME} PRIVATE gar Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog ${MPI_LIBRARIES})
     # target_link_libraries(${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog ${MPI_LIBRARIES})
+
+    # if OpenSSL library exists, link the OpenSSL library.
+    # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
+    if(OPENSSL_FOUND)
+        target_link_libraries(${E_NAME} PRIVATE OpenSSL::SSL)
+    endif()
+endforeach()
+
+# build examples without grin
+foreach(f ${WITHOUT_GRIN_EXAMPLE_FILES})
+    string(REGEX MATCH "^(.*)\\.[^.]*$" dummy ${f})
+    set(E_NAME ${CMAKE_MATCH_1})
+    message(STATUS "Found GRIN example - " ${E_NAME})
+    add_executable(${E_NAME} example/${E_NAME}.cc)
+    target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${Protobuf_INCLUDE_DIRS} ${MPI_INCLUDE_PATH})
+    # enable LTO for building examples
+    set_property(TARGET ${E_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    # link to gar
+    target_link_libraries(${E_NAME} PRIVATE gar Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog ${MPI_LIBRARIES})
 
     # if OpenSSL library exists, link the OpenSSL library.
     # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
