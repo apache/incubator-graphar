@@ -30,15 +30,13 @@ GRIN_VERTEX_LIST grin_get_vertex_list_select_mirror(GRIN_GRAPH);
 GRIN_VERTEX_LIST grin_get_vertex_list_by_type_select_master(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  return new GRIN_VERTEX_LIST_T(vtype, vtype + 1, ONE_PARTITION,
-                                _g->partition_id);
+  return new GRIN_VERTEX_LIST_T(vtype, ONE_PARTITION, _g->partition_id);
 }
 
 GRIN_VERTEX_LIST grin_get_vertex_list_by_type_select_mirror(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  return new GRIN_VERTEX_LIST_T(vtype, vtype + 1, ALL_BUT_ONE_PARTITION,
-                                _g->partition_id);
+  return new GRIN_VERTEX_LIST_T(vtype, ALL_BUT_ONE_PARTITION, _g->partition_id);
 }
 #endif
 
@@ -56,7 +54,7 @@ GRIN_VERTEX_LIST grin_get_vertex_list_by_type_select_partition(
   if (p >= _g->partition_num) {
     return GRIN_NULL_LIST;
   }
-  return new GRIN_VERTEX_LIST_T(vtype, vtype + 1, ONE_PARTITION, p);
+  return new GRIN_VERTEX_LIST_T(vtype, ONE_PARTITION, p);
 }
 #endif
 

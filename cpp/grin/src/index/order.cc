@@ -42,16 +42,15 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
                                                     GRIN_VERTEX v) {
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
   auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
-  if (_v->type_id < _vl->type_begin || _v->type_id >= _vl->type_end)
+  if (_v->type_id != _vl->type_id)
     return GRIN_NULL_SIZE;
-  auto _g = static_cast<GRIN_GRAPH_T*>(g);
 
   // all partition
   if (_vl->partition_type == ALL_PARTITION) {
-    return _g->vertex_offsets[_v->type_id] + _v->id -
-           _g->vertex_offsets[_vl->type_begin];
+    return _v->id;
   }
 
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto partition_id = __grin_get_master_partition_id(_g, _v->id, _v->type_id);
 
   // one partition
@@ -59,13 +58,8 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
     if (partition_id != _vl->partition_id)
       return GRIN_NULL_SIZE;  // not in this vertex list
 
-    size_t offset = 0;
-    // previous vertex types
-    for (auto i = _vl->type_begin; i < _v->type_id; i++) {
-      offset += _g->partitioned_vertex_num[i][_vl->partition_id];
-    }
-    // in the same vertex type
-    offset += __grin_get_partitioned_vertex_id_from_vertex_id(
+    // in the partition
+    size_t offset = __grin_get_partitioned_vertex_id_from_vertex_id(
         _g, _v->type_id, _vl->partition_id, _g->partition_strategy, _v->id);
     return offset;
   }
@@ -75,14 +69,8 @@ size_t grin_get_position_of_vertex_from_sorted_list(GRIN_GRAPH g,
     if (partition_id == _vl->partition_id)
       return GRIN_NULL_SIZE;  // not in this vertex list
 
-    size_t offset = 0;
-    // previous vertex types
-    for (auto i = _vl->type_begin; i < _v->type_id; i++) {
-      offset += _g->vertex_offsets[i + 1] - _g->vertex_offsets[i];
-      offset -= _g->partitioned_vertex_num[i][_vl->partition_id];
-    }
     // previous partitions of the same vertex type
-    offset =
+    size_t offset =
         _g->partitioned_vertex_offsets
             [_v->type_id]
             [partition_id];  // offset of the first vertex in this partition

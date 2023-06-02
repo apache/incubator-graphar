@@ -60,17 +60,15 @@ typedef enum {
 } PARTITION_TYPE_IN_VERTEX_LIST;
 
 struct GRIN_VERTEX_LIST_T {
-  unsigned type_begin;
-  unsigned type_end;
+  unsigned type_id;
   PARTITION_TYPE_IN_VERTEX_LIST partition_type;
   unsigned partition_id;  // only used when partition_type is
                           // ONE_PARTITION/ALL_BUT_ONE_PARTITION
   GRIN_VERTEX_LIST_T(
-      unsigned _type_begin, unsigned _type_end,
+      unsigned _type_id,
       PARTITION_TYPE_IN_VERTEX_LIST _partition_type = ALL_PARTITION,
       unsigned _partition_id = 0)
-      : type_begin(_type_begin),
-        type_end(_type_end),
+      : type_id(_type_id),
         partition_type(_partition_type),
         partition_id(_partition_id) {}
 };
@@ -78,28 +76,28 @@ struct GRIN_VERTEX_LIST_T {
 
 #ifdef GRIN_ENABLE_VERTEX_LIST_ITERATOR
 struct GRIN_VERTEX_LIST_ITERATOR_T {
-  unsigned type_end;
+  unsigned type_id;
   PARTITION_TYPE_IN_VERTEX_LIST partition_type;
-  unsigned partition_id;  // only used when partition_type is
-                          // ONE_PARTITION/ALL_BUT_ONE_PARTITION
-  unsigned current_type;
+  unsigned partition_id;          // only used when partition_type is
+                                  // ONE_PARTITION/ALL_BUT_ONE_PARTITION
   unsigned current_partition_id;  // only used when partition_type is
                                   // ALL_BUT_ONE_PARTITION
   GAR_NAMESPACE::IdType current_offset;
   GAR_NAMESPACE::VertexIter iter;
-  GRIN_VERTEX_LIST_ITERATOR_T(unsigned _type_end,
+  bool is_end;
+  GRIN_VERTEX_LIST_ITERATOR_T(unsigned _type_id,
                               PARTITION_TYPE_IN_VERTEX_LIST _partition_type,
-                              unsigned _partition_id, unsigned _current_type,
+                              unsigned _partition_id,
                               unsigned _current_partition_id,
                               GAR_NAMESPACE::IdType _current_offset,
                               GAR_NAMESPACE::VertexIter _iter)
-      : type_end(_type_end),
+      : type_id(_type_id),
         partition_type(_partition_type),
         partition_id(_partition_id),
-        current_type(_current_type),
         current_partition_id(_current_partition_id),
         current_offset(_current_offset),
-        iter(std::move(_iter)) {}
+        iter(std::move(_iter)),
+        is_end(false) {}
 };
 #endif
 

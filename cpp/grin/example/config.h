@@ -73,27 +73,28 @@ static const std::string TEST_DATA_SMALL_PATH =  // NOLINT
         .string() +
     "/testing/ldbc_sample/parquet/ldbc_sample.graph.yml";
 
-static const std::string VERTEX_OID_NAME = "id";
+static const std::string VERTEX_OID_NAME = "id";  // NOLINT
 
-static const std::string PR_VERTEX_TYPE = "comment";
-static const std::string PR_EDGE_TYPE = "replyOf";
-static const std::string PR_TEST_DATA_PATH = TEST_DATA_PATH;
+static const std::string PR_VERTEX_TYPE = "comment";          // NOLINT
+static const std::string PR_EDGE_TYPE = "replyOf";            // NOLINT
+static const std::string PR_TEST_DATA_PATH = TEST_DATA_PATH;  // NOLINT
 static const int PR_MAX_ITERS = 30;
 
-static const std::string BFS_VERTEX_TYPE = "person";
-static const std::string BFS_EDGE_TYPE = "knows";
-static const std::string BFS_TEST_DATA_PATH = TEST_DATA_SMALL_PATH;
+static const std::string BFS_VERTEX_TYPE = "person";                 // NOLINT
+static const std::string BFS_EDGE_TYPE = "knows";                    // NOLINT
+static const std::string BFS_TEST_DATA_PATH = TEST_DATA_SMALL_PATH;  // NOLINT
 static const int64_t BFS_ROOT_ID = 0;
 
-static const std::string CC_VERTEX_TYPE = "person";
-static const std::string CC_EDGE_TYPE = "knows";
-static const std::string CC_TEST_DATA_PATH = TEST_DATA_SMALL_PATH;
+static const std::string CC_VERTEX_TYPE = "person";                 // NOLINT
+static const std::string CC_EDGE_TYPE = "knows";                    // NOLINT
+static const std::string CC_TEST_DATA_PATH = TEST_DATA_SMALL_PATH;  // NOLINT
 
-static const std::string DIS_PR_VERTEX_TYPE = "person";
-static const std::string DIS_PR_EDGE_TYPE = "knows";
-static const std::string DIS_PR_TEST_DATA_PATH = TEST_DATA_SMALL_PATH;
+static const std::string DIS_PR_VERTEX_TYPE = "person";  // NOLINT
+static const std::string DIS_PR_EDGE_TYPE = "knows";     // NOLINT
+static const std::string DIS_PR_TEST_DATA_PATH =
+    TEST_DATA_SMALL_PATH;  // NOLINT
 static const int DIS_PR_MAX_ITERS = 10;
 
-static const std::string PROPERTY_TEST_DATA_PATH = TEST_DATA_PATH;
+static const std::string PROPERTY_TEST_DATA_PATH = TEST_DATA_PATH;  // NOLINT
 
 #endif  // CPP_GRIN_EXAMPLE_CONFIG_H_
