@@ -4,6 +4,6 @@
 [submodule "cpp/thirdparty/Catch2"]
 	path = cpp/thirdparty/Catch2
 	url = https://github.com/catchorg/Catch2.git
-[submodule "cpp/grin/include"]
-	path = cpp/grin/include
+[submodule "cpp/thirdparty/grin"]
+	path = cpp/thirdparty/grin
 	url = https://github.com/GraphScope/GRIN.git

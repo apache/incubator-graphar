@@ -13,10 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-extern "C" {
-#include "grin/include/common/error.h"
-}
 #include "grin/src/predefine.h"
+extern "C" {
+#include "common/error.h"
+}
 
 __thread GRIN_ERROR_CODE grin_error_code = NO_ERROR;
 

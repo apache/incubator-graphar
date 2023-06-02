@@ -18,15 +18,16 @@ limitations under the License.
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/include/property/primarykey.h"
-#include "grin/include/property/property.h"
-#include "grin/include/property/propertylist.h"
-#include "grin/include/property/row.h"
-#include "grin/include/property/topology.h"
-#include "grin/include/property/type.h"
-#include "grin/include/topology/edgelist.h"
-#include "grin/include/topology/structure.h"
-#include "grin/include/topology/vertexlist.h"
+#include "grin/predefine.h"
+#include "property/primarykey.h"
+#include "property/property.h"
+#include "property/propertylist.h"
+#include "property/row.h"
+#include "property/topology.h"
+#include "property/type.h"
+#include "topology/edgelist.h"
+#include "topology/structure.h"
+#include "topology/vertexlist.h"
 }
 
 void test_property_primarykey(GRIN_GRAPH graph) {
@@ -55,10 +56,9 @@ void test_property_primarykey(GRIN_GRAPH graph) {
 
     // create row of primary keys for vertex A
     std::cout << "create row of primary key for vertex A" << std::endl;
-    auto vertex_list = grin_get_vertex_list(graph);
-    auto select_vertex_list =
-        grin_select_type_for_vertex_list(graph, vertex_type, vertex_list);
-    auto vertex = grin_get_vertex_from_list(graph, select_vertex_list, 20);
+
+    auto vertex_list = grin_get_vertex_list_by_type(graph, vertex_type);
+    auto vertex = grin_get_vertex_from_list(graph, vertex_list, 20);
     auto row = grin_create_row(graph);
     auto property_list_size =
         grin_get_vertex_property_list_size(graph, property_list);
@@ -84,7 +84,6 @@ void test_property_primarykey(GRIN_GRAPH graph) {
     grin_destroy_vertex_property_list(graph, property_list);
     grin_destroy_vertex_type(graph, vertex_type);
     grin_destroy_vertex_list(graph, vertex_list);
-    grin_destroy_vertex_list(graph, select_vertex_list);
     grin_destroy_vertex(graph, vertex);
     grin_destroy_vertex(graph, vertex2);
     grin_destroy_row(graph, row);

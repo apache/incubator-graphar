@@ -15,10 +15,10 @@ limitations under the License.
 
 #include <utility>
 
-extern "C" {
-#include "grin/include/property/primarykey.h"
-}
 #include "grin/src/predefine.h"
+extern "C" {
+#include "property/primarykey.h"
+}
 
 #ifdef GRIN_ENABLE_VERTEX_PRIMARY_KEYS
 GRIN_VERTEX_TYPE_LIST grin_get_vertex_types_with_primary_keys(GRIN_GRAPH g) {

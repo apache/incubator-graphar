@@ -13,11 +13,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-extern "C" {
-#include "grin/include/property/row.h"
-#include "grin/include/common/error.h"
-}
 #include "grin/src/predefine.h"
+extern "C" {
+#include "property/row.h"
+#include "common/error.h"
+}
 
 #define __grin_get_gar_vertex(_v)                           \
   if (_v->vertex.has_value() == false) {                    \

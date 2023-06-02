@@ -1,2 +1,2 @@
-proto/graph.pb.cc
-proto/graph.pb.h
+common/graph.pb.cc
+common/graph.pb.h

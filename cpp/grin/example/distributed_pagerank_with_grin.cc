@@ -22,18 +22,19 @@ limitations under the License.
 #include "grin/example/config.h"
 
 extern "C" {
-#include "grin/include/index/order.h"
-#include "grin/include/index/original_id.h"
-#include "grin/include/partition/partition.h"
-#include "grin/include/partition/reference.h"
-#include "grin/include/partition/topology.h"
-#include "grin/include/property/property.h"
-#include "grin/include/property/topology.h"
-#include "grin/include/property/type.h"
-#include "grin/include/topology/adjacentlist.h"
-#include "grin/include/topology/edgelist.h"
-#include "grin/include/topology/structure.h"
-#include "grin/include/topology/vertexlist.h"
+#include "grin/predefine.h"
+#include "index/order.h"
+#include "index/original_id.h"
+#include "partition/partition.h"
+#include "partition/reference.h"
+#include "partition/topology.h"
+#include "property/property.h"
+#include "property/topology.h"
+#include "property/type.h"
+#include "topology/adjacentlist.h"
+#include "topology/edgelist.h"
+#include "topology/structure.h"
+#include "topology/vertexlist.h"
 }
 
 GRIN_GRAPH init(GRIN_PARTITIONED_GRAPH partitioned_graph, int pid = 0) {
@@ -53,11 +54,10 @@ void run_pagerank(GRIN_PARTITIONED_GRAPH graph, bool print_result = false) {
   const double damping = 0.85;
   const int max_iters = DIS_PR_MAX_ITERS;
   // get vertex list & select by vertex type
-  auto all_vertex_list = grin_get_vertex_list(graph);
   auto vtype = grin_get_vertex_type_by_name(graph, DIS_PR_VERTEX_TYPE.c_str());
   auto etype = grin_get_edge_type_by_name(graph, DIS_PR_EDGE_TYPE.c_str());
   auto vertex_list =
-      grin_select_type_for_vertex_list(graph, vtype, all_vertex_list);
+      grin_get_vertex_list_by_type(graph, vtype);
   const size_t num_vertices = grin_get_vertex_num_by_type(graph, vtype);
   std::cout << "num_vertices = " << num_vertices << std::endl;
 
@@ -71,8 +71,7 @@ void run_pagerank(GRIN_PARTITIONED_GRAPH graph, bool print_result = false) {
             << pid << " ++++" << std::endl;
 
   // select master
-  auto master_vertex_list =
-      grin_select_master_for_vertex_list(graph, vertex_list);
+  auto master_vertex_list = grin_get_vertex_list_by_type_select_master(graph, vtype);
   const size_t num_masters =
       grin_get_vertex_list_size(graph, master_vertex_list);
   std::cout << "pid = " << pid << ", num_masters = " << num_masters
@@ -108,10 +107,7 @@ void run_pagerank(GRIN_PARTITIONED_GRAPH graph, bool print_result = false) {
     auto id =
         grin_get_position_of_vertex_from_sorted_list(graph, vertex_list, v);
     // get outgoing adjacent list
-    auto all_adjacent_list =
-        grin_get_adjacent_list(graph, GRIN_DIRECTION::OUT, v);
-    auto adjacent_list = grin_select_edge_type_for_adjacent_list(
-        graph, etype, all_adjacent_list);
+    auto adjacent_list = grin_get_adjacent_list_by_edge_type(graph, GRIN_DIRECTION::OUT, v, etype);   
     auto it = grin_get_adjacent_list_begin(graph, adjacent_list);
     while (grin_is_adjacent_list_end(graph, it) == false) {
       out_degree[id]++;
@@ -120,7 +116,6 @@ void run_pagerank(GRIN_PARTITIONED_GRAPH graph, bool print_result = false) {
     // destroy
     grin_destroy_adjacent_list_iter(graph, it);
     grin_destroy_adjacent_list(graph, adjacent_list);
-    grin_destroy_adjacent_list(graph, all_adjacent_list);
     grin_destroy_vertex(graph, v);
   }
   // synchronize out degree
@@ -136,10 +131,7 @@ void run_pagerank(GRIN_PARTITIONED_GRAPH graph, bool print_result = false) {
       // get vertex
       auto v = grin_get_vertex_from_list(graph, master_vertex_list, i);
       // get incoming adjacent list
-      auto all_adjacent_list =
-          grin_get_adjacent_list(graph, GRIN_DIRECTION::IN, v);
-      auto adjacent_list = grin_select_edge_type_for_adjacent_list(
-          graph, etype, all_adjacent_list);
+      auto adjacent_list = grin_get_adjacent_list_by_edge_type(graph, GRIN_DIRECTION::IN, v, etype);
       auto it = grin_get_adjacent_list_begin(graph, adjacent_list);
       // update pagerank value
       next[i] = 0;
@@ -155,7 +147,6 @@ void run_pagerank(GRIN_PARTITIONED_GRAPH graph, bool print_result = false) {
       // destroy
       grin_destroy_adjacent_list_iter(graph, it);
       grin_destroy_adjacent_list(graph, adjacent_list);
-      grin_destroy_adjacent_list(graph, all_adjacent_list);
       grin_destroy_vertex(graph, v);
     }
 
@@ -206,7 +197,6 @@ void run_pagerank(GRIN_PARTITIONED_GRAPH graph, bool print_result = false) {
 
   grin_destroy_vertex_list(graph, master_vertex_list);
   grin_destroy_vertex_list(graph, vertex_list);
-  grin_destroy_vertex_list(graph, all_vertex_list);
   grin_destroy_vertex_type(graph, vtype);
   grin_destroy_edge_type(graph, etype);
 

@@ -13,23 +13,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-extern "C" {
-#include "grin/include/topology/adjacentlist.h"
-}
 #include "grin/src/predefine.h"
+extern "C" {
+#include "topology/adjacentlist.h"
+}
+
+#if defined(GRIN_ENABLE_ADJACENT_LIST) && !defined(GRIN_WITH_EDGE_PROPERTY)
+GRIN_ADJACENT_LIST grin_get_adjacent_list(GRIN_GRAPH, GRIN_DIRECTION, GRIN_VERTEX);
+#endif
 
 #ifdef GRIN_ENABLE_ADJACENT_LIST
-GRIN_ADJACENT_LIST grin_get_adjacent_list(GRIN_GRAPH g, GRIN_DIRECTION d,
-                                          GRIN_VERTEX v) {
-  if (d == GRIN_DIRECTION::BOTH)
-    return GRIN_NULL_LIST;
-  auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto _v = static_cast<GRIN_VERTEX_T*>(v);
-  auto al = new GRIN_ADJACENT_LIST_T(_v->id, _v->type_id, d, 0,
-                                     _g->edge_type_num, 0, _g->vertex_type_num);
-  return al;
-}
-
 void grin_destroy_adjacent_list(GRIN_GRAPH g, GRIN_ADJACENT_LIST al) {
   auto _al = static_cast<GRIN_ADJACENT_LIST_T*>(al);
   delete _al;

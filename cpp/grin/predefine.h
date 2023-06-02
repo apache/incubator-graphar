@@ -532,38 +532,6 @@ typedef enum {
  */
 ///@{
 /** @ingroup TraitFilterTypeMacros
- * @brief The storage provides a filtering predicate of single-type vertices
- * for vertex list iterator. That means, the caller can use the predicate
- * to make a vertex list iterator for a certain type of vertices from the 
- * original iterator.
-*/
-#define GRIN_TRAIT_SELECT_TYPE_FOR_VERTEX_LIST
-
-/** @ingroup TraitFilterTypeMacros
- * @brief The storage provides a filtering predicate of single-type edges
- * for edge list iterator. That means, the caller can use the predicate
- * to make an edge list iterator for a certain type of edges from the 
- * original iterator.
-*/
-#define GRIN_TRAIT_SELECT_TYPE_FOR_EDGE_LIST
-
-/** @ingroup TraitFilterTypeMacros
- * @brief The storage provides a filtering predicate of single-type neighbors
- * for adjacent list iterator. That means, the caller can use the predicate
- * to make an adjacent list iterator of neighbors with a certain type from 
- * the original iterator.
-*/
-#define GRIN_TRAIT_SELECT_NEIGHBOR_TYPE_FOR_ADJACENT_LIST
-
-/** @ingroup TraitFilterTypeMacros
- * @brief The storage provides a filtering predicate of single-type edges
- * for adjacent list iterator. That means, the caller can use the predicate
- * to make an adjacent list iterator of edges with a certain type from 
- * the original iterator.
-*/
-#define GRIN_TRAIT_SELECT_EDGE_TYPE_FOR_ADJACENT_LIST
-
-/** @ingroup TraitFilterTypeMacros
  * @brief The storage provides specific relationship description for each
  * vertex-edge-vertex type traid. This means further optimizations can be
  * applied by the callers for vev traid under certain relationships, such as
@@ -625,10 +593,6 @@ typedef enum {
 #undef GRIN_TRAIT_NATURAL_ID_FOR_EDGE_TYPE
 #undef GRIN_ENABLE_EDGE_PRIMARY_KEYS
 #undef GRIN_TRAIT_NATURAL_ID_FOR_EDGE_PROPERTY
-#undef GRIN_TRAIT_SELECT_TYPE_FOR_VERTEX_LIST
-#undef GRIN_TRAIT_SELECT_TYPE_FOR_EDGE_LIST
-#undef GRIN_TRAIT_SELECT_NEIGHBOR_TYPE_FOR_ADJACENT_LIST
-#undef GRIN_TRAIT_SELECT_EDGE_TYPE_FOR_ADJACENT_LIST
 #undef GRIN_TRAIT_SPECIFIC_VEV_RELATION
 #undef GRIN_ASSUME_MASTER_ONLY_PARTITION_FOR_VERTEX_PROPERTY
 #undef GRIN_ASSUME_REPLICATE_MASTER_MIRROR_PARTITION_FOR_VERTEX_PROPERTY
@@ -652,10 +616,6 @@ typedef enum {
 #define GRIN_WITH_EDGE_TYPE_NAME
 #define GRIN_TRAIT_NATURAL_ID_FOR_EDGE_TYPE
 #define GRIN_TRAIT_NATURAL_ID_FOR_EDGE_PROPERTY
-#define GRIN_TRAIT_SELECT_TYPE_FOR_VERTEX_LIST
-#define GRIN_TRAIT_SELECT_TYPE_FOR_EDGE_LIST
-#define GRIN_TRAIT_SELECT_NEIGHBOR_TYPE_FOR_ADJACENT_LIST
-#define GRIN_TRAIT_SELECT_EDGE_TYPE_FOR_ADJACENT_LIST
 // GRIN_END
 
 // GRIN_FEATURE_DEPENDENCY

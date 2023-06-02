@@ -13,10 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-extern "C" {
-#include "grin/include/index/original_id.h"
-}
 #include "grin/src/predefine.h"
+extern "C" {
+#include "index/original_id.h"
+}
 
 GRIN_DATATYPE grin_get_vertex_original_id_datatype(GRIN_GRAPH g) {
   return GRIN_DATATYPE::Int64;

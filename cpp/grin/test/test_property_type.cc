@@ -18,17 +18,20 @@ limitations under the License.
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/include/property/type.h"
-#include "grin/include/topology/edgelist.h"
-#include "grin/include/topology/structure.h"
-#include "grin/include/topology/vertexlist.h"
+#include "grin/predefine.h"
+#include "property/type.h"
+#include "property/topology.h"
+#include "topology/edgelist.h"
+#include "topology/structure.h"
+#include "topology/vertexlist.h"
 }
 
 void test_property_type_vertex(GRIN_GRAPH graph) {
   std::cout << "\n== test vertex type ==" << std::endl;
 
   // get vertex type from vertex
-  auto vertex_list = grin_get_vertex_list(graph);
+  auto vtype = grin_get_vertex_type_by_id(graph, 0);
+  auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
   size_t idx0 = 0, idx1 = 1;
   auto v0 = grin_get_vertex_from_list(graph, vertex_list, idx0);
   auto v1 = grin_get_vertex_from_list(graph, vertex_list, idx1);
@@ -88,12 +91,14 @@ void test_property_type_vertex(GRIN_GRAPH graph) {
   // destroy vertex type list
   grin_destroy_vertex_type_list(graph, vertex_type_list);
   grin_destroy_vertex_type_list(graph, new_vertex_type_list);
+  grin_destroy_vertex_type(graph, vtype);
 }
 
 void test_property_type_edge(GRIN_GRAPH graph) {
   std::cout << "\n== test edge type ==" << std::endl;
 
-  auto edge_list = grin_get_edge_list(graph);
+  auto etype = grin_get_edge_type_by_id(graph, 0);
+  auto edge_list = grin_get_edge_list_by_type(graph, etype);
   auto it = grin_get_edge_list_begin(graph, edge_list);
   if (grin_is_edge_list_end(graph, it) == false) {
     auto e = grin_get_edge_from_iter(graph, it);
@@ -152,6 +157,7 @@ void test_property_type_edge(GRIN_GRAPH graph) {
   // destroy edge type list
   grin_destroy_edge_type_list(graph, edge_type_list);
   grin_destroy_edge_type_list(graph, new_edge_type_list);
+  grin_destroy_edge_type(graph, etype);
 }
 
 void test_property_type_vertex_and_edge(GRIN_GRAPH graph) {

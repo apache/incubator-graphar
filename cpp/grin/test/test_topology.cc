@@ -18,11 +18,14 @@ limitations under the License.
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/include/proto/message.h"
-#include "grin/include/topology/adjacentlist.h"
-#include "grin/include/topology/edgelist.h"
-#include "grin/include/topology/structure.h"
-#include "grin/include/topology/vertexlist.h"
+#include "grin/predefine.h"
+#include "common/message.h"
+#include "topology/adjacentlist.h"
+#include "topology/edgelist.h"
+#include "topology/structure.h"
+#include "topology/vertexlist.h"
+#include "property/topology.h"
+#include "property/type.h"
 }
 
 void test_protobuf() {
@@ -38,17 +41,14 @@ void test_topology_structure(GRIN_GRAPH graph) {
 
   assert(grin_is_multigraph(graph) == true);
 
-  std::cout << "vertex num = " << grin_get_vertex_num(graph) << std::endl;
-
-  std::cout << "edge num = " << grin_get_edge_num(graph) << std::endl;
-
   std::cout << "---- test topology: structure ----" << std::endl;
 }
 
 void test_topology_vertexlist(GRIN_GRAPH graph) {
   std::cout << "\n++++ test topology: vertexlist ++++" << std::endl;
   // get vertex list
-  auto vertex_list = grin_get_vertex_list(graph);
+  auto vtype = grin_get_vertex_type_by_name(graph, "person");
+  auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
 
   // test vertex list array
   auto n = grin_get_vertex_list_size(graph, vertex_list);
@@ -80,6 +80,7 @@ void test_topology_vertexlist(GRIN_GRAPH graph) {
 
   // destroy vertex list
   grin_destroy_vertex_list(graph, vertex_list);
+  grin_destroy_vertex_type(graph, vtype);
 
   std::cout << "---- test topology: vertexlist ----" << std::endl;
 }
@@ -87,7 +88,8 @@ void test_topology_vertexlist(GRIN_GRAPH graph) {
 void test_topology_edgelist(GRIN_GRAPH graph) {
   std::cout << "\n++++ test topology: edgelist ++++" << std::endl;
   // get edge list
-  auto edge_list = grin_get_edge_list(graph);
+  auto etype = grin_get_edge_type_by_name(graph, "knows");
+  auto edge_list = grin_get_edge_list_by_type(graph, etype);
 
   // test edge list iterator
   auto it = grin_get_edge_list_begin(graph, edge_list);
@@ -113,15 +115,18 @@ void test_topology_edgelist(GRIN_GRAPH graph) {
 
   // destroy edge list
   grin_destroy_edge_list(graph, edge_list);
+  grin_destroy_edge_type(graph, etype);
 
   std::cout << "---- test topology: edgelist -----" << std::endl;
 }
 
 void test_topology_adjlist_in(GRIN_GRAPH graph) {
   // get adj list
-  auto vertex_list = grin_get_vertex_list(graph);
+  auto vtype = grin_get_vertex_type_by_name(graph, "person");
+  auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
+  auto etype = grin_get_edge_type_by_name(graph, "knows");
   auto v = grin_get_vertex_from_list(graph, vertex_list, 201);
-  auto adj_list = grin_get_adjacent_list(graph, GRIN_DIRECTION::IN, v);
+  auto adj_list = grin_get_adjacent_list_by_edge_type(graph, GRIN_DIRECTION::IN, v, etype);
 
   // iterate adj list
   auto it = grin_get_adjacent_list_begin(graph, adj_list);
@@ -146,15 +151,21 @@ void test_topology_adjlist_in(GRIN_GRAPH graph) {
   std::cout << "adj list size (IN) of vertex #201 = " << count << std::endl;
   grin_destroy_adjacent_list_iter(graph, it);
 
-  // destory adj list
+  // destory
+  grin_destroy_vertex(graph, v);
+  grin_destroy_vertex_list(graph, vertex_list);
+  grin_destroy_vertex_type(graph, vtype);
+  grin_destroy_edge_type(graph, etype);
   grin_destroy_adjacent_list(graph, adj_list);
 }
 
 void test_topology_adjlist_out(GRIN_GRAPH graph) {
   // get adj list
-  auto vertex_list = grin_get_vertex_list(graph);
+  auto vtype = grin_get_vertex_type_by_name(graph, "person");
+  auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
+  auto etype = grin_get_edge_type_by_name(graph, "knows");
   auto v = grin_get_vertex_from_list(graph, vertex_list, 297);
-  auto adj_list = grin_get_adjacent_list(graph, GRIN_DIRECTION::OUT, v);
+  auto adj_list = grin_get_adjacent_list_by_edge_type(graph, GRIN_DIRECTION::OUT, v, etype);
 
   // iterate adj list
   auto it = grin_get_adjacent_list_begin(graph, adj_list);
@@ -179,7 +190,11 @@ void test_topology_adjlist_out(GRIN_GRAPH graph) {
   std::cout << "adj list size (OUT) of vertex #297 = " << count << std::endl;
   grin_destroy_adjacent_list_iter(graph, it);
 
-  // destory adj list
+  // destory
+  grin_destroy_vertex(graph, v);
+  grin_destroy_vertex_list(graph, vertex_list);
+  grin_destroy_vertex_type(graph, vtype);
+  grin_destroy_edge_type(graph, etype);
   grin_destroy_adjacent_list(graph, adj_list);
 }
 

@@ -18,8 +18,9 @@ limitations under the License.
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/include/partition/partition.h"
-#include "grin/include/topology/structure.h"
+#include "grin/predefine.h"
+#include "partition/partition.h"
+#include "topology/structure.h"
 }
 
 void test_partition_partition(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
@@ -72,12 +73,7 @@ void test_partition_partition(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
     auto info = grin_get_partition_info(pg, partition);
     std::cout << "Partition " << static_cast<const char*>(info) << std::endl;
     auto graph = grin_get_local_graph_by_partition(pg, partition);
-    // check information of local graph
     assert(graph != GRIN_NULL_GRAPH);
-    auto vertex_num = grin_get_vertex_num(graph);
-    auto edge_num = grin_get_edge_num(graph);
-    std::cout << "- vertex num = " << vertex_num << std::endl;
-    std::cout << "- edge num = " << edge_num << std::endl;
     // destroy
     grin_destroy_partition(pg, partition);
     grin_destroy_graph(graph);

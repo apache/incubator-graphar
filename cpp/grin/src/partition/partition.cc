@@ -15,10 +15,10 @@ limitations under the License.
 
 #include <sstream>
 
-extern "C" {
-#include "grin/include/partition/partition.h"
-}
 #include "grin/src/predefine.h"
+extern "C" {
+#include "partition/partition.h"
+}
 
 #ifdef GRIN_ENABLE_GRAPH_PARTITION
 GRIN_PARTITIONED_GRAPH grin_get_partitioned_graph_from_storage(int argc,

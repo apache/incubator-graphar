@@ -13,10 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-extern "C" {
-#include "grin/include/property/type.h"
-}
 #include "grin/src/predefine.h"
+extern "C" {
+#include "property/type.h"
+}
 
 #ifdef GRIN_WITH_VERTEX_PROPERTY
 bool grin_equal_vertex_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt1,

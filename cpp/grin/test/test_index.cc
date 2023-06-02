@@ -18,17 +18,21 @@ limitations under the License.
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/include/index/order.h"
-#include "grin/include/index/original_id.h"
-#include "grin/include/topology/structure.h"
-#include "grin/include/topology/vertexlist.h"
+#include "grin/predefine.h"
+#include "index/order.h"
+#include "index/original_id.h"
+#include "topology/structure.h"
+#include "topology/vertexlist.h"
+#include "property/type.h"
+#include "property/topology.h"
 }
 
 void test_index_order(GRIN_GRAPH graph) {
   std::cout << "\n++++ test index: order ++++" << std::endl;
 
   std::cout << "test vertex order" << std::endl;
-  auto vertex_list = grin_get_vertex_list(graph);
+  auto vtype = grin_get_vertex_type_by_id(graph, 0);
+  auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
   size_t idx0 = 0, idx1 = 1;
   auto v0 = grin_get_vertex_from_list(graph, vertex_list, idx0);
   auto v1 = grin_get_vertex_from_list(graph, vertex_list, idx1);
@@ -47,6 +51,7 @@ void test_index_order(GRIN_GRAPH graph) {
   grin_destroy_vertex(graph, v0);
   grin_destroy_vertex(graph, v1);
   grin_destroy_vertex_list(graph, vertex_list);
+  grin_destroy_vertex_type(graph, vtype);
 
   std::cout << "---- test index: order completed ----" << std::endl;
 }
@@ -55,7 +60,8 @@ void test_original_id(GRIN_GRAPH graph) {
   std::cout << "\n++++ test index: original id ++++" << std::endl;
 
   std::cout << "test vertex original id" << std::endl;
-  auto vertex_list = grin_get_vertex_list(graph);
+  auto vtype = grin_get_vertex_type_by_id(graph, 0);
+  auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
   size_t idx0 = 0, idx1 = 1;
   auto v0 = grin_get_vertex_from_list(graph, vertex_list, idx0);
   auto v1 = grin_get_vertex_from_list(graph, vertex_list, idx1);
@@ -82,6 +88,7 @@ void test_original_id(GRIN_GRAPH graph) {
   grin_destroy_vertex(graph, v0_from_oid);
   grin_destroy_vertex(graph, v1_from_oid);
   grin_destroy_vertex_list(graph, vertex_list);
+  grin_destroy_vertex_type(graph, vtype);
 
   std::cout << "---- test index: original id completed ----" << std::endl;
 }

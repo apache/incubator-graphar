@@ -15,10 +15,10 @@ limitations under the License.
 
 #include <sstream>
 
-extern "C" {
-#include "grin/include/partition/reference.h"
-}
 #include "grin/src/predefine.h"
+extern "C" {
+#include "partition/reference.h"
+}
 
 #ifdef GRIN_ENABLE_VERTEX_REF
 GRIN_VERTEX_REF grin_get_vertex_ref_by_vertex(GRIN_GRAPH g, GRIN_VERTEX v) {

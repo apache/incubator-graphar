@@ -16,11 +16,11 @@ limitations under the License.
 #include <glog/logging.h>
 #include <google/protobuf/util/json_util.h>
 
-#include "./graph.pb.h"
-extern "C" {
-#include "grin/include/proto/message.h"
-}
 #include "grin/src/predefine.h"
+#include "grin/src/common/graph.pb.h"
+extern "C" {
+#include "common/message.h"
+}
 
 const char* grin_get_static_storage_feature_msg() {
   grin::Graph g;
@@ -283,22 +283,6 @@ const char* grin_get_static_storage_feature_msg() {
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_EDGE_PROPERTY
     efeature->set_grin_trait_natural_id_for_edge_property(true);
-#endif
-
-#ifdef GRIN_TRAIT_SELECT_TYPE_FOR_VERTEX_LIST
-    feature->set_grin_trait_select_type_for_vertex_list(true);
-#endif
-
-#ifdef GRIN_TRAIT_SELECT_TYPE_FOR_EDGE_LIST
-    feature->set_grin_trait_select_type_for_edge_list(true);
-#endif
-
-#ifdef GRIN_TRAIT_SELECT_NEIGHBOR_TYPE_FOR_ADJACENT_LIST
-    feature->set_grin_trait_select_neighbor_type_for_adjacent_list(true);
-#endif
-
-#ifdef GRIN_TRAIT_SELECT_EDGE_TYPE_FOR_ADJACENT_LIST
-    feature->set_grin_trait_select_edge_type_for_adjacent_list(true);
 #endif
 
 #ifdef GRIN_TRAIT_SPECIFIC_VEV_RELATION

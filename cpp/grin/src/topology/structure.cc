@@ -13,10 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-extern "C" {
-#include "grin/include/topology/structure.h"
-}
 #include "grin/src/predefine.h"
+extern "C" {
+#include "topology/structure.h"
+}
 
 GRIN_GRAPH grin_get_graph_from_storage(int argc, char** argv) {
   if (argc < 1)
@@ -38,17 +38,13 @@ bool grin_is_directed(GRIN_GRAPH);
 bool grin_is_multigraph(GRIN_GRAPH g) { return true; }
 #endif
 
-size_t grin_get_vertex_num(GRIN_GRAPH g) {
-  auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  size_t result = _g->tot_vertex_num;
-  return result;
-}
+#if !defined(GRIN_WITH_VERTEX_PROPERTY)
+size_t grin_get_vertex_num(GRIN_GRAPH);
+#endif
 
-size_t grin_get_edge_num(GRIN_GRAPH g) {
-  auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  size_t result = _g->tot_edge_num;
-  return result;
-}
+#if !defined(GRIN_WITH_EDGE_PROPERTY)
+size_t grin_get_edge_num(GRIN_GRAPH);
+#endif
 
 // Vertex
 void grin_destroy_vertex(GRIN_GRAPH g, GRIN_VERTEX v) {

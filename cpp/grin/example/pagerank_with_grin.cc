@@ -20,15 +20,16 @@ limitations under the License.
 #include "grin/example/config.h"
 
 extern "C" {
-#include "grin/include/index/order.h"
-#include "grin/include/index/original_id.h"
-#include "grin/include/property/property.h"
-#include "grin/include/property/topology.h"
-#include "grin/include/property/type.h"
-#include "grin/include/topology/adjacentlist.h"
-#include "grin/include/topology/edgelist.h"
-#include "grin/include/topology/structure.h"
-#include "grin/include/topology/vertexlist.h"
+#include "grin/predefine.h"
+#include "index/order.h"
+#include "index/original_id.h"
+#include "property/property.h"
+#include "property/topology.h"
+#include "property/type.h"
+#include "topology/adjacentlist.h"
+#include "topology/edgelist.h"
+#include "topology/structure.h"
+#include "topology/vertexlist.h"
 }
 
 void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
@@ -42,8 +43,7 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
   const size_t num_vertices = grin_get_vertex_num_by_type(graph, vtype);
   // select edge type
   auto etype = grin_get_edge_type_by_name(graph, PR_EDGE_TYPE.c_str());
-  auto all_edge_list = grin_get_edge_list(graph);
-  auto edge_list = grin_select_type_for_edge_list(graph, etype, all_edge_list);
+  auto edge_list = grin_get_edge_list_by_type(graph, etype);
 
   // initialize pagerank value of vertices
   std::vector<double> pr_curr(num_vertices);
@@ -108,9 +108,7 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
   // output results
   if (print_result) {
     std::cout << "num_vertices: " << num_vertices << std::endl;
-    auto all_vertex_list = grin_get_vertex_list(graph);
-    auto vertex_list =
-        grin_select_type_for_vertex_list(graph, vtype, all_vertex_list);
+    auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
     auto property =
         grin_get_vertex_property_by_name(graph, vtype, VERTEX_OID_NAME.c_str());
     auto data_type = grin_get_vertex_property_datatype(graph, property);
@@ -139,11 +137,9 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
     grin_destroy_vertex_list_iter(graph, it);
     grin_destroy_vertex_property(graph, property);
     grin_destroy_vertex_list(graph, vertex_list);
-    grin_destroy_vertex_list(graph, all_vertex_list);
   }
 
   grin_destroy_edge_list(graph, edge_list);
-  grin_destroy_edge_list(graph, all_edge_list);
   grin_destroy_vertex_type(graph, vtype);
   grin_destroy_edge_type(graph, etype);
 

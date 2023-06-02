@@ -19,20 +19,19 @@ limitations under the License.
 #include "grin/example/config.h"
 
 extern "C" {
-#include "grin/include/property/property.h"
-#include "grin/include/property/propertylist.h"
-#include "grin/include/property/topology.h"
-#include "grin/include/property/type.h"
-#include "grin/include/topology/adjacentlist.h"
-#include "grin/include/topology/edgelist.h"
-#include "grin/include/topology/structure.h"
-#include "grin/include/topology/vertexlist.h"
+#include "grin/predefine.h"
+#include "property/property.h"
+#include "property/propertylist.h"
+#include "property/topology.h"
+#include "property/type.h"
+#include "topology/adjacentlist.h"
+#include "topology/edgelist.h"
+#include "topology/structure.h"
+#include "topology/vertexlist.h"
 }
 
 void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
   std::cout << "++++ Test vertex properties ++++" << std::endl;
-
-  auto vertex_list = grin_get_vertex_list(graph);
 
   // get vertex type list
   auto vertex_type_list = grin_get_vertex_type_list(graph);
@@ -52,8 +51,7 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
     size_t vpn = grin_get_vertex_property_list_size(graph, property_list);
 
     // select type for vertex list
-    auto select_vertex_list =
-        grin_select_type_for_vertex_list(graph, vertex_type, vertex_list);
+    auto select_vertex_list = grin_get_vertex_list_by_type(graph, vertex_type);
 
     auto it = grin_get_vertex_list_begin(graph, select_vertex_list);
     while (grin_is_vertex_list_end(graph, it) == false) {
@@ -119,16 +117,11 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
     grin_destroy_vertex_property_list(graph, property_list);
   }
 
-  // destroy vertex list
-  grin_destroy_vertex_list(graph, vertex_list);
-
   std::cout << "--- Test vertex properties ---" << std::endl;
 }
 
 void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
   std::cout << "\n++++ Test edge properties ++++" << std::endl;
-
-  auto edge_list = grin_get_edge_list(graph);
 
   // get edge type list
   auto edge_type_list = grin_get_edge_type_list(graph);
@@ -147,7 +140,7 @@ void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
 
     // select type for edge list
     auto select_edge_list =
-        grin_select_type_for_edge_list(graph, edge_type, edge_list);
+        grin_get_edge_list_by_type(graph, edge_type);
 
     auto it = grin_get_edge_list_begin(graph, select_edge_list);
     while (grin_is_edge_list_end(graph, it) == false) {

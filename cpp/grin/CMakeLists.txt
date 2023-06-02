@@ -12,18 +12,20 @@ add_library(gar-grin SHARED ${GAR_GRIN_SRC_FILES})
 
 target_compile_features(gar-grin PUBLIC cxx_std_17)
 
-target_include_directories(gar-grin SYSTEM BEFORE PUBLIC include ${Protobuf_INCLUDE_DIRS})
+target_include_directories(gar-grin SYSTEM BEFORE PUBLIC ${PROJECT_SOURCE_DIR}/thirdparty/grin/include ${Protobuf_INCLUDE_DIRS})
 
 target_link_libraries(gar-grin PUBLIC gar ${Protobuf_LIBRARIES} glog::glog)
 
 # ------------------------------------------------------------------------------
 # complile protobuf to generate cpp files
 # ------------------------------------------------------------------------------
-set(DST_DIR "${PROJECT_SOURCE_DIR}/grin/src/proto/")
+set(DST_DIR "${PROJECT_SOURCE_DIR}/grin/src/common/")
 
-list(APPEND PROTO_FLAGS -I${PROJECT_SOURCE_DIR}/grin/include/proto/)
+list(APPEND PROTO_FLAGS -I${PROJECT_SOURCE_DIR}/thirdparty/grin/proto/)
 
-file(GLOB PROTO_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/include/proto" "${PROJECT_SOURCE_DIR}/grin/include/proto/*.proto")
+file(GLOB PROTO_FILES RELATIVE "${PROJECT_SOURCE_DIR}/thirdparty/grin/proto" "${PROJECT_SOURCE_DIR}/thirdparty/grin/proto/*.proto")
+message(${PROTO_FILES})
+
 set(PROTO_SRCS "")
 set(PROTO_HDRS "")
 
@@ -47,7 +49,7 @@ foreach(f ${TEST_FILES})
     set(E_NAME ${CMAKE_MATCH_1})
     message(STATUS "Found GRIN test - " ${E_NAME})
     add_executable(${E_NAME} test/${E_NAME}.cc)
-    target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${Protobuf_INCLUDE_DIRS})
+    target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/thirdparty/grin/include ${Protobuf_INCLUDE_DIRS})
     target_link_libraries(${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog)
 
     # if OpenSSL library exists, link the OpenSSL library.
@@ -67,7 +69,7 @@ foreach(f ${C_TEST_FILES})
     set(E_NAME ${CMAKE_MATCH_1})
     message(STATUS "Found GRIN C test - " ${E_NAME})
     add_executable(C_${E_NAME} c_test/${E_NAME}.c)
-    target_include_directories(C_${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${Protobuf_INCLUDE_DIRS})
+    target_include_directories(C_${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/thirdparty/grin/include ${Protobuf_INCLUDE_DIRS})
     target_link_libraries(C_${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog)
 
     # if OpenSSL library exists, link the OpenSSL library.
@@ -100,7 +102,7 @@ foreach(f ${EXAMPLE_FILES})
     set(E_NAME ${CMAKE_MATCH_1})
     message(STATUS "Found GRIN example - " ${E_NAME})
     add_executable(${E_NAME} example/${E_NAME}.cc ${GAR_GRIN_SRC_FILES})
-    target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${Protobuf_INCLUDE_DIRS} ${MPI_INCLUDE_PATH})
+    target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/thirdparty/grin/include ${Protobuf_INCLUDE_DIRS} ${MPI_INCLUDE_PATH})
     # enable LTO for building examples
     set_property(TARGET ${E_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
     # link to gar instead of gar-grin

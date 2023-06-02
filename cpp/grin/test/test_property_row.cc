@@ -18,16 +18,17 @@ limitations under the License.
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/include/common/error.h"
-#include "grin/include/property/property.h"
-#include "grin/include/property/propertylist.h"
-#include "grin/include/property/row.h"
-#include "grin/include/property/topology.h"
-#include "grin/include/property/type.h"
-#include "grin/include/topology/adjacentlist.h"
-#include "grin/include/topology/edgelist.h"
-#include "grin/include/topology/structure.h"
-#include "grin/include/topology/vertexlist.h"
+#include "grin/predefine.h"
+#include "common/error.h"
+#include "property/property.h"
+#include "property/propertylist.h"
+#include "property/row.h"
+#include "property/topology.h"
+#include "property/type.h"
+#include "topology/adjacentlist.h"
+#include "topology/edgelist.h"
+#include "topology/structure.h"
+#include "topology/vertexlist.h"
 }
 
 void test_property_row(GRIN_GRAPH graph) {
@@ -89,9 +90,6 @@ void test_property_vertex(GRIN_GRAPH graph) {
   size_t n = grin_get_vertex_type_list_size(graph, vertex_type_list);
   std::cout << "size of vertex type list = " << n << std::endl;
 
-  // get vertex list
-  auto vertex_list = grin_get_vertex_list(graph);
-
   for (auto i = 0; i < n; i++) {
     std::cout << "== vertex type " << i << ": ==" << std::endl;
     auto vertex_type =
@@ -99,7 +97,7 @@ void test_property_vertex(GRIN_GRAPH graph) {
 
     // select type for vertex list
     auto select_vertex_list =
-        grin_select_type_for_vertex_list(graph, vertex_type, vertex_list);
+        grin_get_vertex_list_by_type(graph, vertex_type);
 
     // get property list by vertex type
     auto property_list =
@@ -168,7 +166,6 @@ void test_property_vertex(GRIN_GRAPH graph) {
 
   // destroy
   grin_destroy_vertex_type_list(graph, vertex_type_list);
-  grin_destroy_vertex_list(graph, vertex_list);
 
   std::cout << "---- test property: vertex completed ----" << std::endl;
 }
@@ -181,16 +178,13 @@ void test_property_edge(GRIN_GRAPH graph) {
   size_t n = grin_get_edge_type_list_size(graph, edge_type_list);
   std::cout << "size of edge type list = " << n << std::endl;
 
-  // get edge list
-  auto edge_list = grin_get_edge_list(graph);
-
   for (auto i = 0; i < n; i++) {
     std::cout << "== edge type " << i << ": ==" << std::endl;
     auto edge_type = grin_get_edge_type_from_list(graph, edge_type_list, i);
 
     // select type for edge list
     auto select_edge_list =
-        grin_select_type_for_edge_list(graph, edge_type, edge_list);
+        grin_get_edge_list_by_type(graph, edge_type);
 
     // get property list by edge type
     auto property_list = grin_get_edge_property_list_by_type(graph, edge_type);
@@ -260,7 +254,6 @@ void test_property_edge(GRIN_GRAPH graph) {
 
   // destroy
   grin_destroy_edge_type_list(graph, edge_type_list);
-  grin_destroy_edge_list(graph, edge_list);
 
   std::cout << "---- test property: edge completed ----" << std::endl;
 }

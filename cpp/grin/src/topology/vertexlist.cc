@@ -13,18 +13,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-extern "C" {
-#include "grin/include/topology/vertexlist.h"
-}
 #include "grin/src/predefine.h"
+extern "C" {
+#include "topology/vertexlist.h"
+}
+
+#if defined(GRIN_ENABLE_VERTEX_LIST) && !defined(GRIN_WITH_VERTEX_PROPERTY)
+GRIN_VERTEX_LIST grin_get_vertex_list(GRIN_GRAPH);
+#endif
 
 #ifdef GRIN_ENABLE_VERTEX_LIST
-GRIN_VERTEX_LIST grin_get_vertex_list(GRIN_GRAPH g) {
-  auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto vl = new GRIN_VERTEX_LIST_T(0, _g->vertex_type_num);
-  return vl;
-}
-
 void grin_destroy_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
   auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
   delete _vl;

@@ -18,15 +18,16 @@ limitations under the License.
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/include/index/order.h"
-#include "grin/include/index/original_id.h"
-#include "grin/include/partition/partition.h"
-#include "grin/include/partition/reference.h"
-#include "grin/include/partition/topology.h"
-#include "grin/include/property/topology.h"
-#include "grin/include/property/type.h"
-#include "grin/include/topology/structure.h"
-#include "grin/include/topology/vertexlist.h"
+#include "grin/predefine.h"
+#include "index/order.h"
+#include "index/original_id.h"
+#include "partition/partition.h"
+#include "partition/reference.h"
+#include "partition/topology.h"
+#include "property/topology.h"
+#include "property/type.h"
+#include "topology/structure.h"
+#include "topology/vertexlist.h"
 }
 
 void test_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
@@ -68,23 +69,6 @@ void test_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
   std::cout << "(Correct) check vertex order succeed" << std::endl;
 }
 
-void test_select_type_for_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
-  // select vertex type
-  auto type = grin_get_vertex_type_by_name(g, "person");
-  auto select_vertex_list = grin_select_type_for_vertex_list(g, type, vl);
-  auto select_vertex_list_size =
-      grin_get_vertex_list_size(g, select_vertex_list);
-  std::cout << "select vertex type \"person\", size = "
-            << select_vertex_list_size << std::endl;
-
-  // check vertex list
-  test_vertex_list(g, select_vertex_list);
-
-  // destroy
-  grin_destroy_vertex_list(g, select_vertex_list);
-  grin_destroy_vertex_type(g, type);
-}
-
 void test_partition_topology(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
   std::cout << "\n++++ test partition: topology ++++" << std::endl;
 
@@ -100,14 +84,15 @@ void test_partition_topology(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
     auto graph = grin_get_local_graph_by_partition(pg, partition);
 
     // get vertex list
-    auto vertex_list = grin_get_vertex_list(graph);
+    auto type = grin_get_vertex_type_by_name(graph, "person");
+    auto vertex_list = grin_get_vertex_list_by_type(graph, type);
     auto vertex_list_size = grin_get_vertex_list_size(graph, vertex_list);
-    std::cout << "complete vertex list size = " << vertex_list_size
+    std::cout << "vertex list for \"person\", size = " << vertex_list_size
               << std::endl;
 
     // select master
     auto master_vertex_list =
-        grin_select_master_for_vertex_list(graph, vertex_list);
+        grin_get_vertex_list_by_type_select_master(graph, type);
     auto master_vertex_list_size =
         grin_get_vertex_list_size(graph, master_vertex_list);
     std::cout << "master vertex list size = " << master_vertex_list_size
@@ -115,11 +100,10 @@ void test_partition_topology(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
     if (partition_id == 0) {
       test_vertex_list(graph, master_vertex_list);
     }
-    test_select_type_for_vertex_list(graph, master_vertex_list);
 
     // select mirror
     auto mirror_vertex_list =
-        grin_select_mirror_for_vertex_list(graph, vertex_list);
+        grin_get_vertex_list_by_type_select_mirror(graph, type);
     auto mirror_vertex_list_size =
         grin_get_vertex_list_size(graph, mirror_vertex_list);
     std::cout << "mirror vertex list size = " << mirror_vertex_list_size
@@ -127,7 +111,6 @@ void test_partition_topology(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
     if (partition_id == 1) {
       test_vertex_list(graph, mirror_vertex_list);
     }
-    test_select_type_for_vertex_list(graph, mirror_vertex_list);
 
     // check vertex number
     assert(vertex_list_size ==
@@ -136,34 +119,22 @@ void test_partition_topology(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
     // select by partition
     auto partition0 = grin_get_partition_by_id(pg, 0);
     auto vertex_list0 =
-        grin_select_partition_for_vertex_list(graph, partition0, vertex_list);
+        grin_get_vertex_list_by_type_select_partition(graph, type, partition0);
     auto vertex_list0_size = grin_get_vertex_list_size(graph, vertex_list0);
     std::cout << "vertex list size of partition 0 = " << vertex_list0_size
               << std::endl;
     if (partition_id == 2) {
       test_vertex_list(graph, vertex_list0);
     }
-    test_select_type_for_vertex_list(graph, vertex_list0);
-
-    // invalid operations
-    if (partition_id == 0) {
-      assert(grin_select_mirror_for_vertex_list(graph, vertex_list0) ==
-             GRIN_NULL_LIST);
-      assert(grin_select_partition_for_vertex_list(
-                 graph, partition0, mirror_vertex_list) == GRIN_NULL_LIST);
-    } else {
-      assert(grin_select_master_for_vertex_list(graph, vertex_list0) ==
-             GRIN_NULL_LIST);
-      assert(grin_select_partition_for_vertex_list(
-                 graph, partition0, master_vertex_list) == GRIN_NULL_LIST);
-    }
 
     // destroy
     grin_destroy_partition(graph, partition);
     grin_destroy_partition(graph, partition0);
-    grin_destroy_graph(graph);
     grin_destroy_vertex_list(graph, vertex_list);
     grin_destroy_vertex_list(graph, master_vertex_list);
+    grin_destroy_vertex_list(graph, mirror_vertex_list);
+    grin_destroy_vertex_type(graph, type);
+    grin_destroy_graph(graph);
   }
 
   std::cout << "---- test partition: topology completed ----" << std::endl;

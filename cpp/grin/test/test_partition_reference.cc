@@ -18,10 +18,13 @@ limitations under the License.
 #include "grin/test/config.h"
 
 extern "C" {
-#include "grin/include/partition/partition.h"
-#include "grin/include/partition/reference.h"
-#include "grin/include/topology/structure.h"
-#include "grin/include/topology/vertexlist.h"
+#include "grin/predefine.h"
+#include "partition/partition.h"
+#include "partition/reference.h"
+#include "topology/structure.h"
+#include "topology/vertexlist.h"
+#include "property/type.h"
+#include "property/topology.h"
 }
 
 void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph,
@@ -123,7 +126,8 @@ void test_partition_reference(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
   auto partition0 = grin_get_partition_by_id(pg, 0);
   auto graph = grin_get_local_graph_by_partition(pg, partition0);
 
-  auto vertex_list = grin_get_vertex_list(graph);
+  auto vtype = grin_get_vertex_type_by_id(graph, 0);
+  auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
   // get vertex 0 & test
   if (grin_get_vertex_list_size(graph, vertex_list) > 0) {
     auto v = grin_get_vertex_from_list(graph, vertex_list, 0);
@@ -141,6 +145,7 @@ void test_partition_reference(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
   grin_destroy_partition(graph, partition0);
   grin_destroy_graph(graph);
   grin_destroy_vertex_list(graph, vertex_list);
+  grin_destroy_vertex_type(graph, vtype);
 
   std::cout << "---- test partition: reference completed ----" << std::endl;
 }
