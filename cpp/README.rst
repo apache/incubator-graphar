@@ -43,7 +43,7 @@ Building
 All the instructions below assume that you have cloned the GraphAr git
 repository and navigated to the ``cpp`` subdirectory:
 
-.. code-block::
+.. code-block:: shell
 
     $ git clone https://github.com/alibaba/GraphAr.git
     $ cd GraphAr
@@ -52,7 +52,7 @@ repository and navigated to the ``cpp`` subdirectory:
 
 Release build:
 
-.. code-block::
+.. code-block:: shell
 
     $ mkdir build-release
     $ cd build-release
@@ -101,7 +101,7 @@ After the building, you can install the GraphAr C++ library with:
 
 .. code-block:: shell
 
-    $ sudo make install  # run in directory you build, like build-relese, build and so on
+    $ sudo make install       # run in directory you build, like build-release, build and so on
 
 Generate API document
 ^^^^^^^^^^^^^^^^^^^^^
