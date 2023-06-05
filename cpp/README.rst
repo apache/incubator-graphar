@@ -97,11 +97,11 @@ Build with examples:
 Install
 ^^^^^^^^^
 
-After the building, you can install the GraphAr C++ library with(run in directory you build, like build-relese, build and so on):
+After the building, you can install the GraphAr C++ library with:
 
 .. code-block:: shell
 
-    $ sudo make install
+    $ sudo make install  # run in directory you build, like build-relese, build and so on
 
 Generate API document
 ^^^^^^^^^^^^^^^^^^^^^
