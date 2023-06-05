@@ -195,11 +195,12 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
   // all partition
   if (_vli->partition_type == ALL_PARTITION) {
     ++_vli->current_offset;
-    ++_vli->iter;
     // end of the list
     if (_vli->current_offset >= _g->vertex_offsets[_vli->type_id + 1] -
                                     _g->vertex_offsets[_vli->type_id]) {
-      _vli->is_end = true;
+      _vli->current_offset = -1;
+    } else {
+      ++_vli->iter;
     }
     return;
   }
@@ -213,7 +214,7 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
       _vli->iter += idx - _vli->current_offset;
       _vli->current_offset = idx;
     } else {  // end of the list
-      _vli->is_end = true;
+      _vli->current_offset = -1;
     }
     return;
   }
@@ -247,7 +248,7 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
         _vli->current_partition_id = partition_id;
         _vli->current_offset = idx;
       } else {  // end of the list
-        _vli->is_end = true;
+        _vli->current_offset = -1;
       }
     }
     return;
@@ -258,7 +259,7 @@ bool grin_is_vertex_list_end(GRIN_GRAPH g, GRIN_VERTEX_LIST_ITERATOR vli) {
   if (vli == GRIN_NULL_LIST_ITERATOR)
     return true;
   auto _vli = static_cast<GRIN_VERTEX_LIST_ITERATOR_T*>(vli);
-  return _vli->is_end;
+  return _vli->current_offset == -1;
 }
 
 GRIN_VERTEX grin_get_vertex_from_iter(GRIN_GRAPH g,

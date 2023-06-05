@@ -84,7 +84,6 @@ struct GRIN_VERTEX_LIST_ITERATOR_T {
                                   // ALL_BUT_ONE_PARTITION
   GAR_NAMESPACE::IdType current_offset;
   GAR_NAMESPACE::VertexIter iter;
-  bool is_end;
   GRIN_VERTEX_LIST_ITERATOR_T(unsigned _type_id,
                               PARTITION_TYPE_IN_VERTEX_LIST _partition_type,
                               unsigned _partition_id,
@@ -96,8 +95,7 @@ struct GRIN_VERTEX_LIST_ITERATOR_T {
         partition_id(_partition_id),
         current_partition_id(_current_partition_id),
         current_offset(_current_offset),
-        iter(std::move(_iter)),
-        is_end(false) {}
+        iter(std::move(_iter)) {}
 };
 #endif
 
