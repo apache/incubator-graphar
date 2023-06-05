@@ -26,7 +26,7 @@ Building requires:
   sufficient. For MacOS, at least clang 5 is required
 * CMake 3.5 or higher
 * On Linux and macOS, ``make`` build utilities
-* curl-devel (Linux) or curl (macOS), for s3 filesystem support
+* curl-devel with SSL (Linux) or curl (macOS), for s3 filesystem support
 
 Dependencies for optional features:
 
@@ -57,7 +57,7 @@ Release build:
     $ mkdir build-release
     $ cd build-release
     $ cmake ..
-    $ make -j8       # if you have 8 CPU cores, otherwise adjust
+    $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
 
 Build with a custom namespace:
 
@@ -70,7 +70,7 @@ setting :code:`NAMESPACE` option with cmake:
     $ mkdir build
     $ cd build
     $ cmake -DNAMESPACE=MyNamespace ..
-    $ make -j8       # if you have 8 CPU cores, otherwise adjust
+    $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
 
 Debug build with unit tests:
 
@@ -80,7 +80,7 @@ Debug build with unit tests:
     $ mkdir build-debug
     $ cd build-debug
     $ cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON ..
-    $ make -j8       # if you have 8 CPU cores, otherwise adjust
+    $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
     $ make test      # to run the tests
 
 Build with examples:
@@ -91,13 +91,13 @@ Build with examples:
     $ mkdir build-examples
     $ cd build-examples
     $ cmake -DBUILD_EXAMPLES=ON ..
-    $ make -j8       # if you have 8 CPU cores, otherwise adjust
+    $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
     $ ./bgl_example  # run the BGL example
 
 Install
 ^^^^^^^^^
 
-After the building, you can install the GraphAr C++ library with:
+After the building, you can install the GraphAr C++ library with(run in directory you build, like build-relese, build and so on):
 
 .. code-block:: shell
 
