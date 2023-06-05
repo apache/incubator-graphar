@@ -118,8 +118,10 @@ const char* vt_names[] = {"person", "software"};
 const char* et_names[] = {"created", "knows"};
 
 #ifdef GRIN_ENABLE_VERTEX_ORIGINAL_ID_OF_INT64
-const char* v_names[] = {"WRONG", "marko",  "vadas", "lop",
-                         "josh",  "ripple", "peter"};
+// const char* v_names[] = {"WRONG", "marko",  "vadas", "lop",
+//                         "josh",  "ripple", "peter"};
+// fix for GraphAr
+char v_names[(1 << 20) + 2][10] = {"vadas", "peter", "josh", "marko"};
 #else
 const char* v_names[] = {"josh", "vadas",
                          "peter"};  // TODO align with order in local graph
@@ -874,7 +876,7 @@ void test_topology_adjacent_list(int argc, char** argv, GRIN_DIRECTION dir) {
 #ifdef GRIN_ENABLE_VERTEX_ORIGINAL_ID_OF_INT64
   long long int vid = grin_get_vertex_original_id_of_int64(g, v);
 #else
-  long long int vid = vcnt;
+  long long int vid = __vcnt;
 #endif
 #ifdef GRIN_ENABLE_GRAPH_PARTITION
   if (!grin_is_master_vertex(g, v)) {
@@ -1019,6 +1021,10 @@ void test_index(int argc, char** argv) {
 }
 
 int main(int argc, char** argv) {
+  // fix for GraphAr
+  strcpy(v_names[1 << 20], "lop");
+  strcpy(v_names[(1 << 20) + 1], "ripple");
+
   test_index(argc, argv);
   test_property(argc, argv);
   test_partition(argc, argv);

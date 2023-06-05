@@ -91,8 +91,8 @@ static const std::string CC_TEST_DATA_PATH = TEST_DATA_SMALL_PATH;  // NOLINT
 
 static const std::string DIS_PR_VERTEX_TYPE = "person";  // NOLINT
 static const std::string DIS_PR_EDGE_TYPE = "knows";     // NOLINT
-static const std::string DIS_PR_TEST_DATA_PATH =
-    TEST_DATA_SMALL_PATH;  // NOLINT
+static const std::string DIS_PR_TEST_DATA_PATH =         // NOLINT
+    TEST_DATA_SMALL_PATH;
 static const int DIS_PR_MAX_ITERS = 10;
 
 static const std::string PROPERTY_TEST_DATA_PATH = TEST_DATA_PATH;  // NOLINT
