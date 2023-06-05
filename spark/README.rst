@@ -24,7 +24,7 @@ Building
 All the instructions below assume that you have cloned the GraphAr git
 repository and navigated to the ``spark`` subdirectory:
 
-.. code-block::
+.. code-block:: shell
 
     $ git clone https://github.com/alibaba/GraphAr.git
     $ cd GraphAr
@@ -33,7 +33,7 @@ repository and navigated to the ``spark`` subdirectory:
 
 Build the package:
 
-.. code-block::
+.. code-block:: shell
 
     $ mvn clean package -DskipTests
 
@@ -42,19 +42,19 @@ After compilation, the package file graphar-x.x.x-SNAPSHOT-shaded.jar is generat
 
 Build the package and run the unit tests:
 
-.. code-block::
+.. code-block:: shell
 
     $ mvn clean package
 
 Build and run the unit tests:
 
-.. code-block::
+.. code-block:: shell
 
     $ mvn clean test
 
 Build and run certain unit test:
 
-.. code-block::
+.. code-block:: shell
 
     $ mvn clean test -Dsuites='com.alibaba.graphar.GraphInfoSuite'   # run the GraphInfo test suite
     $ mvn clean test -Dsuites='com.alibaba.graphar.GraphInfoSuite load graph info'  # run the `load graph info` test of test suite
