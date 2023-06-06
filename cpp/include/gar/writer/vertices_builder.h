@@ -178,9 +178,9 @@ class VerticesBuilder {
    * which is the writer's validate level by default.
    * @return Status: ok or Status::InvalidOperation error.
    */
-  Status AddVertex(Vertex& v, IdType index = -1,
-                   ValidateLevel validate_level =
-                       ValidateLevel::default_validate) {  // NOLINT
+  Status AddVertex(
+      Vertex& v, IdType index = -1,  // NOLINT
+      ValidateLevel validate_level = ValidateLevel::default_validate) {
     // validate
     GAR_RETURN_NOT_OK(validate(v, index, validate_level));
     // add a vertex
