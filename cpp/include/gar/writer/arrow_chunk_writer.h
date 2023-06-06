@@ -75,21 +75,6 @@ class VertexPropertyWriter {
   inline ValidateLevel GetValidateLevel() const { return validate_level_; }
 
   /**
-   * @brief Check if the write opeartion is allowed.
-   *
-   * @param input_table The input table containing data.
-   * @param property_group The property group to write.
-   * @param chunk_index The index of the vertex chunk.
-   * @param validate_level The validate level for this operation,
-   * which is the writer's validate level by default.
-   * @return Status: ok or error.
-   */
-  Status Validate(const std::shared_ptr<arrow::Table>& input_table,
-                  const PropertyGroup& property_group, IdType chunk_index,
-                  ValidateLevel validate_level =
-                      ValidateLevel::default_validate) const noexcept;
-
-  /**
    * @brief Write the number of vertices into the file.
    *
    * @param count The number of vertices.
@@ -157,6 +142,22 @@ class VertexPropertyWriter {
                     IdType start_chunk_index) const noexcept;
 
  private:
+   /**
+   * @brief Check if the write opeartion is allowed.
+   *
+   * @param input_table The input table containing data.
+   * @param property_group The property group to write.
+   * @param chunk_index The index of the vertex chunk.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
+   * @return Status: ok or error.
+   */
+  Status validate(const std::shared_ptr<arrow::Table>& input_table,
+                  const PropertyGroup& property_group, IdType chunk_index,
+                  ValidateLevel validate_level =
+                      ValidateLevel::default_validate) const noexcept;                    
+
+ private:
   VertexInfo vertex_info_;
   std::string prefix_;
   std::shared_ptr<FileSystem> fs_;
@@ -219,52 +220,6 @@ class EdgeChunkWriter {
    * @return The validate level of this writer.
    */
   inline ValidateLevel GetValidateLevel() const { return validate_level_; }
-
-  /**
-   * @brief Check if the writer operation for offset is allowed.
-   *
-   * @param input_table The input table containing data.
-   * @param vertex_chunk_index The index of the vertex chunk.
-   * @param validate_level The validate level for this operation,
-   * which is the writer's validate level by default.
-   * @return Status: ok or error.
-   */
-  Status Validate(const std::shared_ptr<arrow::Table>& input_table,
-                  IdType vertex_chunk_index,
-                  ValidateLevel validate_level =
-                      ValidateLevel::default_validate) const noexcept;
-
-  /**
-   * @brief Check if the writer operation for adj list is allowed.
-   *
-   * @param input_table The input table containing data.
-   * @param vertex_chunk_index The index of the vertex chunk.
-   * @param chunk_index The index of the edge chunk inside the vertex chunk.
-   * @param validate_level The validate level for this operation,
-   * which is the writer's validate level by default.
-   * @return Status: ok or error.
-   */
-  Status Validate(const std::shared_ptr<arrow::Table>& input_table,
-                  IdType vertex_chunk_index, IdType chunk_index,
-                  ValidateLevel validate_level =
-                      ValidateLevel::default_validate) const noexcept;
-
-  /**
-   * @brief Check if the writer operation (for property group) is allowed.
-   *
-   * @param input_table The input table containing data.
-   * @param property_group The property group to write.
-   * @param vertex_chunk_index The index of the vertex chunk.
-   * @param chunk_index The index of the edge chunk inside the vertex chunk.
-   * @param validate_level The validate level for this operation,
-   * which is the writer's validate level by default.
-   * @return Status: ok or error.
-   */
-  Status Validate(const std::shared_ptr<arrow::Table>& input_table,
-                  const PropertyGroup& property_group,
-                  IdType vertex_chunk_index, IdType chunk_index,
-                  ValidateLevel validate_level =
-                      ValidateLevel::default_validate) const noexcept;
 
   /**
    * @brief Write the number of edges into the file.
@@ -495,6 +450,52 @@ class EdgeChunkWriter {
                            IdType start_chunk_index = 0) const noexcept;
 
  private:
+   /**
+   * @brief Check if the writer operation for offset is allowed.
+   *
+   * @param input_table The input table containing data.
+   * @param vertex_chunk_index The index of the vertex chunk.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
+   * @return Status: ok or error.
+   */
+  Status validate(const std::shared_ptr<arrow::Table>& input_table,
+                  IdType vertex_chunk_index,
+                  ValidateLevel validate_level =
+                      ValidateLevel::default_validate) const noexcept;
+
+  /**
+   * @brief Check if the writer operation for adj list is allowed.
+   *
+   * @param input_table The input table containing data.
+   * @param vertex_chunk_index The index of the vertex chunk.
+   * @param chunk_index The index of the edge chunk inside the vertex chunk.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
+   * @return Status: ok or error.
+   */
+  Status validate(const std::shared_ptr<arrow::Table>& input_table,
+                  IdType vertex_chunk_index, IdType chunk_index,
+                  ValidateLevel validate_level =
+                      ValidateLevel::default_validate) const noexcept;
+
+  /**
+   * @brief Check if the writer operation (for property group) is allowed.
+   *
+   * @param input_table The input table containing data.
+   * @param property_group The property group to write.
+   * @param vertex_chunk_index The index of the vertex chunk.
+   * @param chunk_index The index of the edge chunk inside the vertex chunk.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
+   * @return Status: ok or error.
+   */
+  Status validate(const std::shared_ptr<arrow::Table>& input_table,
+                  const PropertyGroup& property_group,
+                  IdType vertex_chunk_index, IdType chunk_index,
+                  ValidateLevel validate_level =
+                      ValidateLevel::default_validate) const noexcept;
+
   /**
    * @brief Construct the offset table.
    *
