@@ -213,7 +213,7 @@ class EdgesBuilder {
    * @return Status: ok or Status::InvalidOperation error.
    */
   Status AddEdge(const Edge& e, const ValidateLevel& validate_level =
-                                   ValidateLevel::default_validate) {
+                                    ValidateLevel::default_validate) {
     // validate
     GAR_RETURN_NOT_OK(validate(e, validate_level));
     // add an edge
@@ -293,7 +293,7 @@ class EdgesBuilder {
   }
 
  private:
-   /**
+  /**
    * @brief Get the vertex chunk index of a given edge.
    *
    * @param e The edge to add.
@@ -314,7 +314,7 @@ class EdgesBuilder {
     }
   }
 
-   /**
+  /**
    * @brief Check if adding an edge is allowed.
    *
    * @param e The edge to add.

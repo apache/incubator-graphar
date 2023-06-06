@@ -178,7 +178,9 @@ class VerticesBuilder {
    * which is the writer's validate level by default.
    * @return Status: ok or Status::InvalidOperation error.
    */
-  Status AddVertex(Vertex& v, IdType index = -1, ValidateLevel validate_level = ValidateLevel::default_validate) {  // NOLINT
+  Status AddVertex(Vertex& v, IdType index = -1,
+                   ValidateLevel validate_level =
+                       ValidateLevel::default_validate) {  // NOLINT
     // validate
     GAR_RETURN_NOT_OK(validate(v, index, validate_level));
     // add a vertex
@@ -224,7 +226,7 @@ class VerticesBuilder {
   }
 
  private:
-   /**
+  /**
    * @brief Check if adding a vertex with the given index is allowed.
    *
    * @param v The vertex to add.
@@ -232,7 +234,8 @@ class VerticesBuilder {
    * @param validate_level The validate level for this operation.
    * @return Status: ok or Status::InvalidOperation error.
    */
-  Status validate(const Vertex& v, IdType index, ValidateLevel validate_level) const;
+  Status validate(const Vertex& v, IdType index,
+                  ValidateLevel validate_level) const;
 
   /**
    * @brief Construct an array for a given property.

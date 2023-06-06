@@ -63,8 +63,8 @@ TEST_CASE("test_vertices_builder") {
   v.AddProperty("id", "id_of_string");
   REQUIRE(
       builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::no_validate).ok());
-  REQUIRE(
-      builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::weak_validate).ok());
+  REQUIRE(builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::weak_validate)
+              .ok());
   REQUIRE(builder.AddVertex(v, -2, GAR_NAMESPACE::ValidateLevel::weak_validate)
               .IsInvalidOperation());
   REQUIRE(builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::strong_validate)
@@ -151,8 +151,7 @@ TEST_CASE("test_edges_builder") {
   GAR_NAMESPACE::builder::Edge e(0, 1);
   e.AddProperty("creationDate", 2020);
   REQUIRE(builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::no_validate).ok());
-  REQUIRE(
-      builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::weak_validate).ok());
+  REQUIRE(builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::weak_validate).ok());
   REQUIRE(builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::strong_validate)
               .IsTypeError());
   e.AddProperty("invalid_name", "invalid_value");
@@ -170,7 +169,7 @@ TEST_CASE("test_edges_builder") {
   std::istringstream readstr(line);
   std::map<std::string, int64_t> mapping;
   int64_t cnt = 0, lines = 0;
-  
+
   while (getline(fp, line)) {
     lines++;
     std::string val;
