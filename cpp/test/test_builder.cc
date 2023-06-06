@@ -62,15 +62,19 @@ TEST_CASE("test_vertices_builder") {
   GAR_NAMESPACE::builder::Vertex v;
   v.AddProperty("id", "id_of_string");
   REQUIRE(
-      builder.Validate(v, 0, GAR_NAMESPACE::ValidateLevel::no_validate).ok());
+      builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::no_validate).ok());
   REQUIRE(
-      builder.Validate(v, 0, GAR_NAMESPACE::ValidateLevel::weak_validate).ok());
-  REQUIRE(builder.Validate(v, -2, GAR_NAMESPACE::ValidateLevel::weak_validate)
+      builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::weak_validate).ok());
+  REQUIRE(builder.AddVertex(v, -2, GAR_NAMESPACE::ValidateLevel::weak_validate)
               .IsInvalidOperation());
-  REQUIRE(builder.Validate(v, 0, GAR_NAMESPACE::ValidateLevel::strong_validate)
+  REQUIRE(builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::strong_validate)
               .IsTypeError());
   v.AddProperty("invalid_name", "invalid_value");
-  REQUIRE(builder.Validate(v, 0).IsInvalidOperation());
+  REQUIRE(builder.AddVertex(v, 0).IsInvalidOperation());
+
+  // clear vertices
+  builder.Clear();
+  REQUIRE(builder.GetNum() == 0);
 
   // add vertices
   std::ifstream fp(root + "/ldbc_sample/person_0_0.csv");
@@ -84,7 +88,10 @@ TEST_CASE("test_vertices_builder") {
     getline(readstr, name, '|');
     names.push_back(name);
   }
+
+  int lines = 0;
   while (getline(fp, line)) {
+    lines++;
     std::string val;
     std::istringstream readstr(line);
     GAR_NAMESPACE::builder::Vertex v;
@@ -101,6 +108,9 @@ TEST_CASE("test_vertices_builder") {
     }
     REQUIRE(builder.AddVertex(v).ok());
   }
+
+  // check the number of vertices
+  REQUIRE(builder.GetNum() == lines);
 
   // dump
   REQUIRE(builder.Dump().ok());
@@ -140,13 +150,17 @@ TEST_CASE("test_edges_builder") {
   // check different validate levels
   GAR_NAMESPACE::builder::Edge e(0, 1);
   e.AddProperty("creationDate", 2020);
-  REQUIRE(builder.Validate(e, GAR_NAMESPACE::ValidateLevel::no_validate).ok());
+  REQUIRE(builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::no_validate).ok());
   REQUIRE(
-      builder.Validate(e, GAR_NAMESPACE::ValidateLevel::weak_validate).ok());
-  REQUIRE(builder.Validate(e, GAR_NAMESPACE::ValidateLevel::strong_validate)
+      builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::weak_validate).ok());
+  REQUIRE(builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::strong_validate)
               .IsTypeError());
   e.AddProperty("invalid_name", "invalid_value");
-  REQUIRE(builder.Validate(e).IsInvalidOperation());
+  REQUIRE(builder.AddEdge(e).IsInvalidOperation());
+
+  // clear edges
+  builder.Clear();
+  REQUIRE(builder.GetNum() == 0);
 
   // add edges
   std::ifstream fp(root + "/ldbc_sample/person_knows_person_0_0.csv");
@@ -155,8 +169,10 @@ TEST_CASE("test_edges_builder") {
   std::vector<std::string> names;
   std::istringstream readstr(line);
   std::map<std::string, int64_t> mapping;
-  int64_t cnt = 0;
+  int64_t cnt = 0, lines = 0;
+  
   while (getline(fp, line)) {
+    lines++;
     std::string val;
     std::istringstream readstr(line);
     int64_t s, d;
@@ -177,6 +193,9 @@ TEST_CASE("test_edges_builder") {
       }
     }
   }
+
+  // check the number of edges
+  REQUIRE(builder.GetNum() == lines);
 
   // dump
   REQUIRE(builder.Dump().ok());

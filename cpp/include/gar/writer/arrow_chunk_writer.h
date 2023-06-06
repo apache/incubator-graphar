@@ -27,6 +27,7 @@ limitations under the License.
 #include "gar/utils/result.h"
 #include "gar/utils/status.h"
 #include "gar/utils/utils.h"
+#include "gar/utils/writer_utils.h"
 
 // forward declaration
 namespace arrow {
@@ -34,16 +35,6 @@ class Table;
 }
 
 namespace GAR_NAMESPACE_INTERNAL {
-
-/**
- * @brief The level for validating writing operations.
- */
-enum class ValidateLevel : char {
-  default_validate = 0,
-  no_validate = 1,
-  weak_validate = 2,
-  strong_validate = 3
-};
 
 /**
  * @brief The writer for vertex property group chunks.

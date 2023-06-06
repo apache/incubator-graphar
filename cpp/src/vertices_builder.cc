@@ -19,7 +19,7 @@ limitations under the License.
 namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {
 
-Status VerticesBuilder::Validate(const Vertex& v, IdType index,
+Status VerticesBuilder::validate(const Vertex& v, IdType index,
                                  ValidateLevel validate_level) const {
   // use the builder's validate level
   if (validate_level == ValidateLevel::default_validate)

@@ -20,7 +20,7 @@ limitations under the License.
 namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {
 
-Status EdgesBuilder::Validate(const Edge& e,
+Status EdgesBuilder::validate(const Edge& e,
                               ValidateLevel validate_level) const {
   // use the builder's validate level
   if (validate_level == ValidateLevel::default_validate)

@@ -196,46 +196,26 @@ class EdgesBuilder {
   inline ValidateLevel GetValidateLevel() const { return validate_level_; }
 
   /**
-   * @brief Check if adding an edge is allowed.
-   *
-   * @param e The edge to add.
-   * @param validate_level The validate level for this operation,
-   * which is the writer's validate level by default.
-   * @return Status: ok or status::InvalidOperation error.
+   * @brief Clear the edges in this EdgessBuilder.
    */
-  Status Validate(const Edge& e, ValidateLevel validate_level =
-                                     ValidateLevel::default_validate) const;
-
-  /**
-   * @brief Get the vertex chunk index of a given edge.
-   *
-   * @param e The edge to add.
-   * @return The vertex chunk index of the edge.
-   */
-  IdType getVertexChunkIndex(const Edge& e) {
-    switch (adj_list_type_) {
-    case AdjListType::unordered_by_source:
-      return e.GetSource() / vertex_chunk_size_;
-    case AdjListType::ordered_by_source:
-      return e.GetSource() / vertex_chunk_size_;
-    case AdjListType::unordered_by_dest:
-      return e.GetDestination() / vertex_chunk_size_;
-    case AdjListType::ordered_by_dest:
-      return e.GetDestination() / vertex_chunk_size_;
-    default:
-      return e.GetSource() / vertex_chunk_size_;
-    }
+  inline void Clear() {
+    edges_.clear();
+    num_edges_ = 0;
+    is_saved_ = false;
   }
 
   /**
    * @brief Add an edge to the collection.
    *
    * @param e The edge to add.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
    * @return Status: ok or Status::InvalidOperation error.
    */
-  Status AddEdge(const Edge& e) {
+  Status AddEdge(const Edge& e, const ValidateLevel& validate_level =
+                                   ValidateLevel::default_validate) {
     // validate
-    GAR_RETURN_NOT_OK(Validate(e));
+    GAR_RETURN_NOT_OK(validate(e, validate_level));
     // add an edge
     IdType vertex_chunk_index = getVertexChunkIndex(e);
     edges_[vertex_chunk_index].push_back(e);
@@ -313,6 +293,36 @@ class EdgesBuilder {
   }
 
  private:
+   /**
+   * @brief Get the vertex chunk index of a given edge.
+   *
+   * @param e The edge to add.
+   * @return The vertex chunk index of the edge.
+   */
+  IdType getVertexChunkIndex(const Edge& e) {
+    switch (adj_list_type_) {
+    case AdjListType::unordered_by_source:
+      return e.GetSource() / vertex_chunk_size_;
+    case AdjListType::ordered_by_source:
+      return e.GetSource() / vertex_chunk_size_;
+    case AdjListType::unordered_by_dest:
+      return e.GetDestination() / vertex_chunk_size_;
+    case AdjListType::ordered_by_dest:
+      return e.GetDestination() / vertex_chunk_size_;
+    default:
+      return e.GetSource() / vertex_chunk_size_;
+    }
+  }
+
+   /**
+   * @brief Check if adding an edge is allowed.
+   *
+   * @param e The edge to add.
+   * @param validate_level The validate level for this operation.
+   * @return Status: ok or status::InvalidOperation error.
+   */
+  Status validate(const Edge& e, ValidateLevel validate_level) const;
+
   /**
    * @brief Construct an array for a given property.
    *

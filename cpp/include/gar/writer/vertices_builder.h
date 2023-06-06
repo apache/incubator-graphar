@@ -145,6 +145,15 @@ class VerticesBuilder {
   }
 
   /**
+   * @brief Clear the vertices in this VerciesBuilder.
+   */
+  inline void Clear() {
+    vertices_.clear();
+    num_vertices_ = 0;
+    is_saved_ = false;
+  }
+
+  /**
    * @brief Set the validate level.
    *
    * @param validate_level The validate level to set.
@@ -161,7 +170,7 @@ class VerticesBuilder {
   inline ValidateLevel GetValidateLevel() const { return validate_level_; }
 
   /**
-   * @brief Check if adding a vertex with the given index is allowed.
+   * @brief Add a vertex with the given index.
    *
    * @param v The vertex to add.
    * @param index The given index, -1 means the next unused index.
@@ -169,20 +178,9 @@ class VerticesBuilder {
    * which is the writer's validate level by default.
    * @return Status: ok or Status::InvalidOperation error.
    */
-  Status Validate(
-      const Vertex& v, IdType index = -1,
-      ValidateLevel validate_level = ValidateLevel::default_validate) const;
-
-  /**
-   * @brief Add a vertex with the given index.
-   *
-   * @param v The vertex to add.
-   * @param index The given index, -1 means the next unused index.
-   * @return Status: ok or Status::InvalidOperation error.
-   */
-  Status AddVertex(Vertex& v, IdType index = -1) {  // NOLINT
+  Status AddVertex(Vertex& v, IdType index = -1, ValidateLevel validate_level = ValidateLevel::default_validate) {  // NOLINT
     // validate
-    GAR_RETURN_NOT_OK(Validate(v, index));
+    GAR_RETURN_NOT_OK(validate(v, index, validate_level));
     // add a vertex
     if (index == -1) {
       v.SetId(vertices_.size());
@@ -226,6 +224,16 @@ class VerticesBuilder {
   }
 
  private:
+   /**
+   * @brief Check if adding a vertex with the given index is allowed.
+   *
+   * @param v The vertex to add.
+   * @param index The given index, -1 means the next unused index.
+   * @param validate_level The validate level for this operation.
+   * @return Status: ok or Status::InvalidOperation error.
+   */
+  Status validate(const Vertex& v, IdType index, ValidateLevel validate_level) const;
+
   /**
    * @brief Construct an array for a given property.
    *
