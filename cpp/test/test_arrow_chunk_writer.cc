@@ -86,6 +86,8 @@ TEST_CASE("test_vertex_property_writer_from_file") {
   // Validate operation
   REQUIRE(writer.WriteTable(table, 0).ok());
 
+  // Invalid vertices number
+  REQUIRE(writer.WriteVerticesNum(-1).IsInvalidOperation());
   // Out of range
   REQUIRE(writer.WriteChunk(table, 0).IsOutOfRange());
   // Invalid chunk id

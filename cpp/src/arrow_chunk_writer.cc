@@ -90,6 +90,36 @@ Result<std::shared_ptr<arrow::Table>> ExecutePlanAndCollectAsTable(
 
 // implementations for VertexPropertyChunkWriter
 
+Status VertexPropertyWriter::validate(const IdType& count, ValidateLevel validate_level) const noexcept {
+  // use the writer's validate level
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
+    return Status::OK();
+  // weak & strong validate
+  if (count < 0)
+    return Status::InvalidOperation("the number of vertices must be non-negative");
+  return Status::OK();
+}
+
+Status VertexPropertyWriter::validate(const PropertyGroup& property_group, IdType chunk_index,
+                ValidateLevel validate_level) const noexcept {
+  // use the writer's validate level
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
+    return Status::OK();
+  // weak & strong validate
+  if (!vertex_info_.ContainPropertyGroup(property_group))
+    return Status::InvalidOperation(
+        "the property group does not exist in the vertex info");
+  if (chunk_index < 0)
+    return Status::InvalidOperation("invalid vertex chunk index");
+  return Status::OK();
+}
+
 Status VertexPropertyWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table,
     const PropertyGroup& property_group, IdType chunk_index,
@@ -131,8 +161,9 @@ Status VertexPropertyWriter::validate(
   return Status::OK();
 }
 
-Status VertexPropertyWriter::WriteVerticesNum(const IdType& count) const
+Status VertexPropertyWriter::WriteVerticesNum(const IdType& count, ValidateLevel validate_level) const
     noexcept {
+  GAR_RETURN_NOT_OK(validate(count, validate_level));
   GAR_ASSIGN_OR_RAISE(auto suffix, vertex_info_.GetVerticesNumFilePath());
   std::string path = prefix_ + suffix;
   return fs_->WriteValueToFile<IdType>(count, path);
@@ -140,7 +171,8 @@ Status VertexPropertyWriter::WriteVerticesNum(const IdType& count) const
 
 Status VertexPropertyWriter::WriteChunk(const std::string& file_name,
                                         const PropertyGroup& property_group,
-                                        IdType chunk_index) const noexcept {
+                                        IdType chunk_index, ValidateLevel validate_level) const noexcept {
+  GAR_RETURN_NOT_OK(validate(property_group, chunk_index, validate_level));                                  
   GAR_ASSIGN_OR_RAISE(auto suffix,
                       vertex_info_.GetFilePath(property_group, chunk_index));
   std::string path = prefix_ + suffix;
@@ -149,8 +181,8 @@ Status VertexPropertyWriter::WriteChunk(const std::string& file_name,
 
 Status VertexPropertyWriter::WriteChunk(
     const std::shared_ptr<arrow::Table>& input_table,
-    const PropertyGroup& property_group, IdType chunk_index) const noexcept {
-  GAR_RETURN_NOT_OK(validate(input_table, property_group, chunk_index));
+    const PropertyGroup& property_group, IdType chunk_index, ValidateLevel validate_level) const noexcept {
+  GAR_RETURN_NOT_OK(validate(input_table, property_group, chunk_index, validate_level));
   auto file_type = property_group.GetFileType();
 
   std::vector<int> indices;
@@ -174,18 +206,18 @@ Status VertexPropertyWriter::WriteChunk(
 }
 
 Status VertexPropertyWriter::WriteChunk(
-    const std::shared_ptr<arrow::Table>& input_table, IdType chunk_index) const
+    const std::shared_ptr<arrow::Table>& input_table, IdType chunk_index, ValidateLevel validate_level) const
     noexcept {
   auto property_groups = vertex_info_.GetPropertyGroups();
   for (auto& property_group : property_groups) {
-    GAR_RETURN_NOT_OK(WriteChunk(input_table, property_group, chunk_index));
+    GAR_RETURN_NOT_OK(WriteChunk(input_table, property_group, chunk_index, validate_level));
   }
   return Status::OK();
 }
 
 Status VertexPropertyWriter::WriteTable(
     const std::shared_ptr<arrow::Table>& input_table,
-    const PropertyGroup& property_group, IdType start_chunk_index) const
+    const PropertyGroup& property_group, IdType start_chunk_index, ValidateLevel validate_level) const
     noexcept {
   IdType chunk_size = vertex_info_.GetChunkSize();
   int64_t length = input_table->num_rows();
@@ -193,18 +225,18 @@ Status VertexPropertyWriter::WriteTable(
   for (int64_t offset = 0; offset < length;
        offset += chunk_size, chunk_index++) {
     auto in_chunk = input_table->Slice(offset, chunk_size);
-    GAR_RETURN_NOT_OK(WriteChunk(in_chunk, property_group, chunk_index));
+    GAR_RETURN_NOT_OK(WriteChunk(in_chunk, property_group, chunk_index, validate_level));
   }
   return Status::OK();
 }
 
 Status VertexPropertyWriter::WriteTable(
     const std::shared_ptr<arrow::Table>& input_table,
-    IdType start_chunk_index) const noexcept {
+    IdType start_chunk_index, ValidateLevel validate_level) const noexcept {
   auto property_groups = vertex_info_.GetPropertyGroups();
   for (auto& property_group : property_groups) {
     GAR_RETURN_NOT_OK(
-        WriteTable(input_table, property_group, start_chunk_index));
+        WriteTable(input_table, property_group, start_chunk_index, validate_level));
   }
   return Status::OK();
 }

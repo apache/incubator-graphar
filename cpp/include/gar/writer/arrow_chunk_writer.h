@@ -78,9 +78,12 @@ class VertexPropertyWriter {
    * @brief Write the number of vertices into the file.
    *
    * @param count The number of vertices.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
    * @return Status: ok or error.
    */
-  Status WriteVerticesNum(const IdType& count) const noexcept;
+  Status WriteVerticesNum(const IdType& count, ValidateLevel validate_level =
+                       ValidateLevel::default_validate) const noexcept;
 
   /**
    * @brief Copy a file as a vertex property group chunk.
@@ -92,7 +95,8 @@ class VertexPropertyWriter {
    */
   Status WriteChunk(const std::string& file_name,
                     const PropertyGroup& property_group,
-                    IdType chunk_index) const noexcept;
+                    IdType chunk_index, ValidateLevel validate_level =
+                       ValidateLevel::default_validate) const noexcept;
   /**
    * @brief Validate and write a single property group for a
    * single vertex chunk.
@@ -100,11 +104,14 @@ class VertexPropertyWriter {
    * @param input_table The table containing data.
    * @param property_group The property group.
    * @param chunk_index The index of the vertex chunk.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
    * @return Status: ok or error.
    */
   Status WriteChunk(const std::shared_ptr<arrow::Table>& input_table,
                     const PropertyGroup& property_group,
-                    IdType chunk_index) const noexcept;
+                    IdType chunk_index, ValidateLevel validate_level =
+                       ValidateLevel::default_validate) const noexcept;
 
   /**
    * @brief Write all property groups of a single vertex chunk
@@ -112,10 +119,13 @@ class VertexPropertyWriter {
    *
    * @param input_table The table containing data.
    * @param chunk_index The index of the vertex chunk.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
    * @return Status: ok or error.
    */
   Status WriteChunk(const std::shared_ptr<arrow::Table>& input_table,
-                    IdType chunk_index) const noexcept;
+                    IdType chunk_index, ValidateLevel validate_level =
+                       ValidateLevel::default_validate) const noexcept;
 
   /**
    * @brief Write a single property group for multiple vertex chunks
@@ -124,11 +134,14 @@ class VertexPropertyWriter {
    * @param input_table The table containing data.
    * @param property_group The property group.
    * @param start_chunk_index The start index of the vertex chunks.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
    * @return Status: ok or error.
    */
   Status WriteTable(const std::shared_ptr<arrow::Table>& input_table,
                     const PropertyGroup& property_group,
-                    IdType start_chunk_index) const noexcept;
+                    IdType start_chunk_index, ValidateLevel validate_level =
+                       ValidateLevel::default_validate) const noexcept;
 
   /**
    * @brief Write all property groups for multiple vertex chunks
@@ -136,26 +149,50 @@ class VertexPropertyWriter {
    *
    * @param input_table The table containing data.
    * @param start_chunk_index The start index of the vertex chunks.
-   * @return Status: ok or error.
-   */
-  Status WriteTable(const std::shared_ptr<arrow::Table>& input_table,
-                    IdType start_chunk_index) const noexcept;
-
- private:
-  /**
-   * @brief Check if the write opeartion is allowed.
-   *
-   * @param input_table The input table containing data.
-   * @param property_group The property group to write.
-   * @param chunk_index The index of the vertex chunk.
    * @param validate_level The validate level for this operation,
    * which is the writer's validate level by default.
    * @return Status: ok or error.
    */
+  Status WriteTable(const std::shared_ptr<arrow::Table>& input_table,
+                    IdType start_chunk_index, ValidateLevel validate_level =
+                       ValidateLevel::default_validate) const noexcept;
+
+ private:
+   /**
+   * @brief Check if the writing vertices number opeartion is allowed.
+   *
+   * @param input_table The input table containing data.
+   * @param count The number of vertices.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
+   * @return Status: ok or error.
+   */
+  Status validate(const IdType& count,
+                  ValidateLevel validate_level) const noexcept;
+
+    /**
+   * @brief Check if the copy file as chunk opeartion is allowed.
+   *
+   * @param property_group The property group to write.
+   * @param chunk_index The index of the vertex chunk.
+   * @param validate_level The validate level for this operation..
+   * @return Status: ok or error.
+   */
+  Status validate(const PropertyGroup& property_group, IdType chunk_index,
+                  ValidateLevel validate_level) const noexcept;
+
+  /**
+   * @brief Check if the writing chunk opeartion is allowed.
+   *
+   * @param input_table The input table containing data.
+   * @param property_group The property group to write.
+   * @param chunk_index The index of the vertex chunk.
+   * @param validate_level The validate level for this operation.
+   * @return Status: ok or error.
+   */
   Status validate(const std::shared_ptr<arrow::Table>& input_table,
                   const PropertyGroup& property_group, IdType chunk_index,
-                  ValidateLevel validate_level =
-                      ValidateLevel::default_validate) const noexcept;
+                  ValidateLevel validate_level) const noexcept;
 
  private:
   VertexInfo vertex_info_;
