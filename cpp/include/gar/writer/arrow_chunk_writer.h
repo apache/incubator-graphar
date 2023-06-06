@@ -142,7 +142,7 @@ class VertexPropertyWriter {
                     IdType start_chunk_index) const noexcept;
 
  private:
-   /**
+  /**
    * @brief Check if the write opeartion is allowed.
    *
    * @param input_table The input table containing data.
@@ -155,7 +155,7 @@ class VertexPropertyWriter {
   Status validate(const std::shared_ptr<arrow::Table>& input_table,
                   const PropertyGroup& property_group, IdType chunk_index,
                   ValidateLevel validate_level =
-                      ValidateLevel::default_validate) const noexcept;                    
+                      ValidateLevel::default_validate) const noexcept;
 
  private:
   VertexInfo vertex_info_;
@@ -450,7 +450,7 @@ class EdgeChunkWriter {
                            IdType start_chunk_index = 0) const noexcept;
 
  private:
-   /**
+  /**
    * @brief Check if the writer operation for offset is allowed.
    *
    * @param input_table The input table containing data.
