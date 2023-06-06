@@ -92,6 +92,8 @@ class VertexPropertyWriter {
    * @param file_name The file to copy.
    * @param property_group The property group.
    * @param chunk_index The index of the vertex chunk.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
    * @return Status: ok or error.
    */
   Status WriteChunk(const std::string& file_name,
@@ -165,10 +167,8 @@ class VertexPropertyWriter {
   /**
    * @brief Check if the writing vertices number opeartion is allowed.
    *
-   * @param input_table The input table containing data.
    * @param count The number of vertices.
-   * @param validate_level The validate level for this operation,
-   * which is the writer's validate level by default.
+   * @param validate_level The validate level for this operation.
    * @return Status: ok or error.
    */
   Status validate(const IdType& count, ValidateLevel validate_level) const
@@ -265,6 +265,7 @@ class EdgeChunkWriter {
   /**
    * @brief Write the number of edges into the file.
    *
+   * @param vertex_chunk_index The index of the vertex chunk.
    * @param count The number of edges.
    * @param validate_level The validate level for this operation,
    * which is the writer's validate level by default.
