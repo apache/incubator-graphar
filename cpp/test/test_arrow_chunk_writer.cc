@@ -220,6 +220,10 @@ TEST_CASE("test_edge_chunk_writer") {
   // Validate operation
   REQUIRE(writer.SortAndWriteAdjListTable(table, 0, 0).ok());
 
+  // Invalid count or index
+  REQUIRE(writer.WriteEdgesNum(-1, 0).IsInvalidOperation());
+  REQUIRE(writer.WriteEdgesNum(0, -1).IsInvalidOperation());
+  REQUIRE(writer.WriteVerticesNum(-1).IsInvalidOperation());
   // Out of range
   REQUIRE(writer.WriteOffsetChunk(table, 0).IsOutOfRange());
   // Invalid chunk id
