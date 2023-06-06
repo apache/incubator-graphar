@@ -181,6 +181,10 @@ Adj List Type
 ~~~~~~~~~~~~~~~~~~~
 .. doxygenenum:: GraphArchive::AdjListType
 
+Validate Level
+~~~~~~~~~~~~~~~~~~~
+.. doxygenenum:: GraphArchive::ValidateLevel
+
 
 Utilities
 ---------
