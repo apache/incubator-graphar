@@ -24,9 +24,16 @@ namespace GAR_NAMESPACE_INTERNAL {
  * @brief The level for validating writing operations.
  */
 enum class ValidateLevel : char {
+  /// To use the default validate level of the writer/builder.
   default_validate = 0,
+  /// To skip the validation.
   no_validate = 1,
+  /// Weak validation: check if the index, count, chunk size, adj_list type or
+  /// the property group passed to the writer/builder are valid.
   weak_validate = 2,
+  /// Strong validation: except for the weak validation, also check if the
+  /// schema (property name and data type) of the data passed to the
+  /// writer/builder are valid.
   strong_validate = 3
 };
 
