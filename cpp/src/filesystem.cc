@@ -13,6 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <iostream>
+
 #include "arrow/adapters/orc/adapter.h"
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
@@ -294,6 +296,15 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     }
   }
   return std::make_shared<FileSystem>(arrow_fs);
+}
+
+// NB: bring by arrow 12.0.0
+// https://github.com/apache/arrow/blob/main/cpp/src/arrow/filesystem/s3fs.h#L340-L341  // NOLINT
+Status FileSystem::FinalizeS3() {
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
+    RETURN_NOT_ARROW_OK(arrow::fs::FinalizeS3());
+#endif
+    return Status::OK();
 }
 
 /// template specialization for std::string

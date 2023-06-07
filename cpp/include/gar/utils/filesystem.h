@@ -116,6 +116,11 @@ class FileSystem {
   Result<IdType> GetFileNumOfDir(const std::string& dir_path,
                                  bool recursive = false) const noexcept;
 
+  /**
+   * Shutdown the S3 APIs if the FileSystem is for S3 job.
+   */
+  static Status FinalizeS3();
+
  private:
   std::shared_ptr<arrow::fs::FileSystem> arrow_fs_;
 };

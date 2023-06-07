@@ -380,4 +380,5 @@ TEST_CASE("test_graph_info_load_from_s3") {
   const auto& edge_infos = graph_info.GetEdgeInfos();
   REQUIRE(vertex_infos.size() == 8);
   REQUIRE(edge_infos.size() == 23);
+  REQUIRE(GAR_NAMESPACE::FileSystem::FinalizeS3().ok());
 }
