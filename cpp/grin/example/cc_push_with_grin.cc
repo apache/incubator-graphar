@@ -21,7 +21,7 @@ limitations under the License.
 #include "grin/example/config.h"
 #include "grin/predefine.h"
 
-extern "C" {
+// GRIN headers
 #include "index/original_id.h"
 #include "property/property.h"
 #include "property/topology.h"
@@ -30,7 +30,6 @@ extern "C" {
 #include "topology/edgelist.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-}
 
 void run_cc(GRIN_GRAPH graph, bool print_result = false) {
   std::cout << "++++ Run CC (push) algorithm with GRIN ++++" << std::endl;

@@ -20,7 +20,7 @@ limitations under the License.
 #include "grin/example/config.h"
 #include "grin/predefine.h"
 
-extern "C" {
+// GRIN headers
 #include "index/original_id.h"
 #include "property/property.h"
 #include "property/topology.h"
@@ -29,7 +29,6 @@ extern "C" {
 #include "topology/edgelist.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-}
 
 void run_bfs(GRIN_GRAPH graph, size_t root = BFS_ROOT_ID,
              bool print_result = false) {

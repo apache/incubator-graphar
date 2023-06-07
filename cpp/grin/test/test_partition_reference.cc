@@ -18,14 +18,13 @@ limitations under the License.
 #include "grin/predefine.h"
 #include "grin/test/config.h"
 
-extern "C" {
+// GRIN headers
 #include "partition/partition.h"
 #include "partition/reference.h"
 #include "property/topology.h"
 #include "property/type.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-}
 
 void test_vertex_ref(GRIN_PARTITIONED_GRAPH pg, GRIN_GRAPH graph,
                      GRIN_VERTEX v) {

@@ -18,14 +18,13 @@ limitations under the License.
 #include "grin/predefine.h"
 #include "grin/test/config.h"
 
-extern "C" {
+// GRIN headers
 #include "index/order.h"
 #include "index/original_id.h"
 #include "property/topology.h"
 #include "property/type.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-}
 
 void test_index_order(GRIN_GRAPH graph) {
   std::cout << "\n++++ test index: order ++++" << std::endl;

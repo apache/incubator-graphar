@@ -18,10 +18,9 @@ limitations under the License.
 #include "grin/predefine.h"
 #include "grin/test/config.h"
 
-extern "C" {
+// GRIN headers
 #include "partition/partition.h"
 #include "topology/structure.h"
-}
 
 void test_partition_partition(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
   std::cout << "\n++++ test partition: partition ++++" << std::endl;

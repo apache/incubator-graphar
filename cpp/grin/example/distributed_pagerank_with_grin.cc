@@ -22,7 +22,7 @@ limitations under the License.
 #include "grin/example/config.h"
 #include "grin/predefine.h"
 
-extern "C" {
+// GRIN headers
 #include "index/order.h"
 #include "index/original_id.h"
 #include "partition/partition.h"
@@ -35,7 +35,6 @@ extern "C" {
 #include "topology/edgelist.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-}
 
 GRIN_GRAPH init(GRIN_PARTITIONED_GRAPH partitioned_graph, int pid = 0) {
   // get local graph

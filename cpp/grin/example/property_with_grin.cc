@@ -19,7 +19,7 @@ limitations under the License.
 #include "grin/example/config.h"
 #include "grin/predefine.h"
 
-extern "C" {
+// GRIN headers
 #include "property/property.h"
 #include "property/propertylist.h"
 #include "property/topology.h"
@@ -28,7 +28,6 @@ extern "C" {
 #include "topology/edgelist.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-}
 
 void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
   std::cout << "++++ Test vertex properties ++++" << std::endl;

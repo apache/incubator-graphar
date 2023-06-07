@@ -18,14 +18,13 @@ limitations under the License.
 #include "grin/predefine.h"
 #include "grin/test/config.h"
 
-extern "C" {
+// GRIN headers
 #include "property/property.h"
 #include "property/propertylist.h"
 #include "property/type.h"
 #include "topology/edgelist.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-}
 
 void test_vertex_property(GRIN_GRAPH graph, GRIN_VERTEX_PROPERTY property,
                           GRIN_VERTEX_TYPE vertex_type) {

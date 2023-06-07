@@ -18,7 +18,7 @@ limitations under the License.
 #include "grin/predefine.h"
 #include "grin/test/config.h"
 
-extern "C" {
+// GRIN headers
 #include "index/order.h"
 #include "index/original_id.h"
 #include "partition/partition.h"
@@ -28,7 +28,6 @@ extern "C" {
 #include "property/type.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-}
 
 void test_vertex_list(GRIN_GRAPH g, GRIN_VERTEX_LIST vl) {
   // check vertex list

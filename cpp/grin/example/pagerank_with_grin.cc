@@ -20,7 +20,7 @@ limitations under the License.
 #include "grin/example/config.h"
 #include "grin/predefine.h"
 
-extern "C" {
+// GRIN headers
 #include "index/order.h"
 #include "index/original_id.h"
 #include "property/property.h"
@@ -30,7 +30,6 @@ extern "C" {
 #include "topology/edgelist.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"
-}
 
 void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
   std::cout << "++++ Run PageRank algorithm with GRIN ++++" << std::endl;
