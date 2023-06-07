@@ -175,7 +175,7 @@ class VerticesBuilder {
    * @param v The vertex to add.
    * @param index The given index, -1 means the next unused index.
    * @param validate_level The validate level for this operation,
-   * which is the writer's validate level by default.
+   * which is the builder's validate level by default.
    * @return Status: ok or Status::InvalidOperation error.
    */
   Status AddVertex(

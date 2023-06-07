@@ -165,7 +165,7 @@ class VertexPropertyWriter {
 
  private:
   /**
-   * @brief Check if the writing vertices number opeartion is allowed.
+   * @brief Check if the opeartion of writing vertices number is allowed.
    *
    * @param count The number of vertices.
    * @param validate_level The validate level for this operation.
@@ -175,18 +175,18 @@ class VertexPropertyWriter {
       noexcept;
 
   /**
-   * @brief Check if the copy file as chunk opeartion is allowed.
+   * @brief Check if the opeartion of copying a file as a chunk is allowed.
    *
    * @param property_group The property group to write.
    * @param chunk_index The index of the vertex chunk.
-   * @param validate_level The validate level for this operation..
+   * @param validate_level The validate level for this operation.
    * @return Status: ok or error.
    */
   Status validate(const PropertyGroup& property_group, IdType chunk_index,
                   ValidateLevel validate_level) const noexcept;
 
   /**
-   * @brief Check if the writing chunk opeartion is allowed.
+   * @brief Check if the opeartion of writing a table as a chunk is allowed.
    *
    * @param input_table The input table containing data.
    * @param property_group The property group to write.
@@ -557,7 +557,8 @@ class EdgeChunkWriter {
 
  private:
   /**
-   * @brief Check if the writing number or copying file operation is allowed.
+   * @brief Check if the operation of writing number or copying a file is
+   * allowed.
    *
    * @param count_or_index1 The first count or index used by the operation.
    * @param count_or_index2 The second count or index used by the operation.
@@ -568,7 +569,8 @@ class EdgeChunkWriter {
                   ValidateLevel validate_level) const noexcept;
 
   /**
-   * @brief Check if the copying file operation (for property group) is allowed.
+   * @brief Check if the operation of copying a file as a property chunk is
+   * allowed.
    *
    * @param property_group The property group to write.
    * @param vertex_chunk_index The index of the vertex chunk.
@@ -581,7 +583,8 @@ class EdgeChunkWriter {
                   ValidateLevel validate_level) const noexcept;
 
   /**
-   * @brief Check if the writer operation for offset is allowed.
+   * @brief Check if the operation of writing a table as an offset chunk is
+   * allowed.
    *
    * @param input_table The input table containing data.
    * @param vertex_chunk_index The index of the vertex chunk.
@@ -593,7 +596,8 @@ class EdgeChunkWriter {
       noexcept;
 
   /**
-   * @brief Check if the writer operation for adj list is allowed.
+   * @brief Check if the operation of writing a table as an adj list chunk is
+   * allowed.
    *
    * @param input_table The input table containing data.
    * @param vertex_chunk_index The index of the vertex chunk.
@@ -606,7 +610,8 @@ class EdgeChunkWriter {
                   ValidateLevel validate_level) const noexcept;
 
   /**
-   * @brief Check if the writer operation (for property group) is allowed.
+   * @brief Check if the operation of writing a table as a property chunk is
+   * allowed.
    *
    * @param input_table The input table containing data.
    * @param property_group The property group to write.
