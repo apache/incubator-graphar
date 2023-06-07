@@ -135,17 +135,14 @@ Status VertexPropertyWriter::validate(
   // no validate
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
-  // weak validate
+  // validate property_group & chunk_index
+  GAR_RETURN_NOT_OK(validate(property_group, chunk_index, validate_level));
+  // weak validate for the input_table
   if (input_table->num_rows() > vertex_info_.GetChunkSize())
     return Status::OutOfRange(
         "the number of rows in the input table is larger than the vertex chunk "
         "size");
-  if (!vertex_info_.ContainPropertyGroup(property_group))
-    return Status::InvalidOperation(
-        "the property group does not exist in the vertex info");
-  if (chunk_index < 0)
-    return Status::InvalidOperation("invalid vertex chunk index");
-  // strong validate
+  // strong validate for the input_table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     for (auto& property : property_group.GetProperties()) {
@@ -262,14 +259,15 @@ Status EdgeChunkWriter::validate(IdType count_or_index1, IdType count_or_index2,
   // no validate
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
-  // weak & strong validate
-  if (count_or_index1 < 0 || count_or_index2 < 0)
-    return Status::InvalidOperation("the count or index must be non-negative");
+  // weak & strong validate for adj list type
   if (!edge_info_.ContainAdjList(adj_list_type_))
     return Status::InvalidOperation(
         "the adj list type " +
         std::string(AdjListTypeToString(adj_list_type_)) +
         "  does not exist in the edge info");
+  // weak & strong validate for count or index
+  if (count_or_index1 < 0 || count_or_index2 < 0)
+    return Status::InvalidOperation("the count or index must be non-negative");
   return Status::OK();
 }
 
@@ -282,19 +280,12 @@ Status EdgeChunkWriter::validate(const PropertyGroup& property_group,
   // no validate
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
-  // weak & strong validate
+  // validate for adj list type & index
+  GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
+  // weak & strong validate for property group
   if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_))
     return Status::InvalidOperation(
         "the property group does not exist in the edge info");
-  if (!edge_info_.ContainAdjList(adj_list_type_))
-    return Status::InvalidOperation(
-        "the adj list type " +
-        std::string(AdjListTypeToString(adj_list_type_)) +
-        "  does not exist in the edge info");
-  if (vertex_chunk_index < 0)
-    return Status::InvalidOperation("invalid vertex chunk index");
-  if (chunk_index < 0)
-    return Status::InvalidOperation("invalid edge chunk index");
   return Status::OK();
 }
 
@@ -307,12 +298,9 @@ Status EdgeChunkWriter::validate(
   // no validate
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
-  // weak validate
-  if (!edge_info_.ContainAdjList(adj_list_type_))
-    return Status::InvalidOperation(
-        "the adj list type " +
-        std::string(AdjListTypeToString(adj_list_type_)) +
-        "  does not exist in the edge info");
+  // validate for adj list type & index
+  GAR_RETURN_NOT_OK(validate(vertex_chunk_index, 0, validate_level));
+  // weak validate for the input table
   if (adj_list_type_ != AdjListType::ordered_by_source &&
       adj_list_type_ != AdjListType::ordered_by_dest)
     return Status::InvalidOperation(
@@ -329,9 +317,7 @@ Status EdgeChunkWriter::validate(
     return Status::OutOfRange(
         "the number of rows in the input table is larger than the offset table "
         "size for a vertex chunk");
-  if (vertex_chunk_index < 0)
-    return Status::InvalidOperation("invalid vertex chunk index");
-  // strong validate
+  // strong validate for the input_table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     int index = schema->GetFieldIndex(GeneralParams::kOffsetCol);
@@ -355,21 +341,14 @@ Status EdgeChunkWriter::validate(
   // no validate
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
-  // weak validate
-  if (!edge_info_.ContainAdjList(adj_list_type_))
-    return Status::InvalidOperation(
-        "the adj list type " +
-        std::string(AdjListTypeToString(adj_list_type_)) +
-        "  does not exist in the edge info");
+  // validate for adj list type & index
+  GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
+  // weak validate for the input table
   if (input_table->num_rows() > edge_info_.GetChunkSize())
     return Status::OutOfRange(
         "the number of rows in the input table is larger than the edge chunk "
         "size");
-  if (vertex_chunk_index < 0)
-    return Status::InvalidOperation("invalid vertex chunk index");
-  if (chunk_index < 0)
-    return Status::InvalidOperation("invalid edge chunk index");
-  // stong validate
+  // stong validate for the input table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     int index = schema->GetFieldIndex(GeneralParams::kSrcIndexCol);
@@ -402,22 +381,13 @@ Status EdgeChunkWriter::validate(
   // no validate
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
-  // weak validate
-  if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_))
-    return Status::InvalidOperation(
-        "the property group does not exist in the edge info");
-  if (!edge_info_.ContainAdjList(adj_list_type_))
-    return Status::InvalidOperation(
-        "the adj list type " +
-        std::string(AdjListTypeToString(adj_list_type_)) +
-        "  does not exist in the edge info");
+  // validate for property group, adj list type & index
+  GAR_RETURN_NOT_OK(validate(property_group, vertex_chunk_index, chunk_index,
+                             validate_level));
+  // weak validate for the input table
   if (input_table->num_rows() > edge_info_.GetChunkSize())
     return Status::OutOfRange();
-  if (vertex_chunk_index < 0)
-    return Status::InvalidOperation("invalid vertex chunk index");
-  if (chunk_index < 0)
-    return Status::InvalidOperation("invalid edge chunk index");
-  // strong validate
+  // strong validate for the input table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     for (auto& property : property_group.GetProperties()) {

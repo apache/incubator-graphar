@@ -28,12 +28,12 @@ enum class ValidateLevel : char {
   default_validate = 0,
   /// To skip the validation.
   no_validate = 1,
-  /// Weak validation: check if the index, count, chunk size, adj_list type or
-  /// the property group passed to the writer/builder are valid.
+  /// Weak validation: check if the index, count, adj_list type, property group
+  /// and the size of the table passed to the writer/builder are valid.
   weak_validate = 2,
   /// Strong validation: except for the weak validation, also check if the
-  /// schema (property name and data type) of the data passed to the
-  /// writer/builder are valid.
+  /// schema (including each property name and data type) of the table passed to
+  /// the writer/builder is consistent with that defined in the info.
   strong_validate = 3
 };
 
