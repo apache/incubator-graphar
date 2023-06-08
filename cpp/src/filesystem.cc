@@ -302,9 +302,9 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
 // https://github.com/apache/arrow/blob/main/cpp/src/arrow/filesystem/s3fs.h#L340-L341  // NOLINT
 Status FileSystem::FinalizeS3() {
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
-    RETURN_NOT_ARROW_OK(arrow::fs::FinalizeS3());
+  RETURN_NOT_ARROW_OK(arrow::fs::FinalizeS3());
 #endif
-    return Status::OK();
+  return Status::OK();
 }
 
 /// template specialization for std::string
