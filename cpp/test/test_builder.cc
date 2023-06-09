@@ -51,7 +51,7 @@ TEST_CASE("test_vertices_builder") {
   GAR_NAMESPACE::builder::VerticesBuilder builder(vertex_info, "/tmp/",
                                                   start_index);
 
-  // set validate level
+  // get & set validate level
   REQUIRE(builder.GetValidateLevel() ==
           GAR_NAMESPACE::ValidateLevel::no_validate);
   builder.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
@@ -109,16 +109,16 @@ TEST_CASE("test_vertices_builder") {
     REQUIRE(builder.AddVertex(v).ok());
   }
 
-  // check the number of vertices
+  // check the number of vertices in builder
   REQUIRE(builder.GetNum() == lines);
 
-  // dump
+  // dump to files
   REQUIRE(builder.Dump().ok());
 
   // can not add new vertices after dumping
   REQUIRE(builder.AddVertex(v).IsInvalidOperation());
 
-  // check the number of vertices
+  // check the number of vertices dumped
   auto fs = arrow::fs::FileSystemFromUriOrPath(root).ValueOrDie();
   auto input =
       fs->OpenInputStream("/tmp/vertex/person/vertex_count").ValueOrDie();
@@ -137,10 +137,12 @@ TEST_CASE("test_edges_builder") {
       root + "/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
   auto edge_meta = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = GAR_NAMESPACE::EdgeInfo::Load(edge_meta).value();
+  auto vertices_num = 903;
   GAR_NAMESPACE::builder::EdgesBuilder builder(
-      edge_info, "/tmp/", GraphArchive::AdjListType::ordered_by_dest, 903);
+      edge_info, "/tmp/", GraphArchive::AdjListType::ordered_by_dest,
+      vertices_num);
 
-  // set validate level
+  // get & set validate level
   REQUIRE(builder.GetValidateLevel() ==
           GAR_NAMESPACE::ValidateLevel::no_validate);
   builder.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
@@ -193,12 +195,22 @@ TEST_CASE("test_edges_builder") {
     }
   }
 
-  // check the number of edges
+  // check the number of edges in builder
   REQUIRE(builder.GetNum() == lines);
 
-  // dump
+  // dump to files
   REQUIRE(builder.Dump().ok());
 
   // can not add new edges after dumping
   REQUIRE(builder.AddEdge(e).IsInvalidOperation());
+
+  // check the number of vertices dumped
+  auto fs = arrow::fs::FileSystemFromUriOrPath(root).ValueOrDie();
+  auto input =
+      fs->OpenInputStream(
+            "/tmp/edge/person_knows_person/ordered_by_dest/vertex_count")
+          .ValueOrDie();
+  auto num = input->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
+  GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
+  REQUIRE((*ptr) == vertices_num);
 }

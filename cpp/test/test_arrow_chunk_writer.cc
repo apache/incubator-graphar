@@ -63,29 +63,34 @@ TEST_CASE("test_vertex_property_writer_from_file") {
   std::shared_ptr<arrow::Table> table = *maybe_table;
   std::cout << table->num_rows() << ' ' << table->num_columns() << std::endl;
 
+  // Construct the writer
   std::string vertex_meta_file =
       root + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = GAR_NAMESPACE::VertexInfo::Load(vertex_meta).value();
   REQUIRE(vertex_info.GetLabel() == "person");
   GAR_NAMESPACE::VertexPropertyWriter writer(vertex_info, "/tmp/");
-  REQUIRE(writer.WriteTable(table, 0).ok());
-  REQUIRE(writer.WriteVerticesNum(table->num_rows()).ok());
 
-  input = fs->OpenInputStream("/tmp/vertex/person/vertex_count").ValueOrDie();
-  auto num = input->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
-  GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
-  REQUIRE((*ptr) == table->num_rows());
-
-  // Set validate level
+  // Get & set validate level
   REQUIRE(writer.GetValidateLevel() ==
           GAR_NAMESPACE::ValidateLevel::no_validate);
   writer.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
   REQUIRE(writer.GetValidateLevel() ==
           GAR_NAMESPACE::ValidateLevel::strong_validate);
-  // Validate operation
-  REQUIRE(writer.WriteTable(table, 0).ok());
 
+  // Valid cases
+  // Write the table
+  REQUIRE(writer.WriteTable(table, 0).ok());
+  // Write the number of vertices
+  REQUIRE(writer.WriteVerticesNum(table->num_rows()).ok());
+
+  // Check vertex count
+  input = fs->OpenInputStream("/tmp/vertex/person/vertex_count").ValueOrDie();
+  auto num = input->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
+  GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
+  REQUIRE((*ptr) == table->num_rows());
+
+  // Invalid cases
   // Invalid vertices number
   REQUIRE(writer.WriteVerticesNum(-1).IsInvalidOperation());
   // Out of range
@@ -180,17 +185,30 @@ TEST_CASE("test_edge_chunk_writer") {
   std::cout << table->schema()->ToString() << std::endl;
   std::cout << table->num_rows() << ' ' << table->num_columns() << std::endl;
 
-  // Write edges of vertex chunk 0 to files
+  // Construct the writer
   std::string edge_meta_file =
       root + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
   auto edge_meta = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = GAR_NAMESPACE::EdgeInfo::Load(edge_meta).value();
   auto adj_list_type = GAR_NAMESPACE::AdjListType::ordered_by_source;
   GAR_NAMESPACE::EdgeChunkWriter writer(edge_info, "/tmp/", adj_list_type);
-  REQUIRE(writer.SortAndWriteAdjListTable(table, 0, 0).ok());
 
+  // Get & set validate level
+  REQUIRE(writer.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::no_validate);
+  writer.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  REQUIRE(writer.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::strong_validate);
+
+  // Valid cases
+  // Write adj list of vertex chunk 0 to files
+  REQUIRE(writer.SortAndWriteAdjListTable(table, 0, 0).ok());
   // Write number of edges for vertex chunk 0
   REQUIRE(writer.WriteEdgesNum(0, table->num_rows()).ok());
+  // Write number of vertices
+  REQUIRE(writer.WriteVerticesNum(903).ok());
+
+  // Check the number of edges
   std::shared_ptr<arrow::io::InputStream> input2 =
       fs->OpenInputStream(
             "/tmp/edge/person_knows_person/ordered_by_source/edge_count0")
@@ -200,8 +218,7 @@ TEST_CASE("test_edge_chunk_writer") {
       (GAR_NAMESPACE::IdType*) edge_num->data();
   REQUIRE((*edge_num_ptr) == table->num_rows());
 
-  // Write number of vertices
-  REQUIRE(writer.WriteVerticesNum(903).ok());
+  // Check the number of vertices
   std::shared_ptr<arrow::io::InputStream> input3 =
       fs->OpenInputStream(
             "/tmp/edge/person_knows_person/ordered_by_source/vertex_count")
@@ -211,15 +228,7 @@ TEST_CASE("test_edge_chunk_writer") {
       (GAR_NAMESPACE::IdType*) vertex_num->data();
   REQUIRE((*vertex_num_ptr) == 903);
 
-  // Set validate level
-  REQUIRE(writer.GetValidateLevel() ==
-          GAR_NAMESPACE::ValidateLevel::no_validate);
-  writer.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
-  REQUIRE(writer.GetValidateLevel() ==
-          GAR_NAMESPACE::ValidateLevel::strong_validate);
-  // Validate operation
-  REQUIRE(writer.SortAndWriteAdjListTable(table, 0, 0).ok());
-
+  // Invalid cases
   // Invalid count or index
   REQUIRE(writer.WriteEdgesNum(-1, 0).IsInvalidOperation());
   REQUIRE(writer.WriteEdgesNum(0, -1).IsInvalidOperation());
