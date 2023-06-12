@@ -90,6 +90,7 @@ Result<std::shared_ptr<arrow::Table>> ExecutePlanAndCollectAsTable(
 
 // implementations for VertexPropertyChunkWriter
 
+// Check if the opeartion of writing vertices number is allowed.
 Status VertexPropertyWriter::validate(const IdType& count,
                                       ValidateLevel validate_level) const
     noexcept {
@@ -107,6 +108,7 @@ Status VertexPropertyWriter::validate(const IdType& count,
   return Status::OK();
 }
 
+// Check if the opeartion of copying a file as a chunk is allowed.
 Status VertexPropertyWriter::validate(const PropertyGroup& property_group,
                                       IdType chunk_index,
                                       ValidateLevel validate_level) const
@@ -127,6 +129,7 @@ Status VertexPropertyWriter::validate(const PropertyGroup& property_group,
   return Status::OK();
 }
 
+// Check if the opeartion of writing a table as a chunk is allowed.
 Status VertexPropertyWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table,
     const PropertyGroup& property_group, IdType chunk_index,
@@ -255,6 +258,7 @@ Status VertexPropertyWriter::WriteTable(
 
 // implementations for EdgeChunkWriter
 
+// Check if the operation of writing number or copying a file is allowed.
 Status EdgeChunkWriter::validate(IdType count_or_index1, IdType count_or_index2,
                                  ValidateLevel validate_level) const noexcept {
   // use the writer's validate level
@@ -276,6 +280,7 @@ Status EdgeChunkWriter::validate(IdType count_or_index1, IdType count_or_index2,
   return Status::OK();
 }
 
+// Check if the operation of copying a file as a property chunk is allowed.
 Status EdgeChunkWriter::validate(const PropertyGroup& property_group,
                                  IdType vertex_chunk_index, IdType chunk_index,
                                  ValidateLevel validate_level) const noexcept {
@@ -295,6 +300,7 @@ Status EdgeChunkWriter::validate(const PropertyGroup& property_group,
   return Status::OK();
 }
 
+// Check if the operation of writing a table as an offset chunk is allowed.
 Status EdgeChunkWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     ValidateLevel validate_level) const noexcept {
@@ -342,6 +348,7 @@ Status EdgeChunkWriter::validate(
   return Status::OK();
 }
 
+// Check if the operation of writing a table as an adj list chunk is allowed.
 Status EdgeChunkWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     IdType chunk_index, ValidateLevel validate_level) const noexcept {
@@ -384,6 +391,7 @@ Status EdgeChunkWriter::validate(
   return Status::OK();
 }
 
+// Check if the operation of writing a table as a property chunk is allowed.
 Status EdgeChunkWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table,
     const PropertyGroup& property_group, IdType vertex_chunk_index,
