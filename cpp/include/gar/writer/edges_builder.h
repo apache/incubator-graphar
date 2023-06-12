@@ -147,7 +147,10 @@ class EdgesBuilder {
    * @param prefix The absolute prefix.
    * @param adj_list_type The adj list type of the edges.
    * @param num_vertices The total number of vertices for source or destination.
-   * @param validate_level The validate level, with no validate by default.
+   * @param validate_level The global validate level for the writer, with no
+   * validate by default. It could be ValidateLevel::no_validate,
+   * ValidateLevel::weak_validate or ValidateLevel::strong_validate, but could
+   * not be ValidateLevel::default_validate.
    */
   explicit EdgesBuilder(
       const EdgeInfo edge_info, const std::string& prefix,
@@ -158,6 +161,11 @@ class EdgesBuilder {
         adj_list_type_(adj_list_type),
         num_vertices_(num_vertices),
         validate_level_(validate_level) {
+    if (validate_level_ == ValidateLevel::default_validate) {
+      throw std::runtime_error(
+          "default_validate is not allowed to be set as the global validate "
+          "level for EdgesBuilder");
+    }
     edges_.clear();
     num_edges_ = 0;
     is_saved_ = false;
@@ -185,6 +193,9 @@ class EdgesBuilder {
    * @param validate_level The validate level to set.
    */
   inline void SetValidateLevel(const ValidateLevel& validate_level) {
+    if (validate_level == ValidateLevel::default_validate) {
+      return;
+    }
     validate_level_ = validate_level;
   }
 

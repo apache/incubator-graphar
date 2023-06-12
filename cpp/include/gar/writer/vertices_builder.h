@@ -129,7 +129,10 @@ class VerticesBuilder {
    * @param vertex_info The vertex info that describes the vertex type.
    * @param prefix The absolute prefix.
    * @param start_vertex_index The start index of the vertices collection.
-   * @param validate_level The validate level, with no validate by default.
+   * @param validate_level The global validate level for the writer, with no
+   * validate by default. It could be ValidateLevel::no_validate,
+   * ValidateLevel::weak_validate or ValidateLevel::strong_validate, but could
+   * not be ValidateLevel::default_validate.
    */
   explicit VerticesBuilder(
       const VertexInfo& vertex_info, const std::string& prefix,
@@ -139,6 +142,11 @@ class VerticesBuilder {
         prefix_(prefix),
         start_vertex_index_(start_vertex_index),
         validate_level_(validate_level) {
+    if (validate_level_ == ValidateLevel::default_validate) {
+      throw std::runtime_error(
+          "default_validate is not allowed to be set as the global validate "
+          "level for VerticesBuilder");
+    }
     vertices_.clear();
     num_vertices_ = 0;
     is_saved_ = false;
@@ -159,6 +167,9 @@ class VerticesBuilder {
    * @param validate_level The validate level to set.
    */
   inline void SetValidateLevel(const ValidateLevel& validate_level) {
+    if (validate_level == ValidateLevel::default_validate) {
+      return;
+    }
     validate_level_ = validate_level;
   }
 

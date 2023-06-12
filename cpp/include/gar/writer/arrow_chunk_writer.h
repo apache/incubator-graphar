@@ -47,7 +47,10 @@ class VertexPropertyWriter {
    *
    * @param vertex_info The vertex info that describes the vertex type.
    * @param prefix The absolute prefix.
-   * @param validate_level The validate level, with no validate by default.
+   * @param validate_level The global validate level for the writer, with no
+   * validate by default. It could be ValidateLevel::no_validate,
+   * ValidateLevel::weak_validate or ValidateLevel::strong_validate, but could
+   * not be ValidateLevel::default_validate.
    */
   VertexPropertyWriter(
       const VertexInfo& vertex_info, const std::string& prefix,
@@ -55,6 +58,11 @@ class VertexPropertyWriter {
       : vertex_info_(vertex_info),
         prefix_(prefix),
         validate_level_(validate_level) {
+    if (validate_level_ == ValidateLevel::default_validate) {
+      throw std::runtime_error(
+          "default_validate is not allowed to be set as the global validate "
+          "level for VertexPropertyWriter");
+    }
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
   }
 
@@ -64,6 +72,9 @@ class VertexPropertyWriter {
    * @param validate_level The validate level to set.
    */
   inline void SetValidateLevel(const ValidateLevel& validate_level) {
+    if (validate_level == ValidateLevel::default_validate) {
+      return;
+    }
     validate_level_ = validate_level;
   }
 
@@ -217,7 +228,10 @@ class EdgeChunkWriter {
    * @param edge_info The edge info that describes the edge type.
    * @param prefix The absolute prefix.
    * @param adj_list_type The adj list type for the edges.
-   * @param validate_level The validate level, with no validate by default.
+   * @param validate_level The global validate level for the writer, with no
+   * validate by default. It could be ValidateLevel::no_validate,
+   * ValidateLevel::weak_validate or ValidateLevel::strong_validate, but could
+   * not be ValidateLevel::default_validate.
    */
   EdgeChunkWriter(
       const EdgeInfo& edge_info, const std::string& prefix,
@@ -226,6 +240,11 @@ class EdgeChunkWriter {
       : edge_info_(edge_info),
         adj_list_type_(adj_list_type),
         validate_level_(validate_level) {
+    if (validate_level_ == ValidateLevel::default_validate) {
+      throw std::runtime_error(
+          "default_validate is not allowed to be set as the global validate "
+          "level for EdgeChunkWriter");
+    }
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
     chunk_size_ = edge_info_.GetChunkSize();
     switch (adj_list_type) {
@@ -252,6 +271,9 @@ class EdgeChunkWriter {
    * @param validate_level The validate level to set.
    */
   void SetValidateLevel(const ValidateLevel& validate_level) {
+    if (validate_level == ValidateLevel::default_validate) {
+      return;
+    }
     validate_level_ = validate_level;
   }
 
