@@ -100,9 +100,10 @@ Status VertexPropertyWriter::validate(const IdType& count,
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
   // weak & strong validate
-  if (count < 0)
+  if (count < 0) {
     return Status::InvalidOperation(
         "the number of vertices must be non-negative");
+  }
   return Status::OK();
 }
 
@@ -117,9 +118,10 @@ Status VertexPropertyWriter::validate(const PropertyGroup& property_group,
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
   // weak & strong validate
-  if (!vertex_info_.ContainPropertyGroup(property_group))
+  if (!vertex_info_.ContainPropertyGroup(property_group)) {
     return Status::InvalidOperation(
         "the property group does not exist in the vertex info");
+  }
   if (chunk_index < 0)
     return Status::InvalidOperation("invalid vertex chunk index");
   return Status::OK();
@@ -138,18 +140,20 @@ Status VertexPropertyWriter::validate(
   // validate property_group & chunk_index
   GAR_RETURN_NOT_OK(validate(property_group, chunk_index, validate_level));
   // weak validate for the input_table
-  if (input_table->num_rows() > vertex_info_.GetChunkSize())
+  if (input_table->num_rows() > vertex_info_.GetChunkSize()) {
     return Status::OutOfRange(
         "the number of rows in the input table is larger than the vertex chunk "
         "size");
+  }
   // strong validate for the input_table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     for (auto& property : property_group.GetProperties()) {
       int indice = schema->GetFieldIndex(property.name);
-      if (indice == -1)
+      if (indice == -1) {
         return Status::InvalidOperation("property: " + property.name +
                                         " not found");
+      }
       auto field = schema->field(indice);
       if (DataType::ArrowDataTypeToDataType(field->type()) != property.type) {
         std::string err_msg =
@@ -260,11 +264,12 @@ Status EdgeChunkWriter::validate(IdType count_or_index1, IdType count_or_index2,
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
   // weak & strong validate for adj list type
-  if (!edge_info_.ContainAdjList(adj_list_type_))
+  if (!edge_info_.ContainAdjList(adj_list_type_)) {
     return Status::InvalidOperation(
         "the adj list type " +
         std::string(AdjListTypeToString(adj_list_type_)) +
         "  does not exist in the edge info");
+  }
   // weak & strong validate for count or index
   if (count_or_index1 < 0 || count_or_index2 < 0)
     return Status::InvalidOperation("the count or index must be non-negative");
@@ -283,9 +288,10 @@ Status EdgeChunkWriter::validate(const PropertyGroup& property_group,
   // validate for adj list type & index
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   // weak & strong validate for property group
-  if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_))
+  if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_)) {
     return Status::InvalidOperation(
         "the property group does not exist in the edge info");
+  }
   return Status::OK();
 }
 
@@ -302,21 +308,24 @@ Status EdgeChunkWriter::validate(
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, 0, validate_level));
   // weak validate for the input table
   if (adj_list_type_ != AdjListType::ordered_by_source &&
-      adj_list_type_ != AdjListType::ordered_by_dest)
+      adj_list_type_ != AdjListType::ordered_by_dest) {
     return Status::InvalidOperation(
         "the adj list type has to be ordered_by_source or ordered_by_dest, but "
         "got " +
         std::string(AdjListTypeToString(adj_list_type_)));
+  }
   if (adj_list_type_ == AdjListType::ordered_by_source &&
-      input_table->num_rows() > edge_info_.GetSrcChunkSize() + 1)
+      input_table->num_rows() > edge_info_.GetSrcChunkSize() + 1) {
     return Status::OutOfRange(
         "the number of rows in the input table is larger than the offset table "
         "size for a vertex chunk");
+  }
   if (adj_list_type_ == AdjListType::ordered_by_dest &&
-      input_table->num_rows() > edge_info_.GetDstChunkSize() + 1)
+      input_table->num_rows() > edge_info_.GetDstChunkSize() + 1) {
     return Status::OutOfRange(
         "the number of rows in the input table is larger than the offset table "
         "size for a vertex chunk");
+  }
   // strong validate for the input_table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
@@ -324,10 +333,11 @@ Status EdgeChunkWriter::validate(
     if (index == -1)
       return Status::InvalidOperation("the offset column is not provided");
     auto field = schema->field(index);
-    if (field->type()->id() != arrow::Type::INT64)
+    if (field->type()->id() != arrow::Type::INT64) {
       return Status::TypeError(
           "the data type for offset column should be INT64, but got " +
           field->type()->name());
+    }
   }
   return Status::OK();
 }
@@ -344,10 +354,11 @@ Status EdgeChunkWriter::validate(
   // validate for adj list type & index
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   // weak validate for the input table
-  if (input_table->num_rows() > edge_info_.GetChunkSize())
+  if (input_table->num_rows() > edge_info_.GetChunkSize()) {
     return Status::OutOfRange(
         "the number of rows in the input table is larger than the edge chunk "
         "size");
+  }
   // stong validate for the input table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
@@ -355,18 +366,20 @@ Status EdgeChunkWriter::validate(
     if (index == -1)
       return Status::InvalidOperation("the source column is not provided");
     auto field = schema->field(index);
-    if (field->type()->id() != arrow::Type::INT64)
+    if (field->type()->id() != arrow::Type::INT64) {
       return Status::TypeError(
           "the data type for source column should be INT64, but got " +
           field->type()->name());
+    }
     index = schema->GetFieldIndex(GeneralParams::kDstIndexCol);
     if (index == -1)
       return Status::InvalidOperation("the destination column is not provided");
     field = schema->field(index);
-    if (field->type()->id() != arrow::Type::INT64)
+    if (field->type()->id() != arrow::Type::INT64) {
       return Status::TypeError(
           "the data type for destination  column should be INT64, but got " +
           field->type()->name());
+    }
   }
   return Status::OK();
 }

@@ -46,10 +46,11 @@ Status EdgesBuilder::validate(const Edge& e,
   if (validate_level == ValidateLevel::strong_validate) {
     for (auto& property : e.GetProperties()) {
       // check if the property is contained
-      if (!edge_info_.ContainProperty(property.first))
+      if (!edge_info_.ContainProperty(property.first)) {
         return Status::InvalidOperation(
             "invalid property name: " + property.first +
             ", which is not contained in the vertex info");
+      }
       // check if the property type is correct
       auto type = edge_info_.GetPropertyType(property.first).value();
       bool invalid_type = false;
@@ -223,10 +224,11 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::getOffsetTable(
       int64_t x = (adj_list_type_ == AdjListType::ordered_by_source
                        ? edges[index].GetSource()
                        : edges[index].GetDestination());
-      if (x <= i)
+      if (x <= i) {
         index++;
-      else
+      } else {
         break;
+      }
     }
     RETURN_NOT_ARROW_OK(builder.Append(index));
   }

@@ -40,18 +40,20 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
         "with the chunk size");
   }
   // the vertex index must larger than start index
-  if (index != -1 && index < start_vertex_index_)
+  if (index != -1 && index < start_vertex_index_) {
     return Status::InvalidOperation(
         "the vertex index must be larger than start index");
+  }
 
   // strong validate
   if (validate_level == ValidateLevel::strong_validate) {
     for (auto& property : v.GetProperties()) {
       // check if the property is contained
-      if (!vertex_info_.ContainProperty(property.first))
+      if (!vertex_info_.ContainProperty(property.first)) {
         return Status::InvalidOperation(
             "invalid property name: " + property.first +
             ", which is not contained in the vertex info");
+      }
       // check if the property type is correct
       auto type = vertex_info_.GetPropertyType(property.first).value();
       bool invalid_type = false;
