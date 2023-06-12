@@ -384,7 +384,7 @@ Status EdgeChunkWriter::validate(
     field = schema->field(index);
     if (field->type()->id() != arrow::Type::INT64) {
       return Status::TypeError(
-          "the data type for destination  column should be INT64, but got " +
+          "the data type for destination column should be INT64, but got " +
           field->type()->name());
     }
   }

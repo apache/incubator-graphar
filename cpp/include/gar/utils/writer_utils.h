@@ -32,8 +32,8 @@ enum class ValidateLevel : char {
   /// and the size of the table passed to the writer/builder are valid.
   weak_validate = 2,
   /// Strong validation: except for the weak validation, also check if the
-  /// schema (including each property name and data type) of the table passed to
-  /// the writer/builder is consistent with that defined in the info.
+  /// schema (including each property name and data type) of the intput data
+  /// passed to the writer/builder is consistent with that defined in the info.
   strong_validate = 3
 };
 

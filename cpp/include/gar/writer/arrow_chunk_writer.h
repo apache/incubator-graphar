@@ -39,6 +39,23 @@ namespace GAR_NAMESPACE_INTERNAL {
 /**
  * @brief The writer for vertex property group chunks.
  *
+ * Notes: For each writing operation, a validate_level could be set, which will
+ * be used to validate the data before writing. The validate_level could be:
+ *
+ * ValidateLevel::default_validate: to use the validate_level of the writer,
+ * which set through the constructor or the SetValidateLevel method;
+ *
+ * ValidateLevel::no_validate: without validation;
+ *
+ * ValidateLevel::weak_validate: to validate if the vertex count or vertex chunk
+ * index is non-negative, the property group exists and the size of input_table
+ * is not larger than the vertex chunk size;
+ *
+ * ValidateLevel::strong_validate: besides weak_validate, also validate the
+ * schema of input_table is consistent with that of property group; for writing
+ * operations without input_table, such as writing vertices number or copying
+ * file, the strong_validate is same as weak_validate.
+ *
  */
 class VertexPropertyWriter {
  public:
@@ -218,6 +235,24 @@ class VertexPropertyWriter {
 
 /**
  * @brief The writer for edge (adj list, offset and property group) chunks.
+ *
+ * Notes: For each writing operation, a validate_level could be set, which will
+ * be used to validate the data before writing. The validate_level could be:
+ *
+ * ValidateLevel::default_validate: to use the validate_level of the writer,
+ * which set through the constructor or the SetValidateLevel method;
+ *
+ * ValidateLevel::no_validate: without validation;
+ *
+ * ValidateLevel::weak_validate: to validate if the vertex/edge count or
+ * vertex/edge chunk index is non-negative, the adj_list type is valid, the
+ * property group exists and the size of input_table is not larger than the
+ * chunk size;
+ *
+ * ValidateLevel::strong_validate: besides weak_validate, also validate the
+ * schema of input_table is consistent with that of property group; for writing
+ * operations without input_table, such as writing vertices/edges number or
+ * copying file, the strong_validate is same as weak_validate.
  *
  */
 class EdgeChunkWriter {

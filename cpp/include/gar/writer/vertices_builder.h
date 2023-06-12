@@ -183,6 +183,19 @@ class VerticesBuilder {
   /**
    * @brief Add a vertex with the given index.
    *
+   * The validate_level for this operation could be:
+   *
+   * ValidateLevel::default_validate: to use the validate_level of the builder,
+   * which set through the constructor or the SetValidateLevel method;
+   *
+   * ValidateLevel::no_validate: without validation;
+   *
+   * ValidateLevel::weak_validate: to validate if the start index and the vertex
+   * index is valid, and the data in builder is not saved;
+   *
+   * ValidateLevel::strong_validate: besides weak_validate, also validate the
+   * schema of the vertex is consistent with the info defined.
+   *
    * @param v The vertex to add.
    * @param index The given index, -1 means the next unused index.
    * @param validate_level The validate level for this operation,
