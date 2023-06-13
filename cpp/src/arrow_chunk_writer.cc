@@ -90,7 +90,47 @@ Result<std::shared_ptr<arrow::Table>> ExecutePlanAndCollectAsTable(
 
 // implementations for VertexPropertyChunkWriter
 
-Status VertexPropertyWriter::Validate(
+// Check if the opeartion of writing vertices number is allowed.
+Status VertexPropertyWriter::validate(const IdType& count,
+                                      ValidateLevel validate_level) const
+    noexcept {
+  // use the writer's validate level
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
+    return Status::OK();
+  // weak & strong validate
+  if (count < 0) {
+    return Status::InvalidOperation(
+        "the number of vertices must be non-negative");
+  }
+  return Status::OK();
+}
+
+// Check if the opeartion of copying a file as a chunk is allowed.
+Status VertexPropertyWriter::validate(const PropertyGroup& property_group,
+                                      IdType chunk_index,
+                                      ValidateLevel validate_level) const
+    noexcept {
+  // use the writer's validate level
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
+    return Status::OK();
+  // weak & strong validate
+  if (!vertex_info_.ContainPropertyGroup(property_group)) {
+    return Status::InvalidOperation(
+        "the property group does not exist in the vertex info");
+  }
+  if (chunk_index < 0)
+    return Status::InvalidOperation("invalid vertex chunk index");
+  return Status::OK();
+}
+
+// Check if the opeartion of writing a table as a chunk is allowed.
+Status VertexPropertyWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table,
     const PropertyGroup& property_group, IdType chunk_index,
     ValidateLevel validate_level) const noexcept {
@@ -100,24 +140,23 @@ Status VertexPropertyWriter::Validate(
   // no validate
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
-  // weak validate
-  if (input_table->num_rows() > vertex_info_.GetChunkSize())
+  // validate property_group & chunk_index
+  GAR_RETURN_NOT_OK(validate(property_group, chunk_index, validate_level));
+  // weak validate for the input_table
+  if (input_table->num_rows() > vertex_info_.GetChunkSize()) {
     return Status::OutOfRange(
         "the number of rows in the input table is larger than the vertex chunk "
         "size");
-  if (!vertex_info_.ContainPropertyGroup(property_group))
-    return Status::InvalidOperation(
-        "the property group does not exist in the vertex info");
-  if (chunk_index < 0)
-    return Status::InvalidOperation("invalid vertex chunk index");
-  // strong validate
+  }
+  // strong validate for the input_table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     for (auto& property : property_group.GetProperties()) {
       int indice = schema->GetFieldIndex(property.name);
-      if (indice == -1)
+      if (indice == -1) {
         return Status::InvalidOperation("property: " + property.name +
                                         " not found");
+      }
       auto field = schema->field(indice);
       if (DataType::ArrowDataTypeToDataType(field->type()) != property.type) {
         std::string err_msg =
@@ -131,8 +170,9 @@ Status VertexPropertyWriter::Validate(
   return Status::OK();
 }
 
-Status VertexPropertyWriter::WriteVerticesNum(const IdType& count) const
-    noexcept {
+Status VertexPropertyWriter::WriteVerticesNum(
+    const IdType& count, ValidateLevel validate_level) const noexcept {
+  GAR_RETURN_NOT_OK(validate(count, validate_level));
   GAR_ASSIGN_OR_RAISE(auto suffix, vertex_info_.GetVerticesNumFilePath());
   std::string path = prefix_ + suffix;
   return fs_->WriteValueToFile<IdType>(count, path);
@@ -140,7 +180,10 @@ Status VertexPropertyWriter::WriteVerticesNum(const IdType& count) const
 
 Status VertexPropertyWriter::WriteChunk(const std::string& file_name,
                                         const PropertyGroup& property_group,
-                                        IdType chunk_index) const noexcept {
+                                        IdType chunk_index,
+                                        ValidateLevel validate_level) const
+    noexcept {
+  GAR_RETURN_NOT_OK(validate(property_group, chunk_index, validate_level));
   GAR_ASSIGN_OR_RAISE(auto suffix,
                       vertex_info_.GetFilePath(property_group, chunk_index));
   std::string path = prefix_ + suffix;
@@ -149,8 +192,10 @@ Status VertexPropertyWriter::WriteChunk(const std::string& file_name,
 
 Status VertexPropertyWriter::WriteChunk(
     const std::shared_ptr<arrow::Table>& input_table,
-    const PropertyGroup& property_group, IdType chunk_index) const noexcept {
-  GAR_RETURN_NOT_OK(Validate(input_table, property_group, chunk_index));
+    const PropertyGroup& property_group, IdType chunk_index,
+    ValidateLevel validate_level) const noexcept {
+  GAR_RETURN_NOT_OK(
+      validate(input_table, property_group, chunk_index, validate_level));
   auto file_type = property_group.GetFileType();
 
   std::vector<int> indices;
@@ -174,44 +219,89 @@ Status VertexPropertyWriter::WriteChunk(
 }
 
 Status VertexPropertyWriter::WriteChunk(
-    const std::shared_ptr<arrow::Table>& input_table, IdType chunk_index) const
-    noexcept {
+    const std::shared_ptr<arrow::Table>& input_table, IdType chunk_index,
+    ValidateLevel validate_level) const noexcept {
   auto property_groups = vertex_info_.GetPropertyGroups();
   for (auto& property_group : property_groups) {
-    GAR_RETURN_NOT_OK(WriteChunk(input_table, property_group, chunk_index));
+    GAR_RETURN_NOT_OK(
+        WriteChunk(input_table, property_group, chunk_index, validate_level));
   }
   return Status::OK();
 }
 
 Status VertexPropertyWriter::WriteTable(
     const std::shared_ptr<arrow::Table>& input_table,
-    const PropertyGroup& property_group, IdType start_chunk_index) const
-    noexcept {
+    const PropertyGroup& property_group, IdType start_chunk_index,
+    ValidateLevel validate_level) const noexcept {
   IdType chunk_size = vertex_info_.GetChunkSize();
   int64_t length = input_table->num_rows();
   IdType chunk_index = start_chunk_index;
   for (int64_t offset = 0; offset < length;
        offset += chunk_size, chunk_index++) {
     auto in_chunk = input_table->Slice(offset, chunk_size);
-    GAR_RETURN_NOT_OK(WriteChunk(in_chunk, property_group, chunk_index));
+    GAR_RETURN_NOT_OK(
+        WriteChunk(in_chunk, property_group, chunk_index, validate_level));
   }
   return Status::OK();
 }
 
 Status VertexPropertyWriter::WriteTable(
-    const std::shared_ptr<arrow::Table>& input_table,
-    IdType start_chunk_index) const noexcept {
+    const std::shared_ptr<arrow::Table>& input_table, IdType start_chunk_index,
+    ValidateLevel validate_level) const noexcept {
   auto property_groups = vertex_info_.GetPropertyGroups();
   for (auto& property_group : property_groups) {
-    GAR_RETURN_NOT_OK(
-        WriteTable(input_table, property_group, start_chunk_index));
+    GAR_RETURN_NOT_OK(WriteTable(input_table, property_group, start_chunk_index,
+                                 validate_level));
   }
   return Status::OK();
 }
 
 // implementations for EdgeChunkWriter
 
-Status EdgeChunkWriter::Validate(
+// Check if the operation of writing number or copying a file is allowed.
+Status EdgeChunkWriter::validate(IdType count_or_index1, IdType count_or_index2,
+                                 ValidateLevel validate_level) const noexcept {
+  // use the writer's validate level
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
+    return Status::OK();
+  // weak & strong validate for adj list type
+  if (!edge_info_.ContainAdjList(adj_list_type_)) {
+    return Status::InvalidOperation(
+        "the adj list type " +
+        std::string(AdjListTypeToString(adj_list_type_)) +
+        "  does not exist in the edge info");
+  }
+  // weak & strong validate for count or index
+  if (count_or_index1 < 0 || count_or_index2 < 0)
+    return Status::InvalidOperation("the count or index must be non-negative");
+  return Status::OK();
+}
+
+// Check if the operation of copying a file as a property chunk is allowed.
+Status EdgeChunkWriter::validate(const PropertyGroup& property_group,
+                                 IdType vertex_chunk_index, IdType chunk_index,
+                                 ValidateLevel validate_level) const noexcept {
+  // use the writer's validate level
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
+    return Status::OK();
+  // validate for adj list type & index
+  GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
+  // weak & strong validate for property group
+  if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_)) {
+    return Status::InvalidOperation(
+        "the property group does not exist in the edge info");
+  }
+  return Status::OK();
+}
+
+// Check if the operation of writing a table as an offset chunk is allowed.
+Status EdgeChunkWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     ValidateLevel validate_level) const noexcept {
   // use the writer's validate level
@@ -220,46 +310,46 @@ Status EdgeChunkWriter::Validate(
   // no validate
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
-  // weak validate
-  if (!edge_info_.ContainAdjList(adj_list_type_))
-    return Status::InvalidOperation(
-        "the adj list type " +
-        std::string(AdjListTypeToString(adj_list_type_)) +
-        "  does not exist in the edge info");
+  // validate for adj list type & index
+  GAR_RETURN_NOT_OK(validate(vertex_chunk_index, 0, validate_level));
+  // weak validate for the input table
   if (adj_list_type_ != AdjListType::ordered_by_source &&
-      adj_list_type_ != AdjListType::ordered_by_dest)
+      adj_list_type_ != AdjListType::ordered_by_dest) {
     return Status::InvalidOperation(
         "the adj list type has to be ordered_by_source or ordered_by_dest, but "
         "got " +
         std::string(AdjListTypeToString(adj_list_type_)));
+  }
   if (adj_list_type_ == AdjListType::ordered_by_source &&
-      input_table->num_rows() > edge_info_.GetSrcChunkSize() + 1)
+      input_table->num_rows() > edge_info_.GetSrcChunkSize() + 1) {
     return Status::OutOfRange(
         "the number of rows in the input table is larger than the offset table "
         "size for a vertex chunk");
+  }
   if (adj_list_type_ == AdjListType::ordered_by_dest &&
-      input_table->num_rows() > edge_info_.GetDstChunkSize() + 1)
+      input_table->num_rows() > edge_info_.GetDstChunkSize() + 1) {
     return Status::OutOfRange(
         "the number of rows in the input table is larger than the offset table "
         "size for a vertex chunk");
-  if (vertex_chunk_index < 0)
-    return Status::InvalidOperation("invalid vertex chunk index");
-  // strong validate
+  }
+  // strong validate for the input_table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     int index = schema->GetFieldIndex(GeneralParams::kOffsetCol);
     if (index == -1)
       return Status::InvalidOperation("the offset column is not provided");
     auto field = schema->field(index);
-    if (field->type()->id() != arrow::Type::INT64)
+    if (field->type()->id() != arrow::Type::INT64) {
       return Status::TypeError(
           "the data type for offset column should be INT64, but got " +
           field->type()->name());
+    }
   }
   return Status::OK();
 }
 
-Status EdgeChunkWriter::Validate(
+// Check if the operation of writing a table as an adj list chunk is allowed.
+Status EdgeChunkWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     IdType chunk_index, ValidateLevel validate_level) const noexcept {
   // use the writer's validate level
@@ -268,44 +358,41 @@ Status EdgeChunkWriter::Validate(
   // no validate
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
-  // weak validate
-  if (!edge_info_.ContainAdjList(adj_list_type_))
-    return Status::InvalidOperation(
-        "the adj list type " +
-        std::string(AdjListTypeToString(adj_list_type_)) +
-        "  does not exist in the edge info");
-  if (input_table->num_rows() > edge_info_.GetChunkSize())
+  // validate for adj list type & index
+  GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
+  // weak validate for the input table
+  if (input_table->num_rows() > edge_info_.GetChunkSize()) {
     return Status::OutOfRange(
         "the number of rows in the input table is larger than the edge chunk "
         "size");
-  if (vertex_chunk_index < 0)
-    return Status::InvalidOperation("invalid vertex chunk index");
-  if (chunk_index < 0)
-    return Status::InvalidOperation("invalid edge chunk index");
-  // stong validate
+  }
+  // stong validate for the input table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     int index = schema->GetFieldIndex(GeneralParams::kSrcIndexCol);
     if (index == -1)
       return Status::InvalidOperation("the source column is not provided");
     auto field = schema->field(index);
-    if (field->type()->id() != arrow::Type::INT64)
+    if (field->type()->id() != arrow::Type::INT64) {
       return Status::TypeError(
           "the data type for source column should be INT64, but got " +
           field->type()->name());
+    }
     index = schema->GetFieldIndex(GeneralParams::kDstIndexCol);
     if (index == -1)
       return Status::InvalidOperation("the destination column is not provided");
     field = schema->field(index);
-    if (field->type()->id() != arrow::Type::INT64)
+    if (field->type()->id() != arrow::Type::INT64) {
       return Status::TypeError(
-          "the data type for destination  column should be INT64, but got " +
+          "the data type for destination column should be INT64, but got " +
           field->type()->name());
+    }
   }
   return Status::OK();
 }
 
-Status EdgeChunkWriter::Validate(
+// Check if the operation of writing a table as a property chunk is allowed.
+Status EdgeChunkWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table,
     const PropertyGroup& property_group, IdType vertex_chunk_index,
     IdType chunk_index, ValidateLevel validate_level) const noexcept {
@@ -315,22 +402,13 @@ Status EdgeChunkWriter::Validate(
   // no validate
   if (validate_level == ValidateLevel::no_validate)
     return Status::OK();
-  // weak validate
-  if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_))
-    return Status::InvalidOperation(
-        "the property group does not exist in the edge info");
-  if (!edge_info_.ContainAdjList(adj_list_type_))
-    return Status::InvalidOperation(
-        "the adj list type " +
-        std::string(AdjListTypeToString(adj_list_type_)) +
-        "  does not exist in the edge info");
+  // validate for property group, adj list type & index
+  GAR_RETURN_NOT_OK(validate(property_group, vertex_chunk_index, chunk_index,
+                             validate_level));
+  // weak validate for the input table
   if (input_table->num_rows() > edge_info_.GetChunkSize())
     return Status::OutOfRange();
-  if (vertex_chunk_index < 0)
-    return Status::InvalidOperation("invalid vertex chunk index");
-  if (chunk_index < 0)
-    return Status::InvalidOperation("invalid edge chunk index");
-  // strong validate
+  // strong validate for the input table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     for (auto& property : property_group.GetProperties()) {
@@ -352,14 +430,20 @@ Status EdgeChunkWriter::Validate(
 }
 
 Status EdgeChunkWriter::WriteEdgesNum(IdType vertex_chunk_index,
-                                      const IdType& count) const noexcept {
+                                      const IdType& count,
+                                      ValidateLevel validate_level) const
+    noexcept {
+  GAR_RETURN_NOT_OK(validate(vertex_chunk_index, count, validate_level));
   GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_.GetEdgesNumFilePath(
                                        vertex_chunk_index, adj_list_type_));
   std::string path = prefix_ + suffix;
   return fs_->WriteValueToFile<IdType>(count, path);
 }
 
-Status EdgeChunkWriter::WriteVerticesNum(const IdType& count) const noexcept {
+Status EdgeChunkWriter::WriteVerticesNum(const IdType& count,
+                                         ValidateLevel validate_level) const
+    noexcept {
+  GAR_RETURN_NOT_OK(validate(0, count, validate_level));
   GAR_ASSIGN_OR_RAISE(auto suffix,
                       edge_info_.GetVerticesNumFilePath(adj_list_type_));
   std::string path = prefix_ + suffix;
@@ -367,8 +451,10 @@ Status EdgeChunkWriter::WriteVerticesNum(const IdType& count) const noexcept {
 }
 
 Status EdgeChunkWriter::WriteOffsetChunk(const std::string& file_name,
-                                         IdType vertex_chunk_index) const
+                                         IdType vertex_chunk_index,
+                                         ValidateLevel validate_level) const
     noexcept {
+  GAR_RETURN_NOT_OK(validate(vertex_chunk_index, 0, validate_level));
   GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_.GetAdjListOffsetFilePath(
                                        vertex_chunk_index, adj_list_type_));
   std::string path = prefix_ + suffix;
@@ -377,7 +463,10 @@ Status EdgeChunkWriter::WriteOffsetChunk(const std::string& file_name,
 
 Status EdgeChunkWriter::WriteAdjListChunk(const std::string& file_name,
                                           IdType vertex_chunk_index,
-                                          IdType chunk_index) const noexcept {
+                                          IdType chunk_index,
+                                          ValidateLevel validate_level) const
+    noexcept {
+  GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   GAR_ASSIGN_OR_RAISE(
       auto suffix, edge_info_.GetAdjListFilePath(vertex_chunk_index,
                                                  chunk_index, adj_list_type_));
@@ -388,7 +477,11 @@ Status EdgeChunkWriter::WriteAdjListChunk(const std::string& file_name,
 Status EdgeChunkWriter::WritePropertyChunk(const std::string& file_name,
                                            const PropertyGroup& property_group,
                                            IdType vertex_chunk_index,
-                                           IdType chunk_index) const noexcept {
+                                           IdType chunk_index,
+                                           ValidateLevel validate_level) const
+    noexcept {
+  GAR_RETURN_NOT_OK(validate(property_group, vertex_chunk_index, chunk_index,
+                             validate_level));
   GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_.GetPropertyFilePath(
                                        property_group, adj_list_type_,
                                        vertex_chunk_index, chunk_index));
@@ -397,9 +490,9 @@ Status EdgeChunkWriter::WritePropertyChunk(const std::string& file_name,
 }
 
 Status EdgeChunkWriter::WriteOffsetChunk(
-    const std::shared_ptr<arrow::Table>& input_table,
-    IdType vertex_chunk_index) const noexcept {
-  GAR_RETURN_NOT_OK(Validate(input_table, vertex_chunk_index));
+    const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
+    ValidateLevel validate_level) const noexcept {
+  GAR_RETURN_NOT_OK(validate(input_table, vertex_chunk_index, validate_level));
   GAR_ASSIGN_OR_RAISE(auto file_type, edge_info_.GetFileType(adj_list_type_));
   auto schema = input_table->schema();
   int index = schema->GetFieldIndex(GeneralParams::kOffsetCol);
@@ -414,8 +507,9 @@ Status EdgeChunkWriter::WriteOffsetChunk(
 
 Status EdgeChunkWriter::WriteAdjListChunk(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
-    IdType chunk_index) const noexcept {
-  GAR_RETURN_NOT_OK(Validate(input_table, vertex_chunk_index, chunk_index));
+    IdType chunk_index, ValidateLevel validate_level) const noexcept {
+  GAR_RETURN_NOT_OK(
+      validate(input_table, vertex_chunk_index, chunk_index, validate_level));
   GAR_ASSIGN_OR_RAISE(auto file_type, edge_info_.GetFileType(adj_list_type_));
   std::vector<int> indices;
   indices.clear();
@@ -440,9 +534,9 @@ Status EdgeChunkWriter::WriteAdjListChunk(
 Status EdgeChunkWriter::WritePropertyChunk(
     const std::shared_ptr<arrow::Table>& input_table,
     const PropertyGroup& property_group, IdType vertex_chunk_index,
-    IdType chunk_index) const noexcept {
-  GAR_RETURN_NOT_OK(
-      Validate(input_table, property_group, vertex_chunk_index, chunk_index));
+    IdType chunk_index, ValidateLevel validate_level) const noexcept {
+  GAR_RETURN_NOT_OK(validate(input_table, property_group, vertex_chunk_index,
+                             chunk_index, validate_level));
   auto file_type = property_group.GetFileType();
 
   std::vector<int> indices;
@@ -467,34 +561,36 @@ Status EdgeChunkWriter::WritePropertyChunk(
 
 Status EdgeChunkWriter::WritePropertyChunk(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
-    IdType chunk_index) const noexcept {
+    IdType chunk_index, ValidateLevel validate_level) const noexcept {
   GAR_ASSIGN_OR_RAISE(auto& property_groups,
                       edge_info_.GetPropertyGroups(adj_list_type_));
   for (auto& property_group : property_groups) {
     GAR_RETURN_NOT_OK(WritePropertyChunk(input_table, property_group,
-                                         vertex_chunk_index, chunk_index));
+                                         vertex_chunk_index, chunk_index,
+                                         validate_level));
   }
   return Status::OK();
 }
 
 Status EdgeChunkWriter::WriteChunk(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
-    IdType chunk_index) const noexcept {
-  GAR_RETURN_NOT_OK(
-      WriteAdjListChunk(input_table, vertex_chunk_index, chunk_index));
-  return WritePropertyChunk(input_table, vertex_chunk_index, chunk_index);
+    IdType chunk_index, ValidateLevel validate_level) const noexcept {
+  GAR_RETURN_NOT_OK(WriteAdjListChunk(input_table, vertex_chunk_index,
+                                      chunk_index, validate_level));
+  return WritePropertyChunk(input_table, vertex_chunk_index, chunk_index,
+                            validate_level);
 }
 
 Status EdgeChunkWriter::WriteAdjListTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
-    IdType start_chunk_index) const noexcept {
+    IdType start_chunk_index, ValidateLevel validate_level) const noexcept {
   int64_t length = input_table->num_rows();
   IdType chunk_index = start_chunk_index;
   for (int64_t offset = 0; offset < length;
        offset += chunk_size_, chunk_index++) {
     auto in_chunk = input_table->Slice(offset, chunk_size_);
-    GAR_RETURN_NOT_OK(
-        WriteAdjListChunk(in_chunk, vertex_chunk_index, chunk_index));
+    GAR_RETURN_NOT_OK(WriteAdjListChunk(in_chunk, vertex_chunk_index,
+                                        chunk_index, validate_level));
   }
   return Status::OK();
 }
@@ -502,48 +598,50 @@ Status EdgeChunkWriter::WriteAdjListTable(
 Status EdgeChunkWriter::WritePropertyTable(
     const std::shared_ptr<arrow::Table>& input_table,
     const PropertyGroup& property_group, IdType vertex_chunk_index,
-    IdType start_chunk_index) const noexcept {
+    IdType start_chunk_index, ValidateLevel validate_level) const noexcept {
   int64_t length = input_table->num_rows();
   IdType chunk_index = start_chunk_index;
   for (int64_t offset = 0; offset < length;
        offset += chunk_size_, chunk_index++) {
     auto in_chunk = input_table->Slice(offset, chunk_size_);
     GAR_RETURN_NOT_OK(WritePropertyChunk(in_chunk, property_group,
-                                         vertex_chunk_index, chunk_index));
+                                         vertex_chunk_index, chunk_index,
+                                         validate_level));
   }
   return Status::OK();
 }
 
 Status EdgeChunkWriter::WritePropertyTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
-    IdType start_chunk_index) const noexcept {
+    IdType start_chunk_index, ValidateLevel validate_level) const noexcept {
   int64_t length = input_table->num_rows();
   IdType chunk_index = start_chunk_index;
   for (int64_t offset = 0; offset < length;
        offset += chunk_size_, chunk_index++) {
     auto in_chunk = input_table->Slice(offset, chunk_size_);
-    GAR_RETURN_NOT_OK(
-        WritePropertyChunk(in_chunk, vertex_chunk_index, chunk_index));
+    GAR_RETURN_NOT_OK(WritePropertyChunk(in_chunk, vertex_chunk_index,
+                                         chunk_index, validate_level));
   }
   return Status::OK();
 }
 
 Status EdgeChunkWriter::WriteTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
-    IdType start_chunk_index) const noexcept {
+    IdType start_chunk_index, ValidateLevel validate_level) const noexcept {
   int64_t length = input_table->num_rows();
   IdType chunk_index = start_chunk_index;
   for (int64_t offset = 0; offset < length;
        offset += chunk_size_, chunk_index++) {
     auto in_chunk = input_table->Slice(offset, chunk_size_);
-    GAR_RETURN_NOT_OK(WriteChunk(in_chunk, vertex_chunk_index, chunk_index));
+    GAR_RETURN_NOT_OK(
+        WriteChunk(in_chunk, vertex_chunk_index, chunk_index, validate_level));
   }
   return Status::OK();
 }
 
 Status EdgeChunkWriter::SortAndWriteAdjListTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
-    IdType start_chunk_index) const noexcept {
+    IdType start_chunk_index, ValidateLevel validate_level) const noexcept {
   GAR_ASSIGN_OR_RAISE(
       auto response_table,
       sortTable(input_table, getSortColumnName(adj_list_type_)));
@@ -553,36 +651,37 @@ Status EdgeChunkWriter::SortAndWriteAdjListTable(
         auto offset_table,
         getOffsetTable(response_table, getSortColumnName(adj_list_type_),
                        vertex_chunk_index));
-    GAR_RETURN_NOT_OK(WriteOffsetChunk(offset_table, vertex_chunk_index));
+    GAR_RETURN_NOT_OK(
+        WriteOffsetChunk(offset_table, vertex_chunk_index, validate_level));
   }
   return WriteAdjListTable(response_table, vertex_chunk_index,
-                           start_chunk_index);
+                           start_chunk_index, validate_level);
 }
 
 Status EdgeChunkWriter::SortAndWritePropertyTable(
     const std::shared_ptr<arrow::Table>& input_table,
     const PropertyGroup& property_group, IdType vertex_chunk_index,
-    IdType start_chunk_index) const noexcept {
+    IdType start_chunk_index, ValidateLevel validate_level) const noexcept {
   GAR_ASSIGN_OR_RAISE(
       auto response_table,
       sortTable(input_table, getSortColumnName(adj_list_type_)));
   return WritePropertyTable(response_table, property_group, vertex_chunk_index,
-                            start_chunk_index);
+                            start_chunk_index, validate_level);
 }
 
 Status EdgeChunkWriter::SortAndWritePropertyTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
-    IdType start_chunk_index) const noexcept {
+    IdType start_chunk_index, ValidateLevel validate_level) const noexcept {
   GAR_ASSIGN_OR_RAISE(
       auto response_table,
       sortTable(input_table, getSortColumnName(adj_list_type_)));
   return WritePropertyTable(response_table, vertex_chunk_index,
-                            start_chunk_index);
+                            start_chunk_index, validate_level);
 }
 
 Status EdgeChunkWriter::SortAndWriteTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
-    IdType start_chunk_index) const noexcept {
+    IdType start_chunk_index, ValidateLevel validate_level) const noexcept {
   GAR_ASSIGN_OR_RAISE(
       auto response_table,
       sortTable(input_table, getSortColumnName(adj_list_type_)));
@@ -593,10 +692,12 @@ Status EdgeChunkWriter::SortAndWriteTable(
         auto offset_table,
         getOffsetTable(response_table, getSortColumnName(adj_list_type_),
                        vertex_chunk_index));
-    GAR_RETURN_NOT_OK(WriteOffsetChunk(offset_table, vertex_chunk_index));
+    GAR_RETURN_NOT_OK(
+        WriteOffsetChunk(offset_table, vertex_chunk_index, validate_level));
   }
 
-  return WriteTable(response_table, vertex_chunk_index, start_chunk_index);
+  return WriteTable(response_table, vertex_chunk_index, start_chunk_index,
+                    validate_level);
 }
 
 Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::getOffsetTable(
