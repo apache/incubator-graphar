@@ -224,7 +224,7 @@ const char* grin_get_static_storage_feature_msg() {
 #endif
 
 #ifdef GRIN_TRAIT_SELECT_NEIGHBOR_PARTITION_FOR_ADJACENT_LIST
-    feature->set_grin_trait_select_partition_neighbor_for_adjacent_list(true);
+    feature->set_grin_trait_select_neighbor_partition_for_adjacent_list(true);
 #endif
   }
 
