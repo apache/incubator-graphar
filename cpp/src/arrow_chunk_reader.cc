@@ -19,8 +19,31 @@ limitations under the License.
 
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/utils/reader_utils.h"
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
+#include "arrow/compute/expression.h"
+#else
+#include "arrow/compute/exec/expression.h"
+#endif
 
 namespace GAR_NAMESPACE_INTERNAL {
+
+VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
+    const VertexInfo& vertex_info, const PropertyGroup& property_group,
+    const std::string& prefix, IdType chunk_index)
+    : vertex_info_(vertex_info),
+      property_group_(property_group),
+      chunk_index_(chunk_index),
+      seek_id_(chunk_index * vertex_info.GetChunkSize()),
+      chunk_table_(nullptr),
+      filter_(std::make_shared<arrow::compute::Expression>(
+          arrow::compute::literal(true))) {
+  GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
+  GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
+                            vertex_info.GetPathPrefix(property_group));
+  std::string base_dir = prefix_ + pg_path_prefix;
+  GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
+                            utils::GetVertexChunkNum(prefix_, vertex_info));
+}
 
 Result<std::shared_ptr<arrow::Table>>
 VertexPropertyArrowChunkReader::GetChunk() noexcept {
@@ -36,6 +59,21 @@ VertexPropertyArrowChunkReader::GetChunk() noexcept {
   return chunk_table_->Slice(row_offset);
 }
 
+Result<std::shared_ptr<arrow::Table>>
+VertexPropertyArrowChunkReader::GetChunk2() noexcept {
+  if (chunk_table_ == nullptr) {
+    GAR_ASSIGN_OR_RAISE(
+        auto chunk_file_path,
+        vertex_info_.GetFilePath(property_group_, chunk_index_));
+    std::string path = prefix_ + chunk_file_path;
+    GAR_ASSIGN_OR_RAISE(chunk_table_,
+                        fs_->ReadAndFilterFileToTable(
+                            path, property_group_.GetFileType(), filter_));
+  }
+  IdType row_offset = seek_id_ - chunk_index_ * vertex_info_.GetChunkSize();
+  return chunk_table_->Slice(row_offset);
+}
+
 Result<std::pair<IdType, IdType>>
 VertexPropertyArrowChunkReader::GetRange() noexcept {
   if (chunk_table_ == nullptr) {
@@ -46,6 +84,12 @@ VertexPropertyArrowChunkReader::GetRange() noexcept {
   IdType row_offset = seek_id_ - chunk_index_ * vertex_info_.GetChunkSize();
   return std::make_pair(seek_id_,
                         seek_id_ + chunk_table_->num_rows() - row_offset);
+}
+
+Status VertexPropertyArrowChunkReader::Filter(
+    const arrow::compute::Expression& filter) {
+  filter_ = std::make_shared<arrow::compute::Expression>(filter);
+  return Status::OK();
 }
 
 Status AdjListArrowChunkReader::seek_src(IdType id) noexcept {

@@ -22,7 +22,12 @@ limitations under the License.
 #include "arrow/util/uri.h"
 #include "parquet/arrow/reader.h"
 #include "parquet/arrow/writer.h"
-
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
+#include "arrow/compute/expression.h"
+#else
+#include "arrow/compute/exec/expression.h"
+#endif
+#include "arrow/dataset/api.h"
 #include "gar/utils/filesystem.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
@@ -81,6 +86,57 @@ Result<arrow::internal::Uri> ParseFileSystemUri(const std::string& uri_string) {
 }
 }  // namespace detail
 
+std::shared_ptr<arrow::dataset::FileFormat> FileSystem::ToFileFormat(
+    const FileType type) const {
+  switch (type) {
+  case CSV:
+    return std::make_shared<arrow::dataset::CsvFileFormat>();
+  case PARQUET:
+    return std::make_shared<arrow::dataset::ParquetFileFormat>();
+  case ORC:
+    return std::make_shared<arrow::dataset::OrcFileFormat>();
+  default:
+    return nullptr;
+  }
+}
+
+Status FileSystem::CastTableColumnType(
+    std::shared_ptr<arrow::Table> table) const {
+  // cast string array to large string array as we need concatenate chunks in
+  // some places, e.g., in vineyard
+  for (int i = 0; i < table->num_columns(); ++i) {
+    std::shared_ptr<arrow::DataType> type = table->column(i)->type();
+    if (type->id() == arrow::Type::STRING) {
+      type = arrow::large_utf8();
+    } else if (type->id() == arrow::Type::BINARY) {
+      type = arrow::large_binary();
+    }
+    if (type->Equals(table->column(i)->type())) {
+      continue;
+    }
+    // do casting
+    auto field = table->field(i)->WithType(type);
+    std::shared_ptr<arrow::ChunkedArray> chunked_array;
+    if (type->Equals(arrow::large_utf8())) {
+      auto status = detail::CastToLargeOffsetArray<arrow::StringArray,
+                                                   arrow::LargeStringArray>(
+          table->column(i), type, chunked_array);
+      GAR_RETURN_NOT_OK(status);
+    } else if (type->Equals(arrow::large_binary())) {
+      auto status = detail::CastToLargeOffsetArray<arrow::BinaryArray,
+                                                   arrow::LargeBinaryArray>(
+          table->column(i), type, chunked_array);
+      GAR_RETURN_NOT_OK(status);
+    } else {
+      // noop
+      chunked_array = table->column(i);
+    }
+    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(table, table->RemoveColumn(i));
+    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
+        table, table->AddColumn(i, field, chunked_array));
+  }
+  return Status::OK();
+}
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     const std::string& path, FileType file_type) const noexcept {
   arrow::MemoryPool* pool = arrow::default_memory_pool();
@@ -152,6 +208,25 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
         table, table->AddColumn(i, field, chunked_array));
   }
+  return table;
+}
+
+Result<std::shared_ptr<arrow::Table>> FileSystem::ReadAndFilterFileToTable(
+    const std::string& path, FileType file_type,
+    std::shared_ptr<arrow::compute::Expression> filter) const noexcept {
+  std::shared_ptr<arrow::dataset::FileFormat> format = ToFileFormat(file_type);
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
+      auto factory, arrow::dataset::FileSystemDatasetFactory::Make(
+                        arrow_fs_, {path}, format,
+                        arrow::dataset::FileSystemFactoryOptions()));
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto dataset, factory->Finish());
+  // Read specified columns with a row filter
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
+  RETURN_NOT_ARROW_OK(scan_builder->Filter(*filter));
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scanner, scan_builder->Finish());
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto table, scanner->ToTable());
+
+  GAR_RETURN_NOT_OK(CastTableColumnType(table));
   return table;
 }
 

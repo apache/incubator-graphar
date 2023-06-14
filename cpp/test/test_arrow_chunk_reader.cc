@@ -31,6 +31,8 @@ limitations under the License.
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
+namespace cp = arrow::compute;
+
 TEST_CASE("test_vertex_property_arrow_chunk_reader") {
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
@@ -88,6 +90,60 @@ TEST_CASE("test_vertex_property_arrow_chunk_reader") {
   REQUIRE(reader.next_chunk().IsIndexError());
 
   REQUIRE(reader.seek(1024).IsIndexError());
+}
+
+TEST_CASE("test_vertex_property_pushdown") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
+  // read file and construct graph info
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
+  REQUIRE(maybe_graph_info.status().ok());
+  auto graph_info = maybe_graph_info.value();
+
+  // construct vertex chunk reader
+  std::string label = "person", property_name = "gender";
+  REQUIRE(graph_info.GetVertexInfo(label).status().ok());
+  auto maybe_group = graph_info.GetVertexPropertyGroup(label, property_name);
+  REQUIRE(maybe_group.status().ok());
+  auto group = maybe_group.value();
+  auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
+      graph_info, label, group);
+  REQUIRE(maybe_reader.status().ok());
+  auto reader = maybe_reader.value();
+
+  SECTION("no pushdown") {
+    std::cout << "Reader & no pushdown:" << std::endl;
+    int i = 0;
+    do {
+      auto result = reader.GetChunk2();
+      REQUIRE(!result.has_error());
+      auto [l, r] = reader.GetRange().value();
+      auto table = result.value();
+      std::cout << "Chunk Index: " << i << ",\tRow Nums: " << table->num_rows()
+                << ",\tTable Range: [" << l << ", " << r << "]" << '\n';
+      i++;
+      reader.next_chunk();
+    } while (i < reader.GetChunkNum());
+  }
+
+  SECTION("pushdown `gender=female`") {
+    std::cout << "\nReader & Pushdown `gender=female`:" << std::endl;
+    reader.seek(0);
+    reader.Filter(cp::equal(cp::field_ref("gender"), cp::literal("female")));
+    int i = 0;
+    do {
+      auto result = reader.GetChunk2();
+      REQUIRE(!result.has_error());
+      auto [l, r] = reader.GetRange().value();
+      auto table = result.value();
+      std::cout << "Chunk Index: " << i << ",\tRow Nums: " << table->num_rows()
+                << ",\tTable Range: [" << l << ", " << r << "]" << '\n';
+      i++;
+      reader.next_chunk();
+    } while (i < reader.GetChunkNum());
+  }
 }
 
 TEST_CASE("test_adj_list_arrow_chunk_reader") {

@@ -33,6 +33,9 @@ limitations under the License.
 namespace arrow {
 class Array;
 class Table;
+namespace compute {
+class Expression;
+}
 }  // namespace arrow
 
 namespace GAR_NAMESPACE_INTERNAL {
@@ -52,19 +55,7 @@ class VertexPropertyArrowChunkReader {
   VertexPropertyArrowChunkReader(const VertexInfo& vertex_info,
                                  const PropertyGroup& property_group,
                                  const std::string& prefix,
-                                 IdType chunk_index = 0)
-      : vertex_info_(vertex_info),
-        property_group_(property_group),
-        chunk_index_(chunk_index),
-        seek_id_(chunk_index * vertex_info.GetChunkSize()),
-        chunk_table_(nullptr) {
-    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
-                              vertex_info.GetPathPrefix(property_group));
-    std::string base_dir = prefix_ + pg_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
-                              utils::GetVertexChunkNum(prefix_, vertex_info));
-  }
+                                 IdType chunk_index = 0);
 
   /**
    * @brief Sets chunk position indicator for reader by internal vertex id.
@@ -98,6 +89,11 @@ class VertexPropertyArrowChunkReader {
   Result<std::shared_ptr<arrow::Table>> GetChunk() noexcept;
 
   /**
+   * @brief Return the current arrow chunk table of chunk position indicator.
+   */
+  Result<std::shared_ptr<arrow::Table>> GetChunk2() noexcept;
+
+  /**
    * @brief Get the vertex id range of current chunk.
    *
    * @return Result: std::pair<begin_id, end_id> or error.
@@ -126,6 +122,8 @@ class VertexPropertyArrowChunkReader {
    */
   IdType GetChunkNum() const noexcept { return chunk_num_; }
 
+  Status Filter(const arrow::compute::Expression& filter);
+
  private:
   VertexInfo vertex_info_;
   PropertyGroup property_group_;
@@ -134,6 +132,7 @@ class VertexPropertyArrowChunkReader {
   IdType seek_id_;
   IdType chunk_num_;
   std::shared_ptr<arrow::Table> chunk_table_;
+  std::shared_ptr<arrow::compute::Expression> filter_;
   std::shared_ptr<FileSystem> fs_;
 };
 

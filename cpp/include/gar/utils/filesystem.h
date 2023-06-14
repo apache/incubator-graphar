@@ -18,6 +18,7 @@ limitations under the License.
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "gar/utils/file_type.h"
 #include "gar/utils/result.h"
@@ -28,6 +29,12 @@ limitations under the License.
 namespace arrow {
 class Buffer;
 class Table;
+namespace compute {
+class Expression;
+}
+namespace dataset {
+class FileFormat;
+}
 namespace fs {
 class FileSystem;
 }
@@ -64,6 +71,19 @@ class FileSystem {
    */
   Result<std::shared_ptr<arrow::Table>> ReadFileToTable(
       const std::string& path, FileType file_type) const noexcept;
+
+  /**
+   * @brief Read and filter a file as an arrow::Table.
+   *
+   * @param path The path of the file to read.
+   * @param file_type The type of the file to read.
+   * @param filters The predictors to apply to the file.
+   * @return A Result containing a std::shared_ptr to an arrow::Table if
+   * successful, or an error Status if unsuccessful.
+   */
+  Result<std::shared_ptr<arrow::Table>> ReadAndFilterFileToTable(
+      const std::string& path, FileType file_type,
+      std::shared_ptr<arrow::compute::Expression> filter) const noexcept;
 
   /**
    * @brief Read a file and convert its bytes to a value of type T.
@@ -115,6 +135,12 @@ class FileSystem {
    */
   Result<IdType> GetFileNumOfDir(const std::string& dir_path,
                                  bool recursive = false) const noexcept;
+
+ private:
+  std::shared_ptr<arrow::dataset::FileFormat> ToFileFormat(
+      const FileType type) const;
+
+  Status CastTableColumnType(std::shared_ptr<arrow::Table> table) const;
 
  private:
   std::shared_ptr<arrow::fs::FileSystem> arrow_fs_;
