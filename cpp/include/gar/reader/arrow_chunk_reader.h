@@ -52,10 +52,10 @@ class VertexPropertyArrowChunkReader {
    * @param property_group The property group that describes the property group.
    * @param prefix The absolute prefix.
    */
-  VertexPropertyArrowChunkReader(const VertexInfo& vertex_info,
-                                 const PropertyGroup& property_group,
-                                 const std::string& prefix,
-                                 IdType chunk_index = 0);
+  VertexPropertyArrowChunkReader(
+      const VertexInfo& vertex_info, const PropertyGroup& property_group,
+      const std::string& prefix, IdType chunk_index = 0,
+      std::shared_ptr<arrow::compute::Expression> filter = nullptr);
 
   /**
    * @brief Sets chunk position indicator for reader by internal vertex id.
@@ -89,11 +89,6 @@ class VertexPropertyArrowChunkReader {
   Result<std::shared_ptr<arrow::Table>> GetChunk() noexcept;
 
   /**
-   * @brief Return the current arrow chunk table of chunk position indicator.
-   */
-  Result<std::shared_ptr<arrow::Table>> GetChunk2() noexcept;
-
-  /**
    * @brief Get the vertex id range of current chunk.
    *
    * @return Result: std::pair<begin_id, end_id> or error.
@@ -122,7 +117,7 @@ class VertexPropertyArrowChunkReader {
    */
   IdType GetChunkNum() const noexcept { return chunk_num_; }
 
-  Status Filter(const arrow::compute::Expression& filter);
+  Status Filter(std::shared_ptr<arrow::compute::Expression> filter);
 
  private:
   VertexInfo vertex_info_;
@@ -586,7 +581,8 @@ class AdjListPropertyArrowChunkReader {
 static inline Result<VertexPropertyArrowChunkReader>
 ConstructVertexPropertyArrowChunkReader(
     const GraphInfo& graph_info, const std::string& label,
-    const PropertyGroup& property_group) noexcept {
+    const PropertyGroup& property_group,
+    std::shared_ptr<arrow::compute::Expression> filter = nullptr) noexcept {
   VertexInfo vertex_info;
   GAR_ASSIGN_OR_RAISE(vertex_info, graph_info.GetVertexInfo(label));
   if (!vertex_info.ContainPropertyGroup(property_group)) {
@@ -594,7 +590,7 @@ ConstructVertexPropertyArrowChunkReader(
                             label, ".");
   }
   return VertexPropertyArrowChunkReader(vertex_info, property_group,
-                                        graph_info.GetPrefix());
+                                        graph_info.GetPrefix(), 0, filter);
 }
 
 /**

@@ -26,17 +26,18 @@ limitations under the License.
 #endif
 
 namespace GAR_NAMESPACE_INTERNAL {
-
+namespace cp = arrow::compute;
 VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
     const VertexInfo& vertex_info, const PropertyGroup& property_group,
-    const std::string& prefix, IdType chunk_index)
+    const std::string& prefix, IdType chunk_index,
+    std::shared_ptr<cp::Expression> filter)
     : vertex_info_(vertex_info),
       property_group_(property_group),
       chunk_index_(chunk_index),
       seek_id_(chunk_index * vertex_info.GetChunkSize()),
       chunk_table_(nullptr),
-      filter_(std::make_shared<arrow::compute::Expression>(
-          arrow::compute::literal(true))) {
+      filter_(filter ? filter
+                     : std::make_shared<cp::Expression>(cp::literal(true))) {
   GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
   GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
                             vertex_info.GetPathPrefix(property_group));
@@ -47,20 +48,6 @@ VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
 
 Result<std::shared_ptr<arrow::Table>>
 VertexPropertyArrowChunkReader::GetChunk() noexcept {
-  if (chunk_table_ == nullptr) {
-    GAR_ASSIGN_OR_RAISE(
-        auto chunk_file_path,
-        vertex_info_.GetFilePath(property_group_, chunk_index_));
-    std::string path = prefix_ + chunk_file_path;
-    GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadFileToTable(
-                                          path, property_group_.GetFileType()));
-  }
-  IdType row_offset = seek_id_ - chunk_index_ * vertex_info_.GetChunkSize();
-  return chunk_table_->Slice(row_offset);
-}
-
-Result<std::shared_ptr<arrow::Table>>
-VertexPropertyArrowChunkReader::GetChunk2() noexcept {
   if (chunk_table_ == nullptr) {
     GAR_ASSIGN_OR_RAISE(
         auto chunk_file_path,
@@ -87,8 +74,8 @@ VertexPropertyArrowChunkReader::GetRange() noexcept {
 }
 
 Status VertexPropertyArrowChunkReader::Filter(
-    const arrow::compute::Expression& filter) {
-  filter_ = std::make_shared<arrow::compute::Expression>(filter);
+    std::shared_ptr<cp::Expression> filter) {
+  filter_ = filter;
   return Status::OK();
 }
 

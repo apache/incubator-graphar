@@ -137,10 +137,8 @@ class FileSystem {
                                  bool recursive = false) const noexcept;
 
  private:
-  std::shared_ptr<arrow::dataset::FileFormat> ToFileFormat(
-      const FileType type) const;
-
-  Status CastTableColumnType(std::shared_ptr<arrow::Table> table) const;
+  std::shared_ptr<arrow::dataset::FileFormat> GetFileFormat(
+      const FileType file_type) const;
 
  private:
   std::shared_ptr<arrow::fs::FileSystem> arrow_fs_;

@@ -106,43 +106,49 @@ TEST_CASE("test_vertex_property_pushdown") {
   std::string label = "person", property_name = "gender";
   REQUIRE(graph_info.GetVertexInfo(label).status().ok());
   auto maybe_group = graph_info.GetVertexPropertyGroup(label, property_name);
+  auto filter = std::make_shared<arrow::compute::Expression>(
+      cp::equal(cp::field_ref("gender"), cp::literal("female")));
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
-  auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
-      graph_info, label, group);
-  REQUIRE(maybe_reader.status().ok());
-  auto reader = maybe_reader.value();
 
-  SECTION("no pushdown") {
-    std::cout << "Reader & no pushdown:" << std::endl;
+  auto walkReader = [&](GAR_NAMESPACE::VertexPropertyArrowChunkReader& reader) {
     int i = 0;
+    int sum = 0;
     do {
-      auto result = reader.GetChunk2();
+      auto result = reader.GetChunk();
       REQUIRE(!result.has_error());
       auto [l, r] = reader.GetRange().value();
       auto table = result.value();
-      std::cout << "Chunk Index: " << i << ",\tRow Nums: " << table->num_rows()
-                << ",\tTable Range: [" << l << ", " << r << "]" << '\n';
+      std::cout << "Chunk : " << i << ",\tNums: " << table->num_rows()
+                << ",\tRange: [" << l << ", " << r << "]" << '\n';
       i++;
+      sum += table->num_rows();
       reader.next_chunk();
     } while (i < reader.GetChunkNum());
+    std::cout << "item size: " << sum << "/"
+              << graph_info.GetVertexInfo(label)->GetChunkSize() *
+                     reader.GetChunkNum()
+              << '\n';
+  };
+
+  SECTION("filter by helper function") {
+    std::cout << "filter by ConstructVertexPropertyArrowChunkReader():"
+              << std::endl;
+    auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
+        graph_info, label, group, filter);
+    REQUIRE(maybe_reader.status().ok());
+    walkReader(maybe_reader.value());
   }
 
-  SECTION("pushdown `gender=female`") {
-    std::cout << "\nReader & Pushdown `gender=female`:" << std::endl;
+  SECTION("filter by function Filter()") {
+    std::cout << "\nfilter by Filter():" << std::endl;
+    auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
+        graph_info, label, group);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
     reader.seek(0);
-    reader.Filter(cp::equal(cp::field_ref("gender"), cp::literal("female")));
-    int i = 0;
-    do {
-      auto result = reader.GetChunk2();
-      REQUIRE(!result.has_error());
-      auto [l, r] = reader.GetRange().value();
-      auto table = result.value();
-      std::cout << "Chunk Index: " << i << ",\tRow Nums: " << table->num_rows()
-                << ",\tTable Range: [" << l << ", " << r << "]" << '\n';
-      i++;
-      reader.next_chunk();
-    } while (i < reader.GetChunkNum());
+    reader.Filter(filter);
+    walkReader(reader);
   }
 }
 
