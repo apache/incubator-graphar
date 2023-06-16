@@ -177,7 +177,8 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
 
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadAndFilterFileToTable(
     const std::string& path, FileType file_type,
-    std::shared_ptr<cp::Expression> filter) const noexcept {
+    std::shared_ptr<cp::Expression> filter,
+    std::optional<std::vector<std::string>> columns) const noexcept {
   std::shared_ptr<ds::FileFormat> format = GetFileFormat(file_type);
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
       auto factory, arrow::dataset::FileSystemDatasetFactory::Make(
@@ -187,6 +188,9 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadAndFilterFileToTable(
   // Read specified columns with a row filter
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
   RETURN_NOT_ARROW_OK(scan_builder->Filter(*filter));
+  if (columns) {
+    RETURN_NOT_ARROW_OK(scan_builder->Project(columns.value()));
+  }
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scanner, scan_builder->Finish());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto table, scanner->ToTable());
   // cast string array to large string array as we need concatenate chunks in

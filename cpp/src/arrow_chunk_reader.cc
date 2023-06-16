@@ -30,14 +30,16 @@ namespace cp = arrow::compute;
 VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
     const VertexInfo& vertex_info, const PropertyGroup& property_group,
     const std::string& prefix, IdType chunk_index,
-    std::shared_ptr<cp::Expression> filter)
+    std::shared_ptr<cp::Expression> filter,
+    std::optional<std::vector<std::string>> columns)
     : vertex_info_(vertex_info),
       property_group_(property_group),
       chunk_index_(chunk_index),
       seek_id_(chunk_index * vertex_info.GetChunkSize()),
       chunk_table_(nullptr),
       filter_(filter ? filter
-                     : std::make_shared<cp::Expression>(cp::literal(true))) {
+                     : std::make_shared<cp::Expression>(cp::literal(true))),
+      columns_(columns) {
   GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
   GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
                             vertex_info.GetPathPrefix(property_group));
@@ -53,9 +55,9 @@ VertexPropertyArrowChunkReader::GetChunk() noexcept {
         auto chunk_file_path,
         vertex_info_.GetFilePath(property_group_, chunk_index_));
     std::string path = prefix_ + chunk_file_path;
-    GAR_ASSIGN_OR_RAISE(chunk_table_,
-                        fs_->ReadAndFilterFileToTable(
-                            path, property_group_.GetFileType(), filter_));
+    GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadAndFilterFileToTable(
+                                          path, property_group_.GetFileType(),
+                                          filter_, columns_));
   }
   IdType row_offset = seek_id_ - chunk_index_ * vertex_info_.GetChunkSize();
   return chunk_table_->Slice(row_offset);
@@ -73,10 +75,21 @@ VertexPropertyArrowChunkReader::GetRange() noexcept {
                         seek_id_ + chunk_table_->num_rows() - row_offset);
 }
 
-Status VertexPropertyArrowChunkReader::Filter(
+void VertexPropertyArrowChunkReader::Filter(
     std::shared_ptr<cp::Expression> filter) {
   filter_ = filter;
-  return Status::OK();
+}
+
+void VertexPropertyArrowChunkReader::ClearFilter() {
+  filter_ = std::make_shared<cp::Expression>(cp::literal(true));
+}
+
+void VertexPropertyArrowChunkReader::Project(std::vector<std::string> columns) {
+  columns_ = std::optional<std::vector<std::string>>(columns);
+}
+
+void VertexPropertyArrowChunkReader::ClearProjection() {
+  columns_ = std::nullopt;
 }
 
 Status AdjListArrowChunkReader::seek_src(IdType id) noexcept {

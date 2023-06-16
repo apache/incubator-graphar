@@ -106,19 +106,24 @@ TEST_CASE("test_vertex_property_pushdown") {
   std::string label = "person", property_name = "gender";
   REQUIRE(graph_info.GetVertexInfo(label).status().ok());
   auto maybe_group = graph_info.GetVertexPropertyGroup(label, property_name);
-  auto filter = std::make_shared<arrow::compute::Expression>(
-      cp::equal(cp::field_ref("gender"), cp::literal("female")));
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
+
+  // pushdown options
+  auto filter = std::make_shared<cp::Expression>(
+      cp::equal(cp::field_ref("gender"), cp::literal("female")));
+  std::vector<std::string> column_names = {"firstName", "lastName"};
 
   auto walkReader = [&](GAR_NAMESPACE::VertexPropertyArrowChunkReader& reader) {
     int i = 0;
     int sum = 0;
+    std::vector<std::string> names;
     do {
       auto result = reader.GetChunk();
       REQUIRE(!result.has_error());
       auto [l, r] = reader.GetRange().value();
       auto table = result.value();
+      names = table->ColumnNames();
       std::cout << "Chunk : " << i << ",\tNums: " << table->num_rows()
                 << ",\tRange: [" << l << ", " << r << "]" << '\n';
       i++;
@@ -129,13 +134,18 @@ TEST_CASE("test_vertex_property_pushdown") {
               << graph_info.GetVertexInfo(label)->GetChunkSize() *
                      reader.GetChunkNum()
               << '\n';
+    std::cout << "Column names: ";
+    for (const auto& n : names) {
+      std::cout << n << ' ';
+    }
+    std::cout << '\n';
   };
 
   SECTION("filter by helper function") {
     std::cout << "filter by ConstructVertexPropertyArrowChunkReader():"
               << std::endl;
     auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
-        graph_info, label, group, filter);
+        graph_info, label, group, filter, column_names);
     REQUIRE(maybe_reader.status().ok());
     walkReader(maybe_reader.value());
   }
@@ -146,8 +156,8 @@ TEST_CASE("test_vertex_property_pushdown") {
         graph_info, label, group);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
-    reader.seek(0);
     reader.Filter(filter);
+    reader.Project(column_names);
     walkReader(reader);
   }
 }

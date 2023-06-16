@@ -17,6 +17,7 @@ limitations under the License.
 #define GAR_READER_ARROW_CHUNK_READER_H_
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -55,7 +56,8 @@ class VertexPropertyArrowChunkReader {
   VertexPropertyArrowChunkReader(
       const VertexInfo& vertex_info, const PropertyGroup& property_group,
       const std::string& prefix, IdType chunk_index = 0,
-      std::shared_ptr<arrow::compute::Expression> filter = nullptr);
+      std::shared_ptr<arrow::compute::Expression> filter = nullptr,
+      std::optional<std::vector<std::string>> columns = std::nullopt);
 
   /**
    * @brief Sets chunk position indicator for reader by internal vertex id.
@@ -117,7 +119,11 @@ class VertexPropertyArrowChunkReader {
    */
   IdType GetChunkNum() const noexcept { return chunk_num_; }
 
-  Status Filter(std::shared_ptr<arrow::compute::Expression> filter);
+  void Filter(std::shared_ptr<arrow::compute::Expression> filter);
+  void ClearFilter();
+
+  void Project(std::vector<std::string> columns);
+  void ClearProjection();
 
  private:
   VertexInfo vertex_info_;
@@ -128,6 +134,7 @@ class VertexPropertyArrowChunkReader {
   IdType chunk_num_;
   std::shared_ptr<arrow::Table> chunk_table_;
   std::shared_ptr<arrow::compute::Expression> filter_;
+  std::optional<std::vector<std::string>> columns_;
   std::shared_ptr<FileSystem> fs_;
 };
 
@@ -582,15 +589,16 @@ static inline Result<VertexPropertyArrowChunkReader>
 ConstructVertexPropertyArrowChunkReader(
     const GraphInfo& graph_info, const std::string& label,
     const PropertyGroup& property_group,
-    std::shared_ptr<arrow::compute::Expression> filter = nullptr) noexcept {
+    std::shared_ptr<arrow::compute::Expression> filter = nullptr,
+    std::optional<std::vector<std::string>> columns = std::nullopt) noexcept {
   VertexInfo vertex_info;
   GAR_ASSIGN_OR_RAISE(vertex_info, graph_info.GetVertexInfo(label));
   if (!vertex_info.ContainPropertyGroup(property_group)) {
     return Status::KeyError("No property group ", property_group, " in vertex ",
                             label, ".");
   }
-  return VertexPropertyArrowChunkReader(vertex_info, property_group,
-                                        graph_info.GetPrefix(), 0, filter);
+  return VertexPropertyArrowChunkReader(
+      vertex_info, property_group, graph_info.GetPrefix(), 0, filter, columns);
 }
 
 /**

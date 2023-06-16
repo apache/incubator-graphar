@@ -17,6 +17,7 @@ limitations under the License.
 #define GAR_UTILS_FILESYSTEM_H_
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -83,7 +84,8 @@ class FileSystem {
    */
   Result<std::shared_ptr<arrow::Table>> ReadAndFilterFileToTable(
       const std::string& path, FileType file_type,
-      std::shared_ptr<arrow::compute::Expression> filter) const noexcept;
+      std::shared_ptr<arrow::compute::Expression> filter,
+      std::optional<std::vector<std::string>> columns) const noexcept;
 
   /**
    * @brief Read a file and convert its bytes to a value of type T.
