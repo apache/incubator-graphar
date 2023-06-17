@@ -110,9 +110,8 @@ TEST_CASE("test_vertex_property_pushdown") {
   auto group = maybe_group.value();
 
   // pushdown options
-  auto filter = std::make_shared<cp::Expression>(
-      cp::equal(cp::field_ref("gender"), cp::literal("female")));
-  std::vector<std::string> column_names = {"firstName", "lastName"};
+  auto filter = cp::equal(cp::field_ref("gender"), cp::literal("female"));
+  std::vector<std::string> columns = {"firstName", "lastName"};
 
   auto walkReader = [&](GAR_NAMESPACE::VertexPropertyArrowChunkReader& reader) {
     int i = 0;
@@ -124,7 +123,7 @@ TEST_CASE("test_vertex_property_pushdown") {
       auto [l, r] = reader.GetRange().value();
       auto table = result.value();
       names = table->ColumnNames();
-      std::cout << "Chunk : " << i << ",\tNums: " << table->num_rows()
+      std::cout << "Chunk: " << i << ",\tNums: " << table->num_rows()
                 << ",\tRange: [" << l << ", " << r << "]" << '\n';
       i++;
       sum += table->num_rows();
@@ -141,23 +140,22 @@ TEST_CASE("test_vertex_property_pushdown") {
     std::cout << '\n';
   };
 
-  SECTION("filter by helper function") {
-    std::cout << "filter by ConstructVertexPropertyArrowChunkReader():"
-              << std::endl;
+  SECTION("pushdown by helper function") {
+    std::cout << "pushdown by helper function: \n";
     auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
-        graph_info, label, group, filter, column_names);
+        graph_info, label, group, {filter, columns});
     REQUIRE(maybe_reader.status().ok());
     walkReader(maybe_reader.value());
   }
 
-  SECTION("filter by function Filter()") {
-    std::cout << "\nfilter by Filter():" << std::endl;
+  SECTION("pushdown by function Filter()") {
+    std::cout << "\npushdown by Filter():" << std::endl;
     auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
         graph_info, label, group);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     reader.Filter(filter);
-    reader.Project(column_names);
+    reader.Project(columns);
     walkReader(reader);
   }
 }

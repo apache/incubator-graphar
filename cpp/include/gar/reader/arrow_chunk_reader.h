@@ -22,6 +22,7 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
+#include "arrow/compute/api.h"
 #include "gar/graph_info.h"
 #include "gar/utils/data_type.h"
 #include "gar/utils/filesystem.h"
@@ -41,6 +42,16 @@ class Expression;
 
 namespace GAR_NAMESPACE_INTERNAL {
 
+using Columns = std::vector<std::string>;
+struct FilterOptions {
+  std::optional<arrow::compute::Expression> filter;
+  std::optional<Columns> columns;
+
+  FilterOptions() : filter(std::nullopt), columns(std::nullopt) {}
+  FilterOptions(arrow::compute::Expression f, Columns cols)
+      : filter(f), columns(cols) {}
+};
+
 /**
  * @brief The arrow chunk reader for vertex property group.
  */
@@ -53,11 +64,11 @@ class VertexPropertyArrowChunkReader {
    * @param property_group The property group that describes the property group.
    * @param prefix The absolute prefix.
    */
-  VertexPropertyArrowChunkReader(
-      const VertexInfo& vertex_info, const PropertyGroup& property_group,
-      const std::string& prefix, IdType chunk_index = 0,
-      std::shared_ptr<arrow::compute::Expression> filter = nullptr,
-      std::optional<std::vector<std::string>> columns = std::nullopt);
+  VertexPropertyArrowChunkReader(const VertexInfo& vertex_info,
+                                 const PropertyGroup& property_group,
+                                 const std::string& prefix,
+                                 IdType chunk_index = 0,
+                                 const FilterOptions& opts = {});
 
   /**
    * @brief Sets chunk position indicator for reader by internal vertex id.
@@ -119,10 +130,10 @@ class VertexPropertyArrowChunkReader {
    */
   IdType GetChunkNum() const noexcept { return chunk_num_; }
 
-  void Filter(std::shared_ptr<arrow::compute::Expression> filter);
+  void Filter(arrow::compute::Expression filter);
   void ClearFilter();
 
-  void Project(std::vector<std::string> columns);
+  void Project(Columns columns);
   void ClearProjection();
 
  private:
@@ -133,8 +144,7 @@ class VertexPropertyArrowChunkReader {
   IdType seek_id_;
   IdType chunk_num_;
   std::shared_ptr<arrow::Table> chunk_table_;
-  std::shared_ptr<arrow::compute::Expression> filter_;
-  std::optional<std::vector<std::string>> columns_;
+  FilterOptions filter_options_;
   std::shared_ptr<FileSystem> fs_;
 };
 
@@ -589,16 +599,15 @@ static inline Result<VertexPropertyArrowChunkReader>
 ConstructVertexPropertyArrowChunkReader(
     const GraphInfo& graph_info, const std::string& label,
     const PropertyGroup& property_group,
-    std::shared_ptr<arrow::compute::Expression> filter = nullptr,
-    std::optional<std::vector<std::string>> columns = std::nullopt) noexcept {
+    const FilterOptions& opts = {}) noexcept {
   VertexInfo vertex_info;
   GAR_ASSIGN_OR_RAISE(vertex_info, graph_info.GetVertexInfo(label));
   if (!vertex_info.ContainPropertyGroup(property_group)) {
     return Status::KeyError("No property group ", property_group, " in vertex ",
                             label, ".");
   }
-  return VertexPropertyArrowChunkReader(
-      vertex_info, property_group, graph_info.GetPrefix(), 0, filter, columns);
+  return VertexPropertyArrowChunkReader(vertex_info, property_group,
+                                        graph_info.GetPrefix(), 0, opts);
 }
 
 /**

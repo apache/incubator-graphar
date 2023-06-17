@@ -22,16 +22,11 @@ limitations under the License.
 #include "arrow/util/uri.h"
 #include "parquet/arrow/reader.h"
 #include "parquet/arrow/writer.h"
-#if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
-#include "arrow/compute/expression.h"
-#else
-#include "arrow/compute/exec/expression.h"
-#endif
-#include "arrow/dataset/api.h"
+
+#include "gar/reader/arrow_chunk_reader.h"
 #include "gar/utils/filesystem.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
-namespace cp = arrow::compute;
 namespace ds = arrow::dataset;
 namespace detail {
 template <typename U, typename T>
@@ -177,8 +172,7 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
 
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadAndFilterFileToTable(
     const std::string& path, FileType file_type,
-    std::shared_ptr<cp::Expression> filter,
-    std::optional<std::vector<std::string>> columns) const noexcept {
+    const FilterOptions& opts) const noexcept {
   std::shared_ptr<ds::FileFormat> format = GetFileFormat(file_type);
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
       auto factory, arrow::dataset::FileSystemDatasetFactory::Make(
@@ -187,7 +181,10 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadAndFilterFileToTable(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto dataset, factory->Finish());
   // Read specified columns with a row filter
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
-  RETURN_NOT_ARROW_OK(scan_builder->Filter(*filter));
+  auto&& [filter, columns] = opts;
+  if (filter) {
+    RETURN_NOT_ARROW_OK(scan_builder->Filter(filter.value()));
+  }
   if (columns) {
     RETURN_NOT_ARROW_OK(scan_builder->Project(columns.value()));
   }

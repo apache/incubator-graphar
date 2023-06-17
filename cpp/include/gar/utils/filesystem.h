@@ -26,6 +26,9 @@ limitations under the License.
 #include "gar/utils/status.h"
 #include "gar/utils/utils.h"
 
+#include "arrow/compute/api.h"
+#include "arrow/dataset/api.h"
+
 // forward declarations
 namespace arrow {
 class Buffer;
@@ -45,6 +48,8 @@ class RandomAccessFile;
 }  // namespace arrow
 
 namespace GAR_NAMESPACE_INTERNAL {
+
+struct FilterOptions;
 
 /**
  * This class wraps an arrow::fs::FileSystem and provides methods for
@@ -78,14 +83,13 @@ class FileSystem {
    *
    * @param path The path of the file to read.
    * @param file_type The type of the file to read.
-   * @param filters The predictors to apply to the file.
+   * @param opts Filter condition and columns to be read
    * @return A Result containing a std::shared_ptr to an arrow::Table if
    * successful, or an error Status if unsuccessful.
    */
   Result<std::shared_ptr<arrow::Table>> ReadAndFilterFileToTable(
       const std::string& path, FileType file_type,
-      std::shared_ptr<arrow::compute::Expression> filter,
-      std::optional<std::vector<std::string>> columns) const noexcept;
+      const FilterOptions& opts) const noexcept;
 
   /**
    * @brief Read a file and convert its bytes to a value of type T.
