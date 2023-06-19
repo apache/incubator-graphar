@@ -22,22 +22,6 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 namespace cp = arrow::compute;
-VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
-    const VertexInfo& vertex_info, const PropertyGroup& property_group,
-    const std::string& prefix, IdType chunk_index, const FilterOptions& opts)
-    : vertex_info_(vertex_info),
-      property_group_(property_group),
-      chunk_index_(chunk_index),
-      seek_id_(chunk_index * vertex_info.GetChunkSize()),
-      chunk_table_(nullptr),
-      filter_options_(opts) {
-  GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
-  GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
-                            vertex_info.GetPathPrefix(property_group));
-  std::string base_dir = prefix_ + pg_path_prefix;
-  GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
-                            utils::GetVertexChunkNum(prefix_, vertex_info));
-}
 
 Result<std::shared_ptr<arrow::Table>>
 VertexPropertyArrowChunkReader::GetChunk() noexcept {
@@ -66,20 +50,20 @@ VertexPropertyArrowChunkReader::GetRange() noexcept {
                         seek_id_ + chunk_table_->num_rows() - row_offset);
 }
 
-void VertexPropertyArrowChunkReader::Filter(cp::Expression filter) {
+void VertexPropertyArrowChunkReader::Filter(cp::Expression* filter) {
   filter_options_.filter = filter;
 }
 
 void VertexPropertyArrowChunkReader::ClearFilter() {
-  filter_options_.filter = {};
+  filter_options_.filter = nullptr;
 }
 
-void VertexPropertyArrowChunkReader::Project(Columns columns) {
+void VertexPropertyArrowChunkReader::Project(Columns* columns) {
   filter_options_.columns = columns;
 }
 
 void VertexPropertyArrowChunkReader::ClearProjection() {
-  filter_options_.columns = {};
+  filter_options_.columns = nullptr;
 }
 
 Status AdjListArrowChunkReader::seek_src(IdType id) noexcept {
@@ -264,11 +248,28 @@ AdjListPropertyArrowChunkReader::GetChunk() noexcept {
         edge_info_.GetPropertyFilePath(property_group_, adj_list_type_,
                                        vertex_chunk_index_, chunk_index_));
     std::string path = prefix_ + chunk_file_path;
-    GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadFileToTable(
-                                          path, property_group_.GetFileType()));
+    GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadAndFilterFileToTable(
+                                          path, property_group_.GetFileType(),
+                                          filter_options_));
   }
   IdType row_offset = seek_offset_ - chunk_index_ * edge_info_.GetChunkSize();
   return chunk_table_->Slice(row_offset);
+}
+
+void AdjListPropertyArrowChunkReader::Filter(cp::Expression* filter) {
+  filter_options_.filter = (filter);
+}
+
+void AdjListPropertyArrowChunkReader::ClearFilter() {
+  filter_options_.filter = nullptr;
+}
+
+void AdjListPropertyArrowChunkReader::Project(Columns* columns) {
+  filter_options_.columns = columns;
+}
+
+void AdjListPropertyArrowChunkReader::ClearProjection() {
+  filter_options_.columns = nullptr;
 }
 
 }  // namespace GAR_NAMESPACE_INTERNAL

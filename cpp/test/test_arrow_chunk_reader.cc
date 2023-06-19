@@ -105,6 +105,7 @@ TEST_CASE("test_vertex_property_pushdown") {
   // construct vertex chunk reader
   std::string label = "person", property_name = "gender";
   REQUIRE(graph_info.GetVertexInfo(label).status().ok());
+  const auto chunk_size = graph_info.GetVertexInfo(label)->GetChunkSize();
   auto maybe_group = graph_info.GetVertexPropertyGroup(label, property_name);
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
@@ -123,39 +124,37 @@ TEST_CASE("test_vertex_property_pushdown") {
       auto [l, r] = reader.GetRange().value();
       auto table = result.value();
       names = table->ColumnNames();
-      std::cout << "Chunk: " << i << ",\tNums: " << table->num_rows()
-                << ",\tRange: [" << l << ", " << r << "]" << '\n';
+      std::cout << "Chunk: " << i << ",\tNums: " << table->num_rows() << "/"
+                << chunk_size << ",\tRange: [" << l << ", " << r << "]" << '\n';
       i++;
       sum += table->num_rows();
-      reader.next_chunk();
-    } while (i < reader.GetChunkNum());
+    } while (!reader.next_chunk().IsOutOfRange());
     std::cout << "item size: " << sum << "/"
-              << graph_info.GetVertexInfo(label)->GetChunkSize() *
-                     reader.GetChunkNum()
-              << '\n';
+              << reader.GetChunkNum() * chunk_size << '\n';
     std::cout << "Column names: ";
     for (const auto& n : names) {
       std::cout << n << ' ';
     }
-    std::cout << '\n';
+    std::cout << "\n\n";
   };
 
   SECTION("pushdown by helper function") {
-    std::cout << "pushdown by helper function: \n";
+    std::cout << "vertex property pushdown by helper function: \n";
     auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
-        graph_info, label, group, {filter, columns});
+        graph_info, label, group, {&filter, &columns});
     REQUIRE(maybe_reader.status().ok());
     walkReader(maybe_reader.value());
   }
 
-  SECTION("pushdown by function Filter()") {
-    std::cout << "\npushdown by Filter():" << std::endl;
+  SECTION("pushdown by function Filter() & Project()") {
+    std::cout << "vertex property pushdown by Filter() & Project():"
+              << std::endl;
     auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
         graph_info, label, group);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
-    reader.Filter(filter);
-    reader.Project(columns);
+    reader.Filter(&filter);
+    reader.Project(&columns);
     walkReader(reader);
   }
 }
@@ -269,6 +268,80 @@ TEST_CASE("test_adj_list_property_arrow_chunk_reader") {
   REQUIRE(table->num_rows() == 4);
 
   REQUIRE(reader.next_chunk().IsIndexError());
+}
+
+TEST_CASE("test_adj_list_property_pushdown") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
+  // read file and construct graph info
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
+  REQUIRE(maybe_graph_info.status().ok());
+  auto graph_info = maybe_graph_info.value();
+
+  std::string src_label = "person", edge_label = "knows", dst_label = "person",
+              property_name = "creationDate";
+  REQUIRE(
+      graph_info.GetEdgeInfo(src_label, edge_label, dst_label).status().ok());
+  const auto chunk_size =
+      graph_info.GetEdgeInfo(src_label, edge_label, dst_label)->GetChunkSize();
+  auto maybe_group = graph_info.GetEdgePropertyGroup(
+      src_label, edge_label, dst_label, property_name,
+      GAR_NAMESPACE::AdjListType::ordered_by_source);
+  REQUIRE(maybe_group.status().ok());
+  auto group = maybe_group.value();
+
+  auto filter = cp::greater_equal(cp::field_ref("creationDate"),
+                                  cp::literal("2012-06-02T04:30:44.526+0000"));
+  std::vector<std::string> columns = {"creationDate"};
+  GAR_NAMESPACE::FilterOptions opts{&filter, &columns};
+
+  auto walkReader =
+      [&](GAR_NAMESPACE::AdjListPropertyArrowChunkReader& reader) {
+        int i = 0;
+        int sum = 0;
+        std::vector<std::string> names;
+        do {
+          auto result = reader.GetChunk();
+          REQUIRE(!result.has_error());
+          auto table = result.value();
+          names = table->ColumnNames();
+          std::cout << "Chunk: " << i << ",\tNums: " << table->num_rows() << "/"
+                    << chunk_size << '\n';
+          i++;
+          sum += table->num_rows();
+        } while (!reader.next_chunk().IsOutOfRange());
+        std::cout << "item size: " << sum << "/" << i * chunk_size << '\n';
+        std::cout << "Column names: ";
+        for (const auto& n : names) {
+          std::cout << n << ' ';
+        }
+        std::cout << "\n\n";
+      };
+
+  SECTION("pushdown by helper function") {
+    std::cout << "adj list property pushdown by helper function: \n";
+    auto maybe_reader = GAR_NAMESPACE::ConstructAdjListPropertyArrowChunkReader(
+        graph_info, src_label, edge_label, dst_label, group,
+        GAR_NAMESPACE::AdjListType::ordered_by_source, opts);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    walkReader(reader);
+  }
+
+  SECTION("pushdown by function Filter() & Project()") {
+    std::cout << "vertex property pushdown by Filter() & Project():"
+              << std::endl;
+    auto maybe_reader = GAR_NAMESPACE::ConstructAdjListPropertyArrowChunkReader(
+        graph_info, src_label, edge_label, dst_label, group,
+        GAR_NAMESPACE::AdjListType::ordered_by_source);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    reader.Filter(&filter);
+    reader.Project(&columns);
+    walkReader(reader);
+  }
 }
 
 TEST_CASE("test_read_adj_list_offset_chunk_example") {

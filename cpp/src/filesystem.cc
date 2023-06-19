@@ -181,12 +181,11 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadAndFilterFileToTable(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto dataset, factory->Finish());
   // Read specified columns with a row filter
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
-  auto&& [filter, columns] = opts;
-  if (filter) {
-    RETURN_NOT_ARROW_OK(scan_builder->Filter(filter.value()));
+  if (opts.filter) {
+    RETURN_NOT_ARROW_OK(scan_builder->Filter(*opts.filter));
   }
-  if (columns) {
-    RETURN_NOT_ARROW_OK(scan_builder->Project(columns.value()));
+  if (opts.columns) {
+    RETURN_NOT_ARROW_OK(scan_builder->Project(*opts.columns));
   }
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scanner, scan_builder->Finish());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto table, scanner->ToTable());
