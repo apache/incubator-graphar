@@ -14,10 +14,9 @@ limitations under the License.
 */
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "common/error.h"
 #include "property/row.h"
-}
 
 #define __grin_get_gar_vertex(_v)                           \
   if (_v->vertex.has_value() == false) {                    \

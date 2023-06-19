@@ -14,10 +14,9 @@ limitations under the License.
 */
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "common/error.h"
 #include "property/property.h"
-}
 
 #define __grin_get_gar_vertex(_v)                           \
   if (_v->vertex.has_value() == false) {                    \
@@ -75,7 +74,7 @@ GRIN_VERTEX_PROPERTY_LIST grin_get_vertex_properties_by_name(GRIN_GRAPH g,
   }
   if (vpl->size() == 0) {
     delete vpl;
-    return GRIN_NULL_LIST;
+    return GRIN_NULL_VERTEX_PROPERTY_LIST;
   } else {
     return vpl;
   }
@@ -114,7 +113,7 @@ GRIN_EDGE_PROPERTY_LIST grin_get_edge_properties_by_name(GRIN_GRAPH g,
   }
   if (epl->size() == 0) {
     delete epl;
-    return GRIN_NULL_LIST;
+    return GRIN_NULL_EDGE_PROPERTY_LIST;
   } else {
     return epl;
   }

@@ -16,9 +16,15 @@ limitations under the License.
 #include <utility>
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "property/primarykey.h"
-}
+
+#define __grin_get_gar_vertex(_v)                           \
+  if (_v->vertex.has_value() == false) {                    \
+    auto& vertices = _g->vertices_collections[_v->type_id]; \
+    auto it = vertices.begin() + _v->id;                    \
+    _v->vertex = *it;                                       \
+  }
 
 #ifdef GRIN_ENABLE_VERTEX_PRIMARY_KEYS
 GRIN_VERTEX_TYPE_LIST grin_get_vertex_types_with_primary_keys(GRIN_GRAPH g) {
@@ -40,7 +46,7 @@ GRIN_VERTEX_PROPERTY_LIST grin_get_primary_keys_by_vertex_type(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   if (vtype >= _g->vertex_type_num)
-    return GRIN_NULL_LIST;
+    return GRIN_NULL_VERTEX_PROPERTY_LIST;
   auto vpl = new GRIN_VERTEX_PROPERTY_LIST_T();
   for (unsigned i = _g->vertex_property_offsets[vtype];
        i < _g->vertex_property_offsets[vtype + 1]; ++i) {
@@ -50,74 +56,52 @@ GRIN_VERTEX_PROPERTY_LIST grin_get_primary_keys_by_vertex_type(
   return vpl;
 }
 
-GRIN_VERTEX grin_get_vertex_by_primary_keys(GRIN_GRAPH g,
-                                            GRIN_VERTEX_TYPE vtype,
-                                            GRIN_ROW r) {
+GRIN_ROW grin_get_vertex_primary_keys_row(GRIN_GRAPH g, GRIN_VERTEX v) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
-  auto vpl = grin_get_primary_keys_by_vertex_type(g, vtype);
-  auto _vpl = static_cast<GRIN_VERTEX_PROPERTY_LIST_T*>(vpl);
-  if (_vpl->size() == 0 || r == GRIN_NULL_ROW)
-    return GRIN_NULL_VERTEX;
-  auto _r = static_cast<GRIN_ROW_T*>(r);
+  auto _v = static_cast<GRIN_VERTEX_T*>(v);
+  __grin_get_gar_vertex(_v);
 
-  // traverse all vertices
-  auto& vertices = _g->vertices_collections[vtype];
-  auto it_end = vertices.end();
-  for (auto it = vertices.begin(); it != it_end; it++) {
-    bool flag = true;
-    unsigned idx = 0;
-    for (auto& vp : *_vpl) {
-      auto& property = _g->vertex_properties[vp];
-      auto& name = property.name;
-      auto type = property.type;
-      switch (type) {
-      case GRIN_DATATYPE::Int32: {
-        auto p1 = std::any_cast<int32_t>((*_r)[idx++]);
-        auto p2 = it.property<int32_t>(name).value();
-        if (p1 != p2)
-          flag = false;
-        break;
-      }
-      case GRIN_DATATYPE::Int64: {
-        auto p1 = std::any_cast<int64_t>((*_r)[idx++]);
-        auto p2 = it.property<int64_t>(name).value();
-        if (p1 != p2)
-          flag = false;
-        break;
-      }
-      case GRIN_DATATYPE::Float: {
-        auto p1 = std::any_cast<float>((*_r)[idx++]);
-        auto p2 = it.property<float>(name).value();
-        if (p1 != p2)
-          flag = false;
-        break;
-      }
-      case GRIN_DATATYPE::Double: {
-        auto p1 = std::any_cast<double>((*_r)[idx++]);
-        auto p2 = it.property<double>(name).value();
-        if (p1 != p2)
-          flag = false;
-        break;
-      }
-      case GRIN_DATATYPE::String: {
-        auto&& p1 = std::any_cast<std::string>((*_r)[idx++]);
-        auto p2 = it.property<std::string>(name).value();
-        if (p1 != p2)
-          flag = false;
-        break;
-      }
-      default:
-        flag = false;
-      }
-      if (!flag)
-        break;
+  auto r = new GRIN_ROW_T();
+  for (auto vp = _g->vertex_property_offsets[_v->type_id];
+       vp < _g->vertex_property_offsets[_v->type_id + 1]; ++vp) {
+    auto& property = _g->vertex_properties[vp];
+    if (!property.is_primary)
+      continue;
+
+    switch (property.type) {
+    case GRIN_DATATYPE::Int32: {
+      auto value = _v->vertex.value().property<int32_t>(property.name).value();
+      r->push_back(value);
+      break;
     }
-    if (flag) {
-      auto v = new GRIN_VERTEX_T(it.id(), vtype);
-      return v;
+    case GRIN_DATATYPE::Int64: {
+      auto value = _v->vertex.value().property<int64_t>(property.name).value();
+      r->push_back(value);
+      break;
+    }
+    case GRIN_DATATYPE::Float: {
+      auto value = _v->vertex.value().property<float>(property.name).value();
+      r->push_back(value);
+      break;
+    }
+    case GRIN_DATATYPE::Double: {
+      auto value = _v->vertex.value().property<double>(property.name).value();
+      r->push_back(value);
+      break;
+    }
+    case GRIN_DATATYPE::String: {
+      auto value =
+          _v->vertex.value().property<std::string>(property.name).value();
+      r->push_back(std::move(value));
+      break;
+    }
+    default: {
+      delete r;
+      return GRIN_NULL_ROW;
+    }
     }
   }
-  return GRIN_NULL_VERTEX;
+  return r;
 }
 #endif
 

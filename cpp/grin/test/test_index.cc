@@ -19,8 +19,8 @@ limitations under the License.
 #include "grin/test/config.h"
 
 // GRIN headers
+#include "index/internal_id.h"
 #include "index/order.h"
-#include "index/original_id.h"
 #include "property/topology.h"
 #include "property/type.h"
 #include "topology/structure.h"
@@ -55,41 +55,45 @@ void test_index_order(GRIN_GRAPH graph) {
   std::cout << "---- test index: order completed ----" << std::endl;
 }
 
-void test_original_id(GRIN_GRAPH graph) {
-  std::cout << "\n++++ test index: original id ++++" << std::endl;
+void test_internal_id(GRIN_GRAPH graph) {
+  std::cout << "\n++++ test index: internal id ++++" << std::endl;
 
-  std::cout << "test vertex original id" << std::endl;
+  std::cout << "test vertex internal id" << std::endl;
   auto vtype = grin_get_vertex_type_by_id(graph, 0);
   auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
   size_t idx0 = 0, idx1 = 1;
   auto v0 = grin_get_vertex_from_list(graph, vertex_list, idx0);
   auto v1 = grin_get_vertex_from_list(graph, vertex_list, idx1);
 
-  // orignal id datatype
-  auto type = grin_get_vertex_original_id_datatype(graph);
-  ASSERT(type == GRIN_DATATYPE::Int64);
+  // get internal id of vertex
+  auto id0 = grin_get_vertex_internal_id_by_type(graph, vtype, v0);
+  auto id1 = grin_get_vertex_internal_id_by_type(graph, vtype, v1);
+  std::cout << "internal id of v0 = " << id0 << std::endl;
+  std::cout << "internal id of v1 = " << id1 << std::endl;
 
-  // get original id of vertex
-  auto oid0 = grin_get_vertex_original_id_of_int64(graph, v0);
-  auto oid1 = grin_get_vertex_original_id_of_int64(graph, v1);
-  std::cout << "original id of v0 = " << oid0 << std::endl;
-  std::cout << "original id of v1 = " << oid1 << std::endl;
+  // get vertex by internal id
+  auto v0_from_id = grin_get_vertex_by_internal_id_by_type(graph, vtype, id0);
+  auto v1_from_id = grin_get_vertex_by_internal_id_by_type(graph, vtype, id1);
+  ASSERT(grin_equal_vertex(graph, v0, v0_from_id) == true);
+  ASSERT(grin_equal_vertex(graph, v1, v1_from_id) == true);
 
-  // get vertex by original id
-  auto v0_from_oid = grin_get_vertex_by_original_id_of_int64(graph, oid0);
-  auto v1_from_oid = grin_get_vertex_by_original_id_of_int64(graph, oid1);
-  ASSERT(grin_equal_vertex(graph, v0, v0_from_oid) == true);
-  ASSERT(grin_equal_vertex(graph, v1, v1_from_oid) == true);
+  // get upper bound and lower bound of internal id
+  auto upper_bound =
+      grin_get_vertex_internal_id_upper_bound_by_type(graph, vtype);
+  auto lower_bound =
+      grin_get_vertex_internal_id_lower_bound_by_type(graph, vtype);
+  std::cout << "upper bound of internal id = " << upper_bound << std::endl;
+  std::cout << "lower bound of internal id = " << lower_bound << std::endl;
 
   // destroy
   grin_destroy_vertex(graph, v0);
   grin_destroy_vertex(graph, v1);
-  grin_destroy_vertex(graph, v0_from_oid);
-  grin_destroy_vertex(graph, v1_from_oid);
+  grin_destroy_vertex(graph, v0_from_id);
+  grin_destroy_vertex(graph, v1_from_id);
   grin_destroy_vertex_list(graph, vertex_list);
   grin_destroy_vertex_type(graph, vtype);
 
-  std::cout << "---- test index: original id completed ----" << std::endl;
+  std::cout << "---- test index: internal id completed ----" << std::endl;
 }
 
 int main(int argc, char* argv[]) {
@@ -97,18 +101,16 @@ int main(int argc, char* argv[]) {
   std::string path = TEST_DATA_PATH;
   std::cout << "GraphInfo path = " << path << std::endl;
 
-  char** args = new char*[1];
-  args[0] = new char[path.length() + 1];
-  snprintf(args[0], path.length() + 1, "%s", path.c_str());
-  GRIN_GRAPH graph = grin_get_graph_from_storage(1, args);
-  delete[] args[0];
-  delete[] args;
+  char* id = new char[path.length() + 1];
+  snprintf(id, path.length() + 1, "%s", path.c_str());
+  GRIN_GRAPH graph = grin_get_graph_from_storage(id, NULL);
+  delete[] id;
 
   // test index order
   test_index_order(graph);
 
-  // test original id
-  test_original_id(graph);
+  // test internal id
+  test_internal_id(graph);
 
   // destroy graph
   grin_destroy_graph(graph);

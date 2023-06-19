@@ -23,8 +23,8 @@ limitations under the License.
 #include "grin/predefine.h"
 
 // GRIN headers
+#include "index/internal_id.h"
 #include "index/order.h"
-#include "index/original_id.h"
 #include "partition/partition.h"
 #include "partition/reference.h"
 #include "partition/topology.h"
@@ -229,20 +229,12 @@ int main(int argc, char* argv[]) {
   }
 
   // get partitioned graph from graph info of GraphAr
-  char** args = new char*[3];
-  args[0] = new char[path.length() + 1];
-  snprintf(args[0], path.length() + 1, "%s", path.c_str());
-  args[1] = new char[2];
-  snprintf(args[1], sizeof(args[1]), "%d", partition_num);
-  args[2] = new char[2];
-  uint32_t strategy = 0;  // segmented
-  snprintf(args[2], sizeof(args[2]), "%d", strategy);
-  GRIN_PARTITIONED_GRAPH pg = grin_get_partitioned_graph_from_storage(3, args);
-  // destroy args
-  delete[] args[0];
-  delete[] args[1];
-  delete[] args[2];
-  delete[] args;
+  std::string partitioned_path =
+      path + ":" + std::to_string(partition_num) + ":" + "segmented";
+  char* id = new char[partitioned_path.length() + 1];
+  snprintf(id, partitioned_path.length() + 1, "%s", partitioned_path.c_str());
+  GRIN_PARTITIONED_GRAPH pg = grin_get_partitioned_graph_from_storage(id, NULL);
+  delete[] id;
   // get local graph from partitioned graph
   GRIN_GRAPH graph = init(pg, pid);
 

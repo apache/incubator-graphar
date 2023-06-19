@@ -14,14 +14,13 @@ limitations under the License.
 */
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "topology/structure.h"
-}
 
-GRIN_GRAPH grin_get_graph_from_storage(int argc, char** argv) {
-  if (argc < 1)
+GRIN_GRAPH grin_get_graph_from_storage(const char* id, const char* version) {
+  if (id == NULL)
     return GRIN_NULL_GRAPH;
-  return get_graph_by_info_path(std::string(argv[0]));
+  return get_graph_by_info_path(std::string(id));
 }
 
 void grin_destroy_graph(GRIN_GRAPH g) {

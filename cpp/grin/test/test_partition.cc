@@ -26,19 +26,19 @@ void test_partition_partition(GRIN_PARTITIONED_GRAPH pg, unsigned n) {
   std::cout << "\n++++ test partition: partition ++++" << std::endl;
 
   // check partition number
-  ASSERT(pg != GRIN_NULL_GRAPH);
+  ASSERT(pg != GRIN_NULL_PARTITIONED_GRAPH);
   auto partition_num = grin_get_total_partitions_number(pg);
   ASSERT(partition_num == n);
 
   // check partition list
   auto partition_list = grin_get_local_partition_list(pg);
-  ASSERT(partition_list != GRIN_NULL_LIST);
+  ASSERT(partition_list != GRIN_NULL_PARTITION_LIST);
   auto partition_list_size = grin_get_partition_list_size(pg, partition_list);
   ASSERT(partition_list_size == n);
 
   // check create new partition list
   auto new_partition_list = grin_create_partition_list(pg);
-  ASSERT(new_partition_list != GRIN_NULL_LIST);
+  ASSERT(new_partition_list != GRIN_NULL_PARTITION_LIST);
   for (auto i = 0; i < partition_list_size; ++i) {
     // get & insert partition
     auto partition = grin_get_partition_from_list(pg, partition_list, i);
@@ -92,12 +92,12 @@ int main(int argc, char* argv[]) {
   std::cout << "Partition number = " << partition_num << std::endl;
 
   // get partitioned graph from graph info of GraphAr
-  char** args = new char*[1];
-  args[0] = new char[path.length() + 1];
-  snprintf(args[0], path.length() + 1, "%s", path.c_str());
-  GRIN_PARTITIONED_GRAPH pg = grin_get_partitioned_graph_from_storage(1, args);
-  delete[] args[0];
-  delete[] args;
+  std::string partitioned_path =
+      path + ":" + std::to_string(partition_num) + ":" + "segmented";
+  char* id = new char[partitioned_path.length() + 1];
+  snprintf(id, partitioned_path.length() + 1, "%s", partitioned_path.c_str());
+  GRIN_PARTITIONED_GRAPH pg = grin_get_partitioned_graph_from_storage(id, NULL);
+  delete[] id;
 
   // test partitioned graph
   test_partition_partition(pg, partition_num);
@@ -110,20 +110,14 @@ int main(int argc, char* argv[]) {
   std::cout << "Partition number = " << partition_num << std::endl;
 
   // get partitioned graph from graph info of GraphAr
-  char** args2 = new char*[3];
-  args2[0] = new char[path.length() + 1];
-  snprintf(args2[0], path.length() + 1, "%s", path.c_str());
-  args2[1] = new char[2];
-  snprintf(args2[1], sizeof(args2[1]), "%d", partition_num);
-  args2[2] = new char[2];
-  uint32_t strategy = 1;
-  snprintf(args2[2], sizeof(args2[2]), "%d", strategy);
+  std::string partitioned_path2 =
+      path + ":" + std::to_string(partition_num) + ":" + "hash";
+  char* id2 = new char[partitioned_path2.length() + 1];
+  snprintf(id2, partitioned_path2.length() + 1, "%s",
+           partitioned_path2.c_str());
   GRIN_PARTITIONED_GRAPH pg2 =
-      grin_get_partitioned_graph_from_storage(3, args2);
-  delete[] args2[0];
-  delete[] args2[1];
-  delete[] args2[2];
-  delete[] args2;
+      grin_get_partitioned_graph_from_storage(id2, NULL);
+  delete[] id2;
 
   // test partitioned graph
   test_partition_partition(pg2, partition_num);

@@ -14,9 +14,8 @@ limitations under the License.
 */
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "property/type.h"
-}
 
 #ifdef GRIN_WITH_VERTEX_PROPERTY
 bool grin_equal_vertex_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vt1,
@@ -183,7 +182,7 @@ GRIN_VERTEX_TYPE_LIST grin_get_src_types_by_edge_type(GRIN_GRAPH g,
                                                       GRIN_EDGE_TYPE et) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   if (et >= _g->unique_edge_type_num)
-    return GRIN_NULL_LIST;
+    return GRIN_NULL_VERTEX_TYPE_LIST;
   auto vtl = new GRIN_VERTEX_TYPE_LIST_T();
   for (auto i = _g->unique_edge_type_begin_type[et];
        i < _g->unique_edge_type_begin_type[et + 1]; i++) {
@@ -196,7 +195,7 @@ GRIN_VERTEX_TYPE_LIST grin_get_dst_types_by_edge_type(GRIN_GRAPH g,
                                                       GRIN_EDGE_TYPE et) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   if (et >= _g->unique_edge_type_num)
-    return GRIN_NULL_LIST;
+    return GRIN_NULL_VERTEX_TYPE_LIST;
   auto vtl = new GRIN_VERTEX_TYPE_LIST_T();
   for (auto i = _g->unique_edge_type_begin_type[et];
        i < _g->unique_edge_type_begin_type[et + 1]; i++) {

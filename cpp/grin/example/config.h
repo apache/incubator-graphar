@@ -19,8 +19,6 @@ limitations under the License.
 #ifndef CPP_GRIN_EXAMPLE_CONFIG_H_
 #define CPP_GRIN_EXAMPLE_CONFIG_H_
 
-#define gar_get_internal_id_from_original_id(x) (x & 0xFFFFF)
-
 // Define a new macro that is just like the standard C assert macro,
 // except that it works even in optimized builds (where NDEBUG is
 // defined) and it prints the failed assertion to stderr.

@@ -14,16 +14,15 @@ limitations under the License.
 */
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "property/propertylist.h"
-}
 
 #ifdef GRIN_WITH_VERTEX_PROPERTY
 GRIN_VERTEX_PROPERTY_LIST grin_get_vertex_property_list_by_type(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   if (vtype >= _g->vertex_type_num)
-    return GRIN_NULL_LIST;
+    return GRIN_NULL_VERTEX_PROPERTY_LIST;
   auto vpl = new GRIN_VERTEX_PROPERTY_LIST_T();
   for (unsigned i = _g->vertex_property_offsets[vtype];
        i < _g->vertex_property_offsets[vtype + 1]; ++i) {
@@ -82,12 +81,12 @@ GRIN_VERTEX_PROPERTY_ID grin_get_vertex_property_id(GRIN_GRAPH g,
                                                     GRIN_VERTEX_PROPERTY vp) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   if (vt >= _g->vertex_type_num)
-    return GRIN_NULL_NATURAL_ID;
+    return GRIN_NULL_VERTEX_PROPERTY_ID;
   if (vp >= _g->vertex_property_offsets[vt] &&
       vp < _g->vertex_property_offsets[vt + 1])
     return vp - _g->vertex_property_offsets[vt];
   else
-    return GRIN_NULL_NATURAL_ID;
+    return GRIN_NULL_VERTEX_PROPERTY_ID;
 }
 #endif
 
@@ -96,7 +95,7 @@ GRIN_EDGE_PROPERTY_LIST grin_get_edge_property_list_by_type(
     GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   if (etype >= _g->unique_edge_type_num)
-    return GRIN_NULL_LIST;
+    return GRIN_NULL_EDGE_PROPERTY_LIST;
   auto epl = new GRIN_EDGE_PROPERTY_LIST_T();
   for (unsigned i = _g->edge_property_offsets[etype];
        i < _g->edge_property_offsets[etype + 1]; ++i) {
@@ -155,11 +154,11 @@ GRIN_EDGE_PROPERTY_ID grin_get_edge_property_id(GRIN_GRAPH g, GRIN_EDGE_TYPE et,
                                                 GRIN_EDGE_PROPERTY ep) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   if (et >= _g->unique_edge_type_num)
-    return GRIN_NULL_NATURAL_ID;
+    return GRIN_NULL_EDGE_PROPERTY_ID;
   if (ep >= _g->edge_property_offsets[et] &&
       ep < _g->edge_property_offsets[et + 1])
     return ep - _g->edge_property_offsets[et];
   else
-    return GRIN_NULL_NATURAL_ID;
+    return GRIN_NULL_EDGE_PROPERTY_ID;
 }
 #endif

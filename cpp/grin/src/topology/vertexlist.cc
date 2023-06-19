@@ -14,9 +14,8 @@ limitations under the License.
 */
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "topology/vertexlist.h"
-}
 
 #if defined(GRIN_ENABLE_VERTEX_LIST) && !defined(GRIN_WITH_VERTEX_PROPERTY)
 GRIN_VERTEX_LIST grin_get_vertex_list(GRIN_GRAPH);
@@ -125,7 +124,7 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
   auto _vl = static_cast<GRIN_VERTEX_LIST_T*>(vl);
   auto vtype = _vl->type_id;
   if (vtype >= _g->vertex_type_num)
-    return GRIN_NULL_LIST_ITERATOR;
+    return GRIN_NULL_VERTEX_LIST_ITERATOR;
 
   // all partition
   if (_vl->partition_type == ALL_PARTITION) {
@@ -140,7 +139,7 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
     // find first non-empty valid type & partition
     auto partition_id = _vl->partition_id;
     if (_g->partitioned_vertex_num[vtype][partition_id] == 0)
-      return GRIN_NULL_LIST_ITERATOR;
+      return GRIN_NULL_VERTEX_LIST_ITERATOR;
 
     // find first vertex in this partition
     auto& vertices = _g->vertices_collections[vtype];
@@ -165,7 +164,7 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
       }
     }
     if (partition_id == _g->partition_num)
-      return GRIN_NULL_LIST_ITERATOR;
+      return GRIN_NULL_VERTEX_LIST_ITERATOR;
     // find first vertex in this partition
     auto& vertices = _g->vertices_collections[vtype];
     auto idx = __grin_get_first_vertex_id_in_partition(_g, vtype, partition_id,
@@ -176,12 +175,12 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
     return vli;
   }
 
-  return GRIN_NULL_LIST_ITERATOR;  // undefined
+  return GRIN_NULL_VERTEX_LIST_ITERATOR;  // undefined
 }
 
 void grin_destroy_vertex_list_iter(GRIN_GRAPH g,
                                    GRIN_VERTEX_LIST_ITERATOR vli) {
-  if (vli == GRIN_NULL_LIST_ITERATOR)
+  if (vli == GRIN_NULL_VERTEX_LIST_ITERATOR)
     return;
   auto _vli = static_cast<GRIN_VERTEX_LIST_ITERATOR_T*>(vli);
   delete _vli;
@@ -256,7 +255,7 @@ void grin_get_next_vertex_list_iter(GRIN_GRAPH g,
 }
 
 bool grin_is_vertex_list_end(GRIN_GRAPH g, GRIN_VERTEX_LIST_ITERATOR vli) {
-  if (vli == GRIN_NULL_LIST_ITERATOR)
+  if (vli == GRIN_NULL_VERTEX_LIST_ITERATOR)
     return true;
   auto _vli = static_cast<GRIN_VERTEX_LIST_ITERATOR_T*>(vli);
   return _vli->current_offset == -1;

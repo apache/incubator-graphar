@@ -14,9 +14,8 @@ limitations under the License.
 */
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "topology/adjacentlist.h"
-}
 
 #if defined(GRIN_ENABLE_ADJACENT_LIST) && !defined(GRIN_WITH_EDGE_PROPERTY)
 GRIN_ADJACENT_LIST grin_get_adjacent_list(GRIN_GRAPH, GRIN_DIRECTION,
@@ -180,7 +179,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
       }
     }
   }
-  return GRIN_NULL_LIST_ITERATOR;
+  return GRIN_NULL_ADJACENT_LIST_ITERATOR;
 }
 
 void grin_destroy_adjacent_list_iter(GRIN_GRAPH g,
@@ -332,7 +331,7 @@ void grin_get_next_adjacent_list_iter(GRIN_GRAPH g,
 }
 
 bool grin_is_adjacent_list_end(GRIN_GRAPH g, GRIN_ADJACENT_LIST_ITERATOR ali) {
-  if (ali == GRIN_NULL_LIST_ITERATOR)
+  if (ali == GRIN_NULL_ADJACENT_LIST_ITERATOR)
     return true;
   auto _ali = static_cast<GRIN_ADJACENT_LIST_ITERATOR_T*>(ali);
   return _ali->current_etype >= _ali->etype_end;

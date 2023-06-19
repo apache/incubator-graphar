@@ -349,7 +349,10 @@ file(GLOB_RECURSE FILES_NEED_FORMAT "include/gar/*.h" "src/*.cc"
                                     "test/*.h" "test/*.cc")
 file(GLOB_RECURSE FILES_NEED_LINT "include/gar/*.h" "src/*.cc"
                                   "test/*.h" "test/*.cc"
-                                  )
+                                  "grin/src/predefine.h" "grin/src/*.cc"
+                                  "grin/test/*.h" "grin/test/*.cc"
+                                  "grin/example/*.h" "grin/example/*.cc")
+list(REMOVE_ITEM FILES_NEED_LINT "${PROJECT_SOURCE_DIR}/grin/src/common/graph.pb.h" "${PROJECT_SOURCE_DIR}/grin/src/common/graph.pb.cc")
 
 add_custom_target(gar-clformat
                   COMMAND clang-format --style=file -i ${FILES_NEED_FORMAT}

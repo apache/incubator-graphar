@@ -14,9 +14,8 @@ limitations under the License.
 */
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "topology/edgelist.h"
-}
 
 #if defined(GRIN_ENABLE_EDGE_LIST) && !defined(GRIN_WITH_EDGE_PROPERTY)
 GRIN_EDGE_LIST grin_get_edge_list(GRIN_GRAPH g);
@@ -43,7 +42,7 @@ GRIN_EDGE_LIST_ITERATOR grin_get_edge_list_begin(GRIN_GRAPH g,
   auto type_id = _el->type_begin;
   if (type_id >= _g->edge_type_num ||
       _g->edges_collections[type_id].size() == 0)
-    return GRIN_NULL_LIST_ITERATOR;
+    return GRIN_NULL_EDGE_LIST_ITERATOR;
   auto adj_list_type = _g->edges_collections[type_id].begin()->first;
   switch (adj_list_type) {
   case GAR_ORDERED_BY_SOURCE:
@@ -71,9 +70,9 @@ GRIN_EDGE_LIST_ITERATOR grin_get_edge_list_begin(GRIN_GRAPH g,
             _g->edges_collections[type_id].at(adj_list_type))
             .begin());
   default:
-    return GRIN_NULL_LIST_ITERATOR;
+    return GRIN_NULL_EDGE_LIST_ITERATOR;
   }
-  return GRIN_NULL_LIST_ITERATOR;
+  return GRIN_NULL_EDGE_LIST_ITERATOR;
 }
 
 void grin_destroy_edge_list_iter(GRIN_GRAPH g, GRIN_EDGE_LIST_ITERATOR eli) {
@@ -127,7 +126,7 @@ void grin_get_next_edge_list_iter(GRIN_GRAPH g, GRIN_EDGE_LIST_ITERATOR eli) {
 }
 
 bool grin_is_edge_list_end(GRIN_GRAPH g, GRIN_EDGE_LIST_ITERATOR eli) {
-  if (eli == GRIN_NULL_LIST_ITERATOR)
+  if (eli == GRIN_NULL_EDGE_LIST_ITERATOR)
     return true;
   auto _eli = static_cast<GRIN_EDGE_LIST_ITERATOR_T*>(eli);
   return _eli->current_type >= _eli->type_end;

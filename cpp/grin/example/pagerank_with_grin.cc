@@ -21,8 +21,8 @@ limitations under the License.
 #include "grin/predefine.h"
 
 // GRIN headers
+#include "index/internal_id.h"
 #include "index/order.h"
-#include "index/original_id.h"
 #include "property/property.h"
 #include "property/topology.h"
 #include "property/type.h"
@@ -58,8 +58,7 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
   while (grin_is_edge_list_end(graph, it) == false) {
     auto e = grin_get_edge_from_iter(graph, it);
     auto v1 = grin_get_src_vertex_from_edge(graph, e);
-    auto src = gar_get_internal_id_from_original_id(
-        grin_get_vertex_original_id_of_int64(graph, v1));
+    auto src = grin_get_vertex_internal_id_by_type(graph, vtype, v1);
     out_degree[src]++;
 
     grin_destroy_vertex(graph, v1);
@@ -79,10 +78,8 @@ void run_pagerank(GRIN_GRAPH graph, bool print_result = false) {
       auto e = grin_get_edge_from_iter(graph, it);
       auto v1 = grin_get_src_vertex_from_edge(graph, e);
       auto v2 = grin_get_dst_vertex_from_edge(graph, e);
-      auto src = gar_get_internal_id_from_original_id(
-          grin_get_vertex_original_id_of_int64(graph, v1));
-      auto dst = gar_get_internal_id_from_original_id(
-          grin_get_vertex_original_id_of_int64(graph, v2));
+      auto src = grin_get_vertex_internal_id_by_type(graph, vtype, v1);
+      auto dst = grin_get_vertex_internal_id_by_type(graph, vtype, v2);
       pr_next[dst] += pr_curr[src] / out_degree[src];
 
       grin_destroy_vertex(graph, v1);
@@ -150,13 +147,12 @@ int main(int argc, char* argv[]) {
   std::string path = PR_TEST_DATA_PATH;
   std::cout << "GraphInfo path = " << path << std::endl;
 
-  char** args = new char*[1];
-  args[0] = new char[path.length() + 1];
-  snprintf(args[0], path.length() + 1, "%s", path.c_str());
+  // initialize graph
   auto init_start = clock();
-  GRIN_GRAPH graph = grin_get_graph_from_storage(1, args);
-  delete[] args[0];
-  delete[] args;
+  char* id = new char[path.length() + 1];
+  snprintf(id, path.length() + 1, "%s", path.c_str());
+  GRIN_GRAPH graph = grin_get_graph_from_storage(id, NULL);
+  delete[] id;
   auto init_time = 1000.0 * (clock() - init_start) / CLOCKS_PER_SEC;
 
   // run pagerank algorithm

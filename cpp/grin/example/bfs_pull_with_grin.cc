@@ -21,7 +21,7 @@ limitations under the License.
 #include "grin/predefine.h"
 
 // GRIN headers
-#include "index/original_id.h"
+#include "index/internal_id.h"
 #include "property/property.h"
 #include "property/topology.h"
 #include "property/type.h"
@@ -61,8 +61,7 @@ void run_bfs(GRIN_GRAPH graph, size_t root = BFS_ROOT_ID,
         while (grin_is_adjacent_list_end(graph, it) == false) {
           // get neighbor
           auto nbr = grin_get_neighbor_from_adjacent_list_iter(graph, it);
-          auto nbr_id = gar_get_internal_id_from_original_id(
-              grin_get_vertex_original_id_of_int64(graph, nbr));
+          auto nbr_id = grin_get_vertex_internal_id_by_type(graph, vtype, nbr);
           grin_destroy_vertex(graph, nbr);
           // update
           if (distance[nbr_id] == iter) {
@@ -127,13 +126,12 @@ int main(int argc, char* argv[]) {
   std::string path = BFS_TEST_DATA_PATH;
   std::cout << "GraphInfo path = " << path << std::endl;
 
-  char** args = new char*[1];
-  args[0] = new char[path.length() + 1];
-  snprintf(args[0], path.length() + 1, "%s", path.c_str());
+  // initialize graph
   auto init_start = clock();
-  GRIN_GRAPH graph = grin_get_graph_from_storage(1, args);
-  delete[] args[0];
-  delete[] args;
+  char* id = new char[path.length() + 1];
+  snprintf(id, path.length() + 1, "%s", path.c_str());
+  GRIN_GRAPH graph = grin_get_graph_from_storage(id, NULL);
+  delete[] id;
   auto init_time = 1000.0 * (clock() - init_start) / CLOCKS_PER_SEC;
 
   // run bfs algorithm

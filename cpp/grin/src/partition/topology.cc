@@ -14,9 +14,8 @@ limitations under the License.
 */
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "partition/topology.h"
-}
 
 #if defined(GRIN_TRAIT_SELECT_MASTER_FOR_VERTEX_LIST) && \
     !defined(GRIN_WITH_VERTEX_PROPERTY)
@@ -52,7 +51,7 @@ GRIN_VERTEX_LIST grin_get_vertex_list_by_type_select_partition(
     GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype, GRIN_PARTITION p) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   if (p >= _g->partition_num) {
-    return GRIN_NULL_LIST;
+    return GRIN_NULL_VERTEX_LIST;
   }
   return new GRIN_VERTEX_LIST_T(vtype, ONE_PARTITION, p);
 }

@@ -16,28 +16,27 @@ limitations under the License.
 #include <sstream>
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "partition/partition.h"
-}
 
 #ifdef GRIN_ENABLE_GRAPH_PARTITION
-GRIN_PARTITIONED_GRAPH grin_get_partitioned_graph_from_storage(int argc,
-                                                               char** argv) {
-  if (argc < 1) {
-    return GRIN_NULL_GRAPH;
-  } else if (argc == 1) {
-    return new GRIN_PARTITIONED_GRAPH_T(argv[0]);
-  } else if (argc == 2) {
-    if (std::stoi(argv[1]) <= 0)
-      return GRIN_NULL_GRAPH;
-    return new GRIN_PARTITIONED_GRAPH_T(argv[0], std::stoi(argv[1]));
-  } else {
-    if (std::stoi(argv[2]) >= PARTITION_STRATEGY_MAX)
-      return GRIN_NULL_GRAPH;
-    return new GRIN_PARTITIONED_GRAPH_T(
-        argv[0], std::stoi(argv[1]),
-        static_cast<GAR_PARTITION_STRATEGY>(std::stoi(argv[2])));
-  }
+GRIN_PARTITIONED_GRAPH grin_get_partitioned_graph_from_storage(
+    const char* id, const char* version) {
+  if (id == NULL)
+    return GRIN_NULL_PARTITIONED_GRAPH;
+  std::string tmp(id);
+  auto pos0 = tmp.find_first_of(':'), pos1 = tmp.find_last_of(':');
+  std::string path = tmp.substr(0, pos0);
+  unsigned partition_num = std::stoi(tmp.substr(pos0 + 1, pos1 - pos0 - 1));
+  std::string strategy = tmp.substr(pos1 + 1);
+  auto strategy_type = PARTITION_STRATEGY_MAX;
+  if (strategy == "segmented")
+    strategy_type = SEGMENTED_PARTITION;
+  else if (strategy == "hash")
+    strategy_type = HASH_PARTITION;
+  else
+    return GRIN_NULL_PARTITIONED_GRAPH;
+  return new GRIN_PARTITIONED_GRAPH_T(path, partition_num, strategy_type);
 }
 
 void grin_destroy_partitioned_graph(GRIN_PARTITIONED_GRAPH pg) {

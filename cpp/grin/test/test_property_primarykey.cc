@@ -54,11 +54,13 @@ void test_property_primarykey(GRIN_GRAPH graph) {
               << std::endl;
 
     // create row of primary keys for vertex A
-    std::cout << "create row of primary key for vertex A" << std::endl;
+    std::cout << "get row of primary key for vertex A" << std::endl;
 
     auto vertex_list = grin_get_vertex_list_by_type(graph, vertex_type);
     auto vertex = grin_get_vertex_from_list(graph, vertex_list, 20);
-    auto row = grin_create_row(graph);
+    auto row = grin_get_vertex_primary_keys_row(graph, vertex);
+
+    // get primary key value from row
     auto property_list_size =
         grin_get_vertex_property_list_size(graph, property_list);
     for (auto i = 0; i < property_list_size; ++i) {
@@ -66,25 +68,21 @@ void test_property_primarykey(GRIN_GRAPH graph) {
           grin_get_vertex_property_from_list(graph, property_list, i);
       ASSERT(grin_get_vertex_property_datatype(graph, property) ==
              GRIN_DATATYPE::Int64);
-      auto value =
-          grin_get_vertex_property_value_of_int64(graph, vertex, property);
-      auto status = grin_insert_int64_to_row(graph, row, value);
-      ASSERT(status == true);
+      auto value = grin_get_int64_from_row(graph, row, i);
+      std::cout << "primary key value: " << value << std::endl;
+      ASSERT(grin_get_vertex_property_value_of_int64(graph, vertex, property) ==
+             value);
+      std::cout << "(Correct) primarty key value from row is equal to the "
+                   "value from vertex"
+                << std::endl;
       grin_destroy_vertex_property(graph, property);
     }
-
-    // get vertex from primary key
-    std::cout << "get vertex B from primary key" << std::endl;
-    auto vertex2 = grin_get_vertex_by_primary_keys(graph, vertex_type, row);
-    ASSERT(grin_equal_vertex(graph, vertex, vertex2) == true);
-    std::cout << "(Correct) vertex A and vertex B are equal" << std::endl;
 
     // destroy
     grin_destroy_vertex_property_list(graph, property_list);
     grin_destroy_vertex_type(graph, vertex_type);
     grin_destroy_vertex_list(graph, vertex_list);
     grin_destroy_vertex(graph, vertex);
-    grin_destroy_vertex(graph, vertex2);
     grin_destroy_row(graph, row);
   }
   // destroy vertex type list
@@ -98,12 +96,10 @@ int main(int argc, char* argv[]) {
   std::string path = TEST_DATA_PATH;
   std::cout << "GraphInfo path = " << path << std::endl;
 
-  char** args = new char*[1];
-  args[0] = new char[path.length() + 1];
-  snprintf(args[0], path.length() + 1, "%s", path.c_str());
-  GRIN_GRAPH graph = grin_get_graph_from_storage(1, args);
-  delete[] args[0];
-  delete[] args;
+  char* id = new char[path.length() + 1];
+  snprintf(id, path.length() + 1, "%s", path.c_str());
+  GRIN_GRAPH graph = grin_get_graph_from_storage(id, NULL);
+  delete[] id;
 
   // test property primary key
   test_property_primarykey(graph);

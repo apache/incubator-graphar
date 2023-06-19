@@ -16,9 +16,8 @@ limitations under the License.
 #include <sstream>
 
 #include "grin/src/predefine.h"
-extern "C" {
+// GRIN headers
 #include "partition/reference.h"
-}
 
 #ifdef GRIN_ENABLE_VERTEX_REF
 GRIN_VERTEX_REF grin_get_vertex_ref_by_vertex(GRIN_GRAPH g, GRIN_VERTEX v) {
@@ -95,7 +94,7 @@ GRIN_PARTITION_LIST grin_get_master_vertex_mirror_partition_list(
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
   auto partition_id = __grin_get_master_partition_id(_g, _v->id, _v->type_id);
   if (partition_id != _g->partition_id)
-    return GRIN_NULL_LIST;
+    return GRIN_NULL_PARTITION_LIST;
   auto pl = new GRIN_PARTITION_LIST_T();
   for (size_t i = 0; i < _g->partition_num; ++i) {
     if (i != _g->partition_id)
@@ -112,7 +111,7 @@ GRIN_PARTITION_LIST grin_get_mirror_vertex_mirror_partition_list(
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
   auto partition_id = __grin_get_master_partition_id(_g, _v->id, _v->type_id);
   if (partition_id == _g->partition_id)
-    return GRIN_NULL_LIST;
+    return GRIN_NULL_PARTITION_LIST;
   auto pl = new GRIN_PARTITION_LIST_T();
   for (size_t i = 0; i < _g->partition_num; ++i) {
     if (i != partition_id)
