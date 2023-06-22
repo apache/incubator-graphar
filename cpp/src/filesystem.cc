@@ -17,13 +17,9 @@ limitations under the License.
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/filesystem/api.h"
-#include "arrow/io/api.h"
 #include "arrow/ipc/writer.h"
-#include "arrow/util/uri.h"
-#include "parquet/arrow/reader.h"
 #include "parquet/arrow/writer.h"
 
-#include "gar/reader/arrow_chunk_reader.h"
 #include "gar/utils/filesystem.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
@@ -97,96 +93,24 @@ std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
 }
 
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
-    const std::string& path, FileType file_type) const noexcept {
-  arrow::MemoryPool* pool = arrow::default_memory_pool();
-  std::shared_ptr<arrow::Table> table;
-  switch (file_type) {
-  case FileType::CSV: {
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto is,
-                                         arrow_fs_->OpenInputStream(path));
-    auto read_options = arrow::csv::ReadOptions::Defaults();
-    auto parse_options = arrow::csv::ParseOptions::Defaults();
-    auto convert_options = arrow::csv::ConvertOptions::Defaults();
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
-        auto reader, arrow::csv::TableReader::Make(
-                         arrow::io::IOContext(pool), is, read_options,
-                         parse_options, convert_options));
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(table, reader->Read());
-    break;
-  }
-  case FileType::PARQUET: {
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto input,
-                                         arrow_fs_->OpenInputFile(path));
-    std::unique_ptr<parquet::arrow::FileReader> reader;
-    RETURN_NOT_ARROW_OK(parquet::arrow::OpenFile(input, pool, &reader));
-    RETURN_NOT_ARROW_OK(reader->ReadTable(&table));
-    break;
-  }
-  case FileType::ORC: {
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto input,
-                                         arrow_fs_->OpenInputFile(path));
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
-        auto reader, arrow::adapters::orc::ORCFileReader::Open(input, pool));
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(table, reader->Read());
-    break;
-  }
-  default:
-    return Status::Invalid("Unsupported file type: ",
-                           FileTypeToString(file_type));
-  }
-  // cast string array to large string array as we need concatenate chunks in
-  // some places, e.g., in vineyard
-  for (int i = 0; i < table->num_columns(); ++i) {
-    std::shared_ptr<arrow::DataType> type = table->column(i)->type();
-    if (type->id() == arrow::Type::STRING) {
-      type = arrow::large_utf8();
-    } else if (type->id() == arrow::Type::BINARY) {
-      type = arrow::large_binary();
-    }
-    if (type->Equals(table->column(i)->type())) {
-      continue;
-    }
-    // do casting
-    auto field = table->field(i)->WithType(type);
-    std::shared_ptr<arrow::ChunkedArray> chunked_array;
-    if (type->Equals(arrow::large_utf8())) {
-      auto status = detail::CastToLargeOffsetArray<arrow::StringArray,
-                                                   arrow::LargeStringArray>(
-          table->column(i), type, chunked_array);
-      GAR_RETURN_NOT_OK(status);
-    } else if (type->Equals(arrow::large_binary())) {
-      auto status = detail::CastToLargeOffsetArray<arrow::BinaryArray,
-                                                   arrow::LargeBinaryArray>(
-          table->column(i), type, chunked_array);
-      GAR_RETURN_NOT_OK(status);
-    } else {
-      // noop
-      chunked_array = table->column(i);
-    }
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(table, table->RemoveColumn(i));
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
-        table, table->AddColumn(i, field, chunked_array));
-  }
-  return table;
-}
-
-Result<std::shared_ptr<arrow::Table>> FileSystem::ReadAndFilterFileToTable(
     const std::string& path, FileType file_type,
-    const FilterOptions& opts) const noexcept {
+    const utils::FilterOptions& options) const noexcept {
   std::shared_ptr<ds::FileFormat> format = GetFileFormat(file_type);
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
       auto factory, arrow::dataset::FileSystemDatasetFactory::Make(
                         arrow_fs_, {path}, format,
                         arrow::dataset::FileSystemFactoryOptions()));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto dataset, factory->Finish());
-  // Read specified columns with a row filter
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
-  if (opts.filter) {
-    RETURN_NOT_ARROW_OK(scan_builder->Filter(*opts.filter));
+
+  // Read specified columns with a row filter
+  if (auto filter = options.filter; filter.has_value()) {
+    RETURN_NOT_ARROW_OK(scan_builder->Filter(filter.value()));
   }
-  if (opts.columns) {
-    RETURN_NOT_ARROW_OK(scan_builder->Project(*opts.columns));
+  if (auto columns = options.columns; columns.has_value()) {
+    RETURN_NOT_ARROW_OK(scan_builder->Project(columns.value()));
   }
+
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scanner, scan_builder->Finish());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto table, scanner->ToTable());
   // cast string array to large string array as we need concatenate chunks in

@@ -18,12 +18,27 @@ limitations under the License.
 
 #include <string>
 #include <utility>
+#include <vector>
 
+#include "arrow/compute/api.h"
 #include "gar/graph_info.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
 namespace utils {
+
+using RowFilter = arrow::compute::Expression;
+using ColumnNames = std::vector<std::string>;
+struct FilterOptions {
+  // The row filter to apply to the table.
+  std::optional<RowFilter> filter = std::nullopt;
+  // The columns to include in the table. Select all columns by default.
+  std::optional<ColumnNames> columns = std::nullopt;
+
+  FilterOptions() {}
+  explicit FilterOptions(const RowFilter& filter, const ColumnNames& columns)
+      : filter(filter), columns(columns) {}
+};
 
 Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
     const EdgeInfo& edge_info, const std::string& prefix,

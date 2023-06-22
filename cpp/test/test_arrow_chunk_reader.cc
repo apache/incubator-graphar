@@ -112,7 +112,11 @@ TEST_CASE("test_vertex_property_pushdown") {
 
   // pushdown options
   auto filter = cp::equal(cp::field_ref("gender"), cp::literal("female"));
-  std::vector<std::string> columns = {"firstName", "lastName"};
+  std::vector<std::string> columns{"firstName", "lastName"};
+
+  GAR_NAMESPACE::utils::FilterOptions options;
+  options.filter = filter;
+  options.columns = columns;
 
   auto walkReader = [&](GAR_NAMESPACE::VertexPropertyArrowChunkReader& reader) {
     int i = 0;
@@ -141,7 +145,7 @@ TEST_CASE("test_vertex_property_pushdown") {
   SECTION("pushdown by helper function") {
     std::cout << "vertex property pushdown by helper function: \n";
     auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
-        graph_info, label, group, {&filter, &columns});
+        graph_info, label, group, options);
     REQUIRE(maybe_reader.status().ok());
     walkReader(maybe_reader.value());
   }
@@ -153,8 +157,8 @@ TEST_CASE("test_vertex_property_pushdown") {
         graph_info, label, group);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
-    reader.Filter(&filter);
-    reader.Project(&columns);
+    reader.Filter(filter);
+    reader.Project(columns);
     walkReader(reader);
   }
 }
@@ -294,8 +298,10 @@ TEST_CASE("test_adj_list_property_pushdown") {
 
   auto filter = cp::greater_equal(cp::field_ref("creationDate"),
                                   cp::literal("2012-06-02T04:30:44.526+0000"));
-  std::vector<std::string> columns = {"creationDate"};
-  GAR_NAMESPACE::FilterOptions opts{&filter, &columns};
+  std::vector<std::string> columns{"creationDate"};
+  GAR_NAMESPACE::utils::FilterOptions options;
+  options.filter = filter;
+  options.columns = columns;
 
   auto walkReader =
       [&](GAR_NAMESPACE::AdjListPropertyArrowChunkReader& reader) {
@@ -324,7 +330,7 @@ TEST_CASE("test_adj_list_property_pushdown") {
     std::cout << "adj list property pushdown by helper function: \n";
     auto maybe_reader = GAR_NAMESPACE::ConstructAdjListPropertyArrowChunkReader(
         graph_info, src_label, edge_label, dst_label, group,
-        GAR_NAMESPACE::AdjListType::ordered_by_source, opts);
+        GAR_NAMESPACE::AdjListType::ordered_by_source, options);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     walkReader(reader);
@@ -338,8 +344,8 @@ TEST_CASE("test_adj_list_property_pushdown") {
         GAR_NAMESPACE::AdjListType::ordered_by_source);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
-    reader.Filter(&filter);
-    reader.Project(&columns);
+    reader.Filter(filter);
+    reader.Project(columns);
     walkReader(reader);
   }
 }

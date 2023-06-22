@@ -13,15 +13,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <iostream>
-
 #include "arrow/api.h"
 
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/utils/reader_utils.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
-namespace cp = arrow::compute;
 
 Result<std::shared_ptr<arrow::Table>>
 VertexPropertyArrowChunkReader::GetChunk() noexcept {
@@ -30,9 +27,9 @@ VertexPropertyArrowChunkReader::GetChunk() noexcept {
         auto chunk_file_path,
         vertex_info_.GetFilePath(property_group_, chunk_index_));
     std::string path = prefix_ + chunk_file_path;
-    GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadAndFilterFileToTable(
-                                          path, property_group_.GetFileType(),
-                                          filter_options_));
+    GAR_ASSIGN_OR_RAISE(
+        chunk_table_, fs_->ReadFileToTable(path, property_group_.GetFileType(),
+                                           filter_options_));
   }
   IdType row_offset = seek_id_ - chunk_index_ * vertex_info_.GetChunkSize();
   return chunk_table_->Slice(row_offset);
@@ -50,20 +47,25 @@ VertexPropertyArrowChunkReader::GetRange() noexcept {
                         seek_id_ + chunk_table_->num_rows() - row_offset);
 }
 
-void VertexPropertyArrowChunkReader::Filter(cp::Expression* filter) {
-  filter_options_.filter = filter;
+void VertexPropertyArrowChunkReader::Filter(const utils::RowFilter& filter) {
+  filter_options_.filter = std::make_optional(filter);
 }
 
 void VertexPropertyArrowChunkReader::ClearFilter() {
-  filter_options_.filter = nullptr;
+  filter_options_.filter.reset();
 }
 
-void VertexPropertyArrowChunkReader::Project(Columns* columns) {
-  filter_options_.columns = columns;
+void VertexPropertyArrowChunkReader::Project(
+    const utils::ColumnNames& columns) {
+  filter_options_.columns = std::make_optional(columns);
+}
+
+void VertexPropertyArrowChunkReader::Project(const std::string& column) {
+  Project({column});
 }
 
 void VertexPropertyArrowChunkReader::ClearProjection() {
-  filter_options_.columns = nullptr;
+  filter_options_.columns.reset();
 }
 
 Status AdjListArrowChunkReader::seek_src(IdType id) noexcept {
@@ -248,28 +250,33 @@ AdjListPropertyArrowChunkReader::GetChunk() noexcept {
         edge_info_.GetPropertyFilePath(property_group_, adj_list_type_,
                                        vertex_chunk_index_, chunk_index_));
     std::string path = prefix_ + chunk_file_path;
-    GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadAndFilterFileToTable(
-                                          path, property_group_.GetFileType(),
-                                          filter_options_));
+    GAR_ASSIGN_OR_RAISE(
+        chunk_table_, fs_->ReadFileToTable(path, property_group_.GetFileType(),
+                                           filter_options_));
   }
   IdType row_offset = seek_offset_ - chunk_index_ * edge_info_.GetChunkSize();
   return chunk_table_->Slice(row_offset);
 }
 
-void AdjListPropertyArrowChunkReader::Filter(cp::Expression* filter) {
-  filter_options_.filter = (filter);
+void AdjListPropertyArrowChunkReader::Filter(const utils::RowFilter& filter) {
+  filter_options_.filter = filter;
 }
 
 void AdjListPropertyArrowChunkReader::ClearFilter() {
-  filter_options_.filter = nullptr;
+  filter_options_.filter.reset();
 }
 
-void AdjListPropertyArrowChunkReader::Project(Columns* columns) {
+void AdjListPropertyArrowChunkReader::Project(
+    const utils::ColumnNames& columns) {
   filter_options_.columns = columns;
 }
 
+void AdjListPropertyArrowChunkReader::Project(const std::string& column) {
+  Project({column});
+}
+
 void AdjListPropertyArrowChunkReader::ClearProjection() {
-  filter_options_.columns = nullptr;
+  filter_options_.columns.reset();
 }
 
 }  // namespace GAR_NAMESPACE_INTERNAL

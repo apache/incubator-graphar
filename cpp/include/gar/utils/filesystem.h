@@ -26,8 +26,8 @@ limitations under the License.
 #include "gar/utils/status.h"
 #include "gar/utils/utils.h"
 
-#include "arrow/compute/api.h"
 #include "arrow/dataset/api.h"
+#include "gar/utils/reader_utils.h"
 
 // forward declarations
 namespace arrow {
@@ -68,28 +68,17 @@ class FileSystem {
   ~FileSystem() = default;
 
   /**
-   * @brief Read a file as an arrow::Table.
-   *
-   * @param path The path of the file to read.
-   * @param file_type The type of the file to read.
-   * @return A Result containing a std::shared_ptr to an arrow::Table if
-   * successful, or an error Status if unsuccessful.
-   */
-  Result<std::shared_ptr<arrow::Table>> ReadFileToTable(
-      const std::string& path, FileType file_type) const noexcept;
-
-  /**
    * @brief Read and filter a file as an arrow::Table.
    *
    * @param path The path of the file to read.
    * @param file_type The type of the file to read.
-   * @param opts Filter condition and columns to be read
+   * @param options Filter condition and columns to be read
    * @return A Result containing a std::shared_ptr to an arrow::Table if
    * successful, or an error Status if unsuccessful.
    */
-  Result<std::shared_ptr<arrow::Table>> ReadAndFilterFileToTable(
+  Result<std::shared_ptr<arrow::Table>> ReadFileToTable(
       const std::string& path, FileType file_type,
-      const FilterOptions& opts) const noexcept;
+      const utils::FilterOptions& options = {}) const noexcept;
 
   /**
    * @brief Read a file and convert its bytes to a value of type T.
