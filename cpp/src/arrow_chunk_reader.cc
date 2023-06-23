@@ -259,7 +259,7 @@ AdjListPropertyArrowChunkReader::GetChunk() noexcept {
 }
 
 void AdjListPropertyArrowChunkReader::Filter(const utils::RowFilter& filter) {
-  filter_options_.filter = filter;
+  filter_options_.filter = std::make_optional(filter);
 }
 
 void AdjListPropertyArrowChunkReader::ClearFilter() {

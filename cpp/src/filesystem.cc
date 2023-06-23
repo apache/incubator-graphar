@@ -105,7 +105,7 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
 
   // Read specified columns with a row filter
   if (auto filter = options.filter; filter.has_value()) {
-    RETURN_NOT_ARROW_OK(scan_builder->Filter(filter.value()));
+    RETURN_NOT_ARROW_OK(scan_builder->Filter(filter.value().GetExpr()));
   }
   if (auto columns = options.columns; columns.has_value()) {
     RETURN_NOT_ARROW_OK(scan_builder->Project(columns.value()));

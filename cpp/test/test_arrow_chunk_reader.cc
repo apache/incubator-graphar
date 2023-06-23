@@ -31,8 +31,6 @@ limitations under the License.
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace cp = arrow::compute;
-
 TEST_CASE("test_vertex_property_arrow_chunk_reader") {
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
@@ -111,7 +109,8 @@ TEST_CASE("test_vertex_property_pushdown") {
   auto group = maybe_group.value();
 
   // pushdown options
-  auto filter = cp::equal(cp::field_ref("gender"), cp::literal("female"));
+  auto filter = GAR_NAMESPACE::FilterBuilder::Make(
+      "gender", GAR_NAMESPACE::CompareOperator::equal, "female");
   std::vector<std::string> columns{"firstName", "lastName"};
 
   GAR_NAMESPACE::utils::FilterOptions options;
@@ -296,8 +295,9 @@ TEST_CASE("test_adj_list_property_pushdown") {
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
 
-  auto filter = cp::greater_equal(cp::field_ref("creationDate"),
-                                  cp::literal("2012-06-02T04:30:44.526+0000"));
+  auto filter = GAR_NAMESPACE::FilterBuilder::Make(
+      "creationDate", GAR_NAMESPACE::CompareOperator::greater_equal,
+      "2012-06-02T04:30:44.526+0000");
   std::vector<std::string> columns{"creationDate"};
   GAR_NAMESPACE::utils::FilterOptions options;
   options.filter = filter;

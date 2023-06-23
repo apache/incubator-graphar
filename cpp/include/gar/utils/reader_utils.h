@@ -20,15 +20,16 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "arrow/compute/api.h"
 #include "gar/graph_info.h"
+#include "gar/utils/expression.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
 namespace utils {
 
-using RowFilter = arrow::compute::Expression;
+using RowFilter = Expression;
 using ColumnNames = std::vector<std::string>;
+
 struct FilterOptions {
   // The row filter to apply to the table.
   std::optional<RowFilter> filter = std::nullopt;
@@ -36,7 +37,7 @@ struct FilterOptions {
   std::optional<ColumnNames> columns = std::nullopt;
 
   FilterOptions() {}
-  explicit FilterOptions(const RowFilter& filter, const ColumnNames& columns)
+  FilterOptions(const RowFilter& filter, const ColumnNames& columns)
       : filter(filter), columns(columns) {}
 };
 

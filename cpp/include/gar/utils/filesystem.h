@@ -33,12 +33,6 @@ limitations under the License.
 namespace arrow {
 class Buffer;
 class Table;
-namespace compute {
-class Expression;
-}
-namespace dataset {
-class FileFormat;
-}
 namespace fs {
 class FileSystem;
 }
@@ -48,8 +42,6 @@ class RandomAccessFile;
 }  // namespace arrow
 
 namespace GAR_NAMESPACE_INTERNAL {
-
-struct FilterOptions;
 
 /**
  * This class wraps an arrow::fs::FileSystem and provides methods for

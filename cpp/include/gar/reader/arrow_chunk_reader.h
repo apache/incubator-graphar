@@ -33,9 +33,6 @@ limitations under the License.
 namespace arrow {
 class Array;
 class Table;
-namespace compute {
-class Expression;
-}
 }  // namespace arrow
 
 namespace GAR_NAMESPACE_INTERNAL {
