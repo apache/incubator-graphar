@@ -108,7 +108,7 @@ TEST_CASE("test_vertex_property_pushdown") {
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
 
-  // pushdown options
+  // construct pushdown options
   auto filter = GAR_NAMESPACE::FilterBuilder::Make(
       "gender", GAR_NAMESPACE::CompareOperator::equal, "female");
   std::vector<std::string> columns{"firstName", "lastName"};
@@ -117,6 +117,7 @@ TEST_CASE("test_vertex_property_pushdown") {
   options.filter = filter;
   options.columns = columns;
 
+  // print reader result
   auto walkReader = [&](GAR_NAMESPACE::VertexPropertyArrowChunkReader& reader) {
     int i = 0;
     int sum = 0;
@@ -295,14 +296,17 @@ TEST_CASE("test_adj_list_property_pushdown") {
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
 
+  // construct pushdown options
   auto filter = GAR_NAMESPACE::FilterBuilder::Make(
       "creationDate", GAR_NAMESPACE::CompareOperator::greater_equal,
       "2012-06-02T04:30:44.526+0000");
   std::vector<std::string> columns{"creationDate"};
+
   GAR_NAMESPACE::utils::FilterOptions options;
   options.filter = filter;
   options.columns = columns;
 
+  // print reader result
   auto walkReader =
       [&](GAR_NAMESPACE::AdjListPropertyArrowChunkReader& reader) {
         int i = 0;

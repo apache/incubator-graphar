@@ -41,29 +41,29 @@ enum class CompareOperator : std::uint8_t {
  */
 class Expression {
   friend class FilterBuilder;
+  friend class FileSystem;
 
  public:
   Expression() = default;
-  Expression(const Expression& other) : expr_(other.expr_) {}
+  Expression(const Expression& other) = default;
   ~Expression() = default;
 
-  bool Equals(const Expression& other) { return expr_.Equals(other.expr_); }
-  arrow::compute::Expression GetExpr() const { return expr_; }
+  bool Equals(const Expression& other) {
+    return arrow_expr_.Equals(other.arrow_expr_);
+  }
 
  private:
-  explicit Expression(arrow::compute::Expression expr) : expr_(expr) {}
+  explicit Expression(arrow::compute::Expression expr)
+      : arrow_expr_(std::move(expr)) {}
 
-  arrow::compute::Expression expr_;
+  arrow::compute::Expression arrow_expr_;
 };
 
 /**
  * This class builds an expression tree for a filter.
  */
 class FilterBuilder {
- public:
-  FilterBuilder() = default;
-  ~FilterBuilder() = default;
-
+ private:
   static auto OperatorTypeToArrowOpFunc(CompareOperator op) {
     switch (op) {
     case CompareOperator::equal:
@@ -81,6 +81,7 @@ class FilterBuilder {
     }
   }
 
+ public:
   template <typename T>
   static Expression Make(const std::string& property, CompareOperator op,
                          const T value) {
@@ -88,21 +89,18 @@ class FilterBuilder {
     return Expression(func(arrow::compute::field_ref(property),
                            arrow::compute::literal(value)));
   }
-
   static Expression And(const Expression& left, const Expression& right) {
-    return Expression(arrow::compute::and_(left.GetExpr(), right.GetExpr()));
+    return Expression(
+        arrow::compute::and_(left.arrow_expr_, right.arrow_expr_));
   }
 
   static Expression Or(const Expression& left, const Expression& right) {
-    return Expression(arrow::compute::or_(left.GetExpr(), right.GetExpr()));
+    return Expression(arrow::compute::or_(left.arrow_expr_, right.arrow_expr_));
   }
 
   static Expression Not(const Expression& expr) {
-    return Expression(arrow::compute::not_(expr.GetExpr()));
+    return Expression(arrow::compute::not_(expr.arrow_expr_));
   }
-
- private:
-  Expression expr_;
 };
 }  // namespace GAR_NAMESPACE_INTERNAL
 #endif  // GAR_UTILS_EXPRESSION_H_
