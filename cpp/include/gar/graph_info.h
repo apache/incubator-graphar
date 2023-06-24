@@ -45,7 +45,7 @@ struct Property {
   bool is_primary;   // primary key tag
 
   Property() {}
-  Property(const std::string& name) : name(name) {}
+  explicit Property(const std::string& name) : name(name) {}
   Property(const std::string& name, const DataType& type, bool is_primary)
       : name(name), type(type), is_primary(is_primary) {}
 };

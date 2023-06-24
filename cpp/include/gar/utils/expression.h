@@ -14,6 +14,7 @@ limitations under the License.
 */
 
 #include <string>
+#include <utility>
 
 #include "arrow/compute/api.h"
 
