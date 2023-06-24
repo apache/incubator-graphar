@@ -108,9 +108,12 @@ TEST_CASE("test_vertex_property_pushdown") {
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
 
+  GAR_NAMESPACE::Property prop("gender");
+  GAR_NAMESPACE::CompareOperator op = GAR_NAMESPACE::CompareOperator::EQUAL;
+  std::string val("female");
+
   // construct pushdown options
-  auto filter = GAR_NAMESPACE::FilterBuilder::Make(
-      "gender", GAR_NAMESPACE::CompareOperator::equal, "female");
+  auto filter = GAR_NAMESPACE::Expression::Make(prop, op, val);
   std::vector<std::string> columns{"firstName", "lastName"};
 
   GAR_NAMESPACE::utils::FilterOptions options;
@@ -296,10 +299,15 @@ TEST_CASE("test_adj_list_property_pushdown") {
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
 
+  GAR_NAMESPACE::Property prop("creationDate");
+  GAR_NAMESPACE::CompareOperator op =
+      GAR_NAMESPACE::CompareOperator::GREATER_EQUAL;
+  std::string val("2012-06-02T04:30:44.526+0000");
   // construct pushdown options
-  auto filter = GAR_NAMESPACE::FilterBuilder::Make(
-      "creationDate", GAR_NAMESPACE::CompareOperator::greater_equal,
-      "2012-06-02T04:30:44.526+0000");
+  auto filter = GAR_NAMESPACE::And(
+      GAR_NAMESPACE::Expression::Make(val, op, prop),
+      GAR_NAMESPACE::Expression::Make(
+          prop, GAR_NAMESPACE::CompareOperator::EQUAL, prop));
   std::vector<std::string> columns{"creationDate"};
 
   GAR_NAMESPACE::utils::FilterOptions options;
