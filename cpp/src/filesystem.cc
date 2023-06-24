@@ -104,11 +104,11 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
 
   // Read specified columns with a row filter
-  if (auto filter = options.filter; filter.has_value()) {
-    RETURN_NOT_ARROW_OK(scan_builder->Filter(filter.value().arrow_expr_));
+  if (options.filter) {
+    RETURN_NOT_ARROW_OK(scan_builder->Filter(options.filter->Evaluate()));
   }
-  if (auto columns = options.columns; columns.has_value()) {
-    RETURN_NOT_ARROW_OK(scan_builder->Project(columns.value()));
+  if (options.columns) {
+    RETURN_NOT_ARROW_OK(scan_builder->Project(*options.columns));
   }
 
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scanner, scan_builder->Finish());

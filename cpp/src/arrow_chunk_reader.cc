@@ -47,17 +47,16 @@ VertexPropertyArrowChunkReader::GetRange() noexcept {
                         seek_id_ + chunk_table_->num_rows() - row_offset);
 }
 
-void VertexPropertyArrowChunkReader::Filter(const utils::RowFilter& filter) {
-  filter_options_.filter = std::make_optional(filter);
+void VertexPropertyArrowChunkReader::Filter(utils::RowFilter filter) {
+  filter_options_.filter = filter;
 }
 
 void VertexPropertyArrowChunkReader::ClearFilter() {
-  filter_options_.filter.reset();
+  filter_options_.filter = nullptr;
 }
 
-void VertexPropertyArrowChunkReader::Project(
-    const utils::ColumnNames& columns) {
-  filter_options_.columns = std::make_optional(columns);
+void VertexPropertyArrowChunkReader::Project(utils::ColumnNames columns) {
+  filter_options_.columns = columns;
 }
 
 void VertexPropertyArrowChunkReader::Project(const std::string& column) {
@@ -65,7 +64,7 @@ void VertexPropertyArrowChunkReader::Project(const std::string& column) {
 }
 
 void VertexPropertyArrowChunkReader::ClearProjection() {
-  filter_options_.columns.reset();
+  filter_options_.columns = nullptr;
 }
 
 Status AdjListArrowChunkReader::seek_src(IdType id) noexcept {
@@ -258,16 +257,15 @@ AdjListPropertyArrowChunkReader::GetChunk() noexcept {
   return chunk_table_->Slice(row_offset);
 }
 
-void AdjListPropertyArrowChunkReader::Filter(const utils::RowFilter& filter) {
-  filter_options_.filter = std::make_optional(filter);
+void AdjListPropertyArrowChunkReader::Filter(utils::RowFilter filter) {
+  filter_options_.filter = filter;
 }
 
 void AdjListPropertyArrowChunkReader::ClearFilter() {
-  filter_options_.filter.reset();
+  filter_options_.filter = nullptr;
 }
 
-void AdjListPropertyArrowChunkReader::Project(
-    const utils::ColumnNames& columns) {
+void AdjListPropertyArrowChunkReader::Project(utils::ColumnNames columns) {
   filter_options_.columns = columns;
 }
 
@@ -276,7 +274,7 @@ void AdjListPropertyArrowChunkReader::Project(const std::string& column) {
 }
 
 void AdjListPropertyArrowChunkReader::ClearProjection() {
-  filter_options_.columns.reset();
+  filter_options_.columns = nullptr;
 }
 
 }  // namespace GAR_NAMESPACE_INTERNAL

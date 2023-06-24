@@ -26,6 +26,7 @@ limitations under the License.
 
 #include "./util.h"
 #include "gar/reader/arrow_chunk_reader.h"
+#include "gar/utils/expression.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
 #define CATCH_CONFIG_MAIN
@@ -109,16 +110,16 @@ TEST_CASE("test_vertex_property_pushdown") {
   auto group = maybe_group.value();
 
   GAR_NAMESPACE::Property prop("gender");
-  GAR_NAMESPACE::CompareOperator op = GAR_NAMESPACE::CompareOperator::EQUAL;
+  GAR_NAMESPACE::Operator op = GAR_NAMESPACE::Operator::Equal;
   std::string val("female");
 
   // construct pushdown options
-  auto filter = GAR_NAMESPACE::Expression::Make(prop, op, val);
+  auto filter = GAR_NAMESPACE::Expression::Make(prop, op, val).value();
   std::vector<std::string> columns{"firstName", "lastName"};
 
   GAR_NAMESPACE::utils::FilterOptions options;
   options.filter = filter;
-  options.columns = columns;
+  options.columns = &columns;
 
   // print reader result
   auto walkReader = [&](GAR_NAMESPACE::VertexPropertyArrowChunkReader& reader) {
@@ -161,9 +162,10 @@ TEST_CASE("test_vertex_property_pushdown") {
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     reader.Filter(filter);
-    reader.Project(columns);
+    reader.Project(&columns);
     walkReader(reader);
   }
+  delete filter;
 }
 
 TEST_CASE("test_adj_list_arrow_chunk_reader") {
@@ -299,20 +301,19 @@ TEST_CASE("test_adj_list_property_pushdown") {
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
 
-  GAR_NAMESPACE::Property prop("creationDate");
-  GAR_NAMESPACE::CompareOperator op =
-      GAR_NAMESPACE::CompareOperator::GREATER_EQUAL;
-  std::string val("2012-06-02T04:30:44.526+0000");
   // construct pushdown options
-  auto filter = GAR_NAMESPACE::And(
-      GAR_NAMESPACE::Expression::Make(val, op, prop),
-      GAR_NAMESPACE::Expression::Make(
-          prop, GAR_NAMESPACE::CompareOperator::EQUAL, prop));
+  GAR_NAMESPACE::Property prop("creationDate");
+  GAR_NAMESPACE::Operator op1 = GAR_NAMESPACE::Operator::GreaterEqual;
+  GAR_NAMESPACE::Operator op2 = GAR_NAMESPACE::Operator::Equal;
+  std::string val("2012-06-02T04:30:44.526+0000");
+  auto f1 = GAR_NAMESPACE::Expression::Make(val, op1, prop).value();
+  auto f2 = GAR_NAMESPACE::Expression::Make(prop, op2, prop).value();
+  auto filter = GAR_NAMESPACE::And(f1, f2).value();
   std::vector<std::string> columns{"creationDate"};
 
   GAR_NAMESPACE::utils::FilterOptions options;
   options.filter = filter;
-  options.columns = columns;
+  options.columns = &columns;
 
   // print reader result
   auto walkReader =
@@ -357,9 +358,10 @@ TEST_CASE("test_adj_list_property_pushdown") {
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     reader.Filter(filter);
-    reader.Project(columns);
+    reader.Project(&columns);
     walkReader(reader);
   }
+  delete filter;
 }
 
 TEST_CASE("test_read_adj_list_offset_chunk_example") {
