@@ -25,24 +25,8 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-/**
- * CompareOperator is an enum class that represents the relational operators
- * that can be used to compare two values.
- */
-
 using ArrowExpression = arrow::compute::Expression;
-enum class Operator : std::uint8_t {
-  Equal,         // "="
-  NotEqual,      // "<>"
-  Less,          // "<"
-  LessEqual,     // "<="
-  Greater,       // ">"
-  GreaterEqual,  // ">="
-  And,           // "and"
-  Or,            // "or"
-  Not,           // "not"
-  IsNull         // "is null"
-};
+class BinaryOperator;
 
 /**
  * This class wraps an arrow::compute::Expression and provides methods for
@@ -54,16 +38,51 @@ class Expression {
   Expression(const Expression& other) = default;
   virtual ~Expression() = default;
 
-  template <typename T>
-  static inline Result<Expression*> Make(const Property& property, Operator op,
-                                         const T& value);
+  /**
+   * @brief Make a new expression from a property and a value
+   *
+   * @tparam OpType The type of the operator, only binary operators are allowed
+   * e.g. OperatorEq
+   * @tparam ValType The type of the value, e.g. int64_t
+   * @param property The property to compare
+   * @param value The value to compare
+   * @return A predicate expression for filter pushdown
+   */
+  template <
+      typename OpType,
+      typename = std::enable_if_t<std::is_base_of_v<BinaryOperator, OpType>>,
+      typename ValType>
+  static inline Expression* Make(const Property& property,
+                                 const ValType& value);
 
-  template <typename T>
-  static inline Result<Expression*> Make(const T& value, Operator op,
-                                         const Property& property);
-
-  static inline Result<Expression*> Make(const Property& p1, Operator op,
-                                         const Property& p2);
+  /**
+   * @brief Make a new expression from a property and a value
+   *
+   * @tparam OpType The type of the operator, only binary operators are allowed
+   * e.g. OperatorEQ
+   * @tparam ValType The type of the value, e.g. int64_t
+   * @param value The value to compare
+   * @param property The property to compare
+   * @return A predicate expression for filter pushdown
+   */
+  template <
+      typename OpType,
+      typename = std::enable_if_t<std::is_base_of_v<BinaryOperator, OpType>>,
+      typename ValType>
+  static inline Expression* Make(const ValType& value,
+                                 const Property& property);
+  /**
+   * @brief Make a new expression from a property and a value
+   *
+   * @tparam OpType The type of the operator, only binary operators are allowed
+   * e.g. OperatorEq
+   * @param p1 The first property to compare
+   * @param p2 The second property to compare
+   * @return A predicate expression for filter pushdown
+   */
+  template <typename OpType, typename = std::enable_if_t<
+                                 std::is_base_of_v<BinaryOperator, OpType>>>
+  static inline Expression* Make(const Property& p1, const Property& p2);
 
   virtual ArrowExpression Evaluate() = 0;
 };
@@ -228,74 +247,49 @@ class OperatorOr : public BinaryOperator {
   ArrowExpression Evaluate() override;
 };
 
+using Equal = OperatorEqual;
+using NotEqual = OperatorNotEqual;
+using Greater = OperatorGreater;
+using GreaterThan = OperatorGreaterEqual;
+using Less = OperatorLess;
+using LessEqual = OperatorLessEqual;
+
 /**
  * Helper functions to Construct Expression.
  */
-template <typename T>
-inline Result<Expression*> Expression::Make(const Property& property,
-                                            Operator op, const T& value) {
-  switch (op) {
-#define TO_OPERATOR_CASE_PV(_op)                                 \
-  case Operator::_op: {                                          \
-    return new Operator##_op(new ExpressionProperty((property)), \
-                             new ExpressionLiteral<T>((value))); \
-  }
-    TO_OPERATOR_CASE_PV(Equal)
-    TO_OPERATOR_CASE_PV(NotEqual)
-    TO_OPERATOR_CASE_PV(Less)
-    TO_OPERATOR_CASE_PV(LessEqual)
-    TO_OPERATOR_CASE_PV(Greater)
-    TO_OPERATOR_CASE_PV(GreaterEqual)
-    TO_OPERATOR_CASE_PV(And)
-    TO_OPERATOR_CASE_PV(Or)
-  default:
-    break;
-  }
-  return Status::Invalid("Unrecognized binary operator");
+template <typename OpType, typename, typename ValType>
+inline Expression* Expression::Make(const Property& property,
+                                    const ValType& value) {
+  return new OpType(new ExpressionProperty(property),
+                    new ExpressionLiteral<ValType>(value));
 }
 
-template <typename T>
-inline Result<Expression*> Expression::Make(const T& value, Operator op,
-                                            const Property& property) {
-  return Expression::Make(property, op, value);
+template <typename OpType, typename, typename ValType>
+
+inline Expression* Expression::Make(const ValType& value,
+                                    const Property& property) {
+  return new OpType(new ExpressionLiteral<ValType>(value),
+                    new ExpressionProperty(property));
 }
 
-inline Result<Expression*> Expression::Make(const Property& p1, Operator op,
-                                            const Property& p2) {
-  switch (op) {
-#define TO_OPERATOR_CASE_PP(_op)                            \
-  case Operator::_op: {                                     \
-    return new Operator##_op(new ExpressionProperty((p1)),  \
-                             new ExpressionProperty((p2))); \
-  }
-    TO_OPERATOR_CASE_PP(Equal);
-    TO_OPERATOR_CASE_PP(NotEqual);
-    TO_OPERATOR_CASE_PP(Less);
-    TO_OPERATOR_CASE_PP(LessEqual);
-    TO_OPERATOR_CASE_PP(Greater);
-    TO_OPERATOR_CASE_PP(GreaterEqual);
-    TO_OPERATOR_CASE_PP(And);
-    TO_OPERATOR_CASE_PP(Or);
-  default:
-    break;
-  }
-  return Status::Invalid("Unrecognized binary operator");
+template <typename OpType, typename>
+inline Expression* Expression::Make(const Property& p1, const Property& p2) {
+  return new OpType(new ExpressionProperty(p1), new ExpressionProperty(p2));
 }
 
-static inline Result<Expression*> Not(Expression* expr) {
+static inline Expression* Not(Expression* expr) {
   return new OperatorNot(expr);
 }
 
-static inline Result<Expression*> IsNull(Expression* expr,
-                                         bool nan_is_null = false) {
+static inline Expression* IsNull(Expression* expr, bool nan_is_null = false) {
   return new OperatorIsNull(expr, nan_is_null);
 }
 
-static inline Result<Expression*> And(Expression* lhs, Expression* rhs) {
+static inline Expression* And(Expression* lhs, Expression* rhs) {
   return new OperatorAnd(lhs, rhs);
 }
 
-static inline Result<Expression*> Or(Expression* lhs, Expression* rhs) {
+static inline Expression* Or(Expression* lhs, Expression* rhs) {
   return new OperatorOr(lhs, rhs);
 }
 

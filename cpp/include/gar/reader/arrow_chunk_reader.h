@@ -128,10 +128,10 @@ class VertexPropertyArrowChunkReader {
    */
   IdType GetChunkNum() const noexcept { return chunk_num_; }
 
-  void Filter(utils::RowFilter filter);
+  void Filter(utils::ExpressionPtr filter);
   void ClearFilter();
 
-  void Project(utils::ColumnNames columns);
+  void Project(utils::VectorPtr columns);
   void Project(const std::string& column);
   void ClearProjection();
 
@@ -580,10 +580,10 @@ class AdjListPropertyArrowChunkReader {
     return Status::OK();
   }
 
-  void Filter(utils::RowFilter filter);
+  void Filter(utils::ExpressionPtr filter);
   void ClearFilter();
 
-  void Project(utils::ColumnNames columns);
+  void Project(utils::VectorPtr columns);
   void Project(const std::string& column);
   void ClearProjection();
 

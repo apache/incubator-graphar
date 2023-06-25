@@ -27,17 +27,17 @@ namespace GAR_NAMESPACE_INTERNAL {
 
 namespace utils {
 
-using RowFilter = Expression*;
-using ColumnNames = std::vector<std::string>*;
+using ExpressionPtr = Expression*;
+using VectorPtr = std::vector<std::string>*;
 
 struct FilterOptions {
   // The row filter to apply to the table.
-  RowFilter filter = nullptr;
+  ExpressionPtr filter = nullptr;
   // The columns to include in the table. Select all columns by default.
-  ColumnNames columns = nullptr;
+  VectorPtr columns = nullptr;
 
   FilterOptions() {}
-  FilterOptions(RowFilter filter, ColumnNames columns)
+  FilterOptions(ExpressionPtr filter, VectorPtr columns)
       : filter(filter), columns(columns) {}
 };
 

@@ -47,7 +47,7 @@ VertexPropertyArrowChunkReader::GetRange() noexcept {
                         seek_id_ + chunk_table_->num_rows() - row_offset);
 }
 
-void VertexPropertyArrowChunkReader::Filter(utils::RowFilter filter) {
+void VertexPropertyArrowChunkReader::Filter(utils::ExpressionPtr filter) {
   filter_options_.filter = filter;
 }
 
@@ -55,7 +55,7 @@ void VertexPropertyArrowChunkReader::ClearFilter() {
   filter_options_.filter = nullptr;
 }
 
-void VertexPropertyArrowChunkReader::Project(utils::ColumnNames columns) {
+void VertexPropertyArrowChunkReader::Project(utils::VectorPtr columns) {
   filter_options_.columns = columns;
 }
 
@@ -257,7 +257,7 @@ AdjListPropertyArrowChunkReader::GetChunk() noexcept {
   return chunk_table_->Slice(row_offset);
 }
 
-void AdjListPropertyArrowChunkReader::Filter(utils::RowFilter filter) {
+void AdjListPropertyArrowChunkReader::Filter(utils::ExpressionPtr filter) {
   filter_options_.filter = filter;
 }
 
@@ -265,7 +265,7 @@ void AdjListPropertyArrowChunkReader::ClearFilter() {
   filter_options_.filter = nullptr;
 }
 
-void AdjListPropertyArrowChunkReader::Project(utils::ColumnNames columns) {
+void AdjListPropertyArrowChunkReader::Project(utils::VectorPtr columns) {
   filter_options_.columns = columns;
 }
 

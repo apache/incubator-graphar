@@ -32,6 +32,12 @@ limitations under the License.
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
+using GAR_NAMESPACE::Equal;
+using GAR_NAMESPACE::Expression;
+using GAR_NAMESPACE::Less;
+using GAR_NAMESPACE::Property;
+using GAR_NAMESPACE::utils::FilterOptions;
+
 TEST_CASE("test_vertex_property_arrow_chunk_reader") {
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
@@ -109,15 +115,15 @@ TEST_CASE("test_vertex_property_pushdown") {
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
 
-  GAR_NAMESPACE::Property prop("gender");
-  GAR_NAMESPACE::Operator op = GAR_NAMESPACE::Operator::Equal;
+  // construct pushdown options
+  Property prop("gender");
   std::string val("female");
 
-  // construct pushdown options
-  auto filter = GAR_NAMESPACE::Expression::Make(prop, op, val).value();
+  auto filter = Expression::Make<Equal>(prop, val);
+  auto defer = std::unique_ptr<Expression>(filter);
   std::vector<std::string> columns{"firstName", "lastName"};
 
-  GAR_NAMESPACE::utils::FilterOptions options;
+  FilterOptions options;
   options.filter = filter;
   options.columns = &columns;
 
@@ -126,6 +132,7 @@ TEST_CASE("test_vertex_property_pushdown") {
     int i = 0;
     int sum = 0;
     std::vector<std::string> names;
+
     do {
       auto result = reader.GetChunk();
       REQUIRE(!result.has_error());
@@ -137,17 +144,19 @@ TEST_CASE("test_vertex_property_pushdown") {
       i++;
       sum += table->num_rows();
     } while (!reader.next_chunk().IsOutOfRange());
-    std::cout << "item size: " << sum << "/"
+
+    std::cout << "Total Nums: " << sum << "/"
               << reader.GetChunkNum() * chunk_size << '\n';
-    std::cout << "Column names: ";
-    for (const auto& n : names) {
-      std::cout << n << ' ';
+    std::cout << "Column Nums: " << names.size() << "\n";
+    std::cout << "Column Names: ";
+    for (const auto& name : names) {
+      std::cout << "`" << name << "` ";
     }
     std::cout << "\n\n";
   };
 
   SECTION("pushdown by helper function") {
-    std::cout << "vertex property pushdown by helper function: \n";
+    std::cout << "vertex property pushdown by helper function:\n";
     auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
         graph_info, label, group, options);
     REQUIRE(maybe_reader.status().ok());
@@ -155,8 +164,7 @@ TEST_CASE("test_vertex_property_pushdown") {
   }
 
   SECTION("pushdown by function Filter() & Project()") {
-    std::cout << "vertex property pushdown by Filter() & Project():"
-              << std::endl;
+    std::cout << "vertex property pushdown by Filter() & Project():\n";
     auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
         graph_info, label, group);
     REQUIRE(maybe_reader.status().ok());
@@ -165,7 +173,6 @@ TEST_CASE("test_vertex_property_pushdown") {
     reader.Project(&columns);
     walkReader(reader);
   }
-  delete filter;
 }
 
 TEST_CASE("test_adj_list_arrow_chunk_reader") {
@@ -302,16 +309,17 @@ TEST_CASE("test_adj_list_property_pushdown") {
   auto group = maybe_group.value();
 
   // construct pushdown options
-  GAR_NAMESPACE::Property prop("creationDate");
-  GAR_NAMESPACE::Operator op1 = GAR_NAMESPACE::Operator::GreaterEqual;
-  GAR_NAMESPACE::Operator op2 = GAR_NAMESPACE::Operator::Equal;
+  Property prop("creationDate");
   std::string val("2012-06-02T04:30:44.526+0000");
-  auto f1 = GAR_NAMESPACE::Expression::Make(val, op1, prop).value();
-  auto f2 = GAR_NAMESPACE::Expression::Make(prop, op2, prop).value();
-  auto filter = GAR_NAMESPACE::And(f1, f2).value();
+
+  auto expr1 = Expression::Make<Less>(val, prop);
+  auto expr2 = Expression::Make<Equal>(prop, prop);
+  auto filter = And(expr1, expr2);
+  auto defer = std::unique_ptr<Expression>(filter);
+
   std::vector<std::string> columns{"creationDate"};
 
-  GAR_NAMESPACE::utils::FilterOptions options;
+  FilterOptions options;
   options.filter = filter;
   options.columns = &columns;
 
@@ -321,6 +329,7 @@ TEST_CASE("test_adj_list_property_pushdown") {
         int i = 0;
         int sum = 0;
         std::vector<std::string> names;
+
         do {
           auto result = reader.GetChunk();
           REQUIRE(!result.has_error());
@@ -331,10 +340,12 @@ TEST_CASE("test_adj_list_property_pushdown") {
           i++;
           sum += table->num_rows();
         } while (!reader.next_chunk().IsOutOfRange());
-        std::cout << "item size: " << sum << "/" << i * chunk_size << '\n';
-        std::cout << "Column names: ";
-        for (const auto& n : names) {
-          std::cout << n << ' ';
+
+        std::cout << "Total Nums: " << sum << "/" << i * chunk_size << '\n';
+        std::cout << "Column Nums: " << names.size() << "\n";
+        std::cout << "Column Names: ";
+        for (const auto& name : names) {
+          std::cout << "`" << name << "` ";
         }
         std::cout << "\n\n";
       };
@@ -361,7 +372,6 @@ TEST_CASE("test_adj_list_property_pushdown") {
     reader.Project(&columns);
     walkReader(reader);
   }
-  delete filter;
 }
 
 TEST_CASE("test_read_adj_list_offset_chunk_example") {
