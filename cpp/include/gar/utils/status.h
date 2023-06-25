@@ -69,7 +69,8 @@ void StringBuilderRecursive(std::ostringstream& stream, Head&& head) {
 }
 
 template <typename Head, typename... Tail>
-void StringBuilderRecursive(std::ostringstream& stream, Head&& head, Tail&&... tail) {
+void StringBuilderRecursive(std::ostringstream& stream, Head&& head,
+                            Tail&&... tail) {
   StringBuilderRecursive(stream, std::forward<Head>(head));
   StringBuilderRecursive(stream, std::forward<Tail>(tail)...);
 }
