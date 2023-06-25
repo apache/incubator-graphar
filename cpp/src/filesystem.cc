@@ -116,7 +116,8 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     break;
   }
   default:
-    return Status::Invalid("File type is invalid.");
+    return Status::Invalid("Unsupported file type: ",
+                           FileTypeToString(file_type));
   }
   // cast string array to large string array as we need concatenate chunks in
   // some places, e.g., in vineyard
@@ -238,10 +239,8 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
     break;
   }
   default:
-    std::string message =
-        "Invalid file type: " + std::string(FileTypeToString(file_type)) +
-        " for writing.";
-    return Status::Invalid(message);
+    return Status::Invalid(
+        "Unsupported file type: ", FileTypeToString(file_type), " for wrting.");
   }
   return Status::OK();
 }
@@ -289,7 +288,7 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
       // the arrow parser would delete the trailing slash which we don't want to
       *out_path = uri.host() + uri.path();
     } else {
-      return Status::Invalid("Unrecognized filesystem type in URI: " +
+      return Status::Invalid("Unrecognized filesystem type in URI: ",
                              uri_string);
     }
   }

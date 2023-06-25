@@ -52,9 +52,9 @@ Status TryToCastToAny(const DataType& type, std::shared_ptr<arrow::Array> array,
   case Type::STRING:
     return CastToAny<Type::STRING>(array, any);
   default:
-    return Status::TypeError();
+    return Status::TypeError("Unsupported type.");
   }
-  return Status::TypeError();
+  return Status::OK();
 }
 
 Vertex::Vertex(IdType id,

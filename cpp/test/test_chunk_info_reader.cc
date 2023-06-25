@@ -135,7 +135,7 @@ TEST_CASE("test_adj_list_chunk_info_reader") {
 
   // seek an invalid src id
   REQUIRE(reader.seek_src(1000).IsKeyError());
-  REQUIRE(reader.seek_dst(100).IsInvalidOperation());
+  REQUIRE(reader.seek_dst(100).IsInvalid());
 
   // test reader to read ordered by dest
   auto maybe_dst_reader = GAR_NAMESPACE::ConstructAdjListChunkInfoReader(
@@ -153,7 +153,7 @@ TEST_CASE("test_adj_list_chunk_info_reader") {
 
   // seek an invalid dst id
   REQUIRE(dst_reader.seek_dst(1000).IsKeyError());
-  REQUIRE(dst_reader.seek_src(100).IsInvalidOperation());
+  REQUIRE(dst_reader.seek_src(100).IsInvalid());
 }
 
 TEST_CASE("test_adj_list_property_chunk_info_reader") {
@@ -222,7 +222,7 @@ TEST_CASE("test_adj_list_property_chunk_info_reader") {
 
   // seek an invalid src id
   REQUIRE(reader.seek_src(1000).IsKeyError());
-  REQUIRE(reader.seek_dst(100).IsInvalidOperation());
+  REQUIRE(reader.seek_dst(100).IsInvalid());
 
   // test reader to read ordered by dest
   maybe_group = graph_info.GetEdgePropertyGroup(
@@ -246,5 +246,5 @@ TEST_CASE("test_adj_list_property_chunk_info_reader") {
 
   // seek an invalid dst id
   REQUIRE(dst_reader.seek_dst(1000).IsKeyError());
-  REQUIRE(dst_reader.seek_src(100).IsInvalidOperation());
+  REQUIRE(dst_reader.seek_src(100).IsInvalid());
 }

@@ -67,8 +67,8 @@ class VertexPropertyArrowChunkReader {
   }
 
   /**
-   * @brief Sets chunk position indicator for reader by vertex id.
-   *    If vertex id is not found, will return Status::KeyError error.
+   * @brief Sets chunk position indicator for reader by internal vertex id.
+   *    If internal vertex id is not found, will return Status::KeyError error.
    *    After seeking to an invalid vertex id, the next call to GetChunk
    * function may undefined, e.g. return an non exist path.
    *
@@ -84,7 +84,9 @@ class VertexPropertyArrowChunkReader {
       chunk_table_.reset();
     }
     if (chunk_index_ >= chunk_num_) {
-      return Status::KeyError();
+      return Status::KeyError("Internal vertex id ", id,
+                              " is not existed in vertex ",
+                              vertex_info_.GetLabel());
     }
     return Status::OK();
   }
@@ -108,7 +110,8 @@ class VertexPropertyArrowChunkReader {
    */
   Status next_chunk() noexcept {
     if (++chunk_index_ >= chunk_num_) {
-      return Status::OutOfRange();
+      return Status::OutOfRange("End of the vertex chunk of vertex ",
+                                vertex_info_.GetLabel());
     }
     seek_id_ = chunk_index_ * vertex_info_.GetChunkSize();
     chunk_table_.reset();
@@ -213,7 +216,9 @@ class AdjListArrowChunkReader {
       chunk_table_.reset();
     }
     if (chunk_index_ >= chunk_num_) {
-      return Status::KeyError("The offset is out of range.");
+      return Status::KeyError("The edge offset ", index, " is out of range [0,",
+                              edge_info_.GetChunkSize() * chunk_num_,
+                              "), edge label: ", edge_info_.GetEdgeLabel());
     }
     return Status::OK();
   }
@@ -239,10 +244,12 @@ class AdjListArrowChunkReader {
     Status st;
     ++chunk_index_;
     while (chunk_index_ >= chunk_num_) {
-      st = Status::EndOfChunk();
+      st = Status::EndOfChunk("End of the adj list chunk of vertex chunk.");
       ++vertex_chunk_index_;
       if (vertex_chunk_index_ >= vertex_chunk_num_) {
-        return Status::OutOfRange();
+        return Status::OutOfRange(
+            "End of the adj list chunk of edge ", edge_info_.GetEdgeLabel(),
+            " of adj list type ", AdjListTypeToString(adj_list_type_), ".");
       }
       chunk_index_ = 0;
       GAR_ASSIGN_OR_RAISE_ERROR(
@@ -336,9 +343,12 @@ class AdjListOffsetArrowChunkReader {
   }
 
   /**
-   * @brief Sets chunk position indicator to next chunk.
-   *     if current chunk is the last chunk, will return Status::OutOfRange
-   * error.
+   * @brief Sets chunk position indicator for reader by internal vertex id.
+   *    If internal vertex id is not found, will return Status::KeyError error.
+   *    After seeking to an invalid vertex id, the next call to GetChunk
+   * function may undefined, e.g. return an non exist path.
+   *
+   * @param id the internal vertex id.
    */
   Status seek(IdType id) noexcept {
     seek_id_ = id;
@@ -348,7 +358,10 @@ class AdjListOffsetArrowChunkReader {
       chunk_table_.reset();
     }
     if (chunk_index_ >= vertex_chunk_num_) {
-      return Status::KeyError();
+      return Status::KeyError("Internal vertex id ", id,
+                              " is not existed in edge ",
+                              edge_info_.GetEdgeLabel(), " of adj list type ",
+                              AdjListTypeToString(adj_list_type_), ".");
     }
     return Status::OK();
   }
@@ -365,7 +378,9 @@ class AdjListOffsetArrowChunkReader {
    */
   Status next_chunk() {
     if (++chunk_index_ >= vertex_chunk_num_) {
-      return Status::OutOfRange();
+      return Status::OutOfRange("End of the offset chunk of edge ",
+                                edge_info_.GetEdgeLabel(), " of adj list type ",
+                                AdjListTypeToString(adj_list_type_), ".");
     }
     seek_id_ = chunk_index_ * vertex_chunk_size_;
     chunk_table_.reset();
@@ -478,8 +493,9 @@ class AdjListPropertyArrowChunkReader {
       chunk_table_.reset();
     }
     if (chunk_index_ >= chunk_num_) {
-      return Status::KeyError(
-          "The offset is out of range of the vertex chunk.");
+      return Status::KeyError("The edge offset ", index, " is out of range [0,",
+                              edge_info_.GetChunkSize() * chunk_num_,
+                              "), edge label: ", edge_info_.GetEdgeLabel());
     }
     return Status::OK();
   }
@@ -500,10 +516,13 @@ class AdjListPropertyArrowChunkReader {
     Status st;
     ++chunk_index_;
     while (chunk_index_ >= chunk_num_) {
-      st = Status::EndOfChunk();
+      st = Status::EndOfChunk("End of the adj list chunk of vertex chunk.");
       ++vertex_chunk_index_;
       if (vertex_chunk_index_ >= vertex_chunk_num_) {
-        return Status::OutOfRange();
+        return Status::OutOfRange(
+            "End of the property chunk of edge ", edge_info_.GetEdgeLabel(),
+            " of adj list type ", AdjListTypeToString(adj_list_type_),
+            ", property group ", property_group_, ".");
       }
       chunk_index_ = 0;
       GAR_ASSIGN_OR_RAISE_ERROR(
@@ -566,6 +585,11 @@ ConstructVertexPropertyArrowChunkReader(
     const PropertyGroup& property_group) noexcept {
   VertexInfo vertex_info;
   GAR_ASSIGN_OR_RAISE(vertex_info, graph_info.GetVertexInfo(label));
+  if (!vertex_info.ContainPropertyGroup(property_group)) {
+    return Status::Invalid("The vertex ", label,
+                           " doesn't contain property group ", property_group,
+                           ".");
+  }
   return VertexPropertyArrowChunkReader(vertex_info, property_group,
                                         graph_info.GetPrefix());
 }
@@ -588,7 +612,9 @@ static inline Result<AdjListArrowChunkReader> ConstructAdjListArrowChunkReader(
                       graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
 
   if (!edge_info.ContainAdjList(adj_list_type)) {
-    return Status::Invalid();
+    return Status::Invalid("The edge ", edge_label, " of adj list type ",
+                           AdjListTypeToString(adj_list_type),
+                           " doesn't exist.");
   }
   return AdjListArrowChunkReader(edge_info, adj_list_type,
                                  graph_info.GetPrefix());
@@ -614,7 +640,9 @@ ConstructAdjListOffsetArrowChunkReader(const GraphInfo& graph_info,
                       graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
 
   if (!edge_info.ContainAdjList(adj_list_type)) {
-    return Status::Invalid();
+    return Status::Invalid("The edge ", edge_label, " of adj list type ",
+                           AdjListTypeToString(adj_list_type),
+                           " doesn't exist.");
   }
   return AdjListOffsetArrowChunkReader(edge_info, adj_list_type,
                                        graph_info.GetPrefix());
@@ -641,7 +669,10 @@ ConstructAdjListPropertyArrowChunkReader(const GraphInfo& graph_info,
   GAR_ASSIGN_OR_RAISE(edge_info,
                       graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
   if (!edge_info.ContainPropertyGroup(property_group, adj_list_type)) {
-    return Status::Invalid();
+    return Status::Invalid("The edge ", edge_label, " of adj list type ",
+                           AdjListTypeToString(adj_list_type),
+                           " doesn't contain property group ", property_group,
+                           ".");
   }
   return AdjListPropertyArrowChunkReader(edge_info, property_group,
                                          adj_list_type, graph_info.GetPrefix());

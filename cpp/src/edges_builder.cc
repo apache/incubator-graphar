@@ -32,14 +32,15 @@ Status EdgesBuilder::validate(const Edge& e,
   // weak validate
   // can not add new edges after dumping
   if (is_saved_) {
-    return Status::InvalidOperation("can not add new edges after dumping");
+    return Status::Invalid(
+        "The edge builder has been saved, can not add "
+        "new edges any more");
   }
   // invalid adj list type
   if (!edge_info_.ContainAdjList(adj_list_type_)) {
-    return Status::InvalidOperation(
-        "the adj list type " +
-        std::string(AdjListTypeToString(adj_list_type_)) +
-        "  does not exist in the edge info");
+    return Status::Invalid(
+        "Adj list type ", AdjListTypeToString(adj_list_type_),
+        " does not exist in the ", edge_info_.GetEdgeLabel(), " edge info.");
   }
 
   // strong validate
@@ -47,9 +48,9 @@ Status EdgesBuilder::validate(const Edge& e,
     for (auto& property : e.GetProperties()) {
       // check if the property is contained
       if (!edge_info_.ContainProperty(property.first)) {
-        return Status::InvalidOperation(
-            "invalid property name: " + property.first +
-            ", which is not contained in the vertex info");
+        return Status::Invalid("Property with name ", property.first,
+                               " is not contained in the ",
+                               edge_info_.GetEdgeLabel(), " edge info.");
       }
       // check if the property type is correct
       auto type = edge_info_.GetPropertyType(property.first).value();
@@ -92,14 +93,12 @@ Status EdgesBuilder::validate(const Edge& e,
         }
         break;
       default:
-        return Status::TypeError("unsupported property type");
+        return Status::TypeError("Unsupported property type.");
       }
       if (invalid_type) {
-        std::string err_msg =
-            "invalid data type for property: " + property.first +
-            ", defined as " + type.ToTypeName() + ", but got " +
-            property.second.type().name();
-        return Status::TypeError(err_msg);
+        return Status::TypeError(
+            "Invalid data type for property ", property.first + ", defined as ",
+            type.ToTypeName(), ", but got ", property.second.type().name());
       }
     }
   }
@@ -124,9 +123,9 @@ Status EdgesBuilder::appendToArray(
   case Type::STRING:
     return tryToAppend<Type::STRING>(property_name, array, edges);
   default:
-    return Status::TypeError();
+    return Status::TypeError("Unsupported property type.");
   }
-  return Status::TypeError();
+  return Status::OK();
 }
 
 template <Type type>
@@ -139,14 +138,10 @@ Status EdgesBuilder::tryToAppend(
   typename ConvertToArrowType<type>::BuilderType builder(pool);
   for (const auto& e : edges) {
     if (e.Empty() || (!e.ContainProperty(property_name))) {
-      auto status = builder.AppendNull();
-      if (!status.ok())
-        return Status::ArrowError(status.ToString());
+      RETURN_NOT_ARROW_OK(builder.AppendNull());
     } else {
-      auto status =
-          builder.Append(std::any_cast<CType>(e.GetProperty(property_name)));
-      if (!status.ok())
-        return Status::ArrowError(status.ToString());
+      RETURN_NOT_ARROW_OK(
+          builder.Append(std::any_cast<CType>(e.GetProperty(property_name))));
     }
   }
   array = builder.Finish().ValueOrDie();
@@ -160,10 +155,8 @@ Status EdgesBuilder::tryToAppend(
   arrow::MemoryPool* pool = arrow::default_memory_pool();
   typename arrow::TypeTraits<arrow::Int64Type>::BuilderType builder(pool);
   for (const auto& e : edges) {
-    auto status = builder.Append(std::any_cast<int64_t>(
-        src_or_dest == 1 ? e.GetSource() : e.GetDestination()));
-    if (!status.ok())
-      return Status::ArrowError(status.ToString());
+    RETURN_NOT_ARROW_OK(builder.Append(std::any_cast<int64_t>(
+        src_or_dest == 1 ? e.GetSource() : e.GetDestination())));
   }
   array = builder.Finish().ValueOrDie();
   return Status::OK();

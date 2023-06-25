@@ -85,9 +85,8 @@ Result<const void*> GetArrowArrayData(
     return reinterpret_cast<const void*>(
         std::dynamic_pointer_cast<arrow::NullArray>(array).get());
   } else {
-    std::string err = "Array type - " + array->type()->ToString() +
-                      " is not supported yet...";
-    return Status::TypeError(err);
+    return Status::TypeError("Array type - ", array->type()->ToString(),
+                             " is not supported yet...");
   }
 }
 

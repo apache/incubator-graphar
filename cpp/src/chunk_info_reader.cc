@@ -23,13 +23,16 @@ namespace GAR_NAMESPACE_INTERNAL {
 Status AdjListChunkInfoReader::seek_src(IdType id) noexcept {
   if (adj_list_type_ != AdjListType::unordered_by_source &&
       adj_list_type_ != AdjListType::ordered_by_source) {
-    return Status::InvalidOperation(
-        "The seek_src operation is invalid in reader.");
+    return Status::Invalid("The seek_src operation is invalid in edge ",
+                           edge_info_.GetEdgeLabel(), " reader with ",
+                           AdjListTypeToString(adj_list_type_), " type.");
   }
 
   IdType new_vertex_chunk_index = id / edge_info_.GetSrcChunkSize();
   if (new_vertex_chunk_index >= vertex_chunk_num_) {
-    return Status::KeyError("The id " + std::to_string(id) + " not exist.");
+    return Status::KeyError("No vertex with internal id ", id,
+                            " exists in edge ", edge_info_.GetEdgeLabel(),
+                            " reader.");
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
@@ -52,13 +55,16 @@ Status AdjListChunkInfoReader::seek_src(IdType id) noexcept {
 Status AdjListChunkInfoReader::seek_dst(IdType id) noexcept {
   if (adj_list_type_ != AdjListType::unordered_by_dest &&
       adj_list_type_ != AdjListType::ordered_by_dest) {
-    return Status::InvalidOperation(
-        "The seek_dst operation is invalid in reader.");
+    return Status::Invalid("The seek_dst operation is invalid in edge ",
+                           edge_info_.GetEdgeLabel(), " reader with ",
+                           AdjListTypeToString(adj_list_type_), " type.");
   }
 
   IdType new_vertex_chunk_index = id / edge_info_.GetDstChunkSize();
   if (new_vertex_chunk_index >= vertex_chunk_num_) {
-    return Status::KeyError("The id " + std::to_string(id) + " not exist.");
+    return Status::KeyError("No vertex with internal id ", id,
+                            " exists in edge ", edge_info_.GetEdgeLabel(),
+                            " reader.");
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
@@ -80,13 +86,16 @@ Status AdjListChunkInfoReader::seek_dst(IdType id) noexcept {
 Status AdjListPropertyChunkInfoReader::seek_src(IdType id) noexcept {
   if (adj_list_type_ != AdjListType::unordered_by_source &&
       adj_list_type_ != AdjListType::ordered_by_source) {
-    return Status::InvalidOperation(
-        "The seek_src operation is invalid in reader.");
+    return Status::Invalid("The seek_src operation is invalid in edge ",
+                           edge_info_.GetEdgeLabel(), " reader with ",
+                           AdjListTypeToString(adj_list_type_), " type.");
   }
 
   IdType new_vertex_chunk_index = id / edge_info_.GetSrcChunkSize();
   if (new_vertex_chunk_index >= vertex_chunk_num_) {
-    return Status::KeyError("The id " + std::to_string(id) + " not exist.");
+    return Status::KeyError("No vertex with internal id ", id,
+                            " exists in edge ", edge_info_.GetEdgeLabel(),
+                            " reader.");
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
@@ -108,13 +117,16 @@ Status AdjListPropertyChunkInfoReader::seek_src(IdType id) noexcept {
 Status AdjListPropertyChunkInfoReader::seek_dst(IdType id) noexcept {
   if (adj_list_type_ != AdjListType::unordered_by_dest &&
       adj_list_type_ != AdjListType::ordered_by_dest) {
-    return Status::InvalidOperation(
-        "The seek_dst operation is invalid in reader.");
+    return Status::Invalid("The seek_dst operation is invalid in edge ",
+                           edge_info_.GetEdgeLabel(), " reader with ",
+                           AdjListTypeToString(adj_list_type_), " type.");
   }
 
   IdType new_vertex_chunk_index = id / edge_info_.GetDstChunkSize();
   if (new_vertex_chunk_index >= vertex_chunk_num_) {
-    return Status::KeyError("The id " + std::to_string(id) + " not exist.");
+    return Status::KeyError("No vertex with internal id ", id,
+                            " exists in edge ", edge_info_.GetEdgeLabel(),
+                            " reader.");
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;

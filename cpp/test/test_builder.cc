@@ -66,11 +66,11 @@ TEST_CASE("test_vertices_builder") {
   REQUIRE(builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::weak_validate)
               .ok());
   REQUIRE(builder.AddVertex(v, -2, GAR_NAMESPACE::ValidateLevel::weak_validate)
-              .IsInvalidOperation());
+              .IsInvalid());
   REQUIRE(builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::strong_validate)
               .IsTypeError());
   v.AddProperty("invalid_name", "invalid_value");
-  REQUIRE(builder.AddVertex(v, 0).IsInvalidOperation());
+  REQUIRE(builder.AddVertex(v, 0).IsInvalid());
 
   // clear vertices
   builder.Clear();
@@ -116,7 +116,7 @@ TEST_CASE("test_vertices_builder") {
   REQUIRE(builder.Dump().ok());
 
   // can not add new vertices after dumping
-  REQUIRE(builder.AddVertex(v).IsInvalidOperation());
+  REQUIRE(builder.AddVertex(v).IsInvalid());
 
   // check the number of vertices dumped
   auto fs = arrow::fs::FileSystemFromUriOrPath(root).ValueOrDie();
@@ -157,7 +157,7 @@ TEST_CASE("test_edges_builder") {
   REQUIRE(builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::strong_validate)
               .IsTypeError());
   e.AddProperty("invalid_name", "invalid_value");
-  REQUIRE(builder.AddEdge(e).IsInvalidOperation());
+  REQUIRE(builder.AddEdge(e).IsInvalid());
 
   // clear edges
   builder.Clear();
@@ -202,7 +202,7 @@ TEST_CASE("test_edges_builder") {
   REQUIRE(builder.Dump().ok());
 
   // can not add new edges after dumping
-  REQUIRE(builder.AddEdge(e).IsInvalidOperation());
+  REQUIRE(builder.AddEdge(e).IsInvalid());
 
   // check the number of vertices dumped
   auto fs = arrow::fs::FileSystemFromUriOrPath(root).ValueOrDie();
