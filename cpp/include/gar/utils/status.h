@@ -64,12 +64,12 @@ namespace GAR_NAMESPACE_INTERNAL {
 
 namespace util {
 template <typename Head>
-void StringBuilderRecursive(std::ostream& stream, Head&& head) {
+void StringBuilderRecursive(std::ostringstream& stream, Head&& head) {
   stream << head;
 }
 
 template <typename Head, typename... Tail>
-void StringBuilderRecursive(std::ostream& stream, Head&& head, Tail&&... tail) {
+void StringBuilderRecursive(std::ostringstream& stream, Head&& head, Tail&&... tail) {
   StringBuilderRecursive(stream, std::forward<Head>(head));
   StringBuilderRecursive(stream, std::forward<Tail>(tail)...);
 }
