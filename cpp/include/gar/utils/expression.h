@@ -42,7 +42,7 @@ class Expression {
    * @brief Make a new expression from a property and a value
    *
    * @tparam OpType The type of the operator, only binary operators are allowed
-   * e.g. OperatorEq
+   * e.g. OperatorEqual
    * @tparam ValType The type of the value, e.g. int64_t
    * @param property The property to compare
    * @param value The value to compare
@@ -59,7 +59,7 @@ class Expression {
    * @brief Make a new expression from a property and a value
    *
    * @tparam OpType The type of the operator, only binary operators are allowed
-   * e.g. OperatorEQ
+   * e.g. OperatorEqual
    * @tparam ValType The type of the value, e.g. int64_t
    * @param value The value to compare
    * @param property The property to compare
@@ -84,6 +84,15 @@ class Expression {
                                  std::is_base_of_v<BinaryOperator, OpType>>>
   static inline Expression* Make(const Property& p1, const Property& p2);
 
+  /**
+   * @brief Parse predicates based on attributes, operators, and values e,g. new
+   * OperatorEqual(new ExpressionProperty(Property("a")), new
+   * ExpressionLiteral<int64_t>(1)) will be parsed as
+   * arrow::compute::equal(arrow::compute::field_ref("a"),
+   * arrow::compute::literal(1))
+   *
+   * @return The arrow::compute::Expression object
+   */
   virtual ArrowExpression Evaluate() = 0;
 };
 
@@ -130,9 +139,7 @@ class OperatorNot : public UnaryOperator {
   OperatorNot(const OperatorNot& other) = default;
   ~OperatorNot() = default;
 
-  ArrowExpression Evaluate() override {
-    return arrow::compute::not_(expr_->Evaluate());
-  }
+  ArrowExpression Evaluate() override;
 };
 
 class OperatorIsNull : public UnaryOperator {
@@ -143,9 +150,7 @@ class OperatorIsNull : public UnaryOperator {
   OperatorIsNull(const OperatorIsNull& other) = default;
   ~OperatorIsNull() = default;
 
-  ArrowExpression Evaluate() override {
-    return arrow::compute::is_null(expr_->Evaluate(), nan_is_null_);
-  }
+  ArrowExpression Evaluate() override;
 
  private:
   bool nan_is_null_;
@@ -265,7 +270,6 @@ inline Expression* Expression::Make(const Property& property,
 }
 
 template <typename OpType, typename, typename ValType>
-
 inline Expression* Expression::Make(const ValType& value,
                                     const Property& property) {
   return new OpType(new ExpressionLiteral<ValType>(value),

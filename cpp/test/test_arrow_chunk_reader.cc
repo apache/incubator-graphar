@@ -116,10 +116,7 @@ TEST_CASE("test_vertex_property_pushdown") {
   auto group = maybe_group.value();
 
   // construct pushdown options
-  Property prop("gender");
-  std::string val("female");
-
-  auto filter = Expression::Make<Equal>(prop, val);
+  auto filter = Expression::Make<Equal>(Property("gender"), "female");
   auto defer = std::unique_ptr<Expression>(filter);
   std::vector<std::string> columns{"firstName", "lastName"};
 
@@ -310,9 +307,8 @@ TEST_CASE("test_adj_list_property_pushdown") {
 
   // construct pushdown options
   Property prop("creationDate");
-  std::string val("2012-06-02T04:30:44.526+0000");
 
-  auto expr1 = Expression::Make<Less>(val, prop);
+  auto expr1 = Expression::Make<Less>("2012-06-02T04:30:44.526+0000", prop);
   auto expr2 = Expression::Make<Equal>(prop, prop);
   auto filter = And(expr1, expr2);
   auto defer = std::unique_ptr<Expression>(filter);

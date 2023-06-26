@@ -17,7 +17,6 @@ limitations under the License.
 #define GAR_READER_ARROW_CHUNK_READER_H_
 
 #include <memory>
-#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -128,11 +127,10 @@ class VertexPropertyArrowChunkReader {
    */
   IdType GetChunkNum() const noexcept { return chunk_num_; }
 
-  void Filter(utils::ExpressionPtr filter);
+  void Filter(utils::FilterPtr filter);
   void ClearFilter();
 
   void Project(utils::VectorPtr columns);
-  void Project(const std::string& column);
   void ClearProjection();
 
  private:
@@ -580,11 +578,10 @@ class AdjListPropertyArrowChunkReader {
     return Status::OK();
   }
 
-  void Filter(utils::ExpressionPtr filter);
+  void Filter(utils::FilterPtr filter);
   void ClearFilter();
 
   void Project(utils::VectorPtr columns);
-  void Project(const std::string& column);
   void ClearProjection();
 
  private:

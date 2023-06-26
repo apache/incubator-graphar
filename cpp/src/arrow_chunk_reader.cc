@@ -47,7 +47,7 @@ VertexPropertyArrowChunkReader::GetRange() noexcept {
                         seek_id_ + chunk_table_->num_rows() - row_offset);
 }
 
-void VertexPropertyArrowChunkReader::Filter(utils::ExpressionPtr filter) {
+void VertexPropertyArrowChunkReader::Filter(utils::FilterPtr filter) {
   filter_options_.filter = filter;
 }
 
@@ -57,10 +57,6 @@ void VertexPropertyArrowChunkReader::ClearFilter() {
 
 void VertexPropertyArrowChunkReader::Project(utils::VectorPtr columns) {
   filter_options_.columns = columns;
-}
-
-void VertexPropertyArrowChunkReader::Project(const std::string& column) {
-  Project({column});
 }
 
 void VertexPropertyArrowChunkReader::ClearProjection() {
@@ -257,7 +253,7 @@ AdjListPropertyArrowChunkReader::GetChunk() noexcept {
   return chunk_table_->Slice(row_offset);
 }
 
-void AdjListPropertyArrowChunkReader::Filter(utils::ExpressionPtr filter) {
+void AdjListPropertyArrowChunkReader::Filter(utils::FilterPtr filter) {
   filter_options_.filter = filter;
 }
 
@@ -267,10 +263,6 @@ void AdjListPropertyArrowChunkReader::ClearFilter() {
 
 void AdjListPropertyArrowChunkReader::Project(utils::VectorPtr columns) {
   filter_options_.columns = columns;
-}
-
-void AdjListPropertyArrowChunkReader::Project(const std::string& column) {
-  Project({column});
 }
 
 void AdjListPropertyArrowChunkReader::ClearProjection() {

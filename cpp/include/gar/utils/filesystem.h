@@ -64,7 +64,7 @@ class FileSystem {
    *
    * @param path The path of the file to read.
    * @param file_type The type of the file to read.
-   * @param options Filter condition and columns to be read
+   * @param options Row filter and columns to be selected
    * @return A Result containing a std::shared_ptr to an arrow::Table if
    * successful, or an error Status if unsuccessful.
    */

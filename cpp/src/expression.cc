@@ -19,6 +19,13 @@ namespace GAR_NAMESPACE_INTERNAL {
 ArrowExpression ExpressionProperty::Evaluate() {
   return arrow::compute::field_ref(property_.name);
 }
+ArrowExpression OperatorNot::Evaluate() {
+  return arrow::compute::not_(expr_->Evaluate());
+}
+
+ArrowExpression OperatorIsNull::Evaluate() {
+  return arrow::compute::is_null(expr_->Evaluate());
+}
 
 ArrowExpression OperatorEqual::Evaluate() {
   return arrow::compute::equal(lhs_->Evaluate(), rhs_->Evaluate());
