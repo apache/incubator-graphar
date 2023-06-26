@@ -494,7 +494,8 @@ class AdjListPropertyArrowChunkReader {
       chunk_table_.reset();
     }
     if (chunk_index_ >= chunk_num_) {
-      return Status::KeyError("The edge offset ", index, " is out of range [0,",
+      return Status::KeyError("The edge offset ", offset,
+                              " is out of range [0,",
                               edge_info_.GetChunkSize() * chunk_num_,
                               "), edge label: ", edge_info_.GetEdgeLabel());
     }

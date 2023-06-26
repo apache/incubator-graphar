@@ -97,7 +97,6 @@ enum class StatusCode : unsigned char {
   kIOError,
   kYamlError,
   kArrowError,
-  kNotImplemented,
 
   kUnknownError,
 };
