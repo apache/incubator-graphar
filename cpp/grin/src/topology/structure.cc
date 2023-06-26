@@ -13,14 +13,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <regex>
+
 #include "grin/src/predefine.h"
 // GRIN headers
 #include "topology/structure.h"
 
-GRIN_GRAPH grin_get_graph_from_storage(const char* id, const char* version) {
-  if (id == NULL)
+GRIN_GRAPH grin_get_graph_from_storage(const char* uri) {
+  if (uri == NULL)
     return GRIN_NULL_GRAPH;
-  return get_graph_by_info_path(std::string(id));
+  std::string input(uri);
+  std::regex re(R"(graphar://([^?]+))");
+  std::smatch match;
+  if (std::regex_search(input, match, re)) {
+    std::string path = match[1];
+    return get_graph_by_info_path(path);
+  } else {
+    return GRIN_NULL_GRAPH;
+  }
 }
 
 void grin_destroy_graph(GRIN_GRAPH g) {

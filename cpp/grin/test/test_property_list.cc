@@ -195,13 +195,13 @@ void test_edge_property_list(GRIN_GRAPH graph) {
 
 int main(int argc, char* argv[]) {
   // get graph from graph info of GraphAr
-  std::string path = TEST_DATA_PATH;
-  std::cout << "GraphInfo path = " << path << std::endl;
+  std::string path = "graphar://" + TEST_DATA_PATH;
+  std::cout << "graph uri = " << path << std::endl;
 
-  char* id = new char[path.length() + 1];
-  snprintf(id, path.length() + 1, "%s", path.c_str());
-  GRIN_GRAPH graph = grin_get_graph_from_storage(id, NULL);
-  delete[] id;
+  char* uri = new char[path.length() + 1];
+  snprintf(uri, path.length() + 1, "%s", path.c_str());
+  GRIN_GRAPH graph = grin_get_graph_from_storage(uri);
+  delete[] uri;
 
   // test vertex property list
   test_vertex_property_list(graph);

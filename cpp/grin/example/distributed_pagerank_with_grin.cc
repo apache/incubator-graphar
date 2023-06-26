@@ -230,11 +230,15 @@ int main(int argc, char* argv[]) {
 
   // get partitioned graph from graph info of GraphAr
   std::string partitioned_path =
-      path + ":" + std::to_string(partition_num) + ":" + "segmented";
-  char* id = new char[partitioned_path.length() + 1];
-  snprintf(id, partitioned_path.length() + 1, "%s", partitioned_path.c_str());
-  GRIN_PARTITIONED_GRAPH pg = grin_get_partitioned_graph_from_storage(id, NULL);
-  delete[] id;
+      "graphar://" + path + "?partition_num=" + std::to_string(partition_num) +
+      "&strategy=" + "segmented";
+  if (is_master) {
+    std::cout << "graph uri = " << partitioned_path << std::endl;
+  }
+  char* uri = new char[partitioned_path.length() + 1];
+  snprintf(uri, partitioned_path.length() + 1, "%s", partitioned_path.c_str());
+  GRIN_PARTITIONED_GRAPH pg = grin_get_partitioned_graph_from_storage(uri);
+  delete[] uri;
   // get local graph from partitioned graph
   GRIN_GRAPH graph = init(pg, pid);
 

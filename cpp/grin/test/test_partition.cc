@@ -93,11 +93,13 @@ int main(int argc, char* argv[]) {
 
   // get partitioned graph from graph info of GraphAr
   std::string partitioned_path =
-      path + ":" + std::to_string(partition_num) + ":" + "segmented";
-  char* id = new char[partitioned_path.length() + 1];
-  snprintf(id, partitioned_path.length() + 1, "%s", partitioned_path.c_str());
-  GRIN_PARTITIONED_GRAPH pg = grin_get_partitioned_graph_from_storage(id, NULL);
-  delete[] id;
+      "graphar://" + path + "?partition_num=" + std::to_string(partition_num) +
+      "&strategy=" + "segmented";
+  std::cout << "graph uri = " << partitioned_path << std::endl;
+  char* uri = new char[partitioned_path.length() + 1];
+  snprintf(uri, partitioned_path.length() + 1, "%s", partitioned_path.c_str());
+  GRIN_PARTITIONED_GRAPH pg = grin_get_partitioned_graph_from_storage(uri);
+  delete[] uri;
 
   // test partitioned graph
   test_partition_partition(pg, partition_num);
@@ -111,13 +113,14 @@ int main(int argc, char* argv[]) {
 
   // get partitioned graph from graph info of GraphAr
   std::string partitioned_path2 =
-      path + ":" + std::to_string(partition_num) + ":" + "hash";
-  char* id2 = new char[partitioned_path2.length() + 1];
-  snprintf(id2, partitioned_path2.length() + 1, "%s",
+      "graphar://" + path + "?partition_num=" + std::to_string(partition_num) +
+      "&strategy=" + "hash";
+  std::cout << "graph uri = " << partitioned_path2 << std::endl;
+  char* uri2 = new char[partitioned_path2.length() + 1];
+  snprintf(uri2, partitioned_path2.length() + 1, "%s",
            partitioned_path2.c_str());
-  GRIN_PARTITIONED_GRAPH pg2 =
-      grin_get_partitioned_graph_from_storage(id2, NULL);
-  delete[] id2;
+  GRIN_PARTITIONED_GRAPH pg2 = grin_get_partitioned_graph_from_storage(uri2);
+  delete[] uri2;
 
   // test partitioned graph
   test_partition_partition(pg2, partition_num);

@@ -136,15 +136,15 @@ void run_cc(GRIN_GRAPH graph, bool print_result = false) {
 
 int main(int argc, char* argv[]) {
   // get graph from graph info of GraphAr
-  std::string path = CC_TEST_DATA_PATH;
-  std::cout << "GraphInfo path = " << path << std::endl;
+  std::string path = "graphar://" + CC_TEST_DATA_PATH;
+  std::cout << "graph uri = " << path << std::endl;
 
   // initialize graph
   auto init_start = clock();
-  char* id = new char[path.length() + 1];
-  snprintf(id, path.length() + 1, "%s", path.c_str());
-  GRIN_GRAPH graph = grin_get_graph_from_storage(id, NULL);
-  delete[] id;
+  char* uri = new char[path.length() + 1];
+  snprintf(uri, path.length() + 1, "%s", path.c_str());
+  GRIN_GRAPH graph = grin_get_graph_from_storage(uri);
+  delete[] uri;
   auto init_time = 1000.0 * (clock() - init_start) / CLOCKS_PER_SEC;
 
   // run cc algorithm
