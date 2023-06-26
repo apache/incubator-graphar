@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <regex>
+#include <regex>  // NOLINT
 
 #include "grin/src/predefine.h"
 // GRIN headers
