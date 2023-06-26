@@ -52,8 +52,7 @@ class Expression {
       typename OpType,
       typename = std::enable_if_t<std::is_base_of_v<BinaryOperator, OpType>>,
       typename ValType>
-  static inline Expression* Make(const Property& property,
-                                 const ValType& value);
+  static inline Expression* Make(const Property& property, ValType value);
 
   /**
    * @brief Make a new expression from a property and a value
@@ -69,8 +68,7 @@ class Expression {
       typename OpType,
       typename = std::enable_if_t<std::is_base_of_v<BinaryOperator, OpType>>,
       typename ValType>
-  static inline Expression* Make(const ValType& value,
-                                 const Property& property);
+  static inline Expression* Make(ValType value, const Property& property);
   /**
    * @brief Make a new expression from a property and a value
    *
@@ -111,7 +109,7 @@ class ExpressionProperty : public Expression {
 template <typename T>
 class ExpressionLiteral : public Expression {
  public:
-  explicit ExpressionLiteral(const T value) : value_(value) {}
+  explicit ExpressionLiteral(T value) : value_(value) {}
   ExpressionLiteral(const ExpressionLiteral& other) = default;
   ~ExpressionLiteral() = default;
 
@@ -263,15 +261,13 @@ using LessEqual = OperatorLessEqual;
  * Helper functions to Construct Expression.
  */
 template <typename OpType, typename, typename ValType>
-inline Expression* Expression::Make(const Property& property,
-                                    const ValType& value) {
+inline Expression* Expression::Make(const Property& property, ValType value) {
   return new OpType(new ExpressionProperty(property),
                     new ExpressionLiteral<ValType>(value));
 }
 
 template <typename OpType, typename, typename ValType>
-inline Expression* Expression::Make(const ValType& value,
-                                    const Property& property) {
+inline Expression* Expression::Make(ValType value, const Property& property) {
   return new OpType(new ExpressionLiteral<ValType>(value),
                     new ExpressionProperty(property));
 }

@@ -128,7 +128,11 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     // do casting
     auto field = table->field(i)->WithType(type);
     std::shared_ptr<arrow::ChunkedArray> chunked_array;
-    if (type->Equals(arrow::large_utf8())) {
+
+    if (table->num_rows() == 0) {
+      GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
+          chunked_array, arrow::ChunkedArray::MakeEmpty(type));
+    } else if (type->Equals(arrow::large_utf8())) {
       auto status = detail::CastToLargeOffsetArray<arrow::StringArray,
                                                    arrow::LargeStringArray>(
           table->column(i), type, chunked_array);
