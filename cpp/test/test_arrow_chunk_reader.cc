@@ -15,26 +15,17 @@ limitations under the License.
 
 #include <cstdlib>
 
-#include "arrow/adapters/orc/adapter.h"
 #include "arrow/api.h"
-#include "arrow/csv/api.h"
-#include "arrow/filesystem/api.h"
-#include "arrow/io/api.h"
-#include "arrow/stl.h"
-#include "arrow/util/uri.h"
-#include "parquet/arrow/writer.h"
 
 #include "./util.h"
 #include "gar/reader/arrow_chunk_reader.h"
-#include "gar/utils/expression.h"
-#include "gar/writer/arrow_chunk_writer.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
 using GAR_NAMESPACE::Equal;
 using GAR_NAMESPACE::Expression;
-using GAR_NAMESPACE::Less;
+using GAR_NAMESPACE::LessThan;
 using GAR_NAMESPACE::Property;
 using GAR_NAMESPACE::utils::FilterOptions;
 
@@ -308,7 +299,7 @@ TEST_CASE("test_adj_list_property_pushdown") {
   // construct pushdown options
   Property prop("creationDate");
 
-  auto expr1 = Expression::Make<Less>("2012-06-02T04:30:44.526+0000", prop);
+  auto expr1 = Expression::Make<LessThan>("2012-06-02T04:30:44.526+0000", prop);
   auto expr2 = Expression::Make<Equal>(prop, prop);
   auto filter = And(expr1, expr2);
   auto defer = std::unique_ptr<Expression>(filter);

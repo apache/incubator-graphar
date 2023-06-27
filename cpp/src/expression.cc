@@ -35,7 +35,7 @@ ArrowExpression OperatorNotEqual::Evaluate() {
   return arrow::compute::not_equal(lhs_->Evaluate(), rhs_->Evaluate());
 }
 
-ArrowExpression OperatorGreater::Evaluate() {
+ArrowExpression OperatorGreaterThan::Evaluate() {
   return arrow::compute::greater(lhs_->Evaluate(), rhs_->Evaluate());
 }
 
@@ -43,7 +43,7 @@ ArrowExpression OperatorGreaterEqual::Evaluate() {
   return arrow::compute::greater_equal(lhs_->Evaluate(), rhs_->Evaluate());
 }
 
-ArrowExpression OperatorLess::Evaluate() {
+ArrowExpression OperatorLessThan::Evaluate() {
   return arrow::compute::less(lhs_->Evaluate(), rhs_->Evaluate());
 }
 

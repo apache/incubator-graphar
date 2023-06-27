@@ -187,13 +187,13 @@ class OperatorNotEqual : public BinaryOperator {
   ArrowExpression Evaluate() override;
 };
 
-class OperatorGreater : public BinaryOperator {
+class OperatorGreaterThan : public BinaryOperator {
  public:
-  OperatorGreater() = default;
-  OperatorGreater(Expression* lhs, Expression* rhs)
+  OperatorGreaterThan() = default;
+  OperatorGreaterThan(Expression* lhs, Expression* rhs)
       : BinaryOperator(lhs, rhs) {}
-  OperatorGreater(const OperatorGreater& other) = default;
-  ~OperatorGreater() = default;
+  OperatorGreaterThan(const OperatorGreaterThan& other) = default;
+  ~OperatorGreaterThan() = default;
 
   ArrowExpression Evaluate() override;
 };
@@ -209,12 +209,13 @@ class OperatorGreaterEqual : public BinaryOperator {
   ArrowExpression Evaluate() override;
 };
 
-class OperatorLess : public BinaryOperator {
+class OperatorLessThan : public BinaryOperator {
  public:
-  OperatorLess() = default;
-  OperatorLess(Expression* lhs, Expression* rhs) : BinaryOperator(lhs, rhs) {}
-  OperatorLess(const OperatorLess& other) = default;
-  ~OperatorLess() = default;
+  OperatorLessThan() = default;
+  OperatorLessThan(Expression* lhs, Expression* rhs)
+      : BinaryOperator(lhs, rhs) {}
+  OperatorLessThan(const OperatorLessThan& other) = default;
+  ~OperatorLessThan() = default;
 
   ArrowExpression Evaluate() override;
 };
@@ -252,9 +253,9 @@ class OperatorOr : public BinaryOperator {
 
 using Equal = OperatorEqual;
 using NotEqual = OperatorNotEqual;
-using Greater = OperatorGreater;
-using GreaterThan = OperatorGreaterEqual;
-using Less = OperatorLess;
+using GreaterThan = OperatorGreaterThan;
+using GreaterEqual = OperatorGreaterEqual;
+using LessThan = OperatorLessThan;
 using LessEqual = OperatorLessEqual;
 
 /**
