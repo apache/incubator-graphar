@@ -398,7 +398,8 @@ Status EdgeChunkWriter::validate(
     field = schema->field(index);
     if (field->type()->id() != arrow::Type::INT64) {
       return Status::TypeError(
-          "The data type for destination column should be INT64, but got ",
+          "The data type for destination index column should be INT64, but "
+          "got ",
           field->type()->name());
     }
   }
@@ -517,7 +518,7 @@ Status EdgeChunkWriter::WriteOffsetChunk(
   int index = schema->GetFieldIndex(GeneralParams::kOffsetCol);
   if (index == -1) {
     return Status::Invalid("The offset column ", GeneralParams::kOffsetCol,
-                           " is not exist in the input table");
+                           " does not exist in the input table");
   }
   auto in_table = input_table->SelectColumns({index}).ValueOrDie();
   GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_.GetAdjListOffsetFilePath(
@@ -539,14 +540,14 @@ Status EdgeChunkWriter::WriteAdjListChunk(
   if (index == -1) {
     return Status::Invalid("The source index column ",
                            GeneralParams::kSrcIndexCol,
-                           " is not exist in the input table");
+                           " does not exist in the input table");
   }
   indices.push_back(index);
   index = schema->GetFieldIndex(GeneralParams::kDstIndexCol);
   if (index == -1) {
     return Status::Invalid("The destination index column ",
                            GeneralParams::kDstIndexCol,
-                           " is not exist in the input table");
+                           " does not exist in the input table");
   }
   indices.push_back(index);
   auto in_table = input_table->SelectColumns(indices).ValueOrDie();
@@ -575,7 +576,7 @@ Status EdgeChunkWriter::WritePropertyChunk(
       return Status::Invalid("Column named ", property.name,
                              " of property group ", property_group, " of edge ",
                              edge_info_.GetEdgeLabel(),
-                             " is not exist in the input table.");
+                             " does not exist in the input table.");
     }
     indices.push_back(indice);
   }
