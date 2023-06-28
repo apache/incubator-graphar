@@ -122,7 +122,7 @@ Status VertexPropertyWriter::validate(const PropertyGroup& property_group,
                             " vertex info.");
   }
   if (chunk_index < 0) {
-    return Status::Invalid("The chunk index is negative.");
+    return Status::IndexError("Negative chunk index ", chunk_index, ".");
   }
   return Status::OK();
 }
@@ -277,7 +277,9 @@ Status EdgeChunkWriter::validate(IdType count_or_index1, IdType count_or_index2,
   }
   // weak & strong validate for count or index
   if (count_or_index1 < 0 || count_or_index2 < 0) {
-    return Status::Invalid("The count or index must be non-negative.");
+    return Status::IndexError(
+        "The count or index must be non-negative, but got ", count_or_index1,
+        " and ", count_or_index2, ".");
   }
   return Status::OK();
 }
@@ -343,7 +345,7 @@ Status EdgeChunkWriter::validate(
     int index = schema->GetFieldIndex(GeneralParams::kOffsetCol);
     if (index == -1) {
       return Status::Invalid("The offset column ", GeneralParams::kOffsetCol,
-                             " is not exist in the input table");
+                             " does not exist in the input table");
     }
     auto field = schema->field(index);
     if (field->type()->id() != arrow::Type::INT64) {
@@ -381,7 +383,7 @@ Status EdgeChunkWriter::validate(
     if (index == -1) {
       return Status::Invalid("The source index column ",
                              GeneralParams::kSrcIndexCol,
-                             " is not exist in the input table");
+                             " does not exist in the input table");
     }
     auto field = schema->field(index);
     if (field->type()->id() != arrow::Type::INT64) {
@@ -393,7 +395,7 @@ Status EdgeChunkWriter::validate(
     if (index == -1) {
       return Status::Invalid("The destination index column ",
                              GeneralParams::kDstIndexCol,
-                             " is not exist in the input table");
+                             " does not exist in the input table");
     }
     field = schema->field(index);
     if (field->type()->id() != arrow::Type::INT64) {

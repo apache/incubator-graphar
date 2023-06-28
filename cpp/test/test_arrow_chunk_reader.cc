@@ -121,7 +121,7 @@ TEST_CASE("test_adj_list_arrow_chunk_reader") {
   table = result.value();
   REQUIRE(table->num_rows() == 567);
   REQUIRE(reader.GetRowNumOfChunk() == 667);
-  REQUIRE(reader.next_chunk().IsEndOfChunk());
+  REQUIRE(reader.next_chunk().ok());
   result = reader.GetChunk();
   REQUIRE(!result.has_error());
   table = result.value();
@@ -177,7 +177,7 @@ TEST_CASE("test_adj_list_property_arrow_chunk_reader") {
   REQUIRE(!result.has_error());
   table = result.value();
   REQUIRE(table->num_rows() == 567);
-  REQUIRE(reader.next_chunk().IsEndOfChunk());
+  REQUIRE(reader.next_chunk().ok());
   result = reader.GetChunk();
   REQUIRE(!result.has_error());
   table = result.value();
