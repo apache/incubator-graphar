@@ -65,12 +65,14 @@ TEST_CASE("test_vertices_builder") {
       builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::no_validate).ok());
   REQUIRE(builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::weak_validate)
               .ok());
+  auto st =
+      builder.AddVertex(v, -2, GAR_NAMESPACE::ValidateLevel::weak_validate);
   REQUIRE(builder.AddVertex(v, -2, GAR_NAMESPACE::ValidateLevel::weak_validate)
-              .IsInvalid());
+              .IsIndexError());
   REQUIRE(builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::strong_validate)
               .IsTypeError());
   v.AddProperty("invalid_name", "invalid_value");
-  REQUIRE(builder.AddVertex(v, 0).IsInvalid());
+  REQUIRE(builder.AddVertex(v, 0).IsKeyError());
 
   // clear vertices
   builder.Clear();
@@ -157,7 +159,7 @@ TEST_CASE("test_edges_builder") {
   REQUIRE(builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::strong_validate)
               .IsTypeError());
   e.AddProperty("invalid_name", "invalid_value");
-  REQUIRE(builder.AddEdge(e).IsInvalid());
+  REQUIRE(builder.AddEdge(e).IsKeyError());
 
   // clear edges
   builder.Clear();

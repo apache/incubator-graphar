@@ -37,15 +37,15 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
   }
   // the start vertex index must be aligned with the chunk size
   if (start_vertex_index_ % vertex_info_.GetChunkSize() != 0) {
-    return Status::Invalid("The start vertex index ", start_vertex_index_,
-                           " is not aligned with the chunk size ",
-                           vertex_info_.GetChunkSize());
+    return Status::IndexError("The start vertex index ", start_vertex_index_,
+                              " is not aligned with the chunk size ",
+                              vertex_info_.GetChunkSize());
   }
   // the vertex index must larger than start index
   if (index != -1 && index < start_vertex_index_) {
-    return Status::Invalid("The vertex index ", index,
-                           " is smaller than the start index ",
-                           start_vertex_index_);
+    return Status::IndexError("The vertex index ", index,
+                              " is smaller than the start index ",
+                              start_vertex_index_);
   }
 
   // strong validate
@@ -53,9 +53,9 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
     for (auto& property : v.GetProperties()) {
       // check if the property is contained
       if (!vertex_info_.ContainProperty(property.first)) {
-        return Status::Invalid("Property with name ", property.first,
-                               " is not contained in the ",
-                               vertex_info_.GetLabel(), " vertex info.");
+        return Status::KeyError("Property with name ", property.first,
+                                " is not contained in the ",
+                                vertex_info_.GetLabel(), " vertex info.");
       }
       // check if the property type is correct
       auto type = vertex_info_.GetPropertyType(property.first).value();

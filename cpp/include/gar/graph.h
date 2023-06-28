@@ -423,7 +423,7 @@ class EdgeIter {
       st = adj_list_reader_.next_chunk();
       ++global_chunk_index_;
       ++vertex_chunk_index_;
-      if (!st.IsOutOfRange()) {
+      if (!st.IsIndexError()) {
         GAR_ASSIGN_OR_RAISE_ERROR(num_row_of_chunk_,
                                   adj_list_reader_.GetRowNumOfChunk());
         for (auto& reader : property_readers_) {

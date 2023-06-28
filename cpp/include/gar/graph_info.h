@@ -583,8 +583,9 @@ class EdgeInfo {
   Status AddPropertyGroup(const PropertyGroup& property_group,
                           AdjListType adj_list_type) noexcept {
     if (!ContainAdjList(adj_list_type)) {
-      return Status::Invalid("Invalid adjacency list type: ",
-                             AdjListTypeToString(adj_list_type));
+      return Status::KeyError(
+          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
+          " is not found in ", edge_label_, " edgeinfo.");
     }
     if (ContainPropertyGroup(property_group, adj_list_type)) {
       return Status::KeyError("Property group: ", property_group,
@@ -882,7 +883,7 @@ class EdgeInfo {
       IdType vertex_chunk_index, IdType edge_chunk_index) const {
     if (!ContainPropertyGroup(property_group, adj_list_type)) {
       return Status::KeyError("The property group: ", property_group,
-                              " is not found in the edge info");
+                              " is not found in the edge info.");
     }
     return prefix_ + adj_list2prefix_.at(adj_list_type) +
            property_group.GetPrefix() + "part" +

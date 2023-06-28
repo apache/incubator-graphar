@@ -108,7 +108,7 @@ Status VertexInfo::Save(const std::string& path) const {
 
 Result<EdgeInfo> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
   if (yaml == nullptr) {
-    return Status::Invalid("yaml is nullptr");
+    return Status::Invalid("yaml shared pointer is nullptr.");
   }
   std::string src_label = yaml->operator[]("src_label").As<std::string>();
   std::string edge_label = yaml->operator[]("edge_label").As<std::string>();

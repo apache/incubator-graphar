@@ -58,9 +58,10 @@ Status AdjListArrowChunkReader::seek_src(IdType id) noexcept {
 
   IdType new_vertex_chunk_index = id / edge_info_.GetSrcChunkSize();
   if (new_vertex_chunk_index >= vertex_chunk_num_) {
-    return Status::KeyError("No vertex with internal id ", id,
-                            " exists in edge ", edge_info_.GetEdgeLabel(),
-                            " reader.");
+    return Status::IndexError(
+        "The source internal id ", id, " is out of range [0,",
+        edge_info_.GetSrcChunkSize() * vertex_chunk_num_, ") of edge ",
+        edge_info_.GetEdgeLabel(), " reader.");
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
@@ -91,9 +92,10 @@ Status AdjListArrowChunkReader::seek_dst(IdType id) noexcept {
 
   IdType new_vertex_chunk_index = id / edge_info_.GetDstChunkSize();
   if (new_vertex_chunk_index >= vertex_chunk_num_) {
-    return Status::KeyError("No vertex with internal id ", id,
-                            " exists in edge ", edge_info_.GetEdgeLabel(),
-                            " reader.");
+    return Status::IndexError(
+        "The destination internal id ", id, " is out of range [0,",
+        edge_info_.GetDstChunkSize() * vertex_chunk_num_, ") of edge ",
+        edge_info_.GetEdgeLabel(), " reader.");
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
@@ -149,9 +151,10 @@ Status AdjListPropertyArrowChunkReader::seek_src(IdType id) noexcept {
 
   IdType new_vertex_chunk_index = id / edge_info_.GetSrcChunkSize();
   if (new_vertex_chunk_index >= vertex_chunk_num_) {
-    return Status::KeyError("No vertex with internal id ", id,
-                            " exists in edge ", edge_info_.GetEdgeLabel(),
-                            " reader.");
+    return Status::IndexError(
+        "The source internal id ", id, " is out of range [0,",
+        edge_info_.GetSrcChunkSize() * vertex_chunk_num_, ") of edge ",
+        edge_info_.GetEdgeLabel(), " reader.");
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
@@ -182,9 +185,10 @@ Status AdjListPropertyArrowChunkReader::seek_dst(IdType id) noexcept {
 
   IdType new_vertex_chunk_index = id / edge_info_.GetDstChunkSize();
   if (new_vertex_chunk_index >= vertex_chunk_num_) {
-    return Status::KeyError("No vertex with internal id ", id,
-                            " exists in edge ", edge_info_.GetEdgeLabel(),
-                            " reader.");
+    return Status::IndexError(
+        "The destination internal id ", id, " is out of range [0,",
+        edge_info_.GetDstChunkSize() * vertex_chunk_num_, ") of edge ",
+        edge_info_.GetEdgeLabel(), " reader.");
   }
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;

@@ -91,7 +91,7 @@ enum class StatusCode : unsigned char {
   kKeyError,
   kTypeError,
   kInvalid,
-  kOutOfRange,
+  kIndexError,
   kOutOfMemory,
   kEndOfChunk,
   kIOError,
@@ -181,12 +181,12 @@ class Status {
   }
 
   /**
-   * Return an error status for value is out of range (for example next_chunk
-   * is out of range)
+   * Return an error status when an index is out of bounds.
+   *
    */
   template <typename... Args>
-  static Status OutOfRange(Args&&... args) {
-    return Status::FromArgs(StatusCode::kOutOfRange,
+  static Status IndexError(Args&&... args) {
+    return Status::FromArgs(StatusCode::kIndexError,
                             std::forward<Args>(args)...);
   }
 
@@ -196,7 +196,7 @@ class Status {
                             std::forward<Args>(args)...);
   }
 
-  /** Return an error status when some yaml-cpp related operation failed. */
+  /** Return an error status when some yaml parse related operation failed. */
   template <typename... Args>
   static Status YamlError(Args&&... args) {
     return Status::FromArgs(StatusCode::kYamlError,
@@ -228,13 +228,14 @@ class Status {
   }
   /** Return true iff the status indicates invalid data. */
   constexpr bool IsInvalid() const { return code() == StatusCode::kInvalid; }
-  constexpr bool IsOutOfRange() const {
-    return code() == StatusCode::kOutOfRange;
+  /** Return true iff the status indicates an index out of bounds. */
+  constexpr bool IsIndexError() const {
+    return code() == StatusCode::kIndexError;
   }
   constexpr bool IsEndOfChunk() const {
     return code() == StatusCode::kEndOfChunk;
   }
-  /** Return true iff the status indicates an yaml-cpp related failure. */
+  /** Return true iff the status indicates an yaml parse related failure. */
   constexpr bool IsYamlError() const {
     return code() == StatusCode::kYamlError;
   }

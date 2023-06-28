@@ -103,7 +103,7 @@ TEST_CASE("test_vertex_property_writer_from_file") {
   p1.name = "invalid_property";
   p1.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32);
   GAR_NAMESPACE::PropertyGroup pg1({p1}, GAR_NAMESPACE::FileType::CSV);
-  REQUIRE(writer.WriteTable(table, pg1, 0).IsInvalid());
+  REQUIRE(writer.WriteTable(table, pg1, 0).IsKeyError());
   // Property not found in table
   std::shared_ptr<arrow::Table> tmp_table =
       table->RenameColumns({"original_id", "firstName", "lastName", "id"})
@@ -243,13 +243,13 @@ TEST_CASE("test_edge_chunk_writer") {
   GAR_NAMESPACE::EdgeChunkWriter writer2(edge_info, "/tmp/",
                                          invalid_adj_list_type);
   writer2.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
-  REQUIRE(writer2.WriteAdjListChunk(table, 0, 0).IsInvalid());
+  REQUIRE(writer2.WriteAdjListChunk(table, 0, 0).IsKeyError());
   // Invalid property group
   GAR_NAMESPACE::Property p1;
   p1.name = "invalid_property";
   p1.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32);
   GAR_NAMESPACE::PropertyGroup pg1({p1}, GAR_NAMESPACE::FileType::CSV);
-  REQUIRE(writer.WritePropertyChunk(table, pg1, 0, 0).IsInvalid());
+  REQUIRE(writer.WritePropertyChunk(table, pg1, 0, 0).IsKeyError());
   // Property not found in table
   GAR_NAMESPACE::PropertyGroup pg2 =
       edge_info.GetPropertyGroup("creationDate", adj_list_type).value();

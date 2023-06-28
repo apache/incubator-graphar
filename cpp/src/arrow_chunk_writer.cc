@@ -99,7 +99,7 @@ Status VertexPropertyWriter::validate(const IdType& count,
     return Status::OK();
   // weak & strong validate
   if (count < 0) {
-    return Status::Invalid("The number of vertices is negative");
+    return Status::Invalid("The number of vertices is negative.");
   }
   return Status::OK();
 }
@@ -117,12 +117,12 @@ Status VertexPropertyWriter::validate(const PropertyGroup& property_group,
     return Status::OK();
   // weak & strong validate
   if (!vertex_info_.ContainPropertyGroup(property_group)) {
-    return Status::Invalid("The property group ", property_group,
-                           " does not exist in ", vertex_info_.GetLabel(),
-                           " vertex info.");
+    return Status::KeyError("The property group ", property_group,
+                            " does not exist in ", vertex_info_.GetLabel(),
+                            " vertex info.");
   }
   if (chunk_index < 0) {
-    return Status::Invalid("The chunk index is negative");
+    return Status::Invalid("The chunk index is negative.");
   }
   return Status::OK();
 }
@@ -155,7 +155,7 @@ Status VertexPropertyWriter::validate(
     for (auto& property : property_group.GetProperties()) {
       int indice = schema->GetFieldIndex(property.name);
       if (indice == -1) {
-        return Status::Invalid("Property ", property.name,
+        return Status::Invalid("Column named ", property.name,
                                " of property group ", property_group,
                                " does not exist in the input table.");
       }
@@ -205,9 +205,9 @@ Status VertexPropertyWriter::WriteChunk(
   for (auto& property : property_group.GetProperties()) {
     int indice = schema->GetFieldIndex(property.name);
     if (indice == -1) {
-      return Status::Invalid("Property ", property.name, " of property group ",
-                             property_group, " of vertex ",
-                             vertex_info_.GetLabel(),
+      return Status::Invalid("Column named ", property.name,
+                             " of property group ", property_group,
+                             " of vertex ", vertex_info_.GetLabel(),
                              " does not exist in the input table.");
     }
     indices.push_back(indice);
@@ -271,7 +271,7 @@ Status EdgeChunkWriter::validate(IdType count_or_index1, IdType count_or_index2,
     return Status::OK();
   // weak & strong validate for adj list type
   if (!edge_info_.ContainAdjList(adj_list_type_)) {
-    return Status::Invalid(
+    return Status::KeyError(
         "Adj list type ", AdjListTypeToString(adj_list_type_),
         " does not exist in the ", edge_info_.GetEdgeLabel(), " edge info.");
   }
@@ -296,9 +296,9 @@ Status EdgeChunkWriter::validate(const PropertyGroup& property_group,
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   // weak & strong validate for property group
   if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_)) {
-    return Status::Invalid("Property group ", property_group,
-                           " does not exist in the ", edge_info_.GetEdgeLabel(),
-                           " edge info.");
+    return Status::KeyError("Property group ", property_group,
+                            " does not exist in the ",
+                            edge_info_.GetEdgeLabel(), " edge info.");
   }
   return Status::OK();
 }
@@ -432,7 +432,7 @@ Status EdgeChunkWriter::validate(
     for (auto& property : property_group.GetProperties()) {
       int indice = schema->GetFieldIndex(property.name);
       if (indice == -1) {
-        return Status::Invalid("Property ", property.name,
+        return Status::Invalid("Column named ", property.name,
                                " of property group ", property_group,
                                " does not exist in the input table.");
       }
@@ -572,8 +572,8 @@ Status EdgeChunkWriter::WritePropertyChunk(
   for (auto& property : property_group.GetProperties()) {
     int indice = schema->GetFieldIndex(property.name);
     if (indice == -1) {
-      return Status::Invalid("Property ", property.name, " of property group ",
-                             property_group, " of edge ",
+      return Status::Invalid("Column named ", property.name,
+                             " of property group ", property_group, " of edge ",
                              edge_info_.GetEdgeLabel(),
                              " is not exist in the input table.");
     }

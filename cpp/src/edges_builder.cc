@@ -36,9 +36,9 @@ Status EdgesBuilder::validate(const Edge& e,
         "The edge builder has been saved, can not add "
         "new edges any more");
   }
-  // invalid adj list type
+  // adj list type not exits in edge info
   if (!edge_info_.ContainAdjList(adj_list_type_)) {
-    return Status::Invalid(
+    return Status::KeyError(
         "Adj list type ", AdjListTypeToString(adj_list_type_),
         " does not exist in the ", edge_info_.GetEdgeLabel(), " edge info.");
   }
@@ -48,9 +48,9 @@ Status EdgesBuilder::validate(const Edge& e,
     for (auto& property : e.GetProperties()) {
       // check if the property is contained
       if (!edge_info_.ContainProperty(property.first)) {
-        return Status::Invalid("Property with name ", property.first,
-                               " is not contained in the ",
-                               edge_info_.GetEdgeLabel(), " edge info.");
+        return Status::KeyError("Property with name ", property.first,
+                                " is not contained in the ",
+                                edge_info_.GetEdgeLabel(), " edge info.");
       }
       // check if the property type is correct
       auto type = edge_info_.GetPropertyType(property.first).value();

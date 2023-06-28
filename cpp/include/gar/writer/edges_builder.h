@@ -234,7 +234,7 @@ class EdgesBuilder {
    * @param e The edge to add.
    * @param validate_level The validate level for this operation,
    * which is the builder's validate level by default.
-   * @return Status: ok or Status::InvalidOperation error.
+   * @return Status: ok or Status::Invalid error.
    */
   Status AddEdge(const Edge& e, const ValidateLevel& validate_level =
                                     ValidateLevel::default_validate) {
