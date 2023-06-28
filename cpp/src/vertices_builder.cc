@@ -31,18 +31,21 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
   // weak validate
   // can not add new vertices after dumping
   if (is_saved_) {
-    return Status::InvalidOperation("can not add new vertices after dumping");
+    return Status::Invalid(
+        "The vertices builder has been saved, can not add "
+        "new vertices any more");
   }
   // the start vertex index must be aligned with the chunk size
   if (start_vertex_index_ % vertex_info_.GetChunkSize() != 0) {
-    return Status::InvalidOperation(
-        "the start vertex index must be aligned "
-        "with the chunk size");
+    return Status::IndexError("The start vertex index ", start_vertex_index_,
+                              " is not aligned with the chunk size ",
+                              vertex_info_.GetChunkSize());
   }
   // the vertex index must larger than start index
   if (index != -1 && index < start_vertex_index_) {
-    return Status::InvalidOperation(
-        "the vertex index must be larger than start index");
+    return Status::IndexError("The vertex index ", index,
+                              " is smaller than the start index ",
+                              start_vertex_index_);
   }
 
   // strong validate
@@ -50,9 +53,9 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
     for (auto& property : v.GetProperties()) {
       // check if the property is contained
       if (!vertex_info_.ContainProperty(property.first)) {
-        return Status::InvalidOperation(
-            "invalid property name: " + property.first +
-            ", which is not contained in the vertex info");
+        return Status::KeyError("Property with name ", property.first,
+                                " is not contained in the ",
+                                vertex_info_.GetLabel(), " vertex info.");
       }
       // check if the property type is correct
       auto type = vertex_info_.GetPropertyType(property.first).value();
@@ -95,14 +98,12 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
         }
         break;
       default:
-        return Status::TypeError("unsupported property type");
+        return Status::TypeError("Unsupported property type.");
       }
       if (invalid_type) {
-        std::string err_msg =
-            "invalid data type for property: " + property.first +
-            ", defined as " + type.ToTypeName() + ", but got " +
-            property.second.type().name();
-        return Status::TypeError(err_msg);
+        return Status::TypeError(
+            "Invalid data type for property ", property.first + ", defined as ",
+            type.ToTypeName(), ", but got ", property.second.type().name());
       }
     }
   }
@@ -126,9 +127,9 @@ Status VerticesBuilder::appendToArray(
   case Type::STRING:
     return tryToAppend<Type::STRING>(property_name, array);
   default:
-    return Status::TypeError();
+    return Status::TypeError("Unsupported property type.");
   }
-  return Status::TypeError();
+  return Status::OK();
 }
 
 template <Type type>
@@ -140,14 +141,10 @@ Status VerticesBuilder::tryToAppend(
   typename ConvertToArrowType<type>::BuilderType builder(pool);
   for (auto& v : vertices_) {
     if (v.Empty() || !v.ContainProperty(property_name)) {
-      auto status = builder.AppendNull();
-      if (!status.ok())
-        return Status::ArrowError(status.ToString());
+      RETURN_NOT_ARROW_OK(builder.AppendNull());
     } else {
-      auto status =
-          builder.Append(std::any_cast<CType>(v.GetProperty(property_name)));
-      if (!status.ok())
-        return Status::ArrowError(status.ToString());
+      RETURN_NOT_ARROW_OK(
+          builder.Append(std::any_cast<CType>(v.GetProperty(property_name))));
     }
   }
   array = builder.Finish().ValueOrDie();

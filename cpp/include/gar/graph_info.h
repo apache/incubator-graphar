@@ -133,6 +133,17 @@ class PropertyGroup {
    */
   inline const std::string& GetPrefix() const { return prefix_; }
 
+  friend std::ostream& operator<<(std::ostream& stream,
+                                  const PropertyGroup& pg) {
+    for (size_t i = 0; i < pg.properties_.size(); ++i) {
+      stream << pg.properties_[i].name;
+      if (i != pg.properties_.size() - 1) {
+        stream << "_";
+      }
+    }
+    return stream;
+  }
+
  private:
   std::vector<Property> properties_;
   FileType file_type_;
@@ -209,22 +220,22 @@ class VertexInfo {
    */
   inline Status AddPropertyGroup(const PropertyGroup& property_group) {
     if (ContainPropertyGroup(property_group)) {
-      return Status::InvalidOperation(
-          "The property group has already existed, can't not be added again.");
+      return Status::Invalid("The property group ", property_group,
+                             " has already existed, can't not be added again.");
     }
     for (const auto& property : property_group.GetProperties()) {
       if (ContainProperty(property.name)) {
-        std::string err_msg = "The property " + property.name +
-                              " has already existed in the vertex info.";
-        return Status::InvalidOperation(err_msg);
+        return Status::Invalid("The property ", property.name,
+                               " has already existed in the ", label_,
+                               " vertex info, can't not be added again.");
       }
     }
 
     property_groups_.push_back(property_group);
     for (const auto& p : property_group.GetProperties()) {
       if (!version_.CheckType(p.type.ToTypeName())) {
-        return Status::Invalid(
-            "The property type is not supported by the version.");
+        return Status::Invalid("The property type ", p.type.ToTypeName(),
+                               " is not supported by the version.");
       }
       p2type_[p.name] = p.type;
       p2primary_[p.name] = p.is_primary;
@@ -280,7 +291,8 @@ class VertexInfo {
   Result<const PropertyGroup&> GetPropertyGroup(
       const std::string& property_name) const noexcept {
     if (!ContainProperty(property_name)) {
-      return Status::KeyError("The property is not found.");
+      return Status::KeyError("No property with name ", property_name,
+                              " found in ", label_, " vertex.");
     }
     return property_groups_[p2group_index_.at(property_name)];
   }
@@ -295,7 +307,8 @@ class VertexInfo {
   inline Result<DataType> GetPropertyType(
       const std::string& property_name) const noexcept {
     if (p2type_.find(property_name) == p2type_.end()) {
-      return Status::KeyError("The property is not found.");
+      return Status::KeyError("No property with name ", property_name,
+                              " found in ", label_, " vertex.");
     }
     return p2type_.at(property_name);
   }
@@ -336,7 +349,8 @@ class VertexInfo {
   inline Result<bool> IsPrimaryKey(const std::string& property_name) const
       noexcept {
     if (p2primary_.find(property_name) == p2primary_.end()) {
-      return Status::KeyError("The property is not found.");
+      return Status::KeyError("No property with name ", property_name,
+                              " found in ", label_, " vertex.");
     }
     return p2primary_.at(property_name);
   }
@@ -383,8 +397,8 @@ class VertexInfo {
   inline Result<std::string> GetFilePath(const PropertyGroup& property_group,
                                          IdType chunk_index) const noexcept {
     if (!ContainPropertyGroup(property_group)) {
-      return Status::KeyError(
-          "Vertex info does not contain the property group.");
+      return Status::KeyError("The property group: ", property_group,
+                              " is not found in the ", label_, " vertex.");
     }
     return prefix_ + property_group.GetPrefix() + "chunk" +
            std::to_string(chunk_index);
@@ -400,8 +414,8 @@ class VertexInfo {
   inline Result<std::string> GetPathPrefix(
       const PropertyGroup& property_group) const noexcept {
     if (!ContainPropertyGroup(property_group)) {
-      return Status::KeyError(
-          "Vertex info does not contain the property group.");
+      return Status::KeyError("The property group: ", property_group,
+                              " is not found in the ", label_, " vertex.");
     }
     return prefix_ + property_group.GetPrefix();
   }
@@ -541,8 +555,9 @@ class EdgeInfo {
   Status AddAdjList(const AdjListType& adj_list_type, FileType file_type,
                     const std::string& prefix = "") {
     if (ContainAdjList(adj_list_type)) {
-      return Status::InvalidOperation(
-          "The adj list type has already existed in edge info.");
+      return Status::KeyError(
+          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
+          " already exists in edge info.");
     }
     if (prefix.empty()) {
       // default prefix
@@ -568,18 +583,18 @@ class EdgeInfo {
   Status AddPropertyGroup(const PropertyGroup& property_group,
                           AdjListType adj_list_type) noexcept {
     if (!ContainAdjList(adj_list_type)) {
-      return Status::InvalidOperation(
-          "The adj list type not supported by edge info.");
+      return Status::KeyError(
+          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
+          " is not found in ", edge_label_, " edgeinfo.");
     }
     if (ContainPropertyGroup(property_group, adj_list_type)) {
-      return Status::InvalidOperation(
-          "The property group has already existed.");
+      return Status::KeyError("Property group: ", property_group,
+                              " already exists in adjacency list.");
     }
     adj_list2property_groups_[adj_list_type].push_back(property_group);
     for (auto& p : property_group.GetProperties()) {
       if (!version_.CheckType(p.type.ToTypeName())) {
-        return Status::Invalid(
-            "The property type is not supported by the version.");
+        return Status::Invalid("Invalid property type: ", p.type.ToTypeName());
       }
       p2type_[p.name] = p.type;
       p2primary_[p.name] = p.is_primary;
@@ -698,7 +713,9 @@ class EdgeInfo {
   inline Result<FileType> GetFileType(AdjListType adj_list_type) const
       noexcept {
     if (!ContainAdjList(adj_list_type)) {
-      return Status::KeyError("The adj list type is not found in edge info.");
+      return Status::KeyError(
+          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
+          " is not found in edge info.");
     }
     return adj_list2file_type_.at(adj_list_type);
   }
@@ -714,7 +731,9 @@ class EdgeInfo {
   inline Result<const std::vector<PropertyGroup>&> GetPropertyGroups(
       AdjListType adj_list_type) const noexcept {
     if (!ContainAdjList(adj_list_type)) {
-      return Status::KeyError("The adj list type is not found in edge info.");
+      return Status::KeyError(
+          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
+          " is not found in edge info.");
     }
     return adj_list2property_groups_.at(adj_list_type);
   }
@@ -731,12 +750,12 @@ class EdgeInfo {
    */
   inline Result<const PropertyGroup&> GetPropertyGroup(
       const std::string& property, AdjListType adj_list_type) const noexcept {
-    if (p2group_index_.find(property) == p2group_index_.end()) {
-      return Status::KeyError("The property is not found.");
-    }
-    if (p2group_index_.at(property).find(adj_list_type) ==
-        p2group_index_.at(property).end()) {
-      return Status::KeyError("The property is not contained in the adj list.");
+    if (p2group_index_.find(property) == p2group_index_.end() ||
+        p2group_index_.at(property).find(adj_list_type) ==
+            p2group_index_.at(property).end()) {
+      return Status::KeyError("No property with name: ", property,
+                              " is found in edge info for adj list type: ",
+                              AdjListTypeToString(adj_list_type));
     }
     return adj_list2property_groups_.at(
         adj_list_type)[p2group_index_.at(property).at(adj_list_type)];
@@ -752,7 +771,9 @@ class EdgeInfo {
   inline Result<std::string> GetVerticesNumFilePath(
       AdjListType adj_list_type) const noexcept {
     if (!ContainAdjList(adj_list_type)) {
-      return Status::KeyError("The adj list type is not found in edge info.");
+      return Status::KeyError(
+          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
+          " is not found in edge info.");
     }
     return prefix_ + adj_list2prefix_.at(adj_list_type) + "vertex_count";
   }
@@ -768,7 +789,9 @@ class EdgeInfo {
   inline Result<std::string> GetEdgesNumFilePath(
       IdType vertex_chunk_index, AdjListType adj_list_type) const noexcept {
     if (!ContainAdjList(adj_list_type)) {
-      return Status::KeyError("The adj list type is not found in edge info.");
+      return Status::KeyError(
+          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
+          " is not found in edge info.");
     }
     return prefix_ + adj_list2prefix_.at(adj_list_type) + "edge_count" +
            std::to_string(vertex_chunk_index);
@@ -785,7 +808,9 @@ class EdgeInfo {
                                                 AdjListType adj_list_type) const
       noexcept {
     if (!ContainAdjList(adj_list_type)) {
-      return Status::KeyError("The adj list type is not found in edge info.");
+      return Status::KeyError(
+          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
+          " is not found in edge info.");
     }
     return prefix_ + adj_list2prefix_.at(adj_list_type) + "adj_list/part" +
            std::to_string(vertex_chunk_index) + "/" + "chunk" +
@@ -802,7 +827,9 @@ class EdgeInfo {
   inline Result<std::string> GetAdjListPathPrefix(
       const AdjListType& adj_list_type) const noexcept {
     if (!ContainAdjList(adj_list_type)) {
-      return Status::KeyError("The adj list type is not found in edge info.");
+      return Status::KeyError(
+          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
+          " is not found in edge info.");
     }
     return prefix_ + adj_list2prefix_.at(adj_list_type) + "adj_list/";
   }
@@ -816,7 +843,9 @@ class EdgeInfo {
   inline Result<std::string> GetAdjListOffsetFilePath(
       IdType vertex_chunk_index, AdjListType adj_list_type) const noexcept {
     if (!ContainAdjList(adj_list_type)) {
-      return Status::KeyError("The adj list type is not found in edge info.");
+      return Status::KeyError(
+          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
+          " is not found in edge info.");
     }
     return prefix_ + adj_list2prefix_.at(adj_list_type) + "offset/chunk" +
            std::to_string(vertex_chunk_index);
@@ -832,7 +861,9 @@ class EdgeInfo {
   inline Result<std::string> GetOffsetPathPrefix(
       AdjListType adj_list_type) const noexcept {
     if (!ContainAdjList(adj_list_type)) {
-      return Status::KeyError("The adj list type is not found in edge info.");
+      return Status::KeyError(
+          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
+          " is not found in edge info.");
     }
     return prefix_ + adj_list2prefix_.at(adj_list_type) + "offset/";
   }
@@ -851,8 +882,8 @@ class EdgeInfo {
       const PropertyGroup& property_group, AdjListType adj_list_type,
       IdType vertex_chunk_index, IdType edge_chunk_index) const {
     if (!ContainPropertyGroup(property_group, adj_list_type)) {
-      return Status::KeyError(
-          "The edge info does not contain the property group.");
+      return Status::KeyError("The property group: ", property_group,
+                              " is not found in the edge info.");
     }
     return prefix_ + adj_list2prefix_.at(adj_list_type) +
            property_group.GetPrefix() + "part" +
@@ -872,8 +903,8 @@ class EdgeInfo {
       const PropertyGroup& property_group, AdjListType adj_list_type) const
       noexcept {
     if (!ContainPropertyGroup(property_group, adj_list_type)) {
-      return Status::KeyError(
-          "The edge info does not contain the property group.");
+      return Status::KeyError("The property group: ", property_group,
+                              " is not found in the edge info");
     }
     return prefix_ + adj_list2prefix_.at(adj_list_type) +
            property_group.GetPrefix();
@@ -888,7 +919,8 @@ class EdgeInfo {
    */
   Result<DataType> GetPropertyType(const std::string& property) const noexcept {
     if (p2type_.find(property) == p2type_.end()) {
-      return Status::KeyError("The property is not found.");
+      return Status::KeyError("No property with name ", property,
+                              " is not found in the edge info");
     }
     return p2type_.at(property);
   }
@@ -902,7 +934,8 @@ class EdgeInfo {
    */
   Result<bool> IsPrimaryKey(const std::string& property) const noexcept {
     if (p2primary_.find(property) == p2primary_.end()) {
-      return Status::KeyError("The property is not found.");
+      return Status::KeyError("No property with name ", property,
+                              " is not found in the edge info");
     }
     return p2primary_.at(property);
   }
@@ -1063,7 +1096,8 @@ class GraphInfo {
   Status AddVertex(const VertexInfo& vertex_info) noexcept {
     std::string label = vertex_info.GetLabel();
     if (vertex2info_.find(label) != vertex2info_.end()) {
-      return Status::InvalidOperation("The vertex info is already contained.");
+      return Status::Invalid("The vertex info of ", label,
+                             " is already existed.");
     }
     vertex2info_.emplace(label, vertex_info);
     return Status::OK();
@@ -1081,7 +1115,7 @@ class GraphInfo {
                       edge_info.GetEdgeLabel() + REGULAR_SEPERATOR +
                       edge_info.GetDstLabel();
     if (edge2info_.find(key) != edge2info_.end()) {
-      return Status::InvalidOperation("The edge info is already contained.");
+      return Status::Invalid("The edge info of ", key, " is already existed.");
     }
     edge2info_.emplace(key, edge_info);
     return Status::OK();
@@ -1133,7 +1167,8 @@ class GraphInfo {
   inline Result<const VertexInfo&> GetVertexInfo(const std::string& label) const
       noexcept {
     if (vertex2info_.find(label) == vertex2info_.end()) {
-      return Status::KeyError("The vertex info is not found in graph info.");
+      return Status::KeyError("The vertex info of ", label,
+                              "is not found in graph info.");
     }
     return vertex2info_.at(label);
   }
@@ -1154,7 +1189,8 @@ class GraphInfo {
     std::string key = src_label + REGULAR_SEPERATOR + edge_label +
                       REGULAR_SEPERATOR + dst_label;
     if (edge2info_.find(key) == edge2info_.end()) {
-      return Status::KeyError("The edge info is not found in graph info.");
+      return Status::KeyError("The edge info of ", key,
+                              " is not found in graph info.");
     }
     return edge2info_.at(key);
   }
@@ -1168,7 +1204,8 @@ class GraphInfo {
   inline Result<const PropertyGroup&> GetVertexPropertyGroup(
       const std::string& label, const std::string& property) const noexcept {
     if (vertex2info_.find(label) == vertex2info_.end()) {
-      return Status::KeyError("The vertex info is not found in graph info.");
+      return Status::KeyError("The vertex info of ", label,
+                              "is not found in graph info.");
     }
     return vertex2info_.at(label).GetPropertyGroup(property);
   }
@@ -1189,7 +1226,8 @@ class GraphInfo {
     std::string key = src_label + REGULAR_SEPERATOR + edge_label +
                       REGULAR_SEPERATOR + dst_label;
     if (edge2info_.find(key) == edge2info_.end()) {
-      return Status::KeyError("The edge info is not found in graph info.");
+      return Status::KeyError("The edge info of ", key,
+                              " is not found in graph info.");
     }
     return edge2info_.at(key).GetPropertyGroup(property, adj_list_type);
   }

@@ -81,16 +81,13 @@ Result<std::shared_ptr<arrow::Table>> ExecutePlanAndCollectAsTable(
   // stop producing
   plan->StopProducing();
   // plan mark finished
-  auto future = plan->finished();
-  if (!future.status().ok()) {
-    return Status::ArrowError(future.status().ToString());
-  }
+  RETURN_NOT_ARROW_OK(plan->finished().status());
   return response_table;
 }
 
 // implementations for VertexPropertyChunkWriter
 
-// Check if the opeartion of writing vertices number is allowed.
+// Check if the operation of writing vertices number is allowed.
 Status VertexPropertyWriter::validate(const IdType& count,
                                       ValidateLevel validate_level) const
     noexcept {
@@ -102,13 +99,12 @@ Status VertexPropertyWriter::validate(const IdType& count,
     return Status::OK();
   // weak & strong validate
   if (count < 0) {
-    return Status::InvalidOperation(
-        "the number of vertices must be non-negative");
+    return Status::Invalid("The number of vertices is negative.");
   }
   return Status::OK();
 }
 
-// Check if the opeartion of copying a file as a chunk is allowed.
+// Check if the operation of copying a file as a chunk is allowed.
 Status VertexPropertyWriter::validate(const PropertyGroup& property_group,
                                       IdType chunk_index,
                                       ValidateLevel validate_level) const
@@ -121,32 +117,37 @@ Status VertexPropertyWriter::validate(const PropertyGroup& property_group,
     return Status::OK();
   // weak & strong validate
   if (!vertex_info_.ContainPropertyGroup(property_group)) {
-    return Status::InvalidOperation(
-        "the property group does not exist in the vertex info");
+    return Status::KeyError("The property group ", property_group,
+                            " does not exist in ", vertex_info_.GetLabel(),
+                            " vertex info.");
   }
-  if (chunk_index < 0)
-    return Status::InvalidOperation("invalid vertex chunk index");
+  if (chunk_index < 0) {
+    return Status::IndexError("Negative chunk index ", chunk_index, ".");
+  }
   return Status::OK();
 }
 
-// Check if the opeartion of writing a table as a chunk is allowed.
+// Check if the operation of writing a table as a chunk is allowed.
 Status VertexPropertyWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table,
     const PropertyGroup& property_group, IdType chunk_index,
     ValidateLevel validate_level) const noexcept {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // validate property_group & chunk_index
   GAR_RETURN_NOT_OK(validate(property_group, chunk_index, validate_level));
   // weak validate for the input_table
   if (input_table->num_rows() > vertex_info_.GetChunkSize()) {
-    return Status::OutOfRange(
-        "the number of rows in the input table is larger than the vertex chunk "
-        "size");
+    return Status::Invalid("The number of rows of input table is ",
+                           input_table->num_rows(),
+                           " which is larger than the vertex chunk size",
+                           vertex_info_.GetChunkSize(), ".");
   }
   // strong validate for the input_table
   if (validate_level == ValidateLevel::strong_validate) {
@@ -154,16 +155,16 @@ Status VertexPropertyWriter::validate(
     for (auto& property : property_group.GetProperties()) {
       int indice = schema->GetFieldIndex(property.name);
       if (indice == -1) {
-        return Status::InvalidOperation("property: " + property.name +
-                                        " not found");
+        return Status::Invalid("Column named ", property.name,
+                               " of property group ", property_group,
+                               " does not exist in the input table.");
       }
       auto field = schema->field(indice);
       if (DataType::ArrowDataTypeToDataType(field->type()) != property.type) {
-        std::string err_msg =
-            "invalid data type for property: " + property.name +
-            ", defined as " + property.type.ToTypeName() + ", but got " +
-            DataType::ArrowDataTypeToDataType(field->type()).ToTypeName();
-        return Status::TypeError(err_msg);
+        return Status::TypeError(
+            "The data type of property: ", property.name, " is ",
+            property.type.ToTypeName(), ", but got ",
+            DataType::ArrowDataTypeToDataType(field->type()).ToTypeName(), ".");
       }
     }
   }
@@ -204,9 +205,10 @@ Status VertexPropertyWriter::WriteChunk(
   for (auto& property : property_group.GetProperties()) {
     int indice = schema->GetFieldIndex(property.name);
     if (indice == -1) {
-      std::string msg = "invalid property: " + property.name +
-                        " vertex: " + vertex_info_.GetLabel();
-      return Status::InvalidOperation(msg);
+      return Status::Invalid("Column named ", property.name,
+                             " of property group ", property_group,
+                             " of vertex ", vertex_info_.GetLabel(),
+                             " does not exist in the input table.");
     }
     indices.push_back(indice);
   }
@@ -269,14 +271,16 @@ Status EdgeChunkWriter::validate(IdType count_or_index1, IdType count_or_index2,
     return Status::OK();
   // weak & strong validate for adj list type
   if (!edge_info_.ContainAdjList(adj_list_type_)) {
-    return Status::InvalidOperation(
-        "the adj list type " +
-        std::string(AdjListTypeToString(adj_list_type_)) +
-        "  does not exist in the edge info");
+    return Status::KeyError(
+        "Adj list type ", AdjListTypeToString(adj_list_type_),
+        " does not exist in the ", edge_info_.GetEdgeLabel(), " edge info.");
   }
   // weak & strong validate for count or index
-  if (count_or_index1 < 0 || count_or_index2 < 0)
-    return Status::InvalidOperation("the count or index must be non-negative");
+  if (count_or_index1 < 0 || count_or_index2 < 0) {
+    return Status::IndexError(
+        "The count or index must be non-negative, but got ", count_or_index1,
+        " and ", count_or_index2, ".");
+  }
   return Status::OK();
 }
 
@@ -294,8 +298,9 @@ Status EdgeChunkWriter::validate(const PropertyGroup& property_group,
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   // weak & strong validate for property group
   if (!edge_info_.ContainPropertyGroup(property_group, adj_list_type_)) {
-    return Status::InvalidOperation(
-        "the property group does not exist in the edge info");
+    return Status::KeyError("Property group ", property_group,
+                            " does not exist in the ",
+                            edge_info_.GetEdgeLabel(), " edge info.");
   }
   return Status::OK();
 }
@@ -315,33 +320,37 @@ Status EdgeChunkWriter::validate(
   // weak validate for the input table
   if (adj_list_type_ != AdjListType::ordered_by_source &&
       adj_list_type_ != AdjListType::ordered_by_dest) {
-    return Status::InvalidOperation(
-        "the adj list type has to be ordered_by_source or ordered_by_dest, but "
+    return Status::Invalid(
+        "The adj list type has to be ordered_by_source or ordered_by_dest, but "
         "got " +
         std::string(AdjListTypeToString(adj_list_type_)));
   }
   if (adj_list_type_ == AdjListType::ordered_by_source &&
       input_table->num_rows() > edge_info_.GetSrcChunkSize() + 1) {
-    return Status::OutOfRange(
-        "the number of rows in the input table is larger than the offset table "
-        "size for a vertex chunk");
+    return Status::Invalid(
+        "The number of rows of input offset table is ", input_table->num_rows(),
+        " which is larger than the offset size of source vertex chunk ",
+        edge_info_.GetSrcChunkSize() + 1, ".");
   }
   if (adj_list_type_ == AdjListType::ordered_by_dest &&
       input_table->num_rows() > edge_info_.GetDstChunkSize() + 1) {
-    return Status::OutOfRange(
-        "the number of rows in the input table is larger than the offset table "
-        "size for a vertex chunk");
+    return Status::Invalid(
+        "The number of rows of input offset table is ", input_table->num_rows(),
+        " which is larger than the offset size of destination vertex chunk ",
+        edge_info_.GetSrcChunkSize() + 1, ".");
   }
   // strong validate for the input_table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     int index = schema->GetFieldIndex(GeneralParams::kOffsetCol);
-    if (index == -1)
-      return Status::InvalidOperation("the offset column is not provided");
+    if (index == -1) {
+      return Status::Invalid("The offset column ", GeneralParams::kOffsetCol,
+                             " does not exist in the input table");
+    }
     auto field = schema->field(index);
     if (field->type()->id() != arrow::Type::INT64) {
       return Status::TypeError(
-          "the data type for offset column should be INT64, but got " +
+          "The data type for offset column should be INT64, but got ",
           field->type()->name());
     }
   }
@@ -362,29 +371,37 @@ Status EdgeChunkWriter::validate(
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   // weak validate for the input table
   if (input_table->num_rows() > edge_info_.GetChunkSize()) {
-    return Status::OutOfRange(
-        "the number of rows in the input table is larger than the edge chunk "
-        "size");
+    return Status::Invalid(
+        "The number of rows of input table is ", input_table->num_rows(),
+        " which is larger than the ", edge_info_.GetEdgeLabel(),
+        " edge chunk size ", edge_info_.GetChunkSize(), ".");
   }
-  // stong validate for the input table
+  // strong validate for the input table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     int index = schema->GetFieldIndex(GeneralParams::kSrcIndexCol);
-    if (index == -1)
-      return Status::InvalidOperation("the source column is not provided");
+    if (index == -1) {
+      return Status::Invalid("The source index column ",
+                             GeneralParams::kSrcIndexCol,
+                             " does not exist in the input table");
+    }
     auto field = schema->field(index);
     if (field->type()->id() != arrow::Type::INT64) {
       return Status::TypeError(
-          "the data type for source column should be INT64, but got " +
+          "The data type for source index column should be INT64, but got ",
           field->type()->name());
     }
     index = schema->GetFieldIndex(GeneralParams::kDstIndexCol);
-    if (index == -1)
-      return Status::InvalidOperation("the destination column is not provided");
+    if (index == -1) {
+      return Status::Invalid("The destination index column ",
+                             GeneralParams::kDstIndexCol,
+                             " does not exist in the input table");
+    }
     field = schema->field(index);
     if (field->type()->id() != arrow::Type::INT64) {
       return Status::TypeError(
-          "the data type for destination column should be INT64, but got " +
+          "The data type for destination index column should be INT64, but "
+          "got ",
           field->type()->name());
     }
   }
@@ -406,23 +423,28 @@ Status EdgeChunkWriter::validate(
   GAR_RETURN_NOT_OK(validate(property_group, vertex_chunk_index, chunk_index,
                              validate_level));
   // weak validate for the input table
-  if (input_table->num_rows() > edge_info_.GetChunkSize())
-    return Status::OutOfRange();
+  if (input_table->num_rows() > edge_info_.GetChunkSize()) {
+    return Status::Invalid(
+        "The number of rows of input table is ", input_table->num_rows(),
+        " which is larger than the ", edge_info_.GetEdgeLabel(),
+        " edge chunk size ", edge_info_.GetChunkSize(), ".");
+  }
   // strong validate for the input table
   if (validate_level == ValidateLevel::strong_validate) {
     auto schema = input_table->schema();
     for (auto& property : property_group.GetProperties()) {
       int indice = schema->GetFieldIndex(property.name);
-      if (indice == -1)
-        return Status::InvalidOperation("property: " + property.name +
-                                        " not found");
+      if (indice == -1) {
+        return Status::Invalid("Column named ", property.name,
+                               " of property group ", property_group,
+                               " does not exist in the input table.");
+      }
       auto field = schema->field(indice);
       if (DataType::ArrowDataTypeToDataType(field->type()) != property.type) {
-        std::string err_msg =
-            "invalid data type for property: " + property.name +
-            ", defined as " + property.type.ToTypeName() + ", but got " +
-            DataType::ArrowDataTypeToDataType(field->type()).ToTypeName();
-        return Status::TypeError(err_msg);
+        return Status::TypeError(
+            "The data type of property: ", property.name, " is ",
+            property.type.ToTypeName(), ", but got ",
+            DataType::ArrowDataTypeToDataType(field->type()).ToTypeName(), ".");
       }
     }
   }
@@ -496,8 +518,10 @@ Status EdgeChunkWriter::WriteOffsetChunk(
   GAR_ASSIGN_OR_RAISE(auto file_type, edge_info_.GetFileType(adj_list_type_));
   auto schema = input_table->schema();
   int index = schema->GetFieldIndex(GeneralParams::kOffsetCol);
-  if (index == -1)
-    return Status::InvalidOperation("the offset column is not provided");
+  if (index == -1) {
+    return Status::Invalid("The offset column ", GeneralParams::kOffsetCol,
+                           " does not exist in the input table");
+  }
   auto in_table = input_table->SelectColumns({index}).ValueOrDie();
   GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_.GetAdjListOffsetFilePath(
                                        vertex_chunk_index, adj_list_type_));
@@ -515,12 +539,18 @@ Status EdgeChunkWriter::WriteAdjListChunk(
   indices.clear();
   auto schema = input_table->schema();
   int index = schema->GetFieldIndex(GeneralParams::kSrcIndexCol);
-  if (index == -1)
-    return Status::InvalidOperation("the source column is not provided");
+  if (index == -1) {
+    return Status::Invalid("The source index column ",
+                           GeneralParams::kSrcIndexCol,
+                           " does not exist in the input table");
+  }
   indices.push_back(index);
   index = schema->GetFieldIndex(GeneralParams::kDstIndexCol);
-  if (index == -1)
-    return Status::InvalidOperation("the destination column is not provided");
+  if (index == -1) {
+    return Status::Invalid("The destination index column ",
+                           GeneralParams::kDstIndexCol,
+                           " does not exist in the input table");
+  }
   indices.push_back(index);
   auto in_table = input_table->SelectColumns(indices).ValueOrDie();
 
@@ -545,9 +575,10 @@ Status EdgeChunkWriter::WritePropertyChunk(
   for (auto& property : property_group.GetProperties()) {
     int indice = schema->GetFieldIndex(property.name);
     if (indice == -1) {
-      std::string msg = "invalid property: " + property.name +
-                        " edge: " + edge_info_.GetEdgeLabel();
-      return Status::InvalidOperation(msg);
+      return Status::Invalid("Column named ", property.name,
+                             " of property group ", property_group, " of edge ",
+                             edge_info_.GetEdgeLabel(),
+                             " does not exist in the input table.");
     }
     indices.push_back(indice);
   }
@@ -765,15 +796,14 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::sortTable(
                                                     {}, table_source_options)
                     .ValueOrDie();
   AsyncGeneratorType sink_gen;
-  if (!arrow_acero_namespace::MakeExecNode(
-           "order_by_sink", plan.get(), {source},
-           arrow_acero_namespace::OrderBySinkNodeOptions{
-               arrow::compute::SortOptions{{arrow::compute::SortKey{
-                   column_name, arrow::compute::SortOrder::Ascending}}},
-               &sink_gen})
-           .ok()) {
-    return Status::InvalidOperation();
-  }
+  RETURN_NOT_ARROW_OK(
+      arrow_acero_namespace::MakeExecNode(
+          "order_by_sink", plan.get(), {source},
+          arrow_acero_namespace::OrderBySinkNodeOptions{
+              arrow::compute::SortOptions{{arrow::compute::SortKey{
+                  column_name, arrow::compute::SortOrder::Ascending}}},
+              &sink_gen})
+          .status());
   return ExecutePlanAndCollectAsTable(*exec_context, plan,
                                       input_table->schema(), sink_gen);
 }

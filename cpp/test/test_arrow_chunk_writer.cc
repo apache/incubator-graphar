@@ -92,25 +92,25 @@ TEST_CASE("test_vertex_property_writer_from_file") {
 
   // Invalid cases
   // Invalid vertices number
-  REQUIRE(writer.WriteVerticesNum(-1).IsInvalidOperation());
+  REQUIRE(writer.WriteVerticesNum(-1).IsInvalid());
   // Out of range
-  REQUIRE(writer.WriteChunk(table, 0).IsOutOfRange());
+  REQUIRE(writer.WriteChunk(table, 0).IsInvalid());
   // Invalid chunk id
   auto chunk = table->Slice(0, vertex_info.GetChunkSize());
-  REQUIRE(writer.WriteChunk(chunk, -1).IsInvalidOperation());
+  REQUIRE(writer.WriteChunk(chunk, -1).IsIndexError());
   // Invalid property group
   GAR_NAMESPACE::Property p1;
   p1.name = "invalid_property";
   p1.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32);
   GAR_NAMESPACE::PropertyGroup pg1({p1}, GAR_NAMESPACE::FileType::CSV);
-  REQUIRE(writer.WriteTable(table, pg1, 0).IsInvalidOperation());
+  REQUIRE(writer.WriteTable(table, pg1, 0).IsKeyError());
   // Property not found in table
   std::shared_ptr<arrow::Table> tmp_table =
       table->RenameColumns({"original_id", "firstName", "lastName", "id"})
           .ValueOrDie();
   GAR_NAMESPACE::PropertyGroup pg2 =
       vertex_info.GetPropertyGroup("firstName").value();
-  REQUIRE(writer.WriteTable(tmp_table, pg2, 0).IsInvalidOperation());
+  REQUIRE(writer.WriteTable(tmp_table, pg2, 0).IsInvalid());
   // Invalid data type
   GAR_NAMESPACE::PropertyGroup pg3 = vertex_info.GetPropertyGroup("id").value();
   REQUIRE(writer.WriteTable(tmp_table, pg3, 0).IsTypeError());
@@ -230,34 +230,34 @@ TEST_CASE("test_edge_chunk_writer") {
 
   // Invalid cases
   // Invalid count or index
-  REQUIRE(writer.WriteEdgesNum(-1, 0).IsInvalidOperation());
-  REQUIRE(writer.WriteEdgesNum(0, -1).IsInvalidOperation());
-  REQUIRE(writer.WriteVerticesNum(-1).IsInvalidOperation());
+  REQUIRE(writer.WriteEdgesNum(-1, 0).IsIndexError());
+  REQUIRE(writer.WriteEdgesNum(0, -1).IsIndexError());
+  REQUIRE(writer.WriteVerticesNum(-1).IsIndexError());
   // Out of range
-  REQUIRE(writer.WriteOffsetChunk(table, 0).IsOutOfRange());
+  REQUIRE(writer.WriteOffsetChunk(table, 0).IsInvalid());
   // Invalid chunk id
-  REQUIRE(writer.WriteAdjListChunk(table, -1, 0).IsInvalidOperation());
-  REQUIRE(writer.WriteAdjListChunk(table, 0, -1).IsInvalidOperation());
+  REQUIRE(writer.WriteAdjListChunk(table, -1, 0).IsIndexError());
+  REQUIRE(writer.WriteAdjListChunk(table, 0, -1).IsIndexError());
   // Invalid adj list type
   auto invalid_adj_list_type = GAR_NAMESPACE::AdjListType::unordered_by_dest;
   GAR_NAMESPACE::EdgeChunkWriter writer2(edge_info, "/tmp/",
                                          invalid_adj_list_type);
   writer2.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
-  REQUIRE(writer2.WriteAdjListChunk(table, 0, 0).IsInvalidOperation());
+  REQUIRE(writer2.WriteAdjListChunk(table, 0, 0).IsKeyError());
   // Invalid property group
   GAR_NAMESPACE::Property p1;
   p1.name = "invalid_property";
   p1.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32);
   GAR_NAMESPACE::PropertyGroup pg1({p1}, GAR_NAMESPACE::FileType::CSV);
-  REQUIRE(writer.WritePropertyChunk(table, pg1, 0, 0).IsInvalidOperation());
+  REQUIRE(writer.WritePropertyChunk(table, pg1, 0, 0).IsKeyError());
   // Property not found in table
   GAR_NAMESPACE::PropertyGroup pg2 =
       edge_info.GetPropertyGroup("creationDate", adj_list_type).value();
-  REQUIRE(writer.WritePropertyChunk(table, pg2, 0, 0).IsInvalidOperation());
+  REQUIRE(writer.WritePropertyChunk(table, pg2, 0, 0).IsInvalid());
   // Required columns not found
   std::shared_ptr<arrow::Table> tmp_table =
       table->RenameColumns({"creationDate", "tmp_property"}).ValueOrDie();
-  REQUIRE(writer.WriteAdjListChunk(tmp_table, 0, 0).IsInvalidOperation());
+  REQUIRE(writer.WriteAdjListChunk(tmp_table, 0, 0).IsInvalid());
   // Invalid data type
   REQUIRE(writer.WritePropertyChunk(tmp_table, pg2, 0, 0).IsTypeError());
 }

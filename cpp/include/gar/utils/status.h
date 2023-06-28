@@ -16,6 +16,7 @@ limitations under the License.
 #ifndef GAR_UTILS_STATUS_H_
 #define GAR_UTILS_STATUS_H_
 
+#include <sstream>
 #include <string>
 #include <utility>
 
@@ -61,24 +62,51 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 
+namespace util {
+template <typename Head>
+void StringBuilderRecursive(std::ostringstream& stream, Head&& head) {
+  stream << head;
+}
+
+template <typename Head, typename... Tail>
+void StringBuilderRecursive(std::ostringstream& stream, Head&& head,
+                            Tail&&... tail) {
+  StringBuilderRecursive(stream, std::forward<Head>(head));
+  StringBuilderRecursive(stream, std::forward<Tail>(tail)...);
+}
+
+template <typename... Args>
+std::string StringBuilder(Args&&... args) {
+  std::ostringstream ss;
+  StringBuilderRecursive(ss, std::forward<Args>(args)...);
+  return ss.str();
+}
+}  // namespace util
+
 /**
  * An enum class representing the status codes for success or error outcomes.
  */
 enum class StatusCode : unsigned char {
+  // success status
   kOK = 0,
+  // error status for failed key lookups
   kKeyError,
+  // error status for type errors
   kTypeError,
+  // error status for invalid data
   kInvalid,
-  kInvalidValue,
-  kInvalidArgument,
-  kInvalidOperation,
-  kOutOfRange,
+  // error status when an index is out of bounds
+  kIndexError,
+  // error status for out-of-memory conditions
   kOutOfMemory,
-  kEndOfChunk,
+  // error status when some IO-related operation failed
   kIOError,
+  // error status when some yaml parse related operation failed
   kYamlError,
+  // error status when some arrow-related operation failed
   kArrowError,
 
+  // error status for unknown errors
   kUnknownError,
 };
 
@@ -128,96 +156,104 @@ class Status {
   /** Returns a success status. */
   inline static Status OK() { return Status(); }
 
+  template <typename... Args>
+  static Status FromArgs(StatusCode code, Args... args) {
+    return Status(code, util::StringBuilder(std::forward<Args>(args)...));
+  }
+
   /** Returns an error status when some IO-related operation failed. */
-  static Status IOError(const std::string& msg = "") {
-    return Status(StatusCode::kIOError, msg);
+  template <typename... Args>
+  static Status IOError(Args&&... args) {
+    return Status::FromArgs(StatusCode::kIOError, std::forward<Args>(args)...);
   }
 
   /** Returns an error status for failed key lookups. */
-  static Status KeyError(const std::string& msg = "") {
-    return Status(StatusCode::kKeyError, msg);
+  template <typename... Args>
+  static Status KeyError(Args&&... args) {
+    return Status::FromArgs(StatusCode::kKeyError, std::forward<Args>(args)...);
   }
 
   /** Returns an error status for failed type matches. */
-  static Status TypeError(const std::string& msg = "") {
-    return Status(StatusCode::kTypeError, msg);
+  template <typename... Args>
+  static Status TypeError(Args&&... args) {
+    return Status::FromArgs(StatusCode::kTypeError,
+                            std::forward<Args>(args)...);
   }
 
   /**
    * Returns an error status for invalid data (for example a string that fails
    * parsing).
    */
-  static Status Invalid(const std::string& msg = "") {
-    return Status(StatusCode::kInvalid, msg);
-  }
-
-  static Status InvalidValue(const std::string& msg = "") {
-    return Status(StatusCode::kInvalidValue, msg);
-  }
-
-  static Status InvalidArgument(const std::string& msg = "") {
-    return Status(StatusCode::kInvalidArgument, msg);
-  }
-
-  static Status InvalidOperation(const std::string& msg = "") {
-    return Status(StatusCode::kInvalidOperation, msg);
+  template <typename... Args>
+  static Status Invalid(Args&&... args) {
+    return Status::FromArgs(StatusCode::kInvalid, std::forward<Args>(args)...);
   }
 
   /**
-   * Return an error status for value is out of range (for example next_chunk
-   * is out of range)
+   * Return an error status when an index is out of bounds.
+   *
    */
-  static Status OutOfRange(const std::string& msg = "") {
-    return Status(StatusCode::kOutOfRange, msg);
+  template <typename... Args>
+  static Status IndexError(Args&&... args) {
+    return Status::FromArgs(StatusCode::kIndexError,
+                            std::forward<Args>(args)...);
   }
 
-  static Status EndOfChunk(const std::string& msg = "") {
-    return Status(StatusCode::kEndOfChunk, msg);
-  }
-
-  /** Return an error status when some yaml-cpp related operation failed. */
-  static Status YamlError(const std::string& msg = "") {
-    return Status(StatusCode::kYamlError, msg);
+  /** Return an error status when some yaml parse related operation failed. */
+  template <typename... Args>
+  static Status YamlError(Args&&... args) {
+    return Status::FromArgs(StatusCode::kYamlError,
+                            std::forward<Args>(args)...);
   }
 
   /** Return an error status when some arrow-related operation failed. */
-  static Status ArrowError(const std::string& msg = "") {
-    return Status(StatusCode::kArrowError, msg);
+  template <typename... Args>
+  static Status ArrowError(Args&&... args) {
+    return Status::FromArgs(StatusCode::kArrowError,
+                            std::forward<Args>(args)...);
   }
 
   /** Return an error status for unknown errors. */
-  static Status UnknownError(const std::string& msg = "") {
-    return Status(StatusCode::kArrowError, msg);
+  template <typename... Args>
+  static Status UnknownError(Args&&... args) {
+    return Status::FromArgs(StatusCode::kUnknownError,
+                            std::forward<Args>(args)...);
   }
 
   /** Return true iff the status indicates success. */
-  bool ok() const { return (state_ == nullptr); }
+  constexpr bool ok() const { return (state_ == nullptr); }
 
   /** Return true iff the status indicates a key lookup error. */
-  bool IsKeyError() const { return code() == StatusCode::kKeyError; }
+  constexpr bool IsKeyError() const { return code() == StatusCode::kKeyError; }
   /** Return true iff the status indicates a type match error. */
-  bool IsTypeError() const { return code() == StatusCode::kTypeError; }
+  constexpr bool IsTypeError() const {
+    return code() == StatusCode::kTypeError;
+  }
   /** Return true iff the status indicates invalid data. */
-  bool IsInvalid() const { return code() == StatusCode::kInvalid; }
-  bool IsInvalidValue() const { return code() == StatusCode::kInvalidValue; }
-  bool IsInvalidArgument() const {
-    return code() == StatusCode::kInvalidArgument;
+  constexpr bool IsInvalid() const { return code() == StatusCode::kInvalid; }
+  /** Return true iff the status indicates an index out of bounds. */
+  constexpr bool IsIndexError() const {
+    return code() == StatusCode::kIndexError;
   }
-  bool IsInvalidOperation() const {
-    return code() == StatusCode::kInvalidOperation;
+  /** Return true iff the status indicates an yaml parse related failure. */
+  constexpr bool IsYamlError() const {
+    return code() == StatusCode::kYamlError;
   }
-  bool IsOutOfRange() const { return code() == StatusCode::kOutOfRange; }
-  bool IsEndOfChunk() const { return code() == StatusCode::kEndOfChunk; }
-  /** Return true iff the status indicates an yaml-cpp related failure. */
-  bool IsYamlError() const { return code() == StatusCode::kYamlError; }
   /** Return true iff the status indicates an arrow-related failure. */
-  bool IsArrowError() const { return code() == StatusCode::kArrowError; }
+  constexpr bool IsArrowError() const {
+    return code() == StatusCode::kArrowError;
+  }
 
   /** Return the StatusCode value attached to this status. */
-  StatusCode code() const { return ok() ? StatusCode::kOK : state_->code; }
+  constexpr StatusCode code() const {
+    return ok() ? StatusCode::kOK : state_->code;
+  }
 
   /** Return the specific error message attached to this status. */
-  std::string message() const { return ok() ? "" : state_->msg; }
+  const std::string& message() const {
+    static const std::string no_message = "";
+    return ok() ? no_message : state_->msg;
+  }
 
  private:
   void deleteState() {

@@ -25,7 +25,7 @@ namespace GAR_NAMESPACE_INTERNAL {
 
 Result<VertexInfo> VertexInfo::Load(std::shared_ptr<Yaml> yaml) {
   if (yaml == nullptr) {
-    return Status::YamlError("yaml is nullptr");
+    return Status::Invalid("yaml shared pointer is nullptr");
   }
   std::string label = yaml->operator[]("label").As<std::string>();
   IdType chunk_size =
@@ -70,7 +70,7 @@ Result<VertexInfo> VertexInfo::Load(std::shared_ptr<Yaml> yaml) {
 
 Result<std::string> VertexInfo::Dump() const noexcept {
   if (!IsValidated()) {
-    return Status::Invalid();
+    return Status::Invalid("The vertex info is not validated");
   }
   ::Yaml::Node node;
   node["label"] = label_;
@@ -108,7 +108,7 @@ Status VertexInfo::Save(const std::string& path) const {
 
 Result<EdgeInfo> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
   if (yaml == nullptr) {
-    return Status::YamlError("yaml is nullptr");
+    return Status::Invalid("yaml shared pointer is nullptr.");
   }
   std::string src_label = yaml->operator[]("src_label").As<std::string>();
   std::string edge_label = yaml->operator[]("edge_label").As<std::string>();
@@ -183,7 +183,7 @@ Result<EdgeInfo> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
 
 Result<std::string> EdgeInfo::Dump() const noexcept {
   if (!IsValidated()) {
-    return Status::Invalid();
+    return Status::Invalid("The edge info is not validated.");
   }
   ::Yaml::Node node;
   node["src_label"] = src_label_;
@@ -333,7 +333,7 @@ Result<GraphInfo> GraphInfo::Load(const std::string& input,
 
 Result<std::string> GraphInfo::Dump() const noexcept {
   if (!IsValidated()) {
-    return Status::Invalid();
+    return Status::Invalid("The graph info is not validated.");
   }
   ::Yaml::Node node;
   node["name"] = name_;
