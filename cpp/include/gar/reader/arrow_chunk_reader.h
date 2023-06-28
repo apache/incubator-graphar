@@ -244,10 +244,8 @@ class AdjListArrowChunkReader {
    *         end of all vertex chunks.
    */
   Status next_chunk() {
-    Status st;
     ++chunk_index_;
     while (chunk_index_ >= chunk_num_) {
-      st = Status::EndOfChunk("End of the adj list chunk of vertex chunk.");
       ++vertex_chunk_index_;
       if (vertex_chunk_index_ >= vertex_chunk_num_) {
         return Status::IndexError("vertex chunk index ", vertex_chunk_index_,
@@ -262,7 +260,7 @@ class AdjListArrowChunkReader {
     }
     seek_offset_ = chunk_index_ * edge_info_.GetChunkSize();
     chunk_table_.reset();
-    return st;
+    return Status::OK();
   }
 
   /**
@@ -520,10 +518,8 @@ class AdjListPropertyArrowChunkReader {
    *         end of all vertex chunks.
    */
   Status next_chunk() {
-    Status st;
     ++chunk_index_;
     while (chunk_index_ >= chunk_num_) {
-      st = Status::EndOfChunk("End of the adj list chunk of vertex chunk.");
       ++vertex_chunk_index_;
       if (vertex_chunk_index_ >= vertex_chunk_num_) {
         return Status::IndexError(
@@ -541,7 +537,7 @@ class AdjListPropertyArrowChunkReader {
     }
     seek_offset_ = chunk_index_ * edge_info_.GetChunkSize();
     chunk_table_.reset();
-    return st;
+    return Status::OK();
   }
 
   /**

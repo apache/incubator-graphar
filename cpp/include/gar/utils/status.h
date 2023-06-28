@@ -93,7 +93,6 @@ enum class StatusCode : unsigned char {
   kInvalid,
   kIndexError,
   kOutOfMemory,
-  kEndOfChunk,
   kIOError,
   kYamlError,
   kArrowError,
@@ -190,12 +189,6 @@ class Status {
                             std::forward<Args>(args)...);
   }
 
-  template <typename... Args>
-  static Status EndOfChunk(Args&&... args) {
-    return Status::FromArgs(StatusCode::kEndOfChunk,
-                            std::forward<Args>(args)...);
-  }
-
   /** Return an error status when some yaml parse related operation failed. */
   template <typename... Args>
   static Status YamlError(Args&&... args) {
@@ -231,9 +224,6 @@ class Status {
   /** Return true iff the status indicates an index out of bounds. */
   constexpr bool IsIndexError() const {
     return code() == StatusCode::kIndexError;
-  }
-  constexpr bool IsEndOfChunk() const {
-    return code() == StatusCode::kEndOfChunk;
   }
   /** Return true iff the status indicates an yaml parse related failure. */
   constexpr bool IsYamlError() const {
