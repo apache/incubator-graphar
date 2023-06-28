@@ -97,7 +97,7 @@ TEST_CASE("test_vertex_property_writer_from_file") {
   REQUIRE(writer.WriteChunk(table, 0).IsInvalid());
   // Invalid chunk id
   auto chunk = table->Slice(0, vertex_info.GetChunkSize());
-  REQUIRE(writer.WriteChunk(chunk, -1).IsInvalid());
+  REQUIRE(writer.WriteChunk(chunk, -1).IsIndexError());
   // Invalid property group
   GAR_NAMESPACE::Property p1;
   p1.name = "invalid_property";
@@ -230,14 +230,14 @@ TEST_CASE("test_edge_chunk_writer") {
 
   // Invalid cases
   // Invalid count or index
-  REQUIRE(writer.WriteEdgesNum(-1, 0).IsInvalid());
-  REQUIRE(writer.WriteEdgesNum(0, -1).IsInvalid());
-  REQUIRE(writer.WriteVerticesNum(-1).IsInvalid());
+  REQUIRE(writer.WriteEdgesNum(-1, 0).IsIndexError());
+  REQUIRE(writer.WriteEdgesNum(0, -1).IsIndexError());
+  REQUIRE(writer.WriteVerticesNum(-1).IsIndexError());
   // Out of range
   REQUIRE(writer.WriteOffsetChunk(table, 0).IsInvalid());
   // Invalid chunk id
-  REQUIRE(writer.WriteAdjListChunk(table, -1, 0).IsInvalid());
-  REQUIRE(writer.WriteAdjListChunk(table, 0, -1).IsInvalid());
+  REQUIRE(writer.WriteAdjListChunk(table, -1, 0).IsIndexError());
+  REQUIRE(writer.WriteAdjListChunk(table, 0, -1).IsIndexError());
   // Invalid adj list type
   auto invalid_adj_list_type = GAR_NAMESPACE::AdjListType::unordered_by_dest;
   GAR_NAMESPACE::EdgeChunkWriter writer2(edge_info, "/tmp/",
