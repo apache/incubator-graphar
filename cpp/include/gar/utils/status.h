@@ -87,16 +87,26 @@ std::string StringBuilder(Args&&... args) {
  * An enum class representing the status codes for success or error outcomes.
  */
 enum class StatusCode : unsigned char {
+  // success status
   kOK = 0,
+  // error status for failed key lookups
   kKeyError,
+  // error status for type errors
   kTypeError,
+  // error status for invalid data
   kInvalid,
+  // error status when an index is out of bounds
   kIndexError,
+  // error status for out-of-memory conditions
   kOutOfMemory,
+  // error status when some IO-related operation failed
   kIOError,
+  // error status when some yaml parse related operation failed
   kYamlError,
+  // error status when some arrow-related operation failed
   kArrowError,
 
+  // error status for unknown errors
   kUnknownError,
 };
 
