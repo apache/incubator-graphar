@@ -131,7 +131,7 @@ TEST_CASE("test_vertex_property_pushdown") {
                 << chunk_size << ",\tRange: [" << l << ", " << r << "]" << '\n';
       i++;
       sum += table->num_rows();
-    } while (!reader.next_chunk().IsOutOfRange());
+    } while (!reader.next_chunk().IsIndexError());
 
     std::cout << "Total Nums: " << sum << "/"
               << reader.GetChunkNum() * chunk_size << '\n';
@@ -326,7 +326,7 @@ TEST_CASE("test_adj_list_property_pushdown") {
                     << chunk_size << '\n';
           i++;
           sum += table->num_rows();
-        } while (!reader.next_chunk().IsOutOfRange());
+        } while (!reader.next_chunk().IsIndexError());
 
         std::cout << "Total Nums: " << sum << "/" << i * chunk_size << '\n';
         std::cout << "Column Nums: " << names.size() << "\n";

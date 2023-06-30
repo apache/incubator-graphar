@@ -103,7 +103,7 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto dataset, factory->Finish());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
 
-  // Read specified columns with a row filter
+  // Apply the row filter and select the specified columns
   if (options.filter) {
     RETURN_NOT_ARROW_OK(scan_builder->Filter(options.filter->Evaluate()));
   }
