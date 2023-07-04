@@ -91,54 +91,56 @@ TEST_CASE("test_vertex_property_arrow_chunk_reader") {
 TEST_CASE("test_vertex_property_pushdown") {
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string label = "person", property_name = "gender";
+
+  Property prop("gender");
+  std::string value("female");
+  auto filter = Expression::Make<Equal>(prop, value);
+  auto defer = std::unique_ptr<Expression>(filter);
+  std::vector<std::string> expected_cols{"firstName", "lastName"};
 
   // read file and construct graph info
-  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
-
   // construct vertex chunk reader
-  std::string label = "person", property_name = "gender";
   REQUIRE(graph_info.GetVertexInfo(label).status().ok());
   const auto chunk_size = graph_info.GetVertexInfo(label)->GetChunkSize();
   auto maybe_group = graph_info.GetVertexPropertyGroup(label, property_name);
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
-
   // construct pushdown options
-  auto filter = Expression::Make<Equal>(Property("gender"), "female");
-  auto defer = std::unique_ptr<Expression>(filter);
-  std::vector<std::string> columns{"firstName", "lastName"};
-
   FilterOptions options;
   options.filter = filter;
-  options.columns = &columns;
+  options.columns = &expected_cols;
 
   // print reader result
   auto walkReader = [&](GAR_NAMESPACE::VertexPropertyArrowChunkReader& reader) {
-    int i = 0;
-    int sum = 0;
-    std::vector<std::string> names;
+    int idx = 0, sum = 0;
+    std::shared_ptr<arrow::Table> table = nullptr;
 
     do {
       auto result = reader.GetChunk();
       REQUIRE(!result.has_error());
-      auto [l, r] = reader.GetRange().value();
-      auto table = result.value();
-      names = table->ColumnNames();
-      std::cout << "Chunk: " << i << ",\tNums: " << table->num_rows() << "/"
-                << chunk_size << ",\tRange: [" << l << ", " << r << "]" << '\n';
-      i++;
+      table = result.value();
+      auto [start, end] = reader.GetRange().value();
+      std::cout << "Chunk: " << idx << ",\tNums: " << table->num_rows() << "/"
+                << chunk_size << ",\tRange: (" << start << ", " << end << "]"
+                << '\n';
+      idx++;
       sum += table->num_rows();
     } while (!reader.next_chunk().IsIndexError());
+    REQUIRE(idx == reader.GetChunkNum());
+    REQUIRE(table->num_columns() == (int) expected_cols.size());
 
     std::cout << "Total Nums: " << sum << "/"
               << reader.GetChunkNum() * chunk_size << '\n';
-    std::cout << "Column Nums: " << names.size() << "\n";
+    std::cout << "Column Nums: " << table->num_columns() << "\n";
     std::cout << "Column Names: ";
-    for (const auto& name : names) {
-      std::cout << "`" << name << "` ";
+    for (int i = 0; i < table->num_columns(); i++) {
+      REQUIRE(table->ColumnNames()[i] == expected_cols[i]);
+      std::cout << "`" << table->ColumnNames()[i] << "` ";
     }
     std::cout << "\n\n";
   };
@@ -158,7 +160,7 @@ TEST_CASE("test_vertex_property_pushdown") {
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     reader.Filter(filter);
-    reader.Project(&columns);
+    reader.Project(&expected_cols);
     walkReader(reader);
   }
 }
@@ -304,35 +306,36 @@ TEST_CASE("test_adj_list_property_pushdown") {
   auto filter = And(expr1, expr2);
   auto defer = std::unique_ptr<Expression>(filter);
 
-  std::vector<std::string> columns{"creationDate"};
+  std::vector<std::string> expected_cols{"creationDate"};
 
   FilterOptions options;
   options.filter = filter;
-  options.columns = &columns;
+  options.columns = &expected_cols;
 
   // print reader result
   auto walkReader =
       [&](GAR_NAMESPACE::AdjListPropertyArrowChunkReader& reader) {
-        int i = 0;
+        int idx = 0;
         int sum = 0;
-        std::vector<std::string> names;
+        std::shared_ptr<arrow::Table> table = nullptr;
 
         do {
           auto result = reader.GetChunk();
           REQUIRE(!result.has_error());
-          auto table = result.value();
-          names = table->ColumnNames();
-          std::cout << "Chunk: " << i << ",\tNums: " << table->num_rows() << "/"
-                    << chunk_size << '\n';
-          i++;
+          table = result.value();
+          std::cout << "Chunk: " << idx << ",\tNums: " << table->num_rows()
+                    << "/" << chunk_size << '\n';
+          idx++;
           sum += table->num_rows();
         } while (!reader.next_chunk().IsIndexError());
+        REQUIRE(table->num_columns() == (int) expected_cols.size());
 
-        std::cout << "Total Nums: " << sum << "/" << i * chunk_size << '\n';
-        std::cout << "Column Nums: " << names.size() << "\n";
+        std::cout << "Total Nums: " << sum << "/" << idx * chunk_size << '\n';
+        std::cout << "Column Nums: " << table->num_columns() << "\n";
         std::cout << "Column Names: ";
-        for (const auto& name : names) {
-          std::cout << "`" << name << "` ";
+        for (int i = 0; i < table->num_columns(); i++) {
+          REQUIRE(table->ColumnNames()[i] == expected_cols[i]);
+          std::cout << "`" << table->ColumnNames()[i] << "` ";
         }
         std::cout << "\n\n";
       };
@@ -356,7 +359,7 @@ TEST_CASE("test_adj_list_property_pushdown") {
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     reader.Filter(filter);
-    reader.Project(&columns);
+    reader.Project(&expected_cols);
     walkReader(reader);
   }
 }
