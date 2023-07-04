@@ -50,7 +50,7 @@ Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
   } else {
     return Status::Invalid(
         "The adj list type has to be ordered_by_source or ordered_by_dest, but "
-        "got " +
+        "got ",
         std::string(AdjListTypeToString(adj_list_type)));
   }
 
