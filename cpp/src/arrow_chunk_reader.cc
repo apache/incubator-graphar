@@ -42,9 +42,13 @@ VertexPropertyArrowChunkReader::GetRange() noexcept {
         "The chunk table is not initialized, please call "
         "GetChunk() first.");
   }
-  IdType row_offset = seek_id_ - chunk_index_ * vertex_info_.GetChunkSize();
-  return std::make_pair(seek_id_,
-                        seek_id_ + chunk_table_->num_rows() - row_offset);
+  const auto chunk_size = vertex_info_.GetChunkSize();
+  IdType row_offset = seek_id_ - chunk_index_ * chunk_size;
+  bool is_last_chunk = (chunk_index_ == chunk_num_ - 1);
+  const auto curr_chunk_size =
+      is_last_chunk ? (vertex_num_ - chunk_index_ * chunk_size) : chunk_size;
+
+  return std::make_pair(seek_id_, seek_id_ + curr_chunk_size - row_offset);
 }
 
 void VertexPropertyArrowChunkReader::Filter(utils::FilterPtr filter) {

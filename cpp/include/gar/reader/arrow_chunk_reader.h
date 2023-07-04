@@ -65,6 +65,8 @@ class VertexPropertyArrowChunkReader {
     std::string base_dir = prefix_ + pg_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
                               utils::GetVertexChunkNum(prefix_, vertex_info));
+    GAR_ASSIGN_OR_RAISE_ERROR(vertex_num_,
+                              utils::GetVertexNum(prefix_, vertex_info_));
   }
 
   /**
@@ -140,6 +142,7 @@ class VertexPropertyArrowChunkReader {
   IdType chunk_index_;
   IdType seek_id_;
   IdType chunk_num_;
+  IdType vertex_num_;
   std::shared_ptr<arrow::Table> chunk_table_;
   utils::FilterOptions filter_options_;
   std::shared_ptr<FileSystem> fs_;
