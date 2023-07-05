@@ -16,6 +16,7 @@ limitations under the License.
 #ifndef GAR_UTILS_READER_UTILS_H_
 #define GAR_UTILS_READER_UTILS_H_
 
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -27,7 +28,7 @@ namespace GAR_NAMESPACE_INTERNAL {
 
 namespace utils {
 
-using Filter = Expression*;
+using Filter = std::shared_ptr<Expression>;
 using ColumnNames = std::vector<std::string>*;
 
 struct FilterOptions {

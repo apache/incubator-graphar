@@ -23,9 +23,12 @@ limitations under the License.
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-using GAR_NAMESPACE::Equal;
+using GAR_NAMESPACE::_And;
+using GAR_NAMESPACE::_Equal;
+using GAR_NAMESPACE::_LessThan;
+using GAR_NAMESPACE::_Literal;
+using GAR_NAMESPACE::_Property;
 using GAR_NAMESPACE::Expression;
-using GAR_NAMESPACE::LessThan;
 using GAR_NAMESPACE::Property;
 using GAR_NAMESPACE::utils::FilterOptions;
 
@@ -94,10 +97,7 @@ TEST_CASE("test_vertex_property_pushdown") {
   std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   std::string label = "person", property_name = "gender";
 
-  Property prop("gender");
-  std::string value("female");
-  auto filter = Expression::Make<Equal>(prop, value);
-  auto defer = std::unique_ptr<Expression>(filter);
+  auto filter = _Equal(_Property("gender"), _Literal("female"));
   std::vector<std::string> expected_cols{"firstName", "lastName"};
 
   // read file and construct graph info
@@ -118,7 +118,7 @@ TEST_CASE("test_vertex_property_pushdown") {
   // print reader result
   auto walkReader = [&](GAR_NAMESPACE::VertexPropertyArrowChunkReader& reader) {
     int idx = 0, sum = 0;
-    std::shared_ptr<arrow::Table> table = nullptr;
+    std::shared_ptr<arrow::Table> table;
 
     do {
       auto result = reader.GetChunk();
@@ -301,10 +301,10 @@ TEST_CASE("test_adj_list_property_pushdown") {
   // construct pushdown options
   Property prop("creationDate");
 
-  auto expr1 = Expression::Make<LessThan>("2012-06-02T04:30:44.526+0000", prop);
-  auto expr2 = Expression::Make<Equal>(prop, prop);
-  auto filter = And(expr1, expr2);
-  auto defer = std::unique_ptr<Expression>(filter);
+  auto expr1 =
+      _LessThan(_Literal("2012-06-02T04:30:44.526+0000"), _Property(prop));
+  auto expr2 = _Equal(_Property(prop), _Property(prop));
+  auto filter = _And(expr1, expr2);
 
   std::vector<std::string> expected_cols{"creationDate"};
 
@@ -315,9 +315,8 @@ TEST_CASE("test_adj_list_property_pushdown") {
   // print reader result
   auto walkReader =
       [&](GAR_NAMESPACE::AdjListPropertyArrowChunkReader& reader) {
-        int idx = 0;
-        int sum = 0;
-        std::shared_ptr<arrow::Table> table = nullptr;
+        int idx = 0, sum = 0;
+        std::shared_ptr<arrow::Table> table;
 
         do {
           auto result = reader.GetChunk();

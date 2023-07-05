@@ -19,43 +19,43 @@ namespace GAR_NAMESPACE_INTERNAL {
 ArrowExpression ExpressionProperty::Evaluate() {
   return arrow::compute::field_ref(property_.name);
 }
-ArrowExpression OperatorNot::Evaluate() {
+ArrowExpression ExpressionNot::Evaluate() {
   return arrow::compute::not_(expr_->Evaluate());
 }
 
-ArrowExpression OperatorIsNull::Evaluate() {
+ArrowExpression ExpressionIsNull::Evaluate() {
   return arrow::compute::is_null(expr_->Evaluate());
 }
 
-ArrowExpression OperatorEqual::Evaluate() {
+ArrowExpression ExpressionEqual::Evaluate() {
   return arrow::compute::equal(lhs_->Evaluate(), rhs_->Evaluate());
 }
 
-ArrowExpression OperatorNotEqual::Evaluate() {
+ArrowExpression ExpressionNotEqual::Evaluate() {
   return arrow::compute::not_equal(lhs_->Evaluate(), rhs_->Evaluate());
 }
 
-ArrowExpression OperatorGreaterThan::Evaluate() {
+ArrowExpression ExpressionGreaterThan::Evaluate() {
   return arrow::compute::greater(lhs_->Evaluate(), rhs_->Evaluate());
 }
 
-ArrowExpression OperatorGreaterEqual::Evaluate() {
+ArrowExpression ExpressionGreaterEqual::Evaluate() {
   return arrow::compute::greater_equal(lhs_->Evaluate(), rhs_->Evaluate());
 }
 
-ArrowExpression OperatorLessThan::Evaluate() {
+ArrowExpression ExpressionLessThan::Evaluate() {
   return arrow::compute::less(lhs_->Evaluate(), rhs_->Evaluate());
 }
 
-ArrowExpression OperatorLessEqual::Evaluate() {
+ArrowExpression ExpressionLessEqual::Evaluate() {
   return arrow::compute::less_equal(lhs_->Evaluate(), rhs_->Evaluate());
 }
 
-ArrowExpression OperatorAnd::Evaluate() {
+ArrowExpression ExpressionAnd::Evaluate() {
   return arrow::compute::and_(lhs_->Evaluate(), rhs_->Evaluate());
 }
 
-ArrowExpression OperatorOr::Evaluate() {
+ArrowExpression ExpressionOr::Evaluate() {
   return arrow::compute::or_(lhs_->Evaluate(), rhs_->Evaluate());
 }
 
