@@ -51,20 +51,12 @@ VertexPropertyArrowChunkReader::GetRange() noexcept {
   return std::make_pair(seek_id_, seek_id_ + curr_chunk_size - row_offset);
 }
 
-void VertexPropertyArrowChunkReader::Filter(utils::FilterPtr filter) {
+void VertexPropertyArrowChunkReader::Filter(utils::Filter filter) {
   filter_options_.filter = filter;
 }
 
-void VertexPropertyArrowChunkReader::ClearFilter() {
-  filter_options_.filter = nullptr;
-}
-
-void VertexPropertyArrowChunkReader::Project(utils::VectorPtr columns) {
-  filter_options_.columns = columns;
-}
-
-void VertexPropertyArrowChunkReader::ClearProjection() {
-  filter_options_.columns = nullptr;
+void VertexPropertyArrowChunkReader::Select(utils::ColumnNames column_names) {
+  filter_options_.columns = column_names;
 }
 
 Status AdjListArrowChunkReader::seek_src(IdType id) noexcept {
@@ -257,20 +249,12 @@ AdjListPropertyArrowChunkReader::GetChunk() noexcept {
   return chunk_table_->Slice(row_offset);
 }
 
-void AdjListPropertyArrowChunkReader::Filter(utils::FilterPtr filter) {
+void AdjListPropertyArrowChunkReader::Filter(utils::Filter filter) {
   filter_options_.filter = filter;
 }
 
-void AdjListPropertyArrowChunkReader::ClearFilter() {
-  filter_options_.filter = nullptr;
-}
-
-void AdjListPropertyArrowChunkReader::Project(utils::VectorPtr columns) {
-  filter_options_.columns = columns;
-}
-
-void AdjListPropertyArrowChunkReader::ClearProjection() {
-  filter_options_.columns = nullptr;
+void AdjListPropertyArrowChunkReader::Select(utils::ColumnNames column_names) {
+  filter_options_.columns = column_names;
 }
 
 }  // namespace GAR_NAMESPACE_INTERNAL

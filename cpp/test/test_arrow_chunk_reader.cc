@@ -160,7 +160,7 @@ TEST_CASE("test_vertex_property_pushdown") {
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     reader.Filter(filter);
-    reader.Project(&expected_cols);
+    reader.Select(&expected_cols);
     walkReader(reader);
   }
 }
@@ -359,7 +359,7 @@ TEST_CASE("test_adj_list_property_pushdown") {
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     reader.Filter(filter);
-    reader.Project(&expected_cols);
+    reader.Select(&expected_cols);
     walkReader(reader);
   }
 }
