@@ -254,18 +254,22 @@ template <typename T>
     std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs) {
   return std::make_shared<ExpressionEqual>(lhs, rhs);
 }
+
 [[nodiscard]] static inline std::shared_ptr<Expression> _NotEqual(
     std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs) {
   return std::make_shared<ExpressionNotEqual>(lhs, rhs);
 }
+
 [[nodiscard]] static inline std::shared_ptr<Expression> _GreaterThan(
     std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs) {
   return std::make_shared<ExpressionGreaterThan>(lhs, rhs);
 }
+
 [[nodiscard]] static inline std::shared_ptr<Expression> _GreaterEqual(
     std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs) {
   return std::make_shared<ExpressionGreaterEqual>(lhs, rhs);
 }
+
 [[nodiscard]] static inline std::shared_ptr<Expression> _LessThan(
     std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs) {
   return std::make_shared<ExpressionLessThan>(lhs, rhs);

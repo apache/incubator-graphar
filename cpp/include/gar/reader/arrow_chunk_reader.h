@@ -130,8 +130,8 @@ class VertexPropertyArrowChunkReader {
   IdType GetChunkNum() const noexcept { return chunk_num_; }
 
   /**
-   * @brief Apply the row filter to the table. No parameter call Filter() or
-   * Filter(nullptr) will clear the filter.
+   * @brief Apply the row filter to the table. No parameter call Filter() will
+   * clear the filter.
    *
    * @param filter Predicate expression to filter rows.
    */
@@ -139,11 +139,11 @@ class VertexPropertyArrowChunkReader {
 
   /**
    * @brief Apply the projection to the table to be read. No parameter call
-   * Select() or Select(nullptr) will clear the projection.
+   * Select() will clear the projection.
    *
    * @param column_names The name of columns to be selected.
    */
-  void Select(utils::ColumnNames column_names = nullptr);
+  void Select(utils::ColumnNames column_names = std::nullopt);
 
  private:
   VertexInfo vertex_info_;
@@ -591,9 +591,21 @@ class AdjListPropertyArrowChunkReader {
     return Status::OK();
   }
 
+  /**
+   * @brief Apply the row filter to the table. No parameter call Filter() will
+   * clear the filter.
+   *
+   * @param filter Predicate expression to filter rows.
+   */
   void Filter(utils::Filter filter = nullptr);
 
-  void Select(utils::ColumnNames column_names = nullptr);
+  /**
+   * @brief Apply the projection to the table to be read. No parameter call
+   * Select() will clear the projection.
+   *
+   * @param column_names The name of columns to be selected.
+   */
+  void Select(utils::ColumnNames column_names = std::nullopt);
 
  private:
   EdgeInfo edge_info_;

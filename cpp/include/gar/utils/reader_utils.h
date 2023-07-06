@@ -29,13 +29,14 @@ namespace GAR_NAMESPACE_INTERNAL {
 namespace utils {
 
 using Filter = std::shared_ptr<Expression>;
-using ColumnNames = std::vector<std::string>*;
+using ColumnNames =
+    std::optional<std::reference_wrapper<std::vector<std::string>>>;
 
 struct FilterOptions {
   // The row filter to apply to the table.
   Filter filter = nullptr;
   // The columns to include in the table. Select all columns by default.
-  ColumnNames columns = nullptr;
+  ColumnNames columns = std::nullopt;
 
   FilterOptions() {}
   FilterOptions(Filter filter, ColumnNames columns)

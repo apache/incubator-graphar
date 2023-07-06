@@ -111,7 +111,7 @@ TEST_CASE("test_vertex_property_pushdown") {
   // construct pushdown options
   FilterOptions options;
   options.filter = filter;
-  options.columns = &expected_cols;
+  options.columns = expected_cols;
 
   // print reader result
   auto walkReader = [&](GAR_NAMESPACE::VertexPropertyArrowChunkReader& reader) {
@@ -158,7 +158,7 @@ TEST_CASE("test_vertex_property_pushdown") {
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     reader.Filter(filter);
-    reader.Select(&expected_cols);
+    reader.Select(expected_cols);
     walkReader(reader);
   }
 }
@@ -306,7 +306,7 @@ TEST_CASE("test_adj_list_property_pushdown") {
 
   FilterOptions options;
   options.filter = filter;
-  options.columns = &expected_cols;
+  options.columns = expected_cols;
 
   // print reader result
   auto walkReader =
@@ -354,7 +354,7 @@ TEST_CASE("test_adj_list_property_pushdown") {
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     reader.Filter(filter);
-    reader.Select(&expected_cols);
+    reader.Select(expected_cols);
     walkReader(reader);
   }
 }
