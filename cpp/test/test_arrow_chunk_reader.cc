@@ -28,8 +28,6 @@ using GAR_NAMESPACE::_Equal;
 using GAR_NAMESPACE::_LessThan;
 using GAR_NAMESPACE::_Literal;
 using GAR_NAMESPACE::_Property;
-using GAR_NAMESPACE::Expression;
-using GAR_NAMESPACE::Property;
 using GAR_NAMESPACE::utils::FilterOptions;
 
 TEST_CASE("test_vertex_property_arrow_chunk_reader") {
@@ -146,15 +144,15 @@ TEST_CASE("test_vertex_property_pushdown") {
   };
 
   SECTION("pushdown by helper function") {
-    std::cout << "vertex property pushdown by helper function:\n";
+    std::cout << "Vertex property pushdown by helper function:\n";
     auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
         graph_info, label, group, options);
     REQUIRE(maybe_reader.status().ok());
     walkReader(maybe_reader.value());
   }
 
-  SECTION("pushdown by function Filter() & Project()") {
-    std::cout << "vertex property pushdown by Filter() & Project():\n";
+  SECTION("pushdown by function Filter() & Select()") {
+    std::cout << "Vertex property pushdown by Filter() & Select():\n";
     auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
         graph_info, label, group);
     REQUIRE(maybe_reader.status().ok());
@@ -299,11 +297,9 @@ TEST_CASE("test_adj_list_property_pushdown") {
   auto group = maybe_group.value();
 
   // construct pushdown options
-  Property prop("creationDate");
-
-  auto expr1 =
-      _LessThan(_Literal("2012-06-02T04:30:44.526+0000"), _Property(prop));
-  auto expr2 = _Equal(_Property(prop), _Property(prop));
+  auto expr1 = _LessThan(_Literal("2012-06-02T04:30:44.526+0000"),
+                         _Property(property_name));
+  auto expr2 = _Equal(_Property(property_name), _Property(property_name));
   auto filter = _And(expr1, expr2);
 
   std::vector<std::string> expected_cols{"creationDate"};
@@ -340,7 +336,7 @@ TEST_CASE("test_adj_list_property_pushdown") {
       };
 
   SECTION("pushdown by helper function") {
-    std::cout << "adj list property pushdown by helper function: \n";
+    std::cout << "Adj list property pushdown by helper function: \n";
     auto maybe_reader = GAR_NAMESPACE::ConstructAdjListPropertyArrowChunkReader(
         graph_info, src_label, edge_label, dst_label, group,
         GAR_NAMESPACE::AdjListType::ordered_by_source, options);
@@ -349,8 +345,8 @@ TEST_CASE("test_adj_list_property_pushdown") {
     walkReader(reader);
   }
 
-  SECTION("pushdown by function Filter() & Project()") {
-    std::cout << "vertex property pushdown by Filter() & Project():"
+  SECTION("pushdown by function Filter() & Select()") {
+    std::cout << "Adj list property pushdown by Filter() & Select():"
               << std::endl;
     auto maybe_reader = GAR_NAMESPACE::ConstructAdjListPropertyArrowChunkReader(
         graph_info, src_label, edge_label, dst_label, group,
