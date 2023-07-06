@@ -72,7 +72,7 @@ class VertexPropertyChunkInfoReader {
     chunk_index_ = id / vertex_info_.GetChunkSize();
     if (chunk_index_ >= chunk_num_) {
       return Status::IndexError("Internal vertex id ", id,
-                                " is not out of range [0,",
+                                " is out of range [0,",
                                 chunk_num_ * vertex_info_.GetChunkSize(),
                                 ") of vertex ", vertex_info_.GetLabel());
     }
