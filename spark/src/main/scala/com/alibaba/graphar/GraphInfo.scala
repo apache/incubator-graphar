@@ -151,6 +151,14 @@ class Property () {
   def getData_type_in_gar: GarType.Value = {
     GarType.StringToGarType(data_type)
   }
+
+  def toMap(): java.util.HashMap[String, Object] = {
+    val data = new java.util.HashMap[String, Object]()
+    data.put("name", name)
+    data.put("data_type", data_type)
+    data.put("is_primary", new java.lang.Boolean(is_primary))
+    return data
+  }
 }
 
 /** PropertyGroup is a class to store the property group information. */
@@ -162,6 +170,21 @@ class PropertyGroup () {
   /** Get file type in gar of property group */
   def getFile_type_in_gar: FileType.Value = {
     FileType.StringToFileType(file_type)
+  }
+
+  def toMap(): java.util.HashMap[String, Object] = {
+    val data = new java.util.HashMap[String, Object]()
+    if (prefix != "") data.put("prefix", prefix)
+    data.put("file_type", file_type)
+    val property_num = properties.size()
+    if (property_num > 0) {
+      val property_maps = new java.util.ArrayList[Object]()
+      for (i <- 0 until property_num) {
+        property_maps.add(properties.get(i).toMap())
+      }
+      data.put("properties", property_maps)
+    }
+    return data
   }
 }
 
@@ -197,6 +220,23 @@ class AdjList () {
   /** Get adj list type in gar */
   def getAdjList_type_in_gar: AdjListType.Value = {
     AdjListType.StringToAdjListType(getAdjList_type)
+  }
+
+  def toMap(): java.util.HashMap[String, Object] = {
+    val data = new java.util.HashMap[String, Object]()
+    if (prefix != "") data.put("prefix", prefix)
+    data.put("file_type", file_type)
+    data.put("ordered", new java.lang.Boolean(ordered))
+    data.put("aligned_by", aligned_by)
+    val property_group_num = property_groups.size()
+    if (property_group_num > 0) {
+      val property_group_maps = new java.util.ArrayList[Object]()
+      for (i <- 0 until property_group_num) {
+        property_group_maps.add(property_groups.get(i).toMap())
+      }
+      data.put("property_groups", property_group_maps)
+    }
+    return data
   }
 }
 
@@ -234,6 +274,17 @@ class GraphInfo() {
 
   def getEdgeInfos(): Map[String, EdgeInfo] = {
     return edgeInfos
+  }
+
+  def dump(): String = {
+    val data = new java.util.HashMap[String, Object]()
+    data.put("name", name)
+    data.put("vertices", vertices)
+    data.put("edges", edges)
+    data.put("prefix", prefix)
+    data.put("version", version)
+    val yaml = new Yaml()
+    return yaml.dump(data)
   }
 }
 

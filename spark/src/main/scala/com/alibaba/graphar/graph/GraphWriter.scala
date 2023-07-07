@@ -18,63 +18,59 @@ package com.alibaba.graphar.graph
 import com.alibaba.graphar.{AdjListType, GraphInfo, VertexInfo, EdgeInfo}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 import com.alibaba.graphar.utils.IndexGenerator
+import com.alibaba.graphar.utils.Utils
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 
-/** The helper object for writing graph through the definitions of graph info. */
-object GraphWriter {
-  /** Writing the vertex dataframes to GAR with the vertex infos.
-   *
-   * @param prefix The absolute prefix.
-   * @param vertexInfos The map of (vertex label -> VertexInfo) for the graph.
-   * @param vertexNumMap vertex num of vertices, a map of (vertex label -> vertex num)
-   * @param vertexDataFrames vertex dataframes, a map of (vertex label -> DataFrame)
-   * @param spark The Spark session for the writing.
-   */
-  private def writeAllVertices(prefix: String,
-                               vertexInfos: Map[String, VertexInfo],
-                               vertexNumMap: Map[String, Long],
-                               vertexDataFrames: Map[String, DataFrame],
-                               spark: SparkSession): Unit = {
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.fs.{FileSystem, Path}
+import java.io.{BufferedWriter, OutputStreamWriter}
+
+class GraphWriter() {
+  def AddVertexData(label: String, df: DataFrame): Unit = {
+    if (vertices.exists(_._1 == label)) {
+      throw new IllegalArgumentException
+    }
+    vertices += label -> df
+    vertexNums += label -> df.count
+  }
+
+  def AddEdgeData(source_label: String, edge_label: String, target_label: String, df: DataFrame): Unit = {
+    if (edges.exists(_._1 == (source_label, edge_label, target_label))) {
+      throw new IllegalArgumentException
+    }
+    edges += (source_label, edge_label, target_label) -> df
+  }
+
+  def write(graphInfo: GraphInfo,
+            spark: SparkSession): Unit = {
+    val vertexInfos = graphInfo.getVertexInfos()
+    val edgeInfos = graphInfo.getEdgeInfos()
+    val prefix =graphInfo.getPrefix()
+    var indexMappings: scala.collection.mutable.Map[String, DataFrame] = scala.collection.mutable.Map[String, DataFrame]()
     vertexInfos.foreach { case (label, vertexInfo) => {
-      val vertex_num = vertexNumMap(label)
-      val df_with_index = IndexGenerator.generateVertexIndexColumn(vertexDataFrames(label))
+      val vertex_num = vertexNums(label)
+      val df_and_mapping = IndexGenerator.generateVertexIndexColumnAndIndexMapping(vertices(label))
+      val df_with_index = df_and_mapping._1
+      indexMappings += label -> df_and_mapping._2
       val writer = new VertexWriter(prefix, vertexInfo, df_with_index, Some(vertex_num))
       writer.writeVertexProperties()
     }}
-  }
 
-  /** Writing edge dataframes to GAR with the vertex infos.
-   *
-   * @param prefix The absolute prefix.
-   * @param vertexInfos The map of (vertex label -> VertexInfo) for the graph.
-   * @param edgeInfos The map of (srclabel_edgeLabel_dstLabel -> EdgeInfo) for the graph.
-   * @param vertexNumMap vertex num of vertices, a map of (vertex label -> vertex num)
-   * @param vertexDataFrames vertex dataframes, a map of (vertex label -> DataFrame)
-   * @param edgeDataFrames edge dataframes, a map of (srcLabel_edgeLabel_dstLabel -> DataFrame)
-   * @param spark The Spark session for the writing.
-   */
-  private def writeAllEdges(prefix: String,
-                            vertexInfos: Map[String, VertexInfo],
-                            edgeInfos: Map[String, EdgeInfo],
-                            vertexNumMap: Map[String, Long],
-                            vertexDataFrames: Map[String, DataFrame],
-                            edgeDataFrames: Map[String, DataFrame],
-                            spark: SparkSession): Unit = {
     edgeInfos.foreach { case (key, edgeInfo) => {
       val srcLabel = edgeInfo.getSrc_label
       val dstLabel = edgeInfo.getDst_label
-      val edge_key = edgeInfo.getConcatKey()
-      val src_vertex_index_mapping = IndexGenerator.constructVertexIndexMapping(vertexDataFrames(srcLabel), vertexInfos(srcLabel).getPrimaryKey())
+      val edgeLabel = edgeInfo.getEdge_label
+      val src_vertex_index_mapping = indexMappings(srcLabel)
       val dst_vertex_index_mapping = {
         if (srcLabel == dstLabel)
           src_vertex_index_mapping
         else
-          IndexGenerator.constructVertexIndexMapping(vertexDataFrames(dstLabel), vertexInfos(dstLabel).getPrimaryKey())
+          indexMappings(dstLabel)
       }
-      val edge_df_with_index = IndexGenerator.generateSrcAndDstIndexForEdgesFromMapping(edgeDataFrames(edge_key), src_vertex_index_mapping, dst_vertex_index_mapping)
+      val edge_df_with_index = IndexGenerator.generateSrcAndDstIndexForEdgesFromMapping(edges((srcLabel, edgeLabel, dstLabel)), src_vertex_index_mapping, dst_vertex_index_mapping)
 
       val adj_lists = edgeInfo.getAdj_lists
       val adj_list_it = adj_lists.iterator
@@ -82,9 +78,9 @@ object GraphWriter {
         val adj_list_type = adj_list_it.next().getAdjList_type_in_gar
         val vertex_num = {
           if (adj_list_type == AdjListType.ordered_by_source || adj_list_type == AdjListType.unordered_by_source) {
-            vertexNumMap(srcLabel)
+            vertexNums(srcLabel)
           } else {
-            vertexNumMap(dstLabel)
+            vertexNums(dstLabel)
           }
         }
         val writer = new EdgeWriter(prefix, edgeInfo, adj_list_type, vertex_num, edge_df_with_index)
@@ -93,42 +89,72 @@ object GraphWriter {
     }}
   }
 
-  /** Writing the graph DataFrames to GAR with the graph info object.
-   *
-   * @param graphInfo The graph info object of the graph.
-   * @param vertexDataFrames: vertex dataframes, a map of (vertex label -> DataFrame)
-   * @param edgeDataFrames: edge dataframes, a map of (srcLabel_edgeLabel_dstLabel -> DataFrame)
-   * @param spark The Spark session for the writing.
-   */
-  def write(graphInfo: GraphInfo,
-            vertexDataFrames: Map[String, DataFrame],
-            edgeDataFrames: Map[String, DataFrame],
+  def write(graphInfoPath: String,
             spark: SparkSession): Unit = {
-    // get the vertex num of each vertex dataframe
-    val vertex_num_map: Map[String, Long] = vertexDataFrames.map { case (k, v) => (k, v.count()) }
-    val prefix = graphInfo.getPrefix
-    val vertex_infos = graphInfo.getVertexInfos()
-    val edge_infos = graphInfo.getEdgeInfos()
-
-    // write vertices
-    writeAllVertices(prefix, vertex_infos, vertex_num_map, vertexDataFrames, spark)
-
-    // write edges
-    writeAllEdges(prefix, vertex_infos, edge_infos, vertex_num_map, vertexDataFrames, edgeDataFrames, spark)
-  }
-
-  /** Writing the graph DataFrames to GAR with the graph info yaml file.
-   *
-   * @param graphInfoPath The path of the graph info yaml.
-   * @param vertexDataFrames: vertex dataframes, a map of (vertex label -> DataFrame)
-   * @param edgeDataFrames: edge dataframes, a map of (srcLabel_edgeLabel_dstLabel -> DataFrame)
-   * @param spark The Spark session for the writing.
-   */
-  def write(graphInfoPath: String, vertexDataFrames: Map[String, DataFrame], edgeDataFrames: Map[String, DataFrame], spark: SparkSession): Unit = {
     // load graph info
     val graph_info = GraphInfo.loadGraphInfo(graphInfoPath, spark)
-
-    // conduct writing
-    write(graph_info, vertexDataFrames, edgeDataFrames, spark)
+    write(graph_info, spark)
   }
+
+  private def saveInfoToFile(graphInfo: GraphInfo, spark: SparkSession): Unit = {
+    val vertexInfos = graphInfo.getVertexInfos()
+    val edgeInfos = graphInfo.getEdgeInfos()
+    val prefix = graphInfo.getPrefix()
+    val fs = FileSystem.get(new Path(prefix).toUri(), spark.sparkContext.hadoopConfiguration)
+    vertexInfos.foreach { case (key, vertexInfo) => {
+      val yamlString = vertexInfo.dump()
+      val filePath = new Path(prefix + "/" + key + ".vertex.yml")
+      val outputStream = fs.create(filePath)
+      val writer = new BufferedWriter(new OutputStreamWriter(outputStream))
+      writer.write(yamlString)
+      writer.close()
+      outputStream.close()
+    }}
+    edgeInfos.foreach { case (key, edgeInfo) => {
+      val yamlString = edgeInfo.dump()
+      val filePath = new Path(prefix + "/" + key + ".edge.yml")
+      val outputStream = fs.create(filePath)
+      val writer = new BufferedWriter(new OutputStreamWriter(outputStream))
+      writer.write(yamlString)
+      writer.close()
+      outputStream.close()
+    }}
+
+    val yamlString = graphInfo.dump()
+    val filePath = new Path(prefix + "/" + graphInfo.getName() + ".graph.yml")
+    val outputStream = fs.create(filePath)
+    val writer = new BufferedWriter(new OutputStreamWriter(outputStream))
+    writer.write(yamlString)
+    writer.close()
+    outputStream.close()
+  }
+
+  def write(path: String,
+            name: String,
+            spark: SparkSession,
+            vertex_chunk_size: Long = 262144,  // 2^18
+            edge_chunk_size: Long = 4194304,   // 2^22
+            file_type: String = "parquet",
+            vertison: String = "v1"
+           ): Unit = {
+    val vertex_schemas: scala.collection.mutable.Map[String, StructType] = scala.collection.mutable.Map[String, StructType]()
+    val edge_schemas: scala.collection.mutable.Map[(String, String, String), StructType] = scala.collection.mutable.Map[(String, String, String), StructType]()
+    vertices.foreach { case (key, df) => {
+      vertex_schemas += key -> df.schema
+    }}
+    edges.foreach { case (key, df) => {
+      edge_schemas += key -> new StructType(df.schema.drop(2).toArray)
+    }}
+    // val vertex_schemas = vertices map { (key: String, df: DataFrame) => (key, df.schema)} toMap
+    // val edge_schemas = edges map { (key: (String, String, String), df: DataFrame) => (key, df.schema)} toMap
+    val graph_info = Utils.generate_graph_info(path, name, true, vertex_chunk_size, edge_chunk_size, file_type, vertex_schemas, edge_schemas)
+    // dump infos to file
+    saveInfoToFile(graph_info, spark)
+    // write out the data
+    write(graph_info, spark)
+  }
+
+  val vertices: scala.collection.mutable.Map[String, DataFrame] = scala.collection.mutable.Map[String, DataFrame]()
+  val edges: scala.collection.mutable.Map[(String, String, String), DataFrame] = scala.collection.mutable.Map[(String, String, String), DataFrame]()
+  val vertexNums: scala.collection.mutable.Map[String, Long] = scala.collection.mutable.Map[String, Long]()
 }

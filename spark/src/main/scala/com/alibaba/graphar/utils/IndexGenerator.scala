@@ -68,7 +68,7 @@ object IndexGenerator {
   def generateVertexIndexColumn(vertexDf: DataFrame): DataFrame = {
     val spark = vertexDf.sparkSession
     val schema = vertexDf.schema
-    val schema_with_index =  StructType(StructType(Seq(StructField(GeneralParams.vertexIndexCol, LongType)))++schema)
+    val schema_with_index = StructType(StructType(Seq(StructField(GeneralParams.vertexIndexCol, LongType)))++schema)
     val rdd = vertexDf.rdd
     val counts = rdd
       .mapPartitionsWithIndex((i, ps) => Array((i, ps.size)).iterator, preservesPartitioning = true)
@@ -85,6 +85,19 @@ object IndexGenerator {
     })
     spark.createDataFrame(rdd_with_index, schema_with_index)
   }
+
+  def generateVertexIndexColumnAndIndexMapping(vertexDf: DataFrame, primaryKey: String = ""): (DataFrame, DataFrame) = {
+    val primary_key: String = if (primaryKey == "") vertexDf.columns(0) else primaryKey
+    val spark = vertexDf.sparkSession
+
+    val df_with_index = generateVertexIndexColumn(vertexDf)
+    df_with_index.createOrReplaceTempView("vertex_table")
+    val indexCol = GeneralParams.vertexIndexCol;
+    val primaryCol = GeneralParams.primaryCol;
+    val index_mapping = spark.sql(f"select `$indexCol`, `$primary_key` as `$primaryCol` from vertex_table")
+    return (df_with_index, index_mapping)
+  }
+
 
   // index helper for the Edge DataFrame
 
