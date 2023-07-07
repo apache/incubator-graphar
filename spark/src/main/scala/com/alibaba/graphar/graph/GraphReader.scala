@@ -42,11 +42,11 @@ object GraphReader {
   /** Loads the edge chunks as DataFrame with the edge infos.
    *
    * @param prefix The absolute prefix.
-   * @param edgeInfos The map of (srcLabel_edgeLabel_dstlabel -> EdgeInfo) for the graph.
+   * @param edgeInfos The map of ((srcLabel, edgeLabel, dstLabel) -> EdgeInfo) for the graph.
    * @param spark The Spark session for the reading.
-   * @return The map of (srcLabel_edgeLabel_dstlabel -> (adj_list_type_str -> DataFrame))
+   * @return The map of ((srcLabel, edgeLabel, dstLabel) -> (adj_list_type_str -> DataFrame))
    */
-  private def readAllEdges(prefix: String, edgeInfos: Map[String, EdgeInfo], spark: SparkSession): Map[String, Map[String, DataFrame]] = {
+  private def readAllEdges(prefix: String, edgeInfos: Map[String, EdgeInfo], spark: SparkSession): Map[(String, String, String), Map[String, DataFrame]] = {
     val edge_dataframes: Map[String, Map[String, DataFrame]] = edgeInfos.map { case (key, edgeInfo) => {
       val adj_lists = edgeInfo.getAdj_lists
       val adj_list_it = adj_lists.iterator
@@ -58,7 +58,7 @@ object GraphReader {
         val reader = new EdgeReader(prefix, edgeInfo, adj_list_type, spark)
         adj_list_type_edge_df_map += (adj_list_type_str -> reader.readEdges(false))
       }
-      (key, adj_list_type_edge_df_map)
+      ((edgeInfo.getSrc_label(), edgeInfo.getEdge_label(), edgeInfo.getDst_label()), adj_list_type_edge_df_map)
     }}
     return edge_dataframes
   }
@@ -68,9 +68,9 @@ object GraphReader {
    * @param graphInfo The info object for the graph.
    * @param spark The Spark session for the loading.
    * @return Pair of vertex dataframes and edge dataframes, the vertex dataframes are stored as the map of (vertex_label -> DataFrame)
-   *        the edge dataframes are stored as a map of (srcLabel_edgeLabel_dstLabel -> (adj_list_type_str -> DataFrame))
+   *        the edge dataframes are stored as a map of ((srcLabel, edgeLabel, dstLabel) -> (adj_list_type_str -> DataFrame))
    */
-  def read(graphInfo: GraphInfo, spark: SparkSession): Pair[Map[String, DataFrame], Map[String, Map[String, DataFrame]]] = {
+  def read(graphInfo: GraphInfo, spark: SparkSession): Pair[Map[String, DataFrame], Map[(String, String, String), Map[String, DataFrame]]] = {
     val prefix = graphInfo.getPrefix
     val vertex_infos = graphInfo.getVertexInfos()
     val edge_infos = graphInfo.getEdgeInfos()

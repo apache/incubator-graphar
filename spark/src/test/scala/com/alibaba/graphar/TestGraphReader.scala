@@ -43,8 +43,8 @@ class TestGraphReaderSuite extends AnyFunSuite {
     assert(person_df.count() == 903)
 
     assert(edge_dataframes.size == 1)
-    assert(edge_dataframes contains "person_knows_person")
-    val adj_list_type_dataframes = edge_dataframes("person_knows_person")
+    assert(edge_dataframes contains ("person", "knows", "person"))
+    val adj_list_type_dataframes = edge_dataframes(("person", "knows", "person"))
     assert(adj_list_type_dataframes.size == 3)
   }
 
@@ -67,7 +67,7 @@ class TestGraphReaderSuite extends AnyFunSuite {
     val edgeInfos = graph_info.getEdgeInfos()
     assert(edge_dataframes.size == edgeInfos.size)
     edgeInfos.foreach { case (key, edgeInfo) => {
-      assert(edge_dataframes contains key)
+      assert(edge_dataframes contains (edgeInfo.getSrc_label(), edgeInfo.getEdge_label(), edgeInfo.getDst_label())
       val adj_list_type_dataframes = edge_dataframes(key)
       val adj_lists = edgeInfo.getAdj_lists
       assert(adj_list_type_dataframes.size == adj_lists.size)
