@@ -16,15 +16,9 @@
 package com.alibaba.graphar
 
 import com.alibaba.graphar.datasources._
-import com.alibaba.graphar.utils.IndexGenerator
-import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
+import com.alibaba.graphar.graph.GraphWriter
 
-import java.io.{File, FileInputStream}
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
-import scala.beans.BeanProperty
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.apache.hadoop.fs.{Path, FileSystem}
 
 class Neo4j2GraphArExample {
   // connect to the Neo4j instance
@@ -37,97 +31,81 @@ class Neo4j2GraphArExample {
     .getOrCreate()
 
   // read Person vertices from Neo4j and write to GraphAr
-  def testReadPersonVerticesFromNeo4j(): Unit = {
+  def testReadMovieGraphFromNeo4j(): Unit = {
+    // initialize a graph writer
+    val writer = new GraphWriter()
+
     // read vertices with label "Person" from Neo4j as a DataFrame
     val person_df = spark.read.format("org.neo4j.spark.DataSource")
-      .option("labels", "Person")
+      .option("query", "MATCH (n:Person) RETURN n.name AS name, n.born as born")
       .load()
     // display the DataFrame and its schema
     person_df.show()
     person_df.printSchema()
+    // put into writer
+    writer.PutVertexData("Person", person_df)
 
-    // read vertex info yaml
-    val vertex_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/person.vertex.yml").getPath
-    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
-
-    // generate vertex index column for vertex dataframe
-    val person_df_with_index = IndexGenerator.generateVertexIndexColumn(person_df)
-
-    // create writer object for person
-    val prefix : String = "/tmp/neo4j/"
-    val writer = new VertexWriter(prefix, vertex_info, person_df_with_index)
-
-    // use the DataFrame to generate GAR files
-    writer.writeVertexProperties()
-  }
-
-  // read Movie vertices from Neo4j and write to GraphAr
-  def testReadMovieVerticesFromNeo4j(): Unit = {
     // read vertices with label "Person" from Neo4j as a DataFrame
     val movie_df = spark.read.format("org.neo4j.spark.DataSource")
-      .option("labels", "Movie")
+      .option("query", "MATCH (n:Movie) RETURN n.title AS title, n.tagline as tagline")
       .load()
     // display the DataFrame and its schema
     movie_df.show()
     movie_df.printSchema()
-
-    // read vertex info yaml
-    val vertex_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/movie.vertex.yml").getPath
-    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
-
-    // generate vertex index column for vertex dataframe
-    val movie_df_with_index = IndexGenerator.generateVertexIndexColumn(movie_df)
-
-    // create writer object for person
-    val prefix : String = "/tmp/neo4j/"
-    val writer = new VertexWriter(prefix, vertex_info, movie_df_with_index)
-
-    // use the DataFrame to generate GAR files
-    writer.writeVertexProperties()
-  }
-
-  // read edges from Neo4j and write to GraphAr
-  def testReadEdgesFromNeo4j(): Unit = {
-    // read vertices with label "Person" from Neo4j as a DataFrame
-    val person_df = spark.read.format("org.neo4j.spark.DataSource")
-      .option("labels", "Person")
-      .load()
-    // read vertices with label "Movie" from Neo4j as a DataFrame
-    val movie_df = spark.read.format("org.neo4j.spark.DataSource")
-      .option("labels", "Movie")
-      .load()
+    // put into writer
+    writer.PutVertexData("Movie", movie_df)
 
     // read edges with type "Person"->"PRODUCED"->"Movie" from Neo4j as a DataFrame
-    val edge_df = spark.read.format("org.neo4j.spark.DataSource")
-        .option("relationship", "PRODUCED")
-        .option("relationship.source.labels", "Person")
-        .option("relationship.target.labels", "Movie")
-        .load()
+    val produced_edge_df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("query", "MATCH (a:Person)-[r:PRODUCED]->(b:Movie) return a.name as src, b.title as dst")
+      .load()
     // display the DataFrame and its schema
-    edge_df.show()
-    edge_df.printSchema()
+    produced_edge_df.show()
+    produced_edge_df.printSchema()
+    // put into writer
+    writer.PutEdgeData(("Person", "PRODUCED", "Movie"), produced_edge_df)
 
-    // construct the Person vertex mapping with person_df
-    val person_vertex_mapping = IndexGenerator.constructVertexIndexMapping(person_df, "<id>")
-    // construct the Movie vertex mapping with movie_df
-    val movie_vertex_mapping = IndexGenerator.constructVertexIndexMapping(movie_df, "<id>")
+    val acted_in_edge_df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("query", "MATCH (a:Person)-[r:ACTED_IN]->(b:Movie) return a.name as src, b.title as dst")
+      .load()
+    // display the DataFrame and its schema
+    acted_in_edge_df.show()
+    acted_in_edge_df.printSchema()
+    writer.PutEdgeData(("Person", "ACTED_IN", "Movie"), acted_in_edge_df)
 
-    // generate src index and dst index for edge DataFrame with vertex mapping
-    val edge_df_with_src_index = IndexGenerator.generateSrcIndexForEdgesFromMapping(edge_df, "<source.id>", person_vertex_mapping)
-    val edge_df_with_src_dst_index = IndexGenerator.generateDstIndexForEdgesFromMapping(edge_df_with_src_index, "<target.id>", movie_vertex_mapping)
-    edge_df_with_src_dst_index.show()
+    val directed_edge_df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("query", "MATCH (a:Person)-[r:DIRECTED]->(b:Movie) return a.name as src, b.title as dst")
+      .load()
+    // display the DataFrame and its schema
+    directed_edge_df.show()
+    directed_edge_df.printSchema()
+    writer.PutEdgeData(("Person", "DIRECTED", "Movie"), directed_edge_df)
 
-    // read edge info yaml
-    val edge_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/person_produced_movie.edge.yml").getPath
-    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
+    val follows_edge_df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("query", "MATCH (a:Person)-[r:FOLLOWS]->(b:Person) return a.name as src, b.name as dst")
+      .load()
+    // display the DataFrame and its schema
+    follows_edge_df.show()
+    follows_edge_df.printSchema()
+    writer.PutEdgeData(("Person", "FOLLOWS", "Person"), follows_edge_df)
 
-    // create writer object for the DataFrame with indices
-    val prefix : String = "/tmp/neo4j/"
-    val adj_list_type = AdjListType.ordered_by_source
-    val vertex_num = person_df.count()
-    val writer = new EdgeWriter(prefix, edge_info, adj_list_type, vertex_num, edge_df_with_src_dst_index)
+    val reviewed_edge_df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("query", "MATCH (a:Person)-[r:REVIEWED]->(b:Movie) return a.name as src, b.title as dst, r.rating as rating, r.summary as summary")
+      .load()
+    // display the DataFrame and its schema
+    reviewed_edge_df.show()
+    reviewed_edge_df.printSchema()
+    writer.PutEdgeData(("Person", "REVIEWED", "Movie"), reviewed_edge_df)
 
-    // generate the adj list and properties with GAR format
-    writer.writeEdges()
+    val wrote_edge_df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("query", "MATCH (a:Person)-[r:WROTE]->(b:Movie) return a.name as src, b.title as dst")
+      .load()
+    // display the DataFrame and its schema
+    wrote_edge_df.show()
+    wrote_edge_df.printSchema()
+    writer.PutEdgeData(("Person", "WROTE", "Movie"), wrote_edge_df)
+
+    // write to the path
+    writer.write("/tmp/movie_graph/", "movie_graph", spark, 100, 1024, "csv")
   }
 }

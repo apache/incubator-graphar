@@ -29,7 +29,7 @@ import org.apache.hadoop.fs.{FileSystem, Path}
 import java.io.{BufferedWriter, OutputStreamWriter}
 
 class GraphWriter() {
-  def AddVertexData(label: String, df: DataFrame): Unit = {
+  def PutVertexData(label: String, df: DataFrame): Unit = {
     if (vertices.exists(_._1 == label)) {
       throw new IllegalArgumentException
     }
@@ -37,18 +37,18 @@ class GraphWriter() {
     vertexNums += label -> df.count
   }
 
-  def AddEdgeData(source_label: String, edge_label: String, target_label: String, df: DataFrame): Unit = {
-    if (edges.exists(_._1 == (source_label, edge_label, target_label))) {
+  def PutEdgeData(relation: (String, String, String), df: DataFrame): Unit = {
+    if (edges.exists(_._1 == relation)) {
       throw new IllegalArgumentException
     }
-    edges += (source_label, edge_label, target_label) -> df
+    edges += relation -> df
   }
 
   def write(graphInfo: GraphInfo,
             spark: SparkSession): Unit = {
     val vertexInfos = graphInfo.getVertexInfos()
     val edgeInfos = graphInfo.getEdgeInfos()
-    val prefix =graphInfo.getPrefix()
+    val prefix = graphInfo.getPrefix()
     var indexMappings: scala.collection.mutable.Map[String, DataFrame] = scala.collection.mutable.Map[String, DataFrame]()
     vertexInfos.foreach { case (label, vertexInfo) => {
       val vertex_num = vertexNums(label)
@@ -103,7 +103,7 @@ class GraphWriter() {
     val fs = FileSystem.get(new Path(prefix).toUri(), spark.sparkContext.hadoopConfiguration)
     vertexInfos.foreach { case (key, vertexInfo) => {
       val yamlString = vertexInfo.dump()
-      val filePath = new Path(prefix + "/" + key + ".vertex.yml")
+      val filePath = new Path(prefix + key + ".vertex.yml")
       val outputStream = fs.create(filePath)
       val writer = new BufferedWriter(new OutputStreamWriter(outputStream))
       writer.write(yamlString)
@@ -112,7 +112,7 @@ class GraphWriter() {
     }}
     edgeInfos.foreach { case (key, edgeInfo) => {
       val yamlString = edgeInfo.dump()
-      val filePath = new Path(prefix + "/" + key + ".edge.yml")
+      val filePath = new Path(prefix + key + ".edge.yml")
       val outputStream = fs.create(filePath)
       val writer = new BufferedWriter(new OutputStreamWriter(outputStream))
       writer.write(yamlString)
@@ -143,10 +143,8 @@ class GraphWriter() {
       vertex_schemas += key -> df.schema
     }}
     edges.foreach { case (key, df) => {
-      edge_schemas += key -> new StructType(df.schema.drop(2).toArray)
+      edge_schemas += key -> new StructType(df.schema.drop(2).toArray)  // drop the src, dst
     }}
-    // val vertex_schemas = vertices map { (key: String, df: DataFrame) => (key, df.schema)} toMap
-    // val edge_schemas = edges map { (key: (String, String, String), df: DataFrame) => (key, df.schema)} toMap
     val graph_info = Utils.generate_graph_info(path, name, true, vertex_chunk_size, edge_chunk_size, file_type, vertex_schemas, edge_schemas)
     // dump infos to file
     saveInfoToFile(graph_info, spark)

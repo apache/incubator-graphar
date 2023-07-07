@@ -32,14 +32,16 @@ class TestGraphWriterSuite extends AnyFunSuite {
     // initialize a graph writer
     val writer = new GraphWriter()
 
-    // prepare the dataframes
+    // put the vertex data and edge data into writer
     val vertex_file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/person_0_0.csv").getPath
     val vertex_df = spark.read.option("delimiter", "|").option("header", "true").csv(vertex_file_path)
-    writer.AddVertexData("person", vertex_df)
+    val label = "person"
+    writer.PutVertexData(label, vertex_df)
 
     val file_path = getClass.getClassLoader.getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv").getPath
     val edge_df = spark.read.option("delimiter", "|").option("header", "true").csv(file_path)
-    writer.AddEdgeData("person", "knows", "person", edge_df)
+    val tag = ("person", "knows", "person")
+    writer.PutEdgeData(tag, edge_df)
 
     // conduct writing
     writer.write("/tmp/ldbc", "ldbc", spark)
