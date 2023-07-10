@@ -1,7 +1,7 @@
 .. raw:: html
 
     <h1 align="center" style="clear: both;">
-        <img src="https://alibaba.github.io/GraphAr/_images/graphar-logo.png" width="397" alt="GraphAr">
+        <img src="https://github.com/acezen/GraphAr/blob/minor-add-logo/docs/images/graphar-log.svg" width="397" alt="GraphAr">
     </h1>
     <p align="center">
         An open source, standard data file format for graph data storage and retrieval
