@@ -71,7 +71,7 @@ jobs:
           popd
 
       - name: Preview using surge
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' && github.repository == 'alibaba/GraphAr' }}
+        if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
         run: |
           npm install -g surge
           surge ./docs/_build/html \
@@ -79,7 +79,7 @@ jobs:
                 --token ${{ secrets.SURGE_TOKEN }}
 
       - name: Leave the comment on pull request when succeed
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
+        if: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
         uses: actions-cool/maintain-one-comment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -94,7 +94,7 @@ jobs:
           body-include: '<!-- Sticky Pull Request Comment: Surge Preview build -->'
 
       - name: Leave the comment on pull request when failed
-        if: ${{ failure() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
+        if: ${{ failure() && github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
         uses: actions-cool/maintain-one-comment@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
