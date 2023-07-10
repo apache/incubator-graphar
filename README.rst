@@ -1,15 +1,13 @@
 .. raw:: html
 
     <h1 align="center" style="clear: both;">
-        <img src="https://github.com/acezen/GraphAr/blob/minor-add-logo/docs/images/graphar-log.svg" width="397" alt="GraphAr">
+        <img src="https://github.com/acezen/GraphAr/blob/minor-add-logo/docs/images/graphar-log.svg" width="350" alt="GraphAr">
     </h1>
     <p align="center">
         An open source, standard data file format for graph data storage and retrieval
     </p>
 
 |GraphAr CI| |Docs CI| |GraphAr Docs| |Good First Issue|
-
-Welcome to GraphAr (short for "Graph Archive"), an open source, standardized file format for graph data storage and retrieval.
 
 📢 Join our `Weekly Community Meeting`_ to learn more about GraphAr and get involved!
 
