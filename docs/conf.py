@@ -111,8 +111,7 @@ html_extra_path = [
     './.nojekyll',
 ]
 
-html_title = 'GraphAr'
-html_logo = "images/graphar-logo.png"
+html_title = "GraphAr"
 html_favicon = "images/graphar.ico"
 
 html_show_copyright= True
