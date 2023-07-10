@@ -112,6 +112,8 @@ html_extra_path = [
 ]
 
 html_title = 'GraphAr'
+html_logo = "images/graphar-logo.png"
+html_favicon = "images/graphar.ico"
 
 html_show_copyright= True
 html_show_sphinx = False
