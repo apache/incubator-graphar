@@ -1,9 +1,13 @@
-GraphAr
-========
+.. raw:: html
+
+    <h1 align="center" style="clear: both;">
+        <img src="https://alibaba.github.io/GraphAr/_images/graphar-logo.svg" width="350" alt="GraphAr">
+    </h1>
+    <p align="center">
+        An open source, standard data file format for graph data storage and retrieval
+    </p>
 
 |GraphAr CI| |Docs CI| |GraphAr Docs| |Good First Issue|
-
-Welcome to GraphAr (short for "Graph Archive"), an open source, standardized file format for graph data storage and retrieval.
 
 📢 Join our `Weekly Community Meeting`_ to learn more about GraphAr and get involved!
 
@@ -23,7 +27,7 @@ Graph processing serves as the essential building block for a diverse variety of
 real-world applications such as social network analytics, data mining, network routing,
 and scientific computing.
 
-GraphAr is a project that aims to make it easier for diverse applications and
+GraphAr (short for "Graph Archive") is a project that aims to make it easier for diverse applications and
 systems (in-memory and out-of-core storages, databases, graph computing systems, and interactive graph query frameworks)
 to build and access graph data conveniently and efficiently.
 
