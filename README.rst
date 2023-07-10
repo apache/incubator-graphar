@@ -27,7 +27,7 @@ Graph processing serves as the essential building block for a diverse variety of
 real-world applications such as social network analytics, data mining, network routing,
 and scientific computing.
 
-GraphAr is a project that aims to make it easier for diverse applications and
+GraphAr (short for "Graph Archive") is a project that aims to make it easier for diverse applications and
 systems (in-memory and out-of-core storages, databases, graph computing systems, and interactive graph query frameworks)
 to build and access graph data conveniently and efficiently.
 
