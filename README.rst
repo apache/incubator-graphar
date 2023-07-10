@@ -1,5 +1,11 @@
-GraphAr
-========
+.. raw:: html
+
+    <h1 align="center" style="clear: both;">
+        <img src="https://alibaba.github.io/GraphAr/_images/graphar-logo.png" width="397" alt="GraphAr">
+    </h1>
+    <p align="center">
+        An open source, standard data file format for graph data storage and retrieval
+    </p>
 
 |GraphAr CI| |Docs CI| |GraphAr Docs| |Good First Issue|
 
