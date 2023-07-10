@@ -47,7 +47,7 @@ object GraphReader {
    * @return The map of ((srcLabel, edgeLabel, dstLabel) -> (adj_list_type_str -> DataFrame))
    */
   private def readAllEdges(prefix: String, edgeInfos: Map[String, EdgeInfo], spark: SparkSession): Map[(String, String, String), Map[String, DataFrame]] = {
-    val edge_dataframes: Map[String, Map[String, DataFrame]] = edgeInfos.map { case (key, edgeInfo) => {
+    val edge_dataframes: Map[(String, String, String), Map[String, DataFrame]] = edgeInfos.map { case (key, edgeInfo) => {
       val adj_lists = edgeInfo.getAdj_lists
       val adj_list_it = adj_lists.iterator
       var adj_list_type_edge_df_map: Map[String, DataFrame] = Map[String, DataFrame]()
@@ -84,7 +84,7 @@ object GraphReader {
    * @return Pair of vertex dataframes and edge dataframes, the vertex dataframes are stored as the map of (vertex_label -> DataFrame)
    *        the edge dataframes are stored as a map of (srcLabel_edgeLabel_dstLabel -> (adj_list_type_str -> DataFrame))
    */
-  def read(graphInfoPath: String, spark: SparkSession): Pair[Map[String, DataFrame], Map[String, Map[String, DataFrame]]] = {
+  def read(graphInfoPath: String, spark: SparkSession): Pair[Map[String, DataFrame], Map[(String, String, String), Map[String, DataFrame]]] = {
     // load graph info
     val graph_info = GraphInfo.loadGraphInfo(graphInfoPath, spark)
 
