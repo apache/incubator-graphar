@@ -67,8 +67,9 @@ class TestGraphReaderSuite extends AnyFunSuite {
     val edgeInfos = graph_info.getEdgeInfos()
     assert(edge_dataframes.size == edgeInfos.size)
     edgeInfos.foreach { case (key, edgeInfo) => {
-      assert(edge_dataframes contains (edgeInfo.getSrc_label(), edgeInfo.getEdge_label(), edgeInfo.getDst_label())
-      val adj_list_type_dataframes = edge_dataframes(key)
+      val edge_tag = (edgeInfo.getSrc_label(), edgeInfo.getEdge_label(), edgeInfo.getDst_label())
+      assert(edge_dataframes contains edge_tag)
+      val adj_list_type_dataframes = edge_dataframes(edge_tag)
       val adj_lists = edgeInfo.getAdj_lists
       assert(adj_list_type_dataframes.size == adj_lists.size)
       val adj_list_it = adj_lists.iterator
