@@ -36,6 +36,7 @@ class GraphAr2Neo4jExample {
     .getOrCreate()
 
   // read Person vertices from GraphAr and write to Neo4j
+
   def testWriteVerticesToNeo4j(): Unit = {
     // read vertex info yaml
     val vertex_yaml = getClass.getClassLoader.getResource("gar-test/neo4j/person.vertex.yml").getPath

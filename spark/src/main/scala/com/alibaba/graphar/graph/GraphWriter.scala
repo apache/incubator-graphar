@@ -29,7 +29,7 @@ import org.apache.hadoop.fs.{FileSystem, Path}
 import java.io.{BufferedWriter, OutputStreamWriter}
 
 class GraphWriter() {
-  def PutVertexData(label: String, df: DataFrame): Unit = {
+  def PutVertexData(label: String, df: DataFrame, primaryKey: String = ""): Unit = {
     if (vertices.exists(_._1 == label)) {
       throw new IllegalArgumentException
     }
