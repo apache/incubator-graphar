@@ -355,4 +355,3 @@ template <typename T>
 }
 }  // namespace GAR_NAMESPACE_INTERNAL
 #endif  // GAR_UTILS_EXPRESSION_H_
-
