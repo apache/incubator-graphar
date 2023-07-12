@@ -41,7 +41,31 @@ object Utils {
     }
   }
 
-  def generate_graph_info(path: String, graphName: String, directed: Boolean, vertexChunkSize: Long, edgeChunkSize: Long, fileType: String,
+  def sparkDataType2GraphArTypeName(dataType: DataType): String = {
+    val typeName = dataType.typeName
+    val grapharTypeName = typeName match {
+      case "string" => "string"
+      case "integer" => "int"
+      case "long" => "int64"
+      case "double" => "double"
+      case "boolean" => "bool"
+      case _ => throw new IllegalArgumentException("Expected string, integral, double or boolean type, got " + typeName + " type")
+    }
+   return grapharTypeName
+  }
+  /**
+   * Generate graph info with schema of graph data.
+   * @param path prefix of graph info
+   * @param graphName name of graph
+   * @param directed directed or not of graph
+   * @param vertexChunkSize chunk size for every vertex type
+   * @param edgeChunkSize chunk size for every edge type
+   * @param fileType file type for payload data file, support [csv, orc, parquet]
+   * @param vertexSchemas schemas of every vertex type
+   * @param edgeSchemas schemas of every edge type
+   * @return graph info
+   */
+  def generateGraphInfo(path: String, graphName: String, directed: Boolean, vertexChunkSize: Long, edgeChunkSize: Long, fileType: String,
                           vertexSchemas: scala.collection.mutable.Map[String, StructType], edgeSchemas: scala.collection.mutable.Map[(String, String, String), StructType]): GraphInfo = {
     val info = new GraphInfo()
     info.setName(graphName)
@@ -49,20 +73,20 @@ object Utils {
     info.setVersion("gar/v1")
 
     vertexSchemas.foreach { case (key, schema) => {
-      val vertex_info = new VertexInfo()
+      val vertexInfo = new VertexInfo()
       val prefix = "vertex/" + key + "/"
-      vertex_info.setPrefix(prefix)
-      vertex_info.setLabel(key)
-      vertex_info.setChunk_size(vertexChunkSize)
-      vertex_info.setVersion("gar/v1")
-      vertex_info.getProperty_groups().add(new PropertyGroup())
-      val property_group = vertex_info.getProperty_groups().get(0)
-      property_group.setFile_type(fileType)
-      val properties = property_group.getProperties()
-      schema.foreach { case filed => {
+      vertexInfo.setPrefix(prefix)
+      vertexInfo.setLabel(key)
+      vertexInfo.setChunk_size(vertexChunkSize)
+      vertexInfo.setVersion("gar/v1")
+      vertexInfo.getProperty_groups().add(new PropertyGroup())
+      val propertyGroup = vertexInfo.getProperty_groups().get(0)
+      propertyGroup.setFile_type(fileType)
+      val properties = propertyGroup.getProperties()
+      schema.foreach { case field => {
         val property = new Property()
-        property.setName(filed.name)
-        property.setData_type("string")
+        property.setName(field.name)
+        property.setData_type(sparkDataType2GraphArTypeName(field.dataType))
         if (properties.size() == 0) {
           property.setIs_primary(true)
         } else {
@@ -70,52 +94,61 @@ object Utils {
         }
         properties.add(property)
       }}
-      info.addVertexInfo(vertex_info)
+      info.addVertexInfo(vertexInfo)
       info.vertices.add(key + ".vertex.yml")
     }}
 
     edgeSchemas.foreach { case (key, schema) => {
-      val edge_info = new EdgeInfo()
-      edge_info.setSrc_label(key._1)
-      edge_info.setEdge_label(key._2)
-      edge_info.setDst_label(key._3)
-      edge_info.setChunk_size(edgeChunkSize)
-      edge_info.setSrc_chunk_size(vertexChunkSize)
-      edge_info.setDst_chunk_size(vertexChunkSize)
-      edge_info.setDirected(directed)
-      val prefix = "edge/" + edge_info.getConcatKey() + "/"
-      edge_info.setVersion("gar/v1")
-      edge_info.setPrefix(prefix)
-      val csr_adj_list = new AdjList()
-      csr_adj_list.setOrdered(true)
-      csr_adj_list.setAligned_by("src")
-      csr_adj_list.setFile_type(fileType)
-      val csc_adj_list = new AdjList()
-      csc_adj_list.setOrdered(true)
-      csc_adj_list.setAligned_by("dst")
-      csc_adj_list.setFile_type(fileType)
+      val edgeInfo = new EdgeInfo()
+      edgeInfo.setSrc_label(key._1)
+      edgeInfo.setEdge_label(key._2)
+      edgeInfo.setDst_label(key._3)
+      edgeInfo.setChunk_size(edgeChunkSize)
+      edgeInfo.setSrc_chunk_size(vertexChunkSize)
+      edgeInfo.setDst_chunk_size(vertexChunkSize)
+      edgeInfo.setDirected(directed)
+      val prefix = "edge/" + edgeInfo.getConcatKey() + "/"
+      edgeInfo.setVersion("gar/v1")
+      edgeInfo.setPrefix(prefix)
+      val csrAdjList = new AdjList()
+      csrAdjList.setOrdered(true)
+      csrAdjList.setAligned_by("src")
+      csrAdjList.setFile_type(fileType)
+      val cscAdjList = new AdjList()
+      cscAdjList.setOrdered(true)
+      cscAdjList.setAligned_by("dst")
+      cscAdjList.setFile_type(fileType)
       if (schema.length > 0) {
-        val property_group = new PropertyGroup()
-        property_group.setFile_type(fileType)
-        val properties = property_group.getProperties()
-        schema.foreach { case filed => {
+        val propertyGroup = new PropertyGroup()
+        propertyGroup.setFile_type(fileType)
+        val properties = propertyGroup.getProperties()
+        schema.foreach { case field => {
           val property = new Property()
-          property.setName(filed.name)
-          property.setData_type("string")
+          property.setName(field.name)
+          property.setData_type(sparkDataType2GraphArTypeName(field.dataType))
           properties.add(property)
         }}
-        csr_adj_list.getProperty_groups().add(property_group)
-        csc_adj_list.getProperty_groups().add(property_group)
+        csrAdjList.getProperty_groups().add(propertyGroup)
+        cscAdjList.getProperty_groups().add(propertyGroup)
       }
-      edge_info.getAdj_lists().add(csr_adj_list)
-      edge_info.getAdj_lists().add(csc_adj_list)
-      info.addEdgeInfo(edge_info)
-      info.edges.add(edge_info.getConcatKey() + ".edge.yml")
+      edgeInfo.getAdj_lists().add(csrAdjList)
+      edgeInfo.getAdj_lists().add(cscAdjList)
+      info.addEdgeInfo(edgeInfo)
+      info.edges.add(edgeInfo.getConcatKey() + ".edge.yml")
     }}
     return info
   }
 
-  def join_edges_with_primary_key(edgeDf: DataFrame, sourceDf: DataFrame, targetDf: DataFrame, sourceKey: String, targetKey: String): DataFrame = {
+  /**
+   * Join and convert source index and target index to primary key in edges
+   * @param edgeDf edge data frame
+   * @param sourceDf source vertex data frame
+   * @param targetDf target vertex data frame
+   * @param sourceKey source vertex primary key
+   * @param targetKey target vertex primary key
+   * @return new edge data frame
+   */
+  def joinEdgesWithVertexPrimaryKey(edgeDf: DataFrame, sourceDf: DataFrame, targetDf: DataFrame, sourceKey: String, targetKey: String): DataFrame = {
     val spark: SparkSession = edgeDf.sparkSession
     sourceDf.createOrReplaceTempView("source_table")
     targetDf.createOrReplaceTempView("target_table")
@@ -123,9 +156,9 @@ object Utils {
     val srcCol = GeneralParams.srcIndexCol
     val dstCol = GeneralParams.dstIndexCol
     val indexCol = GeneralParams.vertexIndexCol
-    val edge_df_with_src = spark.sql(f"select source_table.`$sourceKey` as `src`, edge_table.* from edge_table inner join source_table on source_table.`$indexCol`=edge_table.`$srcCol`")
+    val edge_df_with_src = spark.sql(f"select source_table.`$sourceKey` as `src`, edge_table.* from edge_table inner join source_table on source_table.`$indexCol`=edge_table.`$srcCol`").drop(srcCol)
     edge_df_with_src.createOrReplaceTempView("edge_table")
-    val edge_df_with_src_dst = spark.sql(f"select target_table.`$targetKey` as `dst`, edge_table.* from edge_table inner join target_table on target_table.`$indexCol`=edge_table.`$dstCol`")
+    val edge_df_with_src_dst = spark.sql(f"select target_table.`$targetKey` as `dst`, edge_table.* from edge_table inner join target_table on target_table.`$indexCol`=edge_table.`$dstCol`").drop(dstCol)
     edge_df_with_src_dst
   }
 }

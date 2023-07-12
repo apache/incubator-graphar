@@ -35,10 +35,7 @@ object GraphReader {
   private def readAllVertices(prefix: String, vertexInfos: Map[String, VertexInfo], spark: SparkSession): Map[String, DataFrame] = {
     val vertex_dataframes: Map[String, DataFrame] = vertexInfos.map { case (label, vertexInfo) => {
       val reader = new VertexReader(prefix, vertexInfo, spark)
-      val df = reader.readAllVertexPropertyGroups()
-      val df2 = IndexGenerator.generateVertexIndexColumn(df)
-      df2.printSchema()
-      (label, df2)
+      (label, reader.readAllVertexPropertyGroups(true))
     }}
     return vertex_dataframes
   }

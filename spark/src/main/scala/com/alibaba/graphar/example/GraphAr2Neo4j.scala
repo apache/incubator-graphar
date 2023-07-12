@@ -28,7 +28,7 @@ import scala.beans.BeanProperty
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.apache.hadoop.fs.{Path, FileSystem}
 
-object GrapAr2Neo4jExample {
+object GrapAr2Neo4j {
 
   def main(args: Array[String]): Unit = {
     // connect to the Neo4j instance
@@ -56,7 +56,7 @@ object GrapAr2Neo4jExample {
     vertexData.foreach { case (key, df) => {
       // write the vertices to Neo4j
       val primaryKey = graphInfo.getVertexInfo(key).getPrimaryKey()
-      df.write.format("org.neo4j.spark.DataSource")
+      df.drop(GeneralParams.vertexIndexCol).write.format("org.neo4j.spark.DataSource")
         .mode(SaveMode.Overwrite)
         .option("labels", ":" + key)
         .option("node.keys", primaryKey)
@@ -74,8 +74,10 @@ object GrapAr2Neo4jExample {
       val targetPrimaryKey = graphInfo.getVertexInfo(targetLabel).getPrimaryKey()
       val sourceDf = vertexData(sourceLabel)
       val targetDf = vertexData(targetLabel)
-      val df = Utils.join_edges_with_primary_key(value.head._2, sourceDf, targetDf, sourcePrimaryKey, targetPrimaryKey)  // use the first dataframe of (adj_list_type_str, dataframe) map
-      df.printSchema()
+      val df = Utils.joinEdgesWithVertexPrimaryKey(value.head._2, sourceDf, targetDf, sourcePrimaryKey, targetPrimaryKey)  // use the first dataframe of (adj_list_type_str, dataframe) map
+
+      val properties = if (edgeLabel == "REVIEWED") "rating,summary" else ""
+
       df.write.format("org.neo4j.spark.DataSource")
         .mode(SaveMode.Overwrite)
         .option("relationship", edgeLabel)
@@ -86,7 +88,7 @@ object GrapAr2Neo4jExample {
         .option("relationship.target.labels", ":" + targetLabel)
         .option("relationship.target.save.mode", "match")
         .option("relationship.target.node.keys", "dst:" + targetPrimaryKey)
-        .option("relationship.properties", "")
+        .option("relationship.properties", properties)
         .save()
     }}
   }

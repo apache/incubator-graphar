@@ -20,7 +20,7 @@ import com.alibaba.graphar.graph.GraphWriter
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-object Neo4j2GraphArExample {
+object Neo4j2GraphAr {
 
   def main(args: Array[String]): Unit = {
     // connect to the Neo4j instance
@@ -45,7 +45,7 @@ object Neo4j2GraphArExample {
     val edgeChunkSize: Long = args(2).toLong
     val fileType: String = args(3)
 
-    writer.write(outputPath, spark, "movie_graph", vertexChunkSize, edgeChunkSize, fileType)
+    writer.write(outputPath, spark, "MovieGraph", vertexChunkSize, edgeChunkSize, fileType)
   }
 
   // read data from Neo4j and put into writer
@@ -54,9 +54,6 @@ object Neo4j2GraphArExample {
     val person_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (n:Person) RETURN n.name AS name, n.born as born")
       .load()
-    // display the DataFrame and its schema
-    person_df.show()
-    person_df.printSchema()
     // put into writer
     writer.PutVertexData("Person", person_df)
 
@@ -64,9 +61,6 @@ object Neo4j2GraphArExample {
     val movie_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (n:Movie) RETURN n.title AS title, n.tagline as tagline")
       .load()
-    // display the DataFrame and its schema
-    movie_df.show()
-    movie_df.printSchema()
     // put into writer
     writer.PutVertexData("Movie", movie_df)
 
@@ -74,50 +68,32 @@ object Neo4j2GraphArExample {
     val produced_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:PRODUCED]->(b:Movie) return a.name as src, b.title as dst")
       .load()
-    // display the DataFrame and its schema
-    produced_edge_df.show()
-    produced_edge_df.printSchema()
     // put into writer
     writer.PutEdgeData(("Person", "PRODUCED", "Movie"), produced_edge_df)
 
     val acted_in_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:ACTED_IN]->(b:Movie) return a.name as src, b.title as dst")
       .load()
-    // display the DataFrame and its schema
-    acted_in_edge_df.show()
-    acted_in_edge_df.printSchema()
     writer.PutEdgeData(("Person", "ACTED_IN", "Movie"), acted_in_edge_df)
 
     val directed_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:DIRECTED]->(b:Movie) return a.name as src, b.title as dst")
       .load()
-    // display the DataFrame and its schema
-    directed_edge_df.show()
-    directed_edge_df.printSchema()
     writer.PutEdgeData(("Person", "DIRECTED", "Movie"), directed_edge_df)
 
     val follows_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:FOLLOWS]->(b:Person) return a.name as src, b.name as dst")
       .load()
-    // display the DataFrame and its schema
-    follows_edge_df.show()
-    follows_edge_df.printSchema()
     writer.PutEdgeData(("Person", "FOLLOWS", "Person"), follows_edge_df)
 
     val reviewed_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:REVIEWED]->(b:Movie) return a.name as src, b.title as dst, r.rating as rating, r.summary as summary")
       .load()
-    // display the DataFrame and its schema
-    reviewed_edge_df.show()
-    reviewed_edge_df.printSchema()
     writer.PutEdgeData(("Person", "REVIEWED", "Movie"), reviewed_edge_df)
 
     val wrote_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:WROTE]->(b:Movie) return a.name as src, b.title as dst")
       .load()
-    // display the DataFrame and its schema
-    wrote_edge_df.show()
-    wrote_edge_df.printSchema()
     writer.PutEdgeData(("Person", "WROTE", "Movie"), wrote_edge_df)
   }
 }
