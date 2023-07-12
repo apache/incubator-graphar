@@ -24,7 +24,7 @@ ArrowExpression ExpressionNot::Evaluate() {
 }
 
 ArrowExpression ExpressionIsNull::Evaluate() {
-  return arrow::compute::is_null(expr_->Evaluate());
+  return arrow::compute::is_null(expr_->Evaluate(), nan_is_null_);
 }
 
 ArrowExpression ExpressionEqual::Evaluate() {

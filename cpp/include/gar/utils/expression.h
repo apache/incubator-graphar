@@ -28,8 +28,8 @@ namespace GAR_NAMESPACE_INTERNAL {
 using ArrowExpression = arrow::compute::Expression;
 
 /**
- * This class wraps an arrow::compute::Expression and provides methods for
- * reading arrow::compute::Expression objects
+ * This class wraps an arrow::compute::Expression and provides a way to
+ * construct it
  */
 class Expression {
  public:
@@ -49,6 +49,10 @@ class Expression {
   virtual ArrowExpression Evaluate() = 0;
 };
 
+/**
+ * This class wraps the Property and provides a way to construct property
+ * expression
+ */
 class ExpressionProperty : public Expression {
  public:
   explicit ExpressionProperty(const Property& property) : property_(property) {}
@@ -63,6 +67,10 @@ class ExpressionProperty : public Expression {
   Property property_;
 };
 
+/**
+ * This class wraps the literal. Only bool, int32, int64, float, double and
+ * string are allowed.
+ */
 template <typename T>
 class ExpressionLiteral : public Expression {
  public:
@@ -76,34 +84,46 @@ class ExpressionLiteral : public Expression {
   T value_;
 };
 
-class UnaryOperator : public Expression {
+/**
+ * This class constructs a unary operator expression that accepts only one
+ * expression
+ */
+class ExpressionUnaryOp : public Expression {
  public:
-  UnaryOperator() = default;
-  explicit UnaryOperator(std::shared_ptr<Expression> expr) : expr_(expr) {}
-  UnaryOperator(const UnaryOperator& other) = default;
-  virtual ~UnaryOperator() {}
+  ExpressionUnaryOp() = default;
+  explicit ExpressionUnaryOp(std::shared_ptr<Expression> expr) : expr_(expr) {}
+  ExpressionUnaryOp(const ExpressionUnaryOp& other) = default;
+  virtual ~ExpressionUnaryOp() {}
 
  protected:
   std::shared_ptr<Expression> expr_;
 };
 
-class ExpressionNot : public UnaryOperator {
+/**
+ * This class constructs a NOT operator expression. e.g. new ExpressionNot(new
+ * ExpressionLiteral(true)) => NOT TRUE
+ */
+class ExpressionNot : public ExpressionUnaryOp {
  public:
   ExpressionNot() = default;
   explicit ExpressionNot(std::shared_ptr<Expression> expr)
-      : UnaryOperator(expr) {}
+      : ExpressionUnaryOp(expr) {}
   ExpressionNot(const ExpressionNot& other) = default;
   ~ExpressionNot() = default;
 
   ArrowExpression Evaluate() override;
 };
 
-class ExpressionIsNull : public UnaryOperator {
+/**
+ * This class constructs a IS NULL operator expression. e.g. new
+ * ExpressionIsNull(new ExpressionProperty("a")) => a IS NULL
+ */
+class ExpressionIsNull : public ExpressionUnaryOp {
  public:
   ExpressionIsNull() = default;
   explicit ExpressionIsNull(std::shared_ptr<Expression> expr,
                             bool nan_is_null = false)
-      : UnaryOperator(expr), nan_is_null_(nan_is_null) {}
+      : ExpressionUnaryOp(expr), nan_is_null_(nan_is_null) {}
   ExpressionIsNull(const ExpressionIsNull& other) = default;
   ~ExpressionIsNull() = default;
 
@@ -113,109 +133,153 @@ class ExpressionIsNull : public UnaryOperator {
   bool nan_is_null_;
 };
 
-class BinaryOperator : public Expression {
+/**
+ * This class constructs a binary operator expression that accepts two
+ * expressions e.g. a = 1, a > 1, a AND b, a OR b
+ */
+class ExpressionBinaryOp : public Expression {
  public:
-  BinaryOperator() = default;
-  BinaryOperator(std::shared_ptr<Expression> lhs,
-                 std::shared_ptr<Expression> rhs)
+  ExpressionBinaryOp() = default;
+  ExpressionBinaryOp(std::shared_ptr<Expression> lhs,
+                     std::shared_ptr<Expression> rhs)
       : lhs_(lhs), rhs_(rhs) {}
-  BinaryOperator(const BinaryOperator& other) = default;
-  ~BinaryOperator() = default;
+  ExpressionBinaryOp(const ExpressionBinaryOp& other) = default;
+  ~ExpressionBinaryOp() = default;
 
  protected:
   std::shared_ptr<Expression> lhs_;
   std::shared_ptr<Expression> rhs_;
 };
 
-class ExpressionEqual : public BinaryOperator {
+/**
+ * This class constructs a EQUAL operator expression.
+ * e.g. new ExpressionEqual(new ExpressionProperty("a"), new
+ * ExpressionLiteral(1)) => a = 1
+ */
+class ExpressionEqual : public ExpressionBinaryOp {
  public:
   ExpressionEqual() = default;
   ExpressionEqual(std::shared_ptr<Expression> lhs,
                   std::shared_ptr<Expression> rhs)
-      : BinaryOperator(lhs, rhs) {}
+      : ExpressionBinaryOp(lhs, rhs) {}
   ExpressionEqual(const ExpressionEqual& other) = default;
   ~ExpressionEqual() = default;
 
   ArrowExpression Evaluate() override;
 };
 
-class ExpressionNotEqual : public BinaryOperator {
+/**
+ * This class constructs a NOT EQUAL operator expression.
+ * e.g. new ExpressionNotEqual(new ExpressionProperty("a"), new
+ * ExpressionLiteral(1)) => a != 1
+ */
+class ExpressionNotEqual : public ExpressionBinaryOp {
  public:
   ExpressionNotEqual() = default;
   ExpressionNotEqual(std::shared_ptr<Expression> lhs,
                      std::shared_ptr<Expression> rhs)
-      : BinaryOperator(lhs, rhs) {}
+      : ExpressionBinaryOp(lhs, rhs) {}
   ExpressionNotEqual(const ExpressionNotEqual& other) = default;
   ~ExpressionNotEqual() = default;
 
   ArrowExpression Evaluate() override;
 };
 
-class ExpressionGreaterThan : public BinaryOperator {
+/**
+ * This class constructs a GREATER THAN operator expression.
+ * e.g. new ExpressionGreaterThan(new ExpressionProperty("a"), new
+ * ExpressionLiteral(1)) => a > 1
+ */
+class ExpressionGreaterThan : public ExpressionBinaryOp {
  public:
   ExpressionGreaterThan() = default;
   ExpressionGreaterThan(std::shared_ptr<Expression> lhs,
                         std::shared_ptr<Expression> rhs)
-      : BinaryOperator(lhs, rhs) {}
+      : ExpressionBinaryOp(lhs, rhs) {}
   ExpressionGreaterThan(const ExpressionGreaterThan& other) = default;
   ~ExpressionGreaterThan() = default;
 
   ArrowExpression Evaluate() override;
 };
 
-class ExpressionGreaterEqual : public BinaryOperator {
+/**
+ * This class constructs a GREATER EQUAL operator expression.
+ * e.g. new ExpressionGreaterEqual(new ExpressionProperty("a"), new
+ * ExpressionLiteral(1)) => a >= 1
+ */
+class ExpressionGreaterEqual : public ExpressionBinaryOp {
  public:
   ExpressionGreaterEqual() = default;
   ExpressionGreaterEqual(std::shared_ptr<Expression> lhs,
                          std::shared_ptr<Expression> rhs)
-      : BinaryOperator(lhs, rhs) {}
+      : ExpressionBinaryOp(lhs, rhs) {}
   ExpressionGreaterEqual(const ExpressionGreaterEqual& other) = default;
   ~ExpressionGreaterEqual() = default;
 
   ArrowExpression Evaluate() override;
 };
 
-class ExpressionLessThan : public BinaryOperator {
+/**
+ * This class constructs a LESS THAN operator expression.
+ * e.g. new ExpressionLessThan(new ExpressionProperty("a"), new
+ * ExpressionLiteral(1)) => a < 1
+ */
+class ExpressionLessThan : public ExpressionBinaryOp {
  public:
   ExpressionLessThan() = default;
   ExpressionLessThan(std::shared_ptr<Expression> lhs,
                      std::shared_ptr<Expression> rhs)
-      : BinaryOperator(lhs, rhs) {}
+      : ExpressionBinaryOp(lhs, rhs) {}
   ExpressionLessThan(const ExpressionLessThan& other) = default;
   ~ExpressionLessThan() = default;
 
   ArrowExpression Evaluate() override;
 };
 
-class ExpressionLessEqual : public BinaryOperator {
+/**
+ * This class constructs a LESS EQUAL operator expression.
+ * e.g. new ExpressionLessEqual(new ExpressionProperty("a"), new
+ * ExpressionLiteral(1)) => a <= 1
+ */
+class ExpressionLessEqual : public ExpressionBinaryOp {
  public:
   ExpressionLessEqual() = default;
   ExpressionLessEqual(std::shared_ptr<Expression> lhs,
                       std::shared_ptr<Expression> rhs)
-      : BinaryOperator(lhs, rhs) {}
+      : ExpressionBinaryOp(lhs, rhs) {}
   ExpressionLessEqual(const ExpressionLessEqual& other) = default;
   ~ExpressionLessEqual() = default;
 
   ArrowExpression Evaluate() override;
 };
 
-class ExpressionAnd : public BinaryOperator {
+/**
+ * This class constructs a AND operator expression.
+ * e.g. new ExpressionAnd(new ExpressionLiteral(true), new
+ * ExpressionLiteral(1)) => TRUE AND 1
+ */
+class ExpressionAnd : public ExpressionBinaryOp {
  public:
   ExpressionAnd() = default;
   ExpressionAnd(std::shared_ptr<Expression> lhs,
                 std::shared_ptr<Expression> rhs)
-      : BinaryOperator(lhs, rhs) {}
+      : ExpressionBinaryOp(lhs, rhs) {}
   ExpressionAnd(const ExpressionAnd& other) = default;
   ~ExpressionAnd() = default;
 
   ArrowExpression Evaluate() override;
 };
 
-class ExpressionOr : public BinaryOperator {
+/**
+ * This class constructs a OR operator expression.
+ * e.g. new ExpressionOr(new ExpressionLiteral(0), new
+ * ExpressionLiteral(true)) => 0 OR TRUE
+ */
+class ExpressionOr : public ExpressionBinaryOp {
  public:
   ExpressionOr() = default;
   ExpressionOr(std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs)
-      : BinaryOperator(lhs, rhs) {}
+      : ExpressionBinaryOp(lhs, rhs) {}
   ExpressionOr(const ExpressionOr& other) = default;
   ~ExpressionOr() = default;
 
@@ -223,7 +287,7 @@ class ExpressionOr : public BinaryOperator {
 };
 
 /**
- * Helper functions to Construct Expression.
+ * Helper functions to construct a Expression.
  */
 [[nodiscard]] static inline std::shared_ptr<Expression> _Property(
     const Property& property) {
@@ -291,3 +355,4 @@ template <typename T>
 }
 }  // namespace GAR_NAMESPACE_INTERNAL
 #endif  // GAR_UTILS_EXPRESSION_H_
+
