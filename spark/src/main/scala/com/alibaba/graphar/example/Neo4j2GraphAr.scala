@@ -13,28 +13,43 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar
+package com.alibaba.graphar.example
 
 import com.alibaba.graphar.datasources._
 import com.alibaba.graphar.graph.GraphWriter
 
-import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
-class Neo4j2GraphArExample {
-  // connect to the Neo4j instance
-  val spark = SparkSession.builder()
-    .config("neo4j.url", "bolt://localhost:7687")
-    .config("neo4j.authentication.type", "basic")
-    .config("neo4j.authentication.basic.username", sys.env.get("Neo4j_USR").get)
-    .config("neo4j.authentication.basic.password", sys.env.get("Neo4j_PWD").get)
-    .config("spark.master", "local")
-    .getOrCreate()
+object Neo4j2GraphArExample {
 
-  // read Person vertices from Neo4j and write to GraphAr
-  def testReadMovieGraphFromNeo4j(): Unit = {
+  def main(args: Array[String]): Unit = {
+    // connect to the Neo4j instance
+    val spark = SparkSession.builder()
+      .appName("Neo4j to GraphAr for Movie Graph")
+      .config("neo4j.url", "bolt://localhost:7687")
+      .config("neo4j.authentication.type", "basic")
+      .config("neo4j.authentication.basic.username", sys.env.get("Neo4j_USR").get)
+      .config("neo4j.authentication.basic.password", sys.env.get("Neo4j_PWD").get)
+      .config("spark.master", "local")
+      .getOrCreate()
+
     // initialize a graph writer
-    val writer = new GraphWriter()
+    val writer: GraphWriter = new GraphWriter()
 
+    // put movie graph data into writer
+    readAndPutDataIntoWriter(writer, spark)
+
+    // write in graphar format
+    val outputPath: String = args(0)
+    val vertexChunkSize: Long = args(1).toLong
+    val edgeChunkSize: Long = args(2).toLong
+    val fileType: String = args(3)
+
+    writer.write(outputPath, spark, "movie_graph", vertexChunkSize, edgeChunkSize, fileType)
+  }
+
+  // read data from Neo4j and put into writer
+  def readAndPutDataIntoWriter(writer: GraphWriter, spark: SparkSession): Unit = {
     // read vertices with label "Person" from Neo4j as a DataFrame
     val person_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (n:Person) RETURN n.name AS name, n.born as born")
@@ -104,8 +119,5 @@ class Neo4j2GraphArExample {
     wrote_edge_df.show()
     wrote_edge_df.printSchema()
     writer.PutEdgeData(("Person", "WROTE", "Movie"), wrote_edge_df)
-
-    // write to the path
-    writer.write("/tmp/movie_graph/", "movie_graph", spark, 100, 1024, "csv")
   }
 }

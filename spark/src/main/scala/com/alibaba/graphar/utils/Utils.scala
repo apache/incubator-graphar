@@ -17,8 +17,9 @@ package com.alibaba.graphar.utils
 
 import scala.util.matching.Regex
 import org.apache.spark.sql.types._
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
-import com.alibaba.graphar.{PropertyGroup, Property, AdjList, GraphInfo, VertexInfo, EdgeInfo}
+import com.alibaba.graphar.{PropertyGroup, Property, AdjList, GraphInfo, VertexInfo, EdgeInfo, GeneralParams}
 
 object Utils {
 
@@ -112,5 +113,19 @@ object Utils {
       info.edges.add(edge_info.getConcatKey() + ".edge.yml")
     }}
     return info
+  }
+
+  def join_edges_with_primary_key(edgeDf: DataFrame, sourceDf: DataFrame, targetDf: DataFrame, sourceKey: String, targetKey: String): DataFrame = {
+    val spark: SparkSession = edgeDf.sparkSession
+    sourceDf.createOrReplaceTempView("source_table")
+    targetDf.createOrReplaceTempView("target_table")
+    edgeDf.createOrReplaceTempView("edge_table")
+    val srcCol = GeneralParams.srcIndexCol
+    val dstCol = GeneralParams.dstIndexCol
+    val indexCol = GeneralParams.vertexIndexCol
+    val edge_df_with_src = spark.sql(f"select source_table.`$sourceKey` as `src`, edge_table.* from edge_table inner join source_table on source_table.`$indexCol`=edge_table.`$srcCol`")
+    edge_df_with_src.createOrReplaceTempView("edge_table")
+    val edge_df_with_src_dst = spark.sql(f"select target_table.`$targetKey` as `dst`, edge_table.* from edge_table inner join target_table on target_table.`$indexCol`=edge_table.`$dstCol`")
+    edge_df_with_src_dst
   }
 }

@@ -17,6 +17,7 @@ package com.alibaba.graphar.graph
 
 import com.alibaba.graphar.{GeneralParams, AdjListType, GraphInfo, VertexInfo, EdgeInfo}
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
+import com.alibaba.graphar.utils.IndexGenerator
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
@@ -34,7 +35,10 @@ object GraphReader {
   private def readAllVertices(prefix: String, vertexInfos: Map[String, VertexInfo], spark: SparkSession): Map[String, DataFrame] = {
     val vertex_dataframes: Map[String, DataFrame] = vertexInfos.map { case (label, vertexInfo) => {
       val reader = new VertexReader(prefix, vertexInfo, spark)
-      (label, reader.readAllVertexPropertyGroups(false))
+      val df = reader.readAllVertexPropertyGroups()
+      val df2 = IndexGenerator.generateVertexIndexColumn(df)
+      df2.printSchema()
+      (label, df2)
     }}
     return vertex_dataframes
   }
@@ -63,7 +67,7 @@ object GraphReader {
     return edge_dataframes
   }
 
-  /** Reading the graph as DataFrames with the graph info object.
+  /** Reading the graph as vertex and edge  DataFrames with the graph info object.
    *
    * @param graphInfo The info object for the graph.
    * @param spark The Spark session for the loading.
@@ -77,7 +81,7 @@ object GraphReader {
     return (readAllVertices(prefix, vertex_infos, spark), readAllEdges(prefix, edge_infos, spark))
   }
 
-  /** Reading the graph as DataFrames with the graph info yaml file.
+  /** Reading the graph as vertex and edge DataFrames with the graph info yaml file.
    *
    * @param graphInfoPath The path of the graph info yaml.
    * @param spark The Spark session for the loading.

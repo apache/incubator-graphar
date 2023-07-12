@@ -28,15 +28,31 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import java.io.{BufferedWriter, OutputStreamWriter}
 
+/** GraphWriter is a class to help to write graph data in graph format. */
 class GraphWriter() {
+  /**
+   * Put the vertex dataframe into writer.
+   *
+   * @param label label of vertex.
+   * @param df dataframe of the vertex type.
+   * @param primaryKey primary key of the vertex type, default is empty, which take the first property column as primary key.
+   *
+   */
   def PutVertexData(label: String, df: DataFrame, primaryKey: String = ""): Unit = {
     if (vertices.exists(_._1 == label)) {
       throw new IllegalArgumentException
     }
     vertices += label -> df
     vertexNums += label -> df.count
+    primaryKeys += label -> primaryKey
   }
 
+  /**
+   * Put the egde datafrme into writer.
+   * @param relation 3-Tuple (source label, edge label, target label) to indicate edge type.
+   * @param df data frame of edge type.
+   *
+   */
   def PutEdgeData(relation: (String, String, String), df: DataFrame): Unit = {
     if (edges.exists(_._1 == relation)) {
       throw new IllegalArgumentException
@@ -44,6 +60,11 @@ class GraphWriter() {
     edges += relation -> df
   }
 
+  /**
+   * Write the graph data in graphar format with graph info.
+   * @param graphInfo the graph info object for the graph.
+   * @param spark the spark session for the writing.
+   */
   def write(graphInfo: GraphInfo,
             spark: SparkSession): Unit = {
     val vertexInfos = graphInfo.getVertexInfos()
@@ -89,10 +110,49 @@ class GraphWriter() {
     }}
   }
 
+  /**
+   * Write the graph data in graphar format with path of the graph info yaml.
+   * @param graphInfoPath the path of the graph info yaml.
+   * @param spark the spark session for the writing.
+   */
   def write(graphInfoPath: String,
             spark: SparkSession): Unit = {
     // load graph info
     val graph_info = GraphInfo.loadGraphInfo(graphInfoPath, spark)
+    write(graph_info, spark)
+  }
+
+  /**
+   * Write graph data in graphar format.
+   *
+   * @param path the directory to write.
+   * @param spark the spark session for the writing.
+   * @param name the name of graph, default is 'grpah'
+   * @param vertex_chunk_size the chunk size for vertices, default is 2^18
+   * @param edge_chunk_size the chunk size for edges, default is 2^22
+   * @param file_type the file type for data payload file, support [parquet, orc, csv], default is parquet.
+   * @param version version of graphar, default is v1.
+   */
+  def write(path: String,
+            spark: SparkSession,
+            name: String = "graph",
+            vertex_chunk_size: Long = 262144,  // 2^18
+            edge_chunk_size: Long = 4194304,   // 2^22
+            file_type: String = "parquet",
+            vertison: String = "v1"
+           ): Unit = {
+    val vertex_schemas: scala.collection.mutable.Map[String, StructType] = scala.collection.mutable.Map[String, StructType]()
+    val edge_schemas: scala.collection.mutable.Map[(String, String, String), StructType] = scala.collection.mutable.Map[(String, String, String), StructType]()
+    vertices.foreach { case (key, df) => {
+      vertex_schemas += key -> df.schema
+    }}
+    edges.foreach { case (key, df) => {
+      edge_schemas += key -> new StructType(df.schema.drop(2).toArray)  // drop the src, dst
+    }}
+    val graph_info = Utils.generate_graph_info(path, name, true, vertex_chunk_size, edge_chunk_size, file_type, vertex_schemas, edge_schemas)
+    // dump infos to file
+    saveInfoToFile(graph_info, spark)
+    // write out the data
     write(graph_info, spark)
   }
 
@@ -129,30 +189,8 @@ class GraphWriter() {
     outputStream.close()
   }
 
-  def write(path: String,
-            name: String,
-            spark: SparkSession,
-            vertex_chunk_size: Long = 262144,  // 2^18
-            edge_chunk_size: Long = 4194304,   // 2^22
-            file_type: String = "parquet",
-            vertison: String = "v1"
-           ): Unit = {
-    val vertex_schemas: scala.collection.mutable.Map[String, StructType] = scala.collection.mutable.Map[String, StructType]()
-    val edge_schemas: scala.collection.mutable.Map[(String, String, String), StructType] = scala.collection.mutable.Map[(String, String, String), StructType]()
-    vertices.foreach { case (key, df) => {
-      vertex_schemas += key -> df.schema
-    }}
-    edges.foreach { case (key, df) => {
-      edge_schemas += key -> new StructType(df.schema.drop(2).toArray)  // drop the src, dst
-    }}
-    val graph_info = Utils.generate_graph_info(path, name, true, vertex_chunk_size, edge_chunk_size, file_type, vertex_schemas, edge_schemas)
-    // dump infos to file
-    saveInfoToFile(graph_info, spark)
-    // write out the data
-    write(graph_info, spark)
-  }
-
   val vertices: scala.collection.mutable.Map[String, DataFrame] = scala.collection.mutable.Map[String, DataFrame]()
   val edges: scala.collection.mutable.Map[(String, String, String), DataFrame] = scala.collection.mutable.Map[(String, String, String), DataFrame]()
   val vertexNums: scala.collection.mutable.Map[String, Long] = scala.collection.mutable.Map[String, Long]()
+  val primaryKeys: scala.collection.mutable.Map[String, String] = scala.collection.mutable.Map[String, String]()
 }
