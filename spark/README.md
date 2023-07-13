@@ -1,0 +1,125 @@
+# GraphAr Spark
+
+This directory contains the code and build system for the GraphAr Spark library.
+
+## Building GraphAr Spark
+
+### System setup
+
+GraphAr Spark uses maven as a package build system.
+
+Building requires:
+
+- JDK 8 or higher
+- Maven 3.2.0 or higher
+
+### Building
+
+All the instructions below assume that you have cloned the GraphAr git
+repository and navigated to the ``spark`` subdirectory:
+
+```bash
+    $ git clone https://github.com/alibaba/GraphAr.git
+    $ cd GraphAr
+    $ git submodule update --init
+    $ cd spark
+```
+
+Build the package:
+
+```bash
+    $ mvn clean package -DskipTests
+```
+
+After compilation, the package file graphar-x.x.x-SNAPSHOT-shaded.jar is generated in the directory ``spark/target/``.
+
+Build the package and run the unit tests:
+
+```bash
+    $ mvn clean package
+```
+
+Build and run the unit tests:
+
+```bash
+    $ mvn clean test
+```
+
+Build and run certain unit test:
+
+```bash
+    $ mvn clean test -Dsuites='com.alibaba.graphar.GraphInfoSuite'   # run the GraphInfo test suite
+    $ mvn clean test -Dsuites='com.alibaba.graphar.GraphInfoSuite load graph info'  # run the `load graph info` test of test suite
+```
+
+### Generate API document
+
+Building the API document with maven:
+
+```bash
+    $ mvn scala:doc
+```
+
+The API document is generated in the directory ``spark/target/site/scaladocs``.
+
+## Running Neo4j to GraphAr example
+
+Spark provides a simple example to convert Neo4j data to GraphAr data.
+The example is located in the directory ``spark/src/main/scala/com/alibaba/graphar/examples/Neo4j2Graphar``.
+
+To run the example, download Spark and Neo4j first.
+
+### Spark 3.2.x
+
+Spark 3.2.x is the recommended runtime to use. The rest of the instructions are provided assuming Spark 3.2.x.
+
+Place Spark under `${HOME}`:
+
+```bash
+script/get-spark-to-home.sh
+export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+export PATH="${SPARK_HOME}/bin":"${PATH}"
+```
+
+### Neo4j 4.3.x
+
+Neo4j 4.3.x is the LTS version to use. The rest of the instructions are provided assuming Neo4j 4.3.x.
+
+Place Neo4j under `${HOME}`:
+
+```bash
+script/get-neo4j-to-home.sh
+export NEO4J_HOME="${HOME}/neo4j-community-4.3.23"
+export PATH="${NEO4J_HOME}/bin":"${PATH}"
+```
+
+Start Neo4j server and load movie data:
+
+```bash
+script/deploy-neo4j-movie-data.sh
+```
+
+The default username and password are both ``neo4j``.
+Open the Neo4j browser at http://localhost:7474/browser/ to reset the password and check the movie data.
+
+### Building the project
+
+Run:
+
+```bash
+    script/build.sh
+```
+
+### Running the example
+
+```bash
+export NEO4J_USR="neo4j"
+export NEO4J_PWD="xxxxxx" # the password you set in the previous step
+script/run-neo4j2graphar.sh
+```
+
+The example will convert the movie data in Neo4j to GraphAr data and save it to the directory ``/tmp/graphar/neo4j2graphar``.
+
+## How to use
+
+Please refer to our [GraphAr Spark Library Documentation](https://alibaba.github.io/GraphAr/user-guide/spark-lib.html).
