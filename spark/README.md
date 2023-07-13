@@ -76,7 +76,7 @@ Spark 3.2.x is the recommended runtime to use. The rest of the instructions are 
 To place Spark under `${HOME}`:
 
 ```bash
-script/get-spark-to-home.sh
+scripts/get-spark-to-home.sh
 export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
 export PATH="${SPARK_HOME}/bin":"${PATH}"
 ```
@@ -88,7 +88,7 @@ Neo4j 4.3.x is the LTS version to use. The rest of the instructions are provided
 To place Neo4j under `${HOME}`:
 
 ```bash
-script/get-neo4j-to-home.sh
+scripts/get-neo4j-to-home.sh
 export NEO4J_HOME="${HOME}/neo4j-community-4.3.23"
 export PATH="${NEO4J_HOME}/bin":"${PATH}"
 # initialize the password for user database
@@ -98,7 +98,7 @@ neo4j-admin set-initial-password xxxx # set your password here
 Start Neo4j server and load movie data:
 
 ```bash
-script/deploy-neo4j-movie-data.sh
+scripts/deploy-neo4j-movie-data.sh
 ```
 
 The username is ``neo4j`` and the password is the one you set in the previous step.
@@ -109,7 +109,7 @@ Open the Neo4j browser at http://localhost:7474/browser/ to check the movie grap
 Run:
 
 ```bash
-    script/build.sh
+scripts/build.sh
 ```
 
 ### Running the example
@@ -117,7 +117,7 @@ Run:
 ```bash
 export NEO4J_USR="neo4j"
 export NEO4J_PWD="xxxx" # the password you set in the previous step
-script/run-neo4j2graphar.sh
+scripts/run-neo4j2graphar.sh
 ```
 
 The example will convert the movie data in Neo4j to GraphAr data and save it to the directory ``/tmp/graphar/neo4j2graphar``.
