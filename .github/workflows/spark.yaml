@@ -49,7 +49,7 @@ jobs:
         export PATH="${SPARK_HOME}/bin":"${PATH}"
 
         scripts/get-neo4j-to-home.sh
-        export NEO4J_HOME="${HOME}/neo4j-community-4.3.23"
+        export NEO4J_HOME="${HOME}/neo4j-community-4.4.23"
         export PATH="${NEO4J_HOME}/bin":"${PATH}"
         neo4j-admin set-initial-password neo4j
 
