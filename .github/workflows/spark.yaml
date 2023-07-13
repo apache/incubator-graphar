@@ -51,10 +51,13 @@ jobs:
         script/get-neo4j-to-home.sh
         export NEO4J_HOME="${HOME}/neo4j-community-4.3.23"
         export PATH="${NEO4J_HOME}/bin":"${PATH}"
+        neo4j-admin set-initial-password neo4j
 
         script/deploy-neo4j-movie-data.sh
 
         script/build.sh
 
+        export NEO4J_USR="neo4j"
+        export NEO4J_PWD="neo4j"
         script/run-neo4j2graphar.sh
         popd

@@ -91,6 +91,8 @@ To place Neo4j under `${HOME}`:
 script/get-neo4j-to-home.sh
 export NEO4J_HOME="${HOME}/neo4j-community-4.3.23"
 export PATH="${NEO4J_HOME}/bin":"${PATH}"
+# initialize the password for user database
+neo4j-admin set-initial-password xxxx # set your password here
 ```
 
 Start Neo4j server and load movie data:
@@ -99,8 +101,8 @@ Start Neo4j server and load movie data:
 script/deploy-neo4j-movie-data.sh
 ```
 
-The default username and password are both ``neo4j``.
-Open the Neo4j browser at http://localhost:7474/browser/ to reset the password and check the movie data.
+The username is ``neo4j`` and the password is the one you set in the previous step.
+Open the Neo4j browser at http://localhost:7474/browser/ to check the movie graph data.
 
 ### Building the project
 
@@ -114,7 +116,7 @@ Run:
 
 ```bash
 export NEO4J_USR="neo4j"
-export NEO4J_PWD="xxxxxx" # the password you set in the previous step
+export NEO4J_PWD="xxxx" # the password you set in the previous step
 script/run-neo4j2graphar.sh
 ```
 
