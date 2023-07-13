@@ -65,7 +65,7 @@ The API document is generated in the directory ``spark/target/site/scaladocs``.
 ## Running Neo4j to GraphAr example
 
 Spark provides a simple example to convert Neo4j data to GraphAr data.
-The example is located in the directory ``spark/src/main/scala/com/alibaba/graphar/examples/Neo4j2Graphar``.
+The example is located in the directory ``spark/src/main/scala/com/alibaba/graphar/examples/``.
 
 To run the example, download Spark and Neo4j first.
 
@@ -73,7 +73,7 @@ To run the example, download Spark and Neo4j first.
 
 Spark 3.2.x is the recommended runtime to use. The rest of the instructions are provided assuming Spark 3.2.x.
 
-Place Spark under `${HOME}`:
+To place Spark under `${HOME}`:
 
 ```bash
 script/get-spark-to-home.sh
@@ -85,7 +85,7 @@ export PATH="${SPARK_HOME}/bin":"${PATH}"
 
 Neo4j 4.3.x is the LTS version to use. The rest of the instructions are provided assuming Neo4j 4.3.x.
 
-Place Neo4j under `${HOME}`:
+To place Neo4j under `${HOME}`:
 
 ```bash
 script/get-neo4j-to-home.sh

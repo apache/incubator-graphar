@@ -73,7 +73,8 @@ class GraphWriter() {
     var indexMappings: scala.collection.mutable.Map[String, DataFrame] = scala.collection.mutable.Map[String, DataFrame]()
     vertexInfos.foreach { case (label, vertexInfo) => {
       val vertex_num = vertexNums(label)
-      val df_and_mapping = IndexGenerator.generateVertexIndexColumnAndIndexMapping(vertices(label))
+      val primaryKey = primaryKeys(label)
+      val df_and_mapping = IndexGenerator.generateVertexIndexColumnAndIndexMapping(vertices(label), primaryKey)
       val df_with_index = df_and_mapping._1
       indexMappings += label -> df_and_mapping._2
       val writer = new VertexWriter(prefix, vertexInfo, df_with_index, Some(vertex_num))
