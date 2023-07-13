@@ -66,7 +66,8 @@ object Utils {
    * @return graph info
    */
   def generateGraphInfo(path: String, graphName: String, directed: Boolean, vertexChunkSize: Long, edgeChunkSize: Long, fileType: String,
-                          vertexSchemas: scala.collection.mutable.Map[String, StructType], edgeSchemas: scala.collection.mutable.Map[(String, String, String), StructType]): GraphInfo = {
+                        vertexSchemas: scala.collection.mutable.Map[String, StructType], edgeSchemas: scala.collection.mutable.Map[(String, String, String), StructType],
+                        primaryKeys: scala.collection.mutable.Map[String, String]): GraphInfo = {
     val info = new GraphInfo()
     info.setName(graphName)
     info.setPrefix(path + "/")
@@ -87,11 +88,9 @@ object Utils {
         val property = new Property()
         property.setName(field.name)
         property.setData_type(sparkDataType2GraphArTypeName(field.dataType))
-        if (properties.size() == 0) {
-          property.setIs_primary(true)
-        } else {
-          property.setIs_primary(false)
-        }
+        val isPrimary: Boolean =
+          if ((primaryKeys == "" && properties.size() == 0) || field.name == primaryKeys) true else false
+        property.setIs_primary(isPrimary)
         properties.add(property)
       }}
       info.addVertexInfo(vertexInfo)

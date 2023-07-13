@@ -39,3 +39,22 @@ jobs:
         pushd spark
         mvn test
         popd
+
+    - name: Run Neo4j2GraphAr example
+      run: |
+        export JAVA_HOME=${JAVA_HOME_11_X64}
+        pushd spark
+        script/get-spark-to-home.sh
+        export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+        export PATH="${SPARK_HOME}/bin":"${PATH}"
+
+        script/get-neo4j-to-home.sh
+        export NEO4J_HOME="${HOME}/neo4j-community-4.3.23"
+        export PATH="${NEO4J_HOME}/bin":"${PATH}"
+
+        script/deploy-neo4j-movie-data.sh
+
+        script/build.sh
+
+        script/run-neo4j2graphar.sh
+        popd

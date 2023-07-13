@@ -150,7 +150,7 @@ class GraphWriter() {
     edges.foreach { case (key, df) => {
       edge_schemas += key -> new StructType(df.schema.drop(2).toArray)  // drop the src, dst
     }}
-    val graph_info = Utils.generateGraphInfo(path, name, true, vertex_chunk_size, edge_chunk_size, file_type, vertex_schemas, edge_schemas)
+    val graph_info = Utils.generateGraphInfo(path, name, true, vertex_chunk_size, edge_chunk_size, file_type, vertex_schemas, edge_schemas, primaryKeys)
     // dump infos to file
     saveInfoToFile(graph_info, spark)
     // write out the data
