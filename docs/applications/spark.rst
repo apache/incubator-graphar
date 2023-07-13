@@ -1,7 +1,7 @@
 Co-Work with Apache Spark
 ============================
 
-`Apache Spark <https://spark.apache.org/>`_ is a multi-language engine for executing data engineering, data science, and machine learning on single-node machines or clusters. The GraphAr Spark library is developed to make the integration of GraphAr with Spark easy. This library allows users to efficiently generate, load, and transform GAR files, and to integrate GraphAr with other Spark-compatible systems. 
+`Apache Spark <https://spark.apache.org/>`_ is a multi-language engine for executing data engineering, data science, and machine learning on single-node machines or clusters. The GraphAr Spark library is developed to make the integration of GraphAr with Spark easy. This library allows users to efficiently generate, load, and transform GAR files, and to integrate GraphAr with other Spark-compatible systems.
 
 Examples of this co-working integration have been provided as showcases.
 
@@ -11,107 +11,93 @@ Examples
 
 Transform GAR files
 `````````````````````
-We provide an example in `TestGraphTransformer.scala`_, which demonstrates how to conduct data transformation at the graph level. `TransformExample.scala`_ is another example for graph data conversion between different file types or different adjList types, which is implemented at the vertex/edge table level. To do this, the original data is first loaded into a Spark DataFrame using the GraphAr Spark Reader. Then, the DataFrame is written into generated GAR files through a GraphAr Spark Writer, following the meta data defined in a new information file.
+We provide an example in `TestGraphTransformer.scala`_, which demonstrates
+how to conduct data transformation at the graph level. `TransformExample.scala`_ is
+another example for graph data conversion between different file types or different
+adjList types, which is implemented at the vertex/edge table level. To do this,
+the original data is first loaded into a Spark DataFrame using the GraphAr Spark Reader.
+Then, the DataFrame is written into generated GAR files through a GraphAr Spark Writer,
+following the meta data defined in a new information file.
 
 
 Compute with GraphX
 `````````````````````
-Another important use case of GraphAr is to use it as a data source for graph computing or analytics; `ComputeExample.scala`_ provides an example of constructing a GraphX graph from reading GAR files and executing a connected-components computation. Also, executing queries with Spark SQL and running other graph analytic algorithms can be implemented in a similar fashion.
+Another important use case of GraphAr is to use it as a data source for graph
+computing or analytics; `ComputeExample.scala`_ provides an example of constructing
+a GraphX graph from reading GAR files and executing a connected-components computation.
+Also, executing queries with Spark SQL and running other graph analytic algorithms
+can be implemented in a similar fashion.
 
 
 Import/Export graphs of Neo4j
 ```````````````````````````````
-`Neo4j <https://neo4j.com/product/neo4j-graph-database/>`_ graph database provides a `spark connector <https://neo4j.com/docs/spark/current/overview/>`_ for integration with Spark. The Neo4j Spark Connector, combined with the GraphAr Spark library, enables us to migrate graph data between Neo4j and GraphAr. This is also a key application of GraphAr in which it acts as a persistent storage of graph data in the database.
+`Neo4j <https://neo4j.com/product/neo4j-graph-database/>`_ graph database provides
+a `spark connector <https://neo4j.com/docs/spark/current/overview/>`_ for integration
+with Spark. The Neo4j Spark Connector, combined with the GraphAr Spark library,
+enables us to migrate graph data between Neo4j and GraphAr. This is also a key application
+of GraphAr in which it acts as a persistent storage of graph data in the database.
 
-We provide two example programs that demonstrate how GraphAr can be used in conjunction with Neo4j. It utilizes one of the built-in Neo4j datasets, the `Movie Graph <https://neo4j.com/developer/example-data/#built-in-examples>`_, which is a mini graph application containing actors and directors that are related through the movies they have collaborated on. The data schemas for "Person" vertices, "Movie" vertices, and "Person PRODUCED Movie" edges can be represented in GraphAr information files in the `test data <https://github.com/GraphScope/gar-test/tree/main/neo4j>`_.
-When exporting graph data from Neo4j and writing to GraphAr, please refer to the following code, with `Neo4j2GraphAr.scala`_ providing a complete example.
+We provide two example programs that demonstrate how GraphAr can be used in conjunction
+with Neo4j. It utilizes one of the built-in Neo4j datasets, the `Movie Graph <https://neo4j.com/developer/example-data/#built-in-examples>`_,
+which is a mini graph application containing actors and directors that are related through the movies they have collaborated on.
+Given some necessary information like the chunk size, the prefix of the file path, and the file type,
+the program can read the graph data from Neo4j and write it into GraphAr files.
+When exporting graph data from Neo4j and writing to GraphAr, please refer to the following code,
+with `Neo4j2GraphAr.scala`_ providing a complete example.
 
 .. code:: scala
 
-  // connect to the Neo4j instance
-  val spark = SparkSession.builder()
-    .config("neo4j.url", "bolt://localhost:7687")
-    .config("neo4j.authentication.type", "basic")
-    .config("neo4j.authentication.basic.username", sys.env.get("Neo4j_USR").get)
-    .config("neo4j.authentication.basic.password", sys.env.get("Neo4j_PWD").get)
-    .config("spark.master", "local")
-    .getOrCreate()
-  
-  // read vertices with label "Person" from Neo4j as a DataFrame
-  val person_df = spark.read.format("org.neo4j.spark.DataSource")
-    .option("labels", "Person")
-    .load()
+def main(args: Array[String]): Unit = {
+    // connect to the Neo4j instance
+    val spark = SparkSession.builder()
+      .appName("Neo4j to GraphAr for Movie Graph")
+      .config("neo4j.url", "bolt://localhost:7687")
+      .config("neo4j.authentication.type", "basic")
+      .config("neo4j.authentication.basic.username", sys.env.get("Neo4j_USR").get)
+      .config("neo4j.authentication.basic.password", sys.env.get("Neo4j_PWD").get)
+      .config("spark.master", "local")
+      .getOrCreate()
 
-  // construct the GraphAr Spark writer
-  val person_df_with_index = IndexGenerator.generateVertexIndexColumn(person_df)
-  val vertex_info = ...     // the user-provided meta information
-  val prefix : String = ... // the prefix of the file path
-  val writer = new VertexWriter(prefix, vertex_info, person_df_with_index)
+    // initialize a graph writer
+    val writer: GraphWriter = new GraphWriter()
 
-  // use the DataFrame to generate GAR files
-  writer.writeVertexProperties() 
+    // put movie graph data into writer
+    readAndPutDataIntoWriter(writer, spark)
 
-The information file for the this group of vertices may look like: 
+    // write in graphar format
+    val outputPath: String = args(0)
+    val vertexChunkSize: Long = args(1).toLong
+    val edgeChunkSize: Long = args(2).toLong
+    val fileType: String = args(3)
 
-.. code:: Yaml
-
-  label: Person
-  chunk_size: 100
-  prefix: vertex/person/
-  property_groups:
-    - properties:
-        - name: <id>
-          data_type: int64
-          is_primary: false
-        - name: <labels>
-          data_type: array
-          is_primary: false
-      file_type: parquet
-    - properties:
-        - name: name
-          data_type: string
-          is_primary: true
-        - name: born
-          data_type: int64
-          is_primary: false
-      file_type: orc
-  version: gar/v1
-
-.. note::
-
-  Please note that when reading data from Neo4j with this method, the DataFrame contains all the fields contained in the nodes (vertex properties), plus two additional columns:
-
-  - <id> the internal Neo4j ID
-  - <labels> a list of labels for that node
+    writer.write(outputPath, spark, "MovieGraph", vertexChunkSize, edgeChunkSize, fileType)
+}
 
 Additionally, when importing data from GraphAr to create/update instances in Neo4j, please refer to the following code:
 
 .. code:: scala
-  
-  // construct the GraphAr Spark reader
-  val spark = ...   // the Spark session
-  val prefix : String = ... // the prefix of the file path
-  val reader = new VertexReader(prefix, vertex_info, spark)
 
-  // reading chunks for all property groups
-  val vertex_df = reader.readAllVertexPropertyGroups(false)
+def main(args: Array[String]): Unit = {
+    // connect to the Neo4j instance
+    val spark = SparkSession.builder()
+      .appName("GraphAr to Neo4j for Movie Graph")
+      .config("neo4j.url", "bolt://localhost:7687")
+      .config("neo4j.authentication.type", "basic")
+      .config("neo4j.authentication.basic.username", sys.env.get("Neo4j_USR").get)
+      .config("neo4j.authentication.basic.password", sys.env.get("Neo4j_PWD").get)
+      .config("spark.master", "local")
+      .getOrCreate()
 
-  // group vertices with the same Neo4j labels together
-  val labels_array = vertex_df.select("<labels>").distinct.collect.flatMap(_.toSeq)
-  val vertex_df_array = labels_array.map(labels => vertex_df.where(vertex_df("<labels>") === labels))
+    val graphInfoPath: String = args(0)
+    val graphInfo = GraphInfo.loadGraphInfo(graphInfoPath, spark)
 
-  // write a group of vertices (with the same Neo4j labels) to Neo4j each time
-  vertex_df_array.foreach(df => {
-    val labels = df.first().getAs[Seq[String]]("<labels>")
-    var str = ""
-    labels.foreach(label => {str += ":" + label})
-    df.drop("<id>").drop("<labels>")
-      .write.format("org.neo4j.spark.DataSource")
-      .mode(SaveMode.Overwrite)
-      .option("labels", str)
-      .option("node.keys", "name")
-      .save()
-  })
+    val graphData = GraphReader.read(graphInfoPath, spark)
+    val vertexData = graphData._1
+    val edgeData = graphData._2
+
+    putVertexDataIntoNeo4j(graphInfo, vertexData, spark)
+    putEdgeDataIntoNeo4j(graphInfo, vertexData, edgeData, spark)
+}
 
 See `GraphAr2Neo4j.scala`_ for the complete example.
 
@@ -127,6 +113,6 @@ See `GraphAr2Neo4j.scala`_ for the complete example.
 
 .. _ComputeExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/ComputeExample.scala
 
-.. _Neo4j2GraphAr.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/Neo4j2GraphAr.scala
+.. _Neo4j2GraphAr.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/main/scala/com/alibaba/graphar/example/Neo4j2GraphAr.scala
 
-.. _GraphAr2Neo4j.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/GraphAr2Neo4j.scala
+.. _GraphAr2Neo4j.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/main/scala/com/alibaba/graphar/example/GraphAr2Neo4j.scala
