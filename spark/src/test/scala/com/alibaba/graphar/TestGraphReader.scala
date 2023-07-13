@@ -38,7 +38,7 @@ class TestGraphReaderSuite extends AnyFunSuite {
 
     assert(vertex_dataframes.size == 1)
     assert(vertex_dataframes contains "person")
-    val person_df = vertex_dataframes("person")
+    val person_df = vertex_dataframes("person").drop(GeneralParams.vertexIndexCol)
     assert(person_df.columns.size == 4)
     assert(person_df.count() == 903)
 
@@ -60,7 +60,7 @@ class TestGraphReaderSuite extends AnyFunSuite {
 
     assert(vertex_dataframes.size == 1)
     assert(vertex_dataframes contains "person")
-    val person_df = vertex_dataframes("person")
+    val person_df = vertex_dataframes("person").drop(GeneralParams.vertexIndexCol)
     assert(person_df.columns.size == 4)
     assert(person_df.count() == 903)
 
