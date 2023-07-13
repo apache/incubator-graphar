@@ -28,8 +28,8 @@ object Neo4j2GraphAr {
       .appName("Neo4j to GraphAr for Movie Graph")
       .config("neo4j.url", "bolt://localhost:7687")
       .config("neo4j.authentication.type", "basic")
-      .config("neo4j.authentication.basic.username", sys.env.get("Neo4j_USR").get)
-      .config("neo4j.authentication.basic.password", sys.env.get("Neo4j_PWD").get)
+      .config("neo4j.authentication.basic.username", sys.env.get("NEO4J_USR").get)
+      .config("neo4j.authentication.basic.password", sys.env.get("NEO4J_PWD").get)
       .config("spark.master", "local")
       .getOrCreate()
 
