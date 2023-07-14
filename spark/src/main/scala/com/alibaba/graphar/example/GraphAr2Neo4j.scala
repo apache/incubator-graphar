@@ -28,7 +28,7 @@ import scala.beans.BeanProperty
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.apache.hadoop.fs.{Path, FileSystem}
 
-object GrapAr2Neo4j {
+object GraphAr2Neo4j {
 
   def main(args: Array[String]): Unit = {
     // connect to the Neo4j instance

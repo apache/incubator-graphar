@@ -60,4 +60,10 @@ jobs:
         export NEO4J_USR="neo4j"
         export NEO4J_PWD="neo4j"
         scripts/run-neo4j2graphar.sh
+
+        # clean the movie data and import from GraphAr
+        echo "match (a) -[r] -> () delete a, r;match (a) delete a;" | cypher-shell -u ${NEO4J_USR} -p ${NEO4J_PWD} -d neo4j --format plain
+        scripts/run-graphar2neo4j.sh
+
+        # stop and clean
         popd

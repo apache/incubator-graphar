@@ -112,7 +112,7 @@ Run:
 scripts/build.sh
 ```
 
-### Running the example
+### Running the Neo4j2GraphAr example
 
 ```bash
 export NEO4J_USR="neo4j"
@@ -121,6 +121,22 @@ scripts/run-neo4j2graphar.sh
 ```
 
 The example will convert the movie data in Neo4j to GraphAr data and save it to the directory ``/tmp/graphar/neo4j2graphar``.
+
+### Running the GraphAr2Neo4j example
+
+We can also import the movie graph from GraphAr to Neo4j.
+
+First clear the Neo4j movie graph to show the import result clearly:
+```bash
+echo "match (a) -[r] -> () delete a, r;match (a) delete a;" | cypher-shell -u ${NEO4J_USR} -p ${NEO4J_PWD} -d neo4j --format plain
+```bash
+
+Then run the example:
+```bash
+scripts/run-graphar2neo4j.sh
+```
+
+The example will import the movie graph from GraphAr to Neo4j and you can check the result in the Neo4j browser.
 
 ## How to use
 
