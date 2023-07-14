@@ -224,6 +224,7 @@ class VertexInfo() {
     return prefix + str
   }
 
+  /** Dump to Json string. */
   def dump(): String = {
     val data = new java.util.HashMap[String, Object]()
     data.put("label", label)

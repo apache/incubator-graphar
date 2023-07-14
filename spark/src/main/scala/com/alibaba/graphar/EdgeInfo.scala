@@ -481,6 +481,7 @@ class EdgeInfo() {
     return getSrc_label + GeneralParams.regularSeperator + getEdge_label + GeneralParams.regularSeperator + getDst_label
   }
 
+  /** Dump to Json string. */
   def dump(): String = {
     val data = new java.util.HashMap[String, Object]()
     data.put("src_label", src_label)

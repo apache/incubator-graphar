@@ -276,6 +276,7 @@ class GraphInfo() {
     return edgeInfos
   }
 
+  /** Dump to Json string. */
   def dump(): String = {
     val data = new java.util.HashMap[String, Object]()
     data.put("name", name)
