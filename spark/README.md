@@ -81,15 +81,15 @@ export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
 export PATH="${SPARK_HOME}/bin":"${PATH}"
 ```
 
-### Neo4j 4.3.x
+### Neo4j 4.4.x
 
-Neo4j 4.3.x is the LTS version to use. The rest of the instructions are provided assuming Neo4j 4.3.x.
+Neo4j 4.4.x is the LTS version to use. The rest of the instructions are provided assuming Neo4j 4.4.x.
 
 To place Neo4j under `${HOME}`:
 
 ```bash
 scripts/get-neo4j-to-home.sh
-export NEO4J_HOME="${HOME}/neo4j-community-4.3.23"
+export NEO4J_HOME="${HOME}/neo4j-community-4.4.23"
 export PATH="${NEO4J_HOME}/bin":"${PATH}"
 # initialize the password for user database
 neo4j-admin set-initial-password xxxx # set your password here
@@ -129,7 +129,7 @@ We can also import the movie graph from GraphAr to Neo4j.
 First clear the Neo4j movie graph to show the import result clearly:
 ```bash
 echo "match (a) -[r] -> () delete a, r;match (a) delete a;" | cypher-shell -u ${NEO4J_USR} -p ${NEO4J_PWD} -d neo4j --format plain
-```bash
+```
 
 Then run the example:
 ```bash
