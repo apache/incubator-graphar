@@ -76,6 +76,7 @@ object GraphAr2Neo4j {
       val targetDf = vertexData(targetLabel)
       val df = Utils.joinEdgesWithVertexPrimaryKey(value.head._2, sourceDf, targetDf, sourcePrimaryKey, targetPrimaryKey)  // use the first dataframe of (adj_list_type_str, dataframe) map
 
+      // FIXME: use properties message in edge info
       val properties = if (edgeLabel == "REVIEWED") "rating,summary" else ""
 
       df.write.format("org.neo4j.spark.DataSource")

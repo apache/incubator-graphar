@@ -89,7 +89,7 @@ object Utils {
         property.setName(field.name)
         property.setData_type(sparkDataType2GraphArTypeName(field.dataType))
         val isPrimary: Boolean =
-          if ((primaryKeys == "" && properties.size() == 0) || field.name == primaryKeys) true else false
+          if ((primaryKeys(key) == "" && properties.size() == 0) || field.name == primaryKeys) true else false
         property.setIs_primary(isPrimary)
         properties.add(property)
       }}
