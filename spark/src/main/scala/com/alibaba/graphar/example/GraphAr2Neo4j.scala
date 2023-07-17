@@ -41,10 +41,13 @@ object GraphAr2Neo4j {
       .config("spark.master", "local")
       .getOrCreate()
 
+    // path to the graph information file
     val graphInfoPath: String = args(0)
     val graphInfo = GraphInfo.loadGraphInfo(graphInfoPath, spark)
 
-    val graphData = GraphReader.read(graphInfoPath, spark)
+    // The edge data need to convert src and dst to the vertex id , so we need to read
+    // the vertex data with index column.
+    val graphData = GraphReader.read(graphInfoPath, spark, true)
     val vertexData = graphData._1
     val edgeData = graphData._2
 
@@ -53,9 +56,11 @@ object GraphAr2Neo4j {
   }
 
   def putVertexDataIntoNeo4j(graphInfo: GraphInfo, vertexData: Map[String, DataFrame], spark: SparkSession): Unit = {
+    // write each vertex type to Neo4j
     vertexData.foreach { case (key, df) => {
-      // write the vertices to Neo4j
       val primaryKey = graphInfo.getVertexInfo(key).getPrimaryKey()
+      // the vertex index column is not needed in Neo4j
+      // write to Neo4j, refer to https://neo4j.com/docs/spark/current/writing/
       df.drop(GeneralParams.vertexIndexCol).write.format("org.neo4j.spark.DataSource")
         .mode(SaveMode.Overwrite)
         .option("labels", ":" + key)
@@ -65,8 +70,8 @@ object GraphAr2Neo4j {
   }
 
   def putEdgeDataIntoNeo4j(graphInfo: GraphInfo, vertexData: Map[String, DataFrame], edgeData: Map[(String, String, String), Map[String, DataFrame]], spark: SparkSession): Unit = {
+    // write each edge type to Neo4j
     edgeData.foreach { case (key, value) => {
-      // write the edges to Neo4j
       val sourceLabel = key._1
       val edgeLabel = key._2
       val targetLabel = key._3
@@ -74,6 +79,7 @@ object GraphAr2Neo4j {
       val targetPrimaryKey = graphInfo.getVertexInfo(targetLabel).getPrimaryKey()
       val sourceDf = vertexData(sourceLabel)
       val targetDf = vertexData(targetLabel)
+      // convert the source and target index column to the primary key column
       val df = Utils.joinEdgesWithVertexPrimaryKey(value.head._2, sourceDf, targetDf, sourcePrimaryKey, targetPrimaryKey)  // use the first dataframe of (adj_list_type_str, dataframe) map
 
       // FIXME: use properties message in edge info

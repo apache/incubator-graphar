@@ -39,12 +39,16 @@ object Neo4j2GraphAr {
     // put movie graph data into writer
     readAndPutDataIntoWriter(writer, spark)
 
-    // write in graphar format
+    // output directory
     val outputPath: String = args(0)
+    // vertex chunk size
     val vertexChunkSize: Long = args(1).toLong
+    // edge chunk size
     val edgeChunkSize: Long = args(2).toLong
+    // file type
     val fileType: String = args(3)
 
+    // write in graphar format
     writer.write(outputPath, spark, "MovieGraph", vertexChunkSize, edgeChunkSize, fileType)
   }
 
@@ -54,46 +58,62 @@ object Neo4j2GraphAr {
     val person_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (n:Person) RETURN n.name AS name, n.born as born")
       .load()
-    // put into writer
+    // put into writer, vertex label is "Person"
     writer.PutVertexData("Person", person_df)
 
-    // read vertices with label "Person" from Neo4j as a DataFrame
+    // read vertices with label "Movie" from Neo4j as a DataFrame
     val movie_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (n:Movie) RETURN n.title AS title, n.tagline as tagline")
       .load()
-    // put into writer
+    // put into writer, vertex label is "Movie"
     writer.PutVertexData("Movie", movie_df)
 
     // read edges with type "Person"->"PRODUCED"->"Movie" from Neo4j as a DataFrame
     val produced_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:PRODUCED]->(b:Movie) return a.name as src, b.title as dst")
       .load()
-    // put into writer
+    // put into writer, source vertex label is "Person", edge label is "PRODUCED"
+    // target vertex label is "Movie"
     writer.PutEdgeData(("Person", "PRODUCED", "Movie"), produced_edge_df)
 
+    // read edges with type "Person"->"ACTED_IN"->"Movie" from Neo4j as a DataFrame
     val acted_in_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:ACTED_IN]->(b:Movie) return a.name as src, b.title as dst")
       .load()
+    // put into writer, source vertex label is "Person", edge label is "ACTED_IN"
+    // target vertex label is "Movie"
     writer.PutEdgeData(("Person", "ACTED_IN", "Movie"), acted_in_edge_df)
 
+    // read edges with type "Person"->"DIRECTED"->"Movie" from Neo4j as a DataFrame
     val directed_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:DIRECTED]->(b:Movie) return a.name as src, b.title as dst")
       .load()
+    // put into writer, source vertex label is "Person", edge label is "DIRECTED"
+    // target vertex label is "Movie"
     writer.PutEdgeData(("Person", "DIRECTED", "Movie"), directed_edge_df)
 
+    // read edges with type "Person"->"FOLLOWS"->"Person" from Neo4j as a DataFrame
     val follows_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:FOLLOWS]->(b:Person) return a.name as src, b.name as dst")
       .load()
+    // put into writer, source vertex label is "Person", edge label is "FOLLOWS"
+    // target vertex label is "Person"
     writer.PutEdgeData(("Person", "FOLLOWS", "Person"), follows_edge_df)
 
+    // read edges with type "Person"->"REVIEWED"->"Movie" from Neo4j as a DataFrame
     val reviewed_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:REVIEWED]->(b:Movie) return a.name as src, b.title as dst, r.rating as rating, r.summary as summary")
       .load()
+    // put into writer, source vertex label is "Person", edge label is "REVIEWED"
+    // target vertex label is "Movie"
     writer.PutEdgeData(("Person", "REVIEWED", "Movie"), reviewed_edge_df)
 
+    // read edges with type "Person"->"WROTE"->"Movie" from Neo4j as a DataFrame
     val wrote_edge_df = spark.read.format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (a:Person)-[r:WROTE]->(b:Movie) return a.name as src, b.title as dst")
       .load()
+    // put into writer, source vertex label is "Person", edge label is "WROTE"
+    // target vertex label is "Movie"
     writer.PutEdgeData(("Person", "WROTE", "Movie"), wrote_edge_df)
   }
 }

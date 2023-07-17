@@ -47,57 +47,150 @@ with `Neo4j2GraphAr.scala`_ providing a complete example.
 
 .. code:: scala
 
-def main(args: Array[String]): Unit = {
-    // connect to the Neo4j instance
-    val spark = SparkSession.builder()
-      .appName("Neo4j to GraphAr for Movie Graph")
-      .config("neo4j.url", "bolt://localhost:7687")
-      .config("neo4j.authentication.type", "basic")
-      .config("neo4j.authentication.basic.username", sys.env.get("Neo4j_USR").get)
-      .config("neo4j.authentication.basic.password", sys.env.get("Neo4j_PWD").get)
-      .config("spark.master", "local")
-      .getOrCreate()
+  def main(args: Array[String]): Unit = {
+      // connect to the Neo4j instance
+      val spark = SparkSession.builder()
+        .appName("Neo4j to GraphAr for Movie Graph")
+        .config("neo4j.url", "bolt://localhost:7687")
+        .config("neo4j.authentication.type", "basic")
+        .config("neo4j.authentication.basic.username", sys.env.get("Neo4j_USR").get)
+        .config("neo4j.authentication.basic.password", sys.env.get("Neo4j_PWD").get)
+        .config("spark.master", "local")
+        .getOrCreate()
 
-    // initialize a graph writer
-    val writer: GraphWriter = new GraphWriter()
+      // initialize a graph writer
+      val writer: GraphWriter = new GraphWriter()
 
-    // put movie graph data into writer
-    readAndPutDataIntoWriter(writer, spark)
+      // put movie graph data into writer
+      readAndPutDataIntoWriter(writer, spark)
 
-    // write in graphar format
-    val outputPath: String = args(0)
-    val vertexChunkSize: Long = args(1).toLong
-    val edgeChunkSize: Long = args(2).toLong
-    val fileType: String = args(3)
+      // write in graphar format
+      val outputPath: String = args(0)
+      val vertexChunkSize: Long = args(1).toLong
+      val edgeChunkSize: Long = args(2).toLong
+      val fileType: String = args(3)
 
-    writer.write(outputPath, spark, "MovieGraph", vertexChunkSize, edgeChunkSize, fileType)
-}
+      writer.write(outputPath, spark, "MovieGraph", vertexChunkSize, edgeChunkSize, fileType)
+  }
+
+The `readAndPutDataIntoWriter` method read the vertex and edge from Neo4j to DataFrame
+(Refer to `Neo4j docs <https://neo4j.com/docs/spark/current/reading/>`_ for more details),
+and then put then into a GraphAr GraphWriter.
+
+.. code:: scala
+
+  def readAndPutDataIntoWriter(writer: GraphWriter, spark: SparkSession): Unit = {
+    // read vertices with label "Person" from Neo4j as a DataFrame
+    val person_df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("query", "MATCH (n:Person) RETURN n.name AS name, n.born as born")
+      .load()
+    // put into writer, vertex label is "Person"
+    writer.PutVertexData("Person", person_df)
+
+    // read vertices with label "Movie" from Neo4j as a DataFrame
+    val movie_df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("query", "MATCH (n:Movie) RETURN n.title AS title, n.tagline as tagline")
+      .load()
+    // put into writer, vertex label is "Movie"
+    writer.PutVertexData("Movie", movie_df)
+
+    // read edges with type "Person"->"PRODUCED"->"Movie" from Neo4j as a DataFrame
+    val produced_edge_df = spark.read.format("org.neo4j.spark.DataSource")
+      .option("query", "MATCH (a:Person)-[r:PRODUCED]->(b:Movie) return a.name as src, b.title as dst")
+      .load()
+    // put into writer, source vertex label is "Person", edge label is "PRODUCED"
+    // target vertex label is "Movie"
+    writer.PutEdgeData(("Person", "PRODUCED", "Movie"), produced_edge_df)
+
+Finally, the `write` method writes the graph data in GraphAr format to the specified path.
 
 Additionally, when importing data from GraphAr to create/update instances in Neo4j, please refer to the following code:
 
 .. code:: scala
 
-def main(args: Array[String]): Unit = {
-    // connect to the Neo4j instance
-    val spark = SparkSession.builder()
-      .appName("GraphAr to Neo4j for Movie Graph")
-      .config("neo4j.url", "bolt://localhost:7687")
-      .config("neo4j.authentication.type", "basic")
-      .config("neo4j.authentication.basic.username", sys.env.get("Neo4j_USR").get)
-      .config("neo4j.authentication.basic.password", sys.env.get("Neo4j_PWD").get)
-      .config("spark.master", "local")
-      .getOrCreate()
+  def main(args: Array[String]): Unit = {
+      // connect to the Neo4j instance
+      val spark = SparkSession.builder()
+        .appName("GraphAr to Neo4j for Movie Graph")
+        .config("neo4j.url", "bolt://localhost:7687")
+        .config("neo4j.authentication.type", "basic")
+        .config("neo4j.authentication.basic.username", sys.env.get("Neo4j_USR").get)
+        .config("neo4j.authentication.basic.password", sys.env.get("Neo4j_PWD").get)
+        .config("spark.master", "local")
+        .getOrCreate()
 
-    val graphInfoPath: String = args(0)
-    val graphInfo = GraphInfo.loadGraphInfo(graphInfoPath, spark)
+      // path to the graph information file
+      val graphInfoPath: String = args(0)
+      val graphInfo = GraphInfo.loadGraphInfo(graphInfoPath, spark)
 
-    val graphData = GraphReader.read(graphInfoPath, spark)
-    val vertexData = graphData._1
-    val edgeData = graphData._2
+      val graphData = GraphReader.read(graphInfoPath, spark)
+      val vertexData = graphData._1
+      val edgeData = graphData._2
 
-    putVertexDataIntoNeo4j(graphInfo, vertexData, spark)
-    putEdgeDataIntoNeo4j(graphInfo, vertexData, edgeData, spark)
-}
+      putVertexDataIntoNeo4j(graphInfo, vertexData, spark)
+      putEdgeDataIntoNeo4j(graphInfo, vertexData, edgeData, spark)
+  }
+
+Pass the graph information file path to `loadGraphInfo` method to get the graph information.
+Then, read the graph data from GraphAr files with `GraphReader` as DataFrame pair,
+`_1` for vertices and `_2` for edges.
+
+The `putVertexDataIntoNeo4j` and `putEdgeDataIntoNeo4j` methods creates or updates the vertices DataFrame and edges DataFrame in Neo4j.
+
+.. code:: scala
+
+  def putVertexDataIntoNeo4j(graphInfo: GraphInfo,
+                             vertexData: Map[String, DataFrame],
+                             spark: SparkSession): Unit = {
+    // write each vertex type to Neo4j
+    vertexData.foreach { case (key, df) => {
+      val primaryKey = graphInfo.getVertexInfo(key).getPrimaryKey()
+      // the vertex index column is not needed in Neo4j
+      // write to Neo4j, refer to https://neo4j.com/docs/spark/current/writing/
+      df.drop(GeneralParams.vertexIndexCol).write.format("org.neo4j.spark.DataSource")
+        .mode(SaveMode.Overwrite)
+        .option("labels", ":" + key)
+        .option("node.keys", primaryKey)
+        .save()
+    }}
+  }
+
+  def putEdgeDataIntoNeo4j(graphInfo: GraphInfo,
+                           vertexData: Map[String, DataFrame],
+                           edgeData: Map[(String, String, String), Map[String, DataFrame]],
+                           spark: SparkSession): Unit = {
+    // write each edge type to Neo4j
+    edgeData.foreach { case (key, value) => {
+      // key is (source vertex label, edge label, target vertex label)
+      val sourceLabel = key._1
+      val edgeLabel = key._2
+      val targetLabel = key._3
+      val sourcePrimaryKey = graphInfo.getVertexInfo(sourceLabel).getPrimaryKey()
+      val targetPrimaryKey = graphInfo.getVertexInfo(targetLabel).getPrimaryKey()
+      val sourceDf = vertexData(sourceLabel)
+      val targetDf = vertexData(targetLabel)
+      // convert the source and target index column to the primary key column
+      val df = Utils.joinEdgesWithVertexPrimaryKey(value.head._2, sourceDf, targetDf, sourcePrimaryKey, targetPrimaryKey)  // use the first dataframe of (adj_list_type_str, dataframe) map
+
+      val properties = if (edgeLabel == "REVIEWED") "rating,summary" else ""
+
+      // write to Neo4j, refer to https://neo4j.com/docs/spark/current/writing/
+      df.write.format("org.neo4j.spark.DataSource")
+        .mode(SaveMode.Overwrite)
+        .option("relationship", edgeLabel)
+        .option("relationship.save.strategy", "keys")
+        .option("relationship.source.labels", ":" + sourceLabel)
+        .option("relationship.source.save.mode", "match")
+        .option("relationship.source.node.keys", "src:" + sourcePrimaryKey)
+        .option("relationship.target.labels", ":" + targetLabel)
+        .option("relationship.target.save.mode", "match")
+        .option("relationship.target.node.keys", "dst:" + targetPrimaryKey)
+        .option("relationship.properties", properties)
+        .save()
+    }}
+  }
+
+Finally, you will see the graph in Neo4j Browser after running the above code.
 
 See `GraphAr2Neo4j.scala`_ for the complete example.
 

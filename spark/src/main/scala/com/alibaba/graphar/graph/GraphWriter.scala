@@ -15,7 +15,7 @@
 
 package com.alibaba.graphar.graph
 
-import com.alibaba.graphar.{AdjListType, GraphInfo, VertexInfo, EdgeInfo}
+import com.alibaba.graphar.{AdjListType, GraphInfo, VertexInfo, EdgeInfo, GeneralParams}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 import com.alibaba.graphar.utils.IndexGenerator
 import com.alibaba.graphar.utils.Utils
@@ -132,15 +132,15 @@ class GraphWriter() {
    * @param vertex_chunk_size the chunk size for vertices, default is 2^18
    * @param edge_chunk_size the chunk size for edges, default is 2^22
    * @param file_type the file type for data payload file, support [parquet, orc, csv], default is parquet.
-   * @param version version of graphar, default is v1.
+   * @param version version of graphar format, default is v1.
    */
   def write(path: String,
             spark: SparkSession,
             name: String = "graph",
-            vertex_chunk_size: Long = 262144,  // 2^18
-            edge_chunk_size: Long = 4194304,   // 2^22
-            file_type: String = "parquet",
-            vertison: String = "v1"
+            vertex_chunk_size: Long = GeneralParams.defaultVertexChunkSize,
+            edge_chunk_size: Long = GeneralParams.defaultEdgeChunkSize,
+            file_type: String = GeneralParams.defaultFileType,
+            version: String = GeneralParams.defaultVersion
            ): Unit = {
     val vertex_schemas: scala.collection.mutable.Map[String, StructType] = scala.collection.mutable.Map[String, StructType]()
     val edge_schemas: scala.collection.mutable.Map[(String, String, String), StructType] = scala.collection.mutable.Map[(String, String, String), StructType]()
@@ -148,9 +148,9 @@ class GraphWriter() {
       vertex_schemas += key -> df.schema
     }}
     edges.foreach { case (key, df) => {
-      edge_schemas += key -> new StructType(df.schema.drop(2).toArray)  // drop the src, dst
+      edge_schemas += key -> new StructType(df.schema.drop(2).toArray)  // drop the src, dst fileds
     }}
-    val graph_info = Utils.generateGraphInfo(path, name, true, vertex_chunk_size, edge_chunk_size, file_type, vertex_schemas, edge_schemas, primaryKeys)
+    val graph_info = Utils.generateGraphInfo(path, name, true, vertex_chunk_size, edge_chunk_size, file_type, version, vertex_schemas, edge_schemas, primaryKeys)
     // dump infos to file
     saveInfoToFile(graph_info, spark)
     // write out the data

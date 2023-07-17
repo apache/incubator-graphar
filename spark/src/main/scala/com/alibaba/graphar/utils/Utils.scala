@@ -65,13 +65,13 @@ object Utils {
    * @param edgeSchemas schemas of every edge type
    * @return graph info
    */
-  def generateGraphInfo(path: String, graphName: String, directed: Boolean, vertexChunkSize: Long, edgeChunkSize: Long, fileType: String,
+  def generateGraphInfo(path: String, graphName: String, directed: Boolean, vertexChunkSize: Long, edgeChunkSize: Long, fileType: String, version: String,
                         vertexSchemas: scala.collection.mutable.Map[String, StructType], edgeSchemas: scala.collection.mutable.Map[(String, String, String), StructType],
                         primaryKeys: scala.collection.mutable.Map[String, String]): GraphInfo = {
     val info = new GraphInfo()
     info.setName(graphName)
     info.setPrefix(path + "/")
-    info.setVersion("gar/v1")
+    info.setVersion("gar/" + version)
 
     vertexSchemas.foreach { case (key, schema) => {
       val vertexInfo = new VertexInfo()
@@ -79,7 +79,7 @@ object Utils {
       vertexInfo.setPrefix(prefix)
       vertexInfo.setLabel(key)
       vertexInfo.setChunk_size(vertexChunkSize)
-      vertexInfo.setVersion("gar/v1")
+      vertexInfo.setVersion("gar/" + version)
       vertexInfo.getProperty_groups().add(new PropertyGroup())
       val propertyGroup = vertexInfo.getProperty_groups().get(0)
       propertyGroup.setFile_type(fileType)
@@ -107,7 +107,7 @@ object Utils {
       edgeInfo.setDst_chunk_size(vertexChunkSize)
       edgeInfo.setDirected(directed)
       val prefix = "edge/" + edgeInfo.getConcatKey() + "/"
-      edgeInfo.setVersion("gar/v1")
+      edgeInfo.setVersion("gar/" + version)
       edgeInfo.setPrefix(prefix)
       val csrAdjList = new AdjList()
       csrAdjList.setOrdered(true)

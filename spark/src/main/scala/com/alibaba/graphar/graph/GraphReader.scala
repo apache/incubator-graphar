@@ -30,12 +30,13 @@ object GraphReader {
    * @param prefix The absolute prefix.
    * @param vertexInfos The map of (vertex label -> VertexInfo) for the graph.
    * @param spark The Spark session for the reading.
+   * @param addIndex Whether to add index column for the DataFrame.
    * @return The map of (vertex label -> DataFrame)
    */
-  private def readAllVertices(prefix: String, vertexInfos: Map[String, VertexInfo], spark: SparkSession): Map[String, DataFrame] = {
+  private def readAllVertices(prefix: String, vertexInfos: Map[String, VertexInfo], spark: SparkSession, addIndex: Boolean = false): Map[String, DataFrame] = {
     val vertex_dataframes: Map[String, DataFrame] = vertexInfos.map { case (label, vertexInfo) => {
       val reader = new VertexReader(prefix, vertexInfo, spark)
-      (label, reader.readAllVertexPropertyGroups(true))
+      (label, reader.readAllVertexPropertyGroups(addIndex))
     }}
     return vertex_dataframes
   }
@@ -68,28 +69,30 @@ object GraphReader {
    *
    * @param graphInfo The info object for the graph.
    * @param spark The Spark session for the loading.
+   * @param addIndex Whether to add index for the vertex DataFrames.
    * @return Pair of vertex dataframes and edge dataframes, the vertex dataframes are stored as the map of (vertex_label -> DataFrame)
    *        the edge dataframes are stored as a map of ((srcLabel, edgeLabel, dstLabel) -> (adj_list_type_str -> DataFrame))
    */
-  def read(graphInfo: GraphInfo, spark: SparkSession): Pair[Map[String, DataFrame], Map[(String, String, String), Map[String, DataFrame]]] = {
+  def read(graphInfo: GraphInfo, spark: SparkSession, addVertexIndex: Boolean = false): Pair[Map[String, DataFrame], Map[(String, String, String), Map[String, DataFrame]]] = {
     val prefix = graphInfo.getPrefix
     val vertex_infos = graphInfo.getVertexInfos()
     val edge_infos = graphInfo.getEdgeInfos()
-    return (readAllVertices(prefix, vertex_infos, spark), readAllEdges(prefix, edge_infos, spark))
+    return (readAllVertices(prefix, vertex_infos, spark, addVertexIndex), readAllEdges(prefix, edge_infos, spark))
   }
 
   /** Reading the graph as vertex and edge DataFrames with the graph info yaml file.
    *
    * @param graphInfoPath The path of the graph info yaml.
    * @param spark The Spark session for the loading.
+   * @param addIndex Whether to add index for the vertex DataFrames.
    * @return Pair of vertex dataframes and edge dataframes, the vertex dataframes are stored as the map of (vertex_label -> DataFrame)
    *        the edge dataframes are stored as a map of (srcLabel_edgeLabel_dstLabel -> (adj_list_type_str -> DataFrame))
    */
-  def read(graphInfoPath: String, spark: SparkSession): Pair[Map[String, DataFrame], Map[(String, String, String), Map[String, DataFrame]]] = {
+  def read(graphInfoPath: String, spark: SparkSession, addVertexIndex: Boolean = false): Pair[Map[String, DataFrame], Map[(String, String, String), Map[String, DataFrame]]] = {
     // load graph info
     val graph_info = GraphInfo.loadGraphInfo(graphInfoPath, spark)
 
     // conduct reading
-    read(graph_info, spark)
+    read(graph_info, spark, addVertexIndex)
   }
 }
