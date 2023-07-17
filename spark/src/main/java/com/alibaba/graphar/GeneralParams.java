@@ -31,6 +31,6 @@ public class GeneralParams {
     public static final Long defaultVertexChunkSize = 262144L;  // 2^18
     public static final Long defaultEdgeChunkSize = 4194304L;  // 2^22
     public static final String defaultFileType = "parquet";
-    public static final String defaultVersion = "v1"
+    public static final String defaultVersion = "v1";
 }
 

@@ -54,7 +54,7 @@ class TestGraphReaderSuite extends AnyFunSuite {
     val graph_info = GraphInfo.loadGraphInfo(path, spark)
 
     // conduct reading
-    val vertex_edge_df_pair = GraphReader.read(graph_info, spark)
+    val vertex_edge_df_pair = GraphReader.readWithGraphInfo(graph_info, spark)
     val vertex_dataframes = vertex_edge_df_pair._1
     val edge_dataframes = vertex_edge_df_pair._2
 
