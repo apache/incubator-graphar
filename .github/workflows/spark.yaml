@@ -39,3 +39,31 @@ jobs:
         pushd spark
         mvn test
         popd
+
+    - name: Run Neo4j2GraphAr example
+      run: |
+        export JAVA_HOME=${JAVA_HOME_11_X64}
+        pushd spark
+        scripts/get-spark-to-home.sh
+        export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+        export PATH="${SPARK_HOME}/bin":"${PATH}"
+
+        scripts/get-neo4j-to-home.sh
+        export NEO4J_HOME="${HOME}/neo4j-community-4.4.23"
+        export PATH="${NEO4J_HOME}/bin":"${PATH}"
+        neo4j-admin set-initial-password neo4j
+
+        scripts/deploy-neo4j-movie-data.sh
+
+        scripts/build.sh
+
+        export NEO4J_USR="neo4j"
+        export NEO4J_PWD="neo4j"
+        scripts/run-neo4j2graphar.sh
+
+        # clean the movie data and import from GraphAr
+        echo "match (a) -[r] -> () delete a, r;match (a) delete a;" | cypher-shell -u ${NEO4J_USR} -p ${NEO4J_PWD} -d neo4j --format plain
+        scripts/run-graphar2neo4j.sh
+
+        # stop and clean
+        popd

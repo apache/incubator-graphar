@@ -233,6 +233,6 @@ For more information on usage, please refer to the examples:
 
 .. _TransformExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TransformExample.scala
 
-.. _Neo4j2GraphAr.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/Neo4j2GraphAr.scala
+.. _Neo4j2GraphAr.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/main/scala/com/alibaba/graphar/example/Neo4j2GraphAr.scala
 
-.. _GraphAr2Neo4j.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/GraphAr2Neo4j.scala
+.. _GraphAr2Neo4j.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/main/scala/com/alibaba/graphar/example/GraphAr2Neo4j.scala

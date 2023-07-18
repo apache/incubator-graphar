@@ -1058,7 +1058,7 @@ class EdgeInfo {
 };
 
 /**
- * GraphInfo is is a class to store the graph meta information.
+ * GraphInfo is a class to store the graph meta information.
  */
 class GraphInfo {
  public:
@@ -1083,7 +1083,7 @@ class GraphInfo {
 
   /**
    * @brief Loads the input string as a `GraphInfo` instance.
-   * @param content The YAML content string.
+   * @param input The YAML content string.
    * @param relative_path The relative path to access vertex/edge YAML.
    * @return A Result object containing the GraphInfo instance, or a `Status`
    * object indicating an error.
@@ -1259,7 +1259,7 @@ class GraphInfo {
   /**
    * Saves the graph info to a YAML file.
    *
-   * @param file_name The name of the file to save to.
+   * @param path The path of the file to save to.
    * @return A Status object indicating success or failure.
    */
   Status Save(const std::string& path) const;
