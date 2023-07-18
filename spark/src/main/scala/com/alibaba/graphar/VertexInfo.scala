@@ -223,6 +223,25 @@ class VertexInfo() {
     }
     return prefix + str
   }
+
+  /** Dump to Yaml string. */
+  def dump(): String = {
+    val data = new java.util.HashMap[String, Object]()
+    data.put("label", label)
+    data.put("chunk_size", new java.lang.Long(chunk_size))
+    if (prefix != "") data.put("prefix", prefix)
+    data.put("version", version)
+    val property_group_num = property_groups.size()
+    if (property_group_num > 0) {
+      val property_group_maps = new java.util.ArrayList[Object]()
+      for (i <- 0 until property_group_num) {
+        property_group_maps.add(property_groups.get(i).toMap())
+      }
+      data.put("property_groups", property_group_maps)
+    }
+    val yaml = new Yaml()
+    return yaml.dump(data)
+  }
 }
 
 /** Helper object to load vertex info files */

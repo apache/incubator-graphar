@@ -221,7 +221,11 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     val pg0: PropertyGroup = propertyGroups.get(0)
     val df0 = readEdgePropertyGroupForVertexChunk(pg0, vertex_chunk_index, false)
     if (len == 1) {
-      return df0
+      if (addIndex) {
+        return IndexGenerator.generateEdgeIndexColumn(df0)
+      } else {
+        return df0
+      }
     }
 
     var rdd = df0.rdd
@@ -257,7 +261,11 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
     val pg0: PropertyGroup = propertyGroups.get(0)
     val df0 = readEdgePropertyGroup(pg0, false)
     if (len == 1) {
-      return df0
+      if (addIndex) {
+        return IndexGenerator.generateEdgeIndexColumn(df0)
+      } else {
+        return df0
+      }
     }
 
     var rdd = df0.rdd
@@ -323,8 +331,13 @@ class EdgeReader(prefix: String,  edgeInfo: EdgeInfo, adjListType: AdjListType.V
    */
   def readEdges(addIndex: Boolean = true): DataFrame = {
     val adjList_df = readAllAdjList(false)
-    val properties_df = readAllEdgePropertyGroups(false)
-    val df = DataFrameConcat.concat(adjList_df, properties_df)
+    val property_groups = edgeInfo.getPropertyGroups(adjListType)
+    val df = if (property_groups.size == 0) {
+      adjList_df
+    } else {
+      val properties_df = readAllEdgePropertyGroups(false)
+      DataFrameConcat.concat(adjList_df, properties_df)
+    }
     if (addIndex) {
       return IndexGenerator.generateEdgeIndexColumn(df)
     } else {

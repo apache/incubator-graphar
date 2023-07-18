@@ -94,7 +94,11 @@ class VertexReader(prefix: String, vertexInfo: VertexInfo, spark: SparkSession) 
     val pg0: PropertyGroup = propertyGroups.get(0)
     val df0 = readVertexPropertyGroup(pg0, false)
     if (len == 1) {
-      return df0
+      if (addIndex) {
+        return IndexGenerator.generateVertexIndexColumn(df0)
+      } else {
+        return df0
+      }
     }
 
     var rdd = df0.rdd

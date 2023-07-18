@@ -480,6 +480,29 @@ class EdgeInfo() {
   def getConcatKey(): String = {
     return getSrc_label + GeneralParams.regularSeperator + getEdge_label + GeneralParams.regularSeperator + getDst_label
   }
+
+  /** Dump to Yaml string. */
+  def dump(): String = {
+    val data = new java.util.HashMap[String, Object]()
+    data.put("src_label", src_label)
+    data.put("edge_label", edge_label)
+    data.put("dst_label", dst_label)
+    data.put("chunk_size", new java.lang.Long(chunk_size))
+    data.put("src_chunk_size", new java.lang.Long(src_chunk_size))
+    data.put("dst_chunk_size", new java.lang.Long(dst_chunk_size))
+    if (prefix != "") data.put("prefix", prefix)
+    data.put("version", version)
+    val adj_list_num = adj_lists.size()
+    if (adj_list_num > 0) {
+      val adj_list_maps = new java.util.ArrayList[Object]()
+      for (i <- 0 until adj_list_num) {
+        adj_list_maps.add(adj_lists.get(i).toMap())
+      }
+      data.put("adj_lists", adj_list_maps)
+    }
+    val yaml = new Yaml()
+    return yaml.dump(data)
+  }
 }
 
 /** Helper object to load edge info files */
