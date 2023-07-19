@@ -85,6 +85,9 @@ export PATH="${SPARK_HOME}/bin":"${PATH}"
 
 Neo4j 4.4.x is the LTS version to use. The rest of the instructions are provided assuming Neo4j 4.4.x.
 
+Neo4j is required to have a pre-installed, compatible Java Virtual Machine (JVM). **For Neo4j 4.4.x, jdk11/jre11 is needed.**
+Run `java --version` to check it.
+
 To place Neo4j under `${HOME}`:
 
 ```bash
