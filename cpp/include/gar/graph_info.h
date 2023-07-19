@@ -1033,7 +1033,7 @@ class EdgeInfo {
     return true;
   }
 
-  /** Loads the yaml as a EdgeInfo instance. */
+  /** Loads the yaml as an EdgeInfo instance. */
   static Result<EdgeInfo> Load(std::shared_ptr<Yaml> yaml);
 
  private:
@@ -1131,7 +1131,7 @@ class GraphInfo {
   }
 
   /**
-   *@brief Add a edge info path to graph info instance.
+   *@brief Add an edge info path to graph info instance.
    *
    *@param path The edge info path to add
    */
