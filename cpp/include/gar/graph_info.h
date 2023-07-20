@@ -802,6 +802,7 @@ class EdgeInfo {
    *
    * @param vertex_chunk_index the vertex chunk index
    * @param edge_chunk_index index of edge adj list chunk of the vertex chunk
+   * @param adj_list_type The adjacency list type.
    */
   inline Result<std::string> GetAdjListFilePath(IdType vertex_chunk_index,
                                                 IdType edge_chunk_index,
