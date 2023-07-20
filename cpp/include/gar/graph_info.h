@@ -840,6 +840,7 @@ class EdgeInfo {
    *    the offset chunks is aligned with the vertex chunks
    *
    * @param vertex_chunk_index index of vertex chunk
+   * @param adj_list_type The adjacency list type.
    */
   inline Result<std::string> GetAdjListOffsetFilePath(
       IdType vertex_chunk_index, AdjListType adj_list_type) const noexcept {
