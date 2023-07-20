@@ -20,6 +20,7 @@ limitations under the License.
 
 // GRIN headers
 #include "index/internal_id.h"
+#include "index/external_id.h"
 #include "index/order.h"
 #include "property/topology.h"
 #include "property/type.h"
@@ -96,6 +97,39 @@ void test_internal_id(GRIN_GRAPH graph) {
   std::cout << "---- test index: internal id completed ----" << std::endl;
 }
 
+void test_external_id(GRIN_GRAPH graph) {
+  std::cout << "\n++++ test index: external id ++++" << std::endl;
+
+  std::cout << "test vertex external id: int64" << std::endl;
+  auto vtype = grin_get_vertex_type_by_id(graph, 0);
+  auto vertex_list = grin_get_vertex_list_by_type(graph, vtype);
+  size_t idx0 = 0, idx1 = 1;
+  auto v0 = grin_get_vertex_from_list(graph, vertex_list, idx0);
+  auto v1 = grin_get_vertex_from_list(graph, vertex_list, idx1);
+
+  // get external id of int64
+  auto id0 = grin_get_vertex_external_id_of_int64(graph, v0);
+  auto id1 = grin_get_vertex_external_id_of_int64(graph, v1);
+  std::cout << "external id of v0 = " << id0 << std::endl;
+  std::cout << "external id of v1 = " << id1 << std::endl;
+
+  // get vertex by external id
+  auto v0_from_id = grin_get_vertex_by_external_id_of_int64(graph, id0);
+  auto v1_from_id = grin_get_vertex_by_external_id_of_int64(graph, id1);
+  ASSERT(grin_equal_vertex(graph, v0, v0_from_id) == true);
+  ASSERT(grin_equal_vertex(graph, v1, v1_from_id) == true);
+
+  // destroy
+  grin_destroy_vertex(graph, v0);
+  grin_destroy_vertex(graph, v1);
+  grin_destroy_vertex(graph, v0_from_id);
+  grin_destroy_vertex(graph, v1_from_id);
+  grin_destroy_vertex_list(graph, vertex_list);
+  grin_destroy_vertex_type(graph, vtype);
+
+  std::cout << "---- test index: internal id completed ----" << std::endl;
+}
+
 int main(int argc, char* argv[]) {
   // get graph from graph info of GraphAr
   std::string path = "graphar://" + TEST_DATA_PATH;
@@ -111,6 +145,9 @@ int main(int argc, char* argv[]) {
 
   // test internal id
   test_internal_id(graph);
+
+  // test external id
+  test_external_id(graph);
 
   // destroy graph
   grin_destroy_graph(graph);
