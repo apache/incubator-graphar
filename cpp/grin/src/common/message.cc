@@ -24,7 +24,7 @@ limitations under the License.
 const char* grin_get_static_storage_feature_msg() {
   grin::Graph g;
   g.set_uri("graphar_graph_info_path");
-  g.set_grin_version("0.1.0");
+  g.set_grin_version("0.1.2");
 
   {
     auto storage_feature = g.add_features();
@@ -107,31 +107,6 @@ const char* grin_get_static_storage_feature_msg() {
   {
     auto storage_feature = g.add_features();
     auto feature = storage_feature->mutable_partition_feature();
-    auto cnt = 0;
-#ifndef GRIN_ENABLE_GRAPH_PARTITION
-    feature->set_graph_partition_strategy(grin::GraphPartitionStrategy::GPS_NA);
-#else
-#ifdef GRIN_ASSUME_ALL_REPLICATE_PARTITION
-    feature->set_graph_partition_strategy(
-        grin::GraphPartitionStrategy::GPS_ALL_REPLICATE);
-    cnt++;
-#endif
-
-#ifdef GRIN_ASSUME_EDGE_CUT_PARTITION
-    feature->set_graph_partition_strategy(
-        grin::GraphPartitionStrategy::GPS_EDGE_CUT);
-    cnt++;
-#endif
-
-#ifdef GRIN_ASSUME_VERTEX_CUT_PARTITION
-    feature->set_graph_partition_strategy(
-        grin::GraphPartitionStrategy::GPS_VERTEX_CUT);
-    cnt++;
-#endif
-    if (cnt > 1) {
-      LOG(ERROR) << "More than one partition strategy is enabled";
-    }
-#endif
 
 #ifdef GRIN_TRAIT_NATURAL_ID_FOR_PARTITION
     feature->set_grin_trait_natural_id_for_partition(true);
@@ -147,42 +122,6 @@ const char* grin_get_static_storage_feature_msg() {
 
 #ifdef GRIN_ENABLE_EDGE_REF
     feature->set_grin_enable_edge_ref(true);
-#endif
-
-#ifdef GRIN_ASSUME_MASTER_ONLY_PARTITION_FOR_VERTEX_DATA
-#ifdef GRIN_WITH_VERTEX_DATA
-    feature->set_vertex_data(
-        grin::PropertyDataPartitionStrategy::PDPS_MASTER_ONLY);
-#else
-    feature->set_vertex_data(grin::PropertyDataPartitionStrategy::PDPS_NA);
-#endif
-#endif
-
-#ifdef GRIN_ASSUME_REPLICATE_MASTER_MIRROR_PARTITION_FOR_VERTEX_DATA
-#ifdef GRIN_WITH_VERTEX_DATA
-    feature->set_vertex_data(
-        grin::PropertyDataPartitionStrategy::PDPS_REPLICATE_MASTER_MIRROR);
-#else
-    feature->set_vertex_data(grin::PropertyDataPartitionStrategy::PDPS_NA);
-#endif
-#endif
-
-#ifdef GRIN_ASSUME_MASTER_ONLY_PARTITION_FOR_EDGE_DATA
-#ifdef GRIN_WITH_EDGE_DATA
-    feature->set_edge_data(
-        grin::PropertyDataPartitionStrategy::PDPS_MASTER_ONLY);
-#else
-    feature->set_edge_data(grin::PropertyDataPartitionStrategy::PDPS_NA);
-#endif
-#endif
-
-#ifdef GRIN_ASSUME_REPLICATE_MASTER_MIRROR_PARTITION_FOR_EDGE_DATA
-#ifdef GRIN_WITH_EDGE_DATA
-    feature->set_edge_data(
-        grin::PropertyDataPartitionStrategy::PDPS_REPLICATE_MASTER_MIRROR);
-#else
-    feature->set_edge_data(grin::PropertyDataPartitionStrategy::PDPS_NA);
-#endif
 #endif
 
     auto mpl_feature = feature->mutable_mirror_partition_list_feature();
@@ -223,7 +162,7 @@ const char* grin_get_static_storage_feature_msg() {
 #endif
 
 #ifdef GRIN_TRAIT_SELECT_NEIGHBOR_PARTITION_FOR_ADJACENT_LIST
-    feature->set_grin_trait_select_neighbor_partition_for_adjacent_list(true);
+    feature->set_grin_trait_select_partition_neighbor_for_adjacent_list(true);
 #endif
   }
 
@@ -284,10 +223,6 @@ const char* grin_get_static_storage_feature_msg() {
     efeature->set_grin_trait_natural_id_for_edge_property(true);
 #endif
 
-#ifdef GRIN_TRAIT_SPECIFIC_VEV_RELATION
-    feature->set_grin_trait_specific_vev_relation(true);
-#endif
-
 #ifdef GRIN_TRAIT_CONST_VALUE_PTR
     feature->set_grin_trait_const_value_ptr(true);
 #endif
@@ -318,6 +253,22 @@ const char* grin_get_static_storage_feature_msg() {
 
 #ifdef GRIN_ENABLE_EDGE_PK_INDEX
     feature->set_grin_enable_edge_pk_index(true);
+#endif
+
+#ifdef GRIN_ENABLE_VERTEX_EXTERNAL_ID_OF_INT64
+    feature->set_grin_enable_vertex_external_id_of_int64(true);
+#endif
+
+#ifdef GRIN_ENABLE_VERTEX_EXTERNAL_ID_OF_STRING
+    feature->set_grin_enable_vertex_external_id_of_string(true);
+#endif
+  }
+
+  {
+    auto storage_feature = g.add_features();
+    auto feature = storage_feature->mutable_common_feature();
+#ifdef GRIN_TRAIT_LOOSE_SCHEMA
+    feature->set_grin_trait_loose_schema(true);
 #endif
   }
 
