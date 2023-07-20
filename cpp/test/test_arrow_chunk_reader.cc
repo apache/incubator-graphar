@@ -85,9 +85,9 @@ TEST_CASE("test_vertex_property_arrow_chunk_reader") {
   REQUIRE(range.first == 900);
   REQUIRE(range.second == 903);
   REQUIRE(reader.GetChunkNum() == 10);
-  REQUIRE(reader.next_chunk().IsOutOfRange());
+  REQUIRE(reader.next_chunk().IsIndexError());
 
-  REQUIRE(reader.seek(1024).IsKeyError());
+  REQUIRE(reader.seek(1024).IsIndexError());
 }
 
 TEST_CASE("test_adj_list_arrow_chunk_reader") {
@@ -121,12 +121,12 @@ TEST_CASE("test_adj_list_arrow_chunk_reader") {
   table = result.value();
   REQUIRE(table->num_rows() == 567);
   REQUIRE(reader.GetRowNumOfChunk() == 667);
-  REQUIRE(reader.next_chunk().IsEndOfChunk());
+  REQUIRE(reader.next_chunk().ok());
   result = reader.GetChunk();
   REQUIRE(!result.has_error());
   table = result.value();
   REQUIRE(table->num_rows() == 644);
-  REQUIRE(reader.seek(1024).IsKeyError());
+  REQUIRE(reader.seek(1024).IsIndexError());
 
   // seek src & dst
   REQUIRE(reader.seek_src(100).ok());
@@ -142,7 +142,7 @@ TEST_CASE("test_adj_list_arrow_chunk_reader") {
   table = result.value();
   REQUIRE(table->num_rows() == 4);
 
-  REQUIRE(reader.next_chunk().IsOutOfRange());
+  REQUIRE(reader.next_chunk().IsIndexError());
 }
 
 TEST_CASE("test_adj_list_property_arrow_chunk_reader") {
@@ -177,12 +177,12 @@ TEST_CASE("test_adj_list_property_arrow_chunk_reader") {
   REQUIRE(!result.has_error());
   table = result.value();
   REQUIRE(table->num_rows() == 567);
-  REQUIRE(reader.next_chunk().IsEndOfChunk());
+  REQUIRE(reader.next_chunk().ok());
   result = reader.GetChunk();
   REQUIRE(!result.has_error());
   table = result.value();
   REQUIRE(table->num_rows() == 644);
-  REQUIRE(reader.seek(1024).IsKeyError());
+  REQUIRE(reader.seek(1024).IsIndexError());
 
   // seek src & dst
   REQUIRE(reader.seek_src(100).ok());
@@ -198,7 +198,7 @@ TEST_CASE("test_adj_list_property_arrow_chunk_reader") {
   table = result.value();
   REQUIRE(table->num_rows() == 4);
 
-  REQUIRE(reader.next_chunk().IsOutOfRange());
+  REQUIRE(reader.next_chunk().IsIndexError());
 }
 
 TEST_CASE("test_read_adj_list_offset_chunk_example") {
@@ -236,6 +236,6 @@ TEST_CASE("test_read_adj_list_offset_chunk_example") {
   REQUIRE(!result.has_error());
   array = result.value();
   REQUIRE(array->length() == 4);
-  REQUIRE(reader.next_chunk().IsOutOfRange());
-  REQUIRE(reader.seek(1024).IsKeyError());
+  REQUIRE(reader.next_chunk().IsIndexError());
+  REQUIRE(reader.seek(1024).IsIndexError());
 }

@@ -48,7 +48,10 @@ Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
   } else if (adj_list_type == AdjListType::ordered_by_dest) {
     vertex_chunk_size = edge_info.GetDstChunkSize();
   } else {
-    return Status::Invalid("The adj list type is invalid.");
+    return Status::Invalid(
+        "The adj list type has to be ordered_by_source or ordered_by_dest, but "
+        "got ",
+        std::string(AdjListTypeToString(adj_list_type)));
   }
 
   IdType offset_chunk_index = vid / vertex_chunk_size;

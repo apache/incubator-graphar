@@ -34,7 +34,7 @@ limitations under the License.
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-TEST_CASE("test_vertex_property_wrtier_from_file") {
+TEST_CASE("test_vertex_property_writer_from_file") {
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
 
@@ -63,47 +63,54 @@ TEST_CASE("test_vertex_property_wrtier_from_file") {
   std::shared_ptr<arrow::Table> table = *maybe_table;
   std::cout << table->num_rows() << ' ' << table->num_columns() << std::endl;
 
+  // Construct the writer
   std::string vertex_meta_file =
       root + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = GAR_NAMESPACE::VertexInfo::Load(vertex_meta).value();
   REQUIRE(vertex_info.GetLabel() == "person");
   GAR_NAMESPACE::VertexPropertyWriter writer(vertex_info, "/tmp/");
-  REQUIRE(writer.WriteTable(table, 0).ok());
-  REQUIRE(writer.WriteVerticesNum(table->num_rows()).ok());
 
-  input = fs->OpenInputStream("/tmp/vertex/person/vertex_count").ValueOrDie();
-  auto num = input->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
-  GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
-  REQUIRE((*ptr) == table->num_rows());
-
-  // Set validate level
+  // Get & set validate level
   REQUIRE(writer.GetValidateLevel() ==
           GAR_NAMESPACE::ValidateLevel::no_validate);
   writer.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
   REQUIRE(writer.GetValidateLevel() ==
           GAR_NAMESPACE::ValidateLevel::strong_validate);
-  // Validate operation
-  REQUIRE(writer.WriteTable(table, 0).ok());
 
+  // Valid cases
+  // Write the table
+  REQUIRE(writer.WriteTable(table, 0).ok());
+  // Write the number of vertices
+  REQUIRE(writer.WriteVerticesNum(table->num_rows()).ok());
+
+  // Check vertex count
+  input = fs->OpenInputStream("/tmp/vertex/person/vertex_count").ValueOrDie();
+  auto num = input->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
+  GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
+  REQUIRE((*ptr) == table->num_rows());
+
+  // Invalid cases
+  // Invalid vertices number
+  REQUIRE(writer.WriteVerticesNum(-1).IsInvalid());
   // Out of range
-  REQUIRE(writer.WriteChunk(table, 0).IsOutOfRange());
+  REQUIRE(writer.WriteChunk(table, 0).IsInvalid());
   // Invalid chunk id
   auto chunk = table->Slice(0, vertex_info.GetChunkSize());
-  REQUIRE(writer.WriteChunk(chunk, -1).IsInvalidOperation());
+  REQUIRE(writer.WriteChunk(chunk, -1).IsIndexError());
   // Invalid property group
   GAR_NAMESPACE::Property p1;
   p1.name = "invalid_property";
   p1.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32);
   GAR_NAMESPACE::PropertyGroup pg1({p1}, GAR_NAMESPACE::FileType::CSV);
-  REQUIRE(writer.WriteTable(table, pg1, 0).IsInvalidOperation());
+  REQUIRE(writer.WriteTable(table, pg1, 0).IsKeyError());
   // Property not found in table
   std::shared_ptr<arrow::Table> tmp_table =
       table->RenameColumns({"original_id", "firstName", "lastName", "id"})
           .ValueOrDie();
   GAR_NAMESPACE::PropertyGroup pg2 =
       vertex_info.GetPropertyGroup("firstName").value();
-  REQUIRE(writer.WriteTable(tmp_table, pg2, 0).IsInvalidOperation());
+  REQUIRE(writer.WriteTable(tmp_table, pg2, 0).IsInvalid());
   // Invalid data type
   GAR_NAMESPACE::PropertyGroup pg3 = vertex_info.GetPropertyGroup("id").value();
   REQUIRE(writer.WriteTable(tmp_table, pg3, 0).IsTypeError());
@@ -178,17 +185,30 @@ TEST_CASE("test_edge_chunk_writer") {
   std::cout << table->schema()->ToString() << std::endl;
   std::cout << table->num_rows() << ' ' << table->num_columns() << std::endl;
 
-  // Write edges of vertex chunk 0 to files
+  // Construct the writer
   std::string edge_meta_file =
       root + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
   auto edge_meta = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = GAR_NAMESPACE::EdgeInfo::Load(edge_meta).value();
   auto adj_list_type = GAR_NAMESPACE::AdjListType::ordered_by_source;
   GAR_NAMESPACE::EdgeChunkWriter writer(edge_info, "/tmp/", adj_list_type);
-  REQUIRE(writer.SortAndWriteAdjListTable(table, 0, 0).ok());
 
+  // Get & set validate level
+  REQUIRE(writer.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::no_validate);
+  writer.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  REQUIRE(writer.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::strong_validate);
+
+  // Valid cases
+  // Write adj list of vertex chunk 0 to files
+  REQUIRE(writer.SortAndWriteAdjListTable(table, 0, 0).ok());
   // Write number of edges for vertex chunk 0
   REQUIRE(writer.WriteEdgesNum(0, table->num_rows()).ok());
+  // Write number of vertices
+  REQUIRE(writer.WriteVerticesNum(903).ok());
+
+  // Check the number of edges
   std::shared_ptr<arrow::io::InputStream> input2 =
       fs->OpenInputStream(
             "/tmp/edge/person_knows_person/ordered_by_source/edge_count0")
@@ -198,8 +218,7 @@ TEST_CASE("test_edge_chunk_writer") {
       (GAR_NAMESPACE::IdType*) edge_num->data();
   REQUIRE((*edge_num_ptr) == table->num_rows());
 
-  // Write number of vertices
-  REQUIRE(writer.WriteVerticesNum(903).ok());
+  // Check the number of vertices
   std::shared_ptr<arrow::io::InputStream> input3 =
       fs->OpenInputStream(
             "/tmp/edge/person_knows_person/ordered_by_source/vertex_count")
@@ -209,40 +228,36 @@ TEST_CASE("test_edge_chunk_writer") {
       (GAR_NAMESPACE::IdType*) vertex_num->data();
   REQUIRE((*vertex_num_ptr) == 903);
 
-  // Set validate level
-  REQUIRE(writer.GetValidateLevel() ==
-          GAR_NAMESPACE::ValidateLevel::no_validate);
-  writer.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
-  REQUIRE(writer.GetValidateLevel() ==
-          GAR_NAMESPACE::ValidateLevel::strong_validate);
-  // Validate operation
-  REQUIRE(writer.SortAndWriteAdjListTable(table, 0, 0).ok());
-
+  // Invalid cases
+  // Invalid count or index
+  REQUIRE(writer.WriteEdgesNum(-1, 0).IsIndexError());
+  REQUIRE(writer.WriteEdgesNum(0, -1).IsIndexError());
+  REQUIRE(writer.WriteVerticesNum(-1).IsIndexError());
   // Out of range
-  REQUIRE(writer.WriteOffsetChunk(table, 0).IsOutOfRange());
+  REQUIRE(writer.WriteOffsetChunk(table, 0).IsInvalid());
   // Invalid chunk id
-  REQUIRE(writer.WriteAdjListChunk(table, -1, 0).IsInvalidOperation());
-  REQUIRE(writer.WriteAdjListChunk(table, 0, -1).IsInvalidOperation());
+  REQUIRE(writer.WriteAdjListChunk(table, -1, 0).IsIndexError());
+  REQUIRE(writer.WriteAdjListChunk(table, 0, -1).IsIndexError());
   // Invalid adj list type
   auto invalid_adj_list_type = GAR_NAMESPACE::AdjListType::unordered_by_dest;
   GAR_NAMESPACE::EdgeChunkWriter writer2(edge_info, "/tmp/",
                                          invalid_adj_list_type);
   writer2.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
-  REQUIRE(writer2.WriteAdjListChunk(table, 0, 0).IsInvalidOperation());
+  REQUIRE(writer2.WriteAdjListChunk(table, 0, 0).IsKeyError());
   // Invalid property group
   GAR_NAMESPACE::Property p1;
   p1.name = "invalid_property";
   p1.type = GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32);
   GAR_NAMESPACE::PropertyGroup pg1({p1}, GAR_NAMESPACE::FileType::CSV);
-  REQUIRE(writer.WritePropertyChunk(table, pg1, 0, 0).IsInvalidOperation());
+  REQUIRE(writer.WritePropertyChunk(table, pg1, 0, 0).IsKeyError());
   // Property not found in table
   GAR_NAMESPACE::PropertyGroup pg2 =
       edge_info.GetPropertyGroup("creationDate", adj_list_type).value();
-  REQUIRE(writer.WritePropertyChunk(table, pg2, 0, 0).IsInvalidOperation());
+  REQUIRE(writer.WritePropertyChunk(table, pg2, 0, 0).IsInvalid());
   // Required columns not found
   std::shared_ptr<arrow::Table> tmp_table =
       table->RenameColumns({"creationDate", "tmp_property"}).ValueOrDie();
-  REQUIRE(writer.WriteAdjListChunk(tmp_table, 0, 0).IsInvalidOperation());
+  REQUIRE(writer.WriteAdjListChunk(tmp_table, 0, 0).IsInvalid());
   // Invalid data type
   REQUIRE(writer.WritePropertyChunk(tmp_table, pg2, 0, 0).IsTypeError());
 }

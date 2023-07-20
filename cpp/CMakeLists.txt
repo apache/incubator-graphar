@@ -197,10 +197,12 @@ macro(build_gar)
     if(APPLE)
         target_link_libraries(gar PRIVATE -Wl,-force_load gar_arrow_static
             "${GAR_PARQUET_STATIC_LIB}"
+            "${GAR_ACERO_STATIC_LIB}"
             "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
     else()
         target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
             "${GAR_PARQUET_STATIC_LIB}"
+            "${GAR_ARROW_ACERO_STATIC_LIB}"
             "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
     endif()
 
@@ -346,7 +348,8 @@ endif()
 # Format code & cpplint
 # ------------------------------------------------------------------------------
 file(GLOB_RECURSE FILES_NEED_FORMAT "include/gar/*.h" "src/*.cc"
-                                    "test/*.h" "test/*.cc")
+                                    "test/*.h" "test/*.cc"
+                                    "examples/*.h" "examples/*.cc")
 file(GLOB_RECURSE FILES_NEED_LINT "include/gar/*.h" "src/*.cc"
                                   "test/*.h" "test/*.cc"
                                   "grin/src/predefine.h" "grin/src/*.cc"

@@ -50,7 +50,7 @@ TEST_CASE("test_graph_info") {
   REQUIRE(maybe_vertex_info.value().GetPrefix() == "test_vertex_prefix");
   REQUIRE(graph_info.GetVertexInfo("test_not_exist").status().IsKeyError());
   // vertex info already exists
-  REQUIRE(graph_info.AddVertex(vertex_info).IsInvalidOperation());
+  REQUIRE(graph_info.AddVertex(vertex_info).IsInvalid());
 
   // test add edge and get edge info
   REQUIRE(graph_info.GetEdgeInfos().size() == 0);
@@ -70,7 +70,7 @@ TEST_CASE("test_graph_info") {
   REQUIRE(maybe_edge_info.value().GetDstLabel() == dst_label);
   REQUIRE(graph_info.GetEdgeInfo("xxx", "xxx", "xxx").status().IsKeyError());
   // edge info already exists
-  REQUIRE(graph_info.AddEdge(edge_info).IsInvalidOperation());
+  REQUIRE(graph_info.AddEdge(edge_info).IsInvalid());
 
   REQUIRE(graph_info.GetVersion() == version);
 
@@ -104,10 +104,10 @@ TEST_CASE("test_vertex_info") {
   REQUIRE(v_info.GetPropertyGroups().size() == 0);
   REQUIRE(v_info.AddPropertyGroup(pg).ok());
   // same property group can not be added twice
-  REQUIRE(v_info.AddPropertyGroup(pg).IsInvalidOperation());
+  REQUIRE(v_info.AddPropertyGroup(pg).IsInvalid());
   GAR_NAMESPACE::PropertyGroup pg2({p}, GAR_NAMESPACE::FileType::PARQUET);
   // same property can not be put in different property group
-  REQUIRE(v_info.AddPropertyGroup(pg2).IsInvalidOperation());
+  REQUIRE(v_info.AddPropertyGroup(pg2).IsInvalid());
   REQUIRE(v_info.GetPropertyGroups().size() == 1);
 
   GAR_NAMESPACE::Property p2;
@@ -187,7 +187,7 @@ TEST_CASE("test_edge_info") {
   REQUIRE(edge_info.AddAdjList(adj_list_type, file_type).ok());
   REQUIRE(edge_info.ContainAdjList(adj_list_type));
   // same adj list type can not be added twice
-  REQUIRE(edge_info.AddAdjList(adj_list_type, file_type).IsInvalidOperation());
+  REQUIRE(edge_info.AddAdjList(adj_list_type, file_type).IsKeyError());
   auto file_type_result = edge_info.GetFileType(adj_list_type);
   REQUIRE(!file_type_result.has_error());
   REQUIRE(file_type_result.value() == file_type);

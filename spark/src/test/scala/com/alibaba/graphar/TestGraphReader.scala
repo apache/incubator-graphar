@@ -38,13 +38,13 @@ class TestGraphReaderSuite extends AnyFunSuite {
 
     assert(vertex_dataframes.size == 1)
     assert(vertex_dataframes contains "person")
-    val person_df = vertex_dataframes("person")
+    val person_df = vertex_dataframes("person").drop(GeneralParams.vertexIndexCol)
     assert(person_df.columns.size == 4)
     assert(person_df.count() == 903)
 
     assert(edge_dataframes.size == 1)
-    assert(edge_dataframes contains "person_knows_person")
-    val adj_list_type_dataframes = edge_dataframes("person_knows_person")
+    assert(edge_dataframes contains ("person", "knows", "person"))
+    val adj_list_type_dataframes = edge_dataframes(("person", "knows", "person"))
     assert(adj_list_type_dataframes.size == 3)
   }
 
@@ -54,21 +54,22 @@ class TestGraphReaderSuite extends AnyFunSuite {
     val graph_info = GraphInfo.loadGraphInfo(path, spark)
 
     // conduct reading
-    val vertex_edge_df_pair = GraphReader.read(graph_info, spark)
+    val vertex_edge_df_pair = GraphReader.readWithGraphInfo(graph_info, spark)
     val vertex_dataframes = vertex_edge_df_pair._1
     val edge_dataframes = vertex_edge_df_pair._2
 
     assert(vertex_dataframes.size == 1)
     assert(vertex_dataframes contains "person")
-    val person_df = vertex_dataframes("person")
+    val person_df = vertex_dataframes("person").drop(GeneralParams.vertexIndexCol)
     assert(person_df.columns.size == 4)
     assert(person_df.count() == 903)
 
     val edgeInfos = graph_info.getEdgeInfos()
     assert(edge_dataframes.size == edgeInfos.size)
     edgeInfos.foreach { case (key, edgeInfo) => {
-      assert(edge_dataframes contains key)
-      val adj_list_type_dataframes = edge_dataframes(key)
+      val edge_tag = (edgeInfo.getSrc_label(), edgeInfo.getEdge_label(), edgeInfo.getDst_label())
+      assert(edge_dataframes contains edge_tag)
+      val adj_list_type_dataframes = edge_dataframes(edge_tag)
       val adj_lists = edgeInfo.getAdj_lists
       assert(adj_list_type_dataframes.size == adj_lists.size)
       val adj_list_it = adj_lists.iterator

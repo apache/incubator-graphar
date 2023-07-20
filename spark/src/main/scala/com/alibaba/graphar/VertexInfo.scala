@@ -89,7 +89,7 @@ class VertexInfo() {
   /** Get the data type of property.
    *
    * @param property_name name of the property.
-   * @return the data type in gar of the proeprty. If the vertex info does not contains the property,
+   * @return the data type in gar of the property. If the vertex info does not contains the property,
    *         raise IllegalArgumentException error.
    */
   def getPropertyType(property_name: String): GarType.Value = {
@@ -222,6 +222,25 @@ class VertexInfo() {
       str = property_group.getPrefix
     }
     return prefix + str
+  }
+
+  /** Dump to Yaml string. */
+  def dump(): String = {
+    val data = new java.util.HashMap[String, Object]()
+    data.put("label", label)
+    data.put("chunk_size", new java.lang.Long(chunk_size))
+    if (prefix != "") data.put("prefix", prefix)
+    data.put("version", version)
+    val property_group_num = property_groups.size()
+    if (property_group_num > 0) {
+      val property_group_maps = new java.util.ArrayList[Object]()
+      for (i <- 0 until property_group_num) {
+        property_group_maps.add(property_groups.get(i).toMap())
+      }
+      data.put("property_groups", property_group_maps)
+    }
+    val yaml = new Yaml()
+    return yaml.dump(data)
   }
 }
 

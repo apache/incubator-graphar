@@ -67,13 +67,15 @@ class Vertex {
   template <typename T>
   inline Result<T> property(const std::string& property) noexcept {
     if (properties_.find(property) == properties_.end()) {
-      return Status::KeyError("The property is not exist.");
+      return Status::KeyError("Property with name ", property,
+                              " does not exist in the vertex.");
     }
     try {
       T ret = std::any_cast<T>(properties_[property]);
       return ret;
     } catch (const std::bad_any_cast& e) {
-      return Status::TypeError("The property type is not match.");
+      return Status::TypeError("Any cast failed, the property type of ",
+                               property, " is not matched ", e.what());
     }
   }
 
@@ -120,13 +122,15 @@ class Edge {
   template <typename T>
   inline Result<T> property(const std::string& property) noexcept {
     if (properties_.find(property) == properties_.end()) {
-      return Status::KeyError("The property is not exist.");
+      return Status::KeyError("Property with name ", property,
+                              " does not exist in the edge.");
     }
     try {
       T ret = std::any_cast<T>(properties_[property]);
       return ret;
     } catch (const std::bad_any_cast& e) {
-      return Status::TypeError("The property type is not match.");
+      return Status::TypeError("Any cast failed, the property type of ",
+                               property, " is not matched ", e.what());
     }
   }
 
@@ -188,7 +192,8 @@ class VertexIter {
       GAR_ASSIGN_OR_RAISE(auto data, util::GetArrowArrayData(array));
       return util::ValueGetter<T>::Value(data, 0);
     }
-    return Status::KeyError("The property is not exist.");
+    return Status::KeyError("Property with name ", property,
+                            " does not exist in the vertex.");
   }
 
   /** The prefix increment operator. */
@@ -386,7 +391,8 @@ class EdgeIter {
       GAR_ASSIGN_OR_RAISE(auto data, util::GetArrowArrayData(array));
       return util::ValueGetter<T>::Value(data, 0);
     }
-    return Status::KeyError("The property is not exist.");
+    return Status::KeyError("Property with name ", property,
+                            " does not exist in the edge.");
   }
 
   /** The prefix increment operator. */
@@ -403,7 +409,8 @@ class EdgeIter {
       if (row_offset >= num_row_of_chunk_) {
         cur_offset_ = (cur_offset_ / chunk_size_ + 1) * chunk_size_;
         adj_list_reader_.seek(cur_offset_);
-        st = Status::KeyError();
+        st =
+            Status::KeyError("The row offset is overflow, move to next chunk.");
       }
     }
     if (st.ok() && num_row_of_chunk_ == chunk_size_ &&
@@ -416,7 +423,7 @@ class EdgeIter {
       st = adj_list_reader_.next_chunk();
       ++global_chunk_index_;
       ++vertex_chunk_index_;
-      if (!st.IsOutOfRange()) {
+      if (!st.IsIndexError()) {
         GAR_ASSIGN_OR_RAISE_ERROR(num_row_of_chunk_,
                                   adj_list_reader_.GetRowNumOfChunk());
         for (auto& reader : property_readers_) {
@@ -1220,7 +1227,9 @@ static inline Result<Edges> ConstructEdgesCollection(
   GAR_ASSIGN_OR_RAISE(edge_info,
                       graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
   if (!edge_info.ContainAdjList(adj_list_type)) {
-    return Status::Invalid("Invalid adj list type");
+    return Status::Invalid("The edge ", edge_label, " of adj list type ",
+                           AdjListTypeToString(adj_list_type),
+                           " doesn't exist.");
   }
   switch (adj_list_type) {
   case AdjListType::ordered_by_source:
@@ -1240,9 +1249,9 @@ static inline Result<Edges> ConstructEdgesCollection(
         edge_info, graph_info.GetPrefix(), vertex_chunk_begin,
         vertex_chunk_end);
   default:
-    return Status::Invalid("Invalid adj list type");
+    return Status::Invalid("Unknown adj list type.");
   }
-  return Status::Invalid("Invalid adj list type");
+  return Status::OK();
 }
 }  // namespace GAR_NAMESPACE_INTERNAL
 

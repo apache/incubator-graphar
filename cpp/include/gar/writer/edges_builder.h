@@ -147,13 +147,25 @@ class EdgesBuilder {
    * @param prefix The absolute prefix.
    * @param adj_list_type The adj list type of the edges.
    * @param num_vertices The total number of vertices for source or destination.
+   * @param validate_level The global validate level for the writer, with no
+   * validate by default. It could be ValidateLevel::no_validate,
+   * ValidateLevel::weak_validate or ValidateLevel::strong_validate, but could
+   * not be ValidateLevel::default_validate.
    */
-  explicit EdgesBuilder(const EdgeInfo edge_info, const std::string& prefix,
-                        AdjListType adj_list_type, IdType num_vertices)
+  explicit EdgesBuilder(
+      const EdgeInfo edge_info, const std::string& prefix,
+      AdjListType adj_list_type, IdType num_vertices,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate)
       : edge_info_(edge_info),
         prefix_(prefix),
         adj_list_type_(adj_list_type),
-        num_vertices_(num_vertices) {
+        num_vertices_(num_vertices),
+        validate_level_(validate_level) {
+    if (validate_level_ == ValidateLevel::default_validate) {
+      throw std::runtime_error(
+          "default_validate is not allowed to be set as the global validate "
+          "level for EdgesBuilder");
+    }
     edges_.clear();
     num_edges_ = 0;
     is_saved_ = false;
@@ -176,58 +188,58 @@ class EdgesBuilder {
   }
 
   /**
-   * @brief Check if adding an edge is allowed.
+   * @brief Set the validate level.
    *
-   * @param e The edge to add.
-   * @return Status: ok or status::InvalidOperation error.
+   * @param validate_level The validate level to set.
    */
-  Status Validate(const Edge& e) {
-    // can not add new edges
-    if (is_saved_) {
-      return Status::InvalidOperation("can not add new edges after dumping");
+  inline void SetValidateLevel(const ValidateLevel& validate_level) {
+    if (validate_level == ValidateLevel::default_validate) {
+      return;
     }
-    // invalid adj list type
-    if (!edge_info_.ContainAdjList(adj_list_type_)) {
-      return Status::InvalidOperation("invalid adj list type");
-    }
-    // contain invalid properties
-    for (auto& property : e.GetProperties()) {
-      if (!edge_info_.ContainProperty(property.first))
-        return Status::InvalidOperation("invalid property");
-    }
-    return Status::OK();
+    validate_level_ = validate_level;
   }
 
   /**
-   * @brief Get the vertex chunk index of a given edge.
+   * @brief Get the validate level.
    *
-   * @param e The edge to add.
-   * @return The vertex chunk index of the edge.
+   * @return The validate level of this writer.
    */
-  IdType getVertexChunkIndex(const Edge& e) {
-    switch (adj_list_type_) {
-    case AdjListType::unordered_by_source:
-      return e.GetSource() / vertex_chunk_size_;
-    case AdjListType::ordered_by_source:
-      return e.GetSource() / vertex_chunk_size_;
-    case AdjListType::unordered_by_dest:
-      return e.GetDestination() / vertex_chunk_size_;
-    case AdjListType::ordered_by_dest:
-      return e.GetDestination() / vertex_chunk_size_;
-    default:
-      return e.GetSource() / vertex_chunk_size_;
-    }
+  inline ValidateLevel GetValidateLevel() const { return validate_level_; }
+
+  /**
+   * @brief Clear the edges in this EdgessBuilder.
+   */
+  inline void Clear() {
+    edges_.clear();
+    num_edges_ = 0;
+    is_saved_ = false;
   }
 
   /**
    * @brief Add an edge to the collection.
    *
+   * The validate_level for this operation could be:
+   *
+   * ValidateLevel::default_validate: to use the validate_level of the builder,
+   * which set through the constructor or the SetValidateLevel method;
+   *
+   * ValidateLevel::no_validate: without validation;
+   *
+   * ValidateLevel::weak_validate: to validate if the adj_list type is valid,
+   * and the data in builder is not saved;
+   *
+   * ValidateLevel::strong_validate: besides weak_validate, also validate the
+   * schema of the edge is consistent with the info defined.
+   *
    * @param e The edge to add.
-   * @return Status: ok or Status::InvalidOperation error.
+   * @param validate_level The validate level for this operation,
+   * which is the builder's validate level by default.
+   * @return Status: ok or Status::Invalid error.
    */
-  Status AddEdge(const Edge& e) {
+  Status AddEdge(const Edge& e, const ValidateLevel& validate_level =
+                                    ValidateLevel::default_validate) {
     // validate
-    GAR_RETURN_NOT_OK(Validate(e));
+    GAR_RETURN_NOT_OK(validate(e, validate_level));
     // add an edge
     IdType vertex_chunk_index = getVertexChunkIndex(e);
     edges_[vertex_chunk_index].push_back(e);
@@ -249,7 +261,8 @@ class EdgesBuilder {
    */
   Status Dump() {
     // construct the writer
-    EdgeChunkWriter writer(edge_info_, prefix_, adj_list_type_);
+    EdgeChunkWriter writer(edge_info_, prefix_, adj_list_type_,
+                           validate_level_);
     // construct empty edge collections for vertex chunks without edges
     IdType num_vertex_chunks =
         (num_vertices_ + vertex_chunk_size_ - 1) / vertex_chunk_size_;
@@ -304,6 +317,36 @@ class EdgesBuilder {
   }
 
  private:
+  /**
+   * @brief Get the vertex chunk index of a given edge.
+   *
+   * @param e The edge to add.
+   * @return The vertex chunk index of the edge.
+   */
+  IdType getVertexChunkIndex(const Edge& e) {
+    switch (adj_list_type_) {
+    case AdjListType::unordered_by_source:
+      return e.GetSource() / vertex_chunk_size_;
+    case AdjListType::ordered_by_source:
+      return e.GetSource() / vertex_chunk_size_;
+    case AdjListType::unordered_by_dest:
+      return e.GetDestination() / vertex_chunk_size_;
+    case AdjListType::ordered_by_dest:
+      return e.GetDestination() / vertex_chunk_size_;
+    default:
+      return e.GetSource() / vertex_chunk_size_;
+    }
+  }
+
+  /**
+   * @brief Check if adding an edge is allowed.
+   *
+   * @param e The edge to add.
+   * @param validate_level The validate level for this operation.
+   * @return Status: ok or status::InvalidOperation error.
+   */
+  Status validate(const Edge& e, ValidateLevel validate_level) const;
+
   /**
    * @brief Construct an array for a given property.
    *
@@ -372,6 +415,7 @@ class EdgesBuilder {
   IdType num_vertices_;
   IdType num_edges_;
   bool is_saved_;
+  ValidateLevel validate_level_;
 };
 
 }  // namespace builder

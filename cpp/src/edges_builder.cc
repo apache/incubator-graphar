@@ -20,6 +20,91 @@ limitations under the License.
 namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {
 
+Status EdgesBuilder::validate(const Edge& e,
+                              ValidateLevel validate_level) const {
+  // use the builder's validate level
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
+    return Status::OK();
+
+  // weak validate
+  // can not add new edges after dumping
+  if (is_saved_) {
+    return Status::Invalid(
+        "The edge builder has been saved, can not add "
+        "new edges any more");
+  }
+  // adj list type not exits in edge info
+  if (!edge_info_.ContainAdjList(adj_list_type_)) {
+    return Status::KeyError(
+        "Adj list type ", AdjListTypeToString(adj_list_type_),
+        " does not exist in the ", edge_info_.GetEdgeLabel(), " edge info.");
+  }
+
+  // strong validate
+  if (validate_level == ValidateLevel::strong_validate) {
+    for (auto& property : e.GetProperties()) {
+      // check if the property is contained
+      if (!edge_info_.ContainProperty(property.first)) {
+        return Status::KeyError("Property with name ", property.first,
+                                " is not contained in the ",
+                                edge_info_.GetEdgeLabel(), " edge info.");
+      }
+      // check if the property type is correct
+      auto type = edge_info_.GetPropertyType(property.first).value();
+      bool invalid_type = false;
+      switch (type.id()) {
+      case Type::BOOL:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::BOOL>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      case Type::INT32:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::INT32>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      case Type::INT64:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::INT64>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      case Type::FLOAT:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::FLOAT>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      case Type::DOUBLE:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::DOUBLE>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      case Type::STRING:
+        if (property.second.type() !=
+            typeid(typename ConvertToArrowType<Type::STRING>::CType)) {
+          invalid_type = true;
+        }
+        break;
+      default:
+        return Status::TypeError("Unsupported property type.");
+      }
+      if (invalid_type) {
+        return Status::TypeError(
+            "Invalid data type for property ", property.first + ", defined as ",
+            type.ToTypeName(), ", but got ", property.second.type().name());
+      }
+    }
+  }
+  return Status::OK();
+}
+
 Status EdgesBuilder::appendToArray(
     const DataType& type, const std::string& property_name,
     std::shared_ptr<arrow::Array>& array,  // NOLINT
@@ -38,9 +123,9 @@ Status EdgesBuilder::appendToArray(
   case Type::STRING:
     return tryToAppend<Type::STRING>(property_name, array, edges);
   default:
-    return Status::TypeError();
+    return Status::TypeError("Unsupported property type.");
   }
-  return Status::TypeError();
+  return Status::OK();
 }
 
 template <Type type>
@@ -53,14 +138,10 @@ Status EdgesBuilder::tryToAppend(
   typename ConvertToArrowType<type>::BuilderType builder(pool);
   for (const auto& e : edges) {
     if (e.Empty() || (!e.ContainProperty(property_name))) {
-      auto status = builder.AppendNull();
-      if (!status.ok())
-        return Status::ArrowError(status.ToString());
+      RETURN_NOT_ARROW_OK(builder.AppendNull());
     } else {
-      auto status =
-          builder.Append(std::any_cast<CType>(e.GetProperty(property_name)));
-      if (!status.ok())
-        return Status::ArrowError(status.ToString());
+      RETURN_NOT_ARROW_OK(
+          builder.Append(std::any_cast<CType>(e.GetProperty(property_name))));
     }
   }
   array = builder.Finish().ValueOrDie();
@@ -74,10 +155,8 @@ Status EdgesBuilder::tryToAppend(
   arrow::MemoryPool* pool = arrow::default_memory_pool();
   typename arrow::TypeTraits<arrow::Int64Type>::BuilderType builder(pool);
   for (const auto& e : edges) {
-    auto status = builder.Append(std::any_cast<int64_t>(
-        src_or_dest == 1 ? e.GetSource() : e.GetDestination()));
-    if (!status.ok())
-      return Status::ArrowError(status.ToString());
+    RETURN_NOT_ARROW_OK(builder.Append(std::any_cast<int64_t>(
+        src_or_dest == 1 ? e.GetSource() : e.GetDestination())));
   }
   array = builder.Finish().ValueOrDie();
   return Status::OK();
@@ -138,10 +217,11 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::getOffsetTable(
       int64_t x = (adj_list_type_ == AdjListType::ordered_by_source
                        ? edges[index].GetSource()
                        : edges[index].GetDestination());
-      if (x <= i)
+      if (x <= i) {
         index++;
-      else
+      } else {
         break;
+      }
     }
     RETURN_NOT_ARROW_OK(builder.Append(index));
   }

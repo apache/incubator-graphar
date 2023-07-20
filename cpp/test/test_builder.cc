@@ -38,9 +38,11 @@ limitations under the License.
 #include <catch2/catch.hpp>
 
 TEST_CASE("test_vertices_builder") {
+  std::cout << "Test vertex builder" << std::endl;
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
 
+  // construct vertex builder
   std::string vertex_meta_file =
       root + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
@@ -49,6 +51,34 @@ TEST_CASE("test_vertices_builder") {
   GAR_NAMESPACE::builder::VerticesBuilder builder(vertex_info, "/tmp/",
                                                   start_index);
 
+  // get & set validate level
+  REQUIRE(builder.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::no_validate);
+  builder.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  REQUIRE(builder.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::strong_validate);
+
+  // check different validate levels
+  GAR_NAMESPACE::builder::Vertex v;
+  v.AddProperty("id", "id_of_string");
+  REQUIRE(
+      builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::no_validate).ok());
+  REQUIRE(builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::weak_validate)
+              .ok());
+  auto st =
+      builder.AddVertex(v, -2, GAR_NAMESPACE::ValidateLevel::weak_validate);
+  REQUIRE(builder.AddVertex(v, -2, GAR_NAMESPACE::ValidateLevel::weak_validate)
+              .IsIndexError());
+  REQUIRE(builder.AddVertex(v, 0, GAR_NAMESPACE::ValidateLevel::strong_validate)
+              .IsTypeError());
+  v.AddProperty("invalid_name", "invalid_value");
+  REQUIRE(builder.AddVertex(v, 0).IsKeyError());
+
+  // clear vertices
+  builder.Clear();
+  REQUIRE(builder.GetNum() == 0);
+
+  // add vertices
   std::ifstream fp(root + "/ldbc_sample/person_0_0.csv");
   std::string line;
   getline(fp, line);
@@ -60,8 +90,10 @@ TEST_CASE("test_vertices_builder") {
     getline(readstr, name, '|');
     names.push_back(name);
   }
-  int index = 0;
+
+  int lines = 0;
   while (getline(fp, line)) {
+    lines++;
     std::string val;
     std::istringstream readstr(line);
     GAR_NAMESPACE::builder::Vertex v;
@@ -76,11 +108,19 @@ TEST_CASE("test_vertices_builder") {
         v.AddProperty(names[i], val);
       }
     }
-    index++;
     REQUIRE(builder.AddVertex(v).ok());
   }
+
+  // check the number of vertices in builder
+  REQUIRE(builder.GetNum() == lines);
+
+  // dump to files
   REQUIRE(builder.Dump().ok());
 
+  // can not add new vertices after dumping
+  REQUIRE(builder.AddVertex(v).IsInvalid());
+
+  // check the number of vertices dumped
   auto fs = arrow::fs::FileSystemFromUriOrPath(root).ValueOrDie();
   auto input =
       fs->OpenInputStream("/tmp/vertex/person/vertex_count").ValueOrDie();
@@ -90,24 +130,52 @@ TEST_CASE("test_vertices_builder") {
 }
 
 TEST_CASE("test_edges_builder") {
+  std::cout << "Test edge builder" << std::endl;
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
 
+  // construct edge builder
   std::string edge_meta_file =
       root + "/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
   auto edge_meta = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = GAR_NAMESPACE::EdgeInfo::Load(edge_meta).value();
+  auto vertices_num = 903;
   GAR_NAMESPACE::builder::EdgesBuilder builder(
-      edge_info, "/tmp/", GraphArchive::AdjListType::ordered_by_dest, 903);
+      edge_info, "/tmp/", GraphArchive::AdjListType::ordered_by_dest,
+      vertices_num);
 
+  // get & set validate level
+  REQUIRE(builder.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::no_validate);
+  builder.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  REQUIRE(builder.GetValidateLevel() ==
+          GAR_NAMESPACE::ValidateLevel::strong_validate);
+
+  // check different validate levels
+  GAR_NAMESPACE::builder::Edge e(0, 1);
+  e.AddProperty("creationDate", 2020);
+  REQUIRE(builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::no_validate).ok());
+  REQUIRE(builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::weak_validate).ok());
+  REQUIRE(builder.AddEdge(e, GAR_NAMESPACE::ValidateLevel::strong_validate)
+              .IsTypeError());
+  e.AddProperty("invalid_name", "invalid_value");
+  REQUIRE(builder.AddEdge(e).IsKeyError());
+
+  // clear edges
+  builder.Clear();
+  REQUIRE(builder.GetNum() == 0);
+
+  // add edges
   std::ifstream fp(root + "/ldbc_sample/person_knows_person_0_0.csv");
   std::string line;
   getline(fp, line);
   std::vector<std::string> names;
   std::istringstream readstr(line);
   std::map<std::string, int64_t> mapping;
-  int64_t cnt = 0;
+  int64_t cnt = 0, lines = 0;
+
   while (getline(fp, line)) {
+    lines++;
     std::string val;
     std::istringstream readstr(line);
     int64_t s, d;
@@ -128,6 +196,23 @@ TEST_CASE("test_edges_builder") {
       }
     }
   }
-  std::cout << "Test edge builder" << std::endl;
+
+  // check the number of edges in builder
+  REQUIRE(builder.GetNum() == lines);
+
+  // dump to files
   REQUIRE(builder.Dump().ok());
+
+  // can not add new edges after dumping
+  REQUIRE(builder.AddEdge(e).IsInvalid());
+
+  // check the number of vertices dumped
+  auto fs = arrow::fs::FileSystemFromUriOrPath(root).ValueOrDie();
+  auto input =
+      fs->OpenInputStream(
+            "/tmp/edge/person_knows_person/ordered_by_dest/vertex_count")
+          .ValueOrDie();
+  auto num = input->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
+  GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
+  REQUIRE((*ptr) == vertices_num);
 }

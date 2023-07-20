@@ -33,7 +33,6 @@ function(build_arrow)
         message(SEND_ERROR "Error: unrecognized arguments: ${ARG_UNPARSED_ARGUMENTS}")
     endif ()
 
-    find_package(Threads)
     # If Arrow needs to be built, the default location will be within the build tree.
     set(GAR_ARROW_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/arrow_ep-prefix")
 
@@ -71,6 +70,7 @@ function(build_arrow)
                              "-DBoost_SOURCE=BUNDLED"
                              "-DARROW_ORC=ON"
                              "-DARROW_COMPUTE=ON"
+                             "-DARROW_ACERO=ON"
                              "-DARROW_DATASET=ON"
                              "-DARROW_JEMALLOC=OFF"
                              "-DARROW_WITH_SNAPPY=OFF"
@@ -85,9 +85,18 @@ function(build_arrow)
     set(GAR_ARROW_INCLUDE_DIR "${GAR_ARROW_PREFIX}/include" CACHE INTERNAL "arrow include directory")
     set(GAR_ARROW_BUILD_BYPRODUCTS "${GAR_ARROW_STATIC_LIB}" "${GAR_PARQUET_STATIC_LIB}")
 
+    find_package(Threads)
+    find_package(Arrow QUIET)
+    set(ARROW_VERSION_TO_BUILD "10.0.1" CACHE INTERNAL "arrow version")
+    if (Arrow_FOUND) # arrow is installed, build the same version as the installed one
+        message(STATUS "Found Arrow installed, align to version: ${Arrow_VERSION}")
+        set(ARROW_VERSION_TO_BUILD "${Arrow_VERSION}" CACHE INTERNAL "arrow version")
+    endif ()
+    set(GAR_ARROW_SOURCE_FILE "https://www.apache.org/dyn/closer.lua?action=download&filename=arrow/arrow-${ARROW_VERSION_TO_BUILD}/apache-arrow-${ARROW_VERSION_TO_BUILD}.tar.gz")
+
     include(ExternalProject)
     externalproject_add(arrow_ep
-            URL https://www.apache.org/dyn/closer.lua?action=download&filename=arrow/arrow-10.0.1/apache-arrow-10.0.1.tar.gz
+            URL "${GAR_ARROW_SOURCE_FILE}"
             SOURCE_SUBDIR cpp
             BINARY_DIR "${GAR_ARROW_BINARY_DIR}"
             CMAKE_ARGS "${GAR_ARROW_CMAKE_ARGS}"
@@ -105,6 +114,16 @@ function(build_arrow)
     set_target_properties(${GAR_PARQUET_LIBRARY_TARGET}
             PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${GAR_ARROW_INCLUDE_DIR}
             IMPORTED_LOCATION ${GAR_PARQUET_STATIC_LIB})
+    if (ARROW_VERSION_TO_BUILD GREATER_EQUAL "12.0.0")
+        set(GAR_ARROW_ACERO_STATIC_LIB_FILENAME
+	    "${CMAKE_STATIC_LIBRARY_PREFIX}arrow_acero${CMAKE_STATIC_LIBRARY_SUFFIX}")
+        set(GAR_ARROW_ACERO_STATIC_LIB "${GAR_ARROW_STATIC_LIBRARY_DIR}/${GAR_ARROW_ACERO_STATIC_LIB_FILENAME}" CACHE INTERNAL "acero lib")
+        set(GAR_ARROW_ACERO_LIBRARY_TARGET gar_acero_static)
+        add_library(${GAR_ARROW_ACERO_LIBRARY_TARGET} STATIC IMPORTED)
+        set_target_properties(${GAR_ARROW_ACERO_LIBRARY_TARGET}
+            PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${GAR_ARROW_INCLUDE_DIR}
+            IMPORTED_LOCATION ${GAR_ARROW_ACERO_STATIC_LIB})
+    endif()
 
     add_dependencies(${GAR_ARROW_LIBRARY_TARGET} arrow_ep)
 endfunction()

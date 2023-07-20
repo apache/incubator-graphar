@@ -106,7 +106,7 @@ Result<InfoVersion> InfoVersion::Parse(
     version.version_ = parserVersionImpl(version_str);
     version.user_define_types_ = parseUserDefineTypesImpl(version_str);
   } catch (const std::exception& e) {
-    return Status::Invalid("Invalid version string: " + version_str);
+    return Status::Invalid("Invalid version string: ", version_str);
   }
   return version;
 }

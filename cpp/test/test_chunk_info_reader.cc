@@ -64,10 +64,10 @@ TEST_CASE("test_vertex_property_chunk_info_reader") {
   chunk_path = maybe_chunk_path.value();
   REQUIRE(chunk_path == root + "/ldbc_sample/parquet/vertex/person/id/chunk9");
   // now is end of the chunks
-  REQUIRE(reader.next_chunk().IsOutOfRange());
+  REQUIRE(reader.next_chunk().IsIndexError());
 
   // test seek the id not in the chunks
-  REQUIRE(reader.seek(100000).IsKeyError());
+  REQUIRE(reader.seek(100000).IsIndexError());
 
   // test Get vertex property chunk num through vertex property chunk info
   // reader
@@ -131,11 +131,11 @@ TEST_CASE("test_adj_list_chunk_info_reader") {
   REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/adj_list/part9/chunk0");
-  REQUIRE(reader.next_chunk().IsOutOfRange());
+  REQUIRE(reader.next_chunk().IsIndexError());
 
   // seek an invalid src id
-  REQUIRE(reader.seek_src(1000).IsKeyError());
-  REQUIRE(reader.seek_dst(100).IsInvalidOperation());
+  REQUIRE(reader.seek_src(1000).IsIndexError());
+  REQUIRE(reader.seek_dst(100).IsInvalid());
 
   // test reader to read ordered by dest
   auto maybe_dst_reader = GAR_NAMESPACE::ConstructAdjListChunkInfoReader(
@@ -152,8 +152,8 @@ TEST_CASE("test_adj_list_chunk_info_reader") {
                             "ordered_by_dest/adj_list/part1/chunk0");
 
   // seek an invalid dst id
-  REQUIRE(dst_reader.seek_dst(1000).IsKeyError());
-  REQUIRE(dst_reader.seek_src(100).IsInvalidOperation());
+  REQUIRE(dst_reader.seek_dst(1000).IsIndexError());
+  REQUIRE(dst_reader.seek_src(100).IsInvalid());
 }
 
 TEST_CASE("test_adj_list_property_chunk_info_reader") {
@@ -218,11 +218,11 @@ TEST_CASE("test_adj_list_property_chunk_info_reader") {
   REQUIRE(chunk_path == root +
                             "/ldbc_sample/parquet/edge/person_knows_person/"
                             "ordered_by_source/creationDate/part9/chunk0");
-  REQUIRE(reader.next_chunk().IsOutOfRange());
+  REQUIRE(reader.next_chunk().IsIndexError());
 
   // seek an invalid src id
-  REQUIRE(reader.seek_src(1000).IsKeyError());
-  REQUIRE(reader.seek_dst(100).IsInvalidOperation());
+  REQUIRE(reader.seek_src(1000).IsIndexError());
+  REQUIRE(reader.seek_dst(100).IsInvalid());
 
   // test reader to read ordered by dest
   maybe_group = graph_info.GetEdgePropertyGroup(
@@ -245,6 +245,6 @@ TEST_CASE("test_adj_list_property_chunk_info_reader") {
                             "ordered_by_dest/creationDate/part1/chunk0");
 
   // seek an invalid dst id
-  REQUIRE(dst_reader.seek_dst(1000).IsKeyError());
-  REQUIRE(dst_reader.seek_src(100).IsInvalidOperation());
+  REQUIRE(dst_reader.seek_dst(1000).IsIndexError());
+  REQUIRE(dst_reader.seek_src(100).IsInvalid());
 }

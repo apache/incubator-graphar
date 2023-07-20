@@ -106,12 +106,12 @@ class EdgeInfo() {
     throw new IllegalArgumentException
   }
 
-  /** Check if the edge info contains the property group in cerain adj list structure.
+  /** Check if the edge info contains the property group in certain adj list structure.
    *
    * @param property_group the property group to check.
    * @param adj_list_type the type of adj list structure.
-   * @return true if the edge info contains the property group in cerain adj list structure.
-   *         If edge info not support the given adj list type or not contains the proerpty group in the adj list structure,
+   * @return true if the edge info contains the property group in certain adj list structure.
+   *         If edge info not support the given adj list type or not contains the property group in the adj list structure,
    *         return false.
    */
   def containPropertyGroup(property_group: PropertyGroup, adj_list_type: AdjListType.Value): Boolean = {
@@ -388,7 +388,7 @@ class EdgeInfo() {
   /** Get the path prefix of the adjacency list topology chunk for the given
    *  adjacency list type.
    * @param adj_list_type type of adj list structure.
-   * @return path prfix of of the adjacency list topology.
+   * @return path prefix of of the adjacency list topology.
    */
   def getAdjListPathPrefix(adj_list_type: AdjListType.Value) : String = {
     return prefix + getAdjListPrefix(adj_list_type) + "adj_list/"
@@ -479,6 +479,29 @@ class EdgeInfo() {
 
   def getConcatKey(): String = {
     return getSrc_label + GeneralParams.regularSeperator + getEdge_label + GeneralParams.regularSeperator + getDst_label
+  }
+
+  /** Dump to Yaml string. */
+  def dump(): String = {
+    val data = new java.util.HashMap[String, Object]()
+    data.put("src_label", src_label)
+    data.put("edge_label", edge_label)
+    data.put("dst_label", dst_label)
+    data.put("chunk_size", new java.lang.Long(chunk_size))
+    data.put("src_chunk_size", new java.lang.Long(src_chunk_size))
+    data.put("dst_chunk_size", new java.lang.Long(dst_chunk_size))
+    if (prefix != "") data.put("prefix", prefix)
+    data.put("version", version)
+    val adj_list_num = adj_lists.size()
+    if (adj_list_num > 0) {
+      val adj_list_maps = new java.util.ArrayList[Object]()
+      for (i <- 0 until adj_list_num) {
+        adj_list_maps.add(adj_lists.get(i).toMap())
+      }
+      data.put("adj_lists", adj_list_maps)
+    }
+    val yaml = new Yaml()
+    return yaml.dump(data)
   }
 }
 

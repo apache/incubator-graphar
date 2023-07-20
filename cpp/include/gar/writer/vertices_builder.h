@@ -129,56 +129,84 @@ class VerticesBuilder {
    * @param vertex_info The vertex info that describes the vertex type.
    * @param prefix The absolute prefix.
    * @param start_vertex_index The start index of the vertices collection.
+   * @param validate_level The global validate level for the writer, with no
+   * validate by default. It could be ValidateLevel::no_validate,
+   * ValidateLevel::weak_validate or ValidateLevel::strong_validate, but could
+   * not be ValidateLevel::default_validate.
    */
-  explicit VerticesBuilder(const VertexInfo& vertex_info,
-                           const std::string& prefix,
-                           IdType start_vertex_index = 0)
+  explicit VerticesBuilder(
+      const VertexInfo& vertex_info, const std::string& prefix,
+      IdType start_vertex_index = 0,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate)
       : vertex_info_(vertex_info),
         prefix_(prefix),
-        start_vertex_index_(start_vertex_index) {
+        start_vertex_index_(start_vertex_index),
+        validate_level_(validate_level) {
+    if (validate_level_ == ValidateLevel::default_validate) {
+      throw std::runtime_error(
+          "default_validate is not allowed to be set as the global validate "
+          "level for VerticesBuilder");
+    }
     vertices_.clear();
     num_vertices_ = 0;
     is_saved_ = false;
   }
 
   /**
-   * @brief Check if adding a vertex with the given index is allowed.
-   *
-   * @param v The vertex to add.
-   * @param index The given index, -1 means the next unused index.
-   * @return Status: ok or Status::InvalidOperation error.
+   * @brief Clear the vertices in this VerciesBuilder.
    */
-  Status Validate(const Vertex& v, IdType index = -1) const {
-    // can not add new vertices
-    if (is_saved_) {
-      return Status::InvalidOperation("can not add new vertices after dumping");
-    }
-    // start vertex index must be aligned with the chunk size
-    if (start_vertex_index_ % vertex_info_.GetChunkSize() != 0) {
-      return Status::InvalidOperation("invalid start vertex index");
-    }
-    // vertex index must larger than start index
-    if (index != -1 && index < start_vertex_index_)
-      return Status::InvalidOperation(
-          "vertex index must larger than start index");
-    // contain invalid properties
-    for (auto& property : v.GetProperties()) {
-      if (!vertex_info_.ContainProperty(property.first))
-        return Status::InvalidOperation("invalid property");
-    }
-    return Status::OK();
+  inline void Clear() {
+    vertices_.clear();
+    num_vertices_ = 0;
+    is_saved_ = false;
   }
+
+  /**
+   * @brief Set the validate level.
+   *
+   * @param validate_level The validate level to set.
+   */
+  inline void SetValidateLevel(const ValidateLevel& validate_level) {
+    if (validate_level == ValidateLevel::default_validate) {
+      return;
+    }
+    validate_level_ = validate_level;
+  }
+
+  /**
+   * @brief Get the validate level.
+   *
+   * @return The validate level of this writer.
+   */
+  inline ValidateLevel GetValidateLevel() const { return validate_level_; }
 
   /**
    * @brief Add a vertex with the given index.
    *
+   * The validate_level for this operation could be:
+   *
+   * ValidateLevel::default_validate: to use the validate_level of the builder,
+   * which set through the constructor or the SetValidateLevel method;
+   *
+   * ValidateLevel::no_validate: without validation;
+   *
+   * ValidateLevel::weak_validate: to validate if the start index and the vertex
+   * index is valid, and the data in builder is not saved;
+   *
+   * ValidateLevel::strong_validate: besides weak_validate, also validate the
+   * schema of the vertex is consistent with the info defined.
+   *
    * @param v The vertex to add.
    * @param index The given index, -1 means the next unused index.
-   * @return Status: ok or Status::InvalidOperation error.
+   * @param validate_level The validate level for this operation,
+   * which is the builder's validate level by default.
+   * @return Status: ok or Status::Invalid error.
    */
-  Status AddVertex(Vertex& v, IdType index = -1) {  // NOLINT
+  Status AddVertex(
+      Vertex& v, IdType index = -1,  // NOLINT
+      ValidateLevel validate_level = ValidateLevel::default_validate) {
     // validate
-    GAR_RETURN_NOT_OK(Validate(v, index));
+    GAR_RETURN_NOT_OK(validate(v, index, validate_level));
     // add a vertex
     if (index == -1) {
       v.SetId(vertices_.size());
@@ -207,7 +235,7 @@ class VerticesBuilder {
    */
   Status Dump() {
     // construct the writer
-    VertexPropertyWriter writer(vertex_info_, prefix_);
+    VertexPropertyWriter writer(vertex_info_, prefix_, validate_level_);
     IdType start_chunk_index =
         start_vertex_index_ / vertex_info_.GetChunkSize();
     // convert to table
@@ -222,6 +250,17 @@ class VerticesBuilder {
   }
 
  private:
+  /**
+   * @brief Check if adding a vertex with the given index is allowed.
+   *
+   * @param v The vertex to add.
+   * @param index The given index, -1 means the next unused index.
+   * @param validate_level The validate level for this operation.
+   * @return Status: ok or Status::Invalid error.
+   */
+  Status validate(const Vertex& v, IdType index,
+                  ValidateLevel validate_level) const;
+
   /**
    * @brief Construct an array for a given property.
    *
@@ -257,6 +296,7 @@ class VerticesBuilder {
   IdType start_vertex_index_;
   IdType num_vertices_;
   bool is_saved_;
+  ValidateLevel validate_level_;
 };
 
 }  // namespace builder
