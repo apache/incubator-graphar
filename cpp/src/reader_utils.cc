@@ -27,6 +27,40 @@ limitations under the License.
 namespace GAR_NAMESPACE_INTERNAL {
 
 namespace utils {
+
+/**
+ * @brief Checks whether the property names in the FilterOptions match the
+ * properties in the property group
+ *
+ * @param filter_options filter options
+ * @param property_group property group
+ * @return Status error if the property names in the FilterOptions do not match
+ */
+Status CheckFilterOptions(const FilterOptions& filter_options,
+                          const PropertyGroup& property_group) noexcept {
+  if (filter_options.filter) {
+    GAR_ASSIGN_OR_RAISE(auto filter, filter_options.filter->Evaluate());
+    for (const auto& field : arrow::compute::FieldsInExpression(filter)) {
+      auto property_name = *field.name();
+      if (!property_group.ContainProperty(property_name)) {
+        return Status::Invalid(
+            property_name, " in the filter does not match the property group: ",
+            property_group);
+      }
+    }
+  }
+  if (filter_options.columns.has_value()) {
+    for (const auto& col : filter_options.columns.value().get()) {
+      if (!property_group.ContainProperty(col)) {
+        return Status::Invalid(
+            col, " in the columns does not match the property group: ",
+            property_group);
+      }
+    }
+  }
+  return Status::OK();
+}
+
 /**
  * @brief parse the vertex id to related adj list offset
  *

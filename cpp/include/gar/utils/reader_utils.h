@@ -43,6 +43,9 @@ struct FilterOptions {
       : filter(filter), columns(columns) {}
 };
 
+Status CheckFilterOptions(const FilterOptions& filter_options,
+                          const PropertyGroup& property_group) noexcept;
+
 Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
     const EdgeInfo& edge_info, const std::string& prefix,
     AdjListType adj_list_type, IdType vid) noexcept;

@@ -46,7 +46,7 @@ class Expression {
    *
    * @return The arrow::compute::Expression instance
    */
-  virtual ArrowExpression Evaluate() = 0;
+  virtual Result<ArrowExpression> Evaluate() = 0;
 };
 
 /**
@@ -61,7 +61,7 @@ class ExpressionProperty : public Expression {
   ExpressionProperty(const ExpressionProperty& other) = default;
   ~ExpressionProperty() = default;
 
-  ArrowExpression Evaluate() override;
+  Result<ArrowExpression> Evaluate() override;
 
  private:
   Property property_;
@@ -71,14 +71,21 @@ class ExpressionProperty : public Expression {
  * This class wraps the literal. Only bool, int32, int64, float, double and
  * string are allowed.
  */
-template <typename T>
+template <typename T,
+          bool IsScalar =
+              std::is_same_v<T, bool> || std::is_same_v<T, int32_t> ||
+              std::is_same_v<T, int64_t> || std::is_same_v<T, float> ||
+              std::is_same_v<T, double> || std::is_same_v<T, std::string> ||
+              std::is_same_v<T, const char*> ||
+              std::is_same_v<T, const char* const>,
+          typename = std::enable_if_t<IsScalar>>
 class ExpressionLiteral : public Expression {
  public:
   explicit ExpressionLiteral(T value) : value_(value) {}
   ExpressionLiteral(const ExpressionLiteral& other) = default;
   ~ExpressionLiteral() = default;
 
-  ArrowExpression Evaluate() { return arrow::compute::literal(value_); }
+  Result<ArrowExpression> Evaluate() { return arrow::compute::literal(value_); }
 
  private:
   T value_;
@@ -111,26 +118,7 @@ class ExpressionNot : public ExpressionUnaryOp {
   ExpressionNot(const ExpressionNot& other) = default;
   ~ExpressionNot() = default;
 
-  ArrowExpression Evaluate() override;
-};
-
-/**
- * This class constructs a IS NULL operator expression. e.g. new
- * ExpressionIsNull(new ExpressionProperty("a")) => a IS NULL
- */
-class ExpressionIsNull : public ExpressionUnaryOp {
- public:
-  ExpressionIsNull() = default;
-  explicit ExpressionIsNull(std::shared_ptr<Expression> expr,
-                            bool nan_is_null = false)
-      : ExpressionUnaryOp(expr), nan_is_null_(nan_is_null) {}
-  ExpressionIsNull(const ExpressionIsNull& other) = default;
-  ~ExpressionIsNull() = default;
-
-  ArrowExpression Evaluate() override;
-
- private:
-  bool nan_is_null_;
+  Result<ArrowExpression> Evaluate() override;
 };
 
 /**
@@ -145,6 +133,15 @@ class ExpressionBinaryOp : public Expression {
       : lhs_(lhs), rhs_(rhs) {}
   ExpressionBinaryOp(const ExpressionBinaryOp& other) = default;
   ~ExpressionBinaryOp() = default;
+
+ protected:
+  inline Status CheckNullArgs(std::shared_ptr<Expression> lhs,
+                              std::shared_ptr<Expression> rhs) noexcept {
+    if (lhs == nullptr || rhs == nullptr) {
+      return Status::Invalid("Invalid expression: lhs or rhs is null");
+    }
+    return Status::OK();
+  }
 
  protected:
   std::shared_ptr<Expression> lhs_;
@@ -165,7 +162,7 @@ class ExpressionEqual : public ExpressionBinaryOp {
   ExpressionEqual(const ExpressionEqual& other) = default;
   ~ExpressionEqual() = default;
 
-  ArrowExpression Evaluate() override;
+  Result<ArrowExpression> Evaluate() override;
 };
 
 /**
@@ -182,7 +179,7 @@ class ExpressionNotEqual : public ExpressionBinaryOp {
   ExpressionNotEqual(const ExpressionNotEqual& other) = default;
   ~ExpressionNotEqual() = default;
 
-  ArrowExpression Evaluate() override;
+  Result<ArrowExpression> Evaluate() override;
 };
 
 /**
@@ -199,7 +196,7 @@ class ExpressionGreaterThan : public ExpressionBinaryOp {
   ExpressionGreaterThan(const ExpressionGreaterThan& other) = default;
   ~ExpressionGreaterThan() = default;
 
-  ArrowExpression Evaluate() override;
+  Result<ArrowExpression> Evaluate() override;
 };
 
 /**
@@ -216,7 +213,7 @@ class ExpressionGreaterEqual : public ExpressionBinaryOp {
   ExpressionGreaterEqual(const ExpressionGreaterEqual& other) = default;
   ~ExpressionGreaterEqual() = default;
 
-  ArrowExpression Evaluate() override;
+  Result<ArrowExpression> Evaluate() override;
 };
 
 /**
@@ -233,7 +230,7 @@ class ExpressionLessThan : public ExpressionBinaryOp {
   ExpressionLessThan(const ExpressionLessThan& other) = default;
   ~ExpressionLessThan() = default;
 
-  ArrowExpression Evaluate() override;
+  Result<ArrowExpression> Evaluate() override;
 };
 
 /**
@@ -250,7 +247,7 @@ class ExpressionLessEqual : public ExpressionBinaryOp {
   ExpressionLessEqual(const ExpressionLessEqual& other) = default;
   ~ExpressionLessEqual() = default;
 
-  ArrowExpression Evaluate() override;
+  Result<ArrowExpression> Evaluate() override;
 };
 
 /**
@@ -267,7 +264,7 @@ class ExpressionAnd : public ExpressionBinaryOp {
   ExpressionAnd(const ExpressionAnd& other) = default;
   ~ExpressionAnd() = default;
 
-  ArrowExpression Evaluate() override;
+  Result<ArrowExpression> Evaluate() override;
 };
 
 /**
@@ -283,7 +280,7 @@ class ExpressionOr : public ExpressionBinaryOp {
   ExpressionOr(const ExpressionOr& other) = default;
   ~ExpressionOr() = default;
 
-  ArrowExpression Evaluate() override;
+  Result<ArrowExpression> Evaluate() override;
 };
 
 /**
@@ -299,7 +296,14 @@ class ExpressionOr : public ExpressionBinaryOp {
   return std::make_shared<ExpressionProperty>(name);
 }
 
-template <typename T>
+template <typename T,
+          bool IsScalar =
+              std::is_same_v<T, bool> || std::is_same_v<T, int32_t> ||
+              std::is_same_v<T, int64_t> || std::is_same_v<T, float> ||
+              std::is_same_v<T, double> || std::is_same_v<T, std::string> ||
+              std::is_same_v<T, const char*> ||
+              std::is_same_v<T, const char* const>,
+          typename = std::enable_if_t<IsScalar>>
 [[nodiscard]] static inline std::shared_ptr<Expression> _Literal(T value) {
   return std::make_shared<ExpressionLiteral<T>>(value);
 }
@@ -307,11 +311,6 @@ template <typename T>
 [[nodiscard]] static inline std::shared_ptr<Expression> _Not(
     std::shared_ptr<Expression> expr) {
   return std::make_shared<ExpressionNot>(expr);
-}
-
-[[nodiscard]] static inline std::shared_ptr<Expression> _IsNull(
-    std::shared_ptr<Expression> expr, bool nan_is_null = false) {
-  return std::make_shared<ExpressionIsNull>(expr, nan_is_null);
 }
 
 [[nodiscard]] static inline std::shared_ptr<Expression> _Equal(

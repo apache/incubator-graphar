@@ -19,6 +19,7 @@ limitations under the License.
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "utils/adj_list_type.h"
@@ -92,6 +93,7 @@ class PropertyGroup {
       std::vector<std::string> names;
       for (auto& property : properties_) {
         names.push_back(property.name);
+        property_names_.insert(property.name);
       }
       prefix_ = util::ConcatStringWithDelimiter(names, REGULAR_SEPERATOR) + "/";
     }
@@ -126,6 +128,10 @@ class PropertyGroup {
     return properties_;
   }
 
+  inline bool ContainProperty(const std::string& property_name) const {
+    return property_names_.find(property_name) != property_names_.end();
+  }
+
   /** Get the file type of property group chunk file.
    *
    * @return The file type of group.
@@ -151,6 +157,7 @@ class PropertyGroup {
 
  private:
   std::vector<Property> properties_;
+  std::unordered_set<std::string> property_names_;
   FileType file_type_;
   std::string prefix_;
 };

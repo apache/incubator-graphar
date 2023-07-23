@@ -108,10 +108,6 @@ TEST_CASE("test_vertex_property_pushdown") {
   auto maybe_group = graph_info.GetVertexPropertyGroup(label, property_name);
   REQUIRE(maybe_group.status().ok());
   auto group = maybe_group.value();
-  // construct pushdown options
-  FilterOptions options;
-  options.filter = filter;
-  options.columns = expected_cols;
 
   // print reader result
   auto walkReader = [&](GAR_NAMESPACE::VertexPropertyArrowChunkReader& reader) {
@@ -145,6 +141,10 @@ TEST_CASE("test_vertex_property_pushdown") {
 
   SECTION("pushdown by helper function") {
     std::cout << "Vertex property pushdown by helper function:\n";
+    // construct pushdown options
+    FilterOptions options;
+    options.filter = filter;
+    options.columns = expected_cols;
     auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
         graph_info, label, group, options);
     REQUIRE(maybe_reader.status().ok());
@@ -160,6 +160,37 @@ TEST_CASE("test_vertex_property_pushdown") {
     reader.Filter(filter);
     reader.Select(expected_cols);
     walkReader(reader);
+  }
+
+  SECTION("pushdown property that don't exist") {
+    std::cout << "Vertex property pushdown property that don't exist:\n";
+    auto filter = _Equal(_Property("id"), _Literal(933));
+    FilterOptions options;
+    options.filter = filter;
+    options.columns = expected_cols;
+    auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
+        graph_info, label, group, options);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    auto result = reader.GetChunk();
+    REQUIRE(result.error().IsInvalid());
+    std::cerr << result.error().message() << std::endl;
+  }
+
+  SECTION("pushdown column that don't exist") {
+    std::cout << "Vertex property pushdown column that don't exist:\n";
+    auto filter = _Literal(true);
+    std::vector<std::string> expected_cols{"id"};
+    FilterOptions options;
+    options.filter = filter;
+    options.columns = expected_cols;
+    auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
+        graph_info, label, group, options);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    auto result = reader.GetChunk();
+    REQUIRE(result.error().IsInvalid());
+    std::cerr << result.error().message() << std::endl;
   }
 }
 

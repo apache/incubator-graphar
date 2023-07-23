@@ -22,6 +22,8 @@ namespace GAR_NAMESPACE_INTERNAL {
 
 Result<std::shared_ptr<arrow::Table>>
 VertexPropertyArrowChunkReader::GetChunk() noexcept {
+  GAR_RETURN_NOT_OK(
+      utils::CheckFilterOptions(filter_options_, property_group_));
   if (chunk_table_ == nullptr) {
     GAR_ASSIGN_OR_RAISE(
         auto chunk_file_path,
@@ -235,6 +237,8 @@ AdjListOffsetArrowChunkReader::GetChunk() noexcept {
 
 Result<std::shared_ptr<arrow::Table>>
 AdjListPropertyArrowChunkReader::GetChunk() noexcept {
+  GAR_RETURN_NOT_OK(
+      utils::CheckFilterOptions(filter_options_, property_group_));
   if (chunk_table_ == nullptr) {
     GAR_ASSIGN_OR_RAISE(
         auto chunk_file_path,

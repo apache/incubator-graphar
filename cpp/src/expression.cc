@@ -16,47 +16,68 @@ limitations under the License.
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-ArrowExpression ExpressionProperty::Evaluate() {
+Result<ArrowExpression> ExpressionProperty::Evaluate() {
   return arrow::compute::field_ref(property_.name);
 }
-ArrowExpression ExpressionNot::Evaluate() {
-  return arrow::compute::not_(expr_->Evaluate());
+Result<ArrowExpression> ExpressionNot::Evaluate() {
+  GAR_ASSIGN_OR_RAISE(auto expr, expr_->Evaluate());
+  return arrow::compute::not_(expr);
 }
 
-ArrowExpression ExpressionIsNull::Evaluate() {
-  return arrow::compute::is_null(expr_->Evaluate(), nan_is_null_);
+Result<ArrowExpression> ExpressionEqual::Evaluate() {
+  GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
+  GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
+  GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
+  return arrow::compute::equal(lexpr, rexpr);
 }
 
-ArrowExpression ExpressionEqual::Evaluate() {
-  return arrow::compute::equal(lhs_->Evaluate(), rhs_->Evaluate());
+Result<ArrowExpression> ExpressionNotEqual::Evaluate() {
+  GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
+  GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
+  GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
+  return arrow::compute::not_equal(lexpr, rexpr);
 }
 
-ArrowExpression ExpressionNotEqual::Evaluate() {
-  return arrow::compute::not_equal(lhs_->Evaluate(), rhs_->Evaluate());
+Result<ArrowExpression> ExpressionGreaterThan::Evaluate() {
+  GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
+  GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
+  GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
+  return arrow::compute::greater(lexpr, rexpr);
 }
 
-ArrowExpression ExpressionGreaterThan::Evaluate() {
-  return arrow::compute::greater(lhs_->Evaluate(), rhs_->Evaluate());
+Result<ArrowExpression> ExpressionGreaterEqual::Evaluate() {
+  GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
+  GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
+  GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
+  return arrow::compute::greater_equal(lexpr, rexpr);
 }
 
-ArrowExpression ExpressionGreaterEqual::Evaluate() {
-  return arrow::compute::greater_equal(lhs_->Evaluate(), rhs_->Evaluate());
+Result<ArrowExpression> ExpressionLessThan::Evaluate() {
+  GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
+  GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
+  GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
+  return arrow::compute::less(lexpr, rexpr);
 }
 
-ArrowExpression ExpressionLessThan::Evaluate() {
-  return arrow::compute::less(lhs_->Evaluate(), rhs_->Evaluate());
+Result<ArrowExpression> ExpressionLessEqual::Evaluate() {
+  GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
+  GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
+  GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
+  return arrow::compute::less_equal(lexpr, rexpr);
 }
 
-ArrowExpression ExpressionLessEqual::Evaluate() {
-  return arrow::compute::less_equal(lhs_->Evaluate(), rhs_->Evaluate());
+Result<ArrowExpression> ExpressionAnd::Evaluate() {
+  GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
+  GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
+  GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
+  return arrow::compute::and_(lexpr, rexpr);
 }
 
-ArrowExpression ExpressionAnd::Evaluate() {
-  return arrow::compute::and_(lhs_->Evaluate(), rhs_->Evaluate());
-}
-
-ArrowExpression ExpressionOr::Evaluate() {
-  return arrow::compute::or_(lhs_->Evaluate(), rhs_->Evaluate());
+Result<ArrowExpression> ExpressionOr::Evaluate() {
+  GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
+  GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
+  GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
+  return arrow::compute::or_(lexpr, rexpr);
 }
 
 }  // namespace GAR_NAMESPACE_INTERNAL
