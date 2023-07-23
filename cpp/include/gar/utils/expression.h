@@ -348,7 +348,7 @@ template <typename T,
   return std::make_shared<ExpressionAnd>(lhs, rhs);
 }
 
-[[nodiscard]] static inline std::shared_ptr<Expression> Or(
+[[nodiscard]] static inline std::shared_ptr<Expression> _Or(
     std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs) {
   return std::make_shared<ExpressionOr>(lhs, rhs);
 }
