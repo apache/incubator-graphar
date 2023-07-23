@@ -814,6 +814,7 @@ class EdgeInfo {
    *
    * @param vertex_chunk_index the vertex chunk index
    * @param edge_chunk_index index of edge adj list chunk of the vertex chunk
+   * @param adj_list_type The adjacency list type.
    */
   inline Result<std::string> GetAdjListFilePath(IdType vertex_chunk_index,
                                                 IdType edge_chunk_index,
@@ -851,6 +852,7 @@ class EdgeInfo {
    *    the offset chunks is aligned with the vertex chunks
    *
    * @param vertex_chunk_index index of vertex chunk
+   * @param adj_list_type The adjacency list type.
    */
   inline Result<std::string> GetAdjListOffsetFilePath(
       IdType vertex_chunk_index, AdjListType adj_list_type) const noexcept {
@@ -1045,7 +1047,7 @@ class EdgeInfo {
     return true;
   }
 
-  /** Loads the yaml as a EdgeInfo instance. */
+  /** Loads the yaml as an EdgeInfo instance. */
   static Result<EdgeInfo> Load(std::shared_ptr<Yaml> yaml);
 
  private:
@@ -1143,7 +1145,7 @@ class GraphInfo {
   }
 
   /**
-   *@brief Add a edge info path to graph info instance.
+   *@brief Add an edge info path to graph info instance.
    *
    *@param path The edge info path to add
    */
