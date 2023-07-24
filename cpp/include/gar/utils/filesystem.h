@@ -17,12 +17,17 @@ limitations under the License.
 #define GAR_UTILS_FILESYSTEM_H_
 
 #include <memory>
+#include <optional>
 #include <string>
+#include <vector>
 
 #include "gar/utils/file_type.h"
 #include "gar/utils/result.h"
 #include "gar/utils/status.h"
 #include "gar/utils/utils.h"
+
+#include "arrow/dataset/api.h"
+#include "gar/utils/reader_utils.h"
 
 // forward declarations
 namespace arrow {
@@ -55,15 +60,17 @@ class FileSystem {
   ~FileSystem() = default;
 
   /**
-   * @brief Read a file as an arrow::Table.
+   * @brief Read and filter a file as an arrow::Table.
    *
    * @param path The path of the file to read.
    * @param file_type The type of the file to read.
+   * @param options Row filter and columns to be selected
    * @return A Result containing a std::shared_ptr to an arrow::Table if
    * successful, or an error Status if unsuccessful.
    */
   Result<std::shared_ptr<arrow::Table>> ReadFileToTable(
-      const std::string& path, FileType file_type) const noexcept;
+      const std::string& path, FileType file_type,
+      const utils::FilterOptions& options = {}) const noexcept;
 
   /**
    * @brief Read a file and convert its bytes to a value of type T.
@@ -115,6 +122,10 @@ class FileSystem {
    */
   Result<IdType> GetFileNumOfDir(const std::string& dir_path,
                                  bool recursive = false) const noexcept;
+
+ private:
+  std::shared_ptr<arrow::dataset::FileFormat> GetFileFormat(
+      const FileType file_type) const;
 
  private:
   std::shared_ptr<arrow::fs::FileSystem> arrow_fs_;

@@ -220,3 +220,73 @@ Info Version
 .. doxygenclass:: GraphArchive::InfoVersion
     :members:
     :undoc-members:
+
+Expression
+~~~~~~~~~~~~~~~~~~~
+
+.. doxygenclass:: GraphArchive::Expression
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionProperty
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionLiteral
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionNot
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionIsNull
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionEqual
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionNotEqual 
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionGreaterThan
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionGreaterEqual
+    :members:
+    :undoc-members:
+
+
+.. doxygenclass:: GraphArchive::ExpressionLessThan
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionLessEqual 
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionAnd
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionOr
+    :members:
+    :undoc-members:
+
+.. doxygenfunction:: GraphArchive::_Property
+.. doxygenfunction:: GraphArchive::_Literal
+.. doxygenfunction:: GraphArchive::_Not
+.. doxygenfunction:: GraphArchive::_IsNull
+.. doxygenfunction:: GraphArchive::_Equal
+.. doxygenfunction:: GraphArchive::_NotEqual
+.. doxygenfunction:: GraphArchive::_GreaterThan
+.. doxygenfunction:: GraphArchive::_GreaterEqual
+.. doxygenfunction:: GraphArchive::_LessThan
+.. doxygenfunction:: GraphArchive::_LessEqual
+.. doxygenfunction:: GraphArchive::_And
+.. doxygenfunction:: GraphArchive::_Or
+

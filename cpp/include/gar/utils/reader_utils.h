@@ -16,14 +16,35 @@ limitations under the License.
 #ifndef GAR_UTILS_READER_UTILS_H_
 #define GAR_UTILS_READER_UTILS_H_
 
+#include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "gar/graph_info.h"
+#include "gar/utils/expression.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
 namespace utils {
+
+using Filter = std::shared_ptr<Expression>;
+using ColumnNames =
+    std::optional<std::reference_wrapper<std::vector<std::string>>>;
+
+struct FilterOptions {
+  // The row filter to apply to the table.
+  Filter filter = nullptr;
+  // The columns to include in the table. Select all columns by default.
+  ColumnNames columns = std::nullopt;
+
+  FilterOptions() {}
+  FilterOptions(Filter filter, ColumnNames columns)
+      : filter(filter), columns(columns) {}
+};
+
+Status CheckFilterOptions(const FilterOptions& filter_options,
+                          const PropertyGroup& property_group) noexcept;
 
 Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
     const EdgeInfo& edge_info, const std::string& prefix,

@@ -24,7 +24,6 @@ limitations under the License.
 #include "gar/graph_info.h"
 #include "gar/utils/data_type.h"
 #include "gar/utils/filesystem.h"
-#include "gar/utils/reader_utils.h"
 #include "gar/utils/result.h"
 #include "gar/utils/status.h"
 #include "gar/utils/utils.h"
@@ -52,18 +51,22 @@ class VertexPropertyArrowChunkReader {
   VertexPropertyArrowChunkReader(const VertexInfo& vertex_info,
                                  const PropertyGroup& property_group,
                                  const std::string& prefix,
-                                 IdType chunk_index = 0)
+                                 IdType chunk_index = 0,
+                                 const utils::FilterOptions& options = {})
       : vertex_info_(vertex_info),
         property_group_(property_group),
         chunk_index_(chunk_index),
         seek_id_(chunk_index * vertex_info.GetChunkSize()),
-        chunk_table_(nullptr) {
+        chunk_table_(nullptr),
+        filter_options_(options) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
                               vertex_info.GetPathPrefix(property_group));
     std::string base_dir = prefix_ + pg_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
                               utils::GetVertexChunkNum(prefix_, vertex_info));
+    GAR_ASSIGN_OR_RAISE_ERROR(vertex_num_,
+                              utils::GetVertexNum(prefix_, vertex_info_));
   }
 
   /**
@@ -126,6 +129,22 @@ class VertexPropertyArrowChunkReader {
    */
   IdType GetChunkNum() const noexcept { return chunk_num_; }
 
+  /**
+   * @brief Apply the row filter to the table. No parameter call Filter() will
+   * clear the filter.
+   *
+   * @param filter Predicate expression to filter rows.
+   */
+  void Filter(utils::Filter filter = nullptr);
+
+  /**
+   * @brief Apply the projection to the table to be read. No parameter call
+   * Select() will clear the projection.
+   *
+   * @param column_names The name of columns to be selected.
+   */
+  void Select(utils::ColumnNames column_names = std::nullopt);
+
  private:
   VertexInfo vertex_info_;
   PropertyGroup property_group_;
@@ -133,7 +152,9 @@ class VertexPropertyArrowChunkReader {
   IdType chunk_index_;
   IdType seek_id_;
   IdType chunk_num_;
+  IdType vertex_num_;
   std::shared_ptr<arrow::Table> chunk_table_;
+  utils::FilterOptions filter_options_;
   std::shared_ptr<FileSystem> fs_;
 };
 
@@ -227,7 +248,8 @@ class AdjListArrowChunkReader {
   }
 
   /**
-   * @brief Return the current chunk of chunk position indicator as arrow::Table
+   * @brief Return the current chunk of chunk position indicator as
+   * arrow::Table
    */
   Result<std::shared_ptr<arrow::Table>> GetChunk() noexcept;
 
@@ -420,7 +442,8 @@ class AdjListPropertyArrowChunkReader {
    * @brief Initialize the AdjListPropertyArrowChunkReader.
    *
    * @param edge_info The edge info that describes the edge type.
-   * @param property_group The property group that describes the property group.
+   * @param property_group The property group that describes the property
+   * group.
    * @param adj_list_type The adj list type for the edges.
    * @param prefix The absolute prefix.
    * @param vertex_chunk_index The vertex chunk index, default is 0.
@@ -429,7 +452,8 @@ class AdjListPropertyArrowChunkReader {
                                   const PropertyGroup& property_group,
                                   AdjListType adj_list_type,
                                   const std::string prefix,
-                                  IdType vertex_chunk_index = 0)
+                                  IdType vertex_chunk_index = 0,
+                                  const utils::FilterOptions& options = {})
       : edge_info_(edge_info),
         property_group_(property_group),
         adj_list_type_(adj_list_type),
@@ -437,7 +461,8 @@ class AdjListPropertyArrowChunkReader {
         vertex_chunk_index_(vertex_chunk_index),
         chunk_index_(0),
         seek_offset_(0),
-        chunk_table_(nullptr) {
+        chunk_table_(nullptr),
+        filter_options_(options) {
     GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
     GAR_ASSIGN_OR_RAISE_ERROR(
         auto pg_path_prefix,
@@ -463,6 +488,7 @@ class AdjListPropertyArrowChunkReader {
         chunk_index_(other.chunk_index_),
         seek_offset_(other.seek_offset_),
         chunk_table_(nullptr),
+        filter_options_(other.filter_options_),
         vertex_chunk_num_(other.vertex_chunk_num_),
         chunk_num_(other.chunk_num_),
         base_dir_(other.base_dir_),
@@ -506,7 +532,8 @@ class AdjListPropertyArrowChunkReader {
   }
 
   /**
-   * @brief Return the current chunk of chunk position indicator as arrow::Table
+   * @brief Return the current chunk of chunk position indicator as
+   * arrow::Table
    */
   Result<std::shared_ptr<arrow::Table>> GetChunk() noexcept;
 
@@ -564,6 +591,22 @@ class AdjListPropertyArrowChunkReader {
     return Status::OK();
   }
 
+  /**
+   * @brief Apply the row filter to the table. No parameter call Filter() will
+   * clear the filter.
+   *
+   * @param filter Predicate expression to filter rows.
+   */
+  void Filter(utils::Filter filter = nullptr);
+
+  /**
+   * @brief Apply the projection to the table to be read. No parameter call
+   * Select() will clear the projection.
+   *
+   * @param column_names The name of columns to be selected.
+   */
+  void Select(utils::ColumnNames column_names = std::nullopt);
+
  private:
   EdgeInfo edge_info_;
   PropertyGroup property_group_;
@@ -572,6 +615,7 @@ class AdjListPropertyArrowChunkReader {
   IdType vertex_chunk_index_, chunk_index_;
   IdType seek_offset_;
   std::shared_ptr<arrow::Table> chunk_table_;
+  utils::FilterOptions filter_options_;
   IdType vertex_chunk_num_, chunk_num_;
   std::string base_dir_;
   std::shared_ptr<FileSystem> fs_;
@@ -587,7 +631,8 @@ class AdjListPropertyArrowChunkReader {
 static inline Result<VertexPropertyArrowChunkReader>
 ConstructVertexPropertyArrowChunkReader(
     const GraphInfo& graph_info, const std::string& label,
-    const PropertyGroup& property_group) noexcept {
+    const PropertyGroup& property_group,
+    const utils::FilterOptions& options = {}) noexcept {
   VertexInfo vertex_info;
   GAR_ASSIGN_OR_RAISE(vertex_info, graph_info.GetVertexInfo(label));
   if (!vertex_info.ContainPropertyGroup(property_group)) {
@@ -595,7 +640,7 @@ ConstructVertexPropertyArrowChunkReader(
                             label, ".");
   }
   return VertexPropertyArrowChunkReader(vertex_info, property_group,
-                                        graph_info.GetPrefix());
+                                        graph_info.GetPrefix(), 0, options);
 }
 
 /**
@@ -663,12 +708,11 @@ ConstructAdjListOffsetArrowChunkReader(const GraphInfo& graph_info,
  * @param adj_list_type The adj list type for the edges.
  */
 static inline Result<AdjListPropertyArrowChunkReader>
-ConstructAdjListPropertyArrowChunkReader(const GraphInfo& graph_info,
-                                         const std::string& src_label,
-                                         const std::string& edge_label,
-                                         const std::string& dst_label,
-                                         const PropertyGroup& property_group,
-                                         AdjListType adj_list_type) noexcept {
+ConstructAdjListPropertyArrowChunkReader(
+    const GraphInfo& graph_info, const std::string& src_label,
+    const std::string& edge_label, const std::string& dst_label,
+    const PropertyGroup& property_group, AdjListType adj_list_type,
+    const utils::FilterOptions& options = {}) noexcept {
   EdgeInfo edge_info;
   GAR_ASSIGN_OR_RAISE(edge_info,
                       graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
@@ -683,7 +727,8 @@ ConstructAdjListPropertyArrowChunkReader(const GraphInfo& graph_info,
                             AdjListTypeToString(adj_list_type), ".");
   }
   return AdjListPropertyArrowChunkReader(edge_info, property_group,
-                                         adj_list_type, graph_info.GetPrefix());
+                                         adj_list_type, graph_info.GetPrefix(),
+                                         0, options);
 }
 
 }  // namespace GAR_NAMESPACE_INTERNAL
