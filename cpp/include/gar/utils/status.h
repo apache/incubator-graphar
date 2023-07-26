@@ -220,26 +220,26 @@ class Status {
                             std::forward<Args>(args)...);
   }
 
-  /** Return true iff the status indicates success. */
+  /** Return true if the status indicates success. */
   constexpr bool ok() const { return (state_ == nullptr); }
 
-  /** Return true iff the status indicates a key lookup error. */
+  /** Return true if the status indicates a key lookup error. */
   constexpr bool IsKeyError() const { return code() == StatusCode::kKeyError; }
-  /** Return true iff the status indicates a type match error. */
+  /** Return true if the status indicates a type match error. */
   constexpr bool IsTypeError() const {
     return code() == StatusCode::kTypeError;
   }
-  /** Return true iff the status indicates invalid data. */
+  /** Return true if the status indicates invalid data. */
   constexpr bool IsInvalid() const { return code() == StatusCode::kInvalid; }
-  /** Return true iff the status indicates an index out of bounds. */
+  /** Return true if the status indicates an index out of bounds. */
   constexpr bool IsIndexError() const {
     return code() == StatusCode::kIndexError;
   }
-  /** Return true iff the status indicates an yaml parse related failure. */
+  /** Return true if the status indicates a yaml parse related failure. */
   constexpr bool IsYamlError() const {
     return code() == StatusCode::kYamlError;
   }
-  /** Return true iff the status indicates an arrow-related failure. */
+  /** Return true if the status indicates an arrow-related failure. */
   constexpr bool IsArrowError() const {
     return code() == StatusCode::kArrowError;
   }
