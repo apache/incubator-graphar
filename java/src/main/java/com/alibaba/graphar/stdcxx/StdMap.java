@@ -44,6 +44,8 @@ public interface StdMap<K, V> extends FFIPointer {
   @CXXReference
   V get(@CXXReference K key);
 
+  int size();
+
   @FFIFactory
   interface Factory<K, V> {
     StdMap<K, V> create();

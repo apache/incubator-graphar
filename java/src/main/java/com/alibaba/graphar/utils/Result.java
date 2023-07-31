@@ -27,11 +27,13 @@ import static com.alibaba.graphar.utils.CppClassName.STD_STRING;
 import static com.alibaba.graphar.utils.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
+import com.alibaba.fastffi.CXXOperator;
 import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
 import com.alibaba.fastffi.CXXTemplate;
 import com.alibaba.fastffi.CXXValue;
 import com.alibaba.fastffi.FFIGen;
+import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 
 @FFIGen
@@ -47,9 +49,13 @@ import com.alibaba.fastffi.FFITypeAlias;
 @CXXTemplate(cxx = GAR_FILE_TYPE, java = "com.alibaba.graphar.types.FileType")
 @CXXTemplate(cxx = GAR_INFO_VERSION, java = "com.alibaba.graphar.utils.InfoVersion")
 public interface Result<T> extends CXXPointer {
+
   @CXXReference
   T value();
 
   @CXXValue
   Status status();
+
+  @FFINameAlias("has_error")
+  boolean hasError();
 }

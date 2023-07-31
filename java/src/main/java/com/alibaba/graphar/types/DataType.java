@@ -18,6 +18,7 @@ import static com.alibaba.graphar.utils.CppClassName.GAR_DATA_TYPE;
 import static com.alibaba.graphar.utils.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
+import com.alibaba.fastffi.CXXOperator;
 import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
 import com.alibaba.fastffi.CXXValue;
@@ -33,6 +34,9 @@ import com.alibaba.graphar.stdcxx.StdString;
 public interface DataType extends CXXPointer {
   Factory factory = FFITypeFactory.getFactory(DataType.class);
 
+  @CXXOperator("==")
+  boolean eq(@CXXReference DataType other);
+
   @FFIFactory
   interface Factory {
     @CXXValue
@@ -47,5 +51,14 @@ public interface DataType extends CXXPointer {
      */
     @CXXValue
     DataType create(@CXXValue Type id, @CXXReference StdString usrDefinedTypeName);
+
+    /**
+     * Construct a DateType object
+     *
+     * @param id
+     * @return a DateType object
+     */
+    @CXXValue
+    DataType create(@CXXValue Type id);
   }
 }

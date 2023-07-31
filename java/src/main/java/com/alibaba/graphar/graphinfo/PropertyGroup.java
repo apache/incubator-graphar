@@ -87,5 +87,18 @@ public interface PropertyGroup extends CXXPointer {
         @CXXValue StdVector<Property> properties,
         @CXXValue FileType fileType,
         @CXXReference StdString prefix);
+
+    /**
+     * Initialize the PropertyGroup with a list of properties, file type, and optional prefix.
+     *
+     * @param properties Property list of group
+     * @param fileType File type of property group chunk file
+     */
+    @CXXValue
+    PropertyGroup create(
+            @CXXValue StdVector<Property> properties,
+            @CXXValue FileType fileType);
+
+    PropertyGroup create();
   }
 }

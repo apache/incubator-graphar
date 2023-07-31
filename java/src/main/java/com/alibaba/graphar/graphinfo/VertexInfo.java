@@ -231,14 +231,25 @@ public interface VertexInfo extends CXXPointer {
      * @param label The label of the vertex.
      * @param chunkSize The number of vertices in each vertex chunk.
      * @param version The version of the vertex info.
-     * @param prefix The prefix of the vertex info. If left empty, the default prefix will be set to
-     *     the label of the vertex.
+     * @param prefix The prefix of the vertex info.
      */
     VertexInfo create(
         @CXXReference StdString label,
         @FFITypeAlias(GAR_ID_TYPE) long chunkSize,
         @CXXReference InfoVersion version,
         @CXXReference StdString prefix);
+
+    /**
+     * Construct a VertexInfo object with the given metadata information.
+     *
+     * @param label The label of the vertex.
+     * @param chunkSize The number of vertices in each vertex chunk.
+     * @param version The version of the vertex info.
+     */
+    VertexInfo create(
+            @CXXReference StdString label,
+            @FFITypeAlias(GAR_ID_TYPE) long chunkSize,
+            @CXXReference InfoVersion version);
 
     /** Copy constructor. */
     VertexInfo create(@CXXReference VertexInfo other);

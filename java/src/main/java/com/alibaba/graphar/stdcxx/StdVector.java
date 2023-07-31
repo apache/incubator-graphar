@@ -53,6 +53,9 @@ public interface StdVector<E> extends CXXPointer, FFISettablePointer {
   @CXXOperator("[]")
   void set(long index, @CXXReference E value);
 
+  @CXXOperator("==")
+  boolean eq(@CXXReference StdVector<E> other);
+
   void push_back(@CXXValue E e);
 
   default void add(@CXXReference E value) {
@@ -88,5 +91,7 @@ public interface StdVector<E> extends CXXPointer, FFISettablePointer {
   interface Factory<E> {
 
     StdVector<E> create();
+
+//    StdVector<E> create(E e);
   }
 }

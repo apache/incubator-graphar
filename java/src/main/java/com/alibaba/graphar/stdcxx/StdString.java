@@ -16,8 +16,10 @@
 package com.alibaba.graphar.stdcxx;
 
 import com.alibaba.fastffi.CXXHead;
+import com.alibaba.fastffi.CXXOperator;
 import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
+import com.alibaba.fastffi.CXXValue;
 import com.alibaba.fastffi.FFIFactory;
 import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFIStringProvider;
@@ -66,6 +68,9 @@ public interface StdString extends CXXPointer, LLVMPointer, FFIStringReceiver, F
 
     StdString create(@CXXReference StdString string);
   }
+
+  @CXXOperator("==")
+  boolean eq(@CXXReference StdString other);
 
   long size();
 

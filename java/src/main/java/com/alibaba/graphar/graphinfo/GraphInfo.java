@@ -1,17 +1,17 @@
 /* Copyright 2022 Alibaba Group Holding Limited.
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
- http://www.apache.org/licenses/LICENSE-2.0
+http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- */
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package com.alibaba.graphar.graphinfo;
 
 import static com.alibaba.graphar.utils.CppClassName.GAR_GRAPH_INFO;
@@ -28,6 +28,7 @@ import com.alibaba.fastffi.FFILibrary;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
+import com.alibaba.graphar.stdcxx.StdMap;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.types.AdjListType;
 import com.alibaba.graphar.utils.InfoVersion;
@@ -119,14 +120,14 @@ public interface GraphInfo extends CXXPointer {
    * @param property edge property that belongs to the group
    * @param adjListType adj list type of edge
    */
-    @FFINameAlias("GetEdgePropertyGroup")
-    @CXXValue
-    Result<@CXXReference PropertyGroup> getEdgePropertyGroup(
-        @CXXReference StdString srcLabel,
-        @CXXReference StdString edgeLabel,
-        @CXXReference StdString dstLabel,
-        @CXXReference StdString property,
-        @CXXValue AdjListType adjListType);
+  @FFINameAlias("GetEdgePropertyGroup")
+  @CXXValue
+  Result<@CXXReference PropertyGroup> getEdgePropertyGroup(
+      @CXXReference StdString srcLabel,
+      @CXXReference StdString edgeLabel,
+      @CXXReference StdString dstLabel,
+      @CXXReference StdString property,
+      @CXXValue AdjListType adjListType);
 
   /**
    * Adds a vertex info to the GraphInfo instance.
@@ -189,20 +190,20 @@ public interface GraphInfo extends CXXPointer {
    *
    * @return vertex infos of graph info
    */
-  //      @FFINameAlias("GetVertexInfos")
-  //      @FFIConst
-  //      @CXXReference
-  //      @FFITypeAlias("std::map<std::string, GraphArchive::VertexInfo>")
-  //      StdMap<StdString, VertexInfo> getVertexInfos();
+  @FFINameAlias("GetVertexInfos")
+  @FFIConst
+  @CXXReference
+  StdMap<StdString, @CXXReference VertexInfo> getVertexInfos();
 
   /**
    * Get the edge infos of graph info
    *
    * @return edge infos of graph info
    */
-  // @FFINameAlias("GetEdgeInfos")
-  // @FFIConst @CXXReference @FFITypeAlias("std::map<std::string, EdgeInfo>&") StdMap<StdString,
-  // EdgeInfo> getEdgeInfos();
+  @FFINameAlias("GetEdgeInfos")
+  @FFIConst
+  @CXXReference
+  StdMap<StdString, @CXXReference EdgeInfo> getEdgeInfos();
 
   /**
    * Saves the graph info to a YAML file.
@@ -255,12 +256,20 @@ public interface GraphInfo extends CXXPointer {
      *
      * @param graphName The name of the graph.
      * @param version The version of the graph info.
-     * @param prefix The absolute path prefix to store chunk files of the graph. Defaults to "./".
+     * @param prefix The absolute path prefix to store chunk files of the graph.
      */
     GraphInfo create(
         @CXXReference StdString graphName,
         @CXXReference InfoVersion version,
         @CXXReference StdString prefix);
+
+    /**
+     * Constructs a GraphInfo instance.
+     *
+     * @param graphName The name of the graph.
+     * @param version The version of the graph info.
+     */
+    GraphInfo create(@CXXReference StdString graphName, @CXXReference InfoVersion version);
   }
 
   @FFIGen
