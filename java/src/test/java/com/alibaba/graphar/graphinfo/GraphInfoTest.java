@@ -77,7 +77,6 @@ public class GraphInfoTest {
 
   @Test
   public void testGraphInfoLoadFromFile() {
-    System.out.println(root);
     String path = root + "/ldbc_sample/csv/ldbc_sample.graph.yml";
     Result<GraphInfo> graphInfoResult = GraphInfo.load(path);
     Assert.assertFalse(graphInfoResult.hasError());

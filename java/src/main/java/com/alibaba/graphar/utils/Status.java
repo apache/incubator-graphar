@@ -47,21 +47,21 @@ public interface Status extends CXXPointer {
   boolean isInvalid();
 
   /** Return true if the status indicates an index out of bounds. */
-//  @FFINameAlias("IsIndexError")
-//  boolean isIndexError();
+  @FFINameAlias("IsIndexError")
+  boolean isIndexError();
 
   /** Return true if the status indicates a yaml parse related failure. */
-//  @FFINameAlias("IsYamlError")
-//   boolean isYamlError();
+  @FFINameAlias("IsYamlError")
+   boolean isYamlError();
 
   /** Return true if the status indicates an arrow-related failure. */
-//  @FFINameAlias("IsArrowError")
-//  boolean isArrowError();
+  @FFINameAlias("IsArrowError")
+  boolean isArrowError();
 
   /** Return the StatusCode value attached to this status. */
-//  @CXXValue
-//  StatusCode code();
+  @CXXValue
+  StatusCode code();
 
   /** Return the specific error message attached to this status. */
-//  @CXXReference StdString message();
+  @CXXReference StdString message();
 }
