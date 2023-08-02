@@ -17,6 +17,7 @@ limitations under the License.
 #define CPP_GRIN_SRC_PREDEFINE_H_
 
 #include <map>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
