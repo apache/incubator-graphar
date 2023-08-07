@@ -99,7 +99,7 @@ file(GLOB WITH_GRIN_EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/example" 
 
 file(GLOB WITHOUT_GRIN_EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/grin/example" "${PROJECT_SOURCE_DIR}/grin/example/*_without_grin.cc")
 
-# build examples without grin
+# build examples with grin
 foreach(f ${WITH_GRIN_EXAMPLE_FILES})
     string(REGEX MATCH "^(.*)\\.[^.]*$" dummy ${f})
     set(E_NAME ${CMAKE_MATCH_1})
