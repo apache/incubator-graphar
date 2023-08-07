@@ -57,7 +57,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             std::get<GAR_NAMESPACE::EdgesCollection<GAR_ORDERED_BY_DEST>>(
                 _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_al->vid, edges.begin());
-        if (iter.is_end()) {
+        if (iter.is_end() && i + 1 < _al->etype_end) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -72,7 +72,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             std::get<GAR_NAMESPACE::EdgesCollection<GAR_UNORDERED_BY_DEST>>(
                 _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_al->vid, edges.begin());
-        if (iter.is_end()) {
+        if (iter.is_end() && i + 1 < _al->etype_end) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -87,7 +87,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             std::get<GAR_NAMESPACE::EdgesCollection<GAR_ORDERED_BY_SOURCE>>(
                 _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_al->vid, edges.begin());
-        if (iter.is_end()) {
+        if (iter.is_end() && i + 1 < _al->etype_end) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -102,7 +102,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             std::get<GAR_NAMESPACE::EdgesCollection<GAR_UNORDERED_BY_SOURCE>>(
                 _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_dst(_al->vid, edges.begin());
-        if (iter.is_end()) {
+        if (iter.is_end() && i + 1 < _al->etype_end) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -124,7 +124,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             std::get<GAR_NAMESPACE::EdgesCollection<GAR_ORDERED_BY_SOURCE>>(
                 _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_al->vid, edges.begin());
-        if (iter.is_end()) {
+        if (iter.is_end() && i + 1 < _al->etype_end) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -139,7 +139,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             std::get<GAR_NAMESPACE::EdgesCollection<GAR_UNORDERED_BY_SOURCE>>(
                 _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_al->vid, edges.begin());
-        if (iter.is_end()) {
+        if (iter.is_end() && i + 1 < _al->etype_end) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -154,7 +154,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             std::get<GAR_NAMESPACE::EdgesCollection<GAR_ORDERED_BY_DEST>>(
                 _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_al->vid, edges.begin());
-        if (iter.is_end()) {
+        if (iter.is_end() && i + 1 < _al->etype_end) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -169,7 +169,7 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
             std::get<GAR_NAMESPACE::EdgesCollection<GAR_UNORDERED_BY_DEST>>(
                 _g->edges_collections[i].at(adj_list_type));
         auto iter = edges.find_src(_al->vid, edges.begin());
-        if (iter.is_end()) {
+        if (iter.is_end() && i + 1 < _al->etype_end) {
           continue;
         } else {
           auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(
@@ -334,7 +334,9 @@ bool grin_is_adjacent_list_end(GRIN_GRAPH g, GRIN_ADJACENT_LIST_ITERATOR ali) {
   if (ali == GRIN_NULL_ADJACENT_LIST_ITERATOR)
     return true;
   auto _ali = static_cast<GRIN_ADJACENT_LIST_ITERATOR_T*>(ali);
-  return _ali->current_etype >= _ali->etype_end;
+  if (_ali->current_etype >= _ali->etype_end || _ali->iter.is_end())
+    return true;
+  return false;
 }
 
 GRIN_VERTEX grin_get_neighbor_from_adjacent_list_iter(
