@@ -143,8 +143,7 @@ int grin_get_vertex_property_value_of_int32(GRIN_GRAPH g, GRIN_VERTEX v,
   auto& property = _g->vertex_properties[vp];
   __grin_check_vertex_property(_v, 0);
   __grin_get_gar_vertex(_v);
-  return static_cast<int32_t>(
-      _v->vertex.value().property<int64_t>(property.name).value());
+  return _v->vertex.value().property<int32_t>(property.name).value();
 }
 
 unsigned int grin_get_vertex_property_value_of_uint32(GRIN_GRAPH g,
@@ -275,8 +274,7 @@ int grin_get_edge_property_value_of_int32(GRIN_GRAPH g, GRIN_EDGE e,
   auto _e = static_cast<GRIN_EDGE_T*>(e);
   auto& property = _g->edge_properties[ep];
   __grin_check_edge_property(_e, 0);
-  return static_cast<int32_t>(
-      _e->edge.property<int64_t>(property.name).value());
+  return _e->edge.property<int32_t>(property.name).value();
 }
 
 unsigned int grin_get_edge_property_value_of_uint32(GRIN_GRAPH g, GRIN_EDGE e,

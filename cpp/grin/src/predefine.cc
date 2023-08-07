@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <glog/logging.h>
 #include <algorithm>
 #include <string>
 #include <vector>
@@ -250,6 +251,14 @@ void __grin_init_vertex_properties(GRIN_GRAPH_T* graph) {
     std::map<std::string, unsigned> name_2_id;
     for (auto& group : vertex_info.GetPropertyGroups()) {
       for (auto& property : group.GetProperties()) {
+        if (property.type.id() == GAR_NAMESPACE::Type::INT32) {
+          if (vertex_info.GetPropertyGroup(property.name)
+                  .value()
+                  .GetFileType() == GAR_NAMESPACE::FileType::CSV) {
+            LOG(ERROR) << "CSV file is not supported for int32 data type "
+                          "currently in GraphAr";
+          }
+        }
         GRIN_VERTEX_PROPERTY_T vp(vtype, property.name,
                                   GARToDataType(property.type),
                                   property.is_primary);
@@ -284,6 +293,14 @@ void __grin_init_edge_properties(GRIN_GRAPH_T* graph) {
       auto adj_list_type = graph->edges_collections[et].begin()->first;
       for (auto& group : edge_info.GetPropertyGroups(adj_list_type).value()) {
         for (auto& property : group.GetProperties()) {
+          if (property.type.id() == GAR_NAMESPACE::Type::INT32) {
+            if (edge_info.GetPropertyGroup(property.name, adj_list_type)
+                    .value()
+                    .GetFileType() == GAR_NAMESPACE::FileType::CSV) {
+              LOG(ERROR) << "CSV file is not supported for int32 data type "
+                            "currently in GraphAr";
+            }
+          }
           GRIN_EDGE_PROPERTY_T ep(etype, property.name,
                                   GARToDataType(property.type));
           if (name_2_id.find(property.name) != name_2_id.end()) {

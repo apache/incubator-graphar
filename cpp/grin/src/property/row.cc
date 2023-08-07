@@ -188,8 +188,8 @@ GRIN_ROW grin_get_vertex_row(GRIN_GRAPH g, GRIN_VERTEX v) {
 
     switch (property.type) {
     case GRIN_DATATYPE::Int32: {
-      auto value = _v->vertex.value().property<int64_t>(property.name).value();
-      r->push_back(static_cast<int32_t>(value));
+      auto value = _v->vertex.value().property<int32_t>(property.name).value();
+      r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::Int64: {
@@ -236,8 +236,8 @@ GRIN_ROW grin_get_edge_row(GRIN_GRAPH g, GRIN_EDGE e) {
 
     switch (property.type) {
     case GRIN_DATATYPE::Int32: {
-      auto value = _e->edge.property<int64_t>(property.name).value();
-      r->push_back(static_cast<int32_t>(value));
+      auto value = _e->edge.property<int32_t>(property.name).value();
+      r->push_back(value);
       break;
     }
     case GRIN_DATATYPE::Int64: {
