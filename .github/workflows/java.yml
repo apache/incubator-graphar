@@ -1,0 +1,134 @@
+name: GraphAr Java CI
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+    paths:
+      - 'java/**'
+      - '.github/workflows/java.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'java/**'
+      - '.github/workflows/java.yml'
+
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+env:
+  CMAKE_C_COMPILER_LAUNCHER: ccache
+  CMAKE_CXX_COMPILER_LAUNCHER: ccache
+
+  MAVEN_ARGS: "--no-transfer-progress"
+  LLVM11_HOME: /opt/llvm11.0.0
+  LLVM_VER: 11.0.0
+
+jobs:
+  GraphAr-java:
+    runs-on: ubuntu-20.04
+    container: vineyardcloudnative/manylinux-llvm:2014-11.0.0
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          
+      - name: Install dependencies
+        run: |
+          curl -L https://git.io/vaHfR --output /usr/local/bin/screenfetch
+          chmod +x /usr/local/bin/screenfetch
+
+          yum install -y ccache
+          
+      # install GrahpAr C++ library
+      - name: Install dependencies
+        run: |
+          yum update -y
+          yum install -y boost-devel libcurl-devel openssl-devel cmake
+
+      - name: Build GraphAr
+        run: |
+          mkdir build
+          pushd build
+          cmake ../cpp
+          make -j$(nproc)
+          make install
+          popd
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+          java-package: 'jdk'
+          cache: 'maven'
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.OSSRH_MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@master
+        with:
+          maven-version: 3.8.4
+
+      - name: Validate settings
+        run: |
+          mkdir -p /root/.m2
+          cp /github/home/.m2/settings.xml /root/.m2/settings.xml || true
+          cat /root/.m2/settings.xml
+
+      - name: Check environment
+        run: |
+          export PATH=$LLVM11_HOME/bin:$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH
+
+          echo "JAVA_HOME = ${JAVA_HOME}"
+          echo "MAVEN_HOME = ${MAVEN_HOME}"
+          echo "PATH = ${PATH}"
+
+          # check os
+          echo "########################################### checking os ..."
+          screenfetch
+
+          # check clang
+          echo "########################################### checking clang ..."
+          $LLVM11_HOME/bin/clang --version
+
+          # check llvm
+          echo "########################################### checking llvm ..."
+          $LLVM11_HOME/bin/llc --version
+
+          # check clang
+          echo "########################################### checking cmake ..."
+          cmake --version
+
+          # check java
+          echo "########################################### checking java ..."
+          java -version
+
+          # check mvn
+          echo "########################################### checking maven ..."
+          mvn --version
+
+      - name: Build, test and install FastFFI
+        run: |
+          export PATH=$PATH:$LLVM11_HOME/bin:$JAVA_HOME/bin:$MAVEN_HOME/bin
+
+          mkdir install-fastffi
+          pushd install-fastffi
+          git clone https://github.com/alibaba/fastffi
+          pushd fastffi
+          mvn clean install
+          popd
+          popd
+          
+      - name: Run test
+        run: |
+          pushd java
+          mvn clean test
+          popd
