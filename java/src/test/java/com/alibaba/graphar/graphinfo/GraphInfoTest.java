@@ -6,6 +6,7 @@ import com.alibaba.graphar.utils.InfoVersion;
 import com.alibaba.graphar.utils.Result;
 import com.alibaba.graphar.utils.Status;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class GraphInfoTest {
@@ -89,11 +90,8 @@ public class GraphInfoTest {
     Assert.assertEquals(1, edgeInfos.size());
   }
 
-  @Test
+  @Ignore("Problem about arrow 12.0.0 with S3, see https://github.com/alibaba/GraphAr/issues/187")
   public void testGraphInfoLoadFromS3() {
-    // arrow::fs::Fi
-    // nalizeS3 was not called even though S3 was initialized.  This could lead to a segmentation
-    // fault at exit
     String path =
         "s3://graphar/ldbc/ldbc.graph.yml"
             + "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
