@@ -18,7 +18,7 @@ package com.alibaba.graphar
 import java.io.{File, FileInputStream}
 import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.{SparkSession}
-import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.{Yaml, DumperOptions}
 import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
 
@@ -239,7 +239,12 @@ class VertexInfo() {
       }
       data.put("property_groups", property_group_maps)
     }
-    val yaml = new Yaml()
+    val options = new DumperOptions()
+    options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)
+    options.setIndent(4)
+    options.setIndicatorIndent(2);
+    options.setPrettyFlow(true)
+    val yaml = new Yaml(options)
     return yaml.dump(data)
   }
 }

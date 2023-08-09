@@ -16,7 +16,6 @@
         <PermGen>512m</PermGen>
         <MaxPermGen>1024m</MaxPermGen>
         <spark.version>3.2.2</spark.version>
-        <maven.compiler.release>8</maven.compiler.release>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <cupid.sdk.version>3.3.8-public</cupid.sdk.version>
