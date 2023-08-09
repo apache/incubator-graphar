@@ -16,50 +16,61 @@ on:
       - 'java/**'
       - '.github/workflows/java.yml'
 
-
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
   cancel-in-progress: true
 
 env:
-  CMAKE_C_COMPILER_LAUNCHER: ccache
-  CMAKE_CXX_COMPILER_LAUNCHER: ccache
-
-  MAVEN_ARGS: "--no-transfer-progress"
   LLVM11_HOME: /opt/llvm11.0.0
   LLVM_VER: 11.0.0
 
 jobs:
   GraphAr-java:
     runs-on: ubuntu-20.04
-    container: vineyardcloudnative/manylinux-llvm:2014-11.0.0
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
           
+      - name: Install llvm-11
+        run: |
+          bash ${GITHUB_WORKSPACE}/java/install-llvm11.sh
+    
+
+      # install GrahpAr C++ library first
+      - name: Cache for ccache
+        uses: actions/cache@v3
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.os }}-build-ccache-${{ hashFiles('**/git-modules.txt') }}
+          restore-keys: |
+            ${{ matrix.os }}-build-ccache-
       - name: Install dependencies
         run: |
-          curl -L https://git.io/vaHfR --output /usr/local/bin/screenfetch
-          chmod +x /usr/local/bin/screenfetch
-
-          yum install -y ccache
+         
+          # install the latest arrow deb to test arrow
+          wget -c https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
+              -P /tmp/
+          sudo apt-get install -y -V /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
+          sudo apt-get update -y
+          sudo apt-get install -y libarrow-dev
+          sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
           
-      # install GrahpAr C++ library
-      - name: Install dependencies
-        run: |
-          yum update -y
-          yum install -y boost-devel libcurl-devel openssl-devel cmake
-
-      - name: Build GraphAr
+      - name: CMake
         run: |
           mkdir build
           pushd build
           cmake ../cpp
-          make -j$(nproc)
-          make install
           popd
-
+          
+      - name: Build GraphAr
+        run: |
+          pushd build
+          make -j$(nproc)
+          sudo make install
+          popd
+          
+      # Install Java dependencies
       - uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
@@ -76,59 +87,20 @@ jobs:
         uses: stCarolas/setup-maven@master
         with:
           maven-version: 3.8.4
-
-      - name: Validate settings
-        run: |
-          mkdir -p /root/.m2
-          cp /github/home/.m2/settings.xml /root/.m2/settings.xml || true
-          cat /root/.m2/settings.xml
-
+          
       - name: Check environment
         run: |
           export PATH=$LLVM11_HOME/bin:$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH
-
-          echo "JAVA_HOME = ${JAVA_HOME}"
-          echo "MAVEN_HOME = ${MAVEN_HOME}"
-          echo "PATH = ${PATH}"
-
-          # check os
-          echo "########################################### checking os ..."
-          screenfetch
-
-          # check clang
-          echo "########################################### checking clang ..."
-          $LLVM11_HOME/bin/clang --version
-
-          # check llvm
-          echo "########################################### checking llvm ..."
-          $LLVM11_HOME/bin/llc --version
-
-          # check clang
-          echo "########################################### checking cmake ..."
-          cmake --version
-
-          # check java
-          echo "########################################### checking java ..."
-          java -version
-
-          # check mvn
-          echo "########################################### checking maven ..."
-          mvn --version
-
-      - name: Build, test and install FastFFI
+          
+      - name: Install fastFFI
         run: |
-          export PATH=$PATH:$LLVM11_HOME/bin:$JAVA_HOME/bin:$MAVEN_HOME/bin
-
-          mkdir install-fastffi
-          pushd install-fastffi
           git clone https://github.com/alibaba/fastffi
           pushd fastffi
           mvn clean install
-          popd
           popd
           
       - name: Run test
         run: |
           pushd java
-          mvn clean test
+          mvn test
           popd
