@@ -97,10 +97,10 @@ case class GarTable(
     }
 
   /**
-   * Check if a data type is supported. Note: Currently, the GraphAr data source
-   * only supports several atomic data types. To support additional data types
-   * such as Struct, Array and Map, revise this function to handle them case by
-   * case as the commented code shows.
+   * Check if a data type is supported.
+   * Note: Currently, the GraphAr data source only supports several atomic data types.
+   * To support additional data types such as Struct, Array and Map, revise this function
+   * to handle them case by case as the commented code shows.
    */
   override def supportsDataType(dataType: DataType): Boolean = dataType match {
     // case _: AnsiIntervalType => false

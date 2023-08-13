@@ -1,30 +1,32 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
- *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
- */
+/** Copyright 2022 Alibaba Group Holding Limited.
+  *
+  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+  * use this file except in compliance with the License. You may obtain a copy
+  * of the License at
+  *
+  * http://www.apache.org/licenses/LICENSE-2.0
+  *
+  * Unless required by applicable law or agreed to in writing, software
+  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+  * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+  * License for the specific language governing permissions and limitations
+  * under the License.
+  */
 
 package com.alibaba.graphar.datasources
 
-import scala.collection.JavaConverters._
-
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.connector.read.Scan
+import org.apache.spark.sql.connector.read.{Scan, SupportsPushDownFilters}
 import org.apache.spark.sql.execution.datasources.PartitioningAwareFileIndex
+
 import org.apache.spark.sql.execution.datasources.v2.FileScanBuilder
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
+
+import scala.collection.JavaConverters._
+import org.apache.spark.sql.execution.datasources.v2.orc.OrcScanBuilder
+import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetScanBuilder
 
 /** GarScanBuilder is a class to build the file scan for GarDataSource. */
 case class GarScanBuilder(
@@ -34,12 +36,36 @@ case class GarScanBuilder(
     dataSchema: StructType,
     options: CaseInsensitiveStringMap,
     formatName: String
-) extends FileScanBuilder(sparkSession, fileIndex, dataSchema) {
+) extends FileScanBuilder(sparkSession, fileIndex, dataSchema)
+    with SupportsPushDownFilters {
   lazy val hadoopConf = {
     val caseSensitiveMap = options.asCaseSensitiveMap.asScala.toMap
     // Hadoop Configurations are case sensitive.
     sparkSession.sessionState.newHadoopConfWithOptions(caseSensitiveMap)
   }
+
+  private var filters: Array[Filter] = Array.empty
+  override def pushFilters(filters: Array[Filter]): Array[Filter] = {
+    this.filters = filters
+    filters
+  }
+
+  override def pushedFilters(): Array[Filter] = {
+    formatName match {
+      case "csv"     => Array.empty
+      case "orc"     => pushedOrcFilters
+      case "parquet" => pushedParquetFilters
+      case _         => throw new IllegalArgumentException
+    }
+  }
+
+  private lazy val pushedParquetFilters =
+    ParquetScanBuilder(sparkSession, fileIndex, schema, dataSchema, options)
+      .pushFilters(filters)
+
+  private lazy val pushedOrcFilters =
+    OrcScanBuilder(sparkSession, fileIndex, schema, dataSchema, options)
+      .pushFilters(filters)
 
   // Check if the file format supports nested schema pruning.
   override protected val supportsNestedSchemaPruning: Boolean =
@@ -50,15 +76,6 @@ case class GarScanBuilder(
       case _         => throw new IllegalArgumentException
     }
 
-  // Note: This scan builder does not implement "with SupportsPushDownFilters".
-  private var filters: Array[Filter] = Array.empty
-
-  // Note: To support pushdown filters, these two methods need to be implemented.
-
-  // override def pushFilters(filters: Array[Filter]): Array[Filter]
-
-  // override def pushedFilters(): Array[Filter]
-
   /** Build the file scan for GarDataSource. */
   override def build(): Scan = {
     GarScan(
@@ -68,7 +85,7 @@ case class GarScanBuilder(
       dataSchema,
       readDataSchema(),
       readPartitionSchema(),
-      filters,
+      pushedFilters(),
       options,
       formatName
     )

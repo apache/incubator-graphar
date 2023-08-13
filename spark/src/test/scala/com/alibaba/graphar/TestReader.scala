@@ -16,14 +16,9 @@
 
 package com.alibaba.graphar
 
-import com.alibaba.graphar.datasources._
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 
-import java.io.{File, FileInputStream}
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
-import scala.beans.BeanProperty
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.scalatest.funsuite.AnyFunSuite
 
 class ReaderSuite extends AnyFunSuite {
@@ -33,7 +28,10 @@ class ReaderSuite extends AnyFunSuite {
     .master("local[*]")
     .getOrCreate()
 
+  spark.sparkContext.setLogLevel("Error")
+
   test("read chunk files directly") {
+    val cond = "id < 1000"
     // read vertex chunk files in Parquet
     val parquet_file_path = "gar-test/ldbc_sample/parquet/"
     val parquet_prefix =
@@ -46,7 +44,9 @@ class ReaderSuite extends AnyFunSuite {
     // validate reading results
     assert(df1.rdd.getNumPartitions == 10)
     assert(df1.count() == 903)
-    // println(df1.rdd.collect().mkString("\n"))
+    var df_pd = df1.filter(cond)
+    df_pd.explain()
+    df_pd.show()
 
     // read vertex chunk files in Orc
     val orc_file_path = "gar-test/ldbc_sample/orc/"
@@ -58,6 +58,9 @@ class ReaderSuite extends AnyFunSuite {
       .load(orc_read_path)
     // validate reading results
     assert(df2.rdd.collect().deep == df1.rdd.collect().deep)
+    df_pd = df1.filter(cond)
+    df_pd.explain()
+    df_pd.show()
 
     // read adjList chunk files recursively in CSV
     val csv_file_path = "gar-test/ldbc_sample/csv/"
@@ -85,7 +88,7 @@ class ReaderSuite extends AnyFunSuite {
 
   test("read vertex chunks") {
     // construct the vertex information
-    val file_path = "gar-test/ldbc_sample/csv/"
+    val file_path = "gar-test/ldbc_sample/parquet/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
     val vertex_yaml = getClass.getClassLoader
       .getResource(file_path + "person.vertex.yml")
@@ -101,42 +104,50 @@ class ReaderSuite extends AnyFunSuite {
 
     // test reading a single property chunk
     val single_chunk_df = reader.readVertexPropertyChunk(property_group, 0)
-    assert(single_chunk_df.columns.size == 3)
+    assert(single_chunk_df.columns.length == 3)
     assert(single_chunk_df.count() == 100)
+    val cond = "gender = 'female'"
+    var df_pd = single_chunk_df.select("firstName","gender").filter(cond)
+    df_pd.explain()
+    df_pd.show()
 
-    // test reading chunks for a property group
-    val property_df = reader.readVertexPropertyGroup(property_group, false)
-    assert(property_df.columns.size == 3)
+    // test reading all chunks for a property group
+    val property_df = reader.readVertexPropertyGroup(property_group, addIndex = false)
+    assert(property_df.columns.length == 3)
     assert(property_df.count() == 903)
+    df_pd = property_df.select("firstName", "gender").filter(cond)
+    df_pd.explain()
+    df_pd.show()
 
     // test reading chunks for multiple property groups
     val property_group_1 = vertex_info.getPropertyGroup("id")
-    var property_groups = new java.util.ArrayList[PropertyGroup]()
+    val property_groups = new java.util.ArrayList[PropertyGroup]()
     property_groups.add(property_group_1)
     property_groups.add(property_group)
-    val multiple_property_df =
-      reader.readMultipleVertexPropertyGroups(property_groups, false)
-    assert(multiple_property_df.columns.size == 4)
+    val multiple_property_df = reader.readMultipleVertexPropertyGroups(property_groups, addIndex = false)
+    assert(multiple_property_df.columns.length == 4)
     assert(multiple_property_df.count() == 903)
-
+    df_pd = multiple_property_df.filter(cond)
+    df_pd.explain()
+    df_pd.show()
     // test reading chunks for all property groups and optionally adding indices
-    val vertex_df = reader.readAllVertexPropertyGroups(false)
-    vertex_df.show()
-    assert(vertex_df.columns.size == 4)
+    val vertex_df = reader.readAllVertexPropertyGroups(addIndex = false)
+    assert(vertex_df.columns.length == 4)
     assert(vertex_df.count() == 903)
+    df_pd = vertex_df.filter(cond)
+    df_pd.explain()
+    df_pd.show()
     val vertex_df_with_index = reader.readAllVertexPropertyGroups()
-    vertex_df_with_index.show()
-    assert(vertex_df_with_index.columns.size == 5)
+    assert(vertex_df_with_index.columns.length == 5)
     assert(vertex_df_with_index.count() == 903)
+    df_pd = vertex_df_with_index.filter(cond).select("firstName", "gender")
+    df_pd.explain("formatted")
+    df_pd.show()
 
     // throw an exception for non-existing property groups
     val invalid_property_group = new PropertyGroup()
-    assertThrows[IllegalArgumentException](
-      reader.readVertexPropertyChunk(invalid_property_group, 0)
-    )
-    assertThrows[IllegalArgumentException](
-      reader.readVertexPropertyGroup(invalid_property_group)
-    )
+    assertThrows[IllegalArgumentException](reader.readVertexPropertyChunk(invalid_property_group, 0))
+    assertThrows[IllegalArgumentException](reader.readVertexPropertyGroup(invalid_property_group))
   }
 
   test("read edge chunks") {
@@ -229,15 +240,9 @@ class ReaderSuite extends AnyFunSuite {
 
     // throw an exception for non-existing property groups
     val invalid_property_group = new PropertyGroup()
-    assertThrows[IllegalArgumentException](
-      reader.readEdgePropertyChunk(invalid_property_group, 0, 0)
-    )
-    assertThrows[IllegalArgumentException](
-      reader.readEdgePropertyGroupForVertexChunk(invalid_property_group, 0)
-    )
-    assertThrows[IllegalArgumentException](
-      reader.readEdgePropertyGroup(invalid_property_group)
-    )
+    assertThrows[IllegalArgumentException](reader.readEdgePropertyChunk(invalid_property_group, 0, 0))
+    assertThrows[IllegalArgumentException](reader.readEdgePropertyGroupForVertexChunk(invalid_property_group, 0))
+    assertThrows[IllegalArgumentException](reader.readEdgePropertyGroup(invalid_property_group))
 
     // throw an exception for non-existing adjList types
     val invalid_adj_list_type = AdjListType.unordered_by_dest
