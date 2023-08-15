@@ -7,12 +7,14 @@ on:
     branches:
       - main
     paths:
+      - 'cpp/src/**'
       - 'java/**'
       - '.github/workflows/java.yml'
   pull_request:
     branches:
       - main
     paths:
+      - 'cpp/src/**'
       - 'java/**'
       - '.github/workflows/java.yml'
 
@@ -20,23 +22,14 @@ concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
   cancel-in-progress: true
 
-env:
-  LLVM11_HOME: /opt/llvm11.0.0
-  LLVM_VER: 11.0.0
-
 jobs:
   GraphAr-java:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
           
-      - name: Install llvm-11
-        run: |
-          bash ${GITHUB_WORKSPACE}/java/install-llvm11.sh
-    
-
       # install GrahpAr C++ library first
       - name: Cache for ccache
         uses: actions/cache@v3
@@ -45,62 +38,27 @@ jobs:
           key: ${{ matrix.os }}-build-ccache-${{ hashFiles('**/git-modules.txt') }}
           restore-keys: |
             ${{ matrix.os }}-build-ccache-
+
       - name: Install dependencies
         run: |
-         
           # install the latest arrow deb to test arrow
-          wget -c https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
-              -P /tmp/
-          sudo apt-get install -y -V /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
           sudo apt-get update -y
-          sudo apt-get install -y libarrow-dev
-          sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
+          sudo apt-get install ccache -y
+          sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
           
-      - name: CMake
+      - name: Build and Install cpp 
         run: |
           mkdir build
           pushd build
           cmake ../cpp
-          popd
-          
-      - name: Build GraphAr
-        run: |
-          pushd build
           make -j$(nproc)
           sudo make install
           popd
           
-      # Install Java dependencies
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '8'
-          java-package: 'jdk'
-          cache: 'maven'
-          server-id: ossrh
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-          gpg-private-key: ${{ secrets.OSSRH_MAVEN_GPG_PRIVATE_KEY }}
-          gpg-passphrase: MAVEN_GPG_PASSPHRASE
-
-      - name: Set up Maven
-        uses: stCarolas/setup-maven@master
-        with:
-          maven-version: 3.8.4
-          
-      - name: Check environment
-        run: |
-          export PATH=$LLVM11_HOME/bin:$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH
-          
-      - name: Install fastFFI
-        run: |
-          git clone https://github.com/alibaba/fastffi
-          pushd fastffi
-          mvn clean install
-          popd
-          
       - name: Run test
         run: |
+          export JAVA_HOME=${JAVA_HOME_11_X64}
+          export LLVM11_HOME=/usr/lib/llvm-11
           pushd java
           mvn test
           popd

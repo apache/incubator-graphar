@@ -44,6 +44,7 @@
             <groupId>com.alibaba.fastffi</groupId>
             <artifactId>llvm4jni</artifactId>
             <version>${fastffi.revision}</version>
+            <classifier>${os.detected.classifier}</classifier>
             <scope>provided</scope>
         </dependency>
 
@@ -51,6 +52,7 @@
         <dependency>
             <groupId>com.alibaba.fastffi</groupId>
             <artifactId>llvm</artifactId>
+            <classifier>${os.detected.classifier}</classifier>
             <version>${fastffi.revision}</version>
         </dependency>
 
@@ -63,6 +65,13 @@
     </dependencies>
 
     <build>
+	<extensions>
+            <extension>
+                <groupId>kr.motd.maven</groupId>
+                <artifactId>os-maven-plugin</artifactId>
+                <version>1.7.0</version>
+            </extension>
+        </extensions>
         <plugins>
             <plugin>
                 <groupId>kr.motd.maven</groupId>
