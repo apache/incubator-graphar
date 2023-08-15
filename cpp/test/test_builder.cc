@@ -178,7 +178,7 @@ TEST_CASE("test_edges_builder") {
     lines++;
     std::string val;
     std::istringstream readstr(line);
-    int64_t s, d;
+    int64_t s = 0, d = 0;
     for (int i = 0; i < 3; i++) {
       getline(readstr, val, '|');
       if (i == 0) {

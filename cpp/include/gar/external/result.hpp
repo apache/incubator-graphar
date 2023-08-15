@@ -4285,6 +4285,7 @@ auto RESULT_NS_IMPL::detail::throw_bad_result_access(E&& error) -> void
   >;
 
   throw exception_type{
+    error.message(),
     detail::forward<E>(error)
   };
 #endif
