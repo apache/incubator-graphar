@@ -90,7 +90,7 @@ function(build_arrow)
 
     find_package(Threads)
     find_package(Arrow QUIET)
-    set(ARROW_VERSION_TO_BUILD "12.0.1" CACHE INTERNAL "arrow version")
+    set(ARROW_VERSION_TO_BUILD "10.0.1" CACHE INTERNAL "arrow version")
     if (Arrow_FOUND) # arrow is installed, build the same version as the installed one
         message(STATUS "Found Arrow installed, align to version: ${Arrow_VERSION}")
         set(ARROW_VERSION_TO_BUILD "${Arrow_VERSION}" CACHE INTERNAL "arrow version")

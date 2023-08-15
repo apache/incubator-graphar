@@ -1,17 +1,17 @@
-/* Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
+ * except in compliance with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the
+ * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 package com.alibaba.graphar.graphinfo;
 
 import static com.alibaba.graphar.utils.CppClassName.GAR_EDGE_INFO;
@@ -307,40 +307,40 @@ public interface EdgeInfo extends CXXPointer {
   Result<StdString> getOffsetPathPrefix(@CXXValue AdjListType adjListType);
 
   /**
-   * Get the chunk file path of adj list property group
-   *    the property group chunks is aligned with the adj list topology chunks
+   * Get the chunk file path of adj list property group the property group chunks is aligned with
+   * the adj list topology chunks
    *
    * @param propertyGroup property group
    * @param adjListType adj list type that the property group belongs to
    * @param vertexChunkIndex the vertex chunk index
-   * @param edgeChunkIndex index of edge property group chunk of the vertex
-   * chunk
+   * @param edgeChunkIndex index of edge property group chunk of the vertex chunk
    */
   @FFINameAlias("GetPropertyFilePath")
   @CXXValue
   Result<StdString> getPropertyFilePath(
-      @CXXReference PropertyGroup propertyGroup, @CXXValue AdjListType adjListType,
-      @FFINameAlias(GAR_ID_TYPE) long vertexChunkIndex, @FFITypeAlias(GAR_ID_TYPE) long edgeChunkIndex);
+      @CXXReference PropertyGroup propertyGroup,
+      @CXXValue AdjListType adjListType,
+      @FFINameAlias(GAR_ID_TYPE) long vertexChunkIndex,
+      @FFITypeAlias(GAR_ID_TYPE) long edgeChunkIndex);
 
   /**
-   * Get the path prefix of the property group chunk for the given
-   * adjacency list type.
+   * Get the path prefix of the property group chunk for the given adjacency list type.
    *
    * @param propertyGroup property group.
    * @param adjListType The adjacency list type.
-   * @return A Result object containing the path prefix, or a Status object
-   * indicating an error.
+   * @return A Result object containing the path prefix, or a Status object indicating an error.
    */
   @FFINameAlias("GetPropertyGroupPathPrefix")
-  @CXXValue Result<StdString> getPropertyGroupPathPrefix(
+  @CXXValue
+  Result<StdString> getPropertyGroupPathPrefix(
       @CXXReference PropertyGroup propertyGroup, @CXXValue AdjListType adjListType);
 
   /**
    * Get the data type of the specified property.
    *
    * @param propertyName The name of the property.
-   * @return A Result object containing the data type of the property, or a
-   * KeyError Status object if the property is not found.
+   * @return A Result object containing the data type of the property, or a KeyError Status object
+   *     if the property is not found.
    */
   @FFINameAlias("GetPropertyType")
   @CXXValue
@@ -350,14 +350,13 @@ public interface EdgeInfo extends CXXPointer {
    * Returns whether the specified property is a primary key.
    *
    * @param propertyName The name of the property.
-   * @return A Result object containing a bool indicating whether the property
-   * is a primary key, or a KeyError Status object if the property is not found.
+   * @return A Result object containing a bool indicating whether the property is a primary key, or
+   *     a KeyError Status object if the property is not found.
    */
   @FFINameAlias("IsPrimaryKey")
   @CXXValue
   @FFITypeAlias("GraphArchive::Result<bool>")
   Result<Boolean> isPrimaryKey(@CXXReference StdString propertyName);
-
 
   /**
    * Saves the edge info to a YAML file.
@@ -372,54 +371,50 @@ public interface EdgeInfo extends CXXPointer {
   /**
    * Returns the edge info as a YAML formatted string.
    *
-   * @return A Result object containing the YAML string, or a Status object
-   * indicating an error.
+   * @return A Result object containing the YAML string, or a Status object indicating an error.
    */
   @FFINameAlias("Dump")
   @CXXValue
   Result<StdString> dump();
 
   /**
-   * Returns a new EdgeInfo object with the specified adjacency list type
-   * added to with given metadata.
+   * Returns a new EdgeInfo object with the specified adjacency list type added to with given
+   * metadata.
    *
    * @param adjListType The type of the adjacency list to add.
-   * @param fileType The file type of the adjacency list topology and offset
-   * chunk file.
+   * @param fileType The file type of the adjacency list topology and offset chunk file.
    * @param prefix The prefix of the adjacency list topology chunk.
-   * @return A Result object containing the new EdgeInfo object, or a Status
-   * object indicating an error.
+   * @return A Result object containing the new EdgeInfo object, or a Status object indicating an
+   *     error.
    */
   @FFINameAlias("ExtendAdjList")
   @CXXValue
-  Result<EdgeInfo> extendAdjList(@CXXValue AdjListType adjListType,
-                                       @CXXValue FileType fileType,
-                                       @CXXReference StdString prefix);
-
+  Result<EdgeInfo> extendAdjList(
+      @CXXValue AdjListType adjListType,
+      @CXXValue FileType fileType,
+      @CXXReference StdString prefix);
 
   /**
-   * Returns a new EdgeInfo object with the specified adjacency list type
-   * added to with given metadata.
+   * Returns a new EdgeInfo object with the specified adjacency list type added to with given
+   * metadata.
    *
    * @param adjListType The type of the adjacency list to add.
-   * @param fileType The file type of the adjacency list topology and offset
-   * chunk file.
-   * @return A Result object containing the new EdgeInfo object, or a Status
-   * object indicating an error.
+   * @param fileType The file type of the adjacency list topology and offset chunk file.
+   * @return A Result object containing the new EdgeInfo object, or a Status object indicating an
+   *     error.
    */
   @FFINameAlias("ExtendAdjList")
   @CXXValue
-  Result<EdgeInfo> extendAdjList(@CXXValue AdjListType adjListType,
-                                 @CXXValue FileType fileType);
+  Result<EdgeInfo> extendAdjList(@CXXValue AdjListType adjListType, @CXXValue FileType fileType);
 
   /**
-   * Returns a new EdgeInfo object with the specified property group added to
-   * given adjacency list type.
+   * Returns a new EdgeInfo object with the specified property group added to given adjacency list
+   * type.
    *
    * @param propertyGroup The PropertyGroup object to add.
    * @param adjListType The adjacency list type to add the property group to.
-   * @return A Result object containing the new EdgeInfo object, or a Status
-   * object indicating an error.
+   * @return A Result object containing the new EdgeInfo object, or a Status object indicating an
+   *     error.
    */
   @FFINameAlias("ExtendPropertyGroup")
   @CXXValue

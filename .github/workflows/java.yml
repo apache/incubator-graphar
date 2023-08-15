@@ -7,14 +7,14 @@ on:
     branches:
       - main
     paths:
-      - 'cpp/src/**'
+      - 'cpp/include/**'
       - 'java/**'
       - '.github/workflows/java.yml'
   pull_request:
     branches:
       - main
     paths:
-      - 'cpp/src/**'
+      - 'cpp/include/**'
       - 'java/**'
       - '.github/workflows/java.yml'
 
@@ -41,7 +41,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          # install the latest arrow deb to test arrow
           sudo apt-get update -y
           sudo apt-get install ccache libcurl4-openssl-dev -y
           sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
