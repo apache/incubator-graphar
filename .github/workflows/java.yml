@@ -43,7 +43,7 @@ jobs:
         run: |
           # install the latest arrow deb to test arrow
           sudo apt-get update -y
-          sudo apt-get install ccache -y
+          sudo apt-get install ccache libcurl4-openssl-dev -y
           sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
           
       - name: Build and Install cpp 
