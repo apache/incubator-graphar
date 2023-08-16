@@ -1182,7 +1182,7 @@ class GraphInfo {
       noexcept {
     if (vertex2info_.find(label) == vertex2info_.end()) {
       return Status::KeyError("The vertex info of ", label,
-                              "is not found in graph info.");
+                              " is not found in graph info.");
     }
     return vertex2info_.at(label);
   }
@@ -1219,7 +1219,7 @@ class GraphInfo {
       const std::string& label, const std::string& property) const noexcept {
     if (vertex2info_.find(label) == vertex2info_.end()) {
       return Status::KeyError("The vertex info of ", label,
-                              "is not found in graph info.");
+                              " is not found in graph info.");
     }
     return vertex2info_.at(label).GetPropertyGroup(property);
   }
