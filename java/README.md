@@ -1,6 +1,6 @@
-# GraphAr Java
+# [WIP] GraphAr Java
 
-This directory contains the code and build system for the GraphAr Java library which powered by [Alibaba-FastFFI](https://github.com/alibaba/fastFFI)
+This directory contains the code and build system for the GraphAr Java library which powered by [Alibaba-FastFFI](https://github.com/alibaba/fastFFI).
 
 ## Dependencies
 
