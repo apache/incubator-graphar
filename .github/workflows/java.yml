@@ -1,0 +1,63 @@
+name: GraphAr Java CI
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+    paths:
+      - 'cpp/include/**'
+      - 'java/**'
+      - '.github/workflows/java.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'cpp/include/**'
+      - 'java/**'
+      - '.github/workflows/java.yml'
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  GraphAr-java:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+          
+      # install GrahpAr C++ library first
+      - name: Cache for ccache
+        uses: actions/cache@v3
+        with:
+          path: ~/.ccache
+          key: ${{ matrix.os }}-build-ccache-${{ hashFiles('**/git-modules.txt') }}
+          restore-keys: |
+            ${{ matrix.os }}-build-ccache-
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install ccache libcurl4-openssl-dev -y
+          sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
+          
+      - name: Build and Install cpp 
+        run: |
+          mkdir build
+          pushd build
+          cmake ../cpp
+          make -j$(nproc)
+          sudo make install
+          popd
+          
+      - name: Run test
+        run: |
+          export JAVA_HOME=${JAVA_HOME_11_X64}
+          export LLVM11_HOME=/usr/lib/llvm-11
+          pushd java
+          mvn test
+          popd

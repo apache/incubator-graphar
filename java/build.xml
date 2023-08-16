@@ -1,0 +1,74 @@
+<project name="llvm4jni">
+    <target name="make">
+        <echo message="Make native code" level="info"/>
+
+        <mkdir dir="${project.build.directory}/native"/>
+
+        <property environment="env"/>
+        <fail unless="env.LLVM11_HOME" message="LLVM11_HOME not set."/>
+
+        <condition property="platform" value="linux64"><os family="unix" arch="amd64" />
+        </condition>
+
+        <condition property="platform" value="mac"><os family="mac" arch="x86_64" />
+        </condition>
+
+        <fail unless="platform" message="Not a supported platform."/>
+
+        <echo message="Native Library Name: ${native.library.name}" level="info"/>
+
+        <exec executable="cmake" dir="${project.build.directory}/native" failonerror="true">
+            <arg line="-DCMAKE_AR=&quot;${env.LLVM11_HOME}/bin/llvm-ar&quot; -DCMAKE_RANLIB=&quot;${env.LLVM11_HOME}/bin/llvm-ranlib&quot; -DCMAKE_C_COMPILER=&quot;${env.LLVM11_HOME}/bin/clang&quot; -DCMAKE_CXX_COMPILER=&quot;${env.LLVM11_HOME}/bin/clang++&quot; -DCMAKE_CXX_FLAGS=&quot;-flto -fforce-emit-vtables&quot; ${basedir}"/>
+        </exec>
+
+        <exec executable="make" dir="${project.build.directory}/native" failonerror="true">
+            <arg line="VERBOSE=1"/>
+        </exec>
+    </target>
+
+    <target name="link-llvm-bitcode" depends="make">
+        <echo message="Link bitcode" level="info"/>
+
+        <exec executable="sh" dir="${project.build.directory}/native" failonerror="true">
+            <arg line="-c '${env.LLVM11_HOME}/bin/llvm-link ./bitcode/* -o ${native.library.name}.bc'" />
+        </exec>
+
+        <exec executable="cp" dir="${project.build.directory}/native" failonerror="true">
+            <arg line="${native.library.name}.bc ${project.build.directory}/classes"/>
+        </exec>
+    </target>
+
+    <target name="run-llvm4jni" depends="link-llvm-bitcode">
+        <echo message="Run LLVM4JNI" level="info"/>
+
+        <mkdir dir="${project.build.directory}/llvm4jni-output"/>
+
+        <condition property="native.library.file" value="lib${native.library.name}.so"><os family="unix" arch="amd64" />
+        </condition>
+
+        <condition property="native.library.file" value="lib${native.library.name}.dylib"><os family="mac" arch="x86_64" />
+        </condition>
+
+        <java classname="com.alibaba.fastffi.llvm4jni.Main"
+              fork="true" failonerror="true">
+            <arg value="-cp" />
+            <arg value="${project.build.directory}/classes" />
+            <arg value="-bc" />
+            <arg value="${project.build.directory}/native/${native.library.name}.bc" />
+            <!--
+            <arg value="-lib" />
+            <arg value="${project.build.directory}/native/${native.library.file}" />
+            -->
+            <arg value="-output" />
+            <arg value="${project.build.directory}/llvm4jni-output" />
+            <arg value="-v" />
+            <arg value="INFO" />
+            <jvmarg value="-Dllvm4jni.supportIndirectCall=simple" />
+            <jvmarg value="-Dllvm4jni.supportLocalConstant=true" />
+            <jvmarg value="-Dllvm4jni.maximumBytecodeSize=128" />
+            <classpath>
+                <pathelement path="${compile_classpath}"/>
+            </classpath>
+        </java>
+    </target>
+</project>
