@@ -14,7 +14,7 @@
 
 package com.alibaba.graphar.types;
 
-import static com.alibaba.graphar.utils.CppClassName.GAR_FILE_TYPE;
+import static com.alibaba.graphar.util.CppClassName.GAR_FILE_TYPE;
 
 import com.alibaba.fastffi.CXXEnum;
 import com.alibaba.fastffi.FFITypeAlias;

@@ -1,4 +1,4 @@
-package com.alibaba.graphar.utils;
+package com.alibaba.graphar.util;
 
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.stdcxx.StdVector;

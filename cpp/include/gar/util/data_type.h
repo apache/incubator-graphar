@@ -13,15 +13,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef GAR_UTILS_DATA_TYPE_H_
-#define GAR_UTILS_DATA_TYPE_H_
+#ifndef GAR_UTIL_DATA_TYPE_H_
+#define GAR_UTIL_DATA_TYPE_H_
 
 #include <map>
 #include <memory>
 #include <string>
 #include <utility>
 
-#include "gar/utils/macros.h"
+#include "gar/util/macros.h"
 
 // forward declaration
 namespace arrow {
@@ -116,4 +116,4 @@ class DataType {
 };  // struct DataType
 }  // namespace GAR_NAMESPACE_INTERNAL
 
-#endif  // GAR_UTILS_DATA_TYPE_H_
+#endif  // GAR_UTIL_DATA_TYPE_H_

@@ -21,13 +21,13 @@ limitations under the License.
 #include <vector>
 
 #include "gar/graph_info.h"
-#include "gar/utils/data_type.h"
-#include "gar/utils/filesystem.h"
-#include "gar/utils/general_params.h"
-#include "gar/utils/result.h"
-#include "gar/utils/status.h"
-#include "gar/utils/utils.h"
-#include "gar/utils/writer_utils.h"
+#include "gar/util/data_type.h"
+#include "gar/util/filesystem.h"
+#include "gar/util/general_params.h"
+#include "gar/util/result.h"
+#include "gar/util/status.h"
+#include "gar/util/util.h"
+#include "gar/util/writer_util.h"
 
 // forward declaration
 namespace arrow {

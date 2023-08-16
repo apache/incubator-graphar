@@ -13,21 +13,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef GAR_UTILS_FILESYSTEM_H_
-#define GAR_UTILS_FILESYSTEM_H_
+#ifndef GAR_UTIL_FILESYSTEM_H_
+#define GAR_UTIL_FILESYSTEM_H_
 
 #include <memory>
 #include <optional>
 #include <string>
 #include <vector>
 
-#include "gar/utils/file_type.h"
-#include "gar/utils/result.h"
-#include "gar/utils/status.h"
-#include "gar/utils/utils.h"
+#include "gar/util/file_type.h"
+#include "gar/util/result.h"
+#include "gar/util/status.h"
+#include "gar/util/util.h"
 
 #include "arrow/dataset/api.h"
-#include "gar/utils/reader_utils.h"
+#include "gar/util/reader_util.h"
 
 // forward declarations
 namespace arrow {
@@ -70,7 +70,7 @@ class FileSystem {
    */
   Result<std::shared_ptr<arrow::Table>> ReadFileToTable(
       const std::string& path, FileType file_type,
-      const utils::FilterOptions& options = {}) const noexcept;
+      const util::FilterOptions& options = {}) const noexcept;
 
   /**
    * @brief Read a file and convert its bytes to a value of type T.
@@ -146,4 +146,4 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri, std::string* out_path = nullptr);
 
 }  // namespace GAR_NAMESPACE_INTERNAL
-#endif  // GAR_UTILS_FILESYSTEM_H_
+#endif  // GAR_UTIL_FILESYSTEM_H_

@@ -21,8 +21,8 @@ limitations under the License.
 #include "./util.h"
 
 #include "gar/graph_info.h"
-#include "gar/utils/filesystem.h"
-#include "gar/utils/version_parser.h"
+#include "gar/util/filesystem.h"
+#include "gar/util/version_parser.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>

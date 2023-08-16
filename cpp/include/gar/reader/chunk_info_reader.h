@@ -21,12 +21,12 @@ limitations under the License.
 #include <vector>
 
 #include "gar/graph_info.h"
-#include "gar/utils/data_type.h"
-#include "gar/utils/filesystem.h"
-#include "gar/utils/reader_utils.h"
-#include "gar/utils/result.h"
-#include "gar/utils/status.h"
-#include "gar/utils/utils.h"
+#include "gar/util/data_type.h"
+#include "gar/util/filesystem.h"
+#include "gar/util/reader_util.h"
+#include "gar/util/result.h"
+#include "gar/util/status.h"
+#include "gar/util/util.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -57,7 +57,7 @@ class VertexPropertyChunkInfoReader {
                               vertex_info.GetPathPrefix(property_group));
     base_dir += pg_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
-                              utils::GetVertexChunkNum(prefix_, vertex_info_));
+                              util::GetVertexChunkNum(prefix_, vertex_info_));
   }
 
   /**
@@ -141,9 +141,9 @@ class AdjListChunkInfoReader {
     base_dir_ = prefix_ + adj_list_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(
         vertex_chunk_num_,
-        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+        util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     GAR_ASSIGN_OR_RAISE_ERROR(
-        chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+        chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
                                            vertex_chunk_index_));
   }
 
@@ -207,7 +207,7 @@ class AdjListChunkInfoReader {
       chunk_index_ = 0;
       GAR_ASSIGN_OR_RAISE_ERROR(
           chunk_num_,
-          utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+          util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
                                  vertex_chunk_index_));
     }
     return Status::OK();
@@ -253,9 +253,9 @@ class AdjListPropertyChunkInfoReader {
     base_dir_ = prefix_ + pg_path_prefix;
     GAR_ASSIGN_OR_RAISE_ERROR(
         vertex_chunk_num_,
-        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+        util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     GAR_ASSIGN_OR_RAISE_ERROR(
-        chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+        chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
                                            vertex_chunk_index_));
   }
 
@@ -321,7 +321,7 @@ class AdjListPropertyChunkInfoReader {
       chunk_index_ = 0;
       GAR_ASSIGN_OR_RAISE_ERROR(
           chunk_num_,
-          utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+          util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
                                  vertex_chunk_index_));
     }
     return Status::OK();

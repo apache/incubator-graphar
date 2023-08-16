@@ -13,15 +13,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef GAR_UTILS_VERSION_PARSER_H_
-#define GAR_UTILS_VERSION_PARSER_H_
+#ifndef GAR_UTIL_VERSION_PARSER_H_
+#define GAR_UTIL_VERSION_PARSER_H_
 
 #include <map>
 #include <regex>  // NOLINT
 #include <string>
 #include <vector>
 
-#include "gar/utils/result.h"
+#include "gar/util/result.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -105,4 +105,4 @@ class InfoVersion {
 };
 
 }  // namespace GAR_NAMESPACE_INTERNAL
-#endif  // GAR_UTILS_VERSION_PARSER_H_
+#endif  // GAR_UTIL_VERSION_PARSER_H_

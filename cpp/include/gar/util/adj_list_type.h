@@ -17,10 +17,10 @@ limitations under the License.
 #include <string>
 #include <utility>
 
-#include "gar/utils/macros.h"
+#include "gar/util/macros.h"
 
-#ifndef GAR_UTILS_ADJ_LIST_TYPE_H_
-#define GAR_UTILS_ADJ_LIST_TYPE_H_
+#ifndef GAR_UTIL_ADJ_LIST_TYPE_H_
+#define GAR_UTIL_ADJ_LIST_TYPE_H_
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -86,4 +86,4 @@ static inline std::pair<bool, std::string> AdjListTypeToOrderedAligned(
 }
 
 }  // namespace GAR_NAMESPACE_INTERNAL
-#endif  // GAR_UTILS_ADJ_LIST_TYPE_H_
+#endif  // GAR_UTIL_ADJ_LIST_TYPE_H_

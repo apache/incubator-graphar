@@ -12,18 +12,18 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.utils;
+package com.alibaba.graphar.util;
 
-import static com.alibaba.graphar.utils.CppClassName.GAR_DATA_TYPE;
-import static com.alibaba.graphar.utils.CppClassName.GAR_EDGE_INFO;
-import static com.alibaba.graphar.utils.CppClassName.GAR_FILE_TYPE;
-import static com.alibaba.graphar.utils.CppClassName.GAR_GRAPH_INFO;
-import static com.alibaba.graphar.utils.CppClassName.GAR_INFO_VERSION;
-import static com.alibaba.graphar.utils.CppClassName.GAR_PROPERTY_GROUP;
-import static com.alibaba.graphar.utils.CppClassName.GAR_RESULT;
-import static com.alibaba.graphar.utils.CppClassName.GAR_VERTEX_INFO;
-import static com.alibaba.graphar.utils.CppClassName.STD_STRING;
-import static com.alibaba.graphar.utils.CppHeaderName.GAR_GRAPH_INFO_H;
+import static com.alibaba.graphar.util.CppClassName.GAR_DATA_TYPE;
+import static com.alibaba.graphar.util.CppClassName.GAR_EDGE_INFO;
+import static com.alibaba.graphar.util.CppClassName.GAR_FILE_TYPE;
+import static com.alibaba.graphar.util.CppClassName.GAR_GRAPH_INFO;
+import static com.alibaba.graphar.util.CppClassName.GAR_INFO_VERSION;
+import static com.alibaba.graphar.util.CppClassName.GAR_PROPERTY_GROUP;
+import static com.alibaba.graphar.util.CppClassName.GAR_RESULT;
+import static com.alibaba.graphar.util.CppClassName.GAR_VERTEX_INFO;
+import static com.alibaba.graphar.util.CppClassName.STD_STRING;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;
@@ -46,7 +46,7 @@ import com.alibaba.fastffi.FFITypeAlias;
 @CXXTemplate(cxx = GAR_PROPERTY_GROUP, java = "com.alibaba.graphar.graphinfo.PropertyGroup")
 @CXXTemplate(cxx = GAR_DATA_TYPE, java = "com.alibaba.graphar.types.DataType")
 @CXXTemplate(cxx = GAR_FILE_TYPE, java = "com.alibaba.graphar.types.FileType")
-@CXXTemplate(cxx = GAR_INFO_VERSION, java = "com.alibaba.graphar.utils.InfoVersion")
+@CXXTemplate(cxx = GAR_INFO_VERSION, java = "com.alibaba.graphar.util.InfoVersion")
 public interface Result<T> extends CXXPointer {
 
   @CXXReference

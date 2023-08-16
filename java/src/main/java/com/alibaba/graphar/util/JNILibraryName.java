@@ -12,8 +12,8 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.utils;
+package com.alibaba.graphar.util;
 
-public class CppHeaderName {
-    public static final String GAR_GRAPH_INFO_H = "gar/graph_info.h";
+public class JNILibraryName {
+    public static final String GAR_JNI_LIBRARY_NAME = "gar-jni";
 }

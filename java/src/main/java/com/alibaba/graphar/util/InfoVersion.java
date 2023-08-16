@@ -12,10 +12,10 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.utils;
+package com.alibaba.graphar.util;
 
-import static com.alibaba.graphar.utils.CppClassName.GAR_INFO_VERSION;
-import static com.alibaba.graphar.utils.CppHeaderName.GAR_GRAPH_INFO_H;
+import static com.alibaba.graphar.util.CppClassName.GAR_INFO_VERSION;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;

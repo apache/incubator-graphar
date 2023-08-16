@@ -14,7 +14,7 @@ limitations under the License.
 */
 
 #include "gar/graph.h"
-#include "gar/utils/convert_to_arrow_type.h"
+#include "gar/util/convert_to_arrow_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 

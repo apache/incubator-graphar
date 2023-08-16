@@ -20,8 +20,8 @@ limitations under the License.
 
 #include "gar/graph_info.h"
 
-#ifndef GAR_UTILS_EXPRESSION_H_
-#define GAR_UTILS_EXPRESSION_H_
+#ifndef GAR_UTIL_EXPRESSION_H_
+#define GAR_UTIL_EXPRESSION_H_
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -353,4 +353,4 @@ template <typename T,
   return std::make_shared<ExpressionOr>(lhs, rhs);
 }
 }  // namespace GAR_NAMESPACE_INTERNAL
-#endif  // GAR_UTILS_EXPRESSION_H_
+#endif  // GAR_UTIL_EXPRESSION_H_

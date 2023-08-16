@@ -17,10 +17,10 @@ limitations under the License.
 #include <stdexcept>
 #include <string>
 
-#include "gar/utils/macros.h"
+#include "gar/util/macros.h"
 
-#ifndef GAR_UTILS_FILE_TYPE_H_
-#define GAR_UTILS_FILE_TYPE_H_
+#ifndef GAR_UTIL_FILE_TYPE_H_
+#define GAR_UTIL_FILE_TYPE_H_
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -48,4 +48,4 @@ static inline const char* FileTypeToString(FileType file_type) {
 }
 
 }  // namespace GAR_NAMESPACE_INTERNAL
-#endif  // GAR_UTILS_FILE_TYPE_H_
+#endif  // GAR_UTIL_FILE_TYPE_H_

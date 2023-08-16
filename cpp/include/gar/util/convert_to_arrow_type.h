@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef GAR_UTILS_CONVERT_TO_ARROW_TYPE_H_
-#define GAR_UTILS_CONVERT_TO_ARROW_TYPE_H_
+#ifndef GAR_UTIL_CONVERT_TO_ARROW_TYPE_H_
+#define GAR_UTIL_CONVERT_TO_ARROW_TYPE_H_
 
 #include <memory>
 #include <string>
@@ -22,7 +22,7 @@ limitations under the License.
 #include "arrow/api.h"
 #include "arrow/type.h"
 
-#include "gar/utils/data_type.h"
+#include "gar/util/data_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -59,4 +59,4 @@ CONVERT_TO_ARROW_TYPE(Type::STRING, std::string, arrow::LargeStringType,
 
 }  // namespace GAR_NAMESPACE_INTERNAL
 
-#endif  // GAR_UTILS_CONVERT_TO_ARROW_TYPE_H_
+#endif  // GAR_UTIL_CONVERT_TO_ARROW_TYPE_H_

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef GAR_UTILS_MACROS_H_
-#define GAR_UTILS_MACROS_H_
+#ifndef GAR_UTIL_MACROS_H_
+#define GAR_UTIL_MACROS_H_
 
 #include <cstdint>
 
@@ -46,4 +46,4 @@
 #define GAR_PREDICT_TRUE(x) (x)
 #endif
 
-#endif  // GAR_UTILS_MACROS_H_
+#endif  // GAR_UTIL_MACROS_H_

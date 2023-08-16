@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef GAR_UTILS_READER_UTILS_H_
-#define GAR_UTILS_READER_UTILS_H_
+#ifndef GAR_UTIL_READER_UTIL_H_
+#define GAR_UTIL_READER_UTIL_H_
 
 #include <memory>
 #include <string>
@@ -22,11 +22,11 @@ limitations under the License.
 #include <vector>
 
 #include "gar/graph_info.h"
-#include "gar/utils/expression.h"
+#include "gar/util/expression.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-namespace utils {
+namespace util {
 
 using Filter = std::shared_ptr<Expression>;
 using ColumnNames =
@@ -73,6 +73,6 @@ Result<IdType> GetEdgeNum(const std::string& prefix, const EdgeInfo& edge_info,
                           AdjListType adj_list_type,
                           IdType vertex_chunk_index) noexcept;
 
-}  // namespace utils
+}  // namespace util
 }  // namespace GAR_NAMESPACE_INTERNAL
-#endif  // GAR_UTILS_READER_UTILS_H_
+#endif  // GAR_UTIL_READER_UTIL_H_

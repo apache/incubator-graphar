@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef GAR_UTILS_GENERAL_PARAMS_H_
-#define GAR_UTILS_GENERAL_PARAMS_H_
+#ifndef GAR_UTIL_GENERAL_PARAMS_H_
+#define GAR_UTIL_GENERAL_PARAMS_H_
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -28,4 +28,4 @@ struct GeneralParams {
 
 }  // namespace GAR_NAMESPACE_INTERNAL
 
-#endif  // GAR_UTILS_GENERAL_PARAMS_H_
+#endif  // GAR_UTIL_GENERAL_PARAMS_H_

@@ -21,12 +21,12 @@ limitations under the License.
 #include "parquet/arrow/reader.h"
 
 #include "gar/graph_info.h"
-#include "gar/utils/filesystem.h"
-#include "gar/utils/reader_utils.h"
+#include "gar/util/filesystem.h"
+#include "gar/util/reader_util.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-namespace utils {
+namespace util {
 
 /**
  * @brief Checks whether the property names in the FilterOptions match the
@@ -191,6 +191,6 @@ Result<IdType> GetEdgeNum(const std::string& prefix, const EdgeInfo& edge_info,
   return edge_num;
 }
 
-}  // namespace utils
+}  // namespace util
 
 }  // namespace GAR_NAMESPACE_INTERNAL

@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef GAR_UTILS_UTILS_H_
-#define GAR_UTILS_UTILS_H_
+#ifndef GAR_UTIL_UTIL_H_
+#define GAR_UTIL_UTIL_H_
 
 #include <memory>
 #include <numeric>
@@ -22,7 +22,7 @@ limitations under the License.
 #include <utility>
 #include <vector>
 
-#include "gar/utils/result.h"
+#include "gar/util/result.h"
 
 #define REGULAR_SEPERATOR "_"
 
@@ -129,4 +129,4 @@ struct ValueGetter<std::string> {
 }  // namespace util
 
 }  // namespace GAR_NAMESPACE_INTERNAL
-#endif  // GAR_UTILS_UTILS_H_
+#endif  // GAR_UTIL_UTIL_H_

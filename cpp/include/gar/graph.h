@@ -26,8 +26,8 @@ limitations under the License.
 #include <vector>
 
 #include "gar/reader/arrow_chunk_reader.h"
-#include "gar/utils/reader_utils.h"
-#include "gar/utils/utils.h"
+#include "gar/util/reader_util.h"
+#include "gar/util/util.h"
 
 // forward declarations
 namespace arrow {
@@ -651,7 +651,7 @@ class EdgesCollection<AdjListType::ordered_by_source> {
       : edge_info_(edge_info), prefix_(prefix) {
     GAR_ASSIGN_OR_RAISE_ERROR(
         auto vertex_chunk_num,
-        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+        util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
       vertex_chunk_end = vertex_chunk_num;
@@ -662,7 +662,7 @@ class EdgesCollection<AdjListType::ordered_by_source> {
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
       GAR_ASSIGN_OR_RAISE_ERROR(
           edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
+          util::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
       if (i < vertex_chunk_begin) {
         chunk_begin_ += edge_chunk_nums[i];
         chunk_end_ += edge_chunk_nums[i];
@@ -671,7 +671,7 @@ class EdgesCollection<AdjListType::ordered_by_source> {
         chunk_end_ += edge_chunk_nums[i];
         GAR_ASSIGN_OR_RAISE_ERROR(
             auto chunk_edge_num_,
-            utils::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
+            util::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
         edge_num_ += chunk_edge_num_;
       }
     }
@@ -708,7 +708,7 @@ class EdgesCollection<AdjListType::ordered_by_source> {
    * @return The new constructed iterator.
    */
   EdgeIter find_src(IdType id, const EdgeIter& from) {
-    auto result = utils::GetAdjListOffsetOfVertex(edge_info_, prefix_,
+    auto result = util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
                                                   adj_list_type_, id);
     if (!result.status().ok()) {
       return this->end();
@@ -804,7 +804,7 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
       : edge_info_(edge_info), prefix_(prefix) {
     GAR_ASSIGN_OR_RAISE_ERROR(
         auto vertex_chunk_num,
-        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+        util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
       vertex_chunk_end = vertex_chunk_num;
@@ -815,7 +815,7 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
       GAR_ASSIGN_OR_RAISE_ERROR(
           edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
+          util::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
       if (i < vertex_chunk_begin) {
         chunk_begin_ += edge_chunk_nums[i];
         chunk_end_ += edge_chunk_nums[i];
@@ -824,7 +824,7 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
         chunk_end_ += edge_chunk_nums[i];
         GAR_ASSIGN_OR_RAISE_ERROR(
             auto chunk_edge_num_,
-            utils::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
+            util::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
         edge_num_ += chunk_edge_num_;
       }
     }
@@ -882,7 +882,7 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
    * @return The new constructed iterator.
    */
   EdgeIter find_dst(IdType id, const EdgeIter& from) {
-    auto result = utils::GetAdjListOffsetOfVertex(edge_info_, prefix_,
+    auto result = util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
                                                   adj_list_type_, id);
     if (!result.status().ok()) {
       return this->end();
@@ -957,7 +957,7 @@ class EdgesCollection<AdjListType::unordered_by_source> {
       : edge_info_(edge_info), prefix_(prefix) {
     GAR_ASSIGN_OR_RAISE_ERROR(
         auto vertex_chunk_num,
-        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+        util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
       vertex_chunk_end = vertex_chunk_num;
@@ -968,7 +968,7 @@ class EdgesCollection<AdjListType::unordered_by_source> {
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
       GAR_ASSIGN_OR_RAISE_ERROR(
           edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
+          util::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
       if (i < vertex_chunk_begin) {
         chunk_begin_ += edge_chunk_nums[i];
         chunk_end_ += edge_chunk_nums[i];
@@ -977,7 +977,7 @@ class EdgesCollection<AdjListType::unordered_by_source> {
         chunk_end_ += edge_chunk_nums[i];
         GAR_ASSIGN_OR_RAISE_ERROR(
             auto chunk_edge_num_,
-            utils::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
+            util::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
         edge_num_ += chunk_edge_num_;
       }
     }
@@ -1083,7 +1083,7 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
       : edge_info_(edge_info), prefix_(prefix) {
     GAR_ASSIGN_OR_RAISE_ERROR(
         auto vertex_chunk_num,
-        utils::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+        util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     std::vector<IdType> edge_chunk_nums(vertex_chunk_num, 0);
     if (vertex_chunk_end == std::numeric_limits<int64_t>::max()) {
       vertex_chunk_end = vertex_chunk_num;
@@ -1094,7 +1094,7 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
     for (IdType i = 0; i < vertex_chunk_num; ++i) {
       GAR_ASSIGN_OR_RAISE_ERROR(
           edge_chunk_nums[i],
-          utils::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
+          util::GetEdgeChunkNum(prefix, edge_info, adj_list_type_, i));
       if (i < vertex_chunk_begin) {
         chunk_begin_ += edge_chunk_nums[i];
         chunk_end_ += edge_chunk_nums[i];
@@ -1103,7 +1103,7 @@ class EdgesCollection<AdjListType::unordered_by_dest> {
         chunk_end_ += edge_chunk_nums[i];
         GAR_ASSIGN_OR_RAISE_ERROR(
             auto chunk_edge_num_,
-            utils::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
+            util::GetEdgeNum(prefix, edge_info, adj_list_type_, i));
         edge_num_ += chunk_edge_num_;
       }
     }

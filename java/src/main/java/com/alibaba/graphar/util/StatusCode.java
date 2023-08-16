@@ -12,16 +12,16 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.utils;
+package com.alibaba.graphar.util;
 
 import com.alibaba.fastffi.CXXEnum;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeRefiner;
 
-import static com.alibaba.graphar.utils.CppClassName.GAR_STATUS_CODE;
+import static com.alibaba.graphar.util.CppClassName.GAR_STATUS_CODE;
 
 @FFITypeAlias(GAR_STATUS_CODE)
-@FFITypeRefiner("com.alibaba.graphar.utils.StatusCode.get")
+@FFITypeRefiner("com.alibaba.graphar.util.StatusCode.get")
 public enum StatusCode implements CXXEnum {
     // success status
     kOK,

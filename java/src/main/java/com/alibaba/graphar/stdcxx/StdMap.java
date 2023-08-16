@@ -23,10 +23,10 @@ import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFIPointer;
 import com.alibaba.fastffi.FFITypeAlias;
 
-import static com.alibaba.graphar.utils.CppClassName.GAR_EDGE_INFO;
-import static com.alibaba.graphar.utils.CppClassName.GAR_VERTEX_INFO;
-import static com.alibaba.graphar.utils.CppClassName.STD_STRING;
-import static com.alibaba.graphar.utils.CppHeaderName.GAR_GRAPH_INFO_H;
+import static com.alibaba.graphar.util.CppClassName.GAR_EDGE_INFO;
+import static com.alibaba.graphar.util.CppClassName.GAR_VERTEX_INFO;
+import static com.alibaba.graphar.util.CppClassName.STD_STRING;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 @FFIGen
 @CXXHead(system = {"map"})

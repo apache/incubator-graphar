@@ -13,14 +13,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef GAR_UTILS_RESULT_H_
-#define GAR_UTILS_RESULT_H_
+#ifndef GAR_UTIL_RESULT_H_
+#define GAR_UTIL_RESULT_H_
 
 #include <utility>
 
 #include "gar/external/result.hpp"
 
-#include "gar/utils/status.h"
+#include "gar/util/status.h"
 
 #define GAR_ASSIGN_OR_RAISE_IMPL(result_name, lhs, rexpr)          \
   auto&& result_name = (rexpr);                                    \
@@ -149,4 +149,4 @@ inline Status GenericToStatus(Result<T>&& res) {
 }  // namespace internal
 
 }  // namespace GAR_NAMESPACE_INTERNAL
-#endif  // GAR_UTILS_RESULT_H_
+#endif  // GAR_UTIL_RESULT_H_

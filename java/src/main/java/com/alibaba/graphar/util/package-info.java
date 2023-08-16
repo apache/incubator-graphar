@@ -12,8 +12,9 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.utils;
+@FFIApplication(jniLibrary = GAR_JNI_LIBRARY_NAME)
+package com.alibaba.graphar.util;
 
-public class JNILibraryName {
-    public static final String GAR_JNI_LIBRARY_NAME = "gar-jni";
-}
+import com.alibaba.fastffi.FFIApplication;
+
+import static com.alibaba.graphar.util.JNILibraryName.GAR_JNI_LIBRARY_NAME;

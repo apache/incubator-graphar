@@ -16,7 +16,7 @@
 package com.alibaba.graphar
 
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
-import com.alibaba.graphar.utils
+import com.alibaba.graphar.util
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.scalatest.funsuite.AnyFunSuite
@@ -43,7 +43,7 @@ class WriterSuite extends AnyFunSuite {
     val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml_path, spark)
 
     // generate vertex index column for vertex dataframe
-    val vertex_df_with_index = utils.IndexGenerator.generateVertexIndexColumn(vertex_df)
+    val vertex_df_with_index = util.IndexGenerator.generateVertexIndexColumn(vertex_df)
 
     // create writer object for person and generate the properties with GAR format
     val prefix : String = "/tmp/"
@@ -60,7 +60,7 @@ class WriterSuite extends AnyFunSuite {
     val chunk_files = fs.globStatus(chunk_path)
     assert(chunk_files.length == 20)
     val vertex_num_path = prefix + vertex_info.getVerticesNumFilePath()
-    val number = utils.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
+    val number = util.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
     assert(number.toInt == vertex_df.count())
 
     assertThrows[IllegalArgumentException](new VertexWriter(prefix, vertex_info, vertex_df))
@@ -90,7 +90,7 @@ class WriterSuite extends AnyFunSuite {
     val vertex_num = srcDf.union(dstDf).distinct().count()
     val vertex_chunk_size = edge_info.getSrc_chunk_size()
     val vertex_chunk_num = (vertex_num + vertex_chunk_size - 1) / vertex_chunk_size
-    val edge_df_with_index = utils.IndexGenerator.generateSrcAndDstIndexUnitedlyForEdges(edge_df, "src", "dst")
+    val edge_df_with_index = util.IndexGenerator.generateSrcAndDstIndexUnitedlyForEdges(edge_df, "src", "dst")
 
     // create writer object for person_knows_person and generate the adj list and properties with GAR format
     val writer = new EdgeWriter(prefix, edge_info, adj_list_type, vertex_num, edge_df_with_index)
@@ -100,12 +100,12 @@ class WriterSuite extends AnyFunSuite {
 
     // validate vertex number & edge number
     val vertex_num_path = prefix + edge_info.getVerticesNumFilePath(adj_list_type)
-    val number = utils.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
+    val number = util.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
     assert(number.toInt == vertex_num)
     val edge_num_path_pattern = new Path(prefix + edge_info.getEdgesNumPathPrefix(adj_list_type) + "*")
     val edge_num_files = fs.globStatus(edge_num_path_pattern)
     assert(edge_num_files.length == vertex_chunk_num)
-    val edge_num = edge_num_files.map(file => utils.FileSystem.readValue(file.getPath().toString(), spark.sparkContext.hadoopConfiguration).toInt).sum
+    val edge_num = edge_num_files.map(file => util.FileSystem.readValue(file.getPath().toString(), spark.sparkContext.hadoopConfiguration).toInt).sum
     assert(edge_num == edge_df.count())
 
     // validate number of chunk files
@@ -166,10 +166,10 @@ class WriterSuite extends AnyFunSuite {
     val vertex_chunk_num = (vertex_num + vertex_chunk_size - 1) / vertex_chunk_size
 
     // construct person vertex mapping with dataframe
-    val vertex_mapping = utils.IndexGenerator.constructVertexIndexMapping(vertex_df, vertex_info.getPrimaryKey())
+    val vertex_mapping = util.IndexGenerator.constructVertexIndexMapping(vertex_df, vertex_info.getPrimaryKey())
     // generate src index and dst index for edge datafram with vertex mapping
-    val edge_df_with_src_index = utils.IndexGenerator.generateSrcIndexForEdgesFromMapping(edge_df, "src", vertex_mapping)
-    val edge_df_with_src_dst_index = utils.IndexGenerator.generateDstIndexForEdgesFromMapping(edge_df_with_src_index, "dst", vertex_mapping)
+    val edge_df_with_src_index = util.IndexGenerator.generateSrcIndexForEdgesFromMapping(edge_df, "src", vertex_mapping)
+    val edge_df_with_src_dst_index = util.IndexGenerator.generateDstIndexForEdgesFromMapping(edge_df_with_src_index, "dst", vertex_mapping)
 
     // create writer object for person_knows_person and generate the adj list and properties with GAR format
     val writer = new EdgeWriter(prefix, edge_info, adj_list_type, vertex_num, edge_df_with_src_dst_index)
@@ -179,12 +179,12 @@ class WriterSuite extends AnyFunSuite {
 
     // validate vertex number & edge number
     val vertex_num_path = prefix + edge_info.getVerticesNumFilePath(adj_list_type)
-    val number = utils.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
+    val number = util.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
     assert(number.toInt == vertex_num)
     val edge_num_path_pattern = new Path(prefix + edge_info.getEdgesNumPathPrefix(adj_list_type) + "*")
     val edge_num_files = fs.globStatus(edge_num_path_pattern)
     assert(edge_num_files.length == vertex_chunk_num)
-    val edge_num = edge_num_files.map(file => utils.FileSystem.readValue(file.getPath().toString(), spark.sparkContext.hadoopConfiguration).toInt).sum
+    val edge_num = edge_num_files.map(file => util.FileSystem.readValue(file.getPath().toString(), spark.sparkContext.hadoopConfiguration).toInt).sum
     assert(edge_num == edge_df.count())
 
     // validate adj list chunks

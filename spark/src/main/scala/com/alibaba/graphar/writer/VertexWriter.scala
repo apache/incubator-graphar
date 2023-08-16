@@ -15,7 +15,7 @@
 
 package com.alibaba.graphar.writer
 
-import com.alibaba.graphar.utils.{FileSystem, ChunkPartitioner, IndexGenerator}
+import com.alibaba.graphar.util.{FileSystem, ChunkPartitioner, IndexGenerator}
 import com.alibaba.graphar.{GeneralParams, VertexInfo, FileType, AdjListType, PropertyGroup}
 
 import org.apache.spark.sql.SparkSession

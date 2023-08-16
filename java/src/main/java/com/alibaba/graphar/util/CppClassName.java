@@ -12,14 +12,14 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.utils;
+package com.alibaba.graphar.util;
 
 public class CppClassName {
     // stdcxx
     public static final String STD_STRING = "std::string";
     public static final String STD_MAP = "std::map";
 
-    // utils
+    // util
     public static final String GAR_INFO_VERSION = "GraphArchive::InfoVersion";
     public static final String GAR_STATUS_CODE = "GraphArchive::StatusCode";
     public static final String GAR_STATUS = "GraphArchive::Status";

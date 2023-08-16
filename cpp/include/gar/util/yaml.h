@@ -13,14 +13,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#ifndef GAR_UTILS_YAML_H_
-#define GAR_UTILS_YAML_H_
+#ifndef GAR_UTIL_YAML_H_
+#define GAR_UTIL_YAML_H_
 
 #include <iosfwd>
 #include <memory>
 #include <string>
 
-#include "gar/utils/result.h"
+#include "gar/util/result.h"
 
 // forward declaration
 namespace Yaml {
@@ -65,4 +65,4 @@ class Yaml {
 };
 
 }  // namespace GAR_NAMESPACE_INTERNAL
-#endif  // GAR_UTILS_YAML_H_
+#endif  // GAR_UTIL_YAML_H_

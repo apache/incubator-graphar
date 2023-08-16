@@ -16,7 +16,7 @@ limitations under the License.
 #include <filesystem>
 #include <string>
 
-#include "gar/utils/status.h"
+#include "gar/util/status.h"
 
 #ifndef CPP_TEST_UTIL_H_
 #define CPP_TEST_UTIL_H_

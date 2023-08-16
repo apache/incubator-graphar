@@ -20,7 +20,7 @@ limitations under the License.
 #include "arrow/ipc/writer.h"
 #include "parquet/arrow/writer.h"
 
-#include "gar/utils/filesystem.h"
+#include "gar/util/filesystem.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 namespace ds = arrow::dataset;
@@ -94,7 +94,7 @@ std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
 
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     const std::string& path, FileType file_type,
-    const utils::FilterOptions& options) const noexcept {
+    const util::FilterOptions& options) const noexcept {
   std::shared_ptr<ds::FileFormat> format = GetFileFormat(file_type);
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
       auto factory, arrow::dataset::FileSystemDatasetFactory::Make(
