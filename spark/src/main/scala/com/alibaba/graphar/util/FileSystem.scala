@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.utils
+package com.alibaba.graphar.util
 
 import org.json4s._
 import org.json4s.jackson.Serialization.write

@@ -708,8 +708,8 @@ class EdgesCollection<AdjListType::ordered_by_source> {
    * @return The new constructed iterator.
    */
   EdgeIter find_src(IdType id, const EdgeIter& from) {
-    auto result = util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
-                                                  adj_list_type_, id);
+    auto result =
+        util::GetAdjListOffsetOfVertex(edge_info_, prefix_, adj_list_type_, id);
     if (!result.status().ok()) {
       return this->end();
     }
@@ -882,8 +882,8 @@ class EdgesCollection<AdjListType::ordered_by_dest> {
    * @return The new constructed iterator.
    */
   EdgeIter find_dst(IdType id, const EdgeIter& from) {
-    auto result = util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
-                                                  adj_list_type_, id);
+    auto result =
+        util::GetAdjListOffsetOfVertex(edge_info_, prefix_, adj_list_type_, id);
     if (!result.status().ok()) {
       return this->end();
     }

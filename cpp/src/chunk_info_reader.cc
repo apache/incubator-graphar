@@ -39,7 +39,7 @@ Status AdjListChunkInfoReader::seek_src(IdType id) noexcept {
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_ASSIGN_OR_RAISE(
         chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+                                          vertex_chunk_index_));
   }
 
   if (adj_list_type_ == AdjListType::unordered_by_source) {
@@ -47,7 +47,7 @@ Status AdjListChunkInfoReader::seek_src(IdType id) noexcept {
   } else {
     GAR_ASSIGN_OR_RAISE(auto offset_pair,
                         util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
-                                                        adj_list_type_, id));
+                                                       adj_list_type_, id));
     return seek(offset_pair.first);
   }
   return Status::OK();
@@ -72,7 +72,7 @@ Status AdjListChunkInfoReader::seek_dst(IdType id) noexcept {
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_ASSIGN_OR_RAISE(
         chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+                                          vertex_chunk_index_));
   }
 
   if (adj_list_type_ == AdjListType::unordered_by_dest) {
@@ -80,7 +80,7 @@ Status AdjListChunkInfoReader::seek_dst(IdType id) noexcept {
   } else {
     GAR_ASSIGN_OR_RAISE(auto range,
                         util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
-                                                        adj_list_type_, id));
+                                                       adj_list_type_, id));
     return seek(range.first);
   }
 }
@@ -104,14 +104,14 @@ Status AdjListPropertyChunkInfoReader::seek_src(IdType id) noexcept {
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_ASSIGN_OR_RAISE(
         chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+                                          vertex_chunk_index_));
   }
   if (adj_list_type_ == AdjListType::unordered_by_source) {
     return seek(0);  // start from first chunk
   } else {
     GAR_ASSIGN_OR_RAISE(auto range,
                         util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
-                                                        adj_list_type_, id));
+                                                       adj_list_type_, id));
     return seek(range.first);
   }
   return Status::OK();
@@ -136,7 +136,7 @@ Status AdjListPropertyChunkInfoReader::seek_dst(IdType id) noexcept {
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_ASSIGN_OR_RAISE(
         chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+                                          vertex_chunk_index_));
   }
 
   if (adj_list_type_ == AdjListType::unordered_by_dest) {
@@ -144,7 +144,7 @@ Status AdjListPropertyChunkInfoReader::seek_dst(IdType id) noexcept {
   } else {
     GAR_ASSIGN_OR_RAISE(auto range,
                         util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
-                                                        adj_list_type_, id));
+                                                       adj_list_type_, id));
     return seek(range.first);
   }
 }

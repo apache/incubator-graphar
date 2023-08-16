@@ -144,7 +144,7 @@ class AdjListChunkInfoReader {
         util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     GAR_ASSIGN_OR_RAISE_ERROR(
         chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+                                          vertex_chunk_index_));
   }
 
   /**
@@ -206,9 +206,8 @@ class AdjListChunkInfoReader {
       }
       chunk_index_ = 0;
       GAR_ASSIGN_OR_RAISE_ERROR(
-          chunk_num_,
-          util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                 vertex_chunk_index_));
+          chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                            vertex_chunk_index_));
     }
     return Status::OK();
   }
@@ -256,7 +255,7 @@ class AdjListPropertyChunkInfoReader {
         util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     GAR_ASSIGN_OR_RAISE_ERROR(
         chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+                                          vertex_chunk_index_));
   }
 
   /**
@@ -320,9 +319,8 @@ class AdjListPropertyChunkInfoReader {
       }
       chunk_index_ = 0;
       GAR_ASSIGN_OR_RAISE_ERROR(
-          chunk_num_,
-          util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                 vertex_chunk_index_));
+          chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                            vertex_chunk_index_));
     }
     return Status::OK();
   }

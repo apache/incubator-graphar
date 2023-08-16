@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.utils
+package com.alibaba.graphar.util
 
 import scala.util.matching.Regex
 import org.apache.spark.sql.types._

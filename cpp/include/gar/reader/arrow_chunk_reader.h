@@ -191,7 +191,7 @@ class AdjListArrowChunkReader {
         util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     GAR_ASSIGN_OR_RAISE_ERROR(
         chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+                                          vertex_chunk_index_));
   }
 
   /**
@@ -276,9 +276,8 @@ class AdjListArrowChunkReader {
       }
       chunk_index_ = 0;
       GAR_ASSIGN_OR_RAISE_ERROR(
-          chunk_num_,
-          util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                 vertex_chunk_index_));
+          chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                            vertex_chunk_index_));
     }
     seek_offset_ = chunk_index_ * edge_info_.GetChunkSize();
     chunk_table_.reset();
@@ -296,9 +295,8 @@ class AdjListArrowChunkReader {
     if (vertex_chunk_index_ != vertex_chunk_index) {
       vertex_chunk_index_ = vertex_chunk_index;
       GAR_ASSIGN_OR_RAISE_ERROR(
-          chunk_num_,
-          util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                 vertex_chunk_index_));
+          chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                            vertex_chunk_index_));
       chunk_table_.reset();
     }
     if (chunk_index_ != chunk_index) {
@@ -473,7 +471,7 @@ class AdjListPropertyArrowChunkReader {
         util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
     GAR_ASSIGN_OR_RAISE_ERROR(
         chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+                                          vertex_chunk_index_));
   }
 
   /**
@@ -558,9 +556,8 @@ class AdjListPropertyArrowChunkReader {
       }
       chunk_index_ = 0;
       GAR_ASSIGN_OR_RAISE_ERROR(
-          chunk_num_,
-          util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                 vertex_chunk_index_));
+          chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                            vertex_chunk_index_));
     }
     seek_offset_ = chunk_index_ * edge_info_.GetChunkSize();
     chunk_table_.reset();
@@ -578,9 +575,8 @@ class AdjListPropertyArrowChunkReader {
     if (vertex_chunk_index_ != vertex_chunk_index) {
       vertex_chunk_index_ = vertex_chunk_index;
       GAR_ASSIGN_OR_RAISE_ERROR(
-          chunk_num_,
-          util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                 vertex_chunk_index_));
+          chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                            vertex_chunk_index_));
       chunk_table_.reset();
     }
     if (chunk_index_ != chunk_index) {
