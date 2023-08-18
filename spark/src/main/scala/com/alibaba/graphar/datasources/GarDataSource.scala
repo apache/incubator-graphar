@@ -35,7 +35,7 @@ import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.sql.sources.DataSourceRegister
 import org.apache.spark.sql.connector.expressions.Transform
 
-import com.alibaba.graphar.utils.Utils
+import com.alibaba.graphar.util.Utils
 
 object GarUtils
 /** GarDataSource is a class to provide gar files as the data source for spark. */

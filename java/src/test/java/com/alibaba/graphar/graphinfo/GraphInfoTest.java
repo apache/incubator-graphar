@@ -2,9 +2,9 @@ package com.alibaba.graphar.graphinfo;
 
 import com.alibaba.graphar.stdcxx.StdMap;
 import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.utils.InfoVersion;
-import com.alibaba.graphar.utils.Result;
-import com.alibaba.graphar.utils.Status;
+import com.alibaba.graphar.util.InfoVersion;
+import com.alibaba.graphar.util.Result;
+import com.alibaba.graphar.util.Status;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

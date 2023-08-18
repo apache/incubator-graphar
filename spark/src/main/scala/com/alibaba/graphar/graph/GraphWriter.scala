@@ -17,8 +17,8 @@ package com.alibaba.graphar.graph
 
 import com.alibaba.graphar.{AdjListType, GraphInfo, VertexInfo, EdgeInfo, GeneralParams}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
-import com.alibaba.graphar.utils.IndexGenerator
-import com.alibaba.graphar.utils.Utils
+import com.alibaba.graphar.util.IndexGenerator
+import com.alibaba.graphar.util.Utils
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._

@@ -6,8 +6,8 @@ import com.alibaba.graphar.types.AdjListType;
 import com.alibaba.graphar.types.DataType;
 import com.alibaba.graphar.types.FileType;
 import com.alibaba.graphar.types.Type;
-import com.alibaba.graphar.utils.InfoVersion;
-import com.alibaba.graphar.utils.Result;
+import com.alibaba.graphar.util.InfoVersion;
+import com.alibaba.graphar.util.Result;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -28,7 +28,7 @@ using GAR_NAMESPACE::_Equal;
 using GAR_NAMESPACE::_LessThan;
 using GAR_NAMESPACE::_Literal;
 using GAR_NAMESPACE::_Property;
-using GAR_NAMESPACE::utils::FilterOptions;
+using GAR_NAMESPACE::util::FilterOptions;
 
 TEST_CASE("test_vertex_property_arrow_chunk_reader") {
   std::string root;

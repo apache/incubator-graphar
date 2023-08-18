@@ -15,7 +15,7 @@
 
 package com.alibaba.graphar.writer
 
-import com.alibaba.graphar.utils.{FileSystem, ChunkPartitioner, EdgeChunkPartitioner}
+import com.alibaba.graphar.util.{FileSystem, ChunkPartitioner, EdgeChunkPartitioner}
 import com.alibaba.graphar.{GeneralParams, EdgeInfo, FileType, AdjListType, PropertyGroup}
 
 import org.apache.spark.sql.SparkSession

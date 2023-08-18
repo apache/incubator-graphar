@@ -18,8 +18,8 @@ limitations under the License.
 #include "yaml/Yaml.hpp"
 
 #include "gar/graph_info.h"
-#include "gar/utils/filesystem.h"
-#include "gar/utils/yaml.h"
+#include "gar/util/filesystem.h"
+#include "gar/util/yaml.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 

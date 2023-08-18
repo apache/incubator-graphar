@@ -14,9 +14,9 @@
 
 package com.alibaba.graphar.graphinfo;
 
-import static com.alibaba.graphar.utils.CppClassName.GAR_EDGE_INFO;
-import static com.alibaba.graphar.utils.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.utils.CppHeaderName.GAR_GRAPH_INFO_H;
+import static com.alibaba.graphar.util.CppClassName.GAR_EDGE_INFO;
+import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -32,9 +32,9 @@ import com.alibaba.graphar.stdcxx.StdVector;
 import com.alibaba.graphar.types.AdjListType;
 import com.alibaba.graphar.types.DataType;
 import com.alibaba.graphar.types.FileType;
-import com.alibaba.graphar.utils.InfoVersion;
-import com.alibaba.graphar.utils.Result;
-import com.alibaba.graphar.utils.Status;
+import com.alibaba.graphar.util.InfoVersion;
+import com.alibaba.graphar.util.Result;
+import com.alibaba.graphar.util.Status;
 
 /** EdgeInfo is a class that stores metadata information about an edge. */
 @FFIGen

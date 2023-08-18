@@ -14,8 +14,8 @@
 
 package com.alibaba.graphar.graphinfo;
 
-import static com.alibaba.graphar.utils.CppClassName.GAR_GRAPH_INFO;
-import static com.alibaba.graphar.utils.CppHeaderName.GAR_GRAPH_INFO_H;
+import static com.alibaba.graphar.util.CppClassName.GAR_GRAPH_INFO;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -31,9 +31,9 @@ import com.alibaba.fastffi.FFITypeFactory;
 import com.alibaba.graphar.stdcxx.StdMap;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.types.AdjListType;
-import com.alibaba.graphar.utils.InfoVersion;
-import com.alibaba.graphar.utils.Result;
-import com.alibaba.graphar.utils.Status;
+import com.alibaba.graphar.util.InfoVersion;
+import com.alibaba.graphar.util.Result;
+import com.alibaba.graphar.util.Status;
 
 /** GraphInfo is a class to store the graph meta information. */
 @FFIGen

@@ -19,7 +19,7 @@ import com.alibaba.graphar.datasources._
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.graph.GraphReader
 import com.alibaba.graphar.{GeneralParams, GraphInfo}
-import com.alibaba.graphar.utils.Utils
+import com.alibaba.graphar.util.Utils
 
 import java.io.{File, FileInputStream}
 import org.yaml.snakeyaml.Yaml

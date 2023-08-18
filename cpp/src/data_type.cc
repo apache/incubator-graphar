@@ -18,7 +18,7 @@ limitations under the License.
 #include "arrow/api.h"
 #include "arrow/type.h"
 
-#include "gar/utils/data_type.h"
+#include "gar/util/data_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 

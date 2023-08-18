@@ -16,14 +16,13 @@ limitations under the License.
 #include "arrow/api.h"
 
 #include "gar/reader/arrow_chunk_reader.h"
-#include "gar/utils/reader_utils.h"
+#include "gar/util/reader_util.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
 Result<std::shared_ptr<arrow::Table>>
 VertexPropertyArrowChunkReader::GetChunk() noexcept {
-  GAR_RETURN_NOT_OK(
-      utils::CheckFilterOptions(filter_options_, property_group_));
+  GAR_RETURN_NOT_OK(util::CheckFilterOptions(filter_options_, property_group_));
   if (chunk_table_ == nullptr) {
     GAR_ASSIGN_OR_RAISE(
         auto chunk_file_path,
@@ -53,11 +52,11 @@ VertexPropertyArrowChunkReader::GetRange() noexcept {
   return std::make_pair(seek_id_, seek_id_ + curr_chunk_size - row_offset);
 }
 
-void VertexPropertyArrowChunkReader::Filter(utils::Filter filter) {
+void VertexPropertyArrowChunkReader::Filter(util::Filter filter) {
   filter_options_.filter = filter;
 }
 
-void VertexPropertyArrowChunkReader::Select(utils::ColumnNames column_names) {
+void VertexPropertyArrowChunkReader::Select(util::ColumnNames column_names) {
   filter_options_.columns = column_names;
 }
 
@@ -79,8 +78,8 @@ Status AdjListArrowChunkReader::seek_src(IdType id) noexcept {
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_ASSIGN_OR_RAISE(
-        chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+        chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                          vertex_chunk_index_));
     chunk_table_.reset();
   }
 
@@ -88,8 +87,8 @@ Status AdjListArrowChunkReader::seek_src(IdType id) noexcept {
     return seek(0);  // start from first chunk
   } else {
     GAR_ASSIGN_OR_RAISE(auto range,
-                        utils::GetAdjListOffsetOfVertex(edge_info_, prefix_,
-                                                        adj_list_type_, id));
+                        util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
+                                                       adj_list_type_, id));
     return seek(range.first);
   }
   return Status::OK();
@@ -113,8 +112,8 @@ Status AdjListArrowChunkReader::seek_dst(IdType id) noexcept {
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_ASSIGN_OR_RAISE(
-        chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+        chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                          vertex_chunk_index_));
     chunk_table_.reset();
   }
 
@@ -122,8 +121,8 @@ Status AdjListArrowChunkReader::seek_dst(IdType id) noexcept {
     return seek(0);  // start from the first chunk
   } else {
     GAR_ASSIGN_OR_RAISE(auto range,
-                        utils::GetAdjListOffsetOfVertex(edge_info_, prefix_,
-                                                        adj_list_type_, id));
+                        util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
+                                                       adj_list_type_, id));
     return seek(range.first);
   }
 }
@@ -172,8 +171,8 @@ Status AdjListPropertyArrowChunkReader::seek_src(IdType id) noexcept {
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_ASSIGN_OR_RAISE(
-        chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+        chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                          vertex_chunk_index_));
     chunk_table_.reset();
   }
 
@@ -181,8 +180,8 @@ Status AdjListPropertyArrowChunkReader::seek_src(IdType id) noexcept {
     return seek(0);  // start from first chunk
   } else {
     GAR_ASSIGN_OR_RAISE(auto range,
-                        utils::GetAdjListOffsetOfVertex(edge_info_, prefix_,
-                                                        adj_list_type_, id));
+                        util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
+                                                       adj_list_type_, id));
     return seek(range.first);
   }
   return Status::OK();
@@ -206,8 +205,8 @@ Status AdjListPropertyArrowChunkReader::seek_dst(IdType id) noexcept {
   if (vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_ASSIGN_OR_RAISE(
-        chunk_num_, utils::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                           vertex_chunk_index_));
+        chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
+                                          vertex_chunk_index_));
     chunk_table_.reset();
   }
 
@@ -215,8 +214,8 @@ Status AdjListPropertyArrowChunkReader::seek_dst(IdType id) noexcept {
     return seek(0);  // start from the first chunk
   } else {
     GAR_ASSIGN_OR_RAISE(auto range,
-                        utils::GetAdjListOffsetOfVertex(edge_info_, prefix_,
-                                                        adj_list_type_, id));
+                        util::GetAdjListOffsetOfVertex(edge_info_, prefix_,
+                                                       adj_list_type_, id));
     return seek(range.first);
   }
 }
@@ -237,8 +236,7 @@ AdjListOffsetArrowChunkReader::GetChunk() noexcept {
 
 Result<std::shared_ptr<arrow::Table>>
 AdjListPropertyArrowChunkReader::GetChunk() noexcept {
-  GAR_RETURN_NOT_OK(
-      utils::CheckFilterOptions(filter_options_, property_group_));
+  GAR_RETURN_NOT_OK(util::CheckFilterOptions(filter_options_, property_group_));
   if (chunk_table_ == nullptr) {
     GAR_ASSIGN_OR_RAISE(
         auto chunk_file_path,
@@ -253,11 +251,11 @@ AdjListPropertyArrowChunkReader::GetChunk() noexcept {
   return chunk_table_->Slice(row_offset);
 }
 
-void AdjListPropertyArrowChunkReader::Filter(utils::Filter filter) {
+void AdjListPropertyArrowChunkReader::Filter(util::Filter filter) {
   filter_options_.filter = filter;
 }
 
-void AdjListPropertyArrowChunkReader::Select(utils::ColumnNames column_names) {
+void AdjListPropertyArrowChunkReader::Select(util::ColumnNames column_names) {
   filter_options_.columns = column_names;
 }
 

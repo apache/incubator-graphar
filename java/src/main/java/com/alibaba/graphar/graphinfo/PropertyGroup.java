@@ -14,8 +14,8 @@
 
 package com.alibaba.graphar.graphinfo;
 
-import static com.alibaba.graphar.utils.CppClassName.GAR_PROPERTY_GROUP;
-import static com.alibaba.graphar.utils.CppHeaderName.GAR_GRAPH_INFO_H;
+import static com.alibaba.graphar.util.CppClassName.GAR_PROPERTY_GROUP;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;

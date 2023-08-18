@@ -18,7 +18,7 @@ import com.alibaba.fastffi.CXXEnum;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeRefiner;
 
-import static com.alibaba.graphar.utils.CppClassName.GAR_TYPE;
+import static com.alibaba.graphar.util.CppClassName.GAR_TYPE;
 
 @FFITypeAlias(GAR_TYPE)
 @FFITypeRefiner("com.alibaba.graphar.types.Type.get")

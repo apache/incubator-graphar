@@ -15,10 +15,10 @@
 
 package com.alibaba.graphar.reader
 
-import com.alibaba.graphar.utils.{IndexGenerator, DataFrameConcat}
+import com.alibaba.graphar.util.{IndexGenerator, DataFrameConcat}
 import com.alibaba.graphar.{GeneralParams, VertexInfo, FileType, PropertyGroup}
 import com.alibaba.graphar.datasources._
-import com.alibaba.graphar.utils.FileSystem
+import com.alibaba.graphar.util.FileSystem
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._

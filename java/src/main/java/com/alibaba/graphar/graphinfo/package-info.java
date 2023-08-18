@@ -17,4 +17,4 @@ package com.alibaba.graphar.graphinfo;
 
 import com.alibaba.fastffi.FFIApplication;
 
-import static com.alibaba.graphar.utils.JNILibraryName.GAR_JNI_LIBRARY_NAME;
+import static com.alibaba.graphar.util.JNILibraryName.GAR_JNI_LIBRARY_NAME;

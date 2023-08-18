@@ -15,7 +15,7 @@
 
 package com.alibaba.graphar
 
-import com.alibaba.graphar.utils.IndexGenerator
+import com.alibaba.graphar.util.IndexGenerator
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
@@ -99,11 +99,11 @@ class TransformExampleSuite extends AnyFunSuite {
     assert(offset_chunk_files.length == 10)
     // validate vertex number & edge number
     val vertex_num_path = output_prefix + edge_info.getVerticesNumFilePath(output_adj_list_type)
-    val number = utils.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
+    val number = util.FileSystem.readValue(vertex_num_path, spark.sparkContext.hadoopConfiguration)
     assert(number.toInt == vertexNum)
     val edge_num_path_pattern = new Path(output_prefix + edge_info.getEdgesNumPathPrefix(output_adj_list_type) + "*")
     val edge_num_files = fs.globStatus(edge_num_path_pattern)
-    val tot_num = edge_num_files.map(file => utils.FileSystem.readValue(file.getPath().toString(), spark.sparkContext.hadoopConfiguration).toInt).sum
+    val tot_num = edge_num_files.map(file => util.FileSystem.readValue(file.getPath().toString(), spark.sparkContext.hadoopConfiguration).toInt).sum
     assert(tot_num == edgeNum)
 
     // clean generated files and close FileSystem instance

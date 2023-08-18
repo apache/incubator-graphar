@@ -22,14 +22,14 @@ limitations under the License.
 #include <unordered_set>
 #include <vector>
 
-#include "utils/adj_list_type.h"
-#include "utils/data_type.h"
-#include "utils/file_type.h"
-#include "utils/result.h"
-#include "utils/status.h"
-#include "utils/utils.h"
-#include "utils/version_parser.h"
-#include "utils/yaml.h"
+#include "util/adj_list_type.h"
+#include "util/data_type.h"
+#include "util/file_type.h"
+#include "util/result.h"
+#include "util/status.h"
+#include "util/util.h"
+#include "util/version_parser.h"
+#include "util/yaml.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
