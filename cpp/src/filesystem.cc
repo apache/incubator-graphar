@@ -267,11 +267,13 @@ Result<IdType> FileSystem::GetFileNumOfDir(const std::string& dir_path,
 
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri_string, std::string* out_path) {
-  if (arrow::fs::internal::DetectAbsolutePath(uri_string)) {
+  if (uri_string.length() >= 1 && uri_string[0] == '/') {
     // if the uri_string is an absolute path, we need to create a local file
     GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
         auto arrow_fs,
         arrow::fs::FileSystemFromUriOrPath(uri_string, out_path));
+    // arrow would delete the last slash, so use uri string
+    *out_path = uri_string;
     return std::make_shared<FileSystem>(arrow_fs);
   }
 
