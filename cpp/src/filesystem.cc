@@ -16,6 +16,7 @@ limitations under the License.
 #include "arrow/adapters/orc/adapter.h"
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
+#include "arrow/dataset/api.h"
 #include "arrow/filesystem/api.h"
 #include "arrow/ipc/writer.h"
 #include "parquet/arrow/writer.h"

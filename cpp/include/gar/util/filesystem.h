@@ -26,7 +26,6 @@ limitations under the License.
 #include "gar/util/status.h"
 #include "gar/util/util.h"
 
-#include "arrow/dataset/api.h"
 #include "gar/util/reader_util.h"
 
 // forward declarations
@@ -38,6 +37,9 @@ class FileSystem;
 }
 namespace io {
 class RandomAccessFile;
+}
+namespace dataset {
+class FileFormat;
 }
 }  // namespace arrow
 

@@ -12,9 +12,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
+#include "arrow/compute/api.h"
+
 #include "gar/util/expression.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
+
+template <typename T, typename enabler>
+ExpressionLiteral<T, Enabler>::Evaluate() {
+  return arrow::compute::literal(value_);
+}
 
 Result<ArrowExpression> ExpressionProperty::Evaluate() {
   return arrow::compute::field_ref(property_.name);
