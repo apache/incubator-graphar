@@ -117,6 +117,9 @@ jobs:
 
   GraphAr-centos8-arrow-installed:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: yum install -y centos-release-scl devtoolset-8 && scl enable devtoolset-8 -- bash --noprofile --norc -eo pipefail {0}
     container:
       image: centos:7
     steps:
@@ -125,18 +128,19 @@ jobs:
     - name: Install dependencies
       run: |
         # install gcc and g++ 8
-        yum install -y centos-release-scl
-        yum install -y devtoolset-8
-        scl enable devtoolset-8 bash
+        # yum install -y centos-release-scl
+        # yum install -y devtoolset-8
+        # scl enable devtoolset-8 bash
 
         # install cmake
         yum install -y wget
         wget https://cmake.org/files/v3.12/cmake-3.12.3.tar.gz -P /tmp/ && \
-            tar -zxvf /tmp/cmake-3.12.3.tar.gz -C /tmp/ && \
-            cd /tmp/cmake-3.12.3 && \
+            tar -zxf /tmp/cmake-3.12.3.tar.gz -C /tmp/ && \
+            pushd /tmp/cmake-3.12.3 && \
             ./bootstrap --prefix=/usr/local && \
             make -j$(nproc) && \
-            make install
+            make install && \
+            popd
         echo "cmake version: $(cmake --version)"
 
         #install arrow
