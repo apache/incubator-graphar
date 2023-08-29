@@ -21,6 +21,7 @@ limitations under the License.
 #include "arrow/ipc/writer.h"
 #include "parquet/arrow/writer.h"
 
+#include "gar/util/expression.h"
 #include "gar/util/filesystem.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
