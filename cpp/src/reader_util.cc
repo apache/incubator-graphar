@@ -21,6 +21,7 @@ limitations under the License.
 #include "parquet/arrow/reader.h"
 
 #include "gar/graph_info.h"
+#include "gar/util/expression.h"
 #include "gar/util/filesystem.h"
 #include "gar/util/reader_util.h"
 

@@ -16,19 +16,14 @@ limitations under the License.
 #include <memory>
 #include <string>
 
+#include "arrow/compute/api.h"
+
 #include "gar/graph_info.h"
 
 #ifndef GAR_UTIL_EXPRESSION_H_
 #define GAR_UTIL_EXPRESSION_H_
 
 namespace GAR_NAMESPACE_INTERNAL {
-
-// forward declarations
-namespace arrow {
-namespace compute {
-class Expression;
-}
-}  // namespace arrow
 
 using ArrowExpression = arrow::compute::Expression;
 
@@ -90,7 +85,7 @@ class ExpressionLiteral : public Expression {
   ExpressionLiteral(const ExpressionLiteral& other) = default;
   ~ExpressionLiteral() = default;
 
-  Result<ArrowExpression> Evaluate();
+  Result<ArrowExpression> Evaluate() { return arrow::compute::literal(value_); }
 
  private:
   T value_;

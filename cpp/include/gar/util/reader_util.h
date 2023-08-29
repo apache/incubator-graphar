@@ -22,9 +22,10 @@ limitations under the License.
 #include <vector>
 
 #include "gar/graph_info.h"
-#include "gar/util/expression.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
+
+class Expression;
 
 namespace util {
 
