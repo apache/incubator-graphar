@@ -19,6 +19,7 @@ limitations under the License.
 
 #include "./util.h"
 #include "gar/reader/arrow_chunk_reader.h"
+#include "gar/util/expression.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
