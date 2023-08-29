@@ -29,20 +29,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  GraphAr-on-ubuntu:
-    runs-on: ubuntu-20.04
+  GraphAr-ubuntu-arrow-installed:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
       with:
           submodules: true
-
-    - name: Cache for ccache
-      uses: actions/cache@v3
-      with:
-        path: ~/.ccache
-        key: ${{ matrix.os }}-build-ccache-${{ hashFiles('**/git-modules.txt') }}
-        restore-keys: |
-          ${{ matrix.os }}-build-ccache-
 
     - name: Install dependencies
       run: |
@@ -50,9 +42,9 @@ jobs:
         # install the latest arrow deb to test arrow
         wget -c https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
             -P /tmp/
-        sudo apt-get install -y -V /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
+        sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
         sudo apt-get update -y
-        sudo apt-get install -y libarrow-dev
+        sudo apt install -y libarrow-dev libarrow-dataset-dev libarrow-acero-dev libparquet-dev
         sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
 
     - name: CMake
@@ -115,7 +107,6 @@ jobs:
       run: |
         pushd build
         make -j$(nproc)
-        make gar-ccache-stats
         popd
 
     - name: Test
@@ -124,24 +115,40 @@ jobs:
         export GAR_TEST_DATA=$PWD/../testing/
         make test
 
-  GraphAr-on-centos8:
-    runs-on: ubuntu-22.04
+  GraphAr-centos8-arrow-installed:
+    runs-on: ubuntu-latest
     container:
-      image: centos:latest
+      image: centos:7
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install dependencies
+    - name: Set up devtoolset-8 
       run: |
-        pushd /etc/yum.repos.d/
-        sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
-        sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
-        popd
-        yum update -y
-        dnf groupinstall -y "Development Tools"
-        yum install -y boost-devel libcurl-devel openssl-devel cmake
+        # install gcc and g++ 8
+        yum install -y centos-release-scl
+        yum install -y devtoolset-8
+
+    - name: Install dependencies
+      shell: scl enable devtoolset-8 -- bash --noprofile --norc -eo pipefail {0}
+      run: |
+        # install cmake
+        yum install -y wget
+        wget https://cmake.org/files/v3.12/cmake-3.12.3.tar.gz -P /tmp/ && \
+            tar -zxf /tmp/cmake-3.12.3.tar.gz -C /tmp/ && \
+            pushd /tmp/cmake-3.12.3 && \
+            ./bootstrap --prefix=/usr/local && \
+            make -j$(nproc) && \
+            make install && \
+            popd
+        echo "cmake version: $(cmake --version)"
+
+        #install arrow
+        yum install -y epel-release || yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1).noarch.rpm
+        yum install -y https://apache.jfrog.io/artifactory/arrow/centos/$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)/apache-arrow-release-latest.rpm
+        yum install -y --enablerepo=epel arrow-devel arrow-dataset-devel arrow-acero-devel parquet-devel
 
     - name: Build GraphAr
+      shell: scl enable devtoolset-8 -- bash --noprofile --norc -eo pipefail {0}
       run: |
         mkdir build
         pushd build

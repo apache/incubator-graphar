@@ -1,0 +1,50 @@
+name: GraphAr C++ CI Nightly
+
+on:
+  schedule:
+    # The notifications for scheduled workflows are sent to the user who
+    # last modified the cron syntax in the workflow file.
+    # Trigger the workflow at 03:00(CST) every day.
+    - cron:  '00 19 * * *'
+jobs:
+  GraphAr-ubuntu-arrow-from-source:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          submodules: true
+
+    - name: Cache for ccache
+      uses: actions/cache@v3
+      with:
+        path: ~/.ccache
+        key: ${{ matrix.os }}-build-ccache-${{ hashFiles('**/git-modules.txt') }}
+        restore-keys: |
+          ${{ matrix.os }}-build-ccache-
+
+    - name: Install dependencies
+      run: |
+
+        sudo apt-get update -y
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
+
+    - name: CMake
+      run: |
+        mkdir build
+        pushd build
+        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
+        popd
+
+    - name: Build GraphAr
+      run: |
+        pushd build
+        make -j$(nproc)
+        make gar-ccache-stats
+        popd
+
+    - name: Test
+      run: |
+        cd build
+        export GAR_TEST_DATA=$PWD/../testing/
+        make test
