@@ -198,6 +198,7 @@ macro(build_gar)
         target_include_directories(gar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
     endif()
     target_link_libraries(gar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
+    message(STATUS "LIBS: ${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB} ${GAR_ARROW_ACERO_STATIC_LIB} ${GAR_DATASET_STATIC_LIB} ${GAR_PARQUET_STATIC_LIB} gar_arrow_static")
 
     if(APPLE)
         if(BUILD_ARROW_FROM_SOURCE)
@@ -262,7 +263,7 @@ if (BUILD_EXAMPLES)
         target_link_libraries(${E_NAME} PRIVATE gar ${Boost_LIBRARIES} Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
             if(BUILD_ARROW_FROM_SOURCE)
-                target_link_libraries(${E_NAME} PRIVATE gar_arrow_static
+                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
             else()
@@ -271,9 +272,9 @@ if (BUILD_EXAMPLES)
             endif()
         else()
             if(BUILD_ARROW_FROM_SOURCE)
-                target_link_libraries(${E_NAME} PRIVATE gar_arrow_static
+                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
                     "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
             else()
                 target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_static
                     Parquet::parquet_static)
@@ -343,7 +344,7 @@ if (BUILD_TESTS)
         target_link_libraries(${target} PRIVATE Catch2::Catch2 gar Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
             if(BUILD_ARROW_FROM_SOURCE)
-                target_link_libraries(${target} PRIVATE gar_arrow_static
+                target_link_libraries(${target} PRIVATE -Wl,-force_load gar_arrow_static
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
             else()
@@ -352,9 +353,9 @@ if (BUILD_TESTS)
             endif()
         else()
             if(BUILD_ARROW_FROM_SOURCE)
-                target_link_libraries(${target} PRIVATE gar_arrow_static
+                target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
                     "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
             else()
                 target_link_libraries(${target} PRIVATE Arrow::arrow_static
                     Parquet::parquet_static)
