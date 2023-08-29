@@ -115,7 +115,7 @@ jobs:
         export GAR_TEST_DATA=$PWD/../testing/
         make test
 
-  GraphAr-centos8-arrow-from-source:
+  GraphAr-centos8-arrow-installed:
     runs-on: ubuntu-latest
     container:
       image: centos:7
@@ -126,7 +126,7 @@ jobs:
       run: |
         # install gcc and g++ 8
         yum install -y centos-release-scl
-        yum install -y devtoolset-8-gcc*
+        yum install -y devtoolset-8
         scl enable devtoolset-8 bash
 
         # install cmake
