@@ -32,33 +32,33 @@ import com.alibaba.graphar.stdcxx.StdString;
 @FFITypeAlias(GAR_DATA_TYPE)
 @CXXHead(GAR_GRAPH_INFO_H)
 public interface DataType extends CXXPointer {
-  Factory factory = FFITypeFactory.getFactory(DataType.class);
+    Factory factory = FFITypeFactory.getFactory(DataType.class);
 
-  @CXXOperator("==")
-  boolean eq(@CXXReference DataType other);
+    @CXXOperator("==")
+    boolean eq(@CXXReference DataType other);
 
-  @FFIFactory
-  interface Factory {
-    @CXXValue
-    DataType create();
+    @FFIFactory
+    interface Factory {
+        @CXXValue
+        DataType create();
 
-    /**
-     * Construct a DateType object
-     *
-     * @param id
-     * @param usrDefinedTypeName c++ default = ""
-     * @return a DateType object
-     */
-    @CXXValue
-    DataType create(@CXXValue Type id, @CXXReference StdString usrDefinedTypeName);
+        /**
+         * Construct a DateType object
+         *
+         * @param id
+         * @param usrDefinedTypeName c++ default = ""
+         * @return a DateType object
+         */
+        @CXXValue
+        DataType create(@CXXValue Type id, @CXXReference StdString usrDefinedTypeName);
 
-    /**
-     * Construct a DateType object
-     *
-     * @param id
-     * @return a DateType object
-     */
-    @CXXValue
-    DataType create(@CXXValue Type id);
-  }
+        /**
+         * Construct a DateType object
+         *
+         * @param id
+         * @return a DateType object
+         */
+        @CXXValue
+        DataType create(@CXXValue Type id);
+    }
 }

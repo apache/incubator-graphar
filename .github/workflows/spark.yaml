@@ -8,11 +8,13 @@ on:
       - main
     paths:
       - 'spark/**'
+      - '.github/workflows/spark.yaml'
   pull_request:
     branches:
       - main
     paths:
       - 'spark/**'
+      - '.github/workflows/spark.yaml'
 
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
@@ -26,18 +28,25 @@ jobs:
       with:
           submodules: true
 
+    - name: Code Format Check
+      run: |
+        export JAVA_HOME=${JAVA_HOME_11_X64}
+        pushd spark
+        mvn spotless:check
+        popd
+
     - name: Build GraphAr Spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
-        mvn clean package -DskipTests
+        mvn clean package -DskipTests -Dspotless.check.skip=true
         popd
 
     - name: Run test
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
-        mvn test
+        mvn test -Dspotless.check.skip=true
         popd
 
     - name: Run Neo4j2GraphAr example

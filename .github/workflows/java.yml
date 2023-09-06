@@ -41,6 +41,13 @@ jobs:
           sudo apt-get install libcurl4-openssl-dev -y
           sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
           
+      - name: Code Format Check
+        run: |
+          export JAVA_HOME=${JAVA_HOME_11_X64}
+          pushd java 
+          mvn spotless:check
+          popd
+
       - name: Build and Install cpp 
         run: |
           mkdir build
@@ -55,5 +62,5 @@ jobs:
           export JAVA_HOME=${JAVA_HOME_11_X64}
           export LLVM11_HOME=/usr/lib/llvm-11
           pushd java
-          mvn test
+          mvn test -Dspotless.check.skip=true
           popd

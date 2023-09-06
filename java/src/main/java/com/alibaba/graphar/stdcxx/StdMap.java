@@ -14,6 +14,11 @@
 
 package com.alibaba.graphar.stdcxx;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_EDGE_INFO;
+import static com.alibaba.graphar.util.CppClassName.GAR_VERTEX_INFO;
+import static com.alibaba.graphar.util.CppClassName.STD_STRING;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;
 import com.alibaba.fastffi.CXXReference;
@@ -23,31 +28,26 @@ import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFIPointer;
 import com.alibaba.fastffi.FFITypeAlias;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_EDGE_INFO;
-import static com.alibaba.graphar.util.CppClassName.GAR_VERTEX_INFO;
-import static com.alibaba.graphar.util.CppClassName.STD_STRING;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
-
 @FFIGen
 @CXXHead(system = {"map"})
 @CXXHead(GAR_GRAPH_INFO_H)
 @FFITypeAlias("std::map")
 @CXXTemplate(
-    cxx = {STD_STRING, GAR_EDGE_INFO},
-    java = {"com.alibaba.graphar.stdcxx.StdString", "com.alibaba.graphar.graphinfo.EdgeInfo"})
+        cxx = {STD_STRING, GAR_EDGE_INFO},
+        java = {"com.alibaba.graphar.stdcxx.StdString", "com.alibaba.graphar.graphinfo.EdgeInfo"})
 @CXXTemplate(
-    cxx = {STD_STRING, GAR_VERTEX_INFO},
-    java = {"com.alibaba.graphar.stdcxx.StdString", "com.alibaba.graphar.graphinfo.VertexInfo"})
+        cxx = {STD_STRING, GAR_VERTEX_INFO},
+        java = {"com.alibaba.graphar.stdcxx.StdString", "com.alibaba.graphar.graphinfo.VertexInfo"})
 public interface StdMap<K, V> extends FFIPointer {
 
-  @CXXOperator("[]")
-  @CXXReference
-  V get(@CXXReference K key);
+    @CXXOperator("[]")
+    @CXXReference
+    V get(@CXXReference K key);
 
-  int size();
+    int size();
 
-  @FFIFactory
-  interface Factory<K, V> {
-    StdMap<K, V> create();
-  }
+    @FFIFactory
+    interface Factory<K, V> {
+        StdMap<K, V> create();
+    }
 }

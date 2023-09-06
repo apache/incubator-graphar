@@ -1,16 +1,17 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
+/**
+ * Copyright 2022 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.alibaba.graphar.datasources
@@ -34,48 +35,72 @@ import com.alibaba.graphar.datasources.csv.CSVWriteBuilder
 import com.alibaba.graphar.datasources.parquet.ParquetWriteBuilder
 import com.alibaba.graphar.datasources.orc.OrcWriteBuilder
 
-
 /** GarTable is a class to represent the graph data in GraphAr as a table. */
-case class GarTable(name: String,
-                    sparkSession: SparkSession,
-                    options: CaseInsensitiveStringMap,
-                    paths: Seq[String],
-                    userSpecifiedSchema: Option[StructType],
-                    fallbackFileFormat: Class[_ <: FileFormat])
-  extends FileTable(sparkSession, options, paths, userSpecifiedSchema) {
+case class GarTable(
+    name: String,
+    sparkSession: SparkSession,
+    options: CaseInsensitiveStringMap,
+    paths: Seq[String],
+    userSpecifiedSchema: Option[StructType],
+    fallbackFileFormat: Class[_ <: FileFormat]
+) extends FileTable(sparkSession, options, paths, userSpecifiedSchema) {
 
   /** Construct a new scan builder. */
-  override def newScanBuilder(options: CaseInsensitiveStringMap): GarScanBuilder =
-    new GarScanBuilder(sparkSession, fileIndex, schema, dataSchema, options, formatName)
-
-  /** Infer the schema of the table through the methods of the actual file format. */
-  override def inferSchema(files: Seq[FileStatus]): Option[StructType] = formatName match {
-    case "csv" => {
-      val parsedOptions = new CSVOptions(
-        options.asScala.toMap,
-        columnPruning = sparkSession.sessionState.conf.csvColumnPruning,
-        sparkSession.sessionState.conf.sessionLocalTimeZone)
-
-      CSVDataSource(parsedOptions).inferSchema(sparkSession, files, parsedOptions)
-    }
-    case "orc" => OrcUtils.inferSchema(sparkSession, files, options.asScala.toMap)
-    case "parquet" => ParquetUtils.inferSchema(sparkSession, options.asScala.toMap, files)
-    case _ => throw new IllegalArgumentException
-  }
-
-  /** Construct a new write builder according to the actual file format. */
-  override def newWriteBuilder(info: LogicalWriteInfo): WriteBuilder = formatName match {
-    case "csv" => new CSVWriteBuilder(paths, formatName, supportsDataType, info)
-    case "orc" => new OrcWriteBuilder(paths, formatName, supportsDataType, info)
-    case "parquet" => new ParquetWriteBuilder(paths, formatName, supportsDataType, info)
-    case _ => throw new IllegalArgumentException
-  }
+  override def newScanBuilder(
+      options: CaseInsensitiveStringMap
+  ): GarScanBuilder =
+    new GarScanBuilder(
+      sparkSession,
+      fileIndex,
+      schema,
+      dataSchema,
+      options,
+      formatName
+    )
 
   /**
-   * Check if a data type is supported. 
-   * Note: Currently, the GraphAr data source only supports several atomic data types. 
-   * To support additional data types such as Struct, Array and Map, revise this function
-   * to handle them case by case as the commented code shows.
+   * Infer the schema of the table through the methods of the actual file
+   * format.
+   */
+  override def inferSchema(files: Seq[FileStatus]): Option[StructType] =
+    formatName match {
+      case "csv" => {
+        val parsedOptions = new CSVOptions(
+          options.asScala.toMap,
+          columnPruning = sparkSession.sessionState.conf.csvColumnPruning,
+          sparkSession.sessionState.conf.sessionLocalTimeZone
+        )
+
+        CSVDataSource(parsedOptions).inferSchema(
+          sparkSession,
+          files,
+          parsedOptions
+        )
+      }
+      case "orc" =>
+        OrcUtils.inferSchema(sparkSession, files, options.asScala.toMap)
+      case "parquet" =>
+        ParquetUtils.inferSchema(sparkSession, options.asScala.toMap, files)
+      case _ => throw new IllegalArgumentException
+    }
+
+  /** Construct a new write builder according to the actual file format. */
+  override def newWriteBuilder(info: LogicalWriteInfo): WriteBuilder =
+    formatName match {
+      case "csv" =>
+        new CSVWriteBuilder(paths, formatName, supportsDataType, info)
+      case "orc" =>
+        new OrcWriteBuilder(paths, formatName, supportsDataType, info)
+      case "parquet" =>
+        new ParquetWriteBuilder(paths, formatName, supportsDataType, info)
+      case _ => throw new IllegalArgumentException
+    }
+
+  /**
+   * Check if a data type is supported. Note: Currently, the GraphAr data source
+   * only supports several atomic data types. To support additional data types
+   * such as Struct, Array and Map, revise this function to handle them case by
+   * case as the commented code shows.
    */
   override def supportsDataType(dataType: DataType): Boolean = dataType match {
     // case _: AnsiIntervalType => false
@@ -84,11 +109,12 @@ case class GarTable(name: String,
 
     // case st: StructType => st.forall { f => supportsDataType(f.dataType) }
 
-    case ArrayType(elementType, _) => formatName match {
-      case "orc" => supportsDataType(elementType)
-      case "parquet" => supportsDataType(elementType)
-      case _ => false
-    }
+    case ArrayType(elementType, _) =>
+      formatName match {
+        case "orc"     => supportsDataType(elementType)
+        case "parquet" => supportsDataType(elementType)
+        case _         => false
+      }
 
     // case MapType(keyType, valueType, _) =>
     //   supportsDataType(keyType) && supportsDataType(valueType)
