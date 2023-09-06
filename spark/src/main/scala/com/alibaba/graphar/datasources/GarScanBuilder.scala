@@ -1,16 +1,17 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
+/**
+ * Copyright 2022 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.alibaba.graphar.datasources
@@ -32,8 +33,8 @@ case class GarScanBuilder(
     schema: StructType,
     dataSchema: StructType,
     options: CaseInsensitiveStringMap,
-    formatName: String)
-  extends FileScanBuilder(sparkSession, fileIndex, dataSchema) {
+    formatName: String
+) extends FileScanBuilder(sparkSession, fileIndex, dataSchema) {
   lazy val hadoopConf = {
     val caseSensitiveMap = options.asCaseSensitiveMap.asScala.toMap
     // Hadoop Configurations are case sensitive.
@@ -41,12 +42,13 @@ case class GarScanBuilder(
   }
 
   // Check if the file format supports nested schema pruning.
-  override protected val supportsNestedSchemaPruning: Boolean = formatName match {
-    case "csv" => false
-    case "orc" => true
-    case "parquet" => true
-    case _ => throw new IllegalArgumentException
-  }
+  override protected val supportsNestedSchemaPruning: Boolean =
+    formatName match {
+      case "csv"     => false
+      case "orc"     => true
+      case "parquet" => true
+      case _         => throw new IllegalArgumentException
+    }
 
   // Note: This scan builder does not implement "with SupportsPushDownFilters".
   private var filters: Array[Filter] = Array.empty
@@ -59,7 +61,16 @@ case class GarScanBuilder(
 
   /** Build the file scan for GarDataSource. */
   override def build(): Scan = {
-    GarScan(sparkSession, hadoopConf, fileIndex, dataSchema, readDataSchema(),
-      readPartitionSchema(), filters, options, formatName)
+    GarScan(
+      sparkSession,
+      hadoopConf,
+      fileIndex,
+      dataSchema,
+      readDataSchema(),
+      readPartitionSchema(),
+      filters,
+      options,
+      formatName
+    )
   }
 }

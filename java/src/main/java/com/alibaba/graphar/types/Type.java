@@ -14,11 +14,11 @@
 
 package com.alibaba.graphar.types;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_TYPE;
+
 import com.alibaba.fastffi.CXXEnum;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeRefiner;
-
-import static com.alibaba.graphar.util.CppClassName.GAR_TYPE;
 
 @FFITypeAlias(GAR_TYPE)
 @FFITypeRefiner("com.alibaba.graphar.types.Type.get")
@@ -46,6 +46,7 @@ public enum Type implements CXXEnum {
 
     // Leave this at the end
     MAX_ID;
+
     public static Type get(int value) {
         switch (value) {
             case 0:
@@ -74,4 +75,3 @@ public enum Type implements CXXEnum {
         return ordinal();
     }
 }
-

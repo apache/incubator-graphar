@@ -215,15 +215,14 @@
                         <!-- apply a specific flavor of google-java-format and reflow long strings -->
                         <googleJavaFormat>
                             <version>1.13.0</version>
-                            <style>GOOGLE</style>
-                            <reflowLongStrings>true</reflowLongStrings>
+                            <style>AOSP</style>
                         </googleJavaFormat>
                     </java>
-                    <scalafmt>
-                        <version>3.5.9</version>              <!-- optional -->
-                        <file>${project.basedir}/scalafmt.conf</file> <!-- optional -->
-                        <scalaMajorVersion>${scala.binary.version}</scalaMajorVersion> <!-- optional -->
-                    </scalafmt>
+                    <scala>
+                        <scalafmt>
+                            <file>${project.basedir}/.scalafmt.conf</file> <!-- optional -->
+                        </scalafmt>
+                    </scala>
                 </configuration>
             </plugin>
         </plugins>

@@ -15,6 +15,6 @@
 @FFIApplication(jniLibrary = GAR_JNI_LIBRARY_NAME)
 package com.alibaba.graphar.stdcxx;
 
-import com.alibaba.fastffi.FFIApplication;
-
 import static com.alibaba.graphar.util.JNILibraryName.GAR_JNI_LIBRARY_NAME;
+
+import com.alibaba.fastffi.FFIApplication;

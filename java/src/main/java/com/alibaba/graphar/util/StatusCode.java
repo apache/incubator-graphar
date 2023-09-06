@@ -14,11 +14,11 @@
 
 package com.alibaba.graphar.util;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_STATUS_CODE;
+
 import com.alibaba.fastffi.CXXEnum;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeRefiner;
-
-import static com.alibaba.graphar.util.CppClassName.GAR_STATUS_CODE;
 
 @FFITypeAlias(GAR_STATUS_CODE)
 @FFITypeRefiner("com.alibaba.graphar.util.StatusCode.get")
@@ -65,7 +65,7 @@ public enum StatusCode implements CXXEnum {
             case 5:
                 return kOutOfMemory;
             case 6:
-                return  kIOError;
+                return kIOError;
             case 7:
                 return kYamlError;
             case 8:

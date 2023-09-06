@@ -1,21 +1,28 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
+/**
+ * Copyright 2022 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.alibaba.graphar.graph
 
-import com.alibaba.graphar.{GeneralParams, AdjListType, GraphInfo, VertexInfo, EdgeInfo}
+import com.alibaba.graphar.{
+  GeneralParams,
+  AdjListType,
+  GraphInfo,
+  VertexInfo,
+  EdgeInfo
+}
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
@@ -23,16 +30,31 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 
-/** The helper object for transforming graphs through the definitions of their infos. */
+/**
+ * The helper object for transforming graphs through the definitions of their
+ * infos.
+ */
 object GraphTransformer {
-  /** Transform the vertex chunks following the meta data defined in graph info objects.
+
+  /**
+   * Transform the vertex chunks following the meta data defined in graph info
+   * objects.
    *
-   * @param sourceGraphInfo The info object for the source graph.
-   * @param destGraphInfo The info object for the destination graph.
-   * @param sourceVertexInfosMap The map of (vertex label -> VertexInfo) for the source graph.
-   * @param spark The Spark session for the transformer.
+   * @param sourceGraphInfo
+   *   The info object for the source graph.
+   * @param destGraphInfo
+   *   The info object for the destination graph.
+   * @param sourceVertexInfosMap
+   *   The map of (vertex label -> VertexInfo) for the source graph.
+   * @param spark
+   *   The Spark session for the transformer.
    */
-  private def transformAllVertices(sourceGraphInfo: GraphInfo, destGraphInfo: GraphInfo, sourceVertexInfosMap: Map[String, VertexInfo], spark: SparkSession): Unit = {
+  private def transformAllVertices(
+      sourceGraphInfo: GraphInfo,
+      destGraphInfo: GraphInfo,
+      sourceVertexInfosMap: Map[String, VertexInfo],
+      spark: SparkSession
+  ): Unit = {
     val source_prefix = sourceGraphInfo.getPrefix
     val dest_prefix = destGraphInfo.getPrefix
 
@@ -57,15 +79,28 @@ object GraphTransformer {
     }
   }
 
-  /** Transform the edge chunks following the meta data defined in graph info objects.
+  /**
+   * Transform the edge chunks following the meta data defined in graph info
+   * objects.
    *
-   * @param sourceGraphInfo The info object for the source graph.
-   * @param destGraphInfo The info object for the destination graph.
-   * @param sourceVertexInfosMap The map of (vertex label -> VertexInfo) for the source graph.
-   * @param sourceEdgeInfosMap The map of (edge label -> EdgeInfo) for the source graph.
-   * @param spark The Spark session for the transformer.
+   * @param sourceGraphInfo
+   *   The info object for the source graph.
+   * @param destGraphInfo
+   *   The info object for the destination graph.
+   * @param sourceVertexInfosMap
+   *   The map of (vertex label -> VertexInfo) for the source graph.
+   * @param sourceEdgeInfosMap
+   *   The map of (edge label -> EdgeInfo) for the source graph.
+   * @param spark
+   *   The Spark session for the transformer.
    */
-  private def transformAllEdges(sourceGraphInfo: GraphInfo, destGraphInfo: GraphInfo, sourceVertexInfosMap: Map[String, VertexInfo], sourceEdgeInfosMap: Map[String, EdgeInfo], spark: SparkSession): Unit = {
+  private def transformAllEdges(
+      sourceGraphInfo: GraphInfo,
+      destGraphInfo: GraphInfo,
+      sourceVertexInfosMap: Map[String, VertexInfo],
+      sourceEdgeInfosMap: Map[String, EdgeInfo],
+      spark: SparkSession
+  ): Unit = {
     val source_prefix = sourceGraphInfo.getPrefix
     val dest_prefix = destGraphInfo.getPrefix
 
@@ -96,18 +131,26 @@ object GraphTransformer {
           var source_adj_list_type = dest_adj_list_type
           if (!source_edge_info.containAdjList(dest_adj_list_type))
             if (source_adj_lists.size() > 0)
-              source_adj_list_type = source_adj_lists.get(0).getAdjList_type_in_gar
+              source_adj_list_type =
+                source_adj_lists.get(0).getAdjList_type_in_gar
           // read edge chunks from source graph
-          val reader = new EdgeReader(source_prefix, source_edge_info, source_adj_list_type, spark)
+          val reader = new EdgeReader(
+            source_prefix,
+            source_edge_info,
+            source_adj_list_type,
+            spark
+          )
           df = reader.readEdges(false)
           has_loaded = true
         }
 
         // read vertices number
         val vertex_label = {
-          if (dest_adj_list_type == AdjListType.ordered_by_source || dest_adj_list_type == AdjListType.unordered_by_source) 
-            dest_edge_info.getSrc_label 
-          else 
+          if (
+            dest_adj_list_type == AdjListType.ordered_by_source || dest_adj_list_type == AdjListType.unordered_by_source
+          )
+            dest_edge_info.getSrc_label
+          else
             dest_edge_info.getDst_label
         }
         if (!sourceVertexInfosMap.contains(vertex_label)) {
@@ -118,33 +161,66 @@ object GraphTransformer {
         val vertex_num = reader.readVerticesNumber()
 
         // write edge chunks for dest graph
-        val writer = new EdgeWriter(dest_prefix, dest_edge_info, dest_adj_list_type, vertex_num, df)
+        val writer = new EdgeWriter(
+          dest_prefix,
+          dest_edge_info,
+          dest_adj_list_type,
+          vertex_num,
+          df
+        )
         writer.writeEdges()
       }
     }
   }
 
-  /** Transform the graphs following the meta data defined in graph info objects.
+  /**
+   * Transform the graphs following the meta data defined in graph info objects.
    *
-   * @param sourceGraphInfo The info object for the source graph.
-   * @param destGraphInfo The info object for the destination graph.
-   * @param spark The Spark session for the transformer.
+   * @param sourceGraphInfo
+   *   The info object for the source graph.
+   * @param destGraphInfo
+   *   The info object for the destination graph.
+   * @param spark
+   *   The Spark session for the transformer.
    */
-  def transform(sourceGraphInfo: GraphInfo, destGraphInfo: GraphInfo, spark: SparkSession): Unit = {
+  def transform(
+      sourceGraphInfo: GraphInfo,
+      destGraphInfo: GraphInfo,
+      spark: SparkSession
+  ): Unit = {
     // transform and generate vertex data chunks
-    transformAllVertices(sourceGraphInfo, destGraphInfo, sourceGraphInfo.getVertexInfos(), spark)
+    transformAllVertices(
+      sourceGraphInfo,
+      destGraphInfo,
+      sourceGraphInfo.getVertexInfos(),
+      spark
+    )
 
     // transform and generate edge data chunks
-    transformAllEdges(sourceGraphInfo, destGraphInfo, sourceGraphInfo.getVertexInfos(), sourceGraphInfo.getEdgeInfos(), spark)
+    transformAllEdges(
+      sourceGraphInfo,
+      destGraphInfo,
+      sourceGraphInfo.getVertexInfos(),
+      sourceGraphInfo.getEdgeInfos(),
+      spark
+    )
   }
 
-  /** Transform the graphs following the meta data defined in info files.
+  /**
+   * Transform the graphs following the meta data defined in info files.
    *
-   * @param sourceGraphInfoPath The path of the graph info yaml file for the source graph.
-   * @param destGraphInfoPath The path of the graph info yaml file for the destination graph.
-   * @param spark The Spark session for the transformer.
+   * @param sourceGraphInfoPath
+   *   The path of the graph info yaml file for the source graph.
+   * @param destGraphInfoPath
+   *   The path of the graph info yaml file for the destination graph.
+   * @param spark
+   *   The Spark session for the transformer.
    */
-  def transform(sourceGraphInfoPath: String, destGraphInfoPath: String, spark: SparkSession): Unit = {
+  def transform(
+      sourceGraphInfoPath: String,
+      destGraphInfoPath: String,
+      spark: SparkSession
+  ): Unit = {
     // load source graph info
     val source_graph_info = GraphInfo.loadGraphInfo(sourceGraphInfoPath, spark)
 

@@ -26,6 +26,7 @@ public enum FileType implements CXXEnum {
     CSV,
     PARQUET,
     ORC;
+
     public static FileType get(int value) {
         switch (value) {
             case 0:

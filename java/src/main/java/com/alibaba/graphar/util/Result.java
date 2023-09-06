@@ -26,7 +26,6 @@ import static com.alibaba.graphar.util.CppClassName.STD_STRING;
 import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
-import com.alibaba.fastffi.CXXOperator;
 import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
 import com.alibaba.fastffi.CXXTemplate;
@@ -49,12 +48,12 @@ import com.alibaba.fastffi.FFITypeAlias;
 @CXXTemplate(cxx = GAR_INFO_VERSION, java = "com.alibaba.graphar.util.InfoVersion")
 public interface Result<T> extends CXXPointer {
 
-  @CXXReference
-  T value();
+    @CXXReference
+    T value();
 
-  @CXXValue
-  Status status();
+    @CXXValue
+    Status status();
 
-  @FFINameAlias("has_error")
-  boolean hasError();
+    @FFINameAlias("has_error")
+    boolean hasError();
 }
