@@ -23,6 +23,8 @@ on:
       - 'docs/**'
       - 'misc/**'
       - 'spark/**'
+      - '.github/workflows/java.yml'
+      - '.github/workflows/spark.yml'
 
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
