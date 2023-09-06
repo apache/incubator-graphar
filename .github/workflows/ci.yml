@@ -107,7 +107,7 @@ jobs:
         export GAR_TEST_DATA=$PWD/../testing/
         make test
 
-  GraphAr-centos8-arrow-installed:
+  GraphAr-centos7-arrow-installed:
     runs-on: ubuntu-latest
     container:
       image: centos:7
