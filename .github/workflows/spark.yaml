@@ -8,11 +8,13 @@ on:
       - main
     paths:
       - 'spark/**'
+      - '.github/workflows/spark.yaml'
   pull_request:
     branches:
       - main
     paths:
       - 'spark/**'
+      - '.github/workflows/spark.yaml'
 
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}

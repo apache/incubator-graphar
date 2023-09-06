@@ -6,25 +6,15 @@ on:
   push:
     branches:
       - main
-    paths-ignore:
-      - 'LICENSE'
-      - '**.md'
-      - '**.rst'
-      - 'docs/**'
-      - 'misc/**'
-      - 'spark/**'
+    paths:
+      - 'cpp/**'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches:
       - main
-    paths-ignore:
-      - 'LICENSE'
-      - '**.md'
-      - '**.rst'
-      - 'docs/**'
-      - 'misc/**'
-      - 'spark/**'
-      - '.github/workflows/java.yml'
-      - '.github/workflows/spark.yml'
+    paths:
+      - 'cpp/**'
+      - '.github/workflows/ci.yml'
 
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
