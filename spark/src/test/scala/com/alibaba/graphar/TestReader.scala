@@ -51,7 +51,8 @@ class ReaderSuite extends AnyFunSuite {
      * (1) Filter (isnotnull(id#0L) AND (id#0L < 1000))
      * +- *(1) ColumnarToRow
      * +- BatchScan[id#0L] GarScan DataFilters: [isnotnull(id#0L), (id#0L <
-     * 1000)], Format: gar, Location: InMemoryFileIndex(1 paths)[file:...,
+     * 1000)], Format: gar, Location: InMemoryFileIndex(1
+     * paths)[file:/path/to/code/cpp/GraphAr/spark/src/test/resources/gar-test/l...,
      * PartitionFilters: [], PushedFilters: [IsNotNull(id), LessThan(id,1000)],
      * ReadSchema: struct<id:bigint>, PushedFilters: [IsNotNull(id),
      * LessThan(id,1000)] RuntimeFilters: []
@@ -77,7 +78,7 @@ class ReaderSuite extends AnyFunSuite {
      * +- *(1) ColumnarToRow
      * +- BatchScan[id#0L] GarScan DataFilters: [isnotnull(id#0L), (id#0L <
      * 1000)], Format: gar, Location: InMemoryFileIndex(1
-     * paths)[file:/path/to/GraphAr/spark/src/test/resources/gar-test/l...,,
+     * paths)[file:/path/to/GraphAr/spark/src/test/resources/gar-test/l...,
      * PartitionFilters: [], PushedFilters: [IsNotNull(id), LessThan(id,1000)],
      * ReadSchema: struct<id:bigint>, PushedFilters: [IsNotNull(id),
      * LessThan(id,1000)] RuntimeFilters: []
