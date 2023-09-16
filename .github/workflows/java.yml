@@ -29,6 +29,12 @@ jobs:
       - uses: actions/checkout@v3
         with:
           submodules: true
+
+      - name: Update test submodule
+        run: |
+          pushd testing
+          git pull origin main
+          popd
           
       - name: Install dependencies
         run: |
