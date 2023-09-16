@@ -35,37 +35,37 @@ import com.alibaba.graphar.types.DataType;
 @FFITypeAlias(GAR_PROPERTY)
 @CXXHead(GAR_GRAPH_INFO_H)
 public interface Property extends CXXPointer {
-  Factory factory = FFITypeFactory.getFactory(Property.class);
+    Factory factory = FFITypeFactory.getFactory(Property.class);
 
-  @FFIGetter
-  @FFINameAlias("name")
-  @CXXValue
-  StdString getName();
-
-  @FFISetter
-  @FFINameAlias("name")
-  void setName(@CXXValue StdString name);
-
-  @FFIGetter
-  @FFINameAlias("type")
-  @CXXValue
-  DataType getType();
-
-  @FFISetter
-  @FFINameAlias("type")
-  void setType(@CXXValue DataType type);
-
-  @FFIGetter
-  @FFINameAlias("is_primary")
-  boolean isPrimary();
-
-  @FFISetter
-  @FFINameAlias("is_primary")
-  void setPrimary(boolean primary);
-
-  @FFIFactory
-  interface Factory {
+    @FFIGetter
+    @FFINameAlias("name")
     @CXXValue
-    Property create();
-  }
+    StdString getName();
+
+    @FFISetter
+    @FFINameAlias("name")
+    void setName(@CXXValue StdString name);
+
+    @FFIGetter
+    @FFINameAlias("type")
+    @CXXValue
+    DataType getType();
+
+    @FFISetter
+    @FFINameAlias("type")
+    void setType(@CXXValue DataType type);
+
+    @FFIGetter
+    @FFINameAlias("is_primary")
+    boolean isPrimary();
+
+    @FFISetter
+    @FFINameAlias("is_primary")
+    void setPrimary(boolean primary);
+
+    @FFIFactory
+    interface Factory {
+        @CXXValue
+        Property create();
+    }
 }

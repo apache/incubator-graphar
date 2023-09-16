@@ -44,59 +44,59 @@ import com.alibaba.graphar.types.FileType;
 @CXXHead(GAR_GRAPH_INFO_H)
 public interface PropertyGroup extends CXXPointer {
 
-  Factory factory = FFITypeFactory.getFactory(PropertyGroup.class);
+    Factory factory = FFITypeFactory.getFactory(PropertyGroup.class);
 
-  @FFINameAlias("GetProperties")
-  @FFIConst
-  @CXXReference
-  StdVector<Property> getProperties();
-
-  /**
-   * Get the file type of property group chunk file.
-   *
-   * @return The file type of group.
-   */
-  @FFINameAlias("GetFileType")
-  @CXXValue
-  FileType getFileType();
-
-  /**
-   * Get the prefix of property group chunk file.
-   *
-   * @return The path prefix of group.
-   */
-  @FFINameAlias("GetPrefix")
-  @CXXReference
-  StdString getPrefix();
-
-  @CXXOperator("==")
-  boolean eq(@CXXReference PropertyGroup other);
-
-  @FFIFactory
-  interface Factory {
-    /**
-     * Initialize the PropertyGroup with a list of properties, file type, and optional prefix.
-     *
-     * @param properties Property list of group
-     * @param fileType File type of property group chunk file
-     * @param prefix prefix of property group chunk file. The default prefix is the concatenation of
-     *     property names with '_' as separator
-     */
-    @CXXValue
-    PropertyGroup create(
-        @CXXValue StdVector<Property> properties,
-        @CXXValue FileType fileType,
-        @CXXReference StdString prefix);
+    @FFINameAlias("GetProperties")
+    @FFIConst
+    @CXXReference
+    StdVector<Property> getProperties();
 
     /**
-     * Initialize the PropertyGroup with a list of properties, file type, and optional prefix.
+     * Get the file type of property group chunk file.
      *
-     * @param properties Property list of group
-     * @param fileType File type of property group chunk file
+     * @return The file type of group.
      */
+    @FFINameAlias("GetFileType")
     @CXXValue
-    PropertyGroup create(@CXXValue StdVector<Property> properties, @CXXValue FileType fileType);
+    FileType getFileType();
 
-    PropertyGroup create();
-  }
+    /**
+     * Get the prefix of property group chunk file.
+     *
+     * @return The path prefix of group.
+     */
+    @FFINameAlias("GetPrefix")
+    @CXXReference
+    StdString getPrefix();
+
+    @CXXOperator("==")
+    boolean eq(@CXXReference PropertyGroup other);
+
+    @FFIFactory
+    interface Factory {
+        /**
+         * Initialize the PropertyGroup with a list of properties, file type, and optional prefix.
+         *
+         * @param properties Property list of group
+         * @param fileType File type of property group chunk file
+         * @param prefix prefix of property group chunk file. The default prefix is the
+         *     concatenation of property names with '_' as separator
+         */
+        @CXXValue
+        PropertyGroup create(
+                @CXXValue StdVector<Property> properties,
+                @CXXValue FileType fileType,
+                @CXXReference StdString prefix);
+
+        /**
+         * Initialize the PropertyGroup with a list of properties, file type, and optional prefix.
+         *
+         * @param properties Property list of group
+         * @param fileType File type of property group chunk file
+         */
+        @CXXValue
+        PropertyGroup create(@CXXValue StdVector<Property> properties, @CXXValue FileType fileType);
+
+        PropertyGroup create();
+    }
 }

@@ -14,6 +14,9 @@
 
 package com.alibaba.graphar.types;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_DATA_TYPE;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;
 import com.alibaba.fastffi.CXXPointer;
@@ -25,40 +28,37 @@ import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
 import com.alibaba.graphar.stdcxx.StdString;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_DATA_TYPE;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
-
 @FFIGen
 @FFITypeAlias(GAR_DATA_TYPE)
 @CXXHead(GAR_GRAPH_INFO_H)
 public interface DataType extends CXXPointer {
-  Factory factory = FFITypeFactory.getFactory(DataType.class);
+    Factory factory = FFITypeFactory.getFactory(DataType.class);
 
-  @CXXOperator("==")
-  boolean eq(@CXXReference DataType other);
+    @CXXOperator("==")
+    boolean eq(@CXXReference DataType other);
 
-  @FFIFactory
-  interface Factory {
-    @CXXValue
-    DataType create();
+    @FFIFactory
+    interface Factory {
+        @CXXValue
+        DataType create();
 
-    /**
-     * Construct a DateType object
-     *
-     * @param id
-     * @param usrDefinedTypeName c++ default = ""
-     * @return a DateType object
-     */
-    @CXXValue
-    DataType create(@CXXValue Type id, @CXXReference StdString usrDefinedTypeName);
+        /**
+         * Construct a DateType object
+         *
+         * @param id
+         * @param usrDefinedTypeName c++ default = ""
+         * @return a DateType object
+         */
+        @CXXValue
+        DataType create(@CXXValue Type id, @CXXReference StdString usrDefinedTypeName);
 
-    /**
-     * Construct a DateType object
-     *
-     * @param id
-     * @return a DateType object
-     */
-    @CXXValue
-    DataType create(@CXXValue Type id);
-  }
+        /**
+         * Construct a DateType object
+         *
+         * @param id
+         * @return a DateType object
+         */
+        @CXXValue
+        DataType create(@CXXValue Type id);
+    }
 }

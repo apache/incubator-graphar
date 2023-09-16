@@ -14,6 +14,10 @@
 
 package com.alibaba.graphar.readers.chunkinfo;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
+import static com.alibaba.graphar.util.CppClassName.GAR_VERTEX_PROPERTY_CHUNK_INFO_READER;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_CHUNK_INFO_READER_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
@@ -27,82 +31,73 @@ import com.alibaba.graphar.graphinfo.GraphInfo;
 import com.alibaba.graphar.graphinfo.PropertyGroup;
 import com.alibaba.graphar.graphinfo.VertexInfo;
 import com.alibaba.graphar.stdcxx.StdString;
+import com.alibaba.graphar.util.GrapharStaticFunctions;
 import com.alibaba.graphar.util.Result;
 import com.alibaba.graphar.util.Status;
-import com.alibaba.graphar.util.GrapharStaticFunctions;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.util.CppClassName.GAR_VERTEX_PROPERTY_CHUNK_INFO_READER;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_CHUNK_INFO_READER_H;
-
-/**
- * The chunk info reader for vertex property group.
- */
+/** The chunk info reader for vertex property group. */
 @FFIGen
 @FFITypeAlias(GAR_VERTEX_PROPERTY_CHUNK_INFO_READER)
 @CXXHead(GAR_CHUNK_INFO_READER_H)
 public interface VertexPropertyChunkInfoReader extends CXXPointer {
 
-  Factory factory = FFITypeFactory.getFactory(VertexPropertyChunkInfoReader.class);
+    Factory factory = FFITypeFactory.getFactory(VertexPropertyChunkInfoReader.class);
 
-  /**
-   * Sets chunk position indicator for reader by internal vertex id. If internal vertex id is not
-   * found, will return Status::IndexError error. After seeking to an invalid vertex id, the next
-   * call to GetChunk function may undefined, e.g. return a non exist path.
-   *
-   * @param id the internal vertex id.
-   */
-  @CXXValue
-  Status seek(@FFITypeAlias(GAR_ID_TYPE) long id);
-
-  /**
-   * Return the current chunk file path of chunk position indicator.
-   */
-  @FFINameAlias("GetChunk")
-  @CXXValue
-  Result<StdString> getChunk();
-
-  /**
-   * Sets chunk position indicator to next chunk. if current chunk is the last chunk, will return
-   * Status::IndexError error.
-   */
-  @FFINameAlias("next_chunk")
-  @CXXValue
-  Status nextChunk();
-
-  /**
-   * Get the chunk number of the current vertex property group.
-   */
-  @FFINameAlias("GetChunkNum")
-  long getChunkNum();
-
-  /**
-   * Helper function to Construct VertexPropertyChunkInfoReader.
-   *
-   * @param graphInfo     The graph info to describe the graph.
-   * @param label         label name of the vertex.
-   * @param propertyGroup The property group of the vertex.
-   */
-  static Result<VertexPropertyChunkInfoReader> constructVertexPropertyChunkInfoReader(
-          @CXXReference GraphInfo graphInfo,
-          @CXXReference StdString label,
-          @CXXReference PropertyGroup propertyGroup) {
-
-    return GrapharStaticFunctions.INSTANCE.constructVertexPropertyChunkInfoReader(graphInfo, label, propertyGroup);
-  }
-
-  @FFIFactory
-  interface Factory {
     /**
-     * Initialize the VertexPropertyChunkInfoReader.
+     * Sets chunk position indicator for reader by internal vertex id. If internal vertex id is not
+     * found, will return Status::IndexError error. After seeking to an invalid vertex id, the next
+     * call to GetChunk function may undefined, e.g. return a non exist path.
      *
-     * @param vertexInfo    The vertex info that describes the vertex type.
-     * @param propertyGroup The property group that describes the property group.
-     * @param prefix        The absolute prefix of the graph.
+     * @param id the internal vertex id.
      */
-    VertexPropertyChunkInfoReader create(
-            @CXXReference VertexInfo vertexInfo,
-            @CXXReference PropertyGroup propertyGroup,
-            @CXXReference StdString prefix);
-  }
+    @CXXValue
+    Status seek(@FFITypeAlias(GAR_ID_TYPE) long id);
+
+    /** Return the current chunk file path of chunk position indicator. */
+    @FFINameAlias("GetChunk")
+    @CXXValue
+    Result<StdString> getChunk();
+
+    /**
+     * Sets chunk position indicator to next chunk. if current chunk is the last chunk, will return
+     * Status::IndexError error.
+     */
+    @FFINameAlias("next_chunk")
+    @CXXValue
+    Status nextChunk();
+
+    /** Get the chunk number of the current vertex property group. */
+    @FFINameAlias("GetChunkNum")
+    long getChunkNum();
+
+    /**
+     * Helper function to Construct VertexPropertyChunkInfoReader.
+     *
+     * @param graphInfo The graph info to describe the graph.
+     * @param label label name of the vertex.
+     * @param propertyGroup The property group of the vertex.
+     */
+    static Result<VertexPropertyChunkInfoReader> constructVertexPropertyChunkInfoReader(
+            @CXXReference GraphInfo graphInfo,
+            @CXXReference StdString label,
+            @CXXReference PropertyGroup propertyGroup) {
+
+        return GrapharStaticFunctions.INSTANCE.constructVertexPropertyChunkInfoReader(
+                graphInfo, label, propertyGroup);
+    }
+
+    @FFIFactory
+    interface Factory {
+        /**
+         * Initialize the VertexPropertyChunkInfoReader.
+         *
+         * @param vertexInfo The vertex info that describes the vertex type.
+         * @param propertyGroup The property group that describes the property group.
+         * @param prefix The absolute prefix of the graph.
+         */
+        VertexPropertyChunkInfoReader create(
+                @CXXReference VertexInfo vertexInfo,
+                @CXXReference PropertyGroup propertyGroup,
+                @CXXReference StdString prefix);
+    }
 }

@@ -14,6 +14,10 @@
 
 package com.alibaba.graphar.vertices;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
+import static com.alibaba.graphar.util.CppClassName.GAR_VERTICES_COLLECTION;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
@@ -24,46 +28,35 @@ import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.graphar.graphinfo.VertexInfo;
 import com.alibaba.graphar.stdcxx.StdString;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.util.CppClassName.GAR_VERTICES_COLLECTION;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
-
-/**
- * VerticesCollection is designed for reading a collection of vertices.
- */
+/** VerticesCollection is designed for reading a collection of vertices. */
 @FFIGen
 @FFITypeAlias(GAR_VERTICES_COLLECTION)
 @CXXHead(GAR_GRAPH_H)
 public interface VerticesCollection extends CXXPointer {
 
-  /**
-   * The iterator pointing to the first vertex.
-   */
-  @CXXValue
-  VertexIter begin();
+    /** The iterator pointing to the first vertex. */
+    @CXXValue
+    VertexIter begin();
 
-  /**
-   * The iterator pointing to the past-the-end element.
-   */
-  @CXXValue
-  VertexIter end();
+    /** The iterator pointing to the past-the-end element. */
+    @CXXValue
+    VertexIter end();
 
-  /**
-   * The iterator pointing to the vertex with specific id.
-   */
-  @CXXValue
-  VertexIter find(@FFITypeAlias(GAR_ID_TYPE) long id);
+    /** The iterator pointing to the vertex with specific id. */
+    @CXXValue
+    VertexIter find(@FFITypeAlias(GAR_ID_TYPE) long id);
 
-  long size();
+    long size();
 
-  @FFIFactory
-  interface Factory {
-    /**
-     * Initialize the VerticesCollection.
-     *
-     * @param vertexInfo The vertex info that describes the vertex type.
-     * @param prefix     The absolute prefix.
-     */
-    VerticesCollection create(@CXXReference VertexInfo vertexInfo, @CXXReference StdString prefix);
-  }
+    @FFIFactory
+    interface Factory {
+        /**
+         * Initialize the VerticesCollection.
+         *
+         * @param vertexInfo The vertex info that describes the vertex type.
+         * @param prefix The absolute prefix.
+         */
+        VerticesCollection create(
+                @CXXReference VertexInfo vertexInfo, @CXXReference StdString prefix);
+    }
 }

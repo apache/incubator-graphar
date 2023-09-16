@@ -14,6 +14,9 @@
 
 package com.alibaba.graphar.stdcxx;
 
+import static com.alibaba.graphar.util.CppClassName.STD_PAIR;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXTemplate;
 import com.alibaba.fastffi.FFIGen;
@@ -21,9 +24,6 @@ import com.alibaba.fastffi.FFIGetter;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFIPointer;
 import com.alibaba.fastffi.FFITypeAlias;
-
-import static com.alibaba.graphar.util.CppClassName.STD_PAIR;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
 
 @FFIGen
 @FFITypeAlias(STD_PAIR)
@@ -36,11 +36,11 @@ import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
         cxx = {"int64_t", "int64_t"},
         java = {"Long", "Long"})
 public interface StdPair<T1, T2> extends FFIPointer {
-  @FFINameAlias("first")
-  @FFIGetter
-  T1 getFirst();
+    @FFINameAlias("first")
+    @FFIGetter
+    T1 getFirst();
 
-  @FFINameAlias("second")
-  @FFIGetter
-  T2 getSecond();
+    @FFINameAlias("second")
+    @FFIGetter
+    T2 getSecond();
 }

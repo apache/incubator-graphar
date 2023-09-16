@@ -14,24 +14,24 @@
 
 package com.alibaba.graphar.arrow;
 
+import static com.alibaba.graphar.util.CppClassName.ARROW_RESULT;
+import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXReference;
 import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFIPointer;
 import com.alibaba.fastffi.FFITypeAlias;
 
-import static com.alibaba.graphar.util.CppClassName.ARROW_RESULT;
-import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
-
 @FFIGen
 @FFITypeAlias(ARROW_RESULT)
 @CXXHead(ARROW_API_H)
 public interface ArrowResult<T> extends FFIPointer {
-  @CXXReference
-  T ValueOrDie();
+    @CXXReference
+    T ValueOrDie();
 
-  @CXXReference
-  ArrowStatus status();
+    @CXXReference
+    ArrowStatus status();
 
-  boolean ok();
+    boolean ok();
 }

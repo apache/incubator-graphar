@@ -14,6 +14,10 @@
 
 package com.alibaba.graphar.stdcxx;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_PROPERTY;
+import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;
 import com.alibaba.fastffi.CXXPointer;
@@ -26,10 +30,6 @@ import com.alibaba.fastffi.FFISettablePointer;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_PROPERTY;
-import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
-
 @FFIGen
 @CXXHead(system = {"vector", "string"})
 @CXXHead(GAR_GRAPH_INFO_H)
@@ -40,56 +40,56 @@ import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 @CXXTemplate(cxx = GAR_PROPERTY, java = "com.alibaba.graphar.graphinfo.Property")
 public interface StdVector<E> extends CXXPointer, FFISettablePointer {
 
-  static Factory getStdVectorFactory(String foreignName) {
-    return FFITypeFactory.getFactory(StdVector.class, foreignName);
-  }
-
-  long size();
-
-  @CXXOperator("[]")
-  @CXXReference
-  E get(long index);
-
-  @CXXOperator("[]")
-  void set(long index, @CXXReference E value);
-
-  @CXXOperator("==")
-  boolean eq(@CXXReference StdVector<E> other);
-
-  void push_back(@CXXValue E e);
-
-  default void add(@CXXReference E value) {
-    long size = size();
-    long cap = capacity();
-    if (size == cap) {
-      reserve(cap << 1);
+    static Factory getStdVectorFactory(String foreignName) {
+        return FFITypeFactory.getFactory(StdVector.class, foreignName);
     }
-    push_back(value);
-  }
 
-  default @CXXReference E append() {
-    long size = size();
-    long cap = capacity();
-    if (size == cap) {
-      reserve(cap << 1);
+    long size();
+
+    @CXXOperator("[]")
+    @CXXReference
+    E get(long index);
+
+    @CXXOperator("[]")
+    void set(long index, @CXXReference E value);
+
+    @CXXOperator("==")
+    boolean eq(@CXXReference StdVector<E> other);
+
+    void push_back(@CXXValue E e);
+
+    default void add(@CXXReference E value) {
+        long size = size();
+        long cap = capacity();
+        if (size == cap) {
+            reserve(cap << 1);
+        }
+        push_back(value);
     }
-    resize(size + 1);
-    return get(size);
-  }
 
-  void clear();
+    default @CXXReference E append() {
+        long size = size();
+        long cap = capacity();
+        if (size == cap) {
+            reserve(cap << 1);
+        }
+        resize(size + 1);
+        return get(size);
+    }
 
-  long data();
+    void clear();
 
-  long capacity();
+    long data();
 
-  void reserve(long size);
+    long capacity();
 
-  void resize(long size);
+    void reserve(long size);
 
-  @FFIFactory
-  interface Factory<E> {
+    void resize(long size);
 
-    StdVector<E> create();
-  }
+    @FFIFactory
+    interface Factory<E> {
+
+        StdVector<E> create();
+    }
 }

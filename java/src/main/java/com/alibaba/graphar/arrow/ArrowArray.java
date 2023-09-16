@@ -14,17 +14,17 @@
 
 package com.alibaba.graphar.arrow;
 
+import static com.alibaba.graphar.util.CppClassName.ARROW_ARRAY;
+import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFITypeAlias;
 
-import static com.alibaba.graphar.util.CppClassName.ARROW_ARRAY;
-import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
-
 @FFIGen
 @FFITypeAlias(ARROW_ARRAY)
 @CXXHead(ARROW_API_H)
 public interface ArrowArray extends CXXPointer {
-  long length();
+    long length();
 }

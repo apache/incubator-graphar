@@ -14,6 +14,8 @@
 
 package com.alibaba.graphar.vertices;
 
+import static com.alibaba.graphar.graphinfo.GraphInfoTest.root;
+
 import com.alibaba.graphar.graphinfo.GraphInfo;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.util.GrapharStaticFunctions;
@@ -21,48 +23,49 @@ import com.alibaba.graphar.util.Result;
 import org.junit.Assert;
 import org.junit.Test;
 
-import static com.alibaba.graphar.graphinfo.GraphInfoTest.root;
-
 public class VerticesCollectionTest {
-  @Test
-  public void test1() {
-    // read file and construct graph info
-    String path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-    Result<GraphInfo> maybeGraphInfo = GraphInfo.load(path);
-    Assert.assertTrue(maybeGraphInfo.status().ok());
-    GraphInfo graphInfo = maybeGraphInfo.value();
+    @Test
+    public void test1() {
+        // read file and construct graph info
+        String path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+        Result<GraphInfo> maybeGraphInfo = GraphInfo.load(path);
+        Assert.assertTrue(maybeGraphInfo.status().ok());
+        GraphInfo graphInfo = maybeGraphInfo.value();
 
-    // construct vertices collection
-    StdString label = StdString.create("person");
-    StdString property = StdString.create("firstName");
-    StdString stdStrId = StdString.create("id");
-    Result<VerticesCollection> maybeVerticesCollection =
-            GrapharStaticFunctions.INSTANCE.constructVerticesCollection(graphInfo, label);
-    Assert.assertFalse(maybeVerticesCollection.hasError());
-    VerticesCollection vertices = maybeVerticesCollection.value();
-    for (VertexIter it = vertices.begin(); !it.eq(vertices.end()); it.inc()) {
-      // access data through iterator directly
-      VertexIterGen itGen = (VertexIterGen) it;
-      System.out.println(
-              it.id()
-                      + ", id="
-                      + it.<Long>property(stdStrId, 1L).value()
-                      + ", firstName="
-                      + it.property(property, property).value().toJavaString());
-      // access data through vertex
-      Vertex vertex = it.get();
-      System.out.println(
-              vertex.id()
-                      + ", id="
-                      + vertex.<Long>property(stdStrId, 1L).value()
-                      + ", firstName="
-                      + vertex.<StdString>property(property, property).value().toJavaString());
-      // access data reference through vertex
-      Assert.assertEquals(
-              it.<Long>property(stdStrId, 1L).value(), vertex.<Long>property(stdStrId, 1L).value());
-      Assert.assertEquals(
-              it.<StdString>property(property, property).value().toJavaString(),
-              vertex.<StdString>property(property, property).value().toJavaString());
+        // construct vertices collection
+        StdString label = StdString.create("person");
+        StdString property = StdString.create("firstName");
+        StdString stdStrId = StdString.create("id");
+        Result<VerticesCollection> maybeVerticesCollection =
+                GrapharStaticFunctions.INSTANCE.constructVerticesCollection(graphInfo, label);
+        Assert.assertFalse(maybeVerticesCollection.hasError());
+        VerticesCollection vertices = maybeVerticesCollection.value();
+        for (VertexIter it = vertices.begin(); !it.eq(vertices.end()); it.inc()) {
+            // access data through iterator directly
+            VertexIterGen itGen = (VertexIterGen) it;
+            System.out.println(
+                    it.id()
+                            + ", id="
+                            + it.<Long>property(stdStrId, 1L).value()
+                            + ", firstName="
+                            + it.property(property, property).value().toJavaString());
+            // access data through vertex
+            Vertex vertex = it.get();
+            System.out.println(
+                    vertex.id()
+                            + ", id="
+                            + vertex.<Long>property(stdStrId, 1L).value()
+                            + ", firstName="
+                            + vertex.<StdString>property(property, property)
+                                    .value()
+                                    .toJavaString());
+            // access data reference through vertex
+            Assert.assertEquals(
+                    it.<Long>property(stdStrId, 1L).value(),
+                    vertex.<Long>property(stdStrId, 1L).value());
+            Assert.assertEquals(
+                    it.<StdString>property(property, property).value().toJavaString(),
+                    vertex.<StdString>property(property, property).value().toJavaString());
+        }
     }
-  }
 }

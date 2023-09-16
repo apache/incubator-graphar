@@ -14,6 +14,9 @@
 
 package com.alibaba.graphar.util;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_YAML;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_UTIL_YAML_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXReference;
 import com.alibaba.fastffi.CXXValue;
@@ -25,45 +28,40 @@ import com.alibaba.fastffi.FFITypeFactory;
 import com.alibaba.graphar.stdcxx.StdSharedPtr;
 import com.alibaba.graphar.stdcxx.StdString;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_YAML;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_UTIL_YAML_H;
-
-/**
- * A wrapper of ::Yaml::Node to provide functions to parse yaml.
- */
+/** A wrapper of ::Yaml::Node to provide functions to parse yaml. */
 @FFIGen
 @FFITypeAlias(GAR_YAML)
 @CXXHead(GAR_UTIL_YAML_H)
 public interface Yaml extends FFIPointer {
 
-  /**
-   * Loads the input string as Yaml instance.
-   *
-   * @return Status::YamlError if input string can not be loaded(malformed).
-   */
-  static Result<StdSharedPtr<Yaml>> load(StdString input) {
-    return Static.INSTANCE.Load(input);
-  }
+    /**
+     * Loads the input string as Yaml instance.
+     *
+     * @return Status::YamlError if input string can not be loaded(malformed).
+     */
+    static Result<StdSharedPtr<Yaml>> load(StdString input) {
+        return Static.INSTANCE.Load(input);
+    }
 
-  /**
-   * Loads the input file as a single Yaml instance.
-   *
-   * @return Status::YamlError if the file can not be loaded(malformed).
-   */
-  static Result<StdSharedPtr<Yaml>> loadFile(StdString fileName) {
-    return Static.INSTANCE.LoadFile(fileName);
-  }
+    /**
+     * Loads the input file as a single Yaml instance.
+     *
+     * @return Status::YamlError if the file can not be loaded(malformed).
+     */
+    static Result<StdSharedPtr<Yaml>> loadFile(StdString fileName) {
+        return Static.INSTANCE.LoadFile(fileName);
+    }
 
-  @FFIGen
-  @CXXHead(GAR_UTIL_YAML_H)
-  @FFILibrary(value = GAR_YAML, namespace = GAR_YAML)
-  interface Static {
-    Static INSTANCE = FFITypeFactory.getLibrary(Yaml.Static.class);
+    @FFIGen
+    @CXXHead(GAR_UTIL_YAML_H)
+    @FFILibrary(value = GAR_YAML, namespace = GAR_YAML)
+    interface Static {
+        Static INSTANCE = FFITypeFactory.getLibrary(Yaml.Static.class);
 
-    @CXXValue
-    Result<StdSharedPtr<Yaml>> Load(@CXXReference StdString input);
+        @CXXValue
+        Result<StdSharedPtr<Yaml>> Load(@CXXReference StdString input);
 
-    @CXXValue
-    Result<StdSharedPtr<Yaml>> LoadFile(@CXXReference StdString fileName);
-  }
+        @CXXValue
+        Result<StdSharedPtr<Yaml>> LoadFile(@CXXReference StdString fileName);
+    }
 }

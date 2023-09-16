@@ -14,6 +14,10 @@
 
 package com.alibaba.graphar.readers.chunkinfo;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_ADJ_LIST_PROPERTY_CHUNK_INFO_READER;
+import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_CHUNK_INFO_READER_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
@@ -32,97 +36,89 @@ import com.alibaba.graphar.util.GrapharStaticFunctions;
 import com.alibaba.graphar.util.Result;
 import com.alibaba.graphar.util.Status;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_ADJ_LIST_PROPERTY_CHUNK_INFO_READER;
-import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_CHUNK_INFO_READER_H;
-
-/**
- * The chunk info reader for edge property group chunk.
- */
+/** The chunk info reader for edge property group chunk. */
 @FFIGen
 @FFITypeAlias(GAR_ADJ_LIST_PROPERTY_CHUNK_INFO_READER)
 @CXXHead(GAR_CHUNK_INFO_READER_H)
 public interface AdjListPropertyChunkInfoReader extends CXXPointer {
 
-  Factory factory = FFITypeFactory.getFactory(AdjListChunkInfoReader.class);
+    Factory factory = FFITypeFactory.getFactory(AdjListChunkInfoReader.class);
 
-  /**
-   * Sets chunk position indicator for reader by source vertex id.
-   *
-   * @param id the source vertex id.
-   */
-  @FFINameAlias("seek_src")
-  @CXXValue
-  Status seekSrc(@FFINameAlias(GAR_ID_TYPE) long id);
-
-  /**
-   * Sets chunk position indicator for reader by destination vertex id.
-   *
-   * @param id the destination vertex id.
-   */
-  @FFINameAlias("seek_dst")
-  @CXXValue
-  Status seekDst(@FFINameAlias(GAR_ID_TYPE) long id);
-
-  /**
-   * Sets chunk position indicator for reader by edge index.
-   *
-   * @param index offset edge index of the vertex chunk. Note: the offset is the edge index of the
-   *              vertex chunk, not the edge index of the whole graph.
-   */
-  @CXXValue
-  Status seek(@FFINameAlias(GAR_ID_TYPE) long index);
-
-  /**
-   * Return the current chunk file path of chunk position indicator.
-   */
-  @FFINameAlias("GetChunk")
-  @CXXValue
-  Result<StdString> getChunk();
-
-  /**
-   * Sets chunk position indicator to next chunk. if current chunk is the last chunk, will return
-   * Status::IndexError error.
-   */
-  @FFINameAlias("next_chunk")
-  @CXXValue
-  Status nextChunk();
-
-  /**
-   * Helper function to Construct AdjListPropertyChunkInfoReader.
-   *
-   * @param graphInfo     The graph info to describe the graph.
-   * @param srcLabel      label of source vertex.
-   * @param edgeLabel     label of edge.
-   * @param dstLabel      label of destination vertex.
-   * @param propertyGroup The property group of the edge.
-   * @param adjListType   The adj list type for the edges.
-   */
-  static Result<AdjListPropertyChunkInfoReader> constructAdjListPropertyChunkInfoReader(
-          @CXXReference GraphInfo graphInfo,
-          @CXXReference StdString srcLabel,
-          @CXXReference StdString edgeLabel,
-          @CXXReference StdString dstLabel,
-          @CXXReference PropertyGroup propertyGroup,
-          @CXXValue AdjListType adjListType) {
-    return GrapharStaticFunctions.INSTANCE.constructAdjListPropertyChunkInfoReader(
-            graphInfo, srcLabel, edgeLabel, dstLabel, propertyGroup, adjListType);
-  }
-
-  @FFIFactory
-  interface Factory {
     /**
-     * Initialize the AdjListPropertyChunkInfoReader.
+     * Sets chunk position indicator for reader by source vertex id.
      *
-     * @param edgeInfo      The edge info that describes the edge type.
-     * @param propertyGroup The property group of the edge property.
-     * @param adjListType   The adj list type for the edges.
-     * @param prefix        The absolute prefix of the graph.
+     * @param id the source vertex id.
      */
-    AdjListPropertyChunkInfoReader create(
-            @CXXReference EdgeInfo edgeInfo,
+    @FFINameAlias("seek_src")
+    @CXXValue
+    Status seekSrc(@FFINameAlias(GAR_ID_TYPE) long id);
+
+    /**
+     * Sets chunk position indicator for reader by destination vertex id.
+     *
+     * @param id the destination vertex id.
+     */
+    @FFINameAlias("seek_dst")
+    @CXXValue
+    Status seekDst(@FFINameAlias(GAR_ID_TYPE) long id);
+
+    /**
+     * Sets chunk position indicator for reader by edge index.
+     *
+     * @param index offset edge index of the vertex chunk. Note: the offset is the edge index of the
+     *     vertex chunk, not the edge index of the whole graph.
+     */
+    @CXXValue
+    Status seek(@FFINameAlias(GAR_ID_TYPE) long index);
+
+    /** Return the current chunk file path of chunk position indicator. */
+    @FFINameAlias("GetChunk")
+    @CXXValue
+    Result<StdString> getChunk();
+
+    /**
+     * Sets chunk position indicator to next chunk. if current chunk is the last chunk, will return
+     * Status::IndexError error.
+     */
+    @FFINameAlias("next_chunk")
+    @CXXValue
+    Status nextChunk();
+
+    /**
+     * Helper function to Construct AdjListPropertyChunkInfoReader.
+     *
+     * @param graphInfo The graph info to describe the graph.
+     * @param srcLabel label of source vertex.
+     * @param edgeLabel label of edge.
+     * @param dstLabel label of destination vertex.
+     * @param propertyGroup The property group of the edge.
+     * @param adjListType The adj list type for the edges.
+     */
+    static Result<AdjListPropertyChunkInfoReader> constructAdjListPropertyChunkInfoReader(
+            @CXXReference GraphInfo graphInfo,
+            @CXXReference StdString srcLabel,
+            @CXXReference StdString edgeLabel,
+            @CXXReference StdString dstLabel,
             @CXXReference PropertyGroup propertyGroup,
-            @CXXValue AdjListType adjListType,
-            @CXXReference StdString prefix);
-  }
+            @CXXValue AdjListType adjListType) {
+        return GrapharStaticFunctions.INSTANCE.constructAdjListPropertyChunkInfoReader(
+                graphInfo, srcLabel, edgeLabel, dstLabel, propertyGroup, adjListType);
+    }
+
+    @FFIFactory
+    interface Factory {
+        /**
+         * Initialize the AdjListPropertyChunkInfoReader.
+         *
+         * @param edgeInfo The edge info that describes the edge type.
+         * @param propertyGroup The property group of the edge property.
+         * @param adjListType The adj list type for the edges.
+         * @param prefix The absolute prefix of the graph.
+         */
+        AdjListPropertyChunkInfoReader create(
+                @CXXReference EdgeInfo edgeInfo,
+                @CXXReference PropertyGroup propertyGroup,
+                @CXXValue AdjListType adjListType,
+                @CXXReference StdString prefix);
+    }
 }

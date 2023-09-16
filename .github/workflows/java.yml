@@ -43,7 +43,7 @@ jobs:
           
       - name: Code Format Check
         run: |
-          export JAVA_HOME=${JAVA_HOME_11_X64}
+          export JAVA_HOME=${JAVA_HOME_8_X64}
           pushd java 
           mvn spotless:check
           popd
@@ -59,7 +59,7 @@ jobs:
           
       - name: Run test
         run: |
-          export JAVA_HOME=${JAVA_HOME_11_X64}
+          export JAVA_HOME=${JAVA_HOME_8_X64}
           export LLVM11_HOME=/usr/lib/llvm-11
           pushd java
           mvn test -Dspotless.check.skip=true

@@ -16,17 +16,17 @@
 
 package com.alibaba.graphar.stdcxx;
 
-import com.alibaba.fastffi.CXXHead;
-import com.alibaba.fastffi.CXXTemplate;
-import com.alibaba.fastffi.FFIGen;
-import com.alibaba.fastffi.FFIPointer;
-import com.alibaba.fastffi.FFITypeAlias;
-
 import static com.alibaba.graphar.util.CppClassName.ARROW_ARRAY;
 import static com.alibaba.graphar.util.CppClassName.ARROW_TABLE;
 import static com.alibaba.graphar.util.CppClassName.GAR_UTIL_INDEX_CONVERTER;
 import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
 import static com.alibaba.graphar.util.CppHeaderName.GAR_UTIL_UTIL_H;
+
+import com.alibaba.fastffi.CXXHead;
+import com.alibaba.fastffi.CXXTemplate;
+import com.alibaba.fastffi.FFIGen;
+import com.alibaba.fastffi.FFIPointer;
+import com.alibaba.fastffi.FFITypeAlias;
 
 @FFIGen
 @CXXHead(system = "memory")
@@ -37,7 +37,7 @@ import static com.alibaba.graphar.util.CppHeaderName.GAR_UTIL_UTIL_H;
 @CXXTemplate(cxx = ARROW_TABLE, java = "com.alibaba.graphar.arrow.ArrowTable")
 @CXXTemplate(cxx = ARROW_ARRAY, java = "com.alibaba.graphar.arrow.ArrowArray")
 public interface StdSharedPtr<T extends FFIPointer> extends FFIPointer {
-  // & will return the pointer of T.
-  // shall be cxxvalue?
-  T get();
+    // & will return the pointer of T.
+    // shall be cxxvalue?
+    T get();
 }

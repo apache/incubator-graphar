@@ -14,6 +14,9 @@
 
 package com.alibaba.graphar.arrow;
 
+import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
+import static com.alibaba.graphar.util.CppHeaderName.ARROW_C_BRIDGE_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.FFIFactory;
 import com.alibaba.fastffi.FFIGen;
@@ -21,18 +24,15 @@ import com.alibaba.fastffi.FFIPointer;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
 
-import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
-import static com.alibaba.graphar.util.CppHeaderName.ARROW_C_BRIDGE_H;
-
 @FFIGen
 @CXXHead(ARROW_C_BRIDGE_H)
 @CXXHead(ARROW_API_H)
 @FFITypeAlias("struct ArrowArray")
 public interface StructArrowArray extends FFIPointer {
-  Factory factory = FFITypeFactory.getFactory(StructArrowArray.class);
+    Factory factory = FFITypeFactory.getFactory(StructArrowArray.class);
 
-  @FFIFactory
-  interface Factory {
-    StructArrowArray create();
-  }
+    @FFIFactory
+    interface Factory {
+        StructArrowArray create();
+    }
 }

@@ -14,6 +14,9 @@
 
 package com.alibaba.graphar.util;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_INFO_VERSION;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;
 import com.alibaba.fastffi.CXXPointer;
@@ -27,106 +30,89 @@ import com.alibaba.fastffi.FFITypeFactory;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.stdcxx.StdVector;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_INFO_VERSION;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
-
-/**
- * InfoVersion is a class provide version information of info.
- */
+/** InfoVersion is a class provide version information of info. */
 @FFIGen
 @CXXHead(GAR_GRAPH_INFO_H)
 @FFITypeAlias(GAR_INFO_VERSION)
 public interface InfoVersion extends CXXPointer {
-  /**
-   * Parse version string to InfoVersion.
-   */
-  static Result<InfoVersion> parse(String str) {
-    StdString stdString = StdString.create(str);
-    Result<InfoVersion> res = Static.INSTANCE.Parse(stdString);
-    stdString.delete();
-    return res;
-  }
+    /** Parse version string to InfoVersion. */
+    static Result<InfoVersion> parse(String str) {
+        StdString stdString = StdString.create(str);
+        Result<InfoVersion> res = Static.INSTANCE.Parse(stdString);
+        stdString.delete();
+        return res;
+    }
 
-  static InfoVersion create(int version) {
-    return factory.create(version);
-  }
-
-  /**
-   * Check if two InfoVersion are equal
-   *
-   * @param other
-   * @return equal ro not
-   */
-  @CXXOperator("==")
-  boolean eq(@CXXReference InfoVersion other);
-
-  /**
-   * get version integer
-   *
-   * @return version integer
-   */
-  int version();
-
-  /**
-   * get user define types
-   *
-   * @return StdVector of StdString
-   */
-  @FFINameAlias("user_define_types")
-  @FFITypeAlias("std::vector<std::string>")
-  @CXXReference
-  StdVector<StdString> userDefineTypes();
-
-  /**
-   * describe the InfoVersion like toString, but return StdString
-   *
-   * @return StdString that describe the InfoVersion
-   */
-  @FFINameAlias("ToString")
-  @CXXValue
-  StdString toStdString();
-
-  /**
-   * Check specific type in InfoVersion
-   *
-   * @param typeStr StdString of type that you want check
-   * @return whether InfoVersion has this type
-   */
-  @FFINameAlias("CheckType")
-  boolean checkType(@CXXReference StdString typeStr);
-
-  Factory factory = FFITypeFactory.getFactory(InfoVersion.class);
-
-  @FFIFactory
-  interface Factory {
-    /**
-     * Default constructor
-     */
-    InfoVersion create();
+    static InfoVersion create(int version) {
+        return factory.create(version);
+    }
 
     /**
-     * Constructor with version
+     * Check if two InfoVersion are equal
+     *
+     * @param other
+     * @return equal ro not
      */
-    InfoVersion create(int version);
+    @CXXOperator("==")
+    boolean eq(@CXXReference InfoVersion other);
 
     /**
-     * Constructor with version and user defined types.
+     * get version integer
+     *
+     * @return version integer
      */
-    InfoVersion create(int version, @CXXReference StdVector<StdString> userDefineTypes);
+    int version();
 
     /**
-     * Constructor with version and user defined types.
+     * get user define types
+     *
+     * @return StdVector of StdString
      */
-    InfoVersion create(@CXXReference InfoVersion other);
-  }
-
-  interface Static {
-    InfoVersion.Static INSTANCE = FFITypeFactory.getLibrary(InfoVersion.Static.class);
+    @FFINameAlias("user_define_types")
+    @FFITypeAlias("std::vector<std::string>")
+    @CXXReference
+    StdVector<StdString> userDefineTypes();
 
     /**
-     * Parse version string to InfoVersion.
+     * describe the InfoVersion like toString, but return StdString
+     *
+     * @return StdString that describe the InfoVersion
      */
+    @FFINameAlias("ToString")
     @CXXValue
-    Result<InfoVersion> Parse(@CXXReference StdString str);
-  }
+    StdString toStdString();
+
+    /**
+     * Check specific type in InfoVersion
+     *
+     * @param typeStr StdString of type that you want check
+     * @return whether InfoVersion has this type
+     */
+    @FFINameAlias("CheckType")
+    boolean checkType(@CXXReference StdString typeStr);
+
+    Factory factory = FFITypeFactory.getFactory(InfoVersion.class);
+
+    @FFIFactory
+    interface Factory {
+        /** Default constructor */
+        InfoVersion create();
+
+        /** Constructor with version */
+        InfoVersion create(int version);
+
+        /** Constructor with version and user defined types. */
+        InfoVersion create(int version, @CXXReference StdVector<StdString> userDefineTypes);
+
+        /** Constructor with version and user defined types. */
+        InfoVersion create(@CXXReference InfoVersion other);
+    }
+
+    interface Static {
+        InfoVersion.Static INSTANCE = FFITypeFactory.getLibrary(InfoVersion.Static.class);
+
+        /** Parse version string to InfoVersion. */
+        @CXXValue
+        Result<InfoVersion> Parse(@CXXReference StdString str);
+    }
 }
