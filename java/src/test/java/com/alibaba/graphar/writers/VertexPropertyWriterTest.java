@@ -36,16 +36,20 @@ import org.apache.arrow.vector.ipc.ArrowReader;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
+
 public class VertexPropertyWriterTest {
     @Test
     public void test1() {
-        String uri = "file:" + root + "/ldbc_sample/person_0_0_comma.csv";
+        String uri = root + "/ldbc_sample/person_0_0_comma.csv";
+        File testFileExist = new File(uri);
+        Assert.assertTrue(testFileExist.exists());
         ScanOptions options = new ScanOptions(/*batchSize*/ 32768);
         StdSharedPtr<ArrowTable> table = null;
         try (BufferAllocator allocator = new RootAllocator();
                 DatasetFactory datasetFactory =
                         new FileSystemDatasetFactory(
-                                allocator, NativeMemoryPool.getDefault(), FileFormat.CSV, uri);
+                                allocator, NativeMemoryPool.getDefault(), FileFormat.CSV, "file:" + uri);
                 Dataset dataset = datasetFactory.finish();
                 Scanner scanner = dataset.newScan(options);
                 ArrowReader reader = scanner.scanBatches()) {
@@ -56,6 +60,7 @@ public class VertexPropertyWriterTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        Assert.assertNotNull(table);
 
         String vertexMetaFile = root + "/ldbc_sample/parquet/" + "person.vertex.yml";
         StdSharedPtr<Yaml> vertexMeta = Yaml.loadFile(StdString.create(vertexMetaFile)).value();
