@@ -22,6 +22,7 @@ import com.alibaba.graphar.stdcxx.StdSharedPtr;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.types.ValidateLevel;
 import com.alibaba.graphar.util.Yaml;
+import java.io.File;
 import org.apache.arrow.dataset.file.FileFormat;
 import org.apache.arrow.dataset.file.FileSystemDatasetFactory;
 import org.apache.arrow.dataset.jni.NativeMemoryPool;
@@ -36,8 +37,6 @@ import org.apache.arrow.vector.ipc.ArrowReader;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
-
 public class VertexPropertyWriterTest {
     @Test
     public void test1() {
@@ -49,7 +48,10 @@ public class VertexPropertyWriterTest {
         try (BufferAllocator allocator = new RootAllocator();
                 DatasetFactory datasetFactory =
                         new FileSystemDatasetFactory(
-                                allocator, NativeMemoryPool.getDefault(), FileFormat.CSV, "file:" + uri);
+                                allocator,
+                                NativeMemoryPool.getDefault(),
+                                FileFormat.CSV,
+                                "file:" + uri);
                 Dataset dataset = datasetFactory.finish();
                 Scanner scanner = dataset.newScan(options);
                 ArrowReader reader = scanner.scanBatches()) {
