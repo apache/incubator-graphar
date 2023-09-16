@@ -107,12 +107,13 @@ class ReaderSuite extends AnyFunSuite {
     assert(single_chunk_df.columns.length == 3)
     assert(single_chunk_df.count() == 100)
     val cond = "gender = 'female'"
-    var df_pd = single_chunk_df.select("firstName","gender").filter(cond)
+    var df_pd = single_chunk_df.select("firstName", "gender").filter(cond)
     df_pd.explain()
     df_pd.show()
 
     // test reading all chunks for a property group
-    val property_df = reader.readVertexPropertyGroup(property_group, addIndex = false)
+    val property_df =
+      reader.readVertexPropertyGroup(property_group, addIndex = false)
     assert(property_df.columns.length == 3)
     assert(property_df.count() == 903)
     df_pd = property_df.select("firstName", "gender").filter(cond)
@@ -124,7 +125,8 @@ class ReaderSuite extends AnyFunSuite {
     val property_groups = new java.util.ArrayList[PropertyGroup]()
     property_groups.add(property_group_1)
     property_groups.add(property_group)
-    val multiple_property_df = reader.readMultipleVertexPropertyGroups(property_groups, addIndex = false)
+    val multiple_property_df =
+      reader.readMultipleVertexPropertyGroups(property_groups, addIndex = false)
     assert(multiple_property_df.columns.length == 4)
     assert(multiple_property_df.count() == 903)
     df_pd = multiple_property_df.filter(cond)
@@ -146,8 +148,12 @@ class ReaderSuite extends AnyFunSuite {
 
     // throw an exception for non-existing property groups
     val invalid_property_group = new PropertyGroup()
-    assertThrows[IllegalArgumentException](reader.readVertexPropertyChunk(invalid_property_group, 0))
-    assertThrows[IllegalArgumentException](reader.readVertexPropertyGroup(invalid_property_group))
+    assertThrows[IllegalArgumentException](
+      reader.readVertexPropertyChunk(invalid_property_group, 0)
+    )
+    assertThrows[IllegalArgumentException](
+      reader.readVertexPropertyGroup(invalid_property_group)
+    )
   }
 
   test("read edge chunks") {
@@ -240,9 +246,15 @@ class ReaderSuite extends AnyFunSuite {
 
     // throw an exception for non-existing property groups
     val invalid_property_group = new PropertyGroup()
-    assertThrows[IllegalArgumentException](reader.readEdgePropertyChunk(invalid_property_group, 0, 0))
-    assertThrows[IllegalArgumentException](reader.readEdgePropertyGroupForVertexChunk(invalid_property_group, 0))
-    assertThrows[IllegalArgumentException](reader.readEdgePropertyGroup(invalid_property_group))
+    assertThrows[IllegalArgumentException](
+      reader.readEdgePropertyChunk(invalid_property_group, 0, 0)
+    )
+    assertThrows[IllegalArgumentException](
+      reader.readEdgePropertyGroupForVertexChunk(invalid_property_group, 0)
+    )
+    assertThrows[IllegalArgumentException](
+      reader.readEdgePropertyGroup(invalid_property_group)
+    )
 
     // throw an exception for non-existing adjList types
     val invalid_adj_list_type = AdjListType.unordered_by_dest

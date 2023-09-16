@@ -28,8 +28,16 @@ import org.apache.spark.sql.catalyst.expressions.{Expression, ExprUtils}
 import org.apache.spark.sql.catalyst.csv.CSVOptions
 import org.apache.spark.sql.connector.read.PartitionReaderFactory
 import org.apache.spark.sql.execution.PartitionedFileUtil
-import org.apache.spark.sql.execution.datasources.{FilePartition, PartitioningAwareFileIndex, PartitionedFile}
-import org.apache.spark.sql.execution.datasources.parquet.{ParquetOptions, ParquetReadSupport, ParquetWriteSupport}
+import org.apache.spark.sql.execution.datasources.{
+  FilePartition,
+  PartitioningAwareFileIndex,
+  PartitionedFile
+}
+import org.apache.spark.sql.execution.datasources.parquet.{
+  ParquetOptions,
+  ParquetReadSupport,
+  ParquetWriteSupport
+}
 import org.apache.spark.sql.execution.datasources.v2.FileScan
 import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetPartitionReaderFactory
 import org.apache.spark.sql.execution.datasources.v2.orc.OrcPartitionReaderFactory

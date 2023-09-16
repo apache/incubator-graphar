@@ -63,7 +63,10 @@ class VertexReader(
    *   vertex property chunk DataFrame. Raise IllegalArgumentException if the
    *   property group not contained.
    */
-  def readVertexPropertyChunk(propertyGroup: PropertyGroup, chunk_index: Long): DataFrame = {
+  def readVertexPropertyChunk(
+      propertyGroup: PropertyGroup,
+      chunk_index: Long
+  ): DataFrame = {
     if (!vertexInfo.containPropertyGroup(propertyGroup)) {
       throw new IllegalArgumentException
     }
@@ -88,13 +91,20 @@ class VertexReader(
    *   DataFrame that contains all chunks of property group. Raise
    *   IllegalArgumentException if the property group not contained.
    */
-  def readVertexPropertyGroup(propertyGroup: PropertyGroup, addIndex: Boolean = true): DataFrame = {
+  def readVertexPropertyGroup(
+      propertyGroup: PropertyGroup,
+      addIndex: Boolean = true
+  ): DataFrame = {
     if (!vertexInfo.containPropertyGroup(propertyGroup)) {
       throw new IllegalArgumentException
     }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + vertexInfo.getPathPrefix(propertyGroup)
-    val df = spark.read.option("fileFormat", file_type).option("header", "true").format("com.alibaba.graphar.datasources.GarDataSource").load(file_path)
+    val df = spark.read
+      .option("fileFormat", file_type)
+      .option("header", "true")
+      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .load(file_path)
 
     if (addIndex) {
       IndexGenerator.generateVertexIndexColumn(df)
@@ -135,7 +145,7 @@ class VertexReader(
 
     var rdd = df0.rdd
     var schema_array = df0.schema.fields
-    for ( i <- 1 until len) {
+    for (i <- 1 until len) {
       val pg: PropertyGroup = propertyGroups.get(i)
       val new_df = readVertexPropertyGroup(pg, false)
       schema_array = Array.concat(schema_array, new_df.schema.fields)
