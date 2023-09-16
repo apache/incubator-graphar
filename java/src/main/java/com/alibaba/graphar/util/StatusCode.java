@@ -14,66 +14,66 @@
 
 package com.alibaba.graphar.util;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_STATUS_CODE;
-
 import com.alibaba.fastffi.CXXEnum;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeRefiner;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_STATUS_CODE;
+
 @FFITypeAlias(GAR_STATUS_CODE)
 @FFITypeRefiner("com.alibaba.graphar.util.StatusCode.get")
 public enum StatusCode implements CXXEnum {
-    // success status
-    kOK,
-    // error status for failed key lookups
-    kKeyError,
-    // error status for type errors
-    kTypeError,
-    // error status for invalid data
-    kInvalid,
-    // error status when an index is out of bounds
-    kIndexError,
-    // error status for out-of-memory conditions
-    kOutOfMemory,
-    // error status when some IO-related operation failed
-    kIOError,
-    // error status when some yaml parse related operation failed
-    kYamlError,
-    // error status when some arrow-related operation failed
-    kArrowError,
+  // success status
+  kOK,
+  // error status for failed key lookups
+  kKeyError,
+  // error status for type errors
+  kTypeError,
+  // error status for invalid data
+  kInvalid,
+  // error status when an index is out of bounds
+  kIndexError,
+  // error status for out-of-memory conditions
+  kOutOfMemory,
+  // error status when some IO-related operation failed
+  kIOError,
+  // error status when some yaml parse related operation failed
+  kYamlError,
+  // error status when some arrow-related operation failed
+  kArrowError,
 
-    // error status for unknown errors
-    kUnknownError;
+  // error status for unknown errors
+  kUnknownError;
 
-    @Override
-    public int getValue() {
-        return ordinal();
+  @Override
+  public int getValue() {
+    return ordinal();
+  }
+
+  public static StatusCode get(int value) {
+    switch (value) {
+      case 0:
+        return kOK;
+      case 1:
+        return kKeyError;
+      case 2:
+        return kTypeError;
+      case 3:
+        return kInvalid;
+      case 4:
+        return kIndexError;
+      case 5:
+        return kOutOfMemory;
+      case 6:
+        return kIOError;
+      case 7:
+        return kYamlError;
+      case 8:
+        return kArrowError;
+      case 9:
+        return kUnknownError;
+      default:
+        throw new IllegalArgumentException("Oops: unknown value: " + value);
     }
-
-    public static StatusCode get(int value) {
-        switch (value) {
-            case 0:
-                return kOK;
-            case 1:
-                return kKeyError;
-            case 2:
-                return kTypeError;
-            case 3:
-                return kInvalid;
-            case 4:
-                return kIndexError;
-            case 5:
-                return kOutOfMemory;
-            case 6:
-                return kIOError;
-            case 7:
-                return kYamlError;
-            case 8:
-                return kArrowError;
-            case 9:
-                return kUnknownError;
-            default:
-                throw new IllegalArgumentException("Oops: unknown value: " + value);
-        }
-    }
+  }
 }

@@ -15,5 +15,5 @@
 package com.alibaba.graphar.util;
 
 public class JNILibraryName {
-    public static final String GAR_JNI_LIBRARY_NAME = "gar-jni";
+  public static final String GAR_JNI_LIBRARY_NAME = "gar-jni";
 }

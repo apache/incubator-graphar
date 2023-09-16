@@ -32,49 +32,49 @@ import com.alibaba.fastffi.llvm.LLVMPointer;
 @FFITypeAlias("std::string")
 public interface StdString extends CXXPointer, LLVMPointer, FFIStringReceiver, FFIStringProvider {
 
-    static StdString create() {
-        return factory.create();
+  static StdString create() {
+    return factory.create();
+  }
+
+  static StdString create(CharPointer buf) {
+    return factory.create(buf);
+  }
+
+  static StdString create(CharPointer buf, long length) {
+    return factory.create(buf, length);
+  }
+
+  static StdString create(String string) {
+    return factory.create(string);
+  }
+
+  Factory factory = FFITypeFactory.getFactory(StdString.class);
+
+  @FFIFactory
+  interface Factory {
+    StdString create();
+
+    StdString create(CharPointer buf);
+
+    StdString create(CharPointer buf, long length);
+
+    default StdString create(String string) {
+      StdString std = create();
+      std.fromJavaString(string);
+      return std;
     }
 
-    static StdString create(CharPointer buf) {
-        return factory.create(buf);
-    }
+    StdString create(@CXXReference StdString string);
+  }
 
-    static StdString create(CharPointer buf, long length) {
-        return factory.create(buf, length);
-    }
+  @CXXOperator("==")
+  boolean eq(@CXXReference StdString other);
 
-    static StdString create(String string) {
-        return factory.create(string);
-    }
+  long size();
 
-    Factory factory = FFITypeFactory.getFactory(StdString.class);
+  long data();
 
-    @FFIFactory
-    interface Factory {
-        StdString create();
+  void resize(long size);
 
-        StdString create(CharPointer buf);
-
-        StdString create(CharPointer buf, long length);
-
-        default StdString create(String string) {
-            StdString std = create();
-            std.fromJavaString(string);
-            return std;
-        }
-
-        StdString create(@CXXReference StdString string);
-    }
-
-    @CXXOperator("==")
-    boolean eq(@CXXReference StdString other);
-
-    long size();
-
-    long data();
-
-    void resize(long size);
-
-    long c_str();
+  long c_str();
 }

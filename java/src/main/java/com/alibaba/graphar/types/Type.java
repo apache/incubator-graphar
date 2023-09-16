@@ -14,64 +14,79 @@
 
 package com.alibaba.graphar.types;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_TYPE;
-
 import com.alibaba.fastffi.CXXEnum;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeRefiner;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_TYPE;
+
 @FFITypeAlias(GAR_TYPE)
 @FFITypeRefiner("com.alibaba.graphar.types.Type.get")
 public enum Type implements CXXEnum {
-    /** Boolean */
-    BOOL,
+  /**
+   * Boolean
+   */
+  BOOL,
 
-    /** Signed 32-bit integer */
-    INT32,
+  /**
+   * Signed 32-bit integer
+   */
+  INT32,
 
-    /** Signed 64-bit integer */
-    INT64,
+  /**
+   * Signed 64-bit integer
+   */
+  INT64,
 
-    /** 4-byte floating point value */
-    FLOAT,
+  /**
+   * 4-byte floating point value
+   */
+  FLOAT,
 
-    /** 8-byte floating point value */
-    DOUBLE,
+  /**
+   * 8-byte floating point value
+   */
+  DOUBLE,
 
-    /** UTF8 variable-length string */
-    STRING,
+  /**
+   * UTF8 variable-length string
+   */
+  STRING,
 
-    /** User-defined data type */
-    USER_DEFINED,
+  /**
+   * User-defined data type
+   */
+  USER_DEFINED,
 
-    // Leave this at the end
-    MAX_ID;
+  // Leave this at the end
+  MAX_ID;
 
-    public static Type get(int value) {
-        switch (value) {
-            case 0:
-                return BOOL;
-            case 1:
-                return INT32;
-            case 2:
-                return INT64;
-            case 3:
-                return FLOAT;
-            case 4:
-                return DOUBLE;
-            case 5:
-                return STRING;
-            case 6:
-                return USER_DEFINED;
-            case 7:
-                return MAX_ID;
-            default:
-                throw new IllegalStateException("Unknown value for type: " + value);
-        }
+  public static Type get(int value) {
+    switch (value) {
+      case 0:
+        return BOOL;
+      case 1:
+        return INT32;
+      case 2:
+        return INT64;
+      case 3:
+        return FLOAT;
+      case 4:
+        return DOUBLE;
+      case 5:
+        return STRING;
+      case 6:
+        return USER_DEFINED;
+      case 7:
+        return MAX_ID;
+      default:
+        throw new IllegalStateException("Unknown value for type: " + value);
     }
+  }
 
-    @Override
-    public int getValue() {
-        return ordinal();
-    }
+  @Override
+  public int getValue() {
+    return ordinal();
+  }
 }
+

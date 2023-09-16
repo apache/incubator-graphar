@@ -14,9 +14,6 @@
 
 package com.alibaba.graphar.util;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_STATUS;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
-
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
@@ -26,42 +23,62 @@ import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.graphar.stdcxx.StdString;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_STATUS;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+
 @FFIGen
 @FFITypeAlias(GAR_STATUS)
 @CXXHead(GAR_GRAPH_INFO_H)
 public interface Status extends CXXPointer {
-    /** Return true if the status indicates success. */
-    boolean ok();
+  /**
+   * Return true if the status indicates success.
+   */
+  boolean ok();
 
-    /** Return true if the status indicates a key lookup error. */
-    @FFINameAlias("IsKeyError")
-    boolean isKeyError();
+  /**
+   * Return true if the status indicates a key lookup error.
+   */
+  @FFINameAlias("IsKeyError")
+  boolean isKeyError();
 
-    /** Return true if the status indicates a type match error. */
-    @FFINameAlias("IsTypeError")
-    boolean isTypeError();
+  /**
+   * Return true if the status indicates a type match error.
+   */
+  @FFINameAlias("IsTypeError")
+  boolean isTypeError();
 
-    /** Return true if the status indicates invalid data. */
-    @FFINameAlias("IsInvalid")
-    boolean isInvalid();
+  /**
+   * Return true if the status indicates invalid data.
+   */
+  @FFINameAlias("IsInvalid")
+  boolean isInvalid();
 
-    /** Return true if the status indicates an index out of bounds. */
-    @FFINameAlias("IsIndexError")
-    boolean isIndexError();
+  /**
+   * Return true if the status indicates an index out of bounds.
+   */
+  @FFINameAlias("IsIndexError")
+  boolean isIndexError();
 
-    /** Return true if the status indicates a yaml parse related failure. */
-    @FFINameAlias("IsYamlError")
-    boolean isYamlError();
+  /**
+   * Return true if the status indicates a yaml parse related failure.
+   */
+  @FFINameAlias("IsYamlError")
+  boolean isYamlError();
 
-    /** Return true if the status indicates an arrow-related failure. */
-    @FFINameAlias("IsArrowError")
-    boolean isArrowError();
+  /**
+   * Return true if the status indicates an arrow-related failure.
+   */
+  @FFINameAlias("IsArrowError")
+  boolean isArrowError();
 
-    /** Return the StatusCode value attached to this status. */
-    @CXXValue
-    StatusCode code();
+  /**
+   * Return the StatusCode value attached to this status.
+   */
+  @CXXValue
+  StatusCode code();
 
-    /** Return the specific error message attached to this status. */
-    @CXXReference
-    StdString message();
+  /**
+   * Return the specific error message attached to this status.
+   */
+  @CXXReference StdString message();
 }
