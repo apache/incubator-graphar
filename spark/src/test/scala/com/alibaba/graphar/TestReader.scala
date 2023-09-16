@@ -45,6 +45,17 @@ class ReaderSuite extends AnyFunSuite {
     assert(df1.rdd.getNumPartitions == 10)
     assert(df1.count() == 903)
     var df_pd = df1.filter(cond)
+
+    /**
+     * ==Physical Plan==
+     * (1) Filter (isnotnull(id#0L) AND (id#0L < 1000))
+     * +- *(1) ColumnarToRow
+     * +- BatchScan[id#0L] GarScan DataFilters: [isnotnull(id#0L), (id#0L <
+     * 1000)], Format: gar, Location: InMemoryFileIndex(1 paths)[file:...,
+     * PartitionFilters: [], PushedFilters: [IsNotNull(id), LessThan(id,1000)],
+     * ReadSchema: struct<id:bigint>, PushedFilters: [IsNotNull(id),
+     * LessThan(id,1000)] RuntimeFilters: []
+     */
     df_pd.explain()
     df_pd.show()
 
@@ -59,6 +70,18 @@ class ReaderSuite extends AnyFunSuite {
     // validate reading results
     assert(df2.rdd.collect().deep == df1.rdd.collect().deep)
     df_pd = df1.filter(cond)
+
+    /**
+     * ==Physical Plan==
+     * (1) Filter (isnotnull(id#0L) AND (id#0L < 1000))
+     * +- *(1) ColumnarToRow
+     * +- BatchScan[id#0L] GarScan DataFilters: [isnotnull(id#0L), (id#0L <
+     * 1000)], Format: gar, Location: InMemoryFileIndex(1
+     * paths)[file:/path/to/GraphAr/spark/src/test/resources/gar-test/l...,,
+     * PartitionFilters: [], PushedFilters: [IsNotNull(id), LessThan(id,1000)],
+     * ReadSchema: struct<id:bigint>, PushedFilters: [IsNotNull(id),
+     * LessThan(id,1000)] RuntimeFilters: []
+     */
     df_pd.explain()
     df_pd.show()
 
@@ -108,6 +131,20 @@ class ReaderSuite extends AnyFunSuite {
     assert(single_chunk_df.count() == 100)
     val cond = "gender = 'female'"
     var df_pd = single_chunk_df.select("firstName", "gender").filter(cond)
+
+    /**
+     * ==Physical Plan==
+     * (1) Filter (isnotnull(gender#2) AND (gender#2 = female))
+     * +- *(1) ColumnarToRow
+     * +- BatchScan[firstName#0, gender#2] GarScan DataFilters:
+     * [isnotnull(gender#2), (gender#2 = female)], Format: gar, Location:
+     * InMemoryFileIndex(1
+     * paths)[file:/path/to/GraphAr/spark/src/test/resources/gar-test/l...,
+     * PartitionFilters: [], PushedFilters: [IsNotNull(gender),
+     * EqualTo(gender,female)], ReadSchema:
+     * struct<firstName:string,gender:string>, PushedFilters:
+     * [IsNotNull(gender), EqualTo(gender,female)] RuntimeFilters: []
+     */
     df_pd.explain()
     df_pd.show()
 
@@ -117,6 +154,20 @@ class ReaderSuite extends AnyFunSuite {
     assert(property_df.columns.length == 3)
     assert(property_df.count() == 903)
     df_pd = property_df.select("firstName", "gender").filter(cond)
+
+    /**
+     * ==Physical Plan==
+     * (1) Filter (isnotnull(gender#31) AND (gender#31 = female))
+     * +- *(1) ColumnarToRow
+     * +- BatchScan[firstName#29, gender#31] GarScan DataFilters:
+     * [isnotnull(gender#31), (gender#31 = female)], Format: gar, Location:
+     * InMemoryFileIndex(1
+     * paths)[file:/path/to/code/cpp/GraphAr/spark/src/test/resources/gar-test/l...,
+     * PartitionFilters: [], PushedFilters: [IsNotNull(gender),
+     * EqualTo(gender,female)], ReadSchema:
+     * struct<firstName:string,gender:string>, PushedFilters:
+     * [IsNotNull(gender), EqualTo(gender,female)] RuntimeFilters: []
+     */
     df_pd.explain()
     df_pd.show()
 
@@ -143,7 +194,7 @@ class ReaderSuite extends AnyFunSuite {
     assert(vertex_df_with_index.columns.length == 5)
     assert(vertex_df_with_index.count() == 903)
     df_pd = vertex_df_with_index.filter(cond).select("firstName", "gender")
-    df_pd.explain("formatted")
+    df_pd.explain()
     df_pd.show()
 
     // throw an exception for non-existing property groups
