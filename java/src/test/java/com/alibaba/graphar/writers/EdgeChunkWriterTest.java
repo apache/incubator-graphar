@@ -90,6 +90,6 @@ public class EdgeChunkWriterTest {
         Assert.assertTrue(
                 writer.writeEdgesNum(0, table.get().num_rows(), writer.getValidateLevel()).ok());
         // Write number of vertices
-        Assert.assertTrue(writer.writeVerticesNum(903, writer.getValidateLevel()).ok());
+        Assert.assertTrue(writer.writeVerticesNum(903).ok());
     }
 }

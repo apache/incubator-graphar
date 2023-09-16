@@ -109,6 +109,16 @@ public interface EdgeChunkWriter extends CXXPointer {
             @FFITypeAlias(GAR_ID_TYPE) long count, @CXXValue ValidateLevel validateLevel);
 
     /**
+     * Write the number of vertices into the file.
+     *
+     * @param count The number of vertices.
+     * @return Status: ok or error.
+     */
+    @FFINameAlias("WriteVerticesNum")
+    @CXXValue
+    Status writeVerticesNum(@FFITypeAlias(GAR_ID_TYPE) long count);
+
+    /**
      * Copy a file as a offset chunk.
      *
      * @param fileName The file to copy.
