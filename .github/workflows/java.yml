@@ -52,7 +52,7 @@ jobs:
         run: |
           mkdir build
           pushd build
-          cmake -DBUILD_ARROW_FROM_SOURCE=ON ../cpp
+          cmake ../cpp
           make -j$(nproc)
           sudo make install
           popd

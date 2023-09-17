@@ -23,7 +23,7 @@ find_package(gar REQUIRED)
 
 add_library(${LIBNAME} SHARED ${SOURCES})
 target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} gar)
-target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} Arrow::arrow_shared)
+target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} Arrow::arrow_static)
 
 set_target_properties(${LIBNAME} PROPERTIES LINKER_LANGUAGE CXX)
 
