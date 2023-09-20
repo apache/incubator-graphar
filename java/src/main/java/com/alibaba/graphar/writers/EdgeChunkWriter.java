@@ -355,6 +355,21 @@ public interface EdgeChunkWriter extends CXXPointer {
             @CXXValue ValidateLevel validateLevel);
 
     /**
+     * Sort the edges, and write the adj list chunks for the edges of a vertex chunk.
+     *
+     * @param inputTable The table containing data.
+     * @param vertexChunkIndex The index of the vertex chunk.
+     * @param startChunkIndex The start index of the edge chunks inside the vertex chunk.
+     * @return Status: ok or error.
+     */
+    @FFINameAlias("SortAndWriteAdjListTable")
+    @CXXValue
+    Status sortAndWriteAdjListTable(
+            @CXXReference StdSharedPtr<ArrowTable> inputTable,
+            @FFITypeAlias(GAR_ID_TYPE) long vertexChunkIndex,
+            @FFITypeAlias(GAR_ID_TYPE) long startChunkIndex);
+
+    /**
      * Sort the edges, and write chunks of a single property group for the edges of a vertex chunk.
      *
      * @param inputTable The table containing data.

@@ -84,8 +84,7 @@ public class EdgeChunkWriterTest {
 
         // Valid cases
         // Write adj list of vertex chunk 0 to files
-        Assert.assertTrue(
-                writer.sortAndWriteAdjListTable(table, 0, 0, writer.getValidateLevel()).ok());
+        Assert.assertTrue(writer.sortAndWriteAdjListTable(table, 0, 0).ok());
         // Write number of edges for vertex chunk 0
         Assert.assertTrue(
                 writer.writeEdgesNum(0, table.get().num_rows(), writer.getValidateLevel()).ok());
