@@ -112,19 +112,5 @@ public interface VertexPropertyArrowChunkReader extends CXXPointer {
                 @CXXReference VertexInfo vertexInfo,
                 @CXXReference PropertyGroup propertyGroup,
                 @CXXReference StdString prefix);
-
-        /**
-         * Initialize the VertexPropertyArrowChunkReader.
-         *
-         * @param vertexInfo The vertex info that describes the vertex type.
-         * @param propertyGroup The property group that describes the property group.
-         * @param prefix The absolute prefix.
-         */
-        //    VertexPropertyArrowChunkReader create(
-        //        @CXXReference VertexInfo vertexInfo,
-        //        @CXXReference PropertyGroup propertyGroup,
-        //        @CXXReference StdString prefix,
-        //        @FFITypeAlias(GAR_ID_TYPE) long chunkIndex,
-        //        @CXXReference FilterOptions options);
     }
 }
