@@ -60,22 +60,38 @@ case class GarScanBuilder(
     }
   }
 
-  private lazy val pushedParquetFilters =
-    ParquetScanBuilder(sparkSession, fileIndex, schema, dataSchema, options)
-      .pushFilters(filters)
+  private lazy val pushedParquetFilters = {
+    if (!sparkSession.sessionState.conf.parquetFilterPushDown) {
+      Array.empty
+    }
 
-  private lazy val pushedOrcFilters =
-    OrcScanBuilder(sparkSession, fileIndex, schema, dataSchema, options)
-      .pushFilters(filters)
+    val builder =
+      ParquetScanBuilder(sparkSession, fileIndex, schema, dataSchema, options)
+    builder.pushFilters(this.filters)
+    builder.pushedFilters()
+  }
+
+  private lazy val pushedOrcFilters = {
+    if (!sparkSession.sessionState.conf.orcFilterPushDown) {
+      Array.empty
+    }
+
+    val builder =
+      OrcScanBuilder(sparkSession, fileIndex, schema, dataSchema, options)
+    builder.pushFilters(this.filters)
+    builder.pushedFilters()
+  }
 
   // Check if the file format supports nested schema pruning.
-  override protected val supportsNestedSchemaPruning: Boolean =
+  override protected val supportsNestedSchemaPruning: Boolean = {
     formatName match {
-      case "csv"     => false
-      case "orc"     => true
-      case "parquet" => true
-      case _         => throw new IllegalArgumentException
+      case "csv" => false
+      case "orc" => sparkSession.sessionState.conf.nestedSchemaPruningEnabled
+      case "parquet" =>
+        sparkSession.sessionState.conf.nestedSchemaPruningEnabled
+      case _ => throw new IllegalArgumentException
     }
+  }
 
   /** Build the file scan for GarDataSource. */
   override def build(): Scan = {
