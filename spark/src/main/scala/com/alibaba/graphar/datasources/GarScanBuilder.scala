@@ -51,39 +51,37 @@ case class GarScanBuilder(
     filters
   }
 
-  override def pushedFilters(): Array[Filter] = {
-    formatName match {
-      case "csv"     => Array.empty
-      case "orc"     => pushedOrcFilters
-      case "parquet" => pushedParquetFilters
-      case _         => throw new IllegalArgumentException
-    }
+  override def pushedFilters(): Array[Filter] = formatName match {
+    case "csv"     => Array.empty[Filter]
+    case "orc"     => pushedOrcFilters
+    case "parquet" => pushedParquetFilters
+    case _         => throw new IllegalArgumentException
   }
 
-  private lazy val pushedParquetFilters = {
+  private lazy val pushedParquetFilters: Array[Filter] = {
     if (!sparkSession.sessionState.conf.parquetFilterPushDown) {
-      Array.empty
+      Array.empty[Filter]
+    } else {
+      val builder =
+        ParquetScanBuilder(sparkSession, fileIndex, schema, dataSchema, options)
+      builder.pushFilters(this.filters)
+      builder.pushedFilters()
     }
-
-    val builder =
-      ParquetScanBuilder(sparkSession, fileIndex, schema, dataSchema, options)
-    builder.pushFilters(this.filters)
-    builder.pushedFilters()
   }
 
-  private lazy val pushedOrcFilters = {
+  private lazy val pushedOrcFilters: Array[Filter] = {
     if (!sparkSession.sessionState.conf.orcFilterPushDown) {
-      Array.empty
+      Array.empty[Filter]
+    } else {
+      val builder =
+        OrcScanBuilder(sparkSession, fileIndex, schema, dataSchema, options)
+      builder.pushFilters(this.filters)
+      builder.pushedFilters()
     }
-
-    val builder =
-      OrcScanBuilder(sparkSession, fileIndex, schema, dataSchema, options)
-    builder.pushFilters(this.filters)
-    builder.pushedFilters()
   }
 
   // Check if the file format supports nested schema pruning.
-  override protected val supportsNestedSchemaPruning: Boolean = {
+  override protected val supportsNestedSchemaPruning: Boolean =
     formatName match {
       case "csv" => false
       case "orc" => sparkSession.sessionState.conf.nestedSchemaPruningEnabled
@@ -91,7 +89,6 @@ case class GarScanBuilder(
         sparkSession.sessionState.conf.nestedSchemaPruningEnabled
       case _ => throw new IllegalArgumentException
     }
-  }
 
   /** Build the file scan for GarDataSource. */
   override def build(): Scan = {
