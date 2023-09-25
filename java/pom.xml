@@ -16,6 +16,7 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <fastffi.revision>0.1.2</fastffi.revision>
+        <arrow.version>13.0.0</arrow.version>
         <native.library.name>gar-java</native.library.name>
 
     </properties>
@@ -48,7 +49,6 @@
             <scope>provided</scope>
         </dependency>
 
-
         <dependency>
             <groupId>com.alibaba.fastffi</groupId>
             <artifactId>llvm</artifactId>
@@ -57,15 +57,42 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.arrow</groupId>
+            <artifactId>arrow-c-data</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.arrow</groupId>
+            <artifactId>arrow-vector</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.arrow</groupId>
+            <artifactId>arrow-memory-netty</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.arrow</groupId>
+            <artifactId>arrow-dataset</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.25</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <build>
-	<extensions>
+        <extensions>
             <extension>
                 <groupId>kr.motd.maven</groupId>
                 <artifactId>os-maven-plugin</artifactId>
@@ -164,19 +191,6 @@
                     <argLine>-Djava.library.path=${project.basedir}/target/native</argLine>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.diffplug.spotless</groupId>
-                <artifactId>spotless-maven-plugin</artifactId>
-                <version>2.20.0</version>
-                <configuration>
-                    <java>
-                        <googleJavaFormat>
-                            <version>1.13.0</version>
-                            <style>AOSP</style>
-                        </googleJavaFormat>
-                    </java>
-                </configuration>
-            </plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -236,6 +250,19 @@
                 <plugin>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>3.0.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>2.20.0</version>
+                    <configuration>
+                        <java>
+                            <googleJavaFormat>
+                                <version>1.7</version>
+                                <style>AOSP</style>
+                            </googleJavaFormat>
+                        </java>
+                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>

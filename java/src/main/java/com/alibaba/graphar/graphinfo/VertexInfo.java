@@ -25,15 +25,18 @@ import com.alibaba.fastffi.CXXValue;
 import com.alibaba.fastffi.FFIConst;
 import com.alibaba.fastffi.FFIFactory;
 import com.alibaba.fastffi.FFIGen;
+import com.alibaba.fastffi.FFILibrary;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
+import com.alibaba.graphar.stdcxx.StdSharedPtr;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.stdcxx.StdVector;
 import com.alibaba.graphar.types.DataType;
 import com.alibaba.graphar.util.InfoVersion;
 import com.alibaba.graphar.util.Result;
 import com.alibaba.graphar.util.Status;
+import com.alibaba.graphar.util.Yaml;
 
 /** VertexInfo is a class that stores metadata information about a vertex. */
 @FFIGen
@@ -223,6 +226,17 @@ public interface VertexInfo extends CXXPointer {
     @FFINameAlias("IsValidated")
     boolean isValidated();
 
+    /**
+     * Loads vertex info from a YAML object.
+     *
+     * @param yaml A shared pointer to a Yaml object containing the YAML string.
+     * @return A Result object containing the VertexInfo object, or a Status object indicating an
+     *     error.
+     */
+    static Result<VertexInfo> load(StdSharedPtr<Yaml> yaml) {
+        return Static.INSTANCE.Load(yaml);
+    }
+
     @FFIFactory
     interface Factory {
         /**
@@ -253,5 +267,15 @@ public interface VertexInfo extends CXXPointer {
 
         /** Copy constructor. */
         VertexInfo create(@CXXReference VertexInfo other);
+    }
+
+    @FFIGen
+    @CXXHead(GAR_GRAPH_INFO_H)
+    @FFILibrary(value = GAR_VERTEX_INFO, namespace = GAR_VERTEX_INFO)
+    interface Static {
+        Static INSTANCE = FFITypeFactory.getLibrary(VertexInfo.Static.class);
+
+        @CXXValue
+        Result<VertexInfo> Load(@CXXValue StdSharedPtr<Yaml> yaml);
     }
 }

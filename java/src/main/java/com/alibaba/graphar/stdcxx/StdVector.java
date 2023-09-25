@@ -15,6 +15,7 @@
 package com.alibaba.graphar.stdcxx;
 
 import static com.alibaba.graphar.util.CppClassName.GAR_PROPERTY;
+import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
 import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
@@ -32,6 +33,7 @@ import com.alibaba.fastffi.FFITypeFactory;
 @FFIGen
 @CXXHead(system = {"vector", "string"})
 @CXXHead(GAR_GRAPH_INFO_H)
+@CXXHead(ARROW_API_H)
 @FFITypeAlias("std::vector")
 @CXXTemplate(cxx = "char", java = "java.lang.Byte")
 @CXXTemplate(cxx = "int32_t", java = "java.lang.Integer")
@@ -89,7 +91,5 @@ public interface StdVector<E> extends CXXPointer, FFISettablePointer {
     interface Factory<E> {
 
         StdVector<E> create();
-
-        //    StdVector<E> create(E e);
     }
 }

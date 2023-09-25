@@ -27,7 +27,6 @@ import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.fastffi.impl.CXXStdString;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.stdcxx.StdVector;
 
@@ -81,7 +80,7 @@ public interface InfoVersion extends CXXPointer {
      */
     @FFINameAlias("ToString")
     @CXXValue
-    CXXStdString toStdString();
+    StdString toStdString();
 
     /**
      * Check specific type in InfoVersion
