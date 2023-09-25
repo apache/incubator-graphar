@@ -23,24 +23,23 @@ import com.alibaba.fastffi.FFITypeRefiner;
 @FFITypeAlias(GAR_ADJ_LIST_TYPE)
 @FFITypeRefiner("com.alibaba.graphar.types.AdjListType.get")
 public enum AdjListType implements CXXEnum {
-    // collection of edges by source, but unordered, can represent COO format
-    unordered_by_source((byte) 0b00000001),
-    // collection of edges by destination, but unordered, can represent COO
+    /** collection of edges by source, but unordered, can represent COO format */
+    unordered_by_source(0b00000001),
+    /** collection of edges by destination, but unordered, can represent COO */
     // format
-    unordered_by_dest((byte) 0b00000010),
-    // collection of edges by source, ordered by source, can represent CSR format
-    ordered_by_source((byte) 0b00000100),
-    // collection of edges by destination, ordered by destination, can represent
-    // CSC format
-    ordered_by_dest((byte) 0b00001000);
+    unordered_by_dest(0b00000010),
+    /** collection of edges by source, ordered by source, can represent CSR format */
+    ordered_by_source(0b00000100),
+    /** collection of edges by destination, ordered by destination, can represent CSC format */
+    ordered_by_dest(0b00001000);
 
-    private final byte binaryNum;
+    private final int binaryNum;
 
-    AdjListType(byte binaryNum) {
+    AdjListType(int binaryNum) {
         this.binaryNum = binaryNum;
     }
 
-    public static AdjListType get(byte binaryValue) {
+    public static AdjListType get(int binaryValue) {
         switch (binaryValue) {
             case 0b00000001:
                 return unordered_by_source;
@@ -53,6 +52,11 @@ public enum AdjListType implements CXXEnum {
             default:
                 throw new IllegalStateException("Unknown value for AdjList type: " + binaryValue);
         }
+    }
+
+    @Override
+    public String toString() {
+        return adjListType2String(this);
     }
 
     public static String adjListType2String(AdjListType adjListType) {

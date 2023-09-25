@@ -24,9 +24,11 @@ import com.alibaba.fastffi.CXXReference;
 import com.alibaba.fastffi.CXXValue;
 import com.alibaba.fastffi.FFIFactory;
 import com.alibaba.fastffi.FFIGen;
+import com.alibaba.fastffi.FFILibrary;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
+import com.alibaba.graphar.stdcxx.StdSharedPtr;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.stdcxx.StdVector;
 import com.alibaba.graphar.types.AdjListType;
@@ -35,6 +37,7 @@ import com.alibaba.graphar.types.FileType;
 import com.alibaba.graphar.util.InfoVersion;
 import com.alibaba.graphar.util.Result;
 import com.alibaba.graphar.util.Status;
+import com.alibaba.graphar.util.Yaml;
 
 /** EdgeInfo is a class that stores metadata information about an edge. */
 @FFIGen
@@ -430,6 +433,10 @@ public interface EdgeInfo extends CXXPointer {
     @FFINameAlias("IsValidated")
     boolean isValidated();
 
+    static Result<EdgeInfo> load(StdSharedPtr<Yaml> yaml) {
+        return Static.INSTANCE.Load(yaml);
+    }
+
     @FFIFactory
     interface Factory {
         EdgeInfo create();
@@ -481,5 +488,15 @@ public interface EdgeInfo extends CXXPointer {
                 @CXXReference InfoVersion version);
 
         EdgeInfo create(@CXXReference EdgeInfo other);
+    }
+
+    @FFIGen
+    @CXXHead(GAR_GRAPH_INFO_H)
+    @FFILibrary(value = GAR_EDGE_INFO, namespace = GAR_EDGE_INFO)
+    interface Static {
+        Static INSTANCE = FFITypeFactory.getLibrary(EdgeInfo.Static.class);
+
+        @CXXValue
+        Result<EdgeInfo> Load(@CXXValue StdSharedPtr<Yaml> yaml);
     }
 }
