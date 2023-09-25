@@ -67,7 +67,7 @@ class VertexReader(
       propertyGroup: PropertyGroup,
       chunk_index: Long
   ): DataFrame = {
-    if (vertexInfo.containPropertyGroup(propertyGroup) == false) {
+    if (!vertexInfo.containPropertyGroup(propertyGroup)) {
       throw new IllegalArgumentException
     }
     val file_type = propertyGroup.getFile_type()
@@ -95,7 +95,7 @@ class VertexReader(
       propertyGroup: PropertyGroup,
       addIndex: Boolean = true
   ): DataFrame = {
-    if (vertexInfo.containPropertyGroup(propertyGroup) == false) {
+    if (!vertexInfo.containPropertyGroup(propertyGroup)) {
       throw new IllegalArgumentException
     }
     val file_type = propertyGroup.getFile_type()
@@ -107,9 +107,9 @@ class VertexReader(
       .load(file_path)
 
     if (addIndex) {
-      return IndexGenerator.generateVertexIndexColumn(df)
+      IndexGenerator.generateVertexIndexColumn(df)
     } else {
-      return df
+      df
     }
   }
 
@@ -145,7 +145,7 @@ class VertexReader(
 
     var rdd = df0.rdd
     var schema_array = df0.schema.fields
-    for (i <- 1 to len - 1) {
+    for (i <- 1 until len) {
       val pg: PropertyGroup = propertyGroups.get(i)
       val new_df = readVertexPropertyGroup(pg, false)
       schema_array = Array.concat(schema_array, new_df.schema.fields)
@@ -155,9 +155,9 @@ class VertexReader(
     val schema = StructType(schema_array)
     val df = spark.createDataFrame(rdd, schema)
     if (addIndex) {
-      return IndexGenerator.generateVertexIndexColumn(df)
+      IndexGenerator.generateVertexIndexColumn(df)
     } else {
-      return df
+      df
     }
   }
 

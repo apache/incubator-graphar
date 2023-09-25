@@ -17,7 +17,6 @@
 package com.alibaba.graphar.datasources
 
 import scala.collection.JavaConverters._
-import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 
 import org.apache.hadoop.conf.Configuration
@@ -34,7 +33,6 @@ import org.apache.spark.sql.execution.datasources.{
   PartitioningAwareFileIndex,
   PartitionedFile
 }
-import org.apache.spark.sql.execution.datasources.csv.CSVDataSource
 import org.apache.spark.sql.execution.datasources.parquet.{
   ParquetOptions,
   ParquetReadSupport,
@@ -279,7 +277,7 @@ case class GarScan(
     super.description() + ", PushedFilters: " + seqToString(pushedFilters)
   }
 
-  /** Get the meata data map of the object. */
+  /** Get the meta data map of the object. */
   override def getMetaData(): Map[String, String] = {
     super.getMetaData() ++ Map("PushedFilters" -> seqToString(pushedFilters))
   }
