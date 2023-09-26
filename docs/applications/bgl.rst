@@ -19,7 +19,7 @@ And then, the vertex collection and the edge collection are established as the h
    auto maybe_vertices = GraphArchive::ConstructVerticesCollection(graph_info, "person");
    auto& vertices = maybe_vertices.value();
    auto maybe_edges = GraphArchive::ConstructEdgesCollection(graph_info, "person", "knows", "person", GraphArchive::AdjListType::ordered_by_source);
-   auto& edges = std::get<GraphArchive::EdgesCollection<GraphArchive::AdjListType::ordered_by_source>>(maybe_edges.value());
+   auto& edges = maybe_edges.value();
 
 Next, we construct the in-memory graph data structure for BGL by traversing the vertices and edges via GraphAr's high-level reading interface (the vertex iterator and the edge iterator):
 
@@ -36,14 +36,14 @@ Next, we construct the in-memory graph data structure for BGL by traversing the 
 
    // declare a graph object with (num_vertices) vertices and an edge iterator
    std::vector<std::pair<GraphArchive::IdType, GraphArchive::IdType>> edges_array;
-   auto it_begin = edges.begin(), it_end = edges.end();
+   auto it_begin = edges->begin(), it_end = edges->end();
    for (auto it = it_begin; it != it_end; ++it)
       edges_array.push_back(std::make_pair(it.source(), it.destination()));
    Graph g(edges_array.begin(), edges_array.end(), num_vertices);
 
    // define the internal vertex property "id"
    boost::property_map<Graph, boost::vertex_name_t>::type id = get(boost::vertex_name_t(), g);
-   auto v_it_begin = vertices.begin(), v_it_end = vertices.end();
+   auto v_it_begin = vertices->begin(), v_it_end = vertices->end();
    for (auto it = v_it_begin; it != v_it_end; ++it) {
       auto vertex = *it;
       boost::put(id, vertex.id(), vertex.property<int64_t>("id").value());

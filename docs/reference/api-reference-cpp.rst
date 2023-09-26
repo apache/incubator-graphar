@@ -106,19 +106,19 @@ Edges Collection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgesCollection< AdjListType::ordered_by_source >
+.. doxygenclass:: GraphArchive::OBSEdgeCollection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgesCollection< AdjListType::ordered_by_dest >
+.. doxygenclass:: GraphArchive::OBDEdgesCollection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgesCollection< AdjListType::unordered_by_source >
+.. doxygenclass:: GraphArchive::UBSEdgesCollection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgesCollection< AdjListType::unordered_by_dest >
+.. doxygenclass:: GraphArchive::UBDEdgesCollection
     :members:
     :undoc-members:
 
