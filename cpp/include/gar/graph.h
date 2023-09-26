@@ -292,12 +292,6 @@ class VerticesCollection {
 };
 
 /**
- * @brief EdgesCollection is designed for reading a collection of edges.
- *
- */
-class EdgesCollection;
-
-/**
  * @brief The iterator for traversing a type of edges.
  *
  */
@@ -634,9 +628,66 @@ class EdgeIter {
   friend class UBDEdgesCollection;
 };
 
+/**
+ * @brief EdgesCollection is designed for reading a collection of edges.
+ */
 class EdgesCollection {
  public:
   virtual ~EdgesCollection() {}
+
+  /** The iterator pointing to the first edge. */
+  virtual EdgeIter begin() {
+    if (begin_ == nullptr) {
+      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_, 0,
+                    chunk_begin_, chunk_end_, index_converter_);
+      begin_ = std::make_shared<EdgeIter>(iter);
+    }
+    return *begin_;
+  }
+
+  /** The iterator pointing to the past-the-end element. */
+  virtual EdgeIter end() {
+    if (end_ == nullptr) {
+      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_, 0,
+                    chunk_begin_, chunk_end_, index_converter_);
+      end_ = std::make_shared<EdgeIter>(iter);
+    }
+    return *end_;
+  }
+
+  /** Get the number of edges in the collection. */
+  virtual size_t size() const noexcept { return edge_num_; }
+
+  /**
+   * Construct and return the iterator pointing to the first out-going edge of
+   * the vertex with specific id after the input iterator.
+   *
+   * @param id The vertex id.
+   * @param from The input iterator.
+   * @return The new constructed iterator.
+   */
+  virtual EdgeIter find_src(IdType id, const EdgeIter& from) = 0;
+
+  /**
+   * Construct and return the iterator pointing to the first incoming edge of
+   * the vertex with specific id after the input iterator.
+   *
+   * @param id The vertex id.
+   * @param from The input iterator.
+   * @return The new constructed iterator.
+   */
+  virtual EdgeIter find_dst(IdType id, const EdgeIter& from) = 0;
+
+ protected:
+  /**
+   * @brief Initialize the EdgesCollection with a range of chunks.
+   *
+   * @param edge_info The edge info that describes the edge type.
+   * @param prefix The absolute prefix.
+   * @param vertex_chunk_begin The index of the begin vertex chunk.
+   * @param vertex_chunk_end The index of the end vertex chunk (not included).
+   * @param adj_list_type The type of adjList.
+   */
   explicit EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
                            IdType vertex_chunk_begin, IdType vertex_chunk_end,
                            AdjListType adj_list_type)
@@ -671,31 +722,6 @@ class EdgesCollection {
         std::make_shared<util::IndexConverter>(std::move(edge_chunk_nums));
   }
 
-  /** The iterator pointing to the first edge. */
-  virtual EdgeIter begin() {
-    if (begin_ == nullptr) {
-      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_begin_, 0,
-                    chunk_begin_, chunk_end_, index_converter_);
-      begin_ = std::make_shared<EdgeIter>(iter);
-    }
-    return *begin_;
-  }
-
-  /** The iterator pointing to the past-the-end element. */
-  virtual EdgeIter end() {
-    if (end_ == nullptr) {
-      EdgeIter iter(edge_info_, prefix_, adj_list_type_, chunk_end_, 0,
-                    chunk_begin_, chunk_end_, index_converter_);
-      end_ = std::make_shared<EdgeIter>(iter);
-    }
-    return *end_;
-  }
-
-  virtual EdgeIter find_src(IdType id, const EdgeIter& from) = 0;
-  virtual EdgeIter find_dst(IdType id, const EdgeIter& from) = 0;
-  virtual size_t size() const noexcept { return edge_num_; }
-
- protected:
   EdgeInfo edge_info_;
   std::string prefix_;
   AdjListType adj_list_type_;
@@ -706,8 +732,7 @@ class EdgesCollection {
 };
 
 /**
- * @brief The implementation of EdgesCollection when the type of adjList is
- * AdjListType::ordered_by_source.
+ * @brief Ordered By Source EdgesCollection implementation.
  *
  */
 class OBSEdgeCollection : public EdgesCollection {
@@ -715,7 +740,7 @@ class OBSEdgeCollection : public EdgesCollection {
 
  protected:
   /**
-   * @brief Initialize the EdgesCollection with a range of chunks.
+   * @brief Initialize the OBSEdgeCollection with a range of chunks.
    *
    * @param edge_info The edge info that describes the edge type.
    * @param prefix The absolute prefix.
@@ -799,7 +824,9 @@ class OBSEdgeCollection : public EdgesCollection {
     return iter;
   }
 
-  /// Create a OBSEdgeCollection instance from the given options.
+  /**
+   * Create an OBSEdgeCollection instance from the given options.
+   */
   static Result<std::shared_ptr<OBSEdgeCollection>> Make(
       const EdgeInfo& edge_info, const std::string& prefix,
       IdType vertex_chunk_begin = 0,
@@ -811,16 +838,14 @@ class OBSEdgeCollection : public EdgesCollection {
 };
 
 /**
- * @brief The implementation of EdgesCollection when the type of adjList is
- * AdjListType::ordered_by_dest.
- *
+ * @brief Ordered By Destination EdgesCollection implementation.
  */
 class OBDEdgesCollection : public EdgesCollection {
   using Base = EdgesCollection;
 
  protected:
   /**
-   * @brief Initialize the EdgesCollection with a range of chunks.
+   * @brief Initialize the OBDEdgesCollection with a range of chunks.
    *
    * @param edge_info The edge info that describes the edge type.
    * @param prefix The absolute prefix.
@@ -904,7 +929,9 @@ class OBDEdgesCollection : public EdgesCollection {
     return this->end();
   }
 
-  /// Create a OBDEdgesCollection instance from the given options.
+  /**
+   * Create an OBDEdgesCollection instance from the given options.
+   */
   static Result<std::shared_ptr<OBDEdgesCollection>> Make(
       const EdgeInfo& edge_info, const std::string& prefix,
       IdType vertex_chunk_begin = 0,
@@ -916,9 +943,7 @@ class OBDEdgesCollection : public EdgesCollection {
 };
 
 /**
- * @brief The implementation of EdgesCollection when the type of adjList is
- * AdjListType::unordered_by_source.
- *
+ * @brief Unordered By Source EdgesCollection implementation.
  */
 class UBSEdgesCollection : public EdgesCollection {
   using Base = EdgesCollection;
@@ -982,7 +1007,9 @@ class UBSEdgesCollection : public EdgesCollection {
     return iter;
   }
 
-  /// Create a UBSEdgesCollection instance from the given options.
+  /**
+   * Create an UBSEdgesCollection instance from the given options.
+   */
   static Result<std::shared_ptr<UBSEdgesCollection>> Make(
       const EdgeInfo& edge_info, const std::string& prefix,
       IdType vertex_chunk_begin = 0,
@@ -994,9 +1021,7 @@ class UBSEdgesCollection : public EdgesCollection {
 };
 
 /**
- * @brief The implementation of EdgesCollection when the type of adjList is
- * AdjListType::unordered_by_dest.
- *
+ * @brief Unordered By Destination EdgesCollection implementation.
  */
 class UBDEdgesCollection : public EdgesCollection {
   using Base = EdgesCollection;
@@ -1060,7 +1085,9 @@ class UBDEdgesCollection : public EdgesCollection {
     return iter;
   }
 
-  /// Create a UBDEdgesCollection instance from the given options.
+  /**
+   * Create an UBDEdgesCollection instance from the given options.
+   */
   static Result<std::shared_ptr<UBDEdgesCollection>> Make(
       const EdgeInfo& edge_info, const std::string& prefix,
       IdType vertex_chunk_begin = 0,
