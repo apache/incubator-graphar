@@ -636,7 +636,7 @@ class EdgeIter {
 
 class EdgesCollection {
  public:
-  virtual ~EdgesCollection(){};
+  virtual ~EdgesCollection() {}
   explicit EdgesCollection(const EdgeInfo& edge_info, const std::string& prefix,
                            IdType vertex_chunk_begin, IdType vertex_chunk_end,
                            AdjListType adj_list_type)
