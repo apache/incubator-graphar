@@ -45,14 +45,13 @@ int main(int argc, char* argv[]) {
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(!maybe_edges.has_error());
-  auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
-      GAR_NAMESPACE::AdjListType::ordered_by_source>>(maybe_edges.value());
+  auto& edges = maybe_edges.value();
 
   // run cc algorithm
   std::vector<GAR_NAMESPACE::IdType> component(num_vertices);
   for (GAR_NAMESPACE::IdType i = 0; i < num_vertices; i++)
     component[i] = i;
-  auto it_begin = edges.begin(), it_end = edges.end();
+  auto it_begin = edges->begin(), it_end = edges->end();
   for (int iter = 0;; iter++) {
     std::cout << "iter " << iter << std::endl;
     bool flag = false;

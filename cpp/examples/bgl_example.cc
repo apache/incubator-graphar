@@ -51,8 +51,7 @@ int main(int argc, char* argv[]) {
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(!maybe_edges.has_error());
-  auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
-      GAR_NAMESPACE::AdjListType::ordered_by_source>>(maybe_edges.value());
+  auto& edges = maybe_edges.value();
 
   // define the Graph type
   typedef boost::adjacency_list<
@@ -68,8 +67,8 @@ int main(int argc, char* argv[]) {
   // declare a graph object with (num_vertices) vertices and a edge iterator
   std::vector<std::pair<GAR_NAMESPACE::IdType, GAR_NAMESPACE::IdType>>
       edges_array;
-  auto it_end = edges.end();
-  for (auto it = edges.begin(); it != it_end; ++it) {
+  auto it_end = edges->end();
+  for (auto it = edges->begin(); it != it_end; ++it) {
     edges_array.push_back(std::make_pair(it.source(), it.destination()));
   }
   Graph g(edges_array.begin(), edges_array.end(), num_vertices);
@@ -84,8 +83,8 @@ int main(int argc, char* argv[]) {
   boost::property_map<Graph, boost::vertex_name_t>::type id =
       get(boost::vertex_name_t(), g);
 
-  auto v_it_end = vertices.end();
-  for (auto it = vertices.begin(); it != v_it_end; ++it) {
+  auto v_it_end = vertices->end();
+  for (auto it = vertices->begin(); it != v_it_end; ++it) {
     // FIXME(@acezen): double free error when get string property
     boost::put(id, it.id(), it.property<int64_t>("id").value());
   }
