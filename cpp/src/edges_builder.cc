@@ -14,8 +14,8 @@ limitations under the License.
 */
 
 #include "gar/writer/edges_builder.h"
-#include "gar/utils/convert_to_arrow_type.h"
-#include "gar/utils/general_params.h"
+#include "gar/util/convert_to_arrow_type.h"
+#include "gar/util/general_params.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {

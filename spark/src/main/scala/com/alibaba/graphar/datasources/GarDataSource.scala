@@ -35,11 +35,15 @@ import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.sql.sources.DataSourceRegister
 import org.apache.spark.sql.connector.expressions.Transform
 
-import com.alibaba.graphar.utils.Utils
+import com.alibaba.graphar.util.Utils
 
 object GarUtils
-/** GarDataSource is a class to provide gar files as the data source for spark. */
+
+/**
+ * GarDataSource is a class to provide gar files as the data source for spark.
+ */
 class GarDataSource extends TableProvider with DataSourceRegister {
+
   /** The default fallback file format is Parquet. */
   def fallbackFileFormat: Class[_ <: FileFormat] = classOf[ParquetFileFormat]
 
@@ -50,27 +54,40 @@ class GarDataSource extends TableProvider with DataSourceRegister {
 
   protected def getPaths(map: CaseInsensitiveStringMap): Seq[String] = {
     val objectMapper = new ObjectMapper()
-    val paths = Option(map.get("paths")).map { pathStr =>
-      objectMapper.readValue(pathStr, classOf[Array[String]]).toSeq
-    }.getOrElse(Seq.empty)
+    val paths = Option(map.get("paths"))
+      .map { pathStr =>
+        objectMapper.readValue(pathStr, classOf[Array[String]]).toSeq
+      }
+      .getOrElse(Seq.empty)
     paths ++ Option(map.get("path")).toSeq
   }
 
-  protected def getOptionsWithoutPaths(map: CaseInsensitiveStringMap): CaseInsensitiveStringMap = {
+  protected def getOptionsWithoutPaths(
+      map: CaseInsensitiveStringMap
+  ): CaseInsensitiveStringMap = {
     val withoutPath = map.asCaseSensitiveMap().asScala.filterKeys { k =>
       !k.equalsIgnoreCase("path") && !k.equalsIgnoreCase("paths")
     }
     new CaseInsensitiveStringMap(withoutPath.toMap.asJava)
   }
 
-  protected def getTableName(map: CaseInsensitiveStringMap, paths: Seq[String]): String = {
+  protected def getTableName(
+      map: CaseInsensitiveStringMap,
+      paths: Seq[String]
+  ): String = {
     val hadoopConf = sparkSession.sessionState.newHadoopConfWithOptions(
-      map.asCaseSensitiveMap().asScala.toMap)
-    val name = shortName() + " " + paths.map(qualifiedPathName(_, hadoopConf)).mkString(",")
+      map.asCaseSensitiveMap().asScala.toMap
+    )
+    val name = shortName() + " " + paths
+      .map(qualifiedPathName(_, hadoopConf))
+      .mkString(",")
     Utils.redact(sparkSession.sessionState.conf.stringRedactionPattern, name)
   }
 
-  private def qualifiedPathName(path: String, hadoopConf: Configuration): String = {
+  private def qualifiedPathName(
+      path: String,
+      hadoopConf: Configuration
+  ): String = {
     val hdfsPath = new Path(path)
     val fs = hdfsPath.getFileSystem(hadoopConf)
     hdfsPath.makeQualified(fs.getUri, fs.getWorkingDirectory).toString
@@ -81,7 +98,14 @@ class GarDataSource extends TableProvider with DataSourceRegister {
     val paths = getPaths(options)
     val tableName = getTableName(options, paths)
     val optionsWithoutPaths = getOptionsWithoutPaths(options)
-    GarTable(tableName, sparkSession, optionsWithoutPaths, paths, None, getFallbackFileFormat(options))
+    GarTable(
+      tableName,
+      sparkSession,
+      optionsWithoutPaths,
+      paths,
+      None,
+      getFallbackFileFormat(options)
+    )
   }
 
   /** Provide a table from the data source with specific schema. */
@@ -89,7 +113,14 @@ class GarDataSource extends TableProvider with DataSourceRegister {
     val paths = getPaths(options)
     val tableName = getTableName(options, paths)
     val optionsWithoutPaths = getOptionsWithoutPaths(options)
-    GarTable(tableName, sparkSession, optionsWithoutPaths, paths, Some(schema), getFallbackFileFormat(options))
+    GarTable(
+      tableName,
+      sparkSession,
+      optionsWithoutPaths,
+      paths,
+      Some(schema),
+      getFallbackFileFormat(options)
+    )
   }
 
   override def supportsExternalMetadata(): Boolean = true
@@ -101,13 +132,17 @@ class GarDataSource extends TableProvider with DataSourceRegister {
     t.schema()
   }
 
-  override def inferPartitioning(options: CaseInsensitiveStringMap): Array[Transform] = {
+  override def inferPartitioning(
+      options: CaseInsensitiveStringMap
+  ): Array[Transform] = {
     Array.empty
   }
 
-  override def getTable(schema: StructType,
-                        partitioning: Array[Transform],
-                        properties: util.Map[String, String]): Table = {
+  override def getTable(
+      schema: StructType,
+      partitioning: Array[Transform],
+      properties: util.Map[String, String]
+  ): Table = {
     // If the table is already loaded during schema inference, return it directly.
     if (t != null) {
       t
@@ -117,10 +152,12 @@ class GarDataSource extends TableProvider with DataSourceRegister {
   }
 
   // Get the actual fall back file format.
-  private def getFallbackFileFormat(options: CaseInsensitiveStringMap): Class[_ <: FileFormat] = options.get("fileFormat") match {
-    case "csv" => classOf[CSVFileFormat]
-    case "orc" => classOf[OrcFileFormat]
+  private def getFallbackFileFormat(
+      options: CaseInsensitiveStringMap
+  ): Class[_ <: FileFormat] = options.get("fileFormat") match {
+    case "csv"     => classOf[CSVFileFormat]
+    case "orc"     => classOf[OrcFileFormat]
     case "parquet" => classOf[ParquetFileFormat]
-    case _ => throw new IllegalArgumentException
+    case _         => throw new IllegalArgumentException
   }
 }

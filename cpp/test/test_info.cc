@@ -21,8 +21,8 @@ limitations under the License.
 #include "./util.h"
 
 #include "gar/graph_info.h"
-#include "gar/utils/filesystem.h"
-#include "gar/utils/version_parser.h"
+#include "gar/util/filesystem.h"
+#include "gar/util/version_parser.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -368,6 +368,8 @@ TEST_CASE("test_graph_info_load_from_file") {
   REQUIRE(edge_infos.size() == 1);
 }
 
+// ISSUE-187
+#if defined(ARROW_VERSION) && ARROW_VERSION < 12000000
 TEST_CASE("test_graph_info_load_from_s3") {
   std::string path =
       "s3://graphar/ldbc/ldbc.graph.yml"
@@ -381,3 +383,4 @@ TEST_CASE("test_graph_info_load_from_s3") {
   REQUIRE(vertex_infos.size() == 8);
   REQUIRE(edge_infos.size() == 23);
 }
+#endif

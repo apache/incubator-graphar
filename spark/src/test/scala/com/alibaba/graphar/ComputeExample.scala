@@ -1,16 +1,17 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
+/**
+ * Copyright 2022 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
  *
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.alibaba.graphar
@@ -27,7 +28,8 @@ import org.apache.spark.rdd.RDD
 import org.scalatest.funsuite.AnyFunSuite
 
 class ComputeExampleSuite extends AnyFunSuite {
-  val spark = SparkSession.builder()
+  val spark = SparkSession
+    .builder()
     .enableHiveSupport()
     .master("local[*]")
     .getOrCreate()
@@ -36,7 +38,9 @@ class ComputeExampleSuite extends AnyFunSuite {
     // read vertex dataframe
     val file_path = "gar-test/ldbc_sample/parquet/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
-    val vertex_yaml = getClass.getClassLoader.getResource(file_path + "person.vertex.yml").getPath
+    val vertex_yaml = getClass.getClassLoader
+      .getResource(file_path + "person.vertex.yml")
+      .getPath
     val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
 
     val vertex_reader = new VertexReader(prefix, vertex_info, spark)
@@ -47,7 +51,9 @@ class ComputeExampleSuite extends AnyFunSuite {
     assert(vertex_df.count() == vertices_num)
 
     // read edge dataframe
-    val edge_yaml = getClass.getClassLoader.getResource(file_path + "person_knows_person.edge.yml").getPath
+    val edge_yaml = getClass.getClassLoader
+      .getResource(file_path + "person_knows_person.edge.yml")
+      .getPath
     val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
     val adj_list_type = AdjListType.ordered_by_source
 
@@ -60,14 +66,20 @@ class ComputeExampleSuite extends AnyFunSuite {
     assert(edge_df.count() == edges_num)
 
     // construct the graph for GraphX
-    val vertex_rdd: VertexRDD[String] = VertexRDD(vertex_df.rdd.map(i => (i(0).asInstanceOf[Number].longValue, i(1).toString)))
-    val edge_rdd = edge_df.rdd.map(i => (i(0).asInstanceOf[Number].longValue, i(1).asInstanceOf[Number].longValue))
+    val vertex_rdd: VertexRDD[String] = VertexRDD(
+      vertex_df.rdd.map(i =>
+        (i(0).asInstanceOf[Number].longValue, i(1).toString)
+      )
+    )
+    val edge_rdd = edge_df.rdd.map(i =>
+      (i(0).asInstanceOf[Number].longValue, i(1).asInstanceOf[Number].longValue)
+    )
     val graph = Graph.fromEdgeTuples[Null](edge_rdd, null)
     // find the connected components
     val cc = graph.connectedComponents().vertices
     val ccById = vertex_rdd.leftOuterJoin(cc).map {
       case (index, (id, Some(cc))) => (id, cc)
-      case (index, (id, None)) => (id, index)
+      case (index, (id, None))     => (id, index)
     }
     // print the result
     println(ccById.collect().mkString("\n"))

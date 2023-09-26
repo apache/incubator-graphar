@@ -1,0 +1,5 @@
+.idea
+dependency-reduced-pom.xml
+target
+gar-java.iml
+cmake-build-debug

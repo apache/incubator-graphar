@@ -17,7 +17,7 @@ limitations under the License.
 #include <regex>  // NOLINT
 #include <string>
 
-#include "gar/utils/version_parser.h"
+#include "gar/util/version_parser.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 

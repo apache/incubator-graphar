@@ -19,16 +19,17 @@ limitations under the License.
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
-#include "utils/adj_list_type.h"
-#include "utils/data_type.h"
-#include "utils/file_type.h"
-#include "utils/result.h"
-#include "utils/status.h"
-#include "utils/utils.h"
-#include "utils/version_parser.h"
-#include "utils/yaml.h"
+#include "util/adj_list_type.h"
+#include "util/data_type.h"
+#include "util/file_type.h"
+#include "util/result.h"
+#include "util/status.h"
+#include "util/util.h"
+#include "util/version_parser.h"
+#include "util/yaml.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -43,6 +44,11 @@ struct Property {
   std::string name;  // property name
   DataType type;     // property data type
   bool is_primary;   // primary key tag
+
+  Property() {}
+  explicit Property(const std::string& name) : name(name) {}
+  Property(const std::string& name, const DataType& type, bool is_primary)
+      : name(name), type(type), is_primary(is_primary) {}
 };
 
 static bool operator==(const Property& lhs, const Property& rhs) {
@@ -87,6 +93,7 @@ class PropertyGroup {
       std::vector<std::string> names;
       for (auto& property : properties_) {
         names.push_back(property.name);
+        property_names_.insert(property.name);
       }
       prefix_ = util::ConcatStringWithDelimiter(names, REGULAR_SEPERATOR) + "/";
     }
@@ -121,6 +128,10 @@ class PropertyGroup {
     return properties_;
   }
 
+  inline bool ContainProperty(const std::string& property_name) const {
+    return property_names_.find(property_name) != property_names_.end();
+  }
+
   /** Get the file type of property group chunk file.
    *
    * @return The file type of group.
@@ -146,6 +157,7 @@ class PropertyGroup {
 
  private:
   std::vector<Property> properties_;
+  std::unordered_set<std::string> property_names_;
   FileType file_type_;
   std::string prefix_;
 };
@@ -802,6 +814,7 @@ class EdgeInfo {
    *
    * @param vertex_chunk_index the vertex chunk index
    * @param edge_chunk_index index of edge adj list chunk of the vertex chunk
+   * @param adj_list_type The adjacency list type.
    */
   inline Result<std::string> GetAdjListFilePath(IdType vertex_chunk_index,
                                                 IdType edge_chunk_index,
@@ -839,6 +852,7 @@ class EdgeInfo {
    *    the offset chunks is aligned with the vertex chunks
    *
    * @param vertex_chunk_index index of vertex chunk
+   * @param adj_list_type The adjacency list type.
    */
   inline Result<std::string> GetAdjListOffsetFilePath(
       IdType vertex_chunk_index, AdjListType adj_list_type) const noexcept {
@@ -1033,7 +1047,7 @@ class EdgeInfo {
     return true;
   }
 
-  /** Loads the yaml as a EdgeInfo instance. */
+  /** Loads the yaml as an EdgeInfo instance. */
   static Result<EdgeInfo> Load(std::shared_ptr<Yaml> yaml);
 
  private:
@@ -1131,7 +1145,7 @@ class GraphInfo {
   }
 
   /**
-   *@brief Add a edge info path to graph info instance.
+   *@brief Add an edge info path to graph info instance.
    *
    *@param path The edge info path to add
    */
@@ -1168,7 +1182,7 @@ class GraphInfo {
       noexcept {
     if (vertex2info_.find(label) == vertex2info_.end()) {
       return Status::KeyError("The vertex info of ", label,
-                              "is not found in graph info.");
+                              " is not found in graph info.");
     }
     return vertex2info_.at(label);
   }
@@ -1205,7 +1219,7 @@ class GraphInfo {
       const std::string& label, const std::string& property) const noexcept {
     if (vertex2info_.find(label) == vertex2info_.end()) {
       return Status::KeyError("The vertex info of ", label,
-                              "is not found in graph info.");
+                              " is not found in graph info.");
     }
     return vertex2info_.at(label).GetPropertyGroup(property);
   }

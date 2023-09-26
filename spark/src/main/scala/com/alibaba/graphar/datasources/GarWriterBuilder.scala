@@ -28,12 +28,24 @@ import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
 import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
 
-import org.apache.spark.sql.execution.datasources.{OutputWriter, OutputWriterFactory}
+import org.apache.spark.sql.execution.datasources.{
+  OutputWriter,
+  OutputWriterFactory
+}
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util.{CaseInsensitiveMap, DateTimeUtils}
-import org.apache.spark.sql.connector.write.{BatchWrite, LogicalWriteInfo, WriteBuilder}
-import org.apache.spark.sql.execution.datasources.{BasicWriteJobStatsTracker, DataSource, OutputWriterFactory, WriteJobDescription}
+import org.apache.spark.sql.connector.write.{
+  BatchWrite,
+  LogicalWriteInfo,
+  WriteBuilder
+}
+import org.apache.spark.sql.execution.datasources.{
+  BasicWriteJobStatsTracker,
+  DataSource,
+  OutputWriterFactory,
+  WriteJobDescription
+}
 import org.apache.spark.sql.execution.metric.SQLMetric
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.{DataType, StructType}
@@ -42,10 +54,12 @@ import org.apache.spark.util.SerializableConfiguration
 import org.apache.spark.sql.execution.datasources.v2.FileBatchWrite
 import org.apache.spark.sql.catalyst.expressions.AttributeReference
 
-abstract class GarWriteBuilder(paths: Seq[String],
-                      formatName: String,
-                      supportsDataType: DataType => Boolean,
-                      info: LogicalWriteInfo) extends WriteBuilder {
+abstract class GarWriteBuilder(
+    paths: Seq[String],
+    formatName: String,
+    supportsDataType: DataType => Boolean,
+    info: LogicalWriteInfo
+) extends WriteBuilder {
   private val schema = info.schema()
   private val queryId = info.queryId()
   private val options = info.options()
@@ -56,36 +70,53 @@ abstract class GarWriteBuilder(paths: Seq[String],
     val path = new Path(paths.head)
     val caseSensitiveMap = options.asCaseSensitiveMap.asScala.toMap
     // Hadoop Configurations are case sensitive.
-    val hadoopConf = sparkSession.sessionState.newHadoopConfWithOptions(caseSensitiveMap)
+    val hadoopConf =
+      sparkSession.sessionState.newHadoopConfWithOptions(caseSensitiveMap)
     val job = getJobInstance(hadoopConf, path)
-    val committer = new GarCommitProtocol(java.util.UUID.randomUUID().toString, paths.head, options.asScala.toMap, false)
+    val committer = new GarCommitProtocol(
+      java.util.UUID.randomUUID().toString,
+      paths.head,
+      options.asScala.toMap,
+      false
+    )
     lazy val description =
-      createWriteJobDescription(sparkSession, hadoopConf, job, paths.head, options.asScala.toMap)
+      createWriteJobDescription(
+        sparkSession,
+        hadoopConf,
+        job,
+        paths.head,
+        options.asScala.toMap
+      )
 
     committer.setupJob(job)
     new FileBatchWrite(job, description, committer)
   }
 
-  def prepareWrite(sqlConf: SQLConf,
-                   job: Job,
-                   options: Map[String, String],
-                   dataSchema: StructType): OutputWriterFactory
+  def prepareWrite(
+      sqlConf: SQLConf,
+      job: Job,
+      options: Map[String, String],
+      dataSchema: StructType
+  ): OutputWriterFactory
 
   private def validateInputs(caseSensitiveAnalysis: Boolean): Unit = {
     assert(schema != null, "Missing input data schema")
     assert(queryId != null, "Missing query ID")
 
     if (paths.length != 1) {
-      throw new IllegalArgumentException("Expected exactly one path to be specified, but " +
-        s"got: ${paths.mkString(", ")}")
+      throw new IllegalArgumentException(
+        "Expected exactly one path to be specified, but " +
+          s"got: ${paths.mkString(", ")}"
+      )
     }
     val pathName = paths.head
     DataSource.validateSchema(schema)
 
     schema.foreach { field =>
       if (!supportsDataType(field.dataType)) {
-         throw new IllegalArgumentException(
-            s"$formatName data source does not support ${field.dataType.catalogString} data type.")
+        throw new IllegalArgumentException(
+          s"$formatName data source does not support ${field.dataType.catalogString} data type."
+        )
       }
     }
   }
@@ -98,26 +129,37 @@ abstract class GarWriteBuilder(paths: Seq[String],
     job
   }
 
-  private def createWriteJobDescription(sparkSession: SparkSession,
-                                        hadoopConf: Configuration,
-                                        job: Job,
-                                        pathName: String,
-                                        options: Map[String, String]): WriteJobDescription = {
+  private def createWriteJobDescription(
+      sparkSession: SparkSession,
+      hadoopConf: Configuration,
+      job: Job,
+      pathName: String,
+      options: Map[String, String]
+  ): WriteJobDescription = {
     val caseInsensitiveOptions = CaseInsensitiveMap(options)
     // Note: prepareWrite has side effect. It sets "job".
     val outputWriterFactory =
-      prepareWrite(sparkSession.sessionState.conf, job, caseInsensitiveOptions, schema)
+      prepareWrite(
+        sparkSession.sessionState.conf,
+        job,
+        caseInsensitiveOptions,
+        schema
+      )
     // same as schema.toAttributes which is private of spark package
-    val allColumns: Seq[AttributeReference] = schema.map( f => AttributeReference(f.name, f.dataType, f.nullable, f.metadata)())
+    val allColumns: Seq[AttributeReference] = schema.map(f =>
+      AttributeReference(f.name, f.dataType, f.nullable, f.metadata)()
+    )
     val metrics: Map[String, SQLMetric] = BasicWriteJobStatsTracker.metrics
     val serializableHadoopConf = new SerializableConfiguration(hadoopConf)
-    val statsTracker = new BasicWriteJobStatsTracker(serializableHadoopConf, metrics)
+    val statsTracker =
+      new BasicWriteJobStatsTracker(serializableHadoopConf, metrics)
     // TODO: after partitioning is supported in V2:
     //       1. filter out partition columns in `dataColumns`.
     //       2. Don't use Seq.empty for `partitionColumns`.
     new WriteJobDescription(
       uuid = UUID.randomUUID().toString,
-      serializableHadoopConf = new SerializableConfiguration(job.getConfiguration),
+      serializableHadoopConf =
+        new SerializableConfiguration(job.getConfiguration),
       outputWriterFactory = outputWriterFactory,
       allColumns = allColumns,
       dataColumns = allColumns,
@@ -125,9 +167,12 @@ abstract class GarWriteBuilder(paths: Seq[String],
       bucketIdExpression = None,
       path = pathName,
       customPartitionLocations = Map.empty,
-      maxRecordsPerFile = caseInsensitiveOptions.get("maxRecordsPerFile").map(_.toLong)
+      maxRecordsPerFile = caseInsensitiveOptions
+        .get("maxRecordsPerFile")
+        .map(_.toLong)
         .getOrElse(sparkSession.sessionState.conf.maxRecordsPerFile),
-      timeZoneId = caseInsensitiveOptions.get(DateTimeUtils.TIMEZONE_OPTION)
+      timeZoneId = caseInsensitiveOptions
+        .get(DateTimeUtils.TIMEZONE_OPTION)
         .getOrElse(sparkSession.sessionState.conf.sessionLocalTimeZone),
       statsTrackers = Seq(statsTracker)
     )

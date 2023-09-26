@@ -16,17 +16,16 @@ limitations under the License.
 #include "arrow/adapters/orc/adapter.h"
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
+#include "arrow/dataset/api.h"
 #include "arrow/filesystem/api.h"
-#include "arrow/io/api.h"
 #include "arrow/ipc/writer.h"
-#include "arrow/util/uri.h"
-#include "parquet/arrow/reader.h"
 #include "parquet/arrow/writer.h"
 
-#include "gar/utils/filesystem.h"
+#include "gar/util/expression.h"
+#include "gar/util/filesystem.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
-
+namespace ds = arrow::dataset;
 namespace detail {
 template <typename U, typename T>
 static Status CastToLargeOffsetArray(
@@ -81,44 +80,42 @@ Result<arrow::internal::Uri> ParseFileSystemUri(const std::string& uri_string) {
 }
 }  // namespace detail
 
-Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
-    const std::string& path, FileType file_type) const noexcept {
-  arrow::MemoryPool* pool = arrow::default_memory_pool();
-  std::shared_ptr<arrow::Table> table;
-  switch (file_type) {
-  case FileType::CSV: {
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto is,
-                                         arrow_fs_->OpenInputStream(path));
-    auto read_options = arrow::csv::ReadOptions::Defaults();
-    auto parse_options = arrow::csv::ParseOptions::Defaults();
-    auto convert_options = arrow::csv::ConvertOptions::Defaults();
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
-        auto reader, arrow::csv::TableReader::Make(
-                         arrow::io::IOContext(pool), is, read_options,
-                         parse_options, convert_options));
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(table, reader->Read());
-    break;
-  }
-  case FileType::PARQUET: {
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto input,
-                                         arrow_fs_->OpenInputFile(path));
-    std::unique_ptr<parquet::arrow::FileReader> reader;
-    RETURN_NOT_ARROW_OK(parquet::arrow::OpenFile(input, pool, &reader));
-    RETURN_NOT_ARROW_OK(reader->ReadTable(&table));
-    break;
-  }
-  case FileType::ORC: {
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto input,
-                                         arrow_fs_->OpenInputFile(path));
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
-        auto reader, arrow::adapters::orc::ORCFileReader::Open(input, pool));
-    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(table, reader->Read());
-    break;
-  }
+std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
+    const FileType type) const {
+  switch (type) {
+  case CSV:
+    return std::make_shared<ds::CsvFileFormat>();
+  case PARQUET:
+    return std::make_shared<ds::ParquetFileFormat>();
+  case ORC:
+    return std::make_shared<ds::OrcFileFormat>();
   default:
-    return Status::Invalid("Unsupported file type: ",
-                           FileTypeToString(file_type));
+    return nullptr;
   }
+}
+
+Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
+    const std::string& path, FileType file_type,
+    const util::FilterOptions& options) const noexcept {
+  std::shared_ptr<ds::FileFormat> format = GetFileFormat(file_type);
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
+      auto factory, arrow::dataset::FileSystemDatasetFactory::Make(
+                        arrow_fs_, {path}, format,
+                        arrow::dataset::FileSystemFactoryOptions()));
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto dataset, factory->Finish());
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
+
+  // Apply the row filter and select the specified columns
+  if (options.filter) {
+    GAR_ASSIGN_OR_RAISE(auto filter, options.filter->Evaluate());
+    RETURN_NOT_ARROW_OK(scan_builder->Filter(filter));
+  }
+  if (options.columns) {
+    RETURN_NOT_ARROW_OK(scan_builder->Project(*options.columns));
+  }
+
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scanner, scan_builder->Finish());
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto table, scanner->ToTable());
   // cast string array to large string array as we need concatenate chunks in
   // some places, e.g., in vineyard
   for (int i = 0; i < table->num_columns(); ++i) {
@@ -134,7 +131,11 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     // do casting
     auto field = table->field(i)->WithType(type);
     std::shared_ptr<arrow::ChunkedArray> chunked_array;
-    if (type->Equals(arrow::large_utf8())) {
+
+    if (table->num_rows() == 0) {
+      GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
+          chunked_array, arrow::ChunkedArray::MakeEmpty(type));
+    } else if (type->Equals(arrow::large_utf8())) {
       auto status = detail::CastToLargeOffsetArray<arrow::StringArray,
                                                    arrow::LargeStringArray>(
           table->column(i), type, chunked_array);
@@ -268,11 +269,13 @@ Result<IdType> FileSystem::GetFileNumOfDir(const std::string& dir_path,
 
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri_string, std::string* out_path) {
-  if (arrow::fs::internal::DetectAbsolutePath(uri_string)) {
+  if (uri_string.length() >= 1 && uri_string[0] == '/') {
     // if the uri_string is an absolute path, we need to create a local file
     GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
         auto arrow_fs,
         arrow::fs::FileSystemFromUriOrPath(uri_string, out_path));
+    // arrow would delete the last slash, so use uri string
+    *out_path = uri_string;
     return std::make_shared<FileSystem>(arrow_fs);
   }
 

@@ -16,7 +16,6 @@
         <PermGen>512m</PermGen>
         <MaxPermGen>1024m</MaxPermGen>
         <spark.version>3.2.2</spark.version>
-        <maven.compiler.release>8</maven.compiler.release>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <cupid.sdk.version>3.3.8-public</cupid.sdk.version>
@@ -203,6 +202,27 @@
                         <jvmArg>-Xms64m</jvmArg>
                         <jvmArg>-Xmx1024m</jvmArg>
                     </jvmArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.diffplug.spotless</groupId>
+                <artifactId>spotless-maven-plugin</artifactId>
+                <version>2.20.0</version>
+                <configuration>
+                    <!-- define a language-specific format -->
+                    <java>
+                        <!-- no need to specify files, inferred automatically, but you can if you want -->
+                        <!-- apply a specific flavor of google-java-format and reflow long strings -->
+                        <googleJavaFormat>
+                            <version>1.13.0</version>
+                            <style>AOSP</style>
+                        </googleJavaFormat>
+                    </java>
+                    <scala>
+                        <scalafmt>
+                            <file>${project.basedir}/.scalafmt.conf</file> <!-- optional -->
+                        </scalafmt>
+                    </scala>
                 </configuration>
             </plugin>
         </plugins>

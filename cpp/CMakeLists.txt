@@ -32,6 +32,7 @@ option(BUILD_TESTS "Build unit tests" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_GRIN "Build grin" OFF)
 option(USE_LTO "Using IPO/LTO support for link-time optimization" OFF)
+option(BUILD_ARROW_FROM_SOURCE "Build Arrow from source (ON) or use system-installed Arrow (OFF)" OFF)
 
 if (NAMESPACE)
   add_definitions(-DGAR_NAMESPACE=${NAMESPACE})
@@ -165,8 +166,16 @@ if(OPENSSL_FOUND)
     endif()
 endif()
 
-include(apache-arrow)
-build_arrow()
+if(BUILD_ARROW_FROM_SOURCE)
+    include(apache-arrow)
+    build_arrow()
+else()
+    find_package(Arrow REQUIRED)
+    find_package(ArrowDataset REQUIRED)
+    find_package(ArrowAcero REQUIRED)
+    find_package(Parquet REQUIRED)
+endif()
+
 
 macro(get_target_location var target)
   if(TARGET ${target})
@@ -191,19 +200,37 @@ macro(build_gar)
                                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
                                           $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml>
     )
-    target_include_directories(gar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+    if(BUILD_ARROW_FROM_SOURCE)
+        target_include_directories(gar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+    endif()
     target_link_libraries(gar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
 
     if(APPLE)
-        target_link_libraries(gar PRIVATE -Wl,-force_load gar_arrow_static
-            "${GAR_PARQUET_STATIC_LIB}"
-            "${GAR_ACERO_STATIC_LIB}"
-            "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+        if(BUILD_ARROW_FROM_SOURCE)
+            target_link_libraries(gar PRIVATE -Wl,-force_load gar_arrow_static
+                "${GAR_PARQUET_STATIC_LIB}"
+                "${GAR_DATASET_STATIC_LIB}"
+                "${GAR_ACERO_STATIC_LIB}"
+                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+        else()
+            target_link_libraries(gar PRIVATE -Wl,-force_load Arrow::arrow_static
+                Parquet::parquet_static
+                ArrowDataset::arrow_dataset_static
+                ArrowAcero::arrow_acero_static)
+        endif()
     else()
-        target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
-            "${GAR_PARQUET_STATIC_LIB}"
-            "${GAR_ARROW_ACERO_STATIC_LIB}"
-            "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+        if(BUILD_ARROW_FROM_SOURCE)
+            target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
+                "${GAR_PARQUET_STATIC_LIB}"
+                "${GAR_DATASET_STATIC_LIB}"
+                "${GAR_ARROW_ACERO_STATIC_LIB}"
+                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+        else()
+            target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_static
+                Parquet::parquet_static
+                ArrowDataset::arrow_dataset_static
+                ArrowAcero::arrow_acero_static -Wl,--no-whole-archive)
+        endif()
     endif()
 
     # if OpenSSL library exists, link the OpenSSL library.
@@ -212,7 +239,7 @@ macro(build_gar)
         target_link_libraries(gar PRIVATE OpenSSL::SSL)
     endif()
     if (CURL_FOUND)
-        target_link_libraries(gar PRIVATE CURL::libcurl)
+        target_link_libraries(gar PRIVATE ${CURL_LIBRARIES})
     endif()
     if (APPLE)
         target_link_libraries(gar "-framework CoreFoundation")
@@ -239,16 +266,28 @@ if (BUILD_EXAMPLES)
         add_executable(${E_NAME} examples/${E_NAME}.cc)
         target_include_directories(${E_NAME} PRIVATE examples ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
         target_include_directories(${E_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
-        target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+        if(BUILD_ARROW_FROM_SOURCE)
+            target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+        endif()
         target_link_libraries(${E_NAME} PRIVATE gar ${Boost_LIBRARIES} Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
-            target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
-                "${GAR_PARQUET_STATIC_LIB}"
-                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+            if(BUILD_ARROW_FROM_SOURCE)
+                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+            else()
+                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_static
+                    Parquet::parquet_static)
+            endif()
         else()
-            target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
-                "${GAR_PARQUET_STATIC_LIB}"
-                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+            if(BUILD_ARROW_FROM_SOURCE)
+                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+            else()
+                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_static
+                    Parquet::parquet_static)
+            endif()
         endif()
 
         # if OpenSSL library exists, link the OpenSSL library.
@@ -308,15 +347,28 @@ if (BUILD_TESTS)
         cmake_parse_arguments(add_test "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
         add_executable(${target} ${add_test_SRCS})
         target_compile_features(${target} PRIVATE cxx_std_17)
+        if(BUILD_ARROW_FROM_SOURCE)
+            target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+        endif()
         target_link_libraries(${target} PRIVATE Catch2::Catch2 gar Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
-            target_link_libraries(${target} PRIVATE -Wl,-force_load gar_arrow_static
-                "${GAR_PARQUET_STATIC_LIB}"
-                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+            if(BUILD_ARROW_FROM_SOURCE)
+                target_link_libraries(${target} PRIVATE -Wl,-force_load gar_arrow_static
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+            else()
+                target_link_libraries(${target} Arrow::arrow_static
+                    Parquet::parquet_static)
+            endif()
         else()
-            target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
-                "${GAR_PARQUET_STATIC_LIB}"
-                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+            if(BUILD_ARROW_FROM_SOURCE)
+                target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+            else()
+                target_link_libraries(${target} PRIVATE Arrow::arrow_static
+                    Parquet::parquet_static)
+            endif()
         endif()
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
         target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})

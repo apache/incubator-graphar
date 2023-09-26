@@ -14,7 +14,7 @@ limitations under the License.
 */
 
 #include "gar/writer/vertices_builder.h"
-#include "gar/utils/convert_to_arrow_type.h"
+#include "gar/util/convert_to_arrow_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {

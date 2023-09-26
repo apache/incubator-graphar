@@ -25,6 +25,7 @@ Building requires:
 - CMake 3.5 or higher
 - On Linux and macOS, ``make`` build utilities
 - curl-devel with SSL (Linux) or curl (macOS), for s3 filesystem support
+- Apache Arrow C++ (>= 12.0.0, requires `arrow-dev`, `arrow-dataset`, `arrow-acero` and `parquet` modules) for Arrow filesystem support and can use `BUILD_ARROW_FROM_SOURCE` option to build with GraphAr automatically. You can refer to [Apache Arrow Installation](https://arrow.apache.org/install/) to install Arrow directly too.
 
 Dependencies for optional features:
 
@@ -66,6 +67,17 @@ setting `NAMESPACE` option with cmake:
     $ cd build
     $ cmake -DNAMESPACE=MyNamespace ..
     $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
+```
+
+Build the Apache Arrow dependency from source:
+
+By default, GraphAr try to find Apache Arrow in the system. This can be configured to build Arrow dependency automatically from source:
+
+```bash
+    $ mkdir build
+    $ cd build
+    $ cmake -DBUILD_ARROW_FROM_SOURCE=ON ..
+    $ make -j8
 ```
 
 Debug build with unit tests:
