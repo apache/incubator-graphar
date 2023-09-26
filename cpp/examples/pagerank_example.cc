@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
     pr_next[i] = 0;
     out_degree[i] = 0;
   }
-  auto it_begin = edges.begin(), it_end = edges.end();
+  auto it_begin = edges->begin(), it_end = edges->end();
   for (auto it = it_begin; it != it_end; ++it) {
     GAR_NAMESPACE::IdType src = it.source();
     out_degree[src]++;

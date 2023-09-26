@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
-  int num_vertices = vertices.size();
+  int num_vertices = vertices->size();
   std::cout << "num_vertices: " << num_vertices << std::endl;
 
   // construct edges collection
