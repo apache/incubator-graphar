@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
     if (pre[i] == -1) {
       ASSERT(array_builder2.AppendNull().ok());
     } else {
-      auto it = vertices.find(pre[i]);
+      auto it = vertices->find(pre[i]);
       auto father_id = it.property<int64_t>("id").value();
       ASSERT(array_builder2.Append(father_id).ok());
     }
