@@ -40,3 +40,4 @@
 
    reference/api-reference-cpp.rst
    Spark API Reference <reference/spark-api/index>
+   Java API Reference <reference/java-api/index>

@@ -39,6 +39,14 @@ spark-apidoc:
 	cd $(ROOTDIR)/spark && \
 	mvn scala:doc
 
+.PHONY: java-apidoc
+java-apidoc:
+    cd $(ROOTDIR)/java && \
+    mvn -P javadoc javadoc:aggregate \
+    		-Dmaven.antrun.skip=true \
+    		-DskipTests \
+    		--quiet
+
 .PHONY: html
 html: cpp-apidoc spark-apidoc
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
