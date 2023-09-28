@@ -15,7 +15,7 @@ limitations under the License.
 
 #include <mpi.h>
 
-#include <chrono>
+#include <chrono>  // NOLINT
 #include <iostream>
 #include <vector>
 
