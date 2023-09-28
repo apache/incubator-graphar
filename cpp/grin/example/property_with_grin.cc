@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <ctime>
+#include <chrono>
 #include <iostream>
 
 #include "grin/example/config.h"
@@ -213,30 +213,36 @@ int main(int argc, char* argv[]) {
   std::cout << "graph uri = " << path << std::endl;
 
   // initialize graph
-  auto init_start = clock();
+  auto init_start = std::chrono::high_resolution_clock::now();
   char* uri = new char[path.length() + 1];
   snprintf(uri, path.length() + 1, "%s", path.c_str());
   GRIN_GRAPH graph = grin_get_graph_from_storage(uri);
   delete[] uri;
-  auto init_time = 1000.0 * (clock() - init_start) / CLOCKS_PER_SEC;
+  auto init_end = std::chrono::high_resolution_clock::now();
+  auto init_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+      init_end - init_start);
 
   // test vertex properties
-  auto run_start = clock();
+  auto run_start = std::chrono::high_resolution_clock::now();
   test_vertex_properties(graph);
-  auto vertex_run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
+  auto run_end = std::chrono::high_resolution_clock::now();
+  auto vertex_run_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+      run_end - run_start);
 
   // test edge properties
-  run_start = clock();
+  run_start = std::chrono::high_resolution_clock::now();
   test_edge_properties(graph);
-  auto edge_run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
+  run_end = std::chrono::high_resolution_clock::now();
+  auto edge_run_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+      run_end - run_start);
 
   // print run time
-  std::cout << "Init time for building graph with GRIN = " << init_time << " ms"
-            << std::endl;
-  std::cout << "Run time for vertex properties with GRIN = " << vertex_run_time
+  std::cout << "Init time for building graph with GRIN = " << init_time.count()
             << " ms" << std::endl;
-  std::cout << "Run time for edge properties with GRIN = " << edge_run_time
-            << " ms" << std::endl;
+  std::cout << "Run time for vertex properties with GRIN = "
+            << vertex_run_time.count() << " ms" << std::endl;
+  std::cout << "Run time for edge properties with GRIN = "
+            << edge_run_time.count() << " ms" << std::endl;
 
   return 0;
 }

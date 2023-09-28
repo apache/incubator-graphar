@@ -15,7 +15,7 @@ limitations under the License.
 
 #include <mpi.h>
 
-#include <ctime>
+#include <chrono>
 #include <iostream>
 #include <vector>
 
@@ -207,7 +207,7 @@ void run_pagerank(GRIN_PARTITIONED_GRAPH graph, bool print_result = false) {
 }
 
 int main(int argc, char* argv[]) {
-  auto init_start = clock();  // init start
+  auto init_start = std::chrono::high_resolution_clock::now();  // init start
 
   // MPI initialize
   int flag = 0, pid = 0, n_procs = 0, is_master = 0;
@@ -242,13 +242,16 @@ int main(int argc, char* argv[]) {
   // get local graph from partitioned graph
   GRIN_GRAPH graph = init(pg, pid);
 
-  auto init_time =
-      1000.0 * (clock() - init_start) / CLOCKS_PER_SEC;  // init end
+  auto init_end = std::chrono::high_resolution_clock::now();  // init end
+  auto init_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+      init_end - init_start);
 
   // run pagerank algorithm
-  auto run_start = clock();  // run start
-  run_pagerank(graph);       // do not print result by default
-  auto run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;  // run end
+  auto run_start = std::chrono::high_resolution_clock::now();  // run start
+  run_pagerank(graph);  // do not print result by default
+  auto run_end = std::chrono::high_resolution_clock::now();  // run end
+  auto run_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+      run_end - run_start);
 
   // destroy
   grin_destroy_graph(graph);
@@ -259,12 +262,12 @@ int main(int argc, char* argv[]) {
 
   // output execution time
   if (is_master) {
-    std::cout << "Init time for distributed PageRank with GRIN = " << init_time
-              << " ms" << std::endl;
-    std::cout << "Run time for distibuted PageRank with GRIN = " << run_time
-              << " ms" << std::endl;
+    std::cout << "Init time for distributed PageRank with GRIN = "
+              << init_time.count() << " ms" << std::endl;
+    std::cout << "Run time for distibuted PageRank with GRIN = "
+              << run_time.count() << " ms" << std::endl;
     std::cout << "Totoal time for distributed PageRank with GRIN = "
-              << init_time + run_time << " ms" << std::endl;
+              << init_time.count() + run_time.count() << " ms" << std::endl;
   }
 
   return 0;

@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <ctime>
+#include <chrono>
 #include <iostream>
 #include <unordered_set>
 #include <vector>
@@ -126,12 +126,14 @@ int main(int argc, char* argv[]) {
   auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
 
   // run cc algorithm
-  auto run_start = clock();
+  auto run_start = std::chrono::high_resolution_clock::now();
   run_cc(graph_info);
-  auto run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
+  auto run_end = std::chrono::high_resolution_clock::now();
+  auto run_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+      run_end - run_start);
 
-  std::cout << "Run time for CC (push) without GRIN = " << run_time << " ms"
-            << std::endl;
+  std::cout << "Run time for CC (push) without GRIN = " << run_time.count()
+            << " ms" << std::endl;
 
   return 0;
 }

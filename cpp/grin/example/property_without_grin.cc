@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-#include <ctime>
+#include <chrono>
 #include <iostream>
 
 #include "gar/graph.h"
@@ -167,20 +167,24 @@ int main(int argc, char* argv[]) {
   auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
 
   // test vertex properties
-  auto run_start = clock();
+  auto run_start = std::chrono::high_resolution_clock::now();
   test_vertex_properties(graph_info);
-  auto vertex_run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
+  auto run_end = std::chrono::high_resolution_clock::now();
+  auto vertex_run_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+      run_end - run_start);
 
   // test edge properties
-  run_start = clock();
+  run_start = std::chrono::high_resolution_clock::now();
   test_edge_properties(graph_info);
-  auto edge_run_time = 1000.0 * (clock() - run_start) / CLOCKS_PER_SEC;
+  run_end = std::chrono::high_resolution_clock::now();
+  auto edge_run_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+      run_end - run_start);
 
   // print run time
   std::cout << "Run time for vertex properties without GRIN = "
-            << vertex_run_time << " ms" << std::endl;
-  std::cout << "Run time for edge properties without GRIN = " << edge_run_time
-            << " ms" << std::endl;
+            << vertex_run_time.count() << " ms" << std::endl;
+  std::cout << "Run time for edge properties without GRIN = "
+            << edge_run_time.count() << " ms" << std::endl;
 
   return 0;
 }
