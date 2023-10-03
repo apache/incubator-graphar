@@ -28,20 +28,21 @@ object Neo4j {
 
   // define the config format
   case class Gar(
-    path: String,
-    name: String,
-    vertexChunkSize: Long,
-    edgeChunkSize: Long,
-    fileType: String)
+      path: String,
+      name: String,
+      vertexChunkSize: Long,
+      edgeChunkSize: Long,
+      fileType: String
+  )
   case class Neo4j(url: String, username: String, password: String)
   case class Vertex(label: String, properties: List[String])
   case class Edge(
-    label: String, 
-    srcLabel: String, 
-    srcProp: String,
-    dstLabel: String,
-    dstProp: String,
-    properties: List[String]
+      label: String,
+      srcLabel: String,
+      srcProp: String,
+      dstLabel: String,
+      dstProp: String,
+      properties: List[String]
   )
   case class Schema(vertices: List[Vertex], edges: List[Edge])
 
@@ -116,14 +117,16 @@ object Neo4j {
         .load()
       // put into writer
       writer.PutVertexData(vertex.label, vertex_df)
-    }    
+    }
 
     // read edges
     for (edge <- schema.edges) {
       // construct the cypher
       val cypherBuf = new StringBuilder
       cypherBuf
-        .append(s"MATCH (a:${edge.srcLabel})-[r:${edge.label}]->(b:${edge.dstLabel}) RETURN")
+        .append(
+          s"MATCH (a:${edge.srcLabel})-[r:${edge.label}]->(b:${edge.dstLabel}) RETURN"
+        )
         .append(s" a.${edge.srcProp} AS src,")
         .append(s" b.${edge.dstProp} AS dst")
       for (prop <- edge.properties) {
