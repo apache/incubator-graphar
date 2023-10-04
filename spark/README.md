@@ -135,6 +135,7 @@ echo "match (a) -[r] -> () delete a, r;match (a) delete a;" | cypher-shell -u ${
 ```
 
 Then run the example:
+
 ```bash
 scripts/run-graphar2neo4j.sh
 ```
@@ -162,9 +163,7 @@ export PATH="${SPARK_HOME}/bin":"${PATH}"
 
 ### NebulaGraph
 
-Neo4j 4.4.x is the LTS version to use. The rest of the instructions are provided assuming Neo4j 4.4.x.
-
-To place Nebula under `${HOME}`:
+To place NebulaGraph docker-compose.yaml under `${HOME}`:
 
 ```bash
 scripts/get-nebula-to-home.sh
@@ -176,9 +175,7 @@ Start NebulaGraph server by Docker and load `basketballplayer` data:
 scripts/deploy-nebula-default-data.sh
 ```
 
-[//]: # (The username is ``neo4j`` and the password is the one you set in the previous step.)
-
-[//]: # (Open the Neo4j browser at http://localhost:7474/browser/ to check the movie graph data.)
+Use [NebulaGraph Studio](https://docs.nebula-graph.com.cn/master/nebula-studio/deploy-connect/st-ug-deploy/#docker_studio) to check the graph data, the username is ``root`` and the password is ``nebula``.
 
 ### Building the project
 
@@ -194,13 +191,13 @@ scripts/build.sh
 scripts/run-nebula2graphar.sh
 ```
 
-The example will convert the movie data in Neo4j to GraphAr data and save it to the directory ``/tmp/graphar/neo4j2graphar``.
+The example will convert the basketballplayer data in NebulaGraph to GraphAr data and save it to the directory ``/tmp/graphar/nebula2graphar``.
 
 ### Running the GraphAr2Nebula example
 
 We can also import the basketballplayer graph from GraphAr to NebulaGraph.
 
-First clear the NebulaGraph's basketballplayer graph to show the import result clearly:
+First clear the NebulaGraph's basketballplayer graph space to show the import result clearly:
 
 ```bash
 docker run \
@@ -211,9 +208,12 @@ docker run \
 ```
 
 Then run the example:
+
 ```bash
 scripts/run-graphar2nebula.sh
 ```
+
+The example will import the basketballplayer graph from GraphAr to NebulaGraph and you can check the result in NebulaGraph Studio.
 
 ## How to use
 
