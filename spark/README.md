@@ -205,7 +205,6 @@ First clear the NebulaGraph's basketballplayer graph to show the import result c
 ```bash
 docker run \
     --rm \
-    -ti \
     --name nebula-console-loader \
     --network nebula-docker-env_nebula-net \
     vesoft/nebula-console:nightly -addr 172.28.3.1 -port 9669 -u root -p nebula -e "use basketballplayer; clear space basketballplayer;"
