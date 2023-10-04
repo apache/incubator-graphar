@@ -141,6 +141,81 @@ scripts/run-graphar2neo4j.sh
 
 The example will import the movie graph from GraphAr to Neo4j and you can check the result in the Neo4j browser.
 
+## Running NebulaGraph to GraphAr example
+
+Spark provides a simple example to convert NebulaGraph data to GraphAr data.
+The example is located in the directory ``spark/src/main/scala/com/alibaba/graphar/examples/``.
+
+To run the example, download Spark and Neo4j first.
+
+### Spark 3.2.x
+
+Spark 3.2.x is the recommended runtime to use. The rest of the instructions are provided assuming Spark 3.2.x.
+
+To place Spark under `${HOME}`:
+
+```bash
+scripts/get-spark-to-home.sh
+export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+export PATH="${SPARK_HOME}/bin":"${PATH}"
+```
+
+### NebulaGraph
+
+Neo4j 4.4.x is the LTS version to use. The rest of the instructions are provided assuming Neo4j 4.4.x.
+
+To place Nebula under `${HOME}`:
+
+```bash
+scripts/get-nebula-to-home.sh
+```
+
+Start NebulaGraph server by Docker and load `basketballplayer` data:
+
+```bash
+scripts/deploy-nebula-default-data.sh
+```
+
+[//]: # (The username is ``neo4j`` and the password is the one you set in the previous step.)
+
+[//]: # (Open the Neo4j browser at http://localhost:7474/browser/ to check the movie graph data.)
+
+### Building the project
+
+Run:
+
+```bash
+scripts/build.sh
+```
+
+### Running the Nebula2GraphAr example
+
+```bash
+scripts/run-nebula2graphar.sh
+```
+
+The example will convert the movie data in Neo4j to GraphAr data and save it to the directory ``/tmp/graphar/neo4j2graphar``.
+
+### Running the GraphAr2Nebula example
+
+We can also import the basketballplayer graph from GraphAr to NebulaGraph.
+
+First clear the NebulaGraph's basketballplayer graph to show the import result clearly:
+
+```bash
+docker run \
+    --rm \
+    -ti \
+    --name nebula-console-loader \
+    --network nebula-docker-env_nebula-net \
+    vesoft/nebula-console:nightly -addr 172.28.3.1 -port 9669 -u root -p nebula -e "use basketballplayer; clear space basketballplayer;"
+```
+
+Then run the example:
+```bash
+scripts/run-graphar2nebula.sh
+```
+
 ## How to use
 
 Please refer to our [GraphAr Spark Library Documentation](https://alibaba.github.io/GraphAr/user-guide/spark-lib.html).
