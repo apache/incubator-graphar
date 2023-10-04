@@ -76,3 +76,20 @@ jobs:
 
         # stop and clean
         popd
+
+    - name: Run Neo4j importer
+      run: |
+        export JAVA_HOME=${JAVA_HOME_11_X64}
+        pushd spark
+        scripts/get-spark-to-home.sh
+        export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+        export PATH="${SPARK_HOME}/bin":"${PATH}"
+
+        scripts/build.sh
+
+        # run the importer
+        cd import
+        ./neo4j.sh neo4j.json
+
+        # stop and clean
+        popd

@@ -1,15 +1,15 @@
 {
     "gar": {
-        "path": "/root/neo4j/movie",
+        "path": "/tmp/graphar/movie",
         "name": "MovieGraph",
         "vertexChunkSize": 100,
         "edgeChunkSize": 1024,
         "fileType": "parquet"
     },
     "neo4j": {
-        "url": "",
+        "url": "bolt://localhost:7687",
         "username": "neo4j",
-        "password": ""
+        "password": "neo4j"
     },
     "schema": {
         "vertices": [
