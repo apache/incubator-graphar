@@ -147,7 +147,8 @@ We can write a json configuration file like `import/neo4j.json` to do the import
 
 1. Import movie data in neo4j
 2. Fill in the neo4j connection fields in the json file.
-3. Run `neo4j.sh neo4j.json`
+3. `cd import`
+4. `./neo4j.sh neo4j.json`
 
 ## How to use
 
