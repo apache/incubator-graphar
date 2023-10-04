@@ -19,7 +19,7 @@
 set -eu
 cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-nebula_env_dir="${HOME}/1111nebula-docker-env"
+nebula_env_dir="${HOME}/nebula-docker-env"
 if [[ ! -d ${nebula_env_dir} ]]; then
   mkdir ${nebula_env_dir}
 else
