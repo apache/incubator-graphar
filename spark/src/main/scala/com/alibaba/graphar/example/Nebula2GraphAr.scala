@@ -51,16 +51,12 @@ object Nebula2GraphAr {
 
     // output directory
     val outputPath: String = args(0)
-//    val outputPath: String = "/tmp/graphar/nebula2graphar"
     // vertex chunk size
     val vertexChunkSize: Long = args(1).toLong
-//    val vertexChunkSize: Long = 100
     // edge chunk size
     val edgeChunkSize: Long = args(2).toLong
-//    val edgeChunkSize: Long = 1024
     // file type
     val fileType: String = args(3)
-//    val fileType: String = "parquet"
 
     // write in graph format
     writer.write(

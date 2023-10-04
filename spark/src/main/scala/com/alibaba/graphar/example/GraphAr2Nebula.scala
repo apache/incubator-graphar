@@ -50,9 +50,7 @@ object GraphAr2Nebula {
       .getOrCreate()
 
     // path to the graph information file
-    // val graphInfoPath: String = args(0)
-    val graphInfoPath: String =
-      "/tmp/graphar/nebula2graphar/basketballplayergraph.graph.yml"
+    val graphInfoPath: String = args(0)
     val graphInfo = GraphInfo.loadGraphInfo(graphInfoPath, spark)
 
     // The edge data need to convert src and dst to the vertex id,
