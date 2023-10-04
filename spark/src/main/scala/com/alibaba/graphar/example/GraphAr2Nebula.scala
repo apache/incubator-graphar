@@ -105,7 +105,11 @@ object GraphAr2Nebula {
     }
   }
 
-  private def writeVertex(tag: String, idFieldName: String, df: DataFrame): Unit = {
+  private def writeVertex(
+      tag: String,
+      idFieldName: String,
+      df: DataFrame
+  ): Unit = {
     val config = getNebulaConnectionConfig
 
     val nebulaWriterVertexConfig: WriteNebulaVertexConfig =
