@@ -30,8 +30,6 @@ import org.apache.spark.sql.execution.datasources.{
 import org.apache.spark.sql.execution.datasources.csv.CsvOutputWriter
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.{DataType, StructType}
-import org.apache.spark.sql.sources.Filter
-import org.apache.spark.sql.connector.write.SupportsOverwrite
 
 import com.alibaba.graphar.datasources.GarWriteBuilder
 

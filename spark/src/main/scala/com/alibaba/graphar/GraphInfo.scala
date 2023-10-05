@@ -16,8 +16,7 @@
 
 package com.alibaba.graphar
 
-import java.io.{File, FileInputStream}
-import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.{SparkSession}
 import org.yaml.snakeyaml.{Yaml, DumperOptions}
 import org.yaml.snakeyaml.constructor.Constructor

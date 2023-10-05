@@ -19,7 +19,6 @@ package com.alibaba.graphar.util
 import org.json4s._
 import org.json4s.jackson.Serialization.write
 
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.DataFrame
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.conf.Configuration

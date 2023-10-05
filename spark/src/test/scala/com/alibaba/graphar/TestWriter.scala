@@ -17,12 +17,9 @@
 package com.alibaba.graphar
 
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
-import com.alibaba.graphar.util
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.scalatest.funsuite.AnyFunSuite
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
 import org.apache.hadoop.fs.{Path, FileSystem}
 import scala.io.Source.fromFile
 

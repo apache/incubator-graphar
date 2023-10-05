@@ -18,7 +18,6 @@ package com.alibaba.graphar.writer
 
 import com.alibaba.graphar.util.{
   FileSystem,
-  ChunkPartitioner,
   EdgeChunkPartitioner
 }
 import com.alibaba.graphar.{
@@ -38,8 +37,6 @@ import org.apache.spark.sql.types.{
   StructType,
   StructField
 }
-import org.apache.spark.util.Utils
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
 
 import scala.collection.SortedMap
@@ -54,7 +51,6 @@ object EdgeWriter {
       adjListType: AdjListType.Value,
       vertexNumOfPrimaryVertexLabel: Long
   ): (DataFrame, Seq[DataFrame], Array[Long], Map[Long, Int]) = {
-    import spark.implicits._
     val edgeSchema = edgeDf.schema
     val colName = if (
       adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.unordered_by_source

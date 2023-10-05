@@ -17,7 +17,6 @@
 package com.alibaba.graphar.graph
 
 import com.alibaba.graphar.{
-  GeneralParams,
   AdjListType,
   GraphInfo,
   VertexInfo,
@@ -26,9 +25,7 @@ import com.alibaba.graphar.{
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.SparkSession
 
 /**
  * The helper object for transforming graphs through the definitions of their
