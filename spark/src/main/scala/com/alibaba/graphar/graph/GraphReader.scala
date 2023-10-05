@@ -16,11 +16,7 @@
 
 package com.alibaba.graphar.graph
 
-import com.alibaba.graphar.{
-  GraphInfo,
-  VertexInfo,
-  EdgeInfo
-}
+import com.alibaba.graphar.{GraphInfo, VertexInfo, EdgeInfo}
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 
 import org.apache.spark.sql.{DataFrame, SparkSession}

@@ -16,7 +16,6 @@
 
 package com.alibaba.graphar.util
 
-
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.Row

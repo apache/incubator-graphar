@@ -17,12 +17,7 @@
 package com.alibaba.graphar.reader
 
 import com.alibaba.graphar.util.{IndexGenerator, DataFrameConcat}
-import com.alibaba.graphar.{
-  EdgeInfo,
-  FileType,
-  AdjListType,
-  PropertyGroup
-}
+import com.alibaba.graphar.{EdgeInfo, FileType, AdjListType, PropertyGroup}
 import com.alibaba.graphar.util.FileSystem
 
 import org.apache.spark.sql.{DataFrame, SparkSession}

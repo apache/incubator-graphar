@@ -16,10 +16,7 @@
 
 package com.alibaba.graphar.writer
 
-import com.alibaba.graphar.util.{
-  FileSystem,
-  EdgeChunkPartitioner
-}
+import com.alibaba.graphar.util.{FileSystem, EdgeChunkPartitioner}
 import com.alibaba.graphar.{
   GeneralParams,
   EdgeInfo,

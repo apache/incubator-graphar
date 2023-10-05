@@ -17,11 +17,7 @@
 package com.alibaba.graphar.writer
 
 import com.alibaba.graphar.util.{FileSystem, ChunkPartitioner}
-import com.alibaba.graphar.{
-  GeneralParams,
-  VertexInfo,
-  PropertyGroup
-}
+import com.alibaba.graphar.{GeneralParams, VertexInfo, PropertyGroup}
 
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
