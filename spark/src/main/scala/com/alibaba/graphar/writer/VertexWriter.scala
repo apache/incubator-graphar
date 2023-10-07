@@ -16,25 +16,14 @@
 
 package com.alibaba.graphar.writer
 
-import com.alibaba.graphar.util.{FileSystem, ChunkPartitioner, IndexGenerator}
-import com.alibaba.graphar.{
-  GeneralParams,
-  VertexInfo,
-  FileType,
-  AdjListType,
-  PropertyGroup
-}
+import com.alibaba.graphar.util.{FileSystem, ChunkPartitioner}
+import com.alibaba.graphar.{GeneralParams, VertexInfo, PropertyGroup}
 
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.Row
-import org.apache.spark.rdd.RDD
-import org.apache.spark.HashPartitioner
 import org.apache.spark.sql.types.{LongType, StructField}
 
-import scala.collection.SortedMap
 import scala.collection.mutable.ArrayBuffer
 
 /** Helper object for VertexWriter class. */
