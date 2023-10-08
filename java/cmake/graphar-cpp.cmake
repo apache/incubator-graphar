@@ -36,20 +36,20 @@ function(build_graphar_cpp)
     # If GraphAr needs to be built, the default location will be within the build tree.
     set(GAR_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/graphar_ep-prefix")
 
-    set(GAR_DYNAMIC_LIBRARY_DIR "${GAR_PREFIX}/lib")
+    set(GAR_SHARED_LIBRARY_DIR "${GAR_PREFIX}/lib")
 
-    set(GAR_DYNAMIC_LIB_FILENAME
-            "${CMAKE_STATIC_LIBRARY_PREFIX}arrow${CMAKE_STATIC_LIBRARY_SUFFIX}")
-    set(GAR_DYNAMIC_LIB "${GAR_DYNAMIC_LIBRARY_DIR}/${GAR_DYNAMIC_LIB_FILENAME}")
+    set(GAR_SHARED_LIB_FILENAME
+            "${CMAKE_SHARED_LIBRARY_PREFIX}gar${CMAKE_SHARED_LIBRARY_SUFFIX}")
+    set(GAR_SHARED_LIB "${GAR_SHARED_LIBRARY_DIR}/${GAR_SHARED_LIB_FILENAME}")
+    message(STATUS "GraphAr dynamic library: ${GAR_SHARED_LIB}")
 
     set(GAR_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/graphar_ep-build")
     set(GAR_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${GAR_PREFIX}")
 
     set(GAR_INCLUDE_DIR "${GAR_PREFIX}/include" CACHE INTERNAL "graphar cpp include directory")
-    set(GAR_BUILD_BYPRODUCTS "${GAR_DYNAMIC_LIB}")
+    set(GAR_BUILD_BYPRODUCTS "${GAR_SHARED_LIB}")
 
     set(GAR_VERSION_TO_BUILD "v0.9.0" CACHE INTERNAL "GraphAr version")
-    set(GAR_ARROW_SOURCE_FILE "https://www.apache.org/dyn/closer.lua?action=download&filename=arrow/arrow-${ARROW_VERSION_TO_BUILD}/apache-arrow-${ARROW_VERSION_TO_BUILD}.tar.gz")
 
     include(ExternalProject)
     ExternalProject_Add(graphar_ep
@@ -62,13 +62,13 @@ function(build_graphar_cpp)
             CMAKE_ARGS "${GAR_CMAKE_ARGS}"
             BUILD_BYPRODUCTS "${GAR_BUILD_BYPRODUCTS}")
 
-    set(GAR_LIBRARY_TARGET gar_dynamic)
+    set(GAR_LIBRARY_TARGET gar_shared)
 
     file(MAKE_DIRECTORY "${GAR_INCLUDE_DIR}")
-    add_library(${GAR_LIBRARY_TARGET} STATIC IMPORTED)
+    add_library(${GAR_LIBRARY_TARGET} SHARED IMPORTED)
     set_target_properties(${GAR_LIBRARY_TARGET}
             PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${GAR_INCLUDE_DIR}
-            IMPORTED_LOCATION ${GAR_DYNAMIC_LIB})
+            IMPORTED_LOCATION ${GAR_SHARED_LIB})
 
     add_dependencies(${GAR_LIBRARY_TARGET} graphar_ep)
 endfunction()

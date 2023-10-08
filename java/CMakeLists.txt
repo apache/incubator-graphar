@@ -25,7 +25,9 @@ build_graphar_cpp()
 
 add_library(${LIBNAME} SHARED ${SOURCES})
 target_include_directories(${LIBNAME} SYSTEM BEFORE PRIVATE ${GAR_INCLUDE_DIR})
-target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} ${GAR_DYNAMIC_LIB})
+message(STATUS "GAR_INCLUDE_DIR: ${GAR_INCLUDE_DIR}")
+message(STATUS "GAR_SHARED_LIB: ${GAR_SHARED_LIB}")
+target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} ${GAR_SHARED_LIB})
 target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} Arrow::arrow_static)
 
 set_target_properties(${LIBNAME} PROPERTIES LINKER_LANGUAGE CXX)
