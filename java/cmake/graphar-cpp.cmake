@@ -40,8 +40,7 @@ function(build_graphar_cpp)
 
     set(GAR_SHARED_LIB_FILENAME
             "${CMAKE_SHARED_LIBRARY_PREFIX}gar${CMAKE_SHARED_LIBRARY_SUFFIX}")
-    set(GAR_SHARED_LIB "${GAR_SHARED_LIBRARY_DIR}/${GAR_SHARED_LIB_FILENAME}")
-    message(STATUS "GraphAr dynamic library: ${GAR_SHARED_LIB}")
+    set(GAR_SHARED_LIB "${GAR_SHARED_LIBRARY_DIR}/${GAR_SHARED_LIB_FILENAME}" CACHE INTERNAL)
 
     set(GAR_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/graphar_ep-build")
     set(GAR_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${GAR_PREFIX}")
@@ -49,7 +48,7 @@ function(build_graphar_cpp)
     set(GAR_INCLUDE_DIR "${GAR_PREFIX}/include" CACHE INTERNAL "graphar cpp include directory")
     set(GAR_BUILD_BYPRODUCTS "${GAR_SHARED_LIB}")
 
-    set(GAR_VERSION_TO_BUILD "v0.9.0" CACHE INTERNAL "GraphAr version")
+    set(GAR_VERSION_TO_BUILD "v0.9.0")
 
     include(ExternalProject)
     ExternalProject_Add(graphar_ep
