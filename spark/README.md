@@ -144,6 +144,11 @@ The example will import the movie graph from GraphAr to Neo4j and you can check 
 
 ## Running NebulaGraph to GraphAr example
 
+.. note::
+
+Running this example requires `Docker` to be installed, if not, follow [this link](https://docs.docker.com/engine/install/). Run `docker version` to check it.
+
+
 Spark provides a simple example to convert NebulaGraph data to GraphAr data.
 The example is located in the directory ``spark/src/main/scala/com/alibaba/graphar/examples/``.
 
