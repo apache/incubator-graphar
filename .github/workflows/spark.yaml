@@ -76,3 +76,32 @@ jobs:
 
         # stop and clean
         popd
+      
+    - name: Run Nebula2GraphAr example
+      run: |
+        export JAVA_HOME=${JAVA_HOME_11_X64}
+        pushd spark
+        scripts/get-nebula-to-home.sh
+        export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+        export PATH="${SPARK_HOME}/bin":"${PATH}"
+
+        scripts/get-nebula-to-home.sh
+
+        scripts/deploy-nebula-default-data.sh
+
+        scripts/build.sh
+
+        scripts/run-nebula2graphar.sh
+
+        # clean the data
+        docker run \
+            --rm \
+            --name nebula-console-loader \
+            --network nebula-docker-env_nebula-net \
+            vesoft/nebula-console:nightly -addr 172.28.3.1 -port 9669 -u root -p nebula -e "use basketballplayer; clear space basketballplayer;"
+        
+        # import from GraphAr
+        scripts/run-graphar2nebula.sh
+
+        # stop and clean
+        popd

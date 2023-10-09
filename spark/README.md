@@ -135,11 +135,87 @@ echo "match (a) -[r] -> () delete a, r;match (a) delete a;" | cypher-shell -u ${
 ```
 
 Then run the example:
+
 ```bash
 scripts/run-graphar2neo4j.sh
 ```
 
 The example will import the movie graph from GraphAr to Neo4j and you can check the result in the Neo4j browser.
+
+## Running NebulaGraph to GraphAr example
+
+Running this example requires `Docker` to be installed, if not, follow [this link](https://docs.docker.com/engine/install/). Run `docker version` to check it.
+
+Spark provides a simple example to convert NebulaGraph data to GraphAr data.
+The example is located in the directory ``spark/src/main/scala/com/alibaba/graphar/examples/``.
+
+To run the example, download Spark and Neo4j first.
+
+### Spark 3.2.x
+
+Spark 3.2.x is the recommended runtime to use. The rest of the instructions are provided assuming Spark 3.2.x.
+
+To place Spark under `${HOME}`:
+
+```bash
+scripts/get-spark-to-home.sh
+export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+export PATH="${SPARK_HOME}/bin":"${PATH}"
+```
+
+### NebulaGraph
+
+To place NebulaGraph docker-compose.yaml under `${HOME}`:
+
+```bash
+scripts/get-nebula-to-home.sh
+```
+
+Start NebulaGraph server by Docker and load `basketballplayer` data:
+
+```bash
+scripts/deploy-nebula-default-data.sh
+```
+
+Use [NebulaGraph Studio](https://docs.nebula-graph.com.cn/master/nebula-studio/deploy-connect/st-ug-deploy/#docker_studio) to check the graph data, the username is ``root`` and the password is ``nebula``.
+
+### Building the project
+
+Run:
+
+```bash
+scripts/build.sh
+```
+
+### Running the Nebula2GraphAr example
+
+```bash
+scripts/run-nebula2graphar.sh
+```
+
+The example will convert the basketballplayer data in NebulaGraph to GraphAr data and save it to the directory ``/tmp/graphar/nebula2graphar``.
+
+### Running the GraphAr2Nebula example
+
+We can also import the basketballplayer graph from GraphAr to NebulaGraph.
+
+First clear the NebulaGraph's basketballplayer graph space to show the import result clearly:
+
+```bash
+docker run \
+    --rm \
+    --name nebula-console-loader \
+    --network nebula-docker-env_nebula-net \
+    vesoft/nebula-console:nightly -addr 172.28.3.1 -port 9669 -u root -p nebula -e "use basketballplayer; clear space basketballplayer;"
+```
+
+Then run the example:
+
+```bash
+scripts/run-graphar2nebula.sh
+```
+
+The example will import the basketballplayer graph from GraphAr to NebulaGraph and you can check the result in NebulaGraph Studio.
 
 ## How to use
 
