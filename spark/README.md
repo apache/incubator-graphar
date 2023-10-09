@@ -226,10 +226,6 @@ You can include graphar as a dependency in your maven project
     <repository>
         <id>graphar-mvn-repo</id>
         <url>https://github.com/alibaba/GraphAr/raw/mvn-repo/</url>
-       <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>always</updatePolicy>
-        </snapshots>
     </repository>
 </repositories>
 <dependencies>
