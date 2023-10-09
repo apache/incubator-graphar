@@ -16,12 +16,9 @@
 
 package com.alibaba.graphar
 
-import com.alibaba.graphar.GraphInfo
 import com.alibaba.graphar.graph.GraphReader
 
-import java.io.{File, FileInputStream}
-import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.spark.sql.SparkSession
 import org.scalatest.funsuite.AnyFunSuite
 
 class TestGraphReaderSuite extends AnyFunSuite {

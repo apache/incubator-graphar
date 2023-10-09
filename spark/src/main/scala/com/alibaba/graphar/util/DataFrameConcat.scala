@@ -16,11 +16,8 @@
 
 package com.alibaba.graphar.util
 
-import com.alibaba.graphar.GeneralParams
-
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.functions._
 import org.apache.spark.sql.Row
 import org.apache.spark.rdd.RDD
 
