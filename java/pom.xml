@@ -18,7 +18,6 @@
         <fastffi.revision>0.1.2</fastffi.revision>
         <arrow.version>13.0.0</arrow.version>
         <native.library.name>gar-java</native.library.name>
-
     </properties>
 
     <dependencies>
@@ -267,5 +266,4 @@
             </plugins>
         </pluginManagement>
     </build>
-
 </project>
