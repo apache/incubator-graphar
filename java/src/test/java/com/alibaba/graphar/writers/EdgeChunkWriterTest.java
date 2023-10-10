@@ -36,10 +36,11 @@ import org.apache.arrow.memory.RootAllocator;
 import org.apache.arrow.vector.VectorSchemaRoot;
 import org.apache.arrow.vector.ipc.ArrowReader;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore("FIXME: the test would raise memory lead error(arrow object not released)")
 public class EdgeChunkWriterTest {
-    @Ignore // FIXME: the test would raise memory lead error(arrow object not released)
     @Test
     public void test1() {
         String uri =
