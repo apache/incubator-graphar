@@ -50,7 +50,7 @@ Please refer to the `building steps <https://github.com/alibaba/GraphAr/tree/mai
 Get from Maven
 ```````````````
 
-You can include graphar as a dependency in your maven project
+You can include GraphAr as a dependency in your maven project
 
 .. code-block:: shell
 
