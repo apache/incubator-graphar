@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
   auto maybe_vertices =
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
-  auto vertices = maybe_vertices.value();
+  auto& vertices = maybe_vertices.value();
   int num_vertices = vertices->size();
   std::cout << "num_vertices: " << num_vertices << std::endl;
 
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::unordered_by_source);
   ASSERT(!maybe_edges.has_error());
-  auto edges = maybe_edges.value();
+  auto& edges = maybe_edges.value();
 
   // run bfs algorithm
   GAR_NAMESPACE::IdType root = 0;
