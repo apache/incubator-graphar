@@ -40,7 +40,7 @@ import org.junit.Test;
 
 public class EdgeChunkWriterTest {
     @Test
-    @Ignore //FIXME: the test would raise memory lead error(arrow object not released)
+    @Ignore // FIXME: the test would raise memory lead error(arrow object not released)
     public void test1() {
         String uri =
                 "file:"
