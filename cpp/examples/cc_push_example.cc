@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
-  int num_vertices = vertices.size();
+  int num_vertices = vertices->size();
   std::cout << "num_vertices: " << num_vertices << std::endl;
 
   // construct edges collection
@@ -45,14 +45,12 @@ int main(int argc, char* argv[]) {
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(!expect1.has_error());
-  auto& edges1 = std::get<GAR_NAMESPACE::EdgesCollection<
-      GAR_NAMESPACE::AdjListType::ordered_by_source>>(expect1.value());
+  auto& edges1 = expect1.value();
   auto expect2 = GAR_NAMESPACE::ConstructEdgesCollection(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_dest);
   ASSERT(!expect2.has_error());
-  auto& edges2 = std::get<GAR_NAMESPACE::EdgesCollection<
-      GAR_NAMESPACE::AdjListType::ordered_by_dest>>(expect2.value());
+  auto& edges2 = expect2.value();
 
   // run cc algorithm
   std::vector<GAR_NAMESPACE::IdType> component(num_vertices);
@@ -62,8 +60,8 @@ int main(int argc, char* argv[]) {
     active[0].push_back(true);
     active[1].push_back(false);
   }
-  auto begin1 = edges1.begin(), end1 = edges1.end();
-  auto begin2 = edges2.begin(), end2 = edges2.end();
+  auto begin1 = edges1->begin(), end1 = edges1->end();
+  auto begin2 = edges2->begin(), end2 = edges2->end();
   auto it1 = begin1;
   auto it2 = begin2;
   int count = num_vertices;
