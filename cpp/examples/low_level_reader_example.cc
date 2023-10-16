@@ -136,15 +136,18 @@ int main(int argc, char* argv[]) {
 
   // vertex property chunk info reader
   std::cout << "Vertex property chunk info reader" << std::endl;
+  std::cout << "---------------------------------" << std::endl;
   vertex_property_chunk_info_reader(graph_info);
   std::cout << std::endl;
 
   // adj_list chunk info reader
   std::cout << "Adj_list chunk info reader" << std::endl;
+  std::cout << "--------------------------" << std::endl;
   adj_list_chunk_info_reader(graph_info);
   std::cout << std::endl;
 
   // adj_list property chunk info reader
   std::cout << "Adj_list property chunk info reader" << std::endl;
+  std::cout << "-----------------------------------" << std::endl;
   adj_list_property_chunk_info_reader(graph_info);
 }

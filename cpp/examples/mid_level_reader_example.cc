@@ -220,20 +220,24 @@ int main(int argc, char* argv[]) {
 
   // vertex property chunk reader
   std::cout << "Vertex property chunk reader" << std::endl;
+  std::cout << "----------------------------" << std::endl;
   vertex_property_chunk_reader(graph_info);
   std::cout << std::endl;
 
   // adj_list chunk reader
   std::cout << "Adj_list chunk reader" << std::endl;
+  std::cout << "---------------------" << std::endl;
   adj_list_chunk_reader(graph_info);
   std::cout << std::endl;
 
   // adj_list property chunk reader
   std::cout << "Adj_list property chunk reader" << std::endl;
+  std::cout << "------------------------------" << std::endl;
   adj_list_property_chunk_reader(graph_info);
   std::cout << std::endl;
 
   // adj_list offset chunk reader
   std::cout << "Adj_list offset chunk reader" << std::endl;
+  std::cout << "----------------------------" << std::endl;
   adj_list_offset_chunk_reader(graph_info);
 }
