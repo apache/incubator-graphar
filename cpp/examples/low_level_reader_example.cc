@@ -39,12 +39,14 @@ void vertex_property_chunk_info_reader(
   std::string chunk_path = maybe_chunk_path.value();
   std::cout << "path of first vertex property chunk: " << chunk_path
             << std::endl;
+  // seek vertex id
   ASSERT(reader.seek(520).ok());
   maybe_chunk_path = reader.GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
   std::cout << "path of vertex property chunk for vertex id 520: " << chunk_path
             << std::endl;
+  // next chunk
   ASSERT(reader.next_chunk().ok());
   maybe_chunk_path = reader.GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
@@ -77,6 +79,7 @@ void adj_list_chunk_info_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
   std::cout
       << "path of fisrt adj_list chunk for outgoing edges of vertex id 100: "
       << chunk_path << std::endl;
+  // next chunk
   ASSERT(reader.next_chunk().ok());
   maybe_chunk_path = reader.GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
@@ -116,6 +119,7 @@ void adj_list_property_chunk_info_reader(
   std::cout << "path of fisrt adj_list property chunk for outgoing edges of "
                "vertex id 100: "
             << chunk_path << std::endl;
+  // next chunk
   ASSERT(reader.next_chunk().ok());
   maybe_chunk_path = reader.GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
