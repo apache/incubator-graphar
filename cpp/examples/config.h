@@ -58,6 +58,7 @@ static const std::string TEST_DATA_DIR =  // NOLINT
         .parent_path()
         .parent_path()
         .parent_path()
+        .parent_path()
         .string() +
     "/testing";
 
