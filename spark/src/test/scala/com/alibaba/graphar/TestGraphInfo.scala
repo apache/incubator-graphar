@@ -16,11 +16,7 @@
 
 package com.alibaba.graphar
 
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
-import scala.beans.BeanProperty
 import org.scalatest.funsuite.AnyFunSuite
-import org.apache.hadoop.fs.{Path, FileSystem}
 import org.apache.spark.sql.SparkSession
 
 class GraphInfoSuite extends AnyFunSuite {

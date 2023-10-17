@@ -14,11 +14,10 @@ NOTE: This project is still under development, and we will release it soon.
 ### C++
 
 - CMake 3.5 or higher
-- [GraphAr C++ library](../cpp/README.md)
+- [GraphAr C++ library v0.9.0](../cpp/README.md)
 - LLVM 11
 
 Tips: 
-- To install GraphAr C++ library, you can refer to our [C++ CI](../.github/workflows/ci.yml) on Ubuntu and CentOS;
 - To install LLVM 11, you can refer to our [Java CI](../.github/workflows/java.yml) on Ubuntu or compile from source with [this script](https://github.com/alibaba/fastFFI/blob/main/docker/install-llvm11.sh).
 
 ## Build, Test and Install

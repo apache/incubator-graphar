@@ -35,7 +35,7 @@ int main(int argc, char* argv[]) {
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
-  int num_vertices = vertices.size();
+  int num_vertices = vertices->size();
   std::cout << "num_vertices: " << num_vertices << std::endl;
 
   // construct edges collection
@@ -44,15 +44,14 @@ int main(int argc, char* argv[]) {
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(!maybe_edges.has_error());
-  auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
-      GAR_NAMESPACE::AdjListType::ordered_by_source>>(maybe_edges.value());
+  auto& edges = maybe_edges.value();
 
   // run bfs algorithm
   GAR_NAMESPACE::IdType root = 0;
   std::vector<int32_t> distance(num_vertices);
   for (GAR_NAMESPACE::IdType i = 0; i < num_vertices; i++)
     distance[i] = (i == root ? 0 : -1);
-  auto it_begin = edges.begin(), it_end = edges.end();
+  auto it_begin = edges->begin(), it_end = edges->end();
   auto it = it_begin;
   for (int iter = 0;; iter++) {
     GAR_NAMESPACE::IdType count = 0;

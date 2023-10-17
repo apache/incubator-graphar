@@ -1,6 +1,7 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.6)
 project(gar-java)
 
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -std=c++17 -Wall")
 
 file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/target/generated-sources/annotations/*.cc" "${CMAKE_CURRENT_SOURCE_DIR}/target/generated-test-sources/test-annotations/*.cc"
@@ -19,10 +20,12 @@ include_directories("src/main/native")
 include_directories("src/test/native")
 
 find_package(Arrow REQUIRED)
-find_package(gar REQUIRED)
+include(graphar-cpp)
+build_graphar_cpp()
 
 add_library(${LIBNAME} SHARED ${SOURCES})
-target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} gar)
+target_include_directories(${LIBNAME} SYSTEM BEFORE PRIVATE ${GAR_INCLUDE_DIR})
+target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} ${GAR_SHARED_LIB})
 target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} Arrow::arrow_static)
 
 set_target_properties(${LIBNAME} PROPERTIES LINKER_LANGUAGE CXX)

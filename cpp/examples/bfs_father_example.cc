@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
       GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
-  int num_vertices = vertices.size();
+  int num_vertices = vertices->size();
   std::cout << "num_vertices: " << num_vertices << std::endl;
 
   // get the "person_knows_person" edges of graph
@@ -46,8 +46,7 @@ int main(int argc, char* argv[]) {
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::unordered_by_source);
   ASSERT(!maybe_edges.has_error());
-  auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
-      GAR_NAMESPACE::AdjListType::unordered_by_source>>(maybe_edges.value());
+  auto& edges = maybe_edges.value();
 
   // run bfs algorithm
   GAR_NAMESPACE::IdType root = 0;
@@ -57,7 +56,7 @@ int main(int argc, char* argv[]) {
     distance[i] = (i == root ? 0 : -1);
     pre[i] = (i == root ? root : -1);
   }
-  auto it_begin = edges.begin(), it_end = edges.end();
+  auto it_begin = edges->begin(), it_end = edges->end();
   for (int iter = 0;; iter++) {
     GAR_NAMESPACE::IdType count = 0;
     for (auto it = it_begin; it != it_end; ++it) {
@@ -122,7 +121,7 @@ int main(int argc, char* argv[]) {
     if (pre[i] == -1) {
       ASSERT(array_builder2.AppendNull().ok());
     } else {
-      auto it = vertices.find(pre[i]);
+      auto it = vertices->find(pre[i]);
       auto father_id = it.property<int64_t>("id").value();
       ASSERT(array_builder2.Append(father_id).ok());
     }

@@ -16,18 +16,11 @@
 
 package com.alibaba.graphar.example
 
-import com.alibaba.graphar.datasources._
-import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.graph.GraphReader
 import com.alibaba.graphar.{GeneralParams, GraphInfo}
 import com.alibaba.graphar.util.Utils
 
-import java.io.{File, FileInputStream}
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
-import scala.beans.BeanProperty
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.apache.hadoop.fs.{Path, FileSystem}
 
 object GraphAr2Neo4j {
 

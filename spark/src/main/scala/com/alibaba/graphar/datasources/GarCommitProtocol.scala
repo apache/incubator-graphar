@@ -21,9 +21,7 @@ import com.alibaba.graphar.GeneralParams
 import org.json4s._
 import org.json4s.jackson.JsonMethods._
 
-import org.apache.spark.internal.io.FileCommitProtocol
 import org.apache.spark.sql.execution.datasources.SQLHadoopMapReduceCommitProtocol
-import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl
 import org.apache.hadoop.mapreduce._
 import org.apache.spark.internal.Logging
 

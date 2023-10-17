@@ -16,19 +16,10 @@
 
 package com.alibaba.graphar.graph
 
-import com.alibaba.graphar.{
-  GeneralParams,
-  AdjListType,
-  GraphInfo,
-  VertexInfo,
-  EdgeInfo
-}
+import com.alibaba.graphar.{GraphInfo, VertexInfo, EdgeInfo}
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
-import com.alibaba.graphar.util.IndexGenerator
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.functions._
 
 /**
  * The helper object for reading graph through the definitions of graph info.

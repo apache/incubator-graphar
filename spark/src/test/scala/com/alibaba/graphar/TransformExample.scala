@@ -16,15 +16,10 @@
 
 package com.alibaba.graphar
 
-import com.alibaba.graphar.util.IndexGenerator
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
-import java.io.{File, FileInputStream}
-import scala.beans.BeanProperty
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.apache.hadoop.fs.{Path, FileSystem}
 import org.scalatest.funsuite.AnyFunSuite
 

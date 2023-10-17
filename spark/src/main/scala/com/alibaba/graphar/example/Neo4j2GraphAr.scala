@@ -16,10 +16,9 @@
 
 package com.alibaba.graphar.example
 
-import com.alibaba.graphar.datasources._
 import com.alibaba.graphar.graph.GraphWriter
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 
 object Neo4j2GraphAr {
 

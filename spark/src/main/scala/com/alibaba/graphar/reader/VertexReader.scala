@@ -17,14 +17,11 @@
 package com.alibaba.graphar.reader
 
 import com.alibaba.graphar.util.{IndexGenerator, DataFrameConcat}
-import com.alibaba.graphar.{GeneralParams, VertexInfo, FileType, PropertyGroup}
-import com.alibaba.graphar.datasources._
+import com.alibaba.graphar.{VertexInfo, PropertyGroup}
 import com.alibaba.graphar.util.FileSystem
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.Row
 
 /**
  * Reader for vertex chunks.

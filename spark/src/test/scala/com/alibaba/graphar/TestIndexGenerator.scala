@@ -18,7 +18,7 @@ package com.alibaba.graphar
 
 import com.alibaba.graphar.util.IndexGenerator
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.scalatest.funsuite.AnyFunSuite
 
 class IndexGeneratorSuite extends AnyFunSuite {
