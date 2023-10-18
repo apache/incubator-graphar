@@ -30,7 +30,13 @@ void vertices_collection(const GAR_NAMESPACE::GraphInfo& graph_info) {
 
   // use vertices collection
   auto count = 0;
+  // iterate through vertices collection
   for (auto it = vertices->begin(); it != vertices->end(); ++it) {
+    count++;
+    // print the first 10 vertices
+    if (count > 10) {
+      continue;
+    }
     // access data through iterator directly
     std::cout << it.id() << ", id=" << it.property<int64_t>("id").value()
               << ", firstName=" << it.property<std::string>("firstName").value()
@@ -41,7 +47,6 @@ void vertices_collection(const GAR_NAMESPACE::GraphInfo& graph_info) {
               << ", id=" << vertex.property<int64_t>("id").value()
               << ", firstName="
               << vertex.property<std::string>("firstName").value() << std::endl;
-    count++;
   }
   // add operator+ for iterator
   auto it_last = vertices->begin() + (count - 1);
@@ -50,6 +55,13 @@ void vertices_collection(const GAR_NAMESPACE::GraphInfo& graph_info) {
             << ", id=" << it_last.property<int64_t>("id").value()
             << ", firstName="
             << it_last.property<std::string>("firstName").value() << std::endl;
+  // find the vertex with internal id = 100
+  auto it_find = vertices->find(100);
+  std::cout << "the vertex with internal id = 100: " << std::endl;
+  std::cout << it_find.id()
+            << ", id=" << it_find.property<int64_t>("id").value()
+            << ", firstName="
+            << it_find.property<std::string>("firstName").value() << std::endl;
   // count
   ASSERT(count == vertices->size());
   std::cout << "vertex_count=" << count << std::endl;
@@ -65,9 +77,16 @@ void edges_collection(const GAR_NAMESPACE::GraphInfo& graph_info) {
   auto edges = expect.value();
 
   // use edges collection
+  auto begin = edges->begin();
   auto end = edges->end();
   size_t count = 0;
-  for (auto it = edges->begin(); it != end; ++it) {
+  // iterate through edges collection
+  for (auto it = begin; it != end; ++it) {
+    count++;
+    // print the first 10 edges
+    if (count > 10) {
+      continue;
+    }
     // access data through iterator directly
     std::cout << "src=" << it.source() << ", dst=" << it.destination() << "; ";
     // access data through edge
@@ -76,8 +95,17 @@ void edges_collection(const GAR_NAMESPACE::GraphInfo& graph_info) {
               << ", creationDate="
               << edge.property<std::string>("creationDate").value()
               << std::endl;
-    count++;
   }
+  // find the first edge with source = 100
+  auto it_find = edges->find_src(100, begin);
+  std::cout << "the edge with source = 100: " << std::endl;
+  do {
+    std::cout << "src=" << it_find.source() << ", dst=" << it_find.destination()
+              << ", creationDate="
+              << it_find.property<std::string>("creationDate").value()
+              << std::endl;
+  } while (it_find.next_src());
+
   // count
   ASSERT(count == edges->size());
   std::cout << "edge_count=" << count << std::endl;
