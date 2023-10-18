@@ -37,10 +37,12 @@ void vertices_builder() {
 
   // prepare vertex data
   int vertex_count = 3;
-  std::vector<std::string> property_names = {"id", "firstName", "lastName"};
+  std::vector<std::string> property_names = {"id", "firstName", "lastName",
+                                             "gender"};
   std::vector<int64_t> id = {0, 1, 2};
   std::vector<std::string> firstName = {"John", "Jane", "Alice"};
-  std::vector<std::string> lastName = {"Smith", "Doe", "Xu"};
+  std::vector<std::string> lastName = {"Smith", "Doe", "Wonderland"};
+  std::vector<std::string> gender = {"male", "famale", "famale"};
 
   // add vertices
   for (int i = 0; i < vertex_count; i++) {
@@ -48,6 +50,7 @@ void vertices_builder() {
     v.AddProperty(property_names[0], id[i]);
     v.AddProperty(property_names[1], firstName[i]);
     v.AddProperty(property_names[2], lastName[i]);
+    v.AddProperty(property_names[2], gender[i]);
     ASSERT(builder.AddVertex(v).ok());
   }
 

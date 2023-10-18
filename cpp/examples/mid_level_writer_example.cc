@@ -15,75 +15,85 @@ limitations under the License.
 #include <iostream>
 
 #include "arrow/api.h"
-#include "arrow/csv/api.h"
 #include "arrow/filesystem/api.h"
-#include "parquet/arrow/reader.h"
+#include "arrow/result.h"
 
 #include "./config.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
-std::shared_ptr<arrow::Table> read_csv_file_and_return_table(
-    const std::string& path) {
-  arrow::io::IOContext io_context = arrow::io::default_io_context();
+arrow::Result<std::shared_ptr<arrow::Table>> generate_vertex_table() {
+  // property "id"
+  arrow::Int64Builder i64builder;
+  ARROW_RETURN_NOT_OK(i64builder.AppendValues({0, 1, 2}));
+  std::shared_ptr<arrow::Array> i64array;
+  ARROW_RETURN_NOT_OK(i64builder.Finish(&i64array));
 
-  auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
-  std::shared_ptr<arrow::io::InputStream> input =
-      fs->OpenInputStream(path).ValueOrDie();
+  // property "firstName"
+  arrow::StringBuilder strbuilder;
+  ARROW_RETURN_NOT_OK(strbuilder.Append("John"));
+  ARROW_RETURN_NOT_OK(strbuilder.Append("Jane"));
+  ARROW_RETURN_NOT_OK(strbuilder.Append("Alice"));
+  std::shared_ptr<arrow::Array> strarray;
+  ARROW_RETURN_NOT_OK(strbuilder.Finish(&strarray));
 
-  auto read_options = arrow::csv::ReadOptions::Defaults();
-  auto parse_options = arrow::csv::ParseOptions::Defaults();
-  parse_options.delimiter = '|';
-  auto convert_options = arrow::csv::ConvertOptions::Defaults();
+  // property "lastName"
+  arrow::StringBuilder strbuilder2;
+  ARROW_RETURN_NOT_OK(strbuilder2.Append("Smith"));
+  ARROW_RETURN_NOT_OK(strbuilder2.Append("Doe"));
+  ARROW_RETURN_NOT_OK(strbuilder2.Append("Wonderland"));
+  std::shared_ptr<arrow::Array> strarray2;
+  ARROW_RETURN_NOT_OK(strbuilder2.Finish(&strarray2));
 
-  // Instantiate TableReader from input stream and options
-  auto maybe_reader = arrow::csv::TableReader::Make(
-      io_context, input, read_options, parse_options, convert_options);
-  ASSERT(maybe_reader.ok());
-  std::shared_ptr<arrow::csv::TableReader> reader = *maybe_reader;
+  // property "gender"
+  arrow::StringBuilder strbuilder3;
+  ARROW_RETURN_NOT_OK(strbuilder2.Append("male"));
+  ARROW_RETURN_NOT_OK(strbuilder2.Append("female"));
+  ARROW_RETURN_NOT_OK(strbuilder2.Append("female"));
+  std::shared_ptr<arrow::Array> strarray3;
+  ARROW_RETURN_NOT_OK(strbuilder2.Finish(&strarray3));
 
-  // Read table from CSV file
-  auto maybe_table = reader->Read();
-  ASSERT(maybe_table.ok());
-  std::shared_ptr<arrow::Table> table = *maybe_table;
-  // output
-  std::cout << "reading CSV file done" << std::endl;
-  std::cout << "file path: " << path << std::endl;
-  std::cout << "rows number of CSV file: " << table->num_rows() << std::endl;
-  std::cout << "schema of CSV file: " << std::endl
-            << table->schema()->ToString() << std::endl;
-  return table;
+  // schema
+  auto schema = arrow::schema({arrow::field("id", arrow::int64()),
+                               arrow::field("firstName", arrow::utf8()),
+                               arrow::field("lastName", arrow::utf8()),
+                               arrow::field("gender", arrow::utf8())});
+  return arrow::Table::Make(schema, {i64array, strarray, strarray2, strarray3});
 }
 
-std::shared_ptr<arrow::Table> read_parquet_file_and_return_table(
-    const std::string& path, bool is_adj_list = false) {
-  arrow::Status st;
-  arrow::MemoryPool* pool = arrow::default_memory_pool();
-  auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
-  std::shared_ptr<arrow::io::RandomAccessFile> input =
-      fs->OpenInputFile(path).ValueOrDie();
-  std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
-  st = parquet::arrow::OpenFile(input, pool, &arrow_reader);
-  // Read entire file as a single Arrow table
-  std::shared_ptr<arrow::Table> maybe_table;
-  st = arrow_reader->ReadTable(&maybe_table);
-  ASSERT(st.ok());
+arrow::Result<std::shared_ptr<arrow::Table>> generate_adj_list_table() {
+  // source vertex id
+  arrow::Int64Builder i64builder;
+  ARROW_RETURN_NOT_OK(i64builder.AppendValues({1, 0, 0, 2}));
+  std::shared_ptr<arrow::Array> i64array;
+  ARROW_RETURN_NOT_OK(i64builder.Finish(&i64array));
 
-  std::shared_ptr<arrow::Table> table;
-  if (is_adj_list) {
-    table = maybe_table
-                ->RenameColumns({GAR_NAMESPACE::GeneralParams::kSrcIndexCol,
-                                 GAR_NAMESPACE::GeneralParams::kDstIndexCol})
-                .ValueOrDie();
-  } else {
-    table = maybe_table;
-  }
-  std::cout << "reading parquet file done" << std::endl;
-  std::cout << "file path: " << path << std::endl;
-  std::cout << "rows number of parquet file: " << table->num_rows()
-            << std::endl;
-  std::cout << "schema of parquet file: " << std::endl
-            << table->schema()->ToString() << std::endl;
-  return table;
+  // destination vertex id
+  arrow::Int64Builder i64builder2;
+  ARROW_RETURN_NOT_OK(i64builder2.AppendValues({0, 1, 2, 1}));
+  std::shared_ptr<arrow::Array> i64array2;
+  ARROW_RETURN_NOT_OK(i64builder2.Finish(&i64array2));
+
+  // schema
+  auto schema = arrow::schema(
+      {arrow::field(GAR_NAMESPACE::GeneralParams::kSrcIndexCol, arrow::int64()),
+       arrow::field(GAR_NAMESPACE::GeneralParams::kDstIndexCol,
+                    arrow::int64())});
+  return arrow::Table::Make(schema, {i64array, i64array2});
+}
+
+arrow::Result<std::shared_ptr<arrow::Table>> generate_edge_property_table() {
+  // property "creationDate"
+  arrow::StringBuilder strbuilder;
+  ARROW_RETURN_NOT_OK(strbuilder.Append("2010-01-01"));
+  ARROW_RETURN_NOT_OK(strbuilder.Append("2011-01-01"));
+  ARROW_RETURN_NOT_OK(strbuilder.Append("2012-01-01"));
+  ARROW_RETURN_NOT_OK(strbuilder.Append("2013-01-01"));
+  std::shared_ptr<arrow::Array> strarray;
+  ARROW_RETURN_NOT_OK(strbuilder.Finish(&strarray));
+
+  // schema
+  auto schema = arrow::schema({arrow::field("creationDate", arrow::utf8())});
+  return arrow::Table::Make(schema, {strarray});
 }
 
 void vertex_property_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
@@ -95,9 +105,13 @@ void vertex_property_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
   ASSERT(vertex_info.GetLabel() == "person");
   GAR_NAMESPACE::VertexPropertyWriter writer(vertex_info, "/tmp/");
 
-  // construct vertex property table from reading a CSV file
-  auto table = read_csv_file_and_return_table(TEST_DATA_DIR +
-                                              "/ldbc_sample/person_0_0.csv");
+  // construct vertex property table
+  auto table = generate_vertex_table().ValueOrDie();
+  // print
+  std::cout << "rows number of vertex table: " << table->num_rows()
+            << std::endl;
+  std::cout << "schema of vertex table: " << std::endl
+            << table->schema()->ToString() << std::endl;
 
   // use writer
   // set validate level
@@ -125,16 +139,20 @@ void edge_chunk_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
   auto adj_list_type = GAR_NAMESPACE::AdjListType::ordered_by_source;
   GAR_NAMESPACE::EdgeChunkWriter writer(edge_info, "/tmp/", adj_list_type);
 
-  // construct property chunk from reading a Parquet file
-  auto chunk = read_parquet_file_and_return_table(
-      TEST_DATA_DIR +
-      "/ldbc_sample/parquet/edge/person_knows_person/ordered_by_source/"
-      "creationDate/part0/chunk0");
-  // construct adj list table from reading a Parquet file
-  auto table = read_parquet_file_and_return_table(
-      TEST_DATA_DIR +
-      "/ldbc_sample/parquet/edge/person_knows_person/unordered_by_source/"
-      "adj_list/part0/chunk0");
+  // construct property chunk
+  auto chunk = generate_edge_property_table().ValueOrDie();
+  // print
+  std::cout << "rows number of edge property chunk: " << chunk->num_rows()
+            << std::endl;
+  std::cout << "schema of edge property chunk: " << std::endl
+            << chunk->schema()->ToString() << std::endl;
+  // construct adj list table
+  auto table = generate_adj_list_table().ValueOrDie();
+  // print
+  std::cout << "rows number of adj list table: " << table->num_rows()
+            << std::endl;
+  std::cout << "schema of adj list table: " << std::endl
+            << table->schema()->ToString() << std::endl;
 
   // use writer
   // set validate level
