@@ -109,6 +109,7 @@ object FileSystem {
     // consistent with c++ library, convert to little-endian
     output.writeLong(java.lang.Long.reverseBytes(value))
     output.close()
+    fs.close()
   }
 
   def readValue(inputPath: String, hadoopConfig: Configuration): Long = {
