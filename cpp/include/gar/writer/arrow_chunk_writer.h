@@ -227,6 +227,10 @@ class VertexPropertyWriter {
                   ValidateLevel validate_level) const noexcept;
 
  private:
+  Result<std::shared_ptr<arrow::Table>> addIndexColumn(
+    const std::shared_ptr<arrow::Table>& table, IdType chunk_index,
+    IdType chunk_size) const noexcept;
+
   VertexInfo vertex_info_;
   std::string prefix_;
   std::shared_ptr<FileSystem> fs_;
