@@ -20,6 +20,7 @@ limitations under the License.
 #include "./util.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/util/expression.h"
+#include "gar/util/general_params.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -53,37 +54,29 @@ TEST_CASE("test_vertex_property_arrow_chunk_reader") {
   auto reader = maybe_reader.value();
   auto result = reader.GetChunk();
   REQUIRE(!result.has_error());
-  auto range = reader.GetRange().value();
   auto table = result.value();
   REQUIRE(table->num_rows() == 100);
-  REQUIRE(range.first == 0);
-  REQUIRE(range.second == 100);
+  REQUIRE(table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
 
   // seek
   REQUIRE(reader.seek(100).ok());
   result = reader.GetChunk();
   REQUIRE(!result.has_error());
-  range = reader.GetRange().value();
   table = result.value();
   REQUIRE(table->num_rows() == 100);
-  REQUIRE(range.first == 100);
-  REQUIRE(range.second == 200);
+  REQUIRE(table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
   REQUIRE(reader.next_chunk().ok());
   result = reader.GetChunk();
   REQUIRE(!result.has_error());
-  range = reader.GetRange().value();
   table = result.value();
   REQUIRE(table->num_rows() == 100);
-  REQUIRE(range.first == 200);
-  REQUIRE(range.second == 300);
+  REQUIRE(table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
   REQUIRE(reader.seek(900).ok());
   result = reader.GetChunk();
   REQUIRE(!result.has_error());
-  range = reader.GetRange().value();
   table = result.value();
   REQUIRE(table->num_rows() == 3);
-  REQUIRE(range.first == 900);
-  REQUIRE(range.second == 903);
+  REQUIRE(table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
   REQUIRE(reader.GetChunkNum() == 10);
   REQUIRE(reader.next_chunk().IsIndexError());
 
@@ -119,9 +112,8 @@ TEST_CASE("test_vertex_property_pushdown") {
       auto result = reader.GetChunk();
       REQUIRE(!result.has_error());
       table = result.value();
-      auto [start, end] = reader.GetRange().value();
-      std::cout << "Chunk: " << idx << ",\tNums: " << table->num_rows() << "/"
-                << chunk_size << ",\tRange: (" << start << ", " << end << "]"
+      std::cout << "Chunk: " << idx << ",\tNums: " << table->num_rows()
+                << ",\tinternal id column: " << '\t' << table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol)->ToString() 
                 << '\n';
       idx++;
       sum += table->num_rows();

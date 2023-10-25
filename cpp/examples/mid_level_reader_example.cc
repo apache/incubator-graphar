@@ -20,6 +20,7 @@ limitations under the License.
 #include "./config.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/util/expression.h"
+#include "gar/util/general_params.h"
 
 void vertex_property_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
   // constuct reader
@@ -36,29 +37,36 @@ void vertex_property_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
   // use reader
   auto result = reader.GetChunk();
   ASSERT(!result.has_error());
-  auto range = reader.GetRange().value();
   std::cout << "chunk number: " << reader.GetChunkNum() << std::endl;
-  std::cout << "range of fisrt vertex property chunk: " << range.first << " "
-            << range.second << std::endl;
   auto table = result.value();
   std::cout << "rows number of first vertex property chunk: "
             << table->num_rows() << std::endl;
   std::cout << "schema of first vertex property chunk: " << std::endl
             << table->schema()->ToString() << std::endl;
+  auto index_col = table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
+  ASSERT(index_col != nullptr);
+  std::cout << "Internal id column: " << index_col->ToString() << " "
+            << std::endl;
   // seek vertex id
   ASSERT(reader.seek(100).ok());
   result = reader.GetChunk();
   ASSERT(!result.has_error());
-  range = reader.GetRange().value();
-  std::cout << "range of vertex property chunk for vertex id 100: "
-            << range.first << " " << range.second << std::endl;
+  table = result.value();
+  index_col = table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
+  ASSERT(index_col != nullptr);
+  std::cout << "Internal id column of vertex property chunk for vertex id 100: " 
+            << index_col->ToString() << " "
+            << std::endl;
   // next chunk
   ASSERT(reader.next_chunk().ok());
   result = reader.GetChunk();
   ASSERT(!result.has_error());
-  range = reader.GetRange().value();
-  std::cout << "range of next vertex property chunk: " << range.first << " "
-            << range.second << std::endl;
+  table = result.value();
+  index_col = table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
+  ASSERT(index_col != nullptr);
+  std::cout << "Internal id column of next chunk: " 
+            << index_col->ToString() << " "
+            << std::endl;
 
   // reader with filter pushdown
   auto filter = GAR_NAMESPACE::_Equal(GAR_NAMESPACE::_Property("gender"),
