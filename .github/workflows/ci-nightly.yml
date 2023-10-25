@@ -33,7 +33,7 @@ jobs:
       run: |
         mkdir build
         pushd build
-        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
+        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
         popd
 
     - name: Build GraphAr
