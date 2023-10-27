@@ -14,7 +14,7 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
 endif()
 
 set(GAR_MAJOR_VERSION 0)
-set(GAR_MINOR_VERSION 1)
+set(GAR_MINOR_VERSION 9)
 set(GAR_PATCH_VERSION 0)
 set(GAR_VERSION ${GAR_MAJOR_VERSION}.${GAR_MINOR_VERSION}.${GAR_PATCH_VERSION})
 project(graph-archive LANGUAGES C CXX VERSION ${GAR_VERSION})
@@ -26,7 +26,6 @@ project(graph-archive LANGUAGES C CXX VERSION ${GAR_VERSION})
 option(NAMESPACE "User specific namespace, default if GraphArchive" OFF)
 option(BUILD_TESTS "Build unit tests" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
-option(BUILD_ARROW_FROM_SOURCE "Build Arrow from source (ON) or use system-installed Arrow (OFF)" OFF)
 
 if (NAMESPACE)
   add_definitions(-DGAR_NAMESPACE=${NAMESPACE})
@@ -160,14 +159,22 @@ if(OPENSSL_FOUND)
     endif()
 endif()
 
+# check if arrow is installed
+find_package(Arrow QUIET)
+find_package(ArrowDataset QUIET)
+find_package(ArrowAcero QUIET)
+find_package(Parquet QUIET)
+
+if (NOT Arrow_FOUND OR NOT ArrowDataset_FOUND OR NOT ArrowAcero_FOUND OR NOT Parquet_FOUND)
+    message(STATUS "Arrow is not installed, will build from source.")
+    set(BUILD_ARROW_FROM_SOURCE ON)
+else()
+    set(BUILD_ARROW_FROM_SOURCE OFF)
+endif()
+
 if(BUILD_ARROW_FROM_SOURCE)
     include(apache-arrow)
     build_arrow()
-else()
-    find_package(Arrow REQUIRED)
-    find_package(ArrowDataset REQUIRED)
-    find_package(ArrowAcero REQUIRED)
-    find_package(Parquet REQUIRED)
 endif()
 
 
@@ -207,10 +214,10 @@ macro(build_gar)
                 "${GAR_ACERO_STATIC_LIB}"
                 "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
         else()
-            target_link_libraries(gar PRIVATE -Wl,-force_load Arrow::arrow_static
-                Parquet::parquet_static
-                ArrowDataset::arrow_dataset_static
-                ArrowAcero::arrow_acero_static)
+            target_link_libraries(gar PRIVATE -Wl,-force_load Arrow::arrow_shared
+                Parquet::parquet_shared
+                ArrowDataset::arrow_dataset_shared
+                ArrowAcero::arrow_acero_shared)
         endif()
     else()
         if(BUILD_ARROW_FROM_SOURCE)
@@ -220,10 +227,10 @@ macro(build_gar)
                 "${GAR_ARROW_ACERO_STATIC_LIB}"
                 "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
         else()
-            target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_static
-                Parquet::parquet_static
-                ArrowDataset::arrow_dataset_static
-                ArrowAcero::arrow_acero_static -Wl,--no-whole-archive)
+            target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_shared
+                Parquet::parquet_shared
+                ArrowDataset::arrow_dataset_shared
+                ArrowAcero::arrow_acero_shared -Wl,--no-whole-archive)
         endif()
     endif()
 
@@ -266,8 +273,8 @@ if (BUILD_EXAMPLES)
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
             else()
-                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_static
-                    Parquet::parquet_static)
+                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
+                    Parquet::parquet_shared)
             endif()
         else()
             if(BUILD_ARROW_FROM_SOURCE)
@@ -275,8 +282,8 @@ if (BUILD_EXAMPLES)
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
             else()
-                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_static
-                    Parquet::parquet_static)
+                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
+                    Parquet::parquet_shared)
             endif()
         endif()
 
@@ -347,8 +354,8 @@ if (BUILD_TESTS)
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
             else()
-                target_link_libraries(${target} Arrow::arrow_static
-                    Parquet::parquet_static)
+                target_link_libraries(${target} Arrow::arrow_shared
+                    Parquet::parquet_shared)
             endif()
         else()
             if(BUILD_ARROW_FROM_SOURCE)
@@ -356,8 +363,8 @@ if (BUILD_TESTS)
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
             else()
-                target_link_libraries(${target} PRIVATE Arrow::arrow_static
-                    Parquet::parquet_static)
+                target_link_libraries(${target} PRIVATE Arrow::arrow_shared
+                    Parquet::parquet_shared)
             endif()
         endif()
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
