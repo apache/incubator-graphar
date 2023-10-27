@@ -38,9 +38,11 @@ object FileSystem {
    * @param outputPrefix
    *   output path prefix.
    * @param offsetStartChunkIndex[Optional]
-   *   the start index of offset chunk, if not empty, that means writing a offset DataFrame.
+   *   the start index of offset chunk, if not empty, that means writing a
+   *   offset DataFrame.
    * @param aggNumListOfEdgeChunk[Optional]
-   *   the aggregated number list of edge chunk, if not empty, that means writing a edge DataFrame.
+   *   the aggregated number list of edge chunk, if not empty, that means
+   *   writing a edge DataFrame.
    */
   def writeDataFrame(
       dataFrame: DataFrame,
@@ -103,7 +105,7 @@ object FileSystem {
   /**
    * Write input value to output path.
    *
-   * @param value 
+   * @param value
    *   Value to write out.
    * @param outputPrefix
    *   output path prefix.
