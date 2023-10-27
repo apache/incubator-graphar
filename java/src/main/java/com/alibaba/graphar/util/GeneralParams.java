@@ -15,19 +15,19 @@
 package com.alibaba.graphar.util;
 
 public class GeneralParams {
-    // column name
-    public static final String vertexIndexCol = "_graphArVertexIndex";
-    public static final String srcIndexCol = "_graphArSrcIndex";
-    public static final String dstIndexCol = "_graphArDstIndex";
-    public static final String offsetCol = "_graphArOffset";
-    public static final String primaryCol = "_graphArPrimary";
-    public static final String vertexChunkIndexCol = "_graphArVertexChunkIndex";
-    public static final String edgeIndexCol = "_graphArEdgeIndex";
-    public static final String regularSeperator = "_";
-    public static final String offsetStartChunkIndexKey = "_graphar_offset_start_chunk_index";
-    public static final String aggNumListOfEdgeChunkKey = "_graphar_agg_num_list_of_edge_chunk";
-    public static final Long defaultVertexChunkSize = 262144L; // 2^18
-    public static final Long defaultEdgeChunkSize = 4194304L; // 2^22
-    public static final String defaultFileType = "parquet";
-    public static final String defaultVersion = "v1";
+  // column name
+  public static final String vertexIndexCol = "_graphArVertexIndex";
+  public static final String srcIndexCol = "_graphArSrcIndex";
+  public static final String dstIndexCol = "_graphArDstIndex";
+  public static final String offsetCol = "_graphArOffset";
+  public static final String primaryCol = "_graphArPrimary";
+  public static final String vertexChunkIndexCol = "_graphArVertexChunkIndex";
+  public static final String edgeIndexCol = "_graphArEdgeIndex";
+  public static final String regularSeperator = "_";
+  public static final String offsetStartChunkIndexKey = "_graphar_offset_start_chunk_index";
+  public static final String aggNumListOfEdgeChunkKey = "_graphar_agg_num_list_of_edge_chunk";
+  public static final Long defaultVertexChunkSize = 262144L; // 2^18
+  public static final Long defaultEdgeChunkSize = 4194304L; // 2^22
+  public static final String defaultFileType = "parquet";
+  public static final String defaultVersion = "v1";
 }

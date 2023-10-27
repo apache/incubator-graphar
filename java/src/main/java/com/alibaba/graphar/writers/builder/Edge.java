@@ -35,86 +35,86 @@ import com.alibaba.graphar.stdcxx.StdUnorderedMap;
 @CXXHead(GAR_EDGES_BUILDER_H)
 public interface Edge extends CXXPointer {
 
-    Factory factory = FFITypeFactory.getFactory(Edge.class);
+  Factory factory = FFITypeFactory.getFactory(Edge.class);
 
+  /**
+   * Check if the edge is empty.
+   *
+   * @return true/false.
+   */
+  @FFINameAlias("Empty")
+  boolean empty();
+
+  /**
+   * Get source id of the edge.
+   *
+   * @return The id of the source vertex.
+   */
+  @FFINameAlias("GetSource")
+  @FFITypeAlias(GAR_ID_TYPE)
+  long getSource();
+
+  /**
+   * Get destination id of the edge.
+   *
+   * @return The id of the destination vertex.
+   */
+  @FFINameAlias("GetDestination")
+  @FFITypeAlias(GAR_ID_TYPE)
+  long getDestination();
+
+  /**
+   * Add a property to the edge.
+   *
+   * @param name The name of the property.
+   * @param val The value of the property.
+   */
+  @FFINameAlias("AddProperty")
+  void addProperty(@CXXReference StdString name, @CXXReference StdString val);
+
+  /**
+   * Add a property to the edge.
+   *
+   * @param name The name of the property.
+   * @param val The value of the property.
+   */
+  @FFINameAlias("AddProperty")
+  void addProperty(@CXXReference StdString name, long val);
+
+  /**
+   * Get a property of the edge.
+   *
+   * @param property The name of the property.
+   * @return The value of the property.
+   */
+  @FFINameAlias("GetProperty")
+  <T> @CXXReference T getProperty(@CXXReference StdString property);
+
+  /**
+   * Get all properties of the edge.
+   *
+   * @return The map containing all properties of the edge.
+   */
+  @FFINameAlias("GetProperties")
+  <T> @CXXReference StdUnorderedMap<StdString, T> getProperties();
+
+  /**
+   * Check if the edge contains a property.
+   *
+   * @param property The name of the property.
+   * @return true/false.
+   */
+  @FFINameAlias("ContainProperty")
+  boolean containProperty(@CXXReference StdString property);
+
+  @FFIFactory
+  interface Factory {
     /**
-     * Check if the edge is empty.
+     * Initialize the edge with its source and destination.
      *
-     * @return true/false.
+     * @param srcId The id of the source vertex.
+     * @param dstId The id of the destination vertex.
      */
-    @FFINameAlias("Empty")
-    boolean empty();
-
-    /**
-     * Get source id of the edge.
-     *
-     * @return The id of the source vertex.
-     */
-    @FFINameAlias("GetSource")
-    @FFITypeAlias(GAR_ID_TYPE)
-    long getSource();
-
-    /**
-     * Get destination id of the edge.
-     *
-     * @return The id of the destination vertex.
-     */
-    @FFINameAlias("GetDestination")
-    @FFITypeAlias(GAR_ID_TYPE)
-    long getDestination();
-
-    /**
-     * Add a property to the edge.
-     *
-     * @param name The name of the property.
-     * @param val The value of the property.
-     */
-    @FFINameAlias("AddProperty")
-    void addProperty(@CXXReference StdString name, @CXXReference StdString val);
-
-    /**
-     * Add a property to the edge.
-     *
-     * @param name The name of the property.
-     * @param val The value of the property.
-     */
-    @FFINameAlias("AddProperty")
-    void addProperty(@CXXReference StdString name, long val);
-
-    /**
-     * Get a property of the edge.
-     *
-     * @param property The name of the property.
-     * @return The value of the property.
-     */
-    @FFINameAlias("GetProperty")
-    <T> @CXXReference T getProperty(@CXXReference StdString property);
-
-    /**
-     * Get all properties of the edge.
-     *
-     * @return The map containing all properties of the edge.
-     */
-    @FFINameAlias("GetProperties")
-    <T> @CXXReference StdUnorderedMap<StdString, T> getProperties();
-
-    /**
-     * Check if the edge contains a property.
-     *
-     * @param property The name of the property.
-     * @return true/false.
-     */
-    @FFINameAlias("ContainProperty")
-    boolean containProperty(@CXXReference StdString property);
-
-    @FFIFactory
-    interface Factory {
-        /**
-         * Initialize the edge with its source and destination.
-         *
-         * @param srcId The id of the source vertex.
-         * @param dstId The id of the destination vertex.
-         */
-        Edge create(@FFITypeAlias(GAR_ID_TYPE) long srcId, @FFITypeAlias(GAR_ID_TYPE) long dstId);
-    }
+    Edge create(@FFITypeAlias(GAR_ID_TYPE) long srcId, @FFITypeAlias(GAR_ID_TYPE) long dstId);
+  }
 }

@@ -40,56 +40,56 @@ import com.alibaba.fastffi.FFITypeFactory;
 @CXXTemplate(cxx = GAR_PROPERTY, java = "com.alibaba.graphar.graphinfo.Property")
 public interface StdVector<E> extends CXXPointer, FFISettablePointer {
 
-    static Factory getStdVectorFactory(String foreignName) {
-        return FFITypeFactory.getFactory(StdVector.class, foreignName);
+  static Factory getStdVectorFactory(String foreignName) {
+    return FFITypeFactory.getFactory(StdVector.class, foreignName);
+  }
+
+  long size();
+
+  @CXXOperator("[]")
+  @CXXReference
+  E get(long index);
+
+  @CXXOperator("[]")
+  void set(long index, @CXXReference E value);
+
+  @CXXOperator("==")
+  boolean eq(@CXXReference StdVector<E> other);
+
+  void push_back(@CXXValue E e);
+
+  default void add(@CXXReference E value) {
+    long size = size();
+    long cap = capacity();
+    if (size == cap) {
+      reserve(cap << 1);
     }
+    push_back(value);
+  }
 
-    long size();
-
-    @CXXOperator("[]")
-    @CXXReference
-    E get(long index);
-
-    @CXXOperator("[]")
-    void set(long index, @CXXReference E value);
-
-    @CXXOperator("==")
-    boolean eq(@CXXReference StdVector<E> other);
-
-    void push_back(@CXXValue E e);
-
-    default void add(@CXXReference E value) {
-        long size = size();
-        long cap = capacity();
-        if (size == cap) {
-            reserve(cap << 1);
-        }
-        push_back(value);
+  default @CXXReference E append() {
+    long size = size();
+    long cap = capacity();
+    if (size == cap) {
+      reserve(cap << 1);
     }
+    resize(size + 1);
+    return get(size);
+  }
 
-    default @CXXReference E append() {
-        long size = size();
-        long cap = capacity();
-        if (size == cap) {
-            reserve(cap << 1);
-        }
-        resize(size + 1);
-        return get(size);
-    }
+  void clear();
 
-    void clear();
+  long data();
 
-    long data();
+  long capacity();
 
-    long capacity();
+  void reserve(long size);
 
-    void reserve(long size);
+  void resize(long size);
 
-    void resize(long size);
+  @FFIFactory
+  interface Factory<E> {
 
-    @FFIFactory
-    interface Factory<E> {
-
-        StdVector<E> create();
-    }
+    StdVector<E> create();
+  }
 }

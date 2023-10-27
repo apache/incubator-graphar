@@ -34,29 +34,28 @@ import com.alibaba.graphar.stdcxx.StdString;
 @CXXHead(GAR_GRAPH_H)
 public interface VerticesCollection extends CXXPointer {
 
-    /** The iterator pointing to the first vertex. */
-    @CXXValue
-    VertexIter begin();
+  /** The iterator pointing to the first vertex. */
+  @CXXValue
+  VertexIter begin();
 
-    /** The iterator pointing to the past-the-end element. */
-    @CXXValue
-    VertexIter end();
+  /** The iterator pointing to the past-the-end element. */
+  @CXXValue
+  VertexIter end();
 
-    /** The iterator pointing to the vertex with specific id. */
-    @CXXValue
-    VertexIter find(@FFITypeAlias(GAR_ID_TYPE) long id);
+  /** The iterator pointing to the vertex with specific id. */
+  @CXXValue
+  VertexIter find(@FFITypeAlias(GAR_ID_TYPE) long id);
 
-    long size();
+  long size();
 
-    @FFIFactory
-    interface Factory {
-        /**
-         * Initialize the VerticesCollection.
-         *
-         * @param vertexInfo The vertex info that describes the vertex type.
-         * @param prefix The absolute prefix.
-         */
-        VerticesCollection create(
-                @CXXReference VertexInfo vertexInfo, @CXXReference StdString prefix);
-    }
+  @FFIFactory
+  interface Factory {
+    /**
+     * Initialize the VerticesCollection.
+     *
+     * @param vertexInfo The vertex info that describes the vertex type.
+     * @param prefix The absolute prefix.
+     */
+    VerticesCollection create(@CXXReference VertexInfo vertexInfo, @CXXReference StdString prefix);
+  }
 }

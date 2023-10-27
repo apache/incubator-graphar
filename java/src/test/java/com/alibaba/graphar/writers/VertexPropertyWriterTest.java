@@ -38,54 +38,51 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class VertexPropertyWriterTest {
-    @Test
-    public void test1() {
-        String uri = root + "/ldbc_sample/person_0_0_comma.csv";
-        File testFileExist = new File(uri);
-        Assert.assertTrue(testFileExist.exists());
-        ScanOptions options = new ScanOptions(/*batchSize*/ 32768);
-        StdSharedPtr<ArrowTable> table = null;
-        try (BufferAllocator allocator = new RootAllocator();
-                DatasetFactory datasetFactory =
-                        new FileSystemDatasetFactory(
-                                allocator,
-                                NativeMemoryPool.getDefault(),
-                                FileFormat.CSV,
-                                "file:" + uri);
-                Dataset dataset = datasetFactory.finish();
-                Scanner scanner = dataset.newScan(options);
-                ArrowReader reader = scanner.scanBatches()) {
-            reader.loadNextBatch();
-            try (VectorSchemaRoot vectorSchemaRoot = reader.getVectorSchemaRoot()) {
-                table = ArrowTable.fromVectorSchemaRoot(allocator, vectorSchemaRoot, reader);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Assert.assertNotNull(table);
-
-        String vertexMetaFile = root + "/ldbc_sample/parquet/" + "person.vertex.yml";
-        StdSharedPtr<Yaml> vertexMeta = Yaml.loadFile(StdString.create(vertexMetaFile)).value();
-        VertexInfo vertexInfo = VertexInfo.load(vertexMeta).value();
-        Assert.assertEquals("person", vertexInfo.getLabel().toJavaString());
-        VertexPropertyWriter writer =
-                VertexPropertyWriter.factory.create(vertexInfo, StdString.create("/tmp/"));
-
-        // Get & set validate level
-        Assert.assertEquals(ValidateLevel.no_validate, writer.getValidateLevel());
-        writer.setValidateLevel(ValidateLevel.strong_validate);
-        Assert.assertEquals(ValidateLevel.strong_validate, writer.getValidateLevel());
-
-        // Valid cases
-        // Write the table
-        Assert.assertTrue(writer.writeTable(table, 0).ok());
-        // Write the number of vertices
-        Assert.assertTrue(writer.writeVerticesNum(table.get().num_rows()).ok());
-
-        // Invalid cases
-        // Invalid vertices number
-        Assert.assertTrue(writer.writeVerticesNum(-1).isInvalid());
-        // Out of range
-        Assert.assertTrue(writer.writeChunk(table, 0, writer.getValidateLevel()).isInvalid());
+  @Test
+  public void test1() {
+    String uri = root + "/ldbc_sample/person_0_0_comma.csv";
+    File testFileExist = new File(uri);
+    Assert.assertTrue(testFileExist.exists());
+    ScanOptions options = new ScanOptions(/*batchSize*/ 32768);
+    StdSharedPtr<ArrowTable> table = null;
+    try (BufferAllocator allocator = new RootAllocator();
+        DatasetFactory datasetFactory =
+            new FileSystemDatasetFactory(
+                allocator, NativeMemoryPool.getDefault(), FileFormat.CSV, "file:" + uri);
+        Dataset dataset = datasetFactory.finish();
+        Scanner scanner = dataset.newScan(options);
+        ArrowReader reader = scanner.scanBatches()) {
+      reader.loadNextBatch();
+      try (VectorSchemaRoot vectorSchemaRoot = reader.getVectorSchemaRoot()) {
+        table = ArrowTable.fromVectorSchemaRoot(allocator, vectorSchemaRoot, reader);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
+    Assert.assertNotNull(table);
+
+    String vertexMetaFile = root + "/ldbc_sample/parquet/" + "person.vertex.yml";
+    StdSharedPtr<Yaml> vertexMeta = Yaml.loadFile(StdString.create(vertexMetaFile)).value();
+    VertexInfo vertexInfo = VertexInfo.load(vertexMeta).value();
+    Assert.assertEquals("person", vertexInfo.getLabel().toJavaString());
+    VertexPropertyWriter writer =
+        VertexPropertyWriter.factory.create(vertexInfo, StdString.create("/tmp/"));
+
+    // Get & set validate level
+    Assert.assertEquals(ValidateLevel.no_validate, writer.getValidateLevel());
+    writer.setValidateLevel(ValidateLevel.strong_validate);
+    Assert.assertEquals(ValidateLevel.strong_validate, writer.getValidateLevel());
+
+    // Valid cases
+    // Write the table
+    Assert.assertTrue(writer.writeTable(table, 0).ok());
+    // Write the number of vertices
+    Assert.assertTrue(writer.writeVerticesNum(table.get().num_rows()).ok());
+
+    // Invalid cases
+    // Invalid vertices number
+    Assert.assertTrue(writer.writeVerticesNum(-1).isInvalid());
+    // Out of range
+    Assert.assertTrue(writer.writeChunk(table, 0, writer.getValidateLevel()).isInvalid());
+  }
 }

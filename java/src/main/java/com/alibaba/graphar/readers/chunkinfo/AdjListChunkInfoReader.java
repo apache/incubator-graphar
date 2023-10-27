@@ -41,79 +41,79 @@ import com.alibaba.graphar.util.Status;
 @CXXHead(GAR_CHUNK_INFO_READER_H)
 public interface AdjListChunkInfoReader extends CXXPointer {
 
-    Factory factory = FFITypeFactory.getFactory(AdjListChunkInfoReader.class);
+  Factory factory = FFITypeFactory.getFactory(AdjListChunkInfoReader.class);
 
+  /**
+   * Sets chunk position indicator for reader by source internal vertex id.
+   *
+   * @param id the source internal vertex id.
+   */
+  @FFINameAlias("seek_src")
+  @CXXValue
+  Status seekSrc(@FFINameAlias(GAR_ID_TYPE) long id);
+
+  /**
+   * Sets chunk position indicator for reader by destination internal vertex id.
+   *
+   * @param id the destination internal vertex id.
+   */
+  @FFINameAlias("seek_dst")
+  @CXXValue
+  Status seekDst(@FFINameAlias(GAR_ID_TYPE) long id);
+
+  /**
+   * Sets chunk position indicator for reader by edge index.
+   *
+   * @param index offset edge index of the vertex chunk. Note: the offset is the edge index of the
+   *     vertex chunk, not the edge index of the whole graph.
+   */
+  @CXXValue
+  Status seek(@FFINameAlias(GAR_ID_TYPE) long index);
+
+  /** Return the current chunk file path of chunk position indicator. */
+  @FFINameAlias("GetChunk")
+  @CXXValue
+  Result<StdString> getChunk();
+
+  /**
+   * Sets chunk position indicator to next chunk. if current chunk is the last chunk, will return
+   * Status::IndexError error.
+   */
+  @FFINameAlias("next_chunk")
+  @CXXValue
+  Status nextChunk();
+
+  /**
+   * Helper function to Construct AdjListChunkInfoReader.
+   *
+   * @param graphInfo The graph info to describe the graph.
+   * @param srcLabel label of source vertex.
+   * @param edgeLabel label of edge.
+   * @param dstLabel label of destination vertex.
+   * @param adjListType The adj list type for the edges.
+   */
+  static Result<AdjListChunkInfoReader> constructAdjListChunkInfoReader(
+      @CXXReference GraphInfo graphInfo,
+      @CXXReference StdString srcLabel,
+      @CXXReference StdString edgeLabel,
+      @CXXReference StdString dstLabel,
+      @CXXValue AdjListType adjListType) {
+    return GrapharStaticFunctions.INSTANCE.constructAdjListChunkInfoReader(
+        graphInfo, srcLabel, edgeLabel, dstLabel, adjListType);
+  }
+
+  @FFIFactory
+  interface Factory {
     /**
-     * Sets chunk position indicator for reader by source internal vertex id.
+     * Initialize the AdjListChunkInfoReader.
      *
-     * @param id the source internal vertex id.
-     */
-    @FFINameAlias("seek_src")
-    @CXXValue
-    Status seekSrc(@FFINameAlias(GAR_ID_TYPE) long id);
-
-    /**
-     * Sets chunk position indicator for reader by destination internal vertex id.
-     *
-     * @param id the destination internal vertex id.
-     */
-    @FFINameAlias("seek_dst")
-    @CXXValue
-    Status seekDst(@FFINameAlias(GAR_ID_TYPE) long id);
-
-    /**
-     * Sets chunk position indicator for reader by edge index.
-     *
-     * @param index offset edge index of the vertex chunk. Note: the offset is the edge index of the
-     *     vertex chunk, not the edge index of the whole graph.
-     */
-    @CXXValue
-    Status seek(@FFINameAlias(GAR_ID_TYPE) long index);
-
-    /** Return the current chunk file path of chunk position indicator. */
-    @FFINameAlias("GetChunk")
-    @CXXValue
-    Result<StdString> getChunk();
-
-    /**
-     * Sets chunk position indicator to next chunk. if current chunk is the last chunk, will return
-     * Status::IndexError error.
-     */
-    @FFINameAlias("next_chunk")
-    @CXXValue
-    Status nextChunk();
-
-    /**
-     * Helper function to Construct AdjListChunkInfoReader.
-     *
-     * @param graphInfo The graph info to describe the graph.
-     * @param srcLabel label of source vertex.
-     * @param edgeLabel label of edge.
-     * @param dstLabel label of destination vertex.
+     * @param edgeInfo The edge info that describes the edge type.
      * @param adjListType The adj list type for the edges.
+     * @param prefix The absolute prefix of the graph.
      */
-    static Result<AdjListChunkInfoReader> constructAdjListChunkInfoReader(
-            @CXXReference GraphInfo graphInfo,
-            @CXXReference StdString srcLabel,
-            @CXXReference StdString edgeLabel,
-            @CXXReference StdString dstLabel,
-            @CXXValue AdjListType adjListType) {
-        return GrapharStaticFunctions.INSTANCE.constructAdjListChunkInfoReader(
-                graphInfo, srcLabel, edgeLabel, dstLabel, adjListType);
-    }
-
-    @FFIFactory
-    interface Factory {
-        /**
-         * Initialize the AdjListChunkInfoReader.
-         *
-         * @param edgeInfo The edge info that describes the edge type.
-         * @param adjListType The adj list type for the edges.
-         * @param prefix The absolute prefix of the graph.
-         */
-        AdjListChunkInfoReader create(
-                @CXXReference EdgeInfo edgeInfo,
-                @CXXValue AdjListType adjListType,
-                @CXXReference StdString prefix);
-    }
+    AdjListChunkInfoReader create(
+        @CXXReference EdgeInfo edgeInfo,
+        @CXXValue AdjListType adjListType,
+        @CXXReference StdString prefix);
+  }
 }

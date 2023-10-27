@@ -28,6 +28,6 @@ import com.alibaba.graphar.stdcxx.StdString;
 @FFITypeAlias(ARROW_STATUS)
 @CXXHead(ARROW_API_H)
 public interface ArrowStatus extends FFIPointer {
-    @CXXReference
-    StdString message();
+  @CXXReference
+  StdString message();
 }

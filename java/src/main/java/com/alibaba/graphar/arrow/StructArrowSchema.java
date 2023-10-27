@@ -29,10 +29,10 @@ import com.alibaba.fastffi.FFITypeFactory;
 @CXXHead(ARROW_API_H)
 @FFITypeAlias("struct ArrowSchema")
 public interface StructArrowSchema extends FFIPointer {
-    Factory factory = FFITypeFactory.getFactory(StructArrowSchema.class);
+  Factory factory = FFITypeFactory.getFactory(StructArrowSchema.class);
 
-    @FFIFactory
-    interface Factory {
-        StructArrowSchema create();
-    }
+  @FFIFactory
+  interface Factory {
+    StructArrowSchema create();
+  }
 }

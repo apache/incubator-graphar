@@ -40,53 +40,53 @@ import com.alibaba.graphar.util.Result;
 @CXXHead(GAR_GRAPH_H)
 public interface Edge extends CXXPointer {
 
-    Factory factory = FFITypeFactory.getFactory(Edge.class);
+  Factory factory = FFITypeFactory.getFactory(Edge.class);
 
+  /**
+   * Get source id of the edge.
+   *
+   * @return The id of the source vertex.
+   */
+  @FFITypeAlias(GAR_ID_TYPE)
+  long source();
+
+  /**
+   * Get destination id of the edge.
+   *
+   * @return The id of the destination vertex.
+   */
+  @FFITypeAlias(GAR_ID_TYPE)
+  long destination();
+
+  /**
+   * Get the value for a property of the current vertex.
+   *
+   * @param property StdString that describe property.
+   * @param tObject An object that instance of the return type. Supporting types:StdString, Long
+   *     <p>e.g.<br>
+   *     StdString name = StdString.create("name");<br>
+   *     StdString nameProperty = vertexIter.property(name, name);
+   *     <p>If you don't want to create an object, cast `Xxx` class to `XxxGen` and call this method
+   *     with `(ReturnType) null`.<br>
+   *     e.g.<br>
+   *     StdString nameProperty = ((VertexIterGen)vertexIter).property(StdString.create("name"),
+   *     (StdString) null);
+   * @return Result: The property value or error.
+   */
+  @CXXTemplate(cxx = STD_STRING, java = "com.alibaba.graphar.stdcxx.StdString")
+  @CXXTemplate(cxx = "int64_t", java = "java.lang.Long")
+  @CXXValue
+  <T> Result<T> property(@CXXReference StdString property, @FFISkip T tObject);
+
+  interface Factory {
     /**
-     * Get source id of the edge.
+     * Initialize the Edge.
      *
-     * @return The id of the source vertex.
+     * @param adjListReader The reader for reading the adjList.
+     * @param propertyReaders A set of readers for reading the edge properties.
      */
-    @FFITypeAlias(GAR_ID_TYPE)
-    long source();
-
-    /**
-     * Get destination id of the edge.
-     *
-     * @return The id of the destination vertex.
-     */
-    @FFITypeAlias(GAR_ID_TYPE)
-    long destination();
-
-    /**
-     * Get the value for a property of the current vertex.
-     *
-     * @param property StdString that describe property.
-     * @param tObject An object that instance of the return type. Supporting types:StdString, Long
-     *     <p>e.g.<br>
-     *     StdString name = StdString.create("name");<br>
-     *     StdString nameProperty = vertexIter.property(name, name);
-     *     <p>If you don't want to create an object, cast `Xxx` class to `XxxGen` and call this
-     *     method with `(ReturnType) null`.<br>
-     *     e.g.<br>
-     *     StdString nameProperty = ((VertexIterGen)vertexIter).property(StdString.create("name"),
-     *     (StdString) null);
-     * @return Result: The property value or error.
-     */
-    @CXXTemplate(cxx = STD_STRING, java = "com.alibaba.graphar.stdcxx.StdString")
-    @CXXTemplate(cxx = "int64_t", java = "java.lang.Long")
-    @CXXValue
-    <T> Result<T> property(@CXXReference StdString property, @FFISkip T tObject);
-
-    interface Factory {
-        /**
-         * Initialize the Edge.
-         *
-         * @param adjListReader The reader for reading the adjList.
-         * @param propertyReaders A set of readers for reading the edge properties.
-         */
-        Edge create(
-                @CXXReference AdjListArrowChunkReader adjListReader,
-                @CXXReference StdVector<AdjListPropertyArrowChunkReader> propertyReaders);
-    }
+    Edge create(
+        @CXXReference AdjListArrowChunkReader adjListReader,
+        @CXXReference StdVector<AdjListPropertyArrowChunkReader> propertyReaders);
+  }
 }

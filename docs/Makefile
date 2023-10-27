@@ -48,9 +48,11 @@ java-apidoc:
     		--quiet
 
 .PHONY: html
-html: cpp-apidoc spark-apidoc
+html: cpp-apidoc spark-apidoc java-apidoc
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	rm -fr $(BUILDDIR)/html/reference/spark-api
 	cp -fr $(ROOTDIR)/spark/target/site/scaladocs $(BUILDDIR)/html/reference/spark-api
+	rm -fr $(BUILDDIR)/html/reference/java-api
+	cp -fr $(ROOTDIR)/java/target/site/apidocs $(BUILDDIR)/html/reference/java-api
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

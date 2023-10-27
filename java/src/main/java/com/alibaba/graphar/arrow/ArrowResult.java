@@ -27,11 +27,11 @@ import com.alibaba.fastffi.FFITypeAlias;
 @FFITypeAlias(ARROW_RESULT)
 @CXXHead(ARROW_API_H)
 public interface ArrowResult<T> extends FFIPointer {
-    @CXXReference
-    T ValueOrDie();
+  @CXXReference
+  T ValueOrDie();
 
-    @CXXReference
-    ArrowStatus status();
+  @CXXReference
+  ArrowStatus status();
 
-    boolean ok();
+  boolean ok();
 }

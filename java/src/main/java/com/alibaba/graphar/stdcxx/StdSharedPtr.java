@@ -37,7 +37,7 @@ import com.alibaba.fastffi.FFITypeAlias;
 @CXXTemplate(cxx = ARROW_TABLE, java = "com.alibaba.graphar.arrow.ArrowTable")
 @CXXTemplate(cxx = ARROW_ARRAY, java = "com.alibaba.graphar.arrow.ArrowArray")
 public interface StdSharedPtr<T extends FFIPointer> extends FFIPointer {
-    // & will return the pointer of T.
-    // shall be cxxvalue?
-    T get();
+  // & will return the pointer of T.
+  // shall be cxxvalue?
+  T get();
 }

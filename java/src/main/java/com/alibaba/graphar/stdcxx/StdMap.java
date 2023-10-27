@@ -33,21 +33,21 @@ import com.alibaba.fastffi.FFITypeAlias;
 @CXXHead(GAR_GRAPH_INFO_H)
 @FFITypeAlias("std::map")
 @CXXTemplate(
-        cxx = {STD_STRING, GAR_EDGE_INFO},
-        java = {"com.alibaba.graphar.stdcxx.StdString", "com.alibaba.graphar.graphinfo.EdgeInfo"})
+    cxx = {STD_STRING, GAR_EDGE_INFO},
+    java = {"com.alibaba.graphar.stdcxx.StdString", "com.alibaba.graphar.graphinfo.EdgeInfo"})
 @CXXTemplate(
-        cxx = {STD_STRING, GAR_VERTEX_INFO},
-        java = {"com.alibaba.graphar.stdcxx.StdString", "com.alibaba.graphar.graphinfo.VertexInfo"})
+    cxx = {STD_STRING, GAR_VERTEX_INFO},
+    java = {"com.alibaba.graphar.stdcxx.StdString", "com.alibaba.graphar.graphinfo.VertexInfo"})
 public interface StdMap<K, V> extends FFIPointer {
 
-    @CXXOperator("[]")
-    @CXXReference
-    V get(@CXXReference K key);
+  @CXXOperator("[]")
+  @CXXReference
+  V get(@CXXReference K key);
 
-    int size();
+  int size();
 
-    @FFIFactory
-    interface Factory<K, V> {
-        StdMap<K, V> create();
-    }
+  @FFIFactory
+  interface Factory<K, V> {
+    StdMap<K, V> create();
+  }
 }

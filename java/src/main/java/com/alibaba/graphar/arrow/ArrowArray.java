@@ -26,5 +26,5 @@ import com.alibaba.fastffi.FFITypeAlias;
 @FFITypeAlias(ARROW_ARRAY)
 @CXXHead(ARROW_API_H)
 public interface ArrowArray extends CXXPointer {
-    long length();
+  long length();
 }

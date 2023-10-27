@@ -35,66 +35,66 @@ import com.alibaba.graphar.stdcxx.StdString;
 @FFITypeAlias(GAR_EDGES_COLLECTION_ORDERED_BY_SOURCE)
 @CXXHead(GAR_GRAPH_H)
 public interface EdgesCollectionOrderedBySource extends EdgesCollection, CXXPointer {
-    Factory factory = FFITypeFactory.getFactory(EdgesCollectionOrderedBySource.class);
+  Factory factory = FFITypeFactory.getFactory(EdgesCollectionOrderedBySource.class);
 
-    /** The iterator pointing to the first edge. */
-    @CXXValue
-    EdgeIter begin();
+  /** The iterator pointing to the first edge. */
+  @CXXValue
+  EdgeIter begin();
 
-    /** The iterator pointing to the past-the-end element. */
-    @CXXValue
-    EdgeIter end();
+  /** The iterator pointing to the past-the-end element. */
+  @CXXValue
+  EdgeIter end();
+
+  /**
+   * Construct and return the iterator pointing to the first out-going edge of the vertex with
+   * specific id after the input iterator.
+   *
+   * @param id The vertex id.
+   * @param from The input iterator.
+   * @return The new constructed iterator.
+   */
+  @FFINameAlias("find_src")
+  @CXXValue
+  EdgeIter findSrc(long id, @CXXReference EdgeIter from);
+
+  /**
+   * Construct and return the iterator pointing to the first incoming edge of the vertex with
+   * specific id after the input iterator.
+   *
+   * @param id The vertex id.
+   * @param from The input iterator.
+   * @return The new constructed iterator.
+   */
+  @FFINameAlias("find_dst")
+  @CXXValue
+  EdgeIter findDst(long id, @CXXReference EdgeIter from);
+
+  /** Get the number of edges in the collection. */
+  long size();
+
+  @FFIFactory
+  interface Factory {
+    /**
+     * Initialize the EdgesCollection with a range of chunks.
+     *
+     * @param edgeInfo The edge info that describes the edge type.
+     * @param prefix The absolute prefix.
+     * @param vertexChunkBegin The index of the beginning vertex chunk.
+     * @param vertexChunkEnd The index of the end vertex chunk (not included).
+     */
+    EdgesCollectionOrderedBySource create(
+        @CXXReference EdgeInfo edgeInfo,
+        @CXXReference StdString prefix,
+        @FFITypeAlias(GAR_ID_TYPE) long vertexChunkBegin,
+        @FFITypeAlias(GAR_ID_TYPE) long vertexChunkEnd);
 
     /**
-     * Construct and return the iterator pointing to the first out-going edge of the vertex with
-     * specific id after the input iterator.
+     * Initialize the EdgesCollection with a range of chunks.
      *
-     * @param id The vertex id.
-     * @param from The input iterator.
-     * @return The new constructed iterator.
+     * @param edgeInfo The edge info that describes the edge type.
+     * @param prefix The absolute prefix.
      */
-    @FFINameAlias("find_src")
-    @CXXValue
-    EdgeIter findSrc(long id, @CXXReference EdgeIter from);
-
-    /**
-     * Construct and return the iterator pointing to the first incoming edge of the vertex with
-     * specific id after the input iterator.
-     *
-     * @param id The vertex id.
-     * @param from The input iterator.
-     * @return The new constructed iterator.
-     */
-    @FFINameAlias("find_dst")
-    @CXXValue
-    EdgeIter findDst(long id, @CXXReference EdgeIter from);
-
-    /** Get the number of edges in the collection. */
-    long size();
-
-    @FFIFactory
-    interface Factory {
-        /**
-         * Initialize the EdgesCollection with a range of chunks.
-         *
-         * @param edgeInfo The edge info that describes the edge type.
-         * @param prefix The absolute prefix.
-         * @param vertexChunkBegin The index of the beginning vertex chunk.
-         * @param vertexChunkEnd The index of the end vertex chunk (not included).
-         */
-        EdgesCollectionOrderedBySource create(
-                @CXXReference EdgeInfo edgeInfo,
-                @CXXReference StdString prefix,
-                @FFITypeAlias(GAR_ID_TYPE) long vertexChunkBegin,
-                @FFITypeAlias(GAR_ID_TYPE) long vertexChunkEnd);
-
-        /**
-         * Initialize the EdgesCollection with a range of chunks.
-         *
-         * @param edgeInfo The edge info that describes the edge type.
-         * @param prefix The absolute prefix.
-         */
-        EdgesCollectionOrderedBySource create(
-                @CXXReference EdgeInfo edgeInfo, @CXXReference StdString prefix);
-    }
+    EdgesCollectionOrderedBySource create(
+        @CXXReference EdgeInfo edgeInfo, @CXXReference StdString prefix);
+  }
 }

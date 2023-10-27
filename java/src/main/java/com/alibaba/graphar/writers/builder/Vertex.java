@@ -37,89 +37,89 @@ import com.alibaba.graphar.stdcxx.StdUnorderedMap;
 @CXXHead(GAR_VERTICES_BUILDER_H)
 public interface Vertex extends CXXPointer {
 
-    Factory factory = FFITypeFactory.getFactory(Vertex.class);
+  Factory factory = FFITypeFactory.getFactory(Vertex.class);
+
+  /**
+   * Get id of the vertex.
+   *
+   * @return The id of the vertex.
+   */
+  @FFINameAlias("GetId")
+  @FFITypeAlias(GAR_ID_TYPE)
+  long getId();
+
+  /**
+   * Set id of the vertex.
+   *
+   * @param id The id of the vertex.
+   */
+  @FFINameAlias("SetId")
+  void setId(@FFITypeAlias(GAR_ID_TYPE) long id);
+
+  /**
+   * Check if the vertex is empty.
+   *
+   * @return true/false.
+   */
+  @FFINameAlias("Empty")
+  boolean empty();
+
+  /**
+   * Add a property to the vertex.
+   *
+   * @param name The name of the property.
+   * @param val The value of the property.
+   */
+  @FFINameAlias("AddProperty")
+  void addProperty(@CXXReference StdString name, @CXXReference StdString val);
+
+  /**
+   * Add a property to the vertex.
+   *
+   * @param name The name of the property.
+   * @param val The value of the property.
+   */
+  @FFINameAlias("AddProperty")
+  void addProperty(@CXXReference StdString name, long val);
+
+  /**
+   * Get a property of the vertex.
+   *
+   * @param property The name of the property.
+   * @return The value of the property.
+   */
+  @FFINameAlias("GetProperty")
+  @FFIConst
+  @CXXReference
+  <T> T getProperty(@CXXReference StdString property, @FFISkip T skipT);
+
+  /**
+   * Get all properties of the vertex.
+   *
+   * @return The map containing all properties of the vertex.
+   */
+  @FFINameAlias("GetProperties")
+  @CXXReference
+  <T> StdUnorderedMap<StdString, T> getProperties(@FFISkip T skipT);
+
+  /**
+   * Check if the vertex contains a property.
+   *
+   * @param property The name of the property.
+   * @return true/false.
+   */
+  @FFINameAlias("ContainProperty")
+  boolean containProperty(@CXXReference StdString property);
+
+  @FFIFactory
+  interface Factory {
+    Vertex create();
 
     /**
-     * Get id of the vertex.
-     *
-     * @return The id of the vertex.
-     */
-    @FFINameAlias("GetId")
-    @FFITypeAlias(GAR_ID_TYPE)
-    long getId();
-
-    /**
-     * Set id of the vertex.
+     * Initialize the vertex with a given id.
      *
      * @param id The id of the vertex.
      */
-    @FFINameAlias("SetId")
-    void setId(@FFITypeAlias(GAR_ID_TYPE) long id);
-
-    /**
-     * Check if the vertex is empty.
-     *
-     * @return true/false.
-     */
-    @FFINameAlias("Empty")
-    boolean empty();
-
-    /**
-     * Add a property to the vertex.
-     *
-     * @param name The name of the property.
-     * @param val The value of the property.
-     */
-    @FFINameAlias("AddProperty")
-    void addProperty(@CXXReference StdString name, @CXXReference StdString val);
-
-    /**
-     * Add a property to the vertex.
-     *
-     * @param name The name of the property.
-     * @param val The value of the property.
-     */
-    @FFINameAlias("AddProperty")
-    void addProperty(@CXXReference StdString name, long val);
-
-    /**
-     * Get a property of the vertex.
-     *
-     * @param property The name of the property.
-     * @return The value of the property.
-     */
-    @FFINameAlias("GetProperty")
-    @FFIConst
-    @CXXReference
-    <T> T getProperty(@CXXReference StdString property, @FFISkip T skipT);
-
-    /**
-     * Get all properties of the vertex.
-     *
-     * @return The map containing all properties of the vertex.
-     */
-    @FFINameAlias("GetProperties")
-    @CXXReference
-    <T> StdUnorderedMap<StdString, T> getProperties(@FFISkip T skipT);
-
-    /**
-     * Check if the vertex contains a property.
-     *
-     * @param property The name of the property.
-     * @return true/false.
-     */
-    @FFINameAlias("ContainProperty")
-    boolean containProperty(@CXXReference StdString property);
-
-    @FFIFactory
-    interface Factory {
-        Vertex create();
-
-        /**
-         * Initialize the vertex with a given id.
-         *
-         * @param id The id of the vertex.
-         */
-        Vertex create(@FFITypeAlias(GAR_ID_TYPE) long id);
-    }
+    Vertex create(@FFITypeAlias(GAR_ID_TYPE) long id);
+  }
 }

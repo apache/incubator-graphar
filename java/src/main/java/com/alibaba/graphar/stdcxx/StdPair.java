@@ -30,17 +30,17 @@ import com.alibaba.fastffi.FFITypeAlias;
 @CXXHead(system = "utility")
 @CXXHead(GAR_GRAPH_H)
 @CXXTemplate(
-        cxx = {"GraphArchive::IdType", "GraphArchive::IdType"},
-        java = {"Long", "Long"})
+    cxx = {"GraphArchive::IdType", "GraphArchive::IdType"},
+    java = {"Long", "Long"})
 @CXXTemplate(
-        cxx = {"int64_t", "int64_t"},
-        java = {"Long", "Long"})
+    cxx = {"int64_t", "int64_t"},
+    java = {"Long", "Long"})
 public interface StdPair<T1, T2> extends FFIPointer {
-    @FFINameAlias("first")
-    @FFIGetter
-    T1 getFirst();
+  @FFINameAlias("first")
+  @FFIGetter
+  T1 getFirst();
 
-    @FFINameAlias("second")
-    @FFIGetter
-    T2 getSecond();
+  @FFINameAlias("second")
+  @FFIGetter
+  T2 getSecond();
 }

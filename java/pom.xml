@@ -258,7 +258,7 @@
                         <java>
                             <googleJavaFormat>
                                 <version>1.7</version>
-                                <style>AOSP</style>
+                                <style>GOOGLE</style>
                             </googleJavaFormat>
                         </java>
                     </configuration>

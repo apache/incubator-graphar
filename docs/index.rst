@@ -32,6 +32,7 @@
 
    developers/community.rst
    developers/contributing.rst
+   developers/java-dev.rst
 
 .. toctree::
    :maxdepth: 1
