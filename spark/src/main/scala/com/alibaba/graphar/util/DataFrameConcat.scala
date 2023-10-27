@@ -32,7 +32,7 @@ object DataFrameConcat {
    * @param df2
    *   The second DataFrame.
    * @return
-   *   The result DataFrame that concats the two DataFrames.
+   *   The result DataFrame that concatenate the two DataFrames.
    */
   def concat(df1: DataFrame, df2: DataFrame): DataFrame = {
     val spark = df1.sparkSession

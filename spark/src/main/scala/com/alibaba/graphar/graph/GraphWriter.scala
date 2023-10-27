@@ -31,12 +31,12 @@ import java.io.{BufferedWriter, OutputStreamWriter}
 class GraphWriter() {
 
   /**
-   * Put the vertex dataframe into writer.
+   * Put the vertex DataFrame into writer.
    *
    * @param label
    *   label of vertex.
    * @param df
-   *   dataframe of the vertex type.
+   *   DataFrame of the vertex type.
    * @param primaryKey
    *   primary key of the vertex type, default is empty, which take the first
    *   property column as primary key.
