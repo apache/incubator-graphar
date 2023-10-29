@@ -35,7 +35,7 @@ Tips:
 
 - Compile from source with this [script](https://github.com/alibaba/fastFFI/blob/main/docker/install-llvm11.sh):
   ```bash
-  $ export LLVM11_HOME=/usr/lib/llvm-11 LLVM_VAR=11.0.0
+  $ export LLVM11_HOME=/usr/lib/llvm-11
   $ export LLVM_VAR=11.0.0
   $ sudo ./install-llvm11.sh
   ```

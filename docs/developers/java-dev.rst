@@ -36,7 +36,7 @@ Runtime Level
 Interfaces and classes will be compiled to ``.class`` files.
 
 By writing CMakeLists.txt, all C++ dependents(e.g. JNI code, GraphAr C++
-library and other C++ library) will been intergrated into a bridge
+library and other C++ library) will been integrated into a bridge
 dynamic library called gar-jni which can be called by native methods
 directly.
 
@@ -53,12 +53,12 @@ style <https://google.github.io/styleguide/javaguide.html>`__. To ensure
 CI for checking code style will pass, please ensure check below is
 success:
 
-.. code:: bash
+.. code-block:: bash
 
    mvn spotless:check
 
 If there are violations, running command below to automatically format:
 
-.. code:: bash
+.. code-block:: bash
 
    mvn spotless:apply

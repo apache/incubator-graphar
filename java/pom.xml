@@ -12,13 +12,19 @@
     <name>gar-java</name>
 
     <properties>
+        <native.library.name>gar-java</native.library.name>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>
         <fastffi.revision>0.1.2</fastffi.revision>
         <arrow.version>13.0.0</arrow.version>
-        <native.library.name>gar-java</native.library.name>
+        <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
         <maven.javadoc.version>3.4.0</maven.javadoc.version>
+        <javadoc.output.directory>gar-java-javadoc</javadoc.output.directory>
+        <javadoc.output.destDir>gar-java-javadoc</javadoc.output.destDir>
     </properties>
 
     <dependencies>
@@ -234,15 +240,16 @@
                     <configuration>
                         <groups>
                             <group>
-                                <title>GraphAr</title>
+                                <title>GarphAr</title>
                                 <packages>com.alibaba.graphar*</packages>
                             </group>
                         </groups>
-                        <javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
                         <sourceFileExcludes>
                             <sourceFileExclude>**/*GenGen.java</sourceFileExclude>
                             <sourceFileExclude>**/Unused*.java</sourceFileExclude>
                         </sourceFileExcludes>
+                        <reportOutputDirectory>${javadoc.output.directory}</reportOutputDirectory>
+                        <destDir>${javadoc.output.destDir}</destDir>
                         <failOnError>false</failOnError>
                         <failOnWarnings>false</failOnWarnings>
                         <locale>en_US</locale>

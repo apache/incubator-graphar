@@ -34,24 +34,12 @@ Get GraphAr Java Library
 Building from source
 ~~~~~~~~~~~~~~~~~~~~
 
-Firstly, install llvm-11. You can use this
-`script <https://github.com/alibaba/fastFFI/blob/main/docker/install-llvm11.sh>`__
-with ``LLVM11_HOME=/usr/lib/llvm-11`` and ``LLVM_VAR=11.0.0`` installing
-from source, or install from apt-get:
+Only support installing from source currently, but we will support
+installing from Maven in the future.
 
-.. code:: shell
-
-   sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
-
-And export directory to llvm-11:
-
-.. code:: shell
-
-   export LLVM11_HOME=<path-to-llvm-11> 
-
-``LLVM11_HOME`` should point to the home of LLVM 11. In Ubuntu, it is at
-``/usr/lib/llvm-11``. Basically, the build procedure the following
-binary:
+Firstly, install llvm-11. ``LLVM11_HOME`` should point to the home of
+LLVM 11. In Ubuntu, it is at ``/usr/lib/llvm-11``. Basically, the build
+procedure the following binary:
 
 -  ``$LLVM11_HOME/bin/clang++``
 
@@ -59,22 +47,43 @@ binary:
 
 -  ``$LLVM11_HOME/lib/cmake/llvm``
 
+Tips:
+
+-  From apt-get:
+
+   .. code-block:: bash
+
+      $ sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
+      $ export LLVM11_HOME=/usr/lib/llvm-11
+
+-  Compile from source with this
+   `script <https://github.com/alibaba/fastFFI/blob/main/docker/install-llvm11.sh>`__:
+
+   .. code-block:: bash
+
+      $ export LLVM11_HOME=/usr/lib/llvm-11
+      $ export LLVM_VAR=11.0.0
+      $ sudo ./install-llvm11.sh
+
 Make the graphar-java-library directory as the current working
 directory:
 
-.. code:: shell
+.. code-block:: bash
 
-   cd GraphAr/java
+    $ git clone https://github.com/alibaba/GraphAr.git
+    $ cd GraphAr
+    $ git submodule update --init
+    $ cd java
 
 Compile package:
 
-.. code:: shell
+.. code-block:: bash
 
-   mvn clean install -DskipTests
+    $ mvn clean install -DskipTests
 
 Then set GraphAr as a dependency in maven project:
 
-.. code:: shell
+.. code-block:: xml
 
    <dependencies>
        <dependency>
@@ -99,7 +108,7 @@ files (in the Yaml format) or in-memory from scratch.
 To construct information from a Yaml file, please refer to the following
 example code.
 
-.. code:: java
+.. code-block:: java
 
    // read graph yaml and construct information
    String path = ...; // the path to the yaml file
@@ -137,7 +146,7 @@ written alone, or alternatively, all adjList, properties, and the offset
 To utilize the GAR Java writer, please refer to the following example
 code.
 
-.. code:: java
+.. code-block:: java
 
    // common steps to construct VectorSchemaRoot
    String uri = "file:" + ...; // data source
@@ -186,7 +195,7 @@ users to specify the data they need, e.g., a single property group.
 To utilize the GAR Java reader, please refer to the following example
 code.
 
-.. code:: java
+.. code-block:: java
 
    // construct vertex chunk reader
    GraphInfo graphInfo = ...; // load graph meta info

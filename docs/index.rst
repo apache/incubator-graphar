@@ -14,6 +14,7 @@
    user-guide/getting-started.rst
    user-guide/file-format.rst
    user-guide/spark-lib.rst
+   user-guide/java-lib.rst
 
 .. toctree::
    :maxdepth: 1
