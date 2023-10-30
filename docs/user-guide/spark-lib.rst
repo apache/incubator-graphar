@@ -132,7 +132,7 @@ To utilize the GAR Spark writer, please refer to the following example code.
 
 .. code-block:: scala
 
-   // generate the vertex index column for vertex dataframe
+   // generate the vertex index column for vertex DataFrame
    val vertex_df = ...
    val vertex_df_with_index = IndexGenerator.generateVertexIndexColumn(vertex_df)
    // construct the vertex writer
@@ -145,7 +145,7 @@ To utilize the GAR Spark writer, please refer to the following example code.
    // write all properties
    writer.writeVertexProperties()
 
-   // generate vertex index for edge dataframe
+   // generate vertex index for edge DataFrame
    val edge_df = ...
    val edge_df_with_index = IndexGenerator.generateSrcAndDstIndexUnitedlyForEdges(edge_df, "src", "dst")
    // construct the edge writer

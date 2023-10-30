@@ -78,7 +78,7 @@ class VertexWriter(
   )
 
   private def validate(): Unit = {
-    // check if vertex dataframe contains the index_filed
+    // check if vertex DataFrame contains the index_filed
     val index_filed = StructField(GeneralParams.vertexIndexCol, LongType)
     if (vertexDf.schema.contains(index_filed) == false) {
       throw new IllegalArgumentException
@@ -95,7 +95,7 @@ class VertexWriter(
   }
 
   /**
-   * Generate chunks of the property group for vertex dataframe.
+   * Generate chunks of the property group for vertex DataFrame.
    *
    * @param propertyGroup
    *   property group
@@ -124,7 +124,7 @@ class VertexWriter(
     )
   }
 
-  /** Generate chunks of all property groups for vertex dataframe. */
+  /** Generate chunks of all property groups for vertex DataFrame. */
   def writeVertexProperties(): Unit = {
     val property_groups = vertexInfo.getProperty_groups()
     val it = property_groups.iterator

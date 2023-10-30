@@ -30,7 +30,7 @@ class ComputeExampleSuite extends AnyFunSuite {
     .getOrCreate()
 
   test("run cc using graphx") {
-    // read vertex dataframe
+    // read vertex DataFrame
     val file_path = "gar-test/ldbc_sample/parquet/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
     val vertex_yaml = getClass.getClassLoader
@@ -45,7 +45,7 @@ class ComputeExampleSuite extends AnyFunSuite {
     assert(vertex_df.columns.size == 5)
     assert(vertex_df.count() == vertices_num)
 
-    // read edge dataframe
+    // read edge DataFrame
     val edge_yaml = getClass.getClassLoader
       .getResource(file_path + "person_knows_person.edge.yml")
       .getPath

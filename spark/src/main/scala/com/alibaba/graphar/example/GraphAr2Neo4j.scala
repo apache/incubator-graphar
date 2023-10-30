@@ -103,7 +103,7 @@ object GraphAr2Neo4j {
           targetDf,
           sourcePrimaryKey,
           targetPrimaryKey
-        ) // use the first dataframe of (adj_list_type_str, dataframe) map
+        ) // use the first DataFrame of (adj_list_type_str, DataFrame) map
 
         // FIXME: use properties message in edge info
         val properties = if (edgeLabel == "REVIEWED") "rating,summary" else ""

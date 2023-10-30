@@ -112,8 +112,8 @@ object GraphReader {
    * @param addVertexIndex
    *   Whether to add index for the vertex DataFrames.
    * @return
-   *   Pair of vertex dataframes and edge dataframes, the vertex dataframes are
-   *   stored as the map of (vertex_label -> DataFrame) the edge dataframes are
+   *   Pair of vertex DataFrames and edge DataFrames, the vertex DataFrames are
+   *   stored as the map of (vertex_label -> DataFrame) the edge DataFrames are
    *   stored as a map of ((srcLabel, edgeLabel, dstLabel) -> (adj_list_type_str
    * -> DataFrame))
    */
@@ -145,8 +145,8 @@ object GraphReader {
    * @param addVertexIndex
    *   Whether to add index for the vertex DataFrames.
    * @return
-   *   Pair of vertex dataframes and edge dataframes, the vertex dataframes are
-   *   stored as the map of (vertex_label -> DataFrame) the edge dataframes are
+   *   Pair of vertex DataFrames and edge DataFrames, the vertex DataFrames are
+   *   stored as the map of (vertex_label -> DataFrame) the edge DataFrames are
    *   stored as a map of (srcLabel_edgeLabel_dstLabel -> (adj_list_type_str ->
    *   DataFrame))
    */
