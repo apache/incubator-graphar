@@ -49,14 +49,14 @@ procedure the following binary:
 
 Tips:
 
--  From apt-get:
+-  Use Ubuntu as example:
 
    .. code-block:: bash
 
       $ sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
       $ export LLVM11_HOME=/usr/lib/llvm-11
 
--  Compile from source with this
+-  Or compile from source with this
    `script <https://github.com/alibaba/fastFFI/blob/main/docker/install-llvm11.sh>`__:
 
    .. code-block:: bash
