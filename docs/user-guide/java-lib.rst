@@ -124,17 +124,15 @@ See `test for
 graphinfo <https://github.com/alibaba/GraphAr/tree/main/java/src/test/java/com/alibaba/graphar/graphinfo>`__
 for the complete example.
 
-.. _header-n136:
-
 Writers
 ~~~~~~~
 
-The GraphAr Java wraps C++ interfaces to write arrow::Table into GraphAr
-formatted files in a batch-import fashion. But arrow::Table are not easy
+The GraphAr Java writers wrap C++ interfaces to write arrow::Table into GraphAr
+formatted files in a batch-import fashion. But arrow::Table is not easy
 to build in Java. Instead, the GraphAr Java library provide a static
 method to convert VectorSchemaRoot into arrow::Table. Warning: There are
 some problems concerning this method which lead to memory leaks. We will
-fix it or rewritre writer with Apache arrow Java.
+fix it or rewrite writers with Apache arrow Java.
 
 With the VertexWriter, users can specify a particular property group to
 be written into its corresponding chunks, or choose to write all

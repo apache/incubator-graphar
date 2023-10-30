@@ -23,25 +23,25 @@ import com.alibaba.fastffi.FFITypeRefiner;
 @FFITypeAlias(GAR_FILE_TYPE)
 @FFITypeRefiner("com.alibaba.graphar.types.FileType.get")
 public enum FileType implements CXXEnum {
-  CSV,
-  PARQUET,
-  ORC;
+    CSV,
+    PARQUET,
+    ORC;
 
-  public static FileType get(int value) {
-    switch (value) {
-      case 0:
-        return CSV;
-      case 1:
-        return PARQUET;
-      case 2:
-        return ORC;
-      default:
-        throw new IllegalStateException("Unknown value for file type: " + value);
+    public static FileType get(int value) {
+        switch (value) {
+            case 0:
+                return CSV;
+            case 1:
+                return PARQUET;
+            case 2:
+                return ORC;
+            default:
+                throw new IllegalStateException("Unknown value for file type: " + value);
+        }
     }
-  }
 
-  @Override
-  public int getValue() {
-    return ordinal();
-  }
+    @Override
+    public int getValue() {
+        return ordinal();
+    }
 }

@@ -289,7 +289,7 @@
                         <java>
                             <googleJavaFormat>
                                 <version>1.7</version>
-                                <style>GOOGLE</style>
+                                <style>AOSP</style>
                             </googleJavaFormat>
                         </java>
                     </configuration>

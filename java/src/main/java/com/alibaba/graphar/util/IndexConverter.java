@@ -14,9 +14,9 @@ import com.alibaba.fastffi.FFITypeAlias;
 @FFITypeAlias(GAR_UTIL_INDEX_CONVERTER)
 @CXXHead(GAR_UTIL_UTIL_H)
 public interface IndexConverter extends CXXPointer {
-  @FFIFactory
-  interface Factory {
-    // IndexConverter create(@FFITypeAlias("std::vector<GrapharChive::IdType>&&")
-    // StdVector<Long> edgeChunkNums);
-  }
+    @FFIFactory
+    interface Factory {
+        // IndexConverter create(@FFITypeAlias("std::vector<GrapharChive::IdType>&&")
+        // StdVector<Long> edgeChunkNums);
+    }
 }

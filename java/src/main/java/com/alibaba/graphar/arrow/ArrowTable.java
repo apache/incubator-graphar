@@ -38,51 +38,51 @@ import org.apache.arrow.vector.dictionary.DictionaryProvider;
 @CXXHead(ARROW_API_H)
 public interface ArrowTable extends CXXPointer {
 
-  /**
-   * Convert VectorSchemaRoot to C++ arrow::Table
-   *
-   * @param allocator Buffer allocator for allocating C data interface fields
-   * @param vsr Vector schema root to export
-   * @param provider Dictionary provider for dictionary encoded vectors (optional)
-   * @return StdSharedPtr<ArrowTable>
-   */
-  static StdSharedPtr<ArrowTable> fromVectorSchemaRoot(
-      BufferAllocator allocator, VectorSchemaRoot vsr, DictionaryProvider provider) {
-    ArrowResult<StdSharedPtr<ArrowTable>> maybeTable = null;
-    org.apache.arrow.c.ArrowArray arrowArray = ArrowArray.allocateNew(allocator);
-    org.apache.arrow.c.ArrowSchema arrowSchema = ArrowSchema.allocateNew(allocator);
-    Data.exportVectorSchemaRoot(allocator, vsr, provider, arrowArray, arrowSchema);
-    maybeTable =
-        Static.INSTANCE.fromArrowArrayAndArrowSchema(
-            arrowArray.memoryAddress(), arrowSchema.memoryAddress());
-    if (!maybeTable.ok()) {
-      throw new RuntimeException(
-          "Error when convert C RecordBatch to C++ Table: "
-              + maybeTable.status().message().toJavaString());
-    }
-    return maybeTable.ValueOrDie();
-  }
-
-  long num_rows();
-
-  @CXXValue
-  StdString ToString();
-
-  @FFIGen
-  @FFILibrary(value = "arrow", namespace = "arrow")
-  interface Static {
-    Static INSTANCE = FFITypeFactory.getLibrary(ArrowTable.Static.class);
-
     /**
-     * Convert C ArrowArray and ArrowSchema to C++ arrow::Table with JNI wrote manually
+     * Convert VectorSchemaRoot to C++ arrow::Table
      *
-     * @param arrayAddress Address of C ArrowArray
-     * @param schemaAddress Address of C ArrowSchema
-     * @return StdSharedPtr<ArrowTable> wrapped by ArrowResult
+     * @param allocator Buffer allocator for allocating C data interface fields
+     * @param vsr Vector schema root to export
+     * @param provider Dictionary provider for dictionary encoded vectors (optional)
+     * @return StdSharedPtr<ArrowTable>
      */
+    static StdSharedPtr<ArrowTable> fromVectorSchemaRoot(
+            BufferAllocator allocator, VectorSchemaRoot vsr, DictionaryProvider provider) {
+        ArrowResult<StdSharedPtr<ArrowTable>> maybeTable = null;
+        org.apache.arrow.c.ArrowArray arrowArray = ArrowArray.allocateNew(allocator);
+        org.apache.arrow.c.ArrowSchema arrowSchema = ArrowSchema.allocateNew(allocator);
+        Data.exportVectorSchemaRoot(allocator, vsr, provider, arrowArray, arrowSchema);
+        maybeTable =
+                Static.INSTANCE.fromArrowArrayAndArrowSchema(
+                        arrowArray.memoryAddress(), arrowSchema.memoryAddress());
+        if (!maybeTable.ok()) {
+            throw new RuntimeException(
+                    "Error when convert C RecordBatch to C++ Table: "
+                            + maybeTable.status().message().toJavaString());
+        }
+        return maybeTable.ValueOrDie();
+    }
+
+    long num_rows();
+
     @CXXValue
-    ArrowResult<StdSharedPtr<ArrowTable>> fromArrowArrayAndArrowSchema(
-        @FFITypeAlias("struct ArrowArray*") long arrayAddress,
-        @FFITypeAlias("struct ArrowSchema*") long schemaAddress);
-  }
+    StdString ToString();
+
+    @FFIGen
+    @FFILibrary(value = "arrow", namespace = "arrow")
+    interface Static {
+        Static INSTANCE = FFITypeFactory.getLibrary(ArrowTable.Static.class);
+
+        /**
+         * Convert C ArrowArray and ArrowSchema to C++ arrow::Table with JNI wrote manually
+         *
+         * @param arrayAddress Address of C ArrowArray
+         * @param schemaAddress Address of C ArrowSchema
+         * @return StdSharedPtr<ArrowTable> wrapped by ArrowResult
+         */
+        @CXXValue
+        ArrowResult<StdSharedPtr<ArrowTable>> fromArrowArrayAndArrowSchema(
+                @FFITypeAlias("struct ArrowArray*") long arrayAddress,
+                @FFITypeAlias("struct ArrowSchema*") long schemaAddress);
+    }
 }

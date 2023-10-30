@@ -38,60 +38,60 @@ import com.alibaba.graphar.util.Result;
 @FFITypeAlias(GAR_VERTEX_ITER)
 @CXXHead(GAR_GRAPH_H)
 public interface VertexIter extends CXXPointer {
-  /** Construct and return the vertex of the current offset. */
-  @CXXOperator("*")
-  @CXXValue
-  Vertex get();
+    /** Construct and return the vertex of the current offset. */
+    @CXXOperator("*")
+    @CXXValue
+    Vertex get();
 
-  /** Get the vertex id of the current offset. */
-  @FFITypeAlias(GAR_ID_TYPE)
-  long id();
+    /** Get the vertex id of the current offset. */
+    @FFITypeAlias(GAR_ID_TYPE)
+    long id();
 
-  /**
-   * Get the value for a property of the current vertex.
-   *
-   * @param property StdString that describe property.
-   * @param tObject An object that instance of the return type. Supporting types:StdString, Long
-   *     <p>e.g.<br>
-   *     StdString name = StdString.create("name");<br>
-   *     StdString nameProperty = vertexIter.property(name, name);
-   *     <p>If you don't want to create an object, cast `Xxx` class to `XxxGen` and call this method
-   *     with `(ReturnType) null`.<br>
-   *     e.g.<br>
-   *     StdString nameProperty = ((VertexIterGen)vertexIter).property(StdString.create("name"),
-   *     (StdString) null);
-   * @return Result: The property value or error.
-   */
-  @CXXTemplate(cxx = STD_STRING, java = "com.alibaba.graphar.stdcxx.StdString")
-  @CXXTemplate(cxx = "int64_t", java = "java.lang.Long")
-  @CXXValue
-  <T> Result<T> property(@CXXReference StdString property, @FFISkip T tObject);
-
-  @CXXOperator("++")
-  @CXXReference
-  VertexIter inc();
-
-  /** The equality operator. */
-  @CXXOperator("==")
-  boolean eq(@CXXReference VertexIter other);
-
-  /** The add operator. */
-  //    @CXXOperator("+")
-  //    @CXXValue
-  //    VertexIter plus(@FFITypeAlias(GAR_ID_TYPE) long offset);
-
-  @FFIFactory
-  interface Factory {
     /**
-     * Initialize the iterator.
+     * Get the value for a property of the current vertex.
      *
-     * @param vertexInfo The vertex info that describes the vertex type.
-     * @param prefix The absolute prefix.
-     * @param offset The current offset of the readers.
+     * @param property StdString that describe property.
+     * @param tObject An object that instance of the return type. Supporting types:StdString, Long
+     *     <p>e.g.<br>
+     *     StdString name = StdString.create("name");<br>
+     *     StdString nameProperty = vertexIter.property(name, name);
+     *     <p>If you don't want to create an object, cast `Xxx` class to `XxxGen` and call this
+     *     method with `(ReturnType) null`.<br>
+     *     e.g.<br>
+     *     StdString nameProperty = ((VertexIterGen)vertexIter).property(StdString.create("name"),
+     *     (StdString) null);
+     * @return Result: The property value or error.
      */
-    VertexIter create(
-        @CXXReference VertexInfo vertexInfo,
-        @CXXReference StdString prefix,
-        @FFITypeAlias(GAR_ID_TYPE) long offset);
-  }
+    @CXXTemplate(cxx = STD_STRING, java = "com.alibaba.graphar.stdcxx.StdString")
+    @CXXTemplate(cxx = "int64_t", java = "java.lang.Long")
+    @CXXValue
+    <T> Result<T> property(@CXXReference StdString property, @FFISkip T tObject);
+
+    @CXXOperator("++")
+    @CXXReference
+    VertexIter inc();
+
+    /** The equality operator. */
+    @CXXOperator("==")
+    boolean eq(@CXXReference VertexIter other);
+
+    /** The add operator. */
+    //    @CXXOperator("+")
+    //    @CXXValue
+    //    VertexIter plus(@FFITypeAlias(GAR_ID_TYPE) long offset);
+
+    @FFIFactory
+    interface Factory {
+        /**
+         * Initialize the iterator.
+         *
+         * @param vertexInfo The vertex info that describes the vertex type.
+         * @param prefix The absolute prefix.
+         * @param offset The current offset of the readers.
+         */
+        VertexIter create(
+                @CXXReference VertexInfo vertexInfo,
+                @CXXReference StdString prefix,
+                @FFITypeAlias(GAR_ID_TYPE) long offset);
+    }
 }

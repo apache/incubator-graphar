@@ -26,14 +26,14 @@ Firstly, install llvm-11. `LLVM11_HOME` should point to the home of LLVM 11. In 
 
 
 Tips:
-- From apt-get:
+- Use Ubuntu as example:
 
   ```bash
   $ sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
   $ export LLVM11_HOME=/usr/lib/llvm-11
   ```
 
-- Compile from source with this [script](https://github.com/alibaba/fastFFI/blob/main/docker/install-llvm11.sh):
+- Or compile from source with this [script](https://github.com/alibaba/fastFFI/blob/main/docker/install-llvm11.sh):
   ```bash
   $ export LLVM11_HOME=/usr/lib/llvm-11
   $ export LLVM_VAR=11.0.0

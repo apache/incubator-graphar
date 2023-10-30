@@ -28,59 +28,64 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class AdjListPropertyArrowChunkReaderTest {
-  @Test
-  public void test1() {
-    String path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-    Result<GraphInfo> maybeGraphInfo = GraphInfo.load(path);
-    Assert.assertTrue(maybeGraphInfo.status().ok());
-    GraphInfo graphInfo = maybeGraphInfo.value();
+    @Test
+    public void test1() {
+        String path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+        Result<GraphInfo> maybeGraphInfo = GraphInfo.load(path);
+        Assert.assertTrue(maybeGraphInfo.status().ok());
+        GraphInfo graphInfo = maybeGraphInfo.value();
 
-    StdString srcLabel = StdString.create("person");
-    StdString edgeLabel = StdString.create("knows");
-    StdString dstLabel = StdString.create("person");
-    StdString propertyName = StdString.create("creationDate");
-    Result<PropertyGroup> maybeGroup =
-        graphInfo.getEdgePropertyGroup(
-            srcLabel, edgeLabel, dstLabel, propertyName, AdjListType.ordered_by_source);
-    Assert.assertTrue(maybeGroup.status().ok());
-    PropertyGroup group = maybeGroup.value();
-    Result<AdjListPropertyArrowChunkReader> maybeReader =
-        GrapharStaticFunctions.INSTANCE.constructAdjListPropertyArrowChunkReader(
-            graphInfo, srcLabel, edgeLabel, dstLabel, group, AdjListType.ordered_by_source);
-    Assert.assertTrue(maybeReader.status().ok());
-    AdjListPropertyArrowChunkReader reader = maybeReader.value();
-    Result<StdSharedPtr<ArrowTable>> result = reader.getChunk();
-    Assert.assertTrue(result.status().ok());
-    StdSharedPtr<ArrowTable> table = result.value();
-    Assert.assertEquals(667, table.get().num_rows());
+        StdString srcLabel = StdString.create("person");
+        StdString edgeLabel = StdString.create("knows");
+        StdString dstLabel = StdString.create("person");
+        StdString propertyName = StdString.create("creationDate");
+        Result<PropertyGroup> maybeGroup =
+                graphInfo.getEdgePropertyGroup(
+                        srcLabel, edgeLabel, dstLabel, propertyName, AdjListType.ordered_by_source);
+        Assert.assertTrue(maybeGroup.status().ok());
+        PropertyGroup group = maybeGroup.value();
+        Result<AdjListPropertyArrowChunkReader> maybeReader =
+                GrapharStaticFunctions.INSTANCE.constructAdjListPropertyArrowChunkReader(
+                        graphInfo,
+                        srcLabel,
+                        edgeLabel,
+                        dstLabel,
+                        group,
+                        AdjListType.ordered_by_source);
+        Assert.assertTrue(maybeReader.status().ok());
+        AdjListPropertyArrowChunkReader reader = maybeReader.value();
+        Result<StdSharedPtr<ArrowTable>> result = reader.getChunk();
+        Assert.assertTrue(result.status().ok());
+        StdSharedPtr<ArrowTable> table = result.value();
+        Assert.assertEquals(667, table.get().num_rows());
 
-    // seek
-    Assert.assertTrue(reader.seek(100).ok());
-    result = reader.getChunk();
-    Assert.assertTrue(result.status().ok());
-    table = result.value();
-    Assert.assertEquals(567, table.get().num_rows());
-    Assert.assertTrue(reader.nextChunk().ok());
-    result = reader.getChunk();
-    Assert.assertTrue(result.status().ok());
-    table = result.value();
-    Assert.assertEquals(644, table.get().num_rows());
-    Assert.assertTrue(reader.seek(1024).isIndexError());
+        // seek
+        Assert.assertTrue(reader.seek(100).ok());
+        result = reader.getChunk();
+        Assert.assertTrue(result.status().ok());
+        table = result.value();
+        Assert.assertEquals(567, table.get().num_rows());
+        Assert.assertTrue(reader.nextChunk().ok());
+        result = reader.getChunk();
+        Assert.assertTrue(result.status().ok());
+        table = result.value();
+        Assert.assertEquals(644, table.get().num_rows());
+        Assert.assertTrue(reader.seek(1024).isIndexError());
 
-    // seek src & dst
-    Assert.assertTrue(reader.seekSrc(100).ok());
-    result = reader.getChunk();
-    Assert.assertTrue(result.status().ok());
-    table = result.value();
-    Assert.assertEquals(644, table.get().num_rows());
-    Assert.assertFalse(reader.seekDst(100).ok());
+        // seek src & dst
+        Assert.assertTrue(reader.seekSrc(100).ok());
+        result = reader.getChunk();
+        Assert.assertTrue(result.status().ok());
+        table = result.value();
+        Assert.assertEquals(644, table.get().num_rows());
+        Assert.assertFalse(reader.seekDst(100).ok());
 
-    Assert.assertTrue(reader.seekSrc(900).ok());
-    result = reader.getChunk();
-    Assert.assertTrue(result.status().ok());
-    table = result.value();
-    Assert.assertEquals(4, table.get().num_rows());
+        Assert.assertTrue(reader.seekSrc(900).ok());
+        result = reader.getChunk();
+        Assert.assertTrue(result.status().ok());
+        table = result.value();
+        Assert.assertEquals(4, table.get().num_rows());
 
-    Assert.assertTrue(reader.nextChunk().isIndexError());
-  }
+        Assert.assertTrue(reader.nextChunk().isIndexError());
+    }
 }

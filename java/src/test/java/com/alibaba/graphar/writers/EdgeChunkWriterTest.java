@@ -41,56 +41,56 @@ import org.junit.Test;
 
 @Ignore("FIXME: the test would raise memory lead error(arrow object not released)")
 public class EdgeChunkWriterTest {
-  @Test
-  public void test1() {
-    String uri =
-        "file:"
-            + root
-            + "/ldbc_sample/parquet/edge/person_knows_person/"
-            + "unordered_by_source/adj_list/part0/chunk0";
-    ScanOptions options = new ScanOptions(/*batchSize*/ 32768);
-    StdSharedPtr<ArrowTable> table = null;
-    try (BufferAllocator allocator = new RootAllocator();
-        DatasetFactory datasetFactory =
-            new FileSystemDatasetFactory(
-                allocator, NativeMemoryPool.getDefault(), FileFormat.PARQUET, uri);
-        Dataset dataset = datasetFactory.finish();
-        Scanner scanner = dataset.newScan(options);
-        ArrowReader reader = scanner.scanBatches()) {
-      while (reader.loadNextBatch()) {
-        try (VectorSchemaRoot root = reader.getVectorSchemaRoot()) {
-          table = ArrowTable.fromVectorSchemaRoot(allocator, root, reader);
+    @Test
+    public void test1() {
+        String uri =
+                "file:"
+                        + root
+                        + "/ldbc_sample/parquet/edge/person_knows_person/"
+                        + "unordered_by_source/adj_list/part0/chunk0";
+        ScanOptions options = new ScanOptions(/*batchSize*/ 32768);
+        StdSharedPtr<ArrowTable> table = null;
+        try (BufferAllocator allocator = new RootAllocator();
+                DatasetFactory datasetFactory =
+                        new FileSystemDatasetFactory(
+                                allocator, NativeMemoryPool.getDefault(), FileFormat.PARQUET, uri);
+                Dataset dataset = datasetFactory.finish();
+                Scanner scanner = dataset.newScan(options);
+                ArrowReader reader = scanner.scanBatches()) {
+            while (reader.loadNextBatch()) {
+                try (VectorSchemaRoot root = reader.getVectorSchemaRoot()) {
+                    table = ArrowTable.fromVectorSchemaRoot(allocator, root, reader);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
+        Assert.assertNotNull(table);
+
+        StdString edgeMetaFile =
+                StdString.create(root + "/ldbc_sample/csv/person_knows_person.edge.yml");
+        Result<StdSharedPtr<Yaml>> maybeEdgeMeta = Yaml.loadFile(edgeMetaFile);
+        Assert.assertFalse(maybeEdgeMeta.hasError());
+        Result<EdgeInfo> maybeEdgeInfo = EdgeInfo.load(maybeEdgeMeta.value());
+        Assert.assertFalse(maybeEdgeInfo.hasError());
+        EdgeInfo edgeInfo = maybeEdgeInfo.value();
+        Assert.assertTrue(edgeInfo.containAdjList(AdjListType.ordered_by_source));
+        EdgeChunkWriter writer =
+                EdgeChunkWriter.factory.create(
+                        edgeInfo, StdString.create("/tmp/"), AdjListType.ordered_by_source);
+
+        // Get & set validate level
+        Assert.assertEquals(ValidateLevel.no_validate, writer.getValidateLevel());
+        writer.setValidateLevel(ValidateLevel.strong_validate);
+        Assert.assertEquals(ValidateLevel.strong_validate, writer.getValidateLevel());
+
+        // Valid cases
+        // Write adj list of vertex chunk 0 to files
+        Assert.assertTrue(writer.sortAndWriteAdjListTable(table, 0, 0).ok());
+        // Write number of edges for vertex chunk 0
+        Assert.assertTrue(
+                writer.writeEdgesNum(0, table.get().num_rows(), writer.getValidateLevel()).ok());
+        // Write number of vertices
+        Assert.assertTrue(writer.writeVerticesNum(903).ok());
     }
-    Assert.assertNotNull(table);
-
-    StdString edgeMetaFile =
-        StdString.create(root + "/ldbc_sample/csv/person_knows_person.edge.yml");
-    Result<StdSharedPtr<Yaml>> maybeEdgeMeta = Yaml.loadFile(edgeMetaFile);
-    Assert.assertFalse(maybeEdgeMeta.hasError());
-    Result<EdgeInfo> maybeEdgeInfo = EdgeInfo.load(maybeEdgeMeta.value());
-    Assert.assertFalse(maybeEdgeInfo.hasError());
-    EdgeInfo edgeInfo = maybeEdgeInfo.value();
-    Assert.assertTrue(edgeInfo.containAdjList(AdjListType.ordered_by_source));
-    EdgeChunkWriter writer =
-        EdgeChunkWriter.factory.create(
-            edgeInfo, StdString.create("/tmp/"), AdjListType.ordered_by_source);
-
-    // Get & set validate level
-    Assert.assertEquals(ValidateLevel.no_validate, writer.getValidateLevel());
-    writer.setValidateLevel(ValidateLevel.strong_validate);
-    Assert.assertEquals(ValidateLevel.strong_validate, writer.getValidateLevel());
-
-    // Valid cases
-    // Write adj list of vertex chunk 0 to files
-    Assert.assertTrue(writer.sortAndWriteAdjListTable(table, 0, 0).ok());
-    // Write number of edges for vertex chunk 0
-    Assert.assertTrue(
-        writer.writeEdgesNum(0, table.get().num_rows(), writer.getValidateLevel()).ok());
-    // Write number of vertices
-    Assert.assertTrue(writer.writeVerticesNum(903).ok());
-  }
 }
