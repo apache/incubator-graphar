@@ -127,7 +127,7 @@ object FileSystem {
   }
 
   /**
-   * Read an value from input path.
+   * Read a value from input path.
    *
    * @param inputPath
    *   Input path.
