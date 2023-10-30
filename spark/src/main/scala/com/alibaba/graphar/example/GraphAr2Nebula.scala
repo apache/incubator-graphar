@@ -97,7 +97,7 @@ object GraphAr2Nebula {
         targetDF,
         sourcePrimaryKey,
         targetPrimaryKey
-      ) // use the first dataframe of (adj_list_type_str, dataframe) map
+      ) // use the first DataFrame of (adj_list_type_str, DataFrame) map
 
       writeEdge(edgeType, "src", "dst", "_rank", df)
     }

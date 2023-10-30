@@ -126,13 +126,13 @@ object EdgeWriter {
       edgeChunkSize.toInt
     )
 
-    // repartition edge dataframe and sort within partitions
+    // repartition edge DataFrame and sort within partitions
     val partitionRDD =
       rddWithEid.repartitionAndSortWithinPartitions(partitioner).values
     val partitionEdgeDf = spark.createDataFrame(partitionRDD, edgeSchema)
     partitionEdgeDf.cache()
 
-    // generate offset dataframes
+    // generate offset DataFrames
     if (
       adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.ordered_by_dest
     ) {
@@ -190,10 +190,10 @@ object EdgeWriter {
 }
 
 /**
- * Writer for edge dataframe.
+ * Writer for edge DataFrame.
  *
  * @constructor
- *   create a new writer for edge dataframe with edge info.
+ *   create a new writer for edge DataFrame with edge info.
  * @param prefix
  *   the absolute prefix.
  * @param edgeInfo
@@ -288,7 +288,7 @@ class EdgeWriter(
     }
   }
 
-  /** Generate the chunks of AdjList from edge dataframe for this edge type. */
+  /** Generate the chunks of AdjList from edge DataFrame for this edge type. */
   def writeAdjList(): Unit = {
     val fileType = edgeInfo.getAdjListFileType(adjListType)
     val outputPrefix = prefix + edgeInfo.getAdjListPathPrefix(adjListType)
@@ -312,7 +312,7 @@ class EdgeWriter(
   }
 
   /**
-   * Generate the chunks of the property group from edge dataframe.
+   * Generate the chunks of the property group from edge DataFrame.
    *
    * @param propertyGroup
    *   property group
@@ -340,7 +340,7 @@ class EdgeWriter(
     )
   }
 
-  /** Generate the chunks of all property groups from edge dataframe. */
+  /** Generate the chunks of all property groups from edge DataFrame. */
   def writeEdgeProperties(): Unit = {
     val property_groups = edgeInfo.getPropertyGroups(adjListType)
     val it = property_groups.iterator
@@ -352,7 +352,7 @@ class EdgeWriter(
 
   /**
    * Generate the chunks for the AdjList and all property groups from edge
-   * dataframe.
+   * DataFrame.
    */
   def writeEdges(): Unit = {
     writeAdjList()

@@ -170,7 +170,7 @@ The `putVertexDataIntoNeo4j` and `putEdgeDataIntoNeo4j` methods creates or updat
       val sourceDf = vertexData(sourceLabel)
       val targetDf = vertexData(targetLabel)
       // convert the source and target index column to the primary key column
-      val df = Utils.joinEdgesWithVertexPrimaryKey(value.head._2, sourceDf, targetDf, sourcePrimaryKey, targetPrimaryKey)  // use the first dataframe of (adj_list_type_str, dataframe) map
+      val df = Utils.joinEdgesWithVertexPrimaryKey(value.head._2, sourceDf, targetDf, sourcePrimaryKey, targetPrimaryKey)  // use the first DataFrame of (adj_list_type_str, DataFrame) map
 
       val properties = if (edgeLabel == "REVIEWED") "rating,summary" else ""
 
