@@ -14,6 +14,7 @@
    user-guide/getting-started.rst
    user-guide/file-format.rst
    user-guide/spark-lib.rst
+   user-guide/java-lib.rst
 
 .. toctree::
    :maxdepth: 1
@@ -32,6 +33,7 @@
 
    developers/community.rst
    developers/contributing.rst
+   developers/java-dev.rst
 
 .. toctree::
    :maxdepth: 1
@@ -40,3 +42,4 @@
 
    reference/api-reference-cpp.rst
    Spark API Reference <reference/spark-api/index>
+   Java API Reference <reference/java-api/index>

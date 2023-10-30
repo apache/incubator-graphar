@@ -221,7 +221,7 @@ The example will import the basketballplayer graph from GraphAr to NebulaGraph a
 
 You can include GraphAr as a dependency in your maven project
 
-```bash
+```xml
 <repositories>
     <repository>
         <id>graphar-mvn-repo</id>
