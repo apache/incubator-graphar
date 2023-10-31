@@ -21,9 +21,10 @@ import com.alibaba.graphar.graphinfo.GraphInfo;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.types.AdjListType;
 import com.alibaba.graphar.util.Result;
+import java.util.Iterator;
 
 /** EdgesCollection is designed for reading a collection of edges. */
-public interface EdgesCollection extends CXXPointer {
+public interface EdgesCollection extends CXXPointer, Iterable<Edge> {
     /**
      * Construct the collection for a range of edges.
      *
@@ -129,4 +130,24 @@ public interface EdgesCollection extends CXXPointer {
 
     /** Get the number of edges in the collection. */
     long size();
+
+    /** Implement Iterable interface to support for-each loop. */
+    default Iterator<Edge> iterator() {
+        return new Iterator<Edge>() {
+            EdgeIter current = begin();
+            EdgeIter end = end();
+
+            @Override
+            public boolean hasNext() {
+                return !current.isEnd();
+            }
+
+            @Override
+            public Edge next() {
+                Edge ret = current.get();
+                current.inc();
+                return ret;
+            }
+        };
+    }
 }

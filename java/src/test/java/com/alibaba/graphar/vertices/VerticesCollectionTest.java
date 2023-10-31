@@ -40,7 +40,8 @@ public class VerticesCollectionTest {
                 GrapharStaticFunctions.INSTANCE.constructVerticesCollection(graphInfo, label);
         Assert.assertFalse(maybeVerticesCollection.hasError());
         VerticesCollection vertices = maybeVerticesCollection.value();
-        for (VertexIter it = vertices.begin(); !it.eq(vertices.end()); it.inc()) {
+        VertexIter it = vertices.begin();
+        for (Vertex vertex : vertices) {
             // access data through iterator directly
             VertexIterGen itGen = (VertexIterGen) it;
             System.out.println(
@@ -50,7 +51,6 @@ public class VerticesCollectionTest {
                             + ", firstName="
                             + it.property(property, property).value().toJavaString());
             // access data through vertex
-            Vertex vertex = it.get();
             System.out.println(
                     vertex.id()
                             + ", id="
@@ -66,6 +66,7 @@ public class VerticesCollectionTest {
             Assert.assertEquals(
                     it.<StdString>property(property, property).value().toJavaString(),
                     vertex.<StdString>property(property, property).value().toJavaString());
+            it.inc();
         }
     }
 }
