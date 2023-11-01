@@ -49,6 +49,7 @@ public interface VerticesCollection extends CXXPointer, Iterable<Vertex> {
 
     long size();
 
+    /** Implement Iterable interface to support for-each loop. */
     default Iterator<Vertex> iterator() {
         return new Iterator<Vertex>() {
             VertexIter current = begin();
