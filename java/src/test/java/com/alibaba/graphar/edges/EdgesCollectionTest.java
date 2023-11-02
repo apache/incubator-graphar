@@ -41,18 +41,18 @@ public class EdgesCollectionTest {
                         AdjListType.ordered_by_source,
                         0,
                         1);
-        EdgeIter end = edges.end();
+        EdgeIter it = edges.begin();
         long count = 0L;
-        for (EdgeIter it = edges.begin(); !it.eq(end); it.inc()) {
+        for (Edge edge : edges) {
             // access data through iterator directly
             System.out.print("src=" + it.source() + ", dst=" + it.destination() + " ");
             // access data through edge
-            Edge edge = it.get();
             Assert.assertEquals(edge.source(), it.source());
             Assert.assertEquals(edge.destination(), it.destination());
             StdString creationDate = StdString.create("creationDate");
             System.out.println("creationDate=" + edge.property(creationDate, creationDate).value());
             count++;
+            it.inc();
         }
         System.out.println("edge_count=" + count);
         Assert.assertEquals(count, edges.size());
@@ -69,7 +69,7 @@ public class EdgesCollectionTest {
                         4);
         EdgeIter end1 = edges1.end();
         long count1 = 0;
-        for (EdgeIter it = edges1.begin(); !it.eq(end1); it.inc()) {
+        for (Edge edge : edges1) {
             count1++;
         }
         System.out.println("edge_count=" + count1);
@@ -83,10 +83,8 @@ public class EdgesCollectionTest {
                         edgeLabel.toJavaString(),
                         dstLabel.toJavaString(),
                         AdjListType.ordered_by_source);
-        EdgeIter end2 = edges2.end();
         long count2 = 0;
-        for (EdgeIter it = edges2.begin(); !it.eq(end2); it.inc()) {
-            Edge edge = it.get();
+        for (Edge edge : edges2) {
             System.out.println("src=" + edge.source() + ", dst=" + edge.destination());
             count2++;
         }
@@ -103,9 +101,8 @@ public class EdgesCollectionTest {
                         AdjListType.unordered_by_source,
                         5,
                         5);
-        EdgeIter end3 = edges3.end();
         long count3 = 0;
-        for (EdgeIter it = edges3.begin(); !it.eq(end3); it.inc()) {
+        for (Edge edge : edges3) {
             count3++;
         }
         System.out.println("edge_count=" + count3);

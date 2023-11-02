@@ -27,12 +27,13 @@ import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.graphar.graphinfo.VertexInfo;
 import com.alibaba.graphar.stdcxx.StdString;
+import java.util.Iterator;
 
 /** VerticesCollection is designed for reading a collection of vertices. */
 @FFIGen
 @FFITypeAlias(GAR_VERTICES_COLLECTION)
 @CXXHead(GAR_GRAPH_H)
-public interface VerticesCollection extends CXXPointer {
+public interface VerticesCollection extends CXXPointer, Iterable<Vertex> {
 
     /** The iterator pointing to the first vertex. */
     @CXXValue
@@ -47,6 +48,26 @@ public interface VerticesCollection extends CXXPointer {
     VertexIter find(@FFITypeAlias(GAR_ID_TYPE) long id);
 
     long size();
+
+    /** Implement Iterable interface to support for-each loop. */
+    default Iterator<Vertex> iterator() {
+        return new Iterator<Vertex>() {
+            VertexIter current = begin();
+            VertexIter end = end();
+
+            @Override
+            public boolean hasNext() {
+                return !current.eq(end);
+            }
+
+            @Override
+            public Vertex next() {
+                Vertex ret = current.get();
+                current.inc();
+                return ret;
+            }
+        };
+    }
 
     @FFIFactory
     interface Factory {
