@@ -2,7 +2,6 @@
 
 This directory contains the code and build system for the GraphAr C++ library.
 
-
 ## Building GraphAr C++
 
 ### System setup
