@@ -17,6 +17,7 @@ package com.alibaba.graphar.vertices;
 import static com.alibaba.graphar.graphinfo.GraphInfoTest.root;
 
 import com.alibaba.graphar.graphinfo.GraphInfo;
+import com.alibaba.graphar.stdcxx.StdSharedPtr;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.util.GrapharStaticFunctions;
 import com.alibaba.graphar.util.Result;
@@ -36,12 +37,12 @@ public class VerticesCollectionTest {
         StdString label = StdString.create("person");
         StdString property = StdString.create("firstName");
         StdString stdStrId = StdString.create("id");
-        Result<VerticesCollection> maybeVerticesCollection =
+        Result<StdSharedPtr<VerticesCollection>> maybeVerticesCollection =
                 GrapharStaticFunctions.INSTANCE.constructVerticesCollection(graphInfo, label);
         Assert.assertFalse(maybeVerticesCollection.hasError());
-        VerticesCollection vertices = maybeVerticesCollection.value();
-        VertexIter it = vertices.begin();
-        for (Vertex vertex : vertices) {
+        StdSharedPtr<VerticesCollection> vertices = maybeVerticesCollection.value();
+        VertexIter it = vertices.get().begin();
+        for (Vertex vertex : vertices.get()) {
             // access data through iterator directly
             VertexIterGen itGen = (VertexIterGen) it;
             System.out.println(

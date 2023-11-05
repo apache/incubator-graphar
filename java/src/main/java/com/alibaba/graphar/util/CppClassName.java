@@ -28,6 +28,7 @@ public class CppClassName {
     public static final String STD_STRING = "std::string";
     public static final String STD_MAP = "std::map";
     public static final String STD_PAIR = "std::pair";
+    public static final String STD_SHARED_PTR = "std::shared_ptr";
 
     // util
     public static final String GAR_INFO_VERSION = "GraphArchive::InfoVersion";

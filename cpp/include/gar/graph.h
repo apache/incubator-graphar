@@ -1121,7 +1121,7 @@ ConstructVerticesCollection(const GraphInfo& graph_info,
  * @param edge_label The edge label.
  * @param dst_label The destination vertex label.
  * @param adj_list_type The adjList type.
- * @param vertex_chunk_begin The index of the begin vertex chunk.
+ * @param vertex_chunk_begin The index of the beginning vertex chunk.
  * @param vertex_chunk_end The index of the end vertex chunk (not included).
  * @return The constructed collection or error.
  */
