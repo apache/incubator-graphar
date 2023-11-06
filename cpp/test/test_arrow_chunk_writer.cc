@@ -65,7 +65,7 @@ TEST_CASE("test_vertex_property_writer_from_file") {
 
   // Construct the writer
   std::string vertex_meta_file =
-      root + "/ldbc_sample/csv/" + "person.vertex.yml";
+      root + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = GAR_NAMESPACE::VertexInfo::Load(vertex_meta).value();
   REQUIRE(vertex_info.GetLabel() == "person");
