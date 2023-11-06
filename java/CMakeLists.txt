@@ -22,7 +22,6 @@ include_directories(SYSTEM ${JAVA_INCLUDE_PATH2})
 # some JNI code depends on arrow
 find_package(Arrow REQUIRED)
 # build graphar-cpp in specific version
-find_package(gar REQUIRED)
 include(graphar-cpp)
 build_graphar_cpp()
 
