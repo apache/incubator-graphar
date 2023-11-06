@@ -51,6 +51,15 @@ jobs:
           mvn spotless:check
           popd
 
+      - name: Build and Install cpp
+        run: |
+          mkdir build
+          pushd build
+          cmake ../cpp
+          make -j$(nproc)
+          sudo make install
+          popd
+
       - name: Run test
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64}
