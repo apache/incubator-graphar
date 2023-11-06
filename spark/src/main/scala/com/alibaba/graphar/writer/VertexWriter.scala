@@ -16,7 +16,7 @@
 
 package com.alibaba.graphar.writer
 
-import com.alibaba.graphar.util.{FileSystem, ChunkPartitioner}
+import com.alibaba.graphar.util.{FileSystem, ChunkPartitioner, IndexGenerator}
 import com.alibaba.graphar.{GeneralParams, VertexInfo, PropertyGroup}
 
 import org.apache.spark.sql.types._
@@ -33,10 +33,16 @@ object VertexWriter {
       chunkSize: Long,
       vertexNum: Long
   ): DataFrame = {
-    val vertex_df_schema = vertexDf.schema
+    val vertexDfWithIndex = vertexDf.schema.contains(
+      StructField(GeneralParams.vertexIndexCol, LongType)
+    ) match {
+      case true => vertexDf
+      case _    => IndexGenerator.generateVertexIndexColumn(vertexDf)
+    }
+    val vertex_df_schema = vertexDfWithIndex.schema
     val index = vertex_df_schema.fieldIndex(GeneralParams.vertexIndexCol)
     val partition_num = ((vertexNum + chunkSize - 1) / chunkSize).toInt
-    val rdd = vertexDf.rdd.map(row => (row(index).asInstanceOf[Long], row))
+    val rdd = vertexDfWithIndex.rdd.map(row => (row(index).asInstanceOf[Long], row))
 
     // repartition
     val partitioner = new ChunkPartitioner(partition_num, chunkSize)
@@ -113,6 +119,7 @@ class VertexWriter(
     // write out the chunks
     val output_prefix = prefix + vertexInfo.getPathPrefix(propertyGroup)
     val property_list = ArrayBuffer[String]()
+    property_list += "`" + GeneralParams.vertexIndexCol + "`"
     val it = propertyGroup.getProperties().iterator
     while (it.hasNext()) {
       val property = it.next()

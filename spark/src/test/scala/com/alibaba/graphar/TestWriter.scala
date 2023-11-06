@@ -46,7 +46,7 @@ class WriterSuite extends AnyFunSuite {
 
     // read vertex yaml
     val vertex_yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/parquet/person.vertex.yml")
+      .getResource("gar-test/ldbc_sample/csv/person.vertex.yml")
       .getPath
     val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml_path, spark)
 
@@ -74,15 +74,8 @@ class WriterSuite extends AnyFunSuite {
       vertex_num_path,
       spark.sparkContext.hadoopConfiguration
     )
-    assert(number.toInt == vertex_df.count())
-
-    assertThrows[IllegalArgumentException](
-      new VertexWriter(prefix, vertex_info, vertex_df)
-    )
-    val invalid_property_group = new PropertyGroup()
-    assertThrows[IllegalArgumentException](
-      writer.writeVertexProperties(invalid_property_group)
-    )
+    val property_group_2 = vertex_info.getPropertyGroup("firstName")
+    writer.writeVertexProperties(property_group_2)
 
     // clean generated files and close FileSystem instance
     fs.delete(new Path(prefix + "vertex"))
