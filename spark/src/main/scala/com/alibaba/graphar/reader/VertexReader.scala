@@ -89,7 +89,7 @@ class VertexReader(
    *   IllegalArgumentException if the property group not contained.
    */
   def readVertexPropertyGroup(
-      propertyGroup: PropertyGroup,
+      propertyGroup: PropertyGroup
   ): DataFrame = {
     if (!vertexInfo.containPropertyGroup(propertyGroup)) {
       throw new IllegalArgumentException(
@@ -116,7 +116,7 @@ class VertexReader(
    *   IllegalArgumentException if the property group not contained.
    */
   def readMultipleVertexPropertyGroups(
-      propertyGroups: java.util.ArrayList[PropertyGroup],
+      propertyGroups: java.util.ArrayList[PropertyGroup]
   ): DataFrame = {
     val len: Int = propertyGroups.size
     if (len == 0) {
@@ -130,7 +130,8 @@ class VertexReader(
     var schema_array = df0.schema.fields
     for (i <- 1 until len) {
       val pg: PropertyGroup = propertyGroups.get(i)
-      val new_df = readVertexPropertyGroup(pg).drop(GeneralParams.vertexIndexCol)
+      val new_df =
+        readVertexPropertyGroup(pg).drop(GeneralParams.vertexIndexCol)
       schema_array = Array.concat(schema_array, new_df.schema.fields)
       rdd = DataFrameConcat.concatRdd(rdd, new_df.rdd)
     }

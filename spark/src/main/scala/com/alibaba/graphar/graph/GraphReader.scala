@@ -41,7 +41,7 @@ object GraphReader {
   private def readAllVertices(
       prefix: String,
       vertexInfos: Map[String, VertexInfo],
-      spark: SparkSession,
+      spark: SparkSession
   ): Map[String, DataFrame] = {
     val vertex_dataframes: Map[String, DataFrame] = vertexInfos.map {
       case (label, vertexInfo) => {
@@ -114,7 +114,7 @@ object GraphReader {
    */
   def readWithGraphInfo(
       graphInfo: GraphInfo,
-      spark: SparkSession,
+      spark: SparkSession
   ): Pair[Map[String, DataFrame], Map[
     (String, String, String),
     Map[String, DataFrame]
@@ -144,7 +144,7 @@ object GraphReader {
    */
   def read(
       graphInfoPath: String,
-      spark: SparkSession,
+      spark: SparkSession
   ): Pair[Map[String, DataFrame], Map[
     (String, String, String),
     Map[String, DataFrame]

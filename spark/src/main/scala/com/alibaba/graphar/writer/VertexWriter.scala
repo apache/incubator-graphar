@@ -42,7 +42,8 @@ object VertexWriter {
     val vertex_df_schema = vertexDfWithIndex.schema
     val index = vertex_df_schema.fieldIndex(GeneralParams.vertexIndexCol)
     val partition_num = ((vertexNum + chunkSize - 1) / chunkSize).toInt
-    val rdd = vertexDfWithIndex.rdd.map(row => (row(index).asInstanceOf[Long], row))
+    val rdd =
+      vertexDfWithIndex.rdd.map(row => (row(index).asInstanceOf[Long], row))
 
     // repartition
     val partitioner = new ChunkPartitioner(partition_num, chunkSize)
