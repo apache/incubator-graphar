@@ -41,7 +41,7 @@ class TransformExampleSuite extends AnyFunSuite {
 
     val reader = new VertexReader(prefix, vertex_info, spark)
     val vertices_num = reader.readVerticesNumber()
-    val vertex_df_with_index = reader.readAllVertexPropertyGroups(true)
+    val vertex_df_with_index = reader.readAllVertexPropertyGroups()
     assert(vertex_df_with_index.count() == vertices_num)
 
     // write to parquet files

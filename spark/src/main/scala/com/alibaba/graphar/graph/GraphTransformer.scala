@@ -66,7 +66,7 @@ object GraphTransformer {
       val source_vertex_info = sourceVertexInfosMap(label)
       // read vertex chunks from the source graph
       val reader = new VertexReader(source_prefix, source_vertex_info, spark)
-      val df = reader.readAllVertexPropertyGroups(true)
+      val df = reader.readAllVertexPropertyGroups()
       // write vertex chunks for the dest graph
       val writer = new VertexWriter(dest_prefix, dest_vertex_info, df)
       writer.writeVertexProperties()

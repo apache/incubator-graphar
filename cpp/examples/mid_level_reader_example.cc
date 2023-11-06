@@ -43,7 +43,8 @@ void vertex_property_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
             << table->num_rows() << std::endl;
   std::cout << "schema of first vertex property chunk: " << std::endl
             << table->schema()->ToString() << std::endl;
-  auto index_col = table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
+  auto index_col =
+      table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
   ASSERT(index_col != nullptr);
   std::cout << "Internal id column: " << index_col->ToString() << " "
             << std::endl;
@@ -52,21 +53,21 @@ void vertex_property_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
   result = reader.GetChunk();
   ASSERT(!result.has_error());
   table = result.value();
-  index_col = table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
+  index_col =
+      table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
   ASSERT(index_col != nullptr);
-  std::cout << "Internal id column of vertex property chunk for vertex id 100: " 
-            << index_col->ToString() << " "
-            << std::endl;
+  std::cout << "Internal id column of vertex property chunk for vertex id 100: "
+            << index_col->ToString() << " " << std::endl;
   // next chunk
   ASSERT(reader.next_chunk().ok());
   result = reader.GetChunk();
   ASSERT(!result.has_error());
   table = result.value();
-  index_col = table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
+  index_col =
+      table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
   ASSERT(index_col != nullptr);
-  std::cout << "Internal id column of next chunk: " 
-            << index_col->ToString() << " "
-            << std::endl;
+  std::cout << "Internal id column of next chunk: " << index_col->ToString()
+            << " " << std::endl;
 
   // reader with filter pushdown
   auto filter = GAR_NAMESPACE::_Equal(GAR_NAMESPACE::_Property("gender"),

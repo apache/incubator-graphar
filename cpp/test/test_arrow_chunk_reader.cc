@@ -56,7 +56,8 @@ TEST_CASE("test_vertex_property_arrow_chunk_reader") {
   REQUIRE(!result.has_error());
   auto table = result.value();
   REQUIRE(table->num_rows() == 100);
-  REQUIRE(table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
+  REQUIRE(table->GetColumnByName(
+              GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
 
   // seek
   REQUIRE(reader.seek(100).ok());
@@ -64,19 +65,22 @@ TEST_CASE("test_vertex_property_arrow_chunk_reader") {
   REQUIRE(!result.has_error());
   table = result.value();
   REQUIRE(table->num_rows() == 100);
-  REQUIRE(table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
+  REQUIRE(table->GetColumnByName(
+              GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
   REQUIRE(reader.next_chunk().ok());
   result = reader.GetChunk();
   REQUIRE(!result.has_error());
   table = result.value();
   REQUIRE(table->num_rows() == 100);
-  REQUIRE(table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
+  REQUIRE(table->GetColumnByName(
+              GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
   REQUIRE(reader.seek(900).ok());
   result = reader.GetChunk();
   REQUIRE(!result.has_error());
   table = result.value();
   REQUIRE(table->num_rows() == 3);
-  REQUIRE(table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
+  REQUIRE(table->GetColumnByName(
+              GAR_NAMESPACE::GeneralParams::kVertexIndexCol) != nullptr);
   REQUIRE(reader.GetChunkNum() == 10);
   REQUIRE(reader.next_chunk().IsIndexError());
 
@@ -112,9 +116,7 @@ TEST_CASE("test_vertex_property_pushdown") {
       auto result = reader.GetChunk();
       REQUIRE(!result.has_error());
       table = result.value();
-      std::cout << "Chunk: " << idx << ",\tNums: " << table->num_rows()
-                << ",\tinternal id column: " << '\t' << table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol)->ToString() 
-                << '\n';
+      std::cout << "Chunk: " << idx << ",\tNums: " << table->num_rows() << '\n';
       idx++;
       sum += table->num_rows();
     } while (!reader.next_chunk().IsIndexError());

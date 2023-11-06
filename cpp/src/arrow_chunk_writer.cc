@@ -255,10 +255,12 @@ Status VertexPropertyWriter::WriteTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType start_chunk_index,
     ValidateLevel validate_level) const noexcept {
   auto property_groups = vertex_info_.GetPropertyGroups();
-  GAR_ASSIGN_OR_RAISE(auto table_with_index, addIndexColumn(input_table, start_chunk_index, vertex_info_.GetChunkSize()));
+  GAR_ASSIGN_OR_RAISE(auto table_with_index,
+                      addIndexColumn(input_table, start_chunk_index,
+                                     vertex_info_.GetChunkSize()));
   for (auto& property_group : property_groups) {
-    GAR_RETURN_NOT_OK(WriteTable(table_with_index, property_group, start_chunk_index,
-                                 validate_level));
+    GAR_RETURN_NOT_OK(WriteTable(table_with_index, property_group,
+                                 start_chunk_index, validate_level));
   }
   return Status::OK();
 }
@@ -274,9 +276,13 @@ Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::addIndexColumn(
   }
   std::shared_ptr<arrow::Array> array;
   RETURN_NOT_ARROW_OK(array_builder.Finish(&array));
-  std::shared_ptr<arrow::ChunkedArray> chunked_array = std::make_shared<arrow::ChunkedArray>(array);
-  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto ret, table->AddColumn(0, arrow::field(GeneralParams::kVertexIndexCol,
-                                          arrow::int64(), false), chunked_array));
+  std::shared_ptr<arrow::ChunkedArray> chunked_array =
+      std::make_shared<arrow::ChunkedArray>(array);
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
+      auto ret, table->AddColumn(0,
+                                 arrow::field(GeneralParams::kVertexIndexCol,
+                                              arrow::int64(), false),
+                                 chunked_array));
   return ret;
 }
 
