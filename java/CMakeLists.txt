@@ -23,15 +23,15 @@ include_directories(SYSTEM ${JAVA_INCLUDE_PATH2})
 find_package(Arrow REQUIRED)
 # build graphar-cpp in specific version
 find_package(gar REQUIRED)
-# include(graphar-cpp)
-# build_graphar_cpp()
+include(graphar-cpp)
+build_graphar_cpp()
 
 # build the bridge JNI library
 add_library(${LIBNAME} SHARED ${SOURCES})
 # include graphar-cpp headers
 target_include_directories(${LIBNAME} SYSTEM BEFORE PRIVATE ${GAR_INCLUDE_DIR})
 # link graphar-cpp and arrow
-target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} gar)
+target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} gar_shared)
 target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} Arrow::arrow_static)
 
 set_target_properties(${LIBNAME} PROPERTIES LINKER_LANGUAGE CXX)
