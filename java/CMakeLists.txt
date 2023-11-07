@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.6)
 project(gar-java)
 
+option(BUILD_GAR_CPP_BY_CMAKE "Build GraphAr C++ library with specific version" OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -std=c++17 -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -g -std=c++17 -Wall")
 
 # set auto-generated JNI code and handwriting JNI code as source files
 file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/target/generated-sources/annotations/*.cc" "${CMAKE_CURRENT_SOURCE_DIR}/target/generated-test-sources/test-annotations/*.cc"
@@ -19,20 +20,24 @@ find_package(JNI REQUIRED)
 include_directories(SYSTEM ${JAVA_INCLUDE_PATH})
 include_directories(SYSTEM ${JAVA_INCLUDE_PATH2})
 
-# some JNI code depends on arrow
+# some JNI code depends on arrow directly
 find_package(Arrow REQUIRED)
 # build graphar-cpp in specific version
 find_package(gar REQUIRED)
-#TEMP: include(graphar-cpp)
-#TEMP: build_graphar_cpp()
 
 # build the bridge JNI library
 add_library(${LIBNAME} SHARED ${SOURCES})
-# include graphar-cpp headers
-target_include_directories(${LIBNAME} SYSTEM BEFORE PRIVATE ${GAR_INCLUDE_DIR})
-# link graphar-cpp and arrow
-target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} gar)
-target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} Arrow::arrow_static)
+# build GraphAr C++ library or link system installed GraphAr C++ library
+if(BUILD_GAR_CPP_BY_CMAKE)
+    include(graphar-cpp)
+    build_graphar_cpp()
+    target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} gar_shared)
+    # include graphar-cpp headers
+    target_include_directories(${LIBNAME} SYSTEM BEFORE PRIVATE ${GAR_INCLUDE_DIR})
+else()
+    target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} gar)
+endif()
+target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} Arrow::arrow_shared)
 
 set_target_properties(${LIBNAME} PROPERTIES LINKER_LANGUAGE CXX)
 
