@@ -225,6 +225,12 @@ class EdgeInfo() {
               return pg
             }
           }
+          throw new IllegalArgumentException(
+            "property group not found: " + property_name + " in adj list type: " + AdjListType
+              .AdjListTypeToString(
+                adj_list_type
+              )
+          )
         }
       }
     }
