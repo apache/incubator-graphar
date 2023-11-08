@@ -47,7 +47,9 @@ class GraphWriter() {
       primaryKey: String = ""
   ): Unit = {
     if (vertices.exists(_._1 == label)) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Vertex data of label " + label + " has been put."
+      )
     }
     vertices += label -> df
     vertexNums += label -> df.count
@@ -63,7 +65,9 @@ class GraphWriter() {
    */
   def PutEdgeData(relation: (String, String, String), df: DataFrame): Unit = {
     if (edges.exists(_._1 == relation)) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Edge data of relation " + relation + " has been put."
+      )
     }
     edges += relation -> df
   }
@@ -195,7 +199,7 @@ class GraphWriter() {
       case (key, df) => {
         edge_schemas += key -> new StructType(
           df.schema.drop(2).toArray
-        ) // drop the src, dst fileds
+        ) // drop the src, dst fields
       }
     }
     val graph_info = Utils.generateGraphInfo(

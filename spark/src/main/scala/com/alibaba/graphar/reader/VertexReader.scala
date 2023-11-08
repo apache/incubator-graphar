@@ -65,7 +65,9 @@ class VertexReader(
       chunk_index: Long
   ): DataFrame = {
     if (!vertexInfo.containPropertyGroup(propertyGroup)) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "property group not contained in vertex info."
+      )
     }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + vertexInfo.getFilePath(propertyGroup, chunk_index)
@@ -93,7 +95,9 @@ class VertexReader(
       addIndex: Boolean = true
   ): DataFrame = {
     if (!vertexInfo.containPropertyGroup(propertyGroup)) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "property group not contained in vertex info."
+      )
     }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + vertexInfo.getPathPrefix(propertyGroup)

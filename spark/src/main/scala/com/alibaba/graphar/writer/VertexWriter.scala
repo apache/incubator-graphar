@@ -81,7 +81,9 @@ class VertexWriter(
     // check if vertex DataFrame contains the index_filed
     val index_filed = StructField(GeneralParams.vertexIndexCol, LongType)
     if (vertexDf.schema.contains(index_filed) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "vertex DataFrame must contain index column."
+      )
     }
   }
 
@@ -103,7 +105,9 @@ class VertexWriter(
   def writeVertexProperties(propertyGroup: PropertyGroup): Unit = {
     // check if contains the property group
     if (vertexInfo.containPropertyGroup(propertyGroup) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "property group not contained in vertex info."
+      )
     }
 
     // write out the chunks
