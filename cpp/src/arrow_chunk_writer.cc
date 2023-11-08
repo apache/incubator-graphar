@@ -201,8 +201,9 @@ Status VertexPropertyWriter::WriteChunk(
   auto schema = input_table->schema();
   int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
   if (indice == -1) {
-    return Status::Invalid("Column named ", GeneralParams::kVertexIndexCol,
-                           " does not exist in the input table");
+    return Status::Invalid("The internal id Column named ",
+                           GeneralParams::kVertexIndexCol,
+                           " does not exist in the input table.");
   }
 
   std::vector<int> indices({indice});
