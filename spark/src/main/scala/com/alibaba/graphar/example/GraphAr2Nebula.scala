@@ -56,7 +56,7 @@ object GraphAr2Nebula {
     // The edge data need to convert src and dst to the vertex id,
     // so we need to read the vertex data with index column.
     val graphData =
-      GraphReader.read(graphInfoPath, spark, addVertexIndex = true)
+      GraphReader.read(graphInfoPath, spark)
     val vertexData = graphData._1
     val edgeData = graphData._2
     putVertexDataIntoNebula(graphInfo, vertexData)

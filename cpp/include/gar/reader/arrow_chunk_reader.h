@@ -101,13 +101,6 @@ class VertexPropertyArrowChunkReader {
   Result<std::shared_ptr<arrow::Table>> GetChunk() noexcept;
 
   /**
-   * @brief Get the vertex id range of current chunk.
-   *
-   * @return Result: std::pair<begin_id, end_id> or error.
-   */
-  Result<std::pair<IdType, IdType>> GetRange() noexcept;
-
-  /**
    * @brief Sets chunk position indicator to next chunk.
    *
    *  if current chunk is the last chunk, will return Status::IndexError error.
