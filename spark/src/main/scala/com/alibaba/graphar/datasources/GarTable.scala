@@ -81,7 +81,8 @@ case class GarTable(
         OrcUtils.inferSchema(sparkSession, files, options.asScala.toMap)
       case "parquet" =>
         ParquetUtils.inferSchema(sparkSession, options.asScala.toMap, files)
-      case _ => throw new IllegalArgumentException
+      case _ =>
+        throw new IllegalArgumentException("Invalid format name: " + formatName)
     }
 
   /** Construct a new write builder according to the actual file format. */
@@ -93,7 +94,8 @@ case class GarTable(
         new OrcWriteBuilder(paths, formatName, supportsDataType, info)
       case "parquet" =>
         new ParquetWriteBuilder(paths, formatName, supportsDataType, info)
-      case _ => throw new IllegalArgumentException
+      case _ =>
+        throw new IllegalArgumentException("Invalid format name: " + formatName)
     }
 
   /**

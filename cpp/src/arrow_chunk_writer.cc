@@ -198,10 +198,15 @@ Status VertexPropertyWriter::WriteChunk(
   GAR_RETURN_NOT_OK(
       validate(input_table, property_group, chunk_index, validate_level));
   auto file_type = property_group.GetFileType();
-
-  std::vector<int> indices;
-  indices.clear();
   auto schema = input_table->schema();
+  int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
+  if (indice == -1) {
+    return Status::Invalid("The internal id Column named ",
+                           GeneralParams::kVertexIndexCol,
+                           " does not exist in the input table.");
+  }
+
+  std::vector<int> indices({indice});
   for (auto& property : property_group.GetProperties()) {
     int indice = schema->GetFieldIndex(property.name);
     if (indice == -1) {
@@ -251,11 +256,35 @@ Status VertexPropertyWriter::WriteTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType start_chunk_index,
     ValidateLevel validate_level) const noexcept {
   auto property_groups = vertex_info_.GetPropertyGroups();
+  GAR_ASSIGN_OR_RAISE(auto table_with_index,
+                      addIndexColumn(input_table, start_chunk_index,
+                                     vertex_info_.GetChunkSize()));
   for (auto& property_group : property_groups) {
-    GAR_RETURN_NOT_OK(WriteTable(input_table, property_group, start_chunk_index,
-                                 validate_level));
+    GAR_RETURN_NOT_OK(WriteTable(table_with_index, property_group,
+                                 start_chunk_index, validate_level));
   }
   return Status::OK();
+}
+
+Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::addIndexColumn(
+    const std::shared_ptr<arrow::Table>& table, IdType chunk_index,
+    IdType chunk_size) const noexcept {
+  arrow::Int64Builder array_builder;
+  RETURN_NOT_ARROW_OK(array_builder.Reserve(chunk_size));
+  int64_t length = table->num_rows();
+  for (IdType i = 0; i < length; i++) {
+    RETURN_NOT_ARROW_OK(array_builder.Append(chunk_index * chunk_size + i));
+  }
+  std::shared_ptr<arrow::Array> array;
+  RETURN_NOT_ARROW_OK(array_builder.Finish(&array));
+  std::shared_ptr<arrow::ChunkedArray> chunked_array =
+      std::make_shared<arrow::ChunkedArray>(array);
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
+      auto ret, table->AddColumn(0,
+                                 arrow::field(GeneralParams::kVertexIndexCol,
+                                              arrow::int64(), false),
+                                 chunked_array));
+  return ret;
 }
 
 // implementations for EdgeChunkWriter

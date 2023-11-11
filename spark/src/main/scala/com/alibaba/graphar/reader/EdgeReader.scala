@@ -47,7 +47,12 @@ class EdgeReader(
     spark: SparkSession
 ) {
   if (edgeInfo.containAdjList(adjListType) == false) {
-    throw new IllegalArgumentException
+    throw new IllegalArgumentException(
+      "Edge info does not contain adj list type: " + AdjListType
+        .AdjListTypeToString(
+          adjListType
+        )
+    )
   }
 
   /** Load the total number of src/dst vertices for this edge type. */
@@ -111,7 +116,9 @@ class EdgeReader(
     if (
       adjListType != AdjListType.ordered_by_source && adjListType != AdjListType.ordered_by_dest
     ) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Adj list type must be ordered_by_source or ordered_by_dest."
+      )
     }
     val file_type_in_gar = edgeInfo.getAdjListFileType(adjListType)
     val file_type = FileType.FileTypeToString(file_type_in_gar)
@@ -228,7 +235,9 @@ class EdgeReader(
       chunk_index: Long
   ): DataFrame = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Edge info does not contain property group or adj list type."
+      )
     }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + edgeInfo.getPropertyFilePath(
@@ -265,7 +274,9 @@ class EdgeReader(
       addIndex: Boolean = true
   ): DataFrame = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Edge info does not contain property group or adj list type."
+      )
     }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + edgeInfo.getPropertyGroupPathPrefix(
@@ -301,7 +312,9 @@ class EdgeReader(
       addIndex: Boolean = true
   ): DataFrame = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Edge info does not contain property group or adj list type."
+      )
     }
     val file_type = propertyGroup.getFile_type()
     val file_path =

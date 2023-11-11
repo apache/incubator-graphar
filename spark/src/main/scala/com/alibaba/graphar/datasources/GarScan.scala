@@ -72,7 +72,8 @@ case class GarScan(
       case "csv"     => createCSVReaderFactory()
       case "orc"     => createOrcReaderFactory()
       case "parquet" => createParquetReaderFactory()
-      case _         => throw new IllegalArgumentException
+      case _ =>
+        throw new IllegalArgumentException("Invalid format name: " + formatName)
     }
 
   // Create the reader factory for the CSV format.
@@ -269,7 +270,8 @@ case class GarScan(
     case "csv"     => super.hashCode()
     case "orc"     => getClass.hashCode()
     case "parquet" => getClass.hashCode()
-    case _         => throw new IllegalArgumentException
+    case _ =>
+      throw new IllegalArgumentException("Invalid format name: " + formatName)
   }
 
   /** Get the description string of the object. */

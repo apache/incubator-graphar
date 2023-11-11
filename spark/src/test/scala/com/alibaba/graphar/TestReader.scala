@@ -128,7 +128,7 @@ class ReaderSuite extends AnyFunSuite {
 
     // test reading a single property chunk
     val single_chunk_df = reader.readVertexPropertyChunk(property_group, 0)
-    assert(single_chunk_df.columns.length == 3)
+    assert(single_chunk_df.columns.length == 4)
     assert(single_chunk_df.count() == 100)
     val cond = "gender = 'female'"
     var df_pd = single_chunk_df.select("firstName", "gender").filter(cond)
@@ -151,8 +151,8 @@ class ReaderSuite extends AnyFunSuite {
 
     // test reading all chunks for a property group
     val property_df =
-      reader.readVertexPropertyGroup(property_group, addIndex = false)
-    assert(property_df.columns.length == 3)
+      reader.readVertexPropertyGroup(property_group)
+    assert(property_df.columns.length == 4)
     assert(property_df.count() == 903)
     df_pd = property_df.select("firstName", "gender").filter(cond)
 
@@ -178,15 +178,15 @@ class ReaderSuite extends AnyFunSuite {
     property_groups.add(property_group_1)
     property_groups.add(property_group)
     val multiple_property_df =
-      reader.readMultipleVertexPropertyGroups(property_groups, addIndex = false)
-    assert(multiple_property_df.columns.length == 4)
+      reader.readMultipleVertexPropertyGroups(property_groups)
+    assert(multiple_property_df.columns.length == 5)
     assert(multiple_property_df.count() == 903)
     df_pd = multiple_property_df.filter(cond)
     df_pd.explain()
     df_pd.show()
     // test reading chunks for all property groups and optionally adding indices
-    val vertex_df = reader.readAllVertexPropertyGroups(addIndex = false)
-    assert(vertex_df.columns.length == 4)
+    val vertex_df = reader.readAllVertexPropertyGroups()
+    assert(vertex_df.columns.length == 5)
     assert(vertex_df.count() == 903)
     df_pd = vertex_df.filter(cond)
     df_pd.explain()

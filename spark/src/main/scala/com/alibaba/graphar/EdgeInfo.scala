@@ -75,7 +75,11 @@ class EdgeInfo() {
         return str
       }
     }
-    throw new IllegalArgumentException
+    throw new IllegalArgumentException(
+      "adj list type not found: " + AdjListType.AdjListTypeToString(
+        adj_list_type
+      )
+    )
   }
 
   /**
@@ -95,7 +99,11 @@ class EdgeInfo() {
         return adj_list.getFile_type_in_gar
       }
     }
-    throw new IllegalArgumentException
+    throw new IllegalArgumentException(
+      "adj list type not found: " + AdjListType.AdjListTypeToString(
+        adj_list_type
+      )
+    )
   }
 
   /**
@@ -117,7 +125,11 @@ class EdgeInfo() {
         return adj_list.getProperty_groups
       }
     }
-    throw new IllegalArgumentException
+    throw new IllegalArgumentException(
+      "adj list type not found: " + AdjListType.AdjListTypeToString(
+        adj_list_type
+      )
+    )
   }
 
   /**
@@ -213,10 +225,18 @@ class EdgeInfo() {
               return pg
             }
           }
+          throw new IllegalArgumentException(
+            "property group not found: " + property_name + " in adj list type: " + AdjListType
+              .AdjListTypeToString(
+                adj_list_type
+              )
+          )
         }
       }
     }
-    throw new IllegalArgumentException
+    throw new IllegalArgumentException(
+      "adj list type or property group not found."
+    )
   }
 
   /**
@@ -245,7 +265,7 @@ class EdgeInfo() {
         }
       }
     }
-    throw new IllegalArgumentException
+    throw new IllegalArgumentException("property not found: " + property_name)
   }
 
   /**
@@ -275,7 +295,7 @@ class EdgeInfo() {
         }
       }
     }
-    throw new IllegalArgumentException
+    throw new IllegalArgumentException("property not found: " + property_name)
   }
 
   /** Get Primary key of edge info. */
@@ -337,7 +357,11 @@ class EdgeInfo() {
    */
   def getVerticesNumFilePath(adj_list_type: AdjListType.Value): String = {
     if (containAdjList(adj_list_type) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "adj list type not found: " + AdjListType.AdjListTypeToString(
+          adj_list_type
+        )
+      )
     }
     val str: String = prefix + getAdjListPrefix(adj_list_type) + "vertex_count"
     return str
@@ -354,7 +378,11 @@ class EdgeInfo() {
    */
   def getEdgesNumPathPrefix(adj_list_type: AdjListType.Value): String = {
     if (containAdjList(adj_list_type) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "adj list type not found: " + AdjListType.AdjListTypeToString(
+          adj_list_type
+        )
+      )
     }
     val str: String = prefix + getAdjListPrefix(adj_list_type) + "edge_count"
     return str
@@ -376,7 +404,11 @@ class EdgeInfo() {
       adj_list_type: AdjListType.Value
   ): String = {
     if (containAdjList(adj_list_type) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "adj list type not found: " + AdjListType.AdjListTypeToString(
+          adj_list_type
+        )
+      )
     }
     val str: String = prefix + getAdjListPrefix(adj_list_type) + "edge_count" +
       chunk_index.toString()
@@ -400,7 +432,11 @@ class EdgeInfo() {
       adj_list_type: AdjListType.Value
   ): String = {
     if (containAdjList(adj_list_type) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "adj list type not found: " + AdjListType.AdjListTypeToString(
+          adj_list_type
+        )
+      )
     }
     val str: String =
       prefix + getAdjListPrefix(adj_list_type) + "offset/chunk" +
@@ -419,7 +455,11 @@ class EdgeInfo() {
    */
   def getOffsetPathPrefix(adj_list_type: AdjListType.Value): String = {
     if (containAdjList(adj_list_type) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "adj list type not found: " + AdjListType.AdjListTypeToString(
+          adj_list_type
+        )
+      )
     }
     return prefix + getAdjListPrefix(adj_list_type) + "offset/"
   }
@@ -503,7 +543,7 @@ class EdgeInfo() {
       chunk_index: Long
   ): String = {
     if (containPropertyGroup(property_group, adj_list_type) == false)
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException("property group not found.")
     var str: String = property_group.getPrefix
     if (str == "") {
       val properties = property_group.getProperties
@@ -540,7 +580,7 @@ class EdgeInfo() {
       vertex_chunk_index: Long
   ): String = {
     if (containPropertyGroup(property_group, adj_list_type) == false)
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException("property group not found.")
     var str: String = property_group.getPrefix
     if (str == "") {
       val properties = property_group.getProperties
@@ -573,7 +613,7 @@ class EdgeInfo() {
       adj_list_type: AdjListType.Value
   ): String = {
     if (containPropertyGroup(property_group, adj_list_type) == false)
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException("property group not found.")
     var str: String = property_group.getPrefix
     if (str == "") {
       val properties = property_group.getProperties

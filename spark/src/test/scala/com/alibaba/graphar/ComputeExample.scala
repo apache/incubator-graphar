@@ -40,7 +40,7 @@ class ComputeExampleSuite extends AnyFunSuite {
 
     val vertex_reader = new VertexReader(prefix, vertex_info, spark)
     val vertices_num = vertex_reader.readVerticesNumber()
-    val vertex_df = vertex_reader.readAllVertexPropertyGroups(true)
+    val vertex_df = vertex_reader.readAllVertexPropertyGroups()
     vertex_df.show()
     assert(vertex_df.columns.size == 5)
     assert(vertex_df.count() == vertices_num)
