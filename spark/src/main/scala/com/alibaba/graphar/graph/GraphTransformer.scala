@@ -59,12 +59,14 @@ object GraphTransformer {
       // load source vertex info
       val label = dest_vertex_info.getLabel()
       if (!sourceVertexInfosMap.contains(label)) {
-        throw new IllegalArgumentException
+        throw new IllegalArgumentException(
+          "vertex info of " + label + " not found in graph info."
+        )
       }
       val source_vertex_info = sourceVertexInfosMap(label)
       // read vertex chunks from the source graph
       val reader = new VertexReader(source_prefix, source_vertex_info, spark)
-      val df = reader.readAllVertexPropertyGroups(true)
+      val df = reader.readAllVertexPropertyGroups()
       // write vertex chunks for the dest graph
       val writer = new VertexWriter(dest_prefix, dest_vertex_info, df)
       writer.writeVertexProperties()
@@ -105,7 +107,9 @@ object GraphTransformer {
       // load source edge info
       val key = dest_edge_info.getConcatKey()
       if (!sourceEdgeInfosMap.contains(key)) {
-        throw new IllegalArgumentException
+        throw new IllegalArgumentException(
+          "edge info of " + key + " not found in graph info."
+        )
       }
       val source_edge_info = sourceEdgeInfosMap(key)
       var has_loaded = false
@@ -146,7 +150,9 @@ object GraphTransformer {
             dest_edge_info.getDst_label
         }
         if (!sourceVertexInfosMap.contains(vertex_label)) {
-          throw new IllegalArgumentException
+          throw new IllegalArgumentException(
+            "vertex info of " + vertex_label + " not found in graph info."
+          )
         }
         val vertex_info = sourceVertexInfosMap(vertex_label)
         val reader = new VertexReader(source_prefix, vertex_info, spark)

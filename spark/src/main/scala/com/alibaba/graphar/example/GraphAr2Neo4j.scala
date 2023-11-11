@@ -46,9 +46,7 @@ object GraphAr2Neo4j {
     val graphInfoPath: String = args(0)
     val graphInfo = GraphInfo.loadGraphInfo(graphInfoPath, spark)
 
-    // The edge data need to convert src and dst to the vertex id , so we need to read
-    // the vertex data with index column.
-    val graphData = GraphReader.read(graphInfoPath, spark, true)
+    val graphData = GraphReader.read(graphInfoPath, spark)
     val vertexData = graphData._1
     val edgeData = graphData._2
 

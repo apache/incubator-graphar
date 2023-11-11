@@ -63,7 +63,7 @@ object GarType extends Enumeration {
     case GarType.DOUBLE => "double"
     case GarType.STRING => "string"
     case GarType.ARRAY  => "array"
-    case _              => throw new IllegalArgumentException
+    case _ => throw new IllegalArgumentException("Unknown data type")
   }
 
   /**
@@ -82,7 +82,7 @@ object GarType extends Enumeration {
     case "double" => GarType.DOUBLE
     case "string" => GarType.STRING
     case "array"  => GarType.ARRAY
-    case _        => throw new IllegalArgumentException
+    case _ => throw new IllegalArgumentException("Unknown data type: " + str)
   }
 }
 
@@ -105,7 +105,7 @@ object FileType extends Enumeration {
     case FileType.CSV     => "csv"
     case FileType.PARQUET => "parquet"
     case FileType.ORC     => "orc"
-    case _                => throw new IllegalArgumentException
+    case _ => throw new IllegalArgumentException("Unknown file type")
   }
 
   /**
@@ -120,7 +120,7 @@ object FileType extends Enumeration {
     case "csv"     => FileType.CSV
     case "parquet" => FileType.PARQUET
     case "orc"     => FileType.ORC
-    case _         => throw new IllegalArgumentException
+    case _ => throw new IllegalArgumentException("Unknown file type: " + str)
   }
 
 }
@@ -155,7 +155,7 @@ object AdjListType extends Enumeration {
       case AdjListType.unordered_by_dest   => "unordered_by_dest"
       case AdjListType.ordered_by_source   => "ordered_by_source"
       case AdjListType.ordered_by_dest     => "ordered_by_dest"
-      case _                               => throw new IllegalArgumentException
+      case _ => throw new IllegalArgumentException("Unknown adjList type")
     }
 
   /** String to adjList type in gar */
@@ -164,7 +164,7 @@ object AdjListType extends Enumeration {
     case "unordered_by_dest"   => AdjListType.unordered_by_dest
     case "ordered_by_source"   => AdjListType.ordered_by_source
     case "ordered_by_dest"     => AdjListType.ordered_by_dest
-    case _                     => throw new IllegalArgumentException
+    case _ => throw new IllegalArgumentException("Unknown adjList type: " + str)
   }
 }
 

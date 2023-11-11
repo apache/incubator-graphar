@@ -220,7 +220,11 @@ class EdgeWriter(
   private def validate(): Unit = {
     // chunk if edge info contains the adj list type
     if (edgeInfo.containAdjList(adjListType) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "adj list type: " + AdjListType.AdjListTypeToString(
+          adjListType
+        ) + " not found in edge info."
+      )
     }
     // check the src index and dst index column exist
     val src_filed = StructField(GeneralParams.srcIndexCol, LongType)
@@ -229,7 +233,9 @@ class EdgeWriter(
     if (
       schema.contains(src_filed) == false || schema.contains(dst_filed) == false
     ) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "edge DataFrame must contain src index column and dst index column."
+      )
     }
   }
 
@@ -319,7 +325,9 @@ class EdgeWriter(
    */
   def writeEdgeProperties(propertyGroup: PropertyGroup): Unit = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "property group not contained in edge info."
+      )
     }
 
     val propertyList = ArrayBuffer[String]()

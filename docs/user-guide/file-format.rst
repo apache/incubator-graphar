@@ -57,6 +57,8 @@ Take the "person" vertex table as an example, if the chunk size is set to be 500
    :alt: vertex physical table
 
 
+**Note**: For efficiently utilize the filter push-down of the payload file format like Parquet, the internal vertex id is stored in the payload file as a column. And since the internal vertex id is continuous, the payload file format can use the delta encoding for the internal vertex id column, which would not bring too much overhead for the storage.
+
 Edges in GraphAr
 ------------------------
 

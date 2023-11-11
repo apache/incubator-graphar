@@ -93,7 +93,7 @@ class VertexInfo() {
         }
       }
     }
-    throw new IllegalArgumentException
+    throw new IllegalArgumentException("Property not found: " + property_name)
   }
 
   /**
@@ -117,7 +117,7 @@ class VertexInfo() {
         }
       }
     }
-    throw new IllegalArgumentException
+    throw new IllegalArgumentException("Property not found: " + property_name)
   }
 
   /**
@@ -141,7 +141,7 @@ class VertexInfo() {
         }
       }
     }
-    throw new IllegalArgumentException
+    throw new IllegalArgumentException("Property not found: " + property_name)
   }
 
   /**
@@ -205,7 +205,7 @@ class VertexInfo() {
    */
   def getFilePath(property_group: PropertyGroup, chunk_index: Long): String = {
     if (containPropertyGroup(property_group) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException("Property group not found.")
     }
     var str: String = ""
     if (property_group.getPrefix == "") {
@@ -234,7 +234,7 @@ class VertexInfo() {
    */
   def getPathPrefix(property_group: PropertyGroup): String = {
     if (containPropertyGroup(property_group) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException("Property group not found.")
     }
     var str: String = ""
     if (property_group.getPrefix == "") {

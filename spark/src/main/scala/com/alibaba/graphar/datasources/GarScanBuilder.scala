@@ -55,7 +55,8 @@ case class GarScanBuilder(
     case "csv"     => Array.empty[Filter]
     case "orc"     => pushedOrcFilters
     case "parquet" => pushedParquetFilters
-    case _         => throw new IllegalArgumentException
+    case _ =>
+      throw new IllegalArgumentException("Invalid format name: " + formatName)
   }
 
   private lazy val pushedParquetFilters: Array[Filter] = {
@@ -87,7 +88,8 @@ case class GarScanBuilder(
       case "orc" => sparkSession.sessionState.conf.nestedSchemaPruningEnabled
       case "parquet" =>
         sparkSession.sessionState.conf.nestedSchemaPruningEnabled
-      case _ => throw new IllegalArgumentException
+      case _ =>
+        throw new IllegalArgumentException("Invalid format name: " + formatName)
     }
 
   /** Build the file scan for GarDataSource. */
