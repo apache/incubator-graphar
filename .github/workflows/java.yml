@@ -36,10 +36,10 @@ jobs:
           sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
           sudo apt-get update -y
           # TODO: ISSUE-241
-          sudo apt install -y libarrow-dev=13.0.0-1 \
-                              libarrow-dataset-dev=13.0.0-1 \
-                              libarrow-acero-dev=13.0.0-1 \
-                              libparquet-dev=13.0.0-1
+          sudo apt install -y libarrow-dev=14.0.0-1 \
+                              libarrow-dataset-dev=14.0.0-1 \
+                              libarrow-acero-dev=14.0.0-1 \
+                              libparquet-dev=14.0.0-1
           sudo apt-get install libcurl4-openssl-dev -y
           sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
           
@@ -61,6 +61,7 @@ jobs:
 
       - name: Run test
         run: |
+          # Temporarily using Java 8, related issue: https://github.com/alibaba/GraphAr/issues/277
           export JAVA_HOME=${JAVA_HOME_8_X64}
           export LLVM11_HOME=/usr/lib/llvm-11
           pushd java

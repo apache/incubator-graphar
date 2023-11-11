@@ -31,7 +31,6 @@ import com.alibaba.graphar.arrow.ArrowTable;
 import com.alibaba.graphar.graphinfo.GraphInfo;
 import com.alibaba.graphar.graphinfo.PropertyGroup;
 import com.alibaba.graphar.graphinfo.VertexInfo;
-import com.alibaba.graphar.stdcxx.StdPair;
 import com.alibaba.graphar.stdcxx.StdSharedPtr;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.util.GrapharStaticFunctions;
@@ -60,16 +59,6 @@ public interface VertexPropertyArrowChunkReader extends CXXPointer {
     @FFINameAlias("GetChunk")
     @CXXValue
     Result<StdSharedPtr<ArrowTable>> getChunk();
-
-    /**
-     * Get the vertex id range of current chunk.
-     *
-     * @return Result: std::pair<begin_id, end_id> or error.
-     */
-    @FFINameAlias("GetRange")
-    @CXXValue
-    @FFITypeAlias("GraphArchive::Result<std::pair<GraphArchive::IdType,GraphArchive::IdType>>")
-    Result<StdPair<Long, Long>> getRange();
 
     /**
      * Sets chunk position indicator to next chunk. if current chunk is the last chunk, will return
