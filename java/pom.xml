@@ -129,7 +129,7 @@
                         <configuration>
                             <target>
                                 <property name="compile_classpath" refid="maven.compile.classpath"/>
-
+                                <property name="build_gar_cpp" value="${buildGarCPP}"/>
                                 <ant antfile="${basedir}/build.xml">
                                     <target name="run-llvm4jni" />
                                 </ant>
