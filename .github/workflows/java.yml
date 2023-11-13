@@ -50,15 +50,6 @@ jobs:
           mvn spotless:check
           popd
 
-      - name: Build and Install cpp
-        run: |
-          mkdir build
-          pushd build
-          cmake ../cpp
-          make -j$(nproc)
-          sudo make install
-          popd
-
       - name: Run test
         run: |
           # Temporarily using Java 8, related issue: https://github.com/alibaba/GraphAr/issues/277
