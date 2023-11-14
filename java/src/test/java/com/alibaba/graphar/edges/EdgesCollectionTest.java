@@ -17,8 +17,11 @@ package com.alibaba.graphar.edges;
 import static com.alibaba.graphar.graphinfo.GraphInfoTest.root;
 
 import com.alibaba.graphar.graphinfo.GraphInfo;
+import com.alibaba.graphar.stdcxx.StdSharedPtr;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.types.AdjListType;
+import com.alibaba.graphar.util.GrapharStaticFunctions;
+import com.alibaba.graphar.util.Result;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,18 +35,20 @@ public class EdgesCollectionTest {
         GraphInfo graphInfo = GraphInfo.load(path).value();
 
         // iterate edges of vertex chunk 0
-        EdgesCollection edges =
-                EdgesCollection.create(
+        Result<StdSharedPtr<EdgesCollection>> maybeEdges =
+                GrapharStaticFunctions.INSTANCE.constructEdgesCollection(
                         graphInfo,
-                        srcLabel.toJavaString(),
-                        edgeLabel.toJavaString(),
-                        dstLabel.toJavaString(),
+                        srcLabel,
+                        edgeLabel,
+                        dstLabel,
                         AdjListType.ordered_by_source,
                         0,
                         1);
-        EdgeIter it = edges.begin();
+        Assert.assertTrue(maybeEdges.status().ok());
+        StdSharedPtr<EdgesCollection> edges = maybeEdges.value();
+        EdgeIter it = edges.get().begin();
         long count = 0L;
-        for (Edge edge : edges) {
+        for (Edge edge : edges.get()) {
             // access data through iterator directly
             System.out.print("src=" + it.source() + ", dst=" + it.destination() + " ");
             // access data through edge
@@ -55,58 +60,60 @@ public class EdgesCollectionTest {
             it.inc();
         }
         System.out.println("edge_count=" + count);
-        Assert.assertEquals(count, edges.size());
+        Assert.assertEquals(count, edges.get().size());
 
         // iterate edges of vertex chunk [2, 4)
-        EdgesCollection edges1 =
-                EdgesCollection.create(
+        Result<StdSharedPtr<EdgesCollection>> maybeEdges1 =
+                GrapharStaticFunctions.INSTANCE.constructEdgesCollection(
                         graphInfo,
-                        srcLabel.toJavaString(),
-                        edgeLabel.toJavaString(),
-                        dstLabel.toJavaString(),
+                        srcLabel,
+                        edgeLabel,
+                        dstLabel,
                         AdjListType.ordered_by_dest,
                         2,
                         4);
-        EdgeIter end1 = edges1.end();
+        Assert.assertTrue(maybeEdges.status().ok());
+        StdSharedPtr<EdgesCollection> edges1 = maybeEdges1.value();
+        EdgeIter end1 = edges1.get().end();
         long count1 = 0;
-        for (Edge edge : edges1) {
+        for (Edge edge : edges1.get()) {
             count1++;
         }
         System.out.println("edge_count=" + count1);
-        Assert.assertEquals(count1, edges1.size());
+        Assert.assertEquals(count1, edges1.get().size());
 
         // iterate all edges
-        EdgesCollection edges2 =
-                EdgesCollection.create(
-                        graphInfo,
-                        srcLabel.toJavaString(),
-                        edgeLabel.toJavaString(),
-                        dstLabel.toJavaString(),
-                        AdjListType.ordered_by_source);
+        Result<StdSharedPtr<EdgesCollection>> maybeEdges2 =
+                GrapharStaticFunctions.INSTANCE.constructEdgesCollection(
+                        graphInfo, srcLabel, edgeLabel, dstLabel, AdjListType.ordered_by_source);
+        Assert.assertTrue(maybeEdges.status().ok());
+        StdSharedPtr<EdgesCollection> edges2 = maybeEdges2.value();
         long count2 = 0;
-        for (Edge edge : edges2) {
+        for (Edge edge : edges2.get()) {
             System.out.println("src=" + edge.source() + ", dst=" + edge.destination());
             count2++;
         }
         System.out.println("edge_count=" + count2);
-        Assert.assertEquals(count2, edges2.size());
+        Assert.assertEquals(count2, edges2.get().size());
 
         // empty collection
-        EdgesCollection edges3 =
-                EdgesCollection.create(
+        Result<StdSharedPtr<EdgesCollection>> maybeEdges3 =
+                GrapharStaticFunctions.INSTANCE.constructEdgesCollection(
                         graphInfo,
-                        srcLabel.toJavaString(),
-                        edgeLabel.toJavaString(),
-                        dstLabel.toJavaString(),
+                        srcLabel,
+                        edgeLabel,
+                        dstLabel,
                         AdjListType.unordered_by_source,
                         5,
                         5);
+        Assert.assertTrue(maybeEdges3.status().ok());
+        StdSharedPtr<EdgesCollection> edges3 = maybeEdges3.value();
         long count3 = 0;
-        for (Edge edge : edges3) {
+        for (Edge edge : edges3.get()) {
             count3++;
         }
         System.out.println("edge_count=" + count3);
         Assert.assertEquals(0, count3);
-        Assert.assertEquals(0, edges3.size());
+        Assert.assertEquals(0, edges3.get().size());
     }
 }

@@ -20,13 +20,9 @@ import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
-import com.alibaba.fastffi.CXXReference;
 import com.alibaba.fastffi.CXXValue;
-import com.alibaba.fastffi.FFIFactory;
 import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFITypeAlias;
-import com.alibaba.graphar.graphinfo.VertexInfo;
-import com.alibaba.graphar.stdcxx.StdString;
 import java.util.Iterator;
 
 /** VerticesCollection is designed for reading a collection of vertices. */
@@ -67,17 +63,5 @@ public interface VerticesCollection extends CXXPointer, Iterable<Vertex> {
                 return ret;
             }
         };
-    }
-
-    @FFIFactory
-    interface Factory {
-        /**
-         * Initialize the VerticesCollection.
-         *
-         * @param vertexInfo The vertex info that describes the vertex type.
-         * @param prefix The absolute prefix.
-         */
-        VerticesCollection create(
-                @CXXReference VertexInfo vertexInfo, @CXXReference StdString prefix);
     }
 }

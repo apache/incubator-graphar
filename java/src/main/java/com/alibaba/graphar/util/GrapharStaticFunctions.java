@@ -1,5 +1,6 @@
 package com.alibaba.graphar.util;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
 import static com.alibaba.graphar.util.CppClassName.GAR_NAMESPACE;
 import static com.alibaba.graphar.util.CppHeaderName.GAR_ARROW_CHUNK_READER_H;
 import static com.alibaba.graphar.util.CppHeaderName.GAR_CHUNK_INFO_READER_H;
@@ -11,7 +12,9 @@ import com.alibaba.fastffi.CXXValue;
 import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFILibrary;
 import com.alibaba.fastffi.FFINameAlias;
+import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
+import com.alibaba.graphar.edges.EdgesCollection;
 import com.alibaba.graphar.graphinfo.GraphInfo;
 import com.alibaba.graphar.graphinfo.PropertyGroup;
 import com.alibaba.graphar.readers.arrowchunk.AdjListArrowChunkReader;
@@ -21,6 +24,7 @@ import com.alibaba.graphar.readers.arrowchunk.VertexPropertyArrowChunkReader;
 import com.alibaba.graphar.readers.chunkinfo.AdjListChunkInfoReader;
 import com.alibaba.graphar.readers.chunkinfo.AdjListPropertyChunkInfoReader;
 import com.alibaba.graphar.readers.chunkinfo.VertexPropertyChunkInfoReader;
+import com.alibaba.graphar.stdcxx.StdSharedPtr;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.types.AdjListType;
 import com.alibaba.graphar.vertices.VerticesCollection;
@@ -170,6 +174,48 @@ public interface GrapharStaticFunctions {
      */
     @FFINameAlias("ConstructVerticesCollection")
     @CXXValue
-    Result<VerticesCollection> constructVerticesCollection(
+    Result<StdSharedPtr<VerticesCollection>> constructVerticesCollection(
             @CXXReference GraphInfo graphInfo, @CXXReference StdString label);
+
+    /**
+     * Construct the collection for a range of edges.
+     *
+     * @param graphInfo The GraphInfo for the graph.
+     * @param srcLabel The source vertex label.
+     * @param edgeLabel The edge label.
+     * @param dstLabel The destination vertex label.
+     * @param adjListType The adjList type.
+     * @param vertexChunkBegin The index of the beginning vertex chunk.
+     * @param vertexChunkEnd The index of the end vertex chunk (not included).
+     * @return The constructed collection or error.
+     */
+    @FFINameAlias("ConstructEdgesCollection")
+    @CXXValue
+    Result<StdSharedPtr<EdgesCollection>> constructEdgesCollection(
+            @CXXReference GraphInfo graphInfo,
+            @CXXReference StdString srcLabel,
+            @CXXReference StdString edgeLabel,
+            @CXXReference StdString dstLabel,
+            @CXXValue AdjListType adjListType,
+            @FFITypeAlias(GAR_ID_TYPE) long vertexChunkBegin,
+            @FFITypeAlias(GAR_ID_TYPE) long vertexChunkEnd);
+
+    /**
+     * Construct the collection for a range of edges.
+     *
+     * @param graphInfo The GraphInfo for the graph.
+     * @param srcLabel The source vertex label.
+     * @param edgeLabel The edge label.
+     * @param dstLabel The destination vertex label.
+     * @param adjListType The adjList type.
+     * @return The constructed collection or error.
+     */
+    @FFINameAlias("ConstructEdgesCollection")
+    @CXXValue
+    Result<StdSharedPtr<EdgesCollection>> constructEdgesCollection(
+            @CXXReference GraphInfo graphInfo,
+            @CXXReference StdString srcLabel,
+            @CXXReference StdString edgeLabel,
+            @CXXReference StdString dstLabel,
+            @CXXValue AdjListType adjListType);
 }

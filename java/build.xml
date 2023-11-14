@@ -18,7 +18,7 @@
         <echo message="Native Library Name: ${native.library.name}" level="info"/>
 
         <exec executable="cmake" dir="${project.build.directory}/native" failonerror="true">
-            <arg line="-DCMAKE_AR=&quot;${env.LLVM11_HOME}/bin/llvm-ar&quot; -DCMAKE_RANLIB=&quot;${env.LLVM11_HOME}/bin/llvm-ranlib&quot; -DCMAKE_C_COMPILER=&quot;${env.LLVM11_HOME}/bin/clang&quot; -DCMAKE_CXX_COMPILER=&quot;${env.LLVM11_HOME}/bin/clang++&quot; -DCMAKE_CXX_FLAGS=&quot;-flto -fforce-emit-vtables&quot; ${basedir}"/>
+            <arg line="-DBUILD_GAR_CPP=${build_gar_cpp}; -DCMAKE_AR=&quot;${env.LLVM11_HOME}/bin/llvm-ar&quot; -DCMAKE_RANLIB=&quot;${env.LLVM11_HOME}/bin/llvm-ranlib&quot; -DCMAKE_C_COMPILER=&quot;${env.LLVM11_HOME}/bin/clang&quot; -DCMAKE_CXX_COMPILER=&quot;${env.LLVM11_HOME}/bin/clang++&quot; -DCMAKE_CXX_FLAGS=&quot;-flto -fforce-emit-vtables&quot; ${basedir}"/>
         </exec>
 
         <exec executable="make" dir="${project.build.directory}/native" failonerror="true">

@@ -19,7 +19,6 @@ import static com.alibaba.graphar.graphinfo.GraphInfoTest.root;
 import com.alibaba.graphar.arrow.ArrowTable;
 import com.alibaba.graphar.graphinfo.GraphInfo;
 import com.alibaba.graphar.graphinfo.PropertyGroup;
-import com.alibaba.graphar.stdcxx.StdPair;
 import com.alibaba.graphar.stdcxx.StdSharedPtr;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.util.GrapharStaticFunctions;
@@ -49,37 +48,25 @@ public class VertexPropertyArrowChunkReaderTest {
         VertexPropertyArrowChunkReader reader = maybeReader.value();
         Result<StdSharedPtr<ArrowTable>> result = reader.getChunk();
         Assert.assertTrue(result.status().ok());
-        StdPair<Long, Long> range = reader.getRange().value();
         StdSharedPtr<ArrowTable> table = result.value();
         Assert.assertEquals(100, table.get().num_rows());
-        Assert.assertEquals(0, (long) range.getFirst());
-        Assert.assertEquals(100, (long) range.getSecond());
 
         // seek
         Assert.assertTrue(reader.seek(100).ok());
         result = reader.getChunk();
         Assert.assertTrue(result.status().ok());
-        range = reader.getRange().value();
         table = result.value();
         Assert.assertEquals(100, table.get().num_rows());
-        Assert.assertEquals(100, (long) range.getFirst());
-        Assert.assertEquals(200, (long) range.getSecond());
         Assert.assertTrue(reader.nextChunk().ok());
         result = reader.getChunk();
         Assert.assertTrue(result.status().ok());
-        range = reader.getRange().value();
         table = result.value();
         Assert.assertEquals(100, table.get().num_rows());
-        Assert.assertEquals(200, (long) range.getFirst());
-        Assert.assertEquals(300, (long) range.getSecond());
         Assert.assertTrue(reader.seek(900).ok());
         result = reader.getChunk();
         Assert.assertTrue(result.status().ok());
-        range = reader.getRange().value();
         table = result.value();
         Assert.assertEquals(3, table.get().num_rows());
-        Assert.assertEquals(900, (long) range.getFirst());
-        Assert.assertEquals(903, (long) range.getSecond());
         Assert.assertEquals(10, reader.getChunkNum());
         Assert.assertTrue(reader.nextChunk().isIndexError());
 
