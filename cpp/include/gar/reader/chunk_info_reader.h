@@ -107,6 +107,13 @@ class VertexPropertyChunkInfoReader {
   /** Get the chunk number of the current vertex property group. */
   IdType GetChunkNum() noexcept { return chunk_num_; }
 
+  static Result<std::shared_ptr<VertexPropertyChunkInfoReader>> Make(
+      const VertexInfo& vertex_info, const PropertyGroup& property_group,
+      const std::string& prefix) {
+    return std::make_shared<VertexPropertyChunkInfoReader>(
+        vertex_info, property_group, prefix);
+  }
+
  private:
   VertexInfo vertex_info_;
   PropertyGroup property_group_;
@@ -210,6 +217,13 @@ class AdjListChunkInfoReader {
                                             vertex_chunk_index_));
     }
     return Status::OK();
+  }
+
+  static Result<std::shared_ptr<AdjListChunkInfoReader>> Make(
+      const EdgeInfo& edge_info, AdjListType adj_list_type,
+      const std::string& prefix) {
+    return std::make_shared<AdjListChunkInfoReader>(edge_info, adj_list_type,
+                                                    prefix);
   }
 
  private:
@@ -325,6 +339,13 @@ class AdjListPropertyChunkInfoReader {
     return Status::OK();
   }
 
+  static Result<std::shared_ptr<AdjListPropertyChunkInfoReader>> Make(
+      const EdgeInfo& edge_info, const PropertyGroup& property_group,
+      AdjListType adj_list_type, const std::string& prefix) {
+    return std::make_shared<AdjListPropertyChunkInfoReader>(
+        edge_info, property_group, adj_list_type, prefix);
+  }
+
  private:
   EdgeInfo edge_info_;
   PropertyGroup property_group_;
@@ -343,7 +364,7 @@ class AdjListPropertyChunkInfoReader {
  * @param label label name of the vertex.
  * @param property_group The property group of the vertex.
  */
-static inline Result<VertexPropertyChunkInfoReader>
+static inline Result<std::shared_ptr<VertexPropertyChunkInfoReader>>
 ConstructVertexPropertyChunkInfoReader(
     const GraphInfo& graph_info, const std::string& label,
     const PropertyGroup& property_group) noexcept {
@@ -353,7 +374,7 @@ ConstructVertexPropertyChunkInfoReader(
     return Status::KeyError("No property group ", property_group, " in vertex ",
                             label, ".");
   }
-  return VertexPropertyChunkInfoReader(vertex_info, property_group,
+  return VertexPropertyChunkInfoReader::Make(vertex_info, property_group,
                                        graph_info.GetPrefix());
 }
 
@@ -366,7 +387,7 @@ ConstructVertexPropertyChunkInfoReader(
  * @param dst_label label of destination vertex.
  * @param adj_list_type The adj list type for the edges.
  */
-static inline Result<AdjListChunkInfoReader> ConstructAdjListChunkInfoReader(
+static inline Result<std::shared_ptr<AdjListChunkInfoReader>> ConstructAdjListChunkInfoReader(
     const GraphInfo& graph_info, const std::string& src_label,
     const std::string& edge_label, const std::string& dst_label,
     AdjListType adj_list_type) noexcept {
@@ -379,7 +400,7 @@ static inline Result<AdjListChunkInfoReader> ConstructAdjListChunkInfoReader(
                             " doesn't exist in edge ", edge_label, ".");
   }
 
-  return AdjListChunkInfoReader(edge_info, adj_list_type,
+  return AdjListChunkInfoReader::Make(edge_info, adj_list_type,
                                 graph_info.GetPrefix());
 }
 
@@ -393,7 +414,7 @@ static inline Result<AdjListChunkInfoReader> ConstructAdjListChunkInfoReader(
  * @param property_group The property group of the edge.
  * @param adj_list_type The adj list type for the edges.
  */
-static inline Result<AdjListPropertyChunkInfoReader>
+static inline Result<std::shared_ptr<AdjListPropertyChunkInfoReader>>
 ConstructAdjListPropertyChunkInfoReader(const GraphInfo& graph_info,
                                         const std::string& src_label,
                                         const std::string& edge_label,
@@ -414,7 +435,7 @@ ConstructAdjListPropertyChunkInfoReader(const GraphInfo& graph_info,
                             AdjListTypeToString(adj_list_type), ".");
   }
 
-  return AdjListPropertyChunkInfoReader(edge_info, property_group,
+  return AdjListPropertyChunkInfoReader::Make(edge_info, property_group,
                                         adj_list_type, graph_info.GetPrefix());
 }
 
