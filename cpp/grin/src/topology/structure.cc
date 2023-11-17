@@ -47,11 +47,9 @@ bool grin_is_directed(GRIN_GRAPH);
 bool grin_is_multigraph(GRIN_GRAPH g) { return true; }
 #endif
 
-#if !defined(GRIN_WITH_VERTEX_PROPERTY)
+#ifndef GRIN_ENABLE_SCHEMA
 size_t grin_get_vertex_num(GRIN_GRAPH);
-#endif
 
-#if !defined(GRIN_WITH_EDGE_PROPERTY)
 size_t grin_get_edge_num(GRIN_GRAPH);
 #endif
 

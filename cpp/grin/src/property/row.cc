@@ -32,10 +32,23 @@ limitations under the License.
     return x;                        \
   }
 
+// TODO: double check
+#if defined(GRIN_ENABLE_ROW) && defined(GRIN_TRAIT_PROPERTY_VALUE_OF_FLOAT_ARRAY)
+void grin_destroy_row_value_of_float_array(GRIN_GRAPH, const float*, size_t);
+
+const float* grin_get_float_array_from_row(GRIN_GRAPH, GRIN_ROW, size_t, size_t*);
+
+bool grin_insert_float_array_to_row(GRIN_GRAPH, GRIN_ROW, const float*, size_t);
+#endif
+
 #ifdef GRIN_ENABLE_ROW
 void grin_destroy_row(GRIN_GRAPH g, GRIN_ROW r) {
   auto _r = static_cast<GRIN_ROW_T*>(r);
   delete _r;
+}
+
+void grin_destroy_row_value_of_string(GRIN_GRAPH g, const char* value) {
+  return;
 }
 
 int grin_get_int32_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {
@@ -61,7 +74,7 @@ unsigned long long int grin_get_uint64_from_row(GRIN_GRAPH g,  // NOLINT
                                                 GRIN_ROW r, size_t idx) {
   auto _r = static_cast<GRIN_ROW_T*>(r);
   __grin_check_row(_r, 0);
-  return std::any_cast<uint64_t>((*_r)[idx]);
+  return std::any_cast<unsigned long long int>((*_r)[idx]);
 }
 
 float grin_get_float_from_row(GRIN_GRAPH g, GRIN_ROW r, size_t idx) {

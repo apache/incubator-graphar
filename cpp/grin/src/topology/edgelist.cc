@@ -17,7 +17,7 @@ limitations under the License.
 // GRIN headers
 #include "topology/edgelist.h"
 
-#if defined(GRIN_ENABLE_EDGE_LIST) && !defined(GRIN_WITH_EDGE_PROPERTY)
+#if defined(GRIN_ENABLE_EDGE_LIST) && !defined(GRIN_ENABLE_SCHEMA)
 GRIN_EDGE_LIST grin_get_edge_list(GRIN_GRAPH g);
 #endif
 

@@ -24,6 +24,7 @@ limitations under the License.
 #include "property/propertylist.h"
 #include "property/topology.h"
 #include "property/type.h"
+#include "property/value.h"
 #include "topology/adjacentlist.h"
 #include "topology/edgelist.h"
 #include "topology/structure.h"
@@ -93,7 +94,7 @@ void test_vertex_properties(GRIN_GRAPH graph, bool print_result = false) {
               grin_get_vertex_property_value_of_string(graph, v, property);
           if (print_result)
             std::cout << value << "; ";
-          grin_destroy_string_value(graph, value);
+          grin_destroy_vertex_property_value_of_string(graph, value);
           break;
         }
         default:
@@ -181,7 +182,7 @@ void test_edge_properties(GRIN_GRAPH graph, bool print_result = false) {
               grin_get_edge_property_value_of_string(graph, e, property);
           if (print_result)
             std::cout << value << "; ";
-          grin_destroy_string_value(graph, value);
+          grin_destroy_edge_property_value_of_string(graph, value);
           break;
         }
         default:

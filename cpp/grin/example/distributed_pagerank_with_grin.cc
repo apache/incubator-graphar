@@ -31,6 +31,7 @@ limitations under the License.
 #include "property/property.h"
 #include "property/topology.h"
 #include "property/type.h"
+#include "property/value.h"
 #include "topology/adjacentlist.h"
 #include "topology/edgelist.h"
 #include "topology/structure.h"
