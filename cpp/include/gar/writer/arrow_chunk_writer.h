@@ -191,6 +191,15 @@ class VertexPropertyWriter {
                     ValidateLevel validate_level =
                         ValidateLevel::default_validate) const noexcept;
 
+  static Result<std::shared_ptr<VertexPropertyWriter>> Make(
+      const GraphInfo& graph_info, const std::string& label,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    VertexInfo vertex_info;
+    GAR_ASSIGN_OR_RAISE(vertex_info, graph_info.GetVertexInfo(label));
+    return std::make_shared<VertexPropertyWriter>(vertex_info, graph_info.GetPrefix(),
+                                                  validate_level);
+  }
+
  private:
   /**
    * @brief Check if the operation of writing vertices number is allowed.
@@ -615,6 +624,8 @@ class EdgeChunkWriter {
       IdType vertex_chunk_index, IdType start_chunk_index = 0,
       ValidateLevel validate_level = ValidateLevel::default_validate) const
       noexcept;
+  
+  static inline 
 
  private:
   /**
