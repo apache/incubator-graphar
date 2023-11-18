@@ -207,7 +207,7 @@ class EdgesBuilder {
   inline ValidateLevel GetValidateLevel() const { return validate_level_; }
 
   /**
-   * @brief Clear the edges in this EdgessBuilder.
+   * @brief Clear the edges in this EdgesBuilder.
    */
   inline void Clear() {
     edges_.clear();
@@ -361,7 +361,7 @@ class EdgesBuilder {
                        const std::vector<Edge>& edges);
 
   /**
-   * @brief Append the values for a propety for edges in a specific vertex
+   * @brief Append the values for a property for edges in a specific vertex
    * chunk into the given array.
    *
    * @tparam type The data type.

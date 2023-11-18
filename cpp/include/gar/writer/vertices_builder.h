@@ -34,7 +34,7 @@ namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {
 
 /**
- * @brief Vertex is designed for constucting vertices builder.
+ * @brief Vertex is designed for constructing vertices builder.
  *
  */
 class Vertex {
@@ -124,7 +124,7 @@ class Vertex {
 class VerticesBuilder {
  public:
   /**
-   * @brief Initialize the VerciesBuilder.
+   * @brief Initialize the VerticesBuilder.
    *
    * @param vertex_info The vertex info that describes the vertex type.
    * @param prefix The absolute prefix.
