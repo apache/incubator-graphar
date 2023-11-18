@@ -193,7 +193,7 @@ class VertexPropertyWriter {
 
  private:
   /**
-   * @brief Check if the opeartion of writing vertices number is allowed.
+   * @brief Check if the operation of writing vertices number is allowed.
    *
    * @param count The number of vertices.
    * @param validate_level The validate level for this operation.
@@ -203,7 +203,7 @@ class VertexPropertyWriter {
       noexcept;
 
   /**
-   * @brief Check if the opeartion of copying a file as a chunk is allowed.
+   * @brief Check if the operation of copying a file as a chunk is allowed.
    *
    * @param property_group The property group to write.
    * @param chunk_index The index of the vertex chunk.
@@ -214,7 +214,7 @@ class VertexPropertyWriter {
                   ValidateLevel validate_level) const noexcept;
 
   /**
-   * @brief Check if the opeartion of writing a table as a chunk is allowed.
+   * @brief Check if the operation of writing a table as a chunk is allowed.
    *
    * @param input_table The input table containing data.
    * @param property_group The property group to write.
