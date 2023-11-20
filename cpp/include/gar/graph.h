@@ -79,9 +79,19 @@ class Vertex {
     }
   }
 
+  template <typename T>
+  inline Result<const T*> array_property(const std::string&property) noexcept {
+    if (array_properties_.find(property) == array_properties_.end()) {
+      return Status::KeyError("Property with name ", property,
+                              " does not exist in the vertex.");
+    }
+    return static_cast<const T*>(array_properties_[property]) + 3*id_;
+  }
+
  private:
   IdType id_;
   std::map<std::string, std::any> properties_;
+  std::map<std::string, const void*> array_properties_;
 };
 
 /**
@@ -134,9 +144,19 @@ class Edge {
     }
   }
 
+  template <typename T>
+  inline Result<const T*> array_property(const std::string&property) noexcept {
+    if (properties_.find(property) == properties_.end()) {
+      return Status::KeyError("Property with name ", property,
+                              " does not exist in the edge.");
+    }
+    return static_cast<const T*>(array_properties_[property]);
+  }
+
  private:
   IdType src_id_, dst_id_;
   std::map<std::string, std::any> properties_;
+  std::map<std::string, const void*> array_properties_;
 };
 
 /**

@@ -44,7 +44,6 @@ limitations under the License.
 #if defined(GRIN_WITH_VERTEX_PROPERTY) && defined(GRIN_TRAIT_PROPERTY_VALUE_OF_FLOAT_ARRAY)
 // TODO
 void grin_destroy_vertex_property_value_of_float_array(GRIN_GRAPH g, const float* value, size_t size) {
-  delete[] value;
   return;
 }
 
@@ -52,32 +51,9 @@ const float* grin_get_vertex_property_value_of_float_array(GRIN_GRAPH g, GRIN_VE
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _v = static_cast<GRIN_VERTEX_T*>(v);
   auto& property = _g->vertex_properties[vp];
-  __grin_check_vertex_property(_v, NULL);
+  *size_ptr = 100;
   __grin_get_gar_vertex(_v);
-  auto vtype = _v->type_id;
-  auto size = _g->vertex_property_offsets[vtype + 1] -
-              _g->vertex_property_offsets[vtype];
-  *size_ptr = size;
-  auto value = new float[size];
-  for (auto i = 0; i < size; ++i) {
-    auto vp_handle = _g->vertex_property_offsets[vtype] + i;
-    auto& property = _g->vertex_properties[vp_handle];
-    try {  // try float
-      value[i] = _v->vertex.value().property<float>(property.name).value();
-    } catch (std::exception& e) {
-      try {  // try double
-        value[i] = _v->vertex.value().property<double>(property.name).value();
-      } catch (std::exception& e) {
-        try {  // try int64_t
-          value[i] = _v->vertex.value().property<int64_t>(property.name).value();
-        } catch (std::exception& e) {
-          delete[] value;
-          return NULL;
-        }
-      }
-    }
-  }
-  return value;
+  return _v->vertex.value().array_property<float>(property.name).value();
 }
 #endif
 
@@ -199,39 +175,15 @@ const void* grin_get_vertex_property_value(GRIN_GRAPH, GRIN_VERTEX, GRIN_VERTEX_
 
 #if defined(GRIN_WITH_EDGE_PROPERTY) && defined(GRIN_TRAIT_PROPERTY_VALUE_OF_FLOAT_ARRAY)
 void grin_destroy_edge_property_value_of_float_array(GRIN_GRAPH g, const float* value, size_t size) {
-  delete [] value;
   return;
 }
 
 const float* grin_get_edge_property_value_of_float_array(GRIN_GRAPH g, GRIN_EDGE e, GRIN_EDGE_PROPERTY ep, size_t* size_ptr) {
-auto _g = static_cast<GRIN_GRAPH_T*>(g);
+  auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _e = static_cast<GRIN_EDGE_T*>(e);
   auto& property = _g->edge_properties[ep];
-  __grin_check_edge_property(_e, NULL);
-  auto etype = grin_get_edge_type_from_property(g, ep);
-  auto size =
-      _g->edge_property_offsets[etype + 1] - _g->edge_property_offsets[etype];
-  *size_ptr = size;
-  float* value = new float[size];
-  for (auto i = 0; i < size; ++i) {
-    auto ep_handle = _g->edge_property_offsets[etype] + i;
-    auto& property = _g->edge_properties[ep_handle];
-    try {  // try float
-      value[i] = _e->edge.property<float>(property.name).value();
-    } catch (std::exception& e) {
-      try {  // try double
-        value[i] = _e->edge.property<double>(property.name).value();
-      } catch (std::exception& e) {
-        try {  // try int64_t
-          value[i] = _e->edge.property<int64_t>(property.name).value();
-        } catch (std::exception& e) {
-          delete[] value;
-          return NULL;
-        }
-      }
-    }
-  }
-  return value;
+  *size_ptr = 100;
+  return _e->edge.array_property<float>(property.name).value();
 }
 #endif
 

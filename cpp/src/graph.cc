@@ -13,6 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+#include <iostream>
 #include "gar/graph.h"
 #include "gar/util/convert_to_arrow_type.h"
 
@@ -66,9 +67,16 @@ Vertex::Vertex(IdType id,
     auto schema = chunk_table->schema();
     for (int i = 0; i < schema->num_fields(); ++i) {
       auto field = chunk_table->field(i);
-      auto type = DataType::ArrowDataTypeToDataType(field->type());
-      GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(
+      if (field->type()->id() == arrow::Type::LIST) {
+        auto list_array = std::dynamic_pointer_cast<arrow::ListArray>(chunk_table->column(i)->chunk(0));
+        array_properties_[field->name()] =
+            reinterpret_cast<const void*>(std::dynamic_pointer_cast<arrow::FloatArray>(
+                list_array->values())->raw_values());
+      } else {
+        auto type = DataType::ArrowDataTypeToDataType(field->type());
+        GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(
           type, chunk_table->column(i)->chunk(0), properties_[field->name()]));
+      }
     }
   }
 }
@@ -91,9 +99,16 @@ Edge::Edge(
     auto schema = chunk_table->schema();
     for (int i = 0; i < schema->num_fields(); ++i) {
       auto field = chunk_table->field(i);
-      auto type = DataType::ArrowDataTypeToDataType(field->type());
-      GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(
-          type, chunk_table->column(i)->chunk(0), properties_[field->name()]));
+      if (field->type()->id() == arrow::Type::LIST) {
+        auto list_array = std::dynamic_pointer_cast<arrow::ListArray>(chunk_table->column(i)->chunk(0));
+        array_properties_[field->name()] =
+            reinterpret_cast<const void*>(std::dynamic_pointer_cast<arrow::FloatArray>(
+                list_array->values())->raw_values());
+      } else {
+        auto type = DataType::ArrowDataTypeToDataType(field->type());
+        GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(
+            type, chunk_table->column(i)->chunk(0), properties_[field->name()]));
+      }
     }
   }
 }
