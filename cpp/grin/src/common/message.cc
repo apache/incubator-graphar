@@ -16,7 +16,6 @@ limitations under the License.
 #include <glog/logging.h>
 #include <google/protobuf/util/json_util.h>
 
-#include "grin/src/common/graph.pb.h"
 #include "grin/src/predefine.h"
 // GRIN headers
 #include "common/message.h"
