@@ -25,6 +25,7 @@
         <maven.javadoc.version>3.4.0</maven.javadoc.version>
         <javadoc.output.directory>gar-java-javadoc</javadoc.output.directory>
         <javadoc.output.destDir>gar-java-javadoc</javadoc.output.destDir>
+        <buildGarCPP>ON</buildGarCPP>
     </properties>
 
     <dependencies>

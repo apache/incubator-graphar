@@ -81,6 +81,9 @@ Compile package:
 
     $ mvn clean install -DskipTests
 
+This will build GraphAr C++ library internally for Java. If you already installed GraphAr C++ library in your system,
+you can append this option to skip: ``-DbuildGarCPP=OFF``.
+
 Then set GraphAr as a dependency in maven project:
 
 .. code-block:: xml
