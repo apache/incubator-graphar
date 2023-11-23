@@ -138,11 +138,15 @@ GRIN_VERTEX_LIST_ITERATOR grin_get_vertex_list_begin(GRIN_GRAPH g,
   if (_vl->partition_type == ONE_PARTITION) {
     // find first non-empty valid type & partition
     auto partition_id = _vl->partition_id;
-    if (_g->partitioned_vertex_num[vtype][partition_id] == 0)
-      return GRIN_NULL_VERTEX_LIST_ITERATOR;
+    auto& vertices = _g->vertices_collections[vtype];
+    if (_g->partitioned_vertex_num[vtype][partition_id] == 0) {
+      // return end
+      auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(
+          vtype, _vl->partition_type, _vl->partition_id, partition_id, -1, vertices.end());
+      return vli;
+    }
 
     // find first vertex in this partition
-    auto& vertices = _g->vertices_collections[vtype];
     auto idx = __grin_get_first_vertex_id_in_partition(_g, vtype, partition_id,
                                                        _g->partition_strategy);
     auto vli = new GRIN_VERTEX_LIST_ITERATOR_T(vtype, _vl->partition_type,
