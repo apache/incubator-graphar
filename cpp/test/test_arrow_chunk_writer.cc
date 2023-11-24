@@ -215,7 +215,8 @@ TEST_CASE("test_edge_chunk_writer") {
             "/tmp/edge/person_knows_person/ordered_by_source/edge_count0")
           .ValueOrDie();
   auto edge_num = input2->Read(sizeof(IdType)).ValueOrDie();
-  const IdType* edge_num_ptr = reinterpret_cast<const IdType*>(edge_num->data());
+  const IdType* edge_num_ptr =
+      reinterpret_cast<const IdType*>(edge_num->data());
   REQUIRE((*edge_num_ptr) == table->num_rows());
 
   // Check the number of vertices
@@ -224,7 +225,8 @@ TEST_CASE("test_edge_chunk_writer") {
             "/tmp/edge/person_knows_person/ordered_by_source/vertex_count")
           .ValueOrDie();
   auto vertex_num = input3->Read(sizeof(IdType)).ValueOrDie();
-  const IdType* vertex_num_ptr = reinterpret_cast<const IdType*>(vertex_num->data());
+  const IdType* vertex_num_ptr =
+      reinterpret_cast<const IdType*>(vertex_num->data());
   REQUIRE((*vertex_num_ptr) == 903);
 
   // Invalid cases
