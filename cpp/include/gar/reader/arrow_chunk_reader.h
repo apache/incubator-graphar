@@ -138,13 +138,40 @@ class VertexPropertyArrowChunkReader {
    */
   void Select(util::ColumnNames column_names = std::nullopt);
 
+  /**
+   * @brief Construct a VertexPropertyArrowChunkReader from vertex info.
+   *
+   * @param vertex_info The vertex info.
+   * @param property_group The property group of the vertex property.
+   * @param prefix The absolute prefix of the graph.
+   * @param options The filter options, default is empty.
+   */
   static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
       const VertexInfo& vertex_info, const PropertyGroup& property_group,
-      const std::string& prefix, IdType chunk_index = 0, const util::FilterOptions& options = {}) {
-    std::shared_ptr<VertexPropertyArrowChunkReader> reader(
-        new VertexPropertyArrowChunkReader(vertex_info, property_group, prefix,
-                                           chunk_index, options)); 
-    return reader;
+      const std::string& prefix, const util::FilterOptions& options = {}) {
+    if (!vertex_info.ContainPropertyGroup(property_group)) {
+      return Status::KeyError("No property group ", property_group,
+                              " in vertex ", vertex_info.GetLabel(), ".");
+    }
+    return std::make_shared<VertexPropertyArrowChunkReader>(
+        vertex_info, property_group, prefix, 0, options);
+  }
+
+  /**
+   * @brief Construct a VertexPropertyArrowChunkReader from graph info.
+   *
+   * @param graph_info The graph info.
+   * @param label The vertex label.
+   * @param property_group The property group of the vertex property.
+   * @param options The filter options, default is empty.
+   */
+  static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
+      const GraphInfo& graph_info, const std::string& label,
+      const PropertyGroup& property_group,
+      const util::FilterOptions& options = {}) {
+    GAR_ASSIGN_OR_RAISE(const auto& vertex_info,
+                        graph_info.GetVertexInfo(label));
+    return Make(vertex_info, property_group, graph_info.GetPrefix(), options);
   }
 
  private:
@@ -309,13 +336,42 @@ class AdjListArrowChunkReader {
     return Status::OK();
   }
 
+  /**
+   * @brief Construct an AdjListArrowChunkReader from edge info.
+   *
+   * @param edge_info The edge info.
+   * @param adj_list_type The adj list type for the edges.
+   * @param prefix The absolute prefix of the graph.
+   */
   static Result<std::shared_ptr<AdjListArrowChunkReader>> Make(
       const EdgeInfo& edge_info, AdjListType adj_list_type,
-      const std::string& prefix, IdType vertex_chunk_index = 0) {
-    std::shared_ptr<AdjListArrowChunkReader> reader(
-        new AdjListArrowChunkReader(edge_info, adj_list_type, prefix,
-                                    vertex_chunk_index));
-    return reader;
+      const std::string& prefix) {
+    if (!edge_info.ContainAdjList(adj_list_type)) {
+      return Status::KeyError(
+          "The adjacent list type ", AdjListTypeToString(adj_list_type),
+          " doesn't exist in edge ", edge_info.GetEdgeLabel(), ".");
+    }
+    return std::make_shared<AdjListArrowChunkReader>(edge_info, adj_list_type,
+                                                     prefix);
+  }
+
+  /**
+   * @brief Construct an AdjListArrowChunkReader from graph info.
+   *
+   * @param graph_info The graph info.
+   * @param src_label The source vertex label.
+   * @param edge_label The edge label.
+   * @param dst_label The destination vertex label.
+   * @param adj_list_type The adj list type for the edges.
+   */
+  static Result<std::shared_ptr<AdjListArrowChunkReader>> Make(
+      const GraphInfo& graph_info, const std::string& src_label,
+      const std::string& edge_label, const std::string& dst_label,
+      AdjListType adj_list_type) {
+    GAR_ASSIGN_OR_RAISE(
+        const auto& edge_info,
+        graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
+    return Make(edge_info, adj_list_type, graph_info.GetPrefix());
   }
 
  private:
@@ -428,12 +484,42 @@ class AdjListOffsetArrowChunkReader {
    */
   IdType GetChunkIndex() noexcept { return chunk_index_; }
 
+  /**
+   * @brief Construct an AdjListOffsetArrowChunkReader from edge info.
+   *
+   * @param edge_info The edge info.
+   * @param adj_list_type The adj list type for the edges.
+   * @param prefix The absolute prefix of the graph.
+   */
   static Result<std::shared_ptr<AdjListOffsetArrowChunkReader>> Make(
       const EdgeInfo& edge_info, AdjListType adj_list_type,
       const std::string& prefix) {
-    std::shared_ptr<AdjListOffsetArrowChunkReader> reader(
-        new AdjListOffsetArrowChunkReader(edge_info, adj_list_type, prefix));
-    return reader;
+    if (!edge_info.ContainAdjList(adj_list_type)) {
+      return Status::KeyError(
+          "The adjacent list type ", AdjListTypeToString(adj_list_type),
+          " doesn't exist in edge ", edge_info.GetEdgeLabel(), ".");
+    }
+    return std::make_shared<AdjListOffsetArrowChunkReader>(
+        edge_info, adj_list_type, prefix);
+  }
+
+  /**
+   * @brief Construct an AdjListOffsetArrowChunkReader from graph info.
+   *
+   * @param graph_info The graph info.
+   * @param src_label The source vertex label.
+   * @param edge_label The edge label.
+   * @param dst_label The destination vertex label.
+   * @param adj_list_type The adj list type for the edges.
+   */
+  static Result<std::shared_ptr<AdjListOffsetArrowChunkReader>> Make(
+      const GraphInfo& graph_info, const std::string& src_label,
+      const std::string& edge_label, const std::string& dst_label,
+      AdjListType adj_list_type) {
+    GAR_ASSIGN_OR_RAISE(
+        const auto& edge_info,
+        graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
+    return Make(edge_info, adj_list_type, graph_info.GetPrefix());
   }
 
  private:
@@ -622,15 +708,55 @@ class AdjListPropertyArrowChunkReader {
    */
   void Select(util::ColumnNames column_names = std::nullopt);
 
+  /**
+   * @brief Construct an AdjListPropertyArrowChunkReader from edge info.
+   *
+   * @param edge_info The edge info that describes the edge type.
+   * @param property_group The property group that describes the property
+   * @param adj_list_type The adj list type for the edges.
+   * @param prefix The absolute prefix of the graph.
+   * @param options The filter options, default is empty.
+   */
   static Result<std::shared_ptr<AdjListPropertyArrowChunkReader>> Make(
       const EdgeInfo& edge_info, const PropertyGroup& property_group,
       AdjListType adj_list_type, const std::string& prefix,
-      IdType vertex_chunk_index = 0, const util::FilterOptions& options = {}) {
-    std::shared_ptr<AdjListPropertyArrowChunkReader> reader(
-        new AdjListPropertyArrowChunkReader(edge_info, property_group,
-                                            adj_list_type, prefix,
-                                            vertex_chunk_index, options));
-    return reader;
+      const util::FilterOptions& options = {}) {
+    if (!edge_info.ContainAdjList(adj_list_type)) {
+      return Status::KeyError(
+          "The adjacent list type ", AdjListTypeToString(adj_list_type),
+          " doesn't exist in edge ", edge_info.GetEdgeLabel(), ".");
+    }
+    if (!edge_info.ContainPropertyGroup(property_group, adj_list_type)) {
+      return Status::KeyError("No property group ", property_group, " in edge ",
+                              edge_info.GetEdgeLabel(), " with adj list type ",
+                              AdjListTypeToString(adj_list_type), ".");
+    }
+    return std::make_shared<AdjListPropertyArrowChunkReader>(
+        edge_info, property_group, adj_list_type, prefix, 0, options);
+  }
+
+  /**
+   * @brief Construct an AdjListPropertyArrowChunkReader from graph info.
+   *
+   * @param graph_info The graph info that describes the graph.
+   * @param src_label The source vertex label.
+   * @param edge_label The edge label.
+   * @param dst_label The destination vertex label.
+   * @param property_group The property group that describes the property
+   * group.
+   * @param adj_list_type The adj list type for the edges.
+   * @param options The filter options, default is empty.
+   */
+  static Result<std::shared_ptr<AdjListPropertyArrowChunkReader>> Make(
+      const GraphInfo& graph_info, const std::string& src_label,
+      const std::string& edge_label, const std::string& dst_label,
+      const PropertyGroup& property_group, AdjListType adj_list_type,
+      const util::FilterOptions& options = {}) {
+    GAR_ASSIGN_OR_RAISE(
+        const auto& edge_info,
+        graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
+    return Make(edge_info, property_group, adj_list_type,
+                graph_info.GetPrefix(), options);
   }
 
  private:
@@ -646,116 +772,5 @@ class AdjListPropertyArrowChunkReader {
   std::string base_dir_;
   std::shared_ptr<FileSystem> fs_;
 };
-
-/**
- * @brief Helper function to Construct VertexPropertyArrowChunkReader.
- *
- * @param graph_info The graph info to describe the graph.
- * @param label label of the vertex.
- * @param property_group The property group of the vertex.
- */
-static inline Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
-ConstructVertexPropertyArrowChunkReader(
-    const GraphInfo& graph_info, const std::string& label,
-    const PropertyGroup& property_group,
-    const util::FilterOptions& options = {}) noexcept {
-  VertexInfo vertex_info;
-  GAR_ASSIGN_OR_RAISE(vertex_info, graph_info.GetVertexInfo(label));
-  if (!vertex_info.ContainPropertyGroup(property_group)) {
-    return Status::KeyError("No property group ", property_group, " in vertex ",
-                            label, ".");
-  }
-  return VertexPropertyArrowChunkReader::Make(vertex_info, property_group,
-                                        graph_info.GetPrefix(), 0, options);
-}
-
-/**
- * @brief Helper function to Construct AdjListArrowChunkReader.
- *
- * @param graph_info The graph info to describe the graph.
- * @param src_label label of source vertex.
- * @param edge_label label of edge.
- * @param dst_label label of destination vertex.
- * @param adj_list_type The adj list type for the edges.
- */
-static inline Result<std::shared_ptr<AdjListArrowChunkReader>> ConstructAdjListArrowChunkReader(
-    const GraphInfo& graph_info, const std::string& src_label,
-    const std::string& edge_label, const std::string& dst_label,
-    AdjListType adj_list_type) noexcept {
-  EdgeInfo edge_info;
-  GAR_ASSIGN_OR_RAISE(edge_info,
-                      graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
-
-  if (!edge_info.ContainAdjList(adj_list_type)) {
-    return Status::KeyError("The adjacent list type ",
-                            AdjListTypeToString(adj_list_type),
-                            " doesn't exist in edge ", edge_label, ".");
-  }
-  return AdjListArrowChunkReader::Make(edge_info, adj_list_type,
-                                 graph_info.GetPrefix());
-}
-
-/**
- * @brief Helper function to Construct AdjListOffsetArrowChunkReader.
- *
- * @param graph_info The graph info to describe the graph.
- * @param src_label label of source vertex.
- * @param edge_label label of edge.
- * @param dst_label label of destination vertex.
- * @param adj_list_type The adj list type for the edges.
- */
-static inline Result<std::shared_ptr<AdjListOffsetArrowChunkReader>>
-ConstructAdjListOffsetArrowChunkReader(const GraphInfo& graph_info,
-                                       const std::string& src_label,
-                                       const std::string& edge_label,
-                                       const std::string& dst_label,
-                                       AdjListType adj_list_type) noexcept {
-  EdgeInfo edge_info;
-  GAR_ASSIGN_OR_RAISE(edge_info,
-                      graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
-
-  if (!edge_info.ContainAdjList(adj_list_type)) {
-    return Status::KeyError("The adjacent list type ",
-                            AdjListTypeToString(adj_list_type),
-                            " doesn't exist in edge ", edge_label, ".");
-  }
-  return AdjListOffsetArrowChunkReader::Make(edge_info, adj_list_type,
-                                       graph_info.GetPrefix());
-}
-
-/**
- * @brief Helper function to Construct AdjListPropertyArrowChunkReader.
- *
- * @param graph_info The graph info to describe the graph.
- * @param src_label label of source vertex.
- * @param edge_label label of edge.
- * @param dst_label label of destination vertex.
- * @param property_group The property group of the edge.
- * @param adj_list_type The adj list type for the edges.
- */
-static inline Result<std::shared_ptr<AdjListPropertyArrowChunkReader>>
-ConstructAdjListPropertyArrowChunkReader(
-    const GraphInfo& graph_info, const std::string& src_label,
-    const std::string& edge_label, const std::string& dst_label,
-    const PropertyGroup& property_group, AdjListType adj_list_type,
-    const util::FilterOptions& options = {}) noexcept {
-  EdgeInfo edge_info;
-  GAR_ASSIGN_OR_RAISE(edge_info,
-                      graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
-  if (!edge_info.ContainAdjList(adj_list_type)) {
-    return Status::KeyError("The adjacent list type ",
-                            AdjListTypeToString(adj_list_type),
-                            " doesn't exist in edge ", edge_label, ".");
-  }
-  if (!edge_info.ContainPropertyGroup(property_group, adj_list_type)) {
-    return Status::KeyError("No property group ", property_group, " in edge ",
-                            edge_label, " with adj list type ",
-                            AdjListTypeToString(adj_list_type), ".");
-  }
-  return AdjListPropertyArrowChunkReader::Make(edge_info, property_group,
-                                         adj_list_type, graph_info.GetPrefix(),
-                                         0, options);
-}
-
 }  // namespace GAR_NAMESPACE_INTERNAL
 #endif  // GAR_READER_ARROW_CHUNK_READER_H_

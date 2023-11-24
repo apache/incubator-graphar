@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
   std::string label = "person";
   ASSERT(graph_info.GetVertexInfo(label).status().ok());
   auto maybe_vertices =
-      GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
+      GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
   int num_vertices = vertices->size();
@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
 
   // construct edges collection
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto maybe_edges = GAR_NAMESPACE::ConstructEdgesCollection(
+  auto maybe_edges = GAR_NAMESPACE::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(!maybe_edges.has_error());

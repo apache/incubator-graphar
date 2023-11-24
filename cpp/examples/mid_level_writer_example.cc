@@ -103,7 +103,11 @@ void vertex_property_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
   auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = GAR_NAMESPACE::VertexInfo::Load(vertex_meta).value();
   ASSERT(vertex_info.GetLabel() == "person");
-  GAR_NAMESPACE::VertexPropertyWriter writer(vertex_info, "/tmp/");
+
+  auto maybe_writer =
+      GAR_NAMESPACE::VertexPropertyWriter::Make(vertex_info, "/tmp/");
+  ASSERT(maybe_writer.status().ok());
+  auto writer = maybe_writer.value();
 
   // construct vertex property table
   auto table = generate_vertex_table().ValueOrDie();
@@ -115,11 +119,11 @@ void vertex_property_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
 
   // use writer
   // set validate level
-  writer.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  writer->SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
   // write the table
-  ASSERT(writer.WriteTable(table, 0).ok());
+  ASSERT(writer->WriteTable(table, 0).ok());
   // write the number of vertices
-  ASSERT(writer.WriteVerticesNum(table->num_rows()).ok());
+  ASSERT(writer->WriteVerticesNum(table->num_rows()).ok());
   std::cout << "writing vertex data successfully!" << std::endl;
   // check vertex count
   auto path = "/tmp/vertex/person/vertex_count";
@@ -131,13 +135,16 @@ void vertex_property_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
 }
 
 void edge_chunk_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
-  // constuct writer
+  // construct writer
   std::string edge_meta_file =
       TEST_DATA_DIR + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
   auto edge_meta = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = GAR_NAMESPACE::EdgeInfo::Load(edge_meta).value();
   auto adj_list_type = GAR_NAMESPACE::AdjListType::ordered_by_source;
-  GAR_NAMESPACE::EdgeChunkWriter writer(edge_info, "/tmp/", adj_list_type);
+  auto maybe_writer =
+      GAR_NAMESPACE::EdgeChunkWriter::Make(edge_info, "/tmp/", adj_list_type);
+  ASSERT(maybe_writer.status().ok());
+  auto writer = maybe_writer.value();
 
   // construct property chunk
   auto chunk = generate_edge_property_table().ValueOrDie();
@@ -156,17 +163,17 @@ void edge_chunk_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
 
   // use writer
   // set validate level
-  writer.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  writer->SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
   // write a property chunk
   GAR_NAMESPACE::PropertyGroup pg =
       edge_info.GetPropertyGroup("creationDate", adj_list_type).value();
-  ASSERT(writer.WritePropertyChunk(chunk, pg, 0, 0).ok());
+  ASSERT(writer->WritePropertyChunk(chunk, pg, 0, 0).ok());
   // write adj list of vertex chunk 0 to files
-  ASSERT(writer.SortAndWriteAdjListTable(table, 0, 0).ok());
+  ASSERT(writer->SortAndWriteAdjListTable(table, 0, 0).ok());
   // write number of edges for vertex chunk 0
-  ASSERT(writer.WriteEdgesNum(0, table->num_rows()).ok());
+  ASSERT(writer->WriteEdgesNum(0, table->num_rows()).ok());
   // write number of vertices
-  ASSERT(writer.WriteVerticesNum(903).ok());
+  ASSERT(writer->WriteVerticesNum(903).ok());
   std::cout << "writing edge data successfully!" << std::endl;
   // check the number of edges
   auto path = "/tmp/edge/person_knows_person/ordered_by_source/edge_count0";

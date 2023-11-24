@@ -34,7 +34,7 @@ TEST_CASE("test_vertices_collection") {
   // construct vertices collection
   std::string label = "person", property = "firstName";
   auto maybe_vertices_collection =
-      GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
+      GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
   REQUIRE(!maybe_vertices_collection.has_error());
   auto vertices = maybe_vertices_collection.value();
   auto count = 0;
@@ -84,7 +84,7 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
 
   // iterate edges of vertex chunk 0
-  auto expect = GAR_NAMESPACE::ConstructEdgesCollection(
+  auto expect = GAR_NAMESPACE::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source, 0, 1);
   REQUIRE(!expect.has_error());
@@ -111,7 +111,7 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   REQUIRE(edges->size() == count);
 
   // iterate edges of vertex chunk [2, 4)
-  auto expect1 = GAR_NAMESPACE::ConstructEdgesCollection(
+  auto expect1 = GAR_NAMESPACE::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_dest, 2, 4);
   REQUIRE(!expect1.has_error());
@@ -125,7 +125,7 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   REQUIRE(edges1->size() == count1);
 
   // iterate all edges
-  auto expect2 = GAR_NAMESPACE::ConstructEdgesCollection(
+  auto expect2 = GAR_NAMESPACE::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   REQUIRE(!expect2.has_error());
@@ -142,7 +142,7 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   REQUIRE(edges2->size() == count2);
 
   // empty collection
-  auto expect3 = GAR_NAMESPACE::ConstructEdgesCollection(
+  auto expect3 = GAR_NAMESPACE::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::unordered_by_source, 5, 5);
   REQUIRE(!expect2.has_error());
@@ -157,7 +157,7 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   REQUIRE(edges3->size() == 0);
 
   // invalid adjlist type
-  auto expect4 = GAR_NAMESPACE::ConstructEdgesCollection(
+  auto expect4 = GAR_NAMESPACE::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::unordered_by_dest);
   REQUIRE(expect4.status().IsInvalid());

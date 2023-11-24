@@ -192,12 +192,18 @@ class VertexPropertyWriter {
                         ValidateLevel::default_validate) const noexcept;
 
   static Result<std::shared_ptr<VertexPropertyWriter>> Make(
+      const VertexInfo& vertex_info, const std::string& prefix,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    return std::make_shared<VertexPropertyWriter>(vertex_info, prefix,
+                                                  validate_level);
+  }
+
+  static Result<std::shared_ptr<VertexPropertyWriter>> Make(
       const GraphInfo& graph_info, const std::string& label,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
-    VertexInfo vertex_info;
-    GAR_ASSIGN_OR_RAISE(vertex_info, graph_info.GetVertexInfo(label));
-    return std::make_shared<VertexPropertyWriter>(vertex_info, graph_info.GetPrefix(),
-                                                  validate_level);
+    GAR_ASSIGN_OR_RAISE(const auto& vertex_info,
+                        graph_info.GetVertexInfo(label));
+    return Make(vertex_info, graph_info.GetPrefix(), validate_level);
   }
 
  private:
@@ -235,11 +241,11 @@ class VertexPropertyWriter {
                   const PropertyGroup& property_group, IdType chunk_index,
                   ValidateLevel validate_level) const noexcept;
 
- private:
   Result<std::shared_ptr<arrow::Table>> addIndexColumn(
       const std::shared_ptr<arrow::Table>& table, IdType chunk_index,
       IdType chunk_size) const noexcept;
 
+ private:
   VertexInfo vertex_info_;
   std::string prefix_;
   std::shared_ptr<FileSystem> fs_;
@@ -624,8 +630,31 @@ class EdgeChunkWriter {
       IdType vertex_chunk_index, IdType start_chunk_index = 0,
       ValidateLevel validate_level = ValidateLevel::default_validate) const
       noexcept;
-  
-  static inline 
+
+  static Result<std::shared_ptr<EdgeChunkWriter>> Make(
+      const EdgeInfo& edge_info, const std::string& prefix,
+      const AdjListType& adj_list_type = AdjListType::unordered_by_source,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    if (!edge_info.ContainAdjList(adj_list_type)) {
+      return Status::KeyError(
+          "The adjacent list type ", AdjListTypeToString(adj_list_type),
+          " doesn't exist in edge ", edge_info.GetEdgeLabel(), ".");
+    }
+    return std::make_shared<EdgeChunkWriter>(edge_info, prefix, adj_list_type,
+                                             validate_level);
+  }
+
+  static Result<std::shared_ptr<EdgeChunkWriter>> Make(
+      const GraphInfo& graph_info, const std::string& src_label,
+      const std::string& edge_label, const std::string& dst_label,
+      const AdjListType& adj_list_type = AdjListType::unordered_by_source,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    GAR_ASSIGN_OR_RAISE(
+        const auto& edge_info,
+        graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
+    return Make(edge_info, graph_info.GetPrefix(), adj_list_type,
+                validate_level);
+  }
 
  private:
   /**
