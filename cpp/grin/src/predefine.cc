@@ -385,13 +385,13 @@ void __grin_init_graph_partitions(GRIN_GRAPH_T* graph, unsigned partition_num,
 
 int64_t __grin_generate_int64_from_id_and_type(GAR_NAMESPACE::IdType id,
                                                unsigned type_id) {
-  return (static_cast<int32_t>(type_id)) << 20 | id;
+  return (static_cast<int64_t>(type_id)) << 48 | id;
 }
 
 std::pair<GAR_NAMESPACE::IdType, unsigned>
 __grin_generate_id_and_type_from_int64(int64_t svr) {
-  auto _type_id = static_cast<unsigned>(svr >> 20);
-  auto _id = svr & 0xFFFFF;
+  auto _type_id = static_cast<unsigned>(svr >> 48);
+  auto _id = static_cast<GAR_NAMESPACE::IdType>(svr & 0xFFFFFFFFFFFF);
   return {_id, _type_id};
 }
 
