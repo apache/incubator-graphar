@@ -180,6 +180,10 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
     }
   }
   // return an end iterator
+  auto adj_list_type = GAR_ORDERED_BY_DEST;
+  auto& edges =
+            std::get<GAR_NAMESPACE::EdgesCollection<GAR_ORDERED_BY_DEST>>(
+                _g->edges_collections[i].at(adj_list_type));
   auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(_al->vid, _al->vtype_id, _al->dir,
                                                _al->etype_end, _al->etype_end, edges.end());
   return ali;
