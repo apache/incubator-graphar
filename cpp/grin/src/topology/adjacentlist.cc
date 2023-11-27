@@ -179,7 +179,10 @@ GRIN_ADJACENT_LIST_ITERATOR grin_get_adjacent_list_begin(
       }
     }
   }
-  return GRIN_NULL_ADJACENT_LIST_ITERATOR;
+  // return an end iterator
+  auto ali = new GRIN_ADJACENT_LIST_ITERATOR_T(_al->vid, _al->vtype_id, _al->dir,
+                                               _al->etype_end, _al->etype_end, edges.end());
+  return ali;
 }
 
 void grin_destroy_adjacent_list_iter(GRIN_GRAPH g,
