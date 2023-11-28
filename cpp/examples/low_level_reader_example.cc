@@ -28,60 +28,60 @@ void vertex_property_chunk_info_reader(
   auto maybe_group = graph_info.GetVertexPropertyGroup(label, property_name);
   ASSERT(!maybe_group.has_error());
   const GAR_NAMESPACE::PropertyGroup& group = maybe_group.value();
-  auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyChunkInfoReader(
+  auto maybe_reader = GAR_NAMESPACE::VertexPropertyChunkInfoReader::Make(
       graph_info, label, group);
   ASSERT(!maybe_reader.has_error());
-  GAR_NAMESPACE::VertexPropertyChunkInfoReader& reader = maybe_reader.value();
+  auto reader = maybe_reader.value();
 
   // use reader
-  auto maybe_chunk_path = reader.GetChunk();
+  auto maybe_chunk_path = reader->GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
   std::string chunk_path = maybe_chunk_path.value();
   std::cout << "path of first vertex property chunk: " << chunk_path
             << std::endl;
   // seek vertex id
-  ASSERT(reader.seek(520).ok());
-  maybe_chunk_path = reader.GetChunk();
+  ASSERT(reader->seek(520).ok());
+  maybe_chunk_path = reader->GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
   std::cout << "path of vertex property chunk for vertex id 520: " << chunk_path
             << std::endl;
   // next chunk
-  ASSERT(reader.next_chunk().ok());
-  maybe_chunk_path = reader.GetChunk();
+  ASSERT(reader->next_chunk().ok());
+  maybe_chunk_path = reader->GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
   std::cout << "path of next vertex property chunk: " << chunk_path
             << std::endl;
-  std::cout << "vertex property chunk number: " << reader.GetChunkNum()
+  std::cout << "vertex property chunk number: " << reader->GetChunkNum()
             << std::endl;
 }
 
 void adj_list_chunk_info_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
-  // constuct reader
+  // construct reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto maybe_reader = GAR_NAMESPACE::ConstructAdjListChunkInfoReader(
+  auto maybe_reader = GAR_NAMESPACE::AdjListChunkInfoReader::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
-  auto& reader = maybe_reader.value();
+  auto reader = maybe_reader.value();
 
   // use reader
-  auto maybe_chunk_path = reader.GetChunk();
+  auto maybe_chunk_path = reader->GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
   auto chunk_path = maybe_chunk_path.value();
   std::cout << "path of first adj_list chunk: " << chunk_path << std::endl;
   // seek src
-  ASSERT(reader.seek_src(100).ok());
-  maybe_chunk_path = reader.GetChunk();
+  ASSERT(reader->seek_src(100).ok());
+  maybe_chunk_path = reader->GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
   std::cout
       << "path of fisrt adj_list chunk for outgoing edges of vertex id 100: "
       << chunk_path << std::endl;
   // next chunk
-  ASSERT(reader.next_chunk().ok());
-  maybe_chunk_path = reader.GetChunk();
+  ASSERT(reader->next_chunk().ok());
+  maybe_chunk_path = reader->GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
   std::cout << "path of next adj_list chunk: " << chunk_path << std::endl;
@@ -89,7 +89,7 @@ void adj_list_chunk_info_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
 
 void adj_list_property_chunk_info_reader(
     const GAR_NAMESPACE::GraphInfo& graph_info) {
-  // constuct reader
+  // construct reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person",
               property_name = "creationDate";
 
@@ -99,29 +99,29 @@ void adj_list_property_chunk_info_reader(
   ASSERT(maybe_group.status().ok());
   auto group = maybe_group.value();
   auto maybe_property_reader =
-      GAR_NAMESPACE::ConstructAdjListPropertyChunkInfoReader(
+      GAR_NAMESPACE::AdjListPropertyChunkInfoReader::Make(
           graph_info, src_label, edge_label, dst_label, group,
           GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(maybe_property_reader.status().ok());
   auto reader = maybe_property_reader.value();
 
   // use reader
-  auto maybe_chunk_path = reader.GetChunk();
+  auto maybe_chunk_path = reader->GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
   auto chunk_path = maybe_chunk_path.value();
   std::cout << "path of first adj_list property chunk: " << chunk_path
             << std::endl;
   // seek src
-  ASSERT(reader.seek_src(100).ok());
-  maybe_chunk_path = reader.GetChunk();
+  ASSERT(reader->seek_src(100).ok());
+  maybe_chunk_path = reader->GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
   std::cout << "path of fisrt adj_list property chunk for outgoing edges of "
                "vertex id 100: "
             << chunk_path << std::endl;
   // next chunk
-  ASSERT(reader.next_chunk().ok());
-  maybe_chunk_path = reader.GetChunk();
+  ASSERT(reader->next_chunk().ok());
+  maybe_chunk_path = reader->GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
   std::cout << "path of next adj_list property chunk: " << chunk_path

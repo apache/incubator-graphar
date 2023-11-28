@@ -47,12 +47,6 @@ Chunk Info Reader
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::ConstructVertexPropertyChunkInfoReader
-
-.. doxygenfunction:: GraphArchive::ConstructAdjListChunkInfoReader
-
-.. doxygenfunction:: GraphArchive::ConstructAdjListPropertyChunkInfoReader
-
 Arrow Chunk Reader
 ~~~~~~~~~~~~~~~~~~
 
@@ -67,12 +61,6 @@ Arrow Chunk Reader
 .. doxygenclass:: GraphArchive::AdjListOffsetArrowChunkReader
     :members:
     :undoc-members:
-
-.. doxygenfunction:: GraphArchive::ConstructVertexPropertyArrowChunkReader
-
-.. doxygenfunction:: GraphArchive::ConstructAdjListArrowChunkReader
-
-.. doxygenfunction:: GraphArchive::ConstructAdjListOffsetArrowChunkReader
 
 Vertices Collection
 ~~~~~~~~~~~~~~~~~~~
@@ -89,8 +77,6 @@ Vertices Collection
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::ConstructVerticesCollection
-
 Edges Collection
 ~~~~~~~~~~~~~~~~~~
 
@@ -98,11 +84,11 @@ Edges Collection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgesCollection
+.. doxygenclass:: GraphArchive::EdgeIter
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgeIter
+.. doxygenclass:: GraphArchive::EdgesCollection
     :members:
     :undoc-members:
 
@@ -121,8 +107,6 @@ Edges Collection
 .. doxygenclass:: GraphArchive::UBDEdgesCollection
     :members:
     :undoc-members:
-
-.. doxygenfunction:: GraphArchive::ConstructEdgesCollection
 
 Writer and Builder
 ---------------------

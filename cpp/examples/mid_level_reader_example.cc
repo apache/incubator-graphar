@@ -29,15 +29,15 @@ void vertex_property_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
   auto maybe_group = graph_info.GetVertexPropertyGroup(label, property_name);
   ASSERT(maybe_group.status().ok());
   auto group = maybe_group.value();
-  auto maybe_reader = GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(
+  auto maybe_reader = GAR_NAMESPACE::VertexPropertyArrowChunkReader::Make(
       graph_info, label, group);
   ASSERT(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
 
   // use reader
-  auto result = reader.GetChunk();
+  auto result = reader->GetChunk();
   ASSERT(!result.has_error());
-  std::cout << "chunk number: " << reader.GetChunkNum() << std::endl;
+  std::cout << "chunk number: " << reader->GetChunkNum() << std::endl;
   auto table = result.value();
   std::cout << "rows number of first vertex property chunk: "
             << table->num_rows() << std::endl;
@@ -49,8 +49,8 @@ void vertex_property_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
   std::cout << "Internal id column: " << index_col->ToString() << " "
             << std::endl;
   // seek vertex id
-  ASSERT(reader.seek(100).ok());
-  result = reader.GetChunk();
+  ASSERT(reader->seek(100).ok());
+  result = reader->GetChunk();
   ASSERT(!result.has_error());
   table = result.value();
   index_col =
@@ -59,8 +59,8 @@ void vertex_property_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
   std::cout << "Internal id column of vertex property chunk for vertex id 100: "
             << index_col->ToString() << " " << std::endl;
   // next chunk
-  ASSERT(reader.next_chunk().ok());
-  result = reader.GetChunk();
+  ASSERT(reader->next_chunk().ok());
+  result = reader->GetChunk();
   ASSERT(!result.has_error());
   table = result.value();
   index_col =
@@ -74,13 +74,13 @@ void vertex_property_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
                                       GAR_NAMESPACE::_Literal("female"));
   std::vector<std::string> expected_cols{"firstName", "lastName"};
   auto maybe_filter_reader =
-      GAR_NAMESPACE::ConstructVertexPropertyArrowChunkReader(graph_info, label,
-                                                             group);
+      GAR_NAMESPACE::VertexPropertyArrowChunkReader::Make(graph_info, label,
+                                                          group);
   ASSERT(maybe_filter_reader.status().ok());
   auto filter_reader = maybe_filter_reader.value();
-  filter_reader.Filter(filter);
-  filter_reader.Select(expected_cols);
-  auto filter_result = filter_reader.GetChunk();
+  filter_reader->Filter(filter);
+  filter_reader->Select(expected_cols);
+  auto filter_result = filter_reader->GetChunk();
   ASSERT(!result.has_error());
   auto filter_table = filter_result.value();
   std::cout << "rows number of first filtered vertex property chunk: "
@@ -94,14 +94,14 @@ void adj_list_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   ASSERT(
       graph_info.GetEdgeInfo(src_label, edge_label, dst_label).status().ok());
-  auto maybe_reader = GAR_NAMESPACE::ConstructAdjListArrowChunkReader(
+  auto maybe_reader = GAR_NAMESPACE::AdjListArrowChunkReader::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
 
   // use reader
   auto reader = maybe_reader.value();
-  auto result = reader.GetChunk();
+  auto result = reader->GetChunk();
   ASSERT(!result.has_error());
   auto table = result.value();
   std::cout << "rows number of first adj_list chunk: " << table->num_rows()
@@ -109,16 +109,16 @@ void adj_list_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
   std::cout << "schema of first adj_list chunk: " << std::endl
             << table->schema()->ToString() << std::endl;
   // seek src
-  ASSERT(reader.seek_src(100).ok());
-  result = reader.GetChunk();
+  ASSERT(reader->seek_src(100).ok());
+  result = reader->GetChunk();
   ASSERT(!result.has_error());
   table = result.value();
   std::cout << "rows number of first adj_list chunk for outgoing edges of "
                "vertex id 100: "
             << table->num_rows() << std::endl;
   // next chunk
-  ASSERT(reader.next_chunk().ok());
-  result = reader.GetChunk();
+  ASSERT(reader->next_chunk().ok());
+  result = reader->GetChunk();
   ASSERT(!result.has_error());
   table = result.value();
   std::cout << "rows number of next adj_list chunk: " << table->num_rows()
@@ -135,14 +135,14 @@ void adj_list_property_chunk_reader(
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(maybe_group.status().ok());
   auto group = maybe_group.value();
-  auto maybe_reader = GAR_NAMESPACE::ConstructAdjListPropertyArrowChunkReader(
+  auto maybe_reader = GAR_NAMESPACE::AdjListPropertyArrowChunkReader::Make(
       graph_info, src_label, edge_label, dst_label, group,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
 
   // use reader
-  auto result = reader.GetChunk();
+  auto result = reader->GetChunk();
   ASSERT(!result.has_error());
   auto table = result.value();
   std::cout << "rows number of first adj_list property chunk: "
@@ -150,16 +150,16 @@ void adj_list_property_chunk_reader(
   std::cout << "schema of first adj_list property chunk: " << std::endl
             << table->schema()->ToString() << std::endl;
   // seek src
-  ASSERT(reader.seek_src(100).ok());
-  result = reader.GetChunk();
+  ASSERT(reader->seek_src(100).ok());
+  result = reader->GetChunk();
   ASSERT(!result.has_error());
   table = result.value();
   std::cout << "rows number of first adj_list property chunk for outgoing "
                "edges of vertex id 100: "
             << table->num_rows() << std::endl;
   // next chunk
-  ASSERT(reader.next_chunk().ok());
-  result = reader.GetChunk();
+  ASSERT(reader->next_chunk().ok());
+  result = reader->GetChunk();
   ASSERT(!result.has_error());
   table = result.value();
   std::cout << "rows number of next adj_list property chunk: "
@@ -174,14 +174,14 @@ void adj_list_property_chunk_reader(
   auto filter = GAR_NAMESPACE::_And(expr1, expr2);
   std::vector<std::string> expected_cols{"creationDate"};
   auto maybe_filter_reader =
-      GAR_NAMESPACE::ConstructAdjListPropertyArrowChunkReader(
+      GAR_NAMESPACE::AdjListPropertyArrowChunkReader::Make(
           graph_info, src_label, edge_label, dst_label, group,
           GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(maybe_filter_reader.status().ok());
   auto filter_reader = maybe_filter_reader.value();
-  filter_reader.Filter(filter);
-  filter_reader.Select(expected_cols);
-  auto filter_result = filter_reader.GetChunk();
+  filter_reader->Filter(filter);
+  filter_reader->Select(expected_cols);
+  auto filter_result = filter_reader->GetChunk();
   ASSERT(!result.has_error());
   auto filter_table = filter_result.value();
   std::cout << "rows number of first filtered adj_list property chunk: "
@@ -193,28 +193,28 @@ void adj_list_offset_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   ASSERT(
       graph_info.GetEdgeInfo(src_label, edge_label, dst_label).status().ok());
-  auto maybe_reader = GAR_NAMESPACE::ConstructAdjListOffsetArrowChunkReader(
+  auto maybe_reader = GAR_NAMESPACE::AdjListOffsetArrowChunkReader::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
 
   // use reader
-  auto result = reader.GetChunk();
+  auto result = reader->GetChunk();
   ASSERT(!result.has_error());
   auto array = result.value();
   std::cout << "length of first adj_list offset chunk: " << array->length()
             << std::endl;
   // next chunk
-  ASSERT(reader.next_chunk().ok());
-  result = reader.GetChunk();
+  ASSERT(reader->next_chunk().ok());
+  result = reader->GetChunk();
   ASSERT(!result.has_error());
   array = result.value();
   std::cout << "length of next adj_list offset chunk: " << array->length()
             << std::endl;
   // seek vertex id
-  ASSERT(reader.seek(900).ok());
-  result = reader.GetChunk();
+  ASSERT(reader->seek(900).ok());
+  result = reader->GetChunk();
   ASSERT(!result.has_error());
   array = result.value();
   std::cout << "length of adj_list offset chunk for vertex id 900: "

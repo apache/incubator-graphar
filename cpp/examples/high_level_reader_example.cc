@@ -24,7 +24,7 @@ void vertices_collection(const GAR_NAMESPACE::GraphInfo& graph_info) {
   // construct vertices collection
   std::string label = "person", property = "firstName";
   auto maybe_vertices_collection =
-      GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
+      GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
   ASSERT(!maybe_vertices_collection.has_error());
   auto vertices = maybe_vertices_collection.value();
 
@@ -70,7 +70,7 @@ void vertices_collection(const GAR_NAMESPACE::GraphInfo& graph_info) {
 void edges_collection(const GAR_NAMESPACE::GraphInfo& graph_info) {
   // construct edges collection
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto expect = GAR_NAMESPACE::ConstructEdgesCollection(
+  auto expect = GAR_NAMESPACE::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(!expect.has_error());

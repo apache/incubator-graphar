@@ -249,6 +249,42 @@ class VerticesBuilder {
     return Status::OK();
   }
 
+  /**
+   * @brief Construct a VertexBuilder from vertex info.
+   *
+   * @param vertex_info The vertex info that describes the vertex type.
+   * @param prefix The absolute prefix.
+   * @param start_vertex_index The start index of the vertices collection.
+   * @param validate_level The global validate level for the builder, default is
+   * no_validate.
+   */
+  static Result<std::shared_ptr<VerticesBuilder>> Make(
+      const VertexInfo& vertex_info, const std::string& prefix,
+      IdType start_vertex_index = 0,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    return std::make_shared<VerticesBuilder>(
+        vertex_info, prefix, start_vertex_index, validate_level);
+  }
+
+  /**
+   * @brief Construct a VertexBuilder from graph info and vertex label.
+   *
+   * @param graph_info The graph info that describes the graph.
+   * @param label The label of the vertex.
+   * @param start_vertex_index The start index of the vertices collection.
+   * @param validate_level The global validate level for the builder, default is
+   * no_validate.
+   */
+  static Result<std::shared_ptr<VerticesBuilder>> Make(
+      const GraphInfo& graph_info, const std::string& label,
+      IdType start_vertex_index = 0,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    GAR_ASSIGN_OR_RAISE(const auto& vertex_info,
+                        graph_info.GetVertexInfo(label));
+    return Make(vertex_info, graph_info.GetPrefix(), start_vertex_index,
+                validate_level);
+  }
+
  private:
   /**
    * @brief Check if adding a vertex with the given index is allowed.

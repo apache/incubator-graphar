@@ -242,7 +242,7 @@ class VertexIter {
  *
  */
 class VerticesCollection {
- protected:
+ public:
   /**
    * @brief Initialize the VerticesCollection.
    *
@@ -263,14 +263,6 @@ class VerticesCollection {
                               fs->ReadFileToValue<IdType>(vertex_num_path));
   }
 
- public:
-  static Result<std::shared_ptr<VerticesCollection>> Make(
-      const VertexInfo& vertex_info, const std::string& prefix) {
-    std::shared_ptr<VerticesCollection> ret(
-        new VerticesCollection(vertex_info, prefix));  // NOLINT
-    return ret;
-  }
-
   /** The iterator pointing to the first vertex. */
   VertexIter begin() noexcept { return VertexIter(vertex_info_, prefix_, 0); }
 
@@ -284,6 +276,20 @@ class VerticesCollection {
 
   /** Get the number of vertices in the collection. */
   size_t size() const noexcept { return vertex_num_; }
+
+  /**
+   * @brief Construct a VerticesCollection from graph info and vertex label.
+   *
+   * @param graph_info The graph info.
+   * @param label The vertex label.
+   */
+  static Result<std::shared_ptr<VerticesCollection>> Make(
+      const GraphInfo& graph_info, const std::string& label) {
+    GAR_ASSIGN_OR_RAISE(const auto& vertex_info,
+                        graph_info.GetVertexInfo(label));
+    return std::make_shared<VerticesCollection>(vertex_info,
+                                                graph_info.GetPrefix());
+  }
 
  private:
   VertexInfo vertex_info_;
@@ -678,6 +684,25 @@ class EdgesCollection {
    */
   virtual EdgeIter find_dst(IdType id, const EdgeIter& from) = 0;
 
+  /**
+   * @brief Construct an EdgesCollection from graph info and edge label.
+   *
+   * @param graph_info The graph info.
+   * @param src_label The source vertex label.
+   * @param edge_label The edge label.
+   * @param dst_label The destination vertex label.
+   * @param adj_list_type The type of adjList.
+   * @param vertex_chunk_begin The index of the begin vertex chunk, default 0.
+   * @param vertex_chunk_end The index of the end vertex chunk (not included),
+   * default max.
+   */
+  static Result<std::shared_ptr<EdgesCollection>> Make(
+      const GraphInfo& graph_info, const std::string& src_label,
+      const std::string& edge_label, const std::string& dst_label,
+      AdjListType adj_list_type, const IdType vertex_chunk_begin = 0,
+      const IdType vertex_chunk_end =
+          std::numeric_limits<int64_t>::max()) noexcept;
+
  protected:
   /**
    * @brief Initialize the EdgesCollection with a range of chunks.
@@ -738,7 +763,7 @@ class EdgesCollection {
 class OBSEdgeCollection : public EdgesCollection {
   using Base = EdgesCollection;
 
- protected:
+ public:
   /**
    * @brief Initialize the OBSEdgeCollection with a range of chunks.
    *
@@ -754,7 +779,6 @@ class OBSEdgeCollection : public EdgesCollection {
       : Base(edge_info, prefix, vertex_chunk_begin, vertex_chunk_end,
              AdjListType::ordered_by_source) {}
 
- public:
   /**
    * Construct and return the iterator pointing to the first out-going edge of
    * the vertex with specific id after the input iterator.
@@ -823,18 +847,6 @@ class OBSEdgeCollection : public EdgesCollection {
     }
     return iter;
   }
-
-  /**
-   * Create an OBSEdgeCollection instance from the given options.
-   */
-  static Result<std::shared_ptr<OBSEdgeCollection>> Make(
-      const EdgeInfo& edge_info, const std::string& prefix,
-      IdType vertex_chunk_begin = 0,
-      IdType vertex_chunk_end = std::numeric_limits<int64_t>::max()) {
-    std::shared_ptr<OBSEdgeCollection> ret(new OBSEdgeCollection(
-        edge_info, prefix, vertex_chunk_begin, vertex_chunk_end));  // NOLINT
-    return ret;
-  }
 };
 
 /**
@@ -843,7 +855,7 @@ class OBSEdgeCollection : public EdgesCollection {
 class OBDEdgesCollection : public EdgesCollection {
   using Base = EdgesCollection;
 
- protected:
+ public:
   /**
    * @brief Initialize the OBDEdgesCollection with a range of chunks.
    *
@@ -859,7 +871,6 @@ class OBDEdgesCollection : public EdgesCollection {
       : Base(edge_info, prefix, vertex_chunk_begin, vertex_chunk_end,
              AdjListType::ordered_by_dest) {}
 
- public:
   /**
    * Construct and return the iterator pointing to the first out-going edge of
    * the vertex with specific id after the input iterator.
@@ -928,18 +939,6 @@ class OBDEdgesCollection : public EdgesCollection {
     }
     return this->end();
   }
-
-  /**
-   * Create an OBDEdgesCollection instance from the given options.
-   */
-  static Result<std::shared_ptr<OBDEdgesCollection>> Make(
-      const EdgeInfo& edge_info, const std::string& prefix,
-      IdType vertex_chunk_begin = 0,
-      IdType vertex_chunk_end = std::numeric_limits<int64_t>::max()) {
-    std::shared_ptr<OBDEdgesCollection> ret(new OBDEdgesCollection(
-        edge_info, prefix, vertex_chunk_begin, vertex_chunk_end));  // NOLINT
-    return ret;
-  }
 };
 
 /**
@@ -948,6 +947,7 @@ class OBDEdgesCollection : public EdgesCollection {
 class UBSEdgesCollection : public EdgesCollection {
   using Base = EdgesCollection;
 
+ public:
   /**
    * @brief Initialize the EdgesCollection with a range of chunks.
    *
@@ -956,7 +956,6 @@ class UBSEdgesCollection : public EdgesCollection {
    * @param vertex_chunk_begin The index of the begin vertex chunk.
    * @param vertex_chunk_end The index of the end vertex chunk (not included).
    */
- protected:
   explicit UBSEdgesCollection(
       const EdgeInfo& edge_info, const std::string& prefix,
       IdType vertex_chunk_begin = 0,
@@ -964,7 +963,6 @@ class UBSEdgesCollection : public EdgesCollection {
       : Base(edge_info, prefix, vertex_chunk_begin, vertex_chunk_end,
              AdjListType::unordered_by_source) {}
 
- public:
   /**
    * Construct and return the iterator pointing to the first out-going edge of
    * the vertex with specific id after the input iterator.
@@ -1005,18 +1003,6 @@ class UBSEdgesCollection : public EdgesCollection {
       ++iter;
     }
     return iter;
-  }
-
-  /**
-   * Create an UBSEdgesCollection instance from the given options.
-   */
-  static Result<std::shared_ptr<UBSEdgesCollection>> Make(
-      const EdgeInfo& edge_info, const std::string& prefix,
-      IdType vertex_chunk_begin = 0,
-      IdType vertex_chunk_end = std::numeric_limits<int64_t>::max()) {
-    std::shared_ptr<UBSEdgesCollection> ret(new UBSEdgesCollection(
-        edge_info, prefix, vertex_chunk_begin, vertex_chunk_end));  // NOLINT
-    return ret;
   }
 };
 
@@ -1026,6 +1012,7 @@ class UBSEdgesCollection : public EdgesCollection {
 class UBDEdgesCollection : public EdgesCollection {
   using Base = EdgesCollection;
 
+ public:
   /**
    * @brief Initialize the EdgesCollection with a range of chunks.
    *
@@ -1034,7 +1021,6 @@ class UBDEdgesCollection : public EdgesCollection {
    * @param vertex_chunk_begin The index of the begin vertex chunk.
    * @param vertex_chunk_end The index of the end vertex chunk (not included).
    */
- protected:
   explicit UBDEdgesCollection(
       const EdgeInfo& edge_info, const std::string& prefix,
       IdType vertex_chunk_begin = 0,
@@ -1042,7 +1028,6 @@ class UBDEdgesCollection : public EdgesCollection {
       : Base(edge_info, prefix, vertex_chunk_begin, vertex_chunk_end,
              AdjListType::unordered_by_dest) {}
 
- public:
   /**
    * Construct and return the iterator pointing to the first out-going edge of
    * the vertex with specific id after the input iterator.
@@ -1084,79 +1069,7 @@ class UBDEdgesCollection : public EdgesCollection {
     }
     return iter;
   }
-
-  /**
-   * Create an UBDEdgesCollection instance from the given options.
-   */
-  static Result<std::shared_ptr<UBDEdgesCollection>> Make(
-      const EdgeInfo& edge_info, const std::string& prefix,
-      IdType vertex_chunk_begin = 0,
-      IdType vertex_chunk_end = std::numeric_limits<int64_t>::max()) {
-    std::shared_ptr<UBDEdgesCollection> ret(new UBDEdgesCollection(
-        edge_info, prefix, vertex_chunk_begin, vertex_chunk_end));  // NOLINT
-    return ret;
-  }
 };
-
-/**
- * @brief Construct the collection for vertices with specific label.
- *
- * @param graph_info The GraphInfo for the graph.
- * @param label The vertex label.
- * @return The constructed collection or error.
- */
-static inline Result<std::shared_ptr<VerticesCollection>>
-ConstructVerticesCollection(const GraphInfo& graph_info,
-                            const std::string& label) noexcept {
-  VertexInfo vertex_info;
-  GAR_ASSIGN_OR_RAISE(vertex_info, graph_info.GetVertexInfo(label));
-  return VerticesCollection::Make(vertex_info, graph_info.GetPrefix());
-}
-
-/**
- * @brief Construct the collection for a range of edges.
- *
- * @param graph_info The GraphInfo for the graph.
- * @param src_label The source vertex label.
- * @param edge_label The edge label.
- * @param dst_label The destination vertex label.
- * @param adj_list_type The adjList type.
- * @param vertex_chunk_begin The index of the beginning vertex chunk.
- * @param vertex_chunk_end The index of the end vertex chunk (not included).
- * @return The constructed collection or error.
- */
-static inline Result<std::shared_ptr<EdgesCollection>> ConstructEdgesCollection(
-    const GraphInfo& graph_info, const std::string& src_label,
-    const std::string& edge_label, const std::string& dst_label,
-    AdjListType adj_list_type, const IdType vertex_chunk_begin = 0,
-    const IdType vertex_chunk_end =
-        std::numeric_limits<int64_t>::max()) noexcept {
-  EdgeInfo edge_info;
-  GAR_ASSIGN_OR_RAISE(edge_info,
-                      graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
-  if (!edge_info.ContainAdjList(adj_list_type)) {
-    return Status::Invalid("The edge ", edge_label, " of adj list type ",
-                           AdjListTypeToString(adj_list_type),
-                           " doesn't exist.");
-  }
-  switch (adj_list_type) {
-  case AdjListType::ordered_by_source:
-    return OBSEdgeCollection::Make(edge_info, graph_info.GetPrefix(),
-                                   vertex_chunk_begin, vertex_chunk_end);
-  case AdjListType::ordered_by_dest:
-    return OBDEdgesCollection::Make(edge_info, graph_info.GetPrefix(),
-                                    vertex_chunk_begin, vertex_chunk_end);
-  case AdjListType::unordered_by_source:
-    return UBSEdgesCollection::Make(edge_info, graph_info.GetPrefix(),
-                                    vertex_chunk_begin, vertex_chunk_end);
-  case AdjListType::unordered_by_dest:
-    return UBDEdgesCollection::Make(edge_info, graph_info.GetPrefix(),
-                                    vertex_chunk_begin, vertex_chunk_end);
-  default:
-    return Status::Invalid("Unknown adj list type.");
-  }
-  return Status::OK();
-}
 }  // namespace GAR_NAMESPACE_INTERNAL
 
 #endif  // GAR_GRAPH_H_
