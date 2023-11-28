@@ -105,7 +105,7 @@ As a simple case, the following example shows how to read all vertices with labe
 .. code:: C++
 
   graph_info = ...
-  auto& vertices = GraphArchive::ConstructVerticesCollection(graph_info, "person").value();
+  auto& vertices = GraphArchive::VerticesCollection::Make(graph_info, "person").value();
 
   for (auto it = vertices->begin(); it != vertices->end(); ++it) {
     // get a vertex and access its data
@@ -118,7 +118,7 @@ The next example reads all edges with label "person_knows_person" from the above
 .. code:: C++
 
   graph_info = ...
-  auto expect = GraphArchive::ConstructEdgesCollection(graph_info, "person", "konws" "person", GraphArchive::AdjListType::ordered_by_source).value();
+  auto expect = GraphArchive::EdgesCollection::Make(graph_info, "person", "konws" "person", GraphArchive::AdjListType::ordered_by_source).value();
   auto& edges = expect.value();
 
   for (auto it = edges->begin(); it != edges->end(); ++it) {

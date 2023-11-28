@@ -316,6 +316,53 @@ class EdgesBuilder {
     return Status::OK();
   }
 
+  /**
+   * @brief Construct an EdgesBuilder from edge info.
+   *
+   * @param edge_info The edge info that describes the edge type.
+   * @param prefix The absolute prefix.
+   * @param adj_list_type The adj list type of the edges.
+   * @param num_vertices The total number of vertices for source or destination.
+   * @param validate_level The global validate level for the builder, default is
+   * no_validate.
+   */
+  static Result<std::shared_ptr<EdgesBuilder>> Make(
+      const EdgeInfo& edge_info, const std::string& prefix,
+      AdjListType adj_list_type, IdType num_vertices,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    if (!edge_info.ContainAdjList(adj_list_type)) {
+      return Status::KeyError(
+          "The adjacent list type ", AdjListTypeToString(adj_list_type),
+          " doesn't exist in edge ", edge_info.GetEdgeLabel(), ".");
+    }
+    return std::make_shared<EdgesBuilder>(edge_info, prefix, adj_list_type,
+                                          num_vertices, validate_level);
+  }
+
+  /**
+   * @brief Construct an EdgesBuilder from graph info.
+   *
+   * @param graph_info The graph info that describes the graph.
+   * @param src_label The label of the source vertex type.
+   * @param edge_label The label of the edge type.
+   * @param dst_label The label of the destination vertex type.
+   * @param adj_list_type The adj list type of the edges.
+   * @param num_vertices The total number of vertices for source or destination.
+   * @param validate_level The global validate level for the builder, default is
+   * no_validate.
+   */
+  static Result<std::shared_ptr<EdgesBuilder>> Make(
+      const GraphInfo& graph_info, const std::string& src_label,
+      const std::string& edge_label, const std::string& dst_label,
+      const AdjListType& adj_list_type, IdType num_vertices,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    GAR_ASSIGN_OR_RAISE(
+        const auto& edge_info,
+        graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
+    return Make(edge_info, graph_info.GetPrefix(), adj_list_type, num_vertices,
+                validate_level);
+  }
+
  private:
   /**
    * @brief Get the vertex chunk index of a given edge.

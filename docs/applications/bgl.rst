@@ -16,9 +16,9 @@ And then, the vertex collection and the edge collection are established as the h
 
 .. code:: C++
 
-   auto maybe_vertices = GraphArchive::ConstructVerticesCollection(graph_info, "person");
+   auto maybe_vertices = GraphArchive::VerticesCollection::Make(graph_info, "person");
    auto& vertices = maybe_vertices.value();
-   auto maybe_edges = GraphArchive::ConstructEdgesCollection(graph_info, "person", "knows", "person", GraphArchive::AdjListType::ordered_by_source);
+   auto maybe_edges = GraphArchive::EdgesCollection::Make(graph_info, "person", "knows", "person", GraphArchive::AdjListType::ordered_by_source);
    auto& edges = maybe_edges.value();
 
 Next, we construct the in-memory graph data structure for BGL by traversing the vertices and edges via GraphAr's high-level reading interface (the vertex iterator and the edge iterator):

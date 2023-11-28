@@ -21,20 +21,20 @@ limitations under the License.
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
+namespace GAR_NAMESPACE {
 TEST_CASE("test_vertices_collection") {
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
 
   // read file and construct graph info
   std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-  auto maybe_graph_info = GAR_NAMESPACE::GraphInfo::Load(path);
+  auto maybe_graph_info = GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
 
   // construct vertices collection
   std::string label = "person", property = "firstName";
-  auto maybe_vertices_collection =
-      GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
+  auto maybe_vertices_collection = VerticesCollection::Make(graph_info, label);
   REQUIRE(!maybe_vertices_collection.has_error());
   auto vertices = maybe_vertices_collection.value();
   auto count = 0;
@@ -81,12 +81,12 @@ TEST_CASE("test_edges_collection", "[Slow]") {
 
   std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
+  auto graph_info = GraphInfo::Load(path).value();
 
   // iterate edges of vertex chunk 0
-  auto expect = GAR_NAMESPACE::EdgesCollection::Make(
-      graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::ordered_by_source, 0, 1);
+  auto expect =
+      EdgesCollection::Make(graph_info, src_label, edge_label, dst_label,
+                            AdjListType::ordered_by_source, 0, 1);
   REQUIRE(!expect.has_error());
   auto edges = expect.value();
   auto end = edges->end();
@@ -111,9 +111,9 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   REQUIRE(edges->size() == count);
 
   // iterate edges of vertex chunk [2, 4)
-  auto expect1 = GAR_NAMESPACE::EdgesCollection::Make(
-      graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::ordered_by_dest, 2, 4);
+  auto expect1 =
+      EdgesCollection::Make(graph_info, src_label, edge_label, dst_label,
+                            AdjListType::ordered_by_dest, 2, 4);
   REQUIRE(!expect1.has_error());
   auto edges1 = expect1.value();
   auto end1 = edges1->end();
@@ -125,9 +125,9 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   REQUIRE(edges1->size() == count1);
 
   // iterate all edges
-  auto expect2 = GAR_NAMESPACE::EdgesCollection::Make(
-      graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
+  auto expect2 =
+      EdgesCollection::Make(graph_info, src_label, edge_label, dst_label,
+                            AdjListType::ordered_by_source);
   REQUIRE(!expect2.has_error());
   auto& edges2 = expect2.value();
   auto end2 = edges2->end();
@@ -142,9 +142,9 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   REQUIRE(edges2->size() == count2);
 
   // empty collection
-  auto expect3 = GAR_NAMESPACE::EdgesCollection::Make(
-      graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::unordered_by_source, 5, 5);
+  auto expect3 =
+      EdgesCollection::Make(graph_info, src_label, edge_label, dst_label,
+                            AdjListType::unordered_by_source, 5, 5);
   REQUIRE(!expect2.has_error());
   auto edges3 = expect3.value();
   auto end3 = edges3->end();
@@ -157,8 +157,9 @@ TEST_CASE("test_edges_collection", "[Slow]") {
   REQUIRE(edges3->size() == 0);
 
   // invalid adjlist type
-  auto expect4 = GAR_NAMESPACE::EdgesCollection::Make(
-      graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::unordered_by_dest);
+  auto expect4 =
+      EdgesCollection::Make(graph_info, src_label, edge_label, dst_label,
+                            AdjListType::unordered_by_dest);
   REQUIRE(expect4.status().IsInvalid());
 }
+}  // namespace GAR_NAMESPACE

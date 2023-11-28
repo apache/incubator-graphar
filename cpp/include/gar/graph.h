@@ -277,6 +277,12 @@ class VerticesCollection {
   /** Get the number of vertices in the collection. */
   size_t size() const noexcept { return vertex_num_; }
 
+  /**
+   * @brief Construct a VerticesCollection from graph info and vertex label.
+   *
+   * @param graph_info The graph info.
+   * @param label The vertex label.
+   */
   static Result<std::shared_ptr<VerticesCollection>> Make(
       const GraphInfo& graph_info, const std::string& label) {
     GAR_ASSIGN_OR_RAISE(const auto& vertex_info,
@@ -678,6 +684,18 @@ class EdgesCollection {
    */
   virtual EdgeIter find_dst(IdType id, const EdgeIter& from) = 0;
 
+  /**
+   * @brief Construct a EdgesCollection from graph info and edge label.
+   *
+   * @param graph_info The graph info.
+   * @param src_label The source vertex label.
+   * @param edge_label The edge label.
+   * @param dst_label The destination vertex label.
+   * @param adj_list_type The type of adjList.
+   * @param vertex_chunk_begin The index of the begin vertex chunk, default 0.
+   * @param vertex_chunk_end The index of the end vertex chunk (not included),
+   * default max.
+   */
   static Result<std::shared_ptr<EdgesCollection>> Make(
       const GraphInfo& graph_info, const std::string& src_label,
       const std::string& edge_label, const std::string& dst_label,

@@ -191,6 +191,14 @@ class VertexPropertyWriter {
                     ValidateLevel validate_level =
                         ValidateLevel::default_validate) const noexcept;
 
+  /**
+   * @brief Construct a VertexPropertyWriter from vertex info.
+   *
+   * @param vertex_info The vertex info that describes the vertex type.
+   * @param prefix The absolute prefix.
+   * @param validate_level The global validate level for the writer, default is
+   * no_validate.
+   */
   static Result<std::shared_ptr<VertexPropertyWriter>> Make(
       const VertexInfo& vertex_info, const std::string& prefix,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
@@ -198,6 +206,14 @@ class VertexPropertyWriter {
                                                   validate_level);
   }
 
+  /**
+   * @brief Construct a VertexPropertyWriter from graph info and vertex label.
+   *
+   * @param graph_info The graph info that describes the graph.
+   * @param label The vertex label.
+   * @param validate_level The global validate level for the writer, default is
+   * no_validate.
+   */
   static Result<std::shared_ptr<VertexPropertyWriter>> Make(
       const GraphInfo& graph_info, const std::string& label,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
@@ -631,6 +647,15 @@ class EdgeChunkWriter {
       ValidateLevel validate_level = ValidateLevel::default_validate) const
       noexcept;
 
+  /**
+   * @brief Construct an EdgeChunkWriter from edge info.
+   *
+   * @param edge_info The edge info that describes the edge type.
+   * @param prefix The absolute prefix.
+   * @param adj_list_type The adj list type for the edges.
+   * @param validate_level The global validate level for the writer, default is
+   * no_validate.
+   */
   static Result<std::shared_ptr<EdgeChunkWriter>> Make(
       const EdgeInfo& edge_info, const std::string& prefix,
       const AdjListType& adj_list_type = AdjListType::unordered_by_source,
@@ -644,6 +669,17 @@ class EdgeChunkWriter {
                                              validate_level);
   }
 
+  /**
+   * @brief Construct an EdgeChunkWriter from graph info and edge label.
+   *
+   * @param graph_info The graph info that describes the graph.
+   * @param src_label The source vertex label.
+   * @param edge_label The edge label.
+   * @param dst_label The destination vertex label.
+   * @param adj_list_type The adj list type for the edges.
+   * @param validate_level The global validate level for the writer, default is
+   * no_validate.
+   */
   static Result<std::shared_ptr<EdgeChunkWriter>> Make(
       const GraphInfo& graph_info, const std::string& src_label,
       const std::string& edge_label, const std::string& dst_label,
