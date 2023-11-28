@@ -243,10 +243,7 @@ TEST_CASE("test_edge_chunk_writer") {
   auto invalid_adj_list_type = AdjListType::unordered_by_dest;
   auto maybe_writer2 =
       EdgeChunkWriter::Make(edge_info, "/tmp/", invalid_adj_list_type);
-  REQUIRE(!maybe_writer2.has_error());
-  auto writer2 = maybe_writer2.value();
-  writer2->SetValidateLevel(ValidateLevel::strong_validate);
-  REQUIRE(writer2->WriteAdjListChunk(table, 0, 0).IsKeyError());
+  REQUIRE(maybe_writer2.has_error());
   // Invalid property group
   Property p1;
   p1.name = "invalid_property";
