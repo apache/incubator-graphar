@@ -685,7 +685,7 @@ class EdgesCollection {
   virtual EdgeIter find_dst(IdType id, const EdgeIter& from) = 0;
 
   /**
-   * @brief Construct a EdgesCollection from graph info and edge label.
+   * @brief Construct an EdgesCollection from graph info and edge label.
    *
    * @param graph_info The graph info.
    * @param src_label The source vertex label.
