@@ -123,7 +123,7 @@ TEST_CASE("test_vertices_builder") {
   auto input =
       fs->OpenInputStream("/tmp/vertex/person/vertex_count").ValueOrDie();
   auto num = input->Read(sizeof(IdType)).ValueOrDie();
-  IdType* ptr = (IdType*) num->data();
+  const IdType* ptr = reinterpret_cast<const IdType*>(num->data());
   REQUIRE((*ptr) == start_index + builder->GetNum());
 }
 
@@ -210,7 +210,7 @@ TEST_CASE("test_edges_builder") {
             "/tmp/edge/person_knows_person/ordered_by_dest/vertex_count")
           .ValueOrDie();
   auto num = input->Read(sizeof(IdType)).ValueOrDie();
-  IdType* ptr = (IdType*) num->data();
+  const IdType* ptr = reinterpret_cast<const IdType*>(num->data());
   REQUIRE((*ptr) == vertices_num);
 }
 }  // namespace GAR_NAMESPACE
