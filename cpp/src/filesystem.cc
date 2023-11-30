@@ -268,8 +268,10 @@ Result<IdType> FileSystem::GetFileNumOfDir(const std::string& dir_path,
 }
 
 FileSystem::~FileSystem() {
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
   // Finalize the S3 client if it is initialized, otherwise it would mutex error
   arrow::fs::FinalizeS3();
+#endif
 }
 
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
