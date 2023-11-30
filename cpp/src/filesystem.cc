@@ -267,6 +267,11 @@ Result<IdType> FileSystem::GetFileNumOfDir(const std::string& dir_path,
   return static_cast<IdType>(file_infos.size());
 }
 
+FileSystem::~FileSystem() {
+  // Finalize the S3 client if it is initialized, otherwise it would mutex error
+  arrow::fs::FinalizeS3();
+}
+
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri_string, std::string* out_path) {
   if (uri_string.length() >= 1 && uri_string[0] == '/') {

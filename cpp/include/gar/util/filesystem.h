@@ -59,7 +59,7 @@ class FileSystem {
   explicit FileSystem(std::shared_ptr<arrow::fs::FileSystem> arrow_fs)
       : arrow_fs_(arrow_fs) {}
 
-  ~FileSystem() = default;
+  ~FileSystem();
 
   /**
    * @brief Read and filter a file as an arrow::Table.
