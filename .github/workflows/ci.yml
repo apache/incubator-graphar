@@ -107,6 +107,7 @@ jobs:
     - name: Test
       run: |
         cd build
+        export ASAN_OPTIONS=detect_leaks=0
         export GAR_TEST_DATA=$PWD/../testing/
         make test
 

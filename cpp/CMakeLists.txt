@@ -169,6 +169,7 @@ if (NOT Arrow_FOUND OR NOT ArrowDataset_FOUND OR NOT ArrowAcero_FOUND OR NOT Par
     message(STATUS "Arrow is not installed, will build from source.")
     set(BUILD_ARROW_FROM_SOURCE ON)
 else()
+    message(STATUS "-- Found Arrow: ${Arrow_VERSION}")
     set(BUILD_ARROW_FROM_SOURCE OFF)
 endif()
 

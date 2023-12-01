@@ -18,6 +18,7 @@ limitations under the License.
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
 #include "arrow/filesystem/api.h"
+#include "arrow/filesystem/s3fs.h"
 #include "arrow/ipc/writer.h"
 #include "parquet/arrow/writer.h"
 
@@ -265,6 +266,13 @@ Result<IdType> FileSystem::GetFileNumOfDir(const std::string& dir_path,
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(file_infos,
                                        arrow_fs_->GetFileInfo(file_selector));
   return static_cast<IdType>(file_infos.size());
+}
+
+FileSystem::~FileSystem() {
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
+  // Finalize the S3 client if it is initialized, otherwise it would mutex error
+  arrow::fs::FinalizeS3();
+#endif
 }
 
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
