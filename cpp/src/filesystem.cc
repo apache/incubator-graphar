@@ -18,6 +18,7 @@ limitations under the License.
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
 #include "arrow/filesystem/api.h"
+#include "arrow/filesystem/s3fs.h"
 #include "arrow/ipc/writer.h"
 #include "parquet/arrow/writer.h"
 
