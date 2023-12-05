@@ -19,6 +19,7 @@
 #include "yaml/Yaml.hpp"
 
 #include "gar/graph_info.h"
+#include "gar/fwd.h"
 #include "gar/util/filesystem.h"
 #include "gar/util/yaml.h"
 
@@ -33,6 +34,7 @@ namespace GAR_NAMESPACE_INTERNAL {
           " is not found in edge info.");      \
     }                                          \
   } while (false)
+
 namespace {
 
 std::string ConcatEdgeLabel(const std::string& src_label,
@@ -88,9 +90,10 @@ PropertyGroup::PropertyGroup(const std::vector<Property>& properties,
                              FileType file_type, const std::string& prefix)
     : properties_(properties), file_type_(file_type), prefix_(prefix) {
   if (prefix_.empty()) {
-    prefix_ = ConcatStringWithDelimiter(
-        REGULAR_SEPERATOR, properties_.begin(), properties_.end(),
-        [](const Property& p) { return p.name; });
+    for (const auto& p : properties_) {
+      prefix_ += p.name + REGULAR_SEPERATOR;
+    }
+    prefix_.back() = '/';
   }
 }
 
@@ -138,7 +141,7 @@ class VertexInfo::Impl {
   PropertyGroupVector property_groups_;
   std::string prefix_;
   std::shared_ptr<const InfoVersion> version_;
-  std::unordered_multimap<std::string, int> property_name_to_index_;
+  std::unordered_map<std::string, int> property_name_to_index_;
   std::unordered_map<std::string, bool> property_name_to_primary_;
   std::unordered_map<std::string, DataType> property_name_to_type_;
 };
@@ -149,7 +152,7 @@ VertexInfo::VertexInfo(const std::string& label, IdType chunk_size,
                        std::shared_ptr<const InfoVersion> version)
     : impl_(new Impl(label, chunk_size, prefix, property_groups, version)) {}
 
-const std::string& VertexInfo::GetType() const { return impl_->type_; }
+const std::string& VertexInfo::type() const { return impl_->type_; }
 
 IdType VertexInfo::GetChunkSize() const { return impl_->chunk_size_; }
 
@@ -190,7 +193,7 @@ int VertexInfo::PropertyGroupNum() const {
 
 std::shared_ptr<PropertyGroup> VertexInfo::GetPropertyGroup(
     const std::string& property_name) const {
-  int i = LookupNameIndex(impl_->property_name_to_index_, property_name);
+  int i = LookupTypeIndex(impl_->property_name_to_index_, property_name);
   return i == -1 ? nullptr : impl_->property_groups_[i];
 }
 
@@ -221,11 +224,11 @@ Result<DataType> VertexInfo::GetPropertyType(
 }
 
 Result<std::shared_ptr<VertexInfo>> VertexInfo::AddPropertyGroup(
-    std::shared_ptr<PropertyGroup> property_group) {
+    std::shared_ptr<PropertyGroup> property_group) const {
   if (property_group == nullptr) {
     return Status::Invalid("property group is nullptr");
   }
-  return std::make_shared<VertexInfo>(impl_->label_, impl_->chunk_size_, AddVectorElement(impl_->property_groups_, property_group), impl_->version_, impl_->prefix_);
+  return std::make_shared<VertexInfo>(impl_->type_, impl_->chunk_size_, AddVectorElement(impl_->property_groups_, property_group), impl_->version_, impl_->prefix_);
 }
 
 bool VertexInfo::IsValidated() const {

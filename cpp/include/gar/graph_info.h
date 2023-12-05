@@ -71,7 +71,7 @@ class PropertyGroup {
    * @param prefix prefix of property group chunk file. The default
    *        prefix is the concatenation of property names with '_' as separator
    */
-  explicit PropertyGroup(std::vector<Property>& properties, FileType file_type,
+  explicit PropertyGroup(const std::vector<Property>& properties, FileType file_type,
                          const std::string& prefix = "");
 
   /**
@@ -192,7 +192,7 @@ class VertexInfo {
    *
    * @return The label of the vertex.
    */
-  const std::string& GetLabel() const;
+  const std::string& type() const;
 
   /**
    * Get the chunk size of the vertex.
