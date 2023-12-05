@@ -19,25 +19,18 @@
 
 #include <memory>
 #include <string>
-#include <unordered_set>
 #include <vector>
 
 #include "gar/fwd.h"
-#include "util/adj_list_type.h"
-#include "util/data_type.h"
-#include "util/file_type.h"
-#include "util/result.h"
-#include "util/status.h"
-#include "util/util.h"
-#include "util/version_parser.h"
-#include "util/yaml.h"
+#include "gar/util/data_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
 /**
  * Property is a struct to store the property information.
  */
-struct Property {
+class Property {
+ public:
   std::string name;  // property name
   DataType type;     // property data type
   bool is_primary;   // primary key tag
@@ -132,23 +125,12 @@ class PropertyGroup {
   std::string prefix_;
 };
 
-static bool operator==(const PropertyGroup& lhs, const PropertyGroup& rhs) {
-  return (lhs.GetPrefix() == rhs.GetPrefix()) &&
-         (lhs.GetFileType() == rhs.GetFileType()) &&
-         (lhs.GetProperties() == rhs.GetProperties());
-}
-
 class AdjacentList {
  public:
   explicit AdjacentList(AdjListType type, FileType file_type,
-              const std::string& prefix = "")
-      : type_(type), file_type_(file_type), prefix_(prefix) {
-    if (prefix_.empty()) {
-      prefix_ = AdjListTypeToString(type_) + "/";
-    }
-  }
-  
-  inline AdjListType GetType() const { return type_; }
+              const std::string& prefix = "");
+
+  inline AdjListType type() const { return type_; }
 
   inline FileType GetFileType() const { return file_type_; }
 
@@ -156,8 +138,8 @@ class AdjacentList {
   
  private:
   AdjListType type_;
-  std::string prefix_;
   FileType file_type_;
+  std::string prefix_;
 };
 
 /**
@@ -192,7 +174,7 @@ class VertexInfo {
    *
    * @return The label of the vertex.
    */
-  const std::string& type() const;
+  const std::string& GetType() const;
 
   /**
    * Get the chunk size of the vertex.
@@ -365,16 +347,6 @@ class EdgeInfo {
                     std::shared_ptr<const InfoVersion> version = nullptr);
 
   /**
-   * Copy assignment operator.
-   */
-  inline EdgeInfo& operator=(const EdgeInfo& other) = default;
-
-  /**
-   * Move assignment operator.
-   */
-  inline EdgeInfo& operator=(EdgeInfo&& other) = default;
-
-  /**
    * Add an adjacency list information to the edge info.
    * The adjacency list information indicating the adjacency list stored with
    * CSR, CSC, or COO format.
@@ -462,53 +434,16 @@ class EdgeInfo {
    * false otherwise.
    */
   bool HasAdjacentListType(AdjListType adj_list_type) const;
-  /**
-   * Returns whether the edge info contains the given property group for the
-   * specified adjacency list type.
-   *
-   * @param property_group Property group to check.
-   * @param adj_list_type Adjacency list type the property group belongs to.
-   * @return True if the edge info contains the property group, false otherwise.
-   */
-  bool HasPropertyGroup(const PropertyGroup& property_group) const {
-    for (auto& pg : adj_list2property_groups_.at(adj_list_type)) {
-      if (pg == property_group) {
-        return true;
-      }
-    }
-    return false;
-  }
 
   /**
-   * @brief Returns whether the edge info contains the given property for any
-   * adjacency list type.
+   * @brief Returns whether the edge info contains the given property 
    *
    * @param property Property name to check.
    * @return True if the edge info contains the property, false otherwise.
    */
-  bool ContainProperty(const std::string& property) const {
-    return p2type_.find(property) != p2type_.end();
-  }
+  bool HasProperty(const std::string& property_name) const; 
 
-  /**
-   * Get the file type of the adjacency list topology and offset chunk file for
-   * the given adjacency list type.
-   *
-   * @param adj_list_type The adjacency list type.
-   * @return A Result object containing the file type, or a Status object
-   * indicating an KeyError if the adjacency list type is not found in the edge
-   * info.
-   */
-  inline Result<FileType> GetFileType(AdjListType adj_list_type) const
-      noexcept {
-    if (!ContainAdjList(adj_list_type)) {
-      return Status::KeyError(
-          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
-          " is not found in edge info.");
-    }
-    return adj_list2file_type_.at(adj_list_type);
-  }
-
+  std::shared_ptr<AdjacentList> GetAdjacentList(AdjListType adj_list_type) const;
   /**
    * @brief Get the property groups for the given adjacency list type.
    *
@@ -517,15 +452,7 @@ class EdgeInfo {
    * given adjacency list type, or a Status object indicating an KeyError if the
    * adjacency list type is not found in the edge info.
    */
-  inline Result<const std::vector<PropertyGroup>&> GetPropertyGroups(
-      AdjListType adj_list_type) const noexcept {
-    if (!ContainAdjList(adj_list_type)) {
-      return Status::KeyError(
-          "Adjacency list type: ", AdjListTypeToString(adj_list_type),
-          " is not found in edge info.");
-    }
-    return adj_list2property_groups_.at(adj_list_type);
-  }
+  const PropertyGroupVector& GetPropertyGroups() const;
 
   /**
    * @brief Get the property group containing the given property and for the
@@ -537,18 +464,8 @@ class EdgeInfo {
    * Status object indicating an KeyError if the adjacency list type is not
    * found in the edge info.
    */
-  inline Result<const PropertyGroup&> GetPropertyGroup(
-      const std::string& property, AdjListType adj_list_type) const noexcept {
-    if (p2group_index_.find(property) == p2group_index_.end() ||
-        p2group_index_.at(property).find(adj_list_type) ==
-            p2group_index_.at(property).end()) {
-      return Status::KeyError("No property with name: ", property,
-                              " is found in edge info for adj list type: ",
-                              AdjListTypeToString(adj_list_type));
-    }
-    return adj_list2property_groups_.at(
-        adj_list_type)[p2group_index_.at(property).at(adj_list_type)];
-  }
+  std::shared_ptr<PropertyGroup> GetPropertyGroup(
+      const std::string& property) const;
 
   /**
    * Get the file path for the number of vertices.
@@ -623,7 +540,8 @@ class EdgeInfo {
    * chunk
    */
   Result<std::string> GetPropertyFilePath(
-      const PropertyGroup& property_group, AdjListType adj_list_type,
+      const std::shared_ptr<PropertyGroup>& property_group,
+      AdjListType adj_list_type,
       IdType vertex_chunk_index, IdType edge_chunk_index) const;
 
   /**
@@ -678,7 +596,7 @@ class EdgeInfo {
   bool IsValidated() const; 
 
   /** Loads the yaml as an EdgeInfo instance. */
-  static Result<EdgeInfo> Load(std::shared_ptr<Yaml> yaml);
+  static Result<std::shared_ptr<EdgeInfo>> Load(std::shared_ptr<Yaml> yaml);
 
  private:
   class Impl;
@@ -709,7 +627,7 @@ class GraphInfo {
    * @return A Result object containing the GraphInfo instance, or a Status
    * object indicating an error.
    */
-  static Result<GraphInfo> Load(const std::string& path);
+  static Result<std::shared_ptr<GraphInfo>> Load(const std::string& path);
 
   /**
    * @brief Loads the input string as a `GraphInfo` instance.
@@ -718,7 +636,7 @@ class GraphInfo {
    * @return A Result object containing the GraphInfo instance, or a `Status`
    * object indicating an error.
    */
-  static Result<GraphInfo> Load(const std::string& input,
+  static Result<std::shared_ptr<GraphInfo>> Load(const std::string& input,
                                 const std::string& relative_path);
 
   /**
@@ -740,41 +658,23 @@ class GraphInfo {
   Result<std::shared_ptr<GraphInfo>> AddEdge(std::shared_ptr<EdgeInfo> edge_info) const;
 
   /**
-   *@brief Add a vertex info path to graph info instance.
-   *
-   *@param path The vertex info path to add
-   */
-  void AddVertexInfoPath(const std::string& path) noexcept {
-    vertex_paths_.push_back(path);
-  }
-
-  /**
-   *@brief Add an edge info path to graph info instance.
-   *
-   *@param path The edge info path to add
-   */
-  void AddEdgeInfoPath(const std::string& path) noexcept {
-    edge_paths_.push_back(path);
-  }
-
-  /**
    * @brief Get the name of the graph.
    * @return The name of the graph.
    */
-  std::string GetName() const noexcept;
+  const std::string& GetName() const;
 
   /**
    * @brief Get the absolute path prefix of the chunk files.
    * @return The absolute path prefix of the chunk files.
    */
-  std::string GetPrefix() const noexcept;
+  const std::string& GetPrefix() const;
 
   /**
    * Get the version info of the graph info object.
    *
    * @return The version info of the graph info object.
    */
-  const std::shared_ptr<const InfoVersion>& version() const noexcept;
+  const std::shared_ptr<const InfoVersion>& version() const;
 
   /**
    * Get the vertex info with the given label.
@@ -782,8 +682,7 @@ class GraphInfo {
    * @return A Result object containing the vertex info, or a Status object
    * indicating an error.
    */
-  std::shared_ptr<VertexInfo> GetVertexInfoByType(const std::string& label) const
-      noexcept;
+  std::shared_ptr<VertexInfo> GetVertexInfoByType(const std::string& label) const;
 
   /**
    * Get the edge info with the given source vertex label, edge label, and
@@ -794,10 +693,9 @@ class GraphInfo {
    * @return A Result object containing the edge info, or a Status object
    * indicating an error.
    */
-  std::shared_ptr<VertexInfo> GetEdgeInfoByType(const std::string& src_label,
+  std::shared_ptr<EdgeInfo> GetEdgeInfoByType(const std::string& src_label,
                                              const std::string& edge_label,
-                                             const std::string& dst_label) const
-      noexcept;
+                                             const std::string& dst_label) const;
 
   int GetVertexInfoIndex(const std::string& label) const;
 
@@ -809,61 +707,23 @@ class GraphInfo {
 
   int EdgeInfoNum() const;
 
-  const std::shared_ptr<VertexInfo>& GetVertexInfoByIndex(int i) const;
+  const std::shared_ptr<VertexInfo> GetVertexInfoByIndex(int i) const;
 
-  const std::shared_ptr<EdgeInfo>& GetEdgeInfoByIndex(int i) const;
-
-  /**
-   *@brief Get the property group of vertex by label and property
-   *
-   *@param label vertex label
-   *@param property vertex property that belongs to the group
-   */
-  inline Result<const PropertyGroup&> GetVertexPropertyGroup(
-      const std::string& label, const std::string& property) const noexcept {
-    if (vertex2info_.find(label) == vertex2info_.end()) {
-      return Status::KeyError("The vertex info of ", label,
-                              " is not found in graph info.");
-    }
-    return vertex2info_.at(label).GetPropertyGroup(property);
-  }
-
-  /**
-   *@brief Get the property group of edge by label, property and adj list type
-   *
-   *@param src_label source vertex label
-   *@param edge_label edge label
-   *@param dst_label destination vertex label
-   *@param property edge property that belongs to the group
-   *@param adj_list_type adj list type of edge
-   */
-  inline Result<const PropertyGroup&> GetEdgePropertyGroup(
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label, const std::string& property,
-      AdjListType adj_list_type) const noexcept {
-    std::string key = src_label + REGULAR_SEPARATOR + edge_label +
-                      REGULAR_SEPARATOR + dst_label;
-    if (edge2info_.find(key) == edge2info_.end()) {
-      return Status::KeyError("The edge info of ", key,
-                              " is not found in graph info.");
-    }
-    return edge2info_.at(key).GetPropertyGroup(property, adj_list_type);
-  }
+  const std::shared_ptr<EdgeInfo> GetEdgeInfoByIndex(int i) const;
 
   /**
    * @brief Get the vertex infos of graph info
    *
    * @return vertex infos of graph info
    */
-  const VertexInfoVector& GetVertexInfos() const
-      noexcept;
+  const VertexInfoVector& GetVertexInfos() const;
 
   /**
    * @brief Get the edge infos of graph info
    *
    * @return edge infos of graph info
    */
-  const VertexInfoVector& GetEdgeInfos() const noexcept;
+  const EdgeInfoVector& GetEdgeInfos() const;
 
   /**
    * Saves the graph info to a YAML file.
@@ -879,14 +739,14 @@ class GraphInfo {
    * @return A Result object containing the YAML string, or a Status object
    * indicating an error.
    */
-  Result<std::string> Dump() const noexcept;
+  Result<std::string> Dump() const;
 
   /**
    * Returns whether the graph info is validated.
    *
    * @return True if the graph info is valid, False otherwise.
    */
-  bool IsValidated() const noexcept;
+  bool IsValidated() const;
 
  private:
   class Impl;

@@ -19,8 +19,7 @@
 
 #include <utility>
 
-#include "gar/external/result.hpp"
-
+#include "gar/fwd.h"
 #include "gar/util/status.h"
 
 #define GAR_ASSIGN_OR_RAISE_IMPL(result_name, lhs, rexpr)          \
@@ -131,8 +130,8 @@ namespace GAR_NAMESPACE_INTERNAL {
  *  }
  * ```
  */
-template <typename T>
-using Result = cpp::result<T, Status>;
+// template <typename T>
+// using Result = cpp::result<T, Status>;
 
 namespace internal {
 

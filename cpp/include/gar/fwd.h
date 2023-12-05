@@ -16,27 +16,34 @@ limitations under the License.
 #ifndef GAR_FWD_H_
 #define GAR_FWD_H_
 
-namespace cpp {
-template <typename T, typename E>
-class result;
-} // namespace cpp
+#include <memory>
+
+#include "gar/external/result.hpp"
+
+#include "gar/util/macros.h"
+#include "gar/util/status.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
 class Status;
 
 template <typename T>
-using Result = cpp::result<T, Status>;
+using Result = cpp::result<T, Status>; 
 
 class Yaml;
 class FileSystem;
 
+/** Type of vertex id or vertex index. */
+using IdType = int64_t;
 enum class Type;
 class DataType;
-enum FileType;
-enum class AdjListType;
+/** Type of file format */
+enum FileType { CSV = 0, PARQUET = 1, ORC = 2 };
+enum class AdjListType : uint8_t;
 
-struct Property;
+class InfoVersion;
+
+class Property;
 class PropertyGroup;
 class AdjacentList;
 
@@ -45,6 +52,7 @@ class EdgeInfo;
 class GraphInfo;
 
 using PropertyGroupVector = std::vector<std::shared_ptr<PropertyGroup>>;
+using AdjacentListVector = std::vector<std::shared_ptr<AdjacentList>>;
 using VertexInfoVector = std::vector<std::shared_ptr<VertexInfo>>;
 using EdgeInfoVector = std::vector<std::shared_ptr<EdgeInfo>>;
 

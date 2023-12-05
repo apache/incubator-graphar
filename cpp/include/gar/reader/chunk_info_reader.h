@@ -21,13 +21,7 @@
 #include <string>
 #include <vector>
 
-#include "gar/graph_info.h"
-#include "gar/util/data_type.h"
-#include "gar/util/filesystem.h"
-#include "gar/util/reader_util.h"
-#include "gar/util/result.h"
-#include "gar/util/status.h"
-#include "gar/util/util.h"
+#include "gar/fwd.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -43,23 +37,10 @@ class VertexPropertyChunkInfoReader {
    * @param property_group The property group that describes the property group.
    * @param prefix The absolute prefix of the graph.
    */
-  explicit VertexPropertyChunkInfoReader(const VertexInfo& vertex_info,
-                                         const PropertyGroup& property_group,
-                                         const std::string& prefix)
-      : vertex_info_(vertex_info),
-        property_group_(property_group),
-        prefix_(prefix),
-        chunk_index_(0) {
-    // init vertex chunk num
-    std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
-                              FileSystemFromUriOrPath(prefix, &base_dir));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
-                              vertex_info.GetPathPrefix(property_group));
-    base_dir += pg_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
-                              util::GetVertexChunkNum(prefix_, vertex_info_));
-  }
+  explicit VertexPropertyChunkInfoReader(const std::shared_ptr<VertexInfo>& vertex_info,
+                                         const std::shared_ptr<PropertyGroup>& property_group,
+                                         const std::string& prefix);
+ 
 
   /**
    * @brief Sets chunk position indicator for reader by internal vertex id.
@@ -69,26 +50,12 @@ class VertexPropertyChunkInfoReader {
    *
    * @param id the internal vertex id.
    */
-  inline Status seek(IdType id) noexcept {
-    chunk_index_ = id / vertex_info_.GetChunkSize();
-    if (chunk_index_ >= chunk_num_) {
-      return Status::IndexError("Internal vertex id ", id,
-                                " is out of range [0,",
-                                chunk_num_ * vertex_info_.GetChunkSize(),
-                                ") of vertex ", vertex_info_.GetLabel());
-    }
-    return Status::OK();
-  }
+  Status seek(IdType id);
 
   /**
    * @brief Return the current chunk file path of chunk position indicator.
    */
-  Result<std::string> GetChunk() noexcept {
-    GAR_ASSIGN_OR_RAISE(
-        auto chunk_file_path,
-        vertex_info_.GetFilePath(property_group_, chunk_index_));
-    return prefix_ + chunk_file_path;
-  }
+  Result<std::string> GetChunk() const;
 
   /**
    * Sets chunk position indicator to next chunk.
@@ -96,17 +63,10 @@ class VertexPropertyChunkInfoReader {
    * if current chunk is the last chunk, will return Status::IndexError
    *   error.
    */
-  Status next_chunk() noexcept {
-    if (++chunk_index_ >= chunk_num_) {
-      return Status::IndexError(
-          "vertex chunk index ", chunk_index_, " is out-of-bounds for vertex ",
-          vertex_info_.GetLabel(), " chunk num ", chunk_num_);
-    }
-    return Status::OK();
-  }
+  Status next_chunk();
 
   /** Get the chunk number of the current vertex property group. */
-  IdType GetChunkNum() noexcept { return chunk_num_; }
+  IdType GetChunkNum() const noexcept { return chunk_num_; }
 
   /**
    * @brief Construct a VertexPropertyChunkInfoReader from vertex info.
@@ -115,16 +75,8 @@ class VertexPropertyChunkInfoReader {
    * @param property_group The property group of the vertex property.
    * @param prefix The absolute prefix of the graph.
    */
-  static Result<std::shared_ptr<VertexPropertyChunkInfoReader>> Make(
-      const VertexInfo& vertex_info, const PropertyGroup& property_group,
-      const std::string& prefix) {
-    if (!vertex_info.ContainPropertyGroup(property_group)) {
-      return Status::KeyError("No property group ", property_group,
-                              " in vertex ", vertex_info.GetLabel(), ".");
-    }
-    return std::make_shared<VertexPropertyChunkInfoReader>(
-        vertex_info, property_group, prefix);
-  }
+  static Result<std::shared_ptr<VertexPropertyChunkInfoReader>> Make(const std::shared_ptr<VertexInfo>& vertex_info, const std::shared_ptr<PropertyGroup>& property_group,
+      const std::string& prefix);
 
   /**
    * @brief Construct a VertexPropertyChunkInfoReader from graph info.
@@ -134,16 +86,12 @@ class VertexPropertyChunkInfoReader {
    * @param property_group The property group of the vertex property.
    */
   static Result<std::shared_ptr<VertexPropertyChunkInfoReader>> Make(
-      const GraphInfo& graph_info, const std::string& label,
-      const PropertyGroup& property_group) {
-    GAR_ASSIGN_OR_RAISE(const auto& vertex_info,
-                        graph_info.GetVertexInfo(label));
-    return Make(vertex_info, property_group, graph_info.GetPrefix());
-  }
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& vertex_type,
+      const std::shared_ptr<PropertyGroup>& property_group);
 
  private:
-  VertexInfo vertex_info_;
-  PropertyGroup property_group_;
+  std::shared_ptr<VertexInfo> vertex_info_;
+  std::shared_ptr<PropertyGroup> property_group_;
   std::string prefix_;
   IdType chunk_index_;
   IdType chunk_num_;
@@ -161,25 +109,9 @@ class AdjListChunkInfoReader {
    * @param adj_list_type The adj list type for the edges.
    * @param prefix The absolute prefix of the graph.
    */
-  explicit AdjListChunkInfoReader(const EdgeInfo& edge_info,
+  explicit AdjListChunkInfoReader(const std::shared_ptr<EdgeInfo>& edge_info,
                                   AdjListType adj_list_type,
-                                  const std::string& prefix)
-      : edge_info_(edge_info),
-        adj_list_type_(adj_list_type),
-        prefix_(prefix),
-        vertex_chunk_index_(0),
-        chunk_index_(0) {
-    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &base_dir_));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto adj_list_path_prefix,
-                              edge_info.GetAdjListPathPrefix(adj_list_type));
-    base_dir_ = prefix_ + adj_list_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(
-        vertex_chunk_num_,
-        util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
-    GAR_ASSIGN_OR_RAISE_ERROR(
-        chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                          vertex_chunk_index_));
-  }
+                                  const std::string& prefix);
 
   /**
    * @brief Sets chunk position indicator for reader by source internal vertex
@@ -187,7 +119,7 @@ class AdjListChunkInfoReader {
    *
    * @param id the source internal vertex id.
    */
-  Status seek_src(IdType id) noexcept;
+  Status seek_src(IdType id);
 
   /**
    * @brief Sets chunk position indicator for reader by destination internal
@@ -195,7 +127,7 @@ class AdjListChunkInfoReader {
    *
    * @param id the destination internal vertex id.
    */
-  Status seek_dst(IdType id) noexcept;
+  Status seek_dst(IdType id);
 
   /**
    * @brief Sets chunk position indicator for reader by edge index.
@@ -204,24 +136,10 @@ class AdjListChunkInfoReader {
    *     Note: the offset is the edge index of the vertex chunk, not the edge
    * index of the whole graph.
    */
-  Status seek(IdType index) noexcept {
-    chunk_index_ = index / edge_info_.GetChunkSize();
-    if (chunk_index_ >= chunk_num_) {
-      return Status::IndexError("The edge offset ", index,
-                                " is out of range [0,",
-                                edge_info_.GetChunkSize() * chunk_num_,
-                                "), edge label: ", edge_info_.GetEdgeLabel());
-    }
-    return Status::OK();
-  }
+  Status seek(IdType index);
 
   /** Return the current chunk file path of chunk position indicator. */
-  Result<std::string> GetChunk() noexcept {
-    GAR_ASSIGN_OR_RAISE(auto chunk_file_path,
-                        edge_info_.GetAdjListFilePath(
-                            vertex_chunk_index_, chunk_index_, adj_list_type_));
-    return prefix_ + chunk_file_path;
-  }
+  Result<std::string> GetChunk();
 
   /**
    * Sets chunk position indicator to next chunk.
@@ -229,22 +147,7 @@ class AdjListChunkInfoReader {
    * if current chunk is the last chunk, will return Status::IndexError
    *     error.
    */
-  Status next_chunk() {
-    ++chunk_index_;
-    while (chunk_index_ >= chunk_num_) {
-      ++vertex_chunk_index_;
-      if (vertex_chunk_index_ >= vertex_chunk_num_) {
-        return Status::IndexError("vertex chunk index ", vertex_chunk_index_,
-                                  " is out-of-bounds for vertex chunk num ",
-                                  vertex_chunk_num_);
-      }
-      chunk_index_ = 0;
-      GAR_ASSIGN_OR_RAISE_ERROR(
-          chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                            vertex_chunk_index_));
-    }
-    return Status::OK();
-  }
+  Status next_chunk();
 
   /**
    * @brief Construct an AdjListChunkInfoReader from edge info.
@@ -254,16 +157,8 @@ class AdjListChunkInfoReader {
    * @param prefix The absolute prefix of the graph.
    */
   static Result<std::shared_ptr<AdjListChunkInfoReader>> Make(
-      const EdgeInfo& edge_info, AdjListType adj_list_type,
-      const std::string& prefix) {
-    if (!edge_info.ContainAdjList(adj_list_type)) {
-      return Status::KeyError(
-          "The adjacent list type ", AdjListTypeToString(adj_list_type),
-          " doesn't exist in edge ", edge_info.GetEdgeLabel(), ".");
-    }
-    return std::make_shared<AdjListChunkInfoReader>(edge_info, adj_list_type,
-                                                    prefix);
-  }
+      const std::shared_ptr<EdgeInfo>& edge_info, AdjListType adj_list_type,
+      const std::string& prefix);
 
   /**
    * @brief Construct an AdjListChunkInfoReader from graph info.
@@ -275,17 +170,12 @@ class AdjListChunkInfoReader {
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListChunkInfoReader>> Make(
-      const GraphInfo& graph_info, const std::string& src_label,
-      const std::string& edge_label, const std::string& dst_label,
-      AdjListType adj_list_type) {
-    GAR_ASSIGN_OR_RAISE(
-        const auto& edge_info,
-        graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
-    return Make(edge_info, adj_list_type, graph_info.GetPrefix());
-  }
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      AdjListType adj_list_type);
 
  private:
-  EdgeInfo edge_info_;
+  std::shared_ptr<EdgeInfo> edge_info_;
   AdjListType adj_list_type_;
   std::string prefix_;
   IdType vertex_chunk_index_, chunk_index_;
@@ -307,34 +197,9 @@ class AdjListOffsetChunkInfoReader {
    *    or AdjListType::ordered_by_dest.
    * @param prefix The absolute prefix.
    */
-  explicit AdjListOffsetChunkInfoReader(const EdgeInfo& edge_info,
+  explicit AdjListOffsetChunkInfoReader(const std::shared_ptr<EdgeInfo>& edge_info,
                                         AdjListType adj_list_type,
-                                        const std::string& prefix)
-      : edge_info_(edge_info),
-        adj_list_type_(adj_list_type),
-        prefix_(prefix),
-        chunk_index_(0) {
-    std::string base_dir;
-    GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
-                              FileSystemFromUriOrPath(prefix, &base_dir));
-    GAR_ASSIGN_OR_RAISE_ERROR(auto dir_path,
-                              edge_info.GetOffsetPathPrefix(adj_list_type));
-    base_dir = prefix_ + dir_path;
-    if (adj_list_type == AdjListType::ordered_by_source ||
-        adj_list_type == AdjListType::ordered_by_dest) {
-      GAR_ASSIGN_OR_RAISE_ERROR(
-          vertex_chunk_num_,
-          util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
-      vertex_chunk_size_ = adj_list_type == AdjListType::ordered_by_source
-                               ? edge_info_.GetSrcChunkSize()
-                               : edge_info_.GetDstChunkSize();
-    } else {
-      std::string err_msg = "Invalid adj list type " +
-                            std::string(AdjListTypeToString(adj_list_type)) +
-                            " to construct AdjListOffsetReader.";
-      throw std::runtime_error(err_msg);
-    }
-  }
+                                        const std::string& prefix);
 
   /**
    * @brief Sets chunk position indicator for reader by source internal vertex
@@ -342,25 +207,13 @@ class AdjListOffsetChunkInfoReader {
    *
    * @param id the source internal vertex id.
    */
-  inline Status seek(IdType id) noexcept {
-    chunk_index_ = id / vertex_chunk_size_;
-    if (chunk_index_ >= vertex_chunk_num_) {
-      return Status::IndexError(
-          "Internal vertex id ", id, " is out of range [0,",
-          vertex_chunk_num_ * vertex_chunk_size_, ") of vertex.");
-    }
-    return Status::OK();
-  }
+  Status seek(IdType id);
 
   /**
    * @brief Return the current chunk file path of chunk position indicator.
    */
-  Result<std::string> GetChunk() noexcept {
-    GAR_ASSIGN_OR_RAISE(
-        auto chunk_file_path,
-        edge_info_.GetAdjListOffsetFilePath(chunk_index_, adj_list_type_));
-    return prefix_ + chunk_file_path;
-  }
+  Result<std::string> GetChunk() const;
+ 
 
   /**
    * Sets chunk position indicator to next chunk.
@@ -368,14 +221,7 @@ class AdjListOffsetChunkInfoReader {
    * if current chunk is the last chunk, will return Status::IndexError
    *   error.
    */
-  Status next_chunk() noexcept {
-    if (++chunk_index_ >= vertex_chunk_num_) {
-      return Status::IndexError("vertex chunk index ", chunk_index_,
-                                " is out-of-bounds for vertex, chunk_num ",
-                                vertex_chunk_num_);
-    }
-    return Status::OK();
-  }
+  Status next_chunk();
 
   /**
    * @brief Construct an AdjListOffsetChunkInfoReader from edge info.
@@ -385,16 +231,8 @@ class AdjListOffsetChunkInfoReader {
    * @param prefix The absolute prefix of the graph.
    */
   static Result<std::shared_ptr<AdjListOffsetChunkInfoReader>> Make(
-      const EdgeInfo& edge_info, AdjListType adj_list_type,
-      const std::string& prefix) {
-    if (!edge_info.ContainAdjList(adj_list_type)) {
-      return Status::KeyError(
-          "The adjacent list type ", AdjListTypeToString(adj_list_type),
-          " doesn't exist in edge ", edge_info.GetEdgeLabel(), ".");
-    }
-    return std::make_shared<AdjListOffsetChunkInfoReader>(
-        edge_info, adj_list_type, prefix);
-  }
+      const std::shared_ptr<EdgeInfo>& edge_info, AdjListType adj_list_type,
+      const std::string& prefix);
 
   /**
    * @brief Construct an AdjListOffsetChunkInfoReader from graph info.
@@ -406,17 +244,12 @@ class AdjListOffsetChunkInfoReader {
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListOffsetChunkInfoReader>> Make(
-      const GraphInfo& graph_info, const std::string& src_label,
-      const std::string& edge_label, const std::string& dst_label,
-      AdjListType adj_list_type) {
-    GAR_ASSIGN_OR_RAISE(
-        const auto& edge_info,
-        graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
-    return Make(edge_info, adj_list_type, graph_info.GetPrefix());
-  }
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      AdjListType adj_list_type);
 
  private:
-  EdgeInfo edge_info_;
+  std::shared_ptr<EdgeInfo> edge_info_;
   AdjListType adj_list_type_;
   std::string prefix_;
   IdType chunk_index_;
@@ -437,42 +270,24 @@ class AdjListPropertyChunkInfoReader {
    * @param adj_list_type The adj list type for the edges.
    * @param prefix The absolute prefix of the graph.
    */
-  explicit AdjListPropertyChunkInfoReader(const EdgeInfo& edge_info,
-                                          const PropertyGroup& property_group,
+  explicit AdjListPropertyChunkInfoReader(const std::shared_ptr<EdgeInfo>& edge_info,
+                                          const std::shared_ptr<PropertyGroup>& property_group,
                                           AdjListType adj_list_type,
-                                          const std::string prefix)
-      : edge_info_(edge_info),
-        property_group_(property_group),
-        adj_list_type_(adj_list_type),
-        prefix_(prefix),
-        vertex_chunk_index_(0),
-        chunk_index_(0) {
-    GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &base_dir_));
-    GAR_ASSIGN_OR_RAISE_ERROR(
-        auto pg_path_prefix,
-        edge_info.GetPropertyGroupPathPrefix(property_group, adj_list_type));
-    base_dir_ = prefix_ + pg_path_prefix;
-    GAR_ASSIGN_OR_RAISE_ERROR(
-        vertex_chunk_num_,
-        util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
-    GAR_ASSIGN_OR_RAISE_ERROR(
-        chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                          vertex_chunk_index_));
-  }
+                                          const std::string prefix);
 
   /**
    * @brief Sets chunk position indicator for reader by source vertex id.
    *
    * @param id the source vertex id.
    */
-  Status seek_src(IdType id) noexcept;
+  Status seek_src(IdType id);
 
   /**
    * @brief Sets chunk position indicator for reader by destination vertex id.
    *
    * @param id the destination vertex id.
    */
-  Status seek_dst(IdType id) noexcept;
+  Status seek_dst(IdType id);
 
   /**
    * @brief Sets chunk position indicator for reader by edge index.
@@ -481,25 +296,10 @@ class AdjListPropertyChunkInfoReader {
    *     Note: the offset is the edge index of the vertex chunk, not the edge
    * index of the whole graph.
    */
-  Status seek(IdType offset) noexcept {
-    chunk_index_ = offset / edge_info_.GetChunkSize();
-    if (chunk_index_ >= chunk_num_) {
-      return Status::IndexError("The edge offset ", offset,
-                                " is out of range [0,",
-                                edge_info_.GetChunkSize() * chunk_num_,
-                                "), edge label: ", edge_info_.GetEdgeLabel());
-    }
-    return Status::OK();
-  }
+  Status seek(IdType offset);
 
   /** Return the current chunk file path of chunk position indicator. */
-  Result<std::string> GetChunk() noexcept {
-    GAR_ASSIGN_OR_RAISE(
-        auto chunk_file_path,
-        edge_info_.GetPropertyFilePath(property_group_, adj_list_type_,
-                                       vertex_chunk_index_, chunk_index_));
-    return prefix_ + chunk_file_path;
-  }
+  Result<std::string> GetChunk() const;
 
   /**
    * Sets chunk position indicator to next chunk.
@@ -507,25 +307,7 @@ class AdjListPropertyChunkInfoReader {
    * if current chunk is the last chunk, will return Status::IndexError
    *  error.
    */
-  Status next_chunk() {
-    ++chunk_index_;
-    while (chunk_index_ >= chunk_num_) {
-      ++vertex_chunk_index_;
-      if (vertex_chunk_index_ >= vertex_chunk_num_) {
-        return Status::IndexError(
-            "vertex chunk index ", vertex_chunk_index_,
-            " is out-of-bounds for vertex chunk num ", vertex_chunk_num_,
-            " of edge ", edge_info_.GetEdgeLabel(), " of adj list type ",
-            AdjListTypeToString(adj_list_type_), ", property group ",
-            property_group_, ".");
-      }
-      chunk_index_ = 0;
-      GAR_ASSIGN_OR_RAISE_ERROR(
-          chunk_num_, util::GetEdgeChunkNum(prefix_, edge_info_, adj_list_type_,
-                                            vertex_chunk_index_));
-    }
-    return Status::OK();
-  }
+  Status next_chunk();
 
   /**
    * @brief Construct an AdjListPropertyChunkInfoReader from edge info.
@@ -536,21 +318,8 @@ class AdjListPropertyChunkInfoReader {
    * @param prefix The absolute prefix of the graph.
    */
   static Result<std::shared_ptr<AdjListPropertyChunkInfoReader>> Make(
-      const EdgeInfo& edge_info, const PropertyGroup& property_group,
-      AdjListType adj_list_type, const std::string& prefix) {
-    if (!edge_info.ContainAdjList(adj_list_type)) {
-      return Status::KeyError(
-          "The adjacent list type ", AdjListTypeToString(adj_list_type),
-          " doesn't exist in edge ", edge_info.GetEdgeLabel(), ".");
-    }
-    if (!edge_info.ContainPropertyGroup(property_group, adj_list_type)) {
-      return Status::KeyError("No property group ", property_group, " in edge ",
-                              edge_info.GetEdgeLabel(), " with adj list type ",
-                              AdjListTypeToString(adj_list_type), ".");
-    }
-    return std::make_shared<AdjListPropertyChunkInfoReader>(
-        edge_info, property_group, adj_list_type, prefix);
-  }
+      const std::shared_ptr<EdgeInfo>& edge_info, const std::shared_ptr<PropertyGroup>& property_group,
+      AdjListType adj_list_type, const std::string& prefix);
 
   /**
    * @brief Construct an AdjListPropertyChunkInfoReader from graph info.
@@ -563,19 +332,13 @@ class AdjListPropertyChunkInfoReader {
    * @param adj_list_type The adj list type for the edge.
    */
   static Result<std::shared_ptr<AdjListPropertyChunkInfoReader>> Make(
-      const GraphInfo& graph_info, const std::string& src_label,
-      const std::string& edge_label, const std::string& dst_label,
-      const PropertyGroup& property_group, AdjListType adj_list_type) {
-    GAR_ASSIGN_OR_RAISE(
-        const auto& edge_info,
-        graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
-    return Make(edge_info, property_group, adj_list_type,
-                graph_info.GetPrefix());
-  }
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      const std::shared_ptr<PropertyGroup>& property_group, AdjListType adj_list_type);
 
  private:
-  EdgeInfo edge_info_;
-  PropertyGroup property_group_;
+  std::shared_ptr<EdgeInfo> edge_info_;
+  std::shared_ptr<PropertyGroup> property_group_;
   AdjListType adj_list_type_;
   std::string prefix_;
   IdType vertex_chunk_index_, chunk_index_;

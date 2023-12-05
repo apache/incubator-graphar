@@ -36,8 +36,7 @@ class Array;
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-/** Type of vertex id or vertex index. */
-using IdType = int64_t;
+
 
 namespace util {
 
