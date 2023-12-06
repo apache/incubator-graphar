@@ -40,12 +40,12 @@ namespace util {
  * @return Status error if the property names in the FilterOptions do not match
  */
 Status CheckFilterOptions(const FilterOptions& filter_options,
-                          const PropertyGroup& property_group) noexcept {
+                          const std::shared_ptr<PropertyGroup>& property_group) noexcept {
   if (filter_options.filter) {
     GAR_ASSIGN_OR_RAISE(auto filter, filter_options.filter->Evaluate());
     for (const auto& field : arrow::compute::FieldsInExpression(filter)) {
       auto property_name = *field.name();
-      if (!property_group.HasProperty(property_name)) {
+      if (!property_group->HasProperty(property_name)) {
         return Status::Invalid(
             property_name, " in the filter does not match the property group: ",
             property_group);
@@ -54,7 +54,7 @@ Status CheckFilterOptions(const FilterOptions& filter_options,
   }
   if (filter_options.columns.has_value()) {
     for (const auto& col : filter_options.columns.value().get()) {
-      if (!property_group.HasProperty(col)) {
+      if (!property_group->HasProperty(col)) {
         return Status::Invalid(
             col, " in the columns does not match the property group: ",
             property_group);

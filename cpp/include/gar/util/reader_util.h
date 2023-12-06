@@ -26,14 +26,7 @@
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-class Expression;
-
 namespace util {
-
-using Filter = std::shared_ptr<Expression>;
-using ColumnNames =
-    std::optional<std::reference_wrapper<std::vector<std::string>>>;
-
 struct FilterOptions {
   // The row filter to apply to the table.
   Filter filter = nullptr;
@@ -46,7 +39,7 @@ struct FilterOptions {
 };
 
 Status CheckFilterOptions(const FilterOptions& filter_options,
-                          const PropertyGroup& property_group) noexcept;
+                          const std::shared_ptr<PropertyGroup>& property_group) noexcept;
 
 Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
     const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,

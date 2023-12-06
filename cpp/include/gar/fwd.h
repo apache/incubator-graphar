@@ -46,6 +46,7 @@ class InfoVersion;
 class Property;
 class PropertyGroup;
 class AdjacentList;
+class Expression;
 
 class VertexInfo;
 class EdgeInfo;
@@ -55,6 +56,13 @@ using PropertyGroupVector = std::vector<std::shared_ptr<PropertyGroup>>;
 using AdjacentListVector = std::vector<std::shared_ptr<AdjacentList>>;
 using VertexInfoVector = std::vector<std::shared_ptr<VertexInfo>>;
 using EdgeInfoVector = std::vector<std::shared_ptr<EdgeInfo>>;
+
+namespace util {
+struct FilterOptions;
+using Filter = std::shared_ptr<Expression>;
+using ColumnNames =
+    std::optional<std::reference_wrapper<std::vector<std::string>>>;
+}
 
 }  // namespace GAR_NAMESPACE_INTERNAL
 
