@@ -125,6 +125,12 @@ class PropertyGroup {
   std::string prefix_;
 };
 
+static bool operator==(const PropertyGroup& lhs, const PropertyGroup& rhs) {
+  return (lhs.GetPrefix() == rhs.GetPrefix()) &&
+         (lhs.GetFileType() == rhs.GetFileType()) &&
+         (lhs.GetProperties() == rhs.GetProperties());
+}
+
 class AdjacentList {
  public:
   explicit AdjacentList(AdjListType type, FileType file_type,
@@ -266,7 +272,8 @@ class VertexInfo {
    * @return True if the property group exists in the vertex info, False
    * otherwise.
    */
-  bool HasPropertyGroup(const PropertyGroup& property_group) const;
+  bool HasPropertyGroup(
+      const std::shared_ptr<PropertyGroup>& property_group) const;
 
   /**
    * Get the file path for the specified property group and chunk index.
@@ -442,6 +449,9 @@ class EdgeInfo {
    * @return True if the edge info contains the property, false otherwise.
    */
   bool HasProperty(const std::string& property_name) const;
+
+  bool HasPropertyGroup(
+      const std::shared_ptr<PropertyGroup>& property_group) const;
 
   std::shared_ptr<AdjacentList> GetAdjacentList(
       AdjListType adj_list_type) const;

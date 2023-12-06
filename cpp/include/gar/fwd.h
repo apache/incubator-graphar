@@ -17,6 +17,8 @@ limitations under the License.
 #define GAR_FWD_H_
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "gar/external/result.hpp"
 

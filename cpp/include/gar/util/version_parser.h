@@ -18,6 +18,7 @@
 #define GAR_UTIL_VERSION_PARSER_H_
 
 #include <map>
+#include <memory>
 #include <regex>  // NOLINT
 #include <string>
 #include <vector>

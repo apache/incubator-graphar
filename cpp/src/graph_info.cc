@@ -216,6 +216,19 @@ bool VertexInfo::HasProperty(const std::string& property_name) const {
          impl_->property_name_to_index_.end();
 }
 
+bool VertexInfo::HasPropertyGroup(
+    const std::shared_ptr<PropertyGroup>& property_group) const {
+  if (property_group == nullptr) {
+    return false;
+  }
+  for (const auto& pg : impl_->property_groups_) {
+    if (*pg == *property_group) {
+      return true;
+    }
+  }
+  return false;
+}
+
 Result<DataType> VertexInfo::GetPropertyType(
     const std::string& property_name) const {
   auto it = impl_->property_name_to_type_.find(property_name);
@@ -424,6 +437,19 @@ bool EdgeInfo::HasAdjacentListType(AdjListType adj_list_type) const {
 bool EdgeInfo::HasProperty(const std::string& property_name) const {
   return impl_->property_name_to_index_.find(property_name) !=
          impl_->property_name_to_index_.end();
+}
+
+bool EdgeInfo::HasPropertyGroup(
+    const std::shared_ptr<PropertyGroup>& property_group) const {
+  if (property_group == nullptr) {
+    return false;
+  }
+  for (const auto& pg : impl_->property_groups_) {
+    if (*pg == *property_group) {
+      return true;
+    }
+  }
+  return false;
 }
 
 std::shared_ptr<AdjacentList> EdgeInfo::GetAdjacentList(
