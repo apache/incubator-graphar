@@ -104,8 +104,8 @@ Result<std::shared_ptr<const InfoVersion>> InfoVersion::Parse(
     const std::string& version_str) noexcept {
   std::shared_ptr<InfoVersion> version;
   try {
-    version = std::make_shared<InfoVersion>(parserVersionImpl(version_str),
-                                            parseUserDefineTypesImpl(version_str));
+    version = std::make_shared<InfoVersion>(
+        parserVersionImpl(version_str), parseUserDefineTypesImpl(version_str));
   } catch (const std::exception& e) {
     return Status::Invalid("Invalid version string: ", version_str);
   }

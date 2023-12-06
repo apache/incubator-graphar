@@ -38,18 +38,21 @@ struct FilterOptions {
       : filter(filter), columns(columns) {}
 };
 
-Status CheckFilterOptions(const FilterOptions& filter_options,
-                          const std::shared_ptr<PropertyGroup>& property_group) noexcept;
+Status CheckFilterOptions(
+    const FilterOptions& filter_options,
+    const std::shared_ptr<PropertyGroup>& property_group) noexcept;
 
 Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
     const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
     AdjListType adj_list_type, IdType vid) noexcept;
 
-Result<IdType> GetVertexChunkNum(const std::string& prefix,
-                                 const std::shared_ptr<VertexInfo>& vertex_info) noexcept;
+Result<IdType> GetVertexChunkNum(
+    const std::string& prefix,
+    const std::shared_ptr<VertexInfo>& vertex_info) noexcept;
 
-Result<IdType> GetVertexNum(const std::string& prefix,
-                            const std::shared_ptr<VertexInfo>& vertex_info) noexcept;
+Result<IdType> GetVertexNum(
+    const std::string& prefix,
+    const std::shared_ptr<VertexInfo>& vertex_info) noexcept;
 
 Result<IdType> GetVertexChunkNum(const std::string& prefix,
                                  const std::shared_ptr<EdgeInfo>& edge_info,
@@ -64,7 +67,8 @@ Result<IdType> GetEdgeChunkNum(const std::string& prefix,
                                AdjListType adj_list_type,
                                IdType vertex_chunk_index) noexcept;
 
-Result<IdType> GetEdgeNum(const std::string& prefix, const std::shared_ptr<EdgeInfo>& edge_info,
+Result<IdType> GetEdgeNum(const std::string& prefix,
+                          const std::shared_ptr<EdgeInfo>& edge_info,
                           AdjListType adj_list_type,
                           IdType vertex_chunk_index) noexcept;
 

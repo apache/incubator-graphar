@@ -39,8 +39,9 @@ namespace util {
  * @param property_group property group
  * @return Status error if the property names in the FilterOptions do not match
  */
-Status CheckFilterOptions(const FilterOptions& filter_options,
-                          const std::shared_ptr<PropertyGroup>& property_group) noexcept {
+Status CheckFilterOptions(
+    const FilterOptions& filter_options,
+    const std::shared_ptr<PropertyGroup>& property_group) noexcept {
   if (filter_options.filter) {
     GAR_ASSIGN_OR_RAISE(auto filter, filter_options.filter->Evaluate());
     for (const auto& field : arrow::compute::FieldsInExpression(filter)) {
@@ -112,8 +113,9 @@ Result<std::pair<IdType, IdType>> GetAdjListOffsetOfVertex(
                         static_cast<IdType>(array->Value(1)));
 }
 
-Result<IdType> GetVertexChunkNum(const std::string& prefix,
-                                 const std::shared_ptr<VertexInfo>& vertex_info) noexcept {
+Result<IdType> GetVertexChunkNum(
+    const std::string& prefix,
+    const std::shared_ptr<VertexInfo>& vertex_info) noexcept {
   std::string out_prefix;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
   GAR_ASSIGN_OR_RAISE(auto vertex_num_file_suffix,
@@ -125,8 +127,9 @@ Result<IdType> GetVertexChunkNum(const std::string& prefix,
          vertex_info->GetChunkSize();
 }
 
-Result<IdType> GetVertexNum(const std::string& prefix,
-                            const std::shared_ptr<VertexInfo>& vertex_info) noexcept {
+Result<IdType> GetVertexNum(
+    const std::string& prefix,
+    const std::shared_ptr<VertexInfo>& vertex_info) noexcept {
   std::string out_prefix;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(prefix, &out_prefix));
   GAR_ASSIGN_OR_RAISE(auto vertex_num_file_suffix,
@@ -185,7 +188,8 @@ Result<IdType> GetEdgeChunkNum(const std::string& prefix,
   return (edge_num + edge_info->GetChunkSize() - 1) / edge_info->GetChunkSize();
 }
 
-Result<IdType> GetEdgeNum(const std::string& prefix, const std::shared_ptr<EdgeInfo>& edge_info,
+Result<IdType> GetEdgeNum(const std::string& prefix,
+                          const std::shared_ptr<EdgeInfo>& edge_info,
                           AdjListType adj_list_type,
                           IdType vertex_chunk_index) noexcept {
   std::string out_prefix;

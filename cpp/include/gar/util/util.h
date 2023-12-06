@@ -36,8 +36,6 @@ class Array;
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-
-
 namespace util {
 
 struct IndexConverter {

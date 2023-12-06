@@ -37,10 +37,10 @@ class VertexPropertyChunkInfoReader {
    * @param property_group The property group that describes the property group.
    * @param prefix The absolute prefix of the graph.
    */
-  explicit VertexPropertyChunkInfoReader(const std::shared_ptr<VertexInfo>& vertex_info,
-                                         const std::shared_ptr<PropertyGroup>& property_group,
-                                         const std::string& prefix);
- 
+  explicit VertexPropertyChunkInfoReader(
+      const std::shared_ptr<VertexInfo>& vertex_info,
+      const std::shared_ptr<PropertyGroup>& property_group,
+      const std::string& prefix);
 
   /**
    * @brief Sets chunk position indicator for reader by internal vertex id.
@@ -75,7 +75,9 @@ class VertexPropertyChunkInfoReader {
    * @param property_group The property group of the vertex property.
    * @param prefix The absolute prefix of the graph.
    */
-  static Result<std::shared_ptr<VertexPropertyChunkInfoReader>> Make(const std::shared_ptr<VertexInfo>& vertex_info, const std::shared_ptr<PropertyGroup>& property_group,
+  static Result<std::shared_ptr<VertexPropertyChunkInfoReader>> Make(
+      const std::shared_ptr<VertexInfo>& vertex_info,
+      const std::shared_ptr<PropertyGroup>& property_group,
       const std::string& prefix);
 
   /**
@@ -86,7 +88,8 @@ class VertexPropertyChunkInfoReader {
    * @param property_group The property group of the vertex property.
    */
   static Result<std::shared_ptr<VertexPropertyChunkInfoReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& vertex_type,
+      const std::shared_ptr<GraphInfo>& graph_info,
+      const std::string& vertex_type,
       const std::shared_ptr<PropertyGroup>& property_group);
 
  private:
@@ -197,9 +200,9 @@ class AdjListOffsetChunkInfoReader {
    *    or AdjListType::ordered_by_dest.
    * @param prefix The absolute prefix.
    */
-  explicit AdjListOffsetChunkInfoReader(const std::shared_ptr<EdgeInfo>& edge_info,
-                                        AdjListType adj_list_type,
-                                        const std::string& prefix);
+  explicit AdjListOffsetChunkInfoReader(
+      const std::shared_ptr<EdgeInfo>& edge_info, AdjListType adj_list_type,
+      const std::string& prefix);
 
   /**
    * @brief Sets chunk position indicator for reader by source internal vertex
@@ -213,7 +216,6 @@ class AdjListOffsetChunkInfoReader {
    * @brief Return the current chunk file path of chunk position indicator.
    */
   Result<std::string> GetChunk() const;
- 
 
   /**
    * Sets chunk position indicator to next chunk.
@@ -270,10 +272,10 @@ class AdjListPropertyChunkInfoReader {
    * @param adj_list_type The adj list type for the edges.
    * @param prefix The absolute prefix of the graph.
    */
-  explicit AdjListPropertyChunkInfoReader(const std::shared_ptr<EdgeInfo>& edge_info,
-                                          const std::shared_ptr<PropertyGroup>& property_group,
-                                          AdjListType adj_list_type,
-                                          const std::string prefix);
+  explicit AdjListPropertyChunkInfoReader(
+      const std::shared_ptr<EdgeInfo>& edge_info,
+      const std::shared_ptr<PropertyGroup>& property_group,
+      AdjListType adj_list_type, const std::string prefix);
 
   /**
    * @brief Sets chunk position indicator for reader by source vertex id.
@@ -318,7 +320,8 @@ class AdjListPropertyChunkInfoReader {
    * @param prefix The absolute prefix of the graph.
    */
   static Result<std::shared_ptr<AdjListPropertyChunkInfoReader>> Make(
-      const std::shared_ptr<EdgeInfo>& edge_info, const std::shared_ptr<PropertyGroup>& property_group,
+      const std::shared_ptr<EdgeInfo>& edge_info,
+      const std::shared_ptr<PropertyGroup>& property_group,
       AdjListType adj_list_type, const std::string& prefix);
 
   /**
@@ -334,7 +337,8 @@ class AdjListPropertyChunkInfoReader {
   static Result<std::shared_ptr<AdjListPropertyChunkInfoReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
       const std::string& edge_type, const std::string& dst_type,
-      const std::shared_ptr<PropertyGroup>& property_group, AdjListType adj_list_type);
+      const std::shared_ptr<PropertyGroup>& property_group,
+      AdjListType adj_list_type);
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;

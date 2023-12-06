@@ -30,7 +30,8 @@ namespace GAR_NAMESPACE_INTERNAL {
 class InfoVersion {
  public:
   /** Parse version string to InfoVersion. */
-  static Result<std::shared_ptr<const InfoVersion>> Parse(const std::string& str) noexcept;
+  static Result<std::shared_ptr<const InfoVersion>> Parse(
+      const std::string& str) noexcept;
 
   /** Default constructor */
   InfoVersion() : version_(version2types.rbegin()->first) {}

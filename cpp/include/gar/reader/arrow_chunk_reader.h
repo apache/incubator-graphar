@@ -45,11 +45,11 @@ class VertexPropertyArrowChunkReader {
    * @param property_group The property group that describes the property group.
    * @param prefix The absolute prefix.
    */
-  VertexPropertyArrowChunkReader(const std::shared_ptr<VertexInfo>& vertex_info,
-                                 const std::shared_ptr<PropertyGroup>& property_group,
-                                 const std::string& prefix,
-                                 IdType chunk_index = 0,
-                                 const util::FilterOptions& options = {});
+  VertexPropertyArrowChunkReader(
+      const std::shared_ptr<VertexInfo>& vertex_info,
+      const std::shared_ptr<PropertyGroup>& property_group,
+      const std::string& prefix, IdType chunk_index = 0,
+      const util::FilterOptions& options = {});
 
   /**
    * @brief Sets chunk position indicator for reader by internal vertex id.
@@ -103,7 +103,8 @@ class VertexPropertyArrowChunkReader {
    * @param options The filter options, default is empty.
    */
   static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
-      const std::shared_ptr<VertexInfo>& vertex_info, const std::shared_ptr<PropertyGroup>& property_group,
+      const std::shared_ptr<VertexInfo>& vertex_info,
+      const std::shared_ptr<PropertyGroup>& property_group,
       const std::string& prefix, const util::FilterOptions& options = {});
 
   /**
@@ -115,7 +116,8 @@ class VertexPropertyArrowChunkReader {
    * @param options The filter options, default is empty.
    */
   static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& vertex_type,
+      const std::shared_ptr<GraphInfo>& graph_info,
+      const std::string& vertex_type,
       const std::shared_ptr<PropertyGroup>& property_group,
       const util::FilterOptions& options = {});
 
@@ -146,8 +148,8 @@ class AdjListArrowChunkReader {
    * @param prefix The absolute prefix.
    * @param vertex_chunk_index The vertex chunk index, default is 0.
    */
-  AdjListArrowChunkReader(const std::shared_ptr<EdgeInfo>& edge_info, AdjListType adj_list_type,
-                          const std::string& prefix,
+  AdjListArrowChunkReader(const std::shared_ptr<EdgeInfo>& edge_info,
+                          AdjListType adj_list_type, const std::string& prefix,
                           IdType vertex_chunk_index = 0);
 
   /**
@@ -196,7 +198,7 @@ class AdjListArrowChunkReader {
    *         current vertex chunk, or IndexError error if the reader is at the
    *         end of all vertex chunks.
    */
-  Status next_chunk(); 
+  Status next_chunk();
 
   /**
    * @brief Sets chunk position to the specific vertex chunk and edge chunk.
@@ -216,7 +218,7 @@ class AdjListArrowChunkReader {
    */
   static Result<std::shared_ptr<AdjListArrowChunkReader>> Make(
       const std::shared_ptr<EdgeInfo>& edge_info, AdjListType adj_list_type,
-      const std::string& prefix); 
+      const std::string& prefix);
 
   /**
    * @brief Construct an AdjListArrowChunkReader from graph info.
@@ -230,7 +232,7 @@ class AdjListArrowChunkReader {
   static Result<std::shared_ptr<AdjListArrowChunkReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
       const std::string& edge_type, const std::string& dst_type,
-      AdjListType adj_list_type); 
+      AdjListType adj_list_type);
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;
@@ -344,12 +346,11 @@ class AdjListPropertyArrowChunkReader {
    * @param prefix The absolute prefix.
    * @param vertex_chunk_index The vertex chunk index, default is 0.
    */
-  AdjListPropertyArrowChunkReader(const std::shared_ptr<EdgeInfo>& edge_info,
-                                  const std::shared_ptr<PropertyGroup>& property_group,
-                                  AdjListType adj_list_type,
-                                  const std::string prefix,
-                                  IdType vertex_chunk_index = 0,
-                                  const util::FilterOptions& options = {});
+  AdjListPropertyArrowChunkReader(
+      const std::shared_ptr<EdgeInfo>& edge_info,
+      const std::shared_ptr<PropertyGroup>& property_group,
+      AdjListType adj_list_type, const std::string prefix,
+      IdType vertex_chunk_index = 0, const util::FilterOptions& options = {});
 
   /**
    * @brief Copy constructor.
@@ -429,7 +430,8 @@ class AdjListPropertyArrowChunkReader {
    * @param options The filter options, default is empty.
    */
   static Result<std::shared_ptr<AdjListPropertyArrowChunkReader>> Make(
-      const std::shared_ptr<EdgeInfo>& edge_info, const std::shared_ptr<PropertyGroup>& property_group,
+      const std::shared_ptr<EdgeInfo>& edge_info,
+      const std::shared_ptr<PropertyGroup>& property_group,
       AdjListType adj_list_type, const std::string& prefix,
       const util::FilterOptions& options = {});
 
@@ -448,8 +450,8 @@ class AdjListPropertyArrowChunkReader {
   static Result<std::shared_ptr<AdjListPropertyArrowChunkReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
       const std::string& edge_type, const std::string& dst_type,
-      const std::shared_ptr<PropertyGroup>& property_group, AdjListType adj_list_type,
-      const util::FilterOptions& options = {});
+      const std::shared_ptr<PropertyGroup>& property_group,
+      AdjListType adj_list_type, const util::FilterOptions& options = {});
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;

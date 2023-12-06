@@ -28,7 +28,7 @@ namespace GAR_NAMESPACE_INTERNAL {
 class Status;
 
 template <typename T>
-using Result = cpp::result<T, Status>; 
+using Result = cpp::result<T, Status>;
 
 class Yaml;
 class FileSystem;
@@ -62,9 +62,8 @@ struct FilterOptions;
 using Filter = std::shared_ptr<Expression>;
 using ColumnNames =
     std::optional<std::reference_wrapper<std::vector<std::string>>>;
-}
+}  // namespace util
 
 }  // namespace GAR_NAMESPACE_INTERNAL
 
-
-#endif // GAR_FWD_H_
+#endif  // GAR_FWD_H_

@@ -23,9 +23,9 @@
 #include "arrow/ipc/writer.h"
 #include "parquet/arrow/writer.h"
 
+#include "gar/fwd.h"
 #include "gar/util/expression.h"
 #include "gar/util/filesystem.h"
-#include "gar/fwd.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 namespace ds = arrow::dataset;
