@@ -62,7 +62,7 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
       // check if the property type is correct
       auto type = vertex_info_->GetPropertyType(property.first).value();
       bool invalid_type = false;
-      switch (type.id()) {
+      switch (type->id()) {
       case Type::BOOL:
         if (property.second.type() !=
             typeid(typename ConvertToArrowType<Type::BOOL>::CType)) {
@@ -105,7 +105,7 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
       if (invalid_type) {
         return Status::TypeError(
             "Invalid data type for property ", property.first + ", defined as ",
-            type.ToTypeName(), ", but got ", property.second.type().name());
+            type->ToTypeName(), ", but got ", property.second.type().name());
       }
     }
   }
@@ -113,9 +113,9 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
 }
 
 Status VerticesBuilder::appendToArray(
-    const DataType& type, const std::string& property_name,
+    const std::shared_ptr<DataType>& type, const std::string& property_name,
     std::shared_ptr<arrow::Array>& array) {  // NOLINT
-  switch (type.id()) {
+  switch (type->id()) {
   case Type::BOOL:
     return tryToAppend<Type::BOOL>(property_name, array);
   case Type::INT32:

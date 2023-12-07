@@ -89,22 +89,12 @@ class DataType {
   bool operator!=(const DataType& other) const { return !Equals(other); }
 
   static std::shared_ptr<arrow::DataType> DataTypeToArrowDataType(
-      DataType type_id);
+      const std::shared_ptr<DataType>& type);
 
-  static DataType ArrowDataTypeToDataType(
-      std::shared_ptr<arrow::DataType> type);
+  static const std::shared_ptr<DataType>& ArrowDataTypeToDataType(
+      const std::shared_ptr<arrow::DataType>& type);
 
-  static DataType TypeNameToDataType(const std::string& str) {
-    static const std::map<std::string, Type> str2type{
-        {"bool", Type::BOOL},     {"int32", Type::INT32},
-        {"int64", Type::INT64},   {"float", Type::FLOAT},
-        {"double", Type::DOUBLE}, {"string", Type::STRING}};
-
-    if (str2type.find(str) == str2type.end()) {
-      return DataType(Type::USER_DEFINED, str);
-    }
-    return DataType(str2type.at(str.c_str()));
-  }
+  static const std::shared_ptr<DataType>& TypeNameToDataType(const std::string& str);
 
   /** Return the type category of the DataType. */
   Type id() const { return id_; }

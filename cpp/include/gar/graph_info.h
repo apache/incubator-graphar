@@ -22,7 +22,6 @@
 #include <vector>
 
 #include "gar/fwd.h"
-#include "gar/util/data_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -32,17 +31,15 @@ namespace GAR_NAMESPACE_INTERNAL {
 class Property {
  public:
   std::string name;  // property name
-  DataType type;     // property data type
+  std::shared_ptr<DataType> type;     // property data type
   bool is_primary;   // primary key tag
 
-  Property() {}
-  explicit Property(const std::string& name) : name(name) {}
-  Property(const std::string& name, const DataType& type, bool is_primary)
+  explicit Property(const std::string& name, const std::shared_ptr<DataType>& type = nullptr, bool is_primary = false)
       : name(name), type(type), is_primary(is_primary) {}
 };
 
 static bool operator==(const Property& lhs, const Property& rhs) {
-  return (lhs.name == rhs.name) && (lhs.type.Equals(rhs.type)) &&
+  return (lhs.name == rhs.name) && (lhs.type == rhs.type) &&
          (lhs.is_primary == rhs.is_primary);
 }
 
@@ -115,6 +112,7 @@ static bool operator==(const PropertyGroup& lhs, const PropertyGroup& rhs) {
          (lhs.GetFileType() == rhs.GetFileType()) &&
          (lhs.GetProperties() == rhs.GetProperties());
 }
+
 
 /**
  * AdjacentList is a class to store the adjacency list information.
@@ -237,7 +235,7 @@ class VertexInfo {
    * @return A Result object containing the data type of the property, or a
    * KeyError Status object if the property is not found.
    */
-  Result<DataType> GetPropertyType(const std::string& property_name) const;
+  Result<std::shared_ptr<DataType>> GetPropertyType(const std::string& property_name) const;
 
   /**
    * Get whether the vertex info contains the specified property.
@@ -329,6 +327,7 @@ class VertexInfo {
   class Impl;
   std::unique_ptr<Impl> impl_;
 };
+
 
 /**
  * \class EdgeInfo
@@ -582,7 +581,7 @@ class EdgeInfo {
    * @return A Result object containing the data type of the property, or a
   KeyError Status object if the property is not found.
    */
-  Result<DataType> GetPropertyType(const std::string& property_name) const;
+  Result<std::shared_ptr<DataType>> GetPropertyType(const std::string& property_name) const;
   /**
    * Returns whether the specified property is a primary key.
    *

@@ -21,6 +21,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "gar/graph_info.h"
@@ -312,7 +313,7 @@ class VerticesBuilder {
    * @param array The constructed array.
    * @return Status: ok or Status::TypeError error.
    */
-  Status appendToArray(const DataType& type, const std::string& property_name,
+  Status appendToArray(const std::shared_ptr<DataType>& type, const std::string& property_name,
                        std::shared_ptr<arrow::Array>& array);  // NOLINT
 
   /**

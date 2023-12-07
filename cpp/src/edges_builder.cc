@@ -115,7 +115,7 @@ Status EdgesBuilder::validate(const Edge& e,
       // check if the property type is correct
       auto type = edge_info_->GetPropertyType(property.first).value();
       bool invalid_type = false;
-      switch (type.id()) {
+      switch (type->id()) {
       case Type::BOOL:
         if (property.second.type() !=
             typeid(typename ConvertToArrowType<Type::BOOL>::CType)) {
@@ -158,7 +158,7 @@ Status EdgesBuilder::validate(const Edge& e,
       if (invalid_type) {
         return Status::TypeError(
             "Invalid data type for property ", property.first + ", defined as ",
-            type.ToTypeName(), ", but got ", property.second.type().name());
+            type->ToTypeName(), ", but got ", property.second.type().name());
       }
     }
   }
@@ -166,10 +166,10 @@ Status EdgesBuilder::validate(const Edge& e,
 }
 
 Status EdgesBuilder::appendToArray(
-    const DataType& type, const std::string& property_name,
+    const std::shared_ptr<DataType>& type, const std::string& property_name,
     std::shared_ptr<arrow::Array>& array,  // NOLINT
     const std::vector<Edge>& edges) {
-  switch (type.id()) {
+  switch (type->id()) {
   case Type::BOOL:
     return tryToAppend<Type::BOOL>(property_name, array, edges);
   case Type::INT32:
@@ -231,13 +231,13 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::convertToTable(
   std::shared_ptr<arrow::Array> array;
   schema_vector.push_back(
       arrow::field(GeneralParams::kSrcIndexCol,
-                   DataType::DataTypeToArrowDataType(DataType(Type::INT64))));
+                   DataType::DataTypeToArrowDataType(int64())));
   GAR_RETURN_NOT_OK(tryToAppend(1, array, edges));
   arrays.push_back(array);
   // add dst
   schema_vector.push_back(
       arrow::field(GeneralParams::kDstIndexCol,
-                   DataType::DataTypeToArrowDataType(DataType(Type::INT64))));
+                   DataType::DataTypeToArrowDataType(int64())));
   GAR_RETURN_NOT_OK(tryToAppend(0, array, edges));
   arrays.push_back(array);
   // add properties
@@ -268,7 +268,7 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::getOffsetTable(
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
   schema_vector.push_back(
       arrow::field(GeneralParams::kOffsetCol,
-                   DataType::DataTypeToArrowDataType(DataType(Type::INT64))));
+                   DataType::DataTypeToArrowDataType(int64())));
 
   size_t index = 0;
   for (IdType i = begin_index; i < end_index; i++) {

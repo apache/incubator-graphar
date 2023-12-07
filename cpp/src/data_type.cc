@@ -19,13 +19,14 @@
 #include "arrow/api.h"
 #include "arrow/type.h"
 
+#include "gar/fwd.h"
 #include "gar/util/data_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
 std::shared_ptr<arrow::DataType> DataType::DataTypeToArrowDataType(
-    DataType type) {
-  switch (type.id()) {
+    const std::shared_ptr<DataType>& type) {
+  switch (type->id()) {
   case Type::BOOL:
     return arrow::boolean();
   case Type::INT32:
@@ -43,23 +44,23 @@ std::shared_ptr<arrow::DataType> DataType::DataTypeToArrowDataType(
   }
 }
 
-DataType DataType::ArrowDataTypeToDataType(
-    std::shared_ptr<arrow::DataType> type) {
+const std::shared_ptr<DataType>& DataType::ArrowDataTypeToDataType(
+    const std::shared_ptr<arrow::DataType>& type) {
   switch (type->id()) {
   case arrow::Type::BOOL:
-    return DataType(Type::BOOL);
+    return boolean();
   case arrow::Type::INT32:
-    return DataType(Type::INT32);
+    return int32();
   case arrow::Type::INT64:
-    return DataType(Type::INT64);
+    return int64();
   case arrow::Type::FLOAT:
-    return DataType(Type::FLOAT);
+    return float32();
   case arrow::Type::DOUBLE:
-    return DataType(Type::DOUBLE);
+    return float64();
   case arrow::Type::STRING:
-    return DataType(Type::STRING);
+    return string();
   case arrow::Type::LARGE_STRING:
-    return DataType(Type::STRING);
+    return string();
   default:
     throw std::runtime_error("Unsupported data type");
   }
@@ -88,5 +89,36 @@ std::string DataType::ToTypeName() const {
     return "unknown";
   }
 }
+
+const std::shared_ptr<DataType>& DataType::TypeNameToDataType(const std::string& str) {
+  if (str == "bool") {
+    return boolean();
+  } else if (str == "int32") {
+    return int32();
+  } else if (str == "int64") {
+    return int64();
+  } else if (str == "float") {
+    return float32();
+  } else if (str == "double") {
+    return float64();
+  } else if (str == "string") {
+    return string();
+  } else {
+    throw std::runtime_error("Unsupported data type " + str);
+  }
+}
+
+#define TYPE_FACTORY(NAME, TYPE)                                        \
+  const std::shared_ptr<DataType>& NAME() {                              \
+    static std::shared_ptr<DataType> result = std::make_shared<DataType>(TYPE); \
+    return result;                                                       \
+  }
+
+TYPE_FACTORY(boolean, Type::BOOL)
+TYPE_FACTORY(int32, Type::INT32)
+TYPE_FACTORY(int64, Type::INT64)
+TYPE_FACTORY(float32, Type::FLOAT)
+TYPE_FACTORY(float64, Type::DOUBLE)
+TYPE_FACTORY(string, Type::STRING)
 
 }  // namespace GAR_NAMESPACE_INTERNAL

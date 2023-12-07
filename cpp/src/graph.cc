@@ -38,9 +38,9 @@ Status CastToAny<Type::STRING>(std::shared_ptr<arrow::Array> array,
   return Status::OK();
 }
 
-Status TryToCastToAny(const DataType& type, std::shared_ptr<arrow::Array> array,
+Status TryToCastToAny(const std::shared_ptr<DataType>& type, std::shared_ptr<arrow::Array> array,
                       std::any& any) {  // NOLINT
-  switch (type.id()) {
+  switch (type->id()) {
   case Type::BOOL:
     return CastToAny<Type::BOOL>(array, any);
   case Type::INT32:
