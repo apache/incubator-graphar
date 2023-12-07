@@ -24,7 +24,7 @@ limitations under the License.
 
 #include "gar/util/result.h"
 
-#define REGULAR_SEPERATOR "_"
+#define REGULAR_SEPARATOR "_"
 
 // forward declarations
 namespace arrow {
