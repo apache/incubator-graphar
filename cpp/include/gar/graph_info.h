@@ -95,7 +95,7 @@ class PropertyGroup {
         names.push_back(property.name);
         property_names_.insert(property.name);
       }
-      prefix_ = util::ConcatStringWithDelimiter(names, REGULAR_SEPERATOR) + "/";
+      prefix_ = util::ConcatStringWithDelimiter(names, REGULAR_SEPARATOR) + "/";
     }
   }
 
@@ -526,8 +526,8 @@ class EdgeInfo {
         version_(version),
         prefix_(prefix) {
     if (prefix_.empty()) {
-      prefix_ = src_label_ + REGULAR_SEPERATOR + edge_label_ +
-                REGULAR_SEPERATOR + dst_label_ + "/";  // default prefix
+      prefix_ = src_label_ + REGULAR_SEPARATOR + edge_label_ +
+                REGULAR_SEPARATOR + dst_label_ + "/";  // default prefix
     }
   }
 
@@ -1125,8 +1125,8 @@ class GraphInfo {
    * contained.
    */
   Status AddEdge(const EdgeInfo& edge_info) noexcept {
-    std::string key = edge_info.GetSrcLabel() + REGULAR_SEPERATOR +
-                      edge_info.GetEdgeLabel() + REGULAR_SEPERATOR +
+    std::string key = edge_info.GetSrcLabel() + REGULAR_SEPARATOR +
+                      edge_info.GetEdgeLabel() + REGULAR_SEPARATOR +
                       edge_info.GetDstLabel();
     if (edge2info_.find(key) != edge2info_.end()) {
       return Status::Invalid("The edge info of ", key, " is already existed.");
@@ -1200,8 +1200,8 @@ class GraphInfo {
                                              const std::string& edge_label,
                                              const std::string& dst_label) const
       noexcept {
-    std::string key = src_label + REGULAR_SEPERATOR + edge_label +
-                      REGULAR_SEPERATOR + dst_label;
+    std::string key = src_label + REGULAR_SEPARATOR + edge_label +
+                      REGULAR_SEPARATOR + dst_label;
     if (edge2info_.find(key) == edge2info_.end()) {
       return Status::KeyError("The edge info of ", key,
                               " is not found in graph info.");
@@ -1237,8 +1237,8 @@ class GraphInfo {
       const std::string& src_label, const std::string& edge_label,
       const std::string& dst_label, const std::string& property,
       AdjListType adj_list_type) const noexcept {
-    std::string key = src_label + REGULAR_SEPERATOR + edge_label +
-                      REGULAR_SEPERATOR + dst_label;
+    std::string key = src_label + REGULAR_SEPARATOR + edge_label +
+                      REGULAR_SEPARATOR + dst_label;
     if (edge2info_.find(key) == edge2info_.end()) {
       return Status::KeyError("The edge info of ", key,
                               " is not found in graph info.");
