@@ -614,9 +614,9 @@ class EdgeChunkWriter {
    * no_validate.
    */
   static Result<std::shared_ptr<EdgeChunkWriter>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
-      const std::string& edge_label, const std::string& dst_label,
-      AdjListType adj_list_type,
+      const std::shared_ptr<GraphInfo>& graph_info,
+      const std::string& src_label, const std::string& edge_label,
+      const std::string& dst_label, AdjListType adj_list_type,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
  private:

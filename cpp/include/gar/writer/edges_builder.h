@@ -305,12 +305,12 @@ class EdgesBuilder {
    * no_validate.
    */
   static Result<std::shared_ptr<EdgesBuilder>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
-      const std::string& edge_label, const std::string& dst_label,
-      const AdjListType& adj_list_type, IdType num_vertices,
+      const std::shared_ptr<GraphInfo>& graph_info,
+      const std::string& src_label, const std::string& edge_label,
+      const std::string& dst_label, const AdjListType& adj_list_type,
+      IdType num_vertices,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
-    auto edge_info =
-        graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+    auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
     if (!edge_info) {
       return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
                               dst_label, " doesn't exist.");

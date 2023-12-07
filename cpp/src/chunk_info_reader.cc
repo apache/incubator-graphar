@@ -81,8 +81,7 @@ VertexPropertyChunkInfoReader::Make(
 
 Result<std::shared_ptr<VertexPropertyChunkInfoReader>>
 VertexPropertyChunkInfoReader::Make(
-    const std::shared_ptr<GraphInfo>& graph_info,
-    const std::string& label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
     const std::shared_ptr<PropertyGroup>& property_group) {
   auto vertex_info = graph_info->GetVertexInfo(label);
   if (!vertex_info) {
@@ -427,12 +426,12 @@ Status AdjListPropertyChunkInfoReader::next_chunk() {
   while (chunk_index_ >= chunk_num_) {
     ++vertex_chunk_index_;
     if (vertex_chunk_index_ >= vertex_chunk_num_) {
-      return Status::IndexError("vertex chunk index ", vertex_chunk_index_,
-                                " is out-of-bounds for vertex chunk num ",
-                                vertex_chunk_num_, " of edge ",
-                                edge_info_->GetEdgeLabel(), " of adj list type ",
-                                AdjListTypeToString(adj_list_type_),
-                                ", property group ", property_group_, ".");
+      return Status::IndexError(
+          "vertex chunk index ", vertex_chunk_index_,
+          " is out-of-bounds for vertex chunk num ", vertex_chunk_num_,
+          " of edge ", edge_info_->GetEdgeLabel(), " of adj list type ",
+          AdjListTypeToString(adj_list_type_), ", property group ",
+          property_group_, ".");
     }
     chunk_index_ = 0;
     GAR_ASSIGN_OR_RAISE_ERROR(

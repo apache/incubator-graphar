@@ -293,8 +293,8 @@ Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
 }
 
 Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
-    const std::shared_ptr<GraphInfo>& graph_info,
-    const std::string& label, const ValidateLevel& validate_level) {
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+    const ValidateLevel& validate_level) {
   auto vertex_info = graph_info->GetVertexInfo(label);
   if (!vertex_info) {
     return Status::KeyError("The vertex ", label, " doesn't exist.");

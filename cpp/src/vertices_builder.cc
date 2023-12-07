@@ -15,8 +15,8 @@
  */
 
 #include "gar/writer/vertices_builder.h"
-#include "gar/util/convert_to_arrow_type.h"
 #include "gar/graph_info.h"
+#include "gar/util/convert_to_arrow_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {

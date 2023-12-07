@@ -288,8 +288,7 @@ class VerticesCollection {
    * @param label The vertex label.
    */
   static Result<std::shared_ptr<VerticesCollection>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& label) {
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& label) {
     auto vertex_info = graph_info->GetVertexInfo(label);
     if (!vertex_info) {
       return Status::KeyError("The vertex ", label, " doesn't exist.");

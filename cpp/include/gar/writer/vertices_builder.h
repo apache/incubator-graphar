@@ -279,8 +279,8 @@ class VerticesBuilder {
    * no_validate.
    */
   static Result<std::shared_ptr<VerticesBuilder>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& label, IdType start_vertex_index = 0,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+      IdType start_vertex_index = 0,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
     const auto vertex_info = graph_info->GetVertexInfo(label);
     if (!vertex_info) {

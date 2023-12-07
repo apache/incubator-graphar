@@ -88,6 +88,11 @@ class PropertyGroup {
    */
   inline const std::string& GetPrefix() const { return prefix_; }
 
+  /**
+   * Check if the property group is validated.
+   */
+  bool IsValidated() const;
+
   friend std::ostream& operator<<(std::ostream& stream,
                                   const PropertyGroup& pg) {
     for (size_t i = 0; i < pg.properties_.size(); ++i) {
@@ -113,11 +118,12 @@ static bool operator==(const PropertyGroup& lhs, const PropertyGroup& rhs) {
 
 /**
  * AdjacentList is a class to store the adjacency list information.
-*/
+ */
 class AdjacentList {
  public:
   /*
-   * Initialize the AdjacentList with the given type, file type, and optional prefix
+   * Initialize the AdjacentList with the given type, file type, and optional
+   * prefix
    */
   explicit AdjacentList(AdjListType type, FileType file_type,
                         const std::string& prefix = "");
@@ -128,22 +134,24 @@ class AdjacentList {
 
   inline const std::string& GetPrefix() const { return prefix_; }
 
+  bool IsValidated() const;
+
  private:
   AdjListType type_;
   FileType file_type_;
   std::string prefix_;
 };
 
-
 /**
  * \class VertexInfo
- * \brief VertexInfo is a class to describe the vertex information, including the vertex label,
- *       chunk size, property groups, and prefix.
-*/
+ * \brief VertexInfo is a class to describe the vertex information, including
+ * the vertex label, chunk size, property groups, and prefix.
+ */
 class VertexInfo {
  public:
   /**
-   * Construct an VertexInfo object with the given information and property group.
+   * Construct a VertexInfo object with the given information and property
+   * group.
    *
    * @param type The type of the vertex.
    * @param chunk_size The number of vertices in each vertex chunk.
@@ -216,10 +224,10 @@ class VertexInfo {
 
   /**
    * Get the property group at the specified index.
-   * 
-   * @param index The index of the property group. 
+   *
+   * @param index The index of the property group.
    * @return property group may be nullptr if the index is out of range.
-  */
+   */
   std::shared_ptr<PropertyGroup> GetPropertyGroupByIndex(int index) const;
 
   /**
@@ -259,7 +267,7 @@ class VertexInfo {
    * Returns whether the specified property is a primary key.
    *
    * @param property_name The name of the property.
-   * @return True if the property is a primary key, False otherwise. 
+   * @return True if the property is a primary key, False otherwise.
    */
   bool IsPrimaryKey(const std::string& property_name) const;
 
@@ -323,23 +331,29 @@ class VertexInfo {
 };
 
 /**
- * EdgeInfo is a class that stores metadata information about an edge.
+ * \class EdgeInfo
+ * \brief EdgeInfo is a class to describe the edge information, including the
+ * source vertex label, edge label, destination vertex label, chunk size,
+ * adjacent list property groups, and prefix.
  */
 class EdgeInfo {
  public:
   /**
-   * @brief Construct an EdgeInfo object with the given metadata information.
+   * @brief Construct an EdgeInfo object with the given information and property
+   * groups.
    *
-   * @param src_label The type of the source vertex.
-   * @param edge_label The type of the edge.
-   * @param dst_label The type of the destination vertex.
+   * @param src_label The label of the source vertex.
+   * @param edge_label The label of the edge.
+   * @param dst_label The label of the destination vertex.
    * @param chunk_size The number of edges in each edge chunk.
    * @param src_chunk_size The number of source vertices in each vertex chunk.
    * @param dst_chunk_size The number of destination vertices in each vertex
    * chunk.
    * @param directed Whether the edge is directed.
-   * @param version The version of the edge info.
+   * @param adjacent_lists The adjacency list vector of the edge.
+   * @param property_groups The property group vector of the edge.
    * @param prefix The path prefix of the edge info.
+   * @param version The version of the edge info.
    */
   explicit EdgeInfo(const std::string& src_label, const std::string& edge_label,
                     const std::string& dst_label, IdType chunk_size,
@@ -350,29 +364,19 @@ class EdgeInfo {
                     std::shared_ptr<const InfoVersion> version = nullptr);
 
   /**
-   * Add an adjacency list information to the edge info.
-   * The adjacency list information indicating the adjacency list stored with
-   * CSR, CSC, or COO format.
+   * Add an adjacency list information to the edge info and returns a new
+   * EdgeInfo. The adjacency list information indicating the adjacency list
+   * stored with CSR, CSC, or COO format.
    *
-   * @param adj_list_type The type of the adjacency list to add.
-   * @param file_type The file type of the adjacency list topology and offset
-   * chunk file.
-   * @param prefix The prefix of the adjacency list topology chunk (optional,
-   * default is empty).
-   * @return A Status object indicating success or an error if the adjacency
-   * list type has already been added.
+   * @param adj_list The adjacency list to add.
    */
-  Result<std::shared_ptr<EdgeInfo>> AddAdjList(
+  Result<std::shared_ptr<EdgeInfo>> AddAdjacentList(
       std::shared_ptr<AdjacentList> adj_list) const;
 
   /**
-   * Add a property group to edge info for the given adjacency list type.
+   * Add a property group to edge info and returns a new EdgeInfo.
    *
    * @param property_group Property group to add.
-   * @param adj_list_type Adjacency list type to add property group to.
-   * @return A Status object indicating success or an error if adj_list_type is
-   * not supported by edge info or if the property group is already added to the
-   * adjacency list type.
    */
   Result<std::shared_ptr<EdgeInfo>> AddPropertyGroup(
       std::shared_ptr<PropertyGroup> property_group) const;
@@ -448,36 +452,45 @@ class EdgeInfo {
    */
   bool HasProperty(const std::string& property_name) const;
 
+  /**
+   * @brief Returns whether the edge info contains the given property group
+   */
   bool HasPropertyGroup(
       const std::shared_ptr<PropertyGroup>& property_group) const;
 
   std::shared_ptr<AdjacentList> GetAdjacentList(
       AdjListType adj_list_type) const;
+
   /**
-   * @brief Get the property groups for the given adjacency list type.
+   * @brief Get the number of property groups.
+   */
+  int PropertyGroupNum() const;
+
+  /**
+   * @brief Get the property groups.
    *
-   * @param adj_list_type Adjacency list type.
-   * @return A Result object containing reference to the property groups for the
-   * given adjacency list type, or a Status object indicating an KeyError if the
-   * adjacency list type is not found in the edge info.
    */
   const PropertyGroupVector& GetPropertyGroups() const;
 
   /**
-   * @brief Get the property group containing the given property and for the
-   * specified adjacency list type.
+   * @brief Get the property group containing the given property.
    *
    * @param property Property name.
-   * @param adj_list_type Adjacency list type.
-   * @return A Result object containing reference to the property group, or a
-   * Status object indicating an KeyError if the adjacency list type is not
-   * found in the edge info.
+   * @return Property group may be nullptr if the property is not found.
    */
   std::shared_ptr<PropertyGroup> GetPropertyGroup(
       const std::string& property) const;
 
   /**
-   * Get the file path for the number of vertices.
+   * @brief Get the property group at the specified index.
+   *
+   * @param index The index of the property group.
+   * @return Property group may be nullptr if the index is out of range.
+   */
+  std::shared_ptr<PropertyGroup> GetPropertyGroupByIndex(int index) const;
+
+  /**
+   * @brief Get the file path for the number of vertices.
    *
    * @param adj_list_type The adjacency list type.
    * @return A Result object containing the file path for the number of edges,
@@ -508,8 +521,8 @@ class EdgeInfo {
                                          AdjListType adj_list_type) const;
 
   /**
-   * Get the path prefix of the adjacency list topology chunk for the given
-   * adjacency list type.
+   * @brief Get the path prefix of the adjacency list topology chunk for the
+   * given adjacency list type.
    * @param adj_list_type The adjacency list type.
    * @return A Result object containing the directory, or a Status object
    * indicating an error.
@@ -618,9 +631,11 @@ class GraphInfo {
   /**
    * @brief Constructs a GraphInfo instance.
    * @param graph_name The name of the graph.
-   * @param version The version of the graph info.
+   * @param vertex_infos The vertex info vector of the graph.
+   * @param edge_infos The edge info vector of the graph.
    * @param prefix The absolute path prefix to store chunk files of the graph.
    *               Defaults to "./".
+   * @param version The version of the graph info.
    */
   explicit GraphInfo(const std::string& graph_name,
                      VertexInfoVector vertex_infos, EdgeInfoVector edge_infos,
@@ -646,7 +661,8 @@ class GraphInfo {
       const std::string& input, const std::string& relative_path);
 
   /**
-   * @brief Adds a vertex info to the GraphInfo instance.
+   * @brief Adds a vertex info to the GraphInfo instance and returns a new
+   * GraphInfo.
    * @param vertex_info The vertex info to add.
    * @return A Status object indicating the success or failure of the
    * operation. Returns InvalidOperation if the vertex info is already
@@ -656,7 +672,8 @@ class GraphInfo {
       std::shared_ptr<VertexInfo> vertex_info) const;
 
   /**
-   * @brief Adds an edge info to the GraphInfo instance.
+   * @brief Adds an edge info to the GraphInfo instance and returns a new
+   * GraphInfo.
    * @param edge_info The edge info to add.
    * @return A Status object indicating the success or failure of the
    * operation. Returns `InvalidOperation` if the edge info is already
@@ -678,47 +695,69 @@ class GraphInfo {
   const std::string& GetPrefix() const;
 
   /**
-   * Get the version info of the graph info object.
+   * @brief Get the version info of the graph info object.
    *
    * @return The version info of the graph info object.
    */
   const std::shared_ptr<const InfoVersion>& version() const;
 
   /**
-   * Get the vertex info with the given label.
+   * @brief Get the vertex info with the given label.
    * @param label The label of the vertex.
-   * @return A Result object containing the vertex info, or a Status object
-   * indicating an error.
+   * @return vertex info may be nullptr if the label is not found.
    */
-  std::shared_ptr<VertexInfo> GetVertexInfo(
-      const std::string& label) const;
+  std::shared_ptr<VertexInfo> GetVertexInfo(const std::string& label) const;
 
   /**
-   * Get the edge info with the given source vertex label, edge label, and
-   * destination vertex label.
+   * @brief Get the edge info with the given source vertex label, edge label,
+   * and destination vertex label.
    * @param src_label The label of the source vertex.
    * @param edge_label The label of the edge.
    * @param dst_label The label of the destination vertex.
-   * @return A Result object containing the edge info, or a Status object
-   * indicating an error.
+   * @return edge info may be nullptr if the label is not found.
    */
-  std::shared_ptr<EdgeInfo> GetEdgeInfo(
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label) const;
+  std::shared_ptr<EdgeInfo> GetEdgeInfo(const std::string& src_label,
+                                        const std::string& edge_label,
+                                        const std::string& dst_label) const;
 
+  /**
+   * @brief Get the vertex info index with the given label.
+   */
   int GetVertexInfoIndex(const std::string& label) const;
 
+  /**
+   * @brief Get the edge info index with the given source vertex label, edge
+   * label, and destination label.
+   */
   int GetEdgeInfoIndex(const std::string& src_label,
                        const std::string& edge_label,
                        const std::string& dst_label) const;
 
+  /**
+   * @brief Get the number of vertex infos.
+   */
   int VertexInfoNum() const;
 
+  /**
+   * @brief Get the number of edge infos.
+   */
   int EdgeInfoNum() const;
 
-  const std::shared_ptr<VertexInfo> GetVertexInfoByIndex(int i) const;
+  /**
+   * @brief Get the vertex info at the specified index.
+   *
+   * @param index The index of the vertex info.
+   * @return vertex info may be nullptr if the index is out of range.
+   */
+  const std::shared_ptr<VertexInfo> GetVertexInfoByIndex(int index) const;
 
-  const std::shared_ptr<EdgeInfo> GetEdgeInfoByIndex(int i) const;
+  /**
+   * @brief Get the edge info at the specified index.
+   *
+   * @param index The index of the edge info.
+   * @return edge info may be nullptr if the index is out of range.
+   */
+  const std::shared_ptr<EdgeInfo> GetEdgeInfoByIndex(int index) const;
 
   /**
    * @brief Get the vertex infos of graph info
