@@ -280,11 +280,11 @@ class VerticesBuilder {
    */
   static Result<std::shared_ptr<VerticesBuilder>> Make(
       const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& vertex_type, IdType start_vertex_index = 0,
+      const std::string& label, IdType start_vertex_index = 0,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
-    const auto vertex_info = graph_info->GetVertexInfoByType(vertex_type);
+    const auto vertex_info = graph_info->GetVertexInfo(label);
     if (!vertex_info) {
-      return Status::KeyError("The vertex type ", vertex_type,
+      return Status::KeyError("The vertex type ", label,
                               " doesn't exist in graph ", graph_info->GetName(),
                               ".");
     }

@@ -289,10 +289,10 @@ class VerticesCollection {
    */
   static Result<std::shared_ptr<VerticesCollection>> Make(
       const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& vertex_type) {
-    auto vertex_info = graph_info->GetVertexInfoByType(vertex_type);
+      const std::string& label) {
+    auto vertex_info = graph_info->GetVertexInfo(label);
     if (!vertex_info) {
-      return Status::KeyError("The vertex ", vertex_type, " doesn't exist.");
+      return Status::KeyError("The vertex ", label, " doesn't exist.");
     }
     return std::make_shared<VerticesCollection>(vertex_info,
                                                 graph_info->GetPrefix());

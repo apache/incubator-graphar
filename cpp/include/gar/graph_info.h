@@ -68,26 +68,6 @@ class PropertyGroup {
                          FileType file_type, const std::string& prefix = "");
 
   /**
-   * Copy constructor.
-   */
-  PropertyGroup(const PropertyGroup& other) = default;
-
-  /**
-   * Move constructor.
-   */
-  PropertyGroup(PropertyGroup&& other) = default;
-
-  /**
-   * Copy assignment operator.
-   */
-  inline PropertyGroup& operator=(const PropertyGroup& other) = default;
-
-  /**
-   * Move assignment operator.
-   */
-  inline PropertyGroup& operator=(PropertyGroup&& other) = default;
-
-  /**
    * Get the property list of group.
    *
    * @return The property list of group.
@@ -131,12 +111,18 @@ static bool operator==(const PropertyGroup& lhs, const PropertyGroup& rhs) {
          (lhs.GetProperties() == rhs.GetProperties());
 }
 
+/**
+ * AdjacentList is a class to store the adjacency list information.
+*/
 class AdjacentList {
  public:
+  /*
+   * Initialize the AdjacentList with the given type, file type, and optional prefix
+   */
   explicit AdjacentList(AdjListType type, FileType file_type,
                         const std::string& prefix = "");
 
-  inline AdjListType type() const { return type_; }
+  inline AdjListType GetType() const { return type_; }
 
   inline FileType GetFileType() const { return file_type_; }
 
@@ -148,19 +134,23 @@ class AdjacentList {
   std::string prefix_;
 };
 
+
 /**
- * VertexInfo is a class that stores metadata information about a vertex.
- */
+ * \class VertexInfo
+ * \brief VertexInfo is a class to describe the vertex information, including the vertex label,
+ *       chunk size, property groups, and prefix.
+*/
 class VertexInfo {
  public:
   /**
-   * Construct a VertexInfo object with the given metadata information.
+   * Construct an VertexInfo object with the given information and property group.
    *
-   * @param label The label of the vertex.
+   * @param type The type of the vertex.
    * @param chunk_size The number of vertices in each vertex chunk.
-   * @param version The version of the vertex info.
+   * @param property_groups The property group vector of the vertex.
    * @param prefix The prefix of the vertex info. If left empty, the default
    *        prefix will be set to the label of the vertex.
+   * @param version The format version of the vertex info.
    */
   explicit VertexInfo(const std::string& label, IdType chunk_size,
                       const PropertyGroupVector& property_groups,
@@ -168,10 +158,9 @@ class VertexInfo {
                       std::shared_ptr<const InfoVersion> version = nullptr);
 
   /**
-   * Adds a property group to the vertex info.
+   * Adds a property group to the vertex info and returns a new VertexInfo
    *
    * @param property_group The PropertyGroup object to add.
-   * @return A Status object indicating success or failure.
    */
   Result<std::shared_ptr<VertexInfo>> AddPropertyGroup(
       std::shared_ptr<PropertyGroup> property_group) const;
@@ -181,7 +170,7 @@ class VertexInfo {
    *
    * @return The label of the vertex.
    */
-  const std::string& GetType() const;
+  const std::string& GetLabel() const;
 
   /**
    * Get the chunk size of the vertex.
@@ -204,12 +193,15 @@ class VertexInfo {
    */
   const std::shared_ptr<const InfoVersion>& version() const;
 
+  /**
+   * Get the number of property groups of the vertex.
+   *
+   * @return The number of property groups of the vertex.
+   */
   int PropertyGroupNum() const;
 
   /**
    * Get the property groups of the vertex.
-   *
-   *@return A vector of PropertyGroup objects for the vertex.
    */
   const PropertyGroupVector& GetPropertyGroups() const;
 
@@ -217,11 +209,18 @@ class VertexInfo {
    * Get the property group that contains the specified property.
    *
    * @param property_name The name of the property.
-   * @return A Result object containing the PropertyGroup object, or a KeyError
-   * Status object if the property is not found.
+   * @return property group may be nullptr if the property is not found.
    */
   std::shared_ptr<PropertyGroup> GetPropertyGroup(
       const std::string& property_name) const;
+
+  /**
+   * Get the property group at the specified index.
+   * 
+   * @param index The index of the property group. 
+   * @return property group may be nullptr if the index is out of range.
+  */
+  std::shared_ptr<PropertyGroup> GetPropertyGroupByIndex(int index) const;
 
   /**
    * Get the data type of the specified property.
@@ -260,8 +259,7 @@ class VertexInfo {
    * Returns whether the specified property is a primary key.
    *
    * @param property_name The name of the property.
-   * @return A Result object containing a bool indicating whether the property
-   * is a primary key, or a KeyError Status object if the property is not found.
+   * @return True if the property is a primary key, False otherwise. 
    */
   bool IsPrimaryKey(const std::string& property_name) const;
 
@@ -332,9 +330,9 @@ class EdgeInfo {
   /**
    * @brief Construct an EdgeInfo object with the given metadata information.
    *
-   * @param src_label The label of the source vertex.
-   * @param edge_label The label of the edge.
-   * @param dst_label The label of the destination vertex.
+   * @param src_label The type of the source vertex.
+   * @param edge_label The type of the edge.
+   * @param dst_label The type of the destination vertex.
    * @param chunk_size The number of edges in each edge chunk.
    * @param src_chunk_size The number of source vertices in each vertex chunk.
    * @param dst_chunk_size The number of destination vertices in each vertex
@@ -383,19 +381,19 @@ class EdgeInfo {
    * Get the label of the source vertex.
    * @return The label of the source vertex.
    */
-  const std::string& GetSrcType() const;
+  const std::string& GetSrcLabel() const;
 
   /**
    * Get the label of the edge.
    * @return The label of the edge.
    */
-  const std::string& GetEdgeType() const;
+  const std::string& GetEdgeLabel() const;
 
   /**
    * Get the label of the destination vertex.
    * @return The label of the destination vertex.
    */
-  const std::string& GetDstType() const;
+  const std::string& GetDstLabel() const;
 
   /**
    * Get the number of edges in each edge chunk.
@@ -692,7 +690,7 @@ class GraphInfo {
    * @return A Result object containing the vertex info, or a Status object
    * indicating an error.
    */
-  std::shared_ptr<VertexInfo> GetVertexInfoByType(
+  std::shared_ptr<VertexInfo> GetVertexInfo(
       const std::string& label) const;
 
   /**
@@ -704,7 +702,7 @@ class GraphInfo {
    * @return A Result object containing the edge info, or a Status object
    * indicating an error.
    */
-  std::shared_ptr<EdgeInfo> GetEdgeInfoByType(
+  std::shared_ptr<EdgeInfo> GetEdgeInfo(
       const std::string& src_label, const std::string& edge_label,
       const std::string& dst_label) const;
 

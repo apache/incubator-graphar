@@ -117,7 +117,7 @@ class VertexPropertyArrowChunkReader {
    */
   static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& vertex_type,
+      const std::string& label,
       const std::shared_ptr<PropertyGroup>& property_group,
       const util::FilterOptions& options = {});
 
@@ -230,8 +230,8 @@ class AdjListArrowChunkReader {
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListArrowChunkReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
-      const std::string& edge_type, const std::string& dst_type,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
+      const std::string& edge_label, const std::string& dst_label,
       AdjListType adj_list_type);
 
  private:
@@ -313,8 +313,8 @@ class AdjListOffsetArrowChunkReader {
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListOffsetArrowChunkReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
-      const std::string& edge_type, const std::string& dst_type,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
+      const std::string& edge_label, const std::string& dst_label,
       AdjListType adj_list_type);
 
  private:
@@ -448,8 +448,8 @@ class AdjListPropertyArrowChunkReader {
    * @param options The filter options, default is empty.
    */
   static Result<std::shared_ptr<AdjListPropertyArrowChunkReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
-      const std::string& edge_type, const std::string& dst_type,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
+      const std::string& edge_label, const std::string& dst_label,
       const std::shared_ptr<PropertyGroup>& property_group,
       AdjListType adj_list_type, const util::FilterOptions& options = {});
 

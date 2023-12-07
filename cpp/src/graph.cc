@@ -347,17 +347,17 @@ bool EdgeIter::first_dst(const EdgeIter& from, IdType id) {
 }
 
 Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
-    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
-    const std::string& edge_type, const std::string& dst_type,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
+    const std::string& edge_label, const std::string& dst_label,
     AdjListType adj_list_type, const IdType vertex_chunk_begin,
     const IdType vertex_chunk_end) noexcept {
-  auto edge_info = graph_info->GetEdgeInfoByType(src_type, edge_type, dst_type);
+  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
   if (!edge_info) {
-    return Status::KeyError("The edge ", src_type, " ", edge_type, " ",
-                            dst_type, " doesn't exist.");
+    return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
+                            dst_label, " doesn't exist.");
   }
   if (!edge_info->HasAdjacentListType(adj_list_type)) {
-    return Status::Invalid("The edge ", edge_type, " of adj list type ",
+    return Status::Invalid("The edge ", edge_label, " of adj list type ",
                            AdjListTypeToString(adj_list_type),
                            " doesn't exist.");
   }

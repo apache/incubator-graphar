@@ -38,7 +38,7 @@ namespace GAR_NAMESPACE_INTERNAL {
 
 namespace {
 
-std::string ConcatEdgeLabel(const std::string& src_label,
+std::string ConcatEdgeTriple(const std::string& src_label,
                             const std::string& edge_label,
                             const std::string& dst_label) {
   return src_label + REGULAR_SEPERATOR + edge_label + REGULAR_SEPERATOR +
@@ -158,7 +158,7 @@ VertexInfo::VertexInfo(const std::string& label, IdType chunk_size,
                        std::shared_ptr<const InfoVersion> version)
     : impl_(new Impl(label, chunk_size, prefix, property_groups, version)) {}
 
-const std::string& VertexInfo::GetType() const { return impl_->type_; }
+const std::string& VertexInfo::GetLabel() const { return impl_->type_; }
 
 IdType VertexInfo::GetChunkSize() const { return impl_->chunk_size_; }
 
@@ -197,6 +197,15 @@ std::shared_ptr<PropertyGroup> VertexInfo::GetPropertyGroup(
     const std::string& property_name) const {
   int i = LookupKeyIndex(impl_->property_name_to_index_, property_name);
   return i == -1 ? nullptr : impl_->property_groups_[i];
+}
+
+std::shared_ptr<PropertyGroup> VertexInfo::GetPropertyGroupByIndex(
+    int index) const {
+  if (index < 0 ||
+      index >= impl_->property_groups_.size()) {
+    return nullptr;
+  }
+  return impl_->property_groups_[index];
 }
 
 const PropertyGroupVector& VertexInfo::GetPropertyGroups() const {
@@ -256,7 +265,7 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(
   if (yaml == nullptr) {
     return Status::Invalid("yaml shared pointer is nullptr");
   }
-  std::string vertex_type = yaml->operator[]("type").As<std::string>();
+  std::string label = yaml->operator[]("type").As<std::string>();
   IdType chunk_size =
       static_cast<IdType>(yaml->operator[]("chunk_size").As<int64_t>());
   std::string prefix;
@@ -295,7 +304,7 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(
           std::make_shared<PropertyGroup>(property_vec, file_type, pg_prefix));
     }
   }
-  return std::make_shared<VertexInfo>(vertex_type, chunk_size, property_groups,
+  return std::make_shared<VertexInfo>(label, chunk_size, property_groups,
                                       prefix, version);
 }
 
@@ -341,15 +350,15 @@ Status VertexInfo::Save(const std::string& path) const {
 
 class EdgeInfo::Impl {
  public:
-  Impl(const std::string& src_type, const std::string& edge_type,
-       const std::string& dst_type, IdType chunk_size, IdType src_chunk_size,
+  Impl(const std::string& src_label, const std::string& edge_label,
+       const std::string& dst_label, IdType chunk_size, IdType src_chunk_size,
        IdType dst_chunk_size, bool directed, const std::string& prefix,
        const AdjacentListVector& adjacent_lists,
        const PropertyGroupVector& property_groups,
        std::shared_ptr<const InfoVersion> version)
-      : src_type_(src_type),
-        edge_type_(edge_type),
-        dst_type_(dst_type),
+      : src_type_(src_label),
+        edge_label_(edge_label),
+        dst_label_(dst_label),
         chunk_size_(chunk_size),
         src_chunk_size_(src_chunk_size),
         dst_chunk_size_(dst_chunk_size),
@@ -359,11 +368,11 @@ class EdgeInfo::Impl {
         property_groups_(std::move(property_groups)),
         version_(std::move(version)) {
     if (prefix_.empty()) {
-      prefix_ = src_type_ + REGULAR_SEPERATOR + edge_type_ + REGULAR_SEPERATOR +
-                dst_type_ + "/";  // default prefix
+      prefix_ = src_type_ + REGULAR_SEPERATOR + edge_label_ + REGULAR_SEPERATOR +
+                dst_label_ + "/";  // default prefix
     }
     for (int i = 0; i < adjacent_lists_.size(); i++) {
-      auto adj_list_type = adjacent_lists_[i]->type();
+      auto adj_list_type = adjacent_lists_[i]->GetType();
       adjacent_list_type_to_index_[adj_list_type] = i;
     }
     for (int i = 0; i < property_groups_.size(); i++) {
@@ -382,8 +391,8 @@ class EdgeInfo::Impl {
   }
 
   std::string src_type_;
-  std::string edge_type_;
-  std::string dst_type_;
+  std::string edge_label_;
+  std::string dst_label_;
   IdType chunk_size_;
   IdType src_chunk_size_;
   IdType dst_chunk_size_;
@@ -398,22 +407,22 @@ class EdgeInfo::Impl {
   std::shared_ptr<const InfoVersion> version_;
 };
 
-EdgeInfo::EdgeInfo(const std::string& src_type, const std::string& edge_type,
-                   const std::string& dst_type, IdType chunk_size,
+EdgeInfo::EdgeInfo(const std::string& src_label, const std::string& edge_label,
+                   const std::string& dst_label, IdType chunk_size,
                    IdType src_chunk_size, IdType dst_chunk_size, bool directed,
                    const AdjacentListVector& adjacent_lists,
                    const PropertyGroupVector& property_groups,
                    const std::string& prefix,
                    std::shared_ptr<const InfoVersion> version)
-    : impl_(new Impl(src_type, edge_type, dst_type, chunk_size, src_chunk_size,
+    : impl_(new Impl(src_label, edge_label, dst_label, chunk_size, src_chunk_size,
                      dst_chunk_size, directed, prefix, adjacent_lists,
                      property_groups, version)) {}
 
-const std::string& EdgeInfo::GetSrcType() const { return impl_->src_type_; }
+const std::string& EdgeInfo::GetSrcLabel() const { return impl_->src_type_; }
 
-const std::string& EdgeInfo::GetEdgeType() const { return impl_->edge_type_; }
+const std::string& EdgeInfo::GetEdgeLabel() const { return impl_->edge_label_; }
 
-const std::string& EdgeInfo::GetDstType() const { return impl_->dst_type_; }
+const std::string& EdgeInfo::GetDstLabel() const { return impl_->dst_label_; }
 
 IdType EdgeInfo::GetChunkSize() const { return impl_->chunk_size_; }
 
@@ -567,7 +576,7 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddAdjList(
     return Status::Invalid("adj list is nullptr");
   }
   return std::make_shared<EdgeInfo>(
-      impl_->src_type_, impl_->edge_type_, impl_->dst_type_, impl_->chunk_size_,
+      impl_->src_type_, impl_->edge_label_, impl_->dst_label_, impl_->chunk_size_,
       impl_->src_chunk_size_, impl_->dst_chunk_size_, impl_->directed_,
       AddVectorElement(impl_->adjacent_lists_, adj_list),
       impl_->property_groups_, impl_->prefix_, impl_->version_);
@@ -579,7 +588,7 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddPropertyGroup(
     return Status::Invalid("property group is nullptr");
   }
   return std::make_shared<EdgeInfo>(
-      impl_->src_type_, impl_->edge_type_, impl_->dst_type_, impl_->chunk_size_,
+      impl_->src_type_, impl_->edge_label_, impl_->dst_label_, impl_->chunk_size_,
       impl_->src_chunk_size_, impl_->dst_chunk_size_, impl_->directed_,
       impl_->adjacent_lists_,
       AddVectorElement(impl_->property_groups_, property_group), impl_->prefix_,
@@ -592,9 +601,9 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
   if (yaml == nullptr) {
     return Status::Invalid("yaml shared pointer is nullptr.");
   }
-  std::string src_type = yaml->operator[]("src_type").As<std::string>();
-  std::string edge_type = yaml->operator[]("edge_type").As<std::string>();
-  std::string dst_type = yaml->operator[]("dst_type").As<std::string>();
+  std::string src_label = yaml->operator[]("src_label").As<std::string>();
+  std::string edge_label = yaml->operator[]("edge_label").As<std::string>();
+  std::string dst_label = yaml->operator[]("dst_label").As<std::string>();
   IdType chunk_size =
       static_cast<IdType>(yaml->operator[]("chunk_size").As<int64_t>());
   IdType src_chunk_size =
@@ -657,7 +666,7 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
     }
   }
   return std::make_shared<EdgeInfo>(
-      src_type, edge_type, dst_type, chunk_size, src_chunk_size, dst_chunk_size,
+      src_label, edge_label, dst_label, chunk_size, src_chunk_size, dst_chunk_size,
       directed, adjacent_lists, property_groups, prefix, version);
 }
 
@@ -666,9 +675,9 @@ Result<std::string> EdgeInfo::Dump() const noexcept {
     return Status::Invalid("The edge info is not validated.");
   }
   ::Yaml::Node node;
-  node["src_type"] = impl_->src_type_;
-  node["edge_type"] = impl_->edge_type_;
-  node["dst_type"] = impl_->dst_type_;
+  node["src_label"] = impl_->src_type_;
+  node["edge_label"] = impl_->edge_label_;
+  node["dst_label"] = impl_->dst_label_;
   node["chunk_size"] = std::to_string(impl_->chunk_size_);
   node["src_chunk_size"] = std::to_string(impl_->src_chunk_size_);
   node["dst_chunk_size"] = std::to_string(impl_->dst_chunk_size_);
@@ -676,7 +685,7 @@ Result<std::string> EdgeInfo::Dump() const noexcept {
   node["directed"] = impl_->directed_ ? "true" : "false";
   for (const auto& adjacent_list : impl_->adjacent_lists_) {
     ::Yaml::Node adj_list_node;
-    auto adj_list_type = adjacent_list->type();
+    auto adj_list_type = adjacent_list->GetType();
     auto pair = AdjListTypeToOrderedAligned(adj_list_type);
     adj_list_node["ordered"] = pair.first ? "true" : "false";
     adj_list_node["aligned_by"] = pair.second;
@@ -796,13 +805,13 @@ class GraphInfo::Impl {
         prefix_(prefix),
         version_(std::move(version)) {
     for (int i = 0; i < vertex_infos_.size(); i++) {
-      vlabel_to_index_[vertex_infos_[i]->GetType()] = i;
+      vlabel_to_index_[vertex_infos_[i]->GetLabel()] = i;
     }
     for (int i = 0; i < edge_infos_.size(); i++) {
-      std::string edge_label = ConcatEdgeLabel(edge_infos_[i]->GetSrcType(),
-                                               edge_infos_[i]->GetEdgeType(),
-                                               edge_infos_[i]->GetDstType());
-      elabel_to_index_[edge_label] = i;
+      std::string edge_key = ConcatEdgeTriple(edge_infos_[i]->GetSrcLabel(),
+                                               edge_infos_[i]->GetEdgeLabel(),
+                                               edge_infos_[i]->GetDstLabel());
+      elabel_to_index_[edge_key] = i;
     }
   }
 
@@ -835,7 +844,7 @@ const std::shared_ptr<const InfoVersion>& GraphInfo::version() const {
   return impl_->version_;
 }
 
-std::shared_ptr<VertexInfo> GraphInfo::GetVertexInfoByType(
+std::shared_ptr<VertexInfo> GraphInfo::GetVertexInfo(
     const std::string& type) const {
   int i = GetVertexInfoIndex(type);
   return i == -1 ? nullptr : impl_->vertex_infos_[i];
@@ -845,18 +854,18 @@ int GraphInfo::GetVertexInfoIndex(const std::string& type) const {
   return LookupKeyIndex(impl_->vlabel_to_index_, type);
 }
 
-std::shared_ptr<EdgeInfo> GraphInfo::GetEdgeInfoByType(
-    const std::string& src_type, const std::string& edge_type,
-    const std::string& dst_type) const {
-  int i = GetEdgeInfoIndex(src_type, edge_type, dst_type);
+std::shared_ptr<EdgeInfo> GraphInfo::GetEdgeInfo(
+    const std::string& src_label, const std::string& edge_label,
+    const std::string& dst_label) const {
+  int i = GetEdgeInfoIndex(src_label, edge_label, dst_label);
   return i == -1 ? nullptr : impl_->edge_infos_[i];
 }
 
-int GraphInfo::GetEdgeInfoIndex(const std::string& src_type,
-                                const std::string& edge_type,
-                                const std::string& dst_type) const {
-  std::string edge_label = ConcatEdgeLabel(src_type, edge_type, dst_type);
-  return LookupKeyIndex(impl_->elabel_to_index_, edge_label);
+int GraphInfo::GetEdgeInfoIndex(const std::string& src_label,
+                                const std::string& edge_label,
+                                const std::string& dst_label) const {
+  std::string edge_key = ConcatEdgeTriple(src_label, edge_label, dst_label);
+  return LookupKeyIndex(impl_->elabel_to_index_, edge_key);
 }
 
 int GraphInfo::VertexInfoNum() const {
@@ -897,7 +906,7 @@ Result<std::shared_ptr<GraphInfo>> GraphInfo::AddVertex(
   if (vertex_info == nullptr) {
     return Status::Invalid("vertex info is nullptr");
   }
-  if (GetVertexInfoIndex(vertex_info->GetType()) != -1) {
+  if (GetVertexInfoIndex(vertex_info->GetLabel()) != -1) {
     return Status::Invalid("vertex info already exists");
   }
   return std::make_shared<GraphInfo>(
@@ -910,8 +919,8 @@ Result<std::shared_ptr<GraphInfo>> GraphInfo::AddEdge(
   if (edge_info == nullptr) {
     return Status::Invalid("edge info is nullptr");
   }
-  if (GetEdgeInfoIndex(edge_info->GetSrcType(), edge_info->GetEdgeType(),
-                       edge_info->GetDstType()) != -1) {
+  if (GetEdgeInfoIndex(edge_info->GetSrcLabel(), edge_info->GetEdgeLabel(),
+                       edge_info->GetDstLabel()) != -1) {
     return Status::Invalid("edge info already exists");
   }
   return std::make_shared<GraphInfo>(
@@ -958,13 +967,13 @@ Result<std::string> GraphInfo::Dump() const {
   for (const auto& vertex : GetVertexInfos()) {
     node["vertices"].PushBack();
     node["vertices"][node["vertices"].Size() - 1] =
-        vertex->GetType() + ".vertex.yaml";
+        vertex->GetLabel() + ".vertex.yaml";
   }
   for (const auto& edge : GetEdgeInfos()) {
     node["edges"].PushBack();
     node["edges"][node["edges"].Size() - 1] =
-        ConcatEdgeLabel(edge->GetSrcType(), edge->GetEdgeType(),
-                        edge->GetDstType()) +
+        ConcatEdgeTriple(edge->GetSrcLabel(), edge->GetEdgeLabel(),
+                        edge->GetDstLabel()) +
         ".edge.yaml";
   }
   if (impl_->version_ != nullptr) {
