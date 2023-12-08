@@ -99,7 +99,8 @@ arrow::Result<std::shared_ptr<arrow::Table>> generate_edge_property_table() {
   return arrow::Table::Make(schema, {strarray});
 }
 
-void vertex_property_writer(const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+void vertex_property_writer(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // create writer
   std::string vertex_meta_file =
       TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person.vertex.yml";
@@ -137,7 +138,8 @@ void vertex_property_writer(const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& gra
   std::cout << "vertex count from reading written file: " << *ptr << std::endl;
 }
 
-void edge_chunk_writer(const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+void edge_chunk_writer(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // construct writer
   std::string edge_meta_file =
       TEST_DATA_DIR + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";

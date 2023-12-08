@@ -86,8 +86,8 @@ int main(int argc, char* argv[]) {
   // construct property group
   GAR_NAMESPACE::Property cc("cc", GAR_NAMESPACE::int64(), false);
   std::vector<GAR_NAMESPACE::Property> property_vector = {cc};
-  auto group = GAR_NAMESPACE::CreatePropertyGroup(property_vector,
-                                                  GAR_NAMESPACE::FileType::PARQUET);
+  auto group = GAR_NAMESPACE::CreatePropertyGroup(
+      property_vector, GAR_NAMESPACE::FileType::PARQUET);
   // extend the vertex_info
   auto vertex_info = graph_info->GetVertexInfo(label);
   auto maybe_extend_info = vertex_info->AddPropertyGroup(group);

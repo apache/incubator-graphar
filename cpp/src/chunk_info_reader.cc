@@ -490,8 +490,7 @@ Result<std::shared_ptr<AdjListPropertyChunkInfoReader>>
 AdjListPropertyChunkInfoReader::Make(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
     const std::string& edge_label, const std::string& dst_label,
-    const std::string& property_name,
-    AdjListType adj_list_type) {
+    const std::string& property_name, AdjListType adj_list_type) {
   auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
   if (!edge_info) {
     return Status::KeyError("The edge ", src_label, " ", edge_label, " ",

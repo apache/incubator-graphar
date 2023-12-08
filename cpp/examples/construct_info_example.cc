@@ -20,36 +20,42 @@
 #include "gar/api.h"
 
 int main(int argc, char* argv[]) {
-
   /*------------------construct vertex info------------------*/
   auto version = GAR_NAMESPACE::InfoVersion::Parse("gar/v1").value();
 
   // meta info
   std::string vertex_label = "person", vertex_prefix = "vertex/person/";
   int chunk_size = 100;
-  
+
   // construct properties and property groups
-  auto property_vector_1 = {GAR_NAMESPACE::Property("id", GAR_NAMESPACE::int32(), true)};
-  auto property_vector_2 = {GAR_NAMESPACE::Property("firstName", GAR_NAMESPACE::string(), true),
-        GAR_NAMESPACE::Property("lastName", GAR_NAMESPACE::string(), true), GAR_NAMESPACE::Property("gender", GAR_NAMESPACE::string(), true)};
- 
-  auto group1 = GAR_NAMESPACE::CreatePropertyGroup(property_vector_1, GAR_NAMESPACE::FileType::CSV);
-  auto group2 = GAR_NAMESPACE::CreatePropertyGroup(property_vector_2, GAR_NAMESPACE::FileType::ORC);
+  auto property_vector_1 = {
+      GAR_NAMESPACE::Property("id", GAR_NAMESPACE::int32(), true)};
+  auto property_vector_2 = {
+      GAR_NAMESPACE::Property("firstName", GAR_NAMESPACE::string(), false),
+      GAR_NAMESPACE::Property("lastName", GAR_NAMESPACE::string(), false),
+      GAR_NAMESPACE::Property("gender", GAR_NAMESPACE::string(), false)};
+
+  auto group1 = GAR_NAMESPACE::CreatePropertyGroup(
+      property_vector_1, GAR_NAMESPACE::FileType::CSV);
+  auto group2 = GAR_NAMESPACE::CreatePropertyGroup(
+      property_vector_2, GAR_NAMESPACE::FileType::ORC);
 
   // create vertex info
-  auto vertex_info = GAR_NAMESPACE::CreateVertexInfo(vertex_label, chunk_size, {group1},  vertex_prefix, version);
+  auto vertex_info = GAR_NAMESPACE::CreateVertexInfo(
+      vertex_label, chunk_size, {group1}, vertex_prefix, version);
 
   ASSERT(vertex_info != nullptr);
   ASSERT(vertex_info->GetLabel() == vertex_label);
   ASSERT(vertex_info->GetChunkSize() == chunk_size);
-  ASSERT(vertex_info->GetPropertyGroups().size() == 2);
+  ASSERT(vertex_info->GetPropertyGroups().size() == 1);
   ASSERT(vertex_info->HasProperty("id"));
   ASSERT(!vertex_info->HasProperty("firstName"));
   ASSERT(vertex_info->HasPropertyGroup(group1));
   ASSERT(!vertex_info->HasPropertyGroup(group2));
   ASSERT(vertex_info->IsPrimaryKey("id"));
   ASSERT(!vertex_info->IsPrimaryKey("gender"));
-  ASSERT(vertex_info->GetPropertyType("id").value()->Equals(GAR_NAMESPACE::int32()));
+  ASSERT(vertex_info->GetPropertyType("id").value()->Equals(
+      GAR_NAMESPACE::int32()));
   ASSERT(vertex_info->GetFilePath(group1, 0).value() ==
          "vertex/person/id/chunk0");
 
@@ -74,17 +80,22 @@ int main(int argc, char* argv[]) {
   bool directed = false;
 
   // construct adjacent lists
-  auto adjacent_lists = {
-      GAR_NAMESPACE::CreateAdjacentList(GAR_NAMESPACE::AdjListType::unordered_by_source,
-                                         GAR_NAMESPACE::FileType::CSV),
-      GAR_NAMESPACE::CreateAdjacentList(GAR_NAMESPACE::AdjListType::ordered_by_dest,
-                                         GAR_NAMESPACE::FileType::CSV)};
+  auto adjacent_lists = {GAR_NAMESPACE::CreateAdjacentList(
+                             GAR_NAMESPACE::AdjListType::unordered_by_source,
+                             GAR_NAMESPACE::FileType::CSV),
+                         GAR_NAMESPACE::CreateAdjacentList(
+                             GAR_NAMESPACE::AdjListType::ordered_by_dest,
+                             GAR_NAMESPACE::FileType::CSV)};
   // construct properties and property groups
-  auto property_vector_3 = {GAR_NAMESPACE::Property("creationDate", GAR_NAMESPACE::string(), false)}; 
-  auto group3 = GAR_NAMESPACE::CreatePropertyGroup(property_vector_3, GAR_NAMESPACE::FileType::PARQUET);
+  auto property_vector_3 = {
+      GAR_NAMESPACE::Property("creationDate", GAR_NAMESPACE::string(), false)};
+  auto group3 = GAR_NAMESPACE::CreatePropertyGroup(
+      property_vector_3, GAR_NAMESPACE::FileType::PARQUET);
 
   // create edge info
-  auto edge_info = GAR_NAMESPACE::CreateEdgeInfo(src_label, edge_label, dst_label, edge_chunk_size, src_chunk_size, dst_chunk_size, directed, adjacent_lists, {group3}, edge_prefix, version);
+  auto edge_info = GAR_NAMESPACE::CreateEdgeInfo(
+      src_label, edge_label, dst_label, edge_chunk_size, src_chunk_size,
+      dst_chunk_size, directed, adjacent_lists, {group3}, edge_prefix, version);
 
   ASSERT(edge_info != nullptr);
   ASSERT(edge_info->GetSrcLabel() == src_label);
@@ -97,11 +108,13 @@ int main(int argc, char* argv[]) {
 
   ASSERT(edge_info->HasAdjacentListType(
       GAR_NAMESPACE::AdjListType::unordered_by_source));
-  ASSERT(
-      edge_info->GetAdjListFilePath(0, 0, GAR_NAMESPACE::AdjListType::ordered_by_dest)
-          .value() ==
-      "edge/person_knows_person/ordered_by_dest/adj_list/part0/chunk0");
-  ASSERT(edge_info->GetAdjListOffsetFilePath(
+  ASSERT(edge_info
+             ->GetAdjListFilePath(0, 0,
+                                  GAR_NAMESPACE::AdjListType::ordered_by_dest)
+             .value() ==
+         "edge/person_knows_person/ordered_by_dest/adj_list/part0/chunk0");
+  ASSERT(edge_info
+             ->GetAdjListOffsetFilePath(
                  0, GAR_NAMESPACE::AdjListType::ordered_by_dest)
              .value() ==
          "edge/person_knows_person/ordered_by_dest/offset/chunk0");
@@ -109,35 +122,38 @@ int main(int argc, char* argv[]) {
   ASSERT(edge_info->HasPropertyGroup(group3));
   ASSERT(edge_info->HasProperty("creationDate"));
   ASSERT(
-      edge_info->GetPropertyFilePath(
+      edge_info
+          ->GetPropertyFilePath(
               group3, GAR_NAMESPACE::AdjListType::unordered_by_source, 0, 0)
           .value() ==
       "edge/person_knows_person/unordered_by_source/creationDate/part0/chunk0");
-  ASSERT(edge_info->GetPropertyType("creationDate").value()->Equals(GAR_NAMESPACE::string()));
+  ASSERT(edge_info->GetPropertyType("creationDate")
+             .value()
+             ->Equals(GAR_NAMESPACE::string()));
   ASSERT(!edge_info->IsPrimaryKey("creationDate"));
 
   // extend & validate
-  auto new_adjacent_list = GAR_NAMESPACE::CreateAdjacentList(GAR_NAMESPACE::AdjListType::ordered_by_source, GAR_NAMESPACE::FileType::PARQUET);
+  auto new_adjacent_list = GAR_NAMESPACE::CreateAdjacentList(
+      GAR_NAMESPACE::AdjListType::ordered_by_source,
+      GAR_NAMESPACE::FileType::PARQUET);
   auto res1 = edge_info->AddAdjacentList(new_adjacent_list);
   ASSERT(res1.status().ok());
   edge_info = res1.value();
   ASSERT(edge_info->HasAdjacentListType(
       GAR_NAMESPACE::AdjListType::ordered_by_source));
-  auto res2 = edge_info->AddPropertyGroup(group3);
-  ASSERT(res2.status().ok());
-  edge_info = res2.value();
-  ASSERT(edge_info->HasPropertyGroup(group3));
   ASSERT(edge_info->IsValidated());
   // save & dump
   ASSERT(!edge_info->Dump().has_error());
   ASSERT(edge_info->Save("/tmp/person_knows_person.edge.yml").ok());
 
-  /*------------------create graph info with vertex info and edge info------------------*/
+  /*------------------create graph info with vertex info and edge
+   * info------------------*/
   // meta info
   std::string name = "graph", prefix = "file:///tmp/";
 
   // create graph info
-  auto graph_info = GAR_NAMESPACE::CreateGraphInfo(name, {vertex_info}, {edge_info}, prefix, version);
+  auto graph_info = GAR_NAMESPACE::CreateGraphInfo(
+      name, {vertex_info}, {edge_info}, prefix, version);
   ASSERT(graph_info->GetName() == name);
   ASSERT(graph_info->GetPrefix() == prefix);
   ASSERT(graph_info->GetVertexInfos().size() == 1);
@@ -147,9 +163,10 @@ int main(int argc, char* argv[]) {
   ASSERT(vertex_info_from_graph->HasPropertyGroup(group1));
   ASSERT(vertex_info_from_graph->HasPropertyGroup(group2));
   ASSERT(graph_info->GetEdgeInfos().size() == 1);
-  auto edge_info_from_graph = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  auto edge_info_from_graph =
+      graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
   ASSERT(edge_info_from_graph != nullptr);
-  ASSERT(edge_info_from_graph->PropertyGroupNum() == 2);
+  ASSERT(edge_info_from_graph->PropertyGroupNum() == 1);
   ASSERT(edge_info_from_graph->HasPropertyGroup(group3));
   ASSERT(graph_info->IsValidated());
 

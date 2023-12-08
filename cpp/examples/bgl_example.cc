@@ -106,13 +106,14 @@ int main(int argc, char* argv[]) {
   // using vertex builder construct new property group
   GAR_NAMESPACE::Property cc("cc", GAR_NAMESPACE::int32(), false);
   std::vector<GAR_NAMESPACE::Property> property_vector = {cc};
-  auto group = GAR_NAMESPACE::CreatePropertyGroup(property_vector,
-                                                  GAR_NAMESPACE::FileType::PARQUET);
+  auto group = GAR_NAMESPACE::CreatePropertyGroup(
+      property_vector, GAR_NAMESPACE::FileType::PARQUET);
   // construct new vertex info
   std::string vertex_label = "cc_result", vertex_prefix = "result/";
   int chunk_size = 100;
   auto version = GAR_NAMESPACE::InfoVersion::Parse("gar/v1").value();
-  auto new_info = GAR_NAMESPACE::CreateVertexInfo(vertex_label, chunk_size, {group}, vertex_prefix, version);
+  auto new_info = GAR_NAMESPACE::CreateVertexInfo(
+      vertex_label, chunk_size, {group}, vertex_prefix, version);
   // dump new vertex info
   ASSERT(new_info->IsValidated());
   ASSERT(new_info->Dump().status().ok());

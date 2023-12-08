@@ -80,12 +80,11 @@ int main(int argc, char* argv[]) {
   // Append the bfs result to the vertex info as a property group
   // and write to file
   // construct property group
-  GAR_NAMESPACE::Property bfs(
-      "bfs", GAR_NAMESPACE::int32(), false);
-  GAR_NAMESPACE::Property father(
-      "father", GAR_NAMESPACE::int64(), false);
+  GAR_NAMESPACE::Property bfs("bfs", GAR_NAMESPACE::int32(), false);
+  GAR_NAMESPACE::Property father("father", GAR_NAMESPACE::int64(), false);
   std::vector<GAR_NAMESPACE::Property> property_vector = {bfs, father};
-  auto group = GAR_NAMESPACE::CreatePropertyGroup(property_vector, GAR_NAMESPACE::FileType::CSV);
+  auto group = GAR_NAMESPACE::CreatePropertyGroup(property_vector,
+                                                  GAR_NAMESPACE::FileType::CSV);
 
   // extend the vertex_info
   auto vertex_info = graph_info->GetVertexInfo(label);
@@ -140,7 +139,8 @@ int main(int argc, char* argv[]) {
   bool directed = true;
   auto version = GAR_NAMESPACE::InfoVersion::Parse("gar/v1").value();
   auto al = GAR_NAMESPACE::CreateAdjacentList(
-      GAR_NAMESPACE::AdjListType::ordered_by_source, GAR_NAMESPACE::FileType::CSV);
+      GAR_NAMESPACE::AdjListType::ordered_by_source,
+      GAR_NAMESPACE::FileType::CSV);
   auto new_edge_info = GAR_NAMESPACE::CreateEdgeInfo(
       src_label, edge_label, dst_label, edge_chunk_size, src_chunk_size,
       dst_chunk_size, directed, {al}, {}, "", version);

@@ -229,15 +229,13 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::convertToTable(
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
   // add src
   std::shared_ptr<arrow::Array> array;
-  schema_vector.push_back(
-      arrow::field(GeneralParams::kSrcIndexCol,
-                   DataType::DataTypeToArrowDataType(int64())));
+  schema_vector.push_back(arrow::field(
+      GeneralParams::kSrcIndexCol, DataType::DataTypeToArrowDataType(int64())));
   GAR_RETURN_NOT_OK(tryToAppend(1, array, edges));
   arrays.push_back(array);
   // add dst
-  schema_vector.push_back(
-      arrow::field(GeneralParams::kDstIndexCol,
-                   DataType::DataTypeToArrowDataType(int64())));
+  schema_vector.push_back(arrow::field(
+      GeneralParams::kDstIndexCol, DataType::DataTypeToArrowDataType(int64())));
   GAR_RETURN_NOT_OK(tryToAppend(0, array, edges));
   arrays.push_back(array);
   // add properties
@@ -266,9 +264,8 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::getOffsetTable(
 
   std::vector<std::shared_ptr<arrow::Array>> arrays;
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
-  schema_vector.push_back(
-      arrow::field(GeneralParams::kOffsetCol,
-                   DataType::DataTypeToArrowDataType(int64())));
+  schema_vector.push_back(arrow::field(
+      GeneralParams::kOffsetCol, DataType::DataTypeToArrowDataType(int64())));
 
   size_t index = 0;
   for (IdType i = begin_index; i < end_index; i++) {

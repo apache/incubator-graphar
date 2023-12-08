@@ -61,6 +61,6 @@ static const std::string TEST_DATA_DIR =  // NOLINT
         .parent_path()
         .parent_path()
         .string() +
-    "/testing";
+    "/testing/new";
 
 #endif  // CPP_EXAMPLES_CONFIG_H_

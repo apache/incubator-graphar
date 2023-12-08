@@ -60,29 +60,29 @@ using VertexInfoVector = std::vector<std::shared_ptr<VertexInfo>>;
 using EdgeInfoVector = std::vector<std::shared_ptr<EdgeInfo>>;
 
 std::shared_ptr<PropertyGroup> CreatePropertyGroup(
-    const std::vector<Property>& properties, FileType file_type, const std::string& prefix = "");
+    const std::vector<Property>& properties, FileType file_type,
+    const std::string& prefix = "");
 
-std::shared_ptr<AdjacentList> CreateAdjacentList(AdjListType type, FileType file_type,
-                        const std::string& prefix = "");
+std::shared_ptr<AdjacentList> CreateAdjacentList(
+    AdjListType type, FileType file_type, const std::string& prefix = "");
 
-std::shared_ptr<VertexInfo> CreateVertexInfo(const std::string& label, IdType chunk_size,
-                      const PropertyGroupVector& property_groups,
-                      const std::string& prefix = "",
-                      std::shared_ptr<const InfoVersion> version = nullptr);
+std::shared_ptr<VertexInfo> CreateVertexInfo(
+    const std::string& label, IdType chunk_size,
+    const PropertyGroupVector& property_groups, const std::string& prefix = "",
+    std::shared_ptr<const InfoVersion> version = nullptr);
 
-std::shared_ptr<EdgeInfo> CreateEdgeInfo(const std::string& src_label, const std::string& edge_label,
-                    const std::string& dst_label, IdType chunk_size,
-                    IdType src_chunk_size, IdType dst_chunk_size, bool directed,
-                    const AdjacentListVector& adjacent_lists,
-                    const PropertyGroupVector& property_groups,
-                    const std::string& prefix = "",
-                    std::shared_ptr<const InfoVersion> version = nullptr);
+std::shared_ptr<EdgeInfo> CreateEdgeInfo(
+    const std::string& src_label, const std::string& edge_label,
+    const std::string& dst_label, IdType chunk_size, IdType src_chunk_size,
+    IdType dst_chunk_size, bool directed,
+    const AdjacentListVector& adjacent_lists,
+    const PropertyGroupVector& property_groups, const std::string& prefix = "",
+    std::shared_ptr<const InfoVersion> version = nullptr);
 
-std::shared_ptr<GraphInfo> CreateGraphInfo(const std::string& name,
-                    const VertexInfoVector& vertex_infos,
-                    const EdgeInfoVector& edge_infos,
-                    const std::string& prefix = "",
-                    std::shared_ptr<const InfoVersion> version = nullptr);
+std::shared_ptr<GraphInfo> CreateGraphInfo(
+    const std::string& name, const VertexInfoVector& vertex_infos,
+    const EdgeInfoVector& edge_infos, const std::string& prefix = "",
+    std::shared_ptr<const InfoVersion> version = nullptr);
 
 const std::shared_ptr<DataType>& boolean();
 const std::shared_ptr<DataType>& int32();

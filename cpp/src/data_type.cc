@@ -90,7 +90,8 @@ std::string DataType::ToTypeName() const {
   }
 }
 
-const std::shared_ptr<DataType>& DataType::TypeNameToDataType(const std::string& str) {
+const std::shared_ptr<DataType>& DataType::TypeNameToDataType(
+    const std::string& str) {
   if (str == "bool") {
     return boolean();
   } else if (str == "int32") {
@@ -108,10 +109,11 @@ const std::shared_ptr<DataType>& DataType::TypeNameToDataType(const std::string&
   }
 }
 
-#define TYPE_FACTORY(NAME, TYPE)                                        \
-  const std::shared_ptr<DataType>& NAME() {                              \
-    static std::shared_ptr<DataType> result = std::make_shared<DataType>(TYPE); \
-    return result;                                                       \
+#define TYPE_FACTORY(NAME, TYPE)              \
+  const std::shared_ptr<DataType>& NAME() {   \
+    static std::shared_ptr<DataType> result = \
+        std::make_shared<DataType>(TYPE);     \
+    return result;                            \
   }
 
 TYPE_FACTORY(boolean, Type::BOOL)

@@ -20,11 +20,11 @@
 
 #include "gar/graph_info.h"
 #include "gar/util/adj_list_type.h"
+#include "gar/util/data_type.h"
 #include "gar/util/filesystem.h"
 #include "gar/util/result.h"
 #include "gar/util/version_parser.h"
 #include "gar/util/yaml.h"
-#include "gar/util/data_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -120,7 +120,8 @@ bool PropertyGroup::IsValidated() const {
 }
 
 std::shared_ptr<PropertyGroup> CreatePropertyGroup(
-    const std::vector<Property>& properties, FileType file_type, const std::string& prefix) {
+    const std::vector<Property>& properties, FileType file_type,
+    const std::string& prefix) {
   return std::make_shared<PropertyGroup>(properties, file_type, prefix);
 }
 
@@ -147,8 +148,9 @@ bool AdjacentList::IsValidated() const {
   return true;
 }
 
-std::shared_ptr<AdjacentList> CreateAdjacentList(AdjListType type, FileType file_type,
-                        const std::string& prefix) {
+std::shared_ptr<AdjacentList> CreateAdjacentList(AdjListType type,
+                                                 FileType file_type,
+                                                 const std::string& prefix) {
   return std::make_shared<AdjacentList>(type, file_type, prefix);
 }
 
@@ -191,7 +193,8 @@ class VertexInfo::Impl {
   std::shared_ptr<const InfoVersion> version_;
   std::unordered_map<std::string, int> property_name_to_index_;
   std::unordered_map<std::string, bool> property_name_to_primary_;
-  std::unordered_map<std::string, std::shared_ptr<DataType>> property_name_to_type_;
+  std::unordered_map<std::string, std::shared_ptr<DataType>>
+      property_name_to_type_;
 };
 
 VertexInfo::VertexInfo(const std::string& label, IdType chunk_size,
@@ -228,7 +231,7 @@ Result<std::string> VertexInfo::GetPathPrefix(
 }
 
 Result<std::string> VertexInfo::GetVerticesNumFilePath() const {
-  return impl_->prefix_ + "vertices_num";
+  return impl_->prefix_ + "vertex_count";
 }
 
 int VertexInfo::PropertyGroupNum() const {
@@ -293,6 +296,12 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::AddPropertyGroup(
   if (property_group == nullptr) {
     return Status::Invalid("property group is nullptr");
   }
+  for (const auto& property : property_group->GetProperties()) {
+    if (HasProperty(property.name)) {
+      return Status::Invalid("property in the property group already exists: ",
+                             property.name);
+    }
+  }
   return std::make_shared<VertexInfo>(
       impl_->label_, impl_->chunk_size_,
       AddVectorElement(impl_->property_groups_, property_group), impl_->prefix_,
@@ -301,11 +310,12 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::AddPropertyGroup(
 
 bool VertexInfo::IsValidated() const { return impl_->is_validated(); }
 
-std::shared_ptr<VertexInfo> CreateVertexInfo(const std::string& label, IdType chunk_size,
-                      const PropertyGroupVector& property_groups,
-                      const std::string& prefix,
-                      std::shared_ptr<const InfoVersion> version) {
-  return std::make_shared<VertexInfo>(label, chunk_size, property_groups, prefix, version);
+std::shared_ptr<VertexInfo> CreateVertexInfo(
+    const std::string& label, IdType chunk_size,
+    const PropertyGroupVector& property_groups, const std::string& prefix,
+    std::shared_ptr<const InfoVersion> version) {
+  return std::make_shared<VertexInfo>(label, chunk_size, property_groups,
+                                      prefix, version);
 }
 
 Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(
@@ -466,7 +476,8 @@ class EdgeInfo::Impl {
   std::unordered_map<AdjListType, int> adjacent_list_type_to_index_;
   std::unordered_map<std::string, int> property_name_to_index_;
   std::unordered_map<std::string, bool> property_name_to_primary_;
-  std::unordered_map<std::string, std::shared_ptr<DataType>> property_name_to_type_;
+  std::unordered_map<std::string, std::shared_ptr<DataType>>
+      property_name_to_type_;
   std::shared_ptr<const InfoVersion> version_;
 };
 
@@ -568,7 +579,7 @@ Result<std::string> EdgeInfo::GetEdgesNumFilePath(
   CHECK_HAS_ADJ_LIST_TYPE(adj_list_type);
   int i = impl_->adjacent_list_type_to_index_.at(adj_list_type);
   return impl_->prefix_ + impl_->adjacent_lists_[i]->GetPrefix() +
-         "edge_count" + std::to_string(vertex_chunk_index) + "_edge_count";
+         "edge_count" + std::to_string(vertex_chunk_index);
 }
 
 Result<std::string> EdgeInfo::GetAdjListFilePath(
@@ -652,6 +663,10 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddAdjacentList(
   if (adj_list == nullptr) {
     return Status::Invalid("adj list is nullptr");
   }
+  if (HasAdjacentListType(adj_list->GetType())) {
+    return Status::Invalid("adj list type already exists: ",
+                           AdjListTypeToString(adj_list->GetType()));
+  }
   return std::make_shared<EdgeInfo>(
       impl_->src_label_, impl_->edge_label_, impl_->dst_label_,
       impl_->chunk_size_, impl_->src_chunk_size_, impl_->dst_chunk_size_,
@@ -664,6 +679,12 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddPropertyGroup(
   if (property_group == nullptr) {
     return Status::Invalid("property group is nullptr");
   }
+  for (const auto& property : property_group->GetProperties()) {
+    if (HasProperty(property.name)) {
+      return Status::Invalid("property in property group already exists: ",
+                             property.name);
+    }
+  }
   return std::make_shared<EdgeInfo>(
       impl_->src_label_, impl_->edge_label_, impl_->dst_label_,
       impl_->chunk_size_, impl_->src_chunk_size_, impl_->dst_chunk_size_,
@@ -674,17 +695,17 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddPropertyGroup(
 
 bool EdgeInfo::IsValidated() const { return impl_->is_validated(); }
 
-std::shared_ptr<EdgeInfo> CreateEdgeInfo(const std::string& src_label, const std::string& edge_label,
-                    const std::string& dst_label, IdType chunk_size,
-                    IdType src_chunk_size, IdType dst_chunk_size, bool directed,
-                    const AdjacentListVector& adjacent_lists,
-                    const PropertyGroupVector& property_groups,
-                    const std::string& prefix,
-                    std::shared_ptr<const InfoVersion> version) {
-  return std::make_shared<EdgeInfo>(src_label, edge_label, dst_label, chunk_size,
-                                    src_chunk_size, dst_chunk_size, directed,
-                                    adjacent_lists, property_groups, prefix,
-                                    version);
+std::shared_ptr<EdgeInfo> CreateEdgeInfo(
+    const std::string& src_label, const std::string& edge_label,
+    const std::string& dst_label, IdType chunk_size, IdType src_chunk_size,
+    IdType dst_chunk_size, bool directed,
+    const AdjacentListVector& adjacent_lists,
+    const PropertyGroupVector& property_groups, const std::string& prefix,
+    std::shared_ptr<const InfoVersion> version) {
+  return std::make_shared<EdgeInfo>(src_label, edge_label, dst_label,
+                                    chunk_size, src_chunk_size, dst_chunk_size,
+                                    directed, adjacent_lists, property_groups,
+                                    prefix, version);
 }
 
 Result<std::shared_ptr<EdgeInfo>> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
@@ -1031,11 +1052,10 @@ Result<std::shared_ptr<GraphInfo>> GraphInfo::AddEdge(
       impl_->version_);
 }
 
-std::shared_ptr<GraphInfo> CreateGraphInfo(const std::string& name,
-                    const VertexInfoVector& vertex_infos,
-                    const EdgeInfoVector& edge_infos,
-                    const std::string& prefix,
-                    std::shared_ptr<const InfoVersion> version) {
+std::shared_ptr<GraphInfo> CreateGraphInfo(
+    const std::string& name, const VertexInfoVector& vertex_infos,
+    const EdgeInfoVector& edge_infos, const std::string& prefix,
+    std::shared_ptr<const InfoVersion> version) {
   return std::make_shared<GraphInfo>(name, vertex_infos, edge_infos, prefix,
                                      version);
 }

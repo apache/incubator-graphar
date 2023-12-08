@@ -184,7 +184,8 @@ Status VertexPropertyWriter::validate(
         return Status::TypeError(
             "The data type of property: ", property.name, " is ",
             property.type->ToTypeName(), ", but got ",
-            DataType::ArrowDataTypeToDataType(field->type())->ToTypeName(), ".");
+            DataType::ArrowDataTypeToDataType(field->type())->ToTypeName(),
+            ".");
       }
     }
   }
@@ -259,12 +260,21 @@ Status VertexPropertyWriter::WriteTable(
     const std::shared_ptr<arrow::Table>& input_table,
     const std::shared_ptr<PropertyGroup>& property_group,
     IdType start_chunk_index, ValidateLevel validate_level) const {
+  auto schema = input_table->schema();
+  int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
+  auto table_with_index = input_table;
+  if (indice == -1) {
+    // add index column
+    GAR_ASSIGN_OR_RAISE(table_with_index,
+                        addIndexColumn(input_table, start_chunk_index,
+                                       vertex_info_->GetChunkSize()));
+  }
   IdType chunk_size = vertex_info_->GetChunkSize();
-  int64_t length = input_table->num_rows();
+  int64_t length = table_with_index->num_rows();
   IdType chunk_index = start_chunk_index;
   for (int64_t offset = 0; offset < length;
        offset += chunk_size, chunk_index++) {
-    auto in_chunk = input_table->Slice(offset, chunk_size);
+    auto in_chunk = table_with_index->Slice(offset, chunk_size);
     GAR_RETURN_NOT_OK(
         WriteChunk(in_chunk, property_group, chunk_index, validate_level));
   }
@@ -541,7 +551,8 @@ Status EdgeChunkWriter::validate(
         return Status::TypeError(
             "The data type of property: ", property.name, " is ",
             property.type->ToTypeName(), ", but got ",
-            DataType::ArrowDataTypeToDataType(field->type())->ToTypeName(), ".");
+            DataType::ArrowDataTypeToDataType(field->type())->ToTypeName(),
+            ".");
       }
     }
   }
@@ -841,8 +852,8 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::getOffsetTable(
   std::vector<std::shared_ptr<arrow::Array>> arrays;
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
   std::string property = GeneralParams::kOffsetCol;
-  schema_vector.push_back(arrow::field(
-      property, DataType::DataTypeToArrowDataType(int64())));
+  schema_vector.push_back(
+      arrow::field(property, DataType::DataTypeToArrowDataType(int64())));
 
   int64_t global_index = 0;
   for (IdType i = begin_index; i < end_index; i++) {

@@ -128,8 +128,7 @@ VertexPropertyArrowChunkReader::Make(
 Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
 VertexPropertyArrowChunkReader::Make(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
-    const std::string& property_name,
-    const util::FilterOptions& options) {
+    const std::string& property_name, const util::FilterOptions& options) {
   auto vertex_info = graph_info->GetVertexInfo(label);
   if (!vertex_info) {
     return Status::KeyError("The vertex type ", label,
@@ -673,8 +672,8 @@ Result<std::shared_ptr<AdjListPropertyArrowChunkReader>>
 AdjListPropertyArrowChunkReader::Make(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
     const std::string& edge_label, const std::string& dst_label,
-    const std::string& property_name,
-    AdjListType adj_list_type, const util::FilterOptions& options) {
+    const std::string& property_name, AdjListType adj_list_type,
+    const util::FilterOptions& options) {
   auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
   if (!edge_info) {
     return Status::KeyError("The edge ", src_label, " ", edge_label, " ",

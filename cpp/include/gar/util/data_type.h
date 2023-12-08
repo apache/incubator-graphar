@@ -101,7 +101,8 @@ class DataType {
   static const std::shared_ptr<DataType>& ArrowDataTypeToDataType(
       const std::shared_ptr<arrow::DataType>& type);
 
-  static const std::shared_ptr<DataType>& TypeNameToDataType(const std::string& str);
+  static const std::shared_ptr<DataType>& TypeNameToDataType(
+      const std::string& str);
 
   /** Return the type category of the DataType. */
   Type id() const { return id_; }

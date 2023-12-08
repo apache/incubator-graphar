@@ -81,7 +81,8 @@ class VertexPropertyChunkInfoReader {
       const std::string& prefix);
 
   /**
-   * @brief Create a VertexPropertyChunkInfoReader instance from graph info and property group
+   * @brief Create a VertexPropertyChunkInfoReader instance from graph info and
+   * property group
    *
    * @param graph_info The graph info.
    * @param label The vertex label.
@@ -90,14 +91,16 @@ class VertexPropertyChunkInfoReader {
   static Result<std::shared_ptr<VertexPropertyChunkInfoReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
       const std::shared_ptr<PropertyGroup>& property_group);
-  
+
   /**
-   *  @brief Create a VertexPropertyChunkInfoReader instance from graph info and property name
-   * 
+   *  @brief Create a VertexPropertyChunkInfoReader instance from graph info and
+   * property name
+   *
    * @param graph_info The graph info.
    * @param label The vertex label.
-   * @param property_name The name of one property in the property group you want to read.
-  */
+   * @param property_name The name of one property in the property group you
+   * want to read.
+   */
   static Result<std::shared_ptr<VertexPropertyChunkInfoReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
       const std::string& property_name);
@@ -335,7 +338,8 @@ class AdjListPropertyChunkInfoReader {
       AdjListType adj_list_type, const std::string& prefix);
 
   /**
-   * @brief Create an AdjListPropertyChunkInfoReader instance from graph info and property group.
+   * @brief Create an AdjListPropertyChunkInfoReader instance from graph info
+   * and property group.
    *
    * @param graph_info The graph info.
    * @param src_label The source vertex label.
@@ -352,20 +356,21 @@ class AdjListPropertyChunkInfoReader {
       AdjListType adj_list_type);
 
   /**
-   * @brief Create an AdjListPropertyChunkInfoReader instance from graph info and property name.
+   * @brief Create an AdjListPropertyChunkInfoReader instance from graph info
+   * and property name.
    *
    * @param graph_info The graph info.
    * @param src_label The source vertex label.
    * @param edge_label The edge label.
    * @param dst_label The destination vertex label.
-   * @param property_name The name of one property in the property group you want to read.
+   * @param property_name The name of one property in the property group you
+   * want to read.
    * @param adj_list_type The adj list type for the edge.
    */
   static Result<std::shared_ptr<AdjListPropertyChunkInfoReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info,
       const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label,
-      const std::string& property_name,
+      const std::string& dst_label, const std::string& property_name,
       AdjListType adj_list_type);
 
  private:

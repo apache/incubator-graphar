@@ -21,10 +21,11 @@
 
 #include "./config.h"
 #include "gar/api.h"
-#include "gar/util/expression.h"
 #include "gar/reader/arrow_chunk_reader.h"
+#include "gar/util/expression.h"
 
-void vertex_property_chunk_reader(const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+void vertex_property_chunk_reader(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // create reader
   std::string label = "person", property_name = "gender";
   auto maybe_reader = GAR_NAMESPACE::VertexPropertyArrowChunkReader::Make(
@@ -87,7 +88,8 @@ void vertex_property_chunk_reader(const std::shared_ptr<GAR_NAMESPACE::GraphInfo
             << filter_table->schema()->ToString() << std::endl;
 }
 
-void adj_list_chunk_reader(const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+void adj_list_chunk_reader(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // create reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   auto maybe_reader = GAR_NAMESPACE::AdjListArrowChunkReader::Make(
@@ -179,7 +181,8 @@ void adj_list_property_chunk_reader(
             << filter_table->num_rows() << std::endl;
 }
 
-void adj_list_offset_chunk_reader(const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+void adj_list_offset_chunk_reader(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // create reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   auto maybe_reader = GAR_NAMESPACE::AdjListOffsetArrowChunkReader::Make(
