@@ -90,6 +90,22 @@ VertexPropertyChunkInfoReader::Make(
   return Make(vertex_info, property_group, graph_info->GetPrefix());
 }
 
+Result<std::shared_ptr<VertexPropertyChunkInfoReader>>
+VertexPropertyChunkInfoReader::Make(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+    const std::string& property_name) {
+  auto vertex_info = graph_info->GetVertexInfo(label);
+  if (!vertex_info) {
+    return Status::KeyError("The vertex ", label, " doesn't exist.");
+  }
+  auto property_group = vertex_info->GetPropertyGroup(property_name);
+  if (!property_group) {
+    return Status::KeyError("The property ", property_name,
+                            " doesn't exist in vertex ", label, ".");
+  }
+  return Make(vertex_info, property_group, graph_info->GetPrefix());
+}
+
 AdjListChunkInfoReader::AdjListChunkInfoReader(
     const std::shared_ptr<EdgeInfo>& edge_info, AdjListType adj_list_type,
     const std::string& prefix)
@@ -465,6 +481,27 @@ AdjListPropertyChunkInfoReader::Make(
   if (!edge_info) {
     return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
                             dst_label, " doesn't exist.");
+  }
+  return Make(edge_info, property_group, adj_list_type,
+              graph_info->GetPrefix());
+}
+
+Result<std::shared_ptr<AdjListPropertyChunkInfoReader>>
+AdjListPropertyChunkInfoReader::Make(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
+    const std::string& edge_label, const std::string& dst_label,
+    const std::string& property_name,
+    AdjListType adj_list_type) {
+  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  if (!edge_info) {
+    return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
+                            dst_label, " doesn't exist.");
+  }
+  auto property_group = edge_info->GetPropertyGroup(property_name);
+  if (!property_group) {
+    return Status::KeyError("The property ", property_name,
+                            " doesn't exist in edge ", src_label, " ",
+                            edge_label, " ", dst_label, ".");
   }
   return Make(edge_info, property_group, adj_list_type,
               graph_info->GetPrefix());

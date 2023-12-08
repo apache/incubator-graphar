@@ -95,7 +95,7 @@ class VertexPropertyArrowChunkReader {
   void Select(util::ColumnNames column_names = std::nullopt);
 
   /**
-   * @brief Construct a VertexPropertyArrowChunkReader from vertex info.
+   * @brief Create a VertexPropertyArrowChunkReader instance from vertex info.
    *
    * @param vertex_info The vertex info.
    * @param property_group The property group of the vertex property.
@@ -108,7 +108,7 @@ class VertexPropertyArrowChunkReader {
       const std::string& prefix, const util::FilterOptions& options = {});
 
   /**
-   * @brief Construct a VertexPropertyArrowChunkReader from graph info.
+   * @brief Create a VertexPropertyArrowChunkReader instance from graph info and property group.
    *
    * @param graph_info The graph info.
    * @param label The vertex label.
@@ -118,6 +118,19 @@ class VertexPropertyArrowChunkReader {
   static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
       const std::shared_ptr<PropertyGroup>& property_group,
+      const util::FilterOptions& options = {});
+
+  /**
+   * @brief Create a VertexPropertyArrowChunkReader instance from graph info and property name.
+   *
+   * @param graph_info The graph info.
+   * @param label The vertex label.
+   * @param property_name The name of one property in the property group you want to read.
+   * @param options The filter options, default is empty.
+   */
+  static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+      const std::string& property_name,
       const util::FilterOptions& options = {});
 
  private:
@@ -209,7 +222,7 @@ class AdjListArrowChunkReader {
   Status seek_chunk_index(IdType vertex_chunk_index, IdType chunk_index = 0);
 
   /**
-   * @brief Construct an AdjListArrowChunkReader from edge info.
+   * @brief Create an AdjListArrowChunkReader instance from edge info.
    *
    * @param edge_info The edge info.
    * @param adj_list_type The adj list type for the edges.
@@ -220,7 +233,7 @@ class AdjListArrowChunkReader {
       const std::string& prefix);
 
   /**
-   * @brief Construct an AdjListArrowChunkReader from graph info.
+   * @brief Create an AdjListArrowChunkReader instance from graph info.
    *
    * @param graph_info The graph info.
    * @param src_label The source vertex label.
@@ -292,7 +305,7 @@ class AdjListOffsetArrowChunkReader {
   IdType GetChunkIndex() const noexcept { return chunk_index_; }
 
   /**
-   * @brief Construct an AdjListOffsetArrowChunkReader from edge info.
+   * @brief Create an AdjListOffsetArrowChunkReader instance from edge info.
    *
    * @param edge_info The edge info.
    * @param adj_list_type The adj list type for the edges.
@@ -303,7 +316,7 @@ class AdjListOffsetArrowChunkReader {
       const std::string& prefix);
 
   /**
-   * @brief Construct an AdjListOffsetArrowChunkReader from graph info.
+   * @brief Create an AdjListOffsetArrowChunkReader instance from graph info.
    *
    * @param graph_info The graph info.
    * @param src_label The source vertex label.
@@ -420,7 +433,7 @@ class AdjListPropertyArrowChunkReader {
   void Select(util::ColumnNames column_names = std::nullopt);
 
   /**
-   * @brief Construct an AdjListPropertyArrowChunkReader from edge info.
+   * @brief Create an AdjListPropertyArrowChunkReader instance from edge info.
    *
    * @param edge_info The edge info that describes the edge type.
    * @param property_group The property group that describes the property
@@ -435,7 +448,7 @@ class AdjListPropertyArrowChunkReader {
       const util::FilterOptions& options = {});
 
   /**
-   * @brief Construct an AdjListPropertyArrowChunkReader from graph info.
+   * @brief Create an AdjListPropertyArrowChunkReader instance from graph info and property group.
    *
    * @param graph_info The graph info that describes the graph.
    * @param src_label The source vertex label.
@@ -451,6 +464,24 @@ class AdjListPropertyArrowChunkReader {
       const std::string& src_label, const std::string& edge_label,
       const std::string& dst_label,
       const std::shared_ptr<PropertyGroup>& property_group,
+      AdjListType adj_list_type, const util::FilterOptions& options = {});
+
+  /**
+   * @brief Create an AdjListPropertyArrowChunkReader instance from graph info and property name.
+   *
+   * @param graph_info The graph info that describes the graph.
+   * @param src_label The source vertex label.
+   * @param edge_label The edge label.
+   * @param dst_label The destination vertex label.
+   * @param property_name The name of one property in the property group you want to read.
+   * @param adj_list_type The adj list type for the edges.
+   * @param options The filter options, default is empty.
+   */
+  static Result<std::shared_ptr<AdjListPropertyArrowChunkReader>> Make(
+      const std::shared_ptr<GraphInfo>& graph_info,
+      const std::string& src_label, const std::string& edge_label,
+      const std::string& dst_label,
+      const std::string& property_name,
       AdjListType adj_list_type, const util::FilterOptions& options = {});
 
  private:

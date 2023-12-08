@@ -20,18 +20,15 @@
 #include "arrow/filesystem/api.h"
 
 #include "./config.h"
+#include "gar/api.h"
 #include "gar/reader/chunk_info_reader.h"
 
 void vertex_property_chunk_info_reader(
-    const GAR_NAMESPACE::GraphInfo& graph_info) {
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // constuct reader
   std::string label = "person", property_name = "id";
-  ASSERT(graph_info.GetVertexInfo(label).status().ok());
-  auto maybe_group = graph_info.GetVertexPropertyGroup(label, property_name);
-  ASSERT(!maybe_group.has_error());
-  const GAR_NAMESPACE::PropertyGroup& group = maybe_group.value();
   auto maybe_reader = GAR_NAMESPACE::VertexPropertyChunkInfoReader::Make(
-      graph_info, label, group);
+      graph_info, label, property_name);
   ASSERT(!maybe_reader.has_error());
   auto reader = maybe_reader.value();
 
@@ -59,7 +56,7 @@ void vertex_property_chunk_info_reader(
             << std::endl;
 }
 
-void adj_list_chunk_info_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
+void adj_list_chunk_info_reader(const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // construct reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   auto maybe_reader = GAR_NAMESPACE::AdjListChunkInfoReader::Make(
@@ -90,19 +87,14 @@ void adj_list_chunk_info_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
 }
 
 void adj_list_property_chunk_info_reader(
-    const GAR_NAMESPACE::GraphInfo& graph_info) {
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // construct reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person",
               property_name = "creationDate";
 
-  auto maybe_group = graph_info.GetEdgePropertyGroup(
-      src_label, edge_label, dst_label, property_name,
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
-  ASSERT(maybe_group.status().ok());
-  auto group = maybe_group.value();
   auto maybe_property_reader =
       GAR_NAMESPACE::AdjListPropertyChunkInfoReader::Make(
-          graph_info, src_label, edge_label, dst_label, group,
+          graph_info, src_label, edge_label, dst_label, property_name,
           GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(maybe_property_reader.status().ok());
   auto reader = maybe_property_reader.value();

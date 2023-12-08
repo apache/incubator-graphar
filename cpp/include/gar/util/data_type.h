@@ -84,6 +84,13 @@ class DataType {
            user_defined_type_name_ == other.user_defined_type_name_;
   }
 
+  bool Equals(const std::shared_ptr<DataType>& other) const {
+    if (!other) {
+      return false;
+    }
+    return Equals(*other.get());
+  }
+
   bool operator==(const DataType& other) const { return Equals(other); }
 
   bool operator!=(const DataType& other) const { return !Equals(other); }

@@ -19,8 +19,8 @@
 #include "arrow/api.h"
 
 #include "./config.h"
+#include "gar/api.h"
 #include "gar/graph.h"
-#include "gar/graph_info.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/writer/arrow_chunk_writer.h"
 #include "gar/writer/edges_builder.h"
@@ -33,7 +33,7 @@ int main(int argc, char* argv[]) {
 
   // get the person vertices of graph
   std::string label = "person";
-  ASSERT(graph_info.GetVertexInfo(label).status().ok());
+  ASSERT(graph_info->GetVertexInfo(label) != nullptr);
   auto maybe_vertices =
       GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
@@ -80,26 +80,23 @@ int main(int argc, char* argv[]) {
   // Append the bfs result to the vertex info as a property group
   // and write to file
   // construct property group
-  GAR_NAMESPACE::Property bfs = {
-      "bfs", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32), false};
-  GAR_NAMESPACE::Property father = {
-      "father", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT64), false};
+  GAR_NAMESPACE::Property bfs(
+      "bfs", GAR_NAMESPACE::int32(), false);
+  GAR_NAMESPACE::Property father(
+      "father", GAR_NAMESPACE::int64(), false);
   std::vector<GAR_NAMESPACE::Property> property_vector = {bfs, father};
-  GAR_NAMESPACE::PropertyGroup group(property_vector,
-                                     GAR_NAMESPACE::FileType::CSV);
+  auto group = GAR_NAMESPACE::CreatePropertyGroup(property_vector, GAR_NAMESPACE::FileType::CSV);
 
   // extend the vertex_info
-  auto maybe_vertex_info = graph_info.GetVertexInfo(label);
-  ASSERT(maybe_vertex_info.status().ok());
-  auto vertex_info = maybe_vertex_info.value();
-  auto maybe_extend_info = vertex_info.Extend(group);
+  auto vertex_info = graph_info->GetVertexInfo(label);
+  auto maybe_extend_info = vertex_info->AddPropertyGroup(group);
   ASSERT(maybe_extend_info.status().ok());
   auto extend_info = maybe_extend_info.value();
 
   // dump the extened vertex info
-  ASSERT(extend_info.IsValidated());
-  ASSERT(extend_info.Dump().status().ok());
-  ASSERT(extend_info.Save("/tmp/person-new-bfs-father.vertex.yml").ok());
+  ASSERT(extend_info->IsValidated());
+  ASSERT(extend_info->Dump().status().ok());
+  ASSERT(extend_info->Save("/tmp/person-new-bfs-father.vertex.yml").ok());
   // construct vertex property writer
   GAR_NAMESPACE::VertexPropertyWriter writer(extend_info, "file:///tmp/");
   // convert results to arrow::Table
@@ -141,18 +138,16 @@ int main(int argc, char* argv[]) {
   dst_label = "person";
   int edge_chunk_size = 1024, src_chunk_size = 100, dst_chunk_size = 100;
   bool directed = true;
-  GAR_NAMESPACE::InfoVersion version(1);
-  GAR_NAMESPACE::EdgeInfo new_edge_info(src_label, edge_label, dst_label,
-                                        edge_chunk_size, src_chunk_size,
-                                        dst_chunk_size, directed, version);
-  ASSERT(new_edge_info
-             .AddAdjList(GAR_NAMESPACE::AdjListType::ordered_by_source,
-                         GAR_NAMESPACE::FileType::CSV)
-             .ok());
-  ASSERT(new_edge_info.IsValidated());
+  auto version = GAR_NAMESPACE::InfoVersion::Parse("gar/v1").value();
+  auto al = GAR_NAMESPACE::CreateAdjacentList(
+      GAR_NAMESPACE::AdjListType::ordered_by_source, GAR_NAMESPACE::FileType::CSV);
+  auto new_edge_info = GAR_NAMESPACE::CreateEdgeInfo(
+      src_label, edge_label, dst_label, edge_chunk_size, src_chunk_size,
+      dst_chunk_size, directed, {al}, {}, "", version);
+  ASSERT(new_edge_info->IsValidated());
   // save & dump
-  ASSERT(!new_edge_info.Dump().has_error());
-  ASSERT(new_edge_info.Save("/tmp/person_bfs_person.edge.yml").ok());
+  ASSERT(!new_edge_info->Dump().has_error());
+  ASSERT(new_edge_info->Save("/tmp/person_bfs_person.edge.yml").ok());
   GAR_NAMESPACE::builder::EdgesBuilder edges_builder(
       new_edge_info, "file:///tmp/",
       GAR_NAMESPACE::AdjListType::ordered_by_source, num_vertices);

@@ -20,6 +20,7 @@
 #include "arrow/filesystem/api.h"
 
 #include "./config.h"
+#include "gar/api.h"
 #include "gar/writer/edges_builder.h"
 #include "gar/writer/vertices_builder.h"
 

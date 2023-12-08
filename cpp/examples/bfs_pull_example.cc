@@ -19,8 +19,8 @@
 #include "arrow/api.h"
 
 #include "./config.h"
+#include "gar/api.h"
 #include "gar/graph.h"
-#include "gar/graph_info.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
 
   // construct vertices collection
   std::string label = "person";
-  ASSERT(graph_info.GetVertexInfo(label).status().ok());
+  ASSERT(graph_info->GetVertexInfo(label) != nullptr);
   auto maybe_vertices =
       GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
@@ -83,22 +83,19 @@ int main(int argc, char* argv[]) {
 
   // extend the original vertex info and write results to gar using writer
   // construct property group
-  GAR_NAMESPACE::Property bfs = {
-      "bfs-pull", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32), false};
+  GAR_NAMESPACE::Property bfs("bfs-pull", GAR_NAMESPACE::int32(), false);
   std::vector<GAR_NAMESPACE::Property> property_vector = {bfs};
-  GAR_NAMESPACE::PropertyGroup group(property_vector,
-                                     GAR_NAMESPACE::FileType::PARQUET);
+  auto group = GAR_NAMESPACE::CreatePropertyGroup(property_vector,
+                                                  GAR_NAMESPACE::FileType::PARQUET);
   // extend the vertex_info
-  auto maybe_vertex_info = graph_info.GetVertexInfo(label);
-  ASSERT(maybe_vertex_info.status().ok());
-  auto vertex_info = maybe_vertex_info.value();
-  auto maybe_extend_info = vertex_info.Extend(group);
+  auto vertex_info = graph_info->GetVertexInfo(label);
+  auto maybe_extend_info = vertex_info->AddPropertyGroup(group);
   ASSERT(maybe_extend_info.status().ok());
   auto extend_info = maybe_extend_info.value();
   // dump the extened vertex info
-  ASSERT(extend_info.IsValidated());
-  ASSERT(extend_info.Dump().status().ok());
-  ASSERT(extend_info.Save("/tmp/person-new-bfs-pull.vertex.yml").ok());
+  ASSERT(extend_info->IsValidated());
+  ASSERT(extend_info->Dump().status().ok());
+  ASSERT(extend_info->Save("/tmp/person-new-bfs-pull.vertex.yml").ok());
   // construct vertex property writer
   GAR_NAMESPACE::VertexPropertyWriter writer(extend_info, "/tmp/");
   // convert results to arrow::Table
