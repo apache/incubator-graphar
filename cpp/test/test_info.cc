@@ -650,20 +650,20 @@ version: gar/v1
     REQUIRE(graph_info->GetName() == "ldbc_sample");
     REQUIRE(graph_info->GetPrefix() == "/tmp/ldbc/");
   }
+}
 
-  SECTION("LoadFromS3") {
-    std::string path =
-        "s3://graphar/ldbc/ldbc.graph.yml"
-        "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
-    auto graph_info_result = GraphInfo::Load(path);
-    std::cout << graph_info_result.status().message() << std::endl;
-    REQUIRE(!graph_info_result.has_error());
-    auto graph_info = graph_info_result.value();
-    REQUIRE(graph_info->GetName() == "ldbc");
-    const auto& vertex_infos = graph_info->GetVertexInfos();
-    const auto& edge_infos = graph_info->GetEdgeInfos();
-    REQUIRE(vertex_infos.size() == 8);
-    REQUIRE(edge_infos.size() == 23);
-  }
+TEST_CASE("LoadFromS3", "[!hide]") {
+  std::string path =
+      "s3://graphar/ldbc/ldbc.graph.yml"
+      "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
+  auto graph_info_result = GraphInfo::Load(path);
+  std::cout << graph_info_result.status().message() << std::endl;
+  REQUIRE(!graph_info_result.has_error());
+  auto graph_info = graph_info_result.value();
+  REQUIRE(graph_info->GetName() == "ldbc");
+  const auto& vertex_infos = graph_info->GetVertexInfos();
+  const auto& edge_infos = graph_info->GetEdgeInfos();
+  REQUIRE(vertex_infos.size() == 8);
+  REQUIRE(edge_infos.size() == 23);
 }
 }  // namespace GAR_NAMESPACE
