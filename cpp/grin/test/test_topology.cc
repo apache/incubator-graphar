@@ -30,7 +30,8 @@ limitations under the License.
 void test_protobuf() {
   std::cout << "\n++++ test protobuf ++++" << std::endl;
 
-  std::cout << grin_get_static_storage_feature_msg() << std::endl;
+  // TODO: test protobuf
+  // std::cout << grin_get_graph_schema_msg() << std::endl;
 
   std::cout << "---- test protobuf ----" << std::endl;
 }

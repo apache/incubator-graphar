@@ -4,22 +4,15 @@ find_package(Protobuf REQUIRED)
 
 find_package(glog REQUIRED)
 
-file(GLOB_RECURSE GAR_GRIN_SRC_FILES "src/*.cc")
-
-message(${GAR_GRIN_SRC_FILES})
-
-add_library(gar-grin SHARED ${GAR_GRIN_SRC_FILES})
-
-target_compile_features(gar-grin PUBLIC cxx_std_17)
-
-target_include_directories(gar-grin SYSTEM BEFORE PUBLIC ${PROJECT_SOURCE_DIR}/thirdparty/grin/include ${Protobuf_INCLUDE_DIRS})
-
-target_link_libraries(gar-grin PUBLIC gar ${Protobuf_LIBRARIES} glog::glog)
+include_directories(${PROJECT_SOURCE_DIR}/grin)
+include_directories(${PROJECT_SOURCE_DIR}/grin/src/common)
+include_directories(${PROJECT_SOURCE_DIR}/thirdparty/grin/include)
+include_directories(${PROJECT_SOURCE_DIR}/thirdparty/grin/extension/include)
 
 # ------------------------------------------------------------------------------
 # complile protobuf to generate cpp files
 # ------------------------------------------------------------------------------
-set(DST_DIR "${PROJECT_SOURCE_DIR}/grin/src/common/")
+set(DST_DIR "${PROJECT_SOURCE_DIR}/grin/src/common")
 
 list(APPEND PROTO_FLAGS -I${PROJECT_SOURCE_DIR}/thirdparty/grin/proto/)
 
@@ -39,6 +32,18 @@ endforeach()
 
 set_source_files_properties(${PROTO_SRCS} ${PROTO_HDRS} PROPERTIES GENERATED TRUE)
 
+file(GLOB_RECURSE GAR_GRIN_SRC_FILES "src/*.cc" "../thirdparty/grin/extension/src/*.cc")
+
+message(${GAR_GRIN_SRC_FILES})
+
+add_library(gar-grin SHARED ${GAR_GRIN_SRC_FILES})
+
+target_compile_features(gar-grin PUBLIC cxx_std_17)
+
+target_include_directories(gar-grin SYSTEM BEFORE PUBLIC ${PROJECT_SOURCE_DIR}/grin ${PROJECT_SOURCE_DIR}/thirdparty/grin/include ${PROJECT_SOURCE_DIR}/thirdparty/grin/extension/include ${Protobuf_INCLUDE_DIRS})
+
+target_link_libraries(gar-grin PUBLIC gar ${Protobuf_LIBRARIES} glog::glog)
+
 # ------------------------------------------------------------------------------
 # build tests
 # ------------------------------------------------------------------------------
@@ -49,7 +54,7 @@ foreach(f ${TEST_FILES})
     set(E_NAME ${CMAKE_MATCH_1})
     message(STATUS "Found GRIN test - " ${E_NAME})
     add_executable(${E_NAME} test/${E_NAME}.cc)
-    target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/thirdparty/grin/include ${Protobuf_INCLUDE_DIRS})
+    target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${PROJECT_SOURCE_DIR}/grin ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/thirdparty/grin/include ${PROJECT_SOURCE_DIR}/thirdparty/grin/extension/include ${Protobuf_INCLUDE_DIRS})
     target_link_libraries(${E_NAME} PRIVATE gar-grin Threads::Threads ${CMAKE_DL_LIBS} ${Protobuf_LIBRARIES} glog::glog)
 
     # if OpenSSL library exists, link the OpenSSL library.

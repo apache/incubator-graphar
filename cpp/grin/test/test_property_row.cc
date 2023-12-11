@@ -26,6 +26,7 @@ limitations under the License.
 #include "property/row.h"
 #include "property/topology.h"
 #include "property/type.h"
+#include "property/value.h"
 #include "topology/adjacentlist.h"
 #include "topology/edgelist.h"
 #include "topology/structure.h"
@@ -42,6 +43,8 @@ void test_property_row(GRIN_GRAPH graph) {
   const char* value1 = "Test String";
   uint64_t value2 = 2;
   double value3 = 3.3;
+  int64_t value4 = 4;
+
 
   std::cout << "put value0: " << value0 << std::endl;
   std::cout << "put value1: " << value1 << std::endl;
@@ -58,25 +61,25 @@ void test_property_row(GRIN_GRAPH graph) {
 
   // get value from row
   auto value0_ = grin_get_int32_from_row(graph, row, 0);
+  std::cout << "get value0: " << value0_ << std::endl;
   auto value1_ = grin_get_string_from_row(graph, row, 1);
+  std::cout << "get value1: " << value1_ << std::endl;
   auto invalid_value = grin_get_float_from_row(graph, row, 100);
   ASSERT(grin_get_last_error_code() == INVALID_VALUE && invalid_value == 0.0);
   auto value2_ = grin_get_uint64_from_row(graph, row, 2);
+  std::cout << "get value2: " << value2_ << std::endl;
   auto value3_ = grin_get_double_from_row(graph, row, 3);
+  std::cout << "get value3: " << value3_ << std::endl;
   ASSERT(grin_get_last_error_code() == NO_ERROR);
 
   // check value
-  std::cout << "get value0: " << value0_ << std::endl;
-  std::cout << "get value1: " << value1_ << std::endl;
-  std::cout << "get value2: " << value2_ << std::endl;
-  std::cout << "get value3: " << value3_ << std::endl;
   ASSERT(value0_ == value0);
   ASSERT(strcmp(value1_, value1) == 0);
   ASSERT(value2_ == value2);
   ASSERT(value3_ == value3);
 
   // destroy
-  grin_destroy_string_value(graph, value1_);
+  grin_destroy_vertex_property_value_of_string(graph, value1_);
   grin_destroy_row(graph, row);
 
   std::cout << "---- test property: row completed ----" << std::endl;
@@ -147,8 +150,8 @@ void test_property_vertex(GRIN_GRAPH graph) {
             << std::endl;
 
         // destroy
-        grin_destroy_string_value(graph, value1);
-        grin_destroy_string_value(graph, value2);
+        grin_destroy_vertex_property_value_of_string(graph, value1);
+        grin_destroy_vertex_property_value_of_string(graph, value2);
       }
 
       // destroy
@@ -233,8 +236,8 @@ void test_property_edge(GRIN_GRAPH graph) {
             << std::endl;
 
         // destroy
-        grin_destroy_string_value(graph, value1);
-        grin_destroy_string_value(graph, value2);
+        grin_destroy_edge_property_value_of_string(graph, value1);
+        grin_destroy_edge_property_value_of_string(graph, value2);
       }
 
       // destroy

@@ -17,7 +17,7 @@ limitations under the License.
 // GRIN headers
 #include "topology/edgelist.h"
 
-#if defined(GRIN_ENABLE_EDGE_LIST) && !defined(GRIN_WITH_EDGE_PROPERTY)
+#if defined(GRIN_ENABLE_EDGE_LIST) && !defined(GRIN_ENABLE_SCHEMA)
 GRIN_EDGE_LIST grin_get_edge_list(GRIN_GRAPH g);
 #endif
 
@@ -40,8 +40,8 @@ GRIN_EDGE_LIST_ITERATOR grin_get_edge_list_begin(GRIN_GRAPH g,
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   auto _el = static_cast<GRIN_EDGE_LIST_T*>(el);
   auto type_id = _el->type_begin;
-  if (type_id >= _g->edge_type_num ||
-      _g->edges_collections[type_id].size() == 0)
+  // FIXME: size = 0 should return an end iterator
+  if (type_id >= _g->edge_type_num || _g->edges_collections[type_id].size() == 0)
     return GRIN_NULL_EDGE_LIST_ITERATOR;
   auto adj_list_type = _g->edges_collections[type_id].begin()->first;
   switch (adj_list_type) {

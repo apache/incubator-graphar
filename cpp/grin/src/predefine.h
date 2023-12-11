@@ -23,6 +23,7 @@ limitations under the License.
 #include <vector>
 
 #include "grin/predefine.h"
+#include "common/enum_types.h"
 
 #include "gar/graph.h"
 #include "gar/graph_info.h"

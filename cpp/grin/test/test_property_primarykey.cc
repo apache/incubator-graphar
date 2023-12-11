@@ -25,6 +25,7 @@ limitations under the License.
 #include "property/row.h"
 #include "property/topology.h"
 #include "property/type.h"
+#include "property/value.h"
 #include "topology/edgelist.h"
 #include "topology/structure.h"
 #include "topology/vertexlist.h"

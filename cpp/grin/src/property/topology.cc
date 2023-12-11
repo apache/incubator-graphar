@@ -17,14 +17,12 @@ limitations under the License.
 // GRIN headers
 #include "property/topology.h"
 
-#ifdef GRIN_WITH_VERTEX_PROPERTY
+#ifdef GRIN_ENABLE_SCHEMA
 size_t grin_get_vertex_num_by_type(GRIN_GRAPH g, GRIN_VERTEX_TYPE vtype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   return _g->vertex_offsets[vtype + 1] - _g->vertex_offsets[vtype];
 }
-#endif
 
-#ifdef GRIN_WITH_EDGE_PROPERTY
 size_t grin_get_edge_num_by_type(GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   if (etype >= _g->unique_edge_type_num)
@@ -35,7 +33,7 @@ size_t grin_get_edge_num_by_type(GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
 }
 #endif
 
-#if defined(GRIN_ENABLE_VERTEX_LIST) && defined(GRIN_WITH_VERTEX_PROPERTY)
+#if defined(GRIN_ENABLE_VERTEX_LIST) && defined(GRIN_ENABLE_SCHEMA)
 GRIN_VERTEX_LIST grin_get_vertex_list_by_type(GRIN_GRAPH g,
                                               GRIN_VERTEX_TYPE vtype) {
   auto vl = new GRIN_VERTEX_LIST_T(vtype);
@@ -43,7 +41,7 @@ GRIN_VERTEX_LIST grin_get_vertex_list_by_type(GRIN_GRAPH g,
 }
 #endif
 
-#if defined(GRIN_ENABLE_EDGE_LIST) && defined(GRIN_WITH_EDGE_PROPERTY)
+#if defined(GRIN_ENABLE_EDGE_LIST) && defined(GRIN_ENABLE_SCHEMA)
 GRIN_EDGE_LIST grin_get_edge_list_by_type(GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
   auto _g = static_cast<GRIN_GRAPH_T*>(g);
   if (etype >= _g->unique_edge_type_num)
@@ -54,7 +52,7 @@ GRIN_EDGE_LIST grin_get_edge_list_by_type(GRIN_GRAPH g, GRIN_EDGE_TYPE etype) {
 }
 #endif
 
-#if defined(GRIN_ENABLE_ADJACENT_LIST) && defined(GRIN_WITH_EDGE_PROPERTY)
+#if defined(GRIN_ENABLE_ADJACENT_LIST) && defined(GRIN_ENABLE_SCHEMA)
 GRIN_ADJACENT_LIST grin_get_adjacent_list_by_edge_type(GRIN_GRAPH g,
                                                        GRIN_DIRECTION d,
                                                        GRIN_VERTEX v,

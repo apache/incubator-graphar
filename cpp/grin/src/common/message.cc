@@ -16,11 +16,12 @@ limitations under the License.
 #include <glog/logging.h>
 #include <google/protobuf/util/json_util.h>
 
-#include "grin/src/common/graph.pb.h"
 #include "grin/src/predefine.h"
 // GRIN headers
 #include "common/message.h"
 
+/*
+ * TODO: Double check
 const char* grin_get_static_storage_feature_msg() {
   grin::Graph g;
   g.set_uri("graphar_graph_info_path");
@@ -280,3 +281,16 @@ const char* grin_get_static_storage_feature_msg() {
   snprintf(out, len, "%s", graph_def.c_str());
   return out;
 }
+*/
+
+#ifdef GRIN_ENABLE_SCHEMA
+void grin_destroy_graph_schema_msg(const char* msg) {
+  delete[] msg;
+}
+
+// TODO
+const char* grin_get_graph_schema_msg(const char* uri) {
+  char* out = new char[1];
+  return out;
+}
+#endif

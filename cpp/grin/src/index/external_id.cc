@@ -33,6 +33,8 @@ long long int grin_get_vertex_external_id_of_int64(GRIN_GRAPH g,  // NOLINT
 #endif
 
 #ifdef GRIN_ENABLE_VERTEX_EXTERNAL_ID_OF_STRING
+void grin_destroy_vertex_external_id_of_string(GRIN_GRAPH, const char*);
+
 GRIN_VERTEX grin_get_vertex_by_external_id_of_string(GRIN_GRAPH,
                                                      const char* id);
 

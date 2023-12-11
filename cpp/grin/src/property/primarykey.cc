@@ -111,5 +111,5 @@ GRIN_EDGE_TYPE_LIST grin_get_edge_types_with_primary_keys(GRIN_GRAPH);
 GRIN_EDGE_PROPERTY_LIST grin_get_primary_keys_by_edge_type(GRIN_GRAPH,
                                                            GRIN_EDGE_TYPE);
 
-GRIN_EDGE grin_get_edge_by_primay_keys(GRIN_GRAPH, GRIN_EDGE_TYPE, GRIN_ROW);
+GRIN_ROW grin_get_edge_primary_keys_row(GRIN_GRAPH, GRIN_EDGE);
 #endif
