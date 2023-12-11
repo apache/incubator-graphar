@@ -43,7 +43,7 @@ namespace {
 std::string ConcatEdgeTriple(const std::string& src_label,
                              const std::string& edge_label,
                              const std::string& dst_label) {
-  return src_label + REGULAR_SEPERATOR + edge_label + REGULAR_SEPERATOR +
+  return src_label + REGULAR_SEPARATOR + edge_label + REGULAR_SEPARATOR +
          dst_label;
 }
 
@@ -92,7 +92,7 @@ PropertyGroup::PropertyGroup(const std::vector<Property>& properties,
     : properties_(properties), file_type_(file_type), prefix_(prefix) {
   if (prefix_.empty()) {
     for (const auto& p : properties_) {
-      prefix_ += p.name + REGULAR_SEPERATOR;
+      prefix_ += p.name + REGULAR_SEPARATOR;
     }
     prefix_.back() = '/';
   }
@@ -443,8 +443,8 @@ class EdgeInfo::Impl {
         property_groups_(std::move(property_groups)),
         version_(std::move(version)) {
     if (prefix_.empty()) {
-      prefix_ = src_label_ + REGULAR_SEPERATOR + edge_label_ +
-                REGULAR_SEPERATOR + dst_label_ + "/";  // default prefix
+      prefix_ = src_label_ + REGULAR_SEPARATOR + edge_label_ +
+                REGULAR_SEPARATOR + dst_label_ + "/";  // default prefix
     }
     for (int i = 0; i < adjacent_lists_.size(); i++) {
       auto adj_list_type = adjacent_lists_[i]->GetType();
