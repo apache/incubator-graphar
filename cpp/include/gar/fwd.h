@@ -32,6 +32,7 @@ class Status;
 template <typename T>
 using Result = cpp::result<T, Status>;
 
+struct GeneralParams;
 class Yaml;
 class FileSystem;
 

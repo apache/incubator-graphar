@@ -32,7 +32,7 @@
 
 #include "./util.h"
 #include "gar/graph_info.h"
-#include "gar/writer/arrow_chunk_writer.h"
+#include "gar/util/yaml.h"
 #include "gar/writer/edges_builder.h"
 #include "gar/writer/vertices_builder.h"
 

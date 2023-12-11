@@ -15,6 +15,7 @@
  */
 
 #include <iostream>
+#include <unordered_set>
 
 #include "yaml/Yaml.hpp"
 
@@ -115,6 +116,18 @@ bool PropertyGroup::IsValidated() const {
       (file_type_ != FileType::CSV && file_type_ != FileType::PARQUET &&
        file_type_ != FileType::ORC)) {
     return false;
+  }
+  std::unordered_set<std::string> check_property_unique_set;
+  for (const auto& p : properties_) {
+    if (p.name.empty() || p.type == nullptr) {
+      return false;
+    }
+    if (check_property_unique_set.find(p.name) !=
+        check_property_unique_set.end()) {
+      return false;
+    } else {
+      check_property_unique_set.insert(p.name);
+    }
   }
   return true;
 }
@@ -365,6 +378,11 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(
                                       prefix, version);
 }
 
+Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(const std::string& input) {
+  GAR_ASSIGN_OR_RAISE(auto yaml, Yaml::Load(input));
+  return VertexInfo::Load(yaml);
+}
+
 Result<std::string> VertexInfo::Dump() const noexcept {
   if (!IsValidated()) {
     return Status::Invalid("The vertex info is not validated");
@@ -596,7 +614,7 @@ Result<std::string> EdgeInfo::GetAdjListPathPrefix(
     AdjListType adj_list_type) const {
   CHECK_HAS_ADJ_LIST_TYPE(adj_list_type);
   int i = impl_->adjacent_list_type_to_index_.at(adj_list_type);
-  return impl_->prefix_ + impl_->adjacent_lists_[i]->GetPrefix();
+  return impl_->prefix_ + impl_->adjacent_lists_[i]->GetPrefix() + "adj_list/";
 }
 
 Result<std::string> EdgeInfo::GetAdjListOffsetFilePath(
@@ -779,6 +797,11 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
                                     chunk_size, src_chunk_size, dst_chunk_size,
                                     directed, adjacent_lists, property_groups,
                                     prefix, version);
+}
+
+Result<std::shared_ptr<EdgeInfo>> EdgeInfo::Load(const std::string& input) {
+  GAR_ASSIGN_OR_RAISE(auto yaml, Yaml::Load(input));
+  return EdgeInfo::Load(yaml);
 }
 
 Result<std::string> EdgeInfo::Dump() const noexcept {

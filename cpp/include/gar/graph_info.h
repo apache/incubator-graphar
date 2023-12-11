@@ -325,6 +325,14 @@ class VertexInfo {
    */
   static Result<std::shared_ptr<VertexInfo>> Load(std::shared_ptr<Yaml> yaml);
 
+  /**
+   * Loads vertex info from a YAML string.
+   *
+   * @param input The YAML content string.
+   * @return A Result object containing the VertexInfo object, or a Status.
+   */
+  static Result<std::shared_ptr<VertexInfo>> Load(const std::string& input);
+
  private:
   class Impl;
   std::unique_ptr<Impl> impl_;
@@ -618,6 +626,14 @@ class EdgeInfo {
 
   /** Loads the yaml as an EdgeInfo instance. */
   static Result<std::shared_ptr<EdgeInfo>> Load(std::shared_ptr<Yaml> yaml);
+
+  /**
+   * Loads edge info from a YAML string.
+   *
+   * @param input The YAML content string.
+   * @return A Result object containing the EdgeInfo object, or a Status.
+   */
+  static Result<std::shared_ptr<EdgeInfo>> Load(const std::string& input);
 
  private:
   class Impl;

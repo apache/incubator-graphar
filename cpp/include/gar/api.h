@@ -17,16 +17,16 @@ limitations under the License.
 #define GAR_API_H_
 
 #include "gar/graph_info.h"
+#include "gar/util/adj_list_type.h"
 #include "gar/util/data_type.h"
 #include "gar/util/file_type.h"
+#include "gar/util/filesystem.h"
+#include "gar/util/general_params.h"
+#include "gar/util/macros.h"
 #include "gar/util/result.h"
 #include "gar/util/status.h"
-#include "gar/util/adj_list_type.h"
 #include "gar/util/util.h"
 #include "gar/util/version_parser.h"
-#include "gar/util/macros.h"
-#include "gar/util/filesystem.h"
 #include "gar/util/yaml.h"
-#include "gar/util/general_params.h"
 
-#endif // GAR_API_H_
+#endif  // GAR_API_H_

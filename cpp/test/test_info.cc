@@ -22,248 +22,18 @@
 #include "./util.h"
 
 #include "gar/graph_info.h"
+#include "gar/util/adj_list_type.h"
+#include "gar/util/data_type.h"
+#include "gar/util/file_type.h"
 #include "gar/util/filesystem.h"
 #include "gar/util/version_parser.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
- 
+
 namespace GAR_NAMESPACE {
-TEST_CASE("test_vertex_info") {
-  std::string label = "test_vertex";
-  int chunk_size = 100;
-  InfoVersion version(1);
-  VertexInfo v_info(label, chunk_size, version);
-  REQUIRE(v_info.GetLabel() == label);
-  REQUIRE(v_info.GetChunkSize() == chunk_size);
-  REQUIRE(v_info.GetPrefix() == label + "/");  // default prefix is label + "/"
-  REQUIRE(v_info.GetVersion() == version);
 
-  // test add property group
-  Property p;
-  p.name = "id";
-  p.type = DataType(Type::INT32);
-  p.is_primary = true;
-  PropertyGroup pg({p}, FileType::CSV);
-  REQUIRE(v_info.GetPropertyGroups().size() == 0);
-  REQUIRE(v_info.AddPropertyGroup(pg).ok());
-  // same property group can not be added twice
-  REQUIRE(v_info.AddPropertyGroup(pg).IsInvalid());
-  PropertyGroup pg2({p}, FileType::PARQUET);
-  // same property can not be put in different property group
-  REQUIRE(v_info.AddPropertyGroup(pg2).IsInvalid());
-  REQUIRE(v_info.GetPropertyGroups().size() == 1);
-
-  Property p2;
-  p2.name = "name";
-  p2.type = DataType(Type::STRING);
-  p2.is_primary = false;
-  PropertyGroup pg3({p2}, FileType::CSV);
-  REQUIRE(v_info.AddPropertyGroup(pg3).ok());
-
-  // test get property meta
-  REQUIRE(v_info.GetPropertyType(p.name) == p.type);
-  REQUIRE(v_info.IsPrimaryKey(p.name) == p.is_primary);
-  REQUIRE(v_info.GetPropertyType("not_exist_key").status().IsKeyError());
-  REQUIRE(v_info.IsPrimaryKey("not_exist_key").status().IsKeyError());
-  REQUIRE(v_info.ContainPropertyGroup(pg));
-  REQUIRE(!v_info.ContainPropertyGroup(pg2));
-  auto result = v_info.GetPropertyGroup(p.name);
-  REQUIRE(!result.has_error());
-  const auto& property_group = result.value();
-  REQUIRE(property_group.GetProperties()[0].name == p.name);
-  REQUIRE(v_info.GetPropertyGroup("not_exist_key").status().IsKeyError());
-
-  // test get dir path
-  std::string expected_dir_path = v_info.GetPrefix() + pg.GetPrefix();
-  auto maybe_dir_path = v_info.GetPathPrefix(pg);
-  REQUIRE(!maybe_dir_path.has_error());
-  REQUIRE(maybe_dir_path.value() == expected_dir_path);
-  // property group not exist
-  REQUIRE(v_info.GetPathPrefix(pg2).status().IsKeyError());
-  // test get file path
-  auto maybe_path = v_info.GetFilePath(pg, 0);
-  REQUIRE(!maybe_path.has_error());
-  REQUIRE(maybe_path.value() == expected_dir_path + "chunk0");
-  // property group not exist
-  REQUIRE(v_info.GetFilePath(pg2, 0).status().IsKeyError());
-  // vertex count file path
-  auto maybe_path2 = v_info.GetVerticesNumFilePath();
-  REQUIRE(!maybe_path2.has_error());
-  REQUIRE(maybe_path2.value() == v_info.GetPrefix() + "vertex_count");
-
-  // TODO(@acezen): test dump
-
-  // test save
-  std::string save_path(std::tmpnam(nullptr));
-  REQUIRE(v_info.Save(save_path).ok());
-  REQUIRE(std::filesystem::exists(save_path));
-
-  // TODO(@acezen): test extend
-
-  // TODO(@acezen): test is validated
-}
-
-TEST_CASE("test_edge_info") {
-  std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  int chunk_size = 1024;
-  int src_chunk_size = 100;
-  int dst_chunk_size = 100;
-  bool directed = true;
-  InfoVersion version(1);
-  EdgeInfo edge_info(src_label, edge_label, dst_label, chunk_size,
-                     src_chunk_size, dst_chunk_size, directed, version);
-  REQUIRE(edge_info.GetSrcLabel() == src_label);
-  REQUIRE(edge_info.GetEdgeLabel() == edge_label);
-  REQUIRE(edge_info.GetDstLabel() == dst_label);
-  REQUIRE(edge_info.GetChunkSize() == chunk_size);
-  REQUIRE(edge_info.GetSrcChunkSize() == src_chunk_size);
-  REQUIRE(edge_info.GetDstChunkSize() == dst_chunk_size);
-  REQUIRE(edge_info.IsDirected() == directed);
-  REQUIRE(edge_info.GetPrefix() ==
-          src_label + "_" + edge_label + "_" + dst_label + "/");
-  REQUIRE(edge_info.GetVersion() == version);
-
-  auto adj_list_type = AdjListType::ordered_by_source;
-  auto adj_list_type_not_exist = AdjListType::ordered_by_dest;
-  auto file_type = FileType::PARQUET;
-  REQUIRE(edge_info.AddAdjList(adj_list_type, file_type).ok());
-  REQUIRE(edge_info.ContainAdjList(adj_list_type));
-  // same adj list type can not be added twice
-  REQUIRE(edge_info.AddAdjList(adj_list_type, file_type).IsKeyError());
-  auto file_type_result = edge_info.GetFileType(adj_list_type);
-  REQUIRE(!file_type_result.has_error());
-  REQUIRE(file_type_result.value() == file_type);
-  auto prefix_of_adj_list_type =
-      std::string(GraphArchive::AdjListTypeToString(adj_list_type)) + "/";
-  auto adj_list_path_prefix = edge_info.GetAdjListPathPrefix(adj_list_type);
-  REQUIRE(!adj_list_path_prefix.has_error());
-  REQUIRE(adj_list_path_prefix.value() ==
-          edge_info.GetPrefix() + prefix_of_adj_list_type + "adj_list/");
-  auto adj_list_file_path = edge_info.GetAdjListFilePath(0, 0, adj_list_type);
-  REQUIRE(!adj_list_file_path.has_error());
-  REQUIRE(adj_list_file_path.value() ==
-          adj_list_path_prefix.value() + "part0/chunk0");
-  auto adj_list_offset_path_prefix =
-      edge_info.GetOffsetPathPrefix(adj_list_type);
-  REQUIRE(!adj_list_offset_path_prefix.has_error());
-  REQUIRE(adj_list_offset_path_prefix.value() ==
-          edge_info.GetPrefix() + prefix_of_adj_list_type + "offset/");
-  auto adj_list_offset_file_path =
-      edge_info.GetAdjListOffsetFilePath(0, adj_list_type);
-  REQUIRE(!adj_list_offset_file_path.has_error());
-  REQUIRE(adj_list_offset_file_path.value() ==
-          adj_list_offset_path_prefix.value() + "chunk0");
-
-  // adj list type not exist
-  REQUIRE(!edge_info.ContainAdjList(adj_list_type_not_exist));
-  REQUIRE(edge_info.GetFileType(adj_list_type_not_exist).status().IsKeyError());
-  REQUIRE(edge_info.GetAdjListFilePath(0, 0, adj_list_type_not_exist)
-              .status()
-              .IsKeyError());
-  REQUIRE(edge_info.GetAdjListPathPrefix(adj_list_type_not_exist)
-              .status()
-              .IsKeyError());
-  REQUIRE(edge_info.GetAdjListOffsetFilePath(0, adj_list_type_not_exist)
-              .status()
-              .IsKeyError());
-  REQUIRE(edge_info.GetOffsetPathPrefix(adj_list_type_not_exist)
-              .status()
-              .IsKeyError());
-
-  Property p;
-  p.name = "creationDate";
-  p.type = DataType(Type::STRING);
-  p.is_primary = false;
-  PropertyGroup pg({p}, file_type);
-
-  auto pgs = edge_info.GetPropertyGroups(adj_list_type);
-  REQUIRE(pgs.status().ok());
-  REQUIRE(pgs.value().size() == 0);
-  REQUIRE(edge_info.AddPropertyGroup(pg, adj_list_type).ok());
-  REQUIRE(edge_info.ContainPropertyGroup(pg, adj_list_type));
-  pgs = edge_info.GetPropertyGroups(adj_list_type);
-  REQUIRE(pgs.status().ok());
-  REQUIRE(pgs.value().size() == 1);
-  auto property_group_result =
-      edge_info.GetPropertyGroup(p.name, adj_list_type);
-  REQUIRE(!property_group_result.has_error());
-  REQUIRE(property_group_result.value() == pg);
-  auto data_type_result = edge_info.GetPropertyType(p.name);
-  REQUIRE(!data_type_result.has_error());
-  REQUIRE(data_type_result.value() == p.type);
-  auto is_primary_result = edge_info.IsPrimaryKey(p.name);
-  REQUIRE(!is_primary_result.has_error());
-  REQUIRE(is_primary_result.value() == p.is_primary);
-  auto property_path_path_prefix =
-      edge_info.GetPropertyGroupPathPrefix(pg, adj_list_type);
-  REQUIRE(!property_path_path_prefix.has_error());
-  REQUIRE(property_path_path_prefix.value() ==
-          edge_info.GetPrefix() + prefix_of_adj_list_type + pg.GetPrefix());
-  auto property_file_path =
-      edge_info.GetPropertyFilePath(pg, adj_list_type, 0, 0);
-  REQUIRE(!property_file_path.has_error());
-  REQUIRE(property_file_path.value() ==
-          property_path_path_prefix.value() + "part0/chunk0");
-  // test property not exist
-  REQUIRE(edge_info.GetPropertyGroup("p_not_exist", adj_list_type)
-              .status()
-              .IsKeyError());
-  REQUIRE(edge_info.GetPropertyType("p_not_exist").status().IsKeyError());
-  REQUIRE(edge_info.IsPrimaryKey("p_not_exist").status().IsKeyError());
-
-  // test property group not exist
-  PropertyGroup pg_not_exist;
-  REQUIRE(edge_info.GetPropertyFilePath(pg_not_exist, adj_list_type, 0, 0)
-              .status()
-              .IsKeyError());
-  REQUIRE(edge_info.GetPropertyGroupPathPrefix(pg_not_exist, adj_list_type)
-              .status()
-              .IsKeyError());
-
-  // test adj list not exist
-  REQUIRE(edge_info.GetPropertyGroups(adj_list_type_not_exist)
-              .status()
-              .IsKeyError());
-  REQUIRE(edge_info.GetPropertyGroup(p.name, adj_list_type_not_exist)
-              .status()
-              .IsKeyError());
-  REQUIRE(edge_info.GetPropertyFilePath(pg, adj_list_type_not_exist, 0, 0)
-              .status()
-              .IsKeyError());
-  REQUIRE(edge_info.GetPropertyGroupPathPrefix(pg, adj_list_type_not_exist)
-              .status()
-              .IsKeyError());
-  REQUIRE(edge_info.GetEdgesNumFilePath(0, adj_list_type_not_exist)
-              .status()
-              .IsKeyError());
-  REQUIRE(edge_info.GetVerticesNumFilePath(adj_list_type_not_exist)
-              .status()
-              .IsKeyError());
-
-  // edge count file path
-  auto maybe_path = edge_info.GetEdgesNumFilePath(0, adj_list_type);
-  REQUIRE(!maybe_path.has_error());
-  REQUIRE(maybe_path.value() ==
-          edge_info.GetPrefix() + prefix_of_adj_list_type + "edge_count0");
-
-  // vertex count file path
-  auto maybe_path_2 = edge_info.GetVerticesNumFilePath(adj_list_type);
-  REQUIRE(!maybe_path_2.has_error());
-  REQUIRE(maybe_path_2.value() ==
-          edge_info.GetPrefix() + prefix_of_adj_list_type + "vertex_count");
-
-  // test save
-  std::string save_path(std::tmpnam(nullptr));
-  REQUIRE(edge_info.Save(save_path).ok());
-  REQUIRE(std::filesystem::exists(save_path));
-
-  // TODO(@acezen): test extend
-
-  // TODO(@acezen): test is validated
-}
-
-TEST_CASE("test_info_version") {
+TEST_CASE("InfoVersion") {
   InfoVersion info_version(1);
   REQUIRE(info_version.version() == 1);
   REQUIRE(info_version.user_define_types() == std::vector<std::string>({}));
@@ -281,123 +51,632 @@ TEST_CASE("test_info_version") {
   // raise error if version is not 1
   CHECK_THROWS_AS(InfoVersion(2), std::invalid_argument);
 
-  std::string version_str = "gar/v1 (t1,t2)";
-  auto info_version_result = InfoVersion::Parse(version_str);
-  REQUIRE(!info_version_result.has_error());
-  auto& info_version_3 = info_version_result.value();
-  REQUIRE(info_version_3.version() == 1);
-  REQUIRE(info_version_3.user_define_types() ==
-          std::vector<std::string>({"t1", "t2"}));
-  REQUIRE(info_version_3.ToString() == version_str);
-  REQUIRE(info_version_3.CheckType("t1") == true);
-}
-
-TEST_CASE("test_graph_info_load_from_file") {
-  std::string root;
-  REQUIRE(GetTestResourceRoot(&root).ok());
-
-  std::string path = root + "/ldbc_sample/csv/ldbc_sample.graph.yml";
-  auto graph_info_result = GraphInfo::Load(path);
-  if (graph_info_result.has_error()) {
-    std::cout << graph_info_result.status().message() << std::endl;
+  SECTION("Parse") {
+    std::string version_str = "gar/v1 (t1,t2)";
+    auto info_version_result = InfoVersion::Parse(version_str);
+    REQUIRE(!info_version_result.has_error());
+    auto& info_version_3 = info_version_result.value();
+    REQUIRE(info_version_3->version() == 1);
+    REQUIRE(info_version_3->user_define_types() ==
+            std::vector<std::string>({"t1", "t2"}));
+    REQUIRE(info_version_3->ToString() == version_str);
+    REQUIRE(info_version_3->CheckType("t1") == true);
   }
-  REQUIRE(!graph_info_result.has_error());
-  auto graph_info = graph_info_result.value();
-  REQUIRE(graph_info.GetName() == "ldbc_sample");
-  REQUIRE(graph_info.GetPrefix() == root + "/ldbc_sample/csv/");
-  const auto& vertex_infos = graph_info.GetVertexInfos();
-  const auto& edge_infos = graph_info.GetEdgeInfos();
-  REQUIRE(vertex_infos.size() == 1);
-  REQUIRE(edge_infos.size() == 1);
 }
 
-TEST_CASE("test_graph_info_load_from_s3") {
-  std::string path =
-      "s3://graphar/ldbc/ldbc.graph.yml"
-      "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
-  auto graph_info_result = GraphInfo::Load(path);
-  REQUIRE(!graph_info_result.has_error());
-  auto graph_info = graph_info_result.value();
-  REQUIRE(graph_info.GetName() == "ldbc");
-  const auto& vertex_infos = graph_info.GetVertexInfos();
-  const auto& edge_infos = graph_info.GetEdgeInfos();
-  REQUIRE(vertex_infos.size() == 8);
-  REQUIRE(edge_infos.size() == 23);
+TEST_CASE("Property") {
+  Property p0("p0", int32(), true);
+  Property p1("p1", int32(), false);
+
+  REQUIRE(p0.name == "p0");
+  REQUIRE(p0.type->ToTypeName() == int32()->ToTypeName());
+  REQUIRE(p0.is_primary == true);
+  REQUIRE(p1.is_primary == false);
 }
 
-TEST_CASE("test_vertex_info") {
+TEST_CASE("PropertyGroup") {
+  Property p0("p0", int32(), true);
+  Property p1("p1", int32(), false);
+  Property p2("p2", string(), false);
+  Property p3("p3", float32(), false);
+  Property p4("p4", float64(), false);
+
+  PropertyGroup pg0({p0, p1}, FileType::CSV, "p0_and_p1/");
+  PropertyGroup pg1({p2, p3, p4}, FileType::PARQUET);
+
+  SECTION("Properties") {
+    REQUIRE(pg0.GetProperties().size() == 2);
+    REQUIRE(pg1.GetProperties().size() == 3);
+    REQUIRE(pg0.HasProperty("p0") == true);
+    REQUIRE(pg0.HasProperty("p2") == false);
+    REQUIRE(pg1.HasProperty("p2") == true);
+    REQUIRE(pg1.HasProperty("p0") == false);
+    auto& p = pg0.GetProperties()[0];
+    REQUIRE(p.name == "p0");
+    REQUIRE(p.type->ToTypeName() == int32()->ToTypeName());
+    REQUIRE(p.is_primary == true);
+  }
+
+  SECTION("FileType") {
+    REQUIRE(pg0.GetFileType() == FileType::CSV);
+    REQUIRE(pg1.GetFileType() == FileType::PARQUET);
+  }
+
+  SECTION("Prefix") {
+    REQUIRE(pg0.GetPrefix() == "p0_and_p1/");
+    REQUIRE(pg1.GetPrefix() == "p2_p3_p4/");
+  }
+
+  SECTION("IsValidate") {
+    REQUIRE(pg0.IsValidated() == true);
+    REQUIRE(pg1.IsValidated() == true);
+    Property invalid_p0("invalid", nullptr, false);
+    Property invalid_p1("", int32(), false);
+    PropertyGroup invalid_pg0({invalid_p0}, FileType::CSV);
+    PropertyGroup invalid_pg1({invalid_p1}, FileType::CSV);
+    PropertyGroup invalid_pg2({p0, p0}, FileType::PARQUET);
+    REQUIRE(invalid_pg0.IsValidated() == false);
+    REQUIRE(invalid_pg1.IsValidated() == false);
+    REQUIRE(invalid_pg2.IsValidated() == false);
+  }
+
+  SECTION("CreatePropertyGroup") {
+    auto pg2 = CreatePropertyGroup({p0, p1}, FileType::CSV, "p0_and_p1/");
+    REQUIRE(*pg2.get() == pg0);
+    REQUIRE(!(pg0 == pg1));
+  }
+
+  SECTION("Ostream") {
+    std::stringstream ss;
+    ss << pg0;
+    REQUIRE(ss.str() == "p0_p1");
+    ss.str("");
+    ss << pg1;
+    REQUIRE(ss.str() == "p2_p3_p4");
+  }
+}
+
+TEST_CASE("AdjacentList") {
+  AdjacentList adj_list0(AdjListType::unordered_by_source, FileType::CSV,
+                         "adj_list0/");
+  AdjacentList adj_list1(AdjListType::ordered_by_source, FileType::PARQUET);
+
+  SECTION("AdjListType") {
+    REQUIRE(adj_list0.GetType() == AdjListType::unordered_by_source);
+    REQUIRE(adj_list1.GetType() == AdjListType::ordered_by_source);
+  }
+
+  SECTION("FileType") {
+    REQUIRE(adj_list0.GetFileType() == FileType::CSV);
+    REQUIRE(adj_list1.GetFileType() == FileType::PARQUET);
+  }
+
+  SECTION("Prefix") {
+    REQUIRE(adj_list0.GetPrefix() == "adj_list0/");
+    REQUIRE(adj_list1.GetPrefix() == "ordered_by_source/");
+  }
+
+  SECTION("IsValidate") {
+    REQUIRE(adj_list0.IsValidated() == true);
+    REQUIRE(adj_list1.IsValidated() == true);
+  }
+
+  SECTION("CreateAdjacentList") {
+    auto adj_list2 = CreateAdjacentList(AdjListType::unordered_by_source,
+                                        FileType::CSV, "unordered_by_source/");
+    REQUIRE(adj_list2->GetType() == AdjListType::unordered_by_source);
+    REQUIRE(adj_list2->GetFileType() == FileType::CSV);
+    REQUIRE(adj_list2->GetPrefix() == "unordered_by_source/");
+  }
+}
+
+TEST_CASE("VertexInfo") {
   std::string label = "test_vertex";
   int chunk_size = 100;
-  InfoVersion version(1);
-  VertexInfo v_info(label, chunk_size, version);
-  REQUIRE(v_info.GetLabel() == label);
-  REQUIRE(v_info.GetChunkSize() == chunk_size);
-  REQUIRE(v_info.GetPrefix() == label + "/");  // default prefix is label + "/"
-  REQUIRE(v_info.GetVersion() == version);
+  auto version = std::make_shared<InfoVersion>(1);
+  auto pg = CreatePropertyGroup(
+      {Property("p0", int32(), true), Property("p1", string(), false)},
+      FileType::CSV, "p0_p1/");
+  auto vertex_info =
+      CreateVertexInfo(label, chunk_size, {pg}, "test_vertex/", version);
 
-  // test add property group
-  Property p;
-  p.name = "id";
-  p.type = DataType(Type::INT32);
-  p.is_primary = true;
-  PropertyGroup pg({p}, FileType::CSV);
-  REQUIRE(v_info.GetPropertyGroups().size() == 0);
-  REQUIRE(v_info.AddPropertyGroup(pg).ok());
-  // same property group can not be added twice
-  REQUIRE(v_info.AddPropertyGroup(pg).IsInvalid());
-  PropertyGroup pg2({p}, FileType::PARQUET);
-  // same property can not be put in different property group
-  REQUIRE(v_info.AddPropertyGroup(pg2).IsInvalid());
-  REQUIRE(v_info.GetPropertyGroups().size() == 1);
+  SECTION("Basics") {
+    REQUIRE(vertex_info->GetLabel() == label);
+    REQUIRE(vertex_info->GetChunkSize() == chunk_size);
+    REQUIRE(vertex_info->GetPrefix() == "test_vertex/");
+    REQUIRE(vertex_info->version()->ToString() == "gar/v1");
+  }
 
-  Property p2;
-  p2.name = "name";
-  p2.type = DataType(Type::STRING);
-  p2.is_primary = false;
-  PropertyGroup pg3({p2}, FileType::CSV);
-  REQUIRE(v_info.AddPropertyGroup(pg3).ok());
+  SECTION("PropertyGroup") {
+    REQUIRE(vertex_info->PropertyGroupNum() == 1);
+    REQUIRE(*vertex_info->GetPropertyGroupByIndex(0) == *pg);
+    REQUIRE(vertex_info->HasProperty("p0") == true);
+    REQUIRE(vertex_info->HasPropertyGroup(pg) == true);
+    REQUIRE(*vertex_info->GetPropertyGroup("p0") == *pg);
+    REQUIRE(vertex_info->GetPropertyGroups().size() == 1);
+    REQUIRE(*(vertex_info->GetPropertyGroups()[0]) == *pg);
+    REQUIRE(vertex_info->GetPropertyType("p0").value()->ToTypeName() ==
+            int32()->ToTypeName());
+    REQUIRE(vertex_info->IsPrimaryKey("p0") == true);
+    REQUIRE(vertex_info->IsPrimaryKey("p1") == false);
+    REQUIRE(vertex_info->HasProperty("not_exist") == false);
+    REQUIRE(vertex_info->IsPrimaryKey("not_exist") == false);
+    REQUIRE(vertex_info->HasPropertyGroup(nullptr) == false);
+  }
 
-  // test get property meta
-  REQUIRE(v_info.GetPropertyType(p.name) == p.type);
-  REQUIRE(v_info.IsPrimaryKey(p.name) == p.is_primary);
-  REQUIRE(v_info.GetPropertyType("not_exist_key").status().IsKeyError());
-  REQUIRE(v_info.IsPrimaryKey("not_exist_key").status().IsKeyError());
-  REQUIRE(v_info.ContainPropertyGroup(pg));
-  REQUIRE(!v_info.ContainPropertyGroup(pg2));
-  auto result = v_info.GetPropertyGroup(p.name);
-  REQUIRE(!result.has_error());
-  const auto& property_group = result.value();
-  REQUIRE(property_group.GetProperties()[0].name == p.name);
-  REQUIRE(v_info.GetPropertyGroup("not_exist_key").status().IsKeyError());
+  SECTION("Path") {
+    REQUIRE(vertex_info->GetPathPrefix(pg).value() == "test_vertex/p0_p1/");
+    REQUIRE(vertex_info->GetFilePath(pg, 0).value() ==
+            "test_vertex/p0_p1/chunk0");
+    REQUIRE(vertex_info->GetVerticesNumFilePath().value() ==
+            "test_vertex/vertex_count");
+  }
 
-  // test get dir path
-  std::string expected_dir_path = v_info.GetPrefix() + pg.GetPrefix();
-  auto maybe_dir_path = v_info.GetPathPrefix(pg);
-  REQUIRE(!maybe_dir_path.has_error());
-  REQUIRE(maybe_dir_path.value() == expected_dir_path);
-  // property group not exist
-  REQUIRE(v_info.GetPathPrefix(pg2).status().IsKeyError());
-  // test get file path
-  auto maybe_path = v_info.GetFilePath(pg, 0);
-  REQUIRE(!maybe_path.has_error());
-  REQUIRE(maybe_path.value() == expected_dir_path + "chunk0");
-  // property group not exist
-  REQUIRE(v_info.GetFilePath(pg2, 0).status().IsKeyError());
-  // vertex count file path
-  auto maybe_path2 = v_info.GetVerticesNumFilePath();
-  REQUIRE(!maybe_path2.has_error());
-  REQUIRE(maybe_path2.value() == v_info.GetPrefix() + "vertex_count");
+  SECTION("IsValidate") {
+    REQUIRE(vertex_info->IsValidated() == true);
+    auto invalid_pg =
+        CreatePropertyGroup({Property("p0", nullptr, true)}, FileType::CSV);
+    auto invalid_vertex_info0 = CreateVertexInfo(
+        label, chunk_size, {invalid_pg}, "test_vertex/", version);
+    REQUIRE(invalid_vertex_info0->IsValidated() == false);
+    auto invalid_vertex_info1 =
+        CreateVertexInfo("", chunk_size, {pg}, "test_vertex/", version);
+    REQUIRE(invalid_vertex_info1->IsValidated() == false);
+    auto invalid_vertex_info2 =
+        CreateVertexInfo(label, 0, {pg}, "test_vertex/", version);
+    REQUIRE(invalid_vertex_info2->IsValidated() == false);
+  }
 
-  // TODO(@acezen): test dump
+  SECTION("Dump") {
+    auto dump_result = vertex_info->Dump();
+    REQUIRE(dump_result.status().ok());
+    std::string expected = R"(chunk_size: 100
+label: test_vertex
+prefix: test_vertex/
+property_groups:
+  - file_type: csv
+    prefix: p0_p1/
+    properties:
+      - data_type: int32
+        is_primary: true
+        name: p0
+      - data_type: string
+        is_primary: false
+        name: p1
+version: gar/v1
+)";
+    std::string str1 = dump_result.value();
+    auto mismatchIt = std::mismatch(str1.begin(), str1.end(), expected.begin());
+    if (mismatchIt.first == str1.end() && mismatchIt.second == expected.end()) {
+      std::cout << "Strings are equal" << std::endl;
+    } else {
+      std::cout << "Strings are different:" << std::endl;
+      std::cout << "String 1: " << std::string(mismatchIt.first, str1.end())
+                << std::endl;
+      std::cout << "String 2: "
+                << std::string(mismatchIt.second, expected.end()) << std::endl;
+    }
+    REQUIRE(dump_result.value() == expected);
+  }
 
-  // test save
-  std::string save_path(std::tmpnam(nullptr));
-  REQUIRE(v_info.Save(save_path).ok());
-  REQUIRE(std::filesystem::exists(save_path));
-
-  // TODO(@acezen): test extend
-
-  // TODO(@acezen): test is validated
+  SECTION("AddPropertyGroup") {
+    auto pg2 = CreatePropertyGroup({Property("p2", int32(), false)},
+                                   FileType::CSV, "p2/");
+    auto maybe_extend_info = vertex_info->AddPropertyGroup(pg2);
+    REQUIRE(maybe_extend_info.status().ok());
+    auto extend_info = maybe_extend_info.value();
+    REQUIRE(extend_info->PropertyGroupNum() == 2);
+    REQUIRE(extend_info->HasProperty("p2") == true);
+    REQUIRE(extend_info->HasPropertyGroup(pg2) == true);
+    REQUIRE(extend_info->GetPropertyGroups().size() == 2);
+    REQUIRE(*(extend_info->GetPropertyGroups()[1]) == *pg2);
+    REQUIRE(extend_info->GetPropertyType("p2").value()->ToTypeName() ==
+            int32()->ToTypeName());
+    REQUIRE(extend_info->IsPrimaryKey("p2") == false);
+    auto extend_info2 = extend_info->AddPropertyGroup(pg2);
+    REQUIRE(!extend_info2.status().ok());
+  }
 }
 
+TEST_CASE("EdgeInfo") {
+  std::string src_label = "person", edge_label = "knows", dst_label = "person";
+  int chunk_size = 1024;
+  int src_chunk_size = 100;
+  int dst_chunk_size = 100;
+  bool directed = true;
+  auto version = std::make_shared<InfoVersion>(1);
+  auto adj_list_type = AdjListType::ordered_by_source;
+  auto adj_list =
+      CreateAdjacentList(adj_list_type, FileType::CSV, "ordered_by_source/");
+  auto pg = CreatePropertyGroup(
+      {Property("p0", int32(), true), Property("p1", string(), false)},
+      FileType::CSV, "p0_p1/");
+  auto edge_info = CreateEdgeInfo(src_label, edge_label, dst_label, chunk_size,
+                                  src_chunk_size, dst_chunk_size, directed,
+                                  {adj_list}, {pg}, "test_edge/", version);
+
+  SECTION("Basics") {
+    REQUIRE(edge_info->GetSrcLabel() == src_label);
+    REQUIRE(edge_info->GetEdgeLabel() == edge_label);
+    REQUIRE(edge_info->GetDstLabel() == dst_label);
+    REQUIRE(edge_info->GetChunkSize() == chunk_size);
+    REQUIRE(edge_info->GetSrcChunkSize() == src_chunk_size);
+    REQUIRE(edge_info->GetDstChunkSize() == dst_chunk_size);
+    REQUIRE(edge_info->IsDirected() == directed);
+    REQUIRE(edge_info->GetPrefix() == "test_edge/");
+    REQUIRE(edge_info->version()->ToString() == "gar/v1");
+  }
+
+  SECTION("AdjacentList") {
+    REQUIRE(edge_info->HasAdjacentListType(adj_list_type) == true);
+    REQUIRE(edge_info->HasAdjacentListType(AdjListType::unordered_by_source) ==
+            false);
+    REQUIRE(edge_info->GetAdjacentList(adj_list_type)->GetType() ==
+            adj_list_type);
+    REQUIRE(edge_info->GetAdjacentList(adj_list_type)->GetFileType() ==
+            FileType::CSV);
+    REQUIRE(edge_info->GetAdjacentList(AdjListType::unordered_by_source) ==
+            nullptr);
+  }
+
+  SECTION("PropertyGroup") {
+    REQUIRE(edge_info->PropertyGroupNum() == 1);
+    REQUIRE(*edge_info->GetPropertyGroupByIndex(0) == *pg);
+    REQUIRE(edge_info->HasProperty("p0") == true);
+    REQUIRE(edge_info->HasPropertyGroup(pg) == true);
+    REQUIRE(*edge_info->GetPropertyGroup("p0") == *pg);
+    REQUIRE(edge_info->GetPropertyGroups().size() == 1);
+    REQUIRE(*(edge_info->GetPropertyGroups()[0]) == *pg);
+    REQUIRE(edge_info->GetPropertyType("p0").value()->ToTypeName() ==
+            int32()->ToTypeName());
+    REQUIRE(edge_info->IsPrimaryKey("p0") == true);
+    REQUIRE(edge_info->IsPrimaryKey("p1") == false);
+    REQUIRE(edge_info->HasProperty("not_exist") == false);
+    REQUIRE(edge_info->IsPrimaryKey("not_exist") == false);
+    REQUIRE(edge_info->HasPropertyGroup(nullptr) == false);
+  }
+
+  SECTION("Path") {
+    REQUIRE(edge_info->GetAdjListPathPrefix(adj_list_type).value() ==
+            "test_edge/ordered_by_source/adj_list/");
+    REQUIRE(edge_info->GetAdjListFilePath(0, 0, adj_list_type).value() ==
+            "test_edge/ordered_by_source/adj_list/part0/chunk0");
+    REQUIRE(edge_info->GetOffsetPathPrefix(adj_list_type).value() ==
+            "test_edge/ordered_by_source/offset/");
+    REQUIRE(edge_info->GetAdjListOffsetFilePath(0, adj_list_type).value() ==
+            "test_edge/ordered_by_source/offset/chunk0");
+    REQUIRE(edge_info->GetEdgesNumFilePath(0, adj_list_type).value() ==
+            "test_edge/ordered_by_source/edge_count0");
+    REQUIRE(edge_info->GetVerticesNumFilePath(adj_list_type).value() ==
+            "test_edge/ordered_by_source/vertex_count");
+    REQUIRE(edge_info->GetPropertyGroupPathPrefix(pg, adj_list_type).value() ==
+            "test_edge/ordered_by_source/p0_p1/");
+    REQUIRE(edge_info->GetPropertyFilePath(pg, adj_list_type, 0, 0).value() ==
+            "test_edge/ordered_by_source/p0_p1/part0/chunk0");
+  }
+
+  SECTION("IsValidated") {
+    REQUIRE(edge_info->IsValidated() == true);
+    auto invalid_pg =
+        CreatePropertyGroup({Property("p0", nullptr, true)}, FileType::CSV);
+    auto invalid_edge_info0 =
+        CreateEdgeInfo(src_label, edge_label, dst_label, chunk_size,
+                       src_chunk_size, dst_chunk_size, directed, {adj_list},
+                       {invalid_pg}, "test_edge/", version);
+    REQUIRE(invalid_edge_info0->IsValidated() == false);
+    auto invalid_edge_info1 = CreateEdgeInfo(
+        "", edge_label, dst_label, chunk_size, src_chunk_size, dst_chunk_size,
+        directed, {adj_list}, {pg}, "test_edge/", version);
+    REQUIRE(invalid_edge_info1->IsValidated() == false);
+    auto invalid_edge_info2 = CreateEdgeInfo(
+        src_label, "", dst_label, chunk_size, src_chunk_size, dst_chunk_size,
+        directed, {adj_list}, {pg}, "test_edge/", version);
+    REQUIRE(invalid_edge_info2->IsValidated() == false);
+    auto invalid_edge_info3 = CreateEdgeInfo(
+        src_label, edge_label, "", chunk_size, src_chunk_size, dst_chunk_size,
+        directed, {adj_list}, {pg}, "test_edge/", version);
+    REQUIRE(invalid_edge_info3->IsValidated() == false);
+    auto invalid_edge_info4 = CreateEdgeInfo(
+        src_label, edge_label, dst_label, 0, src_chunk_size, dst_chunk_size,
+        directed, {adj_list}, {pg}, "test_edge/", version);
+    REQUIRE(invalid_edge_info4->IsValidated() == false);
+    auto invalid_edge_info5 = CreateEdgeInfo(
+        src_label, edge_label, dst_label, chunk_size, 0, dst_chunk_size,
+        directed, {adj_list}, {pg}, "test_edge/", version);
+    REQUIRE(invalid_edge_info5->IsValidated() == false);
+    auto invalid_edge_info6 = CreateEdgeInfo(
+        src_label, edge_label, dst_label, chunk_size, src_chunk_size, 0,
+        directed, {adj_list}, {pg}, "test_edge/", version);
+    REQUIRE(invalid_edge_info6->IsValidated() == false);
+  }
+
+  SECTION("Dump") {
+    auto dump_result = edge_info->Dump();
+    REQUIRE(dump_result.status().ok());
+    std::string expected = R"(adj_lists:
+  - aligned_by: src
+    file_type: csv
+    ordered: true
+    prefix: adj_list/
+chunk_size: 1024
+directed: true
+dst_chunk_size: 100
+dst_label: person
+edge_label: knows
+prefix: test_edge/
+property_groups:
+  - file_type: csv
+    prefix: p0_p1/
+    properties:
+      - data_type: int32
+        is_primary: true
+        name: p0
+      - data_type: string
+        is_primary: false
+        name: p1
+src_chunk_size: 100
+src_label: person
+version: gar/v1
+)";
+    REQUIRE(dump_result.value() == expected);
+  }
+
+  SECTION("AddAdjacentList") {
+    auto adj_list2 = CreateAdjacentList(AdjListType::ordered_by_dest,
+                                        FileType::CSV, "ordered_by_dest/");
+    auto maybe_extend_info = edge_info->AddAdjacentList(adj_list2);
+    REQUIRE(maybe_extend_info.status().ok());
+    auto extend_info = maybe_extend_info.value();
+    REQUIRE(extend_info->HasAdjacentListType(AdjListType::ordered_by_dest) ==
+            true);
+    REQUIRE(
+        extend_info->GetAdjacentList(AdjListType::ordered_by_dest)->GetType() ==
+        AdjListType::ordered_by_dest);
+    REQUIRE(extend_info->GetAdjacentList(AdjListType::ordered_by_dest)
+                ->GetFileType() == FileType::CSV);
+    auto extend_info2 = extend_info->AddAdjacentList(adj_list2);
+    REQUIRE(!extend_info2.status().ok());
+  }
+
+  SECTION("AddPropertyGroup") {
+    auto pg2 = CreatePropertyGroup({Property("p2", int32(), false)},
+                                   FileType::CSV, "p2/");
+    auto maybe_extend_info = edge_info->AddPropertyGroup(pg2);
+    REQUIRE(maybe_extend_info.status().ok());
+    auto extend_info = maybe_extend_info.value();
+    REQUIRE(extend_info->PropertyGroupNum() == 2);
+    REQUIRE(extend_info->HasProperty("p2") == true);
+    REQUIRE(extend_info->HasPropertyGroup(pg2) == true);
+    REQUIRE(extend_info->GetPropertyGroups().size() == 2);
+    REQUIRE(*(extend_info->GetPropertyGroups()[1]) == *pg2);
+    REQUIRE(extend_info->GetPropertyType("p2").value()->ToTypeName() ==
+            int32()->ToTypeName());
+    REQUIRE(extend_info->IsPrimaryKey("p2") == false);
+    auto extend_info2 = extend_info->AddPropertyGroup(pg2);
+    REQUIRE(!extend_info2.status().ok());
+  }
+}
+
+TEST_CASE("GraphInfo") {
+  std::string name = "test_graph";
+  auto version = std::make_shared<InfoVersion>(1);
+  auto pg = CreatePropertyGroup(
+      {Property("p0", int32(), true), Property("p1", string(), false)},
+      FileType::CSV, "p0_p1/");
+  auto vertex_info =
+      CreateVertexInfo("test_vertex", 100, {pg}, "test_vertex/", version);
+  auto edge_info =
+      CreateEdgeInfo("person", "knows", "person", 1024, 100, 100, true,
+                     {CreateAdjacentList(AdjListType::ordered_by_source,
+                                         FileType::CSV, "adj_list/")},
+                     {pg}, "test_edge/", version);
+  auto graph_info =
+      CreateGraphInfo(name, {vertex_info}, {edge_info}, "test_graph/", version);
+
+  SECTION("Basics") {
+    REQUIRE(graph_info->GetName() == name);
+    REQUIRE(graph_info->GetPrefix() == "test_graph/");
+    REQUIRE(graph_info->version()->ToString() == "gar/v1");
+  }
+
+  SECTION("VertexInfo") {
+    REQUIRE(graph_info->VertexInfoNum() == 1);
+    REQUIRE(graph_info->GetVertexInfoByIndex(0)->GetLabel() == "test_vertex");
+    REQUIRE(graph_info->GetVertexInfoByIndex(1) == nullptr);
+    REQUIRE(graph_info->GetVertexInfo("test_vertex")->GetLabel() ==
+            "test_vertex");
+    REQUIRE(graph_info->GetVertexInfo("not_exist") == nullptr);
+    REQUIRE(graph_info->GetVertexInfos().size() == 1);
+    REQUIRE(graph_info->GetVertexInfos()[0]->GetLabel() == "test_vertex");
+  }
+
+  SECTION("EdgeInfo") {
+    REQUIRE(graph_info->EdgeInfoNum() == 1);
+    REQUIRE(graph_info->GetEdgeInfoByIndex(0)->GetEdgeLabel() == "knows");
+    REQUIRE(graph_info->GetEdgeInfoByIndex(1) == nullptr);
+    REQUIRE(
+        graph_info->GetEdgeInfo("person", "knows", "person")->GetEdgeLabel() ==
+        "knows");
+    REQUIRE(graph_info->GetEdgeInfo("not_exist", "knows", "person") == nullptr);
+    REQUIRE(graph_info->GetEdgeInfos().size() == 1);
+    REQUIRE(graph_info->GetEdgeInfos()[0]->GetEdgeLabel() == "knows");
+  }
+
+  SECTION("IsValidated") {
+    REQUIRE(graph_info->IsValidated() == true);
+    auto invalid_vertex_info =
+        CreateVertexInfo("", 100, {pg}, "test_vertex/", version);
+    auto invalid_graph_info0 = CreateGraphInfo(
+        name, {invalid_vertex_info}, {edge_info}, "test_graph/", version);
+    REQUIRE(invalid_graph_info0->IsValidated() == false);
+    auto invalid_edge_info =
+        CreateEdgeInfo("", "knows", "person", 1024, 100, 100, true,
+                       {CreateAdjacentList(AdjListType::ordered_by_source,
+                                           FileType::CSV, "adj_list/")},
+                       {pg}, "test_edge/", version);
+    auto invalid_graph_info1 = CreateGraphInfo(
+        name, {vertex_info}, {invalid_edge_info}, "test_graph/", version);
+    REQUIRE(invalid_graph_info1->IsValidated() == false);
+    auto invalid_graph_info2 =
+        CreateGraphInfo("", {vertex_info}, {edge_info}, "test_graph/", version);
+    REQUIRE(invalid_graph_info2->IsValidated() == false);
+    auto invalid_graph_info3 =
+        CreateGraphInfo(name, {vertex_info}, {edge_info}, "", version);
+    REQUIRE(invalid_graph_info3->IsValidated() == false);
+  }
+
+  SECTION("Dump") {
+    auto dump_result = graph_info->Dump();
+    REQUIRE(dump_result.status().ok());
+    std::string expected = R"(edges:
+  - person_knows_person.edge.yaml
+name: test_graph
+prefix: test_graph/
+version: gar/v1
+vertices:
+  - test_vertex.vertex.yaml
+)";
+    REQUIRE(dump_result.value() == expected);
+  }
+
+  SECTION("AddVertex") {
+    auto vertex_info2 =
+        CreateVertexInfo("test_vertex2", 100, {pg}, "test_vertex2/", version);
+    auto maybe_extend_info = graph_info->AddVertex(vertex_info2);
+    REQUIRE(maybe_extend_info.status().ok());
+    auto extend_info = maybe_extend_info.value();
+    REQUIRE(extend_info->VertexInfoNum() == 2);
+    REQUIRE(extend_info->GetVertexInfoByIndex(1)->GetLabel() == "test_vertex2");
+    REQUIRE(extend_info->GetVertexInfoByIndex(2) == nullptr);
+    REQUIRE(extend_info->GetVertexInfo("test_vertex2")->GetLabel() ==
+            "test_vertex2");
+    REQUIRE(extend_info->GetVertexInfo("not_exist") == nullptr);
+    REQUIRE(extend_info->GetVertexInfos().size() == 2);
+    REQUIRE(extend_info->GetVertexInfos()[1]->GetLabel() == "test_vertex2");
+    auto extend_info2 = extend_info->AddVertex(vertex_info2);
+    REQUIRE(!extend_info2.status().ok());
+  }
+
+  SECTION("AddEdge") {
+    auto edge_info2 =
+        CreateEdgeInfo("person", "knows2", "person", 1024, 100, 100, true,
+                       {CreateAdjacentList(AdjListType::ordered_by_source,
+                                           FileType::CSV, "adj_list/")},
+                       {pg}, "test_edge/", version);
+    auto maybe_extend_info = graph_info->AddEdge(edge_info2);
+    REQUIRE(maybe_extend_info.status().ok());
+    auto extend_info = maybe_extend_info.value();
+    REQUIRE(extend_info->EdgeInfoNum() == 2);
+    REQUIRE(extend_info->GetEdgeInfoByIndex(1)->GetEdgeLabel() == "knows2");
+    REQUIRE(extend_info->GetEdgeInfoByIndex(2) == nullptr);
+    REQUIRE(extend_info->GetEdgeInfo("person", "knows2", "person")
+                ->GetEdgeLabel() == "knows2");
+    REQUIRE(extend_info->GetEdgeInfo("not_exist", "knows2", "person") ==
+            nullptr);
+    REQUIRE(extend_info->GetEdgeInfos().size() == 2);
+    REQUIRE(extend_info->GetEdgeInfos()[1]->GetEdgeLabel() == "knows2");
+    auto extend_info2 = extend_info->AddEdge(edge_info2);
+    REQUIRE(!extend_info2.status().ok());
+  }
+}
+
+TEST_CASE("LoadFromYaml") {
+  std::string vertex_info_yaml = R"(label: person
+chunk_size: 100
+prefix: vertex/person/
+property_groups:
+  - properties:
+      - name: id
+        data_type: int64
+        is_primary: true
+    file_type: parquet
+  - properties:
+      - name: firstName
+        data_type: string
+        is_primary: false
+      - name: lastName
+        data_type: string
+        is_primary: false
+      - name: gender
+        data_type: string
+        is_primary: false
+    file_type: parquet
+version: gar/v1
+)";
+  std::string edge_info_yaml = R"(src_label: person
+edge_label: knows
+dst_label: person
+chunk_size: 1024
+src_chunk_size: 100
+dst_chunk_size: 100
+directed: false
+prefix: edge/person_knows_person/
+adj_lists:
+  - ordered: false
+    aligned_by: src
+    file_type: parquet
+  - ordered: true
+    aligned_by: src
+    file_type: parquet
+  - ordered: true
+    aligned_by: dst
+    file_type: parquet
+property_groups:
+  - file_type: parquet
+    properties:
+      - name: creationDate
+        data_type: string
+        is_primary: false
+version: gar/v1
+)";
+  std::string graph_info_yaml = R"(name: ldbc_sample
+prefix: /tmp/ldbc/
+version: gar/v1
+)";
+
+  SECTION("VertexInfo::Load") {
+    auto maybe_vertex_info = VertexInfo::Load(vertex_info_yaml);
+    REQUIRE(!maybe_vertex_info.has_error());
+    auto vertex_info = maybe_vertex_info.value();
+    REQUIRE(vertex_info->GetLabel() == "person");
+    REQUIRE(vertex_info->GetChunkSize() == 100);
+    REQUIRE(vertex_info->GetPrefix() == "vertex/person/");
+    REQUIRE(vertex_info->version()->ToString() == "gar/v1");
+  }
+
+  SECTION("EdgeInfo::Load") {
+    auto maybe_edge_info = EdgeInfo::Load(edge_info_yaml);
+    REQUIRE(!maybe_edge_info.has_error());
+    auto edge_info = maybe_edge_info.value();
+    REQUIRE(edge_info->GetSrcLabel() == "person");
+    REQUIRE(edge_info->GetEdgeLabel() == "knows");
+    REQUIRE(edge_info->GetDstLabel() == "person");
+  }
+
+  SECTION("GraphInfo::Load") {
+    auto maybe_graph_info = GraphInfo::Load(graph_info_yaml, "/");
+    std::cout << maybe_graph_info.status().message() << std::endl;
+    REQUIRE(!maybe_graph_info.has_error());
+    auto graph_info = maybe_graph_info.value();
+    REQUIRE(graph_info->GetName() == "ldbc_sample");
+    REQUIRE(graph_info->GetPrefix() == "/tmp/ldbc/");
+  }
+
+  /*
+    SECTION("LoadFromS3") {
+      std::string path =
+          "s3://graphar/ldbc/ldbc.graph.yml"
+          "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
+      auto graph_info_result = GraphInfo::Load(path);
+      std::cout << graph_info_result.status().message() << std::endl;
+      REQUIRE(!graph_info_result.has_error());
+      auto graph_info = graph_info_result.value();
+      REQUIRE(graph_info->GetName() == "ldbc");
+      const auto& vertex_infos = graph_info->GetVertexInfos();
+      const auto& edge_infos = graph_info->GetEdgeInfos();
+      REQUIRE(vertex_infos.size() == 8);
+      REQUIRE(edge_infos.size() == 23);
+    }
+    */
+}
 }  // namespace GAR_NAMESPACE
