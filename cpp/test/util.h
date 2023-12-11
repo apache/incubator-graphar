@@ -30,7 +30,8 @@ GAR_NAMESPACE::Status GetTestResourceRoot(std::string* out) {
     return GAR_NAMESPACE::Status::IOError(
         "Test resources not found, set GAR_TEST_DATA to <repo root>/testing");
   }
-  *out = std::string(c_root);
+  // FIXME(@acezen): This is a hack to get around the fact that the testing
+  *out = std::string(c_root) + "/new";
   return GAR_NAMESPACE::Status::OK();
 }
 
