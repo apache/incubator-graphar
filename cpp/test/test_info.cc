@@ -233,10 +233,10 @@ TEST_CASE("VertexInfo") {
     std::string expected = R"(chunk_size: 100
 label: test_vertex
 prefix: test_vertex/
-property_groups:
+property_groups: 
   - file_type: csv
     prefix: p0_p1/
-    properties:
+    properties: 
       - data_type: int32
         is_primary: true
         name: p0
@@ -245,17 +245,6 @@ property_groups:
         name: p1
 version: gar/v1
 )";
-    std::string str1 = dump_result.value();
-    auto mismatchIt = std::mismatch(str1.begin(), str1.end(), expected.begin());
-    if (mismatchIt.first == str1.end() && mismatchIt.second == expected.end()) {
-      std::cout << "Strings are equal" << std::endl;
-    } else {
-      std::cout << "Strings are different:" << std::endl;
-      std::cout << "String 1: " << std::string(mismatchIt.first, str1.end())
-                << std::endl;
-      std::cout << "String 2: "
-                << std::string(mismatchIt.second, expected.end()) << std::endl;
-    }
     REQUIRE(dump_result.value() == expected);
   }
 
@@ -393,21 +382,21 @@ TEST_CASE("EdgeInfo") {
   SECTION("Dump") {
     auto dump_result = edge_info->Dump();
     REQUIRE(dump_result.status().ok());
-    std::string expected = R"(adj_lists:
+    std::string expected = R"(adj_lists: 
   - aligned_by: src
     file_type: csv
     ordered: true
-    prefix: adj_list/
+    prefix: ordered_by_source/
 chunk_size: 1024
 directed: true
 dst_chunk_size: 100
 dst_label: person
 edge_label: knows
 prefix: test_edge/
-property_groups:
+property_groups: 
   - file_type: csv
     prefix: p0_p1/
-    properties:
+    properties: 
       - data_type: int32
         is_primary: true
         name: p0
@@ -528,12 +517,12 @@ TEST_CASE("GraphInfo") {
   SECTION("Dump") {
     auto dump_result = graph_info->Dump();
     REQUIRE(dump_result.status().ok());
-    std::string expected = R"(edges:
+    std::string expected = R"(edges: 
   - person_knows_person.edge.yaml
 name: test_graph
 prefix: test_graph/
 version: gar/v1
-vertices:
+vertices: 
   - test_vertex.vertex.yaml
 )";
     REQUIRE(dump_result.value() == expected);
@@ -662,21 +651,19 @@ version: gar/v1
     REQUIRE(graph_info->GetPrefix() == "/tmp/ldbc/");
   }
 
-  /*
-    SECTION("LoadFromS3") {
-      std::string path =
-          "s3://graphar/ldbc/ldbc.graph.yml"
-          "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
-      auto graph_info_result = GraphInfo::Load(path);
-      std::cout << graph_info_result.status().message() << std::endl;
-      REQUIRE(!graph_info_result.has_error());
-      auto graph_info = graph_info_result.value();
-      REQUIRE(graph_info->GetName() == "ldbc");
-      const auto& vertex_infos = graph_info->GetVertexInfos();
-      const auto& edge_infos = graph_info->GetEdgeInfos();
-      REQUIRE(vertex_infos.size() == 8);
-      REQUIRE(edge_infos.size() == 23);
-    }
-    */
+  SECTION("LoadFromS3") {
+    std::string path =
+        "s3://graphar/ldbc/ldbc.graph.yml"
+        "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
+    auto graph_info_result = GraphInfo::Load(path);
+    std::cout << graph_info_result.status().message() << std::endl;
+    REQUIRE(!graph_info_result.has_error());
+    auto graph_info = graph_info_result.value();
+    REQUIRE(graph_info->GetName() == "ldbc");
+    const auto& vertex_infos = graph_info->GetVertexInfos();
+    const auto& edge_infos = graph_info->GetEdgeInfos();
+    REQUIRE(vertex_infos.size() == 8);
+    REQUIRE(edge_infos.size() == 23);
+  }
 }
 }  // namespace GAR_NAMESPACE
