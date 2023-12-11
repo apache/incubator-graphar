@@ -17,6 +17,7 @@ limitations under the License.
 #define GAR_FWD_H_
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
