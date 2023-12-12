@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.alibaba.graphar.writers.builder;
 
 import static com.alibaba.graphar.util.CppClassName.GAR_BUILDER_EDGES_BUILDER;

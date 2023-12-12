@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 @FFIApplication(jniLibrary = GAR_JNI_LIBRARY_NAME)
 package com.alibaba.graphar.util;
 

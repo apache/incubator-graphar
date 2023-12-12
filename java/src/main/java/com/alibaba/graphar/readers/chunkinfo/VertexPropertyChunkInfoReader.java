@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.alibaba.graphar.readers.chunkinfo;
 
 import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;

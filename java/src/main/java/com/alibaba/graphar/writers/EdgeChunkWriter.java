@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.alibaba.graphar.writers;
 
 import static com.alibaba.graphar.util.CppClassName.GAR_EDGE_CHUNK_WRITER;

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.alibaba.graphar.stdcxx;
 
 import static com.alibaba.graphar.util.CppClassName.STD_PAIR;

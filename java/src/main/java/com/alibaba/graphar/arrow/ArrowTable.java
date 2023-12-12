@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.alibaba.graphar.arrow;
 
 import static com.alibaba.graphar.util.CppClassName.ARROW_TABLE;

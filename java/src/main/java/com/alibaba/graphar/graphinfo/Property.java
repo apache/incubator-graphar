@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package com.alibaba.graphar.graphinfo;
 
 import static com.alibaba.graphar.util.CppClassName.GAR_PROPERTY;
