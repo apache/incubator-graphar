@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * The implementation of OrcOutputWriter is refered from OrcOutputWriter of spark 3.1.1
+ * The implementation of OrcOutputWriter is referred from OrcOutputWriter of spark 3.1.1
  */
 
 package com.alibaba.graphar.datasources.orc
