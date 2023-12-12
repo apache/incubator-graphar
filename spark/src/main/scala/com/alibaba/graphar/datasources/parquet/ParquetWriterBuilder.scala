@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * The implementation of ParquetWriteBuilder is refered from ParquetWriteBuilder of spark 3.1.1
+ * The implementation of ParquetWriteBuilder is referred from ParquetWriteBuilder of spark 3.1.1
  */
 
 package com.alibaba.graphar.datasources.parquet

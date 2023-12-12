@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * The implementation of OrcWriteBuilder is refered from OrcWriteBuilder of spark 3.1.1
+ * The implementation of OrcWriteBuilder is referred from OrcWriteBuilder of spark 3.1.1
  */
 
 package com.alibaba.graphar.datasources.orc
