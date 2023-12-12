@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #include <cassert>
 
 #include "./config.h"

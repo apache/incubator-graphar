@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #ifndef GAR_WRITER_ARROW_CHUNK_WRITER_H_
 #define GAR_WRITER_ARROW_CHUNK_WRITER_H_
 

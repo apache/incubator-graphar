@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #include "arrow/api.h"
 
 #include "gar/reader/arrow_chunk_reader.h"

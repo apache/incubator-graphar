@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #include <iostream>
 
 #include "gar/reader/chunk_info_reader.h"

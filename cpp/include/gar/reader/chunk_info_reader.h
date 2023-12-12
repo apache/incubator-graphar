@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #ifndef GAR_READER_CHUNK_INFO_READER_H_
 #define GAR_READER_CHUNK_INFO_READER_H_
 

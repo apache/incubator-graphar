@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #ifndef GAR_UTIL_GENERAL_PARAMS_H_
 #define GAR_UTIL_GENERAL_PARAMS_H_
 

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #ifndef GAR_WRITER_VERTICES_BUILDER_H_
 #define GAR_WRITER_VERTICES_BUILDER_H_
 

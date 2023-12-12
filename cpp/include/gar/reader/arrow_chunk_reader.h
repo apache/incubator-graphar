@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #ifndef GAR_READER_ARROW_CHUNK_READER_H_
 #define GAR_READER_ARROW_CHUNK_READER_H_
 

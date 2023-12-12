@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #include "gar/writer/edges_builder.h"
 #include "gar/util/convert_to_arrow_type.h"
 #include "gar/util/general_params.h"

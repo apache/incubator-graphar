@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #ifndef GAR_GRAPH_H_
 #define GAR_GRAPH_H_
 

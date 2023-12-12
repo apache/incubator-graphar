@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 #include <cstdlib>
 
 #include "arrow/api.h"
