@@ -120,17 +120,30 @@ jobs:
 
     - name: Test
       run: |
-        cd build
+        pushd build
         export ASAN_OPTIONS=detect_leaks=0
         export GAR_TEST_DATA=$PWD/../testing/
         make test
+        popd
     
     - name: Code Coverage
       run: |
-        pip install gcovr
         pushd build
-        gcovr
+        ctest -T Coverage
         popd
+
+    - name: Code Coverage Report
+      uses: irongut/CodeCoverageSummary@v1.3.0
+      with:
+        filename: build/Testing/**/Coverage.xml
+        badge: true
+        fail_below_min: true
+        format: markdown
+        hide_branch_rate: false
+        hide_complexity: true
+        indicators: true
+        output: both
+        thresholds: '60 80'
 
   GraphAr-centos-arrow-installed:
     runs-on: ubuntu-latest
