@@ -132,18 +132,6 @@ jobs:
         ctest -T Coverage --output-on-failure || true
         popd
 
-    - name: Code Coverage Report
-      uses: irongut/CodeCoverageSummary@v1.3.0
-      with:
-        filename: build/Testing/**/Coverage.xml
-        badge: true
-        fail_below_min: true
-        format: markdown
-        hide_branch_rate: false
-        hide_complexity: true
-        indicators: true
-        output: both
-        thresholds: '60 80'
 
   GraphAr-centos-arrow-installed:
     runs-on: ubuntu-latest
