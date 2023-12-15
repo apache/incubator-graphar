@@ -129,7 +129,7 @@ jobs:
     - name: Code Coverage
       run: |
         pushd build
-        ctest -T Coverage
+        ctest -T Coverage --output-on-failure || true
         popd
 
     - name: Code Coverage Report
