@@ -67,6 +67,18 @@ std::vector<T> AddVectorElement(const std::vector<T>& values, T new_element) {
   out.emplace_back(std::move(new_element));
   return out;
 }
+
+std::string BuildPath(const std::vector<std::string>& paths) {
+  std::string path;
+  for (const auto& p : paths) {
+    if (p.back() == '/') {
+      path += p;
+    } else {
+      path += p + "/";
+    }
+  }
+  return path;
+}
 }  // namespace
 
 PropertyGroup::PropertyGroup(const std::vector<Property>& properties,
@@ -225,7 +237,7 @@ Result<std::string> VertexInfo::GetFilePath(
   if (property_group == nullptr) {
     return Status::Invalid("property group is nullptr");
   }
-  return impl_->prefix_ + property_group->GetPrefix() + "chunk" +
+  return BuildPath({impl_->prefix_, property_group->GetPrefix()}) + "chunk" +
          std::to_string(chunk_index);
 }
 
@@ -234,11 +246,11 @@ Result<std::string> VertexInfo::GetPathPrefix(
   if (property_group == nullptr) {
     return Status::Invalid("property group is nullptr");
   }
-  return impl_->prefix_ + property_group->GetPrefix();
+  return BuildPath({impl_->prefix_, property_group->GetPrefix()});
 }
 
 Result<std::string> VertexInfo::GetVerticesNumFilePath() const {
-  return impl_->prefix_ + "vertex_count";
+  return BuildPath({impl_->prefix_}) + "vertex_count";
 }
 
 int VertexInfo::PropertyGroupNum() const {
@@ -593,7 +605,7 @@ Result<std::string> EdgeInfo::GetVerticesNumFilePath(
     AdjListType adj_list_type) const {
   CHECK_HAS_ADJ_LIST_TYPE(adj_list_type);
   int i = impl_->adjacent_list_type_to_index_.at(adj_list_type);
-  return impl_->prefix_ + impl_->adjacent_lists_[i]->GetPrefix() +
+  return BuildPath({impl_->prefix_, impl_->adjacent_lists_[i]->GetPrefix()}) +
          "vertex_count";
 }
 
@@ -601,7 +613,7 @@ Result<std::string> EdgeInfo::GetEdgesNumFilePath(
     IdType vertex_chunk_index, AdjListType adj_list_type) const {
   CHECK_HAS_ADJ_LIST_TYPE(adj_list_type);
   int i = impl_->adjacent_list_type_to_index_.at(adj_list_type);
-  return impl_->prefix_ + impl_->adjacent_lists_[i]->GetPrefix() +
+  return BuildPath({impl_->prefix_, impl_->adjacent_lists_[i]->GetPrefix()}) +
          "edge_count" + std::to_string(vertex_chunk_index);
 }
 
@@ -610,7 +622,7 @@ Result<std::string> EdgeInfo::GetAdjListFilePath(
     AdjListType adj_list_type) const {
   CHECK_HAS_ADJ_LIST_TYPE(adj_list_type);
   int i = impl_->adjacent_list_type_to_index_.at(adj_list_type);
-  return impl_->prefix_ + impl_->adjacent_lists_[i]->GetPrefix() +
+  return BuildPath({impl_->prefix_, impl_->adjacent_lists_[i]->GetPrefix()}) +
          "adj_list/part" + std::to_string(vertex_chunk_index) + "/chunk" +
          std::to_string(edge_chunk_index);
 }
@@ -619,14 +631,15 @@ Result<std::string> EdgeInfo::GetAdjListPathPrefix(
     AdjListType adj_list_type) const {
   CHECK_HAS_ADJ_LIST_TYPE(adj_list_type);
   int i = impl_->adjacent_list_type_to_index_.at(adj_list_type);
-  return impl_->prefix_ + impl_->adjacent_lists_[i]->GetPrefix() + "adj_list/";
+  return BuildPath({impl_->prefix_, impl_->adjacent_lists_[i]->GetPrefix()}) +
+         "adj_list/";
 }
 
 Result<std::string> EdgeInfo::GetAdjListOffsetFilePath(
     IdType vertex_chunk_index, AdjListType adj_list_type) const {
   CHECK_HAS_ADJ_LIST_TYPE(adj_list_type);
   int i = impl_->adjacent_list_type_to_index_.at(adj_list_type);
-  return impl_->prefix_ + impl_->adjacent_lists_[i]->GetPrefix() +
+  return BuildPath({impl_->prefix_, impl_->adjacent_lists_[i]->GetPrefix()}) +
          "offset/chunk" + std::to_string(vertex_chunk_index);
 }
 
@@ -634,7 +647,8 @@ Result<std::string> EdgeInfo::GetOffsetPathPrefix(
     AdjListType adj_list_type) const {
   CHECK_HAS_ADJ_LIST_TYPE(adj_list_type);
   int i = impl_->adjacent_list_type_to_index_.at(adj_list_type);
-  return impl_->prefix_ + impl_->adjacent_lists_[i]->GetPrefix() + "offset/";
+  return BuildPath({impl_->prefix_, impl_->adjacent_lists_[i]->GetPrefix()}) +
+         "offset/";
 }
 
 Result<std::string> EdgeInfo::GetPropertyFilePath(
@@ -646,9 +660,9 @@ Result<std::string> EdgeInfo::GetPropertyFilePath(
   }
   CHECK_HAS_ADJ_LIST_TYPE(adj_list_type);
   int i = impl_->adjacent_list_type_to_index_.at(adj_list_type);
-  return impl_->prefix_ + impl_->adjacent_lists_[i]->GetPrefix() +
-         property_group->GetPrefix() + "part" +
-         std::to_string(vertex_chunk_index) + "/chunk" +
+  return BuildPath({impl_->prefix_, impl_->adjacent_lists_[i]->GetPrefix(),
+                    property_group->GetPrefix()}) +
+         "part" + std::to_string(vertex_chunk_index) + "/chunk" +
          std::to_string(edge_chunk_index);
 }
 
@@ -660,8 +674,8 @@ Result<std::string> EdgeInfo::GetPropertyGroupPathPrefix(
   }
   CHECK_HAS_ADJ_LIST_TYPE(adj_list_type);
   int i = impl_->adjacent_list_type_to_index_.at(adj_list_type);
-  return impl_->prefix_ + impl_->adjacent_lists_[i]->GetPrefix() +
-         property_group->GetPrefix();
+  return BuildPath({impl_->prefix_, impl_->adjacent_lists_[i]->GetPrefix(),
+                    property_group->GetPrefix()});
 }
 
 Result<std::shared_ptr<DataType>> EdgeInfo::GetPropertyType(

@@ -178,12 +178,12 @@ TEST_CASE("VertexInfo") {
       {Property("p0", int32(), true), Property("p1", string(), false)},
       FileType::CSV, "p0_p1/");
   auto vertex_info =
-      CreateVertexInfo(label, chunk_size, {pg}, "test_vertex/", version);
+      CreateVertexInfo(label, chunk_size, {pg}, "test_vertex", version);
 
   SECTION("Basics") {
     REQUIRE(vertex_info->GetLabel() == label);
     REQUIRE(vertex_info->GetChunkSize() == chunk_size);
-    REQUIRE(vertex_info->GetPrefix() == "test_vertex/");
+    REQUIRE(vertex_info->GetPrefix() == "test_vertex");
     REQUIRE(vertex_info->version()->ToString() == "gar/v1");
   }
 
@@ -232,7 +232,7 @@ TEST_CASE("VertexInfo") {
     REQUIRE(dump_result.status().ok());
     std::string expected = R"(chunk_size: 100
 label: test_vertex
-prefix: test_vertex/
+prefix: test_vertex
 property_groups: 
   - file_type: csv
     prefix: p0_p1/

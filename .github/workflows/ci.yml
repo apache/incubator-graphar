@@ -126,12 +126,6 @@ jobs:
         make test
         popd
     
-    - name: Code Coverage
-      run: |
-        pushd build
-        ctest -T Coverage --output-on-failure || true
-        popd
-
   GraphAr-centos-arrow-installed:
     runs-on: ubuntu-latest
     container:
