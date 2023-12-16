@@ -152,7 +152,7 @@ class VertexInfo {
    * Construct a VertexInfo object with the given information and property
    * group.
    *
-   * @param type The type of the vertex.
+   * @param label The label of the vertex.
    * @param chunk_size The number of vertices in each vertex chunk.
    * @param property_groups The property group vector of the vertex.
    * @param prefix The prefix of the vertex info. If left empty, the default

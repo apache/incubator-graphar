@@ -57,24 +57,6 @@ int LookupKeyIndex(const std::unordered_map<std::string, int>& key_to_index,
   return it->second;
 }
 
-template <int NotFoundValue = -1, int DuplicateValue = -1>
-int LookupNameIndex(
-    const std::unordered_multimap<std::string, int>& name_to_index,
-    const std::string& name) {
-  auto p = name_to_index.equal_range(name);
-  auto it = p.first;
-  if (it == p.second) {
-    // Not found
-    return NotFoundValue;
-  }
-  auto index = it->second;
-  if (++it != p.second) {
-    // Duplicate field name
-    return DuplicateValue;
-  }
-  return index;
-}
-
 template <typename T>
 std::vector<T> AddVectorElement(const std::vector<T>& values, T new_element) {
   std::vector<T> out;
@@ -191,11 +173,23 @@ class VertexInfo::Impl {
     if (label_.empty() || chunk_size_ <= 0 || prefix_.empty()) {
       return false;
     }
+    std::unordered_set<std::string> check_property_unique_set;
     for (const auto& pg : property_groups_) {
+      // check if property group is validated
       if (!pg || !pg->IsValidated()) {
         return false;
       }
+      // check if property name is unique in all property groups
+      for (const auto& p : pg->GetProperties()) {
+        if (check_property_unique_set.find(p.name) !=
+            check_property_unique_set.end()) {
+          return false;
+        } else {
+          check_property_unique_set.insert(p.name);
+        }
+      }
     }
+
     return true;
   }
 
@@ -473,9 +467,20 @@ class EdgeInfo::Impl {
       }
     }
 
+    std::unordered_set<std::string> check_property_unique_set;
     for (const auto& pg : property_groups_) {
+      // check if property group is validated
       if (!pg || !pg->IsValidated()) {
         return false;
+      }
+      // check if property name is unique in all property groups
+      for (const auto& p : pg->GetProperties()) {
+        if (check_property_unique_set.find(p.name) !=
+            check_property_unique_set.end()) {
+          return false;
+        } else {
+          check_property_unique_set.insert(p.name);
+        }
       }
     }
     return true;

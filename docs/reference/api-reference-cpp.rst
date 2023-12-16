@@ -16,6 +16,10 @@ Graph Info
     :members:
     :undoc-members:
 
+.. doxygenclass:: GraphArchive::AdjacentList
+    :members:
+    :undoc-members:
+
 .. doxygenclass:: GraphArchive::VertexInfo
     :members:
     :undoc-members:

@@ -132,7 +132,6 @@ jobs:
         ctest -T Coverage --output-on-failure || true
         popd
 
-
   GraphAr-centos-arrow-installed:
     runs-on: ubuntu-latest
     container:

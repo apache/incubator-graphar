@@ -82,16 +82,14 @@ Also, the metadata of a graph can be constructed easily through reading the alre
   auto graph_info = GraphArchive::GraphInfo::Load(path).value();
 
   // get vertex information
-  auto maybe_vertex_info = graph_info.GetVertexInfo("person");
-  if (maybe_vertex_info.status().ok())) {
-    auto vertex_info = maybe_vertex_info.value();
+  auto vertex_info = graph_info->GetVertexInfo("person");
+  if (vertex_info != nullptr) {
     // use vertex_info ...
   }
 
   // get edge information
-  auto& maybe_edge_info = graph_info.GetEdgeInfo("person", "knows", "person");
-  if (maybe_edge_info.status().ok())) {
-    auto edge_info = maybe_vertex_info.value();
+  auto edge_info = graph_info->GetEdgeInfo("person", "knows", "person");
+  if (edge_info != nullptr) {
     // use edge_info ...
   }
 
@@ -105,7 +103,7 @@ As a simple case, the following example shows how to read all vertices with labe
 .. code:: C++
 
   graph_info = ...
-  auto& vertices = GraphArchive::VerticesCollection::Make(graph_info, "person").value();
+  auto vertices = GraphArchive::VerticesCollection::Make(graph_info, "person").value();
 
   for (auto it = vertices->begin(); it != vertices->end(); ++it) {
     // get a vertex and access its data
@@ -119,7 +117,7 @@ The next example reads all edges with label "person_knows_person" from the above
 
   graph_info = ...
   auto expect = GraphArchive::EdgesCollection::Make(graph_info, "person", "konws" "person", GraphArchive::AdjListType::ordered_by_source).value();
-  auto& edges = expect.value();
+  auto edges = expect.value();
 
   for (auto it = edges->begin(); it != edges->end(); ++it) {
     // get an edge and access its data
