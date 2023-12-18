@@ -8,7 +8,7 @@ API Reference
 Graph Info
 -----------
 
-.. doxygenstruct:: GraphArchive::Property
+.. doxygenclass:: GraphArchive::Property
     :members:
     :undoc-members:
 
@@ -228,7 +228,11 @@ Expression
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionIsNull
+.. doxygenclass:: GraphArchive::ExpressionUnaryOp
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionBinaryOp
     :members:
     :undoc-members:
 
@@ -265,10 +269,10 @@ Expression
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::_Property
+.. doxygenfunction:: GraphArchive::_Property(const Property&)
+.. doxygenfunction:: GraphArchive::_Property(const std::string&)
 .. doxygenfunction:: GraphArchive::_Literal
 .. doxygenfunction:: GraphArchive::_Not
-.. doxygenfunction:: GraphArchive::_IsNull
 .. doxygenfunction:: GraphArchive::_Equal
 .. doxygenfunction:: GraphArchive::_NotEqual
 .. doxygenfunction:: GraphArchive::_GreaterThan
