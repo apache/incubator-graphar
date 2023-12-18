@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-#include <filesystem>
-#include <string>
+#ifndef GAR_API_H_
+#define GAR_API_H_
 
+#include "gar/graph_info.h"
+#include "gar/util/adj_list_type.h"
+#include "gar/util/data_type.h"
+#include "gar/util/file_type.h"
+#include "gar/util/filesystem.h"
+#include "gar/util/general_params.h"
+#include "gar/util/macros.h"
+#include "gar/util/result.h"
 #include "gar/util/status.h"
+#include "gar/util/util.h"
+#include "gar/util/version_parser.h"
+#include "gar/util/yaml.h"
 
-#ifndef CPP_TEST_UTIL_H_
-#define CPP_TEST_UTIL_H_
-
-// Return the value of the GAR_TEST_DATA environment variable or return error
-// Status
-GAR_NAMESPACE::Status GetTestResourceRoot(std::string* out) {
-  const char* c_root = std::getenv("GAR_TEST_DATA");
-  if (!c_root) {
-    return GAR_NAMESPACE::Status::IOError(
-        "Test resources not found, set GAR_TEST_DATA to <repo root>/testing");
-  }
-  // FIXME(@acezen): This is a hack to get around the fact that the testing
-  *out = std::string(c_root) + "/new";
-  return GAR_NAMESPACE::Status::OK();
-}
-
-#endif  // CPP_TEST_UTIL_H_
+#endif  // GAR_API_H_

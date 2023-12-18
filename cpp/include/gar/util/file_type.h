@@ -18,15 +18,13 @@
 #include <stdexcept>
 #include <string>
 
+#include "gar/fwd.h"
 #include "gar/util/macros.h"
 
 #ifndef GAR_UTIL_FILE_TYPE_H_
 #define GAR_UTIL_FILE_TYPE_H_
 
 namespace GAR_NAMESPACE_INTERNAL {
-
-/** Type of file format */
-enum FileType { CSV = 0, PARQUET = 1, ORC = 2 };
 
 static inline FileType StringToFileType(const std::string& str) {
   static const std::map<std::string, FileType> str2file_type{

@@ -133,7 +133,8 @@ An edge information file which named "<source label>_<edge label>_<destination l
 - the edge chunk size, the source vertex chunk size and the destination vertex chunk size;
 - if the edges are directed or not;
 - the relative path for edge data files;
-- which kinds of adjList it includes: for each kind of adjList, the adjList type, the prefix of file path, the file type and all its associated property groups are specified;
+- which kinds of adjList it includes: for each kind of adjList, the adjList type, the prefix of file path, the file type;
+- the property groups attached to the edge for all adjLists;
 - the version of GraphAr.
 
 .. note::

@@ -100,12 +100,12 @@ std::vector<std::string> parseUserDefineTypesImpl(
   return user_define_types;
 }
 
-Result<InfoVersion> InfoVersion::Parse(
+Result<std::shared_ptr<const InfoVersion>> InfoVersion::Parse(
     const std::string& version_str) noexcept {
-  InfoVersion version;
+  std::shared_ptr<InfoVersion> version;
   try {
-    version.version_ = parserVersionImpl(version_str);
-    version.user_define_types_ = parseUserDefineTypesImpl(version_str);
+    version = std::make_shared<InfoVersion>(
+        parserVersionImpl(version_str), parseUserDefineTypesImpl(version_str));
   } catch (const std::exception& e) {
     return Status::Invalid("Invalid version string: ", version_str);
   }

@@ -21,8 +21,11 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
+#include "gar/graph_info.h"
+#include "gar/util/result.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
 // forward declaration
@@ -136,10 +139,10 @@ class VerticesBuilder {
    * not be ValidateLevel::default_validate.
    */
   explicit VerticesBuilder(
-      const VertexInfo& vertex_info, const std::string& prefix,
+      const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
       IdType start_vertex_index = 0,
       const ValidateLevel& validate_level = ValidateLevel::no_validate)
-      : vertex_info_(vertex_info),
+      : vertex_info_(std::move(vertex_info)),
         prefix_(prefix),
         start_vertex_index_(start_vertex_index),
         validate_level_(validate_level) {
@@ -238,7 +241,7 @@ class VerticesBuilder {
     // construct the writer
     VertexPropertyWriter writer(vertex_info_, prefix_, validate_level_);
     IdType start_chunk_index =
-        start_vertex_index_ / vertex_info_.GetChunkSize();
+        start_vertex_index_ / vertex_info_->GetChunkSize();
     // convert to table
     GAR_ASSIGN_OR_RAISE(auto input_table, convertToTable());
     // write table
@@ -260,7 +263,7 @@ class VerticesBuilder {
    * no_validate.
    */
   static Result<std::shared_ptr<VerticesBuilder>> Make(
-      const VertexInfo& vertex_info, const std::string& prefix,
+      const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
       IdType start_vertex_index = 0,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
     return std::make_shared<VerticesBuilder>(
@@ -277,12 +280,16 @@ class VerticesBuilder {
    * no_validate.
    */
   static Result<std::shared_ptr<VerticesBuilder>> Make(
-      const GraphInfo& graph_info, const std::string& label,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
       IdType start_vertex_index = 0,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
-    GAR_ASSIGN_OR_RAISE(const auto& vertex_info,
-                        graph_info.GetVertexInfo(label));
-    return Make(vertex_info, graph_info.GetPrefix(), start_vertex_index,
+    const auto vertex_info = graph_info->GetVertexInfo(label);
+    if (!vertex_info) {
+      return Status::KeyError("The vertex type ", label,
+                              " doesn't exist in graph ", graph_info->GetName(),
+                              ".");
+    }
+    return Make(vertex_info, graph_info->GetPrefix(), start_vertex_index,
                 validate_level);
   }
 
@@ -306,7 +313,8 @@ class VerticesBuilder {
    * @param array The constructed array.
    * @return Status: ok or Status::TypeError error.
    */
-  Status appendToArray(const DataType& type, const std::string& property_name,
+  Status appendToArray(const std::shared_ptr<DataType>& type,
+                       const std::string& property_name,
                        std::shared_ptr<arrow::Array>& array);  // NOLINT
 
   /**
@@ -327,7 +335,7 @@ class VerticesBuilder {
   Result<std::shared_ptr<arrow::Table>> convertToTable();
 
  private:
-  VertexInfo vertex_info_;
+  std::shared_ptr<VertexInfo> vertex_info_;
   std::string prefix_;
   std::vector<Vertex> vertices_;
   IdType start_vertex_index_;

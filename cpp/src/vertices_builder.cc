@@ -15,6 +15,7 @@
  */
 
 #include "gar/writer/vertices_builder.h"
+#include "gar/graph_info.h"
 #include "gar/util/convert_to_arrow_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
@@ -37,10 +38,10 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
         "new vertices any more");
   }
   // the start vertex index must be aligned with the chunk size
-  if (start_vertex_index_ % vertex_info_.GetChunkSize() != 0) {
+  if (start_vertex_index_ % vertex_info_->GetChunkSize() != 0) {
     return Status::IndexError("The start vertex index ", start_vertex_index_,
                               " is not aligned with the chunk size ",
-                              vertex_info_.GetChunkSize());
+                              vertex_info_->GetChunkSize());
   }
   // the vertex index must larger than start index
   if (index != -1 && index < start_vertex_index_) {
@@ -53,15 +54,15 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
   if (validate_level == ValidateLevel::strong_validate) {
     for (auto& property : v.GetProperties()) {
       // check if the property is contained
-      if (!vertex_info_.ContainProperty(property.first)) {
+      if (!vertex_info_->HasProperty(property.first)) {
         return Status::KeyError("Property with name ", property.first,
                                 " is not contained in the ",
-                                vertex_info_.GetLabel(), " vertex info.");
+                                vertex_info_->GetLabel(), " vertex info.");
       }
       // check if the property type is correct
-      auto type = vertex_info_.GetPropertyType(property.first).value();
+      auto type = vertex_info_->GetPropertyType(property.first).value();
       bool invalid_type = false;
-      switch (type.id()) {
+      switch (type->id()) {
       case Type::BOOL:
         if (property.second.type() !=
             typeid(typename ConvertToArrowType<Type::BOOL>::CType)) {
@@ -104,7 +105,7 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
       if (invalid_type) {
         return Status::TypeError(
             "Invalid data type for property ", property.first + ", defined as ",
-            type.ToTypeName(), ", but got ", property.second.type().name());
+            type->ToTypeName(), ", but got ", property.second.type().name());
       }
     }
   }
@@ -112,9 +113,9 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
 }
 
 Status VerticesBuilder::appendToArray(
-    const DataType& type, const std::string& property_name,
+    const std::shared_ptr<DataType>& type, const std::string& property_name,
     std::shared_ptr<arrow::Array>& array) {  // NOLINT
-  switch (type.id()) {
+  switch (type->id()) {
   case Type::BOOL:
     return tryToAppend<Type::BOOL>(property_name, array);
   case Type::INT32:
@@ -153,11 +154,11 @@ Status VerticesBuilder::tryToAppend(
 }
 
 Result<std::shared_ptr<arrow::Table>> VerticesBuilder::convertToTable() {
-  auto property_groups = vertex_info_.GetPropertyGroups();
+  const auto& property_groups = vertex_info_->GetPropertyGroups();
   std::vector<std::shared_ptr<arrow::Array>> arrays;
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
   for (auto& property_group : property_groups) {
-    for (auto& property : property_group.GetProperties()) {
+    for (auto& property : property_group->GetProperties()) {
       // add a column to schema
       schema_vector.push_back(arrow::field(
           property.name, DataType::DataTypeToArrowDataType(property.type)));

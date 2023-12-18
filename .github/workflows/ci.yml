@@ -120,11 +120,12 @@ jobs:
 
     - name: Test
       run: |
-        cd build
+        pushd build
         export ASAN_OPTIONS=detect_leaks=0
         export GAR_TEST_DATA=$PWD/../testing/
         make test
-
+        popd
+    
   GraphAr-centos-arrow-installed:
     runs-on: ubuntu-latest
     container:

@@ -21,6 +21,7 @@
 #include "arrow/result.h"
 
 #include "./config.h"
+#include "gar/api.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
 arrow::Result<std::shared_ptr<arrow::Table>> generate_vertex_table() {
@@ -98,13 +99,14 @@ arrow::Result<std::shared_ptr<arrow::Table>> generate_edge_property_table() {
   return arrow::Table::Make(schema, {strarray});
 }
 
-void vertex_property_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
-  // constuct writer
+void vertex_property_writer(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+  // create writer
   std::string vertex_meta_file =
       TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = GAR_NAMESPACE::VertexInfo::Load(vertex_meta).value();
-  ASSERT(vertex_info.GetLabel() == "person");
+  ASSERT(vertex_info->GetLabel() == "person");
 
   auto maybe_writer =
       GAR_NAMESPACE::VertexPropertyWriter::Make(vertex_info, "/tmp/");
@@ -136,7 +138,8 @@ void vertex_property_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
   std::cout << "vertex count from reading written file: " << *ptr << std::endl;
 }
 
-void edge_chunk_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
+void edge_chunk_writer(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // construct writer
   std::string edge_meta_file =
       TEST_DATA_DIR + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
@@ -167,8 +170,8 @@ void edge_chunk_writer(const GAR_NAMESPACE::GraphInfo& graph_info) {
   // set validate level
   writer->SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
   // write a property chunk
-  GAR_NAMESPACE::PropertyGroup pg =
-      edge_info.GetPropertyGroup("creationDate", adj_list_type).value();
+  auto pg = edge_info->GetPropertyGroup("creationDate");
+  ASSERT(pg != nullptr);
   ASSERT(writer->WritePropertyChunk(chunk, pg, 0, 0).ok());
   // write adj list of vertex chunk 0 to files
   ASSERT(writer->SortAndWriteAdjListTable(table, 0, 0).ok());

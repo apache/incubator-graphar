@@ -17,9 +17,9 @@ And then, the vertex collection and the edge collection are established as the h
 .. code:: C++
 
    auto maybe_vertices = GraphArchive::VerticesCollection::Make(graph_info, "person");
-   auto& vertices = maybe_vertices.value();
+   auto vertices = maybe_vertices.value();
    auto maybe_edges = GraphArchive::EdgesCollection::Make(graph_info, "person", "knows", "person", GraphArchive::AdjListType::ordered_by_source);
-   auto& edges = maybe_edges.value();
+   auto edges = maybe_edges.value();
 
 Next, we construct the in-memory graph data structure for BGL by traversing the vertices and edges via GraphAr's high-level reading interface (the vertex iterator and the edge iterator):
 
@@ -53,25 +53,25 @@ After that, an internal CC algorithm provided by BGL is called:
 
 .. code:: C++
 
-   // define the exteneral vertex property "component"
+   // define the external vertex property "component"
    std::vector<int> component(num_vertices);
    // call algorithm: cc
    int cc_num = boost::connected_components(g, &component[0]);
-   std::cout<<"Total number of components: "<<cc_num<<std::endl;
+   std::cout << "Total number of components: " << cc_num << std::endl;
 
 Finally, we could use a **VerticesBuilder** of GraphAr to write the results to new generated GAR files:
 
 .. code:: C++
 
    // construct a new property group
-   GraphArchive::Property cc = {"cc", GraphArchive::DataType::INT32, false};
+   GraphArchive::Property cc = {"cc", GraphArchive::int32(), false};
    std::vector<GraphArchive::Property> property_vector = {cc};
-   GraphArchive::PropertyGroup group(property_vector, GraphArchive::FileType::PARQUET);
+   auto group = GraphArchive::CreatePropertyGroup(property_vector, GraphArchive::FileType::PARQUET);
 
    // construct the new vertex info
    std::string vertex_label = "cc_result", vertex_prefix = "result/";
    int chunk_size = 100;
-   GraphArchive::VertexInfo new_info(vertex_label, chunk_size, vertex_prefix);
+   auto new_info = GraphArchive::CreateVertexInfo(vertex_label, chunk_size, {group}, vertex_prefix);
 
    // access the vertices via the index map and vertex iterator of BGL
    typedef boost::property_map<Graph, boost::vertex_index_t>::type IndexMap;

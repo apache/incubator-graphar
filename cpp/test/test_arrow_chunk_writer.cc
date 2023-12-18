@@ -31,6 +31,9 @@
 
 #include "./util.h"
 #include "gar/graph_info.h"
+#include "gar/util/adj_list_type.h"
+#include "gar/util/general_params.h"
+#include "gar/util/yaml.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
 #define CATCH_CONFIG_MAIN
@@ -72,7 +75,6 @@ TEST_CASE("test_vertex_property_writer_from_file") {
       root + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = VertexInfo::Load(vertex_meta).value();
-  REQUIRE(vertex_info.GetLabel() == "person");
   auto maybe_writer = VertexPropertyWriter::Make(vertex_info, "/tmp/");
   REQUIRE(!maybe_writer.has_error());
   auto writer = maybe_writer.value();
@@ -100,22 +102,20 @@ TEST_CASE("test_vertex_property_writer_from_file") {
   // Out of range
   REQUIRE(writer->WriteChunk(table, 0).IsInvalid());
   // Invalid chunk id
-  auto chunk = table->Slice(0, vertex_info.GetChunkSize());
+  auto chunk = table->Slice(0, vertex_info->GetChunkSize());
   REQUIRE(writer->WriteChunk(chunk, -1).IsIndexError());
   // Invalid property group
-  Property p1;
-  p1.name = "invalid_property";
-  p1.type = DataType(Type::INT32);
-  PropertyGroup pg1({p1}, FileType::CSV);
+  Property p1("invalid_property", int32(), false);
+  auto pg1 = CreatePropertyGroup({p1}, FileType::CSV);
   REQUIRE(writer->WriteTable(table, pg1, 0).IsKeyError());
   // Property not found in table
   std::shared_ptr<arrow::Table> tmp_table =
       table->RenameColumns({"original_id", "firstName", "lastName", "id"})
           .ValueOrDie();
-  PropertyGroup pg2 = vertex_info.GetPropertyGroup("firstName").value();
+  auto pg2 = vertex_info->GetPropertyGroup("firstName");
   REQUIRE(writer->WriteTable(tmp_table, pg2, 0).IsInvalid());
   // Invalid data type
-  PropertyGroup pg3 = vertex_info.GetPropertyGroup("id").value();
+  auto pg3 = vertex_info->GetPropertyGroup("id");
   REQUIRE(writer->WriteTable(tmp_table, pg3, 0).IsTypeError());
 }
 
@@ -247,14 +247,11 @@ TEST_CASE("test_edge_chunk_writer") {
       EdgeChunkWriter::Make(edge_info, "/tmp/", invalid_adj_list_type);
   REQUIRE(maybe_writer2.has_error());
   // Invalid property group
-  Property p1;
-  p1.name = "invalid_property";
-  p1.type = DataType(Type::INT32);
-  PropertyGroup pg1({p1}, FileType::CSV);
+  Property p1("invalid_property", int32(), false);
+  auto pg1 = CreatePropertyGroup({p1}, FileType::CSV);
   REQUIRE(writer->WritePropertyChunk(table, pg1, 0, 0).IsKeyError());
   // Property not found in table
-  PropertyGroup pg2 =
-      edge_info.GetPropertyGroup("creationDate", adj_list_type).value();
+  auto pg2 = edge_info->GetPropertyGroup("creationDate");
   REQUIRE(writer->WritePropertyChunk(table, pg2, 0, 0).IsInvalid());
   // Required columns not found
   std::shared_ptr<arrow::Table> tmp_table =

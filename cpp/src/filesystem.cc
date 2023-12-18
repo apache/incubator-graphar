@@ -23,6 +23,7 @@
 #include "arrow/ipc/writer.h"
 #include "parquet/arrow/writer.h"
 
+#include "gar/fwd.h"
 #include "gar/util/expression.h"
 #include "gar/util/filesystem.h"
 
@@ -269,12 +270,7 @@ Result<IdType> FileSystem::GetFileNumOfDir(const std::string& dir_path,
   return static_cast<IdType>(file_infos.size());
 }
 
-FileSystem::~FileSystem() {
-#if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
-  // Finalize the S3 client if it is initialized, otherwise it would mutex error
-  arrow::fs::FinalizeS3();
-#endif
-}
+FileSystem::~FileSystem() {}
 
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri_string, std::string* out_path) {

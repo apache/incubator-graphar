@@ -14,12 +14,71 @@
  * limitations under the License.
  */
 
-#include "gar/writer/edges_builder.h"
+#include "arrow/api.h"
+
 #include "gar/util/convert_to_arrow_type.h"
 #include "gar/util/general_params.h"
+#include "gar/util/result.h"
+#include "gar/writer/edges_builder.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {
+
+Status EdgesBuilder::Dump() {
+  // construct the writer
+  EdgeChunkWriter writer(edge_info_, prefix_, adj_list_type_, validate_level_);
+  // construct empty edge collections for vertex chunks without edges
+  IdType num_vertex_chunks =
+      (num_vertices_ + vertex_chunk_size_ - 1) / vertex_chunk_size_;
+  for (IdType i = 0; i < num_vertex_chunks; i++)
+    if (edges_.find(i) == edges_.end()) {
+      std::vector<Edge> empty_chunk_edges;
+      edges_[i] = empty_chunk_edges;
+    }
+  // dump the offsets
+  if (adj_list_type_ == AdjListType::ordered_by_source ||
+      adj_list_type_ == AdjListType::ordered_by_dest) {
+    for (auto& chunk_edges : edges_) {
+      IdType vertex_chunk_index = chunk_edges.first;
+      // sort the edges
+      if (adj_list_type_ == AdjListType::ordered_by_source)
+        sort(chunk_edges.second.begin(), chunk_edges.second.end(), cmp_src);
+      if (adj_list_type_ == AdjListType::ordered_by_dest)
+        sort(chunk_edges.second.begin(), chunk_edges.second.end(), cmp_dst);
+      // construct and write offset chunk
+      GAR_ASSIGN_OR_RAISE(
+          auto offset_table,
+          getOffsetTable(vertex_chunk_index, chunk_edges.second));
+      GAR_RETURN_NOT_OK(
+          writer.WriteOffsetChunk(offset_table, vertex_chunk_index));
+    }
+  }
+  // dump the vertex num
+  GAR_RETURN_NOT_OK(writer.WriteVerticesNum(num_vertices_));
+  // dump the edge nums
+  IdType vertex_chunk_num =
+      (num_vertices_ + vertex_chunk_size_ - 1) / vertex_chunk_size_;
+  for (IdType vertex_chunk_index = 0; vertex_chunk_index < vertex_chunk_num;
+       vertex_chunk_index++) {
+    if (edges_.find(vertex_chunk_index) == edges_.end()) {
+      GAR_RETURN_NOT_OK(writer.WriteEdgesNum(vertex_chunk_index, 0));
+    } else {
+      GAR_RETURN_NOT_OK(writer.WriteEdgesNum(
+          vertex_chunk_index, edges_[vertex_chunk_index].size()));
+    }
+  }
+  // dump the edges
+  for (auto& chunk_edges : edges_) {
+    IdType vertex_chunk_index = chunk_edges.first;
+    // convert to table
+    GAR_ASSIGN_OR_RAISE(auto input_table, convertToTable(chunk_edges.second));
+    // write table
+    GAR_RETURN_NOT_OK(writer.WriteTable(input_table, vertex_chunk_index, 0));
+    chunk_edges.second.clear();
+  }
+  is_saved_ = true;
+  return Status::OK();
+}
 
 Status EdgesBuilder::validate(const Edge& e,
                               ValidateLevel validate_level) const {
@@ -38,25 +97,25 @@ Status EdgesBuilder::validate(const Edge& e,
         "new edges any more");
   }
   // adj list type not exits in edge info
-  if (!edge_info_.ContainAdjList(adj_list_type_)) {
+  if (!edge_info_->HasAdjacentListType(adj_list_type_)) {
     return Status::KeyError(
         "Adj list type ", AdjListTypeToString(adj_list_type_),
-        " does not exist in the ", edge_info_.GetEdgeLabel(), " edge info.");
+        " does not exist in the ", edge_info_->GetEdgeLabel(), " edge info.");
   }
 
   // strong validate
   if (validate_level == ValidateLevel::strong_validate) {
     for (auto& property : e.GetProperties()) {
       // check if the property is contained
-      if (!edge_info_.ContainProperty(property.first)) {
+      if (!edge_info_->HasProperty(property.first)) {
         return Status::KeyError("Property with name ", property.first,
                                 " is not contained in the ",
-                                edge_info_.GetEdgeLabel(), " edge info.");
+                                edge_info_->GetEdgeLabel(), " edge info.");
       }
       // check if the property type is correct
-      auto type = edge_info_.GetPropertyType(property.first).value();
+      auto type = edge_info_->GetPropertyType(property.first).value();
       bool invalid_type = false;
-      switch (type.id()) {
+      switch (type->id()) {
       case Type::BOOL:
         if (property.second.type() !=
             typeid(typename ConvertToArrowType<Type::BOOL>::CType)) {
@@ -99,7 +158,7 @@ Status EdgesBuilder::validate(const Edge& e,
       if (invalid_type) {
         return Status::TypeError(
             "Invalid data type for property ", property.first + ", defined as ",
-            type.ToTypeName(), ", but got ", property.second.type().name());
+            type->ToTypeName(), ", but got ", property.second.type().name());
       }
     }
   }
@@ -107,10 +166,10 @@ Status EdgesBuilder::validate(const Edge& e,
 }
 
 Status EdgesBuilder::appendToArray(
-    const DataType& type, const std::string& property_name,
+    const std::shared_ptr<DataType>& type, const std::string& property_name,
     std::shared_ptr<arrow::Array>& array,  // NOLINT
     const std::vector<Edge>& edges) {
-  switch (type.id()) {
+  switch (type->id()) {
   case Type::BOOL:
     return tryToAppend<Type::BOOL>(property_name, array, edges);
   case Type::INT32:
@@ -165,26 +224,23 @@ Status EdgesBuilder::tryToAppend(
 
 Result<std::shared_ptr<arrow::Table>> EdgesBuilder::convertToTable(
     const std::vector<Edge>& edges) {
-  GAR_ASSIGN_OR_RAISE(auto& property_groups,
-                      edge_info_.GetPropertyGroups(adj_list_type_));
+  const auto& property_groups = edge_info_->GetPropertyGroups();
   std::vector<std::shared_ptr<arrow::Array>> arrays;
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
   // add src
   std::shared_ptr<arrow::Array> array;
-  schema_vector.push_back(
-      arrow::field(GeneralParams::kSrcIndexCol,
-                   DataType::DataTypeToArrowDataType(DataType(Type::INT64))));
+  schema_vector.push_back(arrow::field(
+      GeneralParams::kSrcIndexCol, DataType::DataTypeToArrowDataType(int64())));
   GAR_RETURN_NOT_OK(tryToAppend(1, array, edges));
   arrays.push_back(array);
   // add dst
-  schema_vector.push_back(
-      arrow::field(GeneralParams::kDstIndexCol,
-                   DataType::DataTypeToArrowDataType(DataType(Type::INT64))));
+  schema_vector.push_back(arrow::field(
+      GeneralParams::kDstIndexCol, DataType::DataTypeToArrowDataType(int64())));
   GAR_RETURN_NOT_OK(tryToAppend(0, array, edges));
   arrays.push_back(array);
   // add properties
   for (auto& property_group : property_groups) {
-    for (auto& property : property_group.GetProperties()) {
+    for (auto& property : property_group->GetProperties()) {
       // add a column to schema
       schema_vector.push_back(arrow::field(
           property.name, DataType::DataTypeToArrowDataType(property.type)));
@@ -208,9 +264,8 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::getOffsetTable(
 
   std::vector<std::shared_ptr<arrow::Array>> arrays;
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
-  schema_vector.push_back(
-      arrow::field(GeneralParams::kOffsetCol,
-                   DataType::DataTypeToArrowDataType(DataType(Type::INT64))));
+  schema_vector.push_back(arrow::field(
+      GeneralParams::kOffsetCol, DataType::DataTypeToArrowDataType(int64())));
 
   size_t index = 0;
   for (IdType i = begin_index; i < end_index; i++) {

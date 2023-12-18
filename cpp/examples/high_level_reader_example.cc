@@ -22,7 +22,8 @@
 #include "./config.h"
 #include "gar/graph.h"
 
-void vertices_collection(const GAR_NAMESPACE::GraphInfo& graph_info) {
+void vertices_collection(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // construct vertices collection
   std::string label = "person", property = "firstName";
   auto maybe_vertices_collection =
@@ -69,7 +70,8 @@ void vertices_collection(const GAR_NAMESPACE::GraphInfo& graph_info) {
   std::cout << "vertex_count=" << count << std::endl;
 }
 
-void edges_collection(const GAR_NAMESPACE::GraphInfo& graph_info) {
+void edges_collection(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
   // construct edges collection
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   auto expect = GAR_NAMESPACE::EdgesCollection::Make(

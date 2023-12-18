@@ -23,8 +23,8 @@
 #include "arrow/api.h"
 
 #include "./config.h"
+#include "gar/api.h"
 #include "gar/graph.h"
-#include "gar/graph_info.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/writer/arrow_chunk_writer.h"
 #include "gar/writer/vertices_builder.h"
@@ -34,12 +34,12 @@ int main(int argc, char* argv[]) {
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
-  ASSERT(graph_info.GetVertexInfos().size() == 1);
-  ASSERT(graph_info.GetEdgeInfos().size() == 1);
+  ASSERT(graph_info->GetVertexInfos().size() == 1);
+  ASSERT(graph_info->GetEdgeInfos().size() == 1);
 
   // construct vertices collection
   std::string label = "person";
-  ASSERT(graph_info.GetVertexInfo(label).status().ok());
+  ASSERT(graph_info->GetVertexInfo(label) != nullptr);
   auto maybe_vertices =
       GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
@@ -104,22 +104,20 @@ int main(int argc, char* argv[]) {
 
   // method 1 for writing results: construct new vertex type and write results
   // using vertex builder construct new property group
-  GAR_NAMESPACE::Property cc = {
-      "cc", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32), false};
+  GAR_NAMESPACE::Property cc("cc", GAR_NAMESPACE::int32(), false);
   std::vector<GAR_NAMESPACE::Property> property_vector = {cc};
-  GAR_NAMESPACE::PropertyGroup group(property_vector,
-                                     GAR_NAMESPACE::FileType::PARQUET);
+  auto group = GAR_NAMESPACE::CreatePropertyGroup(
+      property_vector, GAR_NAMESPACE::FileType::PARQUET);
   // construct new vertex info
   std::string vertex_label = "cc_result", vertex_prefix = "result/";
   int chunk_size = 100;
-  GAR_NAMESPACE::InfoVersion version(1);
-  GAR_NAMESPACE::VertexInfo new_info(vertex_label, chunk_size, version,
-                                     vertex_prefix);
-  ASSERT(new_info.AddPropertyGroup(group).ok());
+  auto version = GAR_NAMESPACE::InfoVersion::Parse("gar/v1").value();
+  auto new_info = GAR_NAMESPACE::CreateVertexInfo(
+      vertex_label, chunk_size, {group}, vertex_prefix, version);
   // dump new vertex info
-  ASSERT(new_info.IsValidated());
-  ASSERT(new_info.Dump().status().ok());
-  ASSERT(new_info.Save("/tmp/cc_result.vertex.yml").ok());
+  ASSERT(new_info->IsValidated());
+  ASSERT(new_info->Dump().status().ok());
+  ASSERT(new_info->Save("/tmp/cc_result.vertex.yml").ok());
   // construct vertices builder
   GAR_NAMESPACE::builder::VerticesBuilder builder(new_info, "/tmp/");
   // add vertices to the builder
@@ -135,16 +133,14 @@ int main(int argc, char* argv[]) {
 
   // method 2 for writing results: extend the original vertex info and write
   // results using writer extend the vertex_info
-  auto maybe_vertex_info = graph_info.GetVertexInfo(label);
-  ASSERT(maybe_vertex_info.status().ok());
-  auto vertex_info = maybe_vertex_info.value();
-  auto maybe_extend_info = vertex_info.Extend(group);
+  auto vertex_info = graph_info->GetVertexInfo(label);
+  auto maybe_extend_info = vertex_info->AddPropertyGroup(group);
   ASSERT(maybe_extend_info.status().ok());
   auto extend_info = maybe_extend_info.value();
   // dump the extened vertex info
-  ASSERT(extend_info.IsValidated());
-  ASSERT(extend_info.Dump().status().ok());
-  ASSERT(extend_info.Save("/tmp/person-new.vertex.yml").ok());
+  ASSERT(extend_info->IsValidated());
+  ASSERT(extend_info->Dump().status().ok());
+  ASSERT(extend_info->Save("/tmp/person-new.vertex.yml").ok());
   // construct vertex property writer
   GAR_NAMESPACE::VertexPropertyWriter writer(extend_info, "/tmp/");
   // convert results to arrow::Table

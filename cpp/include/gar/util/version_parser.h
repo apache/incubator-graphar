@@ -18,6 +18,7 @@
 #define GAR_UTIL_VERSION_PARSER_H_
 
 #include <map>
+#include <memory>
 #include <regex>  // NOLINT
 #include <string>
 #include <vector>
@@ -30,7 +31,8 @@ namespace GAR_NAMESPACE_INTERNAL {
 class InfoVersion {
  public:
   /** Parse version string to InfoVersion. */
-  static Result<InfoVersion> Parse(const std::string& str) noexcept;
+  static Result<std::shared_ptr<const InfoVersion>> Parse(
+      const std::string& str) noexcept;
 
   /** Default constructor */
   InfoVersion() : version_(version2types.rbegin()->first) {}
@@ -83,7 +85,7 @@ class InfoVersion {
   }
 
   /** Check if type is supported by version. */
-  inline bool CheckType(const std::string& type_str) noexcept {
+  inline bool CheckType(const std::string& type_str) const {
     auto& types = version2types.at(version_);
     // check if type_str is in supported types of version
     if (std::find(types.begin(), types.end(), type_str) != types.end()) {

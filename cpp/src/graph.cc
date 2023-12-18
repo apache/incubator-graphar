@@ -15,6 +15,7 @@
  */
 
 #include "gar/graph.h"
+#include "gar/util/adj_list_type.h"
 #include "gar/util/convert_to_arrow_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
@@ -37,9 +38,10 @@ Status CastToAny<Type::STRING>(std::shared_ptr<arrow::Array> array,
   return Status::OK();
 }
 
-Status TryToCastToAny(const DataType& type, std::shared_ptr<arrow::Array> array,
+Status TryToCastToAny(const std::shared_ptr<DataType>& type,
+                      std::shared_ptr<arrow::Array> array,
                       std::any& any) {  // NOLINT
-  switch (type.id()) {
+  switch (type->id()) {
   case Type::BOOL:
     return CastToAny<Type::BOOL>(array, any);
   case Type::INT32:
@@ -346,13 +348,16 @@ bool EdgeIter::first_dst(const EdgeIter& from, IdType id) {
 }
 
 Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
-    const GraphInfo& graph_info, const std::string& src_label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
     const std::string& edge_label, const std::string& dst_label,
     AdjListType adj_list_type, const IdType vertex_chunk_begin,
     const IdType vertex_chunk_end) noexcept {
-  GAR_ASSIGN_OR_RAISE(const auto& edge_info,
-                      graph_info.GetEdgeInfo(src_label, edge_label, dst_label));
-  if (!edge_info.ContainAdjList(adj_list_type)) {
+  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  if (!edge_info) {
+    return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
+                            dst_label, " doesn't exist.");
+  }
+  if (!edge_info->HasAdjacentListType(adj_list_type)) {
     return Status::Invalid("The edge ", edge_label, " of adj list type ",
                            AdjListTypeToString(adj_list_type),
                            " doesn't exist.");
@@ -360,19 +365,19 @@ Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
   switch (adj_list_type) {
   case AdjListType::ordered_by_source:
     return std::make_shared<OBSEdgeCollection>(
-        edge_info, graph_info.GetPrefix(), vertex_chunk_begin,
+        edge_info, graph_info->GetPrefix(), vertex_chunk_begin,
         vertex_chunk_end);
   case AdjListType::ordered_by_dest:
     return std::make_shared<OBDEdgesCollection>(
-        edge_info, graph_info.GetPrefix(), vertex_chunk_begin,
+        edge_info, graph_info->GetPrefix(), vertex_chunk_begin,
         vertex_chunk_end);
   case AdjListType::unordered_by_source:
     return std::make_shared<UBSEdgesCollection>(
-        edge_info, graph_info.GetPrefix(), vertex_chunk_begin,
+        edge_info, graph_info->GetPrefix(), vertex_chunk_begin,
         vertex_chunk_end);
   case AdjListType::unordered_by_dest:
     return std::make_shared<UBDEdgesCollection>(
-        edge_info, graph_info.GetPrefix(), vertex_chunk_begin,
+        edge_info, graph_info->GetPrefix(), vertex_chunk_begin,
         vertex_chunk_end);
   default:
     return Status::Invalid("Unknown adj list type.");

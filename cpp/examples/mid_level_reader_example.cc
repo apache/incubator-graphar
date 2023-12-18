@@ -20,19 +20,16 @@
 #include "arrow/filesystem/api.h"
 
 #include "./config.h"
+#include "gar/api.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/util/expression.h"
-#include "gar/util/general_params.h"
 
-void vertex_property_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
-  // constuct reader
+void vertex_property_chunk_reader(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+  // create reader
   std::string label = "person", property_name = "gender";
-  ASSERT(graph_info.GetVertexInfo(label).status().ok());
-  auto maybe_group = graph_info.GetVertexPropertyGroup(label, property_name);
-  ASSERT(maybe_group.status().ok());
-  auto group = maybe_group.value();
   auto maybe_reader = GAR_NAMESPACE::VertexPropertyArrowChunkReader::Make(
-      graph_info, label, group);
+      graph_info, label, property_name);
   ASSERT(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
 
@@ -77,7 +74,7 @@ void vertex_property_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
   std::vector<std::string> expected_cols{"firstName", "lastName"};
   auto maybe_filter_reader =
       GAR_NAMESPACE::VertexPropertyArrowChunkReader::Make(graph_info, label,
-                                                          group);
+                                                          property_name);
   ASSERT(maybe_filter_reader.status().ok());
   auto filter_reader = maybe_filter_reader.value();
   filter_reader->Filter(filter);
@@ -91,11 +88,10 @@ void vertex_property_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
             << filter_table->schema()->ToString() << std::endl;
 }
 
-void adj_list_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
-  // constuct reader
+void adj_list_chunk_reader(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+  // create reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  ASSERT(
-      graph_info.GetEdgeInfo(src_label, edge_label, dst_label).status().ok());
   auto maybe_reader = GAR_NAMESPACE::AdjListArrowChunkReader::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
@@ -128,17 +124,12 @@ void adj_list_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
 }
 
 void adj_list_property_chunk_reader(
-    const GAR_NAMESPACE::GraphInfo& graph_info) {
-  // constuct reader
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+  // create reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person",
               property_name = "creationDate";
-  auto maybe_group = graph_info.GetEdgePropertyGroup(
-      src_label, edge_label, dst_label, property_name,
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
-  ASSERT(maybe_group.status().ok());
-  auto group = maybe_group.value();
   auto maybe_reader = GAR_NAMESPACE::AdjListPropertyArrowChunkReader::Make(
-      graph_info, src_label, edge_label, dst_label, group,
+      graph_info, src_label, edge_label, dst_label, property_name,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
@@ -177,7 +168,7 @@ void adj_list_property_chunk_reader(
   std::vector<std::string> expected_cols{"creationDate"};
   auto maybe_filter_reader =
       GAR_NAMESPACE::AdjListPropertyArrowChunkReader::Make(
-          graph_info, src_label, edge_label, dst_label, group,
+          graph_info, src_label, edge_label, dst_label, property_name,
           GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(maybe_filter_reader.status().ok());
   auto filter_reader = maybe_filter_reader.value();
@@ -190,11 +181,10 @@ void adj_list_property_chunk_reader(
             << filter_table->num_rows() << std::endl;
 }
 
-void adj_list_offset_chunk_reader(const GAR_NAMESPACE::GraphInfo& graph_info) {
-  // constuct reader
+void adj_list_offset_chunk_reader(
+    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+  // create reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  ASSERT(
-      graph_info.GetEdgeInfo(src_label, edge_label, dst_label).status().ok());
   auto maybe_reader = GAR_NAMESPACE::AdjListOffsetArrowChunkReader::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
