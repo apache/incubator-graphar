@@ -13,10 +13,10 @@ GraphAr is intended to serve as the standard file format for importing/exporting
 The GraphAr project includes such topics as:
 
 - Design of the Graph Archive (GAR) file format. (see `GraphAr File Format <file-format.html>`_)
-- A set of libraries for reading, writing and transforming GAR files. (now `the C++ library <../reference/api-reference-cpp.html>`_ and `the Spark library <spark-lib.html>`_ are available)
-- Examples about how to use GraphAr to write graph algorithms, or to work with existing systems such as GraphScope. (see `Application Cases <../applications/out-of-core.html>`_)
+- A set of libraries for reading, writing and transforming GAR files. (now `the C++ library <cpp/index.html>`_ , `JAVA library <java/index.html>`_ and `the Spark library <spark/index.html>`_ are available)
+- Examples about how to use GraphAr to write graph algorithms, or to work with existing systems such as GraphScope. (see `Application Cases <../cpp/examples/out-of-core.html>`_)
 
-.. image:: ../images/overview.png
+.. image:: images/overview.png
    :alt: overview
 
 

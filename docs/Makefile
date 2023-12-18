@@ -40,5 +40,16 @@ spark-apidoc:
 	mvn scala:doc
 
 .PHONY: html
-html: 
-	python3 -m sphinx -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+html: cpp-apidoc spark-apidoc
+	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+	rm -fr $(BUILDDIR)/html/spark/reference
+	cp -fr $(ROOTDIR)/spark/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
+	cd $(ROOTDIR)/java && \
+	mvn -P javadoc javadoc:aggregate \
+				-Dmaven.antrun.skip=true \
+				-DskipTests \
+				-Djavadoc.output.directory=$(ROOTDIR)/docs/$(BUILDDIR)/html/java/ \
+				-Djavadoc.output.destDir=reference \
+				--quiet
+	@echo
+	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

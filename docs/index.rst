@@ -10,11 +10,8 @@
    :caption: Overview 
    :hidden:
 
-   user-guide/overview.rst
-   user-guide/getting-started.rst
-   user-guide/file-format.rst
-   user-guide/spark-lib.rst
-   user-guide/java-lib.rst
+   Overview <overview>
+   File Format <file-format> 
 
 .. toctree::
    :maxdepth: 2
@@ -31,7 +28,5 @@
    :hidden:
 
    Contributing Overview <developers/contributing>
-   C++ Development <developers/cpp-dev>
    Java Development <developers/java-dev>
-   Spark Development <developers/spark-dev>
    Community <developers/community>

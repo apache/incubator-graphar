@@ -4,5 +4,6 @@ Spark Library
 .. toctree::
    :maxdepth: 2
 
-   Examples <example/spark>
+   Getting Started <spark-lib>
+   Examples <examples/spark>
    Reference <reference/index> 
