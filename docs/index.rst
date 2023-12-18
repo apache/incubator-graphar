@@ -7,39 +7,26 @@
 
 .. toctree::
    :maxdepth: 1
-   :caption: User Guide
+   :caption: Overview 
    :hidden:
 
-   user-guide/overview.rst
-   user-guide/getting-started.rst
-   user-guide/file-format.rst
-   user-guide/spark-lib.rst
-   user-guide/java-lib.rst
+   Overview <overview>
+   File Format <file-format> 
 
 .. toctree::
-   :maxdepth: 1
-   :caption: Application Cases
+   :maxdepth: 2
+   :caption: Libraries
    :hidden:
 
-   applications/out-of-core.rst
-   applications/bgl.rst
-   applications/graphscope.rst
-   applications/spark.rst
+   C++ <cpp/index>
+   Java <java/index>
+   Spark <spark/index>
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Development
    :hidden:
 
-   developers/community.rst
-   developers/contributing.rst
-   developers/java-dev.rst
-
-.. toctree::
-   :maxdepth: 1
-   :caption: API Reference
-   :hidden:
-
-   reference/api-reference-cpp.rst
-   Spark API Reference <reference/spark-api/index>
-   Java API Reference <reference/java-api/index>
+   Contributing Overview <developers/contributing>
+   Java Development <developers/java-dev>
+   Community <developers/community>

@@ -1,7 +1,7 @@
 Getting Started
 ============================
 
-This article is a quick guide that explains how to work with GraphAr. To begin with, please refer to the `Building Steps`_ to install GraphAr. After reading this article to gain a basic understanding of GraphAr, move on to `GraphAr File Format <file-format.html>`_ to explore more specific explanations of the file format, or `the C++ library <../reference/api-reference-cpp.html>`_ and `the Spark library <spark-lib.html>`_  to learn about the GraphAr libraries.
+This article is a quick guide that explains how to work with GraphAr C++. To begin with, please refer to the `Building Steps`_ to install GraphAr.
 
 
 GAR Information Files
@@ -125,7 +125,7 @@ The next example reads all edges with label "person_knows_person" from the above
     std::cout << "src=" << edge.source() << ", dst=" << edge.destination() << std::endl;
   }
 
-See also `C++ Reader API Reference <../reference/api-reference-cpp.html#readers>`_.
+See also `C++ Reader API Reference <reference/index.html#readers>`_.
 
 Write GAR files
 ```````````````
@@ -167,7 +167,7 @@ As the simplest cases, the fist example below adds vertices to **VerticesBuilder
   // write to GAR files
   builder.Dump();
 
-See also `C++ Writer API Reference <../reference/api-reference-cpp.html#writer-and-builder>`_.
+See also `C++ Writer API Reference <reference/index.html#writer-and-builder>`_.
 
 A PageRank Example
 ``````````````````
@@ -175,7 +175,7 @@ Here we will go through an example of out-of-core graph analytic algorithms base
 
 This program first reads in the graph information file to obtain the metadata; then, it constructs the vertex and edge collections to enable access to the graph. After that, an implementation of the PageRank algorithm is provided, with data for the vertices stored in memory, and the edges streamed through disk I/O. Finally, the vertex information with type "person" is extended to include a new property named "pagerank" (a new vertex information file named *person-new-pagerank.vertex.yml* is saved) and the **VerticesBuilder** is used to write the results to new generated data chunks.
 
-Please refer to `more examples <../applications/out-of-core.html>`_ to learn about the other available case studies utilizing GraphAr.
+Please refer to `more examples <examples/out-of-core.html>`_ to learn about the other available case studies utilizing GraphAr.
 
 .. _Building Steps: https://github.com/alibaba/GraphAr/blob/main/README.rst#building-libraries
 
