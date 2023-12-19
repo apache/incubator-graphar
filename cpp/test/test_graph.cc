@@ -80,6 +80,30 @@ TEST_CASE("Graph") {
             it_begin.property<int64_t>("id").value());
   }
 
+  SECTION("ListProperty") {
+    // read file and construct graph info
+    std::string path = root + "/ldbc_sample/parquet/ldbc_sample_with_feature.graph.yml";
+    auto maybe_graph_info = GraphInfo::Load(path);
+    REQUIRE(maybe_graph_info.status().ok());
+    auto graph_info = maybe_graph_info.value();
+    std::string label = "person", list_property = "feature";
+    auto maybe_vertices_collection =
+        VerticesCollection::Make(graph_info, label);
+    REQUIRE(!maybe_vertices_collection.has_error());
+    auto vertices = maybe_vertices_collection.value();
+    auto count = 0;
+    for (auto it = vertices->begin(); it != vertices->end(); ++it) {
+      auto vertex = *it;
+      auto list = vertex.list_property<float>(list_property).value();
+      int len = list.second;
+      for (int i = 0; i < len; i++) {
+        REQUIRE(list.first[i] == static_cast<float>(vertex.id()) + i);
+      }
+      count++;
+    }
+    REQUIRE(count == 903);
+  }
+
   SECTION("EdgesCollection") {
     std::string src_label = "person", edge_label = "knows",
                 dst_label = "person";
