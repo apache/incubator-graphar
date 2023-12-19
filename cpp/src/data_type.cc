@@ -39,6 +39,10 @@ std::shared_ptr<arrow::DataType> DataType::DataTypeToArrowDataType(
     return arrow::float64();
   case Type::STRING:
     return arrow::large_utf8();
+  case Type::LIST:
+    if (type->child_->id() == Type::FLOAT) {
+      return arrow::list(arrow::float32());
+    }
   default:
     throw std::runtime_error("Unsupported data type");
   }
@@ -61,6 +65,10 @@ const std::shared_ptr<DataType>& DataType::ArrowDataTypeToDataType(
     return string();
   case arrow::Type::LARGE_STRING:
     return string();
+  case arrow::Type::LIST:
+    if (type->field(0)->type()->id() == arrow::Type::FLOAT) {
+      return list_float32();
+    }
   default:
     throw std::runtime_error("Unsupported data type");
   }
@@ -85,6 +93,8 @@ std::string DataType::ToTypeName() const {
 #undef TO_STRING_CASE
   case Type::USER_DEFINED:
     return user_defined_type_name_;
+  case Type::LIST:
+    return "list<" + child_->ToTypeName() + ">";
   default:
     return "unknown";
   }
@@ -104,6 +114,8 @@ const std::shared_ptr<DataType>& DataType::TypeNameToDataType(
     return float64();
   } else if (str == "string") {
     return string();
+  } else if (str == "list<float>") {
+    return list_float32();
   } else {
     throw std::runtime_error("Unsupported data type " + str);
   }
@@ -116,11 +128,19 @@ const std::shared_ptr<DataType>& DataType::TypeNameToDataType(
     return result;                            \
   }
 
+#define LIST_TYPE_FACTORY(NAME, TYPE, CHILD)     \
+  const std::shared_ptr<DataType>& NAME() {      \
+    static std::shared_ptr<DataType> result =    \
+        std::make_shared<DataType>(TYPE, CHILD); \
+    return result;                               \
+  }
+
 TYPE_FACTORY(boolean, Type::BOOL)
 TYPE_FACTORY(int32, Type::INT32)
 TYPE_FACTORY(int64, Type::INT64)
 TYPE_FACTORY(float32, Type::FLOAT)
 TYPE_FACTORY(float64, Type::DOUBLE)
 TYPE_FACTORY(string, Type::STRING)
+LIST_TYPE_FACTORY(list_float32, Type::LIST, float32())
 
 }  // namespace GAR_NAMESPACE_INTERNAL

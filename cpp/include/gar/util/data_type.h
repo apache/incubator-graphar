@@ -51,6 +51,9 @@ enum class Type {
   /** UTF8 variable-length string */
   STRING,
 
+  /** List of some logical data type */
+  LIST,
+
   /** User-defined data type */
   USER_DEFINED,
 
@@ -67,14 +70,21 @@ class DataType {
   DataType() : id_(Type::BOOL) {}
 
   explicit DataType(Type id, const std::string& user_defined_type_name = "")
-      : id_(id), user_defined_type_name_(user_defined_type_name) {}
+      : id_(id),
+        child_(nullptr),
+        user_defined_type_name_(user_defined_type_name) {}
+
+  explicit DataType(Type id, const std::shared_ptr<DataType>& child)
+      : id_(id), child_(std::move(child)), user_defined_type_name_("") {}
 
   DataType(const DataType& other)
       : id_(other.id_),
+        child_(other.child_),
         user_defined_type_name_(other.user_defined_type_name_) {}
 
   explicit DataType(DataType&& other)
       : id_(other.id_),
+        child_(std::move(other.child_)),
         user_defined_type_name_(std::move(other.user_defined_type_name_)) {}
 
   inline DataType& operator=(const DataType& other) = default;
@@ -90,6 +100,8 @@ class DataType {
     }
     return Equals(*other.get());
   }
+
+  const std::shared_ptr<DataType>& value_type() const { return child_; }
 
   bool operator==(const DataType& other) const { return Equals(other); }
 
@@ -111,6 +123,7 @@ class DataType {
 
  private:
   Type id_;
+  std::shared_ptr<DataType> child_;
   std::string user_defined_type_name_;
 };  // struct DataType
 }  // namespace GAR_NAMESPACE_INTERNAL

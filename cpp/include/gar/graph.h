@@ -36,7 +36,8 @@
 // forward declarations
 namespace arrow {
 class ChunkedArray;
-}
+class Array;
+}  // namespace arrow
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -83,9 +84,13 @@ class Vertex {
     }
   }
 
+  template <typename T>
+  Result<std::pair<const T*, int>> list_property(const std::string& property);
+
  private:
   IdType id_;
   std::map<std::string, std::any> properties_;
+  std::map<std::string, std::shared_ptr<arrow::Array>> list_properties_;
 };
 
 /**
@@ -138,9 +143,13 @@ class Edge {
     }
   }
 
+  template <typename T>
+  Result<std::pair<const T*, int>> list_property(const std::string& property);
+
  private:
   IdType src_id_, dst_id_;
   std::map<std::string, std::any> properties_;
+  std::map<std::string, std::shared_ptr<arrow::Array>> list_properties_;
 };
 
 /**
