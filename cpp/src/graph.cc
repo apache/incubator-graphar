@@ -97,15 +97,6 @@ Result<std::pair<const T*, int>> Vertex::list_property(
   return std::make_pair(values, array->length());
 }
 
-#define INSTANTIATE_VERTEX_LIST_PROPERTY(T)                           \
-  template Result<std::pair<const T*, int>> Vertex::list_property<T>( \
-      const std::string& name) const;
-
-INSTANTIATE_VERTEX_LIST_PROPERTY(int32_t)
-INSTANTIATE_VERTEX_LIST_PROPERTY(int64_t)
-INSTANTIATE_VERTEX_LIST_PROPERTY(float)
-INSTANTIATE_VERTEX_LIST_PROPERTY(double)
-
 Edge::Edge(
     AdjListArrowChunkReader& adj_list_reader,                          // NOLINT
     std::vector<AdjListPropertyArrowChunkReader>& property_readers) {  // NOLINT
@@ -152,14 +143,16 @@ Result<std::pair<const T*, int>> Edge::list_property(
   return std::make_pair(values, array->length());
 }
 
-#define INSTANTIATE_EDGE_LIST_PROPERTY(T)                           \
-  template Result<std::pair<const T*, int>> Edge::list_property<T>( \
+#define INSTANTIATE_LIST_PROPERTY(T)                                  \
+  template Result<std::pair<const T*, int>> Vertex::list_property<T>( \
+      const std::string& name) const;                                 \
+  template Result<std::pair<const T*, int>> Edge::list_property<T>(   \
       const std::string& name) const;
 
-INSTANTIATE_EDGE_LIST_PROPERTY(int32_t)
-INSTANTIATE_EDGE_LIST_PROPERTY(int64_t)
-INSTANTIATE_EDGE_LIST_PROPERTY(float)
-INSTANTIATE_EDGE_LIST_PROPERTY(double)
+INSTANTIATE_LIST_PROPERTY(int32_t)
+INSTANTIATE_LIST_PROPERTY(int64_t)
+INSTANTIATE_LIST_PROPERTY(float)
+INSTANTIATE_LIST_PROPERTY(double)
 
 IdType EdgeIter::source() {
   adj_list_reader_.seek(cur_offset_);
