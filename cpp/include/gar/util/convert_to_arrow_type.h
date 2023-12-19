@@ -28,13 +28,25 @@
 namespace GAR_NAMESPACE_INTERNAL {
 
 /** Struct to convert DataType to arrow::DataType. */
+template <typename T>
+struct CTypeToArrowType {};
+
 template <Type T>
-struct ConvertToArrowType {};
+struct TypeToArrowType {};
 
 #define CONVERT_TO_ARROW_TYPE(type, c_type, arrow_type, array_type,            \
                               builder_type, type_value, str)                   \
   template <>                                                                  \
-  struct ConvertToArrowType<type> {                                            \
+  struct TypeToArrowType<type> {                                               \
+    using CType = c_type;                                                      \
+    using ArrowType = arrow_type;                                              \
+    using ArrayType = array_type;                                              \
+    using BuilderType = builder_type;                                          \
+    static std::shared_ptr<arrow::DataType> TypeValue() { return type_value; } \
+    static const char* type_to_string() { return str; }                        \
+  };                                                                           \
+  template <>                                                                  \
+  struct CTypeToArrowType<c_type> {                                            \
     using CType = c_type;                                                      \
     using ArrowType = arrow_type;                                              \
     using ArrayType = array_type;                                              \

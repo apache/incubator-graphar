@@ -85,7 +85,8 @@ class Vertex {
   }
 
   template <typename T>
-  Result<std::pair<const T*, int>> list_property(const std::string& property);
+  Result<std::pair<const T*, int>> list_property(
+      const std::string& property) const;
 
  private:
   IdType id_;
@@ -144,7 +145,8 @@ class Edge {
   }
 
   template <typename T>
-  Result<std::pair<const T*, int>> list_property(const std::string& property);
+  Result<std::pair<const T*, int>> list_property(
+      const std::string& property) const;
 
  private:
   IdType src_id_, dst_id_;

@@ -23,7 +23,7 @@ namespace GAR_NAMESPACE_INTERNAL {
 template <Type type>
 Status CastToAny(std::shared_ptr<arrow::Array> array,
                  std::any& any) {  // NOLINT
-  using ArrayType = typename ConvertToArrowType<type>::ArrayType;
+  using ArrayType = typename TypeToArrowType<type>::ArrayType;
   auto column = std::dynamic_pointer_cast<ArrayType>(array);
   any = column->GetView(0);
   return Status::OK();
@@ -32,7 +32,7 @@ Status CastToAny(std::shared_ptr<arrow::Array> array,
 template <>
 Status CastToAny<Type::STRING>(std::shared_ptr<arrow::Array> array,
                                std::any& any) {  // NOLINT
-  using ArrayType = typename ConvertToArrowType<Type::STRING>::ArrayType;
+  using ArrayType = typename TypeToArrowType<Type::STRING>::ArrayType;
   auto column = std::dynamic_pointer_cast<ArrayType>(array);
   any = column->GetString(0);
   return Status::OK();
@@ -90,10 +90,21 @@ Result<std::pair<const T*, int>> Vertex::list_property(
   if (it == list_properties_.end()) {
     return Status::KeyError("The list property ", name, " doesn't exist.");
   }
-  auto array = std::dynamic_pointer_cast<arrow::FloatArray>(it->second);
-  auto value_array = std::dynamic_pointer_cast<T>(array->values());
-  return std::make_pair(value_array->raw_values(), array->length());
+  auto array =
+      std::dynamic_pointer_cast<typename CTypeToArrowType<T>::ArrayType>(
+          it->second);
+  const T* values = array->raw_values();
+  return std::make_pair(values, array->length());
 }
+
+#define INSTANTIATE_VERTEX_LIST_PROPERTY(T)                           \
+  template Result<std::pair<const T*, int>> Vertex::list_property<T>( \
+      const std::string& name) const;
+
+INSTANTIATE_VERTEX_LIST_PROPERTY(int32_t)
+INSTANTIATE_VERTEX_LIST_PROPERTY(int64_t)
+INSTANTIATE_VERTEX_LIST_PROPERTY(float)
+INSTANTIATE_VERTEX_LIST_PROPERTY(double)
 
 Edge::Edge(
     AdjListArrowChunkReader& adj_list_reader,                          // NOLINT
@@ -134,10 +145,21 @@ Result<std::pair<const T*, int>> Edge::list_property(
   if (it == list_properties_.end()) {
     return Status::KeyError("The list property ", name, " doesn't exist.");
   }
-  auto array = std::dynamic_pointer_cast<arrow::FloatArray>(it->second);
-  auto value_array = std::dynamic_pointer_cast<T>(array->values());
-  return std::make_pair(value_array->raw_values(), array->length());
+  auto array =
+      std::dynamic_pointer_cast<typename CTypeToArrowType<T>::ArrayType>(
+          it->second);
+  const T* values = array->raw_values();
+  return std::make_pair(values, array->length());
 }
+
+#define INSTANTIATE_EDGE_LIST_PROPERTY(T)                           \
+  template Result<std::pair<const T*, int>> Edge::list_property<T>( \
+      const std::string& name) const;
+
+INSTANTIATE_EDGE_LIST_PROPERTY(int32_t)
+INSTANTIATE_EDGE_LIST_PROPERTY(int64_t)
+INSTANTIATE_EDGE_LIST_PROPERTY(float)
+INSTANTIATE_EDGE_LIST_PROPERTY(double)
 
 IdType EdgeIter::source() {
   adj_list_reader_.seek(cur_offset_);

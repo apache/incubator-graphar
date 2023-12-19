@@ -120,7 +120,7 @@ const std::shared_ptr<DataType>& int64();
 const std::shared_ptr<DataType>& float32();
 const std::shared_ptr<DataType>& float64();
 const std::shared_ptr<DataType>& string();
-const std::shared_ptr<DataType>& list_float32();
+std::shared_ptr<DataType> list(const std::shared_ptr<DataType>& value_type);
 
 namespace util {
 struct FilterOptions;
