@@ -73,6 +73,9 @@ class DataType;
 enum FileType { CSV = 0, PARQUET = 1, ORC = 2 };
 enum class AdjListType : uint8_t;
 
+template <typename T>
+class Array;
+
 class InfoVersion;
 
 class Property;
