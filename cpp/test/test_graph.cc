@@ -82,7 +82,8 @@ TEST_CASE("Graph") {
 
   SECTION("ListProperty") {
     // read file and construct graph info
-    std::string path = root + "/ldbc_sample/parquet/ldbc_sample_with_feature.graph.yml";
+    std::string path =
+        root + "/ldbc_sample/parquet/ldbc_sample_with_feature.graph.yml";
     auto maybe_graph_info = GraphInfo::Load(path);
     REQUIRE(maybe_graph_info.status().ok());
     auto graph_info = maybe_graph_info.value();
