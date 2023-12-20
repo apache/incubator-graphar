@@ -127,11 +127,11 @@ struct ValueGetter<std::string> {
 }  // namespace util
 
 template <typename T>
-class Array {
+class Array final {
  public:
-  using value_type = T;
+  using ValueType = T;
   Array() : data_(nullptr), size_(0) {}
-  Array(T* data, size_t size) : data_(data), size_(size) {}
+  Array(const T* data, size_t size) : data_(data), size_(size) {}
   Array(const Array& other) = default;
   Array(Array&& other) = default;
   Array& operator=(const Array& other) = default;
@@ -143,8 +143,6 @@ class Array {
   const T* data() const { return data_; }
 
   size_t size() const { return size_; }
-
-  void resize(size_t size) { size_ = size; }
 
   void clear() {
     data_ = nullptr;
@@ -166,6 +164,11 @@ class Array {
   const T* data_;
   size_t size_;
 };
+
+using Int32Array = Array<int32_t>;
+using Int64Array = Array<int64_t>;
+using FloatArray = Array<float>;
+using DoubleArray = Array<double>;
 
 }  // namespace GAR_NAMESPACE_INTERNAL
 #endif  // GAR_UTIL_UTIL_H_

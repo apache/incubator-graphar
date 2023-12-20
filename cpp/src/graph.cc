@@ -84,17 +84,31 @@ Vertex::Vertex(IdType id,
 }
 
 template <typename T>
-Result<std::pair<const T*, int>> Vertex::list_property(
-    const std::string& name) const {
-  auto it = list_properties_.find(name);
-  if (it == list_properties_.end()) {
-    return Status::KeyError("The list property ", name, " doesn't exist.");
+Result<T> Vertex::property(const std::string& property) const {
+  if constexpr (std::is_final<T>::value) {
+    auto it = list_properties_.find(property);
+    if (it == list_properties_.end()) {
+      return Status::KeyError("The list property ", property,
+                              " doesn't exist.");
+    }
+    auto array = std::dynamic_pointer_cast<
+        typename CTypeToArrowType<typename T::ValueType>::ArrayType>(
+        it->second);
+    const typename T::ValueType* values = array->raw_values();
+    return T(values, array->length());
+  } else {
+    if (properties_.find(property) == properties_.end()) {
+      return Status::KeyError("Property with name ", property,
+                              " does not exist in the vertex.");
+    }
+    try {
+      T ret = std::any_cast<T>(properties_.at(property));
+      return ret;
+    } catch (const std::bad_any_cast& e) {
+      return Status::TypeError("Any cast failed, the property type of ",
+                               property, " is not matched ", e.what());
+    }
   }
-  auto array =
-      std::dynamic_pointer_cast<typename CTypeToArrowType<T>::ArrayType>(
-          it->second);
-  const T* values = array->raw_values();
-  return std::make_pair(values, array->length());
 }
 
 Edge::Edge(
@@ -130,29 +144,51 @@ Edge::Edge(
 }
 
 template <typename T>
-Result<std::pair<const T*, int>> Edge::list_property(
-    const std::string& name) const {
-  auto it = list_properties_.find(name);
-  if (it == list_properties_.end()) {
-    return Status::KeyError("The list property ", name, " doesn't exist.");
+Result<T> Edge::property(const std::string& property) const {
+  if constexpr (std::is_final<T>::value) {
+    auto it = list_properties_.find(property);
+    if (it == list_properties_.end()) {
+      return Status::KeyError("The list property ", property,
+                              " doesn't exist.");
+    }
+    auto array = std::dynamic_pointer_cast<
+        typename CTypeToArrowType<typename T::ValueType>::ArrayType>(
+        it->second);
+    const typename T::ValueType* values = array->raw_values();
+    return T(values, array->length());
+  } else {
+    if (properties_.find(property) == properties_.end()) {
+      return Status::KeyError("Property with name ", property,
+                              " does not exist in the vertex.");
+    }
+    try {
+      T ret = std::any_cast<T>(properties_.at(property));
+      return ret;
+    } catch (const std::bad_any_cast& e) {
+      return Status::TypeError("Any cast failed, the property type of ",
+                               property, " is not matched ", e.what());
+    }
   }
-  auto array =
-      std::dynamic_pointer_cast<typename CTypeToArrowType<T>::ArrayType>(
-          it->second);
-  const T* values = array->raw_values();
-  return std::make_pair(values, array->length());
 }
 
-#define INSTANTIATE_LIST_PROPERTY(T)                                  \
-  template Result<std::pair<const T*, int>> Vertex::list_property<T>( \
-      const std::string& name) const;                                 \
-  template Result<std::pair<const T*, int>> Edge::list_property<T>(   \
-      const std::string& name) const;
+#define INSTANTIATE_PROPERTY(T)                                          \
+  template Result<T> Vertex::property<T>(const std::string& name) const; \
+  template Result<T> Edge::property<T>(const std::string& name) const;
 
-INSTANTIATE_LIST_PROPERTY(int32_t)
-INSTANTIATE_LIST_PROPERTY(int64_t)
-INSTANTIATE_LIST_PROPERTY(float)
-INSTANTIATE_LIST_PROPERTY(double)
+INSTANTIATE_PROPERTY(int32_t)
+INSTANTIATE_PROPERTY(const int32_t&)
+INSTANTIATE_PROPERTY(Int32Array)
+INSTANTIATE_PROPERTY(int64_t)
+INSTANTIATE_PROPERTY(const int64_t&)
+INSTANTIATE_PROPERTY(Int64Array)
+INSTANTIATE_PROPERTY(float)
+INSTANTIATE_PROPERTY(const float&)
+INSTANTIATE_PROPERTY(FloatArray)
+INSTANTIATE_PROPERTY(double)
+INSTANTIATE_PROPERTY(const double&)
+INSTANTIATE_PROPERTY(DoubleArray)
+INSTANTIATE_PROPERTY(std::string)
+INSTANTIATE_PROPERTY(const std::string&)
 
 IdType EdgeIter::source() {
   adj_list_reader_.seek(cur_offset_);

@@ -70,23 +70,7 @@ class Vertex {
    * @return Result: The property value or error.
    */
   template <typename T>
-  inline Result<T> property(const std::string& property) noexcept {
-    if (properties_.find(property) == properties_.end()) {
-      return Status::KeyError("Property with name ", property,
-                              " does not exist in the vertex.");
-    }
-    try {
-      T ret = std::any_cast<T>(properties_[property]);
-      return ret;
-    } catch (const std::bad_any_cast& e) {
-      return Status::TypeError("Any cast failed, the property type of ",
-                               property, " is not matched ", e.what());
-    }
-  }
-
-  template <typename T>
-  Result<std::pair<const T*, int>> list_property(
-      const std::string& property) const;
+  Result<T> property(const std::string& property) const;
 
  private:
   IdType id_;
@@ -130,23 +114,7 @@ class Edge {
    * @return Result: The property value or error.
    */
   template <typename T>
-  inline Result<T> property(const std::string& property) noexcept {
-    if (properties_.find(property) == properties_.end()) {
-      return Status::KeyError("Property with name ", property,
-                              " does not exist in the edge.");
-    }
-    try {
-      T ret = std::any_cast<T>(properties_[property]);
-      return ret;
-    } catch (const std::bad_any_cast& e) {
-      return Status::TypeError("Any cast failed, the property type of ",
-                               property, " is not matched ", e.what());
-    }
-  }
-
-  template <typename T>
-  Result<std::pair<const T*, int>> list_property(
-      const std::string& property) const;
+  inline Result<T> property(const std::string& property) const;
 
  private:
   IdType src_id_, dst_id_;
