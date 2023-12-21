@@ -122,6 +122,10 @@ bool PropertyGroup::IsValidated() const {
     } else {
       check_property_unique_set.insert(p.name);
     }
+    if (p.type->id() == Type::LIST && file_type_ == FileType::CSV) {
+      // list type is not supported in csv file
+      return false;
+    }
   }
   return true;
 }
