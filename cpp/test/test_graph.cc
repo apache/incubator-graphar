@@ -18,6 +18,7 @@
 
 #include "./util.h"
 #include "gar/graph.h"
+#include "gar/util/data_type.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -93,16 +94,22 @@ TEST_CASE("Graph") {
     REQUIRE(!maybe_vertices_collection.has_error());
     auto vertices = maybe_vertices_collection.value();
     auto count = 0;
-    for (auto it = vertices->begin(); it != vertices->end(); ++it) {
-      auto vertex = *it;
-      auto float_array = vertex.property<FloatArray>(list_property).value();
-      for (size_t i = 0; i < float_array.size(); i++) {
-        REQUIRE(float_array[i] == static_cast<float>(vertex.id()) + i);
+    auto vertex_info = graph_info->GetVertexInfo(label);
+    auto data_type = vertex_info->GetPropertyType(list_property).value();
+    REQUIRE(data_type->id() == Type::LIST);
+    REQUIRE(data_type->value_type()->id() == Type::FLOAT);
+    if (data_type->id() == Type::LIST &&
+        data_type->value_type()->id() == Type::FLOAT) {
+      for (auto it = vertices->begin(); it != vertices->end(); ++it) {
+        auto vertex = *it;
+        auto float_array = vertex.property<FloatArray>(list_property).value();
+        for (size_t i = 0; i < float_array.size(); i++) {
+          REQUIRE(float_array[i] == static_cast<float>(vertex.id()) + i);
+        }
+        count++;
       }
-      count++;
+      REQUIRE(count == 903);
     }
-    return;
-    REQUIRE(count == 903);
   }
 
   SECTION("EdgesCollection") {

@@ -114,7 +114,7 @@ class Edge {
    * @return Result: The property value or error.
    */
   template <typename T>
-  inline Result<T> property(const std::string& property) const;
+  Result<T> property(const std::string& property) const;
 
  private:
   IdType src_id_, dst_id_;
