@@ -23,7 +23,7 @@ namespace GAR_NAMESPACE_INTERNAL {
 template <Type type>
 Status CastToAny(std::shared_ptr<arrow::Array> array,
                  std::any& any) {  // NOLINT
-  using ArrayType = typename ConvertToArrowType<type>::ArrayType;
+  using ArrayType = typename TypeToArrowType<type>::ArrayType;
   auto column = std::dynamic_pointer_cast<ArrayType>(array);
   any = column->GetView(0);
   return Status::OK();
@@ -32,7 +32,7 @@ Status CastToAny(std::shared_ptr<arrow::Array> array,
 template <>
 Status CastToAny<Type::STRING>(std::shared_ptr<arrow::Array> array,
                                std::any& any) {  // NOLINT
-  using ArrayType = typename ConvertToArrowType<Type::STRING>::ArrayType;
+  using ArrayType = typename TypeToArrowType<Type::STRING>::ArrayType;
   auto column = std::dynamic_pointer_cast<ArrayType>(array);
   any = column->GetString(0);
   return Status::OK();
@@ -69,9 +69,44 @@ Vertex::Vertex(IdType id,
     auto schema = chunk_table->schema();
     for (int i = 0; i < schema->num_fields(); ++i) {
       auto field = chunk_table->field(i);
-      auto type = DataType::ArrowDataTypeToDataType(field->type());
-      GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(
-          type, chunk_table->column(i)->chunk(0), properties_[field->name()]));
+      if (field->type()->id() == arrow::Type::LIST) {
+        auto list_array = std::dynamic_pointer_cast<arrow::ListArray>(
+            chunk_table->column(i)->chunk(0));
+        list_properties_[field->name()] = list_array->value_slice(0);
+      } else {
+        auto type = DataType::ArrowDataTypeToDataType(field->type());
+        GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(type,
+                                              chunk_table->column(i)->chunk(0),
+                                              properties_[field->name()]));
+      }
+    }
+  }
+}
+
+template <typename T>
+Result<T> Vertex::property(const std::string& property) const {
+  if constexpr (std::is_final<T>::value) {
+    auto it = list_properties_.find(property);
+    if (it == list_properties_.end()) {
+      return Status::KeyError("The list property ", property,
+                              " doesn't exist.");
+    }
+    auto array = std::dynamic_pointer_cast<
+        typename CTypeToArrowType<typename T::ValueType>::ArrayType>(
+        it->second);
+    const typename T::ValueType* values = array->raw_values();
+    return T(values, array->length());
+  } else {
+    if (properties_.find(property) == properties_.end()) {
+      return Status::KeyError("Property with name ", property,
+                              " does not exist in the vertex.");
+    }
+    try {
+      T ret = std::any_cast<T>(properties_.at(property));
+      return ret;
+    } catch (const std::bad_any_cast& e) {
+      return Status::TypeError("Any cast failed, the property type of ",
+                               property, " is not matched ", e.what());
     }
   }
 }
@@ -94,12 +129,66 @@ Edge::Edge(
     auto schema = chunk_table->schema();
     for (int i = 0; i < schema->num_fields(); ++i) {
       auto field = chunk_table->field(i);
-      auto type = DataType::ArrowDataTypeToDataType(field->type());
-      GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(
-          type, chunk_table->column(i)->chunk(0), properties_[field->name()]));
+      if (field->type()->id() == arrow::Type::LIST) {
+        auto list_array = std::dynamic_pointer_cast<arrow::ListArray>(
+            chunk_table->column(i)->chunk(0));
+        list_properties_[field->name()] = list_array->value_slice(0);
+      } else {
+        auto type = DataType::ArrowDataTypeToDataType(field->type());
+        GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(type,
+                                              chunk_table->column(i)->chunk(0),
+                                              properties_[field->name()]));
+      }
     }
   }
 }
+
+template <typename T>
+Result<T> Edge::property(const std::string& property) const {
+  if constexpr (std::is_final<T>::value) {
+    auto it = list_properties_.find(property);
+    if (it == list_properties_.end()) {
+      return Status::KeyError("The list property ", property,
+                              " doesn't exist.");
+    }
+    auto array = std::dynamic_pointer_cast<
+        typename CTypeToArrowType<typename T::ValueType>::ArrayType>(
+        it->second);
+    const typename T::ValueType* values = array->raw_values();
+    return T(values, array->length());
+  } else {
+    if (properties_.find(property) == properties_.end()) {
+      return Status::KeyError("Property with name ", property,
+                              " does not exist in the vertex.");
+    }
+    try {
+      T ret = std::any_cast<T>(properties_.at(property));
+      return ret;
+    } catch (const std::bad_any_cast& e) {
+      return Status::TypeError("Any cast failed, the property type of ",
+                               property, " is not matched ", e.what());
+    }
+  }
+}
+
+#define INSTANTIATE_PROPERTY(T)                                          \
+  template Result<T> Vertex::property<T>(const std::string& name) const; \
+  template Result<T> Edge::property<T>(const std::string& name) const;
+
+INSTANTIATE_PROPERTY(int32_t)
+INSTANTIATE_PROPERTY(const int32_t&)
+INSTANTIATE_PROPERTY(Int32Array)
+INSTANTIATE_PROPERTY(int64_t)
+INSTANTIATE_PROPERTY(const int64_t&)
+INSTANTIATE_PROPERTY(Int64Array)
+INSTANTIATE_PROPERTY(float)
+INSTANTIATE_PROPERTY(const float&)
+INSTANTIATE_PROPERTY(FloatArray)
+INSTANTIATE_PROPERTY(double)
+INSTANTIATE_PROPERTY(const double&)
+INSTANTIATE_PROPERTY(DoubleArray)
+INSTANTIATE_PROPERTY(std::string)
+INSTANTIATE_PROPERTY(const std::string&)
 
 IdType EdgeIter::source() {
   adj_list_reader_.seek(cur_offset_);

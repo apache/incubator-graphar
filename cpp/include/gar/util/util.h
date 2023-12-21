@@ -126,5 +126,49 @@ struct ValueGetter<std::string> {
 
 }  // namespace util
 
+template <typename T>
+class Array final {
+ public:
+  using ValueType = T;
+  Array() : data_(nullptr), size_(0) {}
+  Array(const T* data, size_t size) : data_(data), size_(size) {}
+  Array(const Array& other) = default;
+  Array(Array&& other) = default;
+  Array& operator=(const Array& other) = default;
+  Array& operator=(Array&& other) = default;
+  ~Array() = default;
+
+  const T& operator[](size_t index) const { return data_[index]; }
+
+  const T* data() const { return data_; }
+
+  size_t size() const { return size_; }
+
+  void clear() {
+    data_ = nullptr;
+    size_ = 0;
+  }
+
+  bool empty() const { return size_ == 0; }
+
+  void swap(Array& other) {
+    std::swap(data_, other.data_);
+    std::swap(size_, other.size_);
+  }
+
+  const T* begin() { return data_; }
+
+  const T* end() { return data_ + size_; }
+
+ private:
+  const T* data_;
+  size_t size_;
+};
+
+using Int32Array = Array<int32_t>;
+using Int64Array = Array<int64_t>;
+using FloatArray = Array<float>;
+using DoubleArray = Array<double>;
+
 }  // namespace GAR_NAMESPACE_INTERNAL
 #endif  // GAR_UTIL_UTIL_H_

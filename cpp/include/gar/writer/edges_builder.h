@@ -79,6 +79,7 @@ class Edge {
    * @param name The name of the property.
    * @param val The value of the property.
    */
+  // TODO(@acezen): Enable the property to be a vector(list).
   inline void AddProperty(const std::string& name, const std::any& val) {
     empty_ = false;
     properties_[name] = val;

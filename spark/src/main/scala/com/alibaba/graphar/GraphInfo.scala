@@ -44,8 +44,8 @@ object GarType extends Enumeration {
   /** UTF8 variable-length string */
   val STRING = Value(6)
 
-  /** Array of same type */
-  val ARRAY = Value(7)
+  /** List of same type */
+  val LIST = Value(7)
 
   /**
    * Data type in gar to string.
@@ -62,7 +62,7 @@ object GarType extends Enumeration {
     case GarType.FLOAT  => "float"
     case GarType.DOUBLE => "double"
     case GarType.STRING => "string"
-    case GarType.ARRAY  => "array"
+    case GarType.LIST   => "list"
     case _ => throw new IllegalArgumentException("Unknown data type")
   }
 
@@ -81,7 +81,7 @@ object GarType extends Enumeration {
     case "float"  => GarType.FLOAT
     case "double" => GarType.DOUBLE
     case "string" => GarType.STRING
-    case "array"  => GarType.ARRAY
+    case "list"   => GarType.LIST
     case _ => throw new IllegalArgumentException("Unknown data type: " + str)
   }
 }

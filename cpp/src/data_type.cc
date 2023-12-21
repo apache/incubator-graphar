@@ -39,12 +39,14 @@ std::shared_ptr<arrow::DataType> DataType::DataTypeToArrowDataType(
     return arrow::float64();
   case Type::STRING:
     return arrow::large_utf8();
+  case Type::LIST:
+    return arrow::list(DataTypeToArrowDataType(type->child_));
   default:
     throw std::runtime_error("Unsupported data type");
   }
 }
 
-const std::shared_ptr<DataType>& DataType::ArrowDataTypeToDataType(
+std::shared_ptr<DataType> DataType::ArrowDataTypeToDataType(
     const std::shared_ptr<arrow::DataType>& type) {
   switch (type->id()) {
   case arrow::Type::BOOL:
@@ -61,6 +63,8 @@ const std::shared_ptr<DataType>& DataType::ArrowDataTypeToDataType(
     return string();
   case arrow::Type::LARGE_STRING:
     return string();
+  case arrow::Type::LIST:
+    return list(ArrowDataTypeToDataType(type->field(0)->type()));
   default:
     throw std::runtime_error("Unsupported data type");
   }
@@ -85,13 +89,14 @@ std::string DataType::ToTypeName() const {
 #undef TO_STRING_CASE
   case Type::USER_DEFINED:
     return user_defined_type_name_;
+  case Type::LIST:
+    return "list<" + child_->ToTypeName() + ">";
   default:
     return "unknown";
   }
 }
 
-const std::shared_ptr<DataType>& DataType::TypeNameToDataType(
-    const std::string& str) {
+std::shared_ptr<DataType> DataType::TypeNameToDataType(const std::string& str) {
   if (str == "bool") {
     return boolean();
   } else if (str == "int32") {
@@ -104,6 +109,14 @@ const std::shared_ptr<DataType>& DataType::TypeNameToDataType(
     return float64();
   } else if (str == "string") {
     return string();
+  } else if (str == "list<int32>") {
+    return list(int32());
+  } else if (str == "list<int64>") {
+    return list(int64());
+  } else if (str == "list<float>") {
+    return list(float32());
+  } else if (str == "list<double>") {
+    return list(float64());
   } else {
     throw std::runtime_error("Unsupported data type " + str);
   }
@@ -123,4 +136,7 @@ TYPE_FACTORY(float32, Type::FLOAT)
 TYPE_FACTORY(float64, Type::DOUBLE)
 TYPE_FACTORY(string, Type::STRING)
 
+std::shared_ptr<DataType> list(const std::shared_ptr<DataType>& value_type) {
+  return std::make_shared<DataType>(Type::LIST, value_type);
+}
 }  // namespace GAR_NAMESPACE_INTERNAL
