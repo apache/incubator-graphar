@@ -62,7 +62,7 @@ object GarType extends Enumeration {
     case GarType.FLOAT  => "float"
     case GarType.DOUBLE => "double"
     case GarType.STRING => "string"
-    case GarType.LIST  => "list"
+    case GarType.LIST   => "list"
     case _ => throw new IllegalArgumentException("Unknown data type")
   }
 
@@ -81,7 +81,7 @@ object GarType extends Enumeration {
     case "float"  => GarType.FLOAT
     case "double" => GarType.DOUBLE
     case "string" => GarType.STRING
-    case "list"  => GarType.LIST
+    case "list"   => GarType.LIST
     case _ => throw new IllegalArgumentException("Unknown data type: " + str)
   }
 }
