@@ -430,6 +430,7 @@ if (BUILD_BENCHMARKS)
             target_link_libraries(${target} PRIVATE CURL::libcurl)
         endif()
     endmacro()
+    add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
 endif()
 # ------------------------------------------------------------------------------
 # Format code & cpplint

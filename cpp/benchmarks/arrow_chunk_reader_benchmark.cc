@@ -16,13 +16,15 @@
 
 #include "benchmark/benchmark.h"
 
+#include "./util.h"
+#include "gar/graph_info.h"
 #include "gar/reader/arrow_chunk_reader.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
 static void BM_ReadParquetChunk(::benchmark::State& state) {
   std::string root;
-  GAR_NAMESPACE::Status status = GAR_NAMESPACE::GetTestResourceRoot(&root);
+  GAR_NAMESPACE::Status status = GetTestResourceRoot(&root);
   if (!status.ok()) {
     state.SkipWithError(status.message().c_str());
     return;
@@ -44,7 +46,10 @@ static void BM_ReadParquetChunk(::benchmark::State& state) {
   for (auto _ : state) {
     reader->seek(0);
     reader->GetChunk();
-    reader->NextChunk();
+    reader->next_chunk();
   }
 }
-}
+
+BENCHMARK(BM_ReadParquetChunk);
+
+}  // namespace GAR_NAMESPACE_INTERNAL
