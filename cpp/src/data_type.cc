@@ -117,6 +117,8 @@ std::shared_ptr<DataType> DataType::TypeNameToDataType(const std::string& str) {
     return list(float32());
   } else if (str == "list<double>") {
     return list(float64());
+  } else if (str == "list<string>") {
+    return list(string());
   } else {
     throw std::runtime_error("Unsupported data type " + str);
   }
