@@ -431,6 +431,7 @@ if (BUILD_BENCHMARKS)
         endif()
     endmacro()
     add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
+    add_benchmark(graph_info_benchmark SRCS benchmarks/graph_info_benchmark.cc)
 endif()
 # ------------------------------------------------------------------------------
 # Format code & cpplint

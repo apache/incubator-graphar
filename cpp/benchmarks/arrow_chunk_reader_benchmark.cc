@@ -16,28 +16,15 @@
 
 #include "benchmark/benchmark.h"
 
-#include "./util.h"
+#include "./benchmark_util.h"
 #include "gar/graph_info.h"
 #include "gar/reader/arrow_chunk_reader.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-static void BM_ReadParquetChunk(::benchmark::State& state) {
-  std::string root;
-  GAR_NAMESPACE::Status status = GetTestResourceRoot(&root);
-  if (!status.ok()) {
-    state.SkipWithError(status.message().c_str());
-    return;
-  }
-  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-  auto maybe_graph_info = GraphInfo::Load(path);
-  if (maybe_graph_info.has_error()) {
-    state.SkipWithError(maybe_graph_info.status().message().c_str());
-    return;
-  }
-  auto graph_info = maybe_graph_info.value();
-  auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-      graph_info, "person", "id");
+template <class Reader> void ReadChunk(::benchmark::State& state, const std::shared_ptr<GraphInfo>& graph_info) {
+  auto maybe_reader = Reader::Make(
+      graph_info, state.range(0), state.range(3));
   if (maybe_reader.has_error()) {
     state.SkipWithError(maybe_reader.status().message().c_str());
     return;
@@ -50,6 +37,20 @@ static void BM_ReadParquetChunk(::benchmark::State& state) {
   }
 }
 
-BENCHMARK(BM_ReadParquetChunk);
+BENCHMARK_DEFINE_F(BenchmarkFixture, CreateReader)(::benchmark::State& state) {
+  for (auto _ : state) {
+    auto maybe_reader = VertexPropertyArrowChunkReader::Make(
+        graph_info_, state.range(0), state.range(3));
+    if (maybe_reader.has_error()) {
+      state.SkipWithError(maybe_reader.status().message().c_str());
+      return;
+    }
+  }
+}
+BENCHMARK_REGISTER_F(BenchmarkFixture, CreateReader);
 
+BENCHMARK_DEFINE_F(BenchmarkFixture, VertexPropertyArrowChunkReaderReadChunk)(::benchmark::State& state) {
+  ReadParquetChunk(state, graph_info_);
+}
+BENCHMARK_REGISTER_F(BenchmarkFixture, VertexPropertyArrowChunkReaderReadChunk);
 }  // namespace GAR_NAMESPACE_INTERNAL
