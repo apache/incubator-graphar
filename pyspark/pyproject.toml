@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "graphar-pyspark"
+version = "0.0.1"
+description = "PySpark bindings to GraphAr scala spark package"
+authors = ["Semyon Sinchenko ssinchenko@pm.me"]
+readme = "README.md"
+packages = [{include = "graphar_pyspark"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.group.spark]
+optional = true
+
+[tool.poetry.group.spark.dependencies]
+pyspark = "^3.2.2" # TODO: relax requirement when scala part will be available for multiple spark versions
+
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+ruff = "*"
+
+[tool.poetry.group.jupyter]
+optional = true
+
+[tool.poetry.group.jupyter.dependencies]
+jupyterlab = "*"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
