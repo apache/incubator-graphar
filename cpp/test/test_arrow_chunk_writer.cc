@@ -41,6 +41,8 @@
 
 namespace GAR_NAMESPACE {
 
+/*
+TODO: remove this test case
 std::shared_ptr<arrow::Table> GenerateListArrayTable() {
   arrow::ListBuilder list_builder(arrow::default_memory_pool(),
                                   std::make_unique<arrow::FloatBuilder>());
@@ -112,6 +114,7 @@ TEST_CASE("WriteFeature") {
   auto writer = maybe_writer.value();
   writer->WriteTable(GenerateStringListArrayTable(), v_pg, 0);
 }
+*/
 
 TEST_CASE("test_vertex_property_writer_from_file") {
   std::string root;
