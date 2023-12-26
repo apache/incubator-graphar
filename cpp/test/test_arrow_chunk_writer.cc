@@ -41,6 +41,77 @@
 
 namespace GAR_NAMESPACE {
 
+std::shared_ptr<arrow::Table> GenerateListArrayTable() {
+  arrow::ListBuilder list_builder(arrow::default_memory_pool(),
+                                  std::make_unique<arrow::FloatBuilder>());
+  auto value_builder =
+      static_cast<arrow::FloatBuilder*>(list_builder.value_builder());
+  std::vector<std::vector<float>> values(903);
+  for (int i = 0; i < 903; i++) {
+    values[i].resize(3);
+    for (int j = 0; j < 3; j++) {
+      values[i][j] = static_cast<float>(i + j);
+    }
+    list_builder.Append();
+    for (int j = 0; j < 3; j++) {
+      value_builder->Append(values[i][j]);
+    }
+  }
+  std::shared_ptr<arrow::Array> array;
+  list_builder.Finish(&array);
+  auto schema =
+      arrow::schema({arrow::field("feature", arrow::list(arrow::float32()))});
+  auto table = arrow::Table::Make(schema, {array});
+  std::cout << "ListArrayTable:\n" << table->ToString() << std::endl;
+  return table;
+}
+
+std::shared_ptr<arrow::Table> GenerateStringListArrayTable() {
+  arrow::ListBuilder list_builder(arrow::default_memory_pool(),
+                                  std::make_unique<arrow::StringBuilder>());
+  auto value_builder =
+      static_cast<arrow::StringBuilder*>(list_builder.value_builder());
+  std::vector<std::vector<std::string>> values(903);
+  for (int i = 0; i < 903; i++) {
+    values[i].resize(3);
+    values[i][0] = std::to_string(i) + "@gmail.com";
+    values[i][1] = std::to_string(i) + "@yahoo.com";
+    values[i][2] = std::to_string(i) + "@hotmail.com";
+    list_builder.Append();
+    for (int j = 0; j < 3; j++) {
+      value_builder->Append(values[i][j]);
+    }
+  }
+  std::shared_ptr<arrow::Array> array;
+  list_builder.Finish(&array);
+  auto schema =
+      arrow::schema({arrow::field("mails", arrow::list(arrow::utf8()))});
+  auto table = arrow::Table::Make(schema, {array});
+  std::cout << "ListArrayTable:\n" << table->ToString() << std::endl;
+  return table;
+}
+
+TEST_CASE("WriteFeature") {
+  std::string root;
+  REQUIRE(GetTestResourceRoot(&root).ok());
+
+  // read file and construct graph info
+  std::string path = root + "/ldbc_sample/parquet/ldbc_sample_with_feature.graph.yml";
+  std::string vertex_property_name = "mails";
+
+  auto maybe_graph_info = GraphInfo::Load(path);
+  REQUIRE(maybe_graph_info.status().ok());
+  auto graph_info = maybe_graph_info.value();
+  auto vertex_info = graph_info->GetVertexInfo("person");
+  auto v_pg = vertex_info->GetPropertyGroup(vertex_property_name);
+  REQUIRE(v_pg != nullptr);
+
+  auto maybe_writer = VertexPropertyWriter::Make(graph_info, "person");
+  REQUIRE(!maybe_writer.has_error());
+  auto writer = maybe_writer.value();
+  writer->WriteTable(GenerateStringListArrayTable(), v_pg, 0);
+}
+
 TEST_CASE("test_vertex_property_writer_from_file") {
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
