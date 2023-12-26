@@ -54,12 +54,6 @@ enum class Type {
   /** List of some logical data type */
   LIST,
 
-  /** Date */
-  Date,
-
-  /** Time */
-  TimeStamp,
-
   /** User-defined data type */
   USER_DEFINED,
 
