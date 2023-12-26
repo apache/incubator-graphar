@@ -111,15 +111,15 @@ Result<T> Vertex::property(const std::string& property) const {
   }
 }
 
-template<>
+template <>
 Result<StringArray> Vertex::property(const std::string& property) const {
   auto it = list_properties_.find(property);
   if (it == list_properties_.end()) {
-    return Status::KeyError("The list property ", property,
-                            " doesn't exist.");
+    return Status::KeyError("The list property ", property, " doesn't exist.");
   }
   auto array = std::dynamic_pointer_cast<arrow::StringArray>(it->second);
-  return StringArray(array->raw_value_offsets(), array->raw_data(), array->length());
+  return StringArray(array->raw_value_offsets(), array->raw_data(),
+                     array->length());
 }
 
 Edge::Edge(
@@ -182,15 +182,15 @@ Result<T> Edge::property(const std::string& property) const {
   }
 }
 
-template<>
+template <>
 Result<StringArray> Edge::property(const std::string& property) const {
   auto it = list_properties_.find(property);
   if (it == list_properties_.end()) {
-    return Status::KeyError("The list property ", property,
-                            " doesn't exist.");
+    return Status::KeyError("The list property ", property, " doesn't exist.");
   }
   auto array = std::dynamic_pointer_cast<arrow::StringArray>(it->second);
-  return StringArray(array->raw_value_offsets(), array->raw_data(), array->length());
+  return StringArray(array->raw_value_offsets(), array->raw_data(),
+                     array->length());
 }
 
 #define INSTANTIATE_PROPERTY(T)                                          \

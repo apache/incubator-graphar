@@ -96,7 +96,8 @@ TEST_CASE("WriteFeature") {
   REQUIRE(GetTestResourceRoot(&root).ok());
 
   // read file and construct graph info
-  std::string path = root + "/ldbc_sample/parquet/ldbc_sample_with_feature.graph.yml";
+  std::string path =
+      root + "/ldbc_sample/parquet/ldbc_sample_with_feature.graph.yml";
   std::string vertex_property_name = "mails";
 
   auto maybe_graph_info = GraphInfo::Load(path);

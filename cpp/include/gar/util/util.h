@@ -165,7 +165,7 @@ class Array final {
   size_t size_;
 };
 
-template<>
+template <>
 class Array<std::string_view> final {
  public:
   using ValueType = std::string_view;
@@ -175,24 +175,23 @@ class Array<std::string_view> final {
     const int32_t* offsets_;
     const uint8_t* data_;
     size_t index_;
-   
+
    public:
     explicit iterator(const int32_t* offsets, const uint8_t* data, size_t index)
         : offsets_(offsets), data_(data), index_(index) {}
-    
+
     const std::string_view operator*() const {
-      return std::string_view(reinterpret_cast<const char*>(data_ + offsets_[index_]),
-                              offsets_[index_ + 1] - offsets_[index_]);
+      return std::string_view(
+          reinterpret_cast<const char*>(data_ + offsets_[index_]),
+          offsets_[index_ + 1] - offsets_[index_]);
     }
-    
+
     iterator& operator++() {
       ++index_;
       return *this;
     }
 
-    iterator operator++(int) {
-      return iterator(offsets_, data_, index_++);
-    }
+    iterator operator++(int) { return iterator(offsets_, data_, index_++); }
 
     iterator operator+(size_t n) {
       return iterator(offsets_, data_, index_ + n);
@@ -208,12 +207,13 @@ class Array<std::string_view> final {
   Array() : offsets_(nullptr), data_(nullptr), size_(0) {}
   explicit Array(const int32_t* offsets, const uint8_t* data, size_t size)
       : offsets_(offsets), data_(data), size_(size) {}
-  
+
   const std::string_view operator[](size_t index) const {
-    return std::string_view(reinterpret_cast<const char*>(data_ + offsets_[index]),
-                            offsets_[index + 1] - offsets_[index]);
+    return std::string_view(
+        reinterpret_cast<const char*>(data_ + offsets_[index]),
+        offsets_[index + 1] - offsets_[index]);
   }
-  
+
   const int32_t* offsets() const { return offsets_; }
   const uint8_t* data() const { return data_; }
 
