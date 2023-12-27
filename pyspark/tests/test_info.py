@@ -1,4 +1,10 @@
+from pathlib import Path
+
+
+import pytest
 import yaml
+
+from pyspark.errors import IllegalArgumentException
 
 
 from graphar_pyspark import initialize
@@ -11,6 +17,8 @@ from graphar_pyspark.info import (
     PropertyGroup,
     VertexInfo,
 )
+
+GRAPHAR_TESTS_EXAMPLES = Path(__file__).parent.parent.parent.joinpath("testing")
 
 
 def test_property(spark):
@@ -150,8 +158,17 @@ def test_vertex_info(spark):
     )
 
     # TODO: revisit contain_* methods after resolving the discussion in github
-    assert vertex_info_from_py.contain_property_group(PropertyGroup.from_scala(vertex_info_from_py.get_property_groups()[0].to_scala()))
-    assert vertex_info_from_py.contain_property_group(PropertyGroup.from_python("prefix333", FileType.PARQUET, props_list_1)) == False
+    assert vertex_info_from_py.contain_property_group(
+        PropertyGroup.from_scala(
+            vertex_info_from_py.get_property_groups()[0].to_scala()
+        )
+    )
+    assert (
+        vertex_info_from_py.contain_property_group(
+            PropertyGroup.from_python("prefix333", FileType.PARQUET, props_list_1)
+        )
+        == False
+    )
 
     assert vertex_info_from_py.contain_property("primary")
     assert vertex_info_from_py.contain_property("non_primary")
@@ -175,3 +192,46 @@ def test_vertex_info(spark):
 
     vertex_info_from_py.set_version("2")
     assert vertex_info_from_py.get_version() == "2"
+
+    vertex_info_from_py.set_property_groups(
+        [
+            PropertyGroup.from_python("prefix1", FileType.PARQUET, props_list_1),
+            PropertyGroup.from_python("prefix2", FileType.ORC, props_list_2),
+            PropertyGroup.from_python(
+                "prefix3", FileType.CSV, props_list_1 + props_list_2
+            ),
+        ],
+    )
+    assert len(vertex_info_from_py.get_property_groups()) == 3
+
+    # Get property group
+    assert vertex_info_from_py.get_property_group("primary") is not None
+    assert vertex_info_from_py.get_property_group("non_primary") is not None
+    assert vertex_info_from_py.get_property_group("another_one") is not None
+
+    with pytest.raises(IllegalArgumentException) as e:
+        vertex_info_from_py.get_property_group("non-exsiten-one")
+        assert e == "Property not found: non-exsiten-one"
+
+    assert vertex_info_from_py.get_property_type("primary") == GarType.INT64
+    assert vertex_info_from_py.get_property_type("non_primary") == GarType.DOUBLE
+    assert vertex_info_from_py.get_property_type("another_one") == GarType.LIST
+
+    with pytest.raises(IllegalArgumentException) as e:
+        vertex_info_from_py.get_property_type("non-existen-one")
+        assert e == "Property not found: non-exsiten-one"
+
+    # Load from disk
+    person_info = VertexInfo.load_vertex_info(
+        GRAPHAR_TESTS_EXAMPLES.joinpath("transformer")
+        .joinpath("person.vertex.yml")
+        .absolute()
+        .__str__()
+    )
+    assert person_info.get_label() == "person"
+    assert person_info.get_chunk_size() == 50
+    assert person_info.get_prefix() == "vertex/person/"
+    assert person_info.get_version() == "gar/v1"
+    assert len(person_info.get_property_groups()) == 2
+    assert person_info.get_property_type("id") == GarType.INT64
+    assert person_info.get_property_type("firstName") == GarType.STRING

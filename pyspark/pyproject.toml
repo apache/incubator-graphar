@@ -32,6 +32,7 @@ optional = true
 
 [tool.poetry.group.tests.dependencies]
 pytest = "*"
+pytest-cov = "*"
 pyyaml = "*"
 
 [build-system]

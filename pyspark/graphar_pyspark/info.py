@@ -15,10 +15,12 @@ limitations under the License.
 """
 
 from __future__ import annotations
+from sys import prefix
 
 from typing import Optional
 
 from py4j.java_gateway import JavaObject
+import yaml
 
 from graphar_pyspark import GraphArSession
 from graphar_pyspark.enums import AdjListType, FileType, GarType
@@ -345,11 +347,67 @@ class VertexInfo:
         :param vertexInfoPath: yaml file path
         :returns: VertexInfo object
         """
-        scala_obj = VertexInfo(
-            GraphArSession._graphar.VertexInfo(vertex_info_path, GraphArSession._jss)
-        )
+        # TODO: There is a problem with using Spark + ShakeYML + JavaBeans
+        # See https://stackoverflow.com/questions/38002883/snakeyaml-and-spark-results-in-an-inability-to-construct-objects
+        # for details.
 
-        return VertexInfo.from_scala(scala_obj)
+        # There is no other ways to read anyFS (based on HadoopConf) from PySpark side
+        # except direct calls to JVM
+        path = GraphArSession._jvm.org.apache.hadoop.fs.Path(vertex_info_path)
+        fs = path.getFileSystem(GraphArSession._jsc.hadoopConfiguration())
+        in_stream = fs.open(path)
+
+        res = []
+
+        try:
+            while True:
+                if in_stream.available() > 0:
+                    res.append(in_stream.readByte())
+                else:
+                    in_stream.close()
+                    break
+        except Exception as e:
+            in_stream.close()
+            raise e
+
+        yml_str = bytes(res).decode("utf-8")
+        parsed_yml = yaml.safe_load(yml_str)
+
+        p_groups_dicts = parsed_yml.get("property_groups", [])
+        p_groups_lst_of_obj = []
+
+        for p_group_dict in p_groups_dicts:
+            # Default values are equal values from scala code
+            # see com.alibaba.graphar.PropertyGroup for details
+            prefix = p_group_dict.get("prefix", "")
+            file_type = p_group_dict.get("file_type")
+            props_dicts = p_group_dict.get("properties", [])
+            props = []
+
+            for prop_dict in props_dicts:
+                props.append(
+                    Property.from_python(
+                        name=prop_dict.get("name", ""),
+                        data_type=GarType(prop_dict.get("data_type")),
+                        is_primary=True
+                        if prop_dict.get("is_primary") == "true"
+                        else False,
+                    )
+                )
+
+            p_groups_lst_of_obj.append(
+                PropertyGroup.from_python(prefix, FileType(file_type), props)
+            )
+
+        # Default values are equal values from scala code
+        # see com.alibaba.graphar.VertexInfo for details
+        return VertexInfo.from_python(
+            label=parsed_yml.get("label", ""),
+            chunk_size=parsed_yml.get("chunk_size", 0),
+            prefix=parsed_yml.get("prefix", ""),
+            property_groups=p_groups_lst_of_obj,
+            version=parsed_yml.get("version", ""),
+        )
 
     def to_scala(self) -> JavaObject:
         """Transform object to JVM representation.

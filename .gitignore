@@ -47,6 +47,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+pyspark/assets
 
 # Jupyter Notebook
 .ipynb_checkpoints
