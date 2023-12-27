@@ -39,6 +39,7 @@ header:
     - 'spark/src/main/scala/com/alibaba/graphar/datasources'
     - '*.md'
     - '*.rst'
+    - '**/*.json'
 
   comment: on-failure
 
