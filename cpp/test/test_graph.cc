@@ -18,6 +18,7 @@
 
 #include "./util.h"
 #include "gar/graph.h"
+#include "gar/util/data_type.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
@@ -78,6 +79,37 @@ TEST_CASE("Graph") {
     REQUIRE(it.id() == it_begin.id());
     REQUIRE(it.property<int64_t>("id").value() ==
             it_begin.property<int64_t>("id").value());
+  }
+
+  SECTION("ListProperty") {
+    // read file and construct graph info
+    std::string path =
+        root + "/ldbc_sample/parquet/ldbc_sample_with_feature.graph.yml";
+    auto maybe_graph_info = GraphInfo::Load(path);
+    REQUIRE(maybe_graph_info.status().ok());
+    auto graph_info = maybe_graph_info.value();
+    std::string label = "person", list_property = "feature";
+    auto maybe_vertices_collection =
+        VerticesCollection::Make(graph_info, label);
+    REQUIRE(!maybe_vertices_collection.has_error());
+    auto vertices = maybe_vertices_collection.value();
+    auto count = 0;
+    auto vertex_info = graph_info->GetVertexInfo(label);
+    auto data_type = vertex_info->GetPropertyType(list_property).value();
+    REQUIRE(data_type->id() == Type::LIST);
+    REQUIRE(data_type->value_type()->id() == Type::FLOAT);
+    if (data_type->id() == Type::LIST &&
+        data_type->value_type()->id() == Type::FLOAT) {
+      for (auto it = vertices->begin(); it != vertices->end(); ++it) {
+        auto vertex = *it;
+        auto float_array = vertex.property<FloatArray>(list_property).value();
+        for (size_t i = 0; i < float_array.size(); i++) {
+          REQUIRE(float_array[i] == static_cast<float>(vertex.id()) + i);
+        }
+        count++;
+      }
+      REQUIRE(count == 903);
+    }
   }
 
   SECTION("EdgesCollection") {

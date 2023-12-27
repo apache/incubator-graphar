@@ -73,6 +73,9 @@ class DataType;
 enum FileType { CSV = 0, PARQUET = 1, ORC = 2 };
 enum class AdjListType : uint8_t;
 
+template <typename T>
+class Array;
+
 class InfoVersion;
 
 class Property;
@@ -120,6 +123,7 @@ const std::shared_ptr<DataType>& int64();
 const std::shared_ptr<DataType>& float32();
 const std::shared_ptr<DataType>& float64();
 const std::shared_ptr<DataType>& string();
+std::shared_ptr<DataType> list(const std::shared_ptr<DataType>& value_type);
 
 namespace util {
 struct FilterOptions;
