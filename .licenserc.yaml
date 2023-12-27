@@ -40,7 +40,6 @@ header:
     - '*.md'
     - '*.rst'
     - '**/*.json'
-    - '**/*.sh'
 
   comment: on-failure
 
