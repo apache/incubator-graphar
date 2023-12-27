@@ -20,11 +20,10 @@ from typing import Optional, Union
 
 from py4j.java_gateway import JavaObject
 from pyspark.sql import DataFrame
-from pyspark.sql.readwriter import OptionUtils
 
-from graphar_pysaprk import GraphArSession
-from graphar_pysaprk.enums import FileType
-from graphar_pysaprk.info import GraphInfo
+from graphar_pyspark import GraphArSession
+from graphar_pyspark.enums import FileType
+from graphar_pyspark.info import GraphInfo
 
 
 class GraphReader:

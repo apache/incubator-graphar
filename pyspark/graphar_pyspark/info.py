@@ -16,13 +16,12 @@ limitations under the License.
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Optional
 
 from py4j.java_gateway import JavaObject
 
-from graphar_pysaprk import GraphArSession
-from graphar_pysaprk.enums import AdjListType, FileType, GarType
+from graphar_pyspark import GraphArSession
+from graphar_pyspark.enums import AdjListType, FileType, GarType
 
 # TODO: Discuss who should check and catch Java NPEs and other JVM-exceptionsin
 
@@ -58,7 +57,7 @@ class Property:
         return GarType(self._jvm_property_obj.getData_type())
 
     def set_data_type(self, data_type: GarType) -> None:
-        self._jvm_property_obj.setData_type(data_type.to_scala())
+        self._jvm_property_obj.setData_type(data_type.value)
 
     def get_is_primary(self) -> bool:
         return self._jvm_property_obj.getIs_primary()
@@ -85,6 +84,16 @@ class Property:
     @staticmethod
     def from_python(name: str, data_type: GarType, is_primary: bool) -> "Property":
         return Property(name, data_type, is_primary, None)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Property):
+            return False
+
+        return (
+            (self.get_name() == other.get_name())
+            and (self.get_data_type() == other.get_data_type())
+            and (self.get_is_primary() == other.get_is_primary())
+        )
 
 
 class PropertyGroup:
@@ -154,6 +163,22 @@ class PropertyGroup:
     ) -> "PropertyGroup":
         return PropertyGroup(prefix, file_type, properties, None)
 
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, PropertyGroup):
+            return False
+
+        return (
+            (self.get_prefix() == other.get_prefix())
+            and (self.get_file_type() == other.get_file_type())
+            and (len(self.get_properties()) == len(other.get_properties()))
+            and all(
+                p_left == p_right
+                for p_left, p_right in zip(
+                    self.get_properties(), other.get_properties()
+                )
+            )
+        )
+
 
 class VertexInfo:
     """VertexInfo is a class to store the vertex meta information."""
@@ -182,7 +207,7 @@ class VertexInfo:
             self._jvm_vertex_info_obj = vertex_info
 
     def get_label(self) -> str:
-        return self._jvm_vertex_info_obj.getName()
+        return self._jvm_vertex_info_obj.getLabel()
 
     def set_label(self, label: str) -> None:
         self._jvm_vertex_info_obj.setLabel(label)
@@ -194,14 +219,14 @@ class VertexInfo:
         self._jvm_vertex_info_obj.setChunk_size(chunk_size)
 
     def get_prefix(self) -> str:
-        self._jvm_vertex_info_obj.getPrefix()
+        return self._jvm_vertex_info_obj.getPrefix()
 
     def set_prefix(self, prefix: str) -> None:
         self._jvm_vertex_info_obj.setPrefix(prefix)
 
     def get_property_groups(self) -> list[PropertyGroup]:
         return [
-            PropertyGroup(jvm_property_group)
+            PropertyGroup.from_scala(jvm_property_group)
             for jvm_property_group in self._jvm_vertex_info_obj.getProperty_groups()
         ]
 
@@ -223,7 +248,7 @@ class VertexInfo:
         :returns: true if the vertex info contains the property group, otherwise false.
         """
 
-        self._jvm_vertex_info_obj.containPropertyGroup(property_group.to_scala())
+        return self._jvm_vertex_info_obj.containPropertyGroup(property_group.to_scala())
 
     def contain_property(self, property_name: str) -> bool:
         """Check if the vertex info contains certain property.
@@ -231,7 +256,7 @@ class VertexInfo:
         :param property_name: name of the property.
         :returns: true if the vertex info contains the property, otherwise false.
         """
-        self._jvm_vertex_info_obj.containProperty(property_name)
+        return self._jvm_vertex_info_obj.containProperty(property_name)
 
     def get_property_group(self, property_name: str) -> PropertyGroup:
         """Get the property group that contains property.
@@ -416,6 +441,11 @@ class AdjList:
             for jvm_property_group in self._jvm_adj_list_obj.getProperty_groups()
         ]
 
+    def set_property_groups(self, property_groups: list[PropertyGroup]) -> None:
+        self._jvm_adj_list_obj.setProperty_groups(
+            [p_group.to_scala() for p_group in property_groups]
+        )
+
     def get_adj_list_type(self) -> AdjListType:
         """Get adj list type.
 
@@ -448,6 +478,24 @@ class AdjList:
         property_groups: list[PropertyGroup],
     ) -> "AdjList":
         return AdjList(ordered, aligned_by, prefix, file_type, property_groups, None)
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, AdjList):
+            return False
+
+        return (
+            (self.get_ordered() == other.get_ordered())
+            and (self.get_aligned_by() == other.get_aligned_by())
+            and (self.get_prefix() == other.get_prefix())
+            and (self.get_file_type() == other.get_file_type())
+            and (len(self.get_property_groups()) == len(other.get_property_groups()))
+            and all(
+                left_pg == right_pg
+                for left_pg, right_pg in zip(
+                    self.get_property_groups(), other.get_property_groups()
+                )
+            )
+        )
 
 
 class EdgeInfo:
@@ -1017,4 +1065,6 @@ class GraphInfo:
         :param graph_info_path: path of GraphInfo YAML file.
         :returns: GraphInfo object.
         """
-        return GraphInfo.from_scala(GraphArSession._graphar.GraphInfo.loadGraphInfo(graph_info_path))
+        return GraphInfo.from_scala(
+            GraphArSession._graphar.GraphInfo.loadGraphInfo(graph_info_path)
+        )

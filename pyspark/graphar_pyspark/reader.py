@@ -21,9 +21,9 @@ from typing import Optional
 from py4j.java_gateway import JavaObject
 from pyspark.sql import DataFrame
 
-from graphar_pysaprk import GraphArSession
-from graphar_pysaprk.info import PropertyGroup, VertexInfo, EdgeInfo
-from graphar_pysaprk.enums import AdjListType, FileType
+from graphar_pyspark import GraphArSession
+from graphar_pyspark.info import PropertyGroup, VertexInfo, EdgeInfo
+from graphar_pyspark.enums import AdjListType
 
 
 class VertexReader:

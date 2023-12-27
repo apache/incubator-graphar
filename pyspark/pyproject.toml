@@ -27,6 +27,13 @@ optional = true
 [tool.poetry.group.jupyter.dependencies]
 jupyterlab = "*"
 
+[tool.poetry.group.tests]
+optional = true
+
+[tool.poetry.group.tests.dependencies]
+pytest = "*"
+pyyaml = "*"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

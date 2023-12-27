@@ -18,7 +18,7 @@ from enum import Enum
 
 from py4j.java_gateway import JavaObject
 
-from graphar_pysaprk import GraphArSession
+from graphar_pyspark import GraphArSession
 
 
 class GarType(Enum):
@@ -29,7 +29,7 @@ class GarType(Enum):
     FLOAT = "float"
     DOUBLE = "double"
     STRING = "string"
-    ARRAY = "array"
+    LIST = "list"
 
     @staticmethod
     def from_scala(jvm_obj: JavaObject) -> "GarType":
