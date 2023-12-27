@@ -1,17 +1,17 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
+/* Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.alibaba.graphar.datasources
@@ -81,7 +81,8 @@ case class GarTable(
         OrcUtils.inferSchema(sparkSession, files, options.asScala.toMap)
       case "parquet" =>
         ParquetUtils.inferSchema(sparkSession, options.asScala.toMap, files)
-      case _ => throw new IllegalArgumentException
+      case _ =>
+        throw new IllegalArgumentException("Invalid format name: " + formatName)
     }
 
   /** Construct a new write builder according to the actual file format. */
@@ -93,7 +94,8 @@ case class GarTable(
         new OrcWriteBuilder(paths, formatName, supportsDataType, info)
       case "parquet" =>
         new ParquetWriteBuilder(paths, formatName, supportsDataType, info)
-      case _ => throw new IllegalArgumentException
+      case _ =>
+        throw new IllegalArgumentException("Invalid format name: " + formatName)
     }
 
   /**

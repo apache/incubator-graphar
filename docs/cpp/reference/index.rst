@@ -1,4 +1,4 @@
-C++ API Reference
+API Reference
 ==================
 
 .. _cpp-api:
@@ -8,11 +8,15 @@ C++ API Reference
 Graph Info
 -----------
 
-.. doxygenstruct:: GraphArchive::Property
+.. doxygenclass:: GraphArchive::Property
     :members:
     :undoc-members:
 
 .. doxygenclass:: GraphArchive::PropertyGroup
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::AdjacentList
     :members:
     :undoc-members:
 
@@ -47,12 +51,6 @@ Chunk Info Reader
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::ConstructVertexPropertyChunkInfoReader
-
-.. doxygenfunction:: GraphArchive::ConstructAdjListChunkInfoReader
-
-.. doxygenfunction:: GraphArchive::ConstructAdjListPropertyChunkInfoReader
-
 Arrow Chunk Reader
 ~~~~~~~~~~~~~~~~~~
 
@@ -67,12 +65,6 @@ Arrow Chunk Reader
 .. doxygenclass:: GraphArchive::AdjListOffsetArrowChunkReader
     :members:
     :undoc-members:
-
-.. doxygenfunction:: GraphArchive::ConstructVertexPropertyArrowChunkReader
-
-.. doxygenfunction:: GraphArchive::ConstructAdjListArrowChunkReader
-
-.. doxygenfunction:: GraphArchive::ConstructAdjListOffsetArrowChunkReader
 
 Vertices Collection
 ~~~~~~~~~~~~~~~~~~~
@@ -89,8 +81,6 @@ Vertices Collection
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::ConstructVerticesCollection
-
 Edges Collection
 ~~~~~~~~~~~~~~~~~~
 
@@ -98,31 +88,29 @@ Edges Collection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgesCollection
-    :members:
-    :undoc-members:
-
 .. doxygenclass:: GraphArchive::EdgeIter
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgesCollection< AdjListType::ordered_by_source >
+.. doxygenclass:: GraphArchive::EdgesCollection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgesCollection< AdjListType::ordered_by_dest >
+.. doxygenclass:: GraphArchive::OBSEdgeCollection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgesCollection< AdjListType::unordered_by_source >
+.. doxygenclass:: GraphArchive::OBDEdgesCollection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgesCollection< AdjListType::unordered_by_dest >
+.. doxygenclass:: GraphArchive::UBSEdgesCollection
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::ConstructEdgesCollection
+.. doxygenclass:: GraphArchive::UBDEdgesCollection
+    :members:
+    :undoc-members:
 
 Writer and Builder
 ---------------------
@@ -240,7 +228,11 @@ Expression
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionIsNull
+.. doxygenclass:: GraphArchive::ExpressionUnaryOp
+    :members:
+    :undoc-members:
+
+.. doxygenclass:: GraphArchive::ExpressionBinaryOp
     :members:
     :undoc-members:
 
@@ -277,10 +269,10 @@ Expression
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::_Property
+.. doxygenfunction:: GraphArchive::_Property(const Property&)
+.. doxygenfunction:: GraphArchive::_Property(const std::string&)
 .. doxygenfunction:: GraphArchive::_Literal
 .. doxygenfunction:: GraphArchive::_Not
-.. doxygenfunction:: GraphArchive::_IsNull
 .. doxygenfunction:: GraphArchive::_Equal
 .. doxygenfunction:: GraphArchive::_NotEqual
 .. doxygenfunction:: GraphArchive::_GreaterThan

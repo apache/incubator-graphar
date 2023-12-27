@@ -28,8 +28,8 @@ This algorithm can be implemented based on streaming the edges via GraphAr's rea
 .. code:: C++
 
   // construct the edge collection in GraphAr
-  auto &edges = ...
-  auto it_begin = edges.begin(), it_end = edges.end();
+  auto edges = ...
+  auto it_begin = edges->begin(), it_end = edges->end();
 
   // initialize for all vertices
   std::vector<GraphArchive::IdType> component(num_vertices);
@@ -72,8 +72,8 @@ An out-of-core BFS algorithm could be implemented based on streaming the graph d
 .. code:: C++
 
   // construct the edge collection in GraphAr
-  auto &edges = ...
-  auto it_begin = edges.begin(), it_end = edges.end();
+  auto edges = ...
+  auto it_begin = edges->begin(), it_end = edges->end();
 
   // initialize for all vertices
   GraphArchive::IdType root = 0; // the BFS root

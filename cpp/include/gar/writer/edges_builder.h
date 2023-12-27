@@ -1,17 +1,18 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifndef GAR_WRITER_EDGES_BUILDER_H_
 #define GAR_WRITER_EDGES_BUILDER_H_
@@ -21,9 +22,17 @@ limitations under the License.
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
+#include "gar/fwd.h"
+#include "gar/graph_info.h"
+#include "gar/util/adj_list_type.h"
 #include "gar/writer/arrow_chunk_writer.h"
+
+namespace arrow {
+class Array;
+}
 
 namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {
@@ -70,6 +79,7 @@ class Edge {
    * @param name The name of the property.
    * @param val The value of the property.
    */
+  // TODO(@acezen): Enable the property to be a vector(list).
   inline void AddProperty(const std::string& name, const std::any& val) {
     empty_ = false;
     properties_[name] = val;
@@ -153,10 +163,10 @@ class EdgesBuilder {
    * not be ValidateLevel::default_validate.
    */
   explicit EdgesBuilder(
-      const EdgeInfo edge_info, const std::string& prefix,
+      const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
       AdjListType adj_list_type, IdType num_vertices,
       const ValidateLevel& validate_level = ValidateLevel::no_validate)
-      : edge_info_(edge_info),
+      : edge_info_(std::move(edge_info)),
         prefix_(prefix),
         adj_list_type_(adj_list_type),
         num_vertices_(num_vertices),
@@ -171,19 +181,19 @@ class EdgesBuilder {
     is_saved_ = false;
     switch (adj_list_type) {
     case AdjListType::unordered_by_source:
-      vertex_chunk_size_ = edge_info_.GetSrcChunkSize();
+      vertex_chunk_size_ = edge_info_->GetSrcChunkSize();
       break;
     case AdjListType::ordered_by_source:
-      vertex_chunk_size_ = edge_info_.GetSrcChunkSize();
+      vertex_chunk_size_ = edge_info_->GetSrcChunkSize();
       break;
     case AdjListType::unordered_by_dest:
-      vertex_chunk_size_ = edge_info_.GetDstChunkSize();
+      vertex_chunk_size_ = edge_info_->GetDstChunkSize();
       break;
     case AdjListType::ordered_by_dest:
-      vertex_chunk_size_ = edge_info_.GetDstChunkSize();
+      vertex_chunk_size_ = edge_info_->GetDstChunkSize();
       break;
     default:
-      vertex_chunk_size_ = edge_info_.GetSrcChunkSize();
+      vertex_chunk_size_ = edge_info_->GetSrcChunkSize();
     }
   }
 
@@ -207,7 +217,7 @@ class EdgesBuilder {
   inline ValidateLevel GetValidateLevel() const { return validate_level_; }
 
   /**
-   * @brief Clear the edges in this EdgessBuilder.
+   * @brief Clear the edges in this EdgesBuilder.
    */
   inline void Clear() {
     edges_.clear();
@@ -259,61 +269,56 @@ class EdgesBuilder {
    *
    * @return Status: ok or error.
    */
-  Status Dump() {
-    // construct the writer
-    EdgeChunkWriter writer(edge_info_, prefix_, adj_list_type_,
-                           validate_level_);
-    // construct empty edge collections for vertex chunks without edges
-    IdType num_vertex_chunks =
-        (num_vertices_ + vertex_chunk_size_ - 1) / vertex_chunk_size_;
-    for (IdType i = 0; i < num_vertex_chunks; i++)
-      if (edges_.find(i) == edges_.end()) {
-        std::vector<Edge> empty_chunk_edges;
-        edges_[i] = empty_chunk_edges;
-      }
-    // dump the offsets
-    if (adj_list_type_ == AdjListType::ordered_by_source ||
-        adj_list_type_ == AdjListType::ordered_by_dest) {
-      for (auto& chunk_edges : edges_) {
-        IdType vertex_chunk_index = chunk_edges.first;
-        // sort the edges
-        if (adj_list_type_ == AdjListType::ordered_by_source)
-          sort(chunk_edges.second.begin(), chunk_edges.second.end(), cmp_src);
-        if (adj_list_type_ == AdjListType::ordered_by_dest)
-          sort(chunk_edges.second.begin(), chunk_edges.second.end(), cmp_dst);
-        // construct and write offset chunk
-        GAR_ASSIGN_OR_RAISE(
-            auto offset_table,
-            getOffsetTable(vertex_chunk_index, chunk_edges.second));
-        GAR_RETURN_NOT_OK(
-            writer.WriteOffsetChunk(offset_table, vertex_chunk_index));
-      }
+  Status Dump();
+
+  /**
+   * @brief Construct an EdgesBuilder from edge info.
+   *
+   * @param edge_info The edge info that describes the edge type.
+   * @param prefix The absolute prefix.
+   * @param adj_list_type The adj list type of the edges.
+   * @param num_vertices The total number of vertices for source or destination.
+   * @param validate_level The global validate level for the builder, default is
+   * no_validate.
+   */
+  static Result<std::shared_ptr<EdgesBuilder>> Make(
+      const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
+      AdjListType adj_list_type, IdType num_vertices,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    if (!edge_info->HasAdjacentListType(adj_list_type)) {
+      return Status::KeyError(
+          "The adjacent list type ", AdjListTypeToString(adj_list_type),
+          " doesn't exist in edge ", edge_info->GetEdgeLabel(), ".");
     }
-    // dump the vertex num
-    GAR_RETURN_NOT_OK(writer.WriteVerticesNum(num_vertices_));
-    // dump the edge nums
-    IdType vertex_chunk_num =
-        (num_vertices_ + vertex_chunk_size_ - 1) / vertex_chunk_size_;
-    for (IdType vertex_chunk_index = 0; vertex_chunk_index < vertex_chunk_num;
-         vertex_chunk_index++) {
-      if (edges_.find(vertex_chunk_index) == edges_.end()) {
-        GAR_RETURN_NOT_OK(writer.WriteEdgesNum(vertex_chunk_index, 0));
-      } else {
-        GAR_RETURN_NOT_OK(writer.WriteEdgesNum(
-            vertex_chunk_index, edges_[vertex_chunk_index].size()));
-      }
+    return std::make_shared<EdgesBuilder>(edge_info, prefix, adj_list_type,
+                                          num_vertices, validate_level);
+  }
+
+  /**
+   * @brief Construct an EdgesBuilder from graph info.
+   *
+   * @param graph_info The graph info that describes the graph.
+   * @param src_label The label of the source vertex type.
+   * @param edge_label The label of the edge type.
+   * @param dst_label The label of the destination vertex type.
+   * @param adj_list_type The adj list type of the edges.
+   * @param num_vertices The total number of vertices for source or destination.
+   * @param validate_level The global validate level for the builder, default is
+   * no_validate.
+   */
+  static Result<std::shared_ptr<EdgesBuilder>> Make(
+      const std::shared_ptr<GraphInfo>& graph_info,
+      const std::string& src_label, const std::string& edge_label,
+      const std::string& dst_label, const AdjListType& adj_list_type,
+      IdType num_vertices,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+    if (!edge_info) {
+      return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
+                              dst_label, " doesn't exist.");
     }
-    // dump the edges
-    for (auto& chunk_edges : edges_) {
-      IdType vertex_chunk_index = chunk_edges.first;
-      // convert to table
-      GAR_ASSIGN_OR_RAISE(auto input_table, convertToTable(chunk_edges.second));
-      // write table
-      GAR_RETURN_NOT_OK(writer.WriteTable(input_table, vertex_chunk_index, 0));
-      chunk_edges.second.clear();
-    }
-    is_saved_ = true;
-    return Status::OK();
+    return Make(edge_info, graph_info->GetPrefix(), adj_list_type, num_vertices,
+                validate_level);
   }
 
  private:
@@ -356,12 +361,13 @@ class EdgesBuilder {
    * @param edges The edges of a specific vertex chunk.
    * @return Status: ok or Status::TypeError error.
    */
-  Status appendToArray(const DataType& type, const std::string& property_name,
+  Status appendToArray(const std::shared_ptr<DataType>& type,
+                       const std::string& property_name,
                        std::shared_ptr<arrow::Array>& array,  // NOLINT
                        const std::vector<Edge>& edges);
 
   /**
-   * @brief Append the values for a propety for edges in a specific vertex
+   * @brief Append the values for a property for edges in a specific vertex
    * chunk into the given array.
    *
    * @tparam type The data type.
@@ -407,7 +413,7 @@ class EdgesBuilder {
       IdType vertex_chunk_index, const std::vector<Edge>& edges);
 
  private:
-  EdgeInfo edge_info_;
+  std::shared_ptr<EdgeInfo> edge_info_;
   std::string prefix_;
   AdjListType adj_list_type_;
   std::unordered_map<IdType, std::vector<Edge>> edges_;

@@ -1,26 +1,22 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.alibaba.graphar.writer
 
-import com.alibaba.graphar.util.{
-  FileSystem,
-  ChunkPartitioner,
-  EdgeChunkPartitioner
-}
+import com.alibaba.graphar.util.{FileSystem, EdgeChunkPartitioner}
 import com.alibaba.graphar.{
   GeneralParams,
   EdgeInfo,
@@ -38,8 +34,6 @@ import org.apache.spark.sql.types.{
   StructType,
   StructField
 }
-import org.apache.spark.util.Utils
-import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.functions._
 
 import scala.collection.SortedMap
@@ -54,7 +48,6 @@ object EdgeWriter {
       adjListType: AdjListType.Value,
       vertexNumOfPrimaryVertexLabel: Long
   ): (DataFrame, Seq[DataFrame], Array[Long], Map[Long, Int]) = {
-    import spark.implicits._
     val edgeSchema = edgeDf.schema
     val colName = if (
       adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.unordered_by_source
@@ -133,13 +126,13 @@ object EdgeWriter {
       edgeChunkSize.toInt
     )
 
-    // repartition edge dataframe and sort within partitions
+    // repartition edge DataFrame and sort within partitions
     val partitionRDD =
       rddWithEid.repartitionAndSortWithinPartitions(partitioner).values
     val partitionEdgeDf = spark.createDataFrame(partitionRDD, edgeSchema)
     partitionEdgeDf.cache()
 
-    // generate offset dataframes
+    // generate offset DataFrames
     if (
       adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.ordered_by_dest
     ) {
@@ -197,10 +190,10 @@ object EdgeWriter {
 }
 
 /**
- * Writer for edge dataframe.
+ * Writer for edge DataFrame.
  *
  * @constructor
- *   create a new writer for edge dataframe with edge info.
+ *   create a new writer for edge DataFrame with edge info.
  * @param prefix
  *   the absolute prefix.
  * @param edgeInfo
@@ -227,7 +220,11 @@ class EdgeWriter(
   private def validate(): Unit = {
     // chunk if edge info contains the adj list type
     if (edgeInfo.containAdjList(adjListType) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "adj list type: " + AdjListType.AdjListTypeToString(
+          adjListType
+        ) + " not found in edge info."
+      )
     }
     // check the src index and dst index column exist
     val src_filed = StructField(GeneralParams.srcIndexCol, LongType)
@@ -236,7 +233,9 @@ class EdgeWriter(
     if (
       schema.contains(src_filed) == false || schema.contains(dst_filed) == false
     ) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "edge DataFrame must contain src index column and dst index column."
+      )
     }
   }
 
@@ -295,7 +294,7 @@ class EdgeWriter(
     }
   }
 
-  /** Generate the chunks of AdjList from edge dataframe for this edge type. */
+  /** Generate the chunks of AdjList from edge DataFrame for this edge type. */
   def writeAdjList(): Unit = {
     val fileType = edgeInfo.getAdjListFileType(adjListType)
     val outputPrefix = prefix + edgeInfo.getAdjListPathPrefix(adjListType)
@@ -319,14 +318,16 @@ class EdgeWriter(
   }
 
   /**
-   * Generate the chunks of the property group from edge dataframe.
+   * Generate the chunks of the property group from edge DataFrame.
    *
    * @param propertyGroup
    *   property group
    */
   def writeEdgeProperties(propertyGroup: PropertyGroup): Unit = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "property group not contained in edge info."
+      )
     }
 
     val propertyList = ArrayBuffer[String]()
@@ -347,7 +348,7 @@ class EdgeWriter(
     )
   }
 
-  /** Generate the chunks of all property groups from edge dataframe. */
+  /** Generate the chunks of all property groups from edge DataFrame. */
   def writeEdgeProperties(): Unit = {
     val property_groups = edgeInfo.getPropertyGroups(adjListType)
     val it = property_groups.iterator
@@ -359,7 +360,7 @@ class EdgeWriter(
 
   /**
    * Generate the chunks for the AdjList and all property groups from edge
-   * dataframe.
+   * DataFrame.
    */
   def writeEdges(): Unit = {
     writeAdjList()

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * The implementation of GarWriteBuilder is refered from FileWriteBuilder of spark 3.1.1
+ * The implementation of GarWriteBuilder is referred from FileWriteBuilder of spark 3.1.1
  */
 
 package com.alibaba.graphar.datasources
@@ -26,12 +26,9 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
-import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
+import org.apache.hadoop.mapreduce.Job
 
-import org.apache.spark.sql.execution.datasources.{
-  OutputWriter,
-  OutputWriterFactory
-}
+import org.apache.spark.sql.execution.datasources.OutputWriterFactory
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util.{CaseInsensitiveMap, DateTimeUtils}
@@ -49,7 +46,6 @@ import org.apache.spark.sql.execution.datasources.{
 import org.apache.spark.sql.execution.metric.SQLMetric
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.{DataType, StructType}
-import org.apache.spark.sql.util.SchemaUtils
 import org.apache.spark.util.SerializableConfiguration
 import org.apache.spark.sql.execution.datasources.v2.FileBatchWrite
 import org.apache.spark.sql.catalyst.expressions.AttributeReference

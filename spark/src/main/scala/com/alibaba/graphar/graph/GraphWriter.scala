@@ -1,37 +1,29 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.alibaba.graphar.graph
 
-import com.alibaba.graphar.{
-  AdjListType,
-  GraphInfo,
-  VertexInfo,
-  EdgeInfo,
-  GeneralParams
-}
+import com.alibaba.graphar.{AdjListType, GraphInfo, GeneralParams}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 import com.alibaba.graphar.util.IndexGenerator
 import com.alibaba.graphar.util.Utils
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.functions._
 
-import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.{FileSystem, Path}
 import java.io.{BufferedWriter, OutputStreamWriter}
 
@@ -39,12 +31,12 @@ import java.io.{BufferedWriter, OutputStreamWriter}
 class GraphWriter() {
 
   /**
-   * Put the vertex dataframe into writer.
+   * Put the vertex DataFrame into writer.
    *
    * @param label
    *   label of vertex.
    * @param df
-   *   dataframe of the vertex type.
+   *   DataFrame of the vertex type.
    * @param primaryKey
    *   primary key of the vertex type, default is empty, which take the first
    *   property column as primary key.
@@ -55,7 +47,9 @@ class GraphWriter() {
       primaryKey: String = ""
   ): Unit = {
     if (vertices.exists(_._1 == label)) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Vertex data of label " + label + " has been put."
+      )
     }
     vertices += label -> df
     vertexNums += label -> df.count
@@ -71,7 +65,9 @@ class GraphWriter() {
    */
   def PutEdgeData(relation: (String, String, String), df: DataFrame): Unit = {
     if (edges.exists(_._1 == relation)) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Edge data of relation " + relation + " has been put."
+      )
     }
     edges += relation -> df
   }
@@ -203,7 +199,7 @@ class GraphWriter() {
       case (key, df) => {
         edge_schemas += key -> new StructType(
           df.schema.drop(2).toArray
-        ) // drop the src, dst fileds
+        ) // drop the src, dst fields
       }
     }
     val graph_info = Utils.generateGraphInfo(

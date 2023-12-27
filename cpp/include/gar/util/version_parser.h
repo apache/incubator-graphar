@@ -1,22 +1,24 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifndef GAR_UTIL_VERSION_PARSER_H_
 #define GAR_UTIL_VERSION_PARSER_H_
 
 #include <map>
+#include <memory>
 #include <regex>  // NOLINT
 #include <string>
 #include <vector>
@@ -29,7 +31,8 @@ namespace GAR_NAMESPACE_INTERNAL {
 class InfoVersion {
  public:
   /** Parse version string to InfoVersion. */
-  static Result<InfoVersion> Parse(const std::string& str) noexcept;
+  static Result<std::shared_ptr<const InfoVersion>> Parse(
+      const std::string& str) noexcept;
 
   /** Default constructor */
   InfoVersion() : version_(version2types.rbegin()->first) {}
@@ -82,7 +85,7 @@ class InfoVersion {
   }
 
   /** Check if type is supported by version. */
-  inline bool CheckType(const std::string& type_str) noexcept {
+  inline bool CheckType(const std::string& type_str) const {
     auto& types = version2types.at(version_);
     // check if type_str is in supported types of version
     if (std::find(types.begin(), types.end(), type_str) != types.end()) {

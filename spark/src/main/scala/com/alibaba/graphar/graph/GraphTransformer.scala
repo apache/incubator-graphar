@@ -1,34 +1,26 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.alibaba.graphar.graph
 
-import com.alibaba.graphar.{
-  GeneralParams,
-  AdjListType,
-  GraphInfo,
-  VertexInfo,
-  EdgeInfo
-}
+import com.alibaba.graphar.{AdjListType, GraphInfo, VertexInfo, EdgeInfo}
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.functions._
+import org.apache.spark.sql.SparkSession
 
 /**
  * The helper object for transforming graphs through the definitions of their
@@ -67,12 +59,14 @@ object GraphTransformer {
       // load source vertex info
       val label = dest_vertex_info.getLabel()
       if (!sourceVertexInfosMap.contains(label)) {
-        throw new IllegalArgumentException
+        throw new IllegalArgumentException(
+          "vertex info of " + label + " not found in graph info."
+        )
       }
       val source_vertex_info = sourceVertexInfosMap(label)
       // read vertex chunks from the source graph
       val reader = new VertexReader(source_prefix, source_vertex_info, spark)
-      val df = reader.readAllVertexPropertyGroups(true)
+      val df = reader.readAllVertexPropertyGroups()
       // write vertex chunks for the dest graph
       val writer = new VertexWriter(dest_prefix, dest_vertex_info, df)
       writer.writeVertexProperties()
@@ -113,7 +107,9 @@ object GraphTransformer {
       // load source edge info
       val key = dest_edge_info.getConcatKey()
       if (!sourceEdgeInfosMap.contains(key)) {
-        throw new IllegalArgumentException
+        throw new IllegalArgumentException(
+          "edge info of " + key + " not found in graph info."
+        )
       }
       val source_edge_info = sourceEdgeInfosMap(key)
       var has_loaded = false
@@ -154,7 +150,9 @@ object GraphTransformer {
             dest_edge_info.getDst_label
         }
         if (!sourceVertexInfosMap.contains(vertex_label)) {
-          throw new IllegalArgumentException
+          throw new IllegalArgumentException(
+            "vertex info of " + vertex_label + " not found in graph info."
+          )
         }
         val vertex_info = sourceVertexInfosMap(vertex_label)
         val reader = new VertexReader(source_prefix, vertex_info, spark)

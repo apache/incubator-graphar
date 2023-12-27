@@ -1,40 +1,29 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.alibaba.graphar.writer
 
 import com.alibaba.graphar.util.{FileSystem, ChunkPartitioner, IndexGenerator}
-import com.alibaba.graphar.{
-  GeneralParams,
-  VertexInfo,
-  FileType,
-  AdjListType,
-  PropertyGroup
-}
+import com.alibaba.graphar.{GeneralParams, VertexInfo, PropertyGroup}
 
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.Row
-import org.apache.spark.rdd.RDD
-import org.apache.spark.HashPartitioner
 import org.apache.spark.sql.types.{LongType, StructField}
 
-import scala.collection.SortedMap
 import scala.collection.mutable.ArrayBuffer
 
 /** Helper object for VertexWriter class. */
@@ -44,10 +33,17 @@ object VertexWriter {
       chunkSize: Long,
       vertexNum: Long
   ): DataFrame = {
-    val vertex_df_schema = vertexDf.schema
+    val vertexDfWithIndex = vertexDf.schema.contains(
+      StructField(GeneralParams.vertexIndexCol, LongType)
+    ) match {
+      case true => vertexDf
+      case _    => IndexGenerator.generateVertexIndexColumn(vertexDf)
+    }
+    val vertex_df_schema = vertexDfWithIndex.schema
     val index = vertex_df_schema.fieldIndex(GeneralParams.vertexIndexCol)
     val partition_num = ((vertexNum + chunkSize - 1) / chunkSize).toInt
-    val rdd = vertexDf.rdd.map(row => (row(index).asInstanceOf[Long], row))
+    val rdd =
+      vertexDfWithIndex.rdd.map(row => (row(index).asInstanceOf[Long], row))
 
     // repartition
     val partitioner = new ChunkPartitioner(partition_num, chunkSize)
@@ -89,10 +85,12 @@ class VertexWriter(
   )
 
   private def validate(): Unit = {
-    // check if vertex dataframe contains the index_filed
+    // check if vertex DataFrame contains the index_filed
     val index_filed = StructField(GeneralParams.vertexIndexCol, LongType)
     if (vertexDf.schema.contains(index_filed) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "vertex DataFrame must contain index column."
+      )
     }
   }
 
@@ -106,7 +104,7 @@ class VertexWriter(
   }
 
   /**
-   * Generate chunks of the property group for vertex dataframe.
+   * Generate chunks of the property group for vertex DataFrame.
    *
    * @param propertyGroup
    *   property group
@@ -114,12 +112,15 @@ class VertexWriter(
   def writeVertexProperties(propertyGroup: PropertyGroup): Unit = {
     // check if contains the property group
     if (vertexInfo.containPropertyGroup(propertyGroup) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "property group not contained in vertex info."
+      )
     }
 
     // write out the chunks
     val output_prefix = prefix + vertexInfo.getPathPrefix(propertyGroup)
     val property_list = ArrayBuffer[String]()
+    property_list += "`" + GeneralParams.vertexIndexCol + "`"
     val it = propertyGroup.getProperties().iterator
     while (it.hasNext()) {
       val property = it.next()
@@ -135,7 +136,7 @@ class VertexWriter(
     )
   }
 
-  /** Generate chunks of all property groups for vertex dataframe. */
+  /** Generate chunks of all property groups for vertex DataFrame. */
   def writeVertexProperties(): Unit = {
     val property_groups = vertexInfo.getProperty_groups()
     val it = property_groups.iterator

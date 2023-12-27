@@ -98,6 +98,8 @@ Take the "person" vertex table as an example, if the chunk size is set to be 500
   :align: center
   :alt: vertex physical table
 
+**Note**: For efficiently utilize the filter push-down of the payload file format like Parquet, the internal vertex id is stored in the payload file as a column. And since the internal vertex id is continuous, the payload file format can use the delta encoding for the internal vertex id column, which would not bring too much overhead for the storage.
+
 Edges in GraphAr
 ^^^^^^^^^^^^^^^^
 
@@ -106,7 +108,7 @@ Logical table of edges
 
 For maintaining a type of edges (that with the same triplet of the source label, edge label, and destination label), a logical edge table is established.  And in order to support quickly creating a graph from the graph storage file, the logical edge table could maintain the topology information in a way similar to CSR/CSC (learn more about `CSR/CSC <https://en.wikipedia.org/wiki/Sparse_matrix>`_), that is, the edges are ordered by the internal vertex id of either source or destination. In this way, an offset table is required to store the start offset for each vertex's edges, and the edges with the same source/destination will be stored continuously in the logical table.
 
-Take the logical table for "person likes person" edges as an example, the logical edge table looks like:
+Take the logical table for "person knows person" edges as an example, the logical edge table looks like:
 
 .. image:: https://alibaba.github.io/GraphAr/_images/edge_logical_table.png
   :width: 650

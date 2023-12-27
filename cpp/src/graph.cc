@@ -1,19 +1,21 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include "gar/graph.h"
+#include "gar/util/adj_list_type.h"
 #include "gar/util/convert_to_arrow_type.h"
 
 namespace GAR_NAMESPACE_INTERNAL {
@@ -21,7 +23,7 @@ namespace GAR_NAMESPACE_INTERNAL {
 template <Type type>
 Status CastToAny(std::shared_ptr<arrow::Array> array,
                  std::any& any) {  // NOLINT
-  using ArrayType = typename ConvertToArrowType<type>::ArrayType;
+  using ArrayType = typename TypeToArrowType<type>::ArrayType;
   auto column = std::dynamic_pointer_cast<ArrayType>(array);
   any = column->GetView(0);
   return Status::OK();
@@ -30,15 +32,16 @@ Status CastToAny(std::shared_ptr<arrow::Array> array,
 template <>
 Status CastToAny<Type::STRING>(std::shared_ptr<arrow::Array> array,
                                std::any& any) {  // NOLINT
-  using ArrayType = typename ConvertToArrowType<Type::STRING>::ArrayType;
+  using ArrayType = typename TypeToArrowType<Type::STRING>::ArrayType;
   auto column = std::dynamic_pointer_cast<ArrayType>(array);
   any = column->GetString(0);
   return Status::OK();
 }
 
-Status TryToCastToAny(const DataType& type, std::shared_ptr<arrow::Array> array,
+Status TryToCastToAny(const std::shared_ptr<DataType>& type,
+                      std::shared_ptr<arrow::Array> array,
                       std::any& any) {  // NOLINT
-  switch (type.id()) {
+  switch (type->id()) {
   case Type::BOOL:
     return CastToAny<Type::BOOL>(array, any);
   case Type::INT32:
@@ -66,11 +69,57 @@ Vertex::Vertex(IdType id,
     auto schema = chunk_table->schema();
     for (int i = 0; i < schema->num_fields(); ++i) {
       auto field = chunk_table->field(i);
-      auto type = DataType::ArrowDataTypeToDataType(field->type());
-      GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(
-          type, chunk_table->column(i)->chunk(0), properties_[field->name()]));
+      if (field->type()->id() == arrow::Type::LIST) {
+        auto list_array = std::dynamic_pointer_cast<arrow::ListArray>(
+            chunk_table->column(i)->chunk(0));
+        list_properties_[field->name()] = list_array->value_slice(0);
+      } else {
+        auto type = DataType::ArrowDataTypeToDataType(field->type());
+        GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(type,
+                                              chunk_table->column(i)->chunk(0),
+                                              properties_[field->name()]));
+      }
     }
   }
+}
+
+template <typename T>
+Result<T> Vertex::property(const std::string& property) const {
+  if constexpr (std::is_final<T>::value) {
+    auto it = list_properties_.find(property);
+    if (it == list_properties_.end()) {
+      return Status::KeyError("The list property ", property,
+                              " doesn't exist.");
+    }
+    auto array = std::dynamic_pointer_cast<
+        typename CTypeToArrowType<typename T::ValueType>::ArrayType>(
+        it->second);
+    const typename T::ValueType* values = array->raw_values();
+    return T(values, array->length());
+  } else {
+    if (properties_.find(property) == properties_.end()) {
+      return Status::KeyError("Property with name ", property,
+                              " does not exist in the vertex.");
+    }
+    try {
+      T ret = std::any_cast<T>(properties_.at(property));
+      return ret;
+    } catch (const std::bad_any_cast& e) {
+      return Status::TypeError("Any cast failed, the property type of ",
+                               property, " is not matched ", e.what());
+    }
+  }
+}
+
+template <>
+Result<StringArray> Vertex::property(const std::string& property) const {
+  auto it = list_properties_.find(property);
+  if (it == list_properties_.end()) {
+    return Status::KeyError("The list property ", property, " doesn't exist.");
+  }
+  auto array = std::dynamic_pointer_cast<arrow::StringArray>(it->second);
+  return StringArray(array->raw_value_offsets(), array->raw_data(),
+                     array->length());
 }
 
 Edge::Edge(
@@ -91,12 +140,77 @@ Edge::Edge(
     auto schema = chunk_table->schema();
     for (int i = 0; i < schema->num_fields(); ++i) {
       auto field = chunk_table->field(i);
-      auto type = DataType::ArrowDataTypeToDataType(field->type());
-      GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(
-          type, chunk_table->column(i)->chunk(0), properties_[field->name()]));
+      if (field->type()->id() == arrow::Type::LIST) {
+        auto list_array = std::dynamic_pointer_cast<arrow::ListArray>(
+            chunk_table->column(i)->chunk(0));
+        list_properties_[field->name()] = list_array->value_slice(0);
+      } else {
+        auto type = DataType::ArrowDataTypeToDataType(field->type());
+        GAR_RAISE_ERROR_NOT_OK(TryToCastToAny(type,
+                                              chunk_table->column(i)->chunk(0),
+                                              properties_[field->name()]));
+      }
     }
   }
 }
+
+template <typename T>
+Result<T> Edge::property(const std::string& property) const {
+  if constexpr (std::is_final<T>::value) {
+    auto it = list_properties_.find(property);
+    if (it == list_properties_.end()) {
+      return Status::KeyError("The list property ", property,
+                              " doesn't exist.");
+    }
+    auto array = std::dynamic_pointer_cast<
+        typename CTypeToArrowType<typename T::ValueType>::ArrayType>(
+        it->second);
+    const typename T::ValueType* values = array->raw_values();
+    return T(values, array->length());
+  } else {
+    if (properties_.find(property) == properties_.end()) {
+      return Status::KeyError("Property with name ", property,
+                              " does not exist in the vertex.");
+    }
+    try {
+      T ret = std::any_cast<T>(properties_.at(property));
+      return ret;
+    } catch (const std::bad_any_cast& e) {
+      return Status::TypeError("Any cast failed, the property type of ",
+                               property, " is not matched ", e.what());
+    }
+  }
+}
+
+template <>
+Result<StringArray> Edge::property(const std::string& property) const {
+  auto it = list_properties_.find(property);
+  if (it == list_properties_.end()) {
+    return Status::KeyError("The list property ", property, " doesn't exist.");
+  }
+  auto array = std::dynamic_pointer_cast<arrow::StringArray>(it->second);
+  return StringArray(array->raw_value_offsets(), array->raw_data(),
+                     array->length());
+}
+
+#define INSTANTIATE_PROPERTY(T)                                          \
+  template Result<T> Vertex::property<T>(const std::string& name) const; \
+  template Result<T> Edge::property<T>(const std::string& name) const;
+
+INSTANTIATE_PROPERTY(int32_t)
+INSTANTIATE_PROPERTY(const int32_t&)
+INSTANTIATE_PROPERTY(Int32Array)
+INSTANTIATE_PROPERTY(int64_t)
+INSTANTIATE_PROPERTY(const int64_t&)
+INSTANTIATE_PROPERTY(Int64Array)
+INSTANTIATE_PROPERTY(float)
+INSTANTIATE_PROPERTY(const float&)
+INSTANTIATE_PROPERTY(FloatArray)
+INSTANTIATE_PROPERTY(double)
+INSTANTIATE_PROPERTY(const double&)
+INSTANTIATE_PROPERTY(DoubleArray)
+INSTANTIATE_PROPERTY(std::string)
+INSTANTIATE_PROPERTY(const std::string&)
 
 IdType EdgeIter::source() {
   adj_list_reader_.seek(cur_offset_);
@@ -344,17 +458,42 @@ bool EdgeIter::first_dst(const EdgeIter& from, IdType id) {
   }
 }
 
-const AdjListType
-    EdgesCollection<AdjListType::ordered_by_source>::adj_list_type_ =
-        AdjListType::ordered_by_source;
-const AdjListType
-    EdgesCollection<AdjListType::ordered_by_dest>::adj_list_type_ =
-        AdjListType::ordered_by_dest;
-const AdjListType
-    EdgesCollection<AdjListType::unordered_by_source>::adj_list_type_ =
-        AdjListType::unordered_by_source;
-const AdjListType
-    EdgesCollection<AdjListType::unordered_by_dest>::adj_list_type_ =
-        AdjListType::unordered_by_dest;
+Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
+    const std::string& edge_label, const std::string& dst_label,
+    AdjListType adj_list_type, const IdType vertex_chunk_begin,
+    const IdType vertex_chunk_end) noexcept {
+  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  if (!edge_info) {
+    return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
+                            dst_label, " doesn't exist.");
+  }
+  if (!edge_info->HasAdjacentListType(adj_list_type)) {
+    return Status::Invalid("The edge ", edge_label, " of adj list type ",
+                           AdjListTypeToString(adj_list_type),
+                           " doesn't exist.");
+  }
+  switch (adj_list_type) {
+  case AdjListType::ordered_by_source:
+    return std::make_shared<OBSEdgeCollection>(
+        edge_info, graph_info->GetPrefix(), vertex_chunk_begin,
+        vertex_chunk_end);
+  case AdjListType::ordered_by_dest:
+    return std::make_shared<OBDEdgesCollection>(
+        edge_info, graph_info->GetPrefix(), vertex_chunk_begin,
+        vertex_chunk_end);
+  case AdjListType::unordered_by_source:
+    return std::make_shared<UBSEdgesCollection>(
+        edge_info, graph_info->GetPrefix(), vertex_chunk_begin,
+        vertex_chunk_end);
+  case AdjListType::unordered_by_dest:
+    return std::make_shared<UBDEdgesCollection>(
+        edge_info, graph_info->GetPrefix(), vertex_chunk_begin,
+        vertex_chunk_end);
+  default:
+    return Status::Invalid("Unknown adj list type.");
+  }
+  return Status::OK();
+}
 
 }  // namespace GAR_NAMESPACE_INTERNAL

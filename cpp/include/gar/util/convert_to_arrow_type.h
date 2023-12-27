@@ -1,17 +1,18 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifndef GAR_UTIL_CONVERT_TO_ARROW_TYPE_H_
 #define GAR_UTIL_CONVERT_TO_ARROW_TYPE_H_
@@ -27,13 +28,25 @@ limitations under the License.
 namespace GAR_NAMESPACE_INTERNAL {
 
 /** Struct to convert DataType to arrow::DataType. */
+template <typename T>
+struct CTypeToArrowType {};
+
 template <Type T>
-struct ConvertToArrowType {};
+struct TypeToArrowType {};
 
 #define CONVERT_TO_ARROW_TYPE(type, c_type, arrow_type, array_type,            \
                               builder_type, type_value, str)                   \
   template <>                                                                  \
-  struct ConvertToArrowType<type> {                                            \
+  struct TypeToArrowType<type> {                                               \
+    using CType = c_type;                                                      \
+    using ArrowType = arrow_type;                                              \
+    using ArrayType = array_type;                                              \
+    using BuilderType = builder_type;                                          \
+    static std::shared_ptr<arrow::DataType> TypeValue() { return type_value; } \
+    static const char* type_to_string() { return str; }                        \
+  };                                                                           \
+  template <>                                                                  \
+  struct CTypeToArrowType<c_type> {                                            \
     using CType = c_type;                                                      \
     using ArrowType = arrow_type;                                              \
     using ArrayType = array_type;                                              \

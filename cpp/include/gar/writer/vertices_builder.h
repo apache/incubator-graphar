@@ -1,17 +1,18 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #ifndef GAR_WRITER_VERTICES_BUILDER_H_
 #define GAR_WRITER_VERTICES_BUILDER_H_
@@ -20,8 +21,11 @@ limitations under the License.
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
+#include "gar/graph_info.h"
+#include "gar/util/result.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
 // forward declaration
@@ -34,7 +38,7 @@ namespace GAR_NAMESPACE_INTERNAL {
 namespace builder {
 
 /**
- * @brief Vertex is designed for constucting vertices builder.
+ * @brief Vertex is designed for constructing vertices builder.
  *
  */
 class Vertex {
@@ -75,6 +79,7 @@ class Vertex {
    * @param name The name of the property.
    * @param val The value of the property.
    */
+  // TODO(@acezen): Enable the property to be a vector(list).
   inline void AddProperty(const std::string& name, const std::any& val) {
     empty_ = false;
     properties_[name] = val;
@@ -124,7 +129,7 @@ class Vertex {
 class VerticesBuilder {
  public:
   /**
-   * @brief Initialize the VerciesBuilder.
+   * @brief Initialize the VerticesBuilder.
    *
    * @param vertex_info The vertex info that describes the vertex type.
    * @param prefix The absolute prefix.
@@ -135,10 +140,10 @@ class VerticesBuilder {
    * not be ValidateLevel::default_validate.
    */
   explicit VerticesBuilder(
-      const VertexInfo& vertex_info, const std::string& prefix,
+      const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
       IdType start_vertex_index = 0,
       const ValidateLevel& validate_level = ValidateLevel::no_validate)
-      : vertex_info_(vertex_info),
+      : vertex_info_(std::move(vertex_info)),
         prefix_(prefix),
         start_vertex_index_(start_vertex_index),
         validate_level_(validate_level) {
@@ -237,7 +242,7 @@ class VerticesBuilder {
     // construct the writer
     VertexPropertyWriter writer(vertex_info_, prefix_, validate_level_);
     IdType start_chunk_index =
-        start_vertex_index_ / vertex_info_.GetChunkSize();
+        start_vertex_index_ / vertex_info_->GetChunkSize();
     // convert to table
     GAR_ASSIGN_OR_RAISE(auto input_table, convertToTable());
     // write table
@@ -247,6 +252,46 @@ class VerticesBuilder {
     is_saved_ = true;
     vertices_.clear();
     return Status::OK();
+  }
+
+  /**
+   * @brief Construct a VertexBuilder from vertex info.
+   *
+   * @param vertex_info The vertex info that describes the vertex type.
+   * @param prefix The absolute prefix.
+   * @param start_vertex_index The start index of the vertices collection.
+   * @param validate_level The global validate level for the builder, default is
+   * no_validate.
+   */
+  static Result<std::shared_ptr<VerticesBuilder>> Make(
+      const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+      IdType start_vertex_index = 0,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    return std::make_shared<VerticesBuilder>(
+        vertex_info, prefix, start_vertex_index, validate_level);
+  }
+
+  /**
+   * @brief Construct a VertexBuilder from graph info and vertex label.
+   *
+   * @param graph_info The graph info that describes the graph.
+   * @param label The label of the vertex.
+   * @param start_vertex_index The start index of the vertices collection.
+   * @param validate_level The global validate level for the builder, default is
+   * no_validate.
+   */
+  static Result<std::shared_ptr<VerticesBuilder>> Make(
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+      IdType start_vertex_index = 0,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    const auto vertex_info = graph_info->GetVertexInfo(label);
+    if (!vertex_info) {
+      return Status::KeyError("The vertex type ", label,
+                              " doesn't exist in graph ", graph_info->GetName(),
+                              ".");
+    }
+    return Make(vertex_info, graph_info->GetPrefix(), start_vertex_index,
+                validate_level);
   }
 
  private:
@@ -269,7 +314,8 @@ class VerticesBuilder {
    * @param array The constructed array.
    * @return Status: ok or Status::TypeError error.
    */
-  Status appendToArray(const DataType& type, const std::string& property_name,
+  Status appendToArray(const std::shared_ptr<DataType>& type,
+                       const std::string& property_name,
                        std::shared_ptr<arrow::Array>& array);  // NOLINT
 
   /**
@@ -290,7 +336,7 @@ class VerticesBuilder {
   Result<std::shared_ptr<arrow::Table>> convertToTable();
 
  private:
-  VertexInfo vertex_info_;
+  std::shared_ptr<VertexInfo> vertex_info_;
   std::string prefix_;
   std::vector<Vertex> vertices_;
   IdType start_vertex_index_;

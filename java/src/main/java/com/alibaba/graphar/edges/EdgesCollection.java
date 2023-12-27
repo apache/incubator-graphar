@@ -1,108 +1,44 @@
 /*
- * Copyright 2022 Alibaba Group Holding Limited.
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
- * except in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the
- * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing permissions and
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
 package com.alibaba.graphar.edges;
 
+import static com.alibaba.graphar.util.CppClassName.GAR_EDGES_COLLECTION;
+import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
+
+import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
+import com.alibaba.fastffi.CXXReference;
+import com.alibaba.fastffi.CXXValue;
+import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFINameAlias;
-import com.alibaba.graphar.graphinfo.EdgeInfo;
-import com.alibaba.graphar.graphinfo.GraphInfo;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.types.AdjListType;
-import com.alibaba.graphar.util.Result;
+import com.alibaba.fastffi.FFITypeAlias;
+import java.util.Iterator;
 
 /** EdgesCollection is designed for reading a collection of edges. */
-public interface EdgesCollection extends CXXPointer {
-    /**
-     * Construct the collection for a range of edges.
-     *
-     * @param graphInfo The GraphInfo for the graph.
-     * @param srcLabel The source vertex label.
-     * @param edgeLabel The edge label.
-     * @param dstLabel The destination vertex label.
-     * @param adjListType The adjList type.
-     * @param vertexChunkBegin The index of the beginning vertex chunk.
-     * @param vertexChunkEnd The index of the end vertex chunk (not included).
-     * @return The constructed collection or error.
-     */
-    static EdgesCollection create(
-            final GraphInfo graphInfo,
-            String srcLabel,
-            String edgeLabel,
-            String dstLabel,
-            AdjListType adjListType,
-            long vertexChunkBegin,
-            long vertexChunkEnd) {
-        Result<EdgeInfo> maybeEdgeInfo =
-                graphInfo.getEdgeInfo(
-                        StdString.create(srcLabel),
-                        StdString.create(edgeLabel),
-                        StdString.create(dstLabel));
-        if (maybeEdgeInfo.hasError()) {
-            throw new RuntimeException(
-                    "graphInfo to create EdgesCollection has error: "
-                            + maybeEdgeInfo.status().message().toJavaString());
-        }
-        EdgeInfo edgeInfo = maybeEdgeInfo.value();
-        if (!edgeInfo.containAdjList(adjListType)) {
-            throw new RuntimeException(
-                    "The edge "
-                            + edgeLabel
-                            + " of adj list type "
-                            + adjListType
-                            + " doesn't exist.");
-        }
-        switch (adjListType) {
-            case ordered_by_source:
-                return EdgesCollectionOrderedBySource.factory.create(
-                        edgeInfo, graphInfo.getPrefix(), vertexChunkBegin, vertexChunkEnd);
-            case ordered_by_dest:
-                return EdgesCollectionOrderedByDest.factory.create(
-                        edgeInfo, graphInfo.getPrefix(), vertexChunkBegin, vertexChunkEnd);
-            case unordered_by_source:
-                return EdgesCollectionUnorderedBySource.factory.create(
-                        edgeInfo, graphInfo.getPrefix(), vertexChunkBegin, vertexChunkEnd);
-            case unordered_by_dest:
-                return EdgesCollectionUnorderedByDest.factory.create(
-                        edgeInfo, graphInfo.getPrefix(), vertexChunkBegin, vertexChunkEnd);
-        }
-        throw new RuntimeException("Unknown adj list type: " + adjListType);
-    }
-
-    /**
-     * Construct the collection for a range of edges.
-     *
-     * @param graphInfo The GraphInfo for the graph.
-     * @param srcLabel The source vertex label.
-     * @param edgeLabel The edge label.
-     * @param dstLabel The destination vertex label.
-     * @param adjListType The adjList type.
-     * @return The constructed collection or error.
-     */
-    static EdgesCollection create(
-            final GraphInfo graphInfo,
-            String srcLabel,
-            String edgeLabel,
-            String dstLabel,
-            AdjListType adjListType) {
-        return create(graphInfo, srcLabel, edgeLabel, dstLabel, adjListType, 0, Long.MAX_VALUE);
-    }
-
+@FFIGen
+@FFITypeAlias(GAR_EDGES_COLLECTION)
+@CXXHead(GAR_GRAPH_H)
+public interface EdgesCollection extends CXXPointer, Iterable<Edge> {
     /** The iterator pointing to the first edge. */
+    @CXXValue
     EdgeIter begin();
 
     /** The iterator pointing to the past-the-end element. */
+    @CXXValue
     EdgeIter end();
 
     /**
@@ -114,7 +50,8 @@ public interface EdgesCollection extends CXXPointer {
      * @return The new constructed iterator.
      */
     @FFINameAlias("find_src")
-    EdgeIter findSrc(long id, EdgeIter from);
+    @CXXValue
+    EdgeIter findSrc(long id, @CXXReference EdgeIter from);
 
     /**
      * Construct and return the iterator pointing to the first incoming edge of the vertex with
@@ -125,8 +62,29 @@ public interface EdgesCollection extends CXXPointer {
      * @return The new constructed iterator.
      */
     @FFINameAlias("find_dst")
-    EdgeIter findDst(long id, EdgeIter from);
+    @CXXValue
+    EdgeIter findDst(long id, @CXXReference EdgeIter from);
 
     /** Get the number of edges in the collection. */
     long size();
+
+    /** Implement Iterable interface to support for-each loop. */
+    default Iterator<Edge> iterator() {
+        return new Iterator<Edge>() {
+            EdgeIter current = begin();
+            EdgeIter end = end();
+
+            @Override
+            public boolean hasNext() {
+                return !current.isEnd();
+            }
+
+            @Override
+            public Edge next() {
+                Edge ret = current.get();
+                current.inc();
+                return ret;
+            }
+        };
+    }
 }

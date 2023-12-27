@@ -1,34 +1,25 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.alibaba.graphar.graph
 
-import com.alibaba.graphar.{
-  GeneralParams,
-  AdjListType,
-  GraphInfo,
-  VertexInfo,
-  EdgeInfo
-}
+import com.alibaba.graphar.{GraphInfo, VertexInfo, EdgeInfo}
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
-import com.alibaba.graphar.util.IndexGenerator
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.functions._
 
 /**
  * The helper object for reading graph through the definitions of graph info.
@@ -44,21 +35,18 @@ object GraphReader {
    *   The map of (vertex label -> VertexInfo) for the graph.
    * @param spark
    *   The Spark session for the reading.
-   * @param addIndex
-   *   Whether to add index column for the DataFrame.
    * @return
    *   The map of (vertex label -> DataFrame)
    */
   private def readAllVertices(
       prefix: String,
       vertexInfos: Map[String, VertexInfo],
-      spark: SparkSession,
-      addIndex: Boolean = false
+      spark: SparkSession
   ): Map[String, DataFrame] = {
     val vertex_dataframes: Map[String, DataFrame] = vertexInfos.map {
       case (label, vertexInfo) => {
         val reader = new VertexReader(prefix, vertexInfo, spark)
-        (label, reader.readAllVertexPropertyGroups(addIndex))
+        (label, reader.readAllVertexPropertyGroups())
       }
     }
     return vertex_dataframes
@@ -118,18 +106,15 @@ object GraphReader {
    *   The info object for the graph.
    * @param spark
    *   The Spark session for the loading.
-   * @param addVertexIndex
-   *   Whether to add index for the vertex DataFrames.
    * @return
-   *   Pair of vertex dataframes and edge dataframes, the vertex dataframes are
-   *   stored as the map of (vertex_label -> DataFrame) the edge dataframes are
+   *   Pair of vertex DataFrames and edge DataFrames, the vertex DataFrames are
+   *   stored as the map of (vertex_label -> DataFrame) the edge DataFrames are
    *   stored as a map of ((srcLabel, edgeLabel, dstLabel) -> (adj_list_type_str
    * -> DataFrame))
    */
   def readWithGraphInfo(
       graphInfo: GraphInfo,
-      spark: SparkSession,
-      addVertexIndex: Boolean = false
+      spark: SparkSession
   ): Pair[Map[String, DataFrame], Map[
     (String, String, String),
     Map[String, DataFrame]
@@ -138,7 +123,7 @@ object GraphReader {
     val vertex_infos = graphInfo.getVertexInfos()
     val edge_infos = graphInfo.getEdgeInfos()
     return (
-      readAllVertices(prefix, vertex_infos, spark, addVertexIndex),
+      readAllVertices(prefix, vertex_infos, spark),
       readAllEdges(prefix, edge_infos, spark)
     )
   }
@@ -151,18 +136,15 @@ object GraphReader {
    *   The path of the graph info yaml.
    * @param spark
    *   The Spark session for the loading.
-   * @param addVertexIndex
-   *   Whether to add index for the vertex DataFrames.
    * @return
-   *   Pair of vertex dataframes and edge dataframes, the vertex dataframes are
-   *   stored as the map of (vertex_label -> DataFrame) the edge dataframes are
+   *   Pair of vertex DataFrames and edge DataFrames, the vertex DataFrames are
+   *   stored as the map of (vertex_label -> DataFrame) the edge DataFrames are
    *   stored as a map of (srcLabel_edgeLabel_dstLabel -> (adj_list_type_str ->
    *   DataFrame))
    */
   def read(
       graphInfoPath: String,
-      spark: SparkSession,
-      addVertexIndex: Boolean = false
+      spark: SparkSession
   ): Pair[Map[String, DataFrame], Map[
     (String, String, String),
     Map[String, DataFrame]
@@ -171,6 +153,6 @@ object GraphReader {
     val graph_info = GraphInfo.loadGraphInfo(graphInfoPath, spark)
 
     // conduct reading
-    readWithGraphInfo(graph_info, spark, addVertexIndex)
+    readWithGraphInfo(graph_info, spark)
   }
 }

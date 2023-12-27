@@ -1,35 +1,27 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.alibaba.graphar.reader
 
 import com.alibaba.graphar.util.{IndexGenerator, DataFrameConcat}
-import com.alibaba.graphar.{
-  GeneralParams,
-  EdgeInfo,
-  FileType,
-  AdjListType,
-  PropertyGroup
-}
-import com.alibaba.graphar.datasources._
+import com.alibaba.graphar.{EdgeInfo, FileType, AdjListType, PropertyGroup}
 import com.alibaba.graphar.util.FileSystem
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.functions._
 
 /**
  * Reader for edge chunks.
@@ -55,7 +47,12 @@ class EdgeReader(
     spark: SparkSession
 ) {
   if (edgeInfo.containAdjList(adjListType) == false) {
-    throw new IllegalArgumentException
+    throw new IllegalArgumentException(
+      "Edge info does not contain adj list type: " + AdjListType
+        .AdjListTypeToString(
+          adjListType
+        )
+    )
   }
 
   /** Load the total number of src/dst vertices for this edge type. */
@@ -119,7 +116,9 @@ class EdgeReader(
     if (
       adjListType != AdjListType.ordered_by_source && adjListType != AdjListType.ordered_by_dest
     ) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Adj list type must be ordered_by_source or ordered_by_dest."
+      )
     }
     val file_type_in_gar = edgeInfo.getAdjListFileType(adjListType)
     val file_type = FileType.FileTypeToString(file_type_in_gar)
@@ -236,7 +235,9 @@ class EdgeReader(
       chunk_index: Long
   ): DataFrame = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Edge info does not contain property group or adj list type."
+      )
     }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + edgeInfo.getPropertyFilePath(
@@ -273,7 +274,9 @@ class EdgeReader(
       addIndex: Boolean = true
   ): DataFrame = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Edge info does not contain property group or adj list type."
+      )
     }
     val file_type = propertyGroup.getFile_type()
     val file_path = prefix + edgeInfo.getPropertyGroupPathPrefix(
@@ -309,7 +312,9 @@ class EdgeReader(
       addIndex: Boolean = true
   ): DataFrame = {
     if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
-      throw new IllegalArgumentException
+      throw new IllegalArgumentException(
+        "Edge info does not contain property group or adj list type."
+      )
     }
     val file_type = propertyGroup.getFile_type()
     val file_path =

@@ -1,4 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2022-2023 Alibaba Group Holding Limited.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+-->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -6,19 +22,26 @@
 
     <groupId>com.alibaba.graphar</groupId>
     <artifactId>gar-java</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.1.0</version>
     <packaging>jar</packaging>
 
     <name>gar-java</name>
 
     <properties>
+        <native.library.name>gar-java</native.library.name>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven-antrun-plugin.version>3.0.0</maven-antrun-plugin.version>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>
         <fastffi.revision>0.1.2</fastffi.revision>
         <arrow.version>13.0.0</arrow.version>
-        <native.library.name>gar-java</native.library.name>
-
+        <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
+        <maven.javadoc.version>3.4.0</maven.javadoc.version>
+        <javadoc.output.directory>gar-java-javadoc</javadoc.output.directory>
+        <javadoc.output.destDir>gar-java-javadoc</javadoc.output.destDir>
+        <buildGarCPP>ON</buildGarCPP>
     </properties>
 
     <dependencies>
@@ -115,7 +138,6 @@
             </plugin>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <id>make-and-link-bitcode</id>
@@ -124,7 +146,7 @@
                         <configuration>
                             <target>
                                 <property name="compile_classpath" refid="maven.compile.classpath"/>
-
+                                <property name="build_gar_cpp" value="${buildGarCPP}"/>
                                 <ant antfile="${basedir}/build.xml">
                                     <target name="run-llvm4jni" />
                                 </ant>
@@ -149,7 +171,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -228,8 +249,34 @@
                     <version>2.5.2</version>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.9.1</version>
+                    <version>${maven.javadoc.version}</version>
+                    <configuration>
+                        <groups>
+                            <group>
+                                <title>GarphAr</title>
+                                <packages>com.alibaba.graphar*</packages>
+                            </group>
+                        </groups>
+                        <sourceFileExcludes>
+                            <sourceFileExclude>**/*GenGen.java</sourceFileExclude>
+                            <sourceFileExclude>**/Unused*.java</sourceFileExclude>
+                        </sourceFileExcludes>
+                        <reportOutputDirectory>${javadoc.output.directory}</reportOutputDirectory>
+                        <destDir>${javadoc.output.destDir}</destDir>
+                        <failOnError>false</failOnError>
+                        <failOnWarnings>false</failOnWarnings>
+                        <locale>en_US</locale>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>attach-javadocs</id>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
@@ -267,5 +314,4 @@
             </plugins>
         </pluginManagement>
     </build>
-
 </project>

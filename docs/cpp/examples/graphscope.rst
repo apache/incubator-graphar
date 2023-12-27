@@ -21,12 +21,12 @@ We have conducted micro benchmarks to compare the time performance for reading/w
 
 Time performance results
 ````````````````````````
-Here we report the performance results of *ArrowFragmentBuilder*, and compare it with loading the same graph through other ways, including the default loading strategy of GraphScope (through reading the csv files in parallel) and loading based by deserialization. The execution time reported below includes loading the graph data from the disk into memory, as well as building GraphScope fragments from such data. The experiments are conducted on a cluster of 4 AliCloud ecs.r6.6xlarge instances (24vCPU, 192GB memory), and using `com-friendster <https://snap.stanford.edu/data/com-Friendster.html>`_ (a simple graph) and `ldbc-snb-30 <https://ldbcouncil.org/benchmarks/snb/>`_ (a multi-labeled property graph) as datasets.
+Here we report the performance results of *ArrowFragmentBuilder*, and compare it with loading the same graph through the default loading strategy of GraphScope (through reading the csv files in parallel) . The execution time reported below includes loading the graph data from the disk into memory, as well as building GraphScope fragments from such data. The experiments are conducted on a cluster of 4 AliCloud ecs.r6.6xlarge instances (24vCPU, 192GB memory), and using `com-friendster <https://snap.stanford.edu/data/com-Friendster.html>`_ (a simple graph) and `ldbc-snb-30 <https://ldbcouncil.org/benchmarks/snb/>`_ (a multi-labeled property graph) as datasets.
 
-+----------------+---------+-----------------+-----------------+-----------------+
-| Dataset        | Workers | Default Loading | Deserialization | GraphAr Loading |
-+================+=========+=================+=================+=================+
-| com-friendster | 4       | 11min31s        | 1min41s         | 2min21s         |
-+----------------+---------+-----------------+-----------------+-----------------+
-| ldbc-snb-30    | 4       | 6min28s         | 54s             | 1min19s         |
-+----------------+---------+-----------------+-----------------+-----------------+
++----------------+---------+-----------------+-----------------+
+| Dataset        | Workers | Default Loading | GraphAr Loading |
++================+=========+=================+=================+
+| com-friendster | 4       | 282s            |  54s            |
++----------------+---------+-----------------+-----------------+
+| ldbc-snb-30    | 4       | 196s            |  40s            |
++----------------+---------+-----------------+-----------------+

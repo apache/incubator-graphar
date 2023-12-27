@@ -1,17 +1,18 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include <iostream>
 #include <regex>  // NOLINT
@@ -99,12 +100,12 @@ std::vector<std::string> parseUserDefineTypesImpl(
   return user_define_types;
 }
 
-Result<InfoVersion> InfoVersion::Parse(
+Result<std::shared_ptr<const InfoVersion>> InfoVersion::Parse(
     const std::string& version_str) noexcept {
-  InfoVersion version;
+  std::shared_ptr<InfoVersion> version;
   try {
-    version.version_ = parserVersionImpl(version_str);
-    version.user_define_types_ = parseUserDefineTypesImpl(version_str);
+    version = std::make_shared<InfoVersion>(
+        parserVersionImpl(version_str), parseUserDefineTypesImpl(version_str));
   } catch (const std::exception& e) {
     return Status::Invalid("Invalid version string: ", version_str);
   }

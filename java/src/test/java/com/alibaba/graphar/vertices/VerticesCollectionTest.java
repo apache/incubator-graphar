@@ -1,14 +1,16 @@
 /*
- * Copyright 2022 Alibaba Group Holding Limited.
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
- * except in compliance with the License. You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software distributed under the
- * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
- * express or implied. See the License for the specific language governing permissions and
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
@@ -17,6 +19,7 @@ package com.alibaba.graphar.vertices;
 import static com.alibaba.graphar.graphinfo.GraphInfoTest.root;
 
 import com.alibaba.graphar.graphinfo.GraphInfo;
+import com.alibaba.graphar.stdcxx.StdSharedPtr;
 import com.alibaba.graphar.stdcxx.StdString;
 import com.alibaba.graphar.util.GrapharStaticFunctions;
 import com.alibaba.graphar.util.Result;
@@ -36,11 +39,12 @@ public class VerticesCollectionTest {
         StdString label = StdString.create("person");
         StdString property = StdString.create("firstName");
         StdString stdStrId = StdString.create("id");
-        Result<VerticesCollection> maybeVerticesCollection =
+        Result<StdSharedPtr<VerticesCollection>> maybeVerticesCollection =
                 GrapharStaticFunctions.INSTANCE.constructVerticesCollection(graphInfo, label);
         Assert.assertFalse(maybeVerticesCollection.hasError());
-        VerticesCollection vertices = maybeVerticesCollection.value();
-        for (VertexIter it = vertices.begin(); !it.eq(vertices.end()); it.inc()) {
+        StdSharedPtr<VerticesCollection> vertices = maybeVerticesCollection.value();
+        VertexIter it = vertices.get().begin();
+        for (Vertex vertex : vertices.get()) {
             // access data through iterator directly
             VertexIterGen itGen = (VertexIterGen) it;
             System.out.println(
@@ -50,7 +54,6 @@ public class VerticesCollectionTest {
                             + ", firstName="
                             + it.property(property, property).value().toJavaString());
             // access data through vertex
-            Vertex vertex = it.get();
             System.out.println(
                     vertex.id()
                             + ", id="
@@ -66,6 +69,7 @@ public class VerticesCollectionTest {
             Assert.assertEquals(
                     it.<StdString>property(property, property).value().toJavaString(),
                     vertex.<StdString>property(property, property).value().toJavaString());
+            it.inc();
         }
     }
 }

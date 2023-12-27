@@ -20,7 +20,7 @@ Each edge contains a unique identifier and:
 
 The following is an example property graph containing two types of vertices ("person" and "comment") and three types of edges.
 
-.. image:: ../images/property_graph.png
+.. image:: images/property_graph.png
    :width: 700
    :align: center
    :alt: property graph
@@ -35,7 +35,7 @@ Each type of vertices (with the same label) constructs a logical vertex table, w
 
 Given an internal vertex id and the vertex label, a vertex is uniquely identifiable and its respective properties can be accessed from this table. The internal vertex id is further used to identify the source and destination vertices when maintaining the topology of the graph.
 
-.. image:: ../images/vertex_logical_table.png
+.. image:: images/vertex_logical_table.png
    :width: 650
    :align: center
    :alt: vertex logical table
@@ -51,11 +51,13 @@ The logical vertex table will be partitioned into multiple continuous vertex chu
 
 Take the "person" vertex table as an example, if the chunk size is set to be 500, the logical table will be separated into sub-logical-tables of 500 rows with the exception of the last one, which may have less than 500 rows. The columns for maintaining properties will also be divided into distinct groups (e.g., 2 for our example). As a result, a total of 4 physical vertex tables are created for storing the example logical table, which can be seen from the following figure.
 
-.. image:: ../images/vertex_physical_table.png
+.. image:: images/vertex_physical_table.png
    :width: 650
    :align: center
    :alt: vertex physical table
 
+
+**Note**: For efficiently utilize the filter push-down of the payload file format like Parquet, the internal vertex id is stored in the payload file as a column. And since the internal vertex id is continuous, the payload file format can use the delta encoding for the internal vertex id column, which would not bring too much overhead for the storage.
 
 Edges in GraphAr
 ------------------------
@@ -66,7 +68,7 @@ For maintaining a type of edges (that with the same triplet of the source label,
 
 Take the logical table for "person likes person" edges as an example, the logical edge table looks like:
 
-.. image:: ../images/edge_logical_table.png
+.. image:: images/edge_logical_table.png
    :width: 650
    :align: center
    :alt: edge logical table
@@ -89,12 +91,12 @@ Additionally, there would be an offset table for **ordered_by_source** or **orde
 
 Take the "person knows person" edges to illustrate. Suppose the vertex chunk size is set to 500 and the edge chunk size is 1024, and the edges are **ordered_by_source**, then the edges could be saved in the following physical tables:
 
-.. image:: ../images/edge_physical_table1.png
+.. image:: images/edge_physical_table1.png
    :width: 650
    :align: center
    :alt: edge physical table1
 
-.. image:: ../images/edge_physical_table2.png
+.. image:: images/edge_physical_table2.png
    :width: 650
    :align: center
    :alt: edge physical table2
@@ -131,13 +133,14 @@ An edge information file which named "<source label>_<edge label>_<destination l
 - the edge chunk size, the source vertex chunk size and the destination vertex chunk size;
 - if the edges are directed or not;
 - the relative path for edge data files;
-- which kinds of adjList it includes: for each kind of adjList, the adjList type, the prefix of file path, the file type and all its associated property groups are specified;
+- which kinds of adjList it includes: for each kind of adjList, the adjList type, the prefix of file path, the file type;
+- the property groups attached to the edge for all adjLists;
 - the version of GraphAr.
 
 .. note::
    Please note that GraphAr supports the storage of multiple types of adjLists for a given group of edges, e.g., a group of edges could be accessed in both CSR and CSC way when two copies (one is **ordered_by_source** and the other is **ordered_by_dest**) of the relevant data are present in GraphAr.
 
-See also `Gar Information Files <getting-started.html#gar-information-files>`_ for an example.
+See also `Gar Information Files <cpp/getting-started.html#gar-information-files>`_ for an example.
 
 Data files
 ``````````
@@ -149,7 +152,7 @@ As previously mentioned, each logical vertex/edge table is divided into multiple
 
 Both of Apache ORC and Apache Parquet are column-oriented data storage formats. In practice of graph processing, it is common to only query a subset of columns of the properties. Thus, the column-oriented formats are more efficient, which eliminate the need to read columns that are not relevant. They are also used by a large number of data processing frameworks like `Apache Spark <https://spark.apache.org/>`_, `Apache Hive <https://hive.apache.org/>`_, `Apache Flink <https://flink.apache.org/>`_, and `Apache Hadoop <https://hadoop.apache.org/>`_. 
 
-See also `Gar Data Files <getting-started.html#gar-data-files>`_ for an example.
+See also `Gar Data Files <cpp/getting-started.html#gar-data-files>`_ for an example.
 
 Data Types
 ``````````
@@ -161,6 +164,7 @@ GraphAr provides a set of built-in data types that are common in real use cases 
 - float
 - double
 - string
+- list (of int32, int64, float, double; not supported by CSV)
 
 .. tip::
 

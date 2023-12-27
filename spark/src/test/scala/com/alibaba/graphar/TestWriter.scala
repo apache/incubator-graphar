@@ -1,28 +1,25 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.alibaba.graphar
 
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
-import com.alibaba.graphar.util
 
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.scalatest.funsuite.AnyFunSuite
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
 import org.apache.hadoop.fs.{Path, FileSystem}
 import scala.io.Source.fromFile
 
@@ -34,7 +31,7 @@ class WriterSuite extends AnyFunSuite {
     .getOrCreate()
 
   test("test vertex writer with only vertex table") {
-    // read vertex dataframe
+    // read vertex DataFrame
     val file_path = getClass.getClassLoader
       .getResource("gar-test/ldbc_sample/person_0_0.csv")
       .getPath
@@ -53,7 +50,7 @@ class WriterSuite extends AnyFunSuite {
       .getPath
     val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml_path, spark)
 
-    // generate vertex index column for vertex dataframe
+    // generate vertex index column for vertex DataFrame
     val vertex_df_with_index =
       util.IndexGenerator.generateVertexIndexColumn(vertex_df)
 
@@ -93,7 +90,7 @@ class WriterSuite extends AnyFunSuite {
   }
 
   test("test edge writer with only edge table") {
-    // read edge dataframe
+    // read edge DataFrame
     val file_path = getClass.getClassLoader
       .getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv")
       .getPath
@@ -114,7 +111,7 @@ class WriterSuite extends AnyFunSuite {
     val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml_path, spark)
     val adj_list_type = AdjListType.ordered_by_source
 
-    // generate vertex index for edge dataframe
+    // generate vertex index for edge DataFrame
     val srcDf = edge_df.select("src").withColumnRenamed("src", "vertex")
     val dstDf = edge_df.select("dst").withColumnRenamed("dst", "vertex")
     val vertex_num = srcDf.union(dstDf).distinct().count()
@@ -192,7 +189,7 @@ class WriterSuite extends AnyFunSuite {
     assertThrows[IllegalArgumentException](
       writer.writeEdgeProperties(invalid_property_group)
     )
-    // throw exception if not generate src index and dst index for edge dataframe
+    // throw exception if not generate src index and dst index for edge DataFrame
     assertThrows[IllegalArgumentException](
       new EdgeWriter(
         prefix,
@@ -220,7 +217,7 @@ class WriterSuite extends AnyFunSuite {
   }
 
   test("test edge writer with vertex table and edge table") {
-    // read vertex dataframe
+    // read vertex DataFrame
     val vertex_file_path = getClass.getClassLoader
       .getResource("gar-test/ldbc_sample/person_0_0.csv")
       .getPath
@@ -230,7 +227,7 @@ class WriterSuite extends AnyFunSuite {
       .csv(vertex_file_path)
     val vertex_num = vertex_df.count()
 
-    // read edge dataframe
+    // read edge DataFrame
     val file_path = getClass.getClassLoader
       .getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv")
       .getPath
@@ -261,12 +258,12 @@ class WriterSuite extends AnyFunSuite {
     val vertex_chunk_num =
       (vertex_num + vertex_chunk_size - 1) / vertex_chunk_size
 
-    // construct person vertex mapping with dataframe
+    // construct person vertex mapping with DataFrame
     val vertex_mapping = util.IndexGenerator.constructVertexIndexMapping(
       vertex_df,
       vertex_info.getPrimaryKey()
     )
-    // generate src index and dst index for edge datafram with vertex mapping
+    // generate src index and dst index for edge DataFrame with vertex mapping
     val edge_df_with_src_index = util.IndexGenerator
       .generateSrcIndexForEdgesFromMapping(edge_df, "src", vertex_mapping)
     val edge_df_with_src_dst_index =

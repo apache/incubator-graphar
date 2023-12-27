@@ -1,17 +1,19 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
 #include <iostream>
 
 #include <boost/graph/adjacency_list.hpp>
@@ -21,8 +23,8 @@ limitations under the License.
 #include "arrow/api.h"
 
 #include "./config.h"
+#include "gar/api.h"
 #include "gar/graph.h"
-#include "gar/graph_info.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/writer/arrow_chunk_writer.h"
 #include "gar/writer/vertices_builder.h"
@@ -32,27 +34,26 @@ int main(int argc, char* argv[]) {
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
-  ASSERT(graph_info.GetVertexInfos().size() == 1);
-  ASSERT(graph_info.GetEdgeInfos().size() == 1);
+  ASSERT(graph_info->GetVertexInfos().size() == 1);
+  ASSERT(graph_info->GetEdgeInfos().size() == 1);
 
   // construct vertices collection
   std::string label = "person";
-  ASSERT(graph_info.GetVertexInfo(label).status().ok());
+  ASSERT(graph_info->GetVertexInfo(label) != nullptr);
   auto maybe_vertices =
-      GAR_NAMESPACE::ConstructVerticesCollection(graph_info, label);
+      GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
-  int num_vertices = vertices.size();
+  int num_vertices = vertices->size();
   std::cout << "num_vertices: " << num_vertices << std::endl;
 
   // construct edges collection
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto maybe_edges = GAR_NAMESPACE::ConstructEdgesCollection(
+  auto maybe_edges = GAR_NAMESPACE::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
       GAR_NAMESPACE::AdjListType::ordered_by_source);
   ASSERT(!maybe_edges.has_error());
-  auto& edges = std::get<GAR_NAMESPACE::EdgesCollection<
-      GAR_NAMESPACE::AdjListType::ordered_by_source>>(maybe_edges.value());
+  auto& edges = maybe_edges.value();
 
   // define the Graph type
   typedef boost::adjacency_list<
@@ -68,8 +69,8 @@ int main(int argc, char* argv[]) {
   // declare a graph object with (num_vertices) vertices and a edge iterator
   std::vector<std::pair<GAR_NAMESPACE::IdType, GAR_NAMESPACE::IdType>>
       edges_array;
-  auto it_end = edges.end();
-  for (auto it = edges.begin(); it != it_end; ++it) {
+  auto it_end = edges->end();
+  for (auto it = edges->begin(); it != it_end; ++it) {
     edges_array.push_back(std::make_pair(it.source(), it.destination()));
   }
   Graph g(edges_array.begin(), edges_array.end(), num_vertices);
@@ -84,8 +85,8 @@ int main(int argc, char* argv[]) {
   boost::property_map<Graph, boost::vertex_name_t>::type id =
       get(boost::vertex_name_t(), g);
 
-  auto v_it_end = vertices.end();
-  for (auto it = vertices.begin(); it != v_it_end; ++it) {
+  auto v_it_end = vertices->end();
+  for (auto it = vertices->begin(); it != v_it_end; ++it) {
     // FIXME(@acezen): double free error when get string property
     boost::put(id, it.id(), it.property<int64_t>("id").value());
   }
@@ -103,22 +104,20 @@ int main(int argc, char* argv[]) {
 
   // method 1 for writing results: construct new vertex type and write results
   // using vertex builder construct new property group
-  GAR_NAMESPACE::Property cc = {
-      "cc", GAR_NAMESPACE::DataType(GAR_NAMESPACE::Type::INT32), false};
+  GAR_NAMESPACE::Property cc("cc", GAR_NAMESPACE::int32(), false);
   std::vector<GAR_NAMESPACE::Property> property_vector = {cc};
-  GAR_NAMESPACE::PropertyGroup group(property_vector,
-                                     GAR_NAMESPACE::FileType::PARQUET);
+  auto group = GAR_NAMESPACE::CreatePropertyGroup(
+      property_vector, GAR_NAMESPACE::FileType::PARQUET);
   // construct new vertex info
   std::string vertex_label = "cc_result", vertex_prefix = "result/";
   int chunk_size = 100;
-  GAR_NAMESPACE::InfoVersion version(1);
-  GAR_NAMESPACE::VertexInfo new_info(vertex_label, chunk_size, version,
-                                     vertex_prefix);
-  ASSERT(new_info.AddPropertyGroup(group).ok());
+  auto version = GAR_NAMESPACE::InfoVersion::Parse("gar/v1").value();
+  auto new_info = GAR_NAMESPACE::CreateVertexInfo(
+      vertex_label, chunk_size, {group}, vertex_prefix, version);
   // dump new vertex info
-  ASSERT(new_info.IsValidated());
-  ASSERT(new_info.Dump().status().ok());
-  ASSERT(new_info.Save("/tmp/cc_result.vertex.yml").ok());
+  ASSERT(new_info->IsValidated());
+  ASSERT(new_info->Dump().status().ok());
+  ASSERT(new_info->Save("/tmp/cc_result.vertex.yml").ok());
   // construct vertices builder
   GAR_NAMESPACE::builder::VerticesBuilder builder(new_info, "/tmp/");
   // add vertices to the builder
@@ -134,16 +133,14 @@ int main(int argc, char* argv[]) {
 
   // method 2 for writing results: extend the original vertex info and write
   // results using writer extend the vertex_info
-  auto maybe_vertex_info = graph_info.GetVertexInfo(label);
-  ASSERT(maybe_vertex_info.status().ok());
-  auto vertex_info = maybe_vertex_info.value();
-  auto maybe_extend_info = vertex_info.Extend(group);
+  auto vertex_info = graph_info->GetVertexInfo(label);
+  auto maybe_extend_info = vertex_info->AddPropertyGroup(group);
   ASSERT(maybe_extend_info.status().ok());
   auto extend_info = maybe_extend_info.value();
   // dump the extened vertex info
-  ASSERT(extend_info.IsValidated());
-  ASSERT(extend_info.Dump().status().ok());
-  ASSERT(extend_info.Save("/tmp/person-new.vertex.yml").ok());
+  ASSERT(extend_info->IsValidated());
+  ASSERT(extend_info->Dump().status().ok());
+  ASSERT(extend_info->Save("/tmp/person-new.vertex.yml").ok());
   // construct vertex property writer
   GAR_NAMESPACE::VertexPropertyWriter writer(extend_info, "/tmp/");
   // convert results to arrow::Table

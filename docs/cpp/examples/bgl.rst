@@ -16,10 +16,10 @@ And then, the vertex collection and the edge collection are established as the h
 
 .. code:: C++
 
-   auto maybe_vertices = GraphArchive::ConstructVerticesCollection(graph_info, "person");
-   auto& vertices = maybe_vertices.value();
-   auto maybe_edges = GraphArchive::ConstructEdgesCollection(graph_info, "person", "knows", "person", GraphArchive::AdjListType::ordered_by_source);
-   auto& edges = std::get<GraphArchive::EdgesCollection<GraphArchive::AdjListType::ordered_by_source>>(maybe_edges.value());
+   auto maybe_vertices = GraphArchive::VerticesCollection::Make(graph_info, "person");
+   auto vertices = maybe_vertices.value();
+   auto maybe_edges = GraphArchive::EdgesCollection::Make(graph_info, "person", "knows", "person", GraphArchive::AdjListType::ordered_by_source);
+   auto edges = maybe_edges.value();
 
 Next, we construct the in-memory graph data structure for BGL by traversing the vertices and edges via GraphAr's high-level reading interface (the vertex iterator and the edge iterator):
 
@@ -36,14 +36,14 @@ Next, we construct the in-memory graph data structure for BGL by traversing the 
 
    // declare a graph object with (num_vertices) vertices and an edge iterator
    std::vector<std::pair<GraphArchive::IdType, GraphArchive::IdType>> edges_array;
-   auto it_begin = edges.begin(), it_end = edges.end();
+   auto it_begin = edges->begin(), it_end = edges->end();
    for (auto it = it_begin; it != it_end; ++it)
       edges_array.push_back(std::make_pair(it.source(), it.destination()));
    Graph g(edges_array.begin(), edges_array.end(), num_vertices);
 
    // define the internal vertex property "id"
    boost::property_map<Graph, boost::vertex_name_t>::type id = get(boost::vertex_name_t(), g);
-   auto v_it_begin = vertices.begin(), v_it_end = vertices.end();
+   auto v_it_begin = vertices->begin(), v_it_end = vertices->end();
    for (auto it = v_it_begin; it != v_it_end; ++it) {
       auto vertex = *it;
       boost::put(id, vertex.id(), vertex.property<int64_t>("id").value());
@@ -53,25 +53,25 @@ After that, an internal CC algorithm provided by BGL is called:
 
 .. code:: C++
 
-   // define the exteneral vertex property "component"
+   // define the external vertex property "component"
    std::vector<int> component(num_vertices);
    // call algorithm: cc
    int cc_num = boost::connected_components(g, &component[0]);
-   std::cout<<"Total number of components: "<<cc_num<<std::endl;
+   std::cout << "Total number of components: " << cc_num << std::endl;
 
 Finally, we could use a **VerticesBuilder** of GraphAr to write the results to new generated GAR files:
 
 .. code:: C++
 
    // construct a new property group
-   GraphArchive::Property cc = {"cc", GraphArchive::DataType::INT32, false};
+   GraphArchive::Property cc = {"cc", GraphArchive::int32(), false};
    std::vector<GraphArchive::Property> property_vector = {cc};
-   GraphArchive::PropertyGroup group(property_vector, GraphArchive::FileType::PARQUET);
+   auto group = GraphArchive::CreatePropertyGroup(property_vector, GraphArchive::FileType::PARQUET);
 
    // construct the new vertex info
    std::string vertex_label = "cc_result", vertex_prefix = "result/";
    int chunk_size = 100;
-   GraphArchive::VertexInfo new_info(vertex_label, chunk_size, vertex_prefix);
+   auto new_info = GraphArchive::CreateVertexInfo(vertex_label, chunk_size, {group}, vertex_prefix);
 
    // access the vertices via the index map and vertex iterator of BGL
    typedef boost::property_map<Graph, boost::vertex_index_t>::type IndexMap;

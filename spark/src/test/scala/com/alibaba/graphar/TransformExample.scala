@@ -1,30 +1,25 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.alibaba.graphar
 
-import com.alibaba.graphar.util.IndexGenerator
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
-import java.io.{File, FileInputStream}
-import scala.beans.BeanProperty
-import org.yaml.snakeyaml.Yaml
-import org.yaml.snakeyaml.constructor.Constructor
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.SparkSession
 import org.apache.hadoop.fs.{Path, FileSystem}
 import org.scalatest.funsuite.AnyFunSuite
 
@@ -46,7 +41,7 @@ class TransformExampleSuite extends AnyFunSuite {
 
     val reader = new VertexReader(prefix, vertex_info, spark)
     val vertices_num = reader.readVerticesNumber()
-    val vertex_df_with_index = reader.readAllVertexPropertyGroups(true)
+    val vertex_df_with_index = reader.readAllVertexPropertyGroups()
     assert(vertex_df_with_index.count() == vertices_num)
 
     // write to parquet files

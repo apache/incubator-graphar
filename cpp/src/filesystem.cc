@@ -1,26 +1,29 @@
-/** Copyright 2022 Alibaba Group Holding Limited.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 #include "arrow/adapters/orc/adapter.h"
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
 #include "arrow/filesystem/api.h"
+#include "arrow/filesystem/s3fs.h"
 #include "arrow/ipc/writer.h"
 #include "parquet/arrow/writer.h"
 
+#include "gar/fwd.h"
 #include "gar/util/expression.h"
 #include "gar/util/filesystem.h"
 
@@ -266,6 +269,8 @@ Result<IdType> FileSystem::GetFileNumOfDir(const std::string& dir_path,
                                        arrow_fs_->GetFileInfo(file_selector));
   return static_cast<IdType>(file_infos.size());
 }
+
+FileSystem::~FileSystem() {}
 
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri_string, std::string* out_path) {

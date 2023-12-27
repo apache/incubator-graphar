@@ -1,23 +1,22 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.alibaba.graphar
 
-import java.io.{File, FileInputStream}
-import org.apache.hadoop.fs.{Path, FileSystem}
+import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.{SparkSession}
 import org.yaml.snakeyaml.{Yaml, DumperOptions}
 import org.yaml.snakeyaml.constructor.Constructor
@@ -45,8 +44,8 @@ object GarType extends Enumeration {
   /** UTF8 variable-length string */
   val STRING = Value(6)
 
-  /** Array of same type */
-  val ARRAY = Value(7)
+  /** List of same type */
+  val LIST = Value(7)
 
   /**
    * Data type in gar to string.
@@ -63,8 +62,8 @@ object GarType extends Enumeration {
     case GarType.FLOAT  => "float"
     case GarType.DOUBLE => "double"
     case GarType.STRING => "string"
-    case GarType.ARRAY  => "array"
-    case _              => throw new IllegalArgumentException
+    case GarType.LIST   => "list"
+    case _ => throw new IllegalArgumentException("Unknown data type")
   }
 
   /**
@@ -82,8 +81,8 @@ object GarType extends Enumeration {
     case "float"  => GarType.FLOAT
     case "double" => GarType.DOUBLE
     case "string" => GarType.STRING
-    case "array"  => GarType.ARRAY
-    case _        => throw new IllegalArgumentException
+    case "list"   => GarType.LIST
+    case _ => throw new IllegalArgumentException("Unknown data type: " + str)
   }
 }
 
@@ -106,7 +105,7 @@ object FileType extends Enumeration {
     case FileType.CSV     => "csv"
     case FileType.PARQUET => "parquet"
     case FileType.ORC     => "orc"
-    case _                => throw new IllegalArgumentException
+    case _ => throw new IllegalArgumentException("Unknown file type")
   }
 
   /**
@@ -121,7 +120,7 @@ object FileType extends Enumeration {
     case "csv"     => FileType.CSV
     case "parquet" => FileType.PARQUET
     case "orc"     => FileType.ORC
-    case _         => throw new IllegalArgumentException
+    case _ => throw new IllegalArgumentException("Unknown file type: " + str)
   }
 
 }
@@ -156,7 +155,7 @@ object AdjListType extends Enumeration {
       case AdjListType.unordered_by_dest   => "unordered_by_dest"
       case AdjListType.ordered_by_source   => "ordered_by_source"
       case AdjListType.ordered_by_dest     => "ordered_by_dest"
-      case _                               => throw new IllegalArgumentException
+      case _ => throw new IllegalArgumentException("Unknown adjList type")
     }
 
   /** String to adjList type in gar */
@@ -165,7 +164,7 @@ object AdjListType extends Enumeration {
     case "unordered_by_dest"   => AdjListType.unordered_by_dest
     case "ordered_by_source"   => AdjListType.ordered_by_source
     case "ordered_by_dest"     => AdjListType.ordered_by_dest
-    case _                     => throw new IllegalArgumentException
+    case _ => throw new IllegalArgumentException("Unknown adjList type: " + str)
   }
 }
 

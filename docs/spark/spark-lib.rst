@@ -22,11 +22,14 @@ The GraphAr Spark library can be used in a range of scenarios:
 - Transforming GAR data between different adjList types (e.g., from COO to CSR).
 - Modifying existing GAR data (e.g., adding new vertices/edges).
 
-For more information on its usage, please refer to the `applications <../applications/spark.html>`_.
+For more information on its usage, please refer to the `Examples <examples/spark.html>`_.
 
 
 Get GraphAr Spark Library
 ------------------------------
+
+Building from source
+`````````````````````
 
 Make the graphar-spark-library directory as the current working directory:
 
@@ -44,6 +47,27 @@ After compilation, a similar file *graphar-x.x.x-SNAPSHOT-shaded.jar* is generat
 
 Please refer to the `building steps <https://github.com/alibaba/GraphAr/tree/main/spark>`_ for more details.
 
+Get from Maven
+```````````````
+
+You can include GraphAr as a dependency in your maven project
+
+.. code-block:: shell
+
+   <repositories>
+      <repository>
+         <id>graphar-mvn-repo</id>
+         <url>https://github.com/alibaba/GraphAr/raw/mvn-repo/</url>
+      </repository>
+   </repositories>
+   <dependencies>
+      <dependency>
+         <groupId>com.alibaba</groupId>
+         <artifactId>graphar</artifactId>
+         <version>0.1.0</version>
+      </dependency>
+   </dependencies>
+
 
 How to Use
 -----------------
@@ -54,7 +78,7 @@ The Spark library for GraphAr provides distinct information classes for construc
 
 To construct information from a Yaml file, please refer to the following example code.
 
-.. code:: scala
+.. code-block:: scala
 
    // read graph yaml and construct information
    val spark = ... // the Spark session
@@ -80,7 +104,7 @@ To address this issue, the GraphAr Spark library offers the IndexGenerator which
 
 To utilize IndexGenerator, please refer to the following example code.
 
-.. code:: scala
+.. code-block:: scala
 
    // generate indices for vertex DataFrame
    val vertex_df = ...
@@ -106,9 +130,9 @@ The GraphAr Spark writer provides the necessary Spark interfaces to write DataFr
 
 To utilize the GAR Spark writer, please refer to the following example code.
 
-.. code:: scala
+.. code-block:: scala
 
-   // generate the vertex index column for vertex dataframe
+   // generate the vertex index column for vertex DataFrame
    val vertex_df = ...
    val vertex_df_with_index = IndexGenerator.generateVertexIndexColumn(vertex_df)
    // construct the vertex writer
@@ -121,7 +145,7 @@ To utilize the GAR Spark writer, please refer to the following example code.
    // write all properties
    writer.writeVertexProperties()
 
-   // generate vertex index for edge dataframe
+   // generate vertex index for edge DataFrame
    val edge_df = ...
    val edge_df_with_index = IndexGenerator.generateSrcAndDstIndexUnitedlyForEdges(edge_df, "src", "dst")
    // construct the edge writer
@@ -147,7 +171,7 @@ After content has been read into the Spark DataFrame, users can leverage it to d
 
 To utilize the GAR Spark reader, please refer to the following example code.
 
-.. code:: scala
+.. code-block:: scala
 
    // construct the vertex reader
    val prefix = ...
@@ -183,7 +207,7 @@ The Graph Reader is a helper object which enables users to read all the chunk fi
 
 The Graph Transformer is a helper object in the GraphAr Spark library, designed to assist with data transformation at the graph level. It takes two GraphInfo objects (or paths of two yaml files) as inputs: one for the source graph, and one for the destination graph. The transformer will then load data from existing GAR files for the source graph, utilizing the GraphAr Spark Reader and the meta data defined in the source GraphInfo. After reorganizing the data according to the destination GraphInfo, it generates new GAR chunk files with the GraphAr Spark Writer.
 
-.. code:: scala
+.. code-block:: scala
 
    // transform graphs by yaml paths
    val spark = ... // the Spark session

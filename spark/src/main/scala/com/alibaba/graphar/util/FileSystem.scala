@@ -1,17 +1,17 @@
-/**
- * Copyright 2022 Alibaba Group Holding Limited.
+/*
+ * Copyright 2022-2023 Alibaba Group Holding Limited.
  *
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not
- * use this file except in compliance with the License. You may obtain a copy of
- * the License at
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- * License for the specific language governing permissions and limitations under
- * the License.
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.alibaba.graphar.util
@@ -19,27 +19,30 @@ package com.alibaba.graphar.util
 import org.json4s._
 import org.json4s.jackson.Serialization.write
 
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.DataFrame
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.conf.Configuration
 
 import com.alibaba.graphar.GeneralParams
 
-/** Helper object to write dataframe to chunk files */
+/** Helper object to write DataFrame to chunk files */
 object FileSystem {
 
   /**
-   * Write input dataframe to output path with certain file format.
+   * Write input DataFrame to output path with certain file format.
    *
-   * @param dataframe
+   * @param dataFrame
    *   DataFrame to write out.
    * @param fileType
    *   output file format type, the value could be csv|parquet|orc.
    * @param outputPrefix
    *   output path prefix.
-   * @param startChunkIndex
-   *   the start index of chunk.
+   * @param offsetStartChunkIndex[Optional]
+   *   the start index of offset chunk, if not empty, that means writing a
+   *   offset DataFrame.
+   * @param aggNumListOfEdgeChunk[Optional]
+   *   the aggregated number list of edge chunk, if not empty, that means
+   *   writing a edge DataFrame.
    */
   def writeDataFrame(
       dataFrame: DataFrame,
@@ -62,7 +65,7 @@ object FileSystem {
     }
     fs.close()
 
-    // write offset chunks dataframe
+    // write offset chunks DataFrame
     if (!offsetStartChunkIndex.isEmpty) {
       return dataFrame.write
         .mode("append")
@@ -75,7 +78,7 @@ object FileSystem {
         .format("com.alibaba.graphar.datasources.GarDataSource")
         .save(outputPrefix)
     }
-    // write edge chunks dataframe
+    // write edge chunks DataFrame
     if (!aggNumListOfEdgeChunk.isEmpty) {
       implicit val formats =
         DefaultFormats // initialize a default formats for json4s
@@ -90,7 +93,7 @@ object FileSystem {
         .format("com.alibaba.graphar.datasources.GarDataSource")
         .save(outputPrefix)
     }
-    // write vertex chunks dataframe
+    // write vertex chunks DataFrame
     dataFrame.write
       .mode("append")
       .option("header", "true")
@@ -99,6 +102,16 @@ object FileSystem {
       .save(outputPrefix)
   }
 
+  /**
+   * Write input value to output path.
+   *
+   * @param value
+   *   Value to write out.
+   * @param outputPrefix
+   *   output path prefix.
+   * @param hadoopConfig
+   *   hadoop configuration.
+   */
   def writeValue(
       value: Long,
       outputPath: String,
@@ -110,8 +123,19 @@ object FileSystem {
     // consistent with c++ library, convert to little-endian
     output.writeLong(java.lang.Long.reverseBytes(value))
     output.close()
+    fs.close()
   }
 
+  /**
+   * Read a value from input path.
+   *
+   * @param inputPath
+   *   Input path.
+   * @param hadoopConfig
+   *   hadoop configuration.
+   * @return
+   *   The value read from input path.
+   */
   def readValue(inputPath: String, hadoopConfig: Configuration): Long = {
     val path = new Path(inputPath)
     val fs = path.getFileSystem(hadoopConfig)

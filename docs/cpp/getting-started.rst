@@ -1,7 +1,7 @@
 Getting Started
 ============================
 
-This article is a quick guide that explains how to work with GraphAr. To begin with, please refer to the `Building Steps`_ to install GraphAr. After reading this article to gain a basic understanding of GraphAr, move on to `GraphAr File Format <file-format.html>`_ to explore more specific explanations of the file format, or `the C++ library <../reference/api-reference-cpp.html>`_ and `the Spark library <spark-lib.html>`_  to learn about the GraphAr libraries.
+This article is a quick guide that explains how to work with GraphAr C++. To begin with, please refer to the `Building Steps`_ to install GraphAr.
 
 
 GAR Information Files
@@ -82,16 +82,14 @@ Also, the metadata of a graph can be constructed easily through reading the alre
   auto graph_info = GraphArchive::GraphInfo::Load(path).value();
 
   // get vertex information
-  auto maybe_vertex_info = graph_info.GetVertexInfo("person");
-  if (maybe_vertex_info.status().ok())) {
-    auto vertex_info = maybe_vertex_info.value();
+  auto vertex_info = graph_info->GetVertexInfo("person");
+  if (vertex_info != nullptr) {
     // use vertex_info ...
   }
 
   // get edge information
-  auto& maybe_edge_info = graph_info.GetEdgeInfo("person", "knows", "person");
-  if (maybe_edge_info.status().ok())) {
-    auto edge_info = maybe_vertex_info.value();
+  auto edge_info = graph_info->GetEdgeInfo("person", "knows", "person");
+  if (edge_info != nullptr) {
     // use edge_info ...
   }
 
@@ -105,9 +103,9 @@ As a simple case, the following example shows how to read all vertices with labe
 .. code:: C++
 
   graph_info = ...
-  auto& vertices = GraphArchive::ConstructVerticesCollection(graph_info, "person").value();
+  auto vertices = GraphArchive::VerticesCollection::Make(graph_info, "person").value();
 
-  for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+  for (auto it = vertices->begin(); it != vertices->end(); ++it) {
     // get a vertex and access its data
     auto vertex = *it;
     std::cout << "id=" << vertex.property<int64_t>("id").value() << ", firstName=" << vertex.property<std::string>("firstName").value() << std::endl;
@@ -118,16 +116,16 @@ The next example reads all edges with label "person_knows_person" from the above
 .. code:: C++
 
   graph_info = ...
-  auto expect = GraphArchive::ConstructEdgesCollection(graph_info, "person", "konws" "person", GraphArchive::AdjListType::ordered_by_source).value();
-  auto& edges = std::get<GraphArchive::EdgesCollection<GraphArchive::AdjListType::ordered_by_source>>(expect.value());
+  auto expect = GraphArchive::EdgesCollection::Make(graph_info, "person", "konws" "person", GraphArchive::AdjListType::ordered_by_source).value();
+  auto edges = expect.value();
 
-  for (auto it = edges.begin(); it != edges.end(); ++it) {
+  for (auto it = edges->begin(); it != edges->end(); ++it) {
     // get an edge and access its data
     auto edge = *it;
     std::cout << "src=" << edge.source() << ", dst=" << edge.destination() << std::endl;
   }
 
-See also `C++ Reader API Reference <../reference/api-reference-cpp.html#readers>`_.
+See also `C++ Reader API Reference <reference/index.html#readers>`_.
 
 Write GAR files
 ```````````````
@@ -169,7 +167,7 @@ As the simplest cases, the fist example below adds vertices to **VerticesBuilder
   // write to GAR files
   builder.Dump();
 
-See also `C++ Writer API Reference <../reference/api-reference-cpp.html#writer-and-builder>`_.
+See also `C++ Writer API Reference <reference/index.html#writer-and-builder>`_.
 
 A PageRank Example
 ``````````````````
@@ -177,7 +175,7 @@ Here we will go through an example of out-of-core graph analytic algorithms base
 
 This program first reads in the graph information file to obtain the metadata; then, it constructs the vertex and edge collections to enable access to the graph. After that, an implementation of the PageRank algorithm is provided, with data for the vertices stored in memory, and the edges streamed through disk I/O. Finally, the vertex information with type "person" is extended to include a new property named "pagerank" (a new vertex information file named *person-new-pagerank.vertex.yml* is saved) and the **VerticesBuilder** is used to write the results to new generated data chunks.
 
-Please refer to `more examples <../applications/out-of-core.html>`_ to learn about the other available case studies utilizing GraphAr.
+Please refer to `more examples <examples/out-of-core.html>`_ to learn about the other available case studies utilizing GraphAr.
 
 .. _Building Steps: https://github.com/alibaba/GraphAr/blob/main/README.rst#building-libraries
 

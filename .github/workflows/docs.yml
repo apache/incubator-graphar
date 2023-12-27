@@ -1,4 +1,4 @@
-# Copyright 2022 Alibaba Group Holding Limited.
+# Copyright 2022-2023 Alibaba Group Holding Limited.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,6 +46,12 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           submodules: true
           fetch-depth: 0
+      
+      - name: Check License Header
+        uses: apache/skywalking-eyes/header@main 
+        with:
+          config: .licenserc.yaml
+          mode: check
 
       - name: Leave the comment on pull request when started
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
