@@ -389,9 +389,7 @@ class VertexInfo:
                     Property.from_python(
                         name=prop_dict.get("name", ""),
                         data_type=GarType(prop_dict.get("data_type")),
-                        is_primary=True
-                        if prop_dict.get("is_primary") == "true"
-                        else False,
+                        is_primary=prop_dict.get("is_primary", False),
                     )
                 )
 

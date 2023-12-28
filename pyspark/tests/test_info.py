@@ -235,3 +235,86 @@ def test_vertex_info(spark):
     assert len(person_info.get_property_groups()) == 2
     assert person_info.get_property_type("id") == GarType.INT64
     assert person_info.get_property_type("firstName") == GarType.STRING
+
+    # Primary keys logic
+    assert person_info.get_primary_key() == "id"
+    assert person_info.is_primary_key("id")
+    assert person_info.is_primary_key("firstName") == False
+
+    # Other
+    assert (
+        person_info.get_vertices_num_file_path()
+        == person_info.get_prefix() + "vertex_count"
+    )
+    assert person_info.is_validated()
+
+    assert (
+        VertexInfo.from_scala(person_info.to_scala()).get_prefix()
+        == person_info.get_prefix()
+    )
+
+
+def test_edge_info(spark):
+    initialize(spark)
+
+    py_edge_info = EdgeInfo.from_python(
+        src_label="src_label",
+        edge_label="edge_label",
+        dst_label="dst_label",
+        chunk_size=100,
+        src_chunk_size=101,
+        dst_chunk_size=102,
+        directed=True,
+        prefix="prefix",
+        adj_lists=[],
+        version="v1",
+    )
+
+    # getters/setters
+    py_edge_info.set_src_label("new_src_label")
+    assert py_edge_info.get_src_label() == "new_src_label"
+
+    py_edge_info.set_dst_label("new_dst_label")
+    assert py_edge_info.get_dst_label() == "new_dst_label"
+
+    py_edge_info.set_edge_label("new_edge_label")
+    assert py_edge_info.get_edge_label() == "new_edge_label"
+
+    py_edge_info.set_chunk_size(101)
+    assert py_edge_info.get_chunk_size() == 101
+
+    py_edge_info.set_src_chunk_size(102)
+    assert py_edge_info.get_src_chunk_size() == 102
+
+    py_edge_info.set_dst_chunk_size(103)
+    assert py_edge_info.get_dst_chunk_size() == 103
+
+    py_edge_info.set_directed(False)
+    assert py_edge_info.get_directed() == False
+
+    py_edge_info.set_prefix("new_prefix")
+    assert py_edge_info.get_prefix() == "new_prefix"
+
+    py_edge_info.set_version("v2")
+    assert py_edge_info.get_version() == "v2"
+
+    props_list_1 = [
+        Property.from_python("non_primary", GarType.DOUBLE, False),
+        Property.from_python("primary", GarType.INT64, True),
+    ]
+    py_edge_info.set_adj_lists(
+        [
+            AdjList.from_python(
+                True,
+                "dest",
+                "prefix",
+                FileType.PARQUET,
+                [
+                    PropertyGroup.from_python(
+                        "prefix1", FileType.PARQUET, props_list_1
+                    ),
+                ],
+            )
+        ]
+    )
+    assert len(py_edge_info.get_adj_lists()) == 1

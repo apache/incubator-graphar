@@ -3,11 +3,12 @@ name = "graphar-pyspark"
 version = "0.0.1"
 description = "PySpark bindings to GraphAr scala spark package"
 authors = ["Semyon Sinchenko ssinchenko@pm.me"]
-readme = "README.md"
+readme = "README.rst"
 packages = [{include = "graphar_pyspark"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+pyyaml = "*"
 
 [tool.poetry.group.spark]
 optional = true
@@ -33,7 +34,6 @@ optional = true
 [tool.poetry.group.tests.dependencies]
 pytest = "*"
 pytest-cov = "*"
-pyyaml = "*"
 
 [build-system]
 requires = ["poetry-core"]
