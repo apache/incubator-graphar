@@ -179,6 +179,16 @@ class Property() {
     GarType.StringToGarType(data_type)
   }
 
+  override def equals(that: Any): Boolean = {
+    that match {
+      case other: Property =>
+        this.name == other.name &&
+          this.data_type == other.data_type &&
+          this.is_primary == other.is_primary
+      case _ => false
+    }
+  }
+
   def toMap(): java.util.HashMap[String, Object] = {
     val data = new java.util.HashMap[String, Object]()
     data.put("name", name)
@@ -193,6 +203,16 @@ class PropertyGroup() {
   @BeanProperty var prefix: String = ""
   @BeanProperty var file_type: String = ""
   @BeanProperty var properties = new java.util.ArrayList[Property]()
+
+  override def equals(that: Any): Boolean = {
+    that match {
+      case other: PropertyGroup =>
+        this.prefix == other.prefix &&
+          this.file_type == other.file_type &&
+          this.properties == other.properties
+      case _ => false
+    }
+  }
 
   /** Get file type in gar of property group */
   def getFile_type_in_gar: FileType.Value = {
@@ -222,6 +242,18 @@ class AdjList() {
   @BeanProperty var prefix: String = ""
   @BeanProperty var file_type: String = ""
   @BeanProperty var property_groups = new java.util.ArrayList[PropertyGroup]()
+
+  override def equals(that: Any): Boolean = {
+    that match {
+      case other: AdjList =>
+        this.ordered == other.ordered &&
+          this.aligned_by == other.aligned_by &&
+          this.prefix == other.prefix &&
+          this.file_type == other.file_type &&
+          this.property_groups == other.property_groups
+      case _ => false
+    }
+  }
 
   /** Get file type in gar of adj list */
   def getFile_type_in_gar: FileType.Value = {

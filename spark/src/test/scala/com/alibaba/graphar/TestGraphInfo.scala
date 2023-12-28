@@ -415,4 +415,43 @@ class GraphInfoSuite extends AnyFunSuite {
     assertThrows[IllegalArgumentException](edge_info.isPrimaryKey("not_exist"))
   }
 
+  test("== of Property/PropertyGroup/AdjList") {
+    val p1 = new Property()
+    val p2 = new Property()
+    assert(p1 == p2)
+    p1.setName("name")
+    assert(p1 != p2)
+    p2.setName("name")
+    assert(p1 == p2)
+    p1.setData_type("INT64")
+    assert(p1 != p2)
+    p2.setData_type("INT64")
+    assert(p1 == p2)
+    val pg1 = new PropertyGroup()
+    val pg2 = new PropertyGroup()
+    assert(pg1 == pg2)
+    pg1.setPrefix("/tmp")
+    assert(pg1 != pg2)
+    pg2.setPrefix("/tmp")
+    assert(pg1 == pg2)
+    pg1.setProperties(
+      new java.util.ArrayList[Property](java.util.Arrays.asList(p1))
+    )
+    assert(pg1 != pg2)
+    pg2.setProperties(
+      new java.util.ArrayList[Property](java.util.Arrays.asList(p2))
+    )
+    assert(pg1 == pg2)
+    val al1 = new AdjList()
+    val al2 = new AdjList()
+    assert(al1 == al2)
+    al1.setProperty_groups(
+      new java.util.ArrayList[PropertyGroup](java.util.Arrays.asList(pg1))
+    )
+    assert(al1 != al2)
+    al2.setProperty_groups(
+      new java.util.ArrayList[PropertyGroup](java.util.Arrays.asList(pg2))
+    )
+    assert(al1 == al2)
+  }
 }
