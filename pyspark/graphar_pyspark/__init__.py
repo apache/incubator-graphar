@@ -24,7 +24,12 @@ class _GraphArSession:
     """
 
     def __init__(self) -> None:
-        pass
+        self._ss = None
+        self._sc = None
+        self._jvm = None
+        self._graphar = None
+        self._jsc = None
+        self._jss = None
 
     def set_spark_session(self, spark_session: SparkSession) -> None:
         self._ss = spark_session  # Python SparkSession
