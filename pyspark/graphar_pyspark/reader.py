@@ -15,6 +15,7 @@ limitations under the License.
 """
 
 from __future__ import annotations
+import os
 
 from typing import Optional
 
@@ -45,12 +46,6 @@ class VertexReader:
                 GraphArSession._jss,
             )
 
-    def get_prefix(self) -> str:
-        return self._jvm_vertex_reader_obj.prefix()
-
-    def get_vertex_info(self) -> VertexInfo:
-        return VertexInfo.from_scala(self._jvm_vertex_reader_obj.vertexInfo())
-
     def to_scala(self) -> JavaObject:
         """Transform object to JVM representation.
 
@@ -74,6 +69,8 @@ class VertexReader:
         :param prefix: the absolute prefix.
         :param vertex_info: the vertex info that describes the vertex type.
         """
+        if not prefix.endswith(os.sep):
+            prefix += os.sep
         return VertexReader(prefix, vertex_info, None)
 
     def read_vertices_number(self) -> int:
@@ -165,15 +162,6 @@ class EdgeReader:
                 GraphArSession._jss,
             )
 
-    def get_prefix(self) -> str:
-        return self._jvm_edge_reader_obj.prefix()
-
-    def get_edge_info(self) -> EdgeInfo:
-        return EdgeInfo.from_scala(self._jvm_edge_reader_obj.edgeInfo())
-
-    def get_adj_list_type(self) -> AdjListType:
-        return AdjListType.from_scala(self._jvm_edge_reader_obj.adjListType())
-
     def to_scala(self) -> JavaObject:
         """Transform object to JVM representation.
 
@@ -202,6 +190,8 @@ class EdgeReader:
         :param edge_info: the edge info that describes the edge type.
         :param adj_list_type: the adj list type for the edge.
         """
+        if not prefix.endswith(os.sep):
+            prefix += os.sep
         return EdgeReader(prefix, edge_info, adj_list_type, None)
 
     def read_vertices_number(self) -> int:
@@ -348,7 +338,8 @@ class EdgeReader:
             self._jvm_edge_reader_obj.readEdgePropertyGroup(
                 property_group.to_scala(),
                 add_index,
-            )
+            ),
+            GraphArSession._ss,
         )
 
     def read_multiple_edge_property_groups_for_vertex_chunk(
@@ -418,7 +409,9 @@ class EdgeReader:
             GraphArSession._ss,
         )
 
-    def read_edges_for_vertex_chunk(self, vertex_chunk_index: int, add_index: bool = True) -> DataFrame:
+    def read_edges_for_vertex_chunk(
+        self, vertex_chunk_index: int, add_index: bool = True
+    ) -> DataFrame:
         """Load the chunks for the AdjList and all property groups for a vertex chunk as a DataFrame.
 
         :param vertex_chunk_index: index of vertex chunk
@@ -426,7 +419,9 @@ class EdgeReader:
         :returns: DataFrame that contains all chunks of AdjList and property groups of vertices in given vertex chunk.
         """
         return DataFrame(
-            self._jvm_edge_reader_obj.readEdgesForVertexChunk(vertex_chunk_index, add_index),
+            self._jvm_edge_reader_obj.readEdgesForVertexChunk(
+                vertex_chunk_index, add_index
+            ),
             GraphArSession._ss,
         )
 

@@ -1,12 +1,23 @@
-from pathlib import Path
+"""
+copyright 2022-2023 alibaba group holding limited.
 
+licensed under the apache license, version 2.0 (the "license");
+you may not use this file except in compliance with the license.
+you may obtain a copy of the license at
+
+    http://www.apache.org/licenses/license-2.0
+
+unless required by applicable law or agreed to in writing, software
+distributed under the license is distributed on an "as is" basis,
+without warranties or conditions of any kind, either express or implied.
+see the license for the specific language governing permissions and
+limitations under the license.
+"""
+
+from pathlib import Path
 
 import pytest
 import yaml
-
-from pyspark.errors import IllegalArgumentException
-
-
 from graphar_pyspark import initialize
 from graphar_pyspark.enums import AdjListType, FileType, GarType
 from graphar_pyspark.info import (
@@ -17,6 +28,7 @@ from graphar_pyspark.info import (
     PropertyGroup,
     VertexInfo,
 )
+from pyspark.sql.utils import IllegalArgumentException
 
 GRAPHAR_TESTS_EXAMPLES = Path(__file__).parent.parent.parent.joinpath("testing")
 
@@ -157,11 +169,8 @@ def test_vertex_info(spark):
         "1",
     )
 
-    # TODO: revisit contain_* methods after resolving the discussion in github
     assert vertex_info_from_py.contain_property_group(
-        PropertyGroup.from_scala(
-            vertex_info_from_py.get_property_groups()[0].to_scala()
-        )
+        PropertyGroup.from_python("prefix1", FileType.PARQUET, props_list_1)
     )
     assert (
         vertex_info_from_py.contain_property_group(
@@ -318,3 +327,70 @@ def test_edge_info(spark):
         ]
     )
     assert len(py_edge_info.get_adj_lists()) == 1
+
+    # Load from YAML
+    person_knows_person_info = EdgeInfo.load_edge_info(
+        GRAPHAR_TESTS_EXAMPLES.joinpath("transformer")
+        .joinpath("person_knows_person.edge.yml")
+        .absolute()
+        .__str__()
+    )
+    assert person_knows_person_info.get_directed() == False
+    assert person_knows_person_info.contain_property("creationDate")
+    assert (
+        person_knows_person_info.get_adj_list_prefix(AdjListType.UNORDERED_BY_DEST)
+        is not None
+    )
+    assert (
+        person_knows_person_info.get_adj_list_prefix(AdjListType.ORDERED_BY_SOURCE)
+        is not None
+    )
+    with pytest.raises(IllegalArgumentException) as e:
+        person_knows_person_info.get_adj_list_prefix(AdjListType.ORDERED_BY_DEST)
+        assert e == "adj list type not found: ordered_by_dest"
+
+    assert person_knows_person_info.contain_adj_list(AdjListType.UNORDERED_BY_DEST)
+    assert (
+        person_knows_person_info.contain_adj_list(AdjListType.UNORDERED_BY_SOURCE)
+        == False
+    )
+
+    assert person_knows_person_info.get_chunk_size() == 500
+    assert (
+        person_knows_person_info.get_offset_path_prefix(AdjListType.ORDERED_BY_SOURCE)
+        is not None
+    )
+
+
+def test_graph_info(spark):
+    initialize(spark)
+
+    modern_graph_person = GraphInfo.load_graph_info(
+        GRAPHAR_TESTS_EXAMPLES.joinpath("modern_graph")
+        .joinpath("modern_graph.graph.yml")
+        .absolute()
+        .__str__()
+    )
+    assert len(modern_graph_person.get_edges()) == 2
+    assert modern_graph_person.get_name() == "modern_graph"
+    assert len(modern_graph_person.get_vertex_infos().keys()) == 2
+    assert "person" in modern_graph_person.get_vertex_infos().keys()
+    assert "software" in modern_graph_person.get_vertex_infos().keys()
+    assert len(modern_graph_person.get_edge_infos()) == 2
+    assert "person_knows_person" in modern_graph_person.get_edge_infos().keys()
+    assert "person_created_software" in modern_graph_person.get_edge_infos().keys()
+
+    assert modern_graph_person.get_edge_info("person", "knows", "person") is not None
+    assert modern_graph_person.get_vertex_info("person") is not None
+
+    # YAML
+    yaml_dict = yaml.safe_load(modern_graph_person.dump())
+    assert "name" in yaml_dict
+    assert yaml_dict["version"] == "gar/v1"
+
+    # Python constructor and setters
+    py_graph_info = GraphInfo.from_python("name", "prefix", ["person", "software"], ["person_knnows_person"], "v1")
+    py_graph_info.set_name("new_name")
+    assert py_graph_info.get_name() == "new_name"
+    py_graph_info.set_prefix("new_prefix")
+    assert py_graph_info.get_prefix() == "new_prefix"

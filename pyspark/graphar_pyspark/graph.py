@@ -36,19 +36,33 @@ class GraphReader:
         ],
     ) -> tuple[dict[str, DataFrame], dict[tuple[str, str, str], dict[str, DataFrame]]]:
         """Helper that convert nested Java DataFrames to PySpark DataFrames."""
-        return (
-            {
-                label: DataFrame(jdf, GraphArSession._ss)
-                for label, jdf in jvm_result[0].items()
-            },
-            {
-                complex_label: {
-                    adj_type: DataFrame(jdf, GraphArSession._ss)
-                    for adj_type, jdf in mapping.items()
-                }
-                for complex_label, mapping in jvm_result[1].items()
-            },
-        )
+        first_dict = {}
+        first_scala_map = jvm_result._1()
+        first_scala_map_iter = first_scala_map.keySet().iterator()
+
+        while first_scala_map_iter.hasNext():
+            k = first_scala_map_iter.next()
+            first_dict[k] = DataFrame(first_scala_map.get(k).get(), GraphArSession._ss)
+
+        second_dict = {}
+        second_scala_map = jvm_result._2()
+        second_scala_map_iter = second_scala_map.keySet().iterator()
+
+        while second_scala_map_iter.hasNext():
+            k = second_scala_map_iter.next()
+            nested_scala_map = second_scala_map.get(k).get()
+            nested_scala_map_iter = nested_scala_map.keySet().iterator()
+            inner_dict = {}
+
+            while nested_scala_map_iter.hasNext():
+                kk = nested_scala_map_iter.next()
+                inner_dict[kk] = DataFrame(
+                    nested_scala_map.get(kk).get(), GraphArSession._ss
+                )
+
+            second_dict[(k._1(), k._2(), k._3())] = inner_dict
+
+        return (first_dict, second_dict)
 
     @staticmethod
     def read_with_graph_info(
