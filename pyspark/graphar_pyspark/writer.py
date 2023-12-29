@@ -48,7 +48,9 @@ class VertexWriter:
                 # The problem is that py4j always make autounboxing of Long into int
                 # and it cannot make autoboxisng because the method is waiting for Some(Long), not Long
                 # See https://github.com/py4j/py4j/issues/374 for details
-                raise NotImplementedError("Due to py4j problem num_vertices cannot be processed!")
+                raise NotImplementedError(
+                    "Due to py4j problem num_vertices cannot be processed!"
+                )
                 num_vertices_some = GraphArSession.jvm.scala.Some.apply(
                     GraphArSession.jvm.java.lang.Long(num_vertices)
                 )
@@ -67,21 +69,6 @@ class VertexWriter:
                 )
 
             self._jvm_vertex_writer_obj = vertex_writer
-
-    def get_prefix(self) -> str:
-        return self._jvm_vertex_writer_obj.prefix()
-
-    def get_vertex_info(self) -> VertexInfo:
-        return VertexInfo.from_scala(self._jvm_vertex_writer_obj.vertexInfo())
-
-    def get_vertex_df(self) -> DataFrame:
-        return DataFrame(
-            self._jvm_vertex_writer_obj.vertexDf(),
-            GraphArSession.ss,
-        )
-
-    def get_num_vertices(self) -> int:
-        return self._jvm_vertex_writer_obj.numVertices()
 
     def to_scala(self) -> JavaObject:
         """Transform object to JVM representation.
@@ -155,24 +142,6 @@ class EdgeWriter:
                 edge_df._jdf,
             )
 
-    def get_prefix(self) -> str:
-        return self._jvm_edge_writer_obj.prefix()
-
-    def get_edge_info(self) -> EdgeInfo:
-        return EdgeInfo.from_scala(self._jvm_edge_writer_obj.edgeInfo())
-
-    def get_adj_list_type(self) -> AdjListType:
-        return AdjListType.from_scala(self._jvm_edge_writer_obj.adjListType())
-
-    def get_vertex_num(self) -> int:
-        return self._jvm_edge_writer_obj.vertexNum()
-
-    def get_edge_df(self) -> DataFrame:
-        return DataFrame(
-            self._jvm_edge_writer_obj.edgeDf(),
-            GraphArSession.ss,
-        )
-
     def to_scala(self) -> JavaObject:
         """Transform object to JVM representation.
 
@@ -205,6 +174,8 @@ class EdgeWriter:
         :param vertex_num: vertex number of the primary vertex label
         :param edge_df: the input edge DataFrame.
         """
+        if not prefix.endswith(os.sep):
+            prefix += os.sep
         return EdgeWriter(prefix, edge_info, adj_list_type, vertex_num, edge_df, None)
 
     def write_adj_list(self) -> None:
