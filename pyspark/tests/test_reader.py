@@ -18,9 +18,9 @@ from pathlib import Path
 
 from graphar_pyspark import initialize
 from graphar_pyspark.enums import AdjListType
-from graphar_pyspark.info import VertexInfo, EdgeInfo
-from graphar_pyspark.reader import VertexReader, EdgeReader
-from graphar_pyspark.graph import GraphReader
+from graphar_pyspark.graph import EdgeLabels, GraphReader
+from graphar_pyspark.info import EdgeInfo, GraphInfo, VertexInfo
+from graphar_pyspark.reader import EdgeReader, VertexReader
 
 GRAPHAR_TESTS_EXAMPLES = Path(__file__).parent.parent.parent.joinpath("testing")
 
@@ -98,8 +98,32 @@ def test_graph_reader(spark):
         .__str__()
     )
     assert graph_info is not None
-    assert len(graph_info) == 2
-    assert "person" in graph_info[0]
-    assert ("person", "created", "software") in graph_info[1]
-    assert graph_info[0]["person"].count() > 0
-    assert "ordered_by_source" in graph_info[1][("person", "created", "software")]
+    assert len(graph_info.vertex_dataframes.keys()) > 0
+    assert len(graph_info.edge_dataframes.keys()) > 0
+    assert "person" in graph_info.vertex_dataframes.keys()
+    assert (
+        EdgeLabels("person", "created", "software") in graph_info.edge_dataframes.keys()
+    )
+    assert graph_info.vertex_dataframes["person"].count() > 0
+    assert (
+        "ordered_by_source"
+        in graph_info.edge_dataframes[EdgeLabels("person", "created", "software")]
+    )
+    assert (
+        graph_info.edge_dataframes[EdgeLabels("person", "created", "software")][
+            "ordered_by_source"
+        ].count()
+        > 0
+    )
+
+    # test read with graph info
+    graph_info_obj = GraphInfo.load_graph_info(
+        GRAPHAR_TESTS_EXAMPLES.joinpath("modern_graph")
+        .joinpath("modern_graph.graph.yml")
+        .absolute()
+        .__str__()
+    )
+    graph_info2 = GraphReader.read(graph_info_obj)
+    assert len(graph_info2.vertex_dataframes.keys()) == len(
+        graph_info.vertex_dataframes.keys()
+    )

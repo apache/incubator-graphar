@@ -16,12 +16,13 @@ limitations under the License.
 
 from __future__ import annotations
 
+import os
 from typing import Optional
 
 from py4j.java_gateway import JavaObject
 from pyspark.sql import DataFrame
 
-from graphar_pyspark import GraphArSession
+from graphar_pyspark import GraphArSession, _check_session
 from graphar_pyspark.enums import AdjListType
 from graphar_pyspark.info import EdgeInfo, PropertyGroup, VertexInfo
 
@@ -36,21 +37,33 @@ class VertexWriter:
         jvm_obj: Optional[JavaObject],
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
+        _check_session()
         if jvm_obj is not None:
             self._jvm_vertex_writer_obj = jvm_obj
         else:
             if num_vertices is not None:
-                vertex_writer = GraphArSession._graphar.writer.VertexWriter(
+                # This is not working code, there will be always an Exception
+                # class java.lang.Integer cannot be cast to class java.lang.Long
+                #
+                # The problem is that py4j always make autounboxing of Long into int
+                # and it cannot make autoboxisng because the method is waiting for Some(Long), not Long
+                # See https://github.com/py4j/py4j/issues/374 for details
+                raise NotImplementedError("Due to py4j problem num_vertices cannot be processed!")
+                num_vertices_some = GraphArSession.jvm.scala.Some.apply(
+                    GraphArSession.jvm.java.lang.Long(num_vertices)
+                )
+                vertex_writer = GraphArSession.graphar.writer.VertexWriter(
                     prefix,
                     vertex_info.to_scala(),
                     vertex_df._jdf,
-                    num_vertices,
+                    num_vertices_some,
                 )
             else:
-                vertex_writer = GraphArSession._graphar.writer.VertexWriter(
+                vertex_writer = GraphArSession.graphar.writer.VertexWriter(
                     prefix,
                     vertex_info.to_scala(),
                     vertex_df._jdf,
+                    GraphArSession.jvm.scala.Option.empty(),
                 )
 
             self._jvm_vertex_writer_obj = vertex_writer
@@ -64,7 +77,7 @@ class VertexWriter:
     def get_vertex_df(self) -> DataFrame:
         return DataFrame(
             self._jvm_vertex_writer_obj.vertexDf(),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def get_num_vertices(self) -> int:
@@ -91,16 +104,17 @@ class VertexWriter:
         prefix: str,
         vertex_info: VertexInfo,
         vertex_df: DataFrame,
-        num_vertices: Optional[int],
     ) -> "VertexWriter":
         """Create an instance of the Class from Python arguments.
 
         :param prefix: the absolute prefix.
         :param vertex_info: the vertex info that describes the vertex type.
         :param vertex_df: the input vertex DataFrame.
-        :param num_vertices: optional
         """
-        return VertexWriter(prefix, vertex_info, vertex_df, num_vertices)
+        # TODO: track a py4j issue and add optional num_vertices when it will be resolved
+        if not prefix.endswith(os.sep):
+            prefix += os.sep
+        return VertexWriter(prefix, vertex_info, vertex_df, None, None)
 
     def write_vertex_properties(
         self, property_group: Optional[PropertyGroup] = None
@@ -129,10 +143,11 @@ class EdgeWriter:
         jvm_obj: Optional[JavaObject],
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
+        _check_session()
         if jvm_obj is not None:
             self._jvm_edge_writer_obj = jvm_obj
         else:
-            self._jvm_edge_writer_obj = GraphArSession._graphar.writer.EdgeWriter(
+            self._jvm_edge_writer_obj = GraphArSession.graphar.writer.EdgeWriter(
                 prefix,
                 edge_info.to_scala(),
                 adj_list_type.to_scala(),
@@ -155,7 +170,7 @@ class EdgeWriter:
     def get_edge_df(self) -> DataFrame:
         return DataFrame(
             self._jvm_edge_writer_obj.edgeDf(),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def to_scala(self) -> JavaObject:

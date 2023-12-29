@@ -16,14 +16,34 @@ limitations under the License.
 
 from __future__ import annotations
 
-from typing import Optional, Union
+from dataclasses import dataclass
+from typing import Mapping, Optional, Union
 
 from py4j.java_gateway import JavaObject
 from pyspark.sql import DataFrame
 
-from graphar_pyspark import GraphArSession
+from graphar_pyspark import GraphArSession, _check_session
 from graphar_pyspark.enums import FileType
 from graphar_pyspark.info import GraphInfo
+
+
+class InvalidGraphFormatException(ValueError):
+    pass
+
+
+@dataclass(frozen=True)
+class EdgeLabels:
+    """A triplet that describe edge. Contains source, edge and dest labels."""
+    src_label: str
+    edge_label: str
+    dst_label: str
+
+
+@dataclass
+class GraphReaderResult:
+    """A simple class, that represent results of reading a graph with GraphReader."""
+    vertex_dataframes: Mapping[str, DataFrame]
+    edge_dataframes: Mapping[EdgeLabels, Mapping[str, DataFrame]]
 
 
 class GraphReader:
@@ -34,7 +54,7 @@ class GraphReader:
         jvm_result: tuple[
             dict[str, JavaObject], dict[tuple[str, str, str], dict[str, JavaObject]]
         ],
-    ) -> tuple[dict[str, DataFrame], dict[tuple[str, str, str], dict[str, DataFrame]]]:
+    ) -> GraphReaderResult:
         """Helper that convert nested Java DataFrames to PySpark DataFrames."""
         first_dict = {}
         first_scala_map = jvm_result._1()
@@ -42,7 +62,7 @@ class GraphReader:
 
         while first_scala_map_iter.hasNext():
             k = first_scala_map_iter.next()
-            first_dict[k] = DataFrame(first_scala_map.get(k).get(), GraphArSession._ss)
+            first_dict[k] = DataFrame(first_scala_map.get(k).get(), GraphArSession.ss)
 
         second_dict = {}
         second_scala_map = jvm_result._2()
@@ -57,47 +77,39 @@ class GraphReader:
             while nested_scala_map_iter.hasNext():
                 kk = nested_scala_map_iter.next()
                 inner_dict[kk] = DataFrame(
-                    nested_scala_map.get(kk).get(), GraphArSession._ss
+                    nested_scala_map.get(kk).get(), GraphArSession.ss
                 )
 
-            second_dict[(k._1(), k._2(), k._3())] = inner_dict
+            second_dict[EdgeLabels(k._1(), k._2(), k._3())] = inner_dict
 
-        return (first_dict, second_dict)
-
-    @staticmethod
-    def read_with_graph_info(
-        graph_info: GraphInfo,
-    ) -> tuple[dict[str, DataFrame], dict[tuple[str, str, str], dict[str, DataFrame]]]:
-        """Reading the graph as vertex and edge DataFrames with the graph info object.
-
-        :param graph_info: The info object for the graph.
-        :returns: Pair of vertex DataFrames and edge DataFrames, the vertex DataFrames are
-        stored as the map of (vertex_label -> DataFrame) the edge DataFrames are stored as a map of
-        ((srcLabel, edgeLabel, dstLabel) -> (adj_list_type_str -> DataFrame))
-        """
-        jvm_result = GraphArSession._graphar.graph.GraphReader.readWithGraphInfo(
-            graph_info.to_scala(), GraphArSession._jss
+        return GraphReaderResult(
+            vertex_dataframes=first_dict,
+            edge_dataframes=second_dict,
         )
-        return GraphReader._jvm2py(jvm_result)
 
     @staticmethod
     def read(
-        graph_info_path: str,
-    ) -> tuple[dict[str, DataFrame], dict[tuple[str, str, str], dict[str, DataFrame]]]:
-        """Reading the graph as vertex and edge DataFrames with the graph info yaml file.
+        graph_info: Union[GraphInfo, str],
+    ) -> GraphReaderResult:
+        """Reading the graph as vertex and edge DataFrames with the graph info yaml file or GraphInfo object.
 
-        :param graph_info_path: The path of the graph info yaml.
-        :returns: Pair of vertex DataFrames and edge DataFrames, the vertex DataFrames are
-        stored as the map of (vertex_label -> DataFrame) the edge DataFrames are stored as a map of
-        ((srcLabel, edgeLabel, dstLabel) -> (adj_list_type_str -> DataFrame))
+        :param graph_info: The path of the graph info yaml or GraphInfo instance.
+        :returns: GraphReaderResults, that contains vertex and edge dataframes.
         """
-        graph_info = GraphInfo.load_graph_info(graph_info_path)
-        return GraphReader.read_with_graph_info(graph_info)
+        _check_session()
+        if isinstance(graph_info, str):
+            graph_info = GraphInfo.load_graph_info(graph_info)
+
+        jvm_result = GraphArSession.graphar.graph.GraphReader.readWithGraphInfo(
+            graph_info.to_scala(), GraphArSession.jss
+        )
+        return GraphReader._jvm2py(jvm_result)
 
 
 class GraphWriter:
     def __init__(self, jvm_obj: JavaObject) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
+        _check_session()
         self._jvm_graph_writer_obj = jvm_obj
 
     def to_scala(self) -> JavaObject:
@@ -119,7 +131,7 @@ class GraphWriter:
     @staticmethod
     def from_python() -> "GraphWriter":
         """Create an instance of the Class from Python arguments."""
-        return GraphWriter(GraphArSession._graphar.graph.GraphWriter())
+        return GraphWriter(GraphArSession.graphar.graph.GraphWriter())
 
     def put_vertex_data(self, label: str, df: DataFrame, primary_key: str) -> None:
         """Put the vertex DataFrame into writer.
@@ -146,9 +158,9 @@ class GraphWriter:
         :param graph_info: the graph info object for the graph or the path to graph info object.
         """
         if isinstance(graph_info, str):
-            self._jvm_graph_writer_obj.write(graph_info, GraphArSession._jss)
+            self._jvm_graph_writer_obj.write(graph_info, GraphArSession.jss)
         else:
-            self._jvm_graph_writer_obj.write(graph_info.to_scala(), GraphArSession._jss)
+            self._jvm_graph_writer_obj.write(graph_info.to_scala(), GraphArSession.jss)
 
     def write(
         self,
@@ -174,23 +186,23 @@ class GraphWriter:
         """
         if vertex_chunk_size is None:
             vertex_chunk_size = (
-                GraphArSession._graphar.GeneralParams.defaultVertexChunkSize
+                GraphArSession.graphar.GeneralParams.defaultVertexChunkSize
             )
 
         if edge_chunk_size is None:
-            edge_chunk_size = GraphArSession._graphar.GeneralParams.defaultEdgeChunkSize
+            edge_chunk_size = GraphArSession.graphar.GeneralParams.defaultEdgeChunkSize
 
         if file_type is None:
-            file_type = GraphArSession._graphar.GeneralParams.defaultFileType
+            file_type = GraphArSession.graphar.GeneralParams.defaultFileType
         else:
             file_type = file_type.value
 
         if version is None:
-            version = GraphArSession._graphar.GeneralParams.defaultVersion
+            version = GraphArSession.graphar.GeneralParams.defaultVersion
 
         self._jvm_graph_writer_obj.write(
             path,
-            GraphArSession._jss,
+            GraphArSession.jss,
             name,
             vertex_chunk_size,
             edge_chunk_size,
@@ -210,20 +222,22 @@ class GraphTransformer:
 
         :param source_graph_info: The path of the graph info yaml file for the source graph OR the info object for the source graph.
         :param dest_graph_info: The path of the graph info yaml file for the destination graph OR the info object for the destination graph.
+        :raise InvalidGraphFormatException: if you pass mixed format of source and dest graph info.
         """
+        _check_session()
         if isinstance(source_graph_info, str) and isinstance(dest_graph_info, str):
-            GraphArSession._graphar.graph.GraphTransformer.transform(
-                source_graph_info, dest_graph_info, GraphArSession._jss
+            GraphArSession.graphar.graph.GraphTransformer.transform(
+                source_graph_info, dest_graph_info, GraphArSession.jss
             )
         elif isinstance(source_graph_info, GraphInfo) and isinstance(
             dest_graph_info, GraphInfo
         ):
-            GraphArSession._graphar.graph.GraphTransformer.transform(
+            GraphArSession.graphar.graph.GraphTransformer.transform(
                 source_graph_info.to_scala(),
                 dest_graph_info.to_scala(),
-                GraphArSession._jss,
+                GraphArSession.jss,
             )
         else:
             msg = "Both src and dst graph info objects should be of the same type. "
             msg += f"But {type(source_graph_info)} and {type(dest_graph_info)} were provided!"
-            raise ValueError(msg)
+            raise InvalidGraphFormatException(msg)

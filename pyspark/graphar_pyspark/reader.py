@@ -22,7 +22,7 @@ from typing import Optional
 from py4j.java_gateway import JavaObject
 from pyspark.sql import DataFrame
 
-from graphar_pyspark import GraphArSession
+from graphar_pyspark import GraphArSession, _check_session
 from graphar_pyspark.info import PropertyGroup, VertexInfo, EdgeInfo
 from graphar_pyspark.enums import AdjListType
 
@@ -37,13 +37,14 @@ class VertexReader:
         jvm_obj: Optional[JavaObject],
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
+        _check_session()
         if jvm_obj is not None:
             self._jvm_vertex_reader_obj = jvm_obj
         else:
-            self._jvm_vertex_reader_obj = GraphArSession._graphar.reader.VertexReader(
+            self._jvm_vertex_reader_obj = GraphArSession.graphar.reader.VertexReader(
                 prefix,
                 vertex_info.to_scala(),
-                GraphArSession._jss,
+                GraphArSession.jss,
             )
 
     def to_scala(self) -> JavaObject:
@@ -95,7 +96,7 @@ class VertexReader:
             self._jvm_vertex_reader_obj.readVertexPropertyChunk(
                 property_group.to_scala(), chunk_index
             ),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_vertex_property_group(self, property_group: PropertyGroup) -> DataFrame:
@@ -110,7 +111,7 @@ class VertexReader:
             self._jvm_vertex_reader_obj.readVertexPropertyGroup(
                 property_group.to_scala()
             ),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_multiple_vertex_property_groups(
@@ -127,7 +128,7 @@ class VertexReader:
             self._jvm_vertex_reader_obj.readMultipleVertexPropertyGroups(
                 [py_property_group.to_scala() for py_property_group in property_groups]
             ),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_all_vertex_property_groups(self) -> DataFrame:
@@ -137,7 +138,7 @@ class VertexReader:
         """
         return DataFrame(
             self._jvm_vertex_reader_obj.readAllVertexPropertyGroups(),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
 
@@ -152,14 +153,15 @@ class EdgeReader:
         jvm_obj: Optional[JavaObject],
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
+        _check_session()
         if jvm_obj is not None:
             self._jvm_edge_reader_obj = jvm_obj
         else:
-            self._jvm_edge_reader_obj = GraphArSession._graphar.reader.EdgeReader(
+            self._jvm_edge_reader_obj = GraphArSession.graphar.reader.EdgeReader(
                 prefix,
                 edge_info.to_scala(),
                 adj_list_type.to_scala(),
-                GraphArSession._jss,
+                GraphArSession.jss,
             )
 
     def to_scala(self) -> JavaObject:
@@ -232,7 +234,7 @@ class EdgeReader:
         """
         return DataFrame(
             self._jvm_edge_reader_obj.readOffset(chunk_index),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_adj_list_chunk(
@@ -246,7 +248,7 @@ class EdgeReader:
         """
         return DataFrame(
             self._jvm_edge_reader_obj.readAdjListChunk(vertex_chunk_index, chunk_index),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_adj_list_for_vertex_chunk(
@@ -262,7 +264,7 @@ class EdgeReader:
             self._jvm_edge_reader_obj.readAdjListForVertexChunk(
                 vertex_chunk_index, add_index
             ),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_all_adj_list(self, add_index: bool = True) -> DataFrame:
@@ -273,7 +275,7 @@ class EdgeReader:
         """
         return DataFrame(
             self._jvm_edge_reader_obj.readAllAdjList(add_index),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_edge_property_chunk(
@@ -319,7 +321,7 @@ class EdgeReader:
                 vertex_chunk_index,
                 add_index,
             ),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_edge_property_group(
@@ -339,7 +341,7 @@ class EdgeReader:
                 property_group.to_scala(),
                 add_index,
             ),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_multiple_edge_property_groups_for_vertex_chunk(
@@ -361,7 +363,7 @@ class EdgeReader:
                 vertex_chunk_index,
                 add_index,
             ),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_multiple_edge_property_groups(
@@ -378,7 +380,7 @@ class EdgeReader:
                 [py_property_group.to_scala() for py_property_group in property_groups],
                 add_index,
             ),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_all_edge_property_groups_for_vertex_chunk(
@@ -395,7 +397,7 @@ class EdgeReader:
                 vertex_chunk_index,
                 add_index,
             ),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_all_edge_property_groups(self, add_index: bool = True) -> DataFrame:
@@ -406,7 +408,7 @@ class EdgeReader:
         """
         return DataFrame(
             self._jvm_edge_reader_obj.readAllEdgePropertyGroups(add_index),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_edges_for_vertex_chunk(
@@ -422,7 +424,7 @@ class EdgeReader:
             self._jvm_edge_reader_obj.readEdgesForVertexChunk(
                 vertex_chunk_index, add_index
             ),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )
 
     def read_edges(self, add_index: bool = True) -> DataFrame:
@@ -433,5 +435,5 @@ class EdgeReader:
         """
         return DataFrame(
             self._jvm_edge_reader_obj.readEdges(add_index),
-            GraphArSession._ss,
+            GraphArSession.ss,
         )

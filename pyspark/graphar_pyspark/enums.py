@@ -18,11 +18,12 @@ from enum import Enum
 
 from py4j.java_gateway import JavaObject
 
-from graphar_pyspark import GraphArSession
+from graphar_pyspark import GraphArSession, _check_session
 
 
 class GarType(Enum):
     """Main data type in gar enumeration."""
+
     BOOL = "bool"
     INT32 = "int32"
     INT64 = "int64"
@@ -33,28 +34,34 @@ class GarType(Enum):
 
     @staticmethod
     def from_scala(jvm_obj: JavaObject) -> "GarType":
-        return GarType(GraphArSession._graphar.GarType.GarTypeToString(jvm_obj))
+        _check_session()
+        return GarType(GraphArSession.graphar.GarType.GarTypeToString(jvm_obj))
 
     def to_scala(self) -> JavaObject:
-        return GraphArSession._graphar.GarType.StringToGarType(self.value)
+        _check_session()
+        return GraphArSession.graphar.GarType.StringToGarType(self.value)
 
 
 class FileType(Enum):
     """Type of  file format."""
+
     CSV = "csv"
     PARQUET = "parquet"
     ORC = "orc"
 
     @staticmethod
     def from_scala(jvm_obj: JavaObject) -> "FileType":
-        return FileType(GraphArSession._graphar.FileType.FileTypeToString(jvm_obj))
+        _check_session()
+        return FileType(GraphArSession.graphar.FileType.FileTypeToString(jvm_obj))
 
     def to_scala(self) -> JavaObject:
-        return GraphArSession._graphar.FileType.StringToFileType(self.value)
+        _check_session()
+        return GraphArSession.graphar.FileType.StringToFileType(self.value)
 
 
 class AdjListType(Enum):
     """Adj list type enumeration for adjacency list of graph."""
+
     UNORDERED_BY_SOURCE = "unordered_by_source"
     UNORDERED_BY_DEST = "unordered_by_dest"
     ORDERED_BY_SOURCE = "ordered_by_source"
@@ -62,7 +69,11 @@ class AdjListType(Enum):
 
     @staticmethod
     def from_scala(jvm_obj: JavaObject) -> "AdjListType":
-        return AdjListType(GraphArSession._graphar.AdjListType.AdjListTypeToString(jvm_obj))
+        _check_session()
+        return AdjListType(
+            GraphArSession.graphar.AdjListType.AdjListTypeToString(jvm_obj)
+        )
 
     def to_scala(self) -> JavaObject:
-        return GraphArSession._graphar.AdjListType.StringToAdjListType(self.value)
+        _check_session()
+        return GraphArSession.graphar.AdjListType.StringToAdjListType(self.value)

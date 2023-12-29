@@ -24,20 +24,23 @@ class _GraphArSession:
     """
 
     def __init__(self) -> None:
-        self._ss = None
-        self._sc = None
-        self._jvm = None
-        self._graphar = None
-        self._jsc = None
-        self._jss = None
+        self.ss = None
+        self.sc = None
+        self.jvm = None
+        self.graphar = None
+        self.jsc = None
+        self.jss = None
 
     def set_spark_session(self, spark_session: SparkSession) -> None:
-        self._ss = spark_session  # Python SparkSession
-        self._sc = spark_session.sparkContext  # Python SparkContext
-        self._jvm = spark_session._jvm  # JVM
-        self._graphar = spark_session._jvm.com.alibaba.graphar  # Alias to scala graphar
-        self._jsc = spark_session._jsc  # Java SparkContext
-        self._jss = spark_session._jsparkSession  # Java SparkSession
+        self.ss = spark_session  # Python SparkSession
+        self.sc = spark_session.sparkContext  # Python SparkContext
+        self.jvm = spark_session._jvm  # JVM
+        self.graphar = spark_session._jvm.com.alibaba.graphar  # Alias to scala graphar
+        self.jsc = spark_session._jsc  # Java SparkContext
+        self.jss = spark_session._jsparkSession  # Java SparkSession
+
+    def is_initialized(self) -> bool:
+        return self.ss is not None
 
 
 GraphArSession = _GraphArSession()
@@ -48,4 +51,16 @@ def initialize(spark: SparkSession) -> None:
 
     :param spark: pyspark SparkSession object.
     """
-    GraphArSession.set_spark_session(spark) # modify the global GraphArSession singleton.
+    GraphArSession.set_spark_session(
+        spark
+    )  # modify the global GraphArSession singleton.
+
+
+class GraphArIsNotInitializedException(ValueError):
+    pass
+
+
+def _check_session():
+    if not GraphArSession.is_initialized():
+        msg = "GraphArSession is not initialized. Call `pyspark_graphar.initialize` first!"
+        raise GraphArIsNotInitializedException(msg)

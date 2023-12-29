@@ -16,16 +16,14 @@ limitations under the License.
 
 from __future__ import annotations
 
-from sys import prefix
 from typing import Optional, Type, TypeVar, Sequence
 
-import yaml
 from py4j.java_gateway import JavaObject
 
-from graphar_pyspark import GraphArSession
+from graphar_pyspark import GraphArSession, _check_session
 from graphar_pyspark.enums import AdjListType, FileType, GarType
 
-# TODO: Discuss who should check and catch Java NPEs and other JVM-exceptionsin
+
 PropertyType = TypeVar("PropertyType", bound="Property")
 
 
@@ -40,10 +38,11 @@ class Property:
         jvm_obj: Optional[JavaObject] = None,
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
+        _check_session()
         if jvm_obj is not None:
             self._jvm_property_obj = jvm_obj
         else:
-            property = GraphArSession._graphar.Property()
+            property = GraphArSession.graphar.Property()
             property.setName(name)
             property.setData_type(data_type.value)
             property.setIs_primary(is_primary)
@@ -113,10 +112,11 @@ class PropertyGroup:
         jvm_obj: Optional[JavaObject],
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
+        _check_session()
         if jvm_obj is not None:
             self._jvm_property_group_obj = jvm_obj
         else:
-            property_group = GraphArSession._graphar.PropertyGroup()
+            property_group = GraphArSession.graphar.PropertyGroup()
             property_group.setPrefix(prefix)
             property_group.setFile_type(file_type.value)
             property_group.setProperties(
@@ -207,10 +207,11 @@ class VertexInfo:
         jvm_obj: Optional[JavaObject],
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
+        _check_session()
         if jvm_obj is not None:
             self._jvm_vertex_info_obj = jvm_obj
         else:
-            vertex_info = GraphArSession._graphar.VertexInfo()
+            vertex_info = GraphArSession.graphar.VertexInfo()
             vertex_info.setLabel(label)
             vertex_info.setChunk_size(chunk_size)
             vertex_info.setPrefix(prefix)
@@ -360,8 +361,8 @@ class VertexInfo:
         :returns: VertexInfo object
         """
         return VertexInfo.from_scala(
-            GraphArSession._graphar.VertexInfo.loadVertexInfo(
-                vertex_info_path, GraphArSession._jss
+            GraphArSession.graphar.VertexInfo.loadVertexInfo(
+                vertex_info_path, GraphArSession.jss
             )
         )
 
@@ -416,10 +417,11 @@ class AdjList:
         jvm_obj: Optional[JavaObject],
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
+        _check_session()
         if jvm_obj is not None:
             self._jvm_adj_list_obj = jvm_obj
         else:
-            jvm_adj_list = GraphArSession._graphar.AdjList()
+            jvm_adj_list = GraphArSession.graphar.AdjList()
             jvm_adj_list.setOrdered(ordered)
             jvm_adj_list.setAligned_by(aligned_by)
             jvm_adj_list.setPrefix(prefix)
@@ -540,10 +542,11 @@ class EdgeInfo:
         jvm_edge_info_obj: JavaObject,
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
+        _check_session()
         if jvm_edge_info_obj is not None:
             self._jvm_edge_info_obj = jvm_edge_info_obj
         else:
-            edge_info = GraphArSession._graphar.EdgeInfo()
+            edge_info = GraphArSession.graphar.EdgeInfo()
             edge_info.setSrc_label(src_label)
             edge_info.setEdge_label(edge_label)
             edge_info.setDst_label(dst_label)
@@ -700,7 +703,9 @@ class EdgeInfo:
             self._jvm_edge_info_obj.getAdjListFileType(adj_list_type.to_scala())
         )
 
-    def get_property_groups(self, adj_list_type: AdjListType) -> Sequence[PropertyGroup]:
+    def get_property_groups(
+        self, adj_list_type: AdjListType
+    ) -> Sequence[PropertyGroup]:
         """Get the property groups of adj list type.
 
         WARNING! Exceptions from the JVM are not checked inside, it is just a proxy-method!
@@ -967,8 +972,8 @@ class EdgeInfo:
         :returns: EdgeInfo object.
         """
         return EdgeInfo.from_scala(
-            GraphArSession._graphar.EdgeInfo.loadEdgeInfo(
-                edge_info_path, GraphArSession._jss
+            GraphArSession.graphar.EdgeInfo.loadEdgeInfo(
+                edge_info_path, GraphArSession.jss
             )
         )
 
@@ -986,10 +991,11 @@ class GraphInfo:
         jvm_grpah_info_obj: Optional[JavaObject],
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
+        _check_session()
         if jvm_grpah_info_obj is not None:
             self._jvm_graph_info_obj = jvm_grpah_info_obj
         else:
-            graph_info = GraphArSession._graphar.GraphInfo()
+            graph_info = GraphArSession.graphar.GraphInfo()
             graph_info.setName(name)
             graph_info.setPrefix(prefix)
             graph_info.setVertices(vertices)
@@ -1100,8 +1106,8 @@ class GraphInfo:
         :returns: GraphInfo object.
         """
         return GraphInfo.from_scala(
-            GraphArSession._graphar.GraphInfo.loadGraphInfo(
+            GraphArSession.graphar.GraphInfo.loadGraphInfo(
                 graph_info_path,
-                GraphArSession._jss,
+                GraphArSession.jss,
             ),
         )

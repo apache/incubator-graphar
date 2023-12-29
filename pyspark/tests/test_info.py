@@ -389,7 +389,9 @@ def test_graph_info(spark):
     assert yaml_dict["version"] == "gar/v1"
 
     # Python constructor and setters
-    py_graph_info = GraphInfo.from_python("name", "prefix", ["person", "software"], ["person_knnows_person"], "v1")
+    py_graph_info = GraphInfo.from_python(
+        "name", "prefix", ["person", "software"], ["person_knnows_person"], "v1"
+    )
     py_graph_info.set_name("new_name")
     assert py_graph_info.get_name() == "new_name"
     py_graph_info.set_prefix("new_prefix")
