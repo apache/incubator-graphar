@@ -21,6 +21,7 @@ import org.apache.spark.sql.{SparkSession}
 import org.yaml.snakeyaml.{Yaml, DumperOptions}
 import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
+import org.yaml.snakeyaml.LoaderOptions
 
 /** VertexInfo is a class to store the vertex meta information. */
 class VertexInfo() {
@@ -288,7 +289,7 @@ object VertexInfo {
     val path = new Path(vertexInfoPath)
     val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
     val input = fs.open(path)
-    val yaml = new Yaml(new Constructor(classOf[VertexInfo]))
+    val yaml = new Yaml(new Constructor(classOf[VertexInfo], new LoaderOptions()))
     return yaml.load(input).asInstanceOf[VertexInfo]
   }
 }
