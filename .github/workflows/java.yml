@@ -70,5 +70,6 @@ jobs:
           export JAVA_HOME=${JAVA_HOME_8_X64}
           export LLVM11_HOME=/usr/lib/llvm-11
           pushd java
-          mvn test -Dspotless.check.skip=true
+          export GAR_TEST_DATA=$PWD/../testing/
+          mvn clean test -Dspotless.check.skip=true
           popd

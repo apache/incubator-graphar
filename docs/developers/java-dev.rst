@@ -78,6 +78,17 @@ Building GraphAr Java
 
 Please refer to `GraphAr Java Library user guide <../user-guide/java-lib.html>`__.
 
+How To Test
+-----------
+
+.. code-block:: bash
+
+   $ export GAR_TEST_DATA=$PWD/../testing/
+   $ mvn clean test
+
+This will build GraphAr C++ library internally for Java. If you already installed GraphAr C++ library in your system,
+you can append this option to skip: ``-DbuildGarCPP=OFF``.
+
 Code Style
 ----------
 
@@ -88,10 +99,10 @@ success:
 
 .. code-block:: bash
 
-   mvn spotless:check
+   $ mvn spotless:check
 
 If there are violations, running command below to automatically format:
 
 .. code-block:: bash
 
-   mvn spotless:apply
+   $ mvn spotless:apply
