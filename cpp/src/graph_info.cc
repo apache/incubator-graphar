@@ -122,6 +122,7 @@ bool PropertyGroup::IsValidated() const {
     } else {
       check_property_unique_set.insert(p.name);
     }
+    // TODO(@acezen): support list type in csv file
     if (p.type->id() == Type::LIST && file_type_ == FileType::CSV) {
       // list type is not supported in csv file
       return false;
@@ -498,6 +499,9 @@ class EdgeInfo::Impl {
           check_property_unique_set.insert(p.name);
         }
       }
+    }
+    if (adjacent_lists_.size() != adjacent_list_type_to_index_.size()) {
+      return false;
     }
     return true;
   }
@@ -985,6 +989,10 @@ class GraphInfo::Impl {
       if (!e || !e->IsValidated()) {
         return false;
       }
+    }
+    if (vertex_infos_.size() != vlabel_to_index_.size() ||
+        edge_infos_.size() != elabel_to_index_.size()) {
+      return false;
     }
     return true;
   }
