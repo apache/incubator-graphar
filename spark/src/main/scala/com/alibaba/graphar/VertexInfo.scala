@@ -289,7 +289,9 @@ object VertexInfo {
     val path = new Path(vertexInfoPath)
     val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
     val input = fs.open(path)
-    val yaml = new Yaml(new Constructor(classOf[VertexInfo], new LoaderOptions()))
+    val yaml = new Yaml(
+      new Constructor(classOf[VertexInfo], new LoaderOptions())
+    )
     return yaml.load(input).asInstanceOf[VertexInfo]
   }
 }

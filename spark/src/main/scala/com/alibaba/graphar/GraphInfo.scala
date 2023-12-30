@@ -335,7 +335,9 @@ object GraphInfo {
     val path = new Path(graphInfoPath)
     val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
     val input = fs.open(path)
-    val yaml = new Yaml(new Constructor(classOf[GraphInfo], new LoaderOptions()))
+    val yaml = new Yaml(
+      new Constructor(classOf[GraphInfo], new LoaderOptions())
+    )
     val graph_info = yaml.load(input).asInstanceOf[GraphInfo]
     if (graph_info.getPrefix == "") {
       val pos = graphInfoPath.lastIndexOf('/')
