@@ -51,17 +51,13 @@ public class EdgesCollectionTest {
         EdgeIter it = edges.get().begin();
         long count = 0L;
         for (Edge edge : edges.get()) {
-            // access data through iterator directly
-            System.out.print("src=" + it.source() + ", dst=" + it.destination() + " ");
             // access data through edge
             Assert.assertEquals(edge.source(), it.source());
             Assert.assertEquals(edge.destination(), it.destination());
             StdString creationDate = StdString.create("creationDate");
-            System.out.println("creationDate=" + edge.property(creationDate, creationDate).value());
             count++;
             it.inc();
         }
-        System.out.println("edge_count=" + count);
         Assert.assertEquals(count, edges.get().size());
 
         // iterate edges of vertex chunk [2, 4)
@@ -81,7 +77,6 @@ public class EdgesCollectionTest {
         for (Edge edge : edges1.get()) {
             count1++;
         }
-        System.out.println("edge_count=" + count1);
         Assert.assertEquals(count1, edges1.get().size());
 
         // iterate all edges
@@ -92,10 +87,8 @@ public class EdgesCollectionTest {
         StdSharedPtr<EdgesCollection> edges2 = maybeEdges2.value();
         long count2 = 0;
         for (Edge edge : edges2.get()) {
-            System.out.println("src=" + edge.source() + ", dst=" + edge.destination());
             count2++;
         }
-        System.out.println("edge_count=" + count2);
         Assert.assertEquals(count2, edges2.get().size());
 
         // empty collection
@@ -114,7 +107,6 @@ public class EdgesCollectionTest {
         for (Edge edge : edges3.get()) {
             count3++;
         }
-        System.out.println("edge_count=" + count3);
         Assert.assertEquals(0, count3);
         Assert.assertEquals(0, edges3.get().size());
     }

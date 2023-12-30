@@ -45,8 +45,8 @@ object GarType extends Enumeration {
   /** UTF8 variable-length string */
   val STRING = Value(6)
 
-  /** Array of same type */
-  val ARRAY = Value(7)
+  /** List of same type */
+  val LIST = Value(7)
 
   /**
    * Data type in gar to string.
@@ -63,7 +63,7 @@ object GarType extends Enumeration {
     case GarType.FLOAT  => "float"
     case GarType.DOUBLE => "double"
     case GarType.STRING => "string"
-    case GarType.ARRAY  => "array"
+    case GarType.LIST   => "list"
     case _ => throw new IllegalArgumentException("Unknown data type")
   }
 
@@ -82,7 +82,7 @@ object GarType extends Enumeration {
     case "float"  => GarType.FLOAT
     case "double" => GarType.DOUBLE
     case "string" => GarType.STRING
-    case "array"  => GarType.ARRAY
+    case "list"   => GarType.LIST
     case _ => throw new IllegalArgumentException("Unknown data type: " + str)
   }
 }
@@ -180,6 +180,16 @@ class Property() {
     GarType.StringToGarType(data_type)
   }
 
+  override def equals(that: Any): Boolean = {
+    that match {
+      case other: Property =>
+        this.name == other.name &&
+          this.data_type == other.data_type &&
+          this.is_primary == other.is_primary
+      case _ => false
+    }
+  }
+
   def toMap(): java.util.HashMap[String, Object] = {
     val data = new java.util.HashMap[String, Object]()
     data.put("name", name)
@@ -194,6 +204,16 @@ class PropertyGroup() {
   @BeanProperty var prefix: String = ""
   @BeanProperty var file_type: String = ""
   @BeanProperty var properties = new java.util.ArrayList[Property]()
+
+  override def equals(that: Any): Boolean = {
+    that match {
+      case other: PropertyGroup =>
+        this.prefix == other.prefix &&
+          this.file_type == other.file_type &&
+          this.properties == other.properties
+      case _ => false
+    }
+  }
 
   /** Get file type in gar of property group */
   def getFile_type_in_gar: FileType.Value = {
@@ -223,6 +243,18 @@ class AdjList() {
   @BeanProperty var prefix: String = ""
   @BeanProperty var file_type: String = ""
   @BeanProperty var property_groups = new java.util.ArrayList[PropertyGroup]()
+
+  override def equals(that: Any): Boolean = {
+    that match {
+      case other: AdjList =>
+        this.ordered == other.ordered &&
+          this.aligned_by == other.aligned_by &&
+          this.prefix == other.prefix &&
+          this.file_type == other.file_type &&
+          this.property_groups == other.property_groups
+      case _ => false
+    }
+  }
 
   /** Get file type in gar of adj list */
   def getFile_type_in_gar: FileType.Value = {
