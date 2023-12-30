@@ -21,6 +21,7 @@ import org.apache.spark.sql.{SparkSession}
 import org.yaml.snakeyaml.{Yaml, DumperOptions}
 import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
+import org.yaml.snakeyaml.LoaderOptions
 
 /** Edge info is a class to store the edge meta information. */
 class EdgeInfo() {
@@ -670,7 +671,7 @@ object EdgeInfo {
     val path = new Path(edgeInfoPath)
     val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
     val input = fs.open(path)
-    val yaml = new Yaml(new Constructor(classOf[EdgeInfo]))
+    val yaml = new Yaml(new Constructor(classOf[EdgeInfo], new LoaderOptions()))
     return yaml.load(input).asInstanceOf[EdgeInfo]
   }
 }
