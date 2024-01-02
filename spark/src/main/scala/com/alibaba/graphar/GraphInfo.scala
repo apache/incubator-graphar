@@ -21,6 +21,7 @@ import org.apache.spark.sql.{SparkSession}
 import org.yaml.snakeyaml.{Yaml, DumperOptions}
 import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
+import org.yaml.snakeyaml.LoaderOptions
 
 /** Main data type in gar enumeration */
 object GarType extends Enumeration {
@@ -366,7 +367,9 @@ object GraphInfo {
     val path = new Path(graphInfoPath)
     val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
     val input = fs.open(path)
-    val yaml = new Yaml(new Constructor(classOf[GraphInfo]))
+    val yaml = new Yaml(
+      new Constructor(classOf[GraphInfo], new LoaderOptions())
+    )
     val graph_info = yaml.load(input).asInstanceOf[GraphInfo]
     if (graph_info.getPrefix == "") {
       val pos = graphInfoPath.lastIndexOf('/')
