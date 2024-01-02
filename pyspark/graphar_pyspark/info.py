@@ -1,28 +1,26 @@
-"""
-Copyright 2022-2023 Alibaba Group Holding Limited.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
+# copyright 2022-2023 alibaba group holding limited.
+#
+# licensed under the apache license, version 2.0 (the "license");
+# you may not use this file except in compliance with the license.
+# you may obtain a copy of the license at
+#
+#     http://www.apache.org/licenses/license-2.0
+#
+# unless required by applicable law or agreed to in writing, software
+# distributed under the license is distributed on an "as is" basis,
+# without warranties or conditions of any kind, either express or implied.
+# see the license for the specific language governing permissions and
+# limitations under the license.
 
 from __future__ import annotations
 
-from typing import Optional, Type, TypeVar, Sequence
+from collections.abc import Sequence
+from typing import Any, Optional, TypeVar
 
 from py4j.java_gateway import JavaObject
 
 from graphar_pyspark import GraphArSession, _check_session
 from graphar_pyspark.enums import AdjListType, FileType, GarType
-
 
 PropertyType = TypeVar("PropertyType", bound="Property")
 
@@ -42,29 +40,53 @@ class Property:
         if jvm_obj is not None:
             self._jvm_property_obj = jvm_obj
         else:
-            property = GraphArSession.graphar.Property()
-            property.setName(name)
-            property.setData_type(data_type.value)
-            property.setIs_primary(is_primary)
+            property_pyobj = GraphArSession.graphar.Property()
+            property_pyobj.setName(name)
+            property_pyobj.setData_type(data_type.value)
+            property_pyobj.setIs_primary(is_primary)
 
-            self._jvm_property_obj = property
+            self._jvm_property_obj = property_pyobj
 
     def get_name(self) -> str:
+        """Get name from corresponding JVM object.
+
+        :returns: name
+        """
         return self._jvm_property_obj.getName()
 
     def set_name(self, name: str) -> None:
+        """Mutate corresponding JVM object.
+
+        :param name: name
+        """
         self._jvm_property_obj.setName(name)
 
     def get_data_type(self) -> GarType:
+        """Get data type from corresponding JVM object.
+
+        :returns: data type
+        """
         return GarType(self._jvm_property_obj.getData_type())
 
     def set_data_type(self, data_type: GarType) -> None:
+        """Mutate corresponding JVM object.
+
+        :param data_type: data type
+        """
         self._jvm_property_obj.setData_type(data_type.value)
 
     def get_is_primary(self) -> bool:
+        """Get is priamry flag from corresponding JVM object.
+
+        :returns: is primary
+        """
         return self._jvm_property_obj.getIs_primary()
 
     def set_is_primary(self, is_primary: bool) -> None:
+        """Mutate corresponding JVM object.
+
+        :param is_primary: is primary
+        """
         self._jvm_property_obj.setIs_primary(is_primary)
 
     def to_scala(self) -> JavaObject:
@@ -75,7 +97,7 @@ class Property:
         return self._jvm_property_obj
 
     @classmethod
-    def from_scala(cls: Type[PropertyType], jvm_obj: JavaObject) -> PropertyType:
+    def from_scala(cls: type[PropertyType], jvm_obj: JavaObject) -> PropertyType:
         """Create an instance of the Class from the corresponding JVM object.
 
         :param jvm_obj: scala object in JVM.
@@ -84,10 +106,22 @@ class Property:
         return cls(None, None, None, jvm_obj)
 
     @classmethod
-    def from_python(cls, name: str, data_type: GarType, is_primary: bool) -> "Property":
+    def from_python(
+        cls: type[PropertyType],
+        name: str,
+        data_type: GarType,
+        is_primary: bool,
+    ) -> PropertyType:
+        """Create an instance of the Class from Python arguments.
+
+        :param name: property name
+        :param data_type: property data type
+        :param is_primary: flag that property is primary
+        :returns: instance of Python Class.
+        """
         return cls(name, data_type, is_primary, None)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Property):
             return False
 
@@ -120,7 +154,7 @@ class PropertyGroup:
             property_group.setPrefix(prefix)
             property_group.setFile_type(file_type.value)
             property_group.setProperties(
-                [property.to_scala() for property in properties]
+                [py_property.to_scala() for py_property in properties],
             )
             self._jvm_property_group_obj = property_group
 
@@ -144,7 +178,7 @@ class PropertyGroup:
 
     def set_properties(self, properties: Sequence[Property]) -> None:
         self._jvm_property_group_obj.setProperties(
-            [property.to_scala() for property in properties]
+            [property.to_scala() for property in properties],
         )
 
     def to_scala(self) -> JavaObject:
@@ -156,7 +190,8 @@ class PropertyGroup:
 
     @classmethod
     def from_scala(
-        cls: Type[PropertyGroupType], jvm_obj: JavaObject
+        cls: type[PropertyGroupType],
+        jvm_obj: JavaObject,
     ) -> PropertyGroupType:
         """Create an instance of the Class from the corresponding JVM object.
 
@@ -167,14 +202,14 @@ class PropertyGroup:
 
     @classmethod
     def from_python(
-        cls: Type[PropertyGroupType],
+        cls: type[PropertyGroupType],
         prefix: str,
         file_type: FileType,
         properties: Sequence[Property],
     ) -> PropertyGroupType:
         return cls(prefix, file_type, properties, None)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, PropertyGroup):
             return False
 
@@ -185,7 +220,8 @@ class PropertyGroup:
             and all(
                 p_left == p_right
                 for p_left, p_right in zip(
-                    self.get_properties(), other.get_properties()
+                    self.get_properties(),
+                    other.get_properties(),
                 )
             )
         )
@@ -216,7 +252,7 @@ class VertexInfo:
             vertex_info.setChunk_size(chunk_size)
             vertex_info.setPrefix(prefix)
             vertex_info.setProperty_groups(
-                [py_property_group.to_scala() for py_property_group in property_groups]
+                [py_property_group.to_scala() for py_property_group in property_groups],
             )
             vertex_info.setVersion(version)
             self._jvm_vertex_info_obj = vertex_info
@@ -247,7 +283,7 @@ class VertexInfo:
 
     def set_property_groups(self, property_groups: Sequence[PropertyGroup]) -> None:
         self._jvm_vertex_info_obj.setProperty_groups(
-            [py_property_group.to_scala() for py_property_group in property_groups]
+            [py_property_group.to_scala() for py_property_group in property_groups],
         )
 
     def get_version(self) -> str:
@@ -262,7 +298,6 @@ class VertexInfo:
         :param property_group: the property group to check.
         :returns: true if the vertex info contains the property group, otherwise false.
         """
-
         return self._jvm_vertex_info_obj.containPropertyGroup(property_group.to_scala())
 
     def contain_property(self, property_name: str) -> bool:
@@ -282,7 +317,7 @@ class VertexInfo:
         :returns: property group that contains the property, otherwise raise IllegalArgumentException error.
         """
         return PropertyGroup.from_scala(
-            self._jvm_vertex_info_obj.getPropertyGroup(property_name)
+            self._jvm_vertex_info_obj.getPropertyGroup(property_name),
         )
 
     def get_property_type(self, property_name: str) -> GarType:
@@ -294,7 +329,7 @@ class VertexInfo:
         :returns: the data type in gar of the property. If the vertex info does not contains the property, raise IllegalArgumentException error.
         """
         return GarType.from_scala(
-            self._jvm_vertex_info_obj.getPropertyType(property_name)
+            self._jvm_vertex_info_obj.getPropertyType(property_name),
         )
 
     def is_primary_key(self, property_name: str) -> bool:
@@ -335,7 +370,8 @@ class VertexInfo:
 
         """
         return self._jvm_vertex_info_obj.getFilePath(
-            property_group.to_scala(), chunk_index
+            property_group.to_scala(),
+            chunk_index,
         )
 
     def get_path_prefix(self, property_group: PropertyGroup) -> str:
@@ -362,8 +398,9 @@ class VertexInfo:
         """
         return VertexInfo.from_scala(
             GraphArSession.graphar.VertexInfo.loadVertexInfo(
-                vertex_info_path, GraphArSession.jss
-            )
+                vertex_info_path,
+                GraphArSession.jss,
+            ),
         )
 
     def to_scala(self) -> JavaObject:
@@ -374,7 +411,7 @@ class VertexInfo:
         return self._jvm_vertex_info_obj
 
     @classmethod
-    def from_scala(cls: Type[VertexInfoType], jvm_obj: JavaObject) -> VertexInfoType:
+    def from_scala(cls: type[VertexInfoType], jvm_obj: JavaObject) -> VertexInfoType:
         """Create an instance of the Class from the corresponding JVM object.
 
         :param jvm_obj: scala object in JVM.
@@ -391,7 +428,7 @@ class VertexInfo:
 
     @classmethod
     def from_python(
-        cls: Type[VertexInfoType],
+        cls: type[VertexInfoType],
         label: str,
         chunk_size: int,
         prefix: str,
@@ -427,7 +464,7 @@ class AdjList:
             jvm_adj_list.setPrefix(prefix)
             jvm_adj_list.setFile_type(file_type.value)
             jvm_adj_list.setProperty_groups(
-                [py_property_group.to_scala() for py_property_group in property_groups]
+                [py_property_group.to_scala() for py_property_group in property_groups],
             )
             self._jvm_adj_list_obj = jvm_adj_list
 
@@ -463,7 +500,7 @@ class AdjList:
 
     def set_property_groups(self, property_groups: Sequence[PropertyGroup]) -> None:
         self._jvm_adj_list_obj.setProperty_groups(
-            [p_group.to_scala() for p_group in property_groups]
+            [p_group.to_scala() for p_group in property_groups],
         )
 
     def get_adj_list_type(self) -> AdjListType:
@@ -482,7 +519,8 @@ class AdjList:
 
     @classmethod
     def from_scala(
-        cls: Type[AdjListClassType], jvm_obj: JavaObject
+        cls: type[AdjListClassType],
+        jvm_obj: JavaObject,
     ) -> AdjListClassType:
         """Create an instance of the Class from the corresponding JVM object.
 
@@ -493,7 +531,7 @@ class AdjList:
 
     @classmethod
     def from_python(
-        cls: Type[AdjListClassType],
+        cls: type[AdjListClassType],
         ordered: bool,
         aligned_by: str,
         prefix: str,
@@ -502,7 +540,7 @@ class AdjList:
     ) -> AdjListClassType:
         return AdjList(ordered, aligned_by, prefix, file_type, property_groups, None)
 
-    def __eq__(self, other) -> bool:
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, AdjList):
             return False
 
@@ -515,7 +553,8 @@ class AdjList:
             and all(
                 left_pg == right_pg
                 for left_pg, right_pg in zip(
-                    self.get_property_groups(), other.get_property_groups()
+                    self.get_property_groups(),
+                    other.get_property_groups(),
                 )
             )
         )
@@ -556,7 +595,7 @@ class EdgeInfo:
             edge_info.setDirected(directed)
             edge_info.setPrefix(prefix)
             edge_info.setAdj_lists(
-                [py_adj_list.to_scala() for py_adj_list in adj_lists]
+                [py_adj_list.to_scala() for py_adj_list in adj_lists],
             )
             edge_info.setVersion(version)
             self._jvm_edge_info_obj = edge_info
@@ -617,7 +656,7 @@ class EdgeInfo:
 
     def set_adj_lists(self, adj_lists: Sequence[AdjList]) -> None:
         self._jvm_edge_info_obj.setAdj_lists(
-            [py_adj_list.to_scala() for py_adj_list in adj_lists]
+            [py_adj_list.to_scala() for py_adj_list in adj_lists],
         )
 
     def get_version(self) -> str:
@@ -634,19 +673,29 @@ class EdgeInfo:
         return self._jvm_edge_info_obj
 
     @classmethod
-    def from_scala(cls: Type[EdgeInfoType], jvm_obj: JavaObject) -> EdgeInfoType:
+    def from_scala(cls: type[EdgeInfoType], jvm_obj: JavaObject) -> EdgeInfoType:
         """Create an instance of the Class from the corresponding JVM object.
 
         :param jvm_obj: scala object in JVM.
         :returns: instance of Python Class.
         """
         return EdgeInfo(
-            None, None, None, None, None, None, None, None, None, None, jvm_obj
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            jvm_obj,
         )
 
     @classmethod
     def from_python(
-        cls: Type[EdgeInfoType],
+        cls: type[EdgeInfoType],
         src_label: str,
         edge_label: str,
         dst_label: str,
@@ -700,11 +749,12 @@ class EdgeInfo:
         raise an IllegalArgumentException error.
         """
         return FileType.from_scala(
-            self._jvm_edge_info_obj.getAdjListFileType(adj_list_type.to_scala())
+            self._jvm_edge_info_obj.getAdjListFileType(adj_list_type.to_scala()),
         )
 
     def get_property_groups(
-        self, adj_list_type: AdjListType
+        self,
+        adj_list_type: AdjListType,
     ) -> Sequence[PropertyGroup]:
         """Get the property groups of adj list type.
 
@@ -717,12 +767,14 @@ class EdgeInfo:
         return [
             PropertyGroup.from_scala(property_group)
             for property_group in self._jvm_edge_info_obj.getPropertyGroups(
-                adj_list_type.to_scala()
+                adj_list_type.to_scala(),
             )
         ]
 
     def contain_property_group(
-        self, property_group: PropertyGroup, adj_list_type: AdjListType
+        self,
+        property_group: PropertyGroup,
+        adj_list_type: AdjListType,
     ) -> bool:
         """Check if the edge info contains the property group in certain adj list structure.
 
@@ -733,7 +785,8 @@ class EdgeInfo:
         contains the property group in the adj list structure, return false.
         """
         return self._jvm_edge_info_obj.containPropertyGroup(
-            property_group.to_scala(), adj_list_type.to_scala()
+            property_group.to_scala(),
+            adj_list_type.to_scala(),
         )
 
     def contain_property(self, property_name: str) -> bool:
@@ -745,7 +798,9 @@ class EdgeInfo:
         return self._jvm_edge_info_obj.containProperty(property_name)
 
     def get_property_group(
-        self, property_name: str, adj_list_type: AdjListType
+        self,
+        property_name: str,
+        adj_list_type: AdjListType,
     ) -> PropertyGroup:
         """Get property group that contains property with adj list type.
 
@@ -773,7 +828,7 @@ class EdgeInfo:
         :returns: data type in gar of the property. If edge info not contains the property, raise an IllegalArgumentException error.
         """
         return GarType.from_scala(
-            self._jvm_edge_info_obj.getPropertyType(property_name)
+            self._jvm_edge_info_obj.getPropertyType(property_name),
         )
 
     def is_primary_key(self, property_name: str) -> bool:
@@ -785,7 +840,7 @@ class EdgeInfo:
         :returns: true if the property is the primary key of edge info, false if not. If
         edge info not contains the property, raise an IllegalArgumentException error.
         """
-        return self._jvm_edge_info_obj.isPrimaryKey()
+        return self._jvm_edge_info_obj.isPrimaryKey(property_name)
 
     def get_primary_key(self) -> str:
         """Get Primary key of edge info.
@@ -824,7 +879,9 @@ class EdgeInfo:
         return self._jvm_edge_info_obj.getEdgesNumPathPrefix(adj_list_type.to_scala())
 
     def get_edges_num_file_path(
-        self, chunk_index: int, adj_list_type: AdjListType
+        self,
+        chunk_index: int,
+        adj_list_type: AdjListType,
     ) -> str:
         """Get the edge num file path of the vertex chunk.
 
@@ -836,11 +893,14 @@ class EdgeInfo:
         an IllegalArgumentException error.
         """
         return self._jvm_edge_info_obj.getEdgesNumFilePath(
-            chunk_index, adj_list_type.to_scala()
+            chunk_index,
+            adj_list_type.to_scala(),
         )
 
     def get_adj_list_offset_file_path(
-        self, chunk_index: int, adj_list_type: AdjListType
+        self,
+        chunk_index: int,
+        adj_list_type: AdjListType,
     ) -> str:
         """Get the adj list offset chunk file path of vertex chunk the offset chunks is aligned with the vertex chunks.
 
@@ -852,7 +912,8 @@ class EdgeInfo:
 
         """
         return self._jvm_edge_info_obj.getAdjListOffsetFilePath(
-            chunk_index, adj_list_type.to_scala()
+            chunk_index,
+            adj_list_type.to_scala(),
         )
 
     def get_offset_path_prefix(self, adj_list_type: AdjListType) -> str:
@@ -867,7 +928,10 @@ class EdgeInfo:
         return self._jvm_edge_info_obj.getOffsetPathPrefix(adj_list_type.to_scala())
 
     def get_adj_list_file_path(
-        self, vertex_chunk_index: int, chunk_index: int, adj_list_type: AdjListType
+        self,
+        vertex_chunk_index: int,
+        chunk_index: int,
+        adj_list_type: AdjListType,
     ) -> str:
         """Get the file path of adj list topology chunk.
 
@@ -877,11 +941,15 @@ class EdgeInfo:
         :returns: adj list chunk file path.
         """
         return self._jvm_edge_info_obj.getAdjListFilePath(
-            vertex_chunk_index, chunk_index, adj_list_type.to_scala()
+            vertex_chunk_index,
+            chunk_index,
+            adj_list_type.to_scala(),
         )
 
     def get_adj_list_path_prefix(
-        self, vertex_chunk_index: Optional[int], adj_list_type: AdjListType
+        self,
+        vertex_chunk_index: Optional[int],
+        adj_list_type: AdjListType,
     ) -> str:
         """Get the path prefix of adj list topology chunk of certain vertex chunk.
 
@@ -891,11 +959,12 @@ class EdgeInfo:
         """
         if vertex_chunk_index is None:
             return self._jvm_edge_info_obj.getAdjListPathPrefix(
-                adj_list_type.to_scala()
+                adj_list_type.to_scala(),
             )
 
         return self._jvm_edge_info_obj.getAdjListPathPrefix(
-            vertex_chunk_index, adj_list_type.to_scala()
+            vertex_chunk_index,
+            adj_list_type.to_scala(),
         )
 
     def get_property_file_path(
@@ -944,11 +1013,11 @@ class EdgeInfo:
                 adj_list_type.to_scala(),
                 vertex_chunk_index,
             )
-        else:
-            return self._jvm_edge_info_obj.getPropertyGroupPathPrefix(
-                property_group.to_scala(),
-                adj_list_type.to_scala(),
-            )
+
+        return self._jvm_edge_info_obj.getPropertyGroupPathPrefix(
+            property_group.to_scala(),
+            adj_list_type.to_scala(),
+        )
 
     def get_concat_key(self) -> str:
         """Get concat key.
@@ -973,8 +1042,9 @@ class EdgeInfo:
         """
         return EdgeInfo.from_scala(
             GraphArSession.graphar.EdgeInfo.loadEdgeInfo(
-                edge_info_path, GraphArSession.jss
-            )
+                edge_info_path,
+                GraphArSession.jss,
+            ),
         )
 
 
@@ -1051,7 +1121,11 @@ class GraphInfo:
 
     @staticmethod
     def from_python(
-        name: str, prefix: str, vertices: list[str], edges: list[str], version: str
+        name: str,
+        prefix: str,
+        vertices: list[str],
+        edges: list[str],
+        version: str,
     ) -> "GraphInfo":
         return GraphInfo(name, prefix, vertices, edges, version, None)
 
@@ -1065,10 +1139,13 @@ class GraphInfo:
         return VertexInfo.from_scala(self._jvm_graph_info_obj.getVertexInfo(label))
 
     def get_edge_info(
-        self, src_label: str, edge_label: str, dst_label: str
+        self,
+        src_label: str,
+        edge_label: str,
+        dst_label: str,
     ) -> EdgeInfo:
         return EdgeInfo.from_scala(
-            self._jvm_graph_info_obj.getEdgeInfo(src_label, edge_label, dst_label)
+            self._jvm_graph_info_obj.getEdgeInfo(src_label, edge_label, dst_label),
         )
 
     def get_vertex_infos(self) -> dict[str, VertexInfo]:

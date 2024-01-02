@@ -1,18 +1,16 @@
-"""
-copyright 2022-2023 alibaba group holding limited.
-
-licensed under the apache license, version 2.0 (the "license");
-you may not use this file except in compliance with the license.
-you may obtain a copy of the license at
-
-    http://www.apache.org/licenses/license-2.0
-
-unless required by applicable law or agreed to in writing, software
-distributed under the license is distributed on an "as is" basis,
-without warranties or conditions of any kind, either express or implied.
-see the license for the specific language governing permissions and
-limitations under the license.
-"""
+# copyright 2022-2023 alibaba group holding limited.
+#
+# licensed under the apache license, version 2.0 (the "license");
+# you may not use this file except in compliance with the license.
+# you may obtain a copy of the license at
+#
+#     http://www.apache.org/licenses/license-2.0
+#
+# unless required by applicable law or agreed to in writing, software
+# distributed under the license is distributed on an "as is" basis,
+# without warranties or conditions of any kind, either express or implied.
+# see the license for the specific language governing permissions and
+# limitations under the license.
 
 from pathlib import Path
 
@@ -41,6 +39,7 @@ def test_vertex_writer(spark):
 
     vertex_df = vertex_reader.read_all_vertex_property_groups()
     vertex_df_with_index = IndexGenerator.generate_vertex_index_column(vertex_df)
+    num_vertices = vertex_reader.read_vertices_number()
 
     vertex_writer = VertexWriter.from_python(
         "/tmp/nebula",

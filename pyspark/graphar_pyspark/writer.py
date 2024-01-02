@@ -1,18 +1,16 @@
-"""
-Copyright 2022-2023 Alibaba Group Holding Limited.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
+# copyright 2022-2023 alibaba group holding limited.
+#
+# licensed under the apache license, version 2.0 (the "license");
+# you may not use this file except in compliance with the license.
+# you may obtain a copy of the license at
+#
+#     http://www.apache.org/licenses/license-2.0
+#
+# unless required by applicable law or agreed to in writing, software
+# distributed under the license is distributed on an "as is" basis,
+# without warranties or conditions of any kind, either express or implied.
+# see the license for the specific language governing permissions and
+# limitations under the license.
 
 from __future__ import annotations
 
@@ -28,6 +26,8 @@ from graphar_pyspark.info import EdgeInfo, PropertyGroup, VertexInfo
 
 
 class VertexWriter:
+    """Writer for vertex DataFrame."""
+
     def __init__(
         self,
         prefix: Optional[str],
@@ -48,19 +48,12 @@ class VertexWriter:
                 # The problem is that py4j always make autounboxing of Long into int
                 # and it cannot make autoboxisng because the method is waiting for Some(Long), not Long
                 # See https://github.com/py4j/py4j/issues/374 for details
+                # TODO: check the status of py4j-issue && check https://github.com/alibaba/GraphAr/issues/313
+                msg = "Due to py4j problem num_vertices cannot be processed!"
                 raise NotImplementedError(
-                    "Due to py4j problem num_vertices cannot be processed!"
+                    msg,
                 )
-                num_vertices_some = GraphArSession.jvm.scala.Some.apply(
-                    GraphArSession.jvm.java.lang.Long(num_vertices)
-                )
-                vertex_writer = GraphArSession.graphar.writer.VertexWriter(
-                    prefix,
-                    vertex_info.to_scala(),
-                    vertex_df._jdf,
-                    num_vertices_some,
-                )
-            else:
+            else: # noqa: RET506
                 vertex_writer = GraphArSession.graphar.writer.VertexWriter(
                     prefix,
                     vertex_info.to_scala(),
@@ -104,7 +97,7 @@ class VertexWriter:
         return VertexWriter(prefix, vertex_info, vertex_df, None, None)
 
     def write_vertex_properties(
-        self, property_group: Optional[PropertyGroup] = None
+        self, property_group: Optional[PropertyGroup] = None,
     ) -> None:
         """Generate chunks of the property group (or all property groups) for vertex DataFrame.
 
@@ -183,7 +176,7 @@ class EdgeWriter:
         self._jvm_edge_writer_obj.writeAdjList()
 
     def write_edge_properties(
-        self, property_group: Optional[PropertyGroup] = None
+        self, property_group: Optional[PropertyGroup] = None,
     ) -> None:
         """Generate the chunks of all or selected property groups from edge DataFrame.
 
@@ -196,5 +189,5 @@ class EdgeWriter:
             self._jvm_edge_writer_obj.writeEdgeProperties()
 
     def write_edges(self) -> None:
-        """Generate the chunks for the AdjList and all property groups from edge"""
+        """Generate the chunks for the AdjList and all property groups from edge."""
         self._jvm_edge_writer_obj.writeEdges()

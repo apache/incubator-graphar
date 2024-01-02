@@ -1,61 +1,60 @@
-"""
-Copyright 2022-2023 Alibaba Group Holding Limited.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
+# Copyright 2022-2023 Alibaba Group Holding Limited.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Mapping, Optional, Union
+from typing import Optional, Union
 
 from py4j.java_gateway import JavaObject
 from pyspark.sql import DataFrame
 
 from graphar_pyspark import GraphArSession, _check_session
 from graphar_pyspark.enums import FileType
+from graphar_pyspark.errors import InvalidGraphFormatException
 from graphar_pyspark.info import GraphInfo
-
-
-class InvalidGraphFormatException(ValueError):
-    pass
 
 
 @dataclass(frozen=True)
 class EdgeLabels:
-    """A triplet that describe edge. Contains source, edge and dest labels."""
+    """A triplet that describe edge. Contains source, edge and dest labels. Immutable."""
+
     src_label: str
     edge_label: str
     dst_label: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class GraphReaderResult:
-    """A simple class, that represent results of reading a graph with GraphReader."""
+    """A simple immutable class, that represent results of reading a graph with GraphReader."""
+
     vertex_dataframes: Mapping[str, DataFrame]
     edge_dataframes: Mapping[EdgeLabels, Mapping[str, DataFrame]]
 
-
-class GraphReader:
-    """The helper object for reading graph through the definitions of graph info."""
-
     @staticmethod
-    def _jvm2py(
+    def from_scala(
         jvm_result: tuple[
-            dict[str, JavaObject], dict[tuple[str, str, str], dict[str, JavaObject]]
+            dict[str, JavaObject],
+            dict[tuple[str, str, str], dict[str, JavaObject]],
         ],
-    ) -> GraphReaderResult:
-        """Helper that convert nested Java DataFrames to PySpark DataFrames."""
+    ) -> "GraphReaderResult":
+        """Create an instance of the Class from JVM method output.
+
+        :param jvm_result: structure, returned from JVM.
+        :returns: instance of Python Class.
+        """
         first_dict = {}
         first_scala_map = jvm_result._1()
         first_scala_map_iter = first_scala_map.keySet().iterator()
@@ -77,7 +76,8 @@ class GraphReader:
             while nested_scala_map_iter.hasNext():
                 kk = nested_scala_map_iter.next()
                 inner_dict[kk] = DataFrame(
-                    nested_scala_map.get(kk).get(), GraphArSession.ss
+                    nested_scala_map.get(kk).get(),
+                    GraphArSession.ss,
                 )
 
             second_dict[EdgeLabels(k._1(), k._2(), k._3())] = inner_dict
@@ -87,11 +87,15 @@ class GraphReader:
             edge_dataframes=second_dict,
         )
 
+
+class GraphReader:
+    """The helper object for reading graph through the definitions of graph info."""
+
     @staticmethod
     def read(
         graph_info: Union[GraphInfo, str],
     ) -> GraphReaderResult:
-        """Reading the graph as vertex and edge DataFrames with the graph info yaml file or GraphInfo object.
+        """Read the graph as vertex and edge DataFrames with the graph info yaml file or GraphInfo object.
 
         :param graph_info: The path of the graph info yaml or GraphInfo instance.
         :returns: GraphReaderResults, that contains vertex and edge dataframes.
@@ -101,9 +105,10 @@ class GraphReader:
             graph_info = GraphInfo.load_graph_info(graph_info)
 
         jvm_result = GraphArSession.graphar.graph.GraphReader.readWithGraphInfo(
-            graph_info.to_scala(), GraphArSession.jss
+            graph_info.to_scala(),
+            GraphArSession.jss,
         )
-        return GraphReader._jvm2py(jvm_result)
+        return GraphReaderResult.from_scala(jvm_result)
 
 
 class GraphWriter:
@@ -120,7 +125,7 @@ class GraphWriter:
         return self._jvm_graph_writer_obj
 
     @staticmethod
-    def from_scala(jvm_obj) -> "GraphWriter":
+    def from_scala(jvm_obj: JavaObject) -> "GraphWriter":
         """Create an instance of the Class from the corresponding JVM object.
 
         :param jvm_obj: scala object in JVM.
@@ -173,7 +178,6 @@ class GraphWriter:
     ) -> None:
         """Write graph data in graphar format.
 
-
         Note: for default parameters check com.alibaba.graphar.GeneralParams;
         For this method None for any of arguments means that the default value will be used.
 
@@ -192,10 +196,11 @@ class GraphWriter:
         if edge_chunk_size is None:
             edge_chunk_size = GraphArSession.graphar.GeneralParams.defaultEdgeChunkSize
 
-        if file_type is None:
-            file_type = GraphArSession.graphar.GeneralParams.defaultFileType
-        else:
-            file_type = file_type.value
+        file_type = (
+            GraphArSession.graphar.GeneralParams.defaultFileType
+            if file_type is None
+            else file_type.value
+        )
 
         if version is None:
             version = GraphArSession.graphar.GeneralParams.defaultVersion
@@ -212,13 +217,16 @@ class GraphWriter:
 
 
 class GraphTransformer:
+    """The helper object for transforming graphs through the definitions of their infos."""
+
     @staticmethod
     def transform(
-        source_graph_info: Union[str, GraphInfo], dest_graph_info: Union[str, GraphInfo]
+        source_graph_info: Union[str, GraphInfo],
+        dest_graph_info: Union[str, GraphInfo],
     ) -> None:
         """Transform the graphs following the meta data provided or defined in info files.
 
-        Note: both arguments should strings or GrapInfo instances! Mixed arguments type is not supported.
+        Note: both arguments should be strings or GrapInfo instances! Mixed arguments type is not supported.
 
         :param source_graph_info: The path of the graph info yaml file for the source graph OR the info object for the source graph.
         :param dest_graph_info: The path of the graph info yaml file for the destination graph OR the info object for the destination graph.
@@ -227,10 +235,13 @@ class GraphTransformer:
         _check_session()
         if isinstance(source_graph_info, str) and isinstance(dest_graph_info, str):
             GraphArSession.graphar.graph.GraphTransformer.transform(
-                source_graph_info, dest_graph_info, GraphArSession.jss
+                source_graph_info,
+                dest_graph_info,
+                GraphArSession.jss,
             )
         elif isinstance(source_graph_info, GraphInfo) and isinstance(
-            dest_graph_info, GraphInfo
+            dest_graph_info,
+            GraphInfo,
         ):
             GraphArSession.graphar.graph.GraphTransformer.transform(
                 source_graph_info.to_scala(),

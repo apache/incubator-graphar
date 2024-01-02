@@ -1,20 +1,19 @@
-"""
-Copyright 2022-2023 Alibaba Group Holding Limited.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
+# copyright 2022-2023 alibaba group holding limited.
+#
+# licensed under the apache license, version 2.0 (the "license");
+# you may not use this file except in compliance with the license.
+# you may obtain a copy of the license at
+#
+#     http://www.apache.org/licenses/license-2.0
+#
+# unless required by applicable law or agreed to in writing, software
+# distributed under the license is distributed on an "as is" basis,
+# without warranties or conditions of any kind, either express or implied.
+# see the license for the specific language governing permissions and
+# limitations under the license.
 
 from __future__ import annotations
+
 from typing import Optional
 
 from pyspark.sql import DataFrame
@@ -27,7 +26,7 @@ class IndexGenerator:
 
     @staticmethod
     def construct_vertex_index_mapping(
-        vertex_df: DataFrame, primary_key: str
+        vertex_df: DataFrame, primary_key: str,
     ) -> DataFrame:
         """Generate a vertex index mapping from the primary key, the result DataFrame
         contains two columns: vertex index & primary key.
@@ -55,14 +54,14 @@ class IndexGenerator:
         _check_session()
         return DataFrame(
             GraphArSession.graphar.util.IndexGenerator.generateVertexIndexColumn(
-                vertex_df._jdf
+                vertex_df._jdf,
             ),
             GraphArSession.ss,
         )
 
     @staticmethod
     def generate_vertex_index_column_and_index_mapping(
-        vertex_df: DataFrame, primary_key: str = ""
+        vertex_df: DataFrame, primary_key: str = "",
     ) -> (DataFrame, DataFrame):
         _check_session()
         jvm_res = GraphArSession.graphar.util.IndexGenerator.generateVertexIndexColumnAndIndexMapping(
@@ -85,14 +84,14 @@ class IndexGenerator:
         _check_session()
         return DataFrame(
             GraphArSession.graphar.util.IndexGenerator.generateEdgeIndexColumn(
-                edge_df._jdf
+                edge_df._jdf,
             ),
             GraphArSession.ss,
         )
 
     @staticmethod
     def generate_src_index_for_edges_from_mapping(
-        edge_df: DataFrame, src_column_name: str, src_index_mapping: DataFrame
+        edge_df: DataFrame, src_column_name: str, src_index_mapping: DataFrame,
     ) -> DataFrame:
         """Join the edge table with the vertex index mapping for source column.
 
@@ -113,7 +112,7 @@ class IndexGenerator:
 
     @staticmethod
     def generate_dst_index_for_edges_from_mapping(
-        edge_df: DataFrame, dst_column_name: str, dst_index_mapping: DataFrame
+        edge_df: DataFrame, dst_column_name: str, dst_index_mapping: DataFrame,
     ) -> DataFrame:
         """Join the edge table with the vertex index mapping for destination column.
 
@@ -125,7 +124,7 @@ class IndexGenerator:
         _check_session()
         return DataFrame(
             GraphArSession.graphar.util.IndexGenerator.generateDstIndexForEdgesFromMapping(
-                edge_df._jdf, dst_column_name, dst_index_mapping._jdf
+                edge_df._jdf, dst_column_name, dst_index_mapping._jdf,
             ),
             GraphArSession.ss,
         )
@@ -169,7 +168,7 @@ class IndexGenerator:
 
     @staticmethod
     def generate_scr_index_for_edges(
-        edge_df: DataFrame, src_column_name: str
+        edge_df: DataFrame, src_column_name: str,
     ) -> DataFrame:
         """Construct vertex index for source column.
 
@@ -188,7 +187,7 @@ class IndexGenerator:
 
     @staticmethod
     def generate_dst_index_for_edges(
-        edge_df: DataFrame, dst_column_name: str
+        edge_df: DataFrame, dst_column_name: str,
     ) -> DataFrame:
         """Construct vertex index for destination column.
 
@@ -207,7 +206,7 @@ class IndexGenerator:
 
     @staticmethod
     def generate_src_and_dst_index_unitedly_for_edges(
-        edge_df: DataFrame, src_column_name: str, dst_column_name: str
+        edge_df: DataFrame, src_column_name: str, dst_column_name: str,
     ) -> DataFrame:
         """Union and construct vertex index for source & destination columns.
 
@@ -219,7 +218,7 @@ class IndexGenerator:
         _check_session()
         return DataFrame(
             GraphArSession.graphar.util.IndexGenerator.generateSrcAndDstIndexUnitedlyForEdges(
-                edge_df._jdf, src_column_name, dst_column_name
+                edge_df._jdf, src_column_name, dst_column_name,
             ),
             GraphArSession.ss,
         )

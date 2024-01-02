@@ -14,7 +14,20 @@
 
 .PHONY: install_test
 install_test:
-		export JAVA_HOME=${JAVA_HOME_11_X64};
+		export JAVA_HOME=${JAVA_HOME_11_X64}
 		cd ../spark && mvn clean package -DskipTests -Dspotless.check.skip=true && cd ../pyspark
 		export PYSPARK_HADOOP_VERSION=3.2
 		poetry install --with=spark,tests
+
+.PHONY: test
+test:
+		export JAVA_HOME=${JAVA_HOME_11_X64}
+		poetry run pytest --cov graphar_pyspark tests/
+
+.PHONY: install_lint
+install_lint:
+		poetry install --with=lint
+
+.PHONY: lint
+lint:
+		poetry run ruff check graphar_pyspark/

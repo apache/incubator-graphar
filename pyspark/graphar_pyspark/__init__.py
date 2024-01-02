@@ -1,20 +1,21 @@
-"""
-Copyright 2022-2023 Alibaba Group Holding Limited.
+# Copyright 2022-2023 Alibaba Group Holding Limited.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-"""
 
 from pyspark.sql import SparkSession
+
+from graphar_pyspark.errors import GraphArIsNotInitializedException
 
 
 class _GraphArSession:
@@ -52,15 +53,11 @@ def initialize(spark: SparkSession) -> None:
     :param spark: pyspark SparkSession object.
     """
     GraphArSession.set_spark_session(
-        spark
+        spark,
     )  # modify the global GraphArSession singleton.
 
 
-class GraphArIsNotInitializedException(ValueError):
-    pass
-
-
-def _check_session():
+def _check_session() -> None:
     if not GraphArSession.is_initialized():
         msg = "GraphArSession is not initialized. Call `pyspark_graphar.initialize` first!"
         raise GraphArIsNotInitializedException(msg)

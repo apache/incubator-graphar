@@ -63,6 +63,9 @@ ENV/
 env.bak/
 venv.bak/
 
+# Ruff
+.ruff_cache
+
 ### Scala ###
 *.bloop
 *.metals
