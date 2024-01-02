@@ -40,6 +40,7 @@ header:
     - '*.md'
     - '*.rst'
     - '**/*.json'
+    - 'pyspark/poetry.lock' # This file is generated automatically by Poetry-tool; there is no way to add license header
 
   comment: on-failure
 
