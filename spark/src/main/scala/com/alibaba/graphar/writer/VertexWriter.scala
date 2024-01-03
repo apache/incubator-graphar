@@ -63,19 +63,20 @@ object VertexWriter {
  *   the vertex info that describes the vertex type.
  * @param vertexDf
  *   the input vertex DataFrame.
+ * @param numVertices
+ *   the number of vertices, if negative value is passed, then vertexDF.count
+ *   will be used
  */
 class VertexWriter(
     prefix: String,
     vertexInfo: VertexInfo,
     vertexDf: DataFrame,
-    numVertices: Option[Long] = None
+    numVertices: Long = -1
 ) {
   private val spark = vertexDf.sparkSession
   validate()
-  private val vertexNum: Long = numVertices match {
-    case None => vertexDf.count()
-    case _    => numVertices.get
-  }
+  private val vertexNum: Long =
+    if (numVertices < 0) vertexDf.count else numVertices
   writeVertexNum()
 
   private var chunks: DataFrame = VertexWriter.repartitionAndSort(
