@@ -63,7 +63,6 @@ jobs:
         sudo make install
         popd
 
-
     - name: CMake
       run: |
         mkdir build
