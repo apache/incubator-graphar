@@ -21,7 +21,8 @@
 
 namespace GAR_NAMESPACE_INTERNAL {
 
-static void CreateGraphInfo(::benchmark::State& state, const std::string& path) {
+static void CreateGraphInfo(::benchmark::State& state,  // NOLINT
+                            const std::string& path) {
   for (auto _ : state) {
     auto maybe_graph_info = GraphInfo::Load(path);
     if (maybe_graph_info.has_error()) {
@@ -31,7 +32,8 @@ static void CreateGraphInfo(::benchmark::State& state, const std::string& path) 
   }
 }
 
-BENCHMARK_DEFINE_F(BenchmarkFixture, InitialGraphInfo)(::benchmark::State& state) {
+BENCHMARK_DEFINE_F(BenchmarkFixture, InitialGraphInfo)
+(::benchmark::State& state) {  // NOLINT
   CreateGraphInfo(state, path_);
 }
 BENCHMARK_REGISTER_F(BenchmarkFixture, InitialGraphInfo);

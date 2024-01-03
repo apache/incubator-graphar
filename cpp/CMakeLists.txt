@@ -438,10 +438,12 @@ endif()
 # ------------------------------------------------------------------------------
 file(GLOB_RECURSE FILES_NEED_FORMAT "include/gar/*.h" "src/*.cc"
                                     "test/*.h" "test/*.cc"
-                                    "examples/*.h" "examples/*.cc")
+                                    "examples/*.h" "examples/*.cc"
+                                    "benchmarks/*.h" "benchmarks/*.cc")
 file(GLOB_RECURSE FILES_NEED_LINT "include/gar/*.h" "src/*.cc"
                                   "test/*.h" "test/*.cc"
-                                  "examples/*.h" "examples/*.cc")
+                                  "examples/*.h" "examples/*.cc"
+                                  "benchmarks/*.h" "benchmarks/*.cc")
 
 add_custom_target(gar-clformat
                   COMMAND clang-format --style=file -i ${FILES_NEED_FORMAT}

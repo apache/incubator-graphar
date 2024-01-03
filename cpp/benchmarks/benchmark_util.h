@@ -15,6 +15,7 @@
  */
 
 #include <filesystem>
+#include <memory>
 #include <string>
 
 #include "benchmark/benchmark.h"
@@ -22,8 +23,8 @@
 #include "gar/graph_info.h"
 #include "gar/util/status.h"
 
-#ifndef CPP_BENCHMARK_BENCHMARK_UTIL_H_
-#define CPP_BENCHMARK_BENCHMARK_UTIL_H_
+#ifndef CPP_BENCHMARKS_BENCHMARK_UTIL_H_
+#define CPP_BENCHMARKS_BENCHMARK_UTIL_H_
 
 namespace GAR_NAMESPACE_INTERNAL {
 
@@ -53,9 +54,9 @@ class BenchmarkFixture : public ::benchmark::Fixture {
   void TearDown(const ::benchmark::State& state) override {}
 
  protected:
-  std::string path_; 
+  std::string path_;
   std::shared_ptr<GraphInfo> graph_info_;
 };
 }  // namespace GAR_NAMESPACE_INTERNAL
 
-#endif  // CPP_BENCHMARK_BENCHMARK_UTIL_H_
+#endif  // CPP_BENCHMARKS_BENCHMARK_UTIL_H_

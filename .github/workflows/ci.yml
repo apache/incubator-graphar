@@ -60,7 +60,7 @@ jobs:
       run: |
         mkdir build
         pushd build
-        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
         popd
 
     - name: Cpp Format and lint
@@ -124,6 +124,14 @@ jobs:
         export ASAN_OPTIONS=detect_leaks=0
         export GAR_TEST_DATA=$PWD/../testing/
         make test
+        popd
+    
+    - name: Benchmark
+      run: |
+        pushd build
+        export GAR_TEST_DATA=$PWD/../testing/
+        ./graph_info_benchmark
+        ./arrow_chunk_reader_benchmark
         popd
     
   GraphAr-centos-arrow-installed:
