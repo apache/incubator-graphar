@@ -142,10 +142,11 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListPropertyArrowChunkReaderReadChunk)
 BENCHMARK_REGISTER_F(BenchmarkFixture, CreateVertexPropertyArrowChunkReader);
 BENCHMARK_REGISTER_F(BenchmarkFixture, CreateAdjListArrowChunkReader);
 BENCHMARK_REGISTER_F(BenchmarkFixture, CreateAdjListOffsetArrowChunkReader);
-BENCHMARK_REGISTER_F(BenchmarkFixture, AdjListPropertyArrowChunkReaderReadChunk);
+BENCHMARK_REGISTER_F(BenchmarkFixture,
+                     AdjListPropertyArrowChunkReaderReadChunk);
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, VertexPropertyArrowChunkReaderReadChunk);
 BENCHMARK_REGISTER_F(BenchmarkFixture, AdjListArrowChunkReaderReadChunk);
 BENCHMARK_REGISTER_F(BenchmarkFixture, AdjListOffsetArrowChunkReaderReadChunk);
-BENCHMARK_REGISTER_F(BenchmarkFixture, AdjListPropertyArrowChunkReaderReadChunk);
+BENCHMARK_REGISTER_F(BenchmarkFixture, AdjListOffsetArrowChunkReaderReadChunk);
 }  // namespace GAR_NAMESPACE_INTERNAL
