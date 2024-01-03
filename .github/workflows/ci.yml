@@ -54,7 +54,7 @@ jobs:
                             libarrow-dataset-dev=14.0.1-1 \
                             libarrow-acero-dev=14.0.1-1 \
                             libparquet-dev=14.0.1-1
-        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev libbenchmark-dev
 
     - name: CMake
       run: |
