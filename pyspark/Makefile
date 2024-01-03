@@ -22,7 +22,12 @@ install_test:
 .PHONY: test
 test:
 		export JAVA_HOME=${JAVA_HOME_11_X64}
-		poetry run pytest --cov graphar_pyspark tests/
+		poetry run pytest --cov
+
+.PHONY: coverage_report
+coverage_report:
+		export JAVA_HOME=${JAVA_HOME_11_X64}
+		poetry run pytest --cov --cov-report=html:coverage_html graphar_pyspark tests/
 
 .PHONY: install_lint
 install_lint:
@@ -31,3 +36,7 @@ install_lint:
 .PHONY: lint
 lint:
 		poetry run ruff check graphar_pyspark/
+
+.PHONY: lint_fix
+lint_fix:
+		poetry run ruff check --fix graphar_pyspark/

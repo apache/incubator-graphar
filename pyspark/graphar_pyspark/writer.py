@@ -41,27 +41,34 @@ class VertexWriter:
         if jvm_obj is not None:
             self._jvm_vertex_writer_obj = jvm_obj
         else:
-            if num_vertices is not None:
-                # This is not working code, there will be always an Exception
-                # class java.lang.Integer cannot be cast to class java.lang.Long
-                #
-                # The problem is that py4j always make autounboxing of Long into int
-                # and it cannot make autoboxisng because the method is waiting for Some(Long), not Long
-                # See https://github.com/py4j/py4j/issues/374 for details
-                # TODO: check the status of py4j-issue && check https://github.com/alibaba/GraphAr/issues/313
-                msg = "Due to py4j problem num_vertices cannot be processed!"
-                raise NotImplementedError(
-                    msg,
-                )
-            else: # noqa: RET506
-                vertex_writer = GraphArSession.graphar.writer.VertexWriter(
-                    prefix,
-                    vertex_info.to_scala(),
-                    vertex_df._jdf,
-                    GraphArSession.jvm.scala.Option.empty(),
-                )
+            num_vertices = -1 if num_vertices is None else num_vertices
+            self._jvm_vertex_writer_obj = GraphArSession.graphar.writer.VertexWriter(
+                prefix,
+                vertex_info.to_scala(),
+                vertex_df._jdf,
+                num_vertices,
+            )
+            # if num_vertices is not None:
+            #     # This is not working code, there will be always an Exception
+            #     # class java.lang.Integer cannot be cast to class java.lang.Long
+            #     #
+            #     # The problem is that py4j always make autounboxing of Long into int
+            #     # and it cannot make autoboxisng because the method is waiting for Some(Long), not Long
+            #     # See https://github.com/py4j/py4j/issues/374 for details
+            #     # TODO: check the status of py4j-issue && check https://github.com/alibaba/GraphAr/issues/313
+            #     msg = "Due to py4j problem num_vertices cannot be processed!"
+            #     raise NotImplementedError(
+            #         msg,
+            #     )
+            # else: # noqa: RET506
+            #     vertex_writer = GraphArSession.graphar.writer.VertexWriter(
+            #         prefix,
+            #         vertex_info.to_scala(),
+            #         vertex_df._jdf,
+            #         -1,
+            #     )
 
-            self._jvm_vertex_writer_obj = vertex_writer
+            # self._jvm_vertex_writer_obj = vertex_writer
 
     def to_scala(self) -> JavaObject:
         """Transform object to JVM representation.
@@ -84,6 +91,7 @@ class VertexWriter:
         prefix: str,
         vertex_info: VertexInfo,
         vertex_df: DataFrame,
+        num_vertices: Optional[int],
     ) -> "VertexWriter":
         """Create an instance of the Class from Python arguments.
 
@@ -94,10 +102,11 @@ class VertexWriter:
         # TODO: track a py4j issue and add optional num_vertices when it will be resolved
         if not prefix.endswith(os.sep):
             prefix += os.sep
-        return VertexWriter(prefix, vertex_info, vertex_df, None, None)
+        return VertexWriter(prefix, vertex_info, vertex_df, num_vertices, None)
 
     def write_vertex_properties(
-        self, property_group: Optional[PropertyGroup] = None,
+        self,
+        property_group: Optional[PropertyGroup] = None,
     ) -> None:
         """Generate chunks of the property group (or all property groups) for vertex DataFrame.
 
@@ -176,7 +185,8 @@ class EdgeWriter:
         self._jvm_edge_writer_obj.writeAdjList()
 
     def write_edge_properties(
-        self, property_group: Optional[PropertyGroup] = None,
+        self,
+        property_group: Optional[PropertyGroup] = None,
     ) -> None:
         """Generate the chunks of all or selected property groups from edge DataFrame.
 

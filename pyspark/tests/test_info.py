@@ -36,6 +36,8 @@ def test_property(spark):
     property_from_py = Property.from_python("name", GarType.BOOL, False)
 
     assert property_from_py == Property.from_scala(property_from_py.to_scala())
+    assert property_from_py != 0
+    assert property_from_py == Property.from_python("name", GarType.BOOL, False)
 
     property_from_py.set_name("new_name")
     property_from_py.set_data_type(GarType.INT32)
@@ -58,6 +60,7 @@ def test_property_group(spark):
     )
 
     assert p_group_from_py == PropertyGroup.from_scala(p_group_from_py.to_scala())
+    assert p_group_from_py != 0
 
     p_group_from_py.set_prefix("new_prefix")
     p_group_from_py.set_file_type(FileType.ORC)
@@ -107,6 +110,7 @@ def test_adj_list(spark):
     )
 
     assert adj_list_from_py == AdjList.from_scala(adj_list_from_py.to_scala())
+    assert adj_list_from_py != 0
     assert adj_list_from_py.get_adj_list_type() == AdjListType.ORDERED_BY_DEST
 
     adj_list_from_py.set_aligned_by("src")
@@ -115,6 +119,8 @@ def test_adj_list(spark):
     assert adj_list_from_py.get_adj_list_type() == AdjListType.UNORDERED_BY_SOURCE
     adj_list_from_py.set_aligned_by("dest")
     assert adj_list_from_py.get_adj_list_type() == AdjListType.UNORDERED_BY_DEST
+    adj_list_from_py.set_prefix("prefix_new")
+    assert adj_list_from_py.get_prefix() == "prefix_new"
 
     adj_list_from_py.set_file_type(FileType.CSV)
     assert adj_list_from_py.get_file_type() == FileType.CSV
@@ -260,6 +266,19 @@ def test_vertex_info(spark):
         == person_info.get_prefix()
     )
 
+    nebula_vi = VertexInfo.load_vertex_info(
+        GRAPHAR_TESTS_EXAMPLES.joinpath("nebula")
+        .joinpath("team.vertex.yml")
+        .absolute()
+        .__str__()
+    )
+    assert (
+        GRAPHAR_TESTS_EXAMPLES.joinpath("nebula")
+        .joinpath(nebula_vi.get_file_path(nebula_vi.get_property_group("name"), 0))
+        .exists()
+    )
+    assert len(nebula_vi.get_path_prefix(nebula_vi.get_property_group("name"))) > 0
+
 
 def test_edge_info(spark):
     initialize(spark)
@@ -359,6 +378,102 @@ def test_edge_info(spark):
         is not None
     )
 
+    assert (
+        person_knows_person_info.get_adj_list_file_type(AdjListType.UNORDERED_BY_DEST)
+        == FileType.CSV
+    )
+    assert (
+        person_knows_person_info.get_adj_list_file_type(AdjListType.ORDERED_BY_SOURCE)
+        != 0
+    )
+    assert (
+        len(person_knows_person_info.get_property_groups(AdjListType.ORDERED_BY_SOURCE))
+        == 1
+    )
+    assert person_knows_person_info.contain_property_group(
+        person_knows_person_info.get_property_groups(AdjListType.UNORDERED_BY_DEST)[0],
+        AdjListType.UNORDERED_BY_DEST,
+    )
+    assert person_knows_person_info.get_property_type("creationDate") == GarType.STRING
+    assert person_knows_person_info.is_primary_key("creationDate") == False
+    assert person_knows_person_info.get_primary_key() == ""
+    assert person_knows_person_info.is_validated()
+    assert (
+        person_knows_person_info.get_vertices_num_file_path(
+            AdjListType.ORDERED_BY_SOURCE
+        )
+        == "edge/person_knows_person/ordered_by_source/vertex_count"
+    )
+    assert (
+        person_knows_person_info.get_edges_num_path_prefix(
+            AdjListType.ORDERED_BY_SOURCE
+        )
+        == "edge/person_knows_person/ordered_by_source/edge_count"
+    )
+    assert (
+        person_knows_person_info.get_edges_num_file_path(
+            0, AdjListType.ORDERED_BY_SOURCE
+        )
+        == "edge/person_knows_person/ordered_by_source/edge_count0"
+    )
+    assert (
+        person_knows_person_info.get_adj_list_offset_file_path(
+            0, AdjListType.ORDERED_BY_SOURCE
+        )
+        == "edge/person_knows_person/ordered_by_source/offset/chunk0"
+    )
+    assert (
+        person_knows_person_info.get_adj_list_file_path(
+            0, 0, AdjListType.ORDERED_BY_SOURCE
+        )
+        == "edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0"
+    )
+    assert (
+        person_knows_person_info.get_adj_list_path_prefix(
+            None, AdjListType.ORDERED_BY_SOURCE
+        )
+        is not None
+    )
+    assert (
+        person_knows_person_info.get_adj_list_path_prefix(
+            0, AdjListType.ORDERED_BY_SOURCE
+        )
+        is not None
+    )
+    assert (
+        person_knows_person_info.get_property_file_path(
+            person_knows_person_info.get_property_group(
+                "creationDate", AdjListType.ORDERED_BY_SOURCE
+            ),
+            AdjListType.ORDERED_BY_SOURCE,
+            0,
+            0,
+        )
+        is not None
+    )
+    assert (
+        person_knows_person_info.get_property_group_path_prefix(
+            person_knows_person_info.get_property_group(
+                "creationDate", AdjListType.ORDERED_BY_SOURCE
+            ),
+            AdjListType.ORDERED_BY_SOURCE,
+            0,
+        )
+    ) is not None
+    assert (
+        person_knows_person_info.get_property_group_path_prefix(
+            person_knows_person_info.get_property_group(
+                "creationDate", AdjListType.ORDERED_BY_SOURCE
+            ),
+            AdjListType.ORDERED_BY_SOURCE,
+            None,
+        )
+    ) is not None
+    assert person_knows_person_info.get_concat_key() == "person_knows_person"
+    yaml_string = person_knows_person_info.dump()
+    parsed_dict = yaml.safe_load(yaml_string)
+    assert "prefix" in parsed_dict.keys()
+
 
 def test_graph_info(spark):
     initialize(spark)
@@ -394,3 +509,39 @@ def test_graph_info(spark):
     assert py_graph_info.get_name() == "new_name"
     py_graph_info.set_prefix("new_prefix")
     assert py_graph_info.get_prefix() == "new_prefix"
+
+    init_vertices_size = py_graph_info.get_vertices().__len__()
+    new_vertices = py_graph_info.get_vertices()
+    new_vertices.append("new_one")
+    py_graph_info.set_vertices(new_vertices)
+    assert len(py_graph_info.get_vertices()) > init_vertices_size
+
+    init_edges_size = py_graph_info.get_edges().__len__()
+    new_edges = py_graph_info.get_edges()
+    new_edges.append("new_one")
+    py_graph_info.set_edges(new_edges)
+    assert len(py_graph_info.get_edges()) > init_edges_size
+
+    py_graph_info.set_version("v2")
+    assert py_graph_info.get_version() == "v2"
+
+    py_graph_info.add_edge_info(
+        EdgeInfo.from_python(
+            "src_label100",
+            "edge_label100",
+            "dst_label100",
+            10,
+            100,
+            100,
+            True,
+            "prefix",
+            [],
+            "v1",
+        )
+    )
+    assert len(py_graph_info.get_edge_infos()) == 1
+
+    py_graph_info.add_vertex_info(
+        VertexInfo.from_python("some", 100, "prefix", [], "v1")
+    )
+    assert len(py_graph_info.get_vertex_infos()) == 1

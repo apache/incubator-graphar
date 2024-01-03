@@ -15,9 +15,10 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import Any, Optional, TypeVar
+from typing import Any, Optional, TypeVar, Union
 
 from py4j.java_gateway import JavaObject
+from py4j.java_collections import JavaList
 
 from graphar_pyspark import GraphArSession, _check_session
 from graphar_pyspark.enums import AdjListType, FileType, GarType
@@ -159,24 +160,48 @@ class PropertyGroup:
             self._jvm_property_group_obj = property_group
 
     def get_prefix(self) -> str:
+        """Get prefix from the corresponding JVM object.
+
+        :returns: prefix
+        """
         return self._jvm_property_group_obj.getPrefix()
 
     def set_prefix(self, prefix: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param prefix: prefix
+        """
         self._jvm_property_group_obj.setPrefix(prefix)
 
     def get_file_type(self) -> FileType:
+        """Get file type from the corresponding JVM object.
+
+        :returns: FileType
+        """
         return FileType(self._jvm_property_group_obj.getFile_type())
 
     def set_file_type(self, file_type: FileType) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param file_type: FileType
+        """
         self._jvm_property_group_obj.setFile_type(file_type.value)
 
     def get_properties(self) -> Sequence[Property]:
+        """Get properties from the corresponding JVM object.
+
+        :returns: list of Properties
+        """
         return [
             Property.from_scala(jvm_property)
             for jvm_property in self._jvm_property_group_obj.getProperties()
         ]
 
     def set_properties(self, properties: Sequence[Property]) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param properties: list of Properties
+        """
         self._jvm_property_group_obj.setProperties(
             [property.to_scala() for property in properties],
         )
@@ -207,6 +232,12 @@ class PropertyGroup:
         file_type: FileType,
         properties: Sequence[Property],
     ) -> PropertyGroupType:
+        """Create an instance of the class from Python args.
+
+        :param prefix: path prefix
+        :param file_type: type of file
+        :param properties: list of properties
+        """
         return cls(prefix, file_type, properties, None)
 
     def __eq__(self, other: Any) -> bool:
@@ -1074,27 +1105,43 @@ class GraphInfo:
             self._jvm_graph_info_obj = graph_info
 
     def get_name(self) -> str:
+        """Get name from the corresponding JVM object.
+
+        :returns: name
+        """
         return self._jvm_graph_info_obj.getName()
 
     def set_name(self, name: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param name: new name
+        """
         self._jvm_graph_info_obj.setName(name)
 
     def get_prefix(self) -> str:
+        """Get prefix from corresponding JVM object.
+
+        :returns: prefix
+        """
         return self._jvm_graph_info_obj.getPrefix()
 
     def set_prefix(self, prefix: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param prefix: new prefix
+        """
         self._jvm_graph_info_obj.setPrefix(prefix)
 
-    def get_vertices(self) -> list[str]:
+    def get_vertices(self) -> JavaList:
         return self._jvm_graph_info_obj.getVertices()
 
-    def set_vertices(self, vertices: list[str]) -> None:
+    def set_vertices(self, vertices: Union[list[str], JavaList]) -> None:
         self._jvm_graph_info_obj.setVertices(vertices)
 
-    def get_edges(self) -> list[str]:
+    def get_edges(self) -> JavaList:
         return self._jvm_graph_info_obj.getEdges()
 
-    def set_edges(self, edges: list[str]) -> None:
+    def set_edges(self, edges: Union[list[str], JavaList]) -> None:
         self._jvm_graph_info_obj.setEdges(edges)
 
     def get_version(self) -> str:

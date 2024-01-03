@@ -83,6 +83,12 @@ ignore = [
   "D105", # magic methods are self-documented
 ]
 
+[tool.pytest]
+testpaths = "tests"
+
+[tool.coverage.run]
+omit = ["tests/*"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
