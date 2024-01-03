@@ -142,6 +142,15 @@ scripts/run-graphar2neo4j.sh
 
 The example will import the movie graph from GraphAr to Neo4j and you can check the result in the Neo4j browser.
 
+## Running self defined neo4j importer
+
+We can write a json configuration file like `import/neo4j.json` to do the import. Here is an example.
+
+1. Import movie data in neo4j
+2. Fill in the neo4j connection fields in the json file.
+3. `cd import`
+4. `./neo4j.sh neo4j.json`
+
 ## Running NebulaGraph to GraphAr example
 
 Running this example requires `Docker` to be installed, if not, follow [this link](https://docs.docker.com/engine/install/). Run `docker version` to check it.

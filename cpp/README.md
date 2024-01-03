@@ -102,6 +102,17 @@ Build with examples:
     $ ./bgl_example  # run the BGL example
 ```
 
+Build with benchmarks:
+
+```bash
+    $ export GAR_TEST_DATA=$PWD/../testing/
+    $ mkdir build-benchmarks
+    $ cd build-benchmarks
+    $ cmake -DBUILD_BENCHMARKS=ON ..
+    $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
+    $ ./graph_info_benchmark  # run the graph info benchmark
+```
+
 ### Install
 
 After the building, you can install the GraphAr C++ library with:

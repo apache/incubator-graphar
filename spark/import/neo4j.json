@@ -1,0 +1,53 @@
+{
+    "gar": {
+        "path": "/tmp/graphar/movie",
+        "name": "MovieGraph",
+        "vertexChunkSize": 100,
+        "edgeChunkSize": 1024,
+        "fileType": "parquet"
+    },
+    "neo4j": {
+        "url": "bolt://localhost:7687",
+        "username": "neo4j",
+        "password": "neo4j"
+    },
+    "schema": {
+        "vertices": [
+            {
+                "label": "Person",
+                "properties": [
+                    "name",
+                    "born"
+                ]
+            },
+            {
+                "label": "Movie",
+                "properties": [
+                    "title",
+                    "tagline"
+                ]
+            }
+        ],
+        "edges": [
+            {
+                "label": "PRODUCED",
+                "srcLabel": "Person",
+                "srcProp": "name",
+                "dstLabel": "Movie",
+                "dstProp": "title",
+                "properties": []
+            },
+            {
+                "label": "REVIEWED",
+                "srcLabel": "Person",
+                "srcProp": "name",
+                "dstLabel": "Movie",
+                "dstProp": "title",
+                "properties": [
+                    "rating",
+                    "summary"
+                ]
+            }
+        ]
+    }
+}

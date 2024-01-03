@@ -40,6 +40,7 @@ project(graph-archive LANGUAGES C CXX VERSION ${GAR_VERSION})
 option(NAMESPACE "User specific namespace, default if GraphArchive" OFF)
 option(BUILD_TESTS "Build unit tests" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 
 if (NAMESPACE)
   add_definitions(-DGAR_NAMESPACE=${NAMESPACE})
@@ -408,15 +409,41 @@ if (BUILD_TESTS)
     # enable_testing()
 endif()
 
+if (BUILD_BENCHMARKS)
+    find_package(benchmark REQUIRED)
+
+    macro(add_benchmark target)
+        set(options)
+        set(oneValueArgs)
+        set(multiValueArgs SRCS)
+        cmake_parse_arguments(add_test "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+        add_executable(${target} ${add_test_SRCS})
+        target_compile_features(${target} PRIVATE cxx_std_17)
+        target_link_libraries(${target} PRIVATE benchmark::benchmark_main gar Threads::Threads ${CMAKE_DL_LIBS})
+
+        # if OpenSSL library exists, link the OpenSSL library.
+        # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
+        if(OPENSSL_FOUND)
+            target_link_libraries(${target} PRIVATE OpenSSL::SSL)
+        endif()
+        if (CURL_FOUND)
+            target_link_libraries(${target} PRIVATE CURL::libcurl)
+        endif()
+    endmacro()
+    add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
+    add_benchmark(graph_info_benchmark SRCS benchmarks/graph_info_benchmark.cc)
+endif()
 # ------------------------------------------------------------------------------
 # Format code & cpplint
 # ------------------------------------------------------------------------------
 file(GLOB_RECURSE FILES_NEED_FORMAT "include/gar/*.h" "src/*.cc"
                                     "test/*.h" "test/*.cc"
-                                    "examples/*.h" "examples/*.cc")
+                                    "examples/*.h" "examples/*.cc"
+                                    "benchmarks/*.h" "benchmarks/*.cc")
 file(GLOB_RECURSE FILES_NEED_LINT "include/gar/*.h" "src/*.cc"
                                   "test/*.h" "test/*.cc"
-                                  "examples/*.h" "examples/*.cc")
+                                  "examples/*.h" "examples/*.cc"
+                                  "benchmarks/*.h" "benchmarks/*.cc")
 
 add_custom_target(gar-clformat
                   COMMAND clang-format --style=file -i ${FILES_NEED_FORMAT}

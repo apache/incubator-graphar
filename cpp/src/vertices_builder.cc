@@ -65,37 +65,37 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
       switch (type->id()) {
       case Type::BOOL:
         if (property.second.type() !=
-            typeid(typename ConvertToArrowType<Type::BOOL>::CType)) {
+            typeid(typename TypeToArrowType<Type::BOOL>::CType)) {
           invalid_type = true;
         }
         break;
       case Type::INT32:
         if (property.second.type() !=
-            typeid(typename ConvertToArrowType<Type::INT32>::CType)) {
+            typeid(typename TypeToArrowType<Type::INT32>::CType)) {
           invalid_type = true;
         }
         break;
       case Type::INT64:
         if (property.second.type() !=
-            typeid(typename ConvertToArrowType<Type::INT64>::CType)) {
+            typeid(typename TypeToArrowType<Type::INT64>::CType)) {
           invalid_type = true;
         }
         break;
       case Type::FLOAT:
         if (property.second.type() !=
-            typeid(typename ConvertToArrowType<Type::FLOAT>::CType)) {
+            typeid(typename TypeToArrowType<Type::FLOAT>::CType)) {
           invalid_type = true;
         }
         break;
       case Type::DOUBLE:
         if (property.second.type() !=
-            typeid(typename ConvertToArrowType<Type::DOUBLE>::CType)) {
+            typeid(typename TypeToArrowType<Type::DOUBLE>::CType)) {
           invalid_type = true;
         }
         break;
       case Type::STRING:
         if (property.second.type() !=
-            typeid(typename ConvertToArrowType<Type::STRING>::CType)) {
+            typeid(typename TypeToArrowType<Type::STRING>::CType)) {
           invalid_type = true;
         }
         break;
@@ -138,9 +138,9 @@ template <Type type>
 Status VerticesBuilder::tryToAppend(
     const std::string& property_name,
     std::shared_ptr<arrow::Array>& array) {  // NOLINT
-  using CType = typename ConvertToArrowType<type>::CType;
+  using CType = typename TypeToArrowType<type>::CType;
   arrow::MemoryPool* pool = arrow::default_memory_pool();
-  typename ConvertToArrowType<type>::BuilderType builder(pool);
+  typename TypeToArrowType<type>::BuilderType builder(pool);
   for (auto& v : vertices_) {
     if (v.Empty() || !v.ContainProperty(property_name)) {
       RETURN_NOT_ARROW_OK(builder.AppendNull());

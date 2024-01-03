@@ -164,6 +164,7 @@ GraphAr provides a set of built-in data types that are common in real use cases 
 - float
 - double
 - string
+- list (of int32, int64, float, double; not supported by CSV)
 
 .. tip::
 

@@ -45,23 +45,6 @@ public class VerticesCollectionTest {
         StdSharedPtr<VerticesCollection> vertices = maybeVerticesCollection.value();
         VertexIter it = vertices.get().begin();
         for (Vertex vertex : vertices.get()) {
-            // access data through iterator directly
-            VertexIterGen itGen = (VertexIterGen) it;
-            System.out.println(
-                    it.id()
-                            + ", id="
-                            + it.<Long>property(stdStrId, 1L).value()
-                            + ", firstName="
-                            + it.property(property, property).value().toJavaString());
-            // access data through vertex
-            System.out.println(
-                    vertex.id()
-                            + ", id="
-                            + vertex.<Long>property(stdStrId, 1L).value()
-                            + ", firstName="
-                            + vertex.<StdString>property(property, property)
-                                    .value()
-                                    .toJavaString());
             // access data reference through vertex
             Assert.assertEquals(
                     it.<Long>property(stdStrId, 1L).value(),
