@@ -48,27 +48,6 @@ class VertexWriter:
                 vertex_df._jdf,
                 num_vertices,
             )
-            # if num_vertices is not None:
-            #     # This is not working code, there will be always an Exception
-            #     # class java.lang.Integer cannot be cast to class java.lang.Long
-            #     #
-            #     # The problem is that py4j always make autounboxing of Long into int
-            #     # and it cannot make autoboxisng because the method is waiting for Some(Long), not Long
-            #     # See https://github.com/py4j/py4j/issues/374 for details
-            #     # TODO: check the status of py4j-issue && check https://github.com/alibaba/GraphAr/issues/313
-            #     msg = "Due to py4j problem num_vertices cannot be processed!"
-            #     raise NotImplementedError(
-            #         msg,
-            #     )
-            # else: # noqa: RET506
-            #     vertex_writer = GraphArSession.graphar.writer.VertexWriter(
-            #         prefix,
-            #         vertex_info.to_scala(),
-            #         vertex_df._jdf,
-            #         -1,
-            #     )
-
-            # self._jvm_vertex_writer_obj = vertex_writer
 
     def to_scala(self) -> JavaObject:
         """Transform object to JVM representation.
