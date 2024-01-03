@@ -94,7 +94,7 @@ class GraphWriter() {
         val df_with_index = df_and_mapping._1
         indexMappings += label -> df_and_mapping._2
         val writer =
-          new VertexWriter(prefix, vertexInfo, df_with_index, Some(vertex_num))
+          new VertexWriter(prefix, vertexInfo, df_with_index, vertex_num)
         writer.writeVertexProperties()
       }
     }
