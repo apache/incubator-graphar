@@ -54,7 +54,15 @@ jobs:
                             libarrow-dataset-dev=14.0.1-1 \
                             libarrow-acero-dev=14.0.1-1 \
                             libparquet-dev=14.0.1-1
-        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev libbenchmark-dev
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
+
+        # install benchmark
+        git clone --branch v1.8.3 https://github.com/google/benchmark.git --depth 1
+        pushd benchmark
+        cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_TESTING=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF .
+        sudo make install
+        popd
+
 
     - name: CMake
       run: |
