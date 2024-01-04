@@ -81,6 +81,7 @@ ignore = [
   "TCH002", # it makes code harder to read
   "TCH003", # it makes code harder to read
   "D105", # magic methods are self-documented
+  "B905", # not works in python 3.9
 ]
 
 [tool.pytest]

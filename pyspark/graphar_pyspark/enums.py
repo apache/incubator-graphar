@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Enumerations and constants."""
+
 from enum import Enum
 
 from py4j.java_gateway import JavaObject

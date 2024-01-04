@@ -36,10 +36,17 @@ def test_vertex_reader(spark):
         GRAPHAR_TESTS_EXAMPLES.joinpath("modern_graph").absolute().__str__(),
         vertex_info,
     )
+    assert VertexReader.from_scala(vertex_reader.to_scala()) is not None
     assert vertex_reader.read_vertices_number() > 0
     assert (
         vertex_reader.read_vertex_property_group(
             vertex_info.get_property_group("name")
+        ).count()
+        > 0
+    )
+    assert (
+        vertex_reader.read_vertex_property_chunk(
+            vertex_info.get_property_groups()[0], 0
         ).count()
         > 0
     )
@@ -72,6 +79,7 @@ def test_edge_reader(spark):
         edge_info,
         AdjListType.ORDERED_BY_SOURCE,
     )
+    assert EdgeReader.from_scala(edge_reader.to_scala()) is not None
     assert (
         "_graphArEdgeIndex"
         in edge_reader.read_edge_property_group(
@@ -84,6 +92,10 @@ def test_edge_reader(spark):
         ).count()
         > 0
     )
+    assert edge_reader.read_vertex_chunk_number() > 0
+    assert edge_reader.read_edges_number() > 0
+    assert edge_reader.read_edges_number(0) == 0
+    assert edge_reader.read_offset(0).count() > 0
 
 
 def test_graph_reader(spark):

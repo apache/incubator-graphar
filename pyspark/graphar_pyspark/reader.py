@@ -12,6 +12,8 @@
 # see the license for the specific language governing permissions and
 # limitations under the license.
 
+"""Bidnings to com.alibaba.graphar.graph."""
+
 from __future__ import annotations
 
 import os
@@ -80,7 +82,9 @@ class VertexReader:
         return self._jvm_vertex_reader_obj.readVerticesNumber()
 
     def read_vertex_property_chunk(
-        self, property_group: PropertyGroup, chunk_index: int,
+        self,
+        property_group: PropertyGroup,
+        chunk_index: int,
     ) -> DataFrame:
         """Load a single vertex property chunk as a DataFrame.
 
@@ -92,7 +96,8 @@ class VertexReader:
         """
         return DataFrame(
             self._jvm_vertex_reader_obj.readVertexPropertyChunk(
-                property_group.to_scala(), chunk_index,
+                property_group.to_scala(),
+                chunk_index,
             ),
             GraphArSession.ss,
         )
@@ -113,7 +118,8 @@ class VertexReader:
         )
 
     def read_multiple_vertex_property_groups(
-        self, property_groups: list[PropertyGroup],
+        self,
+        property_groups: list[PropertyGroup],
     ) -> DataFrame:
         """Load the chunks for multiple property groups as a DataFrame.
 
@@ -180,7 +186,9 @@ class EdgeReader:
 
     @staticmethod
     def from_python(
-        prefix: str, edge_info: EdgeInfo, adj_list_type: AdjListType,
+        prefix: str,
+        edge_info: EdgeInfo,
+        adj_list_type: AdjListType,
     ) -> "EdgeReader":
         """Create an instance of the Class from Python arguments.
 
@@ -216,10 +224,9 @@ class EdgeReader:
         if provided, returns the number of edges for the vertex chunk
         :returns: the number of edges
         """
-        if chunk_index is not None:
+        if chunk_index is None:
             return self._jvm_edge_reader_obj.readEdgesNumber()
-        else:
-            return self._jvm_edge_reader_obj.readEdgesNumber(chunk_index)
+        return self._jvm_edge_reader_obj.readEdgesNumber(chunk_index)
 
     def read_offset(self, chunk_index: int) -> DataFrame:
         """Load a single offset chunk as a DataFrame.
@@ -236,7 +243,9 @@ class EdgeReader:
         )
 
     def read_adj_list_chunk(
-        self, vertex_chunk_index: int, chunk_index: int,
+        self,
+        vertex_chunk_index: int,
+        chunk_index: int,
     ) -> DataFrame:
         """Load a single AdjList chunk as a DataFrame.
 
@@ -250,7 +259,9 @@ class EdgeReader:
         )
 
     def read_adj_list_for_vertex_chunk(
-        self, vertex_chunk_index: int, add_index: bool = True,
+        self,
+        vertex_chunk_index: int,
+        add_index: bool = True,
     ) -> DataFrame:
         """Load all AdjList chunks for a vertex chunk as a DataFrame.
 
@@ -260,7 +271,8 @@ class EdgeReader:
         """
         return DataFrame(
             self._jvm_edge_reader_obj.readAdjListForVertexChunk(
-                vertex_chunk_index, add_index,
+                vertex_chunk_index,
+                add_index,
             ),
             GraphArSession.ss,
         )
@@ -277,7 +289,10 @@ class EdgeReader:
         )
 
     def read_edge_property_chunk(
-        self, property_group: PropertyGroup, vertex_chunk_index: int, chunk_index: int,
+        self,
+        property_group: PropertyGroup,
+        vertex_chunk_index: int,
+        chunk_index: int,
     ) -> DataFrame:
         """Load a single edge property chunk as a DataFrame.
 
@@ -323,7 +338,9 @@ class EdgeReader:
         )
 
     def read_edge_property_group(
-        self, property_group: PropertyGroup, add_index: bool = True,
+        self,
+        property_group: PropertyGroup,
+        add_index: bool = True,
     ) -> DataFrame:
         """Load all chunks for a property group as a DataFrame.
 
@@ -365,7 +382,9 @@ class EdgeReader:
         )
 
     def read_multiple_edge_property_groups(
-        self, property_groups: list[PropertyGroup], add_index: bool = True,
+        self,
+        property_groups: list[PropertyGroup],
+        add_index: bool = True,
     ) -> DataFrame:
         """Load the chunks for multiple property groups as a DataFrame.
 
@@ -382,7 +401,9 @@ class EdgeReader:
         )
 
     def read_all_edge_property_groups_for_vertex_chunk(
-        self, vertex_chunk_index: int, add_index: bool = True,
+        self,
+        vertex_chunk_index: int,
+        add_index: bool = True,
     ) -> DataFrame:
         """Load the chunks for all property groups of a vertex chunk as a DataFrame.
 
@@ -410,7 +431,9 @@ class EdgeReader:
         )
 
     def read_edges_for_vertex_chunk(
-        self, vertex_chunk_index: int, add_index: bool = True,
+        self,
+        vertex_chunk_index: int,
+        add_index: bool = True,
     ) -> DataFrame:
         """Load the chunks for the AdjList and all property groups for a vertex chunk as a DataFrame.
 
@@ -420,7 +443,8 @@ class EdgeReader:
         """
         return DataFrame(
             self._jvm_edge_reader_obj.readEdgesForVertexChunk(
-                vertex_chunk_index, add_index,
+                vertex_chunk_index,
+                add_index,
             ),
             GraphArSession.ss,
         )

@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""GraphSession and initialization."""
 
 from pyspark.sql import SparkSession
 
-from graphar_pyspark.errors import GraphArIsNotInitializedException
+from graphar_pyspark.errors import GraphArIsNotInitializedError
 
 
 class _GraphArSession:
@@ -60,4 +61,4 @@ def initialize(spark: SparkSession) -> None:
 def _check_session() -> None:
     if not GraphArSession.is_initialized():
         msg = "GraphArSession is not initialized. Call `pyspark_graphar.initialize` first!"
-        raise GraphArIsNotInitializedException(msg)
+        raise GraphArIsNotInitializedError(msg)

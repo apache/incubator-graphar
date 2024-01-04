@@ -16,10 +16,11 @@ from pathlib import Path
 
 from graphar_pyspark import initialize
 from graphar_pyspark.enums import AdjListType
-from graphar_pyspark.info import EdgeInfo, VertexInfo
+from graphar_pyspark.info import EdgeInfo, GraphInfo, VertexInfo
 from graphar_pyspark.reader import EdgeReader, VertexReader
 from graphar_pyspark.util import IndexGenerator
 from graphar_pyspark.writer import EdgeWriter, VertexWriter
+from graphar_pyspark.graph import GraphWriter
 
 GRAPHAR_TESTS_EXAMPLES = Path(__file__).parent.parent.parent.joinpath("testing")
 
@@ -48,6 +49,7 @@ def test_vertex_writer(spark):
         num_vertices,
     )
     vertex_writer.write_vertex_properties()
+    vertex_writer.write_vertex_properties(vertex_info.get_property_groups()[0])
     assert Path("/tmp/nebula").exists()
     assert Path("/tmp/nebula/vertex/player/vertex_count").exists()
     assert Path("/tmp/nebula/vertex/player/_vertexId_name_age/chunk0").exists()
@@ -82,3 +84,35 @@ def test_edge_writer(spark):
     edge_writer.write_edge_properties()
     assert Path("/tmp/nebula").exists()
     assert Path("/tmp/nebula/edge").exists()
+
+    assert EdgeWriter.from_scala(edge_writer.to_scala()) is not None
+
+    edge_writer.write_edges()
+    edge_writer.write_edge_properties(
+        edge_info.get_property_group("degree", AdjListType.ORDERED_BY_SOURCE),
+    )
+    edge_writer.write_edge_properties()
+    edge_writer.write_adj_list()
+
+
+def test_graph_writer(spark):
+    initialize(spark)
+    graph_writer = GraphWriter.from_python()
+
+    assert GraphWriter.from_scala(graph_writer.to_scala()) is not None
+    vertex_file_path = GRAPHAR_TESTS_EXAMPLES.joinpath("ldbc_sample/person_0_0.csv").absolute().__str__()
+    vertex_df = spark.read.option("delimiter", "|").option("header", "true").csv(vertex_file_path)
+    label = "person"
+    graph_writer.put_vertex_data(label, vertex_df, "id")
+
+    edge_file_path = GRAPHAR_TESTS_EXAMPLES.joinpath("ldbc_sample/person_knows_person_0_0.csv").absolute().__str__()
+    edge_df = spark.read.option("delimiter", "|").option("header", "true").csv(edge_file_path)
+    tag = ("person", "knows", "person")
+
+    graph_info = GraphInfo.from_python("ldbc", "/tmp/ldbc", ["person.vertex.yml"], ["person_knows_person.yml"], "gar/v1")
+
+    graph_writer.put_edge_data(tag, edge_df)
+    graph_writer.write_with_graph_info(graph_info)
+    graph_writer.write("/tmp/ldbc", "ldbc")
+
+    assert Path("/tmp/ldbc").exists()

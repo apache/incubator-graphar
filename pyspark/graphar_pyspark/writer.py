@@ -12,6 +12,9 @@
 # see the license for the specific language governing permissions and
 # limitations under the license.
 
+"""Bindings to com.alibaba.graphar.writer."""
+
+
 from __future__ import annotations
 
 import os
@@ -77,8 +80,8 @@ class VertexWriter:
         :param prefix: the absolute prefix.
         :param vertex_info: the vertex info that describes the vertex type.
         :param vertex_df: the input vertex DataFrame.
+        :param num_vertices: the number of vertices, optional
         """
-        # TODO: track a py4j issue and add optional num_vertices when it will be resolved
         if not prefix.endswith(os.sep):
             prefix += os.sep
         return VertexWriter(prefix, vertex_info, vertex_df, num_vertices, None)

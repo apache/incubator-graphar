@@ -12,17 +12,24 @@
 # see the license for the specific language governing permissions and
 # limitations under the license.
 
+"""Bindings to com.alibaba.graphar info classes."""
+
+# because we are using type-hints, we need to define few custom TypeVar
+# to describe returns of classmethods;
+
 from __future__ import annotations
 
+import os
 from collections.abc import Sequence
 from typing import Any, Optional, TypeVar, Union
 
-from py4j.java_gateway import JavaObject
 from py4j.java_collections import JavaList
+from py4j.java_gateway import JavaObject
 
 from graphar_pyspark import GraphArSession, _check_session
 from graphar_pyspark.enums import AdjListType, FileType, GarType
 
+# Return type of Property classmethods
 PropertyType = TypeVar("PropertyType", bound="Property")
 
 
@@ -133,6 +140,7 @@ class Property:
         )
 
 
+# Return type of PropertyGroup classmethods
 PropertyGroupType = TypeVar("PropertyGroupType", bound="PropertyGroup")
 
 
@@ -203,7 +211,7 @@ class PropertyGroup:
         :param properties: list of Properties
         """
         self._jvm_property_group_obj.setProperties(
-            [property.to_scala() for property in properties],
+            [py_property.to_scala() for py_property in properties],
         )
 
     def to_scala(self) -> JavaObject:
@@ -258,6 +266,7 @@ class PropertyGroup:
         )
 
 
+# Return type of VertexInfo classmethods
 VertexInfoType = TypeVar("VertexInfoType", bound="VertexInfo")
 
 
@@ -289,38 +298,78 @@ class VertexInfo:
             self._jvm_vertex_info_obj = vertex_info
 
     def get_label(self) -> str:
+        """Get label from the corresponding JVM object.
+
+        :returns: label
+        """
         return self._jvm_vertex_info_obj.getLabel()
 
     def set_label(self, label: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param label: new label
+        """
         self._jvm_vertex_info_obj.setLabel(label)
 
     def get_chunk_size(self) -> int:
+        """Get chunk size from the corresponding JVM object.
+
+        :returns: chunk size
+        """
         return self._jvm_vertex_info_obj.getChunk_size()
 
     def set_chunk_size(self, chunk_size: int) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param chunk_size: new chunk size
+        """
         self._jvm_vertex_info_obj.setChunk_size(chunk_size)
 
     def get_prefix(self) -> str:
+        """Get prefix from the corresponding JVM object.
+
+        :returns: prefix
+        """
         return self._jvm_vertex_info_obj.getPrefix()
 
     def set_prefix(self, prefix: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param prefix: the new pefix.
+        """
         self._jvm_vertex_info_obj.setPrefix(prefix)
 
     def get_property_groups(self) -> Sequence[PropertyGroup]:
+        """Get property groups from the corresponding JVM object.
+
+        :returns: property groups
+        """
         return [
             PropertyGroup.from_scala(jvm_property_group)
             for jvm_property_group in self._jvm_vertex_info_obj.getProperty_groups()
         ]
 
     def set_property_groups(self, property_groups: Sequence[PropertyGroup]) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param property_groups: new property groups
+        """
         self._jvm_vertex_info_obj.setProperty_groups(
             [py_property_group.to_scala() for py_property_group in property_groups],
         )
 
     def get_version(self) -> str:
+        """Get version from the corresponding JVM object.
+
+        :returns: version
+        """
         return self._jvm_vertex_info_obj.getVersion()
 
     def set_version(self, version: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param version: the new version.
+        """
         self._jvm_vertex_info_obj.setVersion(version)
 
     def contain_property_group(self, property_group: PropertyGroup) -> bool:
@@ -466,9 +515,18 @@ class VertexInfo:
         property_groups: Sequence[PropertyGroup],
         version: str,
     ) -> VertexInfoType:
+        """Create an instance of the class based on python args.
+
+        :param label: label of the vertex
+        :chunk_size: chunk size
+        :prefix: vertex prefix
+        :property_groups: list of property groups
+        :version: version of GAR
+        """
         return VertexInfo(label, chunk_size, prefix, property_groups, version, None)
 
 
+# Return type of AdjList classmethods
 AdjListClassType = TypeVar("AdjListClassType", bound="AdjList")
 
 
@@ -500,36 +558,78 @@ class AdjList:
             self._jvm_adj_list_obj = jvm_adj_list
 
     def get_ordered(self) -> bool:
+        """Get ordered flag from the corresponding JVM object.
+
+        :returns: ordered
+        """
         return self._jvm_adj_list_obj.getOrdered()
 
     def set_ordered(self, ordered: bool) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param ordered: new ordered flag
+        """
         self._jvm_adj_list_obj.setOrdered(ordered)
 
     def get_aligned_by(self) -> str:
+        """Get aligned_by from the corresponding JVM object.
+
+        :returns: aligned by as a string ("src", "dst")
+        """
         return self._jvm_adj_list_obj.getAligned_by()
 
     def set_aligned_by(self, aligned_by: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param aligned_by: the new aligned_by (recommended to use "src" or "dst")
+
+        """
         self._jvm_adj_list_obj.setAligned_by(aligned_by)
 
     def get_prefix(self) -> str:
+        """Get prefix from the corresponding JVM object.
+
+        :returns: prefix
+        """
         return self._jvm_adj_list_obj.getPrefix()
 
     def set_prefix(self, prefix: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param prefix: the new prefix
+
+        """
         self._jvm_adj_list_obj.setPrefix(prefix)
 
     def get_file_type(self) -> FileType:
+        """Get FileType (as Enum) from the corresponding JVM object.
+
+        :returns: file type
+        """
         return FileType(self._jvm_adj_list_obj.getFile_type())
 
     def set_file_type(self, file_type: FileType) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param file_type: the new file type
+        """
         self._jvm_adj_list_obj.setFile_type(file_type.value)
 
     def get_property_groups(self) -> Sequence[PropertyGroup]:
+        """Get property groups from the corresponding JVM object.
+
+        :returns: property groups
+        """
         return [
             PropertyGroup.from_scala(jvm_property_group)
             for jvm_property_group in self._jvm_adj_list_obj.getProperty_groups()
         ]
 
     def set_property_groups(self, property_groups: Sequence[PropertyGroup]) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param property_groups: new property groups
+        """
         self._jvm_adj_list_obj.setProperty_groups(
             [p_group.to_scala() for p_group in property_groups],
         )
@@ -569,6 +669,16 @@ class AdjList:
         file_type: FileType,
         property_groups: Sequence[PropertyGroup],
     ) -> AdjListClassType:
+        """Create an instance of the class from python arguments.
+
+        :param ordered: ordered flag
+        :param aligned_by: recommended values are "src" or "dst"
+        :param prefix: path prefix
+        :param file_type: file type
+        :param property_groups: sequence of PropertyGroup objects
+        """
+        if not prefix.endswith(os.sep):
+            prefix += os.sep
         return AdjList(ordered, aligned_by, prefix, file_type, property_groups, None)
 
     def __eq__(self, other: Any) -> bool:
@@ -591,6 +701,7 @@ class AdjList:
         )
 
 
+# Return type of EdgeInfo classmethods
 EdgeInfoType = TypeVar("EdgeInfoType", bound="EdgeInfo")
 
 
@@ -632,68 +743,148 @@ class EdgeInfo:
             self._jvm_edge_info_obj = edge_info
 
     def get_src_label(self) -> str:
+        """Get src label from the corresponding JVM object.
+
+        :returns: src label
+        """
         return self._jvm_edge_info_obj.getSrc_label()
 
     def set_src_label(self, src_label: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param src_label: the new src label
+        """
         self._jvm_edge_info_obj.setSrc_label(src_label)
 
     def get_edge_label(self) -> str:
+        """Get edge label from the corresponding JVM object.
+
+        :returns: edge label
+        """
         return self._jvm_edge_info_obj.getEdge_label()
 
     def set_edge_label(self, edge_label: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param edge_label: the new edge label
+        """
         self._jvm_edge_info_obj.setEdge_label(edge_label)
 
     def get_dst_label(self) -> str:
+        """Get dst label from the corresponding JVM object.
+
+        :returns: dst label
+        """
         return self._jvm_edge_info_obj.getDst_label()
 
     def set_dst_label(self, dst_label: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param dst_label: the new dst label
+        """
         self._jvm_edge_info_obj.setDst_label(dst_label)
 
     def get_chunk_size(self) -> int:
+        """Get chunk size from the corresponding JVM object.
+
+        :returns: chunk size
+        """
         return self._jvm_edge_info_obj.getChunk_size()
 
     def set_chunk_size(self, chunk_size: int) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param chunk_size: the new chunk size
+        """
         self._jvm_edge_info_obj.setChunk_size(chunk_size)
 
     def get_src_chunk_size(self) -> int:
+        """Get source chunk size from the corresponding JVM object.
+
+        :returns: source chunk size
+        """
         return self._jvm_edge_info_obj.getSrc_chunk_size()
 
     def set_src_chunk_size(self, src_chunk_size: int) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param src_chunk_size: the new source chunk size.
+        """
         self._jvm_edge_info_obj.setSrc_chunk_size(src_chunk_size)
 
     def get_dst_chunk_size(self) -> int:
+        """Get dest chunk size from the corresponding JVM object.
+
+        :returns: destination chunk size
+        """
         return self._jvm_edge_info_obj.getDst_chunk_size()
 
     def set_dst_chunk_size(self, dst_chunk_size: int) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param dst_chunk_size: the new destination chunk size.
+        """
         self._jvm_edge_info_obj.setDst_chunk_size(dst_chunk_size)
 
     def get_directed(self) -> bool:
+        """Get directed flag from the corresponding JVM object.
+
+        :returns: directed flag
+        """
         return self._jvm_edge_info_obj.getDirected()
 
     def set_directed(self, directed: bool) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param directed: the new directed flag
+        """
         self._jvm_edge_info_obj.setDirected(directed)
 
     def get_prefix(self) -> str:
+        """Get prefix from the corresponding JVM object.
+
+        :returns: prefix
+        """
         return self._jvm_edge_info_obj.getPrefix()
 
     def set_prefix(self, prefix: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param prefix: the new prefix
+        """
         self._jvm_edge_info_obj.setPrefix(prefix)
 
     def get_adj_lists(self) -> Sequence[AdjList]:
+        """Get adj lists from the corresponding JVM object.
+
+        :returns: sequence of AdjList
+        """
         return [
             AdjList.from_scala(jvm_adj_list)
             for jvm_adj_list in self._jvm_edge_info_obj.getAdj_lists()
         ]
 
     def set_adj_lists(self, adj_lists: Sequence[AdjList]) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param adj_lists: the new adj lists, sequence of AdjList
+        """
         self._jvm_edge_info_obj.setAdj_lists(
             [py_adj_list.to_scala() for py_adj_list in adj_lists],
         )
 
     def get_version(self) -> str:
+        """Get GAR version from the corresponding JVM object.
+
+        :returns: GAR version
+        """
         return self._jvm_edge_info_obj.getVersion()
 
     def set_version(self, version: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param version: the new GAR version
+        """
         self._jvm_edge_info_obj.setVersion(version)
 
     def to_scala(self) -> JavaObject:
@@ -738,6 +929,22 @@ class EdgeInfo:
         adj_lists: Sequence[AdjList],
         version: str,
     ) -> EdgeInfoType:
+        """Create an instance of the class from python arguments.
+
+        :param src_label: source vertex label
+        :param edge_label: edges label
+        :param dst_label: destination vertex label
+        :param chunk_size: chunk size
+        :param src_chunk_size: source chunk size
+        :param dst_chunk_size: destination chunk size
+        :param directed: directed graph flag
+        :param prefix: path prefix
+        :param adj_lists: sequence of AdjList objects
+        :param version: version of GAR format
+        """
+        if not prefix.endswith(os.sep):
+            prefix += os.sep
+
         return EdgeInfo(
             src_label,
             edge_label,
@@ -1133,21 +1340,45 @@ class GraphInfo:
         self._jvm_graph_info_obj.setPrefix(prefix)
 
     def get_vertices(self) -> JavaList:
+        """Get list of vertices from the corresponding JVM object.
+
+        :returns: vertices
+        """
         return self._jvm_graph_info_obj.getVertices()
 
     def set_vertices(self, vertices: Union[list[str], JavaList]) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param vertices: new list of vertices
+        """
         self._jvm_graph_info_obj.setVertices(vertices)
 
     def get_edges(self) -> JavaList:
+        """Get list of edges from the corresponding JVM object.
+
+        :returns: edges
+        """
         return self._jvm_graph_info_obj.getEdges()
 
     def set_edges(self, edges: Union[list[str], JavaList]) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param edges: new list of edges.
+        """
         self._jvm_graph_info_obj.setEdges(edges)
 
     def get_version(self) -> str:
+        """Get GAR version from the corresponding JVM object.
+
+        :returns: version
+        """
         return self._jvm_graph_info_obj.getVersion()
 
     def set_version(self, version: str) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param version: new version of GAR
+        """
         self._jvm_graph_info_obj.setVersion(version)
 
     def to_scala(self) -> JavaObject:
@@ -1170,19 +1401,41 @@ class GraphInfo:
     def from_python(
         name: str,
         prefix: str,
-        vertices: list[str],
-        edges: list[str],
+        vertices: Sequence[str],
+        edges: Sequence[str],
         version: str,
     ) -> "GraphInfo":
+        """Create an instance of the class from python arguments.
+
+        :param name: name of the graph
+        :param prefix: path prefix
+        :param vertices: list of vertices
+        :param edges: list of edges
+        :param version: version of GAR format
+        """
+        if not prefix.endswith(os.sep):
+            prefix += os.sep
         return GraphInfo(name, prefix, vertices, edges, version, None)
 
     def add_vertex_info(self, vertex_info: VertexInfo) -> None:
+        """Add VertexInfo to GraphInfo.
+
+        :param vertex_info: VertexInfo to add
+        """
         self._jvm_graph_info_obj.addVertexInfo(vertex_info.to_scala())
 
     def add_edge_info(self, edge_info: EdgeInfo) -> None:
+        """Add EdgeInfo to GraphInfo.
+
+        :param edge_info: EdgeInfo to add
+        """
         self._jvm_graph_info_obj.addEdgeInfo(edge_info.to_scala())
 
     def get_vertex_info(self, label: str) -> VertexInfo:
+        """Get vertex info from the corresponding JVM object.
+
+        :param label: label of vertex
+        """
         return VertexInfo.from_scala(self._jvm_graph_info_obj.getVertexInfo(label))
 
     def get_edge_info(
@@ -1191,11 +1444,21 @@ class GraphInfo:
         edge_label: str,
         dst_label: str,
     ) -> EdgeInfo:
+        """Get edge info from the corresponding JVM object.
+
+        :param src_label: source label
+        :param edge_label: edge label
+        :param dst_label: destination label
+        """
         return EdgeInfo.from_scala(
             self._jvm_graph_info_obj.getEdgeInfo(src_label, edge_label, dst_label),
         )
 
     def get_vertex_infos(self) -> dict[str, VertexInfo]:
+        """Get all vertex infos from the corresponding JVM object.
+
+        :returns: Mapping label -> VertexInfo
+        """
         scala_map = self._jvm_graph_info_obj.getVertexInfos()
         keys_set_iter = scala_map.keySet().iterator()
         res = {}
@@ -1206,6 +1469,10 @@ class GraphInfo:
         return res
 
     def get_edge_infos(self) -> dict[str, EdgeInfo]:
+        """Get all edge infos from the corresponding JVM object.
+
+        :returns: Mapping {src_label}_{edge_label}_{dst_label} -> EdgeInfo
+        """
         scala_map = self._jvm_graph_info_obj.getEdgeInfos()
         keys_set_iter = scala_map.keySet().iterator()
         res = {}

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Bidnings to com.alibaba.graphar.graph."""
+
 from __future__ import annotations
 
 from collections.abc import Mapping
@@ -23,7 +25,7 @@ from pyspark.sql import DataFrame
 
 from graphar_pyspark import GraphArSession, _check_session
 from graphar_pyspark.enums import FileType
-from graphar_pyspark.errors import InvalidGraphFormatException
+from graphar_pyspark.errors import InvalidGraphFormatError
 from graphar_pyspark.info import GraphInfo
 
 
@@ -112,6 +114,8 @@ class GraphReader:
 
 
 class GraphWriter:
+    """The helper class for writing graph."""
+
     def __init__(self, jvm_obj: JavaObject) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
         _check_session()
@@ -153,7 +157,10 @@ class GraphWriter:
         :param relation: 3-Tuple (source label, edge label, target label) to indicate edge type.
         :param df: data frame of edge type.
         """
-        self._jvm_graph_writer_obj.PutEdgeData(relation, df._jdf)
+        relation_jvm = GraphArSession.jvm.scala.Tuple3(
+            relation[0], relation[1], relation[2],
+        )
+        self._jvm_graph_writer_obj.PutEdgeData(relation_jvm, df._jdf)
 
     def write_with_graph_info(self, graph_info: Union[GraphInfo, str]) -> None:
         """Write the graph data in graphar format with graph info.
@@ -251,4 +258,4 @@ class GraphTransformer:
         else:
             msg = "Both src and dst graph info objects should be of the same type. "
             msg += f"But {type(source_graph_info)} and {type(dest_graph_info)} were provided!"
-            raise InvalidGraphFormatException(msg)
+            raise InvalidGraphFormatError(msg)

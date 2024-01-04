@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
-class InvalidGraphFormatException(ValueError):
-    pass
+"""Custom Exceptions."""
 
 
-class GraphArIsNotInitializedException(ValueError):
-    pass
+class InvalidGraphFormatError(ValueError):
+    """Exception that graph format arguments have wrong format."""
+
+
+class GraphArIsNotInitializedError(ValueError):
+    """Exception that GraphAr Session is not initialized."""
