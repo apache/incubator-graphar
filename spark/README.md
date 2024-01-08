@@ -248,4 +248,4 @@ You can include GraphAr as a dependency in your maven project
 
 ## How to use
 
-Please refer to our [GraphAr Spark Library Documentation](https://alibaba.github.io/GraphAr/user-guide/spark-lib.html).
+Please refer to our [GraphAr Spark Library Documentation](https://alibaba.github.io/GraphAr/spark/spark-lib.html).
