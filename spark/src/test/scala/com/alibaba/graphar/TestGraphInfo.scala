@@ -29,10 +29,10 @@ class GraphInfoSuite extends AnyFunSuite {
   test("load graph info") {
     // read graph yaml
     val yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/csv/ldbc_sample.graph.yml")
+      .getResource("gar-test/new/ldbc_sample/csv/ldbc_sample.graph.yml")
       .getPath
     val prefix =
-      getClass.getClassLoader.getResource("gar-test/ldbc_sample/csv/").getPath
+      getClass.getClassLoader.getResource("gar-test/new/ldbc_sample/csv/").getPath
     val graph_info = GraphInfo.loadGraphInfo(yaml_path, spark)
 
     val vertex_info = graph_info.getVertexInfo("person")

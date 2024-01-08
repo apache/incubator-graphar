@@ -32,7 +32,7 @@ class TransformExampleSuite extends AnyFunSuite {
 
   test("transform file type") {
     // read from orc files
-    val file_path = "gar-test/ldbc_sample/orc/"
+    val file_path = "gar-test/new/ldbc_sample/orc/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
     val vertex_yaml = getClass.getClassLoader
       .getResource(file_path + "person.vertex.yml")
@@ -45,7 +45,7 @@ class TransformExampleSuite extends AnyFunSuite {
     assert(vertex_df_with_index.count() == vertices_num)
 
     // write to parquet files
-    val output_file_path = "gar-test/ldbc_sample/parquet/"
+    val output_file_path = "gar-test/new/ldbc_sample/parquet/"
     val output_prefix: String = "/tmp/example/"
     val output_vertex_yaml = getClass.getClassLoader
       .getResource(output_file_path + "person.vertex.yml")
@@ -69,7 +69,7 @@ class TransformExampleSuite extends AnyFunSuite {
   }
 
   test("transform adjList type") {
-    val file_path = "gar-test/ldbc_sample/parquet/"
+    val file_path = "gar-test/new/ldbc_sample/parquet/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
     // get vertex num
     val vertex_yaml = getClass.getClassLoader
