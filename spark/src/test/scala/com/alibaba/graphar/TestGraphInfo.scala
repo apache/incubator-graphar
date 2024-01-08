@@ -153,7 +153,7 @@ class GraphInfoSuite extends AnyFunSuite {
         AdjListType.ordered_by_source
       ) == FileType.CSV
     )
-    assert(edge_info.getPropertyGroups(AdjListType.ordered_by_source).size == 1)
+    assert(edge_info.getProperty_groups().size == 1)
     assert(
       edge_info.getVerticesNumFilePath(
         AdjListType.ordered_by_source
@@ -219,11 +219,10 @@ class GraphInfoSuite extends AnyFunSuite {
       ) == "edge/person_knows_person/ordered_by_source/offset/"
     )
     val property_group =
-      edge_info.getPropertyGroups(AdjListType.ordered_by_source).get(0)
+      edge_info.getProperty_groups().get(0)
     assert(
       edge_info.containPropertyGroup(
-        property_group,
-        AdjListType.ordered_by_source
+        property_group
       )
     )
     val property = property_group.getProperties.get(0)
@@ -231,8 +230,7 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(edge_info.containProperty(property_name))
     assert(
       edge_info.getPropertyGroup(
-        property_name,
-        AdjListType.ordered_by_source
+        property_name
       ) == property_group
     )
     assert(
@@ -271,7 +269,7 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(
       edge_info.getAdjListFileType(AdjListType.ordered_by_dest) == FileType.CSV
     )
-    assert(edge_info.getPropertyGroups(AdjListType.ordered_by_dest).size == 1)
+    assert(edge_info.getProperty_groups().size == 1)
     assert(
       edge_info.getAdjListFilePath(
         0,
@@ -321,11 +319,10 @@ class GraphInfoSuite extends AnyFunSuite {
       ) == "edge/person_knows_person/ordered_by_dest/offset/"
     )
     val property_group_2 =
-      edge_info.getPropertyGroups(AdjListType.ordered_by_dest).get(0)
+      edge_info.getProperty_groups().get(0)
     assert(
       edge_info.containPropertyGroup(
-        property_group_2,
-        AdjListType.ordered_by_dest
+        property_group_2
       )
     )
     val property_2 = property_group_2.getProperties.get(0)
@@ -333,8 +330,7 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(edge_info.containProperty(property_name_2))
     assert(
       edge_info.getPropertyGroup(
-        property_name_2,
-        AdjListType.ordered_by_dest
+        property_name_2
       ) == property_group_2
     )
     assert(
@@ -373,13 +369,9 @@ class GraphInfoSuite extends AnyFunSuite {
     assertThrows[IllegalArgumentException](
       edge_info.getAdjListFileType(AdjListType.unordered_by_source)
     )
-    assertThrows[IllegalArgumentException](
-      edge_info.getPropertyGroups(AdjListType.unordered_by_source)
-    )
     assert(
       edge_info.containPropertyGroup(
-        property_group,
-        AdjListType.unordered_by_source
+        property_group
       ) == false
     )
     assertThrows[IllegalArgumentException](
@@ -407,7 +399,7 @@ class GraphInfoSuite extends AnyFunSuite {
     )
     assert(edge_info.containProperty("not_exist") == false)
     assertThrows[IllegalArgumentException](
-      edge_info.getPropertyGroup("not_exist", AdjListType.ordered_by_source)
+      edge_info.getPropertyGroup("not_exist")
     )
     assertThrows[IllegalArgumentException](
       edge_info.getPropertyType("not_exist")
@@ -444,14 +436,6 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(pg1 == pg2)
     val al1 = new AdjList()
     val al2 = new AdjList()
-    assert(al1 == al2)
-    al1.setProperty_groups(
-      new java.util.ArrayList[PropertyGroup](java.util.Arrays.asList(pg1))
-    )
-    assert(al1 != al2)
-    al2.setProperty_groups(
-      new java.util.ArrayList[PropertyGroup](java.util.Arrays.asList(pg2))
-    )
     assert(al1 == al2)
   }
 }

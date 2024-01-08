@@ -245,7 +245,7 @@ class ReaderSuite extends AnyFunSuite {
 
     // test reading a single property group
     val property_group =
-      edge_info.getPropertyGroup("creationDate", adj_list_type)
+      edge_info.getPropertyGroup("creationDate")
     val single_property_df = reader.readEdgePropertyChunk(property_group, 2, 0)
     assert(single_property_df.columns.size == 1)
     assert(single_property_df.count() == 1024)

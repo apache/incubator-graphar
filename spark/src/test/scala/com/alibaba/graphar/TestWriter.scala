@@ -169,7 +169,7 @@ class WriterSuite extends AnyFunSuite {
 
     // test write property group
     val property_group =
-      edge_info.getPropertyGroup("creationDate", adj_list_type)
+      edge_info.getPropertyGroup("creationDate")
     writer.writeEdgeProperties(property_group)
 
     val property_group_path_pattern = new Path(
@@ -334,7 +334,7 @@ class WriterSuite extends AnyFunSuite {
 
     // test write property group
     val property_group =
-      edge_info.getPropertyGroup("creationDate", adj_list_type)
+      edge_info.getPropertyGroup("creationDate")
     writer.writeEdgeProperties(property_group)
     val property_group_path_pattern = new Path(
       prefix + edge_info.getPropertyGroupPathPrefix(
