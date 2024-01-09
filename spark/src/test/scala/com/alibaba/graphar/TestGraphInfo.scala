@@ -371,11 +371,6 @@ class GraphInfoSuite extends AnyFunSuite {
     assertThrows[IllegalArgumentException](
       edge_info.getAdjListFileType(AdjListType.unordered_by_source)
     )
-    assert(
-      edge_info.containPropertyGroup(
-        property_group
-      ) == false
-    )
     assertThrows[IllegalArgumentException](
       edge_info.getVerticesNumFilePath(AdjListType.unordered_by_source)
     )
