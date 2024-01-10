@@ -21,6 +21,7 @@
    C++ <cpp/index>
    Java <java/index>
    Spark <spark/index>
+   PySpark <pyspark/index>
 
 .. toctree::
    :maxdepth: 2

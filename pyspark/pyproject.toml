@@ -1,0 +1,95 @@
+# copyright 2022-2023 alibaba group holding limited.
+# 
+# licensed under the apache license, version 2.0 (the "license");
+# you may not use this file except in compliance with the license.
+# you may obtain a copy of the license at
+# 
+#     http://www.apache.org/licenses/license-2.0
+# 
+# unless required by applicable law or agreed to in writing, software
+# distributed under the license is distributed on an "as is" basis,
+# without warranties or conditions of any kind, either express or implied.
+# see the license for the specific language governing permissions and
+# limitations under the license.
+
+[tool.poetry]
+name = "graphar-pyspark"
+version = "0.0.1"
+description = "PySpark bindings to GraphAr scala spark package"
+authors = ["Semyon Sinchenko <ssinchenko@pm.me>"]
+readme = "README.md"
+packages = [{include = "graphar_pyspark"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.group.spark]
+optional = true
+
+[tool.poetry.group.spark.dependencies]
+pyspark = "3.2.2" # TODO: relax requirement when scala part will be available for multiple spark versions
+
+[tool.poetry.group.lint]
+optional = true
+
+[tool.poetry.group.lint.dependencies]
+ruff = "*"
+
+[tool.poetry.group.tests]
+optional = true
+
+[tool.poetry.group.tests.dependencies]
+pytest = "*"
+pytest-cov = "*"
+pyyaml = "*"
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+breathe = "*"
+docutils = "*"
+furo = "*" # sphinx theme
+nbsphinx = "*"
+sphinx = ">=3.0.2"
+jinja2 = ">=3.1.2"
+sphinx-copybutton = "*"
+sphinx-panels = "*"
+sphinxemoji = "*"
+sphinxext-opengraph = "*"
+markupsafe = "2.0.1"
+
+[tool.ruff]
+exclude = ["tests"]
+
+line-length = 150
+select = ["ALL"]
+ignore = [
+  "UP007", # bad compatibility with python < 3.10
+  "UP037", # bad compatibility with python < 3.10
+  "ANN101", # requires 3d party tool, like typing-extensions
+  "ANN401", # it is questinable
+  "SLF001", # we cannot avoid accessing private members of SparkSession
+  "PLR0913", # public API follows Scala API, changing signatures is not possible
+  "FBT001", # not a problem in our code
+  "FBT002", # not a problem in our code
+  "TD002", # our todos does not have authorship
+  "TD003", # our todos does not have issue links
+  "D203", # not compatible with D211
+  "D213", # not compatible with D212
+  "TCH001", # the whole idea of TCHxxx rules is very questinable
+  "TCH002", # it makes code harder to read
+  "TCH003", # it makes code harder to read
+  "D105", # magic methods are self-documented
+  "B905", # not works in python 3.9
+]
+
+[tool.pytest]
+testpaths = "tests"
+
+[tool.coverage.run]
+omit = ["tests/*"]
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
