@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: GraphAr Spark CI
+name: GraphAr PySpark CI
 
 on:
   # Trigger the workflow on push or pull request,
@@ -38,7 +38,8 @@ jobs:
 
     - name: Install Python
       uses: actions/setup-python@v4
-      python-version: 3.9
+      with:
+        python-version: 3.9
 
     - name: Install Poetry
       uses: abatilo/actions-poetry@v2
