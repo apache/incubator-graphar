@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Sequence
-from typing import Any, Optional, TypeVar, Union
+from typing import Optional, TypeVar, Union
 
 from py4j.java_collections import JavaList
 from py4j.java_gateway import JavaObject
@@ -129,7 +129,7 @@ class Property:
         """
         return cls(name, data_type, is_primary, None)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, Property):
             return False
 
@@ -248,7 +248,7 @@ class PropertyGroup:
         """
         return cls(prefix, file_type, properties, None)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, PropertyGroup):
             return False
 
@@ -681,7 +681,7 @@ class AdjList:
             prefix += os.sep
         return AdjList(ordered, aligned_by, prefix, file_type, property_groups, None)
 
-    def __eq__(self, other: Any) -> bool:
+    def __eq__(self, other: object) -> bool:
         if not isinstance(other, AdjList):
             return False
 
