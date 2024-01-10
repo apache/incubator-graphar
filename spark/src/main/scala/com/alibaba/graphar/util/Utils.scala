@@ -127,7 +127,7 @@ object Utils {
             val isPrimary: Boolean =
               if (
                 (primaryKeys(key) == "" && properties
-                  .size() == 0) || field.name == primaryKeys
+                  .size() == 0) || field.name.equals(primaryKeys(key))
               ) true
               else false
             property.setIs_primary(isPrimary)
