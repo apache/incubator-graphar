@@ -539,7 +539,6 @@ class AdjList:
         aligned_by: Optional[str],
         prefix: Optional[str],
         file_type: Optional[FileType],
-        property_groups: Optional[Sequence[PropertyGroup]],
         jvm_obj: Optional[JavaObject],
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
@@ -552,9 +551,6 @@ class AdjList:
             jvm_adj_list.setAligned_by(aligned_by)
             jvm_adj_list.setPrefix(prefix)
             jvm_adj_list.setFile_type(file_type.value)
-            jvm_adj_list.setProperty_groups(
-                [py_property_group.to_scala() for py_property_group in property_groups],
-            )
             self._jvm_adj_list_obj = jvm_adj_list
 
     def get_ordered(self) -> bool:
@@ -615,25 +611,6 @@ class AdjList:
         """
         self._jvm_adj_list_obj.setFile_type(file_type.value)
 
-    def get_property_groups(self) -> Sequence[PropertyGroup]:
-        """Get property groups from the corresponding JVM object.
-
-        :returns: property groups
-        """
-        return [
-            PropertyGroup.from_scala(jvm_property_group)
-            for jvm_property_group in self._jvm_adj_list_obj.getProperty_groups()
-        ]
-
-    def set_property_groups(self, property_groups: Sequence[PropertyGroup]) -> None:
-        """Mutate the corresponding JVM object.
-
-        :param property_groups: new property groups
-        """
-        self._jvm_adj_list_obj.setProperty_groups(
-            [p_group.to_scala() for p_group in property_groups],
-        )
-
     def get_adj_list_type(self) -> AdjListType:
         """Get adj list type.
 
@@ -658,7 +635,7 @@ class AdjList:
         :param jvm_obj: scala object in JVM.
         :returns: instance of Python Class.
         """
-        return AdjList(None, None, None, None, None, jvm_obj)
+        return AdjList(None, None, None, None, jvm_obj)
 
     @classmethod
     def from_python(
@@ -667,7 +644,6 @@ class AdjList:
         aligned_by: str,
         prefix: str,
         file_type: FileType,
-        property_groups: Sequence[PropertyGroup],
     ) -> AdjListClassType:
         """Create an instance of the class from python arguments.
 
@@ -675,11 +651,10 @@ class AdjList:
         :param aligned_by: recommended values are "src" or "dst"
         :param prefix: path prefix
         :param file_type: file type
-        :param property_groups: sequence of PropertyGroup objects
         """
         if not prefix.endswith(os.sep):
             prefix += os.sep
-        return AdjList(ordered, aligned_by, prefix, file_type, property_groups, None)
+        return AdjList(ordered, aligned_by, prefix, file_type, None)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, AdjList):
@@ -690,14 +665,6 @@ class AdjList:
             and (self.get_aligned_by() == other.get_aligned_by())
             and (self.get_prefix() == other.get_prefix())
             and (self.get_file_type() == other.get_file_type())
-            and (len(self.get_property_groups()) == len(other.get_property_groups()))
-            and all(
-                left_pg == right_pg
-                for left_pg, right_pg in zip(
-                    self.get_property_groups(),
-                    other.get_property_groups(),
-                )
-            )
         )
 
 
@@ -719,6 +686,7 @@ class EdgeInfo:
         directed: Optional[bool],
         prefix: Optional[str],
         adj_lists: Sequence[AdjList],
+        property_groups: Optional[Sequence[PropertyGroup]],
         version: Optional[str],
         jvm_edge_info_obj: JavaObject,
     ) -> None:
@@ -738,6 +706,9 @@ class EdgeInfo:
             edge_info.setPrefix(prefix)
             edge_info.setAdj_lists(
                 [py_adj_list.to_scala() for py_adj_list in adj_lists],
+            )
+            edge_info.setProperty_groups(
+                [py_property_group.to_scala() for py_property_group in property_groups],
             )
             edge_info.setVersion(version)
             self._jvm_edge_info_obj = edge_info
@@ -873,6 +844,27 @@ class EdgeInfo:
             [py_adj_list.to_scala() for py_adj_list in adj_lists],
         )
 
+    def get_property_groups(self) -> Sequence[PropertyGroup]:
+        """Get the property groups of adj list type.
+
+        WARNING! Exceptions from the JVM are not checked inside, it is just a proxy-method!
+
+        :returns: property groups of edge info.
+        """
+        return [
+            PropertyGroup.from_scala(jvm_property_group)
+            for jvm_property_group in self._jvm_edge_info_obj.getProperty_groups()
+        ]
+
+    def set_property_groups(self, property_groups: Sequence[PropertyGroup]) -> None:
+        """Mutate the corresponding JVM object.
+
+        :param property_groups: the new property groups, sequence of PropertyGroup
+        """
+        self._jvm_edge_info_obj.setProperty_groups(
+            [py_property_group.to_scala() for py_property_group in property_groups],
+        )
+
     def get_version(self) -> str:
         """Get GAR version from the corresponding JVM object.
 
@@ -912,6 +904,7 @@ class EdgeInfo:
             None,
             None,
             None,
+            None,
             jvm_obj,
         )
 
@@ -927,6 +920,7 @@ class EdgeInfo:
         directed: bool,
         prefix: str,
         adj_lists: Sequence[AdjList],
+        property_groups: Sequence[PropertyGroup],
         version: str,
     ) -> EdgeInfoType:
         """Create an instance of the class from python arguments.
@@ -940,6 +934,7 @@ class EdgeInfo:
         :param directed: directed graph flag
         :param prefix: path prefix
         :param adj_lists: sequence of AdjList objects
+        :property_groups: sequence of of PropertyGroup objects
         :param version: version of GAR format
         """
         if not prefix.endswith(os.sep):
@@ -955,6 +950,7 @@ class EdgeInfo:
             directed,
             prefix,
             adj_lists,
+            property_groups,
             version,
             None,
         )
@@ -990,41 +986,18 @@ class EdgeInfo:
             self._jvm_edge_info_obj.getAdjListFileType(adj_list_type.to_scala()),
         )
 
-    def get_property_groups(
-        self,
-        adj_list_type: AdjListType,
-    ) -> Sequence[PropertyGroup]:
-        """Get the property groups of adj list type.
-
-        WARNING! Exceptions from the JVM are not checked inside, it is just a proxy-method!
-
-        :param adj_list_type: the input adj list type.
-        :returns: property group of the input adj list type, if edge info not support the adj list type,
-        raise an IllegalArgumentException error.
-        """
-        return [
-            PropertyGroup.from_scala(property_group)
-            for property_group in self._jvm_edge_info_obj.getPropertyGroups(
-                adj_list_type.to_scala(),
-            )
-        ]
-
     def contain_property_group(
         self,
         property_group: PropertyGroup,
-        adj_list_type: AdjListType,
     ) -> bool:
-        """Check if the edge info contains the property group in certain adj list structure.
+        """Check if the edge info contains the property group.
 
         :param property_group: the property group to check.
-        :param adj_list_type: the type of adj list structure.
         :returns: true if the edge info contains the property group in certain adj list
-        structure. If edge info not support the given adj list type or not
-        contains the property group in the adj list structure, return false.
+        structure.
         """
         return self._jvm_edge_info_obj.containPropertyGroup(
             property_group.to_scala(),
-            adj_list_type.to_scala(),
         )
 
     def contain_property(self, property_name: str) -> bool:
@@ -1038,23 +1011,17 @@ class EdgeInfo:
     def get_property_group(
         self,
         property_name: str,
-        adj_list_type: AdjListType,
     ) -> PropertyGroup:
         """Get property group that contains property with adj list type.
 
         WARNING! Exceptions from the JVM are not checked inside, it is just a proxy-method!
 
         :param property_name: name of the property.
-        :param adj_list_type: the type of adj list structure.
-        :returns: property group that contains the property. If edge info not support the
-        adj list type, or not find the property group that contains the property,
-        return false.
+        :returns: property group that contains the property. If edge info not find the property group that contains the property,
+        raise error.
         """
         return PropertyGroup.from_scala(
-            self._jvm_edge_info_obj.getPropertyGroup(
-                property_name,
-                adj_list_type.to_scala(),
-            ),
+            self._jvm_edge_info_obj.getPropertyGroup(property_name),
         )
 
     def get_property_type(self, property_name: str) -> GarType:

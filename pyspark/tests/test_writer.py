@@ -89,7 +89,7 @@ def test_edge_writer(spark):
 
     edge_writer.write_edges()
     edge_writer.write_edge_properties(
-        edge_info.get_property_group("degree", AdjListType.ORDERED_BY_SOURCE),
+        edge_info.get_property_group("degree"),
     )
     edge_writer.write_edge_properties()
     edge_writer.write_adj_list()
