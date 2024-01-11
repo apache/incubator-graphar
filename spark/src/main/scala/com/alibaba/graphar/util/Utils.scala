@@ -162,11 +162,11 @@ object Utils {
         cscAdjList.setFile_type(fileType)
         edgeInfo.getAdj_lists().add(csrAdjList)
         edgeInfo.getAdj_lists().add(cscAdjList)
-        edgeInfo.getProperty_groups().add(new PropertyGroup())
-        val propertyGroup = edgeInfo.getProperty_groups().get(0)
-        propertyGroup.setFile_type(fileType)
-        val properties = propertyGroup.getProperties()
         if (schema.length > 0) {
+          edgeInfo.getProperty_groups().add(new PropertyGroup())
+          val propertyGroup = edgeInfo.getProperty_groups().get(0)
+          propertyGroup.setFile_type(fileType)
+          val properties = propertyGroup.getProperties()
           schema.foreach {
             case field => {
               val property = new Property()
