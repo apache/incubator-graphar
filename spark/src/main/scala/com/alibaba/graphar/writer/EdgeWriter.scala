@@ -324,7 +324,7 @@ class EdgeWriter(
    *   property group
    */
   def writeEdgeProperties(propertyGroup: PropertyGroup): Unit = {
-    if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
+    if (edgeInfo.containPropertyGroup(propertyGroup) == false) {
       throw new IllegalArgumentException(
         "property group not contained in edge info."
       )
@@ -350,7 +350,7 @@ class EdgeWriter(
 
   /** Generate the chunks of all property groups from edge DataFrame. */
   def writeEdgeProperties(): Unit = {
-    val property_groups = edgeInfo.getPropertyGroups(adjListType)
+    val property_groups = edgeInfo.getProperty_groups()
     val it = property_groups.iterator
     while (it.hasNext()) {
       val property_group = it.next()

@@ -87,26 +87,11 @@ def test_property_group(spark):
 def test_adj_list(spark):
     initialize(spark)
 
-    props_list_1 = [
-        Property.from_python("non_primary", GarType.DOUBLE, False),
-        Property.from_python("primary", GarType.INT64, True),
-    ]
-
-    props_list_2 = [
-        Property.from_python("non_primary", GarType.DOUBLE, False),
-        Property.from_python("primary", GarType.INT64, True),
-        Property("another_one", GarType.LIST, False),
-    ]
-
     adj_list_from_py = AdjList.from_python(
         True,
         "dest",
         "prefix",
         FileType.PARQUET,
-        [
-            PropertyGroup.from_python("prefix1", FileType.PARQUET, props_list_1),
-            PropertyGroup.from_python("prefix2", FileType.ORC, props_list_2),
-        ],
     )
 
     assert adj_list_from_py == AdjList.from_scala(adj_list_from_py.to_scala())
@@ -124,28 +109,6 @@ def test_adj_list(spark):
 
     adj_list_from_py.set_file_type(FileType.CSV)
     assert adj_list_from_py.get_file_type() == FileType.CSV
-
-    adj_list_from_py.set_property_groups(
-        adj_list_from_py.get_property_groups()
-        + [
-            PropertyGroup.from_python(
-                "prefix3", FileType.CSV, props_list_1 + props_list_2
-            )
-        ]
-    )
-    assert all(
-        pg_left == pg_right
-        for pg_left, pg_right in zip(
-            adj_list_from_py.get_property_groups(),
-            [
-                PropertyGroup.from_python("prefix1", FileType.PARQUET, props_list_1),
-                PropertyGroup.from_python("prefix2", FileType.ORC, props_list_2),
-                PropertyGroup.from_python(
-                    "prefix3", FileType.CSV, props_list_1 + props_list_2
-                ),
-            ],
-        )
-    )
 
 
 def test_vertex_info(spark):
@@ -293,6 +256,7 @@ def test_edge_info(spark):
         directed=True,
         prefix="prefix",
         adj_lists=[],
+        property_groups=[],
         version="v1",
     )
 
@@ -335,15 +299,19 @@ def test_edge_info(spark):
                 "dest",
                 "prefix",
                 FileType.PARQUET,
-                [
-                    PropertyGroup.from_python(
-                        "prefix1", FileType.PARQUET, props_list_1
-                    ),
-                ],
             )
         ]
     )
+    py_edge_info.set_property_groups(
+        [
+            PropertyGroup.from_python(
+                "prefix1", FileType.PARQUET, props_list_1
+            ),
+        ],
+    )
+        
     assert len(py_edge_info.get_adj_lists()) == 1
+    assert len(py_edge_info.get_property_groups()) == 1
 
     # Load from YAML
     person_knows_person_info = EdgeInfo.load_edge_info(
@@ -387,12 +355,11 @@ def test_edge_info(spark):
         != 0
     )
     assert (
-        len(person_knows_person_info.get_property_groups(AdjListType.ORDERED_BY_SOURCE))
+        len(person_knows_person_info.get_property_groups())
         == 1
     )
     assert person_knows_person_info.contain_property_group(
-        person_knows_person_info.get_property_groups(AdjListType.UNORDERED_BY_DEST)[0],
-        AdjListType.UNORDERED_BY_DEST,
+        person_knows_person_info.get_property_groups()[0],
     )
     assert person_knows_person_info.get_property_type("creationDate") == GarType.STRING
     assert person_knows_person_info.is_primary_key("creationDate") == False
@@ -443,7 +410,7 @@ def test_edge_info(spark):
     assert (
         person_knows_person_info.get_property_file_path(
             person_knows_person_info.get_property_group(
-                "creationDate", AdjListType.ORDERED_BY_SOURCE
+                "creationDate",
             ),
             AdjListType.ORDERED_BY_SOURCE,
             0,
@@ -454,7 +421,7 @@ def test_edge_info(spark):
     assert (
         person_knows_person_info.get_property_group_path_prefix(
             person_knows_person_info.get_property_group(
-                "creationDate", AdjListType.ORDERED_BY_SOURCE
+                "creationDate",
             ),
             AdjListType.ORDERED_BY_SOURCE,
             0,
@@ -463,7 +430,7 @@ def test_edge_info(spark):
     assert (
         person_knows_person_info.get_property_group_path_prefix(
             person_knows_person_info.get_property_group(
-                "creationDate", AdjListType.ORDERED_BY_SOURCE
+                "creationDate",
             ),
             AdjListType.ORDERED_BY_SOURCE,
             None,
@@ -535,6 +502,7 @@ def test_graph_info(spark):
             100,
             True,
             "prefix",
+            [],
             [],
             "v1",
         )

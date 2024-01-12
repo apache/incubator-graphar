@@ -242,7 +242,6 @@ class AdjList() {
   @BeanProperty var aligned_by: String = "src"
   @BeanProperty var prefix: String = ""
   @BeanProperty var file_type: String = ""
-  @BeanProperty var property_groups = new java.util.ArrayList[PropertyGroup]()
 
   override def equals(that: Any): Boolean = {
     that match {
@@ -250,8 +249,7 @@ class AdjList() {
         this.ordered == other.ordered &&
           this.aligned_by == other.aligned_by &&
           this.prefix == other.prefix &&
-          this.file_type == other.file_type &&
-          this.property_groups == other.property_groups
+          this.file_type == other.file_type
       case _ => false
     }
   }
@@ -288,14 +286,6 @@ class AdjList() {
     data.put("file_type", file_type)
     data.put("ordered", new java.lang.Boolean(ordered))
     data.put("aligned_by", aligned_by)
-    val property_group_num = property_groups.size()
-    if (property_group_num > 0) {
-      val property_group_maps = new java.util.ArrayList[Object]()
-      for (i <- 0 until property_group_num) {
-        property_group_maps.add(property_groups.get(i).toMap())
-      }
-      data.put("property_groups", property_group_maps)
-    }
     return data
   }
 }

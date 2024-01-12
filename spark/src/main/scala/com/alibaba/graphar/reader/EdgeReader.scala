@@ -234,7 +234,7 @@ class EdgeReader(
       vertex_chunk_index: Long,
       chunk_index: Long
   ): DataFrame = {
-    if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
+    if (edgeInfo.containPropertyGroup(propertyGroup) == false) {
       throw new IllegalArgumentException(
         "Edge info does not contain property group or adj list type."
       )
@@ -273,7 +273,7 @@ class EdgeReader(
       vertex_chunk_index: Long,
       addIndex: Boolean = true
   ): DataFrame = {
-    if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
+    if (edgeInfo.containPropertyGroup(propertyGroup) == false) {
       throw new IllegalArgumentException(
         "Edge info does not contain property group or adj list type."
       )
@@ -311,7 +311,7 @@ class EdgeReader(
       propertyGroup: PropertyGroup,
       addIndex: Boolean = true
   ): DataFrame = {
-    if (edgeInfo.containPropertyGroup(propertyGroup, adjListType) == false) {
+    if (edgeInfo.containPropertyGroup(propertyGroup) == false) {
       throw new IllegalArgumentException(
         "Edge info does not contain property group or adj list type."
       )
@@ -446,7 +446,7 @@ class EdgeReader(
       vertex_chunk_index: Long,
       addIndex: Boolean = true
   ): DataFrame = {
-    val property_groups = edgeInfo.getPropertyGroups(adjListType)
+    val property_groups = edgeInfo.getProperty_groups()
     return readMultipleEdgePropertyGroupsForVertexChunk(
       property_groups,
       vertex_chunk_index,
@@ -463,7 +463,7 @@ class EdgeReader(
    *   DataFrame tha contains all property groups chunks of edge.
    */
   def readAllEdgePropertyGroups(addIndex: Boolean = true): DataFrame = {
-    val property_groups = edgeInfo.getPropertyGroups(adjListType)
+    val property_groups = edgeInfo.getProperty_groups()
     return readMultipleEdgePropertyGroups(property_groups, addIndex)
   }
 
@@ -505,7 +505,7 @@ class EdgeReader(
    */
   def readEdges(addIndex: Boolean = true): DataFrame = {
     val adjList_df = readAllAdjList(false)
-    val property_groups = edgeInfo.getPropertyGroups(adjListType)
+    val property_groups = edgeInfo.getProperty_groups()
     val df = if (property_groups.size == 0) {
       adjList_df
     } else {

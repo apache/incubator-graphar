@@ -112,7 +112,7 @@ class ReaderSuite extends AnyFunSuite {
 
   test("read vertex chunks") {
     // construct the vertex information
-    val file_path = "gar-test/ldbc_sample/parquet/"
+    val file_path = "gar-test/new/ldbc_sample/parquet/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
     val vertex_yaml = getClass.getClassLoader
       .getResource(file_path + "person.vertex.yml")
@@ -210,7 +210,7 @@ class ReaderSuite extends AnyFunSuite {
 
   test("read edge chunks") {
     // construct the edge information
-    val file_path = "gar-test/ldbc_sample/csv/"
+    val file_path = "gar-test/new/ldbc_sample/csv/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
     val edge_yaml = getClass.getClassLoader
       .getResource(file_path + "person_knows_person.edge.yml")
@@ -245,7 +245,7 @@ class ReaderSuite extends AnyFunSuite {
 
     // test reading a single property group
     val property_group =
-      edge_info.getPropertyGroup("creationDate", adj_list_type)
+      edge_info.getPropertyGroup("creationDate")
     val single_property_df = reader.readEdgePropertyChunk(property_group, 2, 0)
     assert(single_property_df.columns.size == 1)
     assert(single_property_df.count() == 1024)

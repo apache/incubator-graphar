@@ -34,6 +34,7 @@ class EdgeInfo() {
   @BeanProperty var directed: Boolean = false
   @BeanProperty var prefix: String = ""
   @BeanProperty var adj_lists = new java.util.ArrayList[AdjList]()
+  @BeanProperty var property_groups = new java.util.ArrayList[PropertyGroup]()
   @BeanProperty var version: String = ""
 
   /**
@@ -108,60 +109,24 @@ class EdgeInfo() {
   }
 
   /**
-   * Get the property groups of adj list type.
-   *
-   * @param adj_list_type
-   *   the input adj list type.
-   * @return
-   *   property group of the input adj list type, if edge info not support the
-   *   adj list type, raise an IllegalArgumentException error.
-   */
-  def getPropertyGroups(
-      adj_list_type: AdjListType.Value
-  ): java.util.ArrayList[PropertyGroup] = {
-    val tot: Int = adj_lists.size
-    for (k <- 0 to tot - 1) {
-      val adj_list = adj_lists.get(k)
-      if (adj_list.getAdjList_type_in_gar == adj_list_type) {
-        return adj_list.getProperty_groups
-      }
-    }
-    throw new IllegalArgumentException(
-      "adj list type not found: " + AdjListType.AdjListTypeToString(
-        adj_list_type
-      )
-    )
-  }
-
-  /**
-   * Check if the edge info contains the property group in certain adj list
-   * structure.
+   * Check if the edge info contains the property group.
    *
    * @param property_group
    *   the property group to check.
-   * @param adj_list_type
-   *   the type of adj list structure.
+   *
    * @return
    *   true if the edge info contains the property group in certain adj list
    *   structure. If edge info not support the given adj list type or not
    *   contains the property group in the adj list structure, return false.
    */
   def containPropertyGroup(
-      property_group: PropertyGroup,
-      adj_list_type: AdjListType.Value
+      property_group: PropertyGroup
   ): Boolean = {
-    val tot: Int = adj_lists.size
-    for (k <- 0 to tot - 1) {
-      val adj_list = adj_lists.get(k)
-      if (adj_list.getAdjList_type_in_gar == adj_list_type) {
-        val property_groups = adj_list.getProperty_groups
-        val len: Int = property_groups.size
-        for (i <- 0 to len - 1) {
-          val pg: PropertyGroup = property_groups.get(i)
-          if (pg == property_group) {
-            return true
-          }
-        }
+    val len: Int = property_groups.size
+    for (i <- 0 to len - 1) {
+      val pg: PropertyGroup = property_groups.get(i)
+      if (pg == property_group) {
+        return true
       }
     }
     return false
@@ -176,19 +141,14 @@ class EdgeInfo() {
    *   true if edge info contains the property, otherwise false.
    */
   def containProperty(property_name: String): Boolean = {
-    val tot: Int = adj_lists.size
-    for (k <- 0 to tot - 1) {
-      val adj_list = adj_lists.get(k)
-      val property_groups = adj_list.getProperty_groups
-      val len: Int = property_groups.size
-      for (i <- 0 to len - 1) {
-        val pg: PropertyGroup = property_groups.get(i)
-        val properties = pg.getProperties
-        val num = properties.size
-        for (j <- 0 to num - 1) {
-          if (properties.get(j).getName == property_name) {
-            return true
-          }
+    val len: Int = property_groups.size
+    for (i <- 0 to len - 1) {
+      val pg: PropertyGroup = property_groups.get(i)
+      val properties = pg.getProperties
+      val num = properties.size
+      for (j <- 0 to num - 1) {
+        if (properties.get(j).getName == property_name) {
+          return true
         }
       }
     }
@@ -196,48 +156,29 @@ class EdgeInfo() {
   }
 
   /**
-   * Get property group that contains property with adj list type.
+   * Get the property group that contains property.
    *
    * @param property_name
    *   name of the property.
-   * @param adj_list_type
-   *   the type of adj list structure.
    * @return
-   *   property group that contains the property. If edge info not support the
-   *   adj list type, or not find the property group that contains the property,
-   *   return false.
+   *   property group that contains the property, otherwise raise
+   *   IllegalArgumentException error.
    */
   def getPropertyGroup(
-      property_name: String,
-      adj_list_type: AdjListType.Value
+      property_name: String
   ): PropertyGroup = {
-    val tot: Int = adj_lists.size
-    for (k <- 0 to tot - 1) {
-      val adj_list = adj_lists.get(k)
-      if (adj_list.getAdjList_type_in_gar == adj_list_type) {
-        val property_groups = adj_list.getProperty_groups
-        val len: Int = property_groups.size
-        for (i <- 0 to len - 1) {
-          val pg: PropertyGroup = property_groups.get(i)
-          val properties = pg.getProperties
-          val num = properties.size
-          for (j <- 0 to num - 1) {
-            if (properties.get(j).getName == property_name) {
-              return pg
-            }
-          }
-          throw new IllegalArgumentException(
-            "property group not found: " + property_name + " in adj list type: " + AdjListType
-              .AdjListTypeToString(
-                adj_list_type
-              )
-          )
+    val len: Int = property_groups.size
+    for (i <- 0 to len - 1) {
+      val pg: PropertyGroup = property_groups.get(i)
+      val properties = pg.getProperties
+      val num = properties.size
+      for (j <- 0 to num - 1) {
+        if (properties.get(j).getName == property_name) {
+          return pg
         }
       }
     }
-    throw new IllegalArgumentException(
-      "adj list type or property group not found."
-    )
+    throw new IllegalArgumentException("Property not found: " + property_name)
   }
 
   /**
@@ -250,23 +191,18 @@ class EdgeInfo() {
    *   raise an IllegalArgumentException error.
    */
   def getPropertyType(property_name: String): GarType.Value = {
-    val tot: Int = adj_lists.size
-    for (k <- 0 to tot - 1) {
-      val adj_list = adj_lists.get(k)
-      val property_groups = adj_list.getProperty_groups
-      val len: Int = property_groups.size
-      for (i <- 0 to len - 1) {
-        val pg: PropertyGroup = property_groups.get(i)
-        val properties = pg.getProperties
-        val num = properties.size
-        for (j <- 0 to num - 1) {
-          if (properties.get(j).getName == property_name) {
-            return properties.get(j).getData_type_in_gar
-          }
+    val len: Int = property_groups.size
+    for (i <- 0 to len - 1) {
+      val pg: PropertyGroup = property_groups.get(i)
+      val properties = pg.getProperties
+      val num = properties.size
+      for (j <- 0 to num - 1) {
+        if (properties.get(j).getName == property_name) {
+          return properties.get(j).getData_type_in_gar
         }
       }
     }
-    throw new IllegalArgumentException("property not found: " + property_name)
+    throw new IllegalArgumentException("Property not found: " + property_name)
   }
 
   /**
@@ -280,40 +216,30 @@ class EdgeInfo() {
    *   error.
    */
   def isPrimaryKey(property_name: String): Boolean = {
-    val tot: Int = adj_lists.size
-    for (k <- 0 to tot - 1) {
-      val adj_list = adj_lists.get(k)
-      val property_groups = adj_list.getProperty_groups
-      val len: Int = property_groups.size
-      for (i <- 0 to len - 1) {
-        val pg: PropertyGroup = property_groups.get(i)
-        val properties = pg.getProperties
-        val num = properties.size
-        for (j <- 0 to num - 1) {
-          if (properties.get(j).getName == property_name) {
-            return properties.get(j).getIs_primary
-          }
+    val len: Int = property_groups.size
+    for (i <- 0 to len - 1) {
+      val pg: PropertyGroup = property_groups.get(i)
+      val properties = pg.getProperties
+      val num = properties.size
+      for (j <- 0 to num - 1) {
+        if (properties.get(j).getName == property_name) {
+          return properties.get(j).getIs_primary
         }
       }
     }
-    throw new IllegalArgumentException("property not found: " + property_name)
+    throw new IllegalArgumentException("Property not found: " + property_name)
   }
 
   /** Get Primary key of edge info. */
   def getPrimaryKey(): String = {
-    val tot: Int = adj_lists.size
-    for (k <- 0 to tot - 1) {
-      val adj_list = adj_lists.get(k)
-      val property_groups = adj_list.getProperty_groups
-      val len: Int = property_groups.size
-      for (i <- 0 to len - 1) {
-        val pg: PropertyGroup = property_groups.get(i)
-        val properties = pg.getProperties
-        val num = properties.size
-        for (j <- 0 to num - 1) {
-          if (properties.get(j).getIs_primary) {
-            return properties.get(j).getName
-          }
+    val len: Int = property_groups.size
+    for (i <- 0 to len - 1) {
+      val pg: PropertyGroup = property_groups.get(i)
+      val properties = pg.getProperties
+      val num = properties.size
+      for (j <- 0 to num - 1) {
+        if (properties.get(j).getIs_primary) {
+          return properties.get(j).getName
         }
       }
     }
@@ -332,17 +258,16 @@ class EdgeInfo() {
     for (k <- 0 to tot - 1) {
       val adj_list = adj_lists.get(k)
       val file_type = adj_list.getFile_type_in_gar
-      val property_groups = adj_list.getProperty_groups
-      val len: Int = property_groups.size
-      for (i <- 0 to len - 1) {
-        val pg: PropertyGroup = property_groups.get(i)
-        val properties = pg.getProperties
-        val num = properties.size
-        if (num == 0) {
-          return false
-        }
-        val pg_file_type = pg.getFile_type_in_gar
+    }
+    val len: Int = property_groups.size
+    for (i <- 0 to len - 1) {
+      val pg: PropertyGroup = property_groups.get(i)
+      val properties = pg.getProperties
+      val num = properties.size
+      if (num == 0) {
+        return false
       }
+      val file_type = pg.getFile_type_in_gar
     }
     return true
   }
@@ -543,7 +468,7 @@ class EdgeInfo() {
       vertex_chunk_index: Long,
       chunk_index: Long
   ): String = {
-    if (containPropertyGroup(property_group, adj_list_type) == false)
+    if (containPropertyGroup(property_group) == false)
       throw new IllegalArgumentException("property group not found.")
     var str: String = property_group.getPrefix
     if (str == "") {
@@ -580,7 +505,7 @@ class EdgeInfo() {
       adj_list_type: AdjListType.Value,
       vertex_chunk_index: Long
   ): String = {
-    if (containPropertyGroup(property_group, adj_list_type) == false)
+    if (containPropertyGroup(property_group) == false)
       throw new IllegalArgumentException("property group not found.")
     var str: String = property_group.getPrefix
     if (str == "") {
@@ -613,7 +538,7 @@ class EdgeInfo() {
       property_group: PropertyGroup,
       adj_list_type: AdjListType.Value
   ): String = {
-    if (containPropertyGroup(property_group, adj_list_type) == false)
+    if (containPropertyGroup(property_group) == false)
       throw new IllegalArgumentException("property group not found.")
     var str: String = property_group.getPrefix
     if (str == "") {
@@ -652,6 +577,14 @@ class EdgeInfo() {
         adj_list_maps.add(adj_lists.get(i).toMap())
       }
       data.put("adj_lists", adj_list_maps)
+    }
+    val property_group_num = property_groups.size()
+    if (property_group_num > 0) {
+      val property_group_maps = new java.util.ArrayList[Object]()
+      for (i <- 0 until property_group_num) {
+        property_group_maps.add(property_groups.get(i).toMap())
+      }
+      data.put("property_groups", property_group_maps)
     }
     val options = new DumperOptions()
     options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK)

@@ -46,7 +46,7 @@ class WriterSuite extends AnyFunSuite {
 
     // read vertex yaml
     val vertex_yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/parquet/person.vertex.yml")
+      .getResource("gar-test/new/ldbc_sample/parquet/person.vertex.yml")
       .getPath
     val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml_path, spark)
 
@@ -106,7 +106,7 @@ class WriterSuite extends AnyFunSuite {
 
     // read edge yaml
     val edge_yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml")
+      .getResource("gar-test/new/ldbc_sample/csv/person_knows_person.edge.yml")
       .getPath
     val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml_path, spark)
     val adj_list_type = AdjListType.ordered_by_source
@@ -169,7 +169,7 @@ class WriterSuite extends AnyFunSuite {
 
     // test write property group
     val property_group =
-      edge_info.getPropertyGroup("creationDate", adj_list_type)
+      edge_info.getPropertyGroup("creationDate")
     writer.writeEdgeProperties(property_group)
 
     val property_group_path_pattern = new Path(
@@ -245,13 +245,13 @@ class WriterSuite extends AnyFunSuite {
 
     // read vertex yaml
     val vertex_yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/csv/person.vertex.yml")
+      .getResource("gar-test/new/ldbc_sample/csv/person.vertex.yml")
       .getPath
     val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml_path, spark)
 
     // read edge yaml
     val edge_yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml")
+      .getResource("gar-test/new/ldbc_sample/csv/person_knows_person.edge.yml")
       .getPath
     val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml_path, spark)
     val vertex_chunk_size = edge_info.getSrc_chunk_size()
@@ -334,7 +334,7 @@ class WriterSuite extends AnyFunSuite {
 
     // test write property group
     val property_group =
-      edge_info.getPropertyGroup("creationDate", adj_list_type)
+      edge_info.getPropertyGroup("creationDate")
     writer.writeEdgeProperties(property_group)
     val property_group_path_pattern = new Path(
       prefix + edge_info.getPropertyGroupPathPrefix(

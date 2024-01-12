@@ -83,12 +83,12 @@ def test_edge_reader(spark):
     assert (
         "_graphArEdgeIndex"
         in edge_reader.read_edge_property_group(
-            edge_info.get_property_group("weight", AdjListType.ORDERED_BY_SOURCE)
+            edge_info.get_property_group("weight")
         ).columns
     )
     assert (
         edge_reader.read_edge_property_group(
-            edge_info.get_property_group("weight", AdjListType.ORDERED_BY_SOURCE)
+            edge_info.get_property_group("weight")
         ).count()
         > 0
     )
