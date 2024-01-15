@@ -22,7 +22,7 @@ on:
     - cron:  '00 19 * * *'
 jobs:
   GraphAr-ubuntu-arrow-from-source:
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/main' && github.repository == 'alibaba/GraphAr' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
