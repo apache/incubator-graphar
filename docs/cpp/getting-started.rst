@@ -116,7 +116,7 @@ The next example reads all edges with label "person_knows_person" from the above
 .. code:: C++
 
   graph_info = ...
-  auto expect = GraphArchive::EdgesCollection::Make(graph_info, "person", "konws" "person", GraphArchive::AdjListType::ordered_by_source).value();
+  auto expect = GraphArchive::EdgesCollection::Make(graph_info, "person", "konws", "person", GraphArchive::AdjListType::ordered_by_source);
   auto edges = expect.value();
 
   for (auto it = edges->begin(); it != edges->end(); ++it) {
