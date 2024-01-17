@@ -22,7 +22,6 @@ import com.alibaba.graphar.util.IndexGenerator
 import com.alibaba.graphar.util.Utils
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.storage.StorageLevel
 import org.apache.spark.sql.types._
 
 import org.apache.hadoop.fs.{FileSystem, Path}
@@ -88,11 +87,11 @@ class GraphWriter() {
     vertexInfos.foreach {
       case (label, vertexInfo) => {
         val primaryKey = primaryKeys(label)
-        vertices(label).persist(StorageLevel.MEMORY_AND_DISK_SER)  // cache the vertex DataFrame
+        vertices(label).persist(GeneralParams.defaultStorageLevel)  // cache the vertex DataFrame
         val df_and_mapping = IndexGenerator
           .generateVertexIndexColumnAndIndexMapping(vertices(label), primaryKey)
-        df_and_mapping._1.persist(StorageLevel.MEMORY_AND_DISK_SER) // cache the vertex DataFrame with index
-        df_and_mapping._2.persist(StorageLevel.MEMORY_AND_DISK_SER) // cache the index mapping DataFrame
+        df_and_mapping._1.persist(GeneralParams.defaultStorageLevel) // cache the vertex DataFrame with index
+        df_and_mapping._2.persist(GeneralParams.defaultStorageLevel) // cache the index mapping DataFrame
         vertices(label).unpersist() // unpersist the vertex DataFrame
         val df_with_index = df_and_mapping._1
         indexMappings += label -> df_and_mapping._2
@@ -100,6 +99,7 @@ class GraphWriter() {
           new VertexWriter(prefix, vertexInfo, df_with_index)
         vertexNums += label -> writer.getVertexNum()
         writer.writeVertexProperties()
+        df_with_index.unpersist()
       }
     }
 
@@ -121,7 +121,7 @@ class GraphWriter() {
             src_vertex_index_mapping,
             dst_vertex_index_mapping
           )
-        edge_df_with_index.persist(StorageLevel.MEMORY_AND_DISK_SER) // cache the edge DataFrame with index
+        edge_df_with_index.persist(GeneralParams.defaultStorageLevel) // cache the edge DataFrame with index
 
         val adj_lists = edgeInfo.getAdj_lists
         val adj_list_it = adj_lists.iterator

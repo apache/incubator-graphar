@@ -16,6 +16,8 @@
 
 package com.alibaba.graphar;
 
+import org.apache.spark.storage.StorageLevel;
+
 /** General constant parameters for graphar. */
 public class GeneralParams {
     // column name
@@ -33,4 +35,5 @@ public class GeneralParams {
     public static final Long defaultEdgeChunkSize = 4194304L; // 2^22
     public static final String defaultFileType = "parquet";
     public static final String defaultVersion = "v1";
+    public static final StorageLevel defaultStorageLevel = StorageLevel.MEMORY_AND_DISK_SER();
 }
