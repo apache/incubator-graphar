@@ -74,7 +74,9 @@ class VertexWriter(
     numVertices: Long = -1
 ) {
   private val spark = vertexDf.sparkSession
-  vertexDf.persist(GeneralParams.defaultStorageLevel) // cache the vertex DataFrame
+  vertexDf.persist(
+    GeneralParams.defaultStorageLevel
+  ) // cache the vertex DataFrame
   validate()
   private val vertexNum: Long =
     if (numVertices < 0) vertexDf.count else numVertices

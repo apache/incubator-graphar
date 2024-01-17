@@ -222,7 +222,7 @@ class EdgeWriter(
   private val spark: SparkSession = edgeDf.sparkSession
   validate()
   writeVertexNum()
-  
+
   edgeDf.persist(GeneralParams.defaultStorageLevel)
 
   // validate data and info
@@ -266,7 +266,7 @@ class EdgeWriter(
       adjListType,
       vertexNum
     )
-  
+
   // write out the edge number
   private def writeEdgeNum(): Unit = {
     val vertexChunkSize: Long = if (
