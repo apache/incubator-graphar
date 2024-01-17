@@ -35,6 +35,7 @@ import org.apache.spark.sql.types.{
   StructField
 }
 import org.apache.spark.sql.functions._
+import org.apache.spark.storage.StorageLevel
 
 import scala.collection.SortedMap
 import scala.collection.mutable.ArrayBuffer
@@ -64,6 +65,7 @@ object EdgeWriter {
 
     // sort by primary key and generate continue edge id for edge records
     val sortedDfRDD = edgeDf.sort(colName).rdd
+    sortedDfRDD.persist(StorageLevel.MEMORY_AND_DISK_SER)
     // generate continue edge id for every edge
     val partitionCounts = sortedDfRDD
       .mapPartitionsWithIndex(
@@ -82,6 +84,7 @@ object EdgeWriter {
       val start = broadcastedPartitionCounts.value(i)
       for { (row, j) <- ps.zipWithIndex } yield (start + j, row)
     })
+    rddWithEid.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
     // Construct partitioner for edge chunk
     // get edge num of every vertex chunk
@@ -101,6 +104,8 @@ object EdgeWriter {
         edgeNumMutableMap(i) = 0
       }
     }
+    sortedDfRDD.unpersist() // unpersist the sortedDfRDD
+
     var eidBeginOfVertexChunks =
       new Array[Long](vertexChunkNum + 1) // eid begin of vertex chunks
     var aggEdgeChunkNumOfVertexChunks =
@@ -130,7 +135,8 @@ object EdgeWriter {
     val partitionRDD =
       rddWithEid.repartitionAndSortWithinPartitions(partitioner).values
     val partitionEdgeDf = spark.createDataFrame(partitionRDD, edgeSchema)
-    partitionEdgeDf.cache()
+    rddWithEid.unpersist() // unpersist the rddWithEid
+    partitionEdgeDf.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
     // generate offset DataFrames
     if (
@@ -141,6 +147,7 @@ object EdgeWriter {
           iterator.map(row => (row(colIndex).asInstanceOf[Long], 1))
         })
         .reduceByKey(_ + _)
+      edgeCountsByPrimaryKey.persist(StorageLevel.MEMORY_AND_DISK_SER)
       val offsetDfSchema = StructType(
         Seq(StructField(GeneralParams.offsetCol, IntegerType))
       )
@@ -168,7 +175,7 @@ object EdgeWriter {
             })
             .map { case (k, v) => Row(v) }
           val offsetChunk = spark.createDataFrame(offsetRDD, offsetDfSchema)
-          offsetChunk.cache()
+          offsetChunk.persist(StorageLevel.MEMORY_AND_DISK_SER)
           offsetChunk
         }
       }
@@ -215,6 +222,8 @@ class EdgeWriter(
   private val spark: SparkSession = edgeDf.sparkSession
   validate()
   writeVertexNum()
+  
+  edgeDf.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
   // validate data and info
   private def validate(): Unit = {
@@ -257,7 +266,7 @@ class EdgeWriter(
       adjListType,
       vertexNum
     )
-
+  
   // write out the edge number
   private def writeEdgeNum(): Unit = {
     val vertexChunkSize: Long = if (

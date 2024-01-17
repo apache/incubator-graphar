@@ -23,6 +23,7 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.types.{LongType, StructField}
+import org.apache.spark.storage.StorageLevel
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -74,6 +75,7 @@ class VertexWriter(
     numVertices: Long = -1
 ) {
   private val spark = vertexDf.sparkSession
+  vertexDf.persist(StorageLevel.MEMORY_AND_DISK_SER) // cache the vertex DataFrame
   validate()
   private val vertexNum: Long =
     if (numVertices < 0) vertexDf.count else numVertices
@@ -84,6 +86,8 @@ class VertexWriter(
     vertexInfo.getChunk_size(),
     vertexNum
   )
+  vertexDf.unpersist() // unpersist the vertex DataFrame
+  chunks.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
   private def validate(): Unit = {
     // check if vertex DataFrame contains the index_filed
@@ -103,6 +107,8 @@ class VertexWriter(
       spark.sparkContext.hadoopConfiguration
     )
   }
+
+  def getVertexNum(): Long = vertexNum
 
   /**
    * Generate chunks of the property group for vertex DataFrame.

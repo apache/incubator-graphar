@@ -55,8 +55,8 @@ object FileSystem {
     // TODO: Make the hard-code setting to configurable
     spark.conf.set("mapreduce.fileoutputcommitter.marksuccessfuljobs", "false")
     spark.conf.set("parquet.enable.summary-metadata", "false")
-    spark.conf.set("spark.sql.orc.compression.codec", "zstd")
-    spark.conf.set("spark.sql.parquet.compression.codec", "zstd")
+    spark.conf.set("spark.sql.orc.compression.codec", "snappy")
+    spark.conf.set("spark.sql.parquet.compression.codec", "snappy")
     // first check the outputPrefix exists, if not, create it
     val path = new Path(outputPrefix)
     val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
