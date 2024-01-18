@@ -74,6 +74,9 @@ class VertexWriter(
     numVertices: Long = -1
 ) {
   private val spark = vertexDf.sparkSession
+  vertexDf.persist(
+    GeneralParams.defaultStorageLevel
+  ) // cache the vertex DataFrame
   validate()
   private val vertexNum: Long =
     if (numVertices < 0) vertexDf.count else numVertices
@@ -84,6 +87,8 @@ class VertexWriter(
     vertexInfo.getChunk_size(),
     vertexNum
   )
+  vertexDf.unpersist() // unpersist the vertex DataFrame
+  chunks.persist(GeneralParams.defaultStorageLevel)
 
   private def validate(): Unit = {
     // check if vertex DataFrame contains the index_filed
@@ -103,6 +108,8 @@ class VertexWriter(
       spark.sparkContext.hadoopConfiguration
     )
   }
+
+  def getVertexNum(): Long = vertexNum
 
   /**
    * Generate chunks of the property group for vertex DataFrame.
@@ -146,4 +153,9 @@ class VertexWriter(
       writeVertexProperties(property_group)
     }
   }
+
+  override def finalize(): Unit = {
+    chunks.unpersist()
+  }
+
 }

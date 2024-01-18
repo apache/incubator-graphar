@@ -16,7 +16,13 @@
 
 package com.alibaba.graphar.graph
 
-import com.alibaba.graphar.{AdjListType, GraphInfo, VertexInfo, EdgeInfo}
+import com.alibaba.graphar.{
+  AdjListType,
+  GraphInfo,
+  VertexInfo,
+  EdgeInfo,
+  GeneralParams
+}
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
@@ -67,9 +73,11 @@ object GraphTransformer {
       // read vertex chunks from the source graph
       val reader = new VertexReader(source_prefix, source_vertex_info, spark)
       val df = reader.readAllVertexPropertyGroups()
+      df.persist(GeneralParams.defaultStorageLevel)
       // write vertex chunks for the dest graph
       val writer = new VertexWriter(dest_prefix, dest_vertex_info, df)
       writer.writeVertexProperties()
+      df.unpersist()
     }
   }
 
@@ -138,6 +146,7 @@ object GraphTransformer {
           )
           df = reader.readEdges(false)
           has_loaded = true
+          df.persist(GeneralParams.defaultStorageLevel)
         }
 
         // read vertices number
@@ -167,6 +176,7 @@ object GraphTransformer {
           df
         )
         writer.writeEdges()
+        df.unpersist()
       }
     }
   }

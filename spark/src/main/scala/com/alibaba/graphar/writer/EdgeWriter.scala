@@ -64,6 +64,7 @@ object EdgeWriter {
 
     // sort by primary key and generate continue edge id for edge records
     val sortedDfRDD = edgeDf.sort(colName).rdd
+    sortedDfRDD.persist(GeneralParams.defaultStorageLevel)
     // generate continue edge id for every edge
     val partitionCounts = sortedDfRDD
       .mapPartitionsWithIndex(
@@ -82,6 +83,7 @@ object EdgeWriter {
       val start = broadcastedPartitionCounts.value(i)
       for { (row, j) <- ps.zipWithIndex } yield (start + j, row)
     })
+    rddWithEid.persist(GeneralParams.defaultStorageLevel)
 
     // Construct partitioner for edge chunk
     // get edge num of every vertex chunk
@@ -101,6 +103,8 @@ object EdgeWriter {
         edgeNumMutableMap(i) = 0
       }
     }
+    sortedDfRDD.unpersist() // unpersist the sortedDfRDD
+
     var eidBeginOfVertexChunks =
       new Array[Long](vertexChunkNum + 1) // eid begin of vertex chunks
     var aggEdgeChunkNumOfVertexChunks =
@@ -130,7 +134,8 @@ object EdgeWriter {
     val partitionRDD =
       rddWithEid.repartitionAndSortWithinPartitions(partitioner).values
     val partitionEdgeDf = spark.createDataFrame(partitionRDD, edgeSchema)
-    partitionEdgeDf.cache()
+    rddWithEid.unpersist() // unpersist the rddWithEid
+    partitionEdgeDf.persist(GeneralParams.defaultStorageLevel)
 
     // generate offset DataFrames
     if (
@@ -141,6 +146,7 @@ object EdgeWriter {
           iterator.map(row => (row(colIndex).asInstanceOf[Long], 1))
         })
         .reduceByKey(_ + _)
+      edgeCountsByPrimaryKey.persist(GeneralParams.defaultStorageLevel)
       val offsetDfSchema = StructType(
         Seq(StructField(GeneralParams.offsetCol, IntegerType))
       )
@@ -168,10 +174,11 @@ object EdgeWriter {
             })
             .map { case (k, v) => Row(v) }
           val offsetChunk = spark.createDataFrame(offsetRDD, offsetDfSchema)
-          offsetChunk.cache()
+          offsetChunk.persist(GeneralParams.defaultStorageLevel)
           offsetChunk
         }
       }
+      edgeCountsByPrimaryKey.unpersist() // unpersist the edgeCountsByPrimaryKey
       return (
         partitionEdgeDf,
         offsetDfArray,
@@ -215,6 +222,8 @@ class EdgeWriter(
   private val spark: SparkSession = edgeDf.sparkSession
   validate()
   writeVertexNum()
+
+  edgeDf.persist(GeneralParams.defaultStorageLevel)
 
   // validate data and info
   private def validate(): Unit = {
@@ -290,6 +299,7 @@ class EdgeWriter(
         Some(chunkIndex),
         None
       )
+      offsetChunk.unpersist()
       chunkIndex = chunkIndex + 1
     }
   }
@@ -365,5 +375,9 @@ class EdgeWriter(
   def writeEdges(): Unit = {
     writeAdjList()
     writeEdgeProperties()
+  }
+
+  override def finalize(): Unit = {
+    edgeDfAndOffsetDf._1.unpersist()
   }
 }

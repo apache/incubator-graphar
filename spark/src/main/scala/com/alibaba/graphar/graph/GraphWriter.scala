@@ -52,12 +52,11 @@ class GraphWriter() {
       )
     }
     vertices += label -> df
-    vertexNums += label -> df.count
     primaryKeys += label -> primaryKey
   }
 
   /**
-   * Put the egde datafrme into writer.
+   * Put the egde dataframe into writer.
    * @param relation
    *   3-Tuple (source label, edge label, target label) to indicate edge type.
    * @param df
@@ -87,15 +86,26 @@ class GraphWriter() {
       scala.collection.mutable.Map[String, DataFrame]()
     vertexInfos.foreach {
       case (label, vertexInfo) => {
-        val vertex_num = vertexNums(label)
         val primaryKey = primaryKeys(label)
+        vertices(label).persist(
+          GeneralParams.defaultStorageLevel
+        ) // cache the vertex DataFrame
         val df_and_mapping = IndexGenerator
           .generateVertexIndexColumnAndIndexMapping(vertices(label), primaryKey)
+        df_and_mapping._1.persist(
+          GeneralParams.defaultStorageLevel
+        ) // cache the vertex DataFrame with index
+        df_and_mapping._2.persist(
+          GeneralParams.defaultStorageLevel
+        ) // cache the index mapping DataFrame
+        vertices(label).unpersist() // unpersist the vertex DataFrame
         val df_with_index = df_and_mapping._1
         indexMappings += label -> df_and_mapping._2
         val writer =
-          new VertexWriter(prefix, vertexInfo, df_with_index, vertex_num)
+          new VertexWriter(prefix, vertexInfo, df_with_index)
+        vertexNums += label -> writer.getVertexNum()
         writer.writeVertexProperties()
+        df_with_index.unpersist()
       }
     }
 
@@ -117,6 +127,9 @@ class GraphWriter() {
             src_vertex_index_mapping,
             dst_vertex_index_mapping
           )
+        edge_df_with_index.persist(
+          GeneralParams.defaultStorageLevel
+        ) // cache the edge DataFrame with index
 
         val adj_lists = edgeInfo.getAdj_lists
         val adj_list_it = adj_lists.iterator
@@ -140,6 +153,7 @@ class GraphWriter() {
           )
           writer.writeEdges()
         }
+        edge_df_with_index.unpersist()
       }
     }
   }
