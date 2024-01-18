@@ -180,10 +180,8 @@ Getting Involved
 Join the conversation and help the community. Even if you do not plan to contribute
 to GraphAr itself or GraphAr integrations in other projects, we'd be happy to have you involved.
 
-- Join the mailing list: send an email to `graphar+subscribe@googlegroups.com <mailto:graphar+subscribe@googlegroups.com>`_.
-  Share your ideas and use cases for the project.
-- Join the `GraphAr Slack`_ channel.
-- Follow our activity on `GitHub issues <https://github.com/alibaba/GraphAr/issues>`_.
+- Ask questions on `GitHub Discussions`_. We welcome all kinds of questions, from beginner to advanced!
+- Follow our activity and ask for feature requests on `GitHub issues <https://github.com/alibaba/GraphAr/issues>`_.
 - Join our `Weekly Community Meeting`_.
 
 Read through our `community introduction`_ to learn about our communication channels, governance, and more.
@@ -194,6 +192,20 @@ License
 
 **GraphAr** is distributed under `Apache License 2.0`_. Please note that
 third-party libraries may not have the same license as GraphAr.
+
+Publication
+-----------
+
+```
+@misc{li2023enhancing,
+      title={Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme}, 
+      author={Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
+      year={2023},
+      eprint={2312.09577},
+      archivePrefix={arXiv},
+      primaryClass={cs.DB}
+}
+```
 
 
 .. _Apache License 2.0: https://github.com/alibaba/GraphAr/blob/main/LICENSE
