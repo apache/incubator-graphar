@@ -476,7 +476,7 @@ class EdgeInfo() {
       val num = properties.size
       for (j <- 0 to num - 1) {
         if (j > 0)
-          str += GeneralParams.regularSeperator
+          str += GeneralParams.regularSeparator
         str += properties.get(j).getName;
       }
       str += "/"
@@ -513,7 +513,7 @@ class EdgeInfo() {
       val num = properties.size
       for (j <- 0 to num - 1) {
         if (j > 0)
-          str += GeneralParams.regularSeperator
+          str += GeneralParams.regularSeparator
         str += properties.get(j).getName;
       }
       str += "/"
@@ -546,7 +546,7 @@ class EdgeInfo() {
       val num = properties.size
       for (j <- 0 to num - 1) {
         if (j > 0)
-          str += GeneralParams.regularSeperator
+          str += GeneralParams.regularSeparator
         str += properties.get(j).getName;
       }
       str += "/"
@@ -556,7 +556,7 @@ class EdgeInfo() {
   }
 
   def getConcatKey(): String = {
-    return getSrc_label + GeneralParams.regularSeperator + getEdge_label + GeneralParams.regularSeperator + getDst_label
+    return getSrc_label + GeneralParams.regularSeparator + getEdge_label + GeneralParams.regularSeparator + getDst_label
   }
 
   /** Dump to Yaml string. */

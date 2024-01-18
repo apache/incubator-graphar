@@ -214,7 +214,7 @@ class VertexInfo() {
       val num = properties.size
       for (j <- 0 to num - 1) {
         if (j > 0) {
-          str += GeneralParams.regularSeperator
+          str += GeneralParams.regularSeparator
         }
         str += properties.get(j).getName;
       }
@@ -243,7 +243,7 @@ class VertexInfo() {
       val num = properties.size
       for (j <- 0 to num - 1) {
         if (j > 0)
-          str += GeneralParams.regularSeperator
+          str += GeneralParams.regularSeparator
         str += properties.get(j).getName;
       }
       str += "/"

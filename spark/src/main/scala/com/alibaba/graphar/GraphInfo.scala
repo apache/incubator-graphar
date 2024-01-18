@@ -319,7 +319,7 @@ class GraphInfo() {
       dstLabel: String
   ): EdgeInfo = {
     val key =
-      srcLabel + GeneralParams.regularSeperator + edgeLabel + GeneralParams.regularSeperator + dstLabel
+      srcLabel + GeneralParams.regularSeparator + edgeLabel + GeneralParams.regularSeparator + dstLabel
     edgeInfos(key)
   }
 
