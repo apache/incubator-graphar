@@ -16,7 +16,13 @@
 
 package com.alibaba.graphar.graph
 
-import com.alibaba.graphar.{AdjListType, GraphInfo, VertexInfo, EdgeInfo}
+import com.alibaba.graphar.{
+  AdjListType,
+  GraphInfo,
+  VertexInfo,
+  EdgeInfo,
+  GeneralParams
+}
 import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
 import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
 
