@@ -304,6 +304,7 @@ class EdgeWriter(
         Some(i),
         None
       )
+      offsetChunk.unpersist()
     }
   }
 
