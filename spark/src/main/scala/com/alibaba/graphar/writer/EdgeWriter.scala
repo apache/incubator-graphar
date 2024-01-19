@@ -294,7 +294,7 @@ class EdgeWriter(
     var chunkIndex: Int = 0
     val fileType = edgeInfo.getAdjListFileType(adjListType)
     val outputPrefix = prefix + edgeInfo.getOffsetPathPrefix(adjListType)
-    // parallel write offset chunks case error, convert to sequential
+    // TODO(@acezen): Support parallel write with GarDataSource
     val offsetChunks = edgeDfAndOffsetDf._2.seq
     offsetChunks.foreach { case (i, offsetChunk) =>
       FileSystem.writeDataFrame(
