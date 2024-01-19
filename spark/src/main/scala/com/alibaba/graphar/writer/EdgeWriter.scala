@@ -151,8 +151,8 @@ object EdgeWriter {
       val offsetDfSchema = StructType(
         Seq(StructField(GeneralParams.offsetCol, IntegerType))
       )
-      val offsetDfArray: ParSeq[(Int, DataFrame)] = (0 until vertexChunkNum).par.map {
-        i =>
+      val offsetDfArray: ParSeq[(Int, DataFrame)] =
+        (0 until vertexChunkNum).par.map { i =>
           {
             val filterRDD = edgeCountsByPrimaryKey
               .filter(v => v._1 / vertexChunkSize == i)
@@ -179,7 +179,7 @@ object EdgeWriter {
             offsetChunk.persist(GeneralParams.defaultStorageLevel)
             (i, offsetChunk)
           }
-      }
+        }
       edgeCountsByPrimaryKey.unpersist() // unpersist the edgeCountsByPrimaryKey
       return (
         partitionEdgeDf,
