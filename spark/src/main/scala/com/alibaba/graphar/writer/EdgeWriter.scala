@@ -176,6 +176,7 @@ object EdgeWriter {
               })
               .map { case (k, v) => Row(v) }
             val offsetChunk = spark.createDataFrame(offsetRDD, offsetDfSchema)
+            offsetChunk.persist(GeneralParams.defaultStorageLevel)
             (i, offsetChunk)
           }
       }
