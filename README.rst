@@ -196,16 +196,22 @@ third-party libraries may not have the same license as GraphAr.
 Publication
 -----------
 
-```
-@misc{li2023enhancing,
-      title={Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme}, 
-      author={Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
-      year={2023},
-      eprint={2312.09577},
-      archivePrefix={arXiv},
-      primaryClass={cs.DB}
+- Xue Li, Weibin Zeng, Zhibin Wang, Diwen Zhu, Jingbo Xu, Wenyuan Yu, Jingren Zhou.
+  `Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme <https://arxiv.org/abs/2312.09577>`_.
+
+.. code:: bibtex
+  @article{li2023enhancing,
+  @article{li2023enhancing,7,
+    author = {Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
+    title = {Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme},
+    year         = {2023},
+    url          = {https://doi.org/10.48550/arXiv.2312.09577},
+    doi          = {10.48550/ARXIV.2312.09577},
+    eprinttype    = {arXiv},
+    eprint       = {2312.09577},
+    biburl       = {https://dblp.org/rec/journals/corr/abs-2312-09577.bib},
+    bibsource    = {dblp computer science bibliography, https://dblp.org}
 }
-```
 
 
 .. _Apache License 2.0: https://github.com/alibaba/GraphAr/blob/main/LICENSE
