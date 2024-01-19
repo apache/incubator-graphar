@@ -181,7 +181,7 @@ Join the conversation and help the community. Even if you do not plan to contrib
 to GraphAr itself or GraphAr integrations in other projects, we'd be happy to have you involved.
 
 - Ask questions on `GitHub Discussions`_. We welcome all kinds of questions, from beginner to advanced!
-- Follow our activity and ask for feature requests on `GitHub issues <https://github.com/alibaba/GraphAr/issues>`_.
+- Follow our activity and ask for feature requests on `GitHub Issues`_.
 - Join our `Weekly Community Meeting`_.
 
 Read through our `community introduction`_ to learn about our communication channels, governance, and more.
