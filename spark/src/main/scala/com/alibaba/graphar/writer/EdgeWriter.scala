@@ -48,7 +48,7 @@ object EdgeWriter {
       edgeInfo: EdgeInfo,
       adjListType: AdjListType.Value,
       vertexNumOfPrimaryVertexLabel: Long
-  ): (DataFrame, ParSeq[DataFrame], Array[Long], Map[Long, Int]) = {
+  ): (DataFrame, ParSeq[(Int, DataFrame)], Array[Long], Map[Long, Int]) = {
     val edgeSchema = edgeDf.schema
     val colName = if (
       adjListType == AdjListType.ordered_by_source || adjListType == AdjListType.unordered_by_source
@@ -151,7 +151,7 @@ object EdgeWriter {
       val offsetDfSchema = StructType(
         Seq(StructField(GeneralParams.offsetCol, IntegerType))
       )
-      val offsetDfArray: ParSeq[DataFrame] = (0 until vertexChunkNum).par.map {
+      val offsetDfArray: ParSeq[(Int, DataFrame)] = (0 until vertexChunkNum).par.map {
         i =>
           {
             val filterRDD = edgeCountsByPrimaryKey
@@ -176,7 +176,7 @@ object EdgeWriter {
               })
               .map { case (k, v) => Row(v) }
             val offsetChunk = spark.createDataFrame(offsetRDD, offsetDfSchema)
-            offsetChunk
+            (i, offsetChunk)
           }
       }
       edgeCountsByPrimaryKey.unpersist() // unpersist the edgeCountsByPrimaryKey
@@ -187,7 +187,7 @@ object EdgeWriter {
         edgeNumMutableMap.toMap
       )
     }
-    val offsetDfArray = ParSeq.empty[DataFrame]
+    val offsetDfArray = ParSeq.empty[(Int, DataFrame)]
     return (
       partitionEdgeDf,
       offsetDfArray,
@@ -259,7 +259,7 @@ class EdgeWriter(
   }
 
   private val edgeDfAndOffsetDf
-      : (DataFrame, ParSeq[DataFrame], Array[Long], Map[Long, Int]) =
+      : (DataFrame, ParSeq[(Int, DataFrame)], Array[Long], Map[Long, Int]) =
     EdgeWriter.repartitionAndSort(
       spark,
       edgeDf,
@@ -294,7 +294,7 @@ class EdgeWriter(
     val fileType = edgeInfo.getAdjListFileType(adjListType)
     val outputPrefix = prefix + edgeInfo.getOffsetPathPrefix(adjListType)
     val offsetChunks = edgeDfAndOffsetDf._2
-    offsetChunks.zipWithIndex.foreach { case (offsetChunk, i) =>
+    offsetChunks.foreach { case (i, offsetChunk) =>
       FileSystem.writeDataFrame(
         offsetChunk,
         FileType.FileTypeToString(fileType),
