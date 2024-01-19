@@ -200,8 +200,8 @@ Publication
   `Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme <https://arxiv.org/abs/2312.09577>`_.
 
 .. code:: bibtex
+
   @article{li2023enhancing,
-  @article{li2023enhancing,7,
     author = {Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
     title = {Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme},
     year         = {2023},
@@ -211,7 +211,7 @@ Publication
     eprint       = {2312.09577},
     biburl       = {https://dblp.org/rec/journals/corr/abs-2312-09577.bib},
     bibsource    = {dblp computer science bibliography, https://dblp.org}
-}
+  }
 
 
 .. _Apache License 2.0: https://github.com/alibaba/GraphAr/blob/main/LICENSE
