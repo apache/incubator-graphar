@@ -293,7 +293,8 @@ class EdgeWriter(
     var chunkIndex: Int = 0
     val fileType = edgeInfo.getAdjListFileType(adjListType)
     val outputPrefix = prefix + edgeInfo.getOffsetPathPrefix(adjListType)
-    val offsetChunks = edgeDfAndOffsetDf._2
+    // parallel write offset chunks case error, convert to sequential
+    val offsetChunks = edgeDfAndOffsetDf._2.seq
     offsetChunks.foreach { case (i, offsetChunk) =>
       FileSystem.writeDataFrame(
         offsetChunk,
@@ -347,11 +348,11 @@ class EdgeWriter(
       val property = pIter.next()
       propertyList += "`" + property.getName() + "`"
     }
-    val propetyGroupDf = edgeDfAndOffsetDf._1.select(propertyList.map(col): _*)
+    val propertyGroupDf = edgeDfAndOffsetDf._1.select(propertyList.map(col): _*)
     val outputPrefix =
       prefix + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType)
     FileSystem.writeDataFrame(
-      propetyGroupDf,
+      propertyGroupDf,
       propertyGroup.getFile_type(),
       outputPrefix,
       None,
