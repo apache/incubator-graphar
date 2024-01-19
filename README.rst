@@ -197,20 +197,21 @@ Publication
 -----------
 
 - Xue Li, Weibin Zeng, Zhibin Wang, Diwen Zhu, Jingbo Xu, Wenyuan Yu, Jingren Zhou.
-  `Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme <https://arxiv.org/abs/2312.09577>`_.
+  `GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes[J] <https://arxiv.org/abs/2312.09577>`_.
+  arXiv preprint arXiv:2312.09577, 2023.
 
 .. code:: bibtex
 
   @article{li2023enhancing,
     author = {Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
-    title = {Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme},
-    year         = {2023},
-    url          = {https://doi.org/10.48550/arXiv.2312.09577},
-    doi          = {10.48550/ARXIV.2312.09577},
-    eprinttype    = {arXiv},
-    eprint       = {2312.09577},
-    biburl       = {https://dblp.org/rec/journals/corr/abs-2312-09577.bib},
-    bibsource    = {dblp computer science bibliography, https://dblp.org}
+    title = {GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes},
+    year = {2023},
+    url = {https://doi.org/10.48550/arXiv.2312.09577},
+    doi = {10.48550/ARXIV.2312.09577},
+    eprinttype = {arXiv},
+    eprint = {2312.09577},
+    biburl = {https://dblp.org/rec/journals/corr/abs-2312-09577.bib},
+    bibsource = {dblp computer science bibliography, https://dblp.org}
   }
 
 
