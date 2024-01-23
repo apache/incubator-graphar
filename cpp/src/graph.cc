@@ -197,6 +197,8 @@ Result<StringArray> Edge::property(const std::string& property) const {
   template Result<T> Vertex::property<T>(const std::string& name) const; \
   template Result<T> Edge::property<T>(const std::string& name) const;
 
+INSTANTIATE_PROPERTY(bool)
+INSTANTIATE_PROPERTY(const bool&)
 INSTANTIATE_PROPERTY(int32_t)
 INSTANTIATE_PROPERTY(const int32_t&)
 INSTANTIATE_PROPERTY(Int32Array)
