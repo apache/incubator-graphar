@@ -21,7 +21,7 @@ The graph information file defines the most basic information of a graph include
     - person.vertex.yml
   edges:
     - person_knows_person.edge.yml
-  version: 1
+  version: gar/v1
 
 Vertex information
 ``````````````````
