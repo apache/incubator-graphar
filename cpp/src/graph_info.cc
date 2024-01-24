@@ -176,6 +176,9 @@ class VertexInfo::Impl {
         property_groups_(std::move(property_groups)),
         prefix_(prefix),
         version_(std::move(version)) {
+    if (prefix_.empty()) {
+      prefix_ = label_ + "/";  // default prefix
+    }
     for (int i = 0; i < property_groups_.size(); i++) {
       const auto& pg = property_groups_[i];
       for (const auto& p : pg->GetProperties()) {

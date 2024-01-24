@@ -114,7 +114,7 @@ std::shared_ptr<EdgeInfo> CreateEdgeInfo(
 
 std::shared_ptr<GraphInfo> CreateGraphInfo(
     const std::string& name, const VertexInfoVector& vertex_infos,
-    const EdgeInfoVector& edge_infos, const std::string& prefix = "",
+    const EdgeInfoVector& edge_infos, const std::string& prefix,
     std::shared_ptr<const InfoVersion> version = nullptr);
 
 const std::shared_ptr<DataType>& boolean();
