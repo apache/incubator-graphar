@@ -176,6 +176,9 @@ class VertexInfo::Impl {
         property_groups_(std::move(property_groups)),
         prefix_(prefix),
         version_(std::move(version)) {
+    if (prefix_.empty()) {
+      prefix_ = label_ + "/";  // default prefix
+    }
     for (int i = 0; i < property_groups_.size(); i++) {
       const auto& pg = property_groups_[i];
       for (const auto& p : pg->GetProperties()) {
@@ -872,7 +875,9 @@ Result<std::string> EdgeInfo::Dump() const noexcept {
     node["property_groups"].PushBack();
     node["property_groups"][node["property_groups"].Size() - 1] = pg_node;
   }
-  node["version"] = impl_->version_->ToString();
+  if (impl_->version_ != nullptr) {
+    node["version"] = impl_->version_->ToString();
+  }
   std::string dump_string;
   ::Yaml::Serialize(node, dump_string);
   return dump_string;

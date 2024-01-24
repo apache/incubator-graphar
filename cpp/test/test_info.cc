@@ -225,6 +225,10 @@ TEST_CASE("VertexInfo") {
     auto invalid_vertex_info2 =
         CreateVertexInfo(label, 0, {pg}, "test_vertex/", version);
     REQUIRE(invalid_vertex_info2->IsValidated() == false);
+    // check if prefix empty
+    auto vertex_info_empty_prefix =
+        CreateVertexInfo(label, chunk_size, {pg}, "", version);
+    REQUIRE(vertex_info_empty_prefix->IsValidated() == true);
   }
 
   SECTION("Dump") {
@@ -246,6 +250,9 @@ property_groups:
 version: gar/v1
 )";
     REQUIRE(dump_result.value() == expected);
+    auto vertex_info_empty_version =
+        CreateVertexInfo(label, chunk_size, {pg}, "test_vertex/");
+    REQUIRE(vertex_info_empty_version->Dump().status().ok());
   }
 
   SECTION("AddPropertyGroup") {
@@ -377,6 +384,11 @@ TEST_CASE("EdgeInfo") {
         src_label, edge_label, dst_label, chunk_size, src_chunk_size, 0,
         directed, {adj_list}, {pg}, "test_edge/", version);
     REQUIRE(invalid_edge_info6->IsValidated() == false);
+    // check if prefix empty
+    auto edge_info_with_empty_prefix = CreateEdgeInfo(
+        src_label, edge_label, dst_label, chunk_size, src_chunk_size,
+        dst_chunk_size, directed, {adj_list}, {pg}, "", version);
+    REQUIRE(edge_info_with_empty_prefix->IsValidated() == true);
   }
 
   SECTION("Dump") {
@@ -408,6 +420,10 @@ src_label: person
 version: gar/v1
 )";
     REQUIRE(dump_result.value() == expected);
+    auto edge_info_empty_version =
+        CreateEdgeInfo(src_label, edge_label, dst_label, chunk_size,
+                       src_chunk_size, dst_chunk_size, directed, {}, {});
+    REQUIRE(edge_info_empty_version->Dump().status().ok());
   }
 
   SECTION("AddAdjacentList") {
@@ -512,6 +528,10 @@ TEST_CASE("GraphInfo") {
     auto invalid_graph_info3 =
         CreateGraphInfo(name, {vertex_info}, {edge_info}, "", version);
     REQUIRE(invalid_graph_info3->IsValidated() == false);
+    // check if prefix empty, graph_info with empty prefix is invalid
+    auto graph_info_with_empty_prefix =
+        CreateGraphInfo(name, {vertex_info}, {edge_info}, "", version);
+    REQUIRE(graph_info_with_empty_prefix->IsValidated() == false);
   }
 
   SECTION("Dump") {
@@ -526,6 +546,9 @@ vertices:
   - test_vertex.vertex.yaml
 )";
     REQUIRE(dump_result.value() == expected);
+    auto graph_info_empty_version =
+        CreateGraphInfo(name, {vertex_info}, {edge_info}, "test_graph/");
+    REQUIRE(graph_info_empty_version->Dump().status().ok());
   }
 
   SECTION("AddVertex") {
