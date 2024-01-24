@@ -872,7 +872,9 @@ Result<std::string> EdgeInfo::Dump() const noexcept {
     node["property_groups"].PushBack();
     node["property_groups"][node["property_groups"].Size() - 1] = pg_node;
   }
-  node["version"] = impl_->version_->ToString();
+  if (impl_->version_ != nullptr) {
+    node["version"] = impl_->version_->ToString();
+  }
   std::string dump_string;
   ::Yaml::Serialize(node, dump_string);
   return dump_string;
