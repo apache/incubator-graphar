@@ -411,9 +411,9 @@ src_label: person
 version: gar/v1
 )";
     REQUIRE(dump_result.value() == expected);
-    auto edge_info_empty_version = CreateEdgeInfo(
-        src_label, edge_label, dst_label, chunk_size, src_chunk_size,
-        dst_chunk_size, directed, {}, {});
+    auto edge_info_empty_version =
+        CreateEdgeInfo(src_label, edge_label, dst_label, chunk_size,
+                       src_chunk_size, dst_chunk_size, directed, {}, {});
     REQUIRE(edge_info_empty_version->Dump().status().ok());
   }
 
