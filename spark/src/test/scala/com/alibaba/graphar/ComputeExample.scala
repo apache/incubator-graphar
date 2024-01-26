@@ -31,7 +31,7 @@ class ComputeExampleSuite extends AnyFunSuite {
 
   test("run cc using graphx") {
     // read vertex DataFrame
-    val file_path = "gar-test/new/ldbc_sample/parquet/"
+    val file_path = "gar-test/ldbc_sample/parquet/"
     val prefix = getClass.getClassLoader.getResource(file_path).getPath
     val vertex_yaml = getClass.getClassLoader
       .getResource(file_path + "person.vertex.yml")

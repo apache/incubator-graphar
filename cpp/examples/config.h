@@ -54,7 +54,6 @@
 #define DASSERT(x)
 #endif
 
-// FIXME(@acezen): This is a hack to get around the fact that the testing
 static const std::string TEST_DATA_DIR =  // NOLINT
     std::filesystem::path(__FILE__)
         .parent_path()
@@ -62,6 +61,6 @@ static const std::string TEST_DATA_DIR =  // NOLINT
         .parent_path()
         .parent_path()
         .string() +
-    "/testing/new";
+    "/testing";
 
 #endif  // CPP_EXAMPLES_CONFIG_H_

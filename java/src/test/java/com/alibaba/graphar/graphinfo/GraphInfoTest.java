@@ -25,7 +25,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class GraphInfoTest {
-    public static final String root = System.getenv("GAR_TEST_DATA");
+    public static final String root = System.getenv("GAR_TEST_DATA") + "/root";
 
     @Test
     public void test1() {

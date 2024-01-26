@@ -29,11 +29,11 @@ class GraphInfoSuite extends AnyFunSuite {
   test("load graph info") {
     // read graph yaml
     val yaml_path = getClass.getClassLoader
-      .getResource("gar-test/new/ldbc_sample/csv/ldbc_sample.graph.yml")
+      .getResource("gar-test/ldbc_sample/csv/ldbc_sample.graph.yml")
       .getPath
     val prefix =
       getClass.getClassLoader
-        .getResource("gar-test/new/ldbc_sample/csv/")
+        .getResource("gar-test/ldbc_sample/csv/")
         .getPath
     val graph_info = GraphInfo.loadGraphInfo(yaml_path, spark)
 
@@ -127,7 +127,7 @@ class GraphInfoSuite extends AnyFunSuite {
 
   test("load edge info") {
     val yaml_path = getClass.getClassLoader
-      .getResource("gar-test/new/ldbc_sample/csv/person_knows_person.edge.yml")
+      .getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml")
       .getPath
     val edge_info = EdgeInfo.loadEdgeInfo(yaml_path, spark)
 
