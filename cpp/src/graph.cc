@@ -170,7 +170,7 @@ Result<T> Edge::property(const std::string& property) const {
   } else {
     if (properties_.find(property) == properties_.end()) {
       return Status::KeyError("Property with name ", property,
-                              " does not exist in the vertex.");
+                              " does not exist in the edge.");
     }
     try {
       T ret = std::any_cast<T>(properties_.at(property));
