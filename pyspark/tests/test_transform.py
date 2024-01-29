@@ -26,7 +26,7 @@ GRAPHAR_TESTS_EXAMPLES = Path(__file__).parent.parent.parent.joinpath("testing")
 def test_transform(spark):
     initialize(spark)
     source_path = (
-        GRAPHAR_TESTS_EXAMPLES.joinpath("new/ldbc_sample/parquet/ldbc_sample.graph.yml")
+        GRAPHAR_TESTS_EXAMPLES.joinpath("ldbc_sample/parquet/ldbc_sample.graph.yml")
         .absolute()
         .__str__()
     )
