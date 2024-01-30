@@ -147,18 +147,26 @@ Take the "person knows person" edges to illustrate. Suppose the vertex chunk siz
 Building Libraries
 ------------------
 
-Libraries are provided for reading, writing and transforming files in GraphAr,
-now the C++ library and the Spark library are available. And we are going to
-provide libraries for more programming languages.
+GraphAr offers a collection of libraries for the purpose of reading, writing and transforming files.
+Currently, the following libraries are available, and plans are in place to expand support to additional programming language.
 
 The C++ Library
 ^^^^^^^^^^^^^^^
 See `GraphAr C++ Library`_ for details about the building of the C++ library.
 
+The Java Library
+^^^^^^^^^^^^^^^^
+The GraphAr Java library is created with bindings to the C++ library (currently at version v0.10.0), utilizing [Alibaba-FastFFI](https://github.com/alibaba/fastFFI) for implementation.
+See `GraphAr Java Library`_ for details about the building of the Java library.
+
 The Spark Library
 ^^^^^^^^^^^^^^^^^
-
 See `GraphAr Spark Library`_ for details about the Spark library.
+
+The PySpark Library
+^^^^^^^^^^^^^^^^^^^
+The GraphAr PySpark library is developed as bindings to the GraphAr Spark library.
+See `GraphAr PySpark Library`_ for details about the PySpark library.
 
 
 Contributing
@@ -233,7 +241,11 @@ Publication
 
 .. _GraphAr Spark Library: https://github.com/alibaba/GraphAr/tree/main/spark
 
+.. _GraphAr PySpark Library: https://github.com/alibaba/GraphAr/tree/main/pyspark
+
 .. _GraphAr C++ Library: https://github.com/alibaba/GraphAr/tree/main/cpp
+
+.. _GraphAr Java Library: https://github.com/alibaba/GraphAr/tree/main/java
 
 .. _example files: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/
 
