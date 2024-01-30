@@ -156,7 +156,7 @@ See `GraphAr C++ Library`_ for details about the building of the C++ library.
 
 The Java Library
 ^^^^^^^^^^^^^^^^
-The GraphAr Java library is created with bindings to the C++ library (currently at version v0.10.0), utilizing [Alibaba-FastFFI](https://github.com/alibaba/fastFFI) for implementation.
+The GraphAr Java library is created with bindings to the C++ library (currently at version v0.10.0), utilizing  `Alibaba-FastFFI`_ for implementation.
 See `GraphAr Java Library`_ for details about the building of the Java library.
 
 The Spark Library
@@ -262,3 +262,5 @@ Publication
 .. _GitHub Issues: https://github.com/alibaba/GraphAr/issues/new
 
 .. _Github Discussions: https://github.com/alibaba/GraphAr/discussions
+
+.. _Alibaba-FastFFI: https://github.com/alibaba/fastFFI
