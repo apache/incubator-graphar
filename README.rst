@@ -156,7 +156,7 @@ See `GraphAr C++ Library`_ for details about the building of the C++ library.
 
 The Java Library
 ^^^^^^^^^^^^^^^^
-The GraphAr Java library is created with bindings to the C++ library (currently at version v0.10.0), utilizing [Alibaba-FastFFI](https://github.com/alibaba/fastFFI) for implementation.
+The GraphAr Java library is created with bindings to the C++ library (currently at version v0.10.0), utilizing  `Alibaba-FastFFI`_ for implementation.
 See `GraphAr Java Library`_ for details about the building of the Java library.
 
 The Spark Library
@@ -205,14 +205,14 @@ Publication
 -----------
 
 - Xue Li, Weibin Zeng, Zhibin Wang, Diwen Zhu, Jingbo Xu, Wenyuan Yu, Jingren Zhou.
-  `GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes[J] <https://arxiv.org/abs/2312.09577>`_.
+  `Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme[J] <https://arxiv.org/abs/2312.09577>`_.
   arXiv preprint arXiv:2312.09577, 2023.
 
 .. code:: bibtex
 
   @article{li2023enhancing,
     author = {Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
-    title = {GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes},
+    title = {Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme},
     year = {2023},
     url = {https://doi.org/10.48550/arXiv.2312.09577},
     doi = {10.48550/ARXIV.2312.09577},
@@ -262,3 +262,5 @@ Publication
 .. _GitHub Issues: https://github.com/alibaba/GraphAr/issues/new
 
 .. _Github Discussions: https://github.com/alibaba/GraphAr/discussions
+
+.. _Alibaba-FastFFI: https://github.com/alibaba/fastFFI
