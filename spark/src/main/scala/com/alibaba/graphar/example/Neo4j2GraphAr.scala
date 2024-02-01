@@ -72,8 +72,8 @@ object Neo4j2GraphAr {
       spark: SparkSession
   ): Unit = {
     // read vertices with label "Person" from Neo4j as a DataFrame
-    // Note: set "schema.flatten.limit" to 1 to avoid select null to make the property type as string,
-    // If APOC is installed, you can use apoc to get the property type
+    // Note: set "schema.flatten.limit" to 1 to not sample null record infer type as string as far as possible,
+    // if you want a perfect type inference, consider to user APOC.
     val person_df = spark.read
       .format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (n:Person) RETURN n.name AS name, n.born as born")
