@@ -33,16 +33,20 @@ class Property {
   std::string name;                // property name
   std::shared_ptr<DataType> type;  // property data type
   bool is_primary;                 // primary key tag
+  bool is_nullable;                // nullable tag for non-primary key
 
   explicit Property(const std::string& name,
                     const std::shared_ptr<DataType>& type = nullptr,
-                    bool is_primary = false)
-      : name(name), type(type), is_primary(is_primary) {}
+                    bool is_primary = false, bool is_nullable = true)
+      : name(name),
+        type(type),
+        is_primary(is_primary),
+        is_nullable(!is_primary && is_nullable) {}
 };
 
 static bool operator==(const Property& lhs, const Property& rhs) {
   return (lhs.name == rhs.name) && (lhs.type == rhs.type) &&
-         (lhs.is_primary == rhs.is_primary);
+         (lhs.is_primary == rhs.is_primary) && (lhs.is_nullable == rhs.is_nullable);
 }
 
 /**
@@ -270,6 +274,14 @@ class VertexInfo {
    * @return True if the property is a primary key, False otherwise.
    */
   bool IsPrimaryKey(const std::string& property_name) const;
+
+  /**
+   * Returns whether the specified property is a nullable key.
+   *
+   * @param property_name The name of the property.
+   * @return True if the property is a nullable key, False otherwise.
+   */
+  bool IsNullableKey(const std::string& property_name) const;
 
   /**
    * Returns whether the vertex info contains the specified property group.
@@ -596,10 +608,17 @@ class EdgeInfo {
    * Returns whether the specified property is a primary key.
    *
    * @param property_name The name of the property.
-   * @return A Result object containing a bool indicating whether the property
-   * is a primary key, or a KeyError Status object if the property is not found.
+   * @return True if the property is a primary key, False otherwise.
    */
   bool IsPrimaryKey(const std::string& property_name) const;
+
+  /**
+   * Returns whether the specified property is a nullable key.
+   *
+   * @param property_name The name of the property.
+   * @return True if the property is a nullable key, False otherwise.
+   */
+  bool IsNullableKey(const std::string& property_name) const;
 
   /**
    * Saves the edge info to a YAML file.

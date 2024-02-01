@@ -184,6 +184,7 @@ class VertexInfo::Impl {
       for (const auto& p : pg->GetProperties()) {
         property_name_to_index_.emplace(p.name, i);
         property_name_to_primary_.emplace(p.name, p.is_primary);
+        property_name_to_nullable_.emplace(p.name, p.is_nullable);
         property_name_to_type_.emplace(p.name, p.type);
       }
     }
@@ -220,6 +221,7 @@ class VertexInfo::Impl {
   std::shared_ptr<const InfoVersion> version_;
   std::unordered_map<std::string, int> property_name_to_index_;
   std::unordered_map<std::string, bool> property_name_to_primary_;
+  std::unordered_map<std::string, bool> property_name_to_nullable_;
   std::unordered_map<std::string, std::shared_ptr<DataType>>
       property_name_to_type_;
 };
@@ -289,6 +291,14 @@ bool VertexInfo::IsPrimaryKey(const std::string& property_name) const {
     return false;
   }
   return it->second;
+}
+
+bool VertexInfo::IsNullableKey(const std::string &property_name) const {
+    auto it = impl_->property_name_to_nullable_.find(property_name);
+    if (it == impl_->property_name_to_nullable_.end()) {
+        return false;
+    }
+    return it->second;
 }
 
 bool VertexInfo::HasProperty(const std::string& property_name) const {
@@ -382,7 +392,8 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(
         auto property_type =
             DataType::TypeNameToDataType(p_node["data_type"].As<std::string>());
         bool is_primary = p_node["is_primary"].As<bool>();
-        property_vec.emplace_back(property_name, property_type, is_primary);
+        bool is_nullable = p_node["is_nullable"].IsNone() || p_node["is_nullable"].As<bool>();
+        property_vec.emplace_back(property_name, property_type, is_primary, is_nullable);
       }
       property_groups.push_back(
           std::make_shared<PropertyGroup>(property_vec, file_type, pg_prefix));
@@ -416,6 +427,7 @@ Result<std::string> VertexInfo::Dump() const noexcept {
       p_node["name"] = p.name;
       p_node["data_type"] = p.type->ToTypeName();
       p_node["is_primary"] = p.is_primary ? "true" : "false";
+      p_node["is_nullable"] = p.is_nullable ? "true" : "false";
       pg_node["properties"].PushBack();
       pg_node["properties"][pg_node["properties"].Size() - 1] = p_node;
     }
@@ -469,6 +481,7 @@ class EdgeInfo::Impl {
       for (const auto& p : pg->GetProperties()) {
         property_name_to_index_.emplace(p.name, i);
         property_name_to_primary_.emplace(p.name, p.is_primary);
+        property_name_to_nullable_.emplace(p.name, p.is_nullable);
         property_name_to_type_.emplace(p.name, p.type);
       }
     }
@@ -522,6 +535,7 @@ class EdgeInfo::Impl {
   std::unordered_map<AdjListType, int> adjacent_list_type_to_index_;
   std::unordered_map<std::string, int> property_name_to_index_;
   std::unordered_map<std::string, bool> property_name_to_primary_;
+  std::unordered_map<std::string, bool> property_name_to_nullable_;
   std::unordered_map<std::string, std::shared_ptr<DataType>>
       property_name_to_type_;
   std::shared_ptr<const InfoVersion> version_;
@@ -706,6 +720,14 @@ bool EdgeInfo::IsPrimaryKey(const std::string& property_name) const {
   return it->second;
 }
 
+bool EdgeInfo::IsNullableKey(const std::string &property_name) const {
+    auto it = impl_->property_name_to_nullable_.find(property_name);
+    if (it == impl_->property_name_to_nullable_.end()) {
+        return false;
+    }
+    return it->second;
+}
+
 Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddAdjacentList(
     std::shared_ptr<AdjacentList> adj_list) const {
   if (adj_list == nullptr) {
@@ -817,7 +839,8 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
         auto property_type =
             DataType::TypeNameToDataType(p_node["data_type"].As<std::string>());
         bool is_primary = p_node["is_primary"].As<bool>();
-        property_vec.emplace_back(property_name, property_type, is_primary);
+        bool is_nullable = p_node["is_nullable"].IsNone() || p_node["is_nullable"].As<bool>();
+        property_vec.emplace_back(property_name, property_type, is_primary, is_nullable);
       }
       property_groups.push_back(
           std::make_shared<PropertyGroup>(property_vec, file_type, pg_prefix));
@@ -869,6 +892,7 @@ Result<std::string> EdgeInfo::Dump() const noexcept {
       p_node["name"] = p.name;
       p_node["data_type"] = p.type->ToTypeName();
       p_node["is_primary"] = p.is_primary ? "true" : "false";
+      p_node["is_nullable"] = p.is_nullable ? "true" : "false";
       pg_node["properties"].PushBack();
       pg_node["properties"][pg_node["properties"].Size() - 1] = p_node;
     }
