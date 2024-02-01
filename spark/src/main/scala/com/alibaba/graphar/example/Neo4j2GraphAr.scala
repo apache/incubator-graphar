@@ -72,9 +72,12 @@ object Neo4j2GraphAr {
       spark: SparkSession
   ): Unit = {
     // read vertices with label "Person" from Neo4j as a DataFrame
+    // Note: set "schema.flatten.limit" to 1 to avoid select null to make the property type as string,
+    // If APOC is installed, you can use apoc to get the property type
     val person_df = spark.read
       .format("org.neo4j.spark.DataSource")
       .option("query", "MATCH (n:Person) RETURN n.name AS name, n.born as born")
+      .option("schema.flatten.limit", 1)
       .load()
     // put into writer, vertex label is "Person"
     writer.PutVertexData("Person", person_df)
@@ -86,6 +89,7 @@ object Neo4j2GraphAr {
         "query",
         "MATCH (n:Movie) RETURN n.title AS title, n.tagline as tagline"
       )
+      .option("schema.flatten.limit", 1)
       .load()
     // put into writer, vertex label is "Movie"
     writer.PutVertexData("Movie", movie_df)
@@ -97,6 +101,7 @@ object Neo4j2GraphAr {
         "query",
         "MATCH (a:Person)-[r:PRODUCED]->(b:Movie) return a.name as src, b.title as dst"
       )
+      .option("schema.flatten.limit", 1)
       .load()
     // put into writer, source vertex label is "Person", edge label is "PRODUCED"
     // target vertex label is "Movie"
@@ -109,6 +114,7 @@ object Neo4j2GraphAr {
         "query",
         "MATCH (a:Person)-[r:ACTED_IN]->(b:Movie) return a.name as src, b.title as dst"
       )
+      .option("schema.flatten.limit", 1)
       .load()
     // put into writer, source vertex label is "Person", edge label is "ACTED_IN"
     // target vertex label is "Movie"
@@ -121,6 +127,7 @@ object Neo4j2GraphAr {
         "query",
         "MATCH (a:Person)-[r:DIRECTED]->(b:Movie) return a.name as src, b.title as dst"
       )
+      .option("schema.flatten.limit", 1)
       .load()
     // put into writer, source vertex label is "Person", edge label is "DIRECTED"
     // target vertex label is "Movie"
@@ -133,6 +140,7 @@ object Neo4j2GraphAr {
         "query",
         "MATCH (a:Person)-[r:FOLLOWS]->(b:Person) return a.name as src, b.name as dst"
       )
+      .option("schema.flatten.limit", 1)
       .load()
     // put into writer, source vertex label is "Person", edge label is "FOLLOWS"
     // target vertex label is "Person"
@@ -145,6 +153,7 @@ object Neo4j2GraphAr {
         "query",
         "MATCH (a:Person)-[r:REVIEWED]->(b:Movie) return a.name as src, b.title as dst, r.rating as rating, r.summary as summary"
       )
+      .option("schema.flatten.limit", 1)
       .load()
     // put into writer, source vertex label is "Person", edge label is "REVIEWED"
     // target vertex label is "Movie"
@@ -157,6 +166,7 @@ object Neo4j2GraphAr {
         "query",
         "MATCH (a:Person)-[r:WROTE]->(b:Movie) return a.name as src, b.title as dst"
       )
+      .option("schema.flatten.limit", 1)
       .load()
     // put into writer, source vertex label is "Person", edge label is "WROTE"
     // target vertex label is "Movie"
