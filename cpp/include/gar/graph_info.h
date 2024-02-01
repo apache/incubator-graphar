@@ -46,7 +46,8 @@ class Property {
 
 static bool operator==(const Property& lhs, const Property& rhs) {
   return (lhs.name == rhs.name) && (lhs.type == rhs.type) &&
-         (lhs.is_primary == rhs.is_primary) && (lhs.is_nullable == rhs.is_nullable);
+         (lhs.is_primary == rhs.is_primary) &&
+         (lhs.is_nullable == rhs.is_nullable);
 }
 
 /**
