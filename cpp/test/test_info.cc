@@ -71,7 +71,9 @@ TEST_CASE("Property") {
   REQUIRE(p0.name == "p0");
   REQUIRE(p0.type->ToTypeName() == int32()->ToTypeName());
   REQUIRE(p0.is_primary == true);
+  REQUIRE(p0.is_nullable == false);
   REQUIRE(p1.is_primary == false);
+  REQUIRE(p1.is_nullable == true);
 }
 
 TEST_CASE("PropertyGroup") {
@@ -95,6 +97,7 @@ TEST_CASE("PropertyGroup") {
     REQUIRE(p.name == "p0");
     REQUIRE(p.type->ToTypeName() == int32()->ToTypeName());
     REQUIRE(p.is_primary == true);
+    REQUIRE(p.is_nullable == false);
   }
 
   SECTION("FileType") {
@@ -199,6 +202,8 @@ TEST_CASE("VertexInfo") {
             int32()->ToTypeName());
     REQUIRE(vertex_info->IsPrimaryKey("p0") == true);
     REQUIRE(vertex_info->IsPrimaryKey("p1") == false);
+    REQUIRE(vertex_info->IsNullableKey("p0") == false);
+    REQUIRE(vertex_info->IsNullableKey("p1") == true);
     REQUIRE(vertex_info->HasProperty("not_exist") == false);
     REQUIRE(vertex_info->IsPrimaryKey("not_exist") == false);
     REQUIRE(vertex_info->HasPropertyGroup(nullptr) == false);
@@ -242,9 +247,11 @@ property_groups:
     prefix: p0_p1/
     properties: 
       - data_type: int32
+        is_nullable: false
         is_primary: true
         name: p0
       - data_type: string
+        is_nullable: true
         is_primary: false
         name: p1
 version: gar/v1
@@ -269,6 +276,7 @@ version: gar/v1
     REQUIRE(extend_info->GetPropertyType("p2").value()->ToTypeName() ==
             int32()->ToTypeName());
     REQUIRE(extend_info->IsPrimaryKey("p2") == false);
+    REQUIRE(extend_info->IsNullableKey("p2") == true);
     auto extend_info2 = extend_info->AddPropertyGroup(pg2);
     REQUIRE(!extend_info2.status().ok());
   }
@@ -327,8 +335,11 @@ TEST_CASE("EdgeInfo") {
             int32()->ToTypeName());
     REQUIRE(edge_info->IsPrimaryKey("p0") == true);
     REQUIRE(edge_info->IsPrimaryKey("p1") == false);
+    REQUIRE(edge_info->IsNullableKey("p0") == false);
+    REQUIRE(edge_info->IsNullableKey("p1") == true);
     REQUIRE(edge_info->HasProperty("not_exist") == false);
     REQUIRE(edge_info->IsPrimaryKey("not_exist") == false);
+    REQUIRE(edge_info->IsNullableKey("not_exist") == false);
     REQUIRE(edge_info->HasPropertyGroup(nullptr) == false);
   }
 
@@ -410,9 +421,11 @@ property_groups:
     prefix: p0_p1/
     properties: 
       - data_type: int32
+        is_nullable: false
         is_primary: true
         name: p0
       - data_type: string
+        is_nullable: true
         is_primary: false
         name: p1
 src_chunk_size: 100
@@ -601,17 +614,21 @@ property_groups:
       - name: id
         data_type: int64
         is_primary: true
+        is_nullable: false
     file_type: parquet
   - properties:
       - name: firstName
         data_type: string
         is_primary: false
+        is_nullable: true
       - name: lastName
         data_type: string
         is_primary: false
+        is_nullable: true
       - name: gender
         data_type: string
         is_primary: false
+        is_nullable: true
     file_type: parquet
 version: gar/v1
 )";
@@ -639,6 +656,7 @@ property_groups:
       - name: creationDate
         data_type: string
         is_primary: false
+        is_nullable: true
 version: gar/v1
 )";
   std::string graph_info_yaml = R"(name: ldbc_sample

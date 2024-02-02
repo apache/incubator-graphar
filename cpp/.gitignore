@@ -1,5 +1,6 @@
 /build/
 /examples/*/build/
+/cmake-build-debug
 
 apidoc/html
 apidoc/xml
