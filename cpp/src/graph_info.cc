@@ -1052,11 +1052,11 @@ class GraphInfo::Impl {
   std::unordered_map<std::string, int> elabel_to_index_;
 };
 
-GraphInfo::GraphInfo(const std::string& graph_name,
-                     VertexInfoVector vertex_infos, EdgeInfoVector edge_infos,
-                     const std::string& prefix,
-                     std::shared_ptr<const InfoVersion> version,
-                     const std::unordered_map<std::string, std::string>& extra_info)
+GraphInfo::GraphInfo(
+    const std::string& graph_name, VertexInfoVector vertex_infos,
+    EdgeInfoVector edge_infos, const std::string& prefix,
+    std::shared_ptr<const InfoVersion> version,
+    const std::unordered_map<std::string, std::string>& extra_info)
     : impl_(new Impl(graph_name, std::move(vertex_infos), std::move(edge_infos),
                      prefix, version, extra_info)) {}
 
@@ -1224,8 +1224,7 @@ Result<std::string> GraphInfo::Dump() const {
       extra_info_node["key"] = pair.first;
       extra_info_node["value"] = pair.second;
       node["extra_info"].PushBack();
-      node["extra_info"][node["extra_info"].Size() - 1] =
-          extra_info_node;
+      node["extra_info"][node["extra_info"].Size() - 1] = extra_info_node;
     }
   }
   std::string dump_string;

@@ -499,9 +499,9 @@ TEST_CASE("GraphInfo") {
   }
 
   SECTION("ExtraInfo") {
-    auto graph_info_with_extra_info = CreateGraphInfo(
-        name, {vertex_info}, {edge_info}, "test_graph/", version,
-        {{"key1", "value1"}, {"key2", "value2"}});
+    auto graph_info_with_extra_info =
+        CreateGraphInfo(name, {vertex_info}, {edge_info}, "test_graph/",
+                        version, {{"key1", "value1"}, {"key2", "value2"}});
     const auto& extra_info = graph_info_with_extra_info->GetExtraInfo();
     REQUIRE(extra_info.size() == 2);
     REQUIRE(extra_info.find("key1") != extra_info.end());

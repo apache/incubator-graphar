@@ -676,11 +676,11 @@ class GraphInfo {
    * @param version The version of the graph info.
    * @param extra_info The extra metadata of the graph info.
    */
-  explicit GraphInfo(const std::string& graph_name,
-                     VertexInfoVector vertex_infos, EdgeInfoVector edge_infos,
-                     const std::string& prefix = "./",
-                     std::shared_ptr<const InfoVersion> version = nullptr,
-                     const std::unordered_map<std::string, std::string>& extra_info = {});
+  explicit GraphInfo(
+      const std::string& graph_name, VertexInfoVector vertex_infos,
+      EdgeInfoVector edge_infos, const std::string& prefix = "./",
+      std::shared_ptr<const InfoVersion> version = nullptr,
+      const std::unordered_map<std::string, std::string>& extra_info = {});
 
   /**
    * @brief Loads the input file as a `GraphInfo` instance.
