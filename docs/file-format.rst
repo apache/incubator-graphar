@@ -124,7 +124,7 @@ A vertex information file which named "<label>.vertex.yml" defines a single grou
 - the vertex label;
 - the vertex chunk size;
 - the relative path for vertex data files;
-- the property groups attached: each property group has its own file type and the prefix for the path of its data files, it also lists all properties in this group, with every property containing its own name, data type and flagging of whether it is the primary key or not;
+- the property groups attached: each property group has its own file type and the prefix for the path of its data files, it also lists all properties in this group, with every property containing its own name, data type, flagging of whether it is the primary key or not and flagging of whether it is nullable or not for non-primary key properties;
 - the version of GraphAr.
 
 An edge information file which named "<source label>_<edge label>_<destination label>.edge.yml" defines a single group of edges with specific label for source vertex, destination vertex and the edge. It describes the meta information for these edges, includes:
