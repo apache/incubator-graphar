@@ -495,6 +495,19 @@ TEST_CASE("GraphInfo") {
     REQUIRE(graph_info->GetName() == name);
     REQUIRE(graph_info->GetPrefix() == "test_graph/");
     REQUIRE(graph_info->version()->ToString() == "gar/v1");
+    REQUIRE(graph_info->GetExtraInfo().size() == 0);
+  }
+
+  SECTION("ExtraInfo") {
+    auto graph_info_with_extra_info = CreateGraphInfo(
+        name, {vertex_info}, {edge_info}, "test_graph/", version,
+        {{"key1", "value1"}, {"key2", "value2"}});
+    const auto& extra_info = graph_info_with_extra_info->GetExtraInfo();
+    REQUIRE(extra_info.size() == 2);
+    REQUIRE(extra_info.find("key1") != extra_info.end());
+    REQUIRE(extra_info.at("key1") == "value1");
+    REQUIRE(extra_info.find("key2") != extra_info.end());
+    REQUIRE(extra_info.at("key2") == "value2");
   }
 
   SECTION("VertexInfo") {

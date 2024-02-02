@@ -19,6 +19,7 @@
 
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "gar/fwd.h"
@@ -673,11 +674,13 @@ class GraphInfo {
    * @param prefix The absolute path prefix to store chunk files of the graph.
    *               Defaults to "./".
    * @param version The version of the graph info.
+   * @param extra_info The extra metadata of the graph info.
    */
   explicit GraphInfo(const std::string& graph_name,
                      VertexInfoVector vertex_infos, EdgeInfoVector edge_infos,
                      const std::string& prefix = "./",
-                     std::shared_ptr<const InfoVersion> version = nullptr);
+                     std::shared_ptr<const InfoVersion> version = nullptr,
+                     const std::unordered_map<std::string, std::string>& extra_info = {});
 
   /**
    * @brief Loads the input file as a `GraphInfo` instance.
@@ -737,6 +740,13 @@ class GraphInfo {
    * @return The version info of the graph info object.
    */
   const std::shared_ptr<const InfoVersion>& version() const;
+
+  /**
+   * @brief Get the extra metadata of the graph info object.
+   *
+   * @return The extra metadata of the graph info object.
+   */
+  const std::unordered_map<std::string, std::string>& GetExtraInfo() const;
 
   /**
    * @brief Get the vertex info with the given label.

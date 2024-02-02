@@ -20,6 +20,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "gar/external/result.hpp"
@@ -115,7 +116,8 @@ std::shared_ptr<EdgeInfo> CreateEdgeInfo(
 std::shared_ptr<GraphInfo> CreateGraphInfo(
     const std::string& name, const VertexInfoVector& vertex_infos,
     const EdgeInfoVector& edge_infos, const std::string& prefix,
-    std::shared_ptr<const InfoVersion> version = nullptr);
+    std::shared_ptr<const InfoVersion> version = nullptr,
+    const std::unordered_map<std::string, std::string>& extra_info = {});
 
 const std::shared_ptr<DataType>& boolean();
 const std::shared_ptr<DataType>& int32();

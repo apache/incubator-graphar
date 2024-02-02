@@ -956,6 +956,16 @@ static Result<std::shared_ptr<GraphInfo>> ConstructGraphInfo(
         version, InfoVersion::Parse(
                      graph_meta->operator[]("version").As<std::string>()));
   }
+  std::unordered_map<std::string, std::string> extra_info;
+  if (!graph_meta->operator[]("extra_metatdata").IsNone()) {
+    auto& extra_info_node = graph_meta->operator[]("extra_info");
+    for (auto it = extra_info_node.Begin(); it != extra_info_node.End(); it++) {
+      auto node = (*it).second;
+      auto key = node["key"].As<std::string>();
+      auto value = node["value"].As<std::string>();
+      extra_info.emplace(key, value);
+    }
+  }
 
   VertexInfoVector vertex_infos;
   EdgeInfoVector edge_infos;
@@ -983,7 +993,7 @@ static Result<std::shared_ptr<GraphInfo>> ConstructGraphInfo(
     }
   }
   return std::make_shared<GraphInfo>(name, vertex_infos, edge_infos, prefix,
-                                     version);
+                                     version, extra_info);
 }
 
 }  // namespace
@@ -992,12 +1002,14 @@ class GraphInfo::Impl {
  public:
   Impl(const std::string& graph_name, VertexInfoVector vertex_infos,
        EdgeInfoVector edge_infos, const std::string& prefix,
-       std::shared_ptr<const InfoVersion> version)
+       std::shared_ptr<const InfoVersion> version,
+       const std::unordered_map<std::string, std::string>& extra_info)
       : name_(graph_name),
         vertex_infos_(std::move(vertex_infos)),
         edge_infos_(std::move(edge_infos)),
         prefix_(prefix),
-        version_(std::move(version)) {
+        version_(std::move(version)),
+        extra_info_(extra_info) {
     for (int i = 0; i < vertex_infos_.size(); i++) {
       vlabel_to_index_[vertex_infos_[i]->GetLabel()] = i;
     }
@@ -1035,6 +1047,7 @@ class GraphInfo::Impl {
   EdgeInfoVector edge_infos_;
   std::string prefix_;
   std::shared_ptr<const InfoVersion> version_;
+  std::unordered_map<std::string, std::string> extra_info_;
   std::unordered_map<std::string, int> vlabel_to_index_;
   std::unordered_map<std::string, int> elabel_to_index_;
 };
@@ -1042,9 +1055,10 @@ class GraphInfo::Impl {
 GraphInfo::GraphInfo(const std::string& graph_name,
                      VertexInfoVector vertex_infos, EdgeInfoVector edge_infos,
                      const std::string& prefix,
-                     std::shared_ptr<const InfoVersion> version)
+                     std::shared_ptr<const InfoVersion> version,
+                     const std::unordered_map<std::string, std::string>& extra_info)
     : impl_(new Impl(graph_name, std::move(vertex_infos), std::move(edge_infos),
-                     prefix, version)) {}
+                     prefix, version, extra_info)) {}
 
 const std::string& GraphInfo::GetName() const { return impl_->name_; }
 
@@ -1052,6 +1066,11 @@ const std::string& GraphInfo::GetPrefix() const { return impl_->prefix_; }
 
 const std::shared_ptr<const InfoVersion>& GraphInfo::version() const {
   return impl_->version_;
+}
+
+const std::unordered_map<std::string, std::string>& GraphInfo::GetExtraInfo()
+    const {
+  return impl_->extra_info_;
 }
 
 std::shared_ptr<VertexInfo> GraphInfo::GetVertexInfo(
@@ -1142,9 +1161,10 @@ Result<std::shared_ptr<GraphInfo>> GraphInfo::AddEdge(
 std::shared_ptr<GraphInfo> CreateGraphInfo(
     const std::string& name, const VertexInfoVector& vertex_infos,
     const EdgeInfoVector& edge_infos, const std::string& prefix,
-    std::shared_ptr<const InfoVersion> version) {
+    std::shared_ptr<const InfoVersion> version,
+    const std::unordered_map<std::string, std::string>& extra_info) {
   return std::make_shared<GraphInfo>(name, vertex_infos, edge_infos, prefix,
-                                     version);
+                                     version, extra_info);
 }
 
 Result<std::shared_ptr<GraphInfo>> GraphInfo::Load(const std::string& path) {
@@ -1196,6 +1216,17 @@ Result<std::string> GraphInfo::Dump() const {
   }
   if (impl_->version_ != nullptr) {
     node["version"] = impl_->version_->ToString();
+  }
+  if (impl_->extra_info_.size() > 0) {
+    node["extra_info"];
+    for (const auto& pair : impl_->extra_info_) {
+      ::Yaml::Node extra_info_node;
+      extra_info_node["key"] = pair.first;
+      extra_info_node["value"] = pair.second;
+      node["extra_info"].PushBack();
+      node["extra_info"][node["extra_info"].Size() - 1] =
+          extra_info_node;
+    }
   }
   std::string dump_string;
   ::Yaml::Serialize(node, dump_string);
