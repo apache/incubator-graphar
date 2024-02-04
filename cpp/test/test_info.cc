@@ -717,9 +717,6 @@ extra_info:
     REQUIRE(graph_info->version()->ToString() == "gar/v1");
     const auto& extra_info = graph_info->GetExtraInfo();
     REQUIRE(extra_info.size() == 1);
-    for (const auto& [k, v] : extra_info) {
-      std::cout << k << " " << v << std::endl;
-    }
     REQUIRE(extra_info.find("category") != extra_info.end());
     REQUIRE(extra_info.at("category") == "test graph");
   }
