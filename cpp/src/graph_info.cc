@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-#include <iostream>
 #include <unordered_set>
 
 #include "yaml/Yaml.hpp"
@@ -957,7 +956,7 @@ static Result<std::shared_ptr<GraphInfo>> ConstructGraphInfo(
                      graph_meta->operator[]("version").As<std::string>()));
   }
   std::unordered_map<std::string, std::string> extra_info;
-  if (!graph_meta->operator[]("extra_metatdata").IsNone()) {
+  if (!graph_meta->operator[]("extra_info").IsNone()) {
     auto& extra_info_node = graph_meta->operator[]("extra_info");
     for (auto it = extra_info_node.Begin(); it != extra_info_node.End(); it++) {
       auto node = (*it).second;
