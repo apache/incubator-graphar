@@ -483,18 +483,36 @@ TEST_CASE("GraphInfo") {
       FileType::CSV, "p0_p1/");
   auto vertex_info =
       CreateVertexInfo("test_vertex", 100, {pg}, "test_vertex/", version);
+  std::unordered_map<std::string, std::string> extra_info = {
+      {"category", "test graph"}};
   auto edge_info =
       CreateEdgeInfo("person", "knows", "person", 1024, 100, 100, true,
                      {CreateAdjacentList(AdjListType::ordered_by_source,
                                          FileType::CSV, "adj_list/")},
                      {pg}, "test_edge/", version);
-  auto graph_info =
-      CreateGraphInfo(name, {vertex_info}, {edge_info}, "test_graph/", version);
+  auto graph_info = CreateGraphInfo(name, {vertex_info}, {edge_info},
+                                    "test_graph/", version, extra_info);
 
   SECTION("Basics") {
     REQUIRE(graph_info->GetName() == name);
     REQUIRE(graph_info->GetPrefix() == "test_graph/");
     REQUIRE(graph_info->version()->ToString() == "gar/v1");
+    REQUIRE(graph_info->GetExtraInfo().size() == 1);
+    REQUIRE(graph_info->GetExtraInfo().find("category") !=
+            graph_info->GetExtraInfo().end());
+    REQUIRE(graph_info->GetExtraInfo().at("category") == "test graph");
+  }
+
+  SECTION("ExtraInfo") {
+    auto graph_info_with_extra_info =
+        CreateGraphInfo(name, {vertex_info}, {edge_info}, "test_graph/",
+                        version, {{"key1", "value1"}, {"key2", "value2"}});
+    const auto& extra_info = graph_info_with_extra_info->GetExtraInfo();
+    REQUIRE(extra_info.size() == 2);
+    REQUIRE(extra_info.find("key1") != extra_info.end());
+    REQUIRE(extra_info.at("key1") == "value1");
+    REQUIRE(extra_info.find("key2") != extra_info.end());
+    REQUIRE(extra_info.at("key2") == "value2");
   }
 
   SECTION("VertexInfo") {
@@ -552,6 +570,9 @@ TEST_CASE("GraphInfo") {
     REQUIRE(dump_result.status().ok());
     std::string expected = R"(edges: 
   - person_knows_person.edge.yaml
+extra_info: 
+  - key: category
+    value: test graph
 name: test_graph
 prefix: test_graph/
 version: gar/v1
@@ -662,6 +683,9 @@ version: gar/v1
   std::string graph_info_yaml = R"(name: ldbc_sample
 prefix: /tmp/ldbc/
 version: gar/v1
+extra_info:
+  - key: category
+    value: test graph
 )";
 
   SECTION("VertexInfo::Load") {
@@ -690,6 +714,11 @@ version: gar/v1
     auto graph_info = maybe_graph_info.value();
     REQUIRE(graph_info->GetName() == "ldbc_sample");
     REQUIRE(graph_info->GetPrefix() == "/tmp/ldbc/");
+    REQUIRE(graph_info->version()->ToString() == "gar/v1");
+    const auto& extra_info = graph_info->GetExtraInfo();
+    REQUIRE(extra_info.size() == 1);
+    REQUIRE(extra_info.find("category") != extra_info.end());
+    REQUIRE(extra_info.at("category") == "test graph");
   }
 }
 

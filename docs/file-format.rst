@@ -118,6 +118,7 @@ A graph information file which named "<name>.graph.yml" describes the meta infor
 - the root directory path of the data files;
 - the vertex information and edge information files included;
 - the version of GraphAr.
+- extra information for the graph, could be used for user defined information.
 
 A vertex information file which named "<label>.vertex.yml" defines a single group of vertices with the same vertex label <label>, and all vertices in this group have the same schema. The file defines:
 
@@ -164,7 +165,7 @@ GraphAr provides a set of built-in data types that are common in real use cases 
 - float
 - double
 - string
-- list (of int32, int64, float, double; not supported by CSV)
+- list (of int32, int64, float, double, string; not supported by CSV)
 
 .. tip::
 
