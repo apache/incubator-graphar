@@ -48,8 +48,7 @@ class VertexPropertyArrowChunkReader {
   VertexPropertyArrowChunkReader(
       const std::shared_ptr<VertexInfo>& vertex_info,
       const std::shared_ptr<PropertyGroup>& property_group,
-      const std::string& prefix, IdType chunk_index = 0,
-      const util::FilterOptions& options = {});
+      const std::string& prefix, const util::FilterOptions& options = {});
 
   /**
    * @brief Sets chunk position indicator for reader by internal vertex id.
@@ -164,8 +163,7 @@ class AdjListArrowChunkReader {
    * @param vertex_chunk_index The vertex chunk index, default is 0.
    */
   AdjListArrowChunkReader(const std::shared_ptr<EdgeInfo>& edge_info,
-                          AdjListType adj_list_type, const std::string& prefix,
-                          IdType vertex_chunk_index = 0);
+                          AdjListType adj_list_type, const std::string& prefix);
 
   /**
    * @brief Copy constructor.
@@ -248,6 +246,9 @@ class AdjListArrowChunkReader {
       const std::shared_ptr<GraphInfo>& graph_info,
       const std::string& src_label, const std::string& edge_label,
       const std::string& dst_label, AdjListType adj_list_type);
+
+ private:
+  Status initOrUpdateEdgeChunkNum();
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;
@@ -365,7 +366,7 @@ class AdjListPropertyArrowChunkReader {
       const std::shared_ptr<EdgeInfo>& edge_info,
       const std::shared_ptr<PropertyGroup>& property_group,
       AdjListType adj_list_type, const std::string prefix,
-      IdType vertex_chunk_index = 0, const util::FilterOptions& options = {});
+      const util::FilterOptions& options = {});
 
   /**
    * @brief Copy constructor.
@@ -488,6 +489,9 @@ class AdjListPropertyArrowChunkReader {
       const std::string& src_label, const std::string& edge_label,
       const std::string& dst_label, const std::string& property_name,
       AdjListType adj_list_type, const util::FilterOptions& options = {});
+
+ private:
+  Status initOrUpdateEdgeChunkNum();
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;

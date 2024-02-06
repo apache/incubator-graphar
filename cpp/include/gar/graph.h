@@ -306,10 +306,7 @@ class EdgeIter {
                     IdType global_chunk_index, IdType offset,
                     IdType chunk_begin, IdType chunk_end,
                     std::shared_ptr<util::IndexConverter> index_converter)
-      : adj_list_reader_(
-            edge_info, adj_list_type, prefix,
-            index_converter->GlobalChunkIndexToIndexPair(global_chunk_index)
-                .first),
+      : adj_list_reader_(edge_info, adj_list_type, prefix),
         global_chunk_index_(global_chunk_index),
         cur_offset_(offset),
         chunk_size_(edge_info->GetChunkSize()),
@@ -322,10 +319,11 @@ class EdgeIter {
         index_converter_(index_converter) {
     vertex_chunk_index_ =
         index_converter->GlobalChunkIndexToIndexPair(global_chunk_index).first;
+    adj_list_reader_.seek_chunk_index(vertex_chunk_index_);
     const auto& property_groups = edge_info->GetPropertyGroups();
     for (const auto& pg : property_groups) {
-      property_readers_.emplace_back(edge_info, pg, adj_list_type, prefix,
-                                     vertex_chunk_index_);
+      property_readers_.emplace_back(edge_info, pg, adj_list_type, prefix),
+          property_readers_.back().seek_chunk_index(vertex_chunk_index_);
     }
     if (adj_list_type == AdjListType::ordered_by_source ||
         adj_list_type == AdjListType::ordered_by_dest) {
