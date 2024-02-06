@@ -160,7 +160,6 @@ class AdjListArrowChunkReader {
    * @param edge_info The edge info that describes the edge type.
    * @param adj_list_type The adj list type for the edge.
    * @param prefix The absolute prefix.
-   * @param vertex_chunk_index The vertex chunk index, default is 0.
    */
   AdjListArrowChunkReader(const std::shared_ptr<EdgeInfo>& edge_info,
                           AdjListType adj_list_type, const std::string& prefix);
@@ -360,7 +359,6 @@ class AdjListPropertyArrowChunkReader {
    * group.
    * @param adj_list_type The adj list type for the edges.
    * @param prefix The absolute prefix.
-   * @param vertex_chunk_index The vertex chunk index, default is 0.
    */
   AdjListPropertyArrowChunkReader(
       const std::shared_ptr<EdgeInfo>& edge_info,
