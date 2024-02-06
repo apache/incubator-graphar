@@ -254,6 +254,24 @@ TEST_CASE("ArrowChunkReader") {
           edge_info, AdjListType::ordered_by_source, graph_info->GetPrefix());
       REQUIRE(maybe_reader.status().ok());
     }
+
+    SECTION("set start vertex chunk index by seek_chunk_index") {
+      auto maybe_reader = AdjListArrowChunkReader::Make(
+          graph_info, src_label, edge_label, dst_label,
+          AdjListType::ordered_by_source);
+      auto reader = maybe_reader.value();
+      // check reader start from vertex chunk 0
+      auto result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      auto table = result.value();
+      REQUIRE(table->num_rows() == 667);
+      // set start vertex chunk index to 1
+      reader->seek_chunk_index(1);
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 644);
+    }
   }
 
   SECTION("AdjListPropertyArrowChunkReader") {
@@ -363,6 +381,25 @@ TEST_CASE("ArrowChunkReader") {
         reader->Select(expected_cols);
         walkReader(reader);
       }
+    }
+
+    SECTION("set start vertex chunk index by seek_chunk_index") {
+      auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
+          graph_info, src_label, edge_label, dst_label, edge_property_name,
+          GAR_NAMESPACE::AdjListType::ordered_by_source);
+      REQUIRE(maybe_reader.status().ok());
+      auto reader = maybe_reader.value();
+      // check reader start from vertex chunk 0
+      auto result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      auto table = result.value();
+      REQUIRE(table->num_rows() == 667);
+      // set start vertex chunk index to 1
+      reader->seek_chunk_index(1);
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 644);
     }
   }
 
