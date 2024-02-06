@@ -1,0 +1,21 @@
+src_label: person
+edge_label: created
+dst_label: software
+chunk_size: 2
+src_chunk_size: 2
+dst_chunk_size: 10
+directed: true
+prefix: edge/person_created_software/
+adj_lists:
+  - ordered: true
+    aligned_by: src
+    prefix: ordered_by_source/
+    file_type: csv
+property_groups:
+  - prefix: weight/
+    file_type: csv
+    properties:
+      - name: weight
+        data_type: double
+        is_primary: false
+version: gar/v1

@@ -1,0 +1,32 @@
+src_label: person
+edge_label: knows
+dst_label: person
+chunk_size: 1024
+src_chunk_size: 100
+dst_chunk_size: 100
+directed: false
+prefix: edge/person_knows_person/
+adj_lists:
+  - ordered: true
+    aligned_by: src
+    prefix: ordered_by_source/
+    file_type: orc
+    property_groups:
+      - prefix: creationDate/
+        file_type: orc
+        properties:
+          - name: creationDate
+            data_type: string
+            is_primary: false
+  - ordered: true
+    aligned_by: dst
+    prefix: ordered_by_dest/
+    file_type: orc
+    property_groups:
+      - prefix: creationDate/
+        file_type: orc
+        properties:
+          - name: creationDate
+            data_type: string
+            is_primary: false
+version: gar/v1

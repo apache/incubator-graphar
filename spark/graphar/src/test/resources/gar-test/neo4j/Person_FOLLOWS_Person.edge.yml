@@ -1,0 +1,15 @@
+dst_chunk_size: 100
+src_label: Person
+chunk_size: 1024
+src_chunk_size: 100
+prefix: edge/Person_FOLLOWS_Person/
+adj_lists:
+  - ordered: true
+    aligned_by: src
+    file_type: parquet
+  - ordered: true
+    aligned_by: dst
+    file_type: parquet
+dst_label: Person
+edge_label: FOLLOWS
+version: gar/v1

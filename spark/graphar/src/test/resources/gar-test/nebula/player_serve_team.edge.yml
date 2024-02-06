@@ -1,0 +1,39 @@
+dst_chunk_size: 100
+src_label: player
+chunk_size: 1024
+src_chunk_size: 100
+prefix: edge/player_serve_team/
+adj_lists:
+  - ordered: true
+    aligned_by: src
+    file_type: parquet
+    property_groups:
+      - file_type: parquet
+        properties:
+          - is_primary: false
+            name: _rank
+            data_type: int64
+          - is_primary: false
+            name: start_year
+            data_type: int64
+          - is_primary: false
+            name: end_year
+            data_type: int64
+  - ordered: true
+    aligned_by: dst
+    file_type: parquet
+property_groups:
+  - file_type: parquet
+    properties:
+      - is_primary: false
+        name: _rank
+        data_type: int64
+      - is_primary: false
+        name: start_year
+        data_type: int64
+      - is_primary: false
+        name: end_year
+        data_type: int64
+dst_label: team
+edge_label: serve
+version: gar/v1

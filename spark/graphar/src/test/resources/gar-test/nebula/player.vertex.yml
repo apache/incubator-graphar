@@ -1,0 +1,16 @@
+chunk_size: 100
+prefix: vertex/player/
+property_groups:
+  - file_type: parquet
+    properties:
+      - is_primary: true
+        name: _vertexId
+        data_type: string
+      - is_primary: false
+        name: name
+        data_type: string
+      - is_primary: false
+        name: age
+        data_type: int64
+label: player
+version: gar/v1
