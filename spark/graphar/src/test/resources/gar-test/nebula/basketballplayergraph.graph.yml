@@ -1,9 +1,0 @@
-vertices:
-  - player.vertex.yml
-  - team.vertex.yml
-prefix: /tmp/graphar/nebula2graphar/
-name: basketballplayergraph
-edges:
-  - player_follow_player.edge.yml
-  - player_serve_team.edge.yml
-version: gar/v1

@@ -1,8 +1,0 @@
-name: modern_graph
-vertices:
-  - person.vertex.yml
-  - software.vertex.yml
-edges:
-  - person_knows_person.edge.yml
-  - person_created_software.edge.yml
-version: gar/v1
