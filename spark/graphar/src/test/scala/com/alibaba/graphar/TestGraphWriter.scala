@@ -24,6 +24,7 @@ import org.scalatest.funsuite.AnyFunSuite
 class TestGraphWriterSuite extends AnyFunSuite {
   val spark = SparkSession
     .builder()
+    .config("spark.sql.legacy.parquet.nanosAsLong", "false")
     .enableHiveSupport()
     .master("local[*]")
     .getOrCreate()

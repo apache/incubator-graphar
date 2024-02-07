@@ -26,6 +26,7 @@ import scala.io.Source.fromFile
 class WriterSuite extends AnyFunSuite {
   val spark = SparkSession
     .builder()
+    .config("spark.sql.legacy.parquet.nanosAsLong", "false")
     .enableHiveSupport()
     .master("local[*]")
     .getOrCreate()
