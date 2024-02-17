@@ -33,7 +33,7 @@ namespace GAR_NAMESPACE_INTERNAL {
 class Status;
 
 /**
- * @A class for representing either a usable value, or an error.
+ * A class for representing either a usable value, or an error.
  *
  * A Result object either contains a value of type `T` or a Status object
  * explaining why such a value is not present. The type `T` must be
@@ -50,7 +50,7 @@ class Status;
  * returns false. Sample usage:
  *
  * ```
- *   gar::Result<Foo> result = CalculateFoo();
+ *   GraphArchive::Result<Foo> result = CalculateFoo();
  *   if (!result.has_error()) {
  *     Foo foo = result.value();
  *     foo.DoSomethingCool();
