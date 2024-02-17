@@ -64,7 +64,7 @@ class PropertyGroup {
    * Initialize the PropertyGroup with a list of properties, file type, and
    * optional prefix.
    *
-   * @param properties Property list of group
+   * @param properties Property list of the group
    * @param file_type File type of property group chunk file
    * @param prefix prefix of property group chunk file. The default
    *        prefix is the concatenation of property names with '_' as separator
@@ -126,19 +126,44 @@ static bool operator==(const PropertyGroup& lhs, const PropertyGroup& rhs) {
  */
 class AdjacentList {
  public:
-  /*
+  /**
    * Initialize the AdjacentList with the given type, file type, and optional
    * prefix
+   *
+   * @param type Type of adjacent list
+   * @param file_type File type of adjacent list chunk file
+   * @param prefix The prefix of the adjacent list. If left empty, the default
+   *        prefix will be set the type name of adjacent list
    */
   explicit AdjacentList(AdjListType type, FileType file_type,
                         const std::string& prefix = "");
 
+  /**
+   * @brief Get the type of adjacent list
+   *
+   * @return The type of adjacent list
+   */
   inline AdjListType GetType() const { return type_; }
 
+  /**
+   * @brief Get the file type of adjacent list
+   *
+   * @return The file type of adjacent list
+   */
   inline FileType GetFileType() const { return file_type_; }
 
+  /**
+   * @brief Get the prefix of adjacent list
+   *
+   * @return The path prefix of adjacent list
+   */
   inline const std::string& GetPrefix() const { return prefix_; }
 
+  /**
+   * Returns whether the adjacent list is validated.
+   *
+   * @return True if the adjacent list is valid, False otherwise.
+   */
   bool IsValidated() const;
 
  private:

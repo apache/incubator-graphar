@@ -16,22 +16,31 @@ Graph Info
     :members:
     :undoc-members:
 
+.. doxygenfunction:: GraphArchive::CreatePropertyGroup
+
 .. doxygenclass:: GraphArchive::AdjacentList
     :members:
     :undoc-members:
+
+.. doxygenfunction:: GraphArchive::CreateAdjacentList
 
 .. doxygenclass:: GraphArchive::VertexInfo
     :members:
     :undoc-members:
 
+.. doxygenfunction:: GraphArchive::CreateVertexInfo
+
 .. doxygenclass:: GraphArchive::EdgeInfo
     :members:
     :undoc-members:
+
+.. doxygenfunction:: GraphArchive::CreateEdgeInfo
 
 .. doxygenclass:: GraphArchive::GraphInfo
     :members:
     :undoc-members:
 
+.. doxygenfunction:: GraphArchive::CreateGraphInfo
 
 Readers
 ---------------------
@@ -160,6 +169,14 @@ Data Type
 .. doxygenclass:: GraphArchive::DataType
     :members:
     :undoc-members:
+
+.. doxygenfunction:: GraphArchive::boolean
+.. doxygenfunction:: GraphArchive::int32
+.. doxygenfunction:: GraphArchive::int64
+.. doxygenfunction:: GraphArchive::float32
+.. doxygenfunction:: GraphArchive::float64
+.. doxygenfunction:: GraphArchive::string
+.. doxygenfunction:: GraphArchive::list
 
 File Type
 ~~~~~~~~~~~~~~~~~~~
