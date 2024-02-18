@@ -17,11 +17,14 @@
 package com.alibaba.graphar
 
 import org.apache.hadoop.fs.Path
-import org.apache.spark.sql.{SparkSession}
-import org.yaml.snakeyaml.{Yaml, DumperOptions}
+import org.apache.spark.sql.SparkSession
+import org.yaml.snakeyaml.{DumperOptions, Yaml}
 import org.yaml.snakeyaml.constructor.Constructor
+
 import scala.beans.BeanProperty
 import org.yaml.snakeyaml.LoaderOptions
+
+import java.util
 
 /** Edge info is a class to store the edge meta information. */
 class EdgeInfo() {
@@ -224,6 +227,31 @@ class EdgeInfo() {
       for (j <- 0 to num - 1) {
         if (properties.get(j).getName == property_name) {
           return properties.get(j).getIs_primary
+        }
+      }
+    }
+    throw new IllegalArgumentException("Property not found: " + property_name)
+  }
+
+  /**
+   * Check the property is nullable key of edge info.
+   *
+   * @param property_name
+   *   name of the property.
+   * @return
+   *   true if the property is the nullable key of edge info, false if not. If
+   *   edge info not contains the property, raise an IllegalArgumentException
+   *   error.
+   */
+  def isNullableKey(property_name: String): Boolean = {
+    val len: Int = property_groups.size
+    for (i <- 0 to len - 1) {
+      val pg: PropertyGroup = property_groups.get(i)
+      val properties = pg.getProperties
+      val num = properties.size
+      for (j <- 0 to num - 1) {
+        if (properties.get(j).getName == property_name) {
+          return properties.get(j).getIs_nullable()
         }
       }
     }

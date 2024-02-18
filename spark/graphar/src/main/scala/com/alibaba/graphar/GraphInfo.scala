@@ -174,6 +174,7 @@ class Property() {
   @BeanProperty var name: String = ""
   @BeanProperty var data_type: String = ""
   @BeanProperty var is_primary: Boolean = false
+  private var is_nullable: Option[Boolean] = Option.empty
 
   /** Get data type in gar of the property */
   def getData_type_in_gar: GarType.Value = {
@@ -185,7 +186,8 @@ class Property() {
       case other: Property =>
         this.name == other.name &&
           this.data_type == other.data_type &&
-          this.is_primary == other.is_primary
+          this.is_primary == other.is_primary &&
+          this.getIs_nullable() == other.getIs_nullable()
       case _ => false
     }
   }
@@ -195,7 +197,20 @@ class Property() {
     data.put("name", name)
     data.put("data_type", data_type)
     data.put("is_primary", new java.lang.Boolean(is_primary))
+    data.put("is_nullable", new java.lang.Boolean(getIs_nullable()))
     return data
+  }
+
+  def getIs_nullable(): Boolean = {
+    if (is_nullable.isEmpty) {
+      !is_primary
+    } else {
+      is_nullable.get
+    }
+  }
+
+  def setIs_nullable(is_nullable: Boolean): Unit = {
+    this.is_nullable = Option(is_nullable)
   }
 }
 
