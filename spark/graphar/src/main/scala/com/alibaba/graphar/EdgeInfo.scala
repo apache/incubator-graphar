@@ -24,8 +24,6 @@ import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
 import org.yaml.snakeyaml.LoaderOptions
 
-import java.util
-
 /** Edge info is a class to store the edge meta information. */
 class EdgeInfo() {
   @BeanProperty var src_label: String = ""
