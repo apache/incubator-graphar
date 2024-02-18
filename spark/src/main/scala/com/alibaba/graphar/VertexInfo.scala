@@ -146,6 +146,31 @@ class VertexInfo() {
   }
 
   /**
+   * Check the property is nullable key of edge info.
+   *
+   * @param property_name
+   *   name of the property.
+   * @return
+   *   true if the property is the nullable key of edge info, false if not. If
+   *   edge info not contains the property, raise an IllegalArgumentException
+   *   error.
+   */
+  def isNullableKey(property_name: String): Boolean = {
+    val len: Int = property_groups.size
+    for (i <- 0 to len - 1) {
+      val pg: PropertyGroup = property_groups.get(i)
+      val properties = pg.getProperties
+      val num = properties.size
+      for (j <- 0 to num - 1) {
+        if (properties.get(j).getName == property_name) {
+          return properties.get(j).getIs_nullable()
+        }
+      }
+    }
+    throw new IllegalArgumentException("Property not found: " + property_name)
+  }
+
+  /**
    * Get primary key of vertex info.
    *
    * @return

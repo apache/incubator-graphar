@@ -79,6 +79,7 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(vertex_info.containPropertyGroup(property_group))
     assert(vertex_info.getPropertyType("id") == GarType.INT64)
     assert(vertex_info.isPrimaryKey("id"))
+    assert(vertex_info.isNullableKey("id") == false)
     assert(
       vertex_info.getFilePath(property_group, 0) == "vertex/person/id/chunk0"
     )
@@ -95,6 +96,7 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(vertex_info.containPropertyGroup(property_group_2))
     assert(vertex_info.getPropertyType("firstName") == GarType.STRING)
     assert(vertex_info.isPrimaryKey("firstName") == false)
+    assert(vertex_info.isNullableKey("firstName"))
     assert(
       vertex_info.getFilePath(
         property_group_2,
@@ -118,10 +120,13 @@ class GraphInfoSuite extends AnyFunSuite {
       vertex_info.getPropertyGroup("not_exist")
     )
     assertThrows[IllegalArgumentException](
-      vertex_info.getPropertyType("now_exist")
+      vertex_info.getPropertyType("not_exist")
     )
     assertThrows[IllegalArgumentException](
-      vertex_info.isPrimaryKey("now_exist")
+      vertex_info.isPrimaryKey("not_exist")
+    )
+    assertThrows[IllegalArgumentException](
+      vertex_info.isNullableKey("not_exist")
     )
   }
 
@@ -239,6 +244,7 @@ class GraphInfoSuite extends AnyFunSuite {
       edge_info.getPropertyType(property_name) == property.getData_type_in_gar
     )
     assert(edge_info.isPrimaryKey(property_name) == property.getIs_primary)
+    assert(edge_info.isNullableKey(property_name) == property.getIs_nullable)
     assert(
       edge_info.getPropertyFilePath(
         property_group,
@@ -342,6 +348,9 @@ class GraphInfoSuite extends AnyFunSuite {
     )
     assert(edge_info.isPrimaryKey(property_name_2) == property_2.getIs_primary)
     assert(
+      edge_info.isNullableKey(property_name_2) == property_2.getIs_nullable
+    )
+    assert(
       edge_info.getPropertyFilePath(
         property_group_2,
         AdjListType.ordered_by_dest,
@@ -402,6 +411,7 @@ class GraphInfoSuite extends AnyFunSuite {
       edge_info.getPropertyType("not_exist")
     )
     assertThrows[IllegalArgumentException](edge_info.isPrimaryKey("not_exist"))
+    assertThrows[IllegalArgumentException](edge_info.isNullableKey("not_exist"))
   }
 
   test("== of Property/PropertyGroup/AdjList") {
