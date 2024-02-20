@@ -33,7 +33,7 @@ namespace GAR_NAMESPACE_INTERNAL {
 class Status;
 
 /**
- * A class for representing either a usable value, or an error.
+ * @brief A class for representing either a usable value, or an error.
  *
  * A Result object either contains a value of type `T` or a Status object
  * explaining why such a value is not present. The type `T` must be
@@ -93,18 +93,64 @@ using AdjacentListVector = std::vector<std::shared_ptr<AdjacentList>>;
 using VertexInfoVector = std::vector<std::shared_ptr<VertexInfo>>;
 using EdgeInfoVector = std::vector<std::shared_ptr<EdgeInfo>>;
 
+/**
+ * @brief Create a PropertyGroup instance
+ *
+ * @param properties Property list of the group
+ * @param file_type File type of property group chunk file
+ * @param prefix prefix of property group chunk file. The default
+ *        prefix is the concatenation of property names with '_' as separator
+ * @return property_group shared_ptr to PropertyGroup
+ */
 std::shared_ptr<PropertyGroup> CreatePropertyGroup(
     const std::vector<Property>& properties, FileType file_type,
     const std::string& prefix = "");
 
+/**
+ * @brief Create a AdjacentList instance
+ *
+ * @param type Type of adjacent list
+ * @param file_type File type of adjacent list chunk file
+ * @param prefix prefix of adjacent list chunk file, If left empty, the default
+ *        prefix will be set to the name of adjacent list type.
+ * @return adjacent_list shared_ptr to AdjacentList
+ */
 std::shared_ptr<AdjacentList> CreateAdjacentList(
     AdjListType type, FileType file_type, const std::string& prefix = "");
 
+/**
+ * @brief Create a VertexInfo instance
+ *
+ * @param label The label of the vertex
+ * @param chunk_size The number of vertices in each vertex chunk
+ * @param property_groups The property group vector of the vertex
+ * @param prefix The prefix of the vertex info. If left empty, the default
+ *        prefix will be set to the label of the vertex
+ * @param version The format version of the vertex info
+ * @return vertex_info shared_ptr to VertexInfo
+ */
 std::shared_ptr<VertexInfo> CreateVertexInfo(
     const std::string& label, IdType chunk_size,
     const PropertyGroupVector& property_groups, const std::string& prefix = "",
     std::shared_ptr<const InfoVersion> version = nullptr);
 
+/**
+ * @brief Create an EdgeInfo instance
+ *
+ * @param src_label The label of the source vertex.
+ * @param edge_label The label of the edge
+ * @param dst_label The label of the destination vertex
+ * @param chunk_size The number of edges in each edge chunk
+ * @param src_chunk_size The number of source vertices in each vertex chunk
+ * @param dst_chunk_size The number of destination vertices in each vertex
+ * chunk
+ * @param directed Whether the edge is directed
+ * @param adjacent_lists The adjacency list vector of the edge
+ * @param property_groups The property group vector of the edge
+ * @param prefix The path prefix of the edge info
+ * @param version The format version of the edge info
+ * @return edge_info shared_ptr to EdgeInfo
+ */
 std::shared_ptr<EdgeInfo> CreateEdgeInfo(
     const std::string& src_label, const std::string& edge_label,
     const std::string& dst_label, IdType chunk_size, IdType src_chunk_size,
@@ -113,18 +159,41 @@ std::shared_ptr<EdgeInfo> CreateEdgeInfo(
     const PropertyGroupVector& property_groups, const std::string& prefix = "",
     std::shared_ptr<const InfoVersion> version = nullptr);
 
+/**
+ * @brief Create a GraphInfo instance
+ *
+ * @param name The name of the graph
+ * @param vertex_infos The vertex info vector of the graph
+ * @param edge_infos The edge info vector of the graph
+ * @param prefix The absolute path prefix to store chunk files of the graph.
+ *               Defaults to "./"
+ * @param version The version of the graph info
+ * @param extra_info The extra metadata of the graph info
+ * @return graph_info shared_ptr to GraphInfo
+ */
 std::shared_ptr<GraphInfo> CreateGraphInfo(
     const std::string& name, const VertexInfoVector& vertex_infos,
     const EdgeInfoVector& edge_infos, const std::string& prefix,
     std::shared_ptr<const InfoVersion> version = nullptr,
     const std::unordered_map<std::string, std::string>& extra_info = {});
 
+/// @brief Return a boolean DataType instance
 const std::shared_ptr<DataType>& boolean();
+/// @brief Return a int32 DataType instance
 const std::shared_ptr<DataType>& int32();
+/// @brief Return a int64 DataType instance
 const std::shared_ptr<DataType>& int64();
+/// @brief Return a float32 DataType instance
 const std::shared_ptr<DataType>& float32();
+/// @brief Return a float64 DataType instance
 const std::shared_ptr<DataType>& float64();
+/// @brief Return a string DataType instance
 const std::shared_ptr<DataType>& string();
+/**
+ * @brief Return a list DataType instance
+ *
+ * @param value_type value type of the list
+ */
 std::shared_ptr<DataType> list(const std::shared_ptr<DataType>& value_type);
 
 namespace util {
