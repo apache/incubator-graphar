@@ -111,7 +111,8 @@ std::shared_ptr<PropertyGroup> CreatePropertyGroup(
  *
  * @param type Type of adjacent list
  * @param file_type File type of adjacent list chunk file
- * @param prefix prefix of adjacent list chunk file
+ * @param prefix prefix of adjacent list chunk file, If left empty, the default
+ *        prefix will be set to the name of adjacent list type.
  * @return adjacent_list shared_ptr to AdjacentList
  */
 std::shared_ptr<AdjacentList> CreateAdjacentList(
@@ -161,12 +162,13 @@ std::shared_ptr<EdgeInfo> CreateEdgeInfo(
 /**
  * @brief Create a GraphInfo instance
  *
- * @param vertex_infos The vertex info vector of the graph.
- * @param edge_infos The edge info vector of the graph.
+ * @param name The name of the graph
+ * @param vertex_infos The vertex info vector of the graph
+ * @param edge_infos The edge info vector of the graph
  * @param prefix The absolute path prefix to store chunk files of the graph.
- *               Defaults to "./".
- * @param version The version of the graph info.
- * @param extra_info The extra metadata of the graph info.
+ *               Defaults to "./"
+ * @param version The version of the graph info
+ * @param extra_info The extra metadata of the graph info
  * @return graph_info shared_ptr to GraphInfo
  */
 std::shared_ptr<GraphInfo> CreateGraphInfo(
