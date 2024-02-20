@@ -21,12 +21,12 @@
 
     <groupId>com.alibaba</groupId>
     <artifactId>graphar</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>${graphar.version}</version>
     <packaging>pom</packaging>
 
     <profiles>
         <profile>
-            <id>datasources-v1</id>
+            <id>datasources-32</id>
             <properties>
                 <sbt.project.name>graphar</sbt.project.name>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -39,19 +39,20 @@
                 <maven.compiler.source>1.8</maven.compiler.source>
                 <maven.compiler.target>1.8</maven.compiler.target>
                 <cupid.sdk.version>3.3.8-public</cupid.sdk.version>
+                <graphar.version>0.1.0-SNAPSHOT</graphar.version>
             </properties>
             <modules>
                 <module>graphar</module>
-                <module>datasources-v1</module>
+                <module>datasources-32</module>
             </modules>
         </profile>
         <profile>
-            <id>datasources-v2</id>
+            <id>datasources-33</id>
             <properties>
                 <sbt.project.name>graphar</sbt.project.name>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
                 <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-                <scala.version>2.12.10</scala.version>
+                <scala.version>2.12.12</scala.version>
                 <scala.binary.version>2.12</scala.binary.version>
                 <PermGen>512m</PermGen>
                 <MaxPermGen>1024m</MaxPermGen>
@@ -59,10 +60,11 @@
                 <maven.compiler.source>1.8</maven.compiler.source>
                 <maven.compiler.target>1.8</maven.compiler.target>
                 <cupid.sdk.version>3.3.8-public</cupid.sdk.version>
+                <graphar.version>0.1.0-SNAPSHOT</graphar.version>
             </properties>
             <modules>
                 <module>graphar</module>
-                <module>datasources-v2</module>
+                <module>datasources-33</module>
             </modules>
             <activation>
                 <activeByDefault>true</activeByDefault>

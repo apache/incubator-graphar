@@ -22,6 +22,9 @@ import org.apache.spark.sql.SparkSession
 class GraphInfoSuite extends AnyFunSuite {
   val spark = SparkSession
     .builder()
+    .config("spark.sql.legacy.parquet.nanosAsLong", "false")
+    .config("spark.sql.parquet.fieldId.read.enabled", "true")
+    .config("spark.sql.parquet.fieldId.write.enabled", "true")
     .enableHiveSupport()
     .master("local[*]")
     .getOrCreate()
