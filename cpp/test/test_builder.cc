@@ -114,6 +114,7 @@ TEST_CASE("test_vertices_builder") {
   // check the number of vertices in builder
   REQUIRE(builder->GetNum() == lines);
 
+
   // dump to files
   REQUIRE(builder->Dump().ok());
 
