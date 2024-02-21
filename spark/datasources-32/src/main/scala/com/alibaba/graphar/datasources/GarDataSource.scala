@@ -35,7 +35,6 @@ import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.sql.sources.DataSourceRegister
 import org.apache.spark.sql.connector.expressions.Transform
 
-
 object GarUtils
 
 /**
