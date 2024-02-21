@@ -146,14 +146,13 @@ class VertexInfo() {
   }
 
   /**
-   * Check the property is nullable key of edge info.
+   * Check if the property is nullable key.
    *
    * @param property_name
-   *   name of the property.
+   *   name of the property to check.
    * @return
-   *   true if the property is the nullable key of edge info, false if not. If
-   *   edge info not contains the property, raise an IllegalArgumentException
-   *   error.
+   *   true if the property if a nullable key of vertex info, otherwise return
+   *   false.
    */
   def isNullableKey(property_name: String): Boolean = {
     val len: Int = property_groups.size
@@ -163,7 +162,7 @@ class VertexInfo() {
       val num = properties.size
       for (j <- 0 to num - 1) {
         if (properties.get(j).getName == property_name) {
-          return properties.get(j).getIs_nullable()
+          return properties.get(j).getIs_nullable
         }
       }
     }

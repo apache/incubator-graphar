@@ -96,7 +96,9 @@ class GraphInfoSuite extends AnyFunSuite {
     assert(vertex_info.containPropertyGroup(property_group_2))
     assert(vertex_info.getPropertyType("firstName") == GarType.STRING)
     assert(vertex_info.isPrimaryKey("firstName") == false)
+    assert(vertex_info.isNullableKey("id") == false)
     assert(vertex_info.isNullableKey("firstName"))
+    assert(vertex_info.isNullableKey("gender"))
     assert(
       vertex_info.getFilePath(
         property_group_2,

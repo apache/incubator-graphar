@@ -249,7 +249,7 @@ class EdgeInfo() {
       val num = properties.size
       for (j <- 0 to num - 1) {
         if (properties.get(j).getName == property_name) {
-          return properties.get(j).getIs_nullable()
+          return properties.get(j).getIs_nullable
         }
       }
     }
