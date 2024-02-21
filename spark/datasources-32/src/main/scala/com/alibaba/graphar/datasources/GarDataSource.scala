@@ -17,6 +17,7 @@
 package com.alibaba.graphar.datasources
 
 import scala.collection.JavaConverters._
+import scala.util.matching.Regex
 import java.util
 
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -34,7 +35,6 @@ import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.sql.sources.DataSourceRegister
 import org.apache.spark.sql.connector.expressions.Transform
 
-import com.alibaba.graphar.util.Utils
 
 object GarUtils
 
@@ -42,6 +42,23 @@ object GarUtils
  * GarDataSource is a class to provide gar files as the data source for spark.
  */
 class GarDataSource extends TableProvider with DataSourceRegister {
+  private val REDACTION_REPLACEMENT_TEXT = "*********(redacted)"
+
+  /**
+   * Redact the sensitive information in the given string.
+   */
+  // Copy of redact from graphar Utils
+  private def redact(regex: Option[Regex], text: String): String = {
+    regex match {
+      case None => text
+      case Some(r) =>
+        if (text == null || text.isEmpty) {
+          text
+        } else {
+          r.replaceAllIn(text, REDACTION_REPLACEMENT_TEXT)
+        }
+    }
+  }
 
   /** The default fallback file format is Parquet. */
   def fallbackFileFormat: Class[_ <: FileFormat] = classOf[ParquetFileFormat]
@@ -80,7 +97,7 @@ class GarDataSource extends TableProvider with DataSourceRegister {
     val name = shortName() + " " + paths
       .map(qualifiedPathName(_, hadoopConf))
       .mkString(",")
-    Utils.redact(sparkSession.sessionState.conf.stringRedactionPattern, name)
+    redact(sparkSession.sessionState.conf.stringRedactionPattern, name)
   }
 
   private def qualifiedPathName(

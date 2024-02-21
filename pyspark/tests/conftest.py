@@ -17,7 +17,7 @@ from pathlib import Path
 import pytest
 from pyspark.sql import SparkSession
 
-JARS_PATH = Path(__file__).parent.parent.parent.joinpath("spark").joinpath("target")
+JARS_PATH = Path(__file__).parent.parent.parent.joinpath("spark").joinpath("graphar").joinpath("target")
 GRAPHAR_SHADED_JAR_PATH = None
 
 for jar_file in JARS_PATH.glob("*.jar"):
