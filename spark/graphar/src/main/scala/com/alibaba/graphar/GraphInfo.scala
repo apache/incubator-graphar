@@ -187,7 +187,7 @@ class Property() {
         this.name == other.name &&
           this.data_type == other.data_type &&
           this.is_primary == other.is_primary &&
-          this.getIs_nullable() == other.getIs_nullable()
+          this.getIs_nullable == other.getIs_nullable
       case _ => false
     }
   }
@@ -197,7 +197,7 @@ class Property() {
     data.put("name", name)
     data.put("data_type", data_type)
     data.put("is_primary", new java.lang.Boolean(is_primary))
-    data.put("is_nullable", new java.lang.Boolean(getIs_nullable()))
+    data.put("is_nullable", new java.lang.Boolean(getIs_nullable))
     return data
   }
 
