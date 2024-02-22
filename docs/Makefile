@@ -37,8 +37,8 @@ cpp-apidoc:
 .PHONY: spark-apidoc
 spark-apidoc:
 	cd $(ROOTDIR)/spark && \
-  export JAVA_HOME=$JAVA_HOME_11_X64 && \
-	mvn scala:doc
+  export JAVA_HOME=$(JAVA_HOME_11_X64) && \
+	mvn --no-transfer-progress scala:doc
 
 .PHONY: html
 html: cpp-apidoc spark-apidoc
@@ -46,7 +46,7 @@ html: cpp-apidoc spark-apidoc
 	rm -fr $(BUILDDIR)/html/spark/reference
 	cp -fr $(ROOTDIR)/spark/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
 	cd $(ROOTDIR)/java && \
-	mvn -P javadoc javadoc:aggregate \
+	mvn  --no-transfer-progress -P javadoc javadoc:aggregate \
 				-Dmaven.antrun.skip=true \
 				-DskipTests \
 				-Djavadoc.output.directory=$(ROOTDIR)/docs/$(BUILDDIR)/html/java/ \
