@@ -37,6 +37,7 @@ cpp-apidoc:
 .PHONY: spark-apidoc
 spark-apidoc:
 	cd $(ROOTDIR)/spark && \
+  export JAVA_HOME=$JAVA_HOME_11_X64 && \
 	mvn scala:doc
 
 .PHONY: html
