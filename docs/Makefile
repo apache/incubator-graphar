@@ -44,7 +44,7 @@ spark-apidoc:
 html: cpp-apidoc spark-apidoc
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	rm -fr $(BUILDDIR)/html/spark/reference
-	cp -fr $(ROOTDIR)/spark/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
+	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
 	cd $(ROOTDIR)/java && \
 	mvn --no-transfer-progress -P javadoc javadoc:aggregate \
 				-Dmaven.antrun.skip=true \
@@ -65,7 +65,7 @@ html-poetry:
 	cd $(ROOTDIR)/pyspark && \
 	poetry run bash -c "cd $(ROOTDIR)/docs && $(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html"
 	rm -fr $(BUILDDIR)/html/spark/reference
-	cp -fr $(ROOTDIR)/spark/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
+	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
 	cd $(ROOTDIR)/java && \
 	mvn --no-transfer-progress -P javadoc javadoc:aggregate \
 				-Dmaven.antrun.skip=true \
