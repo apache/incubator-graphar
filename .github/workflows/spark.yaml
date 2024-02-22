@@ -46,21 +46,21 @@ jobs:
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
-        mvn spotless:check
+        mvn --no-transfer-progress spotless:check
         popd
 
     - name: Build GraphAr Spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
-        mvn clean package -DskipTests -Dspotless.check.skip=true
+        mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true
         popd
 
     - name: Run test
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
-        mvn test -Dspotless.check.skip=true
+        mvn --no-transfer-progress test -Dspotless.check.skip=true
         popd
 
     - name: Run Neo4j2GraphAr example
