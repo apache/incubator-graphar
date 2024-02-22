@@ -37,7 +37,7 @@ cpp-apidoc:
 .PHONY: spark-apidoc
 spark-apidoc:
 	cd $(ROOTDIR)/spark && \
-  mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true && \
+  mvn --no-transfer-progress clean install -DskipTests -Dspotless.check.skip=true && \
 	mvn --no-transfer-progress scala:doc
 
 .PHONY: html
