@@ -46,7 +46,7 @@ html: cpp-apidoc spark-apidoc
 	rm -fr $(BUILDDIR)/html/spark/reference
 	cp -fr $(ROOTDIR)/spark/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
 	cd $(ROOTDIR)/java && \
-	mvn  --no-transfer-progress -P javadoc javadoc:aggregate \
+	mvn --no-transfer-progress -P javadoc javadoc:aggregate \
 				-Dmaven.antrun.skip=true \
 				-DskipTests \
 				-Djavadoc.output.directory=$(ROOTDIR)/docs/$(BUILDDIR)/html/java/ \
@@ -67,7 +67,7 @@ html-poetry:
 	rm -fr $(BUILDDIR)/html/spark/reference
 	cp -fr $(ROOTDIR)/spark/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
 	cd $(ROOTDIR)/java && \
-	mvn -P javadoc javadoc:aggregate \
+	mvn --no-transfer-progress -P javadoc javadoc:aggregate \
 				-Dmaven.antrun.skip=true \
 				-DskipTests \
 				-Djavadoc.output.directory=$(ROOTDIR)/docs/$(BUILDDIR)/html/java/ \
