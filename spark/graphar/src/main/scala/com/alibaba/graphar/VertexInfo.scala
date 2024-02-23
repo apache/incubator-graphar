@@ -146,6 +146,30 @@ class VertexInfo() {
   }
 
   /**
+   * Check if the property is nullable key.
+   *
+   * @param property_name
+   *   name of the property to check.
+   * @return
+   *   true if the property if a nullable key of vertex info, otherwise return
+   *   false.
+   */
+  def isNullableKey(property_name: String): Boolean = {
+    val len: Int = property_groups.size
+    for (i <- 0 to len - 1) {
+      val pg: PropertyGroup = property_groups.get(i)
+      val properties = pg.getProperties
+      val num = properties.size
+      for (j <- 0 to num - 1) {
+        if (properties.get(j).getName == property_name) {
+          return properties.get(j).getIs_nullable
+        }
+      }
+    }
+    throw new IllegalArgumentException("Property not found: " + property_name)
+  }
+
+  /**
    * Get primary key of vertex info.
    *
    * @return
