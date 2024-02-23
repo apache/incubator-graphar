@@ -41,6 +41,7 @@ class Property:
         name: Optional[str],
         data_type: Optional[GarType],
         is_primary: Optional[bool],
+        is_nullable: Optional[bool],
         jvm_obj: Optional[JavaObject] = None,
     ) -> None:
         """One should not use this constructor directly, please use `from_scala` or `from_python`."""
@@ -52,6 +53,7 @@ class Property:
             property_pyobj.setName(name)
             property_pyobj.setData_type(data_type.value)
             property_pyobj.setIs_primary(is_primary)
+            property_pyobj.setIs_nullable(is_nullable)
 
             self._jvm_property_obj = property_pyobj
 
@@ -97,6 +99,20 @@ class Property:
         """
         self._jvm_property_obj.setIs_primary(is_primary)
 
+    def set_is_nullable(self, is_nullable: bool) -> None:
+        """Mutate corresponding JVM object.
+
+        :param is_nullable: is nullable
+        """
+        self._jvm_property_obj.setIs_nullable(is_nullable)
+
+    def get_is_nullable(self) -> bool:
+        """Get is nullable flag from corresponding JVM object.
+
+        :returns: is nullable
+        """
+        return self._jvm_property_obj.getIs_nullable()
+
     def to_scala(self) -> JavaObject:
         """Transform object to JVM representation.
 
@@ -111,7 +127,7 @@ class Property:
         :param jvm_obj: scala object in JVM.
         :returns: instance of Python Class.
         """
-        return cls(None, None, None, jvm_obj)
+        return cls(None, None, None, None, jvm_obj)
 
     @classmethod
     def from_python(
@@ -119,15 +135,17 @@ class Property:
         name: str,
         data_type: GarType,
         is_primary: bool,
+        is_nullable: Optional[bool] = None,
     ) -> PropertyType:
         """Create an instance of the Class from Python arguments.
 
         :param name: property name
         :param data_type: property data type
         :param is_primary: flag that property is primary
+        :param is_nullable: flag that property is nullable (optional, default is None)
         :returns: instance of Python Class.
         """
-        return cls(name, data_type, is_primary, None)
+        return cls(name, data_type, is_primary, is_nullable, None)
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, Property):
@@ -137,6 +155,7 @@ class Property:
             (self.get_name() == other.get_name())
             and (self.get_data_type() == other.get_data_type())
             and (self.get_is_primary() == other.get_is_primary())
+            and (self.get_is_nullable() == other.get_is_nullable())
         )
 
 
@@ -426,6 +445,14 @@ class VertexInfo:
         :returns: name of the primary key.
         """
         return self._jvm_vertex_info_obj.getPrimaryKey()
+
+    def is_nullable_key(self, property_name: str) -> bool:
+        """Check if the property is nullable key.
+
+        :param property_name: name of the property to check.
+        :returns: true if the property if a nullable key of vertex info, otherwise return false
+        """
+        return self._jvm_vertex_info_obj.isNullableKey(property_name)
 
     def is_validated(self) -> bool:
         """Check if the vertex info is validated.
@@ -1046,6 +1073,15 @@ class EdgeInfo:
         edge info not contains the property, raise an IllegalArgumentException error.
         """
         return self._jvm_edge_info_obj.isPrimaryKey(property_name)
+
+    def is_nullable_key(self, property_name: str) -> bool:
+        """Check the property is nullable key of edge info.
+
+        :param property_name: name of the property.
+        :returns: true if the property is the nullable key of edge info, false if not. If
+        edge info not contains the property, raise an IllegalArgumentException error.
+        """
+        return self._jvm_edge_info_obj.isNullableKey(property_name)
 
     def get_primary_key(self) -> str:
         """Get Primary key of edge info.

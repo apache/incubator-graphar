@@ -16,16 +16,11 @@ from pathlib import Path
 
 import pytest
 import yaml
+
 from graphar_pyspark import initialize
 from graphar_pyspark.enums import AdjListType, FileType, GarType
-from graphar_pyspark.info import (
-    AdjList,
-    EdgeInfo,
-    GraphInfo,
-    Property,
-    PropertyGroup,
-    VertexInfo,
-)
+from graphar_pyspark.info import (AdjList, EdgeInfo, GraphInfo, Property,
+                                  PropertyGroup, VertexInfo)
 from pyspark.sql.utils import IllegalArgumentException
 
 GRAPHAR_TESTS_EXAMPLES = Path(__file__).parent.parent.parent.joinpath("testing")
@@ -33,19 +28,21 @@ GRAPHAR_TESTS_EXAMPLES = Path(__file__).parent.parent.parent.joinpath("testing")
 
 def test_property(spark):
     initialize(spark)
-    property_from_py = Property.from_python("name", GarType.BOOL, False)
+    property_from_py = Property.from_python("name", GarType.BOOL, False, False)
 
     assert property_from_py == Property.from_scala(property_from_py.to_scala())
     assert property_from_py != 0
-    assert property_from_py == Property.from_python("name", GarType.BOOL, False)
+    assert property_from_py == Property.from_python("name", GarType.BOOL, False, False)
 
     property_from_py.set_name("new_name")
     property_from_py.set_data_type(GarType.INT32)
     property_from_py.set_is_primary(True)
+    property_from_py.set_is_nullable(True)
 
     assert property_from_py.get_name() == "new_name"
     assert property_from_py.get_data_type() == GarType.INT32
     assert property_from_py.get_is_primary() == True
+    assert property_from_py.get_is_nullable() == True
 
 
 def test_property_group(spark):
@@ -54,8 +51,8 @@ def test_property_group(spark):
         "prefix",
         FileType.CSV,
         [
-            Property.from_python("non_primary", GarType.DOUBLE, False),
-            Property.from_python("primary", GarType.INT64, True),
+            Property.from_python("non_primary", GarType.DOUBLE, False, False),
+            Property.from_python("primary", GarType.INT64, True, False),
         ],
     )
 
@@ -66,7 +63,7 @@ def test_property_group(spark):
     p_group_from_py.set_file_type(FileType.ORC)
     p_group_from_py.set_properties(
         p_group_from_py.get_properties()
-        + [Property("another_one", GarType.LIST, False)]
+        + [Property("another_one", GarType.LIST, False, False)]
     )
 
     assert p_group_from_py.get_prefix() == "new_prefix"
@@ -76,9 +73,9 @@ def test_property_group(spark):
         for p_left, p_right in zip(
             p_group_from_py.get_properties(),
             [
-                Property.from_python("non_primary", GarType.DOUBLE, False),
-                Property.from_python("primary", GarType.INT64, True),
-                Property("another_one", GarType.LIST, False),
+                Property.from_python("non_primary", GarType.DOUBLE, False, False),
+                Property.from_python("primary", GarType.INT64, True, False),
+                Property("another_one", GarType.LIST, False, False),
             ],
         )
     )
@@ -115,14 +112,14 @@ def test_vertex_info(spark):
     initialize(spark)
 
     props_list_1 = [
-        Property.from_python("non_primary", GarType.DOUBLE, False),
-        Property.from_python("primary", GarType.INT64, True),
+        Property.from_python("non_primary", GarType.DOUBLE, False, False),
+        Property.from_python("primary", GarType.INT64, True, False),
     ]
 
     props_list_2 = [
-        Property.from_python("non_primary", GarType.DOUBLE, False),
-        Property.from_python("primary", GarType.INT64, True),
-        Property("another_one", GarType.LIST, False),
+        Property.from_python("non_primary", GarType.DOUBLE, False, False),
+        Property.from_python("primary", GarType.INT64, True, False),
+        Property("another_one", GarType.LIST, False, False),
     ]
 
     vertex_info_from_py = VertexInfo.from_python(
@@ -135,6 +132,8 @@ def test_vertex_info(spark):
         ],
         "1",
     )
+
+    assert vertex_info_from_py.is_nullable_key("non_primary") == False
 
     assert vertex_info_from_py.contain_property_group(
         PropertyGroup.from_python("prefix1", FileType.PARQUET, props_list_1)
@@ -289,8 +288,8 @@ def test_edge_info(spark):
     assert py_edge_info.get_version() == "v2"
 
     props_list_1 = [
-        Property.from_python("non_primary", GarType.DOUBLE, False),
-        Property.from_python("primary", GarType.INT64, True),
+        Property.from_python("non_primary", GarType.DOUBLE, False, False),
+        Property.from_python("primary", GarType.INT64, True, False),
     ]
     py_edge_info.set_adj_lists(
         [
@@ -304,12 +303,12 @@ def test_edge_info(spark):
     )
     py_edge_info.set_property_groups(
         [
-            PropertyGroup.from_python(
-                "prefix1", FileType.PARQUET, props_list_1
-            ),
+            PropertyGroup.from_python("prefix1", FileType.PARQUET, props_list_1),
         ],
     )
-        
+
+    assert py_edge_info.is_nullable_key("non_primary") == False
+
     assert len(py_edge_info.get_adj_lists()) == 1
     assert len(py_edge_info.get_property_groups()) == 1
 
@@ -354,10 +353,7 @@ def test_edge_info(spark):
         person_knows_person_info.get_adj_list_file_type(AdjListType.ORDERED_BY_SOURCE)
         != 0
     )
-    assert (
-        len(person_knows_person_info.get_property_groups())
-        == 1
-    )
+    assert len(person_knows_person_info.get_property_groups()) == 1
     assert person_knows_person_info.contain_property_group(
         person_knows_person_info.get_property_groups()[0],
     )
