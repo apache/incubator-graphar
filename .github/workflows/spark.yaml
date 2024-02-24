@@ -45,7 +45,7 @@ jobs:
             spark: "spark-3.2.2"
             spark-hadoop: "spark-3.2.2-bin-hadoop3.2"
           - mvn-profile: "datasources-33"
-            spark: "spark-3.2.2"
+            spark: "spark-3.3.4"
             spark-hadoop: "spark-3.3.4-bin-hadoop3"
 
     steps:
