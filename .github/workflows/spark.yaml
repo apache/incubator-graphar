@@ -41,8 +41,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - mvn-profile: datasources-32
-          - mvn-profile: datasources-33
+          - mvn-profile: "datasources-32"
+            spark-home: "spark-3.2.2-bin-hadoop3.2"
+          - mvn-profile: "datasources-33"
+            spark-home: "spark-3.3.4-bin-hadoop3.2"
 
     steps:
     - uses: actions/checkout@v3
@@ -77,7 +79,7 @@ jobs:
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
         scripts/get-spark-to-home.sh
-        export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+        export SPARK_HOME="${HOME}/${{ matrix.spark-home }}"
         export PATH="${SPARK_HOME}/bin":"${PATH}"
 
         scripts/get-neo4j-to-home.sh
@@ -105,7 +107,7 @@ jobs:
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
         scripts/get-nebula-to-home.sh
-        export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+        export SPARK_HOME="${HOME}/${{ matrix.spark-home }}"
         export PATH="${SPARK_HOME}/bin":"${PATH}"
 
         scripts/get-nebula-to-home.sh
@@ -134,7 +136,7 @@ jobs:
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
         scripts/get-spark-to-home.sh
-        export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+        export SPARK_HOME="${HOME}/${{ matrix.spark-home }}"
         export PATH="${SPARK_HOME}/bin":"${PATH}"
 
         scripts/build.sh
