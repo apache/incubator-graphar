@@ -91,7 +91,7 @@ jobs:
 
         scripts/deploy-neo4j-movie-data.sh
 
-        scripts/build.sh
+        scripts/build.sh ${{ matrix.mvn-profile }}
 
         export NEO4J_USR="neo4j"
         export NEO4J_PWD="neo4j"
@@ -116,7 +116,7 @@ jobs:
 
         scripts/deploy-nebula-default-data.sh
 
-        scripts/build.sh
+        scripts/build.sh ${{ matrix.mvn-profile }}
 
         scripts/run-nebula2graphar.sh
 
@@ -140,7 +140,7 @@ jobs:
         export SPARK_HOME="${HOME}/${{ matrix.spark-hadoop }}"
         export PATH="${SPARK_HOME}/bin":"${PATH}"
 
-        scripts/build.sh
+        scripts/build.sh ${{ matrix.mvn-profile }}
 
         # run the importer
         cd import
