@@ -38,6 +38,9 @@ object Neo4j2GraphAr {
         sys.env.get("NEO4J_PWD").get
       )
       .config("spark.master", "local")
+      .config("spark.sql.legacy.parquet.nanosAsLong", "false")
+      .config("spark.sql.parquet.fieldId.read.enabled", "true")
+      .config("spark.sql.parquet.fieldId.write.enabled", "true")
       .getOrCreate()
 
     // initialize a graph writer
