@@ -176,6 +176,14 @@ case class GarScan(
       SQLConf.PARQUET_INT96_AS_TIMESTAMP.key,
       sparkSession.sessionState.conf.isParquetINT96AsTimestamp
     )
+    hadoopConf.setBoolean(
+      SQLConf.LEGACY_PARQUET_NANOS_AS_LONG.key,
+      sparkSession.sessionState.conf.legacyParquetNanosAsLong
+    )
+    hadoopConf.setBoolean(
+      SQLConf.PARQUET_FIELD_ID_READ_ENABLED.key,
+      sparkSession.sessionState.conf.parquetFieldIdReadEnabled
+    )
 
     val broadcastedConf = sparkSession.sparkContext.broadcast(
       new SerializableConfiguration(hadoopConf)

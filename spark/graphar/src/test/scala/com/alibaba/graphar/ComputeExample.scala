@@ -26,9 +26,6 @@ class ComputeExampleSuite extends AnyFunSuite {
   val spark = SparkSession
     .builder()
     .enableHiveSupport()
-    .config("spark.sql.legacy.parquet.nanosAsLong", "false")
-    .config("spark.sql.parquet.fieldId.read.enabled", "true")
-    .config("spark.sql.parquet.fieldId.write.enabled", "true")
     .master("local[*]")
     .getOrCreate()
 

@@ -108,6 +108,12 @@ class ParquetWriteBuilder(
       parquetOptions.compressionCodecClassName
     )
 
+    // ParquetOutputWriter required fields starting from 3.3.x
+    conf.set(
+      SQLConf.PARQUET_FIELD_ID_WRITE_ENABLED.key,
+      sqlConf.parquetFieldIdWriteEnabled.toString
+    )
+
     // SPARK-15719: Disables writing Parquet summary files by default.
     if (
       conf.get(ParquetOutputFormat.JOB_SUMMARY_LEVEL) == null
