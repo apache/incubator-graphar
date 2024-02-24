@@ -60,7 +60,7 @@ jobs:
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
-        echo "Build ${{ matrix.mvn-profile }}
+        echo "Build ${{ matrix.mvn-profile }}"
         mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
         popd
 
@@ -68,7 +68,7 @@ jobs:
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
-        echo "Test ${{ matrix.mvn-profile }}
+        echo "Test ${{ matrix.mvn-profile }}"
         mvn --no-transfer-progress test -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
         popd
 
