@@ -73,9 +73,6 @@ object Neo4j {
         neo4j.password
       )
       .config("spark.master", "local")
-      .config("spark.sql.legacy.parquet.nanosAsLong", "false")
-      .config("spark.sql.parquet.fieldId.read.enabled", "true")
-      .config("spark.sql.parquet.fieldId.write.enabled", "true")
       .getOrCreate()
 
     // initialize a graph writer

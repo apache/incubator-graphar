@@ -40,9 +40,6 @@ object GraphAr2Neo4j {
         sys.env.get("NEO4J_PWD").get
       )
       .config("spark.master", "local")
-      .config("spark.sql.legacy.parquet.nanosAsLong", "false")
-      .config("spark.sql.parquet.fieldId.read.enabled", "true")
-      .config("spark.sql.parquet.fieldId.write.enabled", "true")
       .getOrCreate()
 
     // path to the graph information file

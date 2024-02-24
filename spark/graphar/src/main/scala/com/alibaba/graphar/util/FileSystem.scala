@@ -57,6 +57,19 @@ object FileSystem {
     spark.conf.set("parquet.enable.summary-metadata", "false")
     spark.conf.set("spark.sql.orc.compression.codec", "zstd")
     spark.conf.set("spark.sql.parquet.compression.codec", "zstd")
+    // nanosAsLong: https://github.com/apache/hudi/issues/9282
+    // should be explicitly set
+    spark.conf.set("spark.sql.legacy.parquet.nanosAsLong", "false")
+    // Field ID is a native field of the Parquet schema spec.
+    // When enabled, Parquet readers will use field IDs (if present)
+    // in the requested Spark schema to look up Parquet fields
+    // instead of using column names.
+    //
+    // This thing should explicitly set, otherwise ParquetReader
+    // will raise
+    // java.lang.IllegalArgumentException: For input string: "null"
+    spark.conf.set("spark.sql.parquet.fieldId.read.enabled", "true")
+    spark.conf.set("spark.sql.parquet.fieldId.write.enabled", "true")
     // first check the outputPrefix exists, if not, create it
     val path = new Path(outputPrefix)
     val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)

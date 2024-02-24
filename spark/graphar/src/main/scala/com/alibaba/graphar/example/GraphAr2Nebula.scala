@@ -41,9 +41,6 @@ object GraphAr2Nebula {
     val sparkConf = new SparkConf
     sparkConf
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-      .set("spark.sql.legacy.parquet.nanosAsLong", "false")
-      .set("spark.sql.parquet.fieldId.read.enabled", "true")
-      .set("spark.sql.parquet.fieldId.write.enabled", "true")
       .registerKryoClasses(Array[Class[_]](classOf[TCompactProtocol]))
 
     val spark = SparkSession
