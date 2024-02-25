@@ -37,6 +37,17 @@ concurrency:
 jobs:
   GraphAr-spark:
     runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - mvn-profile: "datasources-32"
+            spark: "spark-3.2.2"
+            spark-hadoop: "spark-3.2.2-bin-hadoop3.2"
+          - mvn-profile: "datasources-33"
+            spark: "spark-3.3.4"
+            spark-hadoop: "spark-3.3.4-bin-hadoop3"
+
     steps:
     - uses: actions/checkout@v3
       with:
@@ -53,22 +64,24 @@ jobs:
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
-        mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true
+        echo "Build ${{ matrix.mvn-profile }}"
+        mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
         popd
 
     - name: Run test
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
-        mvn --no-transfer-progress test -Dspotless.check.skip=true
+        echo "Test ${{ matrix.mvn-profile }}"
+        mvn --no-transfer-progress test -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
         popd
 
     - name: Run Neo4j2GraphAr example
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
-        scripts/get-spark-to-home.sh
-        export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+        scripts/get-spark-to-home.sh ${{ matrix.spark }} ${{ matrix.spark-hadoop }}
+        export SPARK_HOME="${HOME}/${{ matrix.spark-hadoop }}"
         export PATH="${SPARK_HOME}/bin":"${PATH}"
 
         scripts/get-neo4j-to-home.sh
@@ -78,7 +91,7 @@ jobs:
 
         scripts/deploy-neo4j-movie-data.sh
 
-        scripts/build.sh
+        scripts/build.sh ${{ matrix.mvn-profile }}
 
         export NEO4J_USR="neo4j"
         export NEO4J_PWD="neo4j"
@@ -90,20 +103,20 @@ jobs:
 
         # stop and clean
         popd
-    
+
     - name: Run Nebula2GraphAr example
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
         scripts/get-nebula-to-home.sh
-        export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+        export SPARK_HOME="${HOME}/${{ matrix.spark-hadoop }}"
         export PATH="${SPARK_HOME}/bin":"${PATH}"
 
         scripts/get-nebula-to-home.sh
 
         scripts/deploy-nebula-default-data.sh
 
-        scripts/build.sh
+        scripts/build.sh ${{ matrix.mvn-profile }}
 
         scripts/run-nebula2graphar.sh
 
@@ -113,7 +126,7 @@ jobs:
             --name nebula-console-loader \
             --network nebula-docker-env_nebula-net \
             vesoft/nebula-console:nightly -addr 172.28.3.1 -port 9669 -u root -p nebula -e "use basketballplayer; clear space basketballplayer;"
-        
+
         # import from GraphAr
         scripts/run-graphar2nebula.sh
 
@@ -124,11 +137,10 @@ jobs:
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         pushd spark
-        scripts/get-spark-to-home.sh
-        export SPARK_HOME="${HOME}/spark-3.2.2-bin-hadoop3.2"
+        export SPARK_HOME="${HOME}/${{ matrix.spark-hadoop }}"
         export PATH="${SPARK_HOME}/bin":"${PATH}"
 
-        scripts/build.sh
+        scripts/build.sh ${{ matrix.mvn-profile }}
 
         # run the importer
         cd import

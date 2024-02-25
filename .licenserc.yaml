@@ -37,6 +37,7 @@ header:
     - '**/.scalafmt.conf'
     - 'cpp/apidoc'
     - 'spark/datasources-32/src/main/scala/com/alibaba/graphar/datasources'
+    - 'spark/datasources-33/src/main/scala/com/alibaba/graphar/datasources'
     - '*.md'
     - '*.rst'
     - '**/*.json'

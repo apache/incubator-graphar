@@ -49,6 +49,27 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
+        <profile>
+            <id>datasources-33</id>
+            <properties>
+                <sbt.project.name>graphar</sbt.project.name>
+                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+                <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+                <scala.version>2.12.12</scala.version>
+                <scala.binary.version>2.12</scala.binary.version>
+                <PermGen>512m</PermGen>
+                <MaxPermGen>1024m</MaxPermGen>
+                <spark.version>3.3.4</spark.version>
+                <maven.compiler.source>1.8</maven.compiler.source>
+                <maven.compiler.target>1.8</maven.compiler.target>
+                <cupid.sdk.version>3.3.8-public</cupid.sdk.version>
+                <graphar.version>0.1.0-SNAPSHOT</graphar.version>
+            </properties>
+            <modules>
+                <module>graphar</module>
+                <module>datasources-33</module>
+            </modules>
+        </profile>
     </profiles>
     <build>
         <plugins>
