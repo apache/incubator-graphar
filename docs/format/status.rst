@@ -104,7 +104,7 @@ Supported operation in Property:
 Property Group
 ==============
 +-------------------+-------+-------+-------+------------+
-| Property Group    | C++   | Java  | Scala |   Python   |
+| Property Group    | C++   | Java  | Scala |  Python (2)|
 | (operation)       |       |       |       |            |
 +===================+=======+=======+=======+============+
 | create            | ✓     | ✓     | ✓     | ✓          |
@@ -140,7 +140,7 @@ Adjacency List
 
 Supported operation in Adjacency List:
 +-------------------+-------+-------+-------+------------+
-| Adjacency List    | C++   | Java  | Scala |   Python   |
+| Adjacency List    | C++   |Java(1)| Scala |  Python (2)  |
 | (operation)       |       |       |       |            |
 +===================+=======+=======+=======+============+
 | create            | ✓     | ✓     | ✓     | ✓          |
@@ -301,3 +301,34 @@ Notes:
 * \(1) Through fastFFI bindings to the GraphAr C++ library.
 
 * \(2) Through py4j bindings to the GraphAr spark library.
+
+
+Libraries Version Compatibility
+===============================
++-------------------+-------+-------+-------+------------+
+| GraphAr C++       | C++   | CMake | Format Version|
+|   Version         |       |       |               |
++===================+=======+=======+=======+============+
+| 0.11+            | 17+   | 2.8+ | 1.0.0         |
++-------------------+-------+-------+-------+------------+
+
++-------------------+-------+-------+-------+------------+
+| GraphAr Spark     | Apache Spark | Scala Version | JDK Version | Format Version|
+|    Version        | Version      |               |              |               |  
++===================+=======+=======+=======+============+
+| 1.0.0             | 3.2.x-3.3.x | 2.12+  | 8+       | 1.0.0         |
++-------------------+-------+-------+-------+------------+
+
++-------------------+-------+-------+-------+------------+
+| GraphAr Java      | Java  | Maven | Format Version|
+|    Version        |       |       |               |
++===================+=======+=======+=======+============+
+| 1.0.0             |    |   |          |
++-------------------+-------+-------+-------+------------+
+
++-------------------+-------+-------+-------+------------+
+| GraphAr PySpark   | Python| PySpark| Format Version|
+|    Version        |       |        |               |
++===================+=======+=======+=======+============+
+| 1.0.0             |   |  |          |
++-------------------+-------+-------+-------+------------+
