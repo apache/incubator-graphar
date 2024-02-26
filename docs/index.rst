@@ -12,7 +12,7 @@
 
    Overview <overview>
    File Format <format/file-format> 
-   Implementation Status <format/implementation>
+   Implementation Status <format/status>
 
 .. toctree::
    :maxdepth: 2
