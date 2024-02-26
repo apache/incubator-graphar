@@ -43,7 +43,13 @@ Compile package:
 
    mvn clean package -DskipTests
 
-After compilation, a similar file *graphar-x.x.x-SNAPSHOT-shaded.jar* is generated in the directory *spark/target/*.
+GraphAr supports two Apache Spark versions for now and uses Maven Profiles to work with it. The command above built GrahpAr with Spark 3.2.2 by default. To built GraphAr with Spark 3.3.4 use the following command:
+
+.. code-block:: shell
+
+   mvn clean package -DskipTests -P datasources-33
+
+After compilation, a similar file *graphar-x.x.x-SNAPSHOT-shaded.jar* is generated in the directory *spark/graphar/target/*.
 
 Please refer to the `building steps <https://github.com/alibaba/GraphAr/tree/main/spark>`_ for more details.
 
