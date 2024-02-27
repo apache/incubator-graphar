@@ -11,7 +11,8 @@
    :hidden:
 
    Overview <overview>
-   File Format <file-format> 
+   File Format <format/file-format> 
+   Implementation Status <format/status>
 
 .. toctree::
    :maxdepth: 2

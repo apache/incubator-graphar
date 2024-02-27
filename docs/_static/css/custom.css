@@ -11,3 +11,8 @@ div.card-body.card-body-less-padding {
 div.theme-toggle-container.theme-toggle-content {
     display: none;
 }
+
+table.docutils {
+    width: 100%;
+    max-width: none;
+}
