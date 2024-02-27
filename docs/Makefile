@@ -5,12 +5,12 @@
 # from the environment for the first two.
 # Do not fail the build if there are warnings
 SPHINXOPTS    = -j8
-SPHINXBUILD  ?= sphinx-build
+SPHINXBUILD  ?= sphinx.cmd.build
 SOURCEDIR     = .
 BUILDDIR      = _build
 
 # Internal variables.
-ALLSPHINXOPTS   = -d ../docs/$(BUILDDIR)/doctrees $(SPHINXOPTS)
+ALLSPHINXOPTS   = -b html -d ../docs/$(BUILDDIR)/doctrees $(SPHINXOPTS)
 DOXYGEN = doxygen
 ROOTDIR = ..
 
@@ -45,9 +45,9 @@ pyspark-apidoc:
 	cd ../pyspark && poetry run sphinx-apidoc -o ../docs/pyspark/api graphar_pyspark/
 
 .PHONY: html-poetry
-html-poetry: spark-apidoc pyspark-apidoc
-	cd ../pyspark && \
-	poetry run $(SPHINXBUILD) -b html $(ALLSPHINXOPTS) ../docs ../docs/$(BUILDDIR)/html
+html-poetry: cpp-apidoc spark-apidoc pyspark-apidoc
+	cd $(ROOTDIR)/pyspark && \
+	poetry run python -m $(SPHINXBUILD) $(ALLSPHINXOPTS) $(ROOTDIR)/docs $(ROOTDIR)/docs/$(BUILDDIR)/html
 	rm -fr $(BUILDDIR)/html/spark/reference
 	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
 	cd $(ROOTDIR)/java && \
