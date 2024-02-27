@@ -78,6 +78,8 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get update -y
+          sudo apt-get install -y ca-certificates doxygen
           cd pyspark
           poetry install --with=docs,spark
 
