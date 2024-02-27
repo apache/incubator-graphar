@@ -6,11 +6,11 @@
 # Do not fail the build if there are warnings
 SPHINXOPTS    = -j8
 SPHINXBUILD  ?= sphinx-build
-SOURCEDIR     = docs
-BUILDDIR      = docs/_build
+SOURCEDIR     = .
+BUILDDIR      = _build
 
 # Internal variables.
-ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(SPHINXOPTS) $(SOURCEDIR)
+ALLSPHINXOPTS   = -d ../docs/$(BUILDDIR)/doctrees $(SPHINXOPTS)
 DOXYGEN = doxygen
 ROOTDIR = ..
 
@@ -27,7 +27,7 @@ help:
 
 .PHONY: clean
 clean:
-	rm -rf $(ROOTDIR)/$(BUILDDIR)/*
+	rm -rf $(BUILDDIR)/*
 
 .PHONY: cpp-apidoc
 cpp-apidoc:
@@ -42,20 +42,19 @@ spark-apidoc:
 
 .PHONY: pyspark-apidoc
 pyspark-apidoc:
-	cd $(ROOTDIR)/pyspark && \
-	poetry run sphinx-apidoc -o $(ROOTDIR)/docs/pyspark/api graphar_pyspark/
+	cd ../pyspark && poetry run sphinx-apidoc -o ../docs/pyspark/api graphar_pyspark/
 
 .PHONY: html-poetry
-html-poetry: cpp-apidoc spark-apidoc pyspark-apidoc
-	cd $(ROOTDIR)/pyspark/ && \
-	poetry run $(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
+html-poetry: spark-apidoc pyspark-apidoc
+	cd ../pyspark && \
+	poetry run $(SPHINXBUILD) -b html $(ALLSPHINXOPTS) ../docs ../docs/$(BUILDDIR)/html
 	rm -fr $(BUILDDIR)/html/spark/reference
-	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(ROOTDIR)/$(BUILDDIR)/html/spark/reference/
+	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
 	cd $(ROOTDIR)/java && \
 	mvn --no-transfer-progress -P javadoc javadoc:aggregate \
 				-Dmaven.antrun.skip=true \
 				-DskipTests \
-				-Djavadoc.output.directory=$(ROOTDIR)/$(BUILDDIR)/html/java/ \
+				-Djavadoc.output.directory=$(ROOTDIR)/docs/$(BUILDDIR)/html/java/ \
 				-Djavadoc.output.destDir=reference \
 				--quiet
 	@echo
