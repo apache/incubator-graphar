@@ -10,7 +10,7 @@ GraphAr Spark uses maven as a package build system.
 
 Building requires:
 
-- JDK 8 or higher
+- JDK 8 or JDK 11
 - Maven 3.2.0 or higher
 
 ### Building
@@ -25,13 +25,16 @@ repository and navigated to the ``spark`` subdirectory:
     $ cd spark
 ```
 
+
 Build the package:
 
 ```bash
     $ mvn clean package -DskipTests
 ```
 
-After compilation, the package file graphar-x.x.x-SNAPSHOT-shaded.jar is generated in the directory ``spark/target/``.
+GraphAr Spark uses Maven Profiles to support multiple Spark Versions. By default it is built with Spark 3.2.x or profile `datasources-32`. To built with Spark 3.3.4 use `-P datasources-33` (`mvn clean package -DskipTests -P datasources-33`).
+
+After compilation, the package file graphar-x.x.x-SNAPSHOT-shaded.jar is generated in the directory ``spark/graphar/target/``.
 
 Build the package and run the unit tests:
 
@@ -60,18 +63,18 @@ Building the API document with maven:
     $ mvn scala:doc
 ```
 
-The API document is generated in the directory ``spark/target/site/scaladocs``.
+The API document is generated in the directory ``spark/graphar/target/site/scaladocs``.
 
 ## Running Neo4j to GraphAr example
 
 Spark provides a simple example to convert Neo4j data to GraphAr data.
-The example is located in the directory ``spark/src/main/scala/com/alibaba/graphar/examples/``.
+The example is located in the directory ``spark/graphar/src/main/scala/com/alibaba/graphar/examples/``.
 
 To run the example, download Spark and Neo4j first.
 
 ### Spark 3.2.x
 
-Spark 3.2.x is the recommended runtime to use. The rest of the instructions are provided assuming Spark 3.2.x.
+Spark 3.2.x is the recommended runtime to use. The rest of the instructions are provided assuming Spark 3.2.x. Alternative supported Spark version is 3.3.4, to force building with it use Maven Profile `datasources-33`.
 
 To place Spark under `${HOME}`:
 
