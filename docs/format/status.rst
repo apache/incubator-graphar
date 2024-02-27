@@ -3,7 +3,7 @@ Implementation Status
 =====================
 
 The following tables summarize the features available in the various official GraphAr libraries.
-All libraries currently follow version 1.0.0 of the GraphAr format   
+All libraries currently follow version 1.0.0 of the GraphAr format.  
 
 
 Data Types
@@ -351,7 +351,7 @@ Libraries Version Compatibility
 | GraphAr Java   | Java     | Maven  | Format Version   |
 | Version        |          |        |                  |
 +================+==========+========+==================+
-| 0.1.0          | 1.8, 11  | 3.6+   | 1.0.0            |
+| 0.1.0          | 1.8      | 3.6+   | 1.0.0            |
 +----------------+----------+--------+------------------+
 
 +----------------+--------------+---------+---------+----------------+
@@ -370,4 +370,5 @@ Libraries Version Compatibility
 
 Notes:
 
-* The PySpark version should be compatible with the Spark version.
+* Since the GraphAr PySpark library is bindings to the GraphAr Spark library,
+  the PySpark version should be compatible with the Spark version.
