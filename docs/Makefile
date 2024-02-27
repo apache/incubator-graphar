@@ -27,7 +27,7 @@ help:
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILDDIR)/*
+	rm -rf $(ROOTDIR)/$(BUILDDIR)/*
 
 .PHONY: cpp-apidoc
 cpp-apidoc:
@@ -40,21 +40,6 @@ spark-apidoc:
   mvn --no-transfer-progress clean install -DskipTests -Dspotless.check.skip=true && \
 	mvn --no-transfer-progress scala:doc
 
-.PHONY: html
-html: cpp-apidoc spark-apidoc
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
-	rm -fr $(BUILDDIR)/html/spark/reference
-	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
-	cd $(ROOTDIR)/java && \
-	mvn --no-transfer-progress -P javadoc javadoc:aggregate \
-				-Dmaven.antrun.skip=true \
-				-DskipTests \
-				-Djavadoc.output.directory=$(ROOTDIR)/docs/$(BUILDDIR)/html/java/ \
-				-Djavadoc.output.destDir=reference \
-				--quiet
-	@echo
-	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
-
 .PHONY: pyspark-apidoc
 pyspark-apidoc:
 	cd $(ROOTDIR)/pyspark && \
@@ -65,7 +50,7 @@ html-poetry: cpp-apidoc spark-apidoc pyspark-apidoc
 	cd $(ROOTDIR)/pyspark/ && \
 	poetry run $(SPHIXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	rm -fr $(BUILDDIR)/html/spark/reference
-	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
+	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(ROOTDIR)/$(BUILDDIR)/html/spark/reference/
 	cd $(ROOTDIR)/java && \
 	mvn --no-transfer-progress -P javadoc javadoc:aggregate \
 				-Dmaven.antrun.skip=true \
