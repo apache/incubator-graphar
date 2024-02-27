@@ -6,8 +6,8 @@
 # Do not fail the build if there are warnings
 SPHINXOPTS    = -j8
 SPHINXBUILD  ?= sphinx-build
-SOURCEDIR     = .
-BUILDDIR      = _build
+SOURCEDIR     = docs
+BUILDDIR      = docs/_build
 
 # Internal variables.
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(SPHINXOPTS) $(SOURCEDIR)
@@ -61,16 +61,16 @@ pyspark-apidoc:
 	poetry run sphinx-apidoc -o $(ROOTDIR)/docs/pyspark/api graphar_pyspark/
 
 .PHONY: html-poetry
-html-poetry:
-	cd $(ROOTDIR)/pyspark && \
-	poetry run bash -c "cd $(ROOTDIR)/docs && $(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html"
+html-poetry: cpp-apidoc spark-apidoc pyspark-apidoc
+	cd $(ROOTDIR)/pyspark/ && \
+	poetry run $(SPHIXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	rm -fr $(BUILDDIR)/html/spark/reference
 	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
 	cd $(ROOTDIR)/java && \
 	mvn --no-transfer-progress -P javadoc javadoc:aggregate \
 				-Dmaven.antrun.skip=true \
 				-DskipTests \
-				-Djavadoc.output.directory=$(ROOTDIR)/docs/$(BUILDDIR)/html/java/ \
+				-Djavadoc.output.directory=$(ROOTDIR)/$(BUILDDIR)/html/java/ \
 				-Djavadoc.output.destDir=reference \
 				--quiet
 	@echo
