@@ -46,8 +46,8 @@ pyspark-apidoc:
 
 .PHONY: html-poetry
 html-poetry: cpp-apidoc spark-apidoc pyspark-apidoc
-	cd $(ROOTDIR)/pyspark && \
-	poetry run python -m $(SPHINXBUILD) $(ALLSPHINXOPTS) $(ROOTDIR)/docs $(ROOTDIR)/docs/$(BUILDDIR)/html
+	echo "Generate docs..."
+	cd $(ROOTDIR)/pyspark && poetry run python -m $(SPHINXBUILD) $(ALLSPHINXOPTS) $(ROOTDIR)/docs $(ROOTDIR)/docs/$(BUILDDIR)/html
 	rm -fr $(BUILDDIR)/html/spark/reference
 	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
 	cd $(ROOTDIR)/java && \

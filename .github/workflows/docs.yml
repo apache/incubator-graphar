@@ -80,15 +80,14 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ca-certificates doxygen
-          cd pyspark
           poetry install --with=docs,spark
+        working-directory: ./pyspark
 
       - name: Generate Doc
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64}
-          pushd docs
-          make html_poetry
-          popd
+          make html-poetry
+        working-directory: ./docs
 
       - name: Preview using surge
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
