@@ -128,7 +128,16 @@ How to generate the document
 
 If you want to improve the document, you need to know how to generate the docs.
 
-The documentation is generated using Doxygen and sphinx. You can build GraphAr's documentation in the :code:`docs/` directory using:
+The documentation is generated using Doxygen and sphinx. For sphinx and other Python dependency the GraphAr pyspark subproject is used. You need to `install Poetry packaging system first <https://python-poetry.org/docs/#installation>`_. The next step will be installation of docs-related Python dependencies:
+
+.. code:: shell
+    $ cd pyspark
+    $ poetry install --with=docs
+
+.. note::
+   If you want to update PySpark project API documentation, you need also install dependencies from spark group in poetry: poetry install --with=docs,spark. For Cpp API documentation you need to `install also doxygen <https://www.doxygen.nl/manual/install.html>`_ (in most of POSIX-compatible systems installation is also possible via system package manager). For Java/Scala API documentation you need to `install Maven <https://maven.apache.org/install.html>`_ (this step also may be done via system package manager on the most of POSIX-compatible systems).
+
+After that you can build GraphAr's documentation in the :code:`docs/` directory using:
 
 .. code:: shell
 
