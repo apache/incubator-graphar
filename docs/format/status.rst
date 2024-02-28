@@ -34,12 +34,12 @@ Data Types
 | Data type         | C++   | Java  | Scala |   Python   | 
 | (nested)          |       |       |       |            |
 +===================+=======+=======+=======+============+
-| List              | ✓ (1) |       |       |            |
+| List (*)          | ✓     |       |       |            |
 +-------------------+-------+-------+-------+------------+
 
 Notes:
 
-* \(1) The list data type is not supported by CSV payload file format.
+* \(\*) The data type of List is not supported by CSV payload file format.
 
 
 Payload Data File Formats
@@ -71,8 +71,12 @@ Supported compression methods for the file formats:
 +-----------------------------+---------+---------+-------+------------+
 | Compression                 | C++     | Java    | Scala | Python     |
 +=============================+=========+=========+=======+============+
-| ZSTD                        | ✓       | ✓       | ✓     | ✓          |
+| ZSTD (*)                    | ✓       | ✓       | ✓     | ✓          |
 +-----------------------------+---------+---------+-------+------------+
+
+Notes:
+
+* \(\*) Compression is not supported by CSV payload file format.
 
 
 Property
@@ -86,7 +90,7 @@ Property
 +-------------------+-------+-------+-------+------------+
 
 
-Supported operation in Property:
+Supported operations in Property:
 
 +-------------------+-------+-------+-------+------------+
 | Property operation| C++   | Java  | Scala |   Python   |
@@ -138,7 +142,7 @@ Adjacency List
 | COO               | ✓     | ✓     | ✓     | ✓          |
 +-------------------+-------+-------+-------+------------+
 
-Supported operation in Adjacency List:
+Supported operations in Adjacency List:
 
 +-------------------+-------+-------+-------+------------+
 | Adjacency List    | C++   |Java(1)| Scala |  Python (2)|
@@ -177,7 +181,7 @@ Notes:
 * *label* is the vertex label, which is a unique identifier for the vertex.
 * *tag* is the vertex tag, which is tag or category for the vertex.
 
-Supported operation in Vertex Info:
+Supported operations in Vertex Info:
 
 +-------------------+-------+-------+-------+------------+
 | Vertex Info       | C++   |Java(1)| Scala | Python (2) |
@@ -225,7 +229,7 @@ Edge feature:
 | directed          | ✓     | ✓     | ✓     | ✓          |
 +-------------------+-------+-------+-------+------------+
 
-Supported operation in Edge Info:
+Supported operations in Edge Info:
 
 +-------------------+-------+-------+-------+------------+
 | Edge Info         | C++   |Java(1)| Scala | Python (2) |
@@ -293,7 +297,7 @@ Graph
 | extra info        | ✓     |       |       |            |
 +-------------------+-------+-------+-------+------------+
 
-Supported operation in Graph Info:
+Supported operations in Graph Info:
 
 +-------------------+-------+-------+-------+------------+
 | Graph Info        | C++   |Java(1)| Scala | Python (2) |
