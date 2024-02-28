@@ -86,7 +86,7 @@ jobs:
       - name: Generate Doc
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64}
-          make html-poetry
+          make html
         working-directory: ./docs
 
       - name: Preview using surge

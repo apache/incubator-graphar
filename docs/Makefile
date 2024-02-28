@@ -44,7 +44,7 @@ spark-apidoc:
 pyspark-apidoc:
 	cd ../pyspark && poetry run sphinx-apidoc -o ../docs/pyspark/api graphar_pyspark/
 
-.PHONY: html-poetry
+.PHONY: html
 html-poetry: cpp-apidoc spark-apidoc pyspark-apidoc
 	echo "Generate docs..."
 	cd $(ROOTDIR)/pyspark && poetry run python -m $(SPHINXBUILD) $(ALLSPHINXOPTS) $(ROOTDIR)/docs $(ROOTDIR)/docs/$(BUILDDIR)/html
