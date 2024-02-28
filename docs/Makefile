@@ -5,12 +5,12 @@
 # from the environment for the first two.
 # Do not fail the build if there are warnings
 SPHINXOPTS    = -j8
-SPHINXBUILD  ?= sphinx-build
+SPHINXBUILD  ?= sphinx.cmd.build
 SOURCEDIR     = .
 BUILDDIR      = _build
 
 # Internal variables.
-ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(SPHINXOPTS) $(SOURCEDIR)
+ALLSPHINXOPTS   = -b html -d ../docs/$(BUILDDIR)/doctrees $(SPHINXOPTS)
 DOXYGEN = doxygen
 ROOTDIR = ..
 
@@ -40,30 +40,14 @@ spark-apidoc:
   mvn --no-transfer-progress clean install -DskipTests -Dspotless.check.skip=true && \
 	mvn --no-transfer-progress scala:doc
 
-.PHONY: html
-html: cpp-apidoc spark-apidoc
-	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
-	rm -fr $(BUILDDIR)/html/spark/reference
-	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
-	cd $(ROOTDIR)/java && \
-	mvn --no-transfer-progress -P javadoc javadoc:aggregate \
-				-Dmaven.antrun.skip=true \
-				-DskipTests \
-				-Djavadoc.output.directory=$(ROOTDIR)/docs/$(BUILDDIR)/html/java/ \
-				-Djavadoc.output.destDir=reference \
-				--quiet
-	@echo
-	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
-
 .PHONY: pyspark-apidoc
 pyspark-apidoc:
-	cd $(ROOTDIR)/pyspark && \
-	poetry run sphinx-apidoc -o $(ROOTDIR)/docs/pyspark/api graphar_pyspark/
+	cd ../pyspark && poetry run sphinx-apidoc -o ../docs/pyspark/api graphar_pyspark/
 
-.PHONY: html-poetry
-html-poetry:
-	cd $(ROOTDIR)/pyspark && \
-	poetry run bash -c "cd $(ROOTDIR)/docs && $(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html"
+.PHONY: html
+html: cpp-apidoc spark-apidoc pyspark-apidoc
+	echo "Generate docs..."
+	cd $(ROOTDIR)/pyspark && poetry run python -m $(SPHINXBUILD) $(ALLSPHINXOPTS) $(ROOTDIR)/docs $(ROOTDIR)/docs/$(BUILDDIR)/html
 	rm -fr $(BUILDDIR)/html/spark/reference
 	cp -fr $(ROOTDIR)/spark/graphar/target/site/scaladocs $(BUILDDIR)/html/spark/reference/
 	cd $(ROOTDIR)/java && \

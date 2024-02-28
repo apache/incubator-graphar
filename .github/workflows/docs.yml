@@ -46,7 +46,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.ref }}
           submodules: true
           fetch-depth: 0
-      
+
       - name: Check License Header
         uses: apache/skywalking-eyes/header@main 
         with:
@@ -68,18 +68,26 @@ jobs:
             <sub>🤖 By [surge-preview](https://surge.sh/)</sub>
           body-include: '<!-- Sticky Pull Request Comment: Surge Preview build -->'
 
+      - name: Install Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Install Poetry
+        uses: abatilo/actions-poetry@v2
+
       - name: Install dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y ca-certificates cmake doxygen python3-pip
-          sudo pip3 install -r docs/requirements.txt
+          sudo apt-get install -y ca-certificates doxygen
+          poetry install --with=docs,spark
+        working-directory: ./pyspark
 
       - name: Generate Doc
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64}
-          pushd docs
           make html
-          popd
+        working-directory: ./docs
 
       - name: Preview using surge
         if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
