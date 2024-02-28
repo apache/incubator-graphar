@@ -337,7 +337,7 @@ Notes:
 
 * \(1) Through fastFFI bindings to the GraphAr C++ library.
 
-* \(2) Through py4j bindings to the GraphAr spark library.
+* \(2) Through py4j bindings to the GraphAr Spark library.
 
 
 Libraries Version Compatibility
