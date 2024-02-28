@@ -162,7 +162,7 @@ Supported operations in Adjacency List:
 
 Vertex
 -------
-Vertex feature:
+Vertex features:
 
 +-------------------+-------+-------+-------+------------+
 | Vertex feature    | C++   | Java  | Scala |   Python   |
@@ -213,7 +213,7 @@ Supported operations in Vertex Info:
 
 Edge
 -------
-Edge feature:
+Edge features:
 
 +-------------------+-------+-------+-------+------------+
 | Edge feature      | C++   | Java  | Scala |   Python   |
@@ -249,14 +249,14 @@ Supported operations in Edge Info:
 +-------------------+-------+-------+-------+------------+
 | get source label  | ✓     | ✓     | ✓     | ✓          |
 +-------------------+-------+-------+-------+------------+
-| get target label  | ✓     | ✓     | ✓     | ✓          |
+| get dest label    | ✓     | ✓     | ✓     | ✓          |
 +-------------------+-------+-------+-------+------------+
 | get chunk size    | ✓     | ✓     | ✓     | ✓          |
 +-------------------+-------+-------+-------+------------+
 | get source chunk  | ✓     | ✓     | ✓     | ✓          |
 | size              |       |       |       |            |
 +-------------------+-------+-------+-------+------------+
-| get target chunk  | ✓     | ✓     | ✓     | ✓          |
+| get dest chunk    | ✓     | ✓     | ✓     | ✓          |
 | size              |       |       |       |            |
 +-------------------+-------+-------+-------+------------+
 | get groups        | ✓     | ✓     | ✓     | ✓          |
@@ -280,7 +280,7 @@ Supported operations in Edge Info:
 
 Notes:
 
-* *<source label, label, target label>* is the unique identifier for the edge.
+* *<source label, label, dest label>* is the unique identifier for the edge type.
 
 
 Graph
