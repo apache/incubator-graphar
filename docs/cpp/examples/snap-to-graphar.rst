@@ -54,8 +54,9 @@ The code snippet that follows demonstrates the generation and preservation of th
 .. code:: C++
 
   // construct edges builder
-  GAR_NAMESPACE::builder::EdgesBuilder e_builder(edge_info, save_path,
-                                                 ADJLIST_TYPE, VERTEX_COUNT);
+  auto e_builder = GAR_NAMESPACE::builder::EdgesBuilder::Make(
+                       edge_info, save_path, ADJLIST_TYPE, VERTEX_COUNT)
+                       .value();
   // read edge data from file
   std::ifstream file(DATA_PATH);
   std::string line;
@@ -70,11 +71,11 @@ The code snippet that follows demonstrates the generation and preservation of th
       break;
     }
     GAR_NAMESPACE::builder::Edge e(src, dst);
-    ASSERT(e_builder.AddEdge(e).ok());
+    ASSERT(e_builder->AddEdge(e).ok());
   }
 
   // dump & clear
-  ASSERT(e_builder.Dump().ok());
-  e_builder.Clear();
+  ASSERT(e_builder->Dump().ok());
+  e_builder->Clear();
 
 For comprehensive insights into this example, please consult the accompanying `source code <https://github.com/alibaba/GraphAr/tree/main/docs/cpp/examples/snap_dataset_to_graphar.cc>`_ .

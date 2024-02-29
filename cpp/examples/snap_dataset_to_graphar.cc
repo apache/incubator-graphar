@@ -83,28 +83,30 @@ int main(int argc, char* argv[]) {
   /*------------------construct vertices------------------*/
   // construct vertices builder
   GAR_NAMESPACE::IdType start_index = 0;
-  GAR_NAMESPACE::builder::VerticesBuilder v_builder(vertex_info, save_path,
-                                                    start_index);
+  auto v_builder = GAR_NAMESPACE::builder::VerticesBuilder::Make(
+                       vertex_info, save_path, start_index)
+                       .value();
 
   // prepare vertex data
   for (int i = 0; i < VERTEX_COUNT; i++) {
     GAR_NAMESPACE::builder::Vertex v;
-    ASSERT(v_builder.AddVertex(v).ok());
+    ASSERT(v_builder->AddVertex(v).ok());
   }
 
   // dump
-  ASSERT(v_builder.GetNum() == VERTEX_COUNT);
-  std::cout << "vertex_count=" << v_builder.GetNum() << std::endl;
-  ASSERT(v_builder.Dump().ok());
+  ASSERT(v_builder->GetNum() == VERTEX_COUNT);
+  std::cout << "vertex_count=" << v_builder->GetNum() << std::endl;
+  ASSERT(v_builder->Dump().ok());
   std::cout << "dump vertices collection successfully!" << std::endl;
 
   // clear vertices
-  v_builder.Clear();
+  v_builder->Clear();
 
   /*------------------construct edges------------------*/
   // construct edges builder
-  GAR_NAMESPACE::builder::EdgesBuilder e_builder(edge_info, save_path,
-                                                 ADJLIST_TYPE, VERTEX_COUNT);
+  auto e_builder = GAR_NAMESPACE::builder::EdgesBuilder::Make(
+                       edge_info, save_path, ADJLIST_TYPE, VERTEX_COUNT)
+                       .value();
   // prepare edge data
   std::ifstream file(DATA_PATH);
   std::string line;
@@ -119,16 +121,16 @@ int main(int argc, char* argv[]) {
       break;
     }
     GAR_NAMESPACE::builder::Edge e(src, dst);
-    ASSERT(e_builder.AddEdge(e).ok());
+    ASSERT(e_builder->AddEdge(e).ok());
   }
 
   // dump
-  std::cout << "edge_count=" << e_builder.GetNum() << std::endl;
-  ASSERT(e_builder.Dump().ok());
+  std::cout << "edge_count=" << e_builder->GetNum() << std::endl;
+  ASSERT(e_builder->Dump().ok());
   std::cout << "dump edges collection successfully!" << std::endl;
 
   // clear edges
-  e_builder.Clear();
+  e_builder->Clear();
 
   return 0;
 }
