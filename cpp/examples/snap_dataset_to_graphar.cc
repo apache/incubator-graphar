@@ -29,6 +29,7 @@
 #define GRAPH_NAME "facebook"
 #define DATA_PATH "/tmp/snap/original_dataset/facebook/facebook_combined.txt"
 #define VERTEX_COUNT 4039
+#define IS_DIRECTED false
 /*-----------------------GraphAr status---------------------*/
 #define SAVE_PATH "/tmp/snap/" + graph_name + "/"
 #define ADJLIST_TYPE GAR_NAMESPACE::AdjListType::ordered_by_source
@@ -57,7 +58,7 @@ int main(int argc, char* argv[]) {
   /*------------------construct edge info------------------*/
   std::string src_label = "node", edge_label = "links", dst_label = "node",
               edge_prefix = "edge/node_links_node/";
-  bool directed = false;
+  bool directed = IS_DIRECTED;
 
   // construct adjacent lists
   auto adjacent_lists = {
@@ -109,6 +110,10 @@ int main(int argc, char* argv[]) {
   std::string line;
   while (std::getline(file, line)) {
     std::istringstream iss(line);
+    // skip comments
+    if (line[0] == '#') {
+      continue;
+    }
     int src, dst;
     if (!(iss >> src >> dst)) {
       break;
