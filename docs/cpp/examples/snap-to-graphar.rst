@@ -19,10 +19,11 @@ Before converting, download the ego-Facebook dataset from the SNAP website. The 
 Convert the SNAP Dataset to GraphAr Format
 ------------------------------------------
 
-This first step if to first constructs VertexInfo, EdgeInfo, and GraphInfo objects, and then writes them to Yaml files. 
-For example, the following code snippet shows how to create and save the vertex info file.
+The initial phase involves constructing VertexInfo, EdgeInfo, and GraphInfo objects, which are subsequently serialized into YAML files. 
+For instance, the code snippet below illustrates the creation and storage of the vertex information file.
 
 .. code:: C++
+
   auto version = GAR_NAMESPACE::InfoVersion::Parse("gar/v1").value();
 
   // meta info
@@ -47,10 +48,11 @@ For example, the following code snippet shows how to create and save the vertex 
   ASSERT(graph_info->Save(save_path + graph_name + ".graph.yml").ok());
  
 
-Next, high-level vertex/edge builders from GraphAr C++ library are used to write the vertex and edge data to payload data files.
-The following code snippet shows how to create and save the edge data file.
+Subsequently, we employ the high-level vertex and edge builders provided by the GraphAr C++ library to generate payload data files with vertex and edge data. 
+The code snippet that follows demonstrates the generation and preservation of the edge data file.
 
 .. code:: C++
+
   // construct edges builder
   GAR_NAMESPACE::builder::EdgesBuilder e_builder(edge_info, save_path,
                                                  ADJLIST_TYPE, VERTEX_COUNT);
@@ -75,5 +77,4 @@ The following code snippet shows how to create and save the edge data file.
   ASSERT(e_builder.Dump().ok());
   e_builder.Clear();
 
-
-For more details about this example, please refer to the `source code <https://github.com/alibaba/GraphAr/tree/main/docs/cpp/examples/snap_dataset_to_graphar.cc>`_ .
+For comprehensive insights into this example, please consult the accompanying `source code <https://github.com/alibaba/GraphAr/tree/main/docs/cpp/examples/snap_dataset_to_graphar.cc>`_ .
