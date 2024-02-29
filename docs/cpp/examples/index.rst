@@ -7,3 +7,4 @@ Examples
    bgl
    graphscope
    out-of-core
+   snap-to-graphar
