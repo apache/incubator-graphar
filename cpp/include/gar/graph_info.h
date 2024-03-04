@@ -45,11 +45,7 @@ class Property {
         is_nullable(!is_primary && is_nullable) {}
 };
 
-static bool operator==(const Property& lhs, const Property& rhs) {
-  return (lhs.name == rhs.name) && (lhs.type == rhs.type) &&
-         (lhs.is_primary == rhs.is_primary) &&
-         (lhs.is_nullable == rhs.is_nullable);
-}
+bool operator==(const Property& lhs, const Property& rhs);
 
 /**
  * PropertyGroup is a class to store the property group information.
@@ -115,11 +111,7 @@ class PropertyGroup {
   std::string prefix_;
 };
 
-static bool operator==(const PropertyGroup& lhs, const PropertyGroup& rhs) {
-  return (lhs.GetPrefix() == rhs.GetPrefix()) &&
-         (lhs.GetFileType() == rhs.GetFileType()) &&
-         (lhs.GetProperties() == rhs.GetProperties());
-}
+bool operator==(const PropertyGroup& lhs, const PropertyGroup& rhs);
 
 /**
  * AdjacentList is a class to store the adjacency list information.
