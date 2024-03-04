@@ -31,11 +31,49 @@ The following is an example property graph containing two types of vertices ("pe
    :align: center
    :alt: property graph
 
-Property
---------
+
+Property Data Types
+-------------------
+GraphAr support a set of built-in property data types that are common in real use cases and supported by most file types (CSV, ORC, Parquet), includes:
+
+```
+- Boolean 
+- Int32: Integer with 32 bits
+- Int64: Integer with 64 bits
+- Float: 32-bit floating point values
+- Double: 64-bit floating point values
+- String: Textual data
+- Date: days since the Unix epoch
+- Timestamp: milliseconds since the Unix epoch
+- Time: milliseconds since midnight
+- List: A list of values of the same type
+```
+
 
 Property Group
 --------------
+
+GraphAr splits the properties of vertices and edges into groups, with each group containing a set of properties and the properties in the same group are stored in the same file.
+
+
+Adjacency List
+--------------
+
+GraphAr supports the storage of multiple types of adjLists for a given group of edges, e.g., a group of edges could be accessed in both CSR and CSC way when two copies (one is **ordered_by_source** and the other is **ordered_by_dest**) of the relevant data are present in GraphAr. 
+
+
+Configurations
+--------------
+
+Vertex Chunk Size
+`````````````````
+
+Edge Chunk Size
+````````````````
+
+File Format
+````````````
+
 
 
 
