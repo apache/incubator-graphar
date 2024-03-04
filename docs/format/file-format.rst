@@ -1,10 +1,16 @@
 GraphAr File Format
 ============================
 
-What is Property Graph
+Property Graph
 ------------------------
 
-GraphAr is designed for representing and storing the property graphs. Graph (in discrete mathematics) is a structure made of vertices and edges. Property graph is then a type of graph model where the vertices/edges could carry a name (also called as type or label) and some properties. Since carrying additional information than non-property graphs, the property graph is able to represent connections among data scattered across diverse data databases and with different schemas. Compared with the relational database schema, the property graph excels at showing data dependencies. Therefore, it is widely-used in modeling modern applications including social network analytics, data mining, network routing, scientific computing and so on.
+GraphAr is designed for representing and storing the property graphs. Graph (in discrete mathematics) is a structure made of vertices and edges. 
+Property graph is then a type of graph model where the vertices/edges could carry a name (also called as type or label) and some properties. 
+Since carrying additional information than non-property graphs, the property graph is able to represent
+connections among data scattered across diverse data databases and with different schemas.
+Compared with the relational database schema, the property graph excels at showing data dependencies.
+Therefore, it is widely-used in modeling modern applications including social network analytics, data mining,
+network routing, scientific computing and so on.
 
 A property graph consists of vertices and edges, with each vertex contains a unique identifier and:
 
@@ -24,6 +30,13 @@ The following is an example property graph containing two types of vertices ("pe
    :width: 700
    :align: center
    :alt: property graph
+
+Property
+--------
+
+Property Group
+--------------
+
 
 
 Vertices in GraphAr
