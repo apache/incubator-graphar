@@ -80,6 +80,12 @@ std::string BuildPath(const std::vector<std::string>& paths) {
 }
 }  // namespace
 
+bool operator==(const Property& lhs, const Property& rhs) {
+  return (lhs.name == rhs.name) && (lhs.type == rhs.type) &&
+         (lhs.is_primary == rhs.is_primary) &&
+         (lhs.is_nullable == rhs.is_nullable);
+}
+
 PropertyGroup::PropertyGroup(const std::vector<Property>& properties,
                              FileType file_type, const std::string& prefix)
     : properties_(properties), file_type_(file_type), prefix_(prefix) {
@@ -136,6 +142,12 @@ std::shared_ptr<PropertyGroup> CreatePropertyGroup(
   return std::make_shared<PropertyGroup>(properties, file_type, prefix);
 }
 
+bool operator==(const PropertyGroup& lhs, const PropertyGroup& rhs) {
+  return (lhs.GetPrefix() == rhs.GetPrefix()) &&
+         (lhs.GetFileType() == rhs.GetFileType()) &&
+         (lhs.GetProperties() == rhs.GetProperties());
+}
+
 AdjacentList::AdjacentList(AdjListType type, FileType file_type,
                            const std::string& prefix)
     : type_(type), file_type_(file_type), prefix_(prefix) {
@@ -178,7 +190,7 @@ class VertexInfo::Impl {
     if (prefix_.empty()) {
       prefix_ = label_ + "/";  // default prefix
     }
-    for (int i = 0; i < property_groups_.size(); i++) {
+    for (size_t i = 0; i < property_groups_.size(); i++) {
       const auto& pg = property_groups_[i];
       for (const auto& p : pg->GetProperties()) {
         property_name_to_index_.emplace(p.name, i);
@@ -274,7 +286,7 @@ std::shared_ptr<PropertyGroup> VertexInfo::GetPropertyGroup(
 
 std::shared_ptr<PropertyGroup> VertexInfo::GetPropertyGroupByIndex(
     int index) const {
-  if (index < 0 || index >= impl_->property_groups_.size()) {
+  if (index < 0 || index >= static_cast<int>(impl_->property_groups_.size())) {
     return nullptr;
   }
   return impl_->property_groups_[index];
@@ -473,11 +485,11 @@ class EdgeInfo::Impl {
       prefix_ = src_label_ + REGULAR_SEPARATOR + edge_label_ +
                 REGULAR_SEPARATOR + dst_label_ + "/";  // default prefix
     }
-    for (int i = 0; i < adjacent_lists_.size(); i++) {
+    for (size_t i = 0; i < adjacent_lists_.size(); i++) {
       auto adj_list_type = adjacent_lists_[i]->GetType();
       adjacent_list_type_to_index_[adj_list_type] = i;
     }
-    for (int i = 0; i < property_groups_.size(); i++) {
+    for (size_t i = 0; i < property_groups_.size(); i++) {
       const auto& pg = property_groups_[i];
       for (const auto& p : pg->GetProperties()) {
         property_name_to_index_.emplace(p.name, i);
@@ -621,7 +633,7 @@ std::shared_ptr<PropertyGroup> EdgeInfo::GetPropertyGroup(
 
 std::shared_ptr<PropertyGroup> EdgeInfo::GetPropertyGroupByIndex(
     int index) const {
-  if (index < 0 || index >= impl_->property_groups_.size()) {
+  if (index < 0 || index >= static_cast<int>(impl_->property_groups_.size())) {
     return nullptr;
   }
   return impl_->property_groups_[index];
@@ -1009,10 +1021,10 @@ class GraphInfo::Impl {
         prefix_(prefix),
         version_(std::move(version)),
         extra_info_(extra_info) {
-    for (int i = 0; i < vertex_infos_.size(); i++) {
+    for (size_t i = 0; i < vertex_infos_.size(); i++) {
       vlabel_to_index_[vertex_infos_[i]->GetLabel()] = i;
     }
-    for (int i = 0; i < edge_infos_.size(); i++) {
+    for (size_t i = 0; i < edge_infos_.size(); i++) {
       std::string edge_key = ConcatEdgeTriple(edge_infos_[i]->GetSrcLabel(),
                                               edge_infos_[i]->GetEdgeLabel(),
                                               edge_infos_[i]->GetDstLabel());
@@ -1106,14 +1118,14 @@ int GraphInfo::EdgeInfoNum() const {
 
 const std::shared_ptr<VertexInfo> GraphInfo::GetVertexInfoByIndex(
     int index) const {
-  if (index < 0 || index >= impl_->vertex_infos_.size()) {
+  if (index < 0 || index >= static_cast<int>(impl_->vertex_infos_.size())) {
     return nullptr;
   }
   return impl_->vertex_infos_[index];
 }
 
 const std::shared_ptr<EdgeInfo> GraphInfo::GetEdgeInfoByIndex(int index) const {
-  if (index < 0 || index >= impl_->edge_infos_.size()) {
+  if (index < 0 || index >= static_cast<int>(impl_->edge_infos_.size())) {
     return nullptr;
   }
   return impl_->edge_infos_[index];
