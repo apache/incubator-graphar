@@ -1,0 +1,1328 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00007f9a2e1ebd75, pid=7608, tid=7612
+#
+# JRE version: OpenJDK Runtime Environment (11.0.21+9) (build 11.0.21+9-post-Ubuntu-0ubuntu120.04)
+# Java VM: OpenJDK 64-Bit Server VM (11.0.21+9-post-Ubuntu-0ubuntu120.04, mixed mode, sharing, tiered, compressed oops, g1 gc, linux-amd64)
+# Problematic frame:
+# C  [libllvm4jni.so+0x15edd75]  llvm::detail::IEEEFloat::partCount() const+0x7
+#
+# No core dump will be written. Core dumps have been disabled. To enable core dumping, try "ulimit -c unlimited" before starting Java again
+#
+# If you would like to submit a bug report, please visit:
+#   https://bugs.launchpad.net/ubuntu/+source/openjdk-lts
+# The crash happened outside the Java Virtual Machine in native code.
+# See problematic frame for where to report the bug.
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -Dllvm4jni.supportIndirectCall=simple -Dllvm4jni.supportLocalConstant=true -Dllvm4jni.maximumBytecodeSize=128 com.alibaba.fastffi.llvm4jni.Main -cp /home/john/graphar/gar-nullable-key-spark/java/target/classes -bc /home/john/graphar/gar-nullable-key-spark/java/target/native/gar-java.bc -output /home/john/graphar/gar-nullable-key-spark/java/target/llvm4jni-output -v INFO
+
+Host: AMD Ryzen 5 5600H with Radeon Graphics, 12 cores, 7G, Ubuntu 20.04.6 LTS
+Time: Tue Feb 27 14:49:21 2024 CST elapsed time: 14.567399 seconds (0d 0h 0m 14s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x00007f9acc017000):  JavaThread "main" [_thread_in_native, id=7612, stack(0x00007f9ad0806000,0x00007f9ad0907000)]
+
+Stack: [0x00007f9ad0806000,0x00007f9ad0907000],  sp=0x00007f9ad0905518,  free space=1021k
+Native frames: (J=compiled Java code, A=aot compiled Java code, j=interpreted, Vv=VM code, C=native code)
+C  [libllvm4jni.so+0x15edd75]  llvm::detail::IEEEFloat::partCount() const+0x7
+
+Java frames: (J=compiled Java code, j=interpreted, Vv=VM code)
+j  com.alibaba.fastffi.llvm.LLVMContext_cxx_0xf30e4361.nativeDelete(J)V+0
+j  com.alibaba.fastffi.llvm.LLVMContext_cxx_0xf30e4361.delete()V+4
+j  com.alibaba.fastffi.CXXStackObject.close()V+11
+j  com.alibaba.fastffi.llvm4jni.Main.parseAndGenerate(Lcom/alibaba/fastffi/llvm4jni/Options;)V+244
+j  com.alibaba.fastffi.llvm4jni.Main.main([Ljava/lang/String;)V+6
+v  ~StubRoutines::call_stub
+
+siginfo: si_signo: 11 (SIGSEGV), si_code: 1 (SEGV_MAPERR), si_addr: 0x0000000000200008
+
+Register to memory mapping:
+
+RAX=0x0000000000200000 is an unknown value
+RBX=0x00007f9acc5d20de points into unknown readable memory: 00 00
+RCX=0x0000000000000001 is an unknown value
+RDX=0x00000000ffffffff is an unallocated location in the heap
+RSP=0x00007f9ad0905518 is pointing into the stack for thread: 0x00007f9acc017000
+RBP=0x00007f9acc5d20be points into unknown readable memory: 00 00
+RSI=0x00007f9ad0905578 is pointing into the stack for thread: 0x00007f9acc017000
+RDI=0x00007f9acc5d20de points into unknown readable memory: 00 00
+R8 =0x0000000000000001 is an unknown value
+R9 =0x00007f9ad0905570 is pointing into the stack for thread: 0x00007f9acc017000
+R10=0x00007f9a2cf41334: <offset 0x0000000000343334> in /tmp/fastffi-libllvm4jni.so11928552329496536426/libllvm4jni.so at 0x00007f9a2cbfe000
+R11=0x00007f9a2e1ebdd0: _ZN4llvm6detail9IEEEFloat15freeSignificandEv+0x0000000000000000 in /tmp/fastffi-libllvm4jni.so11928552329496536426/libllvm4jni.so at 0x00007f9a2cbfe000
+R12=0x00007f9acc57fd60 points into unknown readable memory: 0x00007f9acc000730 | 30 07 00 cc 9a 7f 00 00
+R13=0x00007f9ad0905580 is pointing into the stack for thread: 0x00007f9acc017000
+R14=0x00007f9ad0905558 is pointing into the stack for thread: 0x00007f9acc017000
+R15=0x00007f9ad0905578 is pointing into the stack for thread: 0x00007f9acc017000
+
+
+Registers:
+RAX=0x0000000000200000, RBX=0x00007f9acc5d20de, RCX=0x0000000000000001, RDX=0x00000000ffffffff
+RSP=0x00007f9ad0905518, RBP=0x00007f9acc5d20be, RSI=0x00007f9ad0905578, RDI=0x00007f9acc5d20de
+R8 =0x0000000000000001, R9 =0x00007f9ad0905570, R10=0x00007f9a2cf41334, R11=0x00007f9a2e1ebdd0
+R12=0x00007f9acc57fd60, R13=0x00007f9ad0905580, R14=0x00007f9ad0905558, R15=0x00007f9ad0905578
+RIP=0x00007f9a2e1ebd75, EFLAGS=0x0000000000010206, CSGSFS=0x002b000000000033, ERR=0x0000000000000004
+  TRAPNO=0x000000000000000e
+
+Top of Stack: (sp=0x00007f9ad0905518)
+0x00007f9ad0905518:   00007f9a2e1ebddd 00007f9acc580760
+0x00007f9ad0905528:   00007f9a2e179180 00007f9acc3dc750
+0x00007f9ad0905538:   00007f9a2e17a331 00007f9ace45a490
+0x00007f9ad0905548:   00007f9ace45a490 0000000000000002 
+
+Instructions: (pc=0x00007f9a2e1ebd75)
+0x00007f9a2e1ebc75:   c3 f3 0f 1e fa 48 8d 05 7f 08 5a ff c3 f3 0f 1e
+0x00007f9a2e1ebc85:   fa 48 8d 15 e7 05 5a ff 89 ff 48 63 04 ba 48 01
+0x00007f9a2e1ebc95:   d0 3e ff e0 e9 62 f2 b2 00 e9 6d f2 b2 00 e9 f8
+0x00007f9a2e1ebca5:   d3 b2 00 e9 13 d3 b2 00 e9 7e f2 b2 00 e9 89 f2
+0x00007f9a2e1ebcb5:   b2 00 e9 54 cd b2 00 f3 0f 1e fa 53 48 89 fb e8
+0x00007f9a2e1ebcc5:   37 f2 b2 00 49 89 c0 31 c0 4c 39 c3 74 59 e8 38
+0x00007f9a2e1ebcd5:   f2 b2 00 49 89 c0 b8 01 00 00 00 4c 39 c3 74 47
+0x00007f9a2e1ebce5:   e8 b6 d3 b2 00 49 89 c0 b8 02 00 00 00 4c 39 c3
+0x00007f9a2e1ebcf5:   74 35 e8 c4 d2 b2 00 49 89 c0 b8 03 00 00 00 4c
+0x00007f9a2e1ebd05:   39 c3 74 23 e8 22 f2 b2 00 49 89 c0 b8 04 00 00
+0x00007f9a2e1ebd15:   00 4c 39 c3 74 11 e8 20 f2 b2 00 48 39 c3 0f 95
+0x00007f9a2e1ebd25:   c0 0f b6 c0 83 c0 05 5b c3 f3 0f 1e fa 50 e8 c8
+0x00007f9a2e1ebd35:   8e af 00 8a 40 14 5a 83 e0 07 3c 01 0f 97 c0 c3
+0x00007f9a2e1ebd45:   cc f3 0f 1e fa 8b 47 08 c3 f3 0f 1e fa 8b 07 c3
+0x00007f9a2e1ebd55:   cc f3 0f 1e fa 8b 47 04 c3 f3 0f 1e fa 8b 47 0c
+0x00007f9a2e1ebd65:   c3 f3 0f 1e fa 8b 47 0c c3 f3 0f 1e fa 48 8b 07
+0x00007f9a2e1ebd75:   8b 40 08 83 c0 40 c1 e8 06 c3 cc f3 0f 1e fa 53
+0x00007f9a2e1ebd85:   48 89 fb 48 89 37 e8 b0 6e b3 00 83 f8 01 76 13
+0x00007f9a2e1ebd95:   89 c0 48 8d 3c c5 00 00 00 00 e8 8c 0a b3 00 48
+0x00007f9a2e1ebda5:   89 43 08 5b c3 f3 0f 1e fa 53 48 89 fb e8 99 6e
+0x00007f9a2e1ebdb5:   b3 00 8a 43 14 83 e0 f0 83 c8 03 88 43 14 5b c3
+0x00007f9a2e1ebdc5:   cc f3 0f 1e fa e9 81 d0 b2 00 cc f3 0f 1e fa 53
+0x00007f9a2e1ebdd5:   48 89 fb e8 63 6e b3 00 83 f8 01 76 0f 48 8b 7b
+0x00007f9a2e1ebde5:   08 48 85 ff 74 06 5b e9 cf cb b2 00 5b c3 cc f3
+0x00007f9a2e1ebdf5:   0f 1e fa 41 54 49 89 fc 53 48 89 f3 50 e8 59 6e
+0x00007f9a2e1ebe05:   b3 00 48 8b 03 8a 53 14 49 89 04 24 48 8b 43 08
+0x00007f9a2e1ebe15:   83 e2 07 49 89 44 24 08 8b 43 10 41 89 44 24 10
+0x00007f9a2e1ebe25:   41 8a 44 24 14 83 e0 f8 09 d0 41 88 44 24 14 8a
+0x00007f9a2e1ebe35:   53 14 83 e0 f7 83 e2 08 09 d0 41 88 44 24 14 48
+0x00007f9a2e1ebe45:   8d 05 c5 06 5a ff 48 89 03 4c 89 e0 5a 5b 41 5c
+0x00007f9a2e1ebe55:   c3 f3 0f 1e fa 48 8d 05 af 06 5a ff 48 89 07 e9
+0x00007f9a2e1ebe65:   d7 cb b2 00 cc f3 0f 1e fa e9 ed 6d b3 00 cc f3 
+
+
+Stack slot to memory mapping:
+stack at sp + 0 slots: 0x00007f9a2e1ebddd: _ZN4llvm6detail9IEEEFloat15freeSignificandEv+0x000000000000000d in /tmp/fastffi-libllvm4jni.so11928552329496536426/libllvm4jni.so at 0x00007f9a2cbfe000
+stack at sp + 1 slots: 0x00007f9acc580760 points into unknown readable memory: 0x0000000000000000 | 00 00 00 00 00 00 00 00
+stack at sp + 2 slots: 0x00007f9a2e179180: <offset 0x000000000157b180> in /tmp/fastffi-libllvm4jni.so11928552329496536426/libllvm4jni.so at 0x00007f9a2cbfe000
+stack at sp + 3 slots: 0x00007f9acc3dc750 points into unknown readable memory: 0x00007f9acc57fd60 | 60 fd 57 cc 9a 7f 00 00
+stack at sp + 4 slots: 0x00007f9a2e17a331: <offset 0x000000000157c331> in /tmp/fastffi-libllvm4jni.so11928552329496536426/libllvm4jni.so at 0x00007f9a2cbfe000
+stack at sp + 5 slots: 0x00007f9ace45a490 points into unknown readable memory: 0x0000000000000000 | 00 00 00 00 00 00 00 00
+stack at sp + 6 slots: 0x00007f9ace45a490 points into unknown readable memory: 0x0000000000000000 | 00 00 00 00 00 00 00 00
+stack at sp + 7 slots: 0x0000000000000002 is an unknown value
+
+
+---------------  P R O C E S S  ---------------
+
+Threads class SMR info:
+_java_thread_list=0x00007f9a74113bd0, length=11, elements={
+0x00007f9acc017000, 0x00007f9acc125800, 0x00007f9acc127800, 0x00007f9acc12f800,
+0x00007f9acc131800, 0x00007f9acc134000, 0x00007f9acc136000, 0x00007f9acc138000,
+0x00007f9acc18b000, 0x00007f9a744a4800, 0x00007f9a74113000
+}
+
+Java Threads: ( => current thread )
+=>0x00007f9acc017000 JavaThread "main" [_thread_in_native, id=7612, stack(0x00007f9ad0806000,0x00007f9ad0907000)]
+  0x00007f9acc125800 JavaThread "Reference Handler" daemon [_thread_blocked, id=7619, stack(0x00007f9aa81b5000,0x00007f9aa82b6000)]
+  0x00007f9acc127800 JavaThread "Finalizer" daemon [_thread_blocked, id=7620, stack(0x00007f9aa80b4000,0x00007f9aa81b5000)]
+  0x00007f9acc12f800 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=7621, stack(0x00007f9a8baa6000,0x00007f9a8bba7000)]
+  0x00007f9acc131800 JavaThread "Service Thread" daemon [_thread_blocked, id=7622, stack(0x00007f9a8b9a5000,0x00007f9a8baa6000)]
+  0x00007f9acc134000 JavaThread "C2 CompilerThread0" daemon [_thread_in_native, id=7623, stack(0x00007f9a8b8a4000,0x00007f9a8b9a5000)]
+  0x00007f9acc136000 JavaThread "C1 CompilerThread0" daemon [_thread_blocked, id=7624, stack(0x00007f9a8b7a3000,0x00007f9a8b8a4000)]
+  0x00007f9acc138000 JavaThread "Sweeper thread" daemon [_thread_blocked, id=7625, stack(0x00007f9a8b6a2000,0x00007f9a8b7a3000)]
+  0x00007f9acc18b000 JavaThread "Common-Cleaner" daemon [_thread_blocked, id=7627, stack(0x00007f9a8b4a0000,0x00007f9a8b5a1000)]
+  0x00007f9a744a4800 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=7639, stack(0x00007f9a8b25d000,0x00007f9a8b35e000)]
+  0x00007f9a74113000 JavaThread "C2 CompilerThread2" daemon [_thread_blocked, id=7640, stack(0x00007f9a88547000,0x00007f9a88648000)]
+
+Other Threads:
+  0x00007f9acc122800 VMThread "VM Thread" [stack: 0x00007f9aa82b7000,0x00007f9aa83b7000] [id=7618]
+  0x00007f9acc188800 WatcherThread [stack: 0x00007f9a8b5a2000,0x00007f9a8b6a2000] [id=7626]
+  0x00007f9acc02f000 GCTaskThread "GC Thread#0" [stack: 0x00007f9ad04ad000,0x00007f9ad05ad000] [id=7613]
+  0x00007f9a98001000 GCTaskThread "GC Thread#1" [stack: 0x00007f9a8b3a0000,0x00007f9a8b4a0000] [id=7632]
+  0x00007f9acc05f000 ConcurrentGCThread "G1 Main Marker" [stack: 0x00007f9ab40d8000,0x00007f9ab41d8000] [id=7614]
+  0x00007f9acc061000 ConcurrentGCThread "G1 Conc#0" [stack: 0x00007f9aab845000,0x00007f9aab945000] [id=7615]
+  0x00007f9acc0ef000 ConcurrentGCThread "G1 Refine#0" [stack: 0x00007f9aa8d3a000,0x00007f9aa8e3a000] [id=7616]
+  0x00007f9acc0f1000 ConcurrentGCThread "G1 Young RemSet Sampling" [stack: 0x00007f9aa8c39000,0x00007f9aa8d39000] [id=7617]
+
+Threads with active compile tasks:
+C2 CompilerThread0    14571 2123       4       org.objectweb.asm.Frame::execute (2318 bytes)
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap address: 0x0000000088e00000, size: 1906 MB, Compressed Oops mode: 32-bit
+Narrow klass base: 0x0000000800000000, Narrow klass shift: 3
+Compressed class space size: 1073741824 Address: 0x0000000840000000
+
+Heap:
+ garbage-first heap   total 124928K, used 16477K [0x0000000088e00000, 0x0000000100000000)
+  region size 1024K, 15 young (15360K), 4 survivors (4096K)
+ Metaspace       used 8625K, capacity 10733K, committed 11008K, reserved 1058816K
+  class space    used 699K, capacity 928K, committed 1024K, reserved 1048576K
+Heap Regions: E=young(eden), S=young(survivor), O=old, HS=humongous(starts), HC=humongous(continues), CS=collection set, F=free, A=archive, TAMS=top-at-mark-start (previous, next)
+|   0|0x0000000088e00000, 0x0000000088f00000, 0x0000000088f00000|100%| O|  |TAMS 0x0000000088e00000, 0x0000000088e00000| Untracked 
+|   1|0x0000000088f00000, 0x0000000089000000, 0x0000000089000000|100%| O|  |TAMS 0x0000000088f00000, 0x0000000088f00000| Untracked 
+|   2|0x0000000089000000, 0x0000000089034600, 0x0000000089100000| 20%| O|  |TAMS 0x0000000089000000, 0x0000000089000000| Untracked 
+|   3|0x0000000089100000, 0x0000000089100000, 0x0000000089200000|  0%| F|  |TAMS 0x0000000089100000, 0x0000000089100000| Untracked 
+|   4|0x0000000089200000, 0x0000000089200000, 0x0000000089300000|  0%| F|  |TAMS 0x0000000089200000, 0x0000000089200000| Untracked 
+|   5|0x0000000089300000, 0x0000000089300000, 0x0000000089400000|  0%| F|  |TAMS 0x0000000089300000, 0x0000000089300000| Untracked 
+|   6|0x0000000089400000, 0x0000000089400000, 0x0000000089500000|  0%| F|  |TAMS 0x0000000089400000, 0x0000000089400000| Untracked 
+|   7|0x0000000089500000, 0x0000000089500000, 0x0000000089600000|  0%| F|  |TAMS 0x0000000089500000, 0x0000000089500000| Untracked 
+|   8|0x0000000089600000, 0x0000000089600000, 0x0000000089700000|  0%| F|  |TAMS 0x0000000089600000, 0x0000000089600000| Untracked 
+|   9|0x0000000089700000, 0x0000000089700000, 0x0000000089800000|  0%| F|  |TAMS 0x0000000089700000, 0x0000000089700000| Untracked 
+|  10|0x0000000089800000, 0x0000000089800000, 0x0000000089900000|  0%| F|  |TAMS 0x0000000089800000, 0x0000000089800000| Untracked 
+|  11|0x0000000089900000, 0x0000000089900000, 0x0000000089a00000|  0%| F|  |TAMS 0x0000000089900000, 0x0000000089900000| Untracked 
+|  12|0x0000000089a00000, 0x0000000089a00000, 0x0000000089b00000|  0%| F|  |TAMS 0x0000000089a00000, 0x0000000089a00000| Untracked 
+|  13|0x0000000089b00000, 0x0000000089b00000, 0x0000000089c00000|  0%| F|  |TAMS 0x0000000089b00000, 0x0000000089b00000| Untracked 
+|  14|0x0000000089c00000, 0x0000000089c00000, 0x0000000089d00000|  0%| F|  |TAMS 0x0000000089c00000, 0x0000000089c00000| Untracked 
+|  15|0x0000000089d00000, 0x0000000089d00000, 0x0000000089e00000|  0%| F|  |TAMS 0x0000000089d00000, 0x0000000089d00000| Untracked 
+|  16|0x0000000089e00000, 0x0000000089e00000, 0x0000000089f00000|  0%| F|  |TAMS 0x0000000089e00000, 0x0000000089e00000| Untracked 
+|  17|0x0000000089f00000, 0x0000000089f00000, 0x000000008a000000|  0%| F|  |TAMS 0x0000000089f00000, 0x0000000089f00000| Untracked 
+|  18|0x000000008a000000, 0x000000008a000000, 0x000000008a100000|  0%| F|  |TAMS 0x000000008a000000, 0x000000008a000000| Untracked 
+|  19|0x000000008a100000, 0x000000008a100000, 0x000000008a200000|  0%| F|  |TAMS 0x000000008a100000, 0x000000008a100000| Untracked 
+|  20|0x000000008a200000, 0x000000008a200000, 0x000000008a300000|  0%| F|  |TAMS 0x000000008a200000, 0x000000008a200000| Untracked 
+|  21|0x000000008a300000, 0x000000008a300000, 0x000000008a400000|  0%| F|  |TAMS 0x000000008a300000, 0x000000008a300000| Untracked 
+|  22|0x000000008a400000, 0x000000008a400000, 0x000000008a500000|  0%| F|  |TAMS 0x000000008a400000, 0x000000008a400000| Untracked 
+|  23|0x000000008a500000, 0x000000008a500000, 0x000000008a600000|  0%| F|  |TAMS 0x000000008a500000, 0x000000008a500000| Untracked 
+|  24|0x000000008a600000, 0x000000008a600000, 0x000000008a700000|  0%| F|  |TAMS 0x000000008a600000, 0x000000008a600000| Untracked 
+|  25|0x000000008a700000, 0x000000008a700000, 0x000000008a800000|  0%| F|  |TAMS 0x000000008a700000, 0x000000008a700000| Untracked 
+|  26|0x000000008a800000, 0x000000008a800000, 0x000000008a900000|  0%| F|  |TAMS 0x000000008a800000, 0x000000008a800000| Untracked 
+|  27|0x000000008a900000, 0x000000008a900000, 0x000000008aa00000|  0%| F|  |TAMS 0x000000008a900000, 0x000000008a900000| Untracked 
+|  28|0x000000008aa00000, 0x000000008aa00000, 0x000000008ab00000|  0%| F|  |TAMS 0x000000008aa00000, 0x000000008aa00000| Untracked 
+|  29|0x000000008ab00000, 0x000000008ab00000, 0x000000008ac00000|  0%| F|  |TAMS 0x000000008ab00000, 0x000000008ab00000| Untracked 
+|  30|0x000000008ac00000, 0x000000008ac00000, 0x000000008ad00000|  0%| F|  |TAMS 0x000000008ac00000, 0x000000008ac00000| Untracked 
+|  31|0x000000008ad00000, 0x000000008ad00000, 0x000000008ae00000|  0%| F|  |TAMS 0x000000008ad00000, 0x000000008ad00000| Untracked 
+|  32|0x000000008ae00000, 0x000000008ae00000, 0x000000008af00000|  0%| F|  |TAMS 0x000000008ae00000, 0x000000008ae00000| Untracked 
+|  33|0x000000008af00000, 0x000000008af00000, 0x000000008b000000|  0%| F|  |TAMS 0x000000008af00000, 0x000000008af00000| Untracked 
+|  34|0x000000008b000000, 0x000000008b000000, 0x000000008b100000|  0%| F|  |TAMS 0x000000008b000000, 0x000000008b000000| Untracked 
+|  35|0x000000008b100000, 0x000000008b100000, 0x000000008b200000|  0%| F|  |TAMS 0x000000008b100000, 0x000000008b100000| Untracked 
+|  36|0x000000008b200000, 0x000000008b200000, 0x000000008b300000|  0%| F|  |TAMS 0x000000008b200000, 0x000000008b200000| Untracked 
+|  37|0x000000008b300000, 0x000000008b300000, 0x000000008b400000|  0%| F|  |TAMS 0x000000008b300000, 0x000000008b300000| Untracked 
+|  38|0x000000008b400000, 0x000000008b400000, 0x000000008b500000|  0%| F|  |TAMS 0x000000008b400000, 0x000000008b400000| Untracked 
+|  39|0x000000008b500000, 0x000000008b500000, 0x000000008b600000|  0%| F|  |TAMS 0x000000008b500000, 0x000000008b500000| Untracked 
+|  40|0x000000008b600000, 0x000000008b600000, 0x000000008b700000|  0%| F|  |TAMS 0x000000008b600000, 0x000000008b600000| Untracked 
+|  41|0x000000008b700000, 0x000000008b700000, 0x000000008b800000|  0%| F|  |TAMS 0x000000008b700000, 0x000000008b700000| Untracked 
+|  42|0x000000008b800000, 0x000000008b800000, 0x000000008b900000|  0%| F|  |TAMS 0x000000008b800000, 0x000000008b800000| Untracked 
+|  43|0x000000008b900000, 0x000000008b900000, 0x000000008ba00000|  0%| F|  |TAMS 0x000000008b900000, 0x000000008b900000| Untracked 
+|  44|0x000000008ba00000, 0x000000008ba2ee70, 0x000000008bb00000| 18%| S|CS|TAMS 0x000000008ba00000, 0x000000008ba00000| Complete 
+|  45|0x000000008bb00000, 0x000000008bc00000, 0x000000008bc00000|100%| S|CS|TAMS 0x000000008bb00000, 0x000000008bb00000| Complete 
+|  46|0x000000008bc00000, 0x000000008bd00000, 0x000000008bd00000|100%| S|CS|TAMS 0x000000008bc00000, 0x000000008bc00000| Complete 
+|  47|0x000000008bd00000, 0x000000008be00000, 0x000000008be00000|100%| S|CS|TAMS 0x000000008bd00000, 0x000000008bd00000| Complete 
+|  48|0x000000008be00000, 0x000000008be00000, 0x000000008bf00000|  0%| F|  |TAMS 0x000000008be00000, 0x000000008be00000| Untracked 
+|  49|0x000000008bf00000, 0x000000008bf00000, 0x000000008c000000|  0%| F|  |TAMS 0x000000008bf00000, 0x000000008bf00000| Untracked 
+|  50|0x000000008c000000, 0x000000008c000000, 0x000000008c100000|  0%| F|  |TAMS 0x000000008c000000, 0x000000008c000000| Untracked 
+|  51|0x000000008c100000, 0x000000008c100000, 0x000000008c200000|  0%| F|  |TAMS 0x000000008c100000, 0x000000008c100000| Untracked 
+|  52|0x000000008c200000, 0x000000008c200000, 0x000000008c300000|  0%| F|  |TAMS 0x000000008c200000, 0x000000008c200000| Untracked 
+|  53|0x000000008c300000, 0x000000008c300000, 0x000000008c400000|  0%| F|  |TAMS 0x000000008c300000, 0x000000008c300000| Untracked 
+|  54|0x000000008c400000, 0x000000008c400000, 0x000000008c500000|  0%| F|  |TAMS 0x000000008c400000, 0x000000008c400000| Untracked 
+|  55|0x000000008c500000, 0x000000008c500000, 0x000000008c600000|  0%| F|  |TAMS 0x000000008c500000, 0x000000008c500000| Untracked 
+|  56|0x000000008c600000, 0x000000008c600000, 0x000000008c700000|  0%| F|  |TAMS 0x000000008c600000, 0x000000008c600000| Untracked 
+|  57|0x000000008c700000, 0x000000008c700000, 0x000000008c800000|  0%| F|  |TAMS 0x000000008c700000, 0x000000008c700000| Untracked 
+|  58|0x000000008c800000, 0x000000008c800000, 0x000000008c900000|  0%| F|  |TAMS 0x000000008c800000, 0x000000008c800000| Untracked 
+|  59|0x000000008c900000, 0x000000008c900000, 0x000000008ca00000|  0%| F|  |TAMS 0x000000008c900000, 0x000000008c900000| Untracked 
+|  60|0x000000008ca00000, 0x000000008ca00000, 0x000000008cb00000|  0%| F|  |TAMS 0x000000008ca00000, 0x000000008ca00000| Untracked 
+|  61|0x000000008cb00000, 0x000000008cb00000, 0x000000008cc00000|  0%| F|  |TAMS 0x000000008cb00000, 0x000000008cb00000| Untracked 
+|  62|0x000000008cc00000, 0x000000008cc00000, 0x000000008cd00000|  0%| F|  |TAMS 0x000000008cc00000, 0x000000008cc00000| Untracked 
+|  63|0x000000008cd00000, 0x000000008cd00000, 0x000000008ce00000|  0%| F|  |TAMS 0x000000008cd00000, 0x000000008cd00000| Untracked 
+|  64|0x000000008ce00000, 0x000000008ce00000, 0x000000008cf00000|  0%| F|  |TAMS 0x000000008ce00000, 0x000000008ce00000| Untracked 
+|  65|0x000000008cf00000, 0x000000008cf00000, 0x000000008d000000|  0%| F|  |TAMS 0x000000008cf00000, 0x000000008cf00000| Untracked 
+|  66|0x000000008d000000, 0x000000008d000000, 0x000000008d100000|  0%| F|  |TAMS 0x000000008d000000, 0x000000008d000000| Untracked 
+|  67|0x000000008d100000, 0x000000008d100000, 0x000000008d200000|  0%| F|  |TAMS 0x000000008d100000, 0x000000008d100000| Untracked 
+|  68|0x000000008d200000, 0x000000008d200000, 0x000000008d300000|  0%| F|  |TAMS 0x000000008d200000, 0x000000008d200000| Untracked 
+|  69|0x000000008d300000, 0x000000008d300000, 0x000000008d400000|  0%| F|  |TAMS 0x000000008d300000, 0x000000008d300000| Untracked 
+|  70|0x000000008d400000, 0x000000008d400000, 0x000000008d500000|  0%| F|  |TAMS 0x000000008d400000, 0x000000008d400000| Untracked 
+|  71|0x000000008d500000, 0x000000008d500000, 0x000000008d600000|  0%| F|  |TAMS 0x000000008d500000, 0x000000008d500000| Untracked 
+|  72|0x000000008d600000, 0x000000008d600000, 0x000000008d700000|  0%| F|  |TAMS 0x000000008d600000, 0x000000008d600000| Untracked 
+|  73|0x000000008d700000, 0x000000008d700000, 0x000000008d800000|  0%| F|  |TAMS 0x000000008d700000, 0x000000008d700000| Untracked 
+|  74|0x000000008d800000, 0x000000008d800000, 0x000000008d900000|  0%| F|  |TAMS 0x000000008d800000, 0x000000008d800000| Untracked 
+|  75|0x000000008d900000, 0x000000008d900000, 0x000000008da00000|  0%| F|  |TAMS 0x000000008d900000, 0x000000008d900000| Untracked 
+|  76|0x000000008da00000, 0x000000008da00000, 0x000000008db00000|  0%| F|  |TAMS 0x000000008da00000, 0x000000008da00000| Untracked 
+|  77|0x000000008db00000, 0x000000008db00000, 0x000000008dc00000|  0%| F|  |TAMS 0x000000008db00000, 0x000000008db00000| Untracked 
+|  78|0x000000008dc00000, 0x000000008dc00000, 0x000000008dd00000|  0%| F|  |TAMS 0x000000008dc00000, 0x000000008dc00000| Untracked 
+|  79|0x000000008dd00000, 0x000000008dd00000, 0x000000008de00000|  0%| F|  |TAMS 0x000000008dd00000, 0x000000008dd00000| Untracked 
+|  80|0x000000008de00000, 0x000000008de00000, 0x000000008df00000|  0%| F|  |TAMS 0x000000008de00000, 0x000000008de00000| Untracked 
+|  81|0x000000008df00000, 0x000000008df00000, 0x000000008e000000|  0%| F|  |TAMS 0x000000008df00000, 0x000000008df00000| Untracked 
+|  82|0x000000008e000000, 0x000000008e000000, 0x000000008e100000|  0%| F|  |TAMS 0x000000008e000000, 0x000000008e000000| Untracked 
+|  83|0x000000008e100000, 0x000000008e100000, 0x000000008e200000|  0%| F|  |TAMS 0x000000008e100000, 0x000000008e100000| Untracked 
+|  84|0x000000008e200000, 0x000000008e200000, 0x000000008e300000|  0%| F|  |TAMS 0x000000008e200000, 0x000000008e200000| Untracked 
+|  85|0x000000008e300000, 0x000000008e300000, 0x000000008e400000|  0%| F|  |TAMS 0x000000008e300000, 0x000000008e300000| Untracked 
+|  86|0x000000008e400000, 0x000000008e400000, 0x000000008e500000|  0%| F|  |TAMS 0x000000008e400000, 0x000000008e400000| Untracked 
+|  87|0x000000008e500000, 0x000000008e500000, 0x000000008e600000|  0%| F|  |TAMS 0x000000008e500000, 0x000000008e500000| Untracked 
+|  88|0x000000008e600000, 0x000000008e600000, 0x000000008e700000|  0%| F|  |TAMS 0x000000008e600000, 0x000000008e600000| Untracked 
+|  89|0x000000008e700000, 0x000000008e700000, 0x000000008e800000|  0%| F|  |TAMS 0x000000008e700000, 0x000000008e700000| Untracked 
+|  90|0x000000008e800000, 0x000000008e800000, 0x000000008e900000|  0%| F|  |TAMS 0x000000008e800000, 0x000000008e800000| Untracked 
+|  91|0x000000008e900000, 0x000000008e900000, 0x000000008ea00000|  0%| F|  |TAMS 0x000000008e900000, 0x000000008e900000| Untracked 
+|  92|0x000000008ea00000, 0x000000008ea00000, 0x000000008eb00000|  0%| F|  |TAMS 0x000000008ea00000, 0x000000008ea00000| Untracked 
+|  93|0x000000008eb00000, 0x000000008eb00000, 0x000000008ec00000|  0%| F|  |TAMS 0x000000008eb00000, 0x000000008eb00000| Untracked 
+|  94|0x000000008ec00000, 0x000000008ec00000, 0x000000008ed00000|  0%| F|  |TAMS 0x000000008ec00000, 0x000000008ec00000| Untracked 
+|  95|0x000000008ed00000, 0x000000008ed00000, 0x000000008ee00000|  0%| F|  |TAMS 0x000000008ed00000, 0x000000008ed00000| Untracked 
+|  96|0x000000008ee00000, 0x000000008ee00000, 0x000000008ef00000|  0%| F|  |TAMS 0x000000008ee00000, 0x000000008ee00000| Untracked 
+|  97|0x000000008ef00000, 0x000000008ef00000, 0x000000008f000000|  0%| F|  |TAMS 0x000000008ef00000, 0x000000008ef00000| Untracked 
+|  98|0x000000008f000000, 0x000000008f000000, 0x000000008f100000|  0%| F|  |TAMS 0x000000008f000000, 0x000000008f000000| Untracked 
+|  99|0x000000008f100000, 0x000000008f100000, 0x000000008f200000|  0%| F|  |TAMS 0x000000008f100000, 0x000000008f100000| Untracked 
+| 100|0x000000008f200000, 0x000000008f200000, 0x000000008f300000|  0%| F|  |TAMS 0x000000008f200000, 0x000000008f200000| Untracked 
+| 101|0x000000008f300000, 0x000000008f300000, 0x000000008f400000|  0%| F|  |TAMS 0x000000008f300000, 0x000000008f300000| Untracked 
+| 102|0x000000008f400000, 0x000000008f400000, 0x000000008f500000|  0%| F|  |TAMS 0x000000008f400000, 0x000000008f400000| Untracked 
+| 103|0x000000008f500000, 0x000000008f500000, 0x000000008f600000|  0%| F|  |TAMS 0x000000008f500000, 0x000000008f500000| Untracked 
+| 104|0x000000008f600000, 0x000000008f600000, 0x000000008f700000|  0%| F|  |TAMS 0x000000008f600000, 0x000000008f600000| Untracked 
+| 105|0x000000008f700000, 0x000000008f700000, 0x000000008f800000|  0%| F|  |TAMS 0x000000008f700000, 0x000000008f700000| Untracked 
+| 106|0x000000008f800000, 0x000000008f800000, 0x000000008f900000|  0%| F|  |TAMS 0x000000008f800000, 0x000000008f800000| Untracked 
+| 107|0x000000008f900000, 0x000000008f900000, 0x000000008fa00000|  0%| F|  |TAMS 0x000000008f900000, 0x000000008f900000| Untracked 
+| 108|0x000000008fa00000, 0x000000008fa00000, 0x000000008fb00000|  0%| F|  |TAMS 0x000000008fa00000, 0x000000008fa00000| Untracked 
+| 109|0x000000008fb00000, 0x000000008fb80800, 0x000000008fc00000| 50%| E|  |TAMS 0x000000008fb00000, 0x000000008fb00000| Complete 
+| 110|0x000000008fc00000, 0x000000008fd00000, 0x000000008fd00000|100%| E|CS|TAMS 0x000000008fc00000, 0x000000008fc00000| Complete 
+| 111|0x000000008fd00000, 0x000000008fe00000, 0x000000008fe00000|100%| E|CS|TAMS 0x000000008fd00000, 0x000000008fd00000| Complete 
+| 112|0x000000008fe00000, 0x000000008ff00000, 0x000000008ff00000|100%| E|CS|TAMS 0x000000008fe00000, 0x000000008fe00000| Complete 
+| 113|0x000000008ff00000, 0x0000000090000000, 0x0000000090000000|100%| E|CS|TAMS 0x000000008ff00000, 0x000000008ff00000| Complete 
+| 114|0x0000000090000000, 0x0000000090100000, 0x0000000090100000|100%| E|CS|TAMS 0x0000000090000000, 0x0000000090000000| Complete 
+| 115|0x0000000090100000, 0x0000000090200000, 0x0000000090200000|100%| E|CS|TAMS 0x0000000090100000, 0x0000000090100000| Complete 
+| 116|0x0000000090200000, 0x0000000090300000, 0x0000000090300000|100%| E|CS|TAMS 0x0000000090200000, 0x0000000090200000| Complete 
+| 117|0x0000000090300000, 0x0000000090400000, 0x0000000090400000|100%| E|CS|TAMS 0x0000000090300000, 0x0000000090300000| Complete 
+| 118|0x0000000090400000, 0x0000000090500000, 0x0000000090500000|100%| E|CS|TAMS 0x0000000090400000, 0x0000000090400000| Complete 
+| 119|0x0000000090500000, 0x0000000090600000, 0x0000000090600000|100%| E|CS|TAMS 0x0000000090500000, 0x0000000090500000| Complete 
+|1904|0x00000000ffe00000, 0x00000000ffe48000, 0x00000000fff00000| 28%|OA|  |TAMS 0x00000000ffe00000, 0x00000000ffe00000| Untracked 
+|1905|0x00000000fff00000, 0x00000000fff6c000, 0x0000000100000000| 42%|CA|  |TAMS 0x00000000fff00000, 0x00000000fff00000| Untracked 
+
+Card table byte_map: [0x00007f9aaf88e000,0x00007f9aafc47000] _byte_map_base: 0x00007f9aaf447000
+
+Marking Bits (Prev, Next): (CMBitMap*) 0x00007f9acc056cc8, (CMBitMap*) 0x00007f9acc056d00
+ Prev Bits: [0x00007f9aad70d000, 0x00007f9aaf4d5000)
+ Next Bits: [0x00007f9aab945000, 0x00007f9aad70d000)
+
+Polling page: 0x00007f9ad216c000
+
+Metaspace:
+
+Usage:
+  Non-class:      9.58 MB capacity,     7.74 MB ( 81%) used,     1.82 MB ( 19%) free+waste,    11.69 KB ( <1%) overhead. 
+      Class:    928.00 KB capacity,   699.74 KB ( 75%) used,   224.07 KB ( 24%) free+waste,     4.19 KB ( <1%) overhead. 
+       Both:     10.48 MB capacity,     8.42 MB ( 80%) used,     2.04 MB ( 19%) free+waste,    15.88 KB ( <1%) overhead. 
+
+Virtual space:
+  Non-class space:       10.00 MB reserved,       9.75 MB ( 98%) committed 
+      Class space:        1.00 GB reserved,       1.00 MB ( <1%) committed 
+             Both:        1.01 GB reserved,      10.75 MB (  1%) committed 
+
+Chunk freelists:
+   Non-Class:  87.00 KB
+       Class:  0 bytes
+        Both:  87.00 KB
+
+MaxMetaspaceSize: unlimited
+CompressedClassSpaceSize: 1.00 GB
+Initial GC threshold: 20.80 MB
+Current GC threshold: 20.80 MB
+CDS: on
+
+CodeHeap 'non-profiled nmethods': size=120032Kb used=1364Kb max_used=1364Kb free=118667Kb
+ bounds [0x00007f9abc2a6000, 0x00007f9abc516000, 0x00007f9ac37de000]
+CodeHeap 'profiled nmethods': size=120028Kb used=4739Kb max_used=4739Kb free=115288Kb
+ bounds [0x00007f9ab4d6f000, 0x00007f9ab521f000, 0x00007f9abc2a6000]
+CodeHeap 'non-nmethods': size=5700Kb used=1139Kb max_used=1191Kb free=4560Kb
+ bounds [0x00007f9ab47de000, 0x00007f9ab4a4e000, 0x00007f9ab4d6f000]
+ total_blobs=2574 nmethods=2183 adapters=304
+ compilation: enabled
+              stopped_count=0, restarted_count=0
+ full_count=0
+
+Compilation events (20 events):
+Event: 14.372 Thread 0x00007f9a744a4800 2177       4       java.lang.CharacterDataLatin1::toUpperCase (53 bytes)
+Event: 14.373 Thread 0x00007f9acc136000 2178       3       jdk.internal.loader.Resource::getByteBuffer (24 bytes)
+Event: 14.373 Thread 0x00007f9a744a4800 nmethod 2177 0x00007f9abc3faa10 code [0x00007f9abc3faba0, 0x00007f9abc3fac98]
+Event: 14.373 Thread 0x00007f9acc136000 nmethod 2178 0x00007f9ab520bb90 code [0x00007f9ab520bd80, 0x00007f9ab520c590]
+Event: 14.373 Thread 0x00007f9acc136000 2179       3       java.security.SecureClassLoader::defineClass (16 bytes)
+Event: 14.373 Thread 0x00007f9acc136000 nmethod 2179 0x00007f9ab520c710 code [0x00007f9ab520c8e0, 0x00007f9ab520ca90]
+Event: 14.377 Thread 0x00007f9acc136000 2180       3       java.io.FileInputStream::<init> (122 bytes)
+Event: 14.377 Thread 0x00007f9acc136000 nmethod 2180 0x00007f9ab520cb90 code [0x00007f9ab520ce20, 0x00007f9ab520d8f0]
+Event: 14.378 Thread 0x00007f9acc136000 2181       3       java.io.FileInputStream::open (6 bytes)
+Event: 14.378 Thread 0x00007f9acc136000 nmethod 2181 0x00007f9ab520dc90 code [0x00007f9ab520de40, 0x00007f9ab520df80]
+Event: 14.378 Thread 0x00007f9acc136000 2183   !   3       java.io.FileInputStream::close (69 bytes)
+Event: 14.378 Thread 0x00007f9acc136000 nmethod 2183 0x00007f9ab520e010 code [0x00007f9ab520e200, 0x00007f9ab520e810]
+Event: 14.378 Thread 0x00007f9acc136000 2184       3       jdk.internal.loader.URLClassPath$FileLoader$1::getCodeSourceURL (8 bytes)
+Event: 14.378 Thread 0x00007f9acc136000 nmethod 2184 0x00007f9ab520ea10 code [0x00007f9ab520ebc0, 0x00007f9ab520ed90]
+Event: 14.378 Thread 0x00007f9acc136000 2185       3       jdk.internal.loader.URLClassPath$FileLoader$1::getInputStream (12 bytes)
+Event: 14.379 Thread 0x00007f9acc136000 nmethod 2185 0x00007f9ab520ee90 code [0x00007f9ab520f040, 0x00007f9ab520f200]
+Event: 14.383 Thread 0x00007f9acc136000 2186       3       jdk.internal.reflect.ReflectionFactory::copyField (10 bytes)
+Event: 14.383 Thread 0x00007f9acc136000 nmethod 2186 0x00007f9ab520f290 code [0x00007f9ab520f480, 0x00007f9ab520f7c0]
+Event: 14.383 Thread 0x00007f9acc136000 2187       3       java.lang.reflect.ReflectAccess::copyField (5 bytes)
+Event: 14.384 Thread 0x00007f9acc136000 nmethod 2187 0x00007f9ab520f910 code [0x00007f9ab520fac0, 0x00007f9ab520fc00]
+
+GC Heap History (4 events):
+Event: 11.791 GC heap before
+{Heap before GC invocations=0 (full 0):
+ garbage-first heap   total 124928K, used 24272K [0x0000000088e00000, 0x0000000100000000)
+  region size 1024K, 24 young (24576K), 0 survivors (0K)
+ Metaspace       used 6064K, capacity 8169K, committed 8448K, reserved 1056768K
+  class space    used 495K, capacity 716K, committed 768K, reserved 1048576K
+}
+Event: 11.798 GC heap after
+{Heap after GC invocations=1 (full 0):
+ garbage-first heap   total 124928K, used 6049K [0x0000000088e00000, 0x0000000100000000)
+  region size 1024K, 3 young (3072K), 3 survivors (3072K)
+ Metaspace       used 6064K, capacity 8169K, committed 8448K, reserved 1056768K
+  class space    used 495K, capacity 716K, committed 768K, reserved 1048576K
+}
+Event: 14.169 GC heap before
+{Heap before GC invocations=1 (full 0):
+ garbage-first heap   total 124928K, used 76705K [0x0000000088e00000, 0x0000000100000000)
+  region size 1024K, 72 young (73728K), 3 survivors (3072K)
+ Metaspace       used 7336K, capacity 9426K, committed 9856K, reserved 1058816K
+  class space    used 584K, capacity 812K, committed 896K, reserved 1048576K
+}
+Event: 14.182 GC heap after
+{Heap after GC invocations=2 (full 0):
+ garbage-first heap   total 124928K, used 6237K [0x0000000088e00000, 0x0000000100000000)
+  region size 1024K, 4 young (4096K), 4 survivors (4096K)
+ Metaspace       used 7336K, capacity 9426K, committed 9856K, reserved 1058816K
+  class space    used 584K, capacity 812K, committed 896K, reserved 1048576K
+}
+
+Deoptimization events (20 events):
+Event: 14.334 Thread 0x00007f9acc017000 Uncommon trap: trap_request=0xffffffde fr.pc=0x00007f9abc365c00 relative=0x0000000000000580
+Event: 14.334 Thread 0x00007f9acc017000 Uncommon trap: reason=class_check action=maybe_recompile pc=0x00007f9abc365c00 method=java.util.Formatter$FormatSpecifier.appendJustified(Ljava/lang/Appendable;Ljava/lang/CharSequence;)Ljava/lang/Appendable; @ 10 c2
+Event: 14.334 Thread 0x00007f9acc017000 DEOPT PACKING pc=0x00007f9abc365c00 sp=0x00007f9ad09054c0
+Event: 14.334 Thread 0x00007f9acc017000 DEOPT UNPACKING pc=0x00007f9ab4827ea5 sp=0x00007f9ad09053b8 mode 2
+Event: 14.345 Thread 0x00007f9acc017000 Uncommon trap: trap_request=0xffffff4d fr.pc=0x00007f9abc308f64 relative=0x0000000000000124
+Event: 14.345 Thread 0x00007f9acc017000 Uncommon trap: reason=unstable_if action=reinterpret pc=0x00007f9abc308f64 method=java.io.UnixFileSystem.normalize(Ljava/lang/String;)Ljava/lang/String; @ 60 c2
+Event: 14.345 Thread 0x00007f9acc017000 DEOPT PACKING pc=0x00007f9abc308f64 sp=0x00007f9ad0901d90
+Event: 14.345 Thread 0x00007f9acc017000 DEOPT UNPACKING pc=0x00007f9ab4827ea5 sp=0x00007f9ad0901d38 mode 2
+Event: 14.345 Thread 0x00007f9acc017000 Uncommon trap: trap_request=0xffffffde fr.pc=0x00007f9abc31d6dc relative=0x000000000000089c
+Event: 14.346 Thread 0x00007f9acc017000 Uncommon trap: reason=class_check action=maybe_recompile pc=0x00007f9abc31d6dc method=jdk.internal.loader.URLClassPath.getLoader(I)Ljdk/internal/loader/URLClassPath$Loader; @ 88 c2
+Event: 14.346 Thread 0x00007f9acc017000 DEOPT PACKING pc=0x00007f9abc31d6dc sp=0x00007f9ad09036c0
+Event: 14.346 Thread 0x00007f9acc017000 DEOPT UNPACKING pc=0x00007f9ab4827ea5 sp=0x00007f9ad0903680 mode 2
+Event: 14.347 Thread 0x00007f9acc017000 Uncommon trap: trap_request=0xffffffde fr.pc=0x00007f9abc31d6dc relative=0x000000000000089c
+Event: 14.348 Thread 0x00007f9acc017000 Uncommon trap: reason=class_check action=maybe_recompile pc=0x00007f9abc31d6dc method=jdk.internal.loader.URLClassPath.getLoader(I)Ljdk/internal/loader/URLClassPath$Loader; @ 88 c2
+Event: 14.348 Thread 0x00007f9acc017000 DEOPT PACKING pc=0x00007f9abc31d6dc sp=0x00007f9ad0900780
+Event: 14.348 Thread 0x00007f9acc017000 DEOPT UNPACKING pc=0x00007f9ab4827ea5 sp=0x00007f9ad0900740 mode 2
+Event: 14.380 Thread 0x00007f9acc017000 Uncommon trap: trap_request=0xffffff4d fr.pc=0x00007f9abc3fac5c relative=0x00000000000000bc
+Event: 14.380 Thread 0x00007f9acc017000 Uncommon trap: reason=unstable_if action=reinterpret pc=0x00007f9abc3fac5c method=java.lang.CharacterDataLatin1.toUpperCase(I)I @ 12 c2
+Event: 14.380 Thread 0x00007f9acc017000 DEOPT PACKING pc=0x00007f9abc3fac5c sp=0x00007f9ad0903360
+Event: 14.380 Thread 0x00007f9acc017000 DEOPT UNPACKING pc=0x00007f9ab4827ea5 sp=0x00007f9ad09032f8 mode 2
+
+Classes redefined (0 events):
+No events
+
+Internal exceptions (10 events):
+Event: 0.382 Thread 0x00007f9acc017000 Implicit null exception at 0x00007f9abc2d7137 to 0x00007f9abc2d7228
+Event: 14.204 Thread 0x00007f9acc017000 Exception <a 'sun/nio/fs/UnixException'{0x0000000090374d40}> (0x0000000090374d40) thrown at [src/hotspot/share/prims/jni.cpp, line 617]
+Event: 14.204 Thread 0x00007f9acc017000 Exception <a 'sun/nio/fs/UnixException'{0x00000000903754f0}> (0x00000000903754f0) thrown at [src/hotspot/share/prims/jni.cpp, line 617]
+Event: 14.204 Thread 0x00007f9acc017000 Exception <a 'sun/nio/fs/UnixException'{0x0000000090375950}> (0x0000000090375950) thrown at [src/hotspot/share/prims/jni.cpp, line 617]
+Event: 14.204 Thread 0x00007f9acc017000 Exception <a 'sun/nio/fs/UnixException'{0x0000000090375da0}> (0x0000000090375da0) thrown at [src/hotspot/share/prims/jni.cpp, line 617]
+Event: 14.219 Thread 0x00007f9acc017000 Exception <a 'sun/nio/fs/UnixException'{0x00000000903cee90}> (0x00000000903cee90) thrown at [src/hotspot/share/prims/jni.cpp, line 617]
+Event: 14.219 Thread 0x00007f9acc017000 Exception <a 'sun/nio/fs/UnixException'{0x00000000903cf318}> (0x00000000903cf318) thrown at [src/hotspot/share/prims/jni.cpp, line 617]
+Event: 14.244 Thread 0x00007f9acc017000 Exception <a 'sun/nio/fs/UnixException'{0x00000000902865d8}> (0x00000000902865d8) thrown at [src/hotspot/share/prims/jni.cpp, line 617]
+Event: 14.244 Thread 0x00007f9acc017000 Exception <a 'sun/nio/fs/UnixException'{0x0000000090286a60}> (0x0000000090286a60) thrown at [src/hotspot/share/prims/jni.cpp, line 617]
+Event: 14.325 Thread 0x00007f9acc017000 Exception <a 'java/lang/NoSuchMethodError'{0x000000008fed7650}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeSpecial(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x000000008fed7650) thrown at [src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+
+Events (20 events):
+Event: 14.327 loading class com/alibaba/fastffi/llvm4jni/body/LibraryClass done
+Event: 14.328 Loaded shared library /tmp/fastffi-libllvm4jni.so7874088872577221440/libllvm4jni.so
+Event: 14.328 Loaded shared library /tmp/fastffi-libllvm4jni.so7874088872577221440/libllvm4jni.so
+Event: 14.334 loading class com/alibaba/fastffi/llvm4jni/BytecodeVerifier
+Event: 14.334 loading class com/alibaba/fastffi/llvm4jni/BytecodeVerifier done
+Event: 14.335 loading class java/lang/VerifyError
+Event: 14.335 loading class java/lang/VerifyError done
+Event: 14.335 loading class com/alibaba/fastffi/llvm4jni/BytecodeVerifier$VerifierClassLoader
+Event: 14.335 loading class com/alibaba/fastffi/llvm4jni/BytecodeVerifier$VerifierClassLoader done
+Event: 14.345 loading class java/net/URLClassLoader$1
+Event: 14.345 loading class java/net/URLClassLoader$1 done
+Event: 14.345 Executing VM operation: RevokeBias
+Event: 14.346 Executing VM operation: RevokeBias done
+Event: 14.346 loading class java/io/FilePermissionCollection
+Event: 14.347 loading class java/io/FilePermissionCollection done
+Event: 14.347 loading class java/io/FilePermissionCollection$1
+Event: 14.347 loading class java/io/FilePermissionCollection$1 done
+Event: 14.347 Executing VM operation: RevokeBias
+Event: 14.347 Executing VM operation: RevokeBias done
+Event: 14.367 Loaded shared library /usr/lib/jvm/java-11-openjdk-amd64/lib/server/libjvm.so
+
+
+Dynamic libraries:
+88e00000-90600000 rw-p 00000000 00:00 0 
+90600000-ffe00000 ---p 00000000 00:00 0 
+ffe00000-ffe48000 rw-p 00b13000 08:20 70573                              /usr/lib/jvm/java-11-openjdk-amd64/lib/server/classes.jsa
+ffe48000-fff00000 rw-p 00000000 00:00 0 
+fff00000-fff6c000 rw-p 00aa7000 08:20 70573                              /usr/lib/jvm/java-11-openjdk-amd64/lib/server/classes.jsa
+fff6c000-100000000 rw-p 00000000 00:00 0 
+800000000-800002000 rwxp 00001000 08:20 70573                            /usr/lib/jvm/java-11-openjdk-amd64/lib/server/classes.jsa
+800002000-8003ce000 rw-p 00003000 08:20 70573                            /usr/lib/jvm/java-11-openjdk-amd64/lib/server/classes.jsa
+8003ce000-800aa5000 r--p 003cf000 08:20 70573                            /usr/lib/jvm/java-11-openjdk-amd64/lib/server/classes.jsa
+800aa5000-800aa6000 rw-p 00aa6000 08:20 70573                            /usr/lib/jvm/java-11-openjdk-amd64/lib/server/classes.jsa
+840000000-840100000 rw-p 00000000 00:00 0 
+840100000-880000000 ---p 00000000 00:00 0 
+56361333b000-56361333c000 r--p 00000000 08:20 358667                     /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+56361333c000-56361333d000 r-xp 00001000 08:20 358667                     /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+56361333d000-56361333e000 r--p 00002000 08:20 358667                     /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+56361333e000-56361333f000 r--p 00002000 08:20 358667                     /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+56361333f000-563613340000 rw-p 00003000 08:20 358667                     /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+5636134f6000-563613517000 rw-p 00000000 00:00 0                          [heap]
+7f99954db000-7f99968dc000 r--p 00000000 08:20 504340                     /tmp/fastffi-libllvm4jni.so245052435916701561/libllvm4jni.so
+7f99968dc000-7f9997648000 r-xp 01400000 08:20 504340                     /tmp/fastffi-libllvm4jni.so245052435916701561/libllvm4jni.so
+7f9997648000-7f9997857000 r--p 0216b000 08:20 504340                     /tmp/fastffi-libllvm4jni.so245052435916701561/libllvm4jni.so
+7f9997857000-7f9997889000 rw-p 02379000 08:20 504340                     /tmp/fastffi-libllvm4jni.so245052435916701561/libllvm4jni.so
+7f9997889000-7f9997892000 rw-p 00000000 00:00 0 
+7f9997892000-7f9998c93000 r--p 00000000 08:20 504336                     /tmp/fastffi-libllvm4jni.so13297463022861599200/libllvm4jni.so
+7f9998c93000-7f99999ff000 r-xp 01400000 08:20 504336                     /tmp/fastffi-libllvm4jni.so13297463022861599200/libllvm4jni.so
+7f99999ff000-7f9999c0e000 r--p 0216b000 08:20 504336                     /tmp/fastffi-libllvm4jni.so13297463022861599200/libllvm4jni.so
+7f9999c0e000-7f9999c40000 rw-p 02379000 08:20 504336                     /tmp/fastffi-libllvm4jni.so13297463022861599200/libllvm4jni.so
+7f9999c40000-7f9999c49000 rw-p 00000000 00:00 0 
+7f9999c49000-7f999b04a000 r--p 00000000 08:20 504332                     /tmp/fastffi-libllvm4jni.so2280578942097159767/libllvm4jni.so
+7f999b04a000-7f999bdb6000 r-xp 01400000 08:20 504332                     /tmp/fastffi-libllvm4jni.so2280578942097159767/libllvm4jni.so
+7f999bdb6000-7f999bfc5000 r--p 0216b000 08:20 504332                     /tmp/fastffi-libllvm4jni.so2280578942097159767/libllvm4jni.so
+7f999bfc5000-7f999bff7000 rw-p 02379000 08:20 504332                     /tmp/fastffi-libllvm4jni.so2280578942097159767/libllvm4jni.so
+7f999bff7000-7f999c000000 rw-p 00000000 00:00 0 
+7f999c000000-7f999cbf1000 rw-p 00000000 00:00 0 
+7f999cbf1000-7f99a0000000 ---p 00000000 00:00 0 
+7f99a01f5000-7f99a15f6000 r--p 00000000 08:20 504328                     /tmp/fastffi-libllvm4jni.so10583682769647744164/libllvm4jni.so
+7f99a15f6000-7f99a2362000 r-xp 01400000 08:20 504328                     /tmp/fastffi-libllvm4jni.so10583682769647744164/libllvm4jni.so
+7f99a2362000-7f99a2571000 r--p 0216b000 08:20 504328                     /tmp/fastffi-libllvm4jni.so10583682769647744164/libllvm4jni.so
+7f99a2571000-7f99a25a3000 rw-p 02379000 08:20 504328                     /tmp/fastffi-libllvm4jni.so10583682769647744164/libllvm4jni.so
+7f99a25a3000-7f99a25ac000 rw-p 00000000 00:00 0 
+7f99a25ac000-7f99a39ad000 r--p 00000000 08:20 504324                     /tmp/fastffi-libllvm4jni.so1581138767601961097/libllvm4jni.so
+7f99a39ad000-7f99a4719000 r-xp 01400000 08:20 504324                     /tmp/fastffi-libllvm4jni.so1581138767601961097/libllvm4jni.so
+7f99a4719000-7f99a4928000 r--p 0216b000 08:20 504324                     /tmp/fastffi-libllvm4jni.so1581138767601961097/libllvm4jni.so
+7f99a4928000-7f99a495a000 rw-p 02379000 08:20 504324                     /tmp/fastffi-libllvm4jni.so1581138767601961097/libllvm4jni.so
+7f99a495a000-7f99a4963000 rw-p 00000000 00:00 0 
+7f99a4963000-7f99a5d64000 r--p 00000000 08:20 504319                     /tmp/fastffi-libllvm4jni.so8155959483334286676/libllvm4jni.so
+7f99a5d64000-7f99a6ad0000 r-xp 01400000 08:20 504319                     /tmp/fastffi-libllvm4jni.so8155959483334286676/libllvm4jni.so
+7f99a6ad0000-7f99a6cdf000 r--p 0216b000 08:20 504319                     /tmp/fastffi-libllvm4jni.so8155959483334286676/libllvm4jni.so
+7f99a6cdf000-7f99a6d11000 rw-p 02379000 08:20 504319                     /tmp/fastffi-libllvm4jni.so8155959483334286676/libllvm4jni.so
+7f99a6d11000-7f99a6d1a000 rw-p 00000000 00:00 0 
+7f99a6d1a000-7f99a811b000 r--p 00000000 08:20 504316                     /tmp/fastffi-libllvm4jni.so8108299361207337363/libllvm4jni.so
+7f99a811b000-7f99a8e87000 r-xp 01400000 08:20 504316                     /tmp/fastffi-libllvm4jni.so8108299361207337363/libllvm4jni.so
+7f99a8e87000-7f99a9096000 r--p 0216b000 08:20 504316                     /tmp/fastffi-libllvm4jni.so8108299361207337363/libllvm4jni.so
+7f99a9096000-7f99a90c8000 rw-p 02379000 08:20 504316                     /tmp/fastffi-libllvm4jni.so8108299361207337363/libllvm4jni.so
+7f99a90c8000-7f99a90d1000 rw-p 00000000 00:00 0 
+7f99a90d1000-7f99aa4d2000 r--p 00000000 08:20 504310                     /tmp/fastffi-libllvm4jni.so6092418619470006167/libllvm4jni.so
+7f99aa4d2000-7f99ab23e000 r-xp 01400000 08:20 504310                     /tmp/fastffi-libllvm4jni.so6092418619470006167/libllvm4jni.so
+7f99ab23e000-7f99ab44d000 r--p 0216b000 08:20 504310                     /tmp/fastffi-libllvm4jni.so6092418619470006167/libllvm4jni.so
+7f99ab44d000-7f99ab47f000 rw-p 02379000 08:20 504310                     /tmp/fastffi-libllvm4jni.so6092418619470006167/libllvm4jni.so
+7f99ab47f000-7f99ab488000 rw-p 00000000 00:00 0 
+7f99ab488000-7f99ac889000 r--p 00000000 08:20 504307                     /tmp/fastffi-libllvm4jni.so10648081558639265194/libllvm4jni.so
+7f99ac889000-7f99ad5f5000 r-xp 01400000 08:20 504307                     /tmp/fastffi-libllvm4jni.so10648081558639265194/libllvm4jni.so
+7f99ad5f5000-7f99ad804000 r--p 0216b000 08:20 504307                     /tmp/fastffi-libllvm4jni.so10648081558639265194/libllvm4jni.so
+7f99ad804000-7f99ad836000 rw-p 02379000 08:20 504307                     /tmp/fastffi-libllvm4jni.so10648081558639265194/libllvm4jni.so
+7f99ad836000-7f99ad83f000 rw-p 00000000 00:00 0 
+7f99ad83f000-7f99aec40000 r--p 00000000 08:20 504304                     /tmp/fastffi-libllvm4jni.so757447918454321052/libllvm4jni.so
+7f99aec40000-7f99af9ac000 r-xp 01400000 08:20 504304                     /tmp/fastffi-libllvm4jni.so757447918454321052/libllvm4jni.so
+7f99af9ac000-7f99afbbb000 r--p 0216b000 08:20 504304                     /tmp/fastffi-libllvm4jni.so757447918454321052/libllvm4jni.so
+7f99afbbb000-7f99afbed000 rw-p 02379000 08:20 504304                     /tmp/fastffi-libllvm4jni.so757447918454321052/libllvm4jni.so
+7f99afbed000-7f99afbf6000 rw-p 00000000 00:00 0 
+7f99afbf6000-7f99b0ff7000 r--p 00000000 08:20 504300                     /tmp/fastffi-libllvm4jni.so15688066033472439910/libllvm4jni.so
+7f99b0ff7000-7f99b1d63000 r-xp 01400000 08:20 504300                     /tmp/fastffi-libllvm4jni.so15688066033472439910/libllvm4jni.so
+7f99b1d63000-7f99b1f72000 r--p 0216b000 08:20 504300                     /tmp/fastffi-libllvm4jni.so15688066033472439910/libllvm4jni.so
+7f99b1f72000-7f99b1fa4000 rw-p 02379000 08:20 504300                     /tmp/fastffi-libllvm4jni.so15688066033472439910/libllvm4jni.so
+7f99b1fa4000-7f99b1fad000 rw-p 00000000 00:00 0 
+7f99b1fad000-7f99b33ae000 r--p 00000000 08:20 504294                     /tmp/fastffi-libllvm4jni.so12757736840584491022/libllvm4jni.so
+7f99b33ae000-7f99b411a000 r-xp 01400000 08:20 504294                     /tmp/fastffi-libllvm4jni.so12757736840584491022/libllvm4jni.so
+7f99b411a000-7f99b4329000 r--p 0216b000 08:20 504294                     /tmp/fastffi-libllvm4jni.so12757736840584491022/libllvm4jni.so
+7f99b4329000-7f99b435b000 rw-p 02379000 08:20 504294                     /tmp/fastffi-libllvm4jni.so12757736840584491022/libllvm4jni.so
+7f99b435b000-7f99b4364000 rw-p 00000000 00:00 0 
+7f99b4364000-7f99b5765000 r--p 00000000 08:20 504291                     /tmp/fastffi-libllvm4jni.so16357251326027048553/libllvm4jni.so
+7f99b5765000-7f99b64d1000 r-xp 01400000 08:20 504291                     /tmp/fastffi-libllvm4jni.so16357251326027048553/libllvm4jni.so
+7f99b64d1000-7f99b66e0000 r--p 0216b000 08:20 504291                     /tmp/fastffi-libllvm4jni.so16357251326027048553/libllvm4jni.so
+7f99b66e0000-7f99b6712000 rw-p 02379000 08:20 504291                     /tmp/fastffi-libllvm4jni.so16357251326027048553/libllvm4jni.so
+7f99b6712000-7f99b671b000 rw-p 00000000 00:00 0 
+7f99b671b000-7f99b7b1c000 r--p 00000000 08:20 504286                     /tmp/fastffi-libllvm4jni.so10100657818773308955/libllvm4jni.so
+7f99b7b1c000-7f99b8888000 r-xp 01400000 08:20 504286                     /tmp/fastffi-libllvm4jni.so10100657818773308955/libllvm4jni.so
+7f99b8888000-7f99b8a97000 r--p 0216b000 08:20 504286                     /tmp/fastffi-libllvm4jni.so10100657818773308955/libllvm4jni.so
+7f99b8a97000-7f99b8ac9000 rw-p 02379000 08:20 504286                     /tmp/fastffi-libllvm4jni.so10100657818773308955/libllvm4jni.so
+7f99b8ac9000-7f99b8ad2000 rw-p 00000000 00:00 0 
+7f99b8ad2000-7f99b9ed3000 r--p 00000000 08:20 504284                     /tmp/fastffi-libllvm4jni.so12538568512044821020/libllvm4jni.so
+7f99b9ed3000-7f99bac3f000 r-xp 01400000 08:20 504284                     /tmp/fastffi-libllvm4jni.so12538568512044821020/libllvm4jni.so
+7f99bac3f000-7f99bae4e000 r--p 0216b000 08:20 504284                     /tmp/fastffi-libllvm4jni.so12538568512044821020/libllvm4jni.so
+7f99bae4e000-7f99bae80000 rw-p 02379000 08:20 504284                     /tmp/fastffi-libllvm4jni.so12538568512044821020/libllvm4jni.so
+7f99bae80000-7f99bae89000 rw-p 00000000 00:00 0 
+7f99bae89000-7f99bc28a000 r--p 00000000 08:20 504279                     /tmp/fastffi-libllvm4jni.so6940238749166979877/libllvm4jni.so
+7f99bc28a000-7f99bcff6000 r-xp 01400000 08:20 504279                     /tmp/fastffi-libllvm4jni.so6940238749166979877/libllvm4jni.so
+7f99bcff6000-7f99bd205000 r--p 0216b000 08:20 504279                     /tmp/fastffi-libllvm4jni.so6940238749166979877/libllvm4jni.so
+7f99bd205000-7f99bd237000 rw-p 02379000 08:20 504279                     /tmp/fastffi-libllvm4jni.so6940238749166979877/libllvm4jni.so
+7f99bd237000-7f99bd240000 rw-p 00000000 00:00 0 
+7f99bd240000-7f99be641000 r--p 00000000 08:20 504275                     /tmp/fastffi-libllvm4jni.so15636209745255171265/libllvm4jni.so
+7f99be641000-7f99bf3ad000 r-xp 01400000 08:20 504275                     /tmp/fastffi-libllvm4jni.so15636209745255171265/libllvm4jni.so
+7f99bf3ad000-7f99bf5bc000 r--p 0216b000 08:20 504275                     /tmp/fastffi-libllvm4jni.so15636209745255171265/libllvm4jni.so
+7f99bf5bc000-7f99bf5ee000 rw-p 02379000 08:20 504275                     /tmp/fastffi-libllvm4jni.so15636209745255171265/libllvm4jni.so
+7f99bf5ee000-7f99bf5f7000 rw-p 00000000 00:00 0 
+7f99bf5f7000-7f99c09f8000 r--p 00000000 08:20 504272                     /tmp/fastffi-libllvm4jni.so5551964501659536242/libllvm4jni.so
+7f99c09f8000-7f99c1764000 r-xp 01400000 08:20 504272                     /tmp/fastffi-libllvm4jni.so5551964501659536242/libllvm4jni.so
+7f99c1764000-7f99c1973000 r--p 0216b000 08:20 504272                     /tmp/fastffi-libllvm4jni.so5551964501659536242/libllvm4jni.so
+7f99c1973000-7f99c19a5000 rw-p 02379000 08:20 504272                     /tmp/fastffi-libllvm4jni.so5551964501659536242/libllvm4jni.so
+7f99c19a5000-7f99c19ae000 rw-p 00000000 00:00 0 
+7f99c19ae000-7f99c2daf000 r--p 00000000 08:20 504268                     /tmp/fastffi-libllvm4jni.so839526260666347608/libllvm4jni.so
+7f99c2daf000-7f99c3b1b000 r-xp 01400000 08:20 504268                     /tmp/fastffi-libllvm4jni.so839526260666347608/libllvm4jni.so
+7f99c3b1b000-7f99c3d2a000 r--p 0216b000 08:20 504268                     /tmp/fastffi-libllvm4jni.so839526260666347608/libllvm4jni.so
+7f99c3d2a000-7f99c3d5c000 rw-p 02379000 08:20 504268                     /tmp/fastffi-libllvm4jni.so839526260666347608/libllvm4jni.so
+7f99c3d5c000-7f99c3d65000 rw-p 00000000 00:00 0 
+7f99c3d65000-7f99c5166000 r--p 00000000 08:20 504264                     /tmp/fastffi-libllvm4jni.so13074919418115130565/libllvm4jni.so
+7f99c5166000-7f99c5ed2000 r-xp 01400000 08:20 504264                     /tmp/fastffi-libllvm4jni.so13074919418115130565/libllvm4jni.so
+7f99c5ed2000-7f99c60e1000 r--p 0216b000 08:20 504264                     /tmp/fastffi-libllvm4jni.so13074919418115130565/libllvm4jni.so
+7f99c60e1000-7f99c6113000 rw-p 02379000 08:20 504264                     /tmp/fastffi-libllvm4jni.so13074919418115130565/libllvm4jni.so
+7f99c6113000-7f99c611c000 rw-p 00000000 00:00 0 
+7f99c611c000-7f99c751d000 r--p 00000000 08:20 504259                     /tmp/fastffi-libllvm4jni.so13997726261029279049/libllvm4jni.so
+7f99c751d000-7f99c8289000 r-xp 01400000 08:20 504259                     /tmp/fastffi-libllvm4jni.so13997726261029279049/libllvm4jni.so
+7f99c8289000-7f99c8498000 r--p 0216b000 08:20 504259                     /tmp/fastffi-libllvm4jni.so13997726261029279049/libllvm4jni.so
+7f99c8498000-7f99c84ca000 rw-p 02379000 08:20 504259                     /tmp/fastffi-libllvm4jni.so13997726261029279049/libllvm4jni.so
+7f99c84ca000-7f99c84d3000 rw-p 00000000 00:00 0 
+7f99c84d3000-7f99c98d4000 r--p 00000000 08:20 504254                     /tmp/fastffi-libllvm4jni.so17688709157132533829/libllvm4jni.so
+7f99c98d4000-7f99ca640000 r-xp 01400000 08:20 504254                     /tmp/fastffi-libllvm4jni.so17688709157132533829/libllvm4jni.so
+7f99ca640000-7f99ca84f000 r--p 0216b000 08:20 504254                     /tmp/fastffi-libllvm4jni.so17688709157132533829/libllvm4jni.so
+7f99ca84f000-7f99ca881000 rw-p 02379000 08:20 504254                     /tmp/fastffi-libllvm4jni.so17688709157132533829/libllvm4jni.so
+7f99ca881000-7f99ca88a000 rw-p 00000000 00:00 0 
+7f99ca88a000-7f99cbc8b000 r--p 00000000 08:20 504252                     /tmp/fastffi-libllvm4jni.so1706011851224847910/libllvm4jni.so
+7f99cbc8b000-7f99cc9f7000 r-xp 01400000 08:20 504252                     /tmp/fastffi-libllvm4jni.so1706011851224847910/libllvm4jni.so
+7f99cc9f7000-7f99ccc06000 r--p 0216b000 08:20 504252                     /tmp/fastffi-libllvm4jni.so1706011851224847910/libllvm4jni.so
+7f99ccc06000-7f99ccc38000 rw-p 02379000 08:20 504252                     /tmp/fastffi-libllvm4jni.so1706011851224847910/libllvm4jni.so
+7f99ccc38000-7f99ccc41000 rw-p 00000000 00:00 0 
+7f99ccc41000-7f99ce042000 r--p 00000000 08:20 504247                     /tmp/fastffi-libllvm4jni.so9475313039913842166/libllvm4jni.so
+7f99ce042000-7f99cedae000 r-xp 01400000 08:20 504247                     /tmp/fastffi-libllvm4jni.so9475313039913842166/libllvm4jni.so
+7f99cedae000-7f99cefbd000 r--p 0216b000 08:20 504247                     /tmp/fastffi-libllvm4jni.so9475313039913842166/libllvm4jni.so
+7f99cefbd000-7f99cefef000 rw-p 02379000 08:20 504247                     /tmp/fastffi-libllvm4jni.so9475313039913842166/libllvm4jni.so
+7f99cefef000-7f99ceff8000 rw-p 00000000 00:00 0 
+7f99ceff8000-7f99d03f9000 r--p 00000000 08:20 504236                     /tmp/fastffi-libllvm4jni.so6665167086095543755/libllvm4jni.so
+7f99d03f9000-7f99d1165000 r-xp 01400000 08:20 504236                     /tmp/fastffi-libllvm4jni.so6665167086095543755/libllvm4jni.so
+7f99d1165000-7f99d1374000 r--p 0216b000 08:20 504236                     /tmp/fastffi-libllvm4jni.so6665167086095543755/libllvm4jni.so
+7f99d1374000-7f99d13a6000 rw-p 02379000 08:20 504236                     /tmp/fastffi-libllvm4jni.so6665167086095543755/libllvm4jni.so
+7f99d13a6000-7f99d13af000 rw-p 00000000 00:00 0 
+7f99d13af000-7f99d27b0000 r--p 00000000 08:20 504234                     /tmp/fastffi-libllvm4jni.so18229734569965624249/libllvm4jni.so
+7f99d27b0000-7f99d351c000 r-xp 01400000 08:20 504234                     /tmp/fastffi-libllvm4jni.so18229734569965624249/libllvm4jni.so
+7f99d351c000-7f99d372b000 r--p 0216b000 08:20 504234                     /tmp/fastffi-libllvm4jni.so18229734569965624249/libllvm4jni.so
+7f99d372b000-7f99d375d000 rw-p 02379000 08:20 504234                     /tmp/fastffi-libllvm4jni.so18229734569965624249/libllvm4jni.so
+7f99d375d000-7f99d3766000 rw-p 00000000 00:00 0 
+7f99d3766000-7f99d4b67000 r--p 00000000 08:20 504232                     /tmp/fastffi-libllvm4jni.so12673601617953711639/libllvm4jni.so
+7f99d4b67000-7f99d58d3000 r-xp 01400000 08:20 504232                     /tmp/fastffi-libllvm4jni.so12673601617953711639/libllvm4jni.so
+7f99d58d3000-7f99d5ae2000 r--p 0216b000 08:20 504232                     /tmp/fastffi-libllvm4jni.so12673601617953711639/libllvm4jni.so
+7f99d5ae2000-7f99d5b14000 rw-p 02379000 08:20 504232                     /tmp/fastffi-libllvm4jni.so12673601617953711639/libllvm4jni.so
+7f99d5b14000-7f99d5b1d000 rw-p 00000000 00:00 0 
+7f99d5b1d000-7f99d6f1e000 r--p 00000000 08:20 504230                     /tmp/fastffi-libllvm4jni.so14943001497076662166/libllvm4jni.so
+7f99d6f1e000-7f99d7c8a000 r-xp 01400000 08:20 504230                     /tmp/fastffi-libllvm4jni.so14943001497076662166/libllvm4jni.so
+7f99d7c8a000-7f99d7e99000 r--p 0216b000 08:20 504230                     /tmp/fastffi-libllvm4jni.so14943001497076662166/libllvm4jni.so
+7f99d7e99000-7f99d7ecb000 rw-p 02379000 08:20 504230                     /tmp/fastffi-libllvm4jni.so14943001497076662166/libllvm4jni.so
+7f99d7ecb000-7f99d7ed4000 rw-p 00000000 00:00 0 
+7f99d7ed4000-7f99d92d5000 r--p 00000000 08:20 504224                     /tmp/fastffi-libllvm4jni.so14750601435422240218/libllvm4jni.so
+7f99d92d5000-7f99da041000 r-xp 01400000 08:20 504224                     /tmp/fastffi-libllvm4jni.so14750601435422240218/libllvm4jni.so
+7f99da041000-7f99da250000 r--p 0216b000 08:20 504224                     /tmp/fastffi-libllvm4jni.so14750601435422240218/libllvm4jni.so
+7f99da250000-7f99da282000 rw-p 02379000 08:20 504224                     /tmp/fastffi-libllvm4jni.so14750601435422240218/libllvm4jni.so
+7f99da282000-7f99da28b000 rw-p 00000000 00:00 0 
+7f99da28b000-7f99db68c000 r--p 00000000 08:20 504221                     /tmp/fastffi-libllvm4jni.so15641074588096524678/libllvm4jni.so
+7f99db68c000-7f99dc3f8000 r-xp 01400000 08:20 504221                     /tmp/fastffi-libllvm4jni.so15641074588096524678/libllvm4jni.so
+7f99dc3f8000-7f99dc607000 r--p 0216b000 08:20 504221                     /tmp/fastffi-libllvm4jni.so15641074588096524678/libllvm4jni.so
+7f99dc607000-7f99dc639000 rw-p 02379000 08:20 504221                     /tmp/fastffi-libllvm4jni.so15641074588096524678/libllvm4jni.so
+7f99dc639000-7f99dc642000 rw-p 00000000 00:00 0 
+7f99dc642000-7f99dda43000 r--p 00000000 08:20 504219                     /tmp/fastffi-libllvm4jni.so6918260173873083220/libllvm4jni.so
+7f99dda43000-7f99de7af000 r-xp 01400000 08:20 504219                     /tmp/fastffi-libllvm4jni.so6918260173873083220/libllvm4jni.so
+7f99de7af000-7f99de9be000 r--p 0216b000 08:20 504219                     /tmp/fastffi-libllvm4jni.so6918260173873083220/libllvm4jni.so
+7f99de9be000-7f99de9f0000 rw-p 02379000 08:20 504219                     /tmp/fastffi-libllvm4jni.so6918260173873083220/libllvm4jni.so
+7f99de9f0000-7f99de9f9000 rw-p 00000000 00:00 0 
+7f99de9f9000-7f99dfdfa000 r--p 00000000 08:20 504213                     /tmp/fastffi-libllvm4jni.so17117216089730105274/libllvm4jni.so
+7f99dfdfa000-7f99e0b66000 r-xp 01400000 08:20 504213                     /tmp/fastffi-libllvm4jni.so17117216089730105274/libllvm4jni.so
+7f99e0b66000-7f99e0d75000 r--p 0216b000 08:20 504213                     /tmp/fastffi-libllvm4jni.so17117216089730105274/libllvm4jni.so
+7f99e0d75000-7f99e0da7000 rw-p 02379000 08:20 504213                     /tmp/fastffi-libllvm4jni.so17117216089730105274/libllvm4jni.so
+7f99e0da7000-7f99e0db0000 rw-p 00000000 00:00 0 
+7f99e0db0000-7f99e21b1000 r--p 00000000 08:20 504202                     /tmp/fastffi-libllvm4jni.so7936943702027127134/libllvm4jni.so
+7f99e21b1000-7f99e2f1d000 r-xp 01400000 08:20 504202                     /tmp/fastffi-libllvm4jni.so7936943702027127134/libllvm4jni.so
+7f99e2f1d000-7f99e312c000 r--p 0216b000 08:20 504202                     /tmp/fastffi-libllvm4jni.so7936943702027127134/libllvm4jni.so
+7f99e312c000-7f99e315e000 rw-p 02379000 08:20 504202                     /tmp/fastffi-libllvm4jni.so7936943702027127134/libllvm4jni.so
+7f99e315e000-7f99e3167000 rw-p 00000000 00:00 0 
+7f99e3167000-7f99e4568000 r--p 00000000 08:20 504200                     /tmp/fastffi-libllvm4jni.so12549190008734659203/libllvm4jni.so
+7f99e4568000-7f99e52d4000 r-xp 01400000 08:20 504200                     /tmp/fastffi-libllvm4jni.so12549190008734659203/libllvm4jni.so
+7f99e52d4000-7f99e54e3000 r--p 0216b000 08:20 504200                     /tmp/fastffi-libllvm4jni.so12549190008734659203/libllvm4jni.so
+7f99e54e3000-7f99e5515000 rw-p 02379000 08:20 504200                     /tmp/fastffi-libllvm4jni.so12549190008734659203/libllvm4jni.so
+7f99e5515000-7f99e551e000 rw-p 00000000 00:00 0 
+7f99e551e000-7f99e691f000 r--p 00000000 08:20 504198                     /tmp/fastffi-libllvm4jni.so7923269435002781217/libllvm4jni.so
+7f99e691f000-7f99e768b000 r-xp 01400000 08:20 504198                     /tmp/fastffi-libllvm4jni.so7923269435002781217/libllvm4jni.so
+7f99e768b000-7f99e789a000 r--p 0216b000 08:20 504198                     /tmp/fastffi-libllvm4jni.so7923269435002781217/libllvm4jni.so
+7f99e789a000-7f99e78cc000 rw-p 02379000 08:20 504198                     /tmp/fastffi-libllvm4jni.so7923269435002781217/libllvm4jni.so
+7f99e78cc000-7f99e78d5000 rw-p 00000000 00:00 0 
+7f99e78d5000-7f99e8cd6000 r--p 00000000 08:20 504196                     /tmp/fastffi-libllvm4jni.so634078660856560475/libllvm4jni.so
+7f99e8cd6000-7f99e9a42000 r-xp 01400000 08:20 504196                     /tmp/fastffi-libllvm4jni.so634078660856560475/libllvm4jni.so
+7f99e9a42000-7f99e9c51000 r--p 0216b000 08:20 504196                     /tmp/fastffi-libllvm4jni.so634078660856560475/libllvm4jni.so
+7f99e9c51000-7f99e9c83000 rw-p 02379000 08:20 504196                     /tmp/fastffi-libllvm4jni.so634078660856560475/libllvm4jni.so
+7f99e9c83000-7f99e9c8c000 rw-p 00000000 00:00 0 
+7f99e9c8c000-7f99eb08d000 r--p 00000000 08:20 504191                     /tmp/fastffi-libllvm4jni.so16590786367426731533/libllvm4jni.so
+7f99eb08d000-7f99ebdf9000 r-xp 01400000 08:20 504191                     /tmp/fastffi-libllvm4jni.so16590786367426731533/libllvm4jni.so
+7f99ebdf9000-7f99ec008000 r--p 0216b000 08:20 504191                     /tmp/fastffi-libllvm4jni.so16590786367426731533/libllvm4jni.so
+7f99ec008000-7f99ec03a000 rw-p 02379000 08:20 504191                     /tmp/fastffi-libllvm4jni.so16590786367426731533/libllvm4jni.so
+7f99ec03a000-7f99ec043000 rw-p 00000000 00:00 0 
+7f99ec043000-7f99ed444000 r--p 00000000 08:20 504147                     /tmp/fastffi-libllvm4jni.so10412079453191200766/libllvm4jni.so
+7f99ed444000-7f99ee1b0000 r-xp 01400000 08:20 504147                     /tmp/fastffi-libllvm4jni.so10412079453191200766/libllvm4jni.so
+7f99ee1b0000-7f99ee3bf000 r--p 0216b000 08:20 504147                     /tmp/fastffi-libllvm4jni.so10412079453191200766/libllvm4jni.so
+7f99ee3bf000-7f99ee3f1000 rw-p 02379000 08:20 504147                     /tmp/fastffi-libllvm4jni.so10412079453191200766/libllvm4jni.so
+7f99ee3f1000-7f99ee3fa000 rw-p 00000000 00:00 0 
+7f99ee3fa000-7f99ef7fb000 r--p 00000000 08:20 504140                     /tmp/fastffi-libllvm4jni.so5530719850368596300/libllvm4jni.so
+7f99ef7fb000-7f99f0567000 r-xp 01400000 08:20 504140                     /tmp/fastffi-libllvm4jni.so5530719850368596300/libllvm4jni.so
+7f99f0567000-7f99f0776000 r--p 0216b000 08:20 504140                     /tmp/fastffi-libllvm4jni.so5530719850368596300/libllvm4jni.so
+7f99f0776000-7f99f07a8000 rw-p 02379000 08:20 504140                     /tmp/fastffi-libllvm4jni.so5530719850368596300/libllvm4jni.so
+7f99f07a8000-7f99f07b1000 rw-p 00000000 00:00 0 
+7f99f07b1000-7f99f1bb2000 r--p 00000000 08:20 504110                     /tmp/fastffi-libllvm4jni.so6763155620916878584/libllvm4jni.so
+7f99f1bb2000-7f99f291e000 r-xp 01400000 08:20 504110                     /tmp/fastffi-libllvm4jni.so6763155620916878584/libllvm4jni.so
+7f99f291e000-7f99f2b2d000 r--p 0216b000 08:20 504110                     /tmp/fastffi-libllvm4jni.so6763155620916878584/libllvm4jni.so
+7f99f2b2d000-7f99f2b5f000 rw-p 02379000 08:20 504110                     /tmp/fastffi-libllvm4jni.so6763155620916878584/libllvm4jni.so
+7f99f2b5f000-7f99f2b68000 rw-p 00000000 00:00 0 
+7f99f2b68000-7f99f3f69000 r--p 00000000 08:20 388294                     /tmp/fastffi-libllvm4jni.so16536712057417821441/libllvm4jni.so
+7f99f3f69000-7f99f4cd5000 r-xp 01400000 08:20 388294                     /tmp/fastffi-libllvm4jni.so16536712057417821441/libllvm4jni.so
+7f99f4cd5000-7f99f4ee4000 r--p 0216b000 08:20 388294                     /tmp/fastffi-libllvm4jni.so16536712057417821441/libllvm4jni.so
+7f99f4ee4000-7f99f4f16000 rw-p 02379000 08:20 388294                     /tmp/fastffi-libllvm4jni.so16536712057417821441/libllvm4jni.so
+7f99f4f16000-7f99f4f1f000 rw-p 00000000 00:00 0 
+7f99f4f1f000-7f99f6320000 r--p 00000000 08:20 387268                     /tmp/fastffi-libllvm4jni.so5631081119373067258/libllvm4jni.so
+7f99f6320000-7f99f708c000 r-xp 01400000 08:20 387268                     /tmp/fastffi-libllvm4jni.so5631081119373067258/libllvm4jni.so
+7f99f708c000-7f99f729b000 r--p 0216b000 08:20 387268                     /tmp/fastffi-libllvm4jni.so5631081119373067258/libllvm4jni.so
+7f99f729b000-7f99f72cd000 rw-p 02379000 08:20 387268                     /tmp/fastffi-libllvm4jni.so5631081119373067258/libllvm4jni.so
+7f99f72cd000-7f99f72d6000 rw-p 00000000 00:00 0 
+7f99f72d6000-7f99f86d7000 r--p 00000000 08:20 384000                     /tmp/fastffi-libllvm4jni.so12900293310805551356/libllvm4jni.so
+7f99f86d7000-7f99f9443000 r-xp 01400000 08:20 384000                     /tmp/fastffi-libllvm4jni.so12900293310805551356/libllvm4jni.so
+7f99f9443000-7f99f9652000 r--p 0216b000 08:20 384000                     /tmp/fastffi-libllvm4jni.so12900293310805551356/libllvm4jni.so
+7f99f9652000-7f99f9684000 rw-p 02379000 08:20 384000                     /tmp/fastffi-libllvm4jni.so12900293310805551356/libllvm4jni.so
+7f99f9684000-7f99f968d000 rw-p 00000000 00:00 0 
+7f99f968d000-7f99faa8e000 r--p 00000000 08:20 383249                     /tmp/fastffi-libllvm4jni.so8535773346243976483/libllvm4jni.so
+7f99faa8e000-7f99fb7fa000 r-xp 01400000 08:20 383249                     /tmp/fastffi-libllvm4jni.so8535773346243976483/libllvm4jni.so
+7f99fb7fa000-7f99fba09000 r--p 0216b000 08:20 383249                     /tmp/fastffi-libllvm4jni.so8535773346243976483/libllvm4jni.so
+7f99fba09000-7f99fba3b000 rw-p 02379000 08:20 383249                     /tmp/fastffi-libllvm4jni.so8535773346243976483/libllvm4jni.so
+7f99fba3b000-7f99fba44000 rw-p 00000000 00:00 0 
+7f99fba44000-7f99fce45000 r--p 00000000 08:20 380299                     /tmp/fastffi-libllvm4jni.so9920035326719267218/libllvm4jni.so
+7f99fce45000-7f99fdbb1000 r-xp 01400000 08:20 380299                     /tmp/fastffi-libllvm4jni.so9920035326719267218/libllvm4jni.so
+7f99fdbb1000-7f99fddc0000 r--p 0216b000 08:20 380299                     /tmp/fastffi-libllvm4jni.so9920035326719267218/libllvm4jni.so
+7f99fddc0000-7f99fddf2000 rw-p 02379000 08:20 380299                     /tmp/fastffi-libllvm4jni.so9920035326719267218/libllvm4jni.so
+7f99fddf2000-7f99fddfb000 rw-p 00000000 00:00 0 
+7f99fddfb000-7f99ff1fc000 r--p 00000000 08:20 359211                     /tmp/fastffi-libllvm4jni.so11383011665482180586/libllvm4jni.so
+7f99ff1fc000-7f99fff68000 r-xp 01400000 08:20 359211                     /tmp/fastffi-libllvm4jni.so11383011665482180586/libllvm4jni.so
+7f99fff68000-7f9a00177000 r--p 0216b000 08:20 359211                     /tmp/fastffi-libllvm4jni.so11383011665482180586/libllvm4jni.so
+7f9a00177000-7f9a001a9000 rw-p 02379000 08:20 359211                     /tmp/fastffi-libllvm4jni.so11383011665482180586/libllvm4jni.so
+7f9a001a9000-7f9a001b2000 rw-p 00000000 00:00 0 
+7f9a001b2000-7f9a015b3000 r--p 00000000 08:20 183782                     /tmp/fastffi-libllvm4jni.so16653300125585570688/libllvm4jni.so
+7f9a015b3000-7f9a0231f000 r-xp 01400000 08:20 183782                     /tmp/fastffi-libllvm4jni.so16653300125585570688/libllvm4jni.so
+7f9a0231f000-7f9a0252e000 r--p 0216b000 08:20 183782                     /tmp/fastffi-libllvm4jni.so16653300125585570688/libllvm4jni.so
+7f9a0252e000-7f9a02560000 rw-p 02379000 08:20 183782                     /tmp/fastffi-libllvm4jni.so16653300125585570688/libllvm4jni.so
+7f9a02560000-7f9a02569000 rw-p 00000000 00:00 0 
+7f9a02569000-7f9a0396a000 r--p 00000000 08:20 183775                     /tmp/fastffi-libllvm4jni.so3862500285014152680/libllvm4jni.so
+7f9a0396a000-7f9a046d6000 r-xp 01400000 08:20 183775                     /tmp/fastffi-libllvm4jni.so3862500285014152680/libllvm4jni.so
+7f9a046d6000-7f9a048e5000 r--p 0216b000 08:20 183775                     /tmp/fastffi-libllvm4jni.so3862500285014152680/libllvm4jni.so
+7f9a048e5000-7f9a04917000 rw-p 02379000 08:20 183775                     /tmp/fastffi-libllvm4jni.so3862500285014152680/libllvm4jni.so
+7f9a04917000-7f9a04920000 rw-p 00000000 00:00 0 
+7f9a04920000-7f9a05d21000 r--p 00000000 08:20 107063                     /tmp/fastffi-libllvm4jni.so9787442465999643881/libllvm4jni.so
+7f9a05d21000-7f9a06a8d000 r-xp 01400000 08:20 107063                     /tmp/fastffi-libllvm4jni.so9787442465999643881/libllvm4jni.so
+7f9a06a8d000-7f9a06c9c000 r--p 0216b000 08:20 107063                     /tmp/fastffi-libllvm4jni.so9787442465999643881/libllvm4jni.so
+7f9a06c9c000-7f9a06cce000 rw-p 02379000 08:20 107063                     /tmp/fastffi-libllvm4jni.so9787442465999643881/libllvm4jni.so
+7f9a06cce000-7f9a06cd7000 rw-p 00000000 00:00 0 
+7f9a06cd7000-7f9a080d8000 r--p 00000000 08:20 106498                     /tmp/fastffi-libllvm4jni.so10689392904872614314/libllvm4jni.so
+7f9a080d8000-7f9a08e44000 r-xp 01400000 08:20 106498                     /tmp/fastffi-libllvm4jni.so10689392904872614314/libllvm4jni.so
+7f9a08e44000-7f9a09053000 r--p 0216b000 08:20 106498                     /tmp/fastffi-libllvm4jni.so10689392904872614314/libllvm4jni.so
+7f9a09053000-7f9a09085000 rw-p 02379000 08:20 106498                     /tmp/fastffi-libllvm4jni.so10689392904872614314/libllvm4jni.so
+7f9a09085000-7f9a0908e000 rw-p 00000000 00:00 0 
+7f9a0908e000-7f9a0a48f000 r--p 00000000 08:20 106491                     /tmp/fastffi-libllvm4jni.so13127649734704740553/libllvm4jni.so
+7f9a0a48f000-7f9a0b1fb000 r-xp 01400000 08:20 106491                     /tmp/fastffi-libllvm4jni.so13127649734704740553/libllvm4jni.so
+7f9a0b1fb000-7f9a0b40a000 r--p 0216b000 08:20 106491                     /tmp/fastffi-libllvm4jni.so13127649734704740553/libllvm4jni.so
+7f9a0b40a000-7f9a0b43c000 rw-p 02379000 08:20 106491                     /tmp/fastffi-libllvm4jni.so13127649734704740553/libllvm4jni.so
+7f9a0b43c000-7f9a0b445000 rw-p 00000000 00:00 0 
+7f9a0b445000-7f9a0c846000 r--p 00000000 08:20 106487                     /tmp/fastffi-libllvm4jni.so14290886986729750771/libllvm4jni.so
+7f9a0c846000-7f9a0d5b2000 r-xp 01400000 08:20 106487                     /tmp/fastffi-libllvm4jni.so14290886986729750771/libllvm4jni.so
+7f9a0d5b2000-7f9a0d7c1000 r--p 0216b000 08:20 106487                     /tmp/fastffi-libllvm4jni.so14290886986729750771/libllvm4jni.so
+7f9a0d7c1000-7f9a0d7f3000 rw-p 02379000 08:20 106487                     /tmp/fastffi-libllvm4jni.so14290886986729750771/libllvm4jni.so
+7f9a0d7f3000-7f9a0d7fc000 rw-p 00000000 00:00 0 
+7f9a0d7fc000-7f9a0ebfd000 r--p 00000000 08:20 106483                     /tmp/fastffi-libllvm4jni.so3932671223509855268/libllvm4jni.so
+7f9a0ebfd000-7f9a0f969000 r-xp 01400000 08:20 106483                     /tmp/fastffi-libllvm4jni.so3932671223509855268/libllvm4jni.so
+7f9a0f969000-7f9a0fb78000 r--p 0216b000 08:20 106483                     /tmp/fastffi-libllvm4jni.so3932671223509855268/libllvm4jni.so
+7f9a0fb78000-7f9a0fbaa000 rw-p 02379000 08:20 106483                     /tmp/fastffi-libllvm4jni.so3932671223509855268/libllvm4jni.so
+7f9a0fbaa000-7f9a0fbb3000 rw-p 00000000 00:00 0 
+7f9a0fbb3000-7f9a10fb4000 r--p 00000000 08:20 106476                     /tmp/fastffi-libllvm4jni.so17857031176582769026/libllvm4jni.so
+7f9a10fb4000-7f9a11d20000 r-xp 01400000 08:20 106476                     /tmp/fastffi-libllvm4jni.so17857031176582769026/libllvm4jni.so
+7f9a11d20000-7f9a11f2f000 r--p 0216b000 08:20 106476                     /tmp/fastffi-libllvm4jni.so17857031176582769026/libllvm4jni.so
+7f9a11f2f000-7f9a11f61000 rw-p 02379000 08:20 106476                     /tmp/fastffi-libllvm4jni.so17857031176582769026/libllvm4jni.so
+7f9a11f61000-7f9a11f6a000 rw-p 00000000 00:00 0 
+7f9a11f6a000-7f9a1336b000 r--p 00000000 08:20 106472                     /tmp/fastffi-libllvm4jni.so6282371078246028930/libllvm4jni.so
+7f9a1336b000-7f9a140d7000 r-xp 01400000 08:20 106472                     /tmp/fastffi-libllvm4jni.so6282371078246028930/libllvm4jni.so
+7f9a140d7000-7f9a142e6000 r--p 0216b000 08:20 106472                     /tmp/fastffi-libllvm4jni.so6282371078246028930/libllvm4jni.so
+7f9a142e6000-7f9a14318000 rw-p 02379000 08:20 106472                     /tmp/fastffi-libllvm4jni.so6282371078246028930/libllvm4jni.so
+7f9a14318000-7f9a14321000 rw-p 00000000 00:00 0 
+7f9a14321000-7f9a15722000 r--p 00000000 08:20 106467                     /tmp/fastffi-libllvm4jni.so1496409046794416478/libllvm4jni.so
+7f9a15722000-7f9a1648e000 r-xp 01400000 08:20 106467                     /tmp/fastffi-libllvm4jni.so1496409046794416478/libllvm4jni.so
+7f9a1648e000-7f9a1669d000 r--p 0216b000 08:20 106467                     /tmp/fastffi-libllvm4jni.so1496409046794416478/libllvm4jni.so
+7f9a1669d000-7f9a166cf000 rw-p 02379000 08:20 106467                     /tmp/fastffi-libllvm4jni.so1496409046794416478/libllvm4jni.so
+7f9a166cf000-7f9a166d8000 rw-p 00000000 00:00 0 
+7f9a166d8000-7f9a17ad9000 r--p 00000000 08:20 106461                     /tmp/fastffi-libllvm4jni.so7319510661585229010/libllvm4jni.so
+7f9a17ad9000-7f9a18845000 r-xp 01400000 08:20 106461                     /tmp/fastffi-libllvm4jni.so7319510661585229010/libllvm4jni.so
+7f9a18845000-7f9a18a54000 r--p 0216b000 08:20 106461                     /tmp/fastffi-libllvm4jni.so7319510661585229010/libllvm4jni.so
+7f9a18a54000-7f9a18a86000 rw-p 02379000 08:20 106461                     /tmp/fastffi-libllvm4jni.so7319510661585229010/libllvm4jni.so
+7f9a18a86000-7f9a18a8f000 rw-p 00000000 00:00 0 
+7f9a18a8f000-7f9a19e90000 r--p 00000000 08:20 106456                     /tmp/fastffi-libllvm4jni.so10259734819806217676/libllvm4jni.so
+7f9a19e90000-7f9a1abfc000 r-xp 01400000 08:20 106456                     /tmp/fastffi-libllvm4jni.so10259734819806217676/libllvm4jni.so
+7f9a1abfc000-7f9a1ae0b000 r--p 0216b000 08:20 106456                     /tmp/fastffi-libllvm4jni.so10259734819806217676/libllvm4jni.so
+7f9a1ae0b000-7f9a1ae3d000 rw-p 02379000 08:20 106456                     /tmp/fastffi-libllvm4jni.so10259734819806217676/libllvm4jni.so
+7f9a1ae3d000-7f9a1ae46000 rw-p 00000000 00:00 0 
+7f9a1ae46000-7f9a1c247000 r--p 00000000 08:20 106438                     /tmp/fastffi-libllvm4jni.so10409046532309100687/libllvm4jni.so
+7f9a1c247000-7f9a1cfb3000 r-xp 01400000 08:20 106438                     /tmp/fastffi-libllvm4jni.so10409046532309100687/libllvm4jni.so
+7f9a1cfb3000-7f9a1d1c2000 r--p 0216b000 08:20 106438                     /tmp/fastffi-libllvm4jni.so10409046532309100687/libllvm4jni.so
+7f9a1d1c2000-7f9a1d1f4000 rw-p 02379000 08:20 106438                     /tmp/fastffi-libllvm4jni.so10409046532309100687/libllvm4jni.so
+7f9a1d1f4000-7f9a1d1fd000 rw-p 00000000 00:00 0 
+7f9a1d1fd000-7f9a1e5fe000 r--p 00000000 08:20 106431                     /tmp/fastffi-libllvm4jni.so12793519215435267914/libllvm4jni.so
+7f9a1e5fe000-7f9a1f36a000 r-xp 01400000 08:20 106431                     /tmp/fastffi-libllvm4jni.so12793519215435267914/libllvm4jni.so
+7f9a1f36a000-7f9a1f579000 r--p 0216b000 08:20 106431                     /tmp/fastffi-libllvm4jni.so12793519215435267914/libllvm4jni.so
+7f9a1f579000-7f9a1f5ab000 rw-p 02379000 08:20 106431                     /tmp/fastffi-libllvm4jni.so12793519215435267914/libllvm4jni.so
+7f9a1f5ab000-7f9a1f5b4000 rw-p 00000000 00:00 0 
+7f9a1f5b4000-7f9a209b5000 r--p 00000000 08:20 106427                     /tmp/fastffi-libllvm4jni.so3653613148877264263/libllvm4jni.so
+7f9a209b5000-7f9a21721000 r-xp 01400000 08:20 106427                     /tmp/fastffi-libllvm4jni.so3653613148877264263/libllvm4jni.so
+7f9a21721000-7f9a21930000 r--p 0216b000 08:20 106427                     /tmp/fastffi-libllvm4jni.so3653613148877264263/libllvm4jni.so
+7f9a21930000-7f9a21962000 rw-p 02379000 08:20 106427                     /tmp/fastffi-libllvm4jni.so3653613148877264263/libllvm4jni.so
+7f9a21962000-7f9a2196b000 rw-p 00000000 00:00 0 
+7f9a2196b000-7f9a22d6c000 r--p 00000000 08:20 106423                     /tmp/fastffi-libllvm4jni.so9954023675070132405/libllvm4jni.so
+7f9a22d6c000-7f9a23ad8000 r-xp 01400000 08:20 106423                     /tmp/fastffi-libllvm4jni.so9954023675070132405/libllvm4jni.so
+7f9a23ad8000-7f9a23ce7000 r--p 0216b000 08:20 106423                     /tmp/fastffi-libllvm4jni.so9954023675070132405/libllvm4jni.so
+7f9a23ce7000-7f9a23d19000 rw-p 02379000 08:20 106423                     /tmp/fastffi-libllvm4jni.so9954023675070132405/libllvm4jni.so
+7f9a23d19000-7f9a23d22000 rw-p 00000000 00:00 0 
+7f9a23d22000-7f9a25123000 r--p 00000000 08:20 106416                     /tmp/fastffi-libllvm4jni.so14611465039108093901/libllvm4jni.so
+7f9a25123000-7f9a25e8f000 r-xp 01400000 08:20 106416                     /tmp/fastffi-libllvm4jni.so14611465039108093901/libllvm4jni.so
+7f9a25e8f000-7f9a2609e000 r--p 0216b000 08:20 106416                     /tmp/fastffi-libllvm4jni.so14611465039108093901/libllvm4jni.so
+7f9a2609e000-7f9a260d0000 rw-p 02379000 08:20 106416                     /tmp/fastffi-libllvm4jni.so14611465039108093901/libllvm4jni.so
+7f9a260d0000-7f9a260d9000 rw-p 00000000 00:00 0 
+7f9a260d9000-7f9a274da000 r--p 00000000 08:20 106412                     /tmp/fastffi-libllvm4jni.so3736626088799112226/libllvm4jni.so
+7f9a274da000-7f9a28246000 r-xp 01400000 08:20 106412                     /tmp/fastffi-libllvm4jni.so3736626088799112226/libllvm4jni.so
+7f9a28246000-7f9a28455000 r--p 0216b000 08:20 106412                     /tmp/fastffi-libllvm4jni.so3736626088799112226/libllvm4jni.so
+7f9a28455000-7f9a28487000 rw-p 02379000 08:20 106412                     /tmp/fastffi-libllvm4jni.so3736626088799112226/libllvm4jni.so
+7f9a28487000-7f9a28490000 rw-p 00000000 00:00 0 
+7f9a28490000-7f9a29891000 r--p 00000000 08:20 106405                     /tmp/fastffi-libllvm4jni.so10062992681454287296/libllvm4jni.so
+7f9a29891000-7f9a2a5fd000 r-xp 01400000 08:20 106405                     /tmp/fastffi-libllvm4jni.so10062992681454287296/libllvm4jni.so
+7f9a2a5fd000-7f9a2a80c000 r--p 0216b000 08:20 106405                     /tmp/fastffi-libllvm4jni.so10062992681454287296/libllvm4jni.so
+7f9a2a80c000-7f9a2a83e000 rw-p 02379000 08:20 106405                     /tmp/fastffi-libllvm4jni.so10062992681454287296/libllvm4jni.so
+7f9a2a83e000-7f9a2a847000 rw-p 00000000 00:00 0 
+7f9a2a847000-7f9a2bc48000 r--p 00000000 08:20 106401                     /tmp/fastffi-libllvm4jni.so2579595962009645735/libllvm4jni.so
+7f9a2bc48000-7f9a2c9b4000 r-xp 01400000 08:20 106401                     /tmp/fastffi-libllvm4jni.so2579595962009645735/libllvm4jni.so
+7f9a2c9b4000-7f9a2cbc3000 r--p 0216b000 08:20 106401                     /tmp/fastffi-libllvm4jni.so2579595962009645735/libllvm4jni.so
+7f9a2cbc3000-7f9a2cbf5000 rw-p 02379000 08:20 106401                     /tmp/fastffi-libllvm4jni.so2579595962009645735/libllvm4jni.so
+7f9a2cbf5000-7f9a2cbfe000 rw-p 00000000 00:00 0 
+7f9a2cbfe000-7f9a2dfff000 r--p 00000000 08:20 106397                     /tmp/fastffi-libllvm4jni.so11928552329496536426/libllvm4jni.so
+7f9a2dfff000-7f9a2ed6b000 r-xp 01400000 08:20 106397                     /tmp/fastffi-libllvm4jni.so11928552329496536426/libllvm4jni.so
+7f9a2ed6b000-7f9a2ef7a000 r--p 0216b000 08:20 106397                     /tmp/fastffi-libllvm4jni.so11928552329496536426/libllvm4jni.so
+7f9a2ef7a000-7f9a2efac000 rw-p 02379000 08:20 106397                     /tmp/fastffi-libllvm4jni.so11928552329496536426/libllvm4jni.so
+7f9a2efac000-7f9a2efb5000 rw-p 00000000 00:00 0 
+7f9a2efb5000-7f9a303b6000 r--p 00000000 08:20 106393                     /tmp/fastffi-libllvm4jni.so15767191571660733084/libllvm4jni.so
+7f9a303b6000-7f9a31122000 r-xp 01400000 08:20 106393                     /tmp/fastffi-libllvm4jni.so15767191571660733084/libllvm4jni.so
+7f9a31122000-7f9a31331000 r--p 0216b000 08:20 106393                     /tmp/fastffi-libllvm4jni.so15767191571660733084/libllvm4jni.so
+7f9a31331000-7f9a31363000 rw-p 02379000 08:20 106393                     /tmp/fastffi-libllvm4jni.so15767191571660733084/libllvm4jni.so
+7f9a31363000-7f9a3136c000 rw-p 00000000 00:00 0 
+7f9a3136c000-7f9a3276d000 r--p 00000000 08:20 106389                     /tmp/fastffi-libllvm4jni.so11042870059114326396/libllvm4jni.so
+7f9a3276d000-7f9a334d9000 r-xp 01400000 08:20 106389                     /tmp/fastffi-libllvm4jni.so11042870059114326396/libllvm4jni.so
+7f9a334d9000-7f9a336e8000 r--p 0216b000 08:20 106389                     /tmp/fastffi-libllvm4jni.so11042870059114326396/libllvm4jni.so
+7f9a336e8000-7f9a3371a000 rw-p 02379000 08:20 106389                     /tmp/fastffi-libllvm4jni.so11042870059114326396/libllvm4jni.so
+7f9a3371a000-7f9a33723000 rw-p 00000000 00:00 0 
+7f9a33723000-7f9a34b24000 r--p 00000000 08:20 106385                     /tmp/fastffi-libllvm4jni.so7987172077297135176/libllvm4jni.so
+7f9a34b24000-7f9a35890000 r-xp 01400000 08:20 106385                     /tmp/fastffi-libllvm4jni.so7987172077297135176/libllvm4jni.so
+7f9a35890000-7f9a35a9f000 r--p 0216b000 08:20 106385                     /tmp/fastffi-libllvm4jni.so7987172077297135176/libllvm4jni.so
+7f9a35a9f000-7f9a35ad1000 rw-p 02379000 08:20 106385                     /tmp/fastffi-libllvm4jni.so7987172077297135176/libllvm4jni.so
+7f9a35ad1000-7f9a35ada000 rw-p 00000000 00:00 0 
+7f9a35ada000-7f9a36edb000 r--p 00000000 08:20 106381                     /tmp/fastffi-libllvm4jni.so6816308820433016678/libllvm4jni.so
+7f9a36edb000-7f9a37c47000 r-xp 01400000 08:20 106381                     /tmp/fastffi-libllvm4jni.so6816308820433016678/libllvm4jni.so
+7f9a37c47000-7f9a37e56000 r--p 0216b000 08:20 106381                     /tmp/fastffi-libllvm4jni.so6816308820433016678/libllvm4jni.so
+7f9a37e56000-7f9a37e88000 rw-p 02379000 08:20 106381                     /tmp/fastffi-libllvm4jni.so6816308820433016678/libllvm4jni.so
+7f9a37e88000-7f9a37e91000 rw-p 00000000 00:00 0 
+7f9a37e91000-7f9a39292000 r--p 00000000 08:20 106377                     /tmp/fastffi-libllvm4jni.so14534585136224486836/libllvm4jni.so
+7f9a39292000-7f9a39ffe000 r-xp 01400000 08:20 106377                     /tmp/fastffi-libllvm4jni.so14534585136224486836/libllvm4jni.so
+7f9a39ffe000-7f9a3a20d000 r--p 0216b000 08:20 106377                     /tmp/fastffi-libllvm4jni.so14534585136224486836/libllvm4jni.so
+7f9a3a20d000-7f9a3a23f000 rw-p 02379000 08:20 106377                     /tmp/fastffi-libllvm4jni.so14534585136224486836/libllvm4jni.so
+7f9a3a23f000-7f9a3a248000 rw-p 00000000 00:00 0 
+7f9a3a248000-7f9a3b649000 r--p 00000000 08:20 106373                     /tmp/fastffi-libllvm4jni.so18023220787962281158/libllvm4jni.so
+7f9a3b649000-7f9a3c3b5000 r-xp 01400000 08:20 106373                     /tmp/fastffi-libllvm4jni.so18023220787962281158/libllvm4jni.so
+7f9a3c3b5000-7f9a3c5c4000 r--p 0216b000 08:20 106373                     /tmp/fastffi-libllvm4jni.so18023220787962281158/libllvm4jni.so
+7f9a3c5c4000-7f9a3c5f6000 rw-p 02379000 08:20 106373                     /tmp/fastffi-libllvm4jni.so18023220787962281158/libllvm4jni.so
+7f9a3c5f6000-7f9a3c5ff000 rw-p 00000000 00:00 0 
+7f9a3c5ff000-7f9a3da00000 r--p 00000000 08:20 106369                     /tmp/fastffi-libllvm4jni.so14097944357098517646/libllvm4jni.so
+7f9a3da00000-7f9a3e76c000 r-xp 01400000 08:20 106369                     /tmp/fastffi-libllvm4jni.so14097944357098517646/libllvm4jni.so
+7f9a3e76c000-7f9a3e97b000 r--p 0216b000 08:20 106369                     /tmp/fastffi-libllvm4jni.so14097944357098517646/libllvm4jni.so
+7f9a3e97b000-7f9a3e9ad000 rw-p 02379000 08:20 106369                     /tmp/fastffi-libllvm4jni.so14097944357098517646/libllvm4jni.so
+7f9a3e9ad000-7f9a3e9b6000 rw-p 00000000 00:00 0 
+7f9a3e9b6000-7f9a3fdb7000 r--p 00000000 08:20 106365                     /tmp/fastffi-libllvm4jni.so12017125513699830029/libllvm4jni.so
+7f9a3fdb7000-7f9a40b23000 r-xp 01400000 08:20 106365                     /tmp/fastffi-libllvm4jni.so12017125513699830029/libllvm4jni.so
+7f9a40b23000-7f9a40d32000 r--p 0216b000 08:20 106365                     /tmp/fastffi-libllvm4jni.so12017125513699830029/libllvm4jni.so
+7f9a40d32000-7f9a40d64000 rw-p 02379000 08:20 106365                     /tmp/fastffi-libllvm4jni.so12017125513699830029/libllvm4jni.so
+7f9a40d64000-7f9a40d6d000 rw-p 00000000 00:00 0 
+7f9a40d6d000-7f9a4216e000 r--p 00000000 08:20 106361                     /tmp/fastffi-libllvm4jni.so18009014653570822697/libllvm4jni.so
+7f9a4216e000-7f9a42eda000 r-xp 01400000 08:20 106361                     /tmp/fastffi-libllvm4jni.so18009014653570822697/libllvm4jni.so
+7f9a42eda000-7f9a430e9000 r--p 0216b000 08:20 106361                     /tmp/fastffi-libllvm4jni.so18009014653570822697/libllvm4jni.so
+7f9a430e9000-7f9a4311b000 rw-p 02379000 08:20 106361                     /tmp/fastffi-libllvm4jni.so18009014653570822697/libllvm4jni.so
+7f9a4311b000-7f9a43124000 rw-p 00000000 00:00 0 
+7f9a43124000-7f9a44525000 r--p 00000000 08:20 106357                     /tmp/fastffi-libllvm4jni.so7874088872577221440/libllvm4jni.so
+7f9a44525000-7f9a45291000 r-xp 01400000 08:20 106357                     /tmp/fastffi-libllvm4jni.so7874088872577221440/libllvm4jni.so
+7f9a45291000-7f9a454a0000 r--p 0216b000 08:20 106357                     /tmp/fastffi-libllvm4jni.so7874088872577221440/libllvm4jni.so
+7f9a454a0000-7f9a454d2000 rw-p 02379000 08:20 106357                     /tmp/fastffi-libllvm4jni.so7874088872577221440/libllvm4jni.so
+7f9a454d2000-7f9a454db000 rw-p 00000000 00:00 0 
+7f9a454db000-7f9a468dc000 r--p 00000000 08:20 106353                     /tmp/fastffi-libllvm4jni.so6149782902909562445/libllvm4jni.so
+7f9a468dc000-7f9a47648000 r-xp 01400000 08:20 106353                     /tmp/fastffi-libllvm4jni.so6149782902909562445/libllvm4jni.so
+7f9a47648000-7f9a47857000 r--p 0216b000 08:20 106353                     /tmp/fastffi-libllvm4jni.so6149782902909562445/libllvm4jni.so
+7f9a47857000-7f9a47889000 rw-p 02379000 08:20 106353                     /tmp/fastffi-libllvm4jni.so6149782902909562445/libllvm4jni.so
+7f9a47889000-7f9a47892000 rw-p 00000000 00:00 0 
+7f9a47892000-7f9a48c93000 r--p 00000000 08:20 106349                     /tmp/fastffi-libllvm4jni.so998841107982984343/libllvm4jni.so
+7f9a48c93000-7f9a499ff000 r-xp 01400000 08:20 106349                     /tmp/fastffi-libllvm4jni.so998841107982984343/libllvm4jni.so
+7f9a499ff000-7f9a49c0e000 r--p 0216b000 08:20 106349                     /tmp/fastffi-libllvm4jni.so998841107982984343/libllvm4jni.so
+7f9a49c0e000-7f9a49c40000 rw-p 02379000 08:20 106349                     /tmp/fastffi-libllvm4jni.so998841107982984343/libllvm4jni.so
+7f9a49c40000-7f9a49c49000 rw-p 00000000 00:00 0 
+7f9a49c49000-7f9a4b04a000 r--p 00000000 08:20 106345                     /tmp/fastffi-libllvm4jni.so693585363721599022/libllvm4jni.so
+7f9a4b04a000-7f9a4bdb6000 r-xp 01400000 08:20 106345                     /tmp/fastffi-libllvm4jni.so693585363721599022/libllvm4jni.so
+7f9a4bdb6000-7f9a4bfc5000 r--p 0216b000 08:20 106345                     /tmp/fastffi-libllvm4jni.so693585363721599022/libllvm4jni.so
+7f9a4bfc5000-7f9a4bff7000 rw-p 02379000 08:20 106345                     /tmp/fastffi-libllvm4jni.so693585363721599022/libllvm4jni.so
+7f9a4bff7000-7f9a4c000000 rw-p 00000000 00:00 0 
+7f9a4c000000-7f9a4c513000 rw-p 00000000 00:00 0 
+7f9a4c513000-7f9a50000000 ---p 00000000 00:00 0 
+7f9a52248000-7f9a53649000 r--p 00000000 08:20 106341                     /tmp/fastffi-libllvm4jni.so4589304029611363738/libllvm4jni.so
+7f9a53649000-7f9a543b5000 r-xp 01400000 08:20 106341                     /tmp/fastffi-libllvm4jni.so4589304029611363738/libllvm4jni.so
+7f9a543b5000-7f9a545c4000 r--p 0216b000 08:20 106341                     /tmp/fastffi-libllvm4jni.so4589304029611363738/libllvm4jni.so
+7f9a545c4000-7f9a545f6000 rw-p 02379000 08:20 106341                     /tmp/fastffi-libllvm4jni.so4589304029611363738/libllvm4jni.so
+7f9a545f6000-7f9a545ff000 rw-p 00000000 00:00 0 
+7f9a545ff000-7f9a55a00000 r--p 00000000 08:20 106337                     /tmp/fastffi-libllvm4jni.so16620028165784776605/libllvm4jni.so
+7f9a55a00000-7f9a5676c000 r-xp 01400000 08:20 106337                     /tmp/fastffi-libllvm4jni.so16620028165784776605/libllvm4jni.so
+7f9a5676c000-7f9a5697b000 r--p 0216b000 08:20 106337                     /tmp/fastffi-libllvm4jni.so16620028165784776605/libllvm4jni.so
+7f9a5697b000-7f9a569ad000 rw-p 02379000 08:20 106337                     /tmp/fastffi-libllvm4jni.so16620028165784776605/libllvm4jni.so
+7f9a569ad000-7f9a569b6000 rw-p 00000000 00:00 0 
+7f9a569b6000-7f9a57db7000 r--p 00000000 08:20 106333                     /tmp/fastffi-libllvm4jni.so7643411043768875846/libllvm4jni.so
+7f9a57db7000-7f9a58b23000 r-xp 01400000 08:20 106333                     /tmp/fastffi-libllvm4jni.so7643411043768875846/libllvm4jni.so
+7f9a58b23000-7f9a58d32000 r--p 0216b000 08:20 106333                     /tmp/fastffi-libllvm4jni.so7643411043768875846/libllvm4jni.so
+7f9a58d32000-7f9a58d64000 rw-p 02379000 08:20 106333                     /tmp/fastffi-libllvm4jni.so7643411043768875846/libllvm4jni.so
+7f9a58d64000-7f9a58d6d000 rw-p 00000000 00:00 0 
+7f9a58d6d000-7f9a5a16e000 r--p 00000000 08:20 106329                     /tmp/fastffi-libllvm4jni.so2319682205961650471/libllvm4jni.so
+7f9a5a16e000-7f9a5aeda000 r-xp 01400000 08:20 106329                     /tmp/fastffi-libllvm4jni.so2319682205961650471/libllvm4jni.so
+7f9a5aeda000-7f9a5b0e9000 r--p 0216b000 08:20 106329                     /tmp/fastffi-libllvm4jni.so2319682205961650471/libllvm4jni.so
+7f9a5b0e9000-7f9a5b11b000 rw-p 02379000 08:20 106329                     /tmp/fastffi-libllvm4jni.so2319682205961650471/libllvm4jni.so
+7f9a5b11b000-7f9a5b124000 rw-p 00000000 00:00 0 
+7f9a5b124000-7f9a5c525000 r--p 00000000 08:20 106325                     /tmp/fastffi-libllvm4jni.so6501047210148365486/libllvm4jni.so
+7f9a5c525000-7f9a5d291000 r-xp 01400000 08:20 106325                     /tmp/fastffi-libllvm4jni.so6501047210148365486/libllvm4jni.so
+7f9a5d291000-7f9a5d4a0000 r--p 0216b000 08:20 106325                     /tmp/fastffi-libllvm4jni.so6501047210148365486/libllvm4jni.so
+7f9a5d4a0000-7f9a5d4d2000 rw-p 02379000 08:20 106325                     /tmp/fastffi-libllvm4jni.so6501047210148365486/libllvm4jni.so
+7f9a5d4d2000-7f9a5d4db000 rw-p 00000000 00:00 0 
+7f9a5d4db000-7f9a5e8dc000 r--p 00000000 08:20 106321                     /tmp/fastffi-libllvm4jni.so7102087966806699180/libllvm4jni.so
+7f9a5e8dc000-7f9a5f648000 r-xp 01400000 08:20 106321                     /tmp/fastffi-libllvm4jni.so7102087966806699180/libllvm4jni.so
+7f9a5f648000-7f9a5f857000 r--p 0216b000 08:20 106321                     /tmp/fastffi-libllvm4jni.so7102087966806699180/libllvm4jni.so
+7f9a5f857000-7f9a5f889000 rw-p 02379000 08:20 106321                     /tmp/fastffi-libllvm4jni.so7102087966806699180/libllvm4jni.so
+7f9a5f889000-7f9a5f892000 rw-p 00000000 00:00 0 
+7f9a5f892000-7f9a60c93000 r--p 00000000 08:20 106317                     /tmp/fastffi-libllvm4jni.so17735529595765503494/libllvm4jni.so
+7f9a60c93000-7f9a619ff000 r-xp 01400000 08:20 106317                     /tmp/fastffi-libllvm4jni.so17735529595765503494/libllvm4jni.so
+7f9a619ff000-7f9a61c0e000 r--p 0216b000 08:20 106317                     /tmp/fastffi-libllvm4jni.so17735529595765503494/libllvm4jni.so
+7f9a61c0e000-7f9a61c40000 rw-p 02379000 08:20 106317                     /tmp/fastffi-libllvm4jni.so17735529595765503494/libllvm4jni.so
+7f9a61c40000-7f9a61c49000 rw-p 00000000 00:00 0 
+7f9a61c49000-7f9a6304a000 r--p 00000000 08:20 106313                     /tmp/fastffi-libllvm4jni.so4127010162078743881/libllvm4jni.so
+7f9a6304a000-7f9a63db6000 r-xp 01400000 08:20 106313                     /tmp/fastffi-libllvm4jni.so4127010162078743881/libllvm4jni.so
+7f9a63db6000-7f9a63fc5000 r--p 0216b000 08:20 106313                     /tmp/fastffi-libllvm4jni.so4127010162078743881/libllvm4jni.so
+7f9a63fc5000-7f9a63ff7000 rw-p 02379000 08:20 106313                     /tmp/fastffi-libllvm4jni.so4127010162078743881/libllvm4jni.so
+7f9a63ff7000-7f9a64000000 rw-p 00000000 00:00 0 
+7f9a64000000-7f9a644f4000 rw-p 00000000 00:00 0 
+7f9a644f4000-7f9a68000000 ---p 00000000 00:00 0 
+7f9a68000000-7f9a68a70000 rw-p 00000000 00:00 0 
+7f9a68a70000-7f9a6c000000 ---p 00000000 00:00 0 
+7f9a6c000000-7f9a6c021000 rw-p 00000000 00:00 0 
+7f9a6c021000-7f9a70000000 ---p 00000000 00:00 0 
+7f9a70000000-7f9a70021000 rw-p 00000000 00:00 0 
+7f9a70021000-7f9a74000000 ---p 00000000 00:00 0 
+7f9a74000000-7f9a74718000 rw-p 00000000 00:00 0 
+7f9a74718000-7f9a78000000 ---p 00000000 00:00 0 
+7f9a78000000-7f9a78021000 rw-p 00000000 00:00 0 
+7f9a78021000-7f9a7c000000 ---p 00000000 00:00 0 
+7f9a7c000000-7f9a7c021000 rw-p 00000000 00:00 0 
+7f9a7c021000-7f9a80000000 ---p 00000000 00:00 0 
+7f9a80000000-7f9a813e7000 rw-p 00000000 00:00 0 
+7f9a813e7000-7f9a84000000 ---p 00000000 00:00 0 
+7f9a84000000-7f9a84021000 rw-p 00000000 00:00 0 
+7f9a84021000-7f9a88000000 ---p 00000000 00:00 0 
+7f9a88347000-7f9a88507000 rw-p 00000000 00:00 0 
+7f9a88507000-7f9a88547000 ---p 00000000 00:00 0 
+7f9a88547000-7f9a8854b000 ---p 00000000 00:00 0 
+7f9a8854b000-7f9a88648000 rw-p 00000000 00:00 0 
+7f9a88648000-7f9a88ea6000 r--p 00000000 08:20 106277                     /home/john/graphar/gar-nullable-key-spark/java/target/native/gar-java.bc
+7f9a88ea6000-7f9a8a2a7000 r--p 00000000 08:20 106309                     /tmp/fastffi-libllvm4jni.so10839524197594858759/libllvm4jni.so
+7f9a8a2a7000-7f9a8b013000 r-xp 01400000 08:20 106309                     /tmp/fastffi-libllvm4jni.so10839524197594858759/libllvm4jni.so
+7f9a8b013000-7f9a8b222000 r--p 0216b000 08:20 106309                     /tmp/fastffi-libllvm4jni.so10839524197594858759/libllvm4jni.so
+7f9a8b222000-7f9a8b254000 rw-p 02379000 08:20 106309                     /tmp/fastffi-libllvm4jni.so10839524197594858759/libllvm4jni.so
+7f9a8b254000-7f9a8b25d000 rw-p 00000000 00:00 0 
+7f9a8b25d000-7f9a8b261000 ---p 00000000 00:00 0 
+7f9a8b261000-7f9a8b35e000 rw-p 00000000 00:00 0 
+7f9a8b39f000-7f9a8b3a3000 ---p 00000000 00:00 0 
+7f9a8b3a3000-7f9a8b4a0000 rw-p 00000000 00:00 0 
+7f9a8b4a0000-7f9a8b4a4000 ---p 00000000 00:00 0 
+7f9a8b4a4000-7f9a8b5a1000 rw-p 00000000 00:00 0 
+7f9a8b5a1000-7f9a8b5a2000 ---p 00000000 00:00 0 
+7f9a8b5a2000-7f9a8b6a2000 rw-p 00000000 00:00 0 
+7f9a8b6a2000-7f9a8b6a6000 ---p 00000000 00:00 0 
+7f9a8b6a6000-7f9a8b7a3000 rw-p 00000000 00:00 0 
+7f9a8b7a3000-7f9a8b7a7000 ---p 00000000 00:00 0 
+7f9a8b7a7000-7f9a8b8a4000 rw-p 00000000 00:00 0 
+7f9a8b8a4000-7f9a8b8a8000 ---p 00000000 00:00 0 
+7f9a8b8a8000-7f9a8b9a5000 rw-p 00000000 00:00 0 
+7f9a8b9a5000-7f9a8b9a9000 ---p 00000000 00:00 0 
+7f9a8b9a9000-7f9a8baa6000 rw-p 00000000 00:00 0 
+7f9a8baa6000-7f9a8baaa000 ---p 00000000 00:00 0 
+7f9a8baaa000-7f9a8bba7000 rw-p 00000000 00:00 0 
+7f9a8bba7000-7f9a8bd1a000 r--p 00000000 08:20 2271                       /usr/lib/locale/C.UTF-8/LC_COLLATE
+7f9a8bd1a000-7f9a8c000000 r--p 00000000 08:20 3908                       /usr/lib/locale/locale-archive
+7f9a8c000000-7f9a8c021000 rw-p 00000000 00:00 0 
+7f9a8c021000-7f9a90000000 ---p 00000000 00:00 0 
+7f9a90000000-7f9a90021000 rw-p 00000000 00:00 0 
+7f9a90021000-7f9a94000000 ---p 00000000 00:00 0 
+7f9a94000000-7f9a94021000 rw-p 00000000 00:00 0 
+7f9a94021000-7f9a98000000 ---p 00000000 00:00 0 
+7f9a98000000-7f9a98021000 rw-p 00000000 00:00 0 
+7f9a98021000-7f9a9c000000 ---p 00000000 00:00 0 
+7f9a9c000000-7f9a9c021000 rw-p 00000000 00:00 0 
+7f9a9c021000-7f9aa0000000 ---p 00000000 00:00 0 
+7f9aa0000000-7f9aa0021000 rw-p 00000000 00:00 0 
+7f9aa0021000-7f9aa4000000 ---p 00000000 00:00 0 
+7f9aa4000000-7f9aa4021000 rw-p 00000000 00:00 0 
+7f9aa4021000-7f9aa8000000 ---p 00000000 00:00 0 
+7f9aa8057000-7f9aa8088000 rw-p 00000000 00:00 0 
+7f9aa8088000-7f9aa808c000 r--p 00000000 08:20 358816                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libnet.so
+7f9aa808c000-7f9aa809a000 r-xp 00004000 08:20 358816                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libnet.so
+7f9aa809a000-7f9aa809e000 r--p 00012000 08:20 358816                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libnet.so
+7f9aa809e000-7f9aa809f000 r--p 00015000 08:20 358816                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libnet.so
+7f9aa809f000-7f9aa80a0000 rw-p 00016000 08:20 358816                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libnet.so
+7f9aa80a0000-7f9aa80a7000 r--p 00000000 08:20 358817                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libnio.so
+7f9aa80a7000-7f9aa80af000 r-xp 00007000 08:20 358817                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libnio.so
+7f9aa80af000-7f9aa80b2000 r--p 0000f000 08:20 358817                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libnio.so
+7f9aa80b2000-7f9aa80b3000 r--p 00011000 08:20 358817                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libnio.so
+7f9aa80b3000-7f9aa80b4000 rw-p 00012000 08:20 358817                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libnio.so
+7f9aa80b4000-7f9aa80b8000 ---p 00000000 00:00 0 
+7f9aa80b8000-7f9aa81b5000 rw-p 00000000 00:00 0 
+7f9aa81b5000-7f9aa81b9000 ---p 00000000 00:00 0 
+7f9aa81b9000-7f9aa82b6000 rw-p 00000000 00:00 0 
+7f9aa82b6000-7f9aa82b7000 ---p 00000000 00:00 0 
+7f9aa82b7000-7f9aa8c38000 rw-p 00000000 00:00 0 
+7f9aa8c38000-7f9aa8c39000 ---p 00000000 00:00 0 
+7f9aa8c39000-7f9aa8d39000 rw-p 00000000 00:00 0 
+7f9aa8d39000-7f9aa8d3a000 ---p 00000000 00:00 0 
+7f9aa8d3a000-7f9aab844000 rw-p 00000000 00:00 0 
+7f9aab844000-7f9aab845000 ---p 00000000 00:00 0 
+7f9aab845000-7f9aabb25000 rw-p 00000000 00:00 0 
+7f9aabb25000-7f9aad705000 ---p 00000000 00:00 0 
+7f9aad705000-7f9aad8ed000 rw-p 00000000 00:00 0 
+7f9aad8ed000-7f9aaf4cd000 ---p 00000000 00:00 0 
+7f9aaf4cd000-7f9aaf511000 rw-p 00000000 00:00 0 
+7f9aaf511000-7f9aaf88d000 ---p 00000000 00:00 0 
+7f9aaf88d000-7f9aaf8ca000 rw-p 00000000 00:00 0 
+7f9aaf8ca000-7f9aafc46000 ---p 00000000 00:00 0 
+7f9aafc46000-7f9aafc83000 rw-p 00000000 00:00 0 
+7f9aafc83000-7f9aaffff000 ---p 00000000 00:00 0 
+7f9aaffff000-7f9ab0000000 rw-p 00000000 00:00 0 
+7f9ab0000000-7f9ab0021000 rw-p 00000000 00:00 0 
+7f9ab0021000-7f9ab4000000 ---p 00000000 00:00 0 
+7f9ab4001000-7f9ab4033000 r--p 00000000 08:20 2278                       /usr/lib/locale/C.UTF-8/LC_CTYPE
+7f9ab4033000-7f9ab40d7000 rw-p 00000000 00:00 0 
+7f9ab40d7000-7f9ab40d8000 ---p 00000000 00:00 0 
+7f9ab40d8000-7f9ab47de000 rw-p 00000000 00:00 0 
+7f9ab47de000-7f9ab4a4e000 rwxp 00000000 00:00 0 
+7f9ab4a4e000-7f9ab4d6f000 ---p 00000000 00:00 0 
+7f9ab4d6f000-7f9ab521f000 rwxp 00000000 00:00 0 
+7f9ab521f000-7f9abc2a6000 ---p 00000000 00:00 0 
+7f9abc2a6000-7f9abc516000 rwxp 00000000 00:00 0 
+7f9abc516000-7f9ac37de000 ---p 00000000 00:00 0 
+7f9ac37de000-7f9acc000000 r--s 00000000 08:20 358826                     /usr/lib/jvm/java-11-openjdk-amd64/lib/modules
+7f9acc000000-7f9ad0000000 rw-p 00000000 00:00 0 
+7f9ad0005000-7f9ad000c000 r--s 00000000 08:20 42720                      /usr/lib/x86_64-linux-gnu/gconv/gconv-modules.cache
+7f9ad000c000-7f9ad04ac000 rw-p 00000000 00:00 0 
+7f9ad04ac000-7f9ad04ad000 ---p 00000000 00:00 0 
+7f9ad04ad000-7f9ad05b2000 rw-p 00000000 00:00 0 
+7f9ad05b2000-7f9ad0698000 ---p 00000000 00:00 0 
+7f9ad0698000-7f9ad06a2000 rw-p 00000000 00:00 0 
+7f9ad06a2000-7f9ad0783000 ---p 00000000 00:00 0 
+7f9ad0783000-7f9ad0788000 rw-p 00000000 00:00 0 
+7f9ad0788000-7f9ad078f000 ---p 00000000 00:00 0 
+7f9ad078f000-7f9ad0791000 r--p 00000000 08:20 358825                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libzip.so
+7f9ad0791000-7f9ad0796000 r-xp 00002000 08:20 358825                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libzip.so
+7f9ad0796000-7f9ad0798000 r--p 00007000 08:20 358825                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libzip.so
+7f9ad0798000-7f9ad0799000 r--p 00008000 08:20 358825                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libzip.so
+7f9ad0799000-7f9ad079a000 rw-p 00009000 08:20 358825                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libzip.so
+7f9ad079a000-7f9ad079d000 r--p 00000000 08:20 42445                      /usr/lib/x86_64-linux-gnu/libnss_files-2.31.so
+7f9ad079d000-7f9ad07a4000 r-xp 00003000 08:20 42445                      /usr/lib/x86_64-linux-gnu/libnss_files-2.31.so
+7f9ad07a4000-7f9ad07a6000 r--p 0000a000 08:20 42445                      /usr/lib/x86_64-linux-gnu/libnss_files-2.31.so
+7f9ad07a6000-7f9ad07a7000 r--p 0000b000 08:20 42445                      /usr/lib/x86_64-linux-gnu/libnss_files-2.31.so
+7f9ad07a7000-7f9ad07a8000 rw-p 0000c000 08:20 42445                      /usr/lib/x86_64-linux-gnu/libnss_files-2.31.so
+7f9ad07a8000-7f9ad07ae000 rw-p 00000000 00:00 0 
+7f9ad07ae000-7f9ad07af000 r--p 00000000 08:20 2499                       /usr/lib/locale/C.UTF-8/LC_NUMERIC
+7f9ad07af000-7f9ad07b0000 r--p 00000000 08:20 2550                       /usr/lib/locale/C.UTF-8/LC_TIME
+7f9ad07b0000-7f9ad07b1000 r--p 00000000 08:20 2432                       /usr/lib/locale/C.UTF-8/LC_MONETARY
+7f9ad07b1000-7f9ad07b2000 r--p 00000000 08:20 2396                       /usr/lib/locale/C.UTF-8/LC_MESSAGES/SYS_LC_MESSAGES
+7f9ad07b2000-7f9ad07b3000 r--p 00000000 08:20 2532                       /usr/lib/locale/C.UTF-8/LC_PAPER
+7f9ad07b3000-7f9ad07b4000 r--p 00000000 08:20 2489                       /usr/lib/locale/C.UTF-8/LC_NAME
+7f9ad07b4000-7f9ad07bc000 rw-s 00000000 08:20 106305                     /tmp/hsperfdata_john/7608
+7f9ad07bc000-7f9ad07ca000 r--p 00000000 08:20 358805                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libjava.so
+7f9ad07ca000-7f9ad07e0000 r-xp 0000e000 08:20 358805                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libjava.so
+7f9ad07e0000-7f9ad07e7000 r--p 00024000 08:20 358805                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libjava.so
+7f9ad07e7000-7f9ad07e8000 r--p 0002a000 08:20 358805                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libjava.so
+7f9ad07e8000-7f9ad07e9000 rw-p 0002b000 08:20 358805                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libjava.so
+7f9ad07e9000-7f9ad07ea000 rw-p 00000000 00:00 0 
+7f9ad07ea000-7f9ad07ef000 r--p 00000000 08:20 358824                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libverify.so
+7f9ad07ef000-7f9ad07f6000 r-xp 00005000 08:20 358824                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libverify.so
+7f9ad07f6000-7f9ad07f8000 r--p 0000c000 08:20 358824                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libverify.so
+7f9ad07f8000-7f9ad07f9000 ---p 0000e000 08:20 358824                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libverify.so
+7f9ad07f9000-7f9ad07fb000 r--p 0000e000 08:20 358824                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libverify.so
+7f9ad07fb000-7f9ad07fc000 rw-p 00010000 08:20 358824                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libverify.so
+7f9ad07fc000-7f9ad07fe000 r--p 00000000 08:20 42452                      /usr/lib/x86_64-linux-gnu/librt-2.31.so
+7f9ad07fe000-7f9ad0802000 r-xp 00002000 08:20 42452                      /usr/lib/x86_64-linux-gnu/librt-2.31.so
+7f9ad0802000-7f9ad0804000 r--p 00006000 08:20 42452                      /usr/lib/x86_64-linux-gnu/librt-2.31.so
+7f9ad0804000-7f9ad0805000 r--p 00007000 08:20 42452                      /usr/lib/x86_64-linux-gnu/librt-2.31.so
+7f9ad0805000-7f9ad0806000 rw-p 00008000 08:20 42452                      /usr/lib/x86_64-linux-gnu/librt-2.31.so
+7f9ad0806000-7f9ad080a000 ---p 00000000 00:00 0 
+7f9ad080a000-7f9ad0907000 rw-p 00000000 00:00 0 
+7f9ad0907000-7f9ad090a000 r--p 00000000 08:20 8161                       /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+7f9ad090a000-7f9ad091c000 r-xp 00003000 08:20 8161                       /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+7f9ad091c000-7f9ad0920000 r--p 00015000 08:20 8161                       /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+7f9ad0920000-7f9ad0921000 r--p 00018000 08:20 8161                       /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+7f9ad0921000-7f9ad0922000 rw-p 00019000 08:20 8161                       /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+7f9ad0922000-7f9ad092f000 r--p 00000000 08:20 42439                      /usr/lib/x86_64-linux-gnu/libm-2.31.so
+7f9ad092f000-7f9ad09d6000 r-xp 0000d000 08:20 42439                      /usr/lib/x86_64-linux-gnu/libm-2.31.so
+7f9ad09d6000-7f9ad0a6f000 r--p 000b4000 08:20 42439                      /usr/lib/x86_64-linux-gnu/libm-2.31.so
+7f9ad0a6f000-7f9ad0a70000 r--p 0014c000 08:20 42439                      /usr/lib/x86_64-linux-gnu/libm-2.31.so
+7f9ad0a70000-7f9ad0a71000 rw-p 0014d000 08:20 42439                      /usr/lib/x86_64-linux-gnu/libm-2.31.so
+7f9ad0a71000-7f9ad0b07000 r--p 00000000 08:20 8370                       /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28
+7f9ad0b07000-7f9ad0bf8000 r-xp 00096000 08:20 8370                       /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28
+7f9ad0bf8000-7f9ad0c41000 r--p 00187000 08:20 8370                       /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28
+7f9ad0c41000-7f9ad0c42000 ---p 001d0000 08:20 8370                       /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28
+7f9ad0c42000-7f9ad0c4d000 r--p 001d0000 08:20 8370                       /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28
+7f9ad0c4d000-7f9ad0c50000 rw-p 001db000 08:20 8370                       /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.28
+7f9ad0c50000-7f9ad0c53000 rw-p 00000000 00:00 0 
+7f9ad0c53000-7f9ad0ed5000 r--p 00000000 08:20 358831                     /usr/lib/jvm/java-11-openjdk-amd64/lib/server/libjvm.so
+7f9ad0ed5000-7f9ad1b67000 r-xp 00282000 08:20 358831                     /usr/lib/jvm/java-11-openjdk-amd64/lib/server/libjvm.so
+7f9ad1b67000-7f9ad1dc6000 r--p 00f14000 08:20 358831                     /usr/lib/jvm/java-11-openjdk-amd64/lib/server/libjvm.so
+7f9ad1dc6000-7f9ad1dc7000 ---p 01173000 08:20 358831                     /usr/lib/jvm/java-11-openjdk-amd64/lib/server/libjvm.so
+7f9ad1dc7000-7f9ad1e8b000 r--p 01173000 08:20 358831                     /usr/lib/jvm/java-11-openjdk-amd64/lib/server/libjvm.so
+7f9ad1e8b000-7f9ad1ec6000 rw-p 01237000 08:20 358831                     /usr/lib/jvm/java-11-openjdk-amd64/lib/server/libjvm.so
+7f9ad1ec6000-7f9ad1f1f000 rw-p 00000000 00:00 0 
+7f9ad1f1f000-7f9ad1f41000 r--p 00000000 08:20 42437                      /usr/lib/x86_64-linux-gnu/libc-2.31.so
+7f9ad1f41000-7f9ad20b9000 r-xp 00022000 08:20 42437                      /usr/lib/x86_64-linux-gnu/libc-2.31.so
+7f9ad20b9000-7f9ad2107000 r--p 0019a000 08:20 42437                      /usr/lib/x86_64-linux-gnu/libc-2.31.so
+7f9ad2107000-7f9ad210b000 r--p 001e7000 08:20 42437                      /usr/lib/x86_64-linux-gnu/libc-2.31.so
+7f9ad210b000-7f9ad210d000 rw-p 001eb000 08:20 42437                      /usr/lib/x86_64-linux-gnu/libc-2.31.so
+7f9ad210d000-7f9ad2111000 rw-p 00000000 00:00 0 
+7f9ad2111000-7f9ad2112000 r--p 00000000 08:20 42438                      /usr/lib/x86_64-linux-gnu/libdl-2.31.so
+7f9ad2112000-7f9ad2114000 r-xp 00001000 08:20 42438                      /usr/lib/x86_64-linux-gnu/libdl-2.31.so
+7f9ad2114000-7f9ad2115000 r--p 00003000 08:20 42438                      /usr/lib/x86_64-linux-gnu/libdl-2.31.so
+7f9ad2115000-7f9ad2116000 r--p 00003000 08:20 42438                      /usr/lib/x86_64-linux-gnu/libdl-2.31.so
+7f9ad2116000-7f9ad2117000 rw-p 00004000 08:20 42438                      /usr/lib/x86_64-linux-gnu/libdl-2.31.so
+7f9ad2117000-7f9ad211a000 r--p 00000000 08:20 358790                     /usr/lib/jvm/java-11-openjdk-amd64/lib/jli/libjli.so
+7f9ad211a000-7f9ad2124000 r-xp 00003000 08:20 358790                     /usr/lib/jvm/java-11-openjdk-amd64/lib/jli/libjli.so
+7f9ad2124000-7f9ad2127000 r--p 0000d000 08:20 358790                     /usr/lib/jvm/java-11-openjdk-amd64/lib/jli/libjli.so
+7f9ad2127000-7f9ad2128000 ---p 00010000 08:20 358790                     /usr/lib/jvm/java-11-openjdk-amd64/lib/jli/libjli.so
+7f9ad2128000-7f9ad2129000 r--p 00010000 08:20 358790                     /usr/lib/jvm/java-11-openjdk-amd64/lib/jli/libjli.so
+7f9ad2129000-7f9ad212a000 rw-p 00011000 08:20 358790                     /usr/lib/jvm/java-11-openjdk-amd64/lib/jli/libjli.so
+7f9ad212a000-7f9ad2130000 r--p 00000000 08:20 42450                      /usr/lib/x86_64-linux-gnu/libpthread-2.31.so
+7f9ad2130000-7f9ad2141000 r-xp 00006000 08:20 42450                      /usr/lib/x86_64-linux-gnu/libpthread-2.31.so
+7f9ad2141000-7f9ad2147000 r--p 00017000 08:20 42450                      /usr/lib/x86_64-linux-gnu/libpthread-2.31.so
+7f9ad2147000-7f9ad2148000 r--p 0001c000 08:20 42450                      /usr/lib/x86_64-linux-gnu/libpthread-2.31.so
+7f9ad2148000-7f9ad2149000 rw-p 0001d000 08:20 42450                      /usr/lib/x86_64-linux-gnu/libpthread-2.31.so
+7f9ad2149000-7f9ad214d000 rw-p 00000000 00:00 0 
+7f9ad214d000-7f9ad214f000 r--p 00000000 08:20 40215                      /usr/lib/x86_64-linux-gnu/libz.so.1.2.11
+7f9ad214f000-7f9ad2160000 r-xp 00002000 08:20 40215                      /usr/lib/x86_64-linux-gnu/libz.so.1.2.11
+7f9ad2160000-7f9ad2166000 r--p 00013000 08:20 40215                      /usr/lib/x86_64-linux-gnu/libz.so.1.2.11
+7f9ad2166000-7f9ad2167000 ---p 00019000 08:20 40215                      /usr/lib/x86_64-linux-gnu/libz.so.1.2.11
+7f9ad2167000-7f9ad2168000 r--p 00019000 08:20 40215                      /usr/lib/x86_64-linux-gnu/libz.so.1.2.11
+7f9ad2168000-7f9ad2169000 rw-p 0001a000 08:20 40215                      /usr/lib/x86_64-linux-gnu/libz.so.1.2.11
+7f9ad2169000-7f9ad216a000 r--p 00000000 08:20 2221                       /usr/lib/locale/C.UTF-8/LC_ADDRESS
+7f9ad216a000-7f9ad216b000 r--p 00000000 08:20 2535                       /usr/lib/locale/C.UTF-8/LC_TELEPHONE
+7f9ad216b000-7f9ad216c000 r--p 00000000 08:20 2280                       /usr/lib/locale/C.UTF-8/LC_MEASUREMENT
+7f9ad216c000-7f9ad216d000 ---p 00000000 00:00 0 
+7f9ad216d000-7f9ad216e000 r--p 00000000 00:00 0 
+7f9ad216e000-7f9ad2170000 r--p 00000000 08:20 358808                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libjimage.so
+7f9ad2170000-7f9ad2173000 r-xp 00002000 08:20 358808                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libjimage.so
+7f9ad2173000-7f9ad2174000 r--p 00005000 08:20 358808                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libjimage.so
+7f9ad2174000-7f9ad2175000 ---p 00006000 08:20 358808                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libjimage.so
+7f9ad2175000-7f9ad2176000 r--p 00006000 08:20 358808                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libjimage.so
+7f9ad2176000-7f9ad2177000 rw-p 00007000 08:20 358808                     /usr/lib/jvm/java-11-openjdk-amd64/lib/libjimage.so
+7f9ad2177000-7f9ad2179000 rw-p 00000000 00:00 0 
+7f9ad2179000-7f9ad217a000 r--p 00000000 08:20 42432                      /usr/lib/x86_64-linux-gnu/ld-2.31.so
+7f9ad217a000-7f9ad219d000 r-xp 00001000 08:20 42432                      /usr/lib/x86_64-linux-gnu/ld-2.31.so
+7f9ad219d000-7f9ad21a5000 r--p 00024000 08:20 42432                      /usr/lib/x86_64-linux-gnu/ld-2.31.so
+7f9ad21a5000-7f9ad21a6000 r--p 00000000 08:20 2279                       /usr/lib/locale/C.UTF-8/LC_IDENTIFICATION
+7f9ad21a6000-7f9ad21a7000 r--p 0002c000 08:20 42432                      /usr/lib/x86_64-linux-gnu/ld-2.31.so
+7f9ad21a7000-7f9ad21a8000 rw-p 0002d000 08:20 42432                      /usr/lib/x86_64-linux-gnu/ld-2.31.so
+7f9ad21a8000-7f9ad21a9000 rw-p 00000000 00:00 0 
+7fff21474000-7fff21496000 rw-p 00000000 00:00 0                          [stack]
+7fff21537000-7fff2153b000 r--p 00000000 00:00 0                          [vvar]
+7fff2153b000-7fff2153d000 r-xp 00000000 00:00 0                          [vdso]
+
+
+VM Arguments:
+jvm_args: -Dllvm4jni.supportIndirectCall=simple -Dllvm4jni.supportLocalConstant=true -Dllvm4jni.maximumBytecodeSize=128 
+java_command: com.alibaba.fastffi.llvm4jni.Main -cp /home/john/graphar/gar-nullable-key-spark/java/target/classes -bc /home/john/graphar/gar-nullable-key-spark/java/target/native/gar-java.bc -output /home/john/graphar/gar-nullable-key-spark/java/target/llvm4jni-output -v INFO
+java_class_path (initial): /home/john/graphar/gar-nullable-key-spark/java/target/classes:/home/john/.m2/repository/com/alibaba/fastffi/ffi/0.1.2/ffi-0.1.2.jar:/home/john/.m2/repository/com/alibaba/fastffi/annotation-processor/0.1.2/annotation-processor-0.1.2.jar:/home/john/.m2/repository/com/squareup/javapoet/1.13.0/javapoet-1.13.0.jar:/home/john/.m2/repository/com/google/code/findbugs/jsr305/3.0.2/jsr305-3.0.2.jar:/home/john/.m2/repository/com/alibaba/fastffi/llvm4jni-runtime/0.1.2/llvm4jni-runtime-0.1.2.jar:/home/john/.m2/repository/com/github/jnr/jnr-ffi/2.2.12/jnr-ffi-2.2.12.jar:/home/john/.m2/repository/com/github/jnr/jffi/1.3.9/jffi-1.3.9.jar:/home/john/.m2/repository/org/ow2/asm/asm/9.2/asm-9.2.jar:/home/john/.m2/repository/org/ow2/asm/asm-commons/9.2/asm-commons-9.2.jar:/home/john/.m2/repository/org/ow2/asm/asm-analysis/9.2/asm-analysis-9.2.jar:/home/john/.m2/repository/org/ow2/asm/asm-tree/9.2/asm-tree-9.2.jar:/home/john/.m2/repository/org/ow2/asm/asm-util/9.2/asm-util-9.2.jar:/home/john/.m2/repository/com/github/jnr/jnr-a64asm/1.0.0/jnr-a64asm-1.0.0.jar:/home/john/.m2/repository/com/github/jnr/jnr-x86asm/1.0.2/jnr-x86asm-1.0.2.jar:/home/john/.m2/repository/com/alibaba/fastffi/llvm4jni/0.1.2/llvm4jni-0.1.2-linux-x86_64.jar:/home/john/.m2/repository/com/alibaba/fastffi/llvm/0.1.2/llvm-0.1.2.jar:/home/john/.m2/repository/com/alibaba/fastffi/llvm/0.1.2/llvm-0.1.2-linux-x86_64.jar:/home/john/.m2/repository/org/apache/arrow/arrow-c-data/13.0.0/arrow-c-data-13.0.0.jar:/home/john/.m2/repository/org/apache/arrow/arrow-memory-core/13.0.0/arrow-memory-core-13.0.0.jar:/home/john/.m2/repository/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar:/home/john/.m2/repository/org/apache/arrow/arrow-vector/13.0.0/arrow-vector-13.0.0.jar:/home/john/.m2/repository/org/apache/arrow/arrow-format/13.0.0/arrow-format-13.0.0.jar:/home/john/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.1/jackson-core-2.15.1.jar:/home/john/.m2/repository/com/fasterxml/jackson/core/jackson
+Launcher Type: SUN_STANDARD
+
+[Global flags]
+     intx CICompilerCount                          = 4                                         {product} {ergonomic}
+     uint ConcGCThreads                            = 3                                         {product} {ergonomic}
+     uint G1ConcRefinementThreads                  = 10                                        {product} {ergonomic}
+   size_t G1HeapRegionSize                         = 1048576                                   {product} {ergonomic}
+    uintx GCDrainStackTargetSize                   = 64                                        {product} {ergonomic}
+   size_t InitialHeapSize                          = 125829120                                 {product} {ergonomic}
+   size_t MarkStackSize                            = 4194304                                   {product} {ergonomic}
+   size_t MaxHeapSize                              = 1998585856                                {product} {ergonomic}
+   size_t MaxNewSize                               = 1198522368                                {product} {ergonomic}
+   size_t MinHeapDeltaBytes                        = 1048576                                   {product} {ergonomic}
+    uintx NonNMethodCodeHeapSize                   = 5836300                                {pd product} {ergonomic}
+    uintx NonProfiledCodeHeapSize                  = 122910970                              {pd product} {ergonomic}
+    uintx ProfiledCodeHeapSize                     = 122910970                              {pd product} {ergonomic}
+    uintx ReservedCodeCacheSize                    = 251658240                              {pd product} {ergonomic}
+     bool SegmentedCodeCache                       = true                                      {product} {ergonomic}
+     bool UseCompressedClassPointers               = true                                 {lp64_product} {ergonomic}
+     bool UseCompressedOops                        = true                                 {lp64_product} {ergonomic}
+     bool UseG1GC                                  = true                                      {product} {ergonomic}
+
+Logging:
+Log output configuration:
+ #0: stdout all=warning uptime,level,tags
+ #1: stderr all=off uptime,level,tags
+
+Environment Variables:
+JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+PATH=/home/john/.local/bin:/home/john/gowork:/home/john/gowork/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/lib/wsl/lib:/mnt/c/Program Files/Zulu/zulu-8/bin/:/mnt/c/Program Files (x86)/Common Files/Oracle/Java/javapath:/mnt/c/Windows/system32:/mnt/c/Windows:/mnt/c/Windows/System32/Wbem:/mnt/c/Windows/System32/WindowsPowerShell/v1.0/:/mnt/c/Windows/System32/OpenSSH/:/mnt/c/WINDOWS/system32:/mnt/c/WINDOWS:/mnt/c/WINDOWS/System32/Wbem:/mnt/c/WINDOWS/System32/WindowsPowerShell/v1.0/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/g/softwares/Software/Git/cmd:/mnt/g/softwares/Software/nodejs/:/mnt/g/softwares/Software/Pandoc/:/mnt/c/WINDOWS/System32/OpenSSH/:/mnt/c/Program Files/Git/cmd:/mnt/g/softwares/Software/powershell/7/:/mnt/c/Program Files/Docker/Docker/resources/bin:/mnt/c/Program Files/Bandizip/:/mnt/g/softwares/Software/Microsoft VS Code/bin:/mnt/c/Program Files/PowerShell/7/:/mnt/c/Users/John Dylan/AppData/Local/Programs/Python/Python312/Scripts/:/mnt/c/Users/John Dylan/AppData/Local/Programs/Python/Python312/:/mnt/c/Users/John Dylan/AppData/Local/Programs/Python/Python311/Scripts/:/mnt/c/Users/John Dylan/AppData/Local/Programs/Python/Python311/:/mnt/c/Users/John Dylan/AppData/Local/Microsoft/WindowsApps:/mnt/c/Users/John Dylan/.dotnet/tools:/mnt/c/Users/John Dylan/AppData/Local/JetBrains/Toolbox/scripts:/mnt/c/Users/John Dylan/AppData/Local/GitHubDesktop/bin:/mnt/c/Users/John Dylan/AppData/Roaming/npm:/mnt/c/Users/John Dylan/AppData/Local/Microsoft/WinGet/Links:/snap/bin:/usr/local/scala/bin
+SHELL=/bin/bash
+DISPLAY=:0
+HOSTTYPE=x86_64
+LANG=C.UTF-8
+TERM=xterm-256color
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0xea0dc0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGBUS: [libjvm.so+0xea0dc0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGFPE: [libjvm.so+0xea0dc0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGPIPE: [libjvm.so+0xbe63a0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGXFSZ: [libjvm.so+0xbe63a0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGILL: [libjvm.so+0xea0dc0], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGUSR2: [libjvm.so+0xbe6240], sa_mask[0]=00100000000000000000000000000000, sa_flags=SA_RESTART|SA_SIGINFO
+SIGHUP: [libjvm.so+0xbe6910], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGINT: [libjvm.so+0xbe6910], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGTERM: [libjvm.so+0xbe6910], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGQUIT: [libjvm.so+0xbe6910], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+
+
+---------------  S Y S T E M  ---------------
+
+OS:DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=20.04
+DISTRIB_CODENAME=focal
+DISTRIB_DESCRIPTION="Ubuntu 20.04.6 LTS"
+uname:Linux 5.15.133.1-microsoft-standard-WSL2 #1 SMP Thu Oct 5 21:02:42 UTC 2023 x86_64
+OS uptime: 0 days 0:04 hours
+libc:glibc 2.31 NPTL 2.31 
+rlimit (soft/hard): STACK 8192k/infinity , CORE 0k/infinity , NPROC 30450/30450 , NOFILE 1048576/1048576 , AS infinity/infinity , CPU infinity/infinity , DATA infinity/infinity , FSIZE infinity/infinity , MEMLOCK 65536k/65536k
+load average:1.12 0.65 0.28
+
+/proc/meminfo:
+MemTotal:        7802004 kB
+MemFree:         1548612 kB
+MemAvailable:    6219128 kB
+Buffers:          155828 kB
+Cached:          4540820 kB
+SwapCached:            0 kB
+Active:           391208 kB
+Inactive:        5272428 kB
+Active(anon):       1932 kB
+Inactive(anon):   967440 kB
+Active(file):     389276 kB
+Inactive(file):  4304988 kB
+Unevictable:           0 kB
+Mlocked:               0 kB
+SwapTotal:       2097152 kB
+SwapFree:        2097152 kB
+Dirty:            192240 kB
+Writeback:            92 kB
+AnonPages:        967180 kB
+Mapped:          1203680 kB
+Shmem:              2380 kB
+KReclaimable:     275716 kB
+Slab:             332356 kB
+SReclaimable:     275716 kB
+SUnreclaim:        56640 kB
+KernelStack:        4624 kB
+PageTables:         8448 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:     5998152 kB
+Committed_AS:    1301744 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:       24864 kB
+VmallocChunk:          0 kB
+Percpu:             4352 kB
+AnonHugePages:    411648 kB
+ShmemHugePages:        0 kB
+ShmemPmdMapped:        0 kB
+FileHugePages:         0 kB
+FilePmdMapped:         0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+Hugetlb:               0 kB
+DirectMap4k:       19456 kB
+DirectMap2M:     3835904 kB
+DirectMap1G:    12582912 kB
+
+/sys/kernel/mm/transparent_hugepage/enabled:
+[always] madvise never
+/sys/kernel/mm/transparent_hugepage/defrag (defrag/compaction efforts parameter):
+always defer defer+madvise [madvise] never
+
+Process Memory:
+Virtual Size: 8160896K (peak: 13387100K)
+Resident Set Size: 1597500K (peak: 1597500K) (anon: 440728K, file: 1156772K, shmem: 0K)
+Swapped out: 0K
+C-Heap outstanding allocations: 75056K, retained: 75215K
+glibc malloc tunables: (default)
+
+/proc/sys/kernel/threads-max (system-wide limit on the number of threads):
+60901
+/proc/sys/vm/max_map_count (maximum number of memory map areas a process may have):
+65530
+/proc/sys/kernel/pid_max (system-wide limit on number of process identifiers):
+32768
+
+container (cgroup) information:
+container_type: cgroupv1
+cpu_cpuset_cpus: 0-11
+cpu_memory_nodes: 0
+active_processor_count: 12
+cpu_quota: no quota
+cpu_period: 100000
+cpu_shares: no shares
+memory_limit_in_bytes: unlimited
+memory_and_swap_limit_in_bytes: unlimited
+memory_soft_limit_in_bytes: unlimited
+memory_usage_in_bytes: 5664224 k
+memory_max_usage_in_bytes: unlimited
+kernel_memory_usage_in_bytes: unlimited
+kernel_memory_max_usage_in_bytes: unlimited
+kernel_memory_limit_in_bytes: unlimited
+maximum number of tasks: not supported
+current number of tasks: not supported
+
+Hyper-V virtualization detected
+Steal ticks since vm start: 0
+Steal ticks percentage since vm start:  0.000
+
+CPU:total 12 (initial active 12) (16 cores per cpu, 2 threads per core) family 25 model 80 stepping 0 microcode 0xffffffff, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, avx2, aes, clmul, erms, mmxext, 3dnowpref, lzcnt, sse4a, ht, tsc, tscinvbit, tscinv, bmi1, bmi2, adx, sha, fma
+CPU Model and flags from /proc/cpuinfo:
+model name	: AMD Ryzen 5 5600H with Radeon Graphics
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good nopl tsc_reliable nonstop_tsc cpuid extd_apicid pni pclmulqdq ssse3 fma cx16 sse4_1 sse4_2 movbe popcnt aes xsave avx f16c rdrand hypervisor lahf_lm cmp_legacy cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw topoext ibrs ibpb stibp vmmcall fsgsbase bmi1 avx2 smep bmi2 erms rdseed adx smap clflushopt clwb sha_ni xsaveopt xsavec xgetbv1 xsaves clzero xsaveerptr arat umip vaes vpclmulqdq rdpid fsrm
+Online cpus:
+0-11
+Offline cpus:
+
+BIOS frequency limitation:
+<Not Available>
+Frequency switch latency (ns):
+<Not Available>
+Available cpu frequencies:
+<Not Available>
+Current governor:
+<Not Available>
+Core performance/turbo boost:
+<Not Available>
+
+Memory: 4k page, physical 7802004k(1548612k free), swap 2097152k(2097152k free)
+
+vm_info: OpenJDK 64-Bit Server VM (11.0.21+9-post-Ubuntu-0ubuntu120.04) for linux-amd64 JRE (11.0.21+9-post-Ubuntu-0ubuntu120.04), built on Oct 19 2023 08:49:39 by "unknown" with gcc 9.4.0
+
+END.
