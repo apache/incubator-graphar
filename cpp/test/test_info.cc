@@ -242,7 +242,7 @@ TEST_CASE("VertexInfo") {
   }
 
   SECTION("CreateVertexInfo") {
-    auto vertex_info3 = CreateVertexInfo("", chunk_size, "test_vertex/");
+    auto vertex_info3 = CreateVertexInfo("", chunk_size, {pg}, "test_vertex/");
     REQUIRE(vertex_info3 == nullptr);
 
     auto vertex_info4 = CreateVertexInfo(label, 0, {pg}, "test_vertex/");
