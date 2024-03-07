@@ -1198,6 +1198,9 @@ std::shared_ptr<GraphInfo> CreateGraphInfo(
     const EdgeInfoVector& edge_infos, const std::string& prefix,
     std::shared_ptr<const InfoVersion> version,
     const std::unordered_map<std::string, std::string>& extra_info) {
+  if (name.empty()) {
+    return nullptr;
+  }
   return std::make_shared<GraphInfo>(name, vertex_infos, edge_infos, prefix,
                                      version, extra_info);
 }

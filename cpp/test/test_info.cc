@@ -601,6 +601,12 @@ TEST_CASE("GraphInfo") {
     REQUIRE(graph_info_with_empty_prefix->IsValidated() == false);
   }
 
+  SECTION("CreateGraphInfo") {
+    auto graph_info_empty_name =
+        CreateGraphInfo("", {vertex_info}, {edge_info}, "test_graph/");
+    REQUIRE(graph_info_empty_name == nullptr);
+  }
+
   SECTION("Dump") {
     auto dump_result = graph_info->Dump();
     REQUIRE(dump_result.status().ok());
