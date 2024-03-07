@@ -229,12 +229,11 @@ TEST_CASE("VertexInfo") {
     auto invalid_vertex_info0 = CreateVertexInfo(
         label, chunk_size, {invalid_pg}, "test_vertex/", version);
     REQUIRE(invalid_vertex_info0->IsValidated() == false);
-    auto invalid_vertex_info1 =
-        CreateVertexInfo("", chunk_size, {pg}, "test_vertex/", version);
-    REQUIRE(invalid_vertex_info1->IsValidated() == false);
-    auto invalid_vertex_info2 =
-        CreateVertexInfo(label, 0, {pg}, "test_vertex/", version);
-    REQUIRE(invalid_vertex_info2->IsValidated() == false);
+    VertexInfo invalid_vertex_info1("", chunk_size, {pg}, "test_vertex/",
+                                    version);
+    REQUIRE(invalid_vertex_info1.IsValidated() == false);
+    VertexInfo invalid_vertex_info2(label, 0, {pg}, "test_vertex/", version);
+    REQUIRE(invalid_vertex_info2.IsValidated() == false);
     // check if prefix empty
     auto vertex_info_empty_prefix =
         CreateVertexInfo(label, chunk_size, {pg}, "", version);
@@ -384,30 +383,23 @@ TEST_CASE("EdgeInfo") {
                        src_chunk_size, dst_chunk_size, directed, {adj_list},
                        {invalid_pg}, "test_edge/", version);
     REQUIRE(invalid_edge_info0->IsValidated() == false);
-    auto invalid_edge_info1 = CreateEdgeInfo(
-        "", edge_label, dst_label, chunk_size, src_chunk_size, dst_chunk_size,
-        directed, {adj_list}, {pg}, "test_edge/", version);
-    REQUIRE(invalid_edge_info1->IsValidated() == false);
-    auto invalid_edge_info2 = CreateEdgeInfo(
-        src_label, "", dst_label, chunk_size, src_chunk_size, dst_chunk_size,
-        directed, {adj_list}, {pg}, "test_edge/", version);
-    REQUIRE(invalid_edge_info2->IsValidated() == false);
-    auto invalid_edge_info3 = CreateEdgeInfo(
-        src_label, edge_label, "", chunk_size, src_chunk_size, dst_chunk_size,
-        directed, {adj_list}, {pg}, "test_edge/", version);
-    REQUIRE(invalid_edge_info3->IsValidated() == false);
-    auto invalid_edge_info4 = CreateEdgeInfo(
-        src_label, edge_label, dst_label, 0, src_chunk_size, dst_chunk_size,
-        directed, {adj_list}, {pg}, "test_edge/", version);
-    REQUIRE(invalid_edge_info4->IsValidated() == false);
-    auto invalid_edge_info5 = CreateEdgeInfo(
-        src_label, edge_label, dst_label, chunk_size, 0, dst_chunk_size,
-        directed, {adj_list}, {pg}, "test_edge/", version);
-    REQUIRE(invalid_edge_info5->IsValidated() == false);
-    auto invalid_edge_info6 = CreateEdgeInfo(
-        src_label, edge_label, dst_label, chunk_size, src_chunk_size, 0,
-        directed, {adj_list}, {pg}, "test_edge/", version);
-    REQUIRE(invalid_edge_info6->IsValidated() == false);
+    for (int i = 0; i < 3; i++) {
+      std::vector<std::string> labels = {src_label, edge_label, dst_label};
+      labels[i] = "";
+      EdgeInfo invalid_edge_info1(labels[0], labels[1], labels[2], chunk_size,
+                                  src_chunk_size, dst_chunk_size, directed,
+                                  {adj_list}, {pg}, "test_edge/", version);
+      REQUIRE(invalid_edge_info1.IsValidated() == false);
+    }
+    for (int i = 0; i < 3; i++) {
+      std::vector<int> sizes = {chunk_size, src_chunk_size, dst_chunk_size};
+      sizes[i] = 0;
+      EdgeInfo invalid_edge_info2(src_label, edge_label, dst_label, sizes[0],
+                                  sizes[1], sizes[2], directed, {adj_list},
+                                  {pg}, "test_edge/", version);
+      REQUIRE(invalid_edge_info2.IsValidated() == false);
+    }
+
     // check if prefix empty
     auto edge_info_with_empty_prefix = CreateEdgeInfo(
         src_label, edge_label, dst_label, chunk_size, src_chunk_size,
@@ -417,7 +409,7 @@ TEST_CASE("EdgeInfo") {
 
   SECTION("CreateEdgeInfo") {
     for (int i = 0; i < 3; i++) {
-      std::vector<std::string> labels = {"person", "knows", "person"};
+      std::vector<std::string> labels = {src_label, edge_label, dst_label};
       labels[i] = "";
       auto edge_info = CreateEdgeInfo(
           labels[0], labels[1], labels[2], chunk_size, src_chunk_size,
@@ -425,7 +417,7 @@ TEST_CASE("EdgeInfo") {
       REQUIRE(edge_info == nullptr);
     }
     for (int i = 0; i < 3; i++) {
-      std::vector<int> sizes = {1024, 100, 100};
+      std::vector<int> sizes = {chunk_size, src_chunk_size, dst_chunk_size};
       sizes[i] = 0;
       auto edge_info = CreateEdgeInfo(src_label, edge_label, dst_label,
                                       sizes[0], sizes[1], sizes[2], directed,
@@ -469,9 +461,9 @@ src_label: person
 version: gar/v1
 )";
     REQUIRE(dump_result.value() == expected);
-    auto edge_info_empty_version =
-        CreateEdgeInfo(src_label, edge_label, dst_label, chunk_size,
-                       src_chunk_size, dst_chunk_size, directed, {}, {});
+    auto edge_info_empty_version = CreateEdgeInfo(
+        src_label, edge_label, dst_label, chunk_size, src_chunk_size,
+        dst_chunk_size, directed, {adj_list}, {pg});
     REQUIRE(edge_info_empty_version->Dump().status().ok());
   }
 
@@ -589,12 +581,12 @@ TEST_CASE("GraphInfo") {
     auto invalid_graph_info1 = CreateGraphInfo(
         name, {vertex_info}, {invalid_edge_info}, "test_graph/", version);
     REQUIRE(invalid_graph_info1->IsValidated() == false);
-    auto invalid_graph_info2 =
-        CreateGraphInfo("", {vertex_info}, {edge_info}, "test_graph/", version);
-    REQUIRE(invalid_graph_info2->IsValidated() == false);
-    auto invalid_graph_info3 =
-        CreateGraphInfo(name, {vertex_info}, {edge_info}, "", version);
-    REQUIRE(invalid_graph_info3->IsValidated() == false);
+    GraphInfo invalid_graph_info2("", {vertex_info}, {edge_info}, "test_graph/",
+                                  version);
+    REQUIRE(invalid_graph_info2.IsValidated() == false);
+    GraphInfo invalid_graph_info3(name, {vertex_info}, {edge_info}, "",
+                                  version);
+    REQUIRE(invalid_graph_info3.IsValidated() == false);
     // check if prefix empty, graph_info with empty prefix is invalid
     auto graph_info_with_empty_prefix =
         CreateGraphInfo(name, {vertex_info}, {edge_info}, "", version);

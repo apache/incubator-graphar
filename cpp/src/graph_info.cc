@@ -199,6 +199,9 @@ class VertexInfo::Impl {
     }
     for (size_t i = 0; i < property_groups_.size(); i++) {
       const auto& pg = property_groups_[i];
+      if (!pg) {
+        continue;
+      }
       for (const auto& p : pg->GetProperties()) {
         property_name_to_index_.emplace(p.name, i);
         property_name_to_primary_.emplace(p.name, p.is_primary);
@@ -249,6 +252,8 @@ VertexInfo::VertexInfo(const std::string& label, IdType chunk_size,
                        const std::string& prefix,
                        std::shared_ptr<const InfoVersion> version)
     : impl_(new Impl(label, chunk_size, prefix, property_groups, version)) {}
+
+VertexInfo::~VertexInfo() = default;
 
 const std::string& VertexInfo::GetLabel() const { return impl_->label_; }
 
@@ -500,11 +505,18 @@ class EdgeInfo::Impl {
                 REGULAR_SEPARATOR + dst_label_ + "/";  // default prefix
     }
     for (size_t i = 0; i < adjacent_lists_.size(); i++) {
+      if (!adjacent_lists_[i]) {
+        continue;
+      }
+
       auto adj_list_type = adjacent_lists_[i]->GetType();
       adjacent_list_type_to_index_[adj_list_type] = i;
     }
     for (size_t i = 0; i < property_groups_.size(); i++) {
       const auto& pg = property_groups_[i];
+      if (!pg) {
+        continue;
+      }
       for (const auto& p : pg->GetProperties()) {
         property_name_to_index_.emplace(p.name, i);
         property_name_to_primary_.emplace(p.name, p.is_primary);
@@ -578,6 +590,8 @@ EdgeInfo::EdgeInfo(const std::string& src_label, const std::string& edge_label,
     : impl_(new Impl(src_label, edge_label, dst_label, chunk_size,
                      src_chunk_size, dst_chunk_size, directed, prefix,
                      adjacent_lists, property_groups, version)) {}
+
+EdgeInfo::~EdgeInfo() = default;
 
 const std::string& EdgeInfo::GetSrcLabel() const { return impl_->src_label_; }
 
@@ -1046,13 +1060,17 @@ class GraphInfo::Impl {
         version_(std::move(version)),
         extra_info_(extra_info) {
     for (size_t i = 0; i < vertex_infos_.size(); i++) {
-      vlabel_to_index_[vertex_infos_[i]->GetLabel()] = i;
+      if (vertex_infos_[i] != nullptr) {
+        vlabel_to_index_[vertex_infos_[i]->GetLabel()] = i;
+      }
     }
     for (size_t i = 0; i < edge_infos_.size(); i++) {
-      std::string edge_key = ConcatEdgeTriple(edge_infos_[i]->GetSrcLabel(),
-                                              edge_infos_[i]->GetEdgeLabel(),
-                                              edge_infos_[i]->GetDstLabel());
-      elabel_to_index_[edge_key] = i;
+      if (edge_infos_[i] != nullptr) {
+        std::string edge_key = ConcatEdgeTriple(edge_infos_[i]->GetSrcLabel(),
+                                                edge_infos_[i]->GetEdgeLabel(),
+                                                edge_infos_[i]->GetDstLabel());
+        elabel_to_index_[edge_key] = i;
+      }
     }
   }
 
@@ -1094,6 +1112,8 @@ GraphInfo::GraphInfo(
     const std::unordered_map<std::string, std::string>& extra_info)
     : impl_(new Impl(graph_name, std::move(vertex_infos), std::move(edge_infos),
                      prefix, version, extra_info)) {}
+
+GraphInfo::~GraphInfo() = default;
 
 const std::string& GraphInfo::GetName() const { return impl_->name_; }
 
