@@ -42,7 +42,9 @@ std::shared_ptr<arrow::DataType> DataType::DataTypeToArrowDataType(
   case Type::LIST:
     return arrow::list(DataTypeToArrowDataType(type->child_));
   default:
-    throw std::runtime_error("Unsupported data type");
+    std::string msg = "The data type " + type->ToTypeName() +
+                      " is not supported yet in GraphAr";
+    throw std::runtime_error(msg);
   }
 }
 
@@ -66,7 +68,9 @@ std::shared_ptr<DataType> DataType::ArrowDataTypeToDataType(
   case arrow::Type::LIST:
     return list(ArrowDataTypeToDataType(type->field(0)->type()));
   default:
-    throw std::runtime_error("Unsupported data type");
+    std::string msg = "The arrow data type " + type->name() +
+                      " is not supported yet in GraphAr";
+    throw std::runtime_error(msg);
   }
 }
 
