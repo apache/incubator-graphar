@@ -44,6 +44,7 @@ std::shared_ptr<arrow::DataType> DataType::DataTypeToArrowDataType(
   default:
     std::string msg = "The data type " + type->ToTypeName() +
                       " is not supported yet in GraphAr";
+    throw std::runtime_error(msg);
   }
 }
 
