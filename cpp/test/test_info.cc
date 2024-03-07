@@ -85,7 +85,6 @@ TEST_CASE("PropertyGroup") {
 
   PropertyGroup pg0({p0, p1}, FileType::CSV, "p0_and_p1/");
   PropertyGroup pg1({p2, p3, p4}, FileType::PARQUET);
-
   SECTION("Properties") {
     REQUIRE(pg0.GetProperties().size() == 2);
     REQUIRE(pg1.GetProperties().size() == 3);
@@ -118,15 +117,21 @@ TEST_CASE("PropertyGroup") {
     PropertyGroup invalid_pg0({invalid_p0}, FileType::CSV);
     PropertyGroup invalid_pg1({invalid_p1}, FileType::CSV);
     PropertyGroup invalid_pg2({p0, p0}, FileType::PARQUET);
+    PropertyGroup invalid_pg3({}, FileType::CSV, "empty/");
     REQUIRE(invalid_pg0.IsValidated() == false);
     REQUIRE(invalid_pg1.IsValidated() == false);
     REQUIRE(invalid_pg2.IsValidated() == false);
+    REQUIRE(invalid_pg3.IsValidated() == false);
   }
 
   SECTION("CreatePropertyGroup") {
     auto pg2 = CreatePropertyGroup({p0, p1}, FileType::CSV, "p0_and_p1/");
     REQUIRE(*pg2.get() == pg0);
     REQUIRE(!(pg0 == pg1));
+
+    // not allow empty property group
+    auto pg3 = CreatePropertyGroup({}, FileType::PARQUET);
+    REQUIRE(pg3 == nullptr);
   }
 
   SECTION("Ostream") {
@@ -234,6 +239,14 @@ TEST_CASE("VertexInfo") {
     auto vertex_info_empty_prefix =
         CreateVertexInfo(label, chunk_size, {pg}, "", version);
     REQUIRE(vertex_info_empty_prefix->IsValidated() == true);
+  }
+
+  SECTION("CreateVertexInfo") {
+    auto vertex_info3 = CreateVertexInfo("", chunk_size, "test_vertex/");
+    REQUIRE(vertex_info3 == nullptr);
+
+    auto vertex_info4 = CreateVertexInfo(label, 0, {pg}, "test_vertex/");
+    REQUIRE(vertex_info4 == nullptr);
   }
 
   SECTION("Dump") {
@@ -400,6 +413,29 @@ TEST_CASE("EdgeInfo") {
         src_label, edge_label, dst_label, chunk_size, src_chunk_size,
         dst_chunk_size, directed, {adj_list}, {pg}, "", version);
     REQUIRE(edge_info_with_empty_prefix->IsValidated() == true);
+  }
+
+  SECTION("CreateEdgeInfo") {
+    for (int i = 0; i < 3; i++) {
+      std::vector<std::string> labels = {"person", "knows", "person"};
+      labels[i] = "";
+      auto edge_info = CreateEdgeInfo(
+          labels[0], labels[1], labels[2], chunk_size, src_chunk_size,
+          dst_chunk_size, directed, {adj_list}, {pg}, "test_edge/", version);
+      REQUIRE(edge_info == nullptr);
+    }
+    for (int i = 0; i < 3; i++) {
+      std::vector<int> sizes = {1024, 100, 100};
+      sizes[i] = 0;
+      auto edge_info = CreateEdgeInfo(src_label, edge_label, dst_label,
+                                      sizes[0], sizes[1], sizes[2], directed,
+                                      {adj_list}, {pg}, "test_edge/", version);
+      REQUIRE(edge_info == nullptr);
+    }
+    auto edge_info_empty_adjlist = CreateEdgeInfo(
+        src_label, edge_label, dst_label, chunk_size, src_chunk_size,
+        dst_chunk_size, directed, {}, {pg}, "test_edge/");
+    REQUIRE(edge_info_empty_adjlist == nullptr);
   }
 
   SECTION("Dump") {

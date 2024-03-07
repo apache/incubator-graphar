@@ -89,7 +89,7 @@ bool operator==(const Property& lhs, const Property& rhs) {
 PropertyGroup::PropertyGroup(const std::vector<Property>& properties,
                              FileType file_type, const std::string& prefix)
     : properties_(properties), file_type_(file_type), prefix_(prefix) {
-  if (prefix_.empty()) {
+  if (prefix_.empty() && !properties_.empty()) {
     for (const auto& p : properties_) {
       prefix_ += p.name + REGULAR_SEPARATOR;
     }
@@ -116,6 +116,9 @@ bool PropertyGroup::IsValidated() const {
        file_type_ != FileType::ORC)) {
     return false;
   }
+  if (properties_.empty()) {
+    return false;
+  }
   std::unordered_set<std::string> check_property_unique_set;
   for (const auto& p : properties_) {
     if (p.name.empty() || p.type == nullptr) {
@@ -139,6 +142,10 @@ bool PropertyGroup::IsValidated() const {
 std::shared_ptr<PropertyGroup> CreatePropertyGroup(
     const std::vector<Property>& properties, FileType file_type,
     const std::string& prefix) {
+  if (properties.empty()) {
+    // empty property group is not allowed
+    return nullptr;
+  }
   return std::make_shared<PropertyGroup>(properties, file_type, prefix);
 }
 
@@ -362,6 +369,9 @@ std::shared_ptr<VertexInfo> CreateVertexInfo(
     const std::string& label, IdType chunk_size,
     const PropertyGroupVector& property_groups, const std::string& prefix,
     std::shared_ptr<const InfoVersion> version) {
+  if (label.empty() || chunk_size <= 0) {
+    return nullptr;
+  }
   return std::make_shared<VertexInfo>(label, chunk_size, property_groups,
                                       prefix, version);
 }
@@ -425,33 +435,37 @@ Result<std::string> VertexInfo::Dump() const noexcept {
   if (!IsValidated()) {
     return Status::Invalid("The vertex info is not validated");
   }
-  ::Yaml::Node node;
-  node["label"] = impl_->label_;
-  node["chunk_size"] = std::to_string(impl_->chunk_size_);
-  node["prefix"] = impl_->prefix_;
-  for (const auto& pg : impl_->property_groups_) {
-    ::Yaml::Node pg_node;
-    if (!pg->GetPrefix().empty()) {
-      pg_node["prefix"] = pg->GetPrefix();
-    }
-    pg_node["file_type"] = FileTypeToString(pg->GetFileType());
-    for (const auto& p : pg->GetProperties()) {
-      ::Yaml::Node p_node;
-      p_node["name"] = p.name;
-      p_node["data_type"] = p.type->ToTypeName();
-      p_node["is_primary"] = p.is_primary ? "true" : "false";
-      p_node["is_nullable"] = p.is_nullable ? "true" : "false";
-      pg_node["properties"].PushBack();
-      pg_node["properties"][pg_node["properties"].Size() - 1] = p_node;
-    }
-    node["property_groups"].PushBack();
-    node["property_groups"][node["property_groups"].Size() - 1] = pg_node;
-  }
-  if (impl_->version_ != nullptr) {
-    node["version"] = impl_->version_->ToString();
-  }
   std::string dump_string;
-  ::Yaml::Serialize(node, dump_string);
+  ::Yaml::Node node;
+  try {
+    node["label"] = impl_->label_;
+    node["chunk_size"] = std::to_string(impl_->chunk_size_);
+    node["prefix"] = impl_->prefix_;
+    for (const auto& pg : impl_->property_groups_) {
+      ::Yaml::Node pg_node;
+      if (!pg->GetPrefix().empty()) {
+        pg_node["prefix"] = pg->GetPrefix();
+      }
+      pg_node["file_type"] = FileTypeToString(pg->GetFileType());
+      for (const auto& p : pg->GetProperties()) {
+        ::Yaml::Node p_node;
+        p_node["name"] = p.name;
+        p_node["data_type"] = p.type->ToTypeName();
+        p_node["is_primary"] = p.is_primary ? "true" : "false";
+        p_node["is_nullable"] = p.is_nullable ? "true" : "false";
+        pg_node["properties"].PushBack();
+        pg_node["properties"][pg_node["properties"].Size() - 1] = p_node;
+      }
+      node["property_groups"].PushBack();
+      node["property_groups"][node["property_groups"].Size() - 1] = pg_node;
+    }
+    if (impl_->version_ != nullptr) {
+      node["version"] = impl_->version_->ToString();
+    }
+    ::Yaml::Serialize(node, dump_string);
+  } catch (const std::exception& e) {
+    return Status::Invalid("Failed to dump vertex info: ", e.what());
+  }
   return dump_string;
 }
 
@@ -503,7 +517,7 @@ class EdgeInfo::Impl {
   bool is_validated() const noexcept {
     if (src_label_.empty() || edge_label_.empty() || dst_label_.empty() ||
         chunk_size_ <= 0 || src_chunk_size_ <= 0 || dst_chunk_size_ <= 0 ||
-        prefix_.empty()) {
+        prefix_.empty() || adjacent_lists_.empty()) {
       return false;
     }
 
@@ -785,6 +799,11 @@ std::shared_ptr<EdgeInfo> CreateEdgeInfo(
     const AdjacentListVector& adjacent_lists,
     const PropertyGroupVector& property_groups, const std::string& prefix,
     std::shared_ptr<const InfoVersion> version) {
+  if (src_label.empty() || edge_label.empty() || dst_label.empty() ||
+      chunk_size <= 0 || src_chunk_size <= 0 || dst_chunk_size <= 0 ||
+      adjacent_lists.empty()) {
+    return nullptr;
+  }
   return std::make_shared<EdgeInfo>(src_label, edge_label, dst_label,
                                     chunk_size, src_chunk_size, dst_chunk_size,
                                     directed, adjacent_lists, property_groups,
@@ -876,49 +895,54 @@ Result<std::string> EdgeInfo::Dump() const noexcept {
   if (!IsValidated()) {
     return Status::Invalid("The edge info is not validated.");
   }
-  ::Yaml::Node node;
-  node["src_label"] = impl_->src_label_;
-  node["edge_label"] = impl_->edge_label_;
-  node["dst_label"] = impl_->dst_label_;
-  node["chunk_size"] = std::to_string(impl_->chunk_size_);
-  node["src_chunk_size"] = std::to_string(impl_->src_chunk_size_);
-  node["dst_chunk_size"] = std::to_string(impl_->dst_chunk_size_);
-  node["prefix"] = impl_->prefix_;
-  node["directed"] = impl_->directed_ ? "true" : "false";
-  for (const auto& adjacent_list : impl_->adjacent_lists_) {
-    ::Yaml::Node adj_list_node;
-    auto adj_list_type = adjacent_list->GetType();
-    auto pair = AdjListTypeToOrderedAligned(adj_list_type);
-    adj_list_node["ordered"] = pair.first ? "true" : "false";
-    adj_list_node["aligned_by"] = pair.second;
-    adj_list_node["prefix"] = adjacent_list->GetPrefix();
-    adj_list_node["file_type"] = FileTypeToString(adjacent_list->GetFileType());
-    node["adj_lists"].PushBack();
-    node["adj_lists"][node["adj_lists"].Size() - 1] = adj_list_node;
-  }
-  for (const auto& pg : impl_->property_groups_) {
-    ::Yaml::Node pg_node;
-    if (!pg->GetPrefix().empty()) {
-      pg_node["prefix"] = pg->GetPrefix();
-    }
-    pg_node["file_type"] = FileTypeToString(pg->GetFileType());
-    for (const auto& p : pg->GetProperties()) {
-      ::Yaml::Node p_node;
-      p_node["name"] = p.name;
-      p_node["data_type"] = p.type->ToTypeName();
-      p_node["is_primary"] = p.is_primary ? "true" : "false";
-      p_node["is_nullable"] = p.is_nullable ? "true" : "false";
-      pg_node["properties"].PushBack();
-      pg_node["properties"][pg_node["properties"].Size() - 1] = p_node;
-    }
-    node["property_groups"].PushBack();
-    node["property_groups"][node["property_groups"].Size() - 1] = pg_node;
-  }
-  if (impl_->version_ != nullptr) {
-    node["version"] = impl_->version_->ToString();
-  }
   std::string dump_string;
-  ::Yaml::Serialize(node, dump_string);
+  ::Yaml::Node node;
+  try {
+    node["src_label"] = impl_->src_label_;
+    node["edge_label"] = impl_->edge_label_;
+    node["dst_label"] = impl_->dst_label_;
+    node["chunk_size"] = std::to_string(impl_->chunk_size_);
+    node["src_chunk_size"] = std::to_string(impl_->src_chunk_size_);
+    node["dst_chunk_size"] = std::to_string(impl_->dst_chunk_size_);
+    node["prefix"] = impl_->prefix_;
+    node["directed"] = impl_->directed_ ? "true" : "false";
+    for (const auto& adjacent_list : impl_->adjacent_lists_) {
+      ::Yaml::Node adj_list_node;
+      auto adj_list_type = adjacent_list->GetType();
+      auto pair = AdjListTypeToOrderedAligned(adj_list_type);
+      adj_list_node["ordered"] = pair.first ? "true" : "false";
+      adj_list_node["aligned_by"] = pair.second;
+      adj_list_node["prefix"] = adjacent_list->GetPrefix();
+      adj_list_node["file_type"] =
+          FileTypeToString(adjacent_list->GetFileType());
+      node["adj_lists"].PushBack();
+      node["adj_lists"][node["adj_lists"].Size() - 1] = adj_list_node;
+    }
+    for (const auto& pg : impl_->property_groups_) {
+      ::Yaml::Node pg_node;
+      if (!pg->GetPrefix().empty()) {
+        pg_node["prefix"] = pg->GetPrefix();
+      }
+      pg_node["file_type"] = FileTypeToString(pg->GetFileType());
+      for (const auto& p : pg->GetProperties()) {
+        ::Yaml::Node p_node;
+        p_node["name"] = p.name;
+        p_node["data_type"] = p.type->ToTypeName();
+        p_node["is_primary"] = p.is_primary ? "true" : "false";
+        p_node["is_nullable"] = p.is_nullable ? "true" : "false";
+        pg_node["properties"].PushBack();
+        pg_node["properties"][pg_node["properties"].Size() - 1] = p_node;
+      }
+      node["property_groups"].PushBack();
+      node["property_groups"][node["property_groups"].Size() - 1] = pg_node;
+    }
+    if (impl_->version_ != nullptr) {
+      node["version"] = impl_->version_->ToString();
+    }
+    ::Yaml::Serialize(node, dump_string);
+  } catch (const std::exception& e) {
+    return Status::Invalid("Failed to dump edge info: ", e.what());
+  }
   return dump_string;
 }
 
@@ -1209,37 +1233,41 @@ Result<std::string> GraphInfo::Dump() const {
     return Status::Invalid("The graph info is not validated.");
   }
   ::Yaml::Node node;
-  node["name"] = impl_->name_;
-  node["prefix"] = impl_->prefix_;
-  node["vertices"];
-  node["edges"];
-  for (const auto& vertex : GetVertexInfos()) {
-    node["vertices"].PushBack();
-    node["vertices"][node["vertices"].Size() - 1] =
-        vertex->GetLabel() + ".vertex.yaml";
-  }
-  for (const auto& edge : GetEdgeInfos()) {
-    node["edges"].PushBack();
-    node["edges"][node["edges"].Size() - 1] =
-        ConcatEdgeTriple(edge->GetSrcLabel(), edge->GetEdgeLabel(),
-                         edge->GetDstLabel()) +
-        ".edge.yaml";
-  }
-  if (impl_->version_ != nullptr) {
-    node["version"] = impl_->version_->ToString();
-  }
-  if (impl_->extra_info_.size() > 0) {
-    node["extra_info"];
-    for (const auto& pair : impl_->extra_info_) {
-      ::Yaml::Node extra_info_node;
-      extra_info_node["key"] = pair.first;
-      extra_info_node["value"] = pair.second;
-      node["extra_info"].PushBack();
-      node["extra_info"][node["extra_info"].Size() - 1] = extra_info_node;
-    }
-  }
   std::string dump_string;
-  ::Yaml::Serialize(node, dump_string);
+  try {
+    node["name"] = impl_->name_;
+    node["prefix"] = impl_->prefix_;
+    node["vertices"];
+    node["edges"];
+    for (const auto& vertex : GetVertexInfos()) {
+      node["vertices"].PushBack();
+      node["vertices"][node["vertices"].Size() - 1] =
+          vertex->GetLabel() + ".vertex.yaml";
+    }
+    for (const auto& edge : GetEdgeInfos()) {
+      node["edges"].PushBack();
+      node["edges"][node["edges"].Size() - 1] =
+          ConcatEdgeTriple(edge->GetSrcLabel(), edge->GetEdgeLabel(),
+                           edge->GetDstLabel()) +
+          ".edge.yaml";
+    }
+    if (impl_->version_ != nullptr) {
+      node["version"] = impl_->version_->ToString();
+    }
+    if (impl_->extra_info_.size() > 0) {
+      node["extra_info"];
+      for (const auto& pair : impl_->extra_info_) {
+        ::Yaml::Node extra_info_node;
+        extra_info_node["key"] = pair.first;
+        extra_info_node["value"] = pair.second;
+        node["extra_info"].PushBack();
+        node["extra_info"][node["extra_info"].Size() - 1] = extra_info_node;
+      }
+    }
+    ::Yaml::Serialize(node, dump_string);
+  } catch (const std::exception& e) {
+    return Status::Invalid("Failed to dump graph info: ", e.what());
+  }
   return dump_string;
 }
 
