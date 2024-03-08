@@ -187,6 +187,8 @@ class VertexInfo {
                       const std::string& prefix = "",
                       std::shared_ptr<const InfoVersion> version = nullptr);
 
+  ~VertexInfo();
+
   /**
    * Adds a property group to the vertex info and returns a new VertexInfo
    *
@@ -401,6 +403,8 @@ class EdgeInfo {
                     const PropertyGroupVector& property_groups,
                     const std::string& prefix = "",
                     std::shared_ptr<const InfoVersion> version = nullptr);
+
+  ~EdgeInfo();
 
   /**
    * Add an adjacency list information to the edge info and returns a new
@@ -698,6 +702,8 @@ class GraphInfo {
       EdgeInfoVector edge_infos, const std::string& prefix = "./",
       std::shared_ptr<const InfoVersion> version = nullptr,
       const std::unordered_map<std::string, std::string>& extra_info = {});
+
+  ~GraphInfo();
 
   /**
    * @brief Loads the input file as a `GraphInfo` instance.
