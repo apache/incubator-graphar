@@ -54,6 +54,9 @@ enum class Type {
   /** List of some logical data type */
   LIST,
 
+  /** int32_t days since the UNIX epoch */
+  DATE,
+
   /** Exact timestamp encoded with int64 since UNIX epoch in milliseconds */
   TIMESTAMP,
 
@@ -134,6 +137,18 @@ class Timestamp {
  public:
   using c_type = int64_t;
   explicit Timestamp(c_type value) : value_(value) {}
+
+  c_type value() const { return value_; }
+
+ private:
+  c_type value_;
+};
+
+// Define a Date class to represent date data type value
+class Date {
+ public:
+  using c_type = int32_t;
+  explicit Date(c_type value) : value_(value) {}
 
   c_type value() const { return value_; }
 

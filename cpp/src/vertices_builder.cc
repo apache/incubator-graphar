@@ -158,6 +158,25 @@ Status VerticesBuilder::tryToAppend<Type::TIMESTAMP>(
   return Status::OK();
 }
 
+template <>
+Status VerticesBuilder::tryToAppend<Type::DATE>(
+    const std::string& property_name,
+    std::shared_ptr<arrow::Array>& array) {  // NOLINT
+  using CType = typename TypeToArrowType<Type::DATE>::CType::c_type;
+  arrow::MemoryPool* pool = arrow::default_memory_pool();
+  typename TypeToArrowType<Type::DATE>::BuilderType builder(pool);
+  for (auto& v : vertices_) {
+    if (v.Empty() || !v.ContainProperty(property_name)) {
+      RETURN_NOT_ARROW_OK(builder.AppendNull());
+    } else {
+      RETURN_NOT_ARROW_OK(
+          builder.Append(std::any_cast<CType>(v.GetProperty(property_name))));
+    }
+  }
+  array = builder.Finish().ValueOrDie();
+  return Status::OK();
+}
+
 Status VerticesBuilder::appendToArray(
     const std::shared_ptr<DataType>& type, const std::string& property_name,
     std::shared_ptr<arrow::Array>& array) {  // NOLINT
@@ -174,6 +193,8 @@ Status VerticesBuilder::appendToArray(
     return tryToAppend<Type::DOUBLE>(property_name, array);
   case Type::STRING:
     return tryToAppend<Type::STRING>(property_name, array);
+  case Type::DATE:
+    return tryToAppend<Type::DATE>(property_name, array);
   case Type::TIMESTAMP:
     return tryToAppend<Type::TIMESTAMP>(property_name, array);
   default:
