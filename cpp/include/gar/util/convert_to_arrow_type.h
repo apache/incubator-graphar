@@ -69,6 +69,11 @@ CONVERT_TO_ARROW_TYPE(Type::DOUBLE, double, arrow::DoubleType,
 CONVERT_TO_ARROW_TYPE(Type::STRING, std::string, arrow::LargeStringType,
                       arrow::LargeStringArray, arrow::LargeStringBuilder,
                       arrow::large_utf8(), "string")
+CONVERT_TO_ARROW_TYPE(Type::TIMESTAMP, Timestamp, arrow::TimestampType,
+                      arrow::TimestampArray, arrow::TimestampBuilder,
+                      arrow::timestamp(arrow::TimeUnit::MILLI), "timestamp")
+CONVERT_TO_ARROW_TYPE(Type::DATE, Date, arrow::Date32Type, arrow::Date32Array,
+                      arrow::Date32Builder, arrow::date32(), "date")
 
 }  // namespace GAR_NAMESPACE_INTERNAL
 

@@ -99,6 +99,20 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
           invalid_type = true;
         }
         break;
+      case Type::DATE:
+        // date is stored as int32_t
+        if (property.second.type() !=
+            typeid(typename TypeToArrowType<Type::DATE>::CType::c_type)) {
+          invalid_type = true;
+        }
+        break;
+      case Type::TIMESTAMP:
+        // timestamp is stored as int64_t
+        if (property.second.type() !=
+            typeid(typename TypeToArrowType<Type::TIMESTAMP>::CType::c_type)) {
+          invalid_type = true;
+        }
+        break;
       default:
         return Status::TypeError("Unsupported property type.");
       }
@@ -108,28 +122,6 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
             type->ToTypeName(), ", but got ", property.second.type().name());
       }
     }
-  }
-  return Status::OK();
-}
-
-Status VerticesBuilder::appendToArray(
-    const std::shared_ptr<DataType>& type, const std::string& property_name,
-    std::shared_ptr<arrow::Array>& array) {  // NOLINT
-  switch (type->id()) {
-  case Type::BOOL:
-    return tryToAppend<Type::BOOL>(property_name, array);
-  case Type::INT32:
-    return tryToAppend<Type::INT32>(property_name, array);
-  case Type::INT64:
-    return tryToAppend<Type::INT64>(property_name, array);
-  case Type::FLOAT:
-    return tryToAppend<Type::FLOAT>(property_name, array);
-  case Type::DOUBLE:
-    return tryToAppend<Type::DOUBLE>(property_name, array);
-  case Type::STRING:
-    return tryToAppend<Type::STRING>(property_name, array);
-  default:
-    return Status::TypeError("Unsupported property type.");
   }
   return Status::OK();
 }
@@ -150,6 +142,71 @@ Status VerticesBuilder::tryToAppend(
     }
   }
   array = builder.Finish().ValueOrDie();
+  return Status::OK();
+}
+
+template <>
+Status VerticesBuilder::tryToAppend<Type::TIMESTAMP>(
+    const std::string& property_name,
+    std::shared_ptr<arrow::Array>& array) {  // NOLINT
+  using CType = typename TypeToArrowType<Type::TIMESTAMP>::CType::c_type;
+  arrow::MemoryPool* pool = arrow::default_memory_pool();
+  typename TypeToArrowType<Type::TIMESTAMP>::BuilderType builder(
+      arrow::timestamp(arrow::TimeUnit::MILLI), pool);
+  for (auto& v : vertices_) {
+    if (v.Empty() || !v.ContainProperty(property_name)) {
+      RETURN_NOT_ARROW_OK(builder.AppendNull());
+    } else {
+      RETURN_NOT_ARROW_OK(
+          builder.Append(std::any_cast<CType>(v.GetProperty(property_name))));
+    }
+  }
+  array = builder.Finish().ValueOrDie();
+  return Status::OK();
+}
+
+template <>
+Status VerticesBuilder::tryToAppend<Type::DATE>(
+    const std::string& property_name,
+    std::shared_ptr<arrow::Array>& array) {  // NOLINT
+  using CType = typename TypeToArrowType<Type::DATE>::CType::c_type;
+  arrow::MemoryPool* pool = arrow::default_memory_pool();
+  typename TypeToArrowType<Type::DATE>::BuilderType builder(pool);
+  for (auto& v : vertices_) {
+    if (v.Empty() || !v.ContainProperty(property_name)) {
+      RETURN_NOT_ARROW_OK(builder.AppendNull());
+    } else {
+      RETURN_NOT_ARROW_OK(
+          builder.Append(std::any_cast<CType>(v.GetProperty(property_name))));
+    }
+  }
+  array = builder.Finish().ValueOrDie();
+  return Status::OK();
+}
+
+Status VerticesBuilder::appendToArray(
+    const std::shared_ptr<DataType>& type, const std::string& property_name,
+    std::shared_ptr<arrow::Array>& array) {  // NOLINT
+  switch (type->id()) {
+  case Type::BOOL:
+    return tryToAppend<Type::BOOL>(property_name, array);
+  case Type::INT32:
+    return tryToAppend<Type::INT32>(property_name, array);
+  case Type::INT64:
+    return tryToAppend<Type::INT64>(property_name, array);
+  case Type::FLOAT:
+    return tryToAppend<Type::FLOAT>(property_name, array);
+  case Type::DOUBLE:
+    return tryToAppend<Type::DOUBLE>(property_name, array);
+  case Type::STRING:
+    return tryToAppend<Type::STRING>(property_name, array);
+  case Type::DATE:
+    return tryToAppend<Type::DATE>(property_name, array);
+  case Type::TIMESTAMP:
+    return tryToAppend<Type::TIMESTAMP>(property_name, array);
+  default:
+    return Status::TypeError("Unsupported property type.");
+  }
   return Status::OK();
 }
 
