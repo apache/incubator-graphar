@@ -152,6 +152,13 @@ Status EdgesBuilder::validate(const Edge& e,
           invalid_type = true;
         }
         break;
+      case Type::DATE:
+        // date is stored as int32_t
+        if (property.second.type() !=
+            typeid(typename TypeToArrowType<Type::DATE>::CType::c_type)) {
+          invalid_type = true;
+        }
+        break;
       case Type::TIMESTAMP:
         // timestamp is stored as int64_t
         if (property.second.type() !=
