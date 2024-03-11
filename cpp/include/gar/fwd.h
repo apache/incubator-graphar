@@ -189,6 +189,8 @@ const std::shared_ptr<DataType>& float32();
 const std::shared_ptr<DataType>& float64();
 /// @brief Return a string DataType instance
 const std::shared_ptr<DataType>& string();
+/// @brief Return a timestamp DataType instance
+const std::shared_ptr<DataType>& timestamp();
 /**
  * @brief Return a list DataType instance
  *

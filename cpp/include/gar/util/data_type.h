@@ -54,6 +54,9 @@ enum class Type {
   /** List of some logical data type */
   LIST,
 
+  /** Exact timestamp encoded with int64 since UNIX epoch in milliseconds */
+  TIMESTAMP,
+
   /** User-defined data type */
   USER_DEFINED,
 
@@ -125,6 +128,19 @@ class DataType {
   std::shared_ptr<DataType> child_;
   std::string user_defined_type_name_;
 };  // struct DataType
+
+// Define a Timestamp class to represent timestamp data type value
+class Timestamp {
+ public:
+  using c_type = int64_t;
+  explicit Timestamp(c_type value) : value_(value) {}
+
+  c_type value() const { return value_; }
+
+ private:
+  c_type value_;
+};
+
 }  // namespace GAR_NAMESPACE_INTERNAL
 
 #endif  // GAR_UTIL_DATA_TYPE_H_

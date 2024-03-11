@@ -39,6 +39,8 @@ std::shared_ptr<arrow::DataType> DataType::DataTypeToArrowDataType(
     return arrow::float64();
   case Type::STRING:
     return arrow::large_utf8();
+  case Type::TIMESTAMP:
+    return arrow::timestamp(arrow::TimeUnit::MILLI);
   case Type::LIST:
     return arrow::list(DataTypeToArrowDataType(type->child_));
   default:
@@ -65,6 +67,8 @@ std::shared_ptr<DataType> DataType::ArrowDataTypeToDataType(
     return string();
   case arrow::Type::LARGE_STRING:
     return string();
+  case arrow::Type::TIMESTAMP:
+    return timestamp();
   case arrow::Type::LIST:
     return list(ArrowDataTypeToDataType(type->field(0)->type()));
   default:
@@ -113,6 +117,8 @@ std::shared_ptr<DataType> DataType::TypeNameToDataType(const std::string& str) {
     return float64();
   } else if (str == "string") {
     return string();
+  } else if (str == "timestamp") {
+    return timestamp();
   } else if (str == "list<int32>") {
     return list(int32());
   } else if (str == "list<int64>") {
@@ -141,6 +147,7 @@ TYPE_FACTORY(int64, Type::INT64)
 TYPE_FACTORY(float32, Type::FLOAT)
 TYPE_FACTORY(float64, Type::DOUBLE)
 TYPE_FACTORY(string, Type::STRING)
+TYPE_FACTORY(timestamp, Type::TIMESTAMP)
 
 std::shared_ptr<DataType> list(const std::shared_ptr<DataType>& value_type) {
   return std::make_shared<DataType>(Type::LIST, value_type);

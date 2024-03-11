@@ -54,6 +54,8 @@ Status TryToCastToAny(const std::shared_ptr<DataType>& type,
     return CastToAny<Type::DOUBLE>(array, any);
   case Type::STRING:
     return CastToAny<Type::STRING>(array, any);
+  case Type::TIMESTAMP:
+    return CastToAny<Type::TIMESTAMP>(array, any);
   default:
     return Status::TypeError("Unsupported type.");
   }
@@ -108,6 +110,21 @@ Result<T> Vertex::property(const std::string& property) const {
       return Status::TypeError("Any cast failed, the property type of ",
                                property, " is not matched ", e.what());
     }
+  }
+}
+
+template <>
+Result<Timestamp> Vertex::property(const std::string& property) const {
+  if (properties_.find(property) == properties_.end()) {
+    return Status::KeyError("Property with name ", property,
+                            " does not exist in the vertex.");
+  }
+  try {
+    Timestamp ret(std::any_cast<Timestamp::c_type>(properties_.at(property)));
+    return ret;
+  } catch (const std::bad_any_cast& e) {
+    return Status::TypeError("Any cast failed, the property type of ", property,
+                             " is not matched ", e.what());
   }
 }
 
@@ -179,6 +196,21 @@ Result<T> Edge::property(const std::string& property) const {
       return Status::TypeError("Any cast failed, the property type of ",
                                property, " is not matched ", e.what());
     }
+  }
+}
+
+template <>
+Result<Timestamp> Edge::property(const std::string& property) const {
+  if (properties_.find(property) == properties_.end()) {
+    return Status::KeyError("Property with name ", property,
+                            " does not exist in the edge.");
+  }
+  try {
+    Timestamp ret(std::any_cast<Timestamp::c_type>(properties_.at(property)));
+    return ret;
+  } catch (const std::bad_any_cast& e) {
+    return Status::TypeError("Any cast failed, the property type of ", property,
+                             " is not matched ", e.what());
   }
 }
 
