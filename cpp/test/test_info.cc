@@ -274,6 +274,13 @@ version: gar/v1
     REQUIRE(vertex_info_empty_version->Dump().status().ok());
   }
 
+  SECTION("Save") {
+    // save to a simple output path
+    REQUIRE(vertex_info->Save("/tmp/" + label + ".vertex.yml").ok());
+    // save to a URI path
+    REQUIRE(vertex_info->Save("file:///tmp/" + label + ".vertex.yml").ok());
+  }
+
   SECTION("AddPropertyGroup") {
     auto pg2 = CreatePropertyGroup({Property("p2", int32(), false)},
                                    FileType::CSV, "p2/");
@@ -467,6 +474,13 @@ version: gar/v1
     REQUIRE(edge_info_empty_version->Dump().status().ok());
   }
 
+  SECTION("Save") {
+    // save to a simple output path
+    REQUIRE(edge_info->Save("/tmp/" + edge_label + ".edge.yml").ok());
+    // save to a URI path
+    REQUIRE(edge_info->Save("file:///tmp/" + edge_label + ".edge.yml").ok());
+  }
+
   SECTION("AddAdjacentList") {
     auto adj_list2 = CreateAdjacentList(AdjListType::ordered_by_dest,
                                         FileType::CSV, "ordered_by_dest/");
@@ -617,6 +631,13 @@ vertices:
     auto graph_info_empty_version =
         CreateGraphInfo(name, {vertex_info}, {edge_info}, "test_graph/");
     REQUIRE(graph_info_empty_version->Dump().status().ok());
+  }
+
+  SECTION("Save") {
+    // save to a simple output path
+    REQUIRE(graph_info->Save("/tmp/" + name + ".graph.yml").ok());
+    // save to a URI path
+    REQUIRE(graph_info->Save("file:///tmp/" + name + ".graph.yml").ok());
   }
 
   SECTION("AddVertex") {

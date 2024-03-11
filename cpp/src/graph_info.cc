@@ -478,7 +478,7 @@ Status VertexInfo::Save(const std::string& path) const {
   std::string no_url_path;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(path, &no_url_path));
   GAR_ASSIGN_OR_RAISE(auto yaml_content, this->Dump());
-  return fs->WriteValueToFile(yaml_content, path);
+  return fs->WriteValueToFile(yaml_content, no_url_path);
 }
 
 class EdgeInfo::Impl {
@@ -964,7 +964,7 @@ Status EdgeInfo::Save(const std::string& path) const {
   std::string no_url_path;
   GAR_ASSIGN_OR_RAISE(auto fs, FileSystemFromUriOrPath(path, &no_url_path));
   GAR_ASSIGN_OR_RAISE(auto yaml_content, this->Dump());
-  return fs->WriteValueToFile(yaml_content, path);
+  return fs->WriteValueToFile(yaml_content, no_url_path);
 }
 
 namespace {
