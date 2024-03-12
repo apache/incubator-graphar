@@ -49,37 +49,45 @@ GraphAr support a set of built-in property data types that are common in real us
 - List: A list of values of the same type
 ```
 
-
-Property Group
---------------
-
-GraphAr splits the properties of vertices and edges into groups, with each group containing a set of properties and the properties in the same group are stored in the same file.
-
-TODO: add a figure to illustrate the property group.
-
-
-Adjacency List
---------------
-
-GraphAr supports the storage of multiple types of adjLists for a given group of edges, e.g., a group of edges could be accessed in both CSR, CSC or COO. The adjacency list is used to store the topology information in a way similar to CSR/CSC
-
-TODO: add a figure to illustrate the adjList types.
-
+GraphAr also supports the user-defined data types, which can be used to represent complex data structures,
+such as the struct, map, and union types. 
 
 Configurations
 --------------
 
 Vertex Chunk Size
 `````````````````
+The vertex chunk size is a configuration parameter that determines the number of vertices in a vertex chunk
+and used to partition the logical vertex table into multiple physical vertex tables.
+The vertex chunk size should be set to a value that is large enough to reduce the overhead of reading/writing files,
+but small enough to avoid reading/writing too many vertices at once. We recommend setting the vertex chunk size to
+empirical value 2^18 (262,144) for most cases.
 
 Edge Chunk Size
 ````````````````
 
+The edge chunk size is a configuration parameter that determines the number of edges in an edge chunk
+and used to partition the logical edge table into multiple physical edge tables.
+The edge chunk size should be set to a value that is large enough to reduce the overhead of reading/writing files,
+but small enough to avoid reading/writing too many edges at once. We recommend setting the edge chunk size to
+empirical value 2^22 (4,194,304) for most cases.
+
 Data File Format
 ````````````````
+GraphAr supports multiple file formats for storing the actual data of vertices and edges,
+including Apache ORC, Apache Parquet, CSV, and JSON. The file format should be chosen
+based on the specific use case and the data processing framework that will be used to
+process the graph data. For example, if the graph data will be processed using Apache Spark,
+then the Apache Parquet file format is recommended.
 
 Adjacency List Type
 ````````````````````
+Adjacency list is a data structure used to represent the edges of a graph. GraphAr supports multiple types of adjacency lists for a given group of edges, including:
+
+- **ordered_by_source**: all the edges in the logical table are ordered and further partitioned by the internal vertex id of the source, which can be seen as the CSR format.
+- **ordered_by_dest**: all the edges in the logical table are ordered and further partitioned by the internal vertex id of the destination, which can be seen as the CSC format.
+- **unordered_by_source**: the internal id of the source vertex is used as the partition key to divide the edges into different sub-logical-tables, and the edges in each sub-logical-table are unordered, which can be seen as the COO format.
+- **unordered_by_dest**: the internal id of the destination vertex is used as the partition key to divide the edges into different sub-logical-tables, and the edges in each sub-logical-table are unordered, which can also be seen as the COO format.
 
 
 Vertex Chunks in GraphAr
@@ -131,12 +139,7 @@ Take the logical table for "person likes person" edges as an example, the logica
 
 Physical table of edges
 ```````````````````````
-As same with the vertex table, the logical edge table is also partitioned into some sub-logical-tables, with each sub-logical-table contains edges that the source (or destination) vertices are in the same vertex chunk. According to the partition strategy and the order of the edges, edges can be stored in GraphAr following one of the four types:
-
-- **ordered_by_source**: all the edges in the logical table are ordered and further partitioned by the internal vertex id of the source, which can be seen as the CSR format.
-- **ordered_by_dest**: all the edges in the logical table are ordered and further partitioned by the internal vertex id of the destination, which can be seen as the CSC format.
-- **unordered_by_source**: the internal id of the source vertex is used as the partition key to divide the edges into different sub-logical-tables, and the edges in each sub-logical-table are unordered, which can be seen as the COO format.
-- **unordered_by_dest**: the internal id of the destination vertex is used as the partition key to divide the edges into different sub-logical-tables, and the edges in each sub-logical-table are unordered, which can also be seen as the COO format.
+As same with the vertex table, the logical edge table is also partitioned into some sub-logical-tables, with each sub-logical-table contains edges that the source (or destination) vertices are in the same vertex chunk. According to the partition strategy and the order of the edges, edges can be stored in GraphAr following the setting adjacency list type.
 
 After that, the whole logical table of edges will be divided into multiple sub-logical-tables with each sub-logical-table contains edges that the source (or destination) vertices are in the same vertex chunk. Then, a sub-logical-table is further divided into edge chunks of a predefined, fixed number of rows (referred to as edge chunk size). Finally, an edge chunk is separated into physical tables in the following way:
 
@@ -160,10 +163,6 @@ Take the "person knows person" edges to illustrate. Suppose the vertex chunk siz
 .. tip::
 
    When the edge type is **ordered_by_source**, the sorted adjList table together with the offset table can be used as CSR, supporting the fast access of the outgoing edges for a given vertex. Similarly, a CSC view can be constructed by sorting the edges by destination and recording corresponding offsets, supporting the fast access of the incoming edges for a given vertex.
-
-
-File Format
-------------
 
 Information files
 `````````````````
@@ -211,3 +210,7 @@ As previously mentioned, each logical vertex/edge table is divided into multiple
 Both of Apache ORC and Apache Parquet are column-oriented data storage formats. In practice of graph processing, it is common to only query a subset of columns of the properties. Thus, the column-oriented formats are more efficient, which eliminate the need to read columns that are not relevant. They are also used by a large number of data processing frameworks like `Apache Spark <https://spark.apache.org/>`_, `Apache Hive <https://hive.apache.org/>`_, `Apache Flink <https://flink.apache.org/>`_, and `Apache Hadoop <https://hadoop.apache.org/>`_. 
 
 See also `Gar Data Files <cpp/getting-started.html#gar-data-files>`_ for an example.
+
+Implementation
+```````````````
+The GraphAr libraries may implement part of the GraphAr format. The implementation status of the GraphAr libraries can refer to the `GraphAr implementation status <status.html>`_.
