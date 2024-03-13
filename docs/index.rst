@@ -10,7 +10,15 @@
    :caption: Overview 
    :hidden:
 
-   Overview <overview>
+   Overview <overview/overview>
+   Motivation <overview/motivation>
+   Concepts <overview/concepts> 
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Format Specification
+   :hidden:
+
    File Format <format/file-format> 
    Implementation Status <format/status>
 
