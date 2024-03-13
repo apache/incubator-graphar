@@ -36,18 +36,16 @@ Property Data Types
 -------------------
 GraphAr support a set of built-in property data types that are common in real use cases and supported by most file types (CSV, ORC, Parquet), includes:
 
-```
-- Boolean 
-- Int32: Integer with 32 bits
-- Int64: Integer with 64 bits
-- Float: 32-bit floating point values
-- Double: 64-bit floating point values
-- String: Textual data
-- Date: days since the Unix epoch
-- Timestamp: milliseconds since the Unix epoch
-- Time: milliseconds since midnight
-- List: A list of values of the same type
-```
+- **Boolean** 
+- **Int32**: Integer with 32 bits
+- **Int64**: Integer with 64 bits
+- **Float**: 32-bit floating point values
+- **Double**: 64-bit floating point values
+- **String**: Textual data
+- **Date**: days since the Unix epoch
+- **Timestamp**: milliseconds since the Unix epoch
+- **Time**: milliseconds since midnight
+- **List**: A list of values of the same type
 
 GraphAr also supports the user-defined data types, which can be used to represent complex data structures,
 such as the struct, map, and union types. 
@@ -59,6 +57,7 @@ Vertex Chunk Size
 `````````````````
 The vertex chunk size is a configuration parameter that determines the number of vertices in a vertex chunk
 and used to partition the logical vertex table into multiple physical vertex tables.
+
 The vertex chunk size should be set to a value that is large enough to reduce the overhead of reading/writing files,
 but small enough to avoid reading/writing too many vertices at once. We recommend setting the vertex chunk size to
 empirical value 2^18 (262,144) for most cases.
@@ -68,6 +67,7 @@ Edge Chunk Size
 
 The edge chunk size is a configuration parameter that determines the number of edges in an edge chunk
 and used to partition the logical edge table into multiple physical edge tables.
+
 The edge chunk size should be set to a value that is large enough to reduce the overhead of reading/writing files,
 but small enough to avoid reading/writing too many edges at once. We recommend setting the edge chunk size to
 empirical value 2^22 (4,194,304) for most cases.
@@ -75,8 +75,9 @@ empirical value 2^22 (4,194,304) for most cases.
 Data File Format
 ````````````````
 GraphAr supports multiple file formats for storing the actual data of vertices and edges,
-including Apache ORC, Apache Parquet, CSV, and JSON. The file format should be chosen
-based on the specific use case and the data processing framework that will be used to
+including Apache ORC, Apache Parquet, CSV, and JSON.
+
+The file format should be chosen based on the specific use case and the data processing framework that will be used to
 process the graph data. For example, if the graph data will be processed using Apache Spark,
 then the Apache Parquet file format is recommended.
 
@@ -165,7 +166,7 @@ Take the "person knows person" edges to illustrate. Suppose the vertex chunk siz
    When the edge type is **ordered_by_source**, the sorted adjList table together with the offset table can be used as CSR, supporting the fast access of the outgoing edges for a given vertex. Similarly, a CSC view can be constructed by sorting the edges by destination and recording corresponding offsets, supporting the fast access of the incoming edges for a given vertex.
 
 Information files
-`````````````````
+------------------
 GraphAr uses two kinds of files to store a graph: a group of Yaml files to describe metadata information; and data files to store actual data for vertices and edges.  
 A graph information file which named "<name>.graph.yml" describes the meta information for a graph whose name is <name>. The content of this file includes:
 
@@ -199,7 +200,7 @@ An edge information file which named "<source label>_<edge label>_<destination l
 See also `Gar Information Files <cpp/getting-started.html#gar-information-files>`_ for an example.
 
 Data files
-``````````
+----------
 As previously mentioned, each logical vertex/edge table is divided into multiple physical tables stored in one of the following file formats:
 
 - `Apache ORC <https://orc.apache.org/>`_ 
@@ -212,5 +213,6 @@ Both of Apache ORC and Apache Parquet are column-oriented data storage formats. 
 See also `Gar Data Files <cpp/getting-started.html#gar-data-files>`_ for an example.
 
 Implementation
-```````````````
+--------------
 The GraphAr libraries may implement part of the GraphAr format. The implementation status of the GraphAr libraries can refer to the `GraphAr implementation status <status.html>`_.
+
