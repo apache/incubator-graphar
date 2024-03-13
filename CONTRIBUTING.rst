@@ -425,7 +425,7 @@ to determine whether the failure was caused by the changes in the pull request.
 Format specification & Libraries implementation
 -----------------------------------------------
 
-The GraphAr is consist of the format specification and libraries implementation. The libraries implementation is based on the format specification.
+The GraphAr includes the format specification and libraries implementation. The libraries implementation is based on the format specification.
 When you request a new feature to the format specification, you should first open a feature request issue and discuss with the community. 
 If the feature is accepted, you can submit a pull request update the `format specification design`_. After the format specification is updated,
 you can submit a pull request to the related libraries implementation to implement the new feature and update the `implementation status`_.
