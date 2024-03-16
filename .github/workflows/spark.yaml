@@ -71,6 +71,7 @@ jobs:
     - name: Run test
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
+        export SPARK_TESTING=1
         pushd spark
         echo "Test ${{ matrix.mvn-profile }}"
         mvn --no-transfer-progress test -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
