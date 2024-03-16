@@ -22,11 +22,13 @@ install_test:
 .PHONY: test
 test:
 		export JAVA_HOME=${JAVA_HOME_11_X64}
+		export SPARK_TESTING=1
 		poetry run pytest --cov
 
 .PHONY: coverage_report
 coverage_report:
 		export JAVA_HOME=${JAVA_HOME_11_X64}
+		export SPARK_TESTING=1
 		poetry run pytest --cov --cov-report=html:coverage_html graphar_pyspark tests/
 
 .PHONY: install_lint
