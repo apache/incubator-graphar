@@ -26,6 +26,7 @@ public class EdgeYamlParser {
     private long chunk_size;
     private long src_chunk_size;
     private long dst_chunk_size;
+    private boolean directed;
     private String prefix;
     private List<AdjacentListYamlParser> adjacent_lists;
     private List<PropertyGroupYamlParser> property_groups;
@@ -38,6 +39,7 @@ public class EdgeYamlParser {
         this.chunk_size = 0;
         this.src_chunk_size = 0;
         this.dst_chunk_size = 0;
+        this.directed = false;
         this.prefix = "";
         this.adjacent_lists = new ArrayList<>();
         this.property_groups = new ArrayList<>();
@@ -66,6 +68,14 @@ public class EdgeYamlParser {
 
     public void setDst_label(String dst_label) {
         this.dst_label = dst_label;
+    }
+
+    public boolean isDirected() {
+        return directed;
+    }
+
+    public void setDirected(boolean directed) {
+        this.directed = directed;
     }
 
     public long getChunk_size() {

@@ -16,6 +16,7 @@
 
 package com.alibaba.graphar.info;
 
+import com.alibaba.graphar.info.type.DataType;
 import com.alibaba.graphar.info.yaml.VertexYamlParser;
 import java.io.IOException;
 import java.util.List;
@@ -31,7 +32,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 public class VertexInfo {
     private final String label;
     private final long chunkSize;
-    private final List<PropertyGroup> propertyGroups;
+    private final PropertyGroups propertyGroups;
     private final String prefix;
     private final String version;
 
@@ -43,7 +44,7 @@ public class VertexInfo {
             String version) {
         this.label = label;
         this.chunkSize = chunkSize;
-        this.propertyGroups = propertyGroups;
+        this.propertyGroups = new PropertyGroups(propertyGroups);
         this.prefix = prefix;
         this.version = version;
     }
@@ -59,6 +60,19 @@ public class VertexInfo {
                 parser.getVersion());
     }
 
+    private VertexInfo(
+            String label,
+            long chunkSize,
+            PropertyGroups propertyGroups,
+            String prefix,
+            String version) {
+        this.label = label;
+        this.chunkSize = chunkSize;
+        this.propertyGroups = propertyGroups;
+        this.prefix = prefix;
+        this.version = version;
+    }
+
     public static VertexInfo load(String vertexInfoPath, Configuration conf) throws IOException {
         if (conf == null) {
             conf = new Configuration();
@@ -66,10 +80,68 @@ public class VertexInfo {
         Path path = new Path(vertexInfoPath);
         FileSystem fileSystem = path.getFileSystem(conf);
         FSDataInputStream inputStream = fileSystem.open(path);
-        VertexInfo ret =
-                new Yaml(new Constructor(VertexInfo.class, new LoaderOptions())).load(inputStream);
-        return ret;
+        Yaml vertexInfoYamlLoader =
+                new Yaml(new Constructor(VertexYamlParser.class, new LoaderOptions()));
+        VertexYamlParser vertexInfoYaml = vertexInfoYamlLoader.load(inputStream);
+        return new VertexInfo(vertexInfoYaml);
     }
+
+    VertexInfo addPropertyGroup(PropertyGroup propertyGroup) {
+        return new VertexInfo(
+                label, chunkSize, propertyGroups.addPropertyGroup(propertyGroup), prefix, version);
+    }
+
+    int PropertyGroupNum() {
+        return propertyGroups.getPropertyGroupNum();
+    }
+
+    PropertyGroup getPropertyGroup(String propertyName) {
+        return propertyGroups.getPropertyGroup(propertyName);
+    }
+
+    DataType getPropertyType(String propertyName) {
+        return propertyGroups.getProperty(propertyName).getDataType();
+    }
+
+    boolean hasProperty(String propertyName) {
+        return propertyGroups.hasProperty(propertyName);
+    }
+
+    boolean isPrimaryKey(String propertyName) {
+        return propertyGroups.isPrimaryKey(propertyName);
+    }
+
+    boolean isNullableKey(String propertyName) {
+        return propertyGroups.isNullableKey(propertyName);
+    }
+
+    boolean hasPropertyGroup(PropertyGroup propertyGroup) {
+        return propertyGroups.hasPropertyGroup(propertyGroup);
+    }
+
+    // TODO(@Thespica): Implement file path get methods
+    //    String getFilePath(PropertyGroup propertyGroup,
+    //                                    long chunkIndex) {
+    //
+    //    }
+    //
+    //    String getPathPrefix(
+    //            PropertyGroup propertyGroup) {
+    //
+    //    }
+    //
+    //    String getVerticesNumFilePath() {
+    //
+    //    }
+
+    // TODO(@Thespica): Implement save and dump methods
+    //    void save(String fileName) {
+    //
+    //    }
+    //
+    //    String Dump() {
+    //
+    //    }
 
     public String getLabel() {
         return label;
@@ -80,7 +152,7 @@ public class VertexInfo {
     }
 
     public List<PropertyGroup> getPropertyGroups() {
-        return propertyGroups;
+        return propertyGroups.toList();
     }
 
     public String getPrefix() {

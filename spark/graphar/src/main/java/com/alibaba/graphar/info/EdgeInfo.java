@@ -16,9 +16,14 @@
 
 package com.alibaba.graphar.info;
 
+import com.alibaba.graphar.info.type.AdjListType;
+import com.alibaba.graphar.info.type.DataType;
 import com.alibaba.graphar.info.yaml.EdgeYamlParser;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -33,29 +38,11 @@ public class EdgeInfo {
     private final long chunkSize;
     private final long srcChunkSize;
     private final long dstChunkSize;
+    private final boolean directed;
     private final String prefix;
-    private final List<AdjacentList> adjacentLists;
-    private final List<PropertyGroup> propertyGroups;
+    private final Map<AdjListType, AdjacentList> adjacentLists;
+    private final PropertyGroups propertyGroups;
     private final String version;
-
-    public EdgeInfo(
-            EdgeTriple edgeTriple,
-            long chunkSize,
-            long srcChunkSize,
-            long dstChunkSize,
-            String prefix,
-            List<AdjacentList> adjacentLists,
-            List<PropertyGroup> propertyGroups,
-            String version) {
-        this.edgeTriple = edgeTriple;
-        this.chunkSize = chunkSize;
-        this.srcChunkSize = srcChunkSize;
-        this.dstChunkSize = dstChunkSize;
-        this.prefix = prefix;
-        this.adjacentLists = adjacentLists;
-        this.propertyGroups = propertyGroups;
-        this.version = version;
-    }
 
     public EdgeInfo(
             String srcLabel,
@@ -64,19 +51,22 @@ public class EdgeInfo {
             long chunkSize,
             long srcChunkSize,
             long dstChunkSize,
+            boolean directed,
             String prefix,
-            List<AdjacentList> adjacentLists,
-            List<PropertyGroup> propertyGroups,
+            List<AdjacentList> adjacentListsAsList,
+            List<PropertyGroup> propertyGroupsAsList,
             String version) {
-        this(
-                new EdgeTriple(srcLabel, edgeLabel, dstLabel),
-                chunkSize,
-                srcChunkSize,
-                dstChunkSize,
-                prefix,
-                adjacentLists,
-                propertyGroups,
-                version);
+        this.edgeTriple = new EdgeTriple(srcLabel, edgeLabel, dstLabel);
+        this.chunkSize = chunkSize;
+        this.srcChunkSize = srcChunkSize;
+        this.dstChunkSize = dstChunkSize;
+        this.directed = directed;
+        this.prefix = prefix;
+        this.adjacentLists =
+                adjacentListsAsList.stream()
+                        .collect(Collectors.toMap(AdjacentList::getType, Function.identity()));
+        this.propertyGroups = new PropertyGroups(propertyGroupsAsList);
+        this.version = version;
     }
 
     EdgeInfo(EdgeYamlParser yamlParser) {
@@ -87,6 +77,7 @@ public class EdgeInfo {
                 yamlParser.getChunk_size(),
                 yamlParser.getSrc_chunk_size(),
                 yamlParser.getDst_chunk_size(),
+                yamlParser.isDirected(),
                 yamlParser.getPrefix(),
                 yamlParser.getAdjacent_lists().stream()
                         .map(AdjacentList::new)
@@ -97,6 +88,27 @@ public class EdgeInfo {
                 yamlParser.getVersion());
     }
 
+    private EdgeInfo(
+            EdgeTriple edgeTriple,
+            long chunkSize,
+            long srcChunkSize,
+            long dstChunkSize,
+            boolean directed,
+            String prefix,
+            Map<AdjListType, AdjacentList> adjacentLists,
+            PropertyGroups propertyGroups,
+            String version) {
+        this.edgeTriple = edgeTriple;
+        this.chunkSize = chunkSize;
+        this.srcChunkSize = srcChunkSize;
+        this.dstChunkSize = dstChunkSize;
+        this.directed = directed;
+        this.prefix = prefix;
+        this.adjacentLists = adjacentLists;
+        this.propertyGroups = propertyGroups;
+        this.version = version;
+    }
+
     public static EdgeInfo load(String edgeInfoPath, Configuration conf) throws IOException {
         if (conf == null) {
             conf = new Configuration();
@@ -104,11 +116,156 @@ public class EdgeInfo {
         Path path = new Path(edgeInfoPath);
         FileSystem fileSystem = path.getFileSystem(conf);
         FSDataInputStream inputStream = fileSystem.open(path);
-        EdgeInfo ret =
-                new Yaml(new Constructor(EdgeYamlParser.class, new LoaderOptions()))
-                        .load(inputStream);
-        return ret;
+        Yaml edgeInfoYamlLoader =
+                new Yaml(new Constructor(EdgeYamlParser.class, new LoaderOptions()));
+        EdgeYamlParser edgeInfoYaml = edgeInfoYamlLoader.load(inputStream);
+        return new EdgeInfo(edgeInfoYaml);
     }
+
+    public EdgeInfo addAdjacentList(AdjacentList adjacentList) {
+        Map<AdjListType, AdjacentList> newAdjacentLists = new HashMap<>(adjacentLists);
+        newAdjacentLists.put(adjacentList.getType(), adjacentList);
+        return new EdgeInfo(
+                edgeTriple,
+                chunkSize,
+                srcChunkSize,
+                dstChunkSize,
+                directed,
+                prefix,
+                newAdjacentLists,
+                propertyGroups,
+                version);
+    }
+
+    public EdgeInfo addPropertyGroup(PropertyGroup propertyGroup) {
+        return new EdgeInfo(
+                edgeTriple,
+                chunkSize,
+                srcChunkSize,
+                dstChunkSize,
+                directed,
+                prefix,
+                adjacentLists,
+                propertyGroups.addPropertyGroup(propertyGroup),
+                version);
+    }
+
+    public boolean hasAdjacentListType(AdjListType adjListType) {
+        return adjacentLists.containsKey(adjListType);
+    }
+
+    public boolean hasProperty(String propertyName) {
+        return propertyGroups.hasProperty(propertyName);
+    }
+
+    public boolean hasPropertyGroup(PropertyGroup propertyGroup) {
+        return propertyGroups.hasPropertyGroup(propertyGroup);
+    }
+
+    public AdjacentList getAdjacentList(AdjListType adjListType) {
+        return adjacentLists.get(adjListType);
+    }
+
+    public int getPropertyGroupNum() {
+        return propertyGroups.getPropertyGroupNum();
+    }
+
+    public PropertyGroup getPropertyGroup(String property) {
+        return propertyGroups.getPropertyGroup(property);
+    }
+
+    // TODO(@Thespica): Implement file path get methods
+
+    //    public String getVerticesNumFilePath(AdjListType adjListType) {
+    //    }
+    //
+    //    public String getEdgesNumFilePath(long vertexChunkIndex, AdjListType adjListType) {
+    //    }
+    //
+    //    public String getAdjListFilePath(long vertexChunkIndex, long edgeChunkIndex, AdjListType
+    // adjListType) {
+    //    }
+    //
+    //    public String getAdjListPathPrefix(AdjListType adjListType) {
+    //    }
+    //
+    //    /**
+    //     * Get the adjacency list offset chunk file path of vertex chunk
+    //     * the offset chunks is aligned with the vertex chunks
+    //     *
+    //     * @param vertexChunkIndex index of vertex chunk
+    //     * @param adjListType      The adjacency list type.
+    //     */
+    //    public String getAdjListOffsetFilePath(long vertexChunkIndex, AdjListType adjListType) {
+    //
+    //    }
+    //
+    //    /**
+    //     * Get the path prefix of the adjacency list offset chunk for the given
+    //     * adjacency list type.
+    //     *
+    //     * @param adjListType The adjacency list type.
+    //     * @return A Result object containing the path prefix, or a Status object
+    //     * indicating an error.
+    //     */
+    //    public String getOffsetPathPrefix(AdjListType adjListType) {
+    //
+    //    }
+    //
+    //    public String getPropertyFilePath(
+    //            PropertyGroup propertyGroup,
+    //            AdjListType adjListType, long vertexChunkIndex,
+    //            long edgeChunkIndex) {
+    //
+    //    }
+    //
+    //    /**
+    //     * Get the path prefix of the property group chunk for the given
+    //     * adjacency list type.
+    //     *
+    //     * @param propertyGroup property group.
+    //     * @param adjListType   The adjacency list type.
+    //     * @return A Result object containing the path prefix, or a Status object
+    //     * indicating an error.
+    //     */
+    //    public String getPropertyGroupPathPrefix(
+    //            PropertyGroup propertyGroup,
+    //            AdjListType adjListType) {
+    //
+    //    }
+
+    DataType getPropertyType(String propertyName) {
+        return propertyGroups.getProperty(propertyName).getDataType();
+    }
+
+    boolean isPrimaryKey(String propertyName) {
+        return propertyGroups.isPrimaryKey(propertyName);
+    }
+
+    boolean isNullableKey(String propertyName) {
+        return propertyGroups.isNullableKey(propertyName);
+    }
+
+    // TODO(@Thespica): Implement save and dump methods
+    //    /**
+    //     * Saves the edge info to a YAML file.
+    //     *
+    //     * @param fileName The name of the file to save to.
+    //     * @return A Status object indicating success or failure.
+    //     */
+    //    void save(String fileName) {
+    //
+    //    }
+    //
+    //    /**
+    //     * Returns the edge info as a YAML formatted string.
+    //     *
+    //     * @return A Result object containing the YAML string, or a Status object
+    //     * indicating an error.
+    //     */
+    //    public String dump() {
+    //
+    //    }
 
     public EdgeTriple getEdgeTriple() {
         return edgeTriple;
@@ -130,12 +287,12 @@ public class EdgeInfo {
         return prefix;
     }
 
-    public List<AdjacentList> getAdjacentLists() {
+    public Map<AdjListType, AdjacentList> getAdjacentLists() {
         return adjacentLists;
     }
 
     public List<PropertyGroup> getPropertyGroups() {
-        return propertyGroups;
+        return propertyGroups.toList();
     }
 
     public String getVersion() {
