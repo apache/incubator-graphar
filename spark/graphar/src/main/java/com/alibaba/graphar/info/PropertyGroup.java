@@ -16,6 +16,7 @@
 
 package com.alibaba.graphar.info;
 
+import com.alibaba.graphar.info.type.DataType;
 import com.alibaba.graphar.info.type.FileType;
 import com.alibaba.graphar.info.yaml.PropertyGroupYamlParser;
 import java.util.ArrayList;
@@ -107,16 +108,20 @@ class PropertyGroups {
         return new PropertyGroups(newPropertyGroups, newPropertyGroupsAsMap, newProperties);
     }
 
-    public boolean hasProperty(String propertyName) {
+    boolean hasProperty(String propertyName) {
         return properties.containsKey(propertyName);
     }
 
-    public boolean hasPropertyGroup(PropertyGroup propertyGroup) {
+    boolean hasPropertyGroup(PropertyGroup propertyGroup) {
         return propertyGroupsAsList.contains(propertyGroup);
     }
 
-    public int getPropertyGroupNum() {
+    int getPropertyGroupNum() {
         return propertyGroupsAsMap.values().size();
+    }
+
+    DataType getPropertyType(String propertyName) {
+        return properties.get(propertyName).getDataType();
     }
 
     boolean isPrimaryKey(String propertyName) {

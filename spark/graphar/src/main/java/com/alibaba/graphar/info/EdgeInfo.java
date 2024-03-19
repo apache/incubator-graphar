@@ -235,7 +235,7 @@ public class EdgeInfo {
     //    }
 
     DataType getPropertyType(String propertyName) {
-        return propertyGroups.getProperty(propertyName).getDataType();
+        return propertyGroups.getPropertyType(propertyName);
     }
 
     boolean isPrimaryKey(String propertyName) {
@@ -267,8 +267,16 @@ public class EdgeInfo {
     //
     //    }
 
-    public EdgeTriple getEdgeTriple() {
-        return edgeTriple;
+    public String getSrcLabel() {
+        return edgeTriple.getSrcLabel();
+    }
+
+    public String getEdgeLabel() {
+        return edgeTriple.getEdgeLabel();
+    }
+
+    public String getDstLabel() {
+        return edgeTriple.getDstLabel();
     }
 
     public long getChunkSize() {
@@ -281,6 +289,10 @@ public class EdgeInfo {
 
     public long getDstChunkSize() {
         return dstChunkSize;
+    }
+
+    public boolean isDirected() {
+        return directed;
     }
 
     public String getPrefix() {

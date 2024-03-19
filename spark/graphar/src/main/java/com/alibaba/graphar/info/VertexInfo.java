@@ -91,7 +91,7 @@ public class VertexInfo {
                 label, chunkSize, propertyGroups.addPropertyGroup(propertyGroup), prefix, version);
     }
 
-    int PropertyGroupNum() {
+    int propertyGroupNum() {
         return propertyGroups.getPropertyGroupNum();
     }
 
@@ -100,7 +100,7 @@ public class VertexInfo {
     }
 
     DataType getPropertyType(String propertyName) {
-        return propertyGroups.getProperty(propertyName).getDataType();
+        return propertyGroups.getPropertyType(propertyName);
     }
 
     boolean hasProperty(String propertyName) {
@@ -120,6 +120,7 @@ public class VertexInfo {
     }
 
     // TODO(@Thespica): Implement file path get methods
+    //
     //    String getFilePath(PropertyGroup propertyGroup,
     //                                    long chunkIndex) {
     //
@@ -135,6 +136,7 @@ public class VertexInfo {
     //    }
 
     // TODO(@Thespica): Implement save and dump methods
+    //
     //    void save(String fileName) {
     //
     //    }
