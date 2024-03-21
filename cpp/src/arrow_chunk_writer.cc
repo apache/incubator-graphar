@@ -171,6 +171,9 @@ Status VertexPropertyWriter::validate(
   }
   // strong validate for the input_table
   if (validate_level == ValidateLevel::strong_validate) {
+    // validate the input table
+    RETURN_NOT_ARROW_OK(input_table->Validate());
+    // validate the schema
     auto schema = input_table->schema();
     for (auto& property : property_group->GetProperties()) {
       int indice = schema->GetFieldIndex(property.name);
@@ -447,6 +450,9 @@ Status EdgeChunkWriter::validate(
   }
   // strong validate for the input_table
   if (validate_level == ValidateLevel::strong_validate) {
+    // validate the input table
+    RETURN_NOT_ARROW_OK(input_table->Validate());
+    // validate the schema
     auto schema = input_table->schema();
     int index = schema->GetFieldIndex(GeneralParams::kOffsetCol);
     if (index == -1) {
@@ -538,6 +544,9 @@ Status EdgeChunkWriter::validate(
   }
   // strong validate for the input table
   if (validate_level == ValidateLevel::strong_validate) {
+    // validate the input table
+    RETURN_NOT_ARROW_OK(input_table->Validate());
+    // validate the schema
     auto schema = input_table->schema();
     for (auto& property : property_group->GetProperties()) {
       int indice = schema->GetFieldIndex(property.name);
