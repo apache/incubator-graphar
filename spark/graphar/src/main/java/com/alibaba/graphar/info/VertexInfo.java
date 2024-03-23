@@ -18,9 +18,10 @@ package com.alibaba.graphar.info;
 
 import com.alibaba.graphar.info.type.DataType;
 import com.alibaba.graphar.info.yaml.VertexYamlParser;
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -49,13 +50,13 @@ public class VertexInfo {
         this.version = version;
     }
 
-    VertexInfo(VertexYamlParser parser) {
+    private VertexInfo(VertexYamlParser parser) {
         this(
                 parser.getLabel(),
                 parser.getChunk_size(),
                 parser.getProperty_groups().stream()
                         .map(PropertyGroup::new)
-                        .collect(Collectors.toList()),
+                        .collect(ImmutableList.toImmutableList()),
                 parser.getPrefix(),
                 parser.getVersion());
     }
@@ -86,9 +87,13 @@ public class VertexInfo {
         return new VertexInfo(vertexInfoYaml);
     }
 
-    VertexInfo addPropertyGroup(PropertyGroup propertyGroup) {
-        return new VertexInfo(
-                label, chunkSize, propertyGroups.addPropertyGroup(propertyGroup), prefix, version);
+    Optional<VertexInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
+        return propertyGroups
+                .addPropertyGroupAsNew(propertyGroup)
+                .map(
+                        newPropertyGroups ->
+                                new VertexInfo(
+                                        label, chunkSize, newPropertyGroups, prefix, version));
     }
 
     int propertyGroupNum() {
@@ -153,7 +158,7 @@ public class VertexInfo {
         return chunkSize;
     }
 
-    public List<PropertyGroup> getPropertyGroups() {
+    public ImmutableList<PropertyGroup> getPropertyGroups() {
         return propertyGroups.toList();
     }
 

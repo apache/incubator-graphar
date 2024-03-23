@@ -16,106 +16,241 @@
 
 package com.alibaba.graphar.info;
 
-import java.util.HashMap;
+import com.alibaba.graphar.info.yaml.GraphYamlParser;
+import com.alibaba.graphar.util.GeneralParams;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 public class GraphInfo {
     private final String name;
-    private final List<VertexInfo> vertexInfos;
-    private final List<EdgeInfo> edgeInfos;
+    private final ImmutableList<VertexInfo> vertexInfos;
+    private final ImmutableList<EdgeInfo> edgeInfos;
     private final String prefix;
-    private final Map<String, Integer> vertexLabelToIndex;
-    private final Map<EdgeTriple, Integer> edgeTripleToIndex;
-    private final VertexInfo version;
+    private final ImmutableMap<String, VertexInfo> vertexLabel2VertexInfo;
+    private final ImmutableMap<String, EdgeInfo> edgeConcat2EdgeInfo;
+    private final String version;
 
     public GraphInfo(
             String name,
             List<VertexInfo> vertexInfos,
             List<EdgeInfo> edgeInfos,
             String prefix,
-            VertexInfo version) {
+            String version) {
+        this.name = name;
+        this.vertexInfos =
+                vertexInfos instanceof ImmutableList
+                        ? (ImmutableList<VertexInfo>) vertexInfos
+                        : ImmutableList.copyOf(vertexInfos);
+        this.edgeInfos =
+                edgeInfos instanceof ImmutableList
+                        ? (ImmutableList<EdgeInfo>) edgeInfos
+                        : ImmutableList.copyOf(edgeInfos);
+        this.prefix = prefix;
+        this.version = version;
+        this.vertexLabel2VertexInfo =
+                vertexInfos.stream()
+                        .collect(
+                                ImmutableMap.toImmutableMap(
+                                        VertexInfo::getLabel, Function.identity()));
+        this.edgeConcat2EdgeInfo =
+                edgeInfos.stream()
+                        .collect(
+                                ImmutableMap.toImmutableMap(
+                                        EdgeInfo::getConcat, Function.identity()));
+    }
+
+    private GraphInfo(GraphYamlParser graphYaml, Configuration conf) throws IOException {
+        this(
+                graphYaml.getName(),
+                vertexFileNames2VertexInfos(graphYaml.getVertices(), conf),
+                edgeFileNames2EdgeInfos(graphYaml.getEdges(), conf),
+                graphYaml.getPrefix(),
+                graphYaml.getVersion());
+    }
+
+    private GraphInfo(
+            String name,
+            ImmutableList<VertexInfo> vertexInfos,
+            ImmutableList<EdgeInfo> edgeInfos,
+            String prefix,
+            ImmutableMap<String, VertexInfo> vertexLabel2VertexInfo,
+            ImmutableMap<String, EdgeInfo> edgeConcat2EdgeInfo,
+            String version) {
         this.name = name;
         this.vertexInfos = vertexInfos;
         this.edgeInfos = edgeInfos;
         this.prefix = prefix;
-        this.vertexLabelToIndex = new HashMap<>(vertexInfos.size());
-        for (int i = 0; i < vertexInfos.size(); i++) {
-            vertexLabelToIndex.put(vertexInfos.get(i).getLabel(), i);
-        }
-        this.edgeTripleToIndex = new HashMap<>(edgeInfos.size());
-        for (int i = 0; i < edgeInfos.size(); i++) {
-            edgeTripleToIndex.put(edgeInfos.get(i).getEdgeTriple(), i);
-        }
+        this.vertexLabel2VertexInfo = vertexLabel2VertexInfo;
+        this.edgeConcat2EdgeInfo = edgeConcat2EdgeInfo;
         this.version = version;
     }
-    //
-    //    public static GraphInfo load(String graphPath, Configuration conf) throws IOException {
-    //        if (graphPath == null) {
-    //            conf = new Configuration();
-    //        }
-    //        Path path = new Path(graphPath);
-    //        FileSystem fileSystem = path.getFileSystem(conf);
-    //        FSDataInputStream inputStream = fileSystem.open(path);
-    //        GraphYamlParser graphYamlParser = new Yaml(new Constructor(GraphYamlParser.class, new
-    // LoaderOptions())).load(inputStream);
-    //        // TODO: Vertex and edge yaml file path getter
+
+    public static GraphInfo load(String graphPath) throws IOException {
+        return load(graphPath, null);
+    }
+
+    public static GraphInfo load(String graphPath, Configuration conf) throws IOException {
+        if (graphPath == null) {
+            conf = new Configuration();
+        }
+        Path path = new Path(graphPath);
+        FileSystem fileSystem = path.getFileSystem(conf);
+        FSDataInputStream inputStream = fileSystem.open(path);
+        Yaml graphYamlLoader =
+                new Yaml(new Constructor(GraphYamlParser.class, new LoaderOptions()));
+        GraphYamlParser graphYaml = graphYamlLoader.load(inputStream);
+        return new GraphInfo(graphYaml, conf);
+    }
+
+    // TODO(@Thespica): Implement save and dump methods
+    //    public void save(String path) {
     //
     //    }
     //
+    //    public String dump() {
+    //
+    //    }
+
+    Optional<GraphInfo> addVertexAsNew(VertexInfo vertexInfo) {
+        if (vertexInfo == null || hasVertexInfo(vertexInfo.getLabel())) {
+            return Optional.empty();
+        }
+        ImmutableList<VertexInfo> newVertexInfos =
+                ImmutableList.<VertexInfo>builder().addAll(vertexInfos).add(vertexInfo).build();
+        ImmutableMap<String, VertexInfo> newVertexLabel2VertexInfo =
+                ImmutableMap.<String, VertexInfo>builder()
+                        .putAll(vertexLabel2VertexInfo)
+                        .put(vertexInfo.getLabel(), vertexInfo)
+                        .build();
+        return Optional.of(
+                new GraphInfo(
+                        name,
+                        newVertexInfos,
+                        edgeInfos,
+                        prefix,
+                        newVertexLabel2VertexInfo,
+                        edgeConcat2EdgeInfo,
+                        version));
+    }
+
+    Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
+        if (edgeInfo == null
+                || hasEdgeInfo(
+                        edgeInfo.getSrcLabel(), edgeInfo.getEdgeLabel(), edgeInfo.getDstLabel())) {
+            return Optional.empty();
+        }
+        ImmutableList<EdgeInfo> newEdgeInfos =
+                ImmutableList.<EdgeInfo>builder().addAll(edgeInfos).add(edgeInfo).build();
+        ImmutableMap<String, EdgeInfo> newEdgeConcat2EdgeInfo =
+                ImmutableMap.<String, EdgeInfo>builder()
+                        .putAll(edgeConcat2EdgeInfo)
+                        .put(edgeInfo.getConcat(), edgeInfo)
+                        .build();
+        return Optional.of(
+                new GraphInfo(
+                        name,
+                        vertexInfos,
+                        newEdgeInfos,
+                        prefix,
+                        vertexLabel2VertexInfo,
+                        newEdgeConcat2EdgeInfo,
+                        version));
+    }
+
+    public boolean hasVertexInfo(String label) {
+        return vertexLabel2VertexInfo.containsKey(label);
+    }
+
+    public boolean hasEdgeInfo(String srcLabel, String edgeLabel, String dstLabel) {
+        return edgeConcat2EdgeInfo.containsKey(srcLabel + dstLabel + edgeLabel);
+    }
+
+    public VertexInfo getVertexInfo(String label) {
+        checkVertexExist(label);
+        return vertexLabel2VertexInfo.get(label);
+    }
+
+    public EdgeInfo getEdgeInfo(String srcLabel, String edgeLabel, String dstLabel) {
+        checkEdgeExist(srcLabel, edgeLabel, dstLabel);
+        return edgeConcat2EdgeInfo.get(srcLabel + edgeLabel + dstLabel);
+    }
+
+    public int getVertexInfoNum() {
+        return vertexInfos.size();
+    }
+
+    public int getEdgeInfoNum() {
+        return edgeInfos.size();
+    }
+
     public String getName() {
         return name;
     }
 
-    public int getVertexInfoCount() {
-        return vertexInfos.size();
-    }
-
-    public List<VertexInfo> getVertexInfos() {
+    public ImmutableList<VertexInfo> getVertexInfos() {
         return vertexInfos;
     }
 
-    public VertexInfo getVertexInfo(String label) {
-        return vertexInfos.get(vertexLabelToIndex.get(label));
-    }
-
-    public VertexInfo getVertexInfo(int index) {
-        return vertexInfos.get(index);
-    }
-
-    public int getVertexInfoIndex(String label) {
-        return vertexLabelToIndex.get(label);
-    }
-
-    public int getEdgeInfoCount() {
-        return edgeInfos.size();
-    }
-
-    public List<EdgeInfo> getEdgeInfos() {
+    public ImmutableList<EdgeInfo> getEdgeInfos() {
         return edgeInfos;
-    }
-
-    public EdgeInfo getEdgeInfo(EdgeTriple edgeTriple) {
-        return edgeInfos.get(edgeTripleToIndex.get(edgeTriple));
-    }
-
-    public EdgeInfo getEdgeInfo(int index) {
-        return edgeInfos.get(index);
-    }
-
-    public int getEdgeInfoIndex(EdgeTriple edgeTriple) {
-        return edgeTripleToIndex.get(edgeTriple);
     }
 
     public String getPrefix() {
         return prefix;
     }
 
-    public List<VertexInfo> getVertexInfos(String label) {
-        return vertexInfos;
+    public String getVersion() {
+        return version;
     }
 
-    public VertexInfo getVersion() {
-        return version;
+    private static ImmutableList<VertexInfo> vertexFileNames2VertexInfos(
+            List<String> vertexFileNames, Configuration conf) throws IOException {
+        ImmutableList.Builder<VertexInfo> verticesBuilder = ImmutableList.builder();
+        for (String vertexFileName : vertexFileNames) {
+            verticesBuilder.add(VertexInfo.load(vertexFileName, conf));
+        }
+        return verticesBuilder.build();
+    }
+
+    private static ImmutableList<EdgeInfo> edgeFileNames2EdgeInfos(
+            List<String> edgeFileNames, Configuration conf) throws IOException {
+        ImmutableList.Builder<EdgeInfo> edgesBuilder = ImmutableList.builder();
+        for (String edgeFileName : edgeFileNames) {
+            edgesBuilder.add(EdgeInfo.load(edgeFileName, conf));
+        }
+        return edgesBuilder.build();
+    }
+
+    private void checkVertexExist(String label) {
+        if (!hasVertexInfo(label)) {
+            throw new IllegalArgumentException(
+                    "Vertex label " + label + " not exist in graph " + getName());
+        }
+    }
+
+    private void checkEdgeExist(String srcLabel, String dstLabel, String edgeLabel) {
+        if (!hasEdgeInfo(srcLabel, dstLabel, edgeLabel)) {
+            throw new IllegalArgumentException(
+                    "Edge label"
+                            + srcLabel
+                            + GeneralParams.regularSeparator
+                            + GeneralParams.regularSeparator
+                            + edgeLabel
+                            + GeneralParams.regularSeparator
+                            + dstLabel
+                            + " not exist in graph "
+                            + getName());
+        }
     }
 }

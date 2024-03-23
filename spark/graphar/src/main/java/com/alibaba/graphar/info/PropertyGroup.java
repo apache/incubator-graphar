@@ -19,22 +19,28 @@ package com.alibaba.graphar.info;
 import com.alibaba.graphar.info.type.DataType;
 import com.alibaba.graphar.info.type.FileType;
 import com.alibaba.graphar.info.yaml.PropertyGroupYamlParser;
-import java.util.ArrayList;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
 public class PropertyGroup implements Iterable<Property> {
-    private final Map<String, Property> properties;
+    private final ImmutableMap<String, Property> properties;
     private final FileType fileType;
     private final String prefix;
 
     public PropertyGroup(Map<String, Property> properties, FileType fileType, String prefix) {
-        this.properties = properties;
+        this.properties =
+                properties instanceof ImmutableMap
+                        ? (ImmutableMap<String, Property>) properties
+                        : ImmutableMap.copyOf(properties);
         this.fileType = fileType;
         this.prefix = prefix;
     }
@@ -42,7 +48,9 @@ public class PropertyGroup implements Iterable<Property> {
     public PropertyGroup(List<Property> properties, FileType fileType, String prefix) {
         this(
                 properties.stream()
-                        .collect(Collectors.toMap(Property::getName, Function.identity())),
+                        .collect(
+                                ImmutableMap.toImmutableMap(
+                                        Property::getName, Function.identity())),
                 fileType,
                 prefix);
     }
@@ -60,7 +68,11 @@ public class PropertyGroup implements Iterable<Property> {
         return properties.values().iterator();
     }
 
-    public Map<String, Property> getProperties() {
+    public int size() {
+        return properties.size();
+    }
+
+    public ImmutableMap<String, Property> getProperties() {
         return properties;
     }
 
@@ -74,38 +86,59 @@ public class PropertyGroup implements Iterable<Property> {
 }
 
 class PropertyGroups {
-    private final List<PropertyGroup> propertyGroupsAsList;
-    private final Map<String, PropertyGroup> propertyGroupsAsMap;
-    private final Map<String, Property> properties;
+    private final ImmutableList<PropertyGroup> propertyGroupsAsList;
+    private final ImmutableMap<String, PropertyGroup> propertyGroupsAsMap;
+    private final ImmutableMap<String, Property> properties;
 
     PropertyGroups(List<PropertyGroup> propertyGroupsAsList) {
-        this.propertyGroupsAsList = propertyGroupsAsList;
-        this.propertyGroupsAsMap =
-                propertyGroupsAsList.stream()
-                        .collect(Collectors.toMap(PropertyGroup::getPrefix, Function.identity()));
+        this.propertyGroupsAsList =
+                propertyGroupsAsList instanceof ImmutableList
+                        ? (ImmutableList<PropertyGroup>) propertyGroupsAsList
+                        : ImmutableList.copyOf(propertyGroupsAsList);
         this.properties =
                 propertyGroupsAsList.stream()
                         .flatMap(propertyGroup -> propertyGroup.getProperties().values().stream())
-                        .collect(Collectors.toMap(Property::getName, Function.identity()));
+                        .collect(
+                                ImmutableMap.toImmutableMap(
+                                        Property::getName, Function.identity()));
+        this.propertyGroupsAsMap =
+                propertyGroupsAsList.stream()
+                        .collect(
+                                ImmutableMap.toImmutableMap(
+                                        PropertyGroup::getPrefix, Function.identity()));
     }
 
     private PropertyGroups(
-            List<PropertyGroup> propertyGroupsAsList,
-            Map<String, PropertyGroup> propertyGroupsAsMap,
-            Map<String, Property> properties) {
+            ImmutableList<PropertyGroup> propertyGroupsAsList,
+            ImmutableMap<String, PropertyGroup> propertyGroupsAsMap,
+            ImmutableMap<String, Property> properties) {
         this.propertyGroupsAsList = propertyGroupsAsList;
         this.propertyGroupsAsMap = propertyGroupsAsMap;
         this.properties = properties;
     }
 
-    PropertyGroups addPropertyGroup(PropertyGroup propertyGroup) {
-        List<PropertyGroup> newPropertyGroups = new ArrayList<>(propertyGroupsAsList);
-        newPropertyGroups.add(propertyGroup);
-        Map<String, PropertyGroup> newPropertyGroupsAsMap = new HashMap<>(propertyGroupsAsMap);
-        newPropertyGroupsAsMap.put(propertyGroup.getPrefix(), propertyGroup);
-        Map<String, Property> newProperties = new HashMap<>(properties);
-        newProperties.putAll(propertyGroup.getProperties());
-        return new PropertyGroups(newPropertyGroups, newPropertyGroupsAsMap, newProperties);
+    Optional<PropertyGroups> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
+        if (propertyGroup == null || propertyGroup.size() == 0 || hasPropertyGroup(propertyGroup)) {
+            return Optional.empty();
+        }
+        for (Property property : propertyGroup) {
+            if (hasProperty(property.getName())) {
+                return Optional.empty();
+            }
+        }
+        ImmutableList<PropertyGroup> newPropertyGroupsAsList =
+                Stream.concat(propertyGroupsAsList.stream(), Stream.of(propertyGroup))
+                        .collect(ImmutableList.toImmutableList());
+        ImmutableMap.Builder<String, PropertyGroup> pgsMapBuilder = ImmutableMap.<String, PropertyGroup>builder().putAll(propertyGroupsAsMap);
+        for (Property property : propertyGroup) {
+            pgsMapBuilder.put(property.getName(), propertyGroup);
+        }
+        ImmutableMap<String, Property> newProperties = ImmutableMap.<String, Property>builder().putAll(properties).putAll(propertyGroup.getProperties()).build();
+        return Optional.of(
+                new PropertyGroups(
+                        newPropertyGroupsAsList,
+                        pgsMapBuilder.build(),
+                        newProperties));
     }
 
     boolean hasProperty(String propertyName) {
@@ -121,30 +154,46 @@ class PropertyGroups {
     }
 
     DataType getPropertyType(String propertyName) {
+        checkPropertyExist(propertyName);
         return properties.get(propertyName).getDataType();
     }
 
     boolean isPrimaryKey(String propertyName) {
+        checkPropertyExist(propertyName);
         return properties.get(propertyName).isPrimary();
     }
 
     boolean isNullableKey(String propertyName) {
+        checkPropertyExist(propertyName);
         return properties.get(propertyName).isNullable();
     }
 
-    List<PropertyGroup> toList() {
+    ImmutableList<PropertyGroup> toList() {
         return propertyGroupsAsList;
     }
 
     PropertyGroup getPropertyGroup(String propertyName) {
+        checkPropertyExist(propertyName);
         return propertyGroupsAsMap.get(propertyName);
     }
 
-    Map<String, Property> getProperties() {
+    ImmutableMap<String, Property> getProperties() {
         return properties;
     }
 
     Property getProperty(String propertyName) {
+        checkPropertyExist(propertyName);
         return properties.get(propertyName);
+    }
+
+    private void checkPropertyExist(String propertyName) {
+        if (!hasProperty(propertyName)) {
+            throw new IllegalArgumentException(
+                    // TODO: To specify the property group name, find out how to convert the
+                    // property group to a string.
+                    // In another words, found out do sequence of properties in the property group
+                    // matter?
+                    "Property " + propertyName + " does not exist in the property groups");
+        }
     }
 }
