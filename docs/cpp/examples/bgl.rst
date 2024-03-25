@@ -10,15 +10,15 @@ The source code of CC based on BGL can be found at `bgl_example.cc`_. In this pr
 .. code:: C++
 
    std::string path = ... // the path of the graph information file
-   auto graph_info = GraphArchive::GraphInfo::Load(path).value();
+   auto graph_info = graphar::GraphInfo::Load(path).value();
 
 And then, the vertex collection and the edge collection are established as the handles to access the graph data:
 
 .. code:: C++
 
-   auto maybe_vertices = GraphArchive::VerticesCollection::Make(graph_info, "person");
+   auto maybe_vertices = graphar::VerticesCollection::Make(graph_info, "person");
    auto vertices = maybe_vertices.value();
-   auto maybe_edges = GraphArchive::EdgesCollection::Make(graph_info, "person", "knows", "person", GraphArchive::AdjListType::ordered_by_source);
+   auto maybe_edges = graphar::EdgesCollection::Make(graph_info, "person", "knows", "person", graphar::AdjListType::ordered_by_source);
    auto edges = maybe_edges.value();
 
 Next, we construct the in-memory graph data structure for BGL by traversing the vertices and edges via GraphAr's high-level reading interface (the vertex iterator and the edge iterator):
@@ -35,7 +35,7 @@ Next, we construct the in-memory graph data structure for BGL by traversing the 
    typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
 
    // declare a graph object with (num_vertices) vertices and an edge iterator
-   std::vector<std::pair<GraphArchive::IdType, GraphArchive::IdType>> edges_array;
+   std::vector<std::pair<graphar::IdType, graphar::IdType>> edges_array;
    auto it_begin = edges->begin(), it_end = edges->end();
    for (auto it = it_begin; it != it_end; ++it)
       edges_array.push_back(std::make_pair(it.source(), it.destination()));
@@ -64,14 +64,14 @@ Finally, we could use a **VerticesBuilder** of GraphAr to write the results to n
 .. code:: C++
 
    // construct a new property group
-   GraphArchive::Property cc = {"cc", GraphArchive::int32(), false};
-   std::vector<GraphArchive::Property> property_vector = {cc};
-   auto group = GraphArchive::CreatePropertyGroup(property_vector, GraphArchive::FileType::PARQUET);
+   graphar::Property cc = {"cc", graphar::int32(), false};
+   std::vector<graphar::Property> property_vector = {cc};
+   auto group = graphar::CreatePropertyGroup(property_vector, graphar::FileType::PARQUET);
 
    // construct the new vertex info
    std::string vertex_label = "cc_result", vertex_prefix = "result/";
    int chunk_size = 100;
-   auto new_info = GraphArchive::CreateVertexInfo(vertex_label, chunk_size, {group}, vertex_prefix);
+   auto new_info = graphar::CreateVertexInfo(vertex_label, chunk_size, {group}, vertex_prefix);
 
    // access the vertices via the index map and vertex iterator of BGL
    typedef boost::property_map<Graph, boost::vertex_index_t>::type IndexMap;
@@ -80,10 +80,10 @@ Finally, we could use a **VerticesBuilder** of GraphAr to write the results to n
    std::pair<vertex_iter, vertex_iter> vp;
 
    // dump the results through the VerticesBuilder
-   GraphArchive::builder::VerticesBuilder builder(new_info, "/tmp/");
+   graphar::builder::VerticesBuilder builder(new_info, "/tmp/");
    for (vp = boost::vertices(g); vp.first!= vp.second; ++vp.first) {
       Vertex v = *vp.first;
-      GraphArchive::builder::Vertex vertex(index[v]);
+      graphar::builder::Vertex vertex(index[v]);
       vertex.AddProperty(cc.name, component[index[v]]);
       builder.AddVertex(vertex);
    }

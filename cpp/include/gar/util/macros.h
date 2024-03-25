@@ -38,7 +38,7 @@
 #if defined(GAR_NAMESPACE)
 #define GAR_NAMESPACE_INTERNAL GAR_NAMESPACE
 #else
-#define GAR_NAMESPACE_INTERNAL GraphArchive
+#define GAR_NAMESPACE_INTERNAL graphar
 #endif
 
 #define GAR_EXPAND(x) x

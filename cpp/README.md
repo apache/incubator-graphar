@@ -59,7 +59,7 @@ Release build:
 Build with a custom namespace:
 
 The `namespace` is configurable. By default,
-it is defined in `namespace GraphArchive`; however this can be toggled by
+it is defined in `namespace graphar`; however this can be toggled by
 setting `NAMESPACE` option with cmake:
 
 ```bash
