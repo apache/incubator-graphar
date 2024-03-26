@@ -28,7 +28,7 @@ namespace Yaml {
 class Node;
 }
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /** A wrapper of ::Yaml::Node to provide functions to parse yaml. */
 class Yaml {
@@ -65,5 +65,5 @@ class Yaml {
   std::shared_ptr<::Yaml::Node> root_node_;
 };
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_UTIL_YAML_H_

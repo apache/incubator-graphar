@@ -17,7 +17,7 @@
 #ifndef GAR_UTIL_GENERAL_PARAMS_H_
 #define GAR_UTIL_GENERAL_PARAMS_H_
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 struct GeneralParams {
   static constexpr const char* kVertexIndexCol = "_graphArVertexIndex";
@@ -27,6 +27,6 @@ struct GeneralParams {
   static constexpr const char* kPrimaryCol = "_graphArPrimary";
 };
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 
 #endif  // GAR_UTIL_GENERAL_PARAMS_H_

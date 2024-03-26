@@ -39,7 +39,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace GAR_NAMESPACE {
+namespace graphar {
 
 TEST_CASE("test_vertex_property_writer_from_file") {
   std::string root;
@@ -182,8 +182,8 @@ TEST_CASE("test_edge_chunk_writer") {
 
   std::shared_ptr<arrow::Table> table =
       maybe_table
-          ->RenameColumns({GAR_NAMESPACE::GeneralParams::kSrcIndexCol,
-                           GAR_NAMESPACE::GeneralParams::kDstIndexCol})
+          ->RenameColumns(
+              {GeneralParams::kSrcIndexCol, GeneralParams::kDstIndexCol})
           .ValueOrDie();
   std::cout << table->schema()->ToString() << std::endl;
   std::cout << table->num_rows() << ' ' << table->num_columns() << std::endl;
@@ -260,4 +260,4 @@ TEST_CASE("test_edge_chunk_writer") {
   // Invalid data type
   REQUIRE(writer->WritePropertyChunk(tmp_table, pg2, 0, 0).IsTypeError());
 }
-}  // namespace GAR_NAMESPACE
+}  // namespace graphar

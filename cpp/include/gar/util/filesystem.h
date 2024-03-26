@@ -44,7 +44,7 @@ class FileFormat;
 }
 }  // namespace arrow
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /**
  * This class wraps an arrow::fs::FileSystem and provides methods for
@@ -148,5 +148,5 @@ class FileSystem {
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri, std::string* out_path = nullptr);
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_UTIL_FILESYSTEM_H_

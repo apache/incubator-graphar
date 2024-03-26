@@ -19,7 +19,7 @@
 
 #include "gar/util/macros.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /**
  * @brief The level for validating writing operations.
@@ -38,5 +38,5 @@ enum class ValidateLevel : char {
   strong_validate = 3
 };
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_UTIL_WRITER_UTIL_H_

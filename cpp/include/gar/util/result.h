@@ -81,8 +81,7 @@
 #define GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN_IMPL(result_name, lhs, rexpr) \
   auto&& result_name = (rexpr);                                            \
   if (!result_name.status().ok()) {                                        \
-    return ::GAR_NAMESPACE_INTERNAL::Status::ArrowError(                   \
-        result_name.status().ToString());                                  \
+    return ::graphar::Status::ArrowError(result_name.status().ToString()); \
   }                                                                        \
   lhs = std::move(result_name).ValueOrDie();
 
@@ -101,7 +100,7 @@
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN_IMPL(             \
       GAR_ASSIGN_OR_RAISE_NAME(_error_or_value, __COUNTER__), lhs, rexpr);
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 namespace internal {
 
@@ -118,5 +117,5 @@ inline Status GenericToStatus(Result<T>&& res) {
 
 }  // namespace internal
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_UTIL_RESULT_H_

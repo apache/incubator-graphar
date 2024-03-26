@@ -33,15 +33,14 @@ int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-  auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
+  auto graph_info = graphar::GraphInfo::Load(path).value();
   ASSERT(graph_info->GetVertexInfos().size() == 1);
   ASSERT(graph_info->GetEdgeInfos().size() == 1);
 
   // construct vertices collection
   std::string label = "person";
   ASSERT(graph_info->GetVertexInfo(label) != nullptr);
-  auto maybe_vertices =
-      GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
+  auto maybe_vertices = graphar::VerticesCollection::Make(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
   int num_vertices = vertices->size();
@@ -49,9 +48,9 @@ int main(int argc, char* argv[]) {
 
   // construct edges collection
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto maybe_edges = GAR_NAMESPACE::EdgesCollection::Make(
+  auto maybe_edges = graphar::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
+      graphar::AdjListType::ordered_by_source);
   ASSERT(!maybe_edges.has_error());
   auto& edges = maybe_edges.value();
 
@@ -67,8 +66,7 @@ int main(int argc, char* argv[]) {
   typedef typename boost::graph_traits<Graph>::vertex_descriptor Vertex;
 
   // declare a graph object with (num_vertices) vertices and a edge iterator
-  std::vector<std::pair<GAR_NAMESPACE::IdType, GAR_NAMESPACE::IdType>>
-      edges_array;
+  std::vector<std::pair<graphar::IdType, graphar::IdType>> edges_array;
   auto it_end = edges->end();
   for (auto it = edges->begin(); it != it_end; ++it) {
     edges_array.push_back(std::make_pair(it.source(), it.destination()));
@@ -104,26 +102,26 @@ int main(int argc, char* argv[]) {
 
   // method 1 for writing results: construct new vertex type and write results
   // using vertex builder construct new property group
-  GAR_NAMESPACE::Property cc("cc", GAR_NAMESPACE::int32(), false);
-  std::vector<GAR_NAMESPACE::Property> property_vector = {cc};
-  auto group = GAR_NAMESPACE::CreatePropertyGroup(
-      property_vector, GAR_NAMESPACE::FileType::PARQUET);
+  graphar::Property cc("cc", graphar::int32(), false);
+  std::vector<graphar::Property> property_vector = {cc};
+  auto group =
+      graphar::CreatePropertyGroup(property_vector, graphar::FileType::PARQUET);
   // construct new vertex info
   std::string vertex_label = "cc_result", vertex_prefix = "result/";
   int chunk_size = 100;
-  auto version = GAR_NAMESPACE::InfoVersion::Parse("gar/v1").value();
-  auto new_info = GAR_NAMESPACE::CreateVertexInfo(
-      vertex_label, chunk_size, {group}, vertex_prefix, version);
+  auto version = graphar::InfoVersion::Parse("gar/v1").value();
+  auto new_info = graphar::CreateVertexInfo(vertex_label, chunk_size, {group},
+                                            vertex_prefix, version);
   // dump new vertex info
   ASSERT(new_info->IsValidated());
   ASSERT(new_info->Dump().status().ok());
   ASSERT(new_info->Save("/tmp/cc_result.vertex.yml").ok());
   // construct vertices builder
-  GAR_NAMESPACE::builder::VerticesBuilder builder(new_info, "/tmp/");
+  graphar::builder::VerticesBuilder builder(new_info, "/tmp/");
   // add vertices to the builder
   for (vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
     Vertex v = *vp.first;
-    GAR_NAMESPACE::builder::Vertex vertex(index[v]);
+    graphar::builder::Vertex vertex(index[v]);
     vertex.AddProperty(cc.name, component[index[v]]);
     builder.AddVertex(vertex);
   }
@@ -142,12 +140,12 @@ int main(int argc, char* argv[]) {
   ASSERT(extend_info->Dump().status().ok());
   ASSERT(extend_info->Save("/tmp/person-new.vertex.yml").ok());
   // construct vertex property writer
-  GAR_NAMESPACE::VertexPropertyWriter writer(extend_info, "/tmp/");
+  graphar::VertexPropertyWriter writer(extend_info, "/tmp/");
   // convert results to arrow::Table
   std::vector<std::shared_ptr<arrow::Array>> arrays;
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
   schema_vector.push_back(arrow::field(
-      cc.name, GAR_NAMESPACE::DataType::DataTypeToArrowDataType(cc.type)));
+      cc.name, graphar::DataType::DataTypeToArrowDataType(cc.type)));
   arrow::MemoryPool* pool = arrow::default_memory_pool();
   typename arrow::TypeTraits<arrow::Int32Type>::BuilderType array_builder(pool);
   ASSERT(array_builder.Reserve(num_vertices).ok());

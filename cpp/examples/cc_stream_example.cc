@@ -29,13 +29,12 @@ int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-  auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
+  auto graph_info = graphar::GraphInfo::Load(path).value();
 
   // construct vertices collection
   std::string label = "person";
   ASSERT(graph_info->GetVertexInfo(label) != nullptr);
-  auto maybe_vertices =
-      GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
+  auto maybe_vertices = graphar::VerticesCollection::Make(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
   int num_vertices = vertices->size();
@@ -43,22 +42,22 @@ int main(int argc, char* argv[]) {
 
   // construct edges collection
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto maybe_edges = GAR_NAMESPACE::EdgesCollection::Make(
+  auto maybe_edges = graphar::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
+      graphar::AdjListType::ordered_by_source);
   ASSERT(!maybe_edges.has_error());
   auto& edges = maybe_edges.value();
 
   // run cc algorithm
-  std::vector<GAR_NAMESPACE::IdType> component(num_vertices);
-  for (GAR_NAMESPACE::IdType i = 0; i < num_vertices; i++)
+  std::vector<graphar::IdType> component(num_vertices);
+  for (graphar::IdType i = 0; i < num_vertices; i++)
     component[i] = i;
   auto it_begin = edges->begin(), it_end = edges->end();
   for (int iter = 0;; iter++) {
     std::cout << "iter " << iter << std::endl;
     bool flag = false;
     for (auto it = it_begin; it != it_end; ++it) {
-      GAR_NAMESPACE::IdType src = it.source(), dst = it.destination();
+      graphar::IdType src = it.source(), dst = it.destination();
       if (component[src] < component[dst]) {
         component[dst] = component[src];
         flag = true;
@@ -71,8 +70,8 @@ int main(int argc, char* argv[]) {
       break;
   }
   // count the number of connected components
-  std::unordered_set<GAR_NAMESPACE::IdType> cc_count;
-  GAR_NAMESPACE::IdType cc_num = 0;
+  std::unordered_set<graphar::IdType> cc_count;
+  graphar::IdType cc_num = 0;
   for (int i = 0; i < num_vertices; i++) {
     std::cout << i << ", component id: " << component[i] << std::endl;
     if (cc_count.find(component[i]) == cc_count.end()) {
@@ -84,10 +83,10 @@ int main(int argc, char* argv[]) {
 
   // extend the original vertex info and write results to gar using writer
   // construct property group
-  GAR_NAMESPACE::Property cc("cc", GAR_NAMESPACE::int64(), false);
-  std::vector<GAR_NAMESPACE::Property> property_vector = {cc};
-  auto group = GAR_NAMESPACE::CreatePropertyGroup(
-      property_vector, GAR_NAMESPACE::FileType::PARQUET);
+  graphar::Property cc("cc", graphar::int64(), false);
+  std::vector<graphar::Property> property_vector = {cc};
+  auto group =
+      graphar::CreatePropertyGroup(property_vector, graphar::FileType::PARQUET);
   // extend the vertex_info
   auto vertex_info = graph_info->GetVertexInfo(label);
   auto maybe_extend_info = vertex_info->AddPropertyGroup(group);
@@ -98,12 +97,12 @@ int main(int argc, char* argv[]) {
   ASSERT(extend_info->Dump().status().ok());
   ASSERT(extend_info->Save("/tmp/person-new.vertex.yml").ok());
   // construct vertex property writer
-  GAR_NAMESPACE::VertexPropertyWriter writer(extend_info, "/tmp/");
+  graphar::VertexPropertyWriter writer(extend_info, "/tmp/");
   // convert results to arrow::Table
   std::vector<std::shared_ptr<arrow::Array>> arrays;
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
   schema_vector.push_back(arrow::field(
-      cc.name, GAR_NAMESPACE::DataType::DataTypeToArrowDataType(cc.type)));
+      cc.name, graphar::DataType::DataTypeToArrowDataType(cc.type)));
   arrow::Int64Builder array_builder;
   ASSERT(array_builder.Reserve(num_vertices).ok());
   ASSERT(array_builder.AppendValues(component).ok());

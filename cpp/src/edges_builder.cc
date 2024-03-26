@@ -21,7 +21,7 @@
 #include "gar/util/result.h"
 #include "gar/writer/edges_builder.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 namespace builder {
 
 Status EdgesBuilder::Dump() {
@@ -347,4 +347,4 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::getOffsetTable(
 }
 
 }  // namespace builder
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

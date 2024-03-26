@@ -31,7 +31,7 @@ class Array;
 class Table;
 }  // namespace arrow
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /**
  * @brief The arrow chunk reader for vertex property group.
@@ -504,5 +504,5 @@ class AdjListPropertyArrowChunkReader {
   std::string base_dir_;
   std::shared_ptr<FileSystem> fs_;
 };
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_READER_ARROW_CHUNK_READER_H_

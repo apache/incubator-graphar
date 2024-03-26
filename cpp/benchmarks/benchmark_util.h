@@ -26,26 +26,26 @@
 #ifndef CPP_BENCHMARKS_BENCHMARK_UTIL_H_
 #define CPP_BENCHMARKS_BENCHMARK_UTIL_H_
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 // Return the value of the GAR_TEST_DATA environment variable or return error
 // Status
-GAR_NAMESPACE::Status GetTestResourceRoot(std::string* out) {
+Status GetTestResourceRoot(std::string* out) {
   const char* c_root = std::getenv("GAR_TEST_DATA");
   if (!c_root) {
-    return GAR_NAMESPACE::Status::IOError(
+    return Status::IOError(
         "Test resources not found, set GAR_TEST_DATA to <repo root>/testing");
   }
   // FIXME(@acezen): This is a hack to get around the fact that the testing
   *out = std::string(c_root);
-  return GAR_NAMESPACE::Status::OK();
+  return Status::OK();
 }
 
 class BenchmarkFixture : public ::benchmark::Fixture {
  public:
   void SetUp(const ::benchmark::State& state) override {
     std::string root;
-    GAR_NAMESPACE::Status status = GetTestResourceRoot(&root);
+    Status status = GetTestResourceRoot(&root);
     path_ = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
     auto maybe_graph_info = GraphInfo::Load(path_);
     graph_info_ = maybe_graph_info.value();
@@ -57,6 +57,6 @@ class BenchmarkFixture : public ::benchmark::Fixture {
   std::string path_;
   std::shared_ptr<GraphInfo> graph_info_;
 };
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 
 #endif  // CPP_BENCHMARKS_BENCHMARK_UTIL_H_

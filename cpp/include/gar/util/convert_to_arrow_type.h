@@ -25,7 +25,7 @@
 
 #include "gar/util/data_type.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /** Struct to convert DataType to arrow::DataType. */
 template <typename T>
@@ -75,6 +75,6 @@ CONVERT_TO_ARROW_TYPE(Type::TIMESTAMP, Timestamp, arrow::TimestampType,
 CONVERT_TO_ARROW_TYPE(Type::DATE, Date, arrow::Date32Type, arrow::Date32Array,
                       arrow::Date32Builder, arrow::date32(), "date")
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 
 #endif  // GAR_UTIL_CONVERT_TO_ARROW_TYPE_H_

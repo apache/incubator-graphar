@@ -29,7 +29,7 @@ namespace arrow {
 class Table;
 }
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /**
  * @brief The writer for vertex property group chunks.
@@ -729,5 +729,5 @@ class EdgeChunkWriter {
   ValidateLevel validate_level_;
 };
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_WRITER_ARROW_CHUNK_WRITER_H_

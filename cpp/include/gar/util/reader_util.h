@@ -24,7 +24,7 @@
 
 #include "gar/fwd.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 namespace util {
 struct FilterOptions {
@@ -73,5 +73,5 @@ Result<IdType> GetEdgeNum(const std::string& prefix,
                           IdType vertex_chunk_index) noexcept;
 
 }  // namespace util
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_UTIL_READER_UTIL_H_

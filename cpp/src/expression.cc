@@ -32,7 +32,7 @@ limitations under the License.
 #include "gar/util/expression.h"
 #include "gar/util/result.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 Result<ArrowExpression> ExpressionProperty::Evaluate() {
   return arrow::compute::field_ref(property_.name);
@@ -98,4 +98,4 @@ Result<ArrowExpression> ExpressionOr::Evaluate() {
   return arrow::compute::or_(lexpr, rexpr);
 }
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

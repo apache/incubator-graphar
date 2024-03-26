@@ -25,7 +25,7 @@
 
 #include "gar/util/result.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /** InfoVersion is a class provide version information of info. */
 class InfoVersion {
@@ -107,5 +107,5 @@ class InfoVersion {
   std::vector<std::string> user_define_types_;
 };
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_UTIL_VERSION_PARSER_H_

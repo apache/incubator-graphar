@@ -23,7 +23,7 @@
 
 #include "gar/fwd.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /** The chunk info reader for vertex property group. */
 class VertexPropertyChunkInfoReader {
@@ -383,5 +383,5 @@ class AdjListPropertyChunkInfoReader {
   std::string base_dir_;  // the chunk files base dir
   std::shared_ptr<FileSystem> fs_;
 };
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_READER_CHUNK_INFO_READER_H_

@@ -28,14 +28,13 @@ void vertices_builder() {
   // construct vertices builder
   std::string vertex_meta_file =
       TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person.vertex.yml";
-  auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
-  auto vertex_info = GAR_NAMESPACE::VertexInfo::Load(vertex_meta).value();
-  GAR_NAMESPACE::IdType start_index = 0;
-  GAR_NAMESPACE::builder::VerticesBuilder builder(vertex_info, "/tmp/",
-                                                  start_index);
+  auto vertex_meta = graphar::Yaml::LoadFile(vertex_meta_file).value();
+  auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
+  graphar::IdType start_index = 0;
+  graphar::builder::VerticesBuilder builder(vertex_info, "/tmp/", start_index);
 
   // set validate level
-  builder.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  builder.SetValidateLevel(graphar::ValidateLevel::strong_validate);
 
   // prepare vertex data
   int vertex_count = 3;
@@ -48,7 +47,7 @@ void vertices_builder() {
 
   // add vertices
   for (int i = 0; i < vertex_count; i++) {
-    GAR_NAMESPACE::builder::Vertex v;
+    graphar::builder::Vertex v;
     v.AddProperty(property_names[0], id[i]);
     v.AddProperty(property_names[1], firstName[i]);
     v.AddProperty(property_names[2], lastName[i]);
@@ -71,15 +70,14 @@ void edges_builder() {
   // construct edges builder
   std::string edge_meta_file =
       TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
-  auto edge_meta = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file).value();
-  auto edge_info = GAR_NAMESPACE::EdgeInfo::Load(edge_meta).value();
+  auto edge_meta = graphar::Yaml::LoadFile(edge_meta_file).value();
+  auto edge_info = graphar::EdgeInfo::Load(edge_meta).value();
   auto vertex_count = 3;
-  GAR_NAMESPACE::builder::EdgesBuilder builder(
-      edge_info, "/tmp/", GAR_NAMESPACE::AdjListType::ordered_by_dest,
-      vertex_count);
+  graphar::builder::EdgesBuilder builder(
+      edge_info, "/tmp/", graphar::AdjListType::ordered_by_dest, vertex_count);
 
   // set validate level
-  builder.SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  builder.SetValidateLevel(graphar::ValidateLevel::strong_validate);
 
   // prepare edge data
   int edge_count = 4;
@@ -91,7 +89,7 @@ void edges_builder() {
 
   // add edges
   for (int i = 0; i < edge_count; i++) {
-    GAR_NAMESPACE::builder::Edge e(src[i], dst[i]);
+    graphar::builder::Edge e(src[i], dst[i]);
     e.AddProperty("creationDate", creationDate[i]);
     ASSERT(builder.AddEdge(e).ok());
   }

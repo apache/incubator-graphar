@@ -31,7 +31,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace GAR_NAMESPACE {
+namespace graphar {
 
 TEST_CASE("InfoVersion") {
   InfoVersion info_version(1);
@@ -791,4 +791,4 @@ TEST_CASE("LoadFromS3", "[!hide]") {
   REQUIRE(vertex_infos.size() == 8);
   REQUIRE(edge_infos.size() == 23);
 }
-}  // namespace GAR_NAMESPACE
+}  // namespace graphar

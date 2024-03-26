@@ -56,19 +56,6 @@ Release build:
     $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
 ```
 
-Build with a custom namespace:
-
-The `namespace` is configurable. By default,
-it is defined in `namespace graphar`; however this can be toggled by
-setting `NAMESPACE` option with cmake:
-
-```bash
-    $ mkdir build
-    $ cd build
-    $ cmake -DNAMESPACE=MyNamespace ..
-    $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
-```
-
 Build the Apache Arrow dependency from source:
 
 By default, GraphAr try to find Apache Arrow in the system. This can be configured to build Arrow dependency automatically from source:

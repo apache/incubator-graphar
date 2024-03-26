@@ -27,7 +27,7 @@
 #include "gar/util/expression.h"
 #include "gar/util/filesystem.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 namespace ds = arrow::dataset;
 namespace detail {
 template <typename U, typename T>
@@ -310,4 +310,4 @@ template Result<IdType> FileSystem::ReadFileToValue<IdType>(
 template Status FileSystem::WriteValueToFile<IdType>(const IdType&,
                                                      const std::string&) const
     noexcept;
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

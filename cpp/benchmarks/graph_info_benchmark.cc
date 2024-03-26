@@ -19,7 +19,7 @@
 #include "./benchmark_util.h"
 #include "gar/graph_info.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 static void CreateGraphInfo(::benchmark::State& state,  // NOLINT
                             const std::string& path) {
@@ -38,4 +38,4 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, InitialGraphInfo)
 }
 BENCHMARK_REGISTER_F(BenchmarkFixture, InitialGraphInfo);
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

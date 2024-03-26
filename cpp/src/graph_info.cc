@@ -26,7 +26,7 @@
 #include "gar/util/version_parser.h"
 #include "gar/util/yaml.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 #define CHECK_HAS_ADJ_LIST_TYPE(adj_list_type)                         \
   do {                                                                 \
@@ -1301,4 +1301,4 @@ Status GraphInfo::Save(const std::string& path) const {
   return fs->WriteValueToFile(yaml_content, no_url_path);
 }
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

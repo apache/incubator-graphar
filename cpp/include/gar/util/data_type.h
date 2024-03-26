@@ -29,7 +29,7 @@ namespace arrow {
 class DataType;
 }
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /** @brief Main data type enumeration. */
 enum class Type {
@@ -156,6 +156,6 @@ class Date {
   c_type value_;
 };
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 
 #endif  // GAR_UTIL_DATA_TYPE_H_

@@ -39,7 +39,7 @@ limitations under the License.
 #ifndef GAR_UTIL_EXPRESSION_H_
 #define GAR_UTIL_EXPRESSION_H_
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 using ArrowExpression = arrow::compute::Expression;
 
@@ -368,5 +368,5 @@ template <typename T,
     std::shared_ptr<Expression> lhs, std::shared_ptr<Expression> rhs) {
   return std::make_shared<ExpressionOr>(lhs, rhs);
 }
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_UTIL_EXPRESSION_H_

@@ -18,7 +18,7 @@
 #include "gar/graph_info.h"
 #include "gar/util/convert_to_arrow_type.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 namespace builder {
 
 Status VerticesBuilder::validate(const Vertex& v, IdType index,
@@ -230,4 +230,4 @@ Result<std::shared_ptr<arrow::Table>> VerticesBuilder::convertToTable() {
 }
 
 }  // namespace builder
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

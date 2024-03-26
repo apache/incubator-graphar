@@ -31,19 +31,18 @@
   } while (0)
 
 /** @brief Propagate any non-successful Status to the caller. */
-#define GAR_RETURN_NOT_OK(status)                                    \
-  do {                                                               \
-    ::GAR_NAMESPACE_INTERNAL::Status __s =                           \
-        ::GAR_NAMESPACE_INTERNAL::internal::GenericToStatus(status); \
-    GAR_RETURN_IF_(!__s.ok(), __s, GAR_STRINGIFY(status));           \
+#define GAR_RETURN_NOT_OK(status)                                         \
+  do {                                                                    \
+    ::graphar::Status __s = ::graphar::internal::GenericToStatus(status); \
+    GAR_RETURN_IF_(!__s.ok(), __s, GAR_STRINGIFY(status));                \
   } while (false)
 
 /** @brief Propagate any non-successful Arrow Status to the caller. */
-#define RETURN_NOT_ARROW_OK(status)                                           \
-  do {                                                                        \
-    if (GAR_PREDICT_FALSE(!status.ok())) {                                    \
-      return ::GAR_NAMESPACE_INTERNAL::Status::ArrowError(status.ToString()); \
-    }                                                                         \
+#define RETURN_NOT_ARROW_OK(status)                            \
+  do {                                                         \
+    if (GAR_PREDICT_FALSE(!status.ok())) {                     \
+      return ::graphar::Status::ArrowError(status.ToString()); \
+    }                                                          \
   } while (false)
 
 #define GAR_RAISE_ERROR_IF_(condition, status, _) \
@@ -54,14 +53,13 @@
   } while (0)
 
 /** @brief Throw runtime error if Status not OK. */
-#define GAR_RAISE_ERROR_NOT_OK(status)                               \
-  do {                                                               \
-    ::GAR_NAMESPACE_INTERNAL::Status __s =                           \
-        ::GAR_NAMESPACE_INTERNAL::internal::GenericToStatus(status); \
-    GAR_RAISE_ERROR_IF_(!__s.ok(), __s, GAR_STRINGIFY(status));      \
+#define GAR_RAISE_ERROR_NOT_OK(status)                                    \
+  do {                                                                    \
+    ::graphar::Status __s = ::graphar::internal::GenericToStatus(status); \
+    GAR_RAISE_ERROR_IF_(!__s.ok(), __s, GAR_STRINGIFY(status));           \
   } while (false)
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 namespace util {
 template <typename Head>
@@ -278,6 +276,6 @@ inline Status GenericToStatus(Status&& st) { return std::move(st); }
 
 }  // namespace internal
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 
 #endif  // GAR_UTIL_STATUS_H_
