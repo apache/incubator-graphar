@@ -8,39 +8,39 @@ API Reference
 Graph Info
 -----------
 
-.. doxygenclass:: GraphArchive::Property
+.. doxygenclass:: graphar::Property
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::PropertyGroup
+.. doxygenclass:: graphar::PropertyGroup
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::CreatePropertyGroup
+.. doxygenfunction:: graphar::CreatePropertyGroup
 
-.. doxygenclass:: GraphArchive::AdjacentList
+.. doxygenclass:: graphar::AdjacentList
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::CreateAdjacentList
+.. doxygenfunction:: graphar::CreateAdjacentList
 
-.. doxygenclass:: GraphArchive::VertexInfo
+.. doxygenclass:: graphar::VertexInfo
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::CreateVertexInfo
+.. doxygenfunction:: graphar::CreateVertexInfo
 
-.. doxygenclass:: GraphArchive::EdgeInfo
+.. doxygenclass:: graphar::EdgeInfo
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::CreateEdgeInfo
+.. doxygenfunction:: graphar::CreateEdgeInfo
 
-.. doxygenclass:: GraphArchive::GraphInfo
+.. doxygenclass:: graphar::GraphInfo
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::CreateGraphInfo
+.. doxygenfunction:: graphar::CreateGraphInfo
 
 Readers
 ---------------------
@@ -48,76 +48,76 @@ Readers
 Chunk Info Reader
 ~~~~~~~~~~~~~~~~~
 
-.. doxygenclass:: GraphArchive::VertexPropertyChunkInfoReader
+.. doxygenclass:: graphar::VertexPropertyChunkInfoReader
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::AdjListChunkInfoReader
+.. doxygenclass:: graphar::AdjListChunkInfoReader
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::AdjListPropertyChunkInfoReader
+.. doxygenclass:: graphar::AdjListPropertyChunkInfoReader
     :members:
     :undoc-members:
 
 Arrow Chunk Reader
 ~~~~~~~~~~~~~~~~~~
 
-.. doxygenclass:: GraphArchive::VertexPropertyArrowChunkReader
+.. doxygenclass:: graphar::VertexPropertyArrowChunkReader
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::AdjListArrowChunkReader
+.. doxygenclass:: graphar::AdjListArrowChunkReader
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::AdjListOffsetArrowChunkReader
+.. doxygenclass:: graphar::AdjListOffsetArrowChunkReader
     :members:
     :undoc-members:
 
 Vertices Collection
 ~~~~~~~~~~~~~~~~~~~
 
-.. doxygenclass:: GraphArchive::Vertex
+.. doxygenclass:: graphar::Vertex
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::VertexIter
+.. doxygenclass:: graphar::VertexIter
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::VerticesCollection
+.. doxygenclass:: graphar::VerticesCollection
     :members:
     :undoc-members:
 
 Edges Collection
 ~~~~~~~~~~~~~~~~~~
 
-.. doxygenclass:: GraphArchive::Edge
+.. doxygenclass:: graphar::Edge
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgeIter
+.. doxygenclass:: graphar::EdgeIter
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgesCollection
+.. doxygenclass:: graphar::EdgesCollection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::OBSEdgeCollection
+.. doxygenclass:: graphar::OBSEdgeCollection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::OBDEdgesCollection
+.. doxygenclass:: graphar::OBDEdgesCollection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::UBSEdgesCollection
+.. doxygenclass:: graphar::UBSEdgesCollection
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::UBDEdgesCollection
+.. doxygenclass:: graphar::UBDEdgesCollection
     :members:
     :undoc-members:
 
@@ -127,30 +127,30 @@ Writer and Builder
 Chunk Writer
 ~~~~~~~~~~~~~~~~~
 
-.. doxygenclass:: GraphArchive::VertexPropertyWriter
+.. doxygenclass:: graphar::VertexPropertyWriter
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::EdgeChunkWriter
+.. doxygenclass:: graphar::EdgeChunkWriter
     :members:
     :undoc-members:
 
 Builder
 ~~~~~~~~~~~~~~~~~~~
 
-.. doxygenclass:: GraphArchive::builder::Vertex
+.. doxygenclass:: graphar::builder::Vertex
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::builder::Edge
+.. doxygenclass:: graphar::builder::Edge
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::builder::VerticesBuilder
+.. doxygenclass:: graphar::builder::VerticesBuilder
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::builder::EdgesBuilder
+.. doxygenclass:: graphar::builder::EdgesBuilder
     :members:
     :undoc-members:
 
@@ -161,34 +161,34 @@ Types
 Id Type
 ~~~~~~~~~~~~~~~~~~~
 
-.. doxygentypedef:: GraphArchive::IdType
+.. doxygentypedef:: graphar::IdType
 
 Data Type
 ~~~~~~~~~~~~~~~~~~~
 
-.. doxygenclass:: GraphArchive::DataType
+.. doxygenclass:: graphar::DataType
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::boolean
-.. doxygenfunction:: GraphArchive::int32
-.. doxygenfunction:: GraphArchive::int64
-.. doxygenfunction:: GraphArchive::float32
-.. doxygenfunction:: GraphArchive::float64
-.. doxygenfunction:: GraphArchive::string
-.. doxygenfunction:: GraphArchive::list
+.. doxygenfunction:: graphar::boolean
+.. doxygenfunction:: graphar::int32
+.. doxygenfunction:: graphar::int64
+.. doxygenfunction:: graphar::float32
+.. doxygenfunction:: graphar::float64
+.. doxygenfunction:: graphar::string
+.. doxygenfunction:: graphar::list
 
 File Type
 ~~~~~~~~~~~~~~~~~~~
-.. doxygenenum:: GraphArchive::FileType
+.. doxygenenum:: graphar::FileType
 
 Adj List Type
 ~~~~~~~~~~~~~~~~~~~
-.. doxygenenum:: GraphArchive::AdjListType
+.. doxygenenum:: graphar::AdjListType
 
 Validate Level
 ~~~~~~~~~~~~~~~~~~~
-.. doxygenenum:: GraphArchive::ValidateLevel
+.. doxygenenum:: graphar::ValidateLevel
 
 
 Utilities
@@ -197,105 +197,105 @@ Utilities
 Result and Status
 ~~~~~~~~~~~~~~~~~~~
 
-.. doxygentypedef:: GraphArchive::Result
+.. doxygentypedef:: graphar::Result
 
-.. doxygenclass:: GraphArchive::Status
+.. doxygenclass:: graphar::Status
     :members:
     :undoc-members:
 
 FileSystem
 ~~~~~~~~~~~~~~~~~~~
 
-.. doxygenclass:: GraphArchive::FileSystem
+.. doxygenclass:: graphar::FileSystem
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::FileSystemFromUriOrPath
+.. doxygenfunction:: graphar::FileSystemFromUriOrPath
 
 Yaml Parser
 ~~~~~~~~~~~~~~~~~~~
 
-.. doxygenclass:: GraphArchive::Yaml
+.. doxygenclass:: graphar::Yaml
     :members:
     :undoc-members:
 
 Info Version
 ~~~~~~~~~~~~~~~~~~~
 
-.. doxygenclass:: GraphArchive::InfoVersion
+.. doxygenclass:: graphar::InfoVersion
     :members:
     :undoc-members:
 
 Expression
 ~~~~~~~~~~~~~~~~~~~
 
-.. doxygenclass:: GraphArchive::Expression
+.. doxygenclass:: graphar::Expression
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionProperty
+.. doxygenclass:: graphar::ExpressionProperty
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionLiteral
+.. doxygenclass:: graphar::ExpressionLiteral
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionNot
+.. doxygenclass:: graphar::ExpressionNot
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionUnaryOp
+.. doxygenclass:: graphar::ExpressionUnaryOp
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionBinaryOp
+.. doxygenclass:: graphar::ExpressionBinaryOp
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionEqual
+.. doxygenclass:: graphar::ExpressionEqual
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionNotEqual 
+.. doxygenclass:: graphar::ExpressionNotEqual 
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionGreaterThan
+.. doxygenclass:: graphar::ExpressionGreaterThan
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionGreaterEqual
+.. doxygenclass:: graphar::ExpressionGreaterEqual
     :members:
     :undoc-members:
 
 
-.. doxygenclass:: GraphArchive::ExpressionLessThan
+.. doxygenclass:: graphar::ExpressionLessThan
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionLessEqual 
+.. doxygenclass:: graphar::ExpressionLessEqual 
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionAnd
+.. doxygenclass:: graphar::ExpressionAnd
     :members:
     :undoc-members:
 
-.. doxygenclass:: GraphArchive::ExpressionOr
+.. doxygenclass:: graphar::ExpressionOr
     :members:
     :undoc-members:
 
-.. doxygenfunction:: GraphArchive::_Property(const Property&)
-.. doxygenfunction:: GraphArchive::_Property(const std::string&)
-.. doxygenfunction:: GraphArchive::_Literal
-.. doxygenfunction:: GraphArchive::_Not
-.. doxygenfunction:: GraphArchive::_Equal
-.. doxygenfunction:: GraphArchive::_NotEqual
-.. doxygenfunction:: GraphArchive::_GreaterThan
-.. doxygenfunction:: GraphArchive::_GreaterEqual
-.. doxygenfunction:: GraphArchive::_LessThan
-.. doxygenfunction:: GraphArchive::_LessEqual
-.. doxygenfunction:: GraphArchive::_And
-.. doxygenfunction:: GraphArchive::_Or
+.. doxygenfunction:: graphar::_Property(const Property&)
+.. doxygenfunction:: graphar::_Property(const std::string&)
+.. doxygenfunction:: graphar::_Literal
+.. doxygenfunction:: graphar::_Not
+.. doxygenfunction:: graphar::_Equal
+.. doxygenfunction:: graphar::_NotEqual
+.. doxygenfunction:: graphar::_GreaterThan
+.. doxygenfunction:: graphar::_GreaterEqual
+.. doxygenfunction:: graphar::_LessThan
+.. doxygenfunction:: graphar::_LessEqual
+.. doxygenfunction:: graphar::_And
+.. doxygenfunction:: graphar::_Or
 

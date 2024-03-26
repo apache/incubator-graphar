@@ -141,8 +141,7 @@ TEST_CASE("test_edges_builder") {
   auto edge_info = EdgeInfo::Load(edge_meta).value();
   auto vertices_num = 903;
   auto maybe_builder = builder::EdgesBuilder::Make(
-      edge_info, "/tmp/", GraphArchive::AdjListType::ordered_by_dest,
-      vertices_num);
+      edge_info, "/tmp/", AdjListType::ordered_by_dest, vertices_num);
   REQUIRE(!maybe_builder.has_error());
   auto builder = maybe_builder.value();
 

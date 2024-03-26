@@ -32,15 +32,15 @@ This algorithm can be implemented based on streaming the edges via GraphAr's rea
   auto it_begin = edges->begin(), it_end = edges->end();
 
   // initialize for all vertices
-  std::vector<GraphArchive::IdType> component(num_vertices);
-  for (GraphArchive::IdType i = 0; i < num_vertices; i++)
+  std::vector<graphar::IdType> component(num_vertices);
+  for (graphar::IdType i = 0; i < num_vertices; i++)
     component[i] = i;
 
   // stream all edges for each iteration
   for (int iter = 0; ; iter++) {
     bool flag = false;
     for (auto it = it_begin; it != it_end; ++it) {
-      GraphArchive::IdType src = it.source(), dst = it.destination();
+      graphar::IdType src = it.source(), dst = it.destination();
       // update
       if (component[src] < component[dst]) {
           component[dst] = component[src];
@@ -76,16 +76,16 @@ An out-of-core BFS algorithm could be implemented based on streaming the graph d
   auto it_begin = edges->begin(), it_end = edges->end();
 
   // initialize for all vertices
-  GraphArchive::IdType root = 0; // the BFS root
+  graphar::IdType root = 0; // the BFS root
   std::vector<int32_t> distance(num_vertices);
-  for (GraphArchive::IdType i = 0; i < num_vertices; i++)
+  for (graphar::IdType i = 0; i < num_vertices; i++)
     distance[i] = (i == root ? 0 : -1);
 
   // stream all edges for each iteration
   for (int iter = 0; ; iter++) {
-    GraphArchive::IdType count = 0;
+    graphar::IdType count = 0;
     for (auto it = it_begin; it != it_end; ++it) {
-      GraphArchive::IdType src = it.source(), dst = it.destination();
+      graphar::IdType src = it.source(), dst = it.destination();
       // update
       if (distance[src] == iter && distance[dst] == -1) {
         distance[dst] = distance[src] + 1;

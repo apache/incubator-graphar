@@ -50,7 +50,7 @@ class Status;
  * returns false. Sample usage:
  *
  * ```
- *   GraphArchive::Result<Foo> result = CalculateFoo();
+ *   graphar::Result<Foo> result = CalculateFoo();
  *   if (!result.has_error()) {
  *     Foo foo = result.value();
  *     foo.DoSomethingCool();

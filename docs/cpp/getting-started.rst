@@ -79,7 +79,7 @@ Also, the metadata of a graph can be constructed easily through reading the alre
 
   // construct graph information from file
   std::string path = ... // the path of the graph information file (e.g., ldbc_sample.graph.yml)
-  auto graph_info = GraphArchive::GraphInfo::Load(path).value();
+  auto graph_info = graphar::GraphInfo::Load(path).value();
 
   // get vertex information
   auto vertex_info = graph_info->GetVertexInfo("person");
@@ -103,7 +103,7 @@ As a simple case, the following example shows how to read all vertices with labe
 .. code:: C++
 
   graph_info = ...
-  auto vertices = GraphArchive::VerticesCollection::Make(graph_info, "person").value();
+  auto vertices = graphar::VerticesCollection::Make(graph_info, "person").value();
 
   for (auto it = vertices->begin(); it != vertices->end(); ++it) {
     // get a vertex and access its data
@@ -116,7 +116,7 @@ The next example reads all edges with label "person_knows_person" from the above
 .. code:: C++
 
   graph_info = ...
-  auto expect = GraphArchive::EdgesCollection::Make(graph_info, "person", "konws", "person", GraphArchive::AdjListType::ordered_by_source);
+  auto expect = graphar::EdgesCollection::Make(graph_info, "person", "konws", "person", graphar::AdjListType::ordered_by_source);
   auto edges = expect.value();
 
   for (auto it = edges->begin(); it != edges->end(); ++it) {
@@ -137,10 +137,10 @@ As the simplest cases, the fist example below adds vertices to **VerticesBuilder
 
   vertex_info = ...
   prefix = ...
-  GraphArchive::builder::VerticesBuilder builder(vertex_info,  prefix);
+  graphar::builder::VerticesBuilder builder(vertex_info,  prefix);
 
   // add a vertex
-  GraphArchive::builder::Vertex v;
+  graphar::builder::Vertex v;
   v.AddProperty("id", 933);
   v.AddProperty("firstName", "Alice");
   builder.AddVertex(v);
@@ -155,10 +155,10 @@ As the simplest cases, the fist example below adds vertices to **VerticesBuilder
   edge_info = ...
   prefix = ...
   vertices_num = ...
-  GraphArchive::builder::EdgesBuilder builder(edge_info, prefix, GraphArchive::AdjListType::ordered_by_source, vertices_num);
+  graphar::builder::EdgesBuilder builder(edge_info, prefix, graphar::AdjListType::ordered_by_source, vertices_num);
 
   // add an edge (0 -> 3)
-  GraphArchive::builder::Edge e(0, 3);
+  graphar::builder::Edge e(0, 3);
   e.AddProperty("creationDate", "2011-07-20T20:02:04.233+0000");
   builder.AddEdge(e);
   // add other edges

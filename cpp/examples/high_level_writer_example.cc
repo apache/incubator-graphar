@@ -75,7 +75,7 @@ void edges_builder() {
   auto edge_info = GAR_NAMESPACE::EdgeInfo::Load(edge_meta).value();
   auto vertex_count = 3;
   GAR_NAMESPACE::builder::EdgesBuilder builder(
-      edge_info, "/tmp/", GraphArchive::AdjListType::ordered_by_dest,
+      edge_info, "/tmp/", GAR_NAMESPACE::AdjListType::ordered_by_dest,
       vertex_count);
 
   // set validate level
