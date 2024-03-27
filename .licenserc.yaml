@@ -23,6 +23,7 @@ header:
     - '**/*.md'
     - 'LICENSE'
     - 'NOTICE'
+    - 'DISCLAIMER'
     - 'testing'
     - 'spark/graphar/src/test/resources'
     - 'java/src/test/resources'
