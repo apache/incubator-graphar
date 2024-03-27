@@ -40,6 +40,14 @@ The text of each license is the standard Apache 2.0 license.
       spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/orc/ORCOutputWriter.scala
       spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/orc/ORCWriteBuilder.scala
       spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/parquet/ParquetWriteBuilder.scala
+    are modified from spark.
+
+* styleguide (https://github.com/google/styleguide)
+    Files:
+      cpp/thirdparty/styleguide/cpplint.py
+
+* arrow (https://github.com/apache/arrow)
+* benchmark (https://github.com/google/benchmark)
 
 
 ================================================================
@@ -50,10 +58,42 @@ The text of each license is also included in licenses/LICENSE-[project].txt
 
 * result (https://github.com/bitwizeshift/result)
     Files:
-      cpp/include/gar/external/result.hpp
+      cpp/include/gar/external/result.hpp are modified from cpp/thirdparty/result.hpp
       cpp/thirdparty/result.hpp
 
 * mini-yaml (https://github.com/jimmiebergmann/mini-yaml)
     Files:
       cpp/thirdparty/mini-yam/Yaml.hpp
       cpp/thirdparty/mini-yaml/Yaml.cpp
+
+* poetry (https://github.com/python-poetry/poetry)
+* pyyaml (https://github.com/yaml/pyyaml)
+*
+
+
+================================================================
+BSD-3-Clause licenses
+================================================================
+The following components are provided under the BSD-3-Clause License. See project link for details.
+The text of each license is also included in licenses/LICENSE-[project].txt.
+
+* py4j (https://github.com/py4j/py4j)
+
+
+================================================================
+Boost Software License Version 1.0
+================================================================
+The following components are provided under the Boost Software License Version 1.0. See project link for details.
+The text of each license is also included in licenses/LICENSE-[project].txt
+
+* boost (https://github.com/boostorg/boost)
+* Catch2 (https://github.com/catchorg/Catch2)
+
+
+================================================================
+EPL-1.0 licenses
+================================================================
+The following components are provided under the EPL-1.0 License. See project link for details.
+The text of each license is also included in licenses/LICENSE-[project].txt.
+
+* junit4 (https://github.com/junit-team/junit4)
