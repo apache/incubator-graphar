@@ -17,7 +17,6 @@
  * under the License.
  */
 
-
 #include "gar/util/expression.h"
 #include "gar/util/result.h"
 
