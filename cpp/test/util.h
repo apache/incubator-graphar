@@ -22,16 +22,20 @@
 #ifndef CPP_TEST_UTIL_H_
 #define CPP_TEST_UTIL_H_
 
+namespace graphar {
+
 // Return the value of the GAR_TEST_DATA environment variable or return error
 // Status
-GAR_NAMESPACE::Status GetTestResourceRoot(std::string* out) {
+Status GetTestResourceRoot(std::string* out) {
   const char* c_root = std::getenv("GAR_TEST_DATA");
   if (!c_root) {
-    return GAR_NAMESPACE::Status::IOError(
+    return Status::IOError(
         "Test resources not found, set GAR_TEST_DATA to <repo root>/testing");
   }
   *out = std::string(c_root);
-  return GAR_NAMESPACE::Status::OK();
+  return Status::OK();
 }
+
+}  // namespace graphar
 
 #endif  // CPP_TEST_UTIL_H_

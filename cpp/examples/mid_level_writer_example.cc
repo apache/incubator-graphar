@@ -78,9 +78,8 @@ arrow::Result<std::shared_ptr<arrow::Table>> generate_adj_list_table() {
 
   // schema
   auto schema = arrow::schema(
-      {arrow::field(GAR_NAMESPACE::GeneralParams::kSrcIndexCol, arrow::int64()),
-       arrow::field(GAR_NAMESPACE::GeneralParams::kDstIndexCol,
-                    arrow::int64())});
+      {arrow::field(graphar::GeneralParams::kSrcIndexCol, arrow::int64()),
+       arrow::field(graphar::GeneralParams::kDstIndexCol, arrow::int64())});
   return arrow::Table::Make(schema, {i64array, i64array2});
 }
 
@@ -100,16 +99,15 @@ arrow::Result<std::shared_ptr<arrow::Table>> generate_edge_property_table() {
 }
 
 void vertex_property_writer(
-    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+    const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // create writer
   std::string vertex_meta_file =
       TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person.vertex.yml";
-  auto vertex_meta = GAR_NAMESPACE::Yaml::LoadFile(vertex_meta_file).value();
-  auto vertex_info = GAR_NAMESPACE::VertexInfo::Load(vertex_meta).value();
+  auto vertex_meta = graphar::Yaml::LoadFile(vertex_meta_file).value();
+  auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
   ASSERT(vertex_info->GetLabel() == "person");
 
-  auto maybe_writer =
-      GAR_NAMESPACE::VertexPropertyWriter::Make(vertex_info, "/tmp/");
+  auto maybe_writer = graphar::VertexPropertyWriter::Make(vertex_info, "/tmp/");
   ASSERT(maybe_writer.status().ok());
   auto writer = maybe_writer.value();
 
@@ -123,7 +121,7 @@ void vertex_property_writer(
 
   // use writer
   // set validate level
-  writer->SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  writer->SetValidateLevel(graphar::ValidateLevel::strong_validate);
   // write the table
   ASSERT(writer->WriteTable(table, 0).ok());
   // write the number of vertices
@@ -133,21 +131,20 @@ void vertex_property_writer(
   auto path = "/tmp/vertex/person/vertex_count";
   auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
   auto input = fs->OpenInputStream(path).ValueOrDie();
-  auto num = input->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
-  GAR_NAMESPACE::IdType* ptr = (GAR_NAMESPACE::IdType*) num->data();
+  auto num = input->Read(sizeof(graphar::IdType)).ValueOrDie();
+  graphar::IdType* ptr = (graphar::IdType*) num->data();
   std::cout << "vertex count from reading written file: " << *ptr << std::endl;
 }
 
-void edge_chunk_writer(
-    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+void edge_chunk_writer(const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // construct writer
   std::string edge_meta_file =
       TEST_DATA_DIR + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
-  auto edge_meta = GAR_NAMESPACE::Yaml::LoadFile(edge_meta_file).value();
-  auto edge_info = GAR_NAMESPACE::EdgeInfo::Load(edge_meta).value();
-  auto adj_list_type = GAR_NAMESPACE::AdjListType::ordered_by_source;
+  auto edge_meta = graphar::Yaml::LoadFile(edge_meta_file).value();
+  auto edge_info = graphar::EdgeInfo::Load(edge_meta).value();
+  auto adj_list_type = graphar::AdjListType::ordered_by_source;
   auto maybe_writer =
-      GAR_NAMESPACE::EdgeChunkWriter::Make(edge_info, "/tmp/", adj_list_type);
+      graphar::EdgeChunkWriter::Make(edge_info, "/tmp/", adj_list_type);
   ASSERT(maybe_writer.status().ok());
   auto writer = maybe_writer.value();
 
@@ -168,7 +165,7 @@ void edge_chunk_writer(
 
   // use writer
   // set validate level
-  writer->SetValidateLevel(GAR_NAMESPACE::ValidateLevel::strong_validate);
+  writer->SetValidateLevel(graphar::ValidateLevel::strong_validate);
   // write a property chunk
   auto pg = edge_info->GetPropertyGroup("creationDate");
   ASSERT(pg != nullptr);
@@ -185,9 +182,8 @@ void edge_chunk_writer(
   auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
   std::shared_ptr<arrow::io::InputStream> input =
       fs->OpenInputStream(path).ValueOrDie();
-  auto edge_num = input->Read(sizeof(GAR_NAMESPACE::IdType)).ValueOrDie();
-  GAR_NAMESPACE::IdType* edge_num_ptr =
-      (GAR_NAMESPACE::IdType*) edge_num->data();
+  auto edge_num = input->Read(sizeof(graphar::IdType)).ValueOrDie();
+  graphar::IdType* edge_num_ptr = (graphar::IdType*) edge_num->data();
   std::cout << "edge number from reading written file: " << *edge_num_ptr
             << std::endl;
 }
@@ -196,7 +192,7 @@ int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-  auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
+  auto graph_info = graphar::GraphInfo::Load(path).value();
 
   // vertex property writer
   std::cout << "Vertex property writer" << std::endl;

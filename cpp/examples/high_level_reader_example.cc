@@ -23,11 +23,11 @@
 #include "gar/graph.h"
 
 void vertices_collection(
-    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+    const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // construct vertices collection
   std::string label = "person", property = "firstName";
   auto maybe_vertices_collection =
-      GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
+      graphar::VerticesCollection::Make(graph_info, label);
   ASSERT(!maybe_vertices_collection.has_error());
   auto vertices = maybe_vertices_collection.value();
 
@@ -70,13 +70,12 @@ void vertices_collection(
   std::cout << "vertex_count=" << count << std::endl;
 }
 
-void edges_collection(
-    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+void edges_collection(const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // construct edges collection
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto expect = GAR_NAMESPACE::EdgesCollection::Make(
+  auto expect = graphar::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
+      graphar::AdjListType::ordered_by_source);
   ASSERT(!expect.has_error());
   auto edges = expect.value();
 
@@ -119,7 +118,7 @@ int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-  auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
+  auto graph_info = graphar::GraphInfo::Load(path).value();
 
   // vertices collection
   std::cout << "Vertices collection" << std::endl;

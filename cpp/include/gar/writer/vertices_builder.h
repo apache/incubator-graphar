@@ -34,7 +34,7 @@ class Array;
 class Table;
 }  // namespace arrow
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 namespace builder {
 
 /**
@@ -346,5 +346,5 @@ class VerticesBuilder {
 };
 
 }  // namespace builder
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_WRITER_VERTICES_BUILDER_H_

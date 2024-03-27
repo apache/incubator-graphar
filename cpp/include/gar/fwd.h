@@ -28,7 +28,7 @@
 #include "gar/util/macros.h"
 #include "gar/util/status.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 class Status;
 
@@ -207,6 +207,6 @@ using ColumnNames =
     std::optional<std::reference_wrapper<std::vector<std::string>>>;
 }  // namespace util
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 
 #endif  // GAR_FWD_H_

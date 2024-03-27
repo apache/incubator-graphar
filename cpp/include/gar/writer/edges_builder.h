@@ -34,7 +34,7 @@ namespace arrow {
 class Array;
 }
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 namespace builder {
 
 /**
@@ -425,5 +425,5 @@ class EdgesBuilder {
 };
 
 }  // namespace builder
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_WRITER_EDGES_BUILDER_H_

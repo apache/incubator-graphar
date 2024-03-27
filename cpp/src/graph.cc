@@ -18,7 +18,7 @@
 #include "gar/util/adj_list_type.h"
 #include "gar/util/convert_to_arrow_type.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 template <Type type>
 Status CastToAny(std::shared_ptr<arrow::Array> array,
@@ -562,4 +562,4 @@ Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
   return Status::OK();
 }
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

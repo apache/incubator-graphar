@@ -27,7 +27,7 @@
 #include "gar/util/filesystem.h"
 #include "gar/util/reader_util.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 namespace util {
 
@@ -205,4 +205,4 @@ Result<IdType> GetEdgeNum(const std::string& prefix,
 
 }  // namespace util
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

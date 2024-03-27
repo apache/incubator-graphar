@@ -26,7 +26,7 @@
 #include "gar/util/status.h"
 #include "gar/util/util.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
     const std::shared_ptr<VertexInfo>& vertex_info,
@@ -700,4 +700,4 @@ Status AdjListPropertyArrowChunkReader::initOrUpdateEdgeChunkNum() {
   return Status::OK();
 }
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

@@ -25,10 +25,10 @@
 #include "gar/util/expression.h"
 
 void vertex_property_chunk_reader(
-    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+    const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // create reader
   std::string label = "person", property_name = "gender";
-  auto maybe_reader = GAR_NAMESPACE::VertexPropertyArrowChunkReader::Make(
+  auto maybe_reader = graphar::VertexPropertyArrowChunkReader::Make(
       graph_info, label, property_name);
   ASSERT(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
@@ -43,7 +43,7 @@ void vertex_property_chunk_reader(
   std::cout << "schema of first vertex property chunk: " << std::endl
             << table->schema()->ToString() << std::endl;
   auto index_col =
-      table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
+      table->GetColumnByName(graphar::GeneralParams::kVertexIndexCol);
   ASSERT(index_col != nullptr);
   std::cout << "Internal id column: " << index_col->ToString() << " "
             << std::endl;
@@ -52,8 +52,7 @@ void vertex_property_chunk_reader(
   result = reader->GetChunk();
   ASSERT(!result.has_error());
   table = result.value();
-  index_col =
-      table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
+  index_col = table->GetColumnByName(graphar::GeneralParams::kVertexIndexCol);
   ASSERT(index_col != nullptr);
   std::cout << "Internal id column of vertex property chunk for vertex id 100: "
             << index_col->ToString() << " " << std::endl;
@@ -62,19 +61,17 @@ void vertex_property_chunk_reader(
   result = reader->GetChunk();
   ASSERT(!result.has_error());
   table = result.value();
-  index_col =
-      table->GetColumnByName(GAR_NAMESPACE::GeneralParams::kVertexIndexCol);
+  index_col = table->GetColumnByName(graphar::GeneralParams::kVertexIndexCol);
   ASSERT(index_col != nullptr);
   std::cout << "Internal id column of next chunk: " << index_col->ToString()
             << " " << std::endl;
 
   // reader with filter pushdown
-  auto filter = GAR_NAMESPACE::_Equal(GAR_NAMESPACE::_Property("gender"),
-                                      GAR_NAMESPACE::_Literal("female"));
+  auto filter = graphar::_Equal(graphar::_Property("gender"),
+                                graphar::_Literal("female"));
   std::vector<std::string> expected_cols{"firstName", "lastName"};
-  auto maybe_filter_reader =
-      GAR_NAMESPACE::VertexPropertyArrowChunkReader::Make(graph_info, label,
-                                                          property_name);
+  auto maybe_filter_reader = graphar::VertexPropertyArrowChunkReader::Make(
+      graph_info, label, property_name);
   ASSERT(maybe_filter_reader.status().ok());
   auto filter_reader = maybe_filter_reader.value();
   filter_reader->Filter(filter);
@@ -89,12 +86,12 @@ void vertex_property_chunk_reader(
 }
 
 void adj_list_chunk_reader(
-    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+    const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // create reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto maybe_reader = GAR_NAMESPACE::AdjListArrowChunkReader::Make(
+  auto maybe_reader = graphar::AdjListArrowChunkReader::Make(
       graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
+      graphar::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
 
   // use reader
@@ -124,13 +121,13 @@ void adj_list_chunk_reader(
 }
 
 void adj_list_property_chunk_reader(
-    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+    const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // create reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person",
               property_name = "creationDate";
-  auto maybe_reader = GAR_NAMESPACE::AdjListPropertyArrowChunkReader::Make(
+  auto maybe_reader = graphar::AdjListPropertyArrowChunkReader::Make(
       graph_info, src_label, edge_label, dst_label, property_name,
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
+      graphar::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
 
@@ -159,17 +156,16 @@ void adj_list_property_chunk_reader(
             << table->num_rows() << std::endl;
 
   // reader with filter pushdown
-  auto expr1 = GAR_NAMESPACE::_LessThan(
-      GAR_NAMESPACE::_Literal("2012-06-02T04:30:44.526+0000"),
-      GAR_NAMESPACE::_Property(property_name));
-  auto expr2 = GAR_NAMESPACE::_Equal(GAR_NAMESPACE::_Property(property_name),
-                                     GAR_NAMESPACE::_Property(property_name));
-  auto filter = GAR_NAMESPACE::_And(expr1, expr2);
+  auto expr1 =
+      graphar::_LessThan(graphar::_Literal("2012-06-02T04:30:44.526+0000"),
+                         graphar::_Property(property_name));
+  auto expr2 = graphar::_Equal(graphar::_Property(property_name),
+                               graphar::_Property(property_name));
+  auto filter = graphar::_And(expr1, expr2);
   std::vector<std::string> expected_cols{"creationDate"};
-  auto maybe_filter_reader =
-      GAR_NAMESPACE::AdjListPropertyArrowChunkReader::Make(
-          graph_info, src_label, edge_label, dst_label, property_name,
-          GAR_NAMESPACE::AdjListType::ordered_by_source);
+  auto maybe_filter_reader = graphar::AdjListPropertyArrowChunkReader::Make(
+      graph_info, src_label, edge_label, dst_label, property_name,
+      graphar::AdjListType::ordered_by_source);
   ASSERT(maybe_filter_reader.status().ok());
   auto filter_reader = maybe_filter_reader.value();
   filter_reader->Filter(filter);
@@ -182,12 +178,12 @@ void adj_list_property_chunk_reader(
 }
 
 void adj_list_offset_chunk_reader(
-    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+    const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // create reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto maybe_reader = GAR_NAMESPACE::AdjListOffsetArrowChunkReader::Make(
+  auto maybe_reader = graphar::AdjListOffsetArrowChunkReader::Make(
       graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
+      graphar::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
 
@@ -217,7 +213,7 @@ int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-  auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
+  auto graph_info = graphar::GraphInfo::Load(path).value();
 
   // vertex property chunk reader
   std::cout << "Vertex property chunk reader" << std::endl;

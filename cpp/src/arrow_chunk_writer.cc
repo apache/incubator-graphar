@@ -39,7 +39,7 @@
 #include "gar/util/util.h"
 #include "gar/writer/arrow_chunk_writer.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 // common methods
 
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
@@ -962,4 +962,4 @@ std::string EdgeChunkWriter::getSortColumnName(AdjListType adj_list_type) {
   }
   return GeneralParams::kSrcIndexCol;
 }
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

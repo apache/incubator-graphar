@@ -37,16 +37,10 @@ project(graph-archive LANGUAGES C CXX VERSION ${GAR_VERSION})
 # cmake options
 # ------------------------------------------------------------------------------
 
-option(NAMESPACE "User specific namespace, default is graphar" OFF)
 option(BUILD_TESTS "Build unit tests" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 
-if (NAMESPACE)
-  add_definitions(-DGAR_NAMESPACE=${NAMESPACE})
-else()
-  add_definitions(-DGAR_NAMESPACE=graphar)
-endif()
 # ------------------------------------------------------------------------------
 # setting default cmake type to Release
 # ------------------------------------------------------------------------------

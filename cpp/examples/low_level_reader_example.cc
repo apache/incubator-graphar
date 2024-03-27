@@ -24,10 +24,10 @@
 #include "gar/reader/chunk_info_reader.h"
 
 void vertex_property_chunk_info_reader(
-    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+    const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // constuct reader
   std::string label = "person", property_name = "id";
-  auto maybe_reader = GAR_NAMESPACE::VertexPropertyChunkInfoReader::Make(
+  auto maybe_reader = graphar::VertexPropertyChunkInfoReader::Make(
       graph_info, label, property_name);
   ASSERT(!maybe_reader.has_error());
   auto reader = maybe_reader.value();
@@ -57,12 +57,12 @@ void vertex_property_chunk_info_reader(
 }
 
 void adj_list_chunk_info_reader(
-    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+    const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // construct reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto maybe_reader = GAR_NAMESPACE::AdjListChunkInfoReader::Make(
+  auto maybe_reader = graphar::AdjListChunkInfoReader::Make(
       graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
+      graphar::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
 
@@ -88,15 +88,14 @@ void adj_list_chunk_info_reader(
 }
 
 void adj_list_property_chunk_info_reader(
-    const std::shared_ptr<GAR_NAMESPACE::GraphInfo>& graph_info) {
+    const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // construct reader
   std::string src_label = "person", edge_label = "knows", dst_label = "person",
               property_name = "creationDate";
 
-  auto maybe_property_reader =
-      GAR_NAMESPACE::AdjListPropertyChunkInfoReader::Make(
-          graph_info, src_label, edge_label, dst_label, property_name,
-          GAR_NAMESPACE::AdjListType::ordered_by_source);
+  auto maybe_property_reader = graphar::AdjListPropertyChunkInfoReader::Make(
+      graph_info, src_label, edge_label, dst_label, property_name,
+      graphar::AdjListType::ordered_by_source);
   ASSERT(maybe_property_reader.status().ok());
   auto reader = maybe_property_reader.value();
 
@@ -127,7 +126,7 @@ int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-  auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
+  auto graph_info = graphar::GraphInfo::Load(path).value();
 
   // vertex property chunk info reader
   std::cout << "Vertex property chunk info reader" << std::endl;

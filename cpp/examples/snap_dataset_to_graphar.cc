@@ -32,8 +32,8 @@
 #define IS_DIRECTED false
 /*-----------------------GraphAr status---------------------*/
 #define SAVE_PATH "/tmp/snap/" + graph_name + "/"
-#define ADJLIST_TYPE GAR_NAMESPACE::AdjListType::ordered_by_source
-#define PAYLOAD_TYPE GAR_NAMESPACE::FileType::CSV
+#define ADJLIST_TYPE graphar::AdjListType::ordered_by_source
+#define PAYLOAD_TYPE graphar::FileType::CSV
 #define VERTEX_CHUNK_SIZE 1024
 #define EDGE_CHUNK_SIZE 1024 * 1024
 
@@ -42,14 +42,14 @@ int main(int argc, char* argv[]) {
   std::string save_path = SAVE_PATH;
 
   /*------------------construct vertex info------------------*/
-  auto version = GAR_NAMESPACE::InfoVersion::Parse("gar/v1").value();
+  auto version = graphar::InfoVersion::Parse("gar/v1").value();
 
   // meta info
   std::string vertex_label = "node", vertex_prefix = "vertex/node/";
 
   // create vertex info
-  auto vertex_info = GAR_NAMESPACE::CreateVertexInfo(
-      vertex_label, VERTEX_CHUNK_SIZE, {}, vertex_prefix, version);
+  auto vertex_info = graphar::CreateVertexInfo(vertex_label, VERTEX_CHUNK_SIZE,
+                                               {}, vertex_prefix, version);
 
   // save & dump
   ASSERT(!vertex_info->Dump().has_error());
@@ -62,9 +62,9 @@ int main(int argc, char* argv[]) {
 
   // construct adjacent lists
   auto adjacent_lists = {
-      GAR_NAMESPACE::CreateAdjacentList(ADJLIST_TYPE, PAYLOAD_TYPE)};
+      graphar::CreateAdjacentList(ADJLIST_TYPE, PAYLOAD_TYPE)};
   // create edge info
-  auto edge_info = GAR_NAMESPACE::CreateEdgeInfo(
+  auto edge_info = graphar::CreateEdgeInfo(
       src_label, edge_label, dst_label, EDGE_CHUNK_SIZE, VERTEX_CHUNK_SIZE,
       VERTEX_CHUNK_SIZE, directed, adjacent_lists, {}, edge_prefix, version);
 
@@ -74,22 +74,22 @@ int main(int argc, char* argv[]) {
 
   /*------------------construct graph info------------------*/
   // create graph info
-  auto graph_info = GAR_NAMESPACE::CreateGraphInfo(
-      graph_name, {vertex_info}, {edge_info}, save_path, version);
+  auto graph_info = graphar::CreateGraphInfo(graph_name, {vertex_info},
+                                             {edge_info}, save_path, version);
   // save & dump
   ASSERT(!graph_info->Dump().has_error());
   ASSERT(graph_info->Save(save_path + graph_name + ".graph.yml").ok());
 
   /*------------------construct vertices------------------*/
   // construct vertices builder
-  GAR_NAMESPACE::IdType start_index = 0;
-  auto v_builder = GAR_NAMESPACE::builder::VerticesBuilder::Make(
+  graphar::IdType start_index = 0;
+  auto v_builder = graphar::builder::VerticesBuilder::Make(
                        vertex_info, save_path, start_index)
                        .value();
 
   // prepare vertex data
   for (int i = 0; i < VERTEX_COUNT; i++) {
-    GAR_NAMESPACE::builder::Vertex v;
+    graphar::builder::Vertex v;
     ASSERT(v_builder->AddVertex(v).ok());
   }
 
@@ -104,7 +104,7 @@ int main(int argc, char* argv[]) {
 
   /*------------------construct edges------------------*/
   // construct edges builder
-  auto e_builder = GAR_NAMESPACE::builder::EdgesBuilder::Make(
+  auto e_builder = graphar::builder::EdgesBuilder::Make(
                        edge_info, save_path, ADJLIST_TYPE, VERTEX_COUNT)
                        .value();
   // prepare edge data
@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
     if (!(iss >> src >> dst)) {
       break;
     }
-    GAR_NAMESPACE::builder::Edge e(src, dst);
+    graphar::builder::Edge e(src, dst);
     ASSERT(e_builder->AddEdge(e).ok());
   }
 

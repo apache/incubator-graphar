@@ -39,7 +39,7 @@ class ChunkedArray;
 class Array;
 }  // namespace arrow
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /**
  * @brief Vertex contains information of certain vertex.
@@ -1056,6 +1056,6 @@ class UBDEdgesCollection : public EdgesCollection {
     return iter;
   }
 };
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 
 #endif  // GAR_GRAPH_H_

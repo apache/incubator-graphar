@@ -21,7 +21,7 @@
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/util/adj_list_type.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, CreateVertexPropertyArrowChunkReader)
 (::benchmark::State& state) {  // NOLINT
@@ -149,4 +149,4 @@ BENCHMARK_REGISTER_F(BenchmarkFixture, VertexPropertyArrowChunkReaderReadChunk);
 BENCHMARK_REGISTER_F(BenchmarkFixture, AdjListArrowChunkReaderReadChunk);
 BENCHMARK_REGISTER_F(BenchmarkFixture, AdjListOffsetArrowChunkReaderReadChunk);
 BENCHMARK_REGISTER_F(BenchmarkFixture, AdjListOffsetArrowChunkReaderReadChunk);
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

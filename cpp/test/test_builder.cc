@@ -39,7 +39,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace GAR_NAMESPACE {
+namespace graphar {
 TEST_CASE("test_vertices_builder") {
   std::cout << "Test vertex builder" << std::endl;
   std::string root;
@@ -214,4 +214,4 @@ TEST_CASE("test_edges_builder") {
   const IdType* ptr = reinterpret_cast<const IdType*>(num->data());
   REQUIRE((*ptr) == vertices_num);
 }
-}  // namespace GAR_NAMESPACE
+}  // namespace graphar

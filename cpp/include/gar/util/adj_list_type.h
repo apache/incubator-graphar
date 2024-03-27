@@ -23,7 +23,7 @@
 #ifndef GAR_UTIL_ADJ_LIST_TYPE_H_
 #define GAR_UTIL_ADJ_LIST_TYPE_H_
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /** Adj list type enumeration for adjacency list of graph. */
 enum class AdjListType : std::uint8_t {
@@ -86,5 +86,5 @@ static inline std::pair<bool, std::string> AdjListTypeToOrderedAligned(
   }
 }
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_UTIL_ADJ_LIST_TYPE_H_

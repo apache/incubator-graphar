@@ -22,7 +22,7 @@
 #include "gar/util/result.h"
 #include "gar/util/yaml.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 const ::Yaml::Node Yaml::operator[](const std::string& key) const {
   return root_node_->operator[](key);
@@ -52,4 +52,4 @@ Result<std::shared_ptr<Yaml>> Yaml::LoadFile(const std::string& file_name) {
   return std::make_shared<Yaml>(root_node);
 }
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

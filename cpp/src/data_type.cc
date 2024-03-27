@@ -22,7 +22,7 @@
 #include "gar/fwd.h"
 #include "gar/util/data_type.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 std::shared_ptr<arrow::DataType> DataType::DataTypeToArrowDataType(
     const std::shared_ptr<DataType>& type) {
@@ -163,4 +163,4 @@ TYPE_FACTORY(timestamp, Type::TIMESTAMP)
 std::shared_ptr<DataType> list(const std::shared_ptr<DataType>& value_type) {
   return std::make_shared<DataType>(Type::LIST, value_type);
 }
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

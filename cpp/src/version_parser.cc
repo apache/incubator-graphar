@@ -20,7 +20,7 @@
 
 #include "gar/util/version_parser.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 // Helper function for parsing version string
 bool is_whitespace(char ch) {
@@ -111,4 +111,4 @@ Result<std::shared_ptr<const InfoVersion>> InfoVersion::Parse(
   }
   return version;
 }
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

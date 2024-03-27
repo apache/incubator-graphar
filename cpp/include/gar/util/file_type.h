@@ -24,7 +24,7 @@
 #ifndef GAR_UTIL_FILE_TYPE_H_
 #define GAR_UTIL_FILE_TYPE_H_
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 static inline FileType StringToFileType(const std::string& str) {
   static const std::map<std::string, FileType> str2file_type{
@@ -46,5 +46,5 @@ static inline const char* FileTypeToString(FileType file_type) {
   return file_type2string.at(file_type);
 }
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_UTIL_FILE_TYPE_H_

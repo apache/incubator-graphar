@@ -24,13 +24,13 @@ For instance, the code snippet below illustrates the creation and storage of the
 
 .. code:: C++
 
-  auto version = GAR_NAMESPACE::InfoVersion::Parse("gar/v1").value();
+  auto version = graphar::InfoVersion::Parse("gar/v1").value();
 
   // meta info
   std::string vertex_label = "node", vertex_prefix = "vertex/node/";
 
   // create vertex info
-  auto vertex_info = GAR_NAMESPACE::CreateVertexInfo(
+  auto vertex_info = graphar::CreateVertexInfo(
       vertex_label, VERTEX_CHUNK_SIZE, {}, vertex_prefix, version);
 
   // save & dump vertex info
@@ -54,7 +54,7 @@ The code snippet that follows demonstrates the generation and preservation of th
 .. code:: C++
 
   // construct edges builder
-  auto e_builder = GAR_NAMESPACE::builder::EdgesBuilder::Make(
+  auto e_builder = graphar::builder::EdgesBuilder::Make(
                        edge_info, save_path, ADJLIST_TYPE, VERTEX_COUNT)
                        .value();
   // read edge data from file
@@ -70,7 +70,7 @@ The code snippet that follows demonstrates the generation and preservation of th
     if (!(iss >> src >> dst)) {
       break;
     }
-    GAR_NAMESPACE::builder::Edge e(src, dst);
+    graphar::builder::Edge e(src, dst);
     ASSERT(e_builder->AddEdge(e).ok());
   }
 

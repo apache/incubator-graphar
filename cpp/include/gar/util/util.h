@@ -34,7 +34,7 @@ class ChunkedArray;
 class Array;
 }  // namespace arrow
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 namespace util {
 
@@ -248,5 +248,5 @@ using FloatArray = Array<float>;
 using DoubleArray = Array<double>;
 using StringArray = Array<std::string_view>;
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_UTIL_UTIL_H_

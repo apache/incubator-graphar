@@ -24,7 +24,7 @@
 
 #include "gar/fwd.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 /**
  * Property is a struct to store the property information.
@@ -871,5 +871,5 @@ class GraphInfo {
   std::unique_ptr<Impl> impl_;
 };
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar
 #endif  // GAR_GRAPH_INFO_H_

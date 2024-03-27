@@ -24,7 +24,7 @@
 #include "gar/util/result.h"
 #include "gar/util/util.h"
 
-namespace GAR_NAMESPACE_INTERNAL {
+namespace graphar {
 
 VertexPropertyChunkInfoReader::VertexPropertyChunkInfoReader(
     const std::shared_ptr<VertexInfo>& vertex_info,
@@ -506,4 +506,4 @@ AdjListPropertyChunkInfoReader::Make(
               graph_info->GetPrefix());
 }
 
-}  // namespace GAR_NAMESPACE_INTERNAL
+}  // namespace graphar

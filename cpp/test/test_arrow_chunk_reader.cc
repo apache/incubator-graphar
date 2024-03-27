@@ -27,14 +27,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-using GAR_NAMESPACE::_And;
-using GAR_NAMESPACE::_Equal;
-using GAR_NAMESPACE::_LessThan;
-using GAR_NAMESPACE::_Literal;
-using GAR_NAMESPACE::_Property;
-using GAR_NAMESPACE::util::FilterOptions;
-
-namespace GAR_NAMESPACE {
+namespace graphar {
 
 TEST_CASE("ArrowChunkReader") {
   std::string root;
@@ -137,7 +130,7 @@ TEST_CASE("ArrowChunkReader") {
       SECTION("pushdown by helper function") {
         std::cout << "Vertex property pushdown by helper function:\n";
         // construct push down options
-        FilterOptions options;
+        util::FilterOptions options;
         options.filter = filter;
         options.columns = expected_cols;
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
@@ -160,7 +153,7 @@ TEST_CASE("ArrowChunkReader") {
       SECTION("pushdown property that don't exist") {
         std::cout << "Vertex property pushdown property that don't exist:\n";
         auto filter = _Equal(_Property("id"), _Literal(933));
-        FilterOptions options;
+        util::FilterOptions options;
         options.filter = filter;
         options.columns = expected_cols;
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
@@ -176,7 +169,7 @@ TEST_CASE("ArrowChunkReader") {
         std::cout << "Vertex property pushdown column that don't exist:\n";
         auto filter = _Literal(true);
         std::vector<std::string> expected_cols{"id"};
-        FilterOptions options;
+        util::FilterOptions options;
         options.filter = filter;
         options.columns = expected_cols;
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
@@ -277,7 +270,7 @@ TEST_CASE("ArrowChunkReader") {
   SECTION("AdjListPropertyArrowChunkReader") {
     auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
         graph_info, src_label, edge_label, dst_label, edge_property_name,
-        GAR_NAMESPACE::AdjListType::ordered_by_source);
+        AdjListType::ordered_by_source);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
 
@@ -327,7 +320,7 @@ TEST_CASE("ArrowChunkReader") {
 
       std::vector<std::string> expected_cols{"creationDate"};
 
-      FilterOptions options;
+      util::FilterOptions options;
       options.filter = filter;
       options.columns = expected_cols;
 
@@ -363,7 +356,7 @@ TEST_CASE("ArrowChunkReader") {
         std::cout << "Adj list property pushdown by helper function: \n";
         auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
             graph_info, src_label, edge_label, dst_label, edge_property_name,
-            GAR_NAMESPACE::AdjListType::ordered_by_source, options);
+            AdjListType::ordered_by_source, options);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
         walkReader(reader);
@@ -374,7 +367,7 @@ TEST_CASE("ArrowChunkReader") {
                   << std::endl;
         auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
             graph_info, src_label, edge_label, dst_label, edge_property_name,
-            GAR_NAMESPACE::AdjListType::ordered_by_source);
+            AdjListType::ordered_by_source);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
         reader->Filter(filter);
@@ -386,7 +379,7 @@ TEST_CASE("ArrowChunkReader") {
     SECTION("set start vertex chunk index by seek_chunk_index") {
       auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
           graph_info, src_label, edge_label, dst_label, edge_property_name,
-          GAR_NAMESPACE::AdjListType::ordered_by_source);
+          AdjListType::ordered_by_source);
       REQUIRE(maybe_reader.status().ok());
       auto reader = maybe_reader.value();
       // check reader start from vertex chunk 0
@@ -406,7 +399,7 @@ TEST_CASE("ArrowChunkReader") {
   SECTION("AdjListOffsetArrowChunkReader") {
     auto maybe_reader = AdjListOffsetArrowChunkReader::Make(
         graph_info, src_label, edge_label, dst_label,
-        GAR_NAMESPACE::AdjListType::ordered_by_source);
+        AdjListType::ordered_by_source);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     auto result = reader->GetChunk();
@@ -429,4 +422,4 @@ TEST_CASE("ArrowChunkReader") {
     REQUIRE(reader->seek(1024).IsIndexError());
   }
 }
-}  // namespace GAR_NAMESPACE
+}  // namespace graphar

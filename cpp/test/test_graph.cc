@@ -23,7 +23,7 @@
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
 
-namespace GAR_NAMESPACE {
+namespace graphar {
 TEST_CASE("Graph") {
   std::string root;
   REQUIRE(GetTestResourceRoot(&root).ok());
@@ -195,4 +195,4 @@ TEST_CASE("Graph") {
     REQUIRE(expect4.status().IsInvalid());
   }
 }
-}  // namespace GAR_NAMESPACE
+}  // namespace graphar

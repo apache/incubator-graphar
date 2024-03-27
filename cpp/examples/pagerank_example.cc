@@ -29,13 +29,12 @@ int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
       TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-  auto graph_info = GAR_NAMESPACE::GraphInfo::Load(path).value();
+  auto graph_info = graphar::GraphInfo::Load(path).value();
 
   // construct vertices collection
   std::string label = "person";
   ASSERT(graph_info->GetVertexInfo(label) != nullptr);
-  auto maybe_vertices =
-      GAR_NAMESPACE::VerticesCollection::Make(graph_info, label);
+  auto maybe_vertices = graphar::VerticesCollection::Make(graph_info, label);
   ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
   int num_vertices = vertices->size();
@@ -43,9 +42,9 @@ int main(int argc, char* argv[]) {
 
   // construct edges collection
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto maybe_edges = GAR_NAMESPACE::EdgesCollection::Make(
+  auto maybe_edges = graphar::EdgesCollection::Make(
       graph_info, src_label, edge_label, dst_label,
-      GAR_NAMESPACE::AdjListType::ordered_by_source);
+      graphar::AdjListType::ordered_by_source);
   ASSERT(!maybe_edges.has_error());
   auto& edges = maybe_edges.value();
 
@@ -54,24 +53,24 @@ int main(int argc, char* argv[]) {
   const int max_iters = 10;
   std::vector<double> pr_curr(num_vertices);
   std::vector<double> pr_next(num_vertices);
-  std::vector<GAR_NAMESPACE::IdType> out_degree(num_vertices);
-  for (GAR_NAMESPACE::IdType i = 0; i < num_vertices; i++) {
+  std::vector<graphar::IdType> out_degree(num_vertices);
+  for (graphar::IdType i = 0; i < num_vertices; i++) {
     pr_curr[i] = 1 / static_cast<double>(num_vertices);
     pr_next[i] = 0;
     out_degree[i] = 0;
   }
   auto it_begin = edges->begin(), it_end = edges->end();
   for (auto it = it_begin; it != it_end; ++it) {
-    GAR_NAMESPACE::IdType src = it.source();
+    graphar::IdType src = it.source();
     out_degree[src]++;
   }
   for (int iter = 0; iter < max_iters; iter++) {
     std::cout << "iter " << iter << std::endl;
     for (auto it = it_begin; it != it_end; ++it) {
-      GAR_NAMESPACE::IdType src = it.source(), dst = it.destination();
+      graphar::IdType src = it.source(), dst = it.destination();
       pr_next[dst] += pr_curr[src] / out_degree[src];
     }
-    for (GAR_NAMESPACE::IdType i = 0; i < num_vertices; i++) {
+    for (graphar::IdType i = 0; i < num_vertices; i++) {
       pr_next[i] = damping * pr_next[i] +
                    (1 - damping) * (1 / static_cast<double>(num_vertices));
       if (out_degree[i] == 0)
@@ -83,10 +82,10 @@ int main(int argc, char* argv[]) {
 
   // extend the original vertex info and write results to gar using writer
   // construct property group
-  GAR_NAMESPACE::Property pagerank("pagerank", GAR_NAMESPACE::float64(), false);
-  std::vector<GAR_NAMESPACE::Property> property_vector = {pagerank};
-  auto group = GAR_NAMESPACE::CreatePropertyGroup(
-      property_vector, GAR_NAMESPACE::FileType::PARQUET);
+  graphar::Property pagerank("pagerank", graphar::float64(), false);
+  std::vector<graphar::Property> property_vector = {pagerank};
+  auto group =
+      graphar::CreatePropertyGroup(property_vector, graphar::FileType::PARQUET);
   // extend the vertex_info
   auto vertex_info = graph_info->GetVertexInfo(label);
   auto maybe_extend_info = vertex_info->AddPropertyGroup(group);
@@ -97,13 +96,13 @@ int main(int argc, char* argv[]) {
   ASSERT(extend_info->Dump().status().ok());
   ASSERT(extend_info->Save("/tmp/person-new-pagerank.vertex.yml").ok());
   // construct vertex property writer
-  GAR_NAMESPACE::VertexPropertyWriter writer(extend_info, "/tmp/");
+  graphar::VertexPropertyWriter writer(extend_info, "/tmp/");
   // convert results to arrow::Table
   std::vector<std::shared_ptr<arrow::Array>> arrays;
   std::vector<std::shared_ptr<arrow::Field>> schema_vector;
-  schema_vector.push_back(arrow::field(
-      pagerank.name,
-      GAR_NAMESPACE::DataType::DataTypeToArrowDataType(pagerank.type)));
+  schema_vector.push_back(
+      arrow::field(pagerank.name,
+                   graphar::DataType::DataTypeToArrowDataType(pagerank.type)));
   arrow::DoubleBuilder array_builder;
   ASSERT(array_builder.Reserve(num_vertices).ok());
   ASSERT(array_builder.AppendValues(pr_curr).ok());
