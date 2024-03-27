@@ -3,3 +3,57 @@ Copyright 2024 The Apache Software Foundation
 
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
+
+================================================================
+
+This product includes a number of Dependencies with separate copyright notices
+and license terms. Your use of these submodules is subject to the terms and
+conditions of the following licenses.
+
+================================================================
+
+================================================================
+Apache-2.0 licenses
+================================================================
+The following components are provided under the Apache-2.0 License. See project link for details.
+The text of each license is the standard Apache 2.0 license.
+
+* spark (https://github.com/apache/spark)
+    Files:
+      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarCommitProtocol.scala
+      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarDataSource.scala
+      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarScan.scala
+      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarScanBuilder.scala
+      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarScanTable.scala
+      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarWriteBuilder.scala
+      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/csv/CSVWriterBuilder.scala
+      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/orc/ORCOutputWriter.scala
+      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/orc/ORCWriteBuilder.scala
+      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/parquet/ParquetWriteBuilder.scala
+      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarCommitProtocol.scala
+      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarDataSource.scala
+      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarScan.scala
+      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarScanBuilder.scala
+      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarScanTable.scala
+      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarWriteBuilder.scala
+      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/csv/CSVWriterBuilder.scala
+      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/orc/ORCOutputWriter.scala
+      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/orc/ORCWriteBuilder.scala
+      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/parquet/ParquetWriteBuilder.scala
+
+
+================================================================
+MIT licenses
+================================================================
+The following components are provided under the MIT License. See project link for details.
+The text of each license is also included in licenses/LICENSE-[project].txt
+
+* result (https://github.com/bitwizeshift/result)
+    Files:
+      cpp/include/gar/external/result.hpp
+      cpp/thirdparty/result.hpp
+
+* mini-yaml (https://github.com/jimmiebergmann/mini-yaml)
+    Files:
+      cpp/thirdparty/mini-yam/Yaml.hpp
+      cpp/thirdparty/mini-yaml/Yaml.cpp
