@@ -47,19 +47,12 @@ The text of each license is the standard Apache 2.0 license.
       cpp/thirdparty/styleguide/cpplint.py
 
 * arrow (https://github.com/apache/arrow)
-* benchmark (https://github.com/google/benchmark)
 * fastFFI (https://github.com/alibaba/fastFFI)
     Files:
       java/src/main/java/com/alibaba/graphar/stdcxx/StdString.java
       java/src/main/java/com/alibaba/graphar/stdcxx/StdVector.java
       java/build.xml
     are modified from fastFFI.
-
-* snakeyaml (https://bitbucket.org/snakeyaml/snakeyaml)
-* scalatest (https://github.com/scalatest/scalatest)
-* scala-lang (https://github.com/scala/scala-lang)
-* neo4j-spark-connector (https://github.com/neo4j-contrib/neo4j-spark-connector)
-* nebula-spark-connector (https://github.com/vesoft-inc/nebula-spark-connector)
 
 
 ================================================================
@@ -77,42 +70,3 @@ The text of each license is also included in licenses/LICENSE-[project].txt
     Files:
       cpp/thirdparty/mini-yam/Yaml.hpp
       cpp/thirdparty/mini-yaml/Yaml.cpp
-
-* poetry (https://github.com/python-poetry/poetry)
-* pyyaml (https://github.com/yaml/pyyaml)
-* furo (https://github.com/pradyunsg/furo)
-* ruff (https://github.com/astral-sh/ruff)
-* pytest (https://github.com/pytest-dev/pytest)
-* pytest-cov (https://github.com/pytest-dev/pytest-cov)
-* slf4j (https://github.com/qos-ch/slf4j)
-* aliyun-oss-hadoop-fs (https://github.com/alibaba-archive/aliyun-oss-hadoop-fs)
-* aliyun-cupid-sdk (https://github.com/aliyun/aliyun-cupid-sdk)
-* aliyun-maxcompute-data-collectors (https://github.com/aliyun/aliyun-maxcompute-data-collectors)
-
-
-================================================================
-BSD-3-Clause licenses
-================================================================
-The following components are provided under the BSD-3-Clause License. See project link for details.
-The text of each license is also included in licenses/LICENSE-[project].txt.
-
-* py4j (https://github.com/py4j/py4j)
-
-
-================================================================
-Boost Software License Version 1.0
-================================================================
-The following components are provided under the Boost Software License Version 1.0. See project link for details.
-The text of each license is also included in licenses/LICENSE-[project].txt
-
-* boost (https://github.com/boostorg/boost)
-* Catch2 (https://github.com/catchorg/Catch2)
-
-
-================================================================
-EPL-1.0 licenses
-================================================================
-The following components are provided under the EPL-1.0 License. See project link for details.
-The text of each license is also included in licenses/LICENSE-[project].txt.
-
-* junit4 (https://github.com/junit-team/junit4)
