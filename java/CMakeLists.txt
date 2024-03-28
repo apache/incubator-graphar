@@ -27,7 +27,7 @@ file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/target/generated-sources/annotati
                   "${CMAKE_CURRENT_SOURCE_DIR}/target/generated-test-sources/test-annotations/*.cc"
                   "${CMAKE_CURRENT_SOURCE_DIR}/src/main/cpp/ffi/*.cc")
 # remove auto-generated JNI code for specific method cause we have handwriting JNI code for it
-list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/target/generated-sources/annotations/jni_com_alibaba_graphar_arrow_ArrowTable_Static_cxx_0x58c7409.cc")
+list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/target/generated-sources/annotations/jni_org_apache_graphar_arrow_ArrowTable_Static_cxx_0x58c7409.cc")
 
 set(LIBNAME "gar-jni")
 
