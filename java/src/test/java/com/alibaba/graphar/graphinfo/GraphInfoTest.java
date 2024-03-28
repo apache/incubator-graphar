@@ -17,12 +17,12 @@
  * under the License.
  */
 
-package com.alibaba.graphar.graphinfo;
+package org.apache.graphar.graphinfo;
 
-import com.alibaba.graphar.stdcxx.StdMap;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.util.InfoVersion;
-import com.alibaba.graphar.util.Result;
+import org.apache.graphar.stdcxx.StdMap;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.util.InfoVersion;
+import org.apache.graphar.util.Result;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;

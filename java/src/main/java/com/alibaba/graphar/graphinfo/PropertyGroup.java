@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.graphinfo;
+package org.apache.graphar.graphinfo;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_PROPERTY_GROUP;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+import static org.apache.graphar.util.CppClassName.GAR_PROPERTY_GROUP;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;
@@ -33,9 +33,9 @@ import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.stdcxx.StdVector;
-import com.alibaba.graphar.types.FileType;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.stdcxx.StdVector;
+import org.apache.graphar.types.FileType;
 
 /**
  * PropertyGroup is a class to store the property group information.

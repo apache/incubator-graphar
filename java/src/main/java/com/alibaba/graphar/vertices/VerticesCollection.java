@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package com.alibaba.graphar.vertices;
+package org.apache.graphar.vertices;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.util.CppClassName.GAR_VERTICES_COLLECTION;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
+import static org.apache.graphar.util.CppClassName.GAR_ID_TYPE;
+import static org.apache.graphar.util.CppClassName.GAR_VERTICES_COLLECTION;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;

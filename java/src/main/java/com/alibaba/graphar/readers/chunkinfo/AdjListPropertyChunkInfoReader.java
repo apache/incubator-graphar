@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package com.alibaba.graphar.readers.chunkinfo;
+package org.apache.graphar.readers.chunkinfo;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_ADJ_LIST_PROPERTY_CHUNK_INFO_READER;
-import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_CHUNK_INFO_READER_H;
+import static org.apache.graphar.util.CppClassName.GAR_ADJ_LIST_PROPERTY_CHUNK_INFO_READER;
+import static org.apache.graphar.util.CppClassName.GAR_ID_TYPE;
+import static org.apache.graphar.util.CppHeaderName.GAR_CHUNK_INFO_READER_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -32,14 +32,14 @@ import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.graphar.graphinfo.EdgeInfo;
-import com.alibaba.graphar.graphinfo.GraphInfo;
-import com.alibaba.graphar.graphinfo.PropertyGroup;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.types.AdjListType;
-import com.alibaba.graphar.util.GrapharStaticFunctions;
-import com.alibaba.graphar.util.Result;
-import com.alibaba.graphar.util.Status;
+import org.apache.graphar.graphinfo.EdgeInfo;
+import org.apache.graphar.graphinfo.GraphInfo;
+import org.apache.graphar.graphinfo.PropertyGroup;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.types.AdjListType;
+import org.apache.graphar.util.GrapharStaticFunctions;
+import org.apache.graphar.util.Result;
+import org.apache.graphar.util.Status;
 
 /** The chunk info reader for edge property group chunk. */
 @FFIGen

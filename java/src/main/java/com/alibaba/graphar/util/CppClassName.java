@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.alibaba.graphar.util;
+package org.apache.graphar.util;
 
 public class CppClassName {
     public static final String GAR_NAMESPACE = "GraphArchive";

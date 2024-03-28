@@ -17,12 +17,12 @@
  * under the License.
  */
 
-package com.alibaba.graphar.vertices;
+package org.apache.graphar.vertices;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.util.CppClassName.GAR_VERTEX_ITER;
-import static com.alibaba.graphar.util.CppClassName.STD_STRING;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
+import static org.apache.graphar.util.CppClassName.GAR_ID_TYPE;
+import static org.apache.graphar.util.CppClassName.GAR_VERTEX_ITER;
+import static org.apache.graphar.util.CppClassName.STD_STRING;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;
@@ -34,9 +34,9 @@ import com.alibaba.fastffi.FFIFactory;
 import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFISkip;
 import com.alibaba.fastffi.FFITypeAlias;
-import com.alibaba.graphar.graphinfo.VertexInfo;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.util.Result;
+import org.apache.graphar.graphinfo.VertexInfo;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.util.Result;
 
 /** The iterator for traversing a type of vertices. */
 @FFIGen
@@ -67,7 +67,7 @@ public interface VertexIter extends CXXPointer {
      *     (StdString) null);
      * @return Result: The property value or error.
      */
-    @CXXTemplate(cxx = STD_STRING, java = "com.alibaba.graphar.stdcxx.StdString")
+    @CXXTemplate(cxx = STD_STRING, java = "org.apache.graphar.stdcxx.StdString")
     @CXXTemplate(cxx = "int64_t", java = "java.lang.Long")
     @CXXValue
     <T> Result<T> property(@CXXReference StdString property, @FFISkip T tObject);

@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.util;
+package org.apache.graphar.util;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_STATUS;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+import static org.apache.graphar.util.CppClassName.GAR_STATUS;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -29,7 +29,7 @@ import com.alibaba.fastffi.CXXValue;
 import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
-import com.alibaba.graphar.stdcxx.StdString;
+import org.apache.graphar.stdcxx.StdString;
 
 @FFIGen
 @FFITypeAlias(GAR_STATUS)

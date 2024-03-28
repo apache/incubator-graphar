@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.edges;
+package org.apache.graphar.edges;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_EDGES_COLLECTION;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
+import static org.apache.graphar.util.CppClassName.GAR_EDGES_COLLECTION;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;

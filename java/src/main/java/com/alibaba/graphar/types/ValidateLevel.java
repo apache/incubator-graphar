@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package com.alibaba.graphar.types;
+package org.apache.graphar.types;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_VALIDATE_LEVEL;
+import static org.apache.graphar.util.CppClassName.GAR_VALIDATE_LEVEL;
 
 import com.alibaba.fastffi.CXXEnum;
 import com.alibaba.fastffi.FFITypeAlias;
@@ -27,7 +27,7 @@ import com.alibaba.fastffi.FFITypeRefiner;
 
 /** The level for validating writing operations. */
 @FFITypeAlias(GAR_VALIDATE_LEVEL)
-@FFITypeRefiner("com.alibaba.graphar.types.ValidateLevel.get")
+@FFITypeRefiner("org.apache.graphar.types.ValidateLevel.get")
 public enum ValidateLevel implements CXXEnum {
     /** To use the default validate level of the writer/builder. */
     default_validate,

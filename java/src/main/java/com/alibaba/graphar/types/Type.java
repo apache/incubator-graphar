@@ -17,16 +17,16 @@
  * under the License.
  */
 
-package com.alibaba.graphar.types;
+package org.apache.graphar.types;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_TYPE;
+import static org.apache.graphar.util.CppClassName.GAR_TYPE;
 
 import com.alibaba.fastffi.CXXEnum;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeRefiner;
 
 @FFITypeAlias(GAR_TYPE)
-@FFITypeRefiner("com.alibaba.graphar.types.Type.get")
+@FFITypeRefiner("org.apache.graphar.types.Type.get")
 public enum Type implements CXXEnum {
     /** Boolean */
     BOOL,

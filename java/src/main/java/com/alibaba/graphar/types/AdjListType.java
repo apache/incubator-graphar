@@ -17,16 +17,16 @@
  * under the License.
  */
 
-package com.alibaba.graphar.types;
+package org.apache.graphar.types;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_ADJ_LIST_TYPE;
+import static org.apache.graphar.util.CppClassName.GAR_ADJ_LIST_TYPE;
 
 import com.alibaba.fastffi.CXXEnum;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeRefiner;
 
 @FFITypeAlias(GAR_ADJ_LIST_TYPE)
-@FFITypeRefiner("com.alibaba.graphar.types.AdjListType.get")
+@FFITypeRefiner("org.apache.graphar.types.AdjListType.get")
 public enum AdjListType implements CXXEnum {
     /** collection of edges by source, but unordered, can represent COO format */
     unordered_by_source(0b00000001),

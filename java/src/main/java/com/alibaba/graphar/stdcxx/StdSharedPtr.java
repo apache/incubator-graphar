@@ -17,13 +17,13 @@
  * under the License.
  */
 
-package com.alibaba.graphar.stdcxx;
+package org.apache.graphar.stdcxx;
 
-import static com.alibaba.graphar.util.CppClassName.ARROW_ARRAY;
-import static com.alibaba.graphar.util.CppClassName.ARROW_TABLE;
-import static com.alibaba.graphar.util.CppClassName.GAR_UTIL_INDEX_CONVERTER;
-import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_UTIL_UTIL_H;
+import static org.apache.graphar.util.CppClassName.ARROW_ARRAY;
+import static org.apache.graphar.util.CppClassName.ARROW_TABLE;
+import static org.apache.graphar.util.CppClassName.GAR_UTIL_INDEX_CONVERTER;
+import static org.apache.graphar.util.CppHeaderName.ARROW_API_H;
+import static org.apache.graphar.util.CppHeaderName.GAR_UTIL_UTIL_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXTemplate;
@@ -36,9 +36,9 @@ import com.alibaba.fastffi.FFITypeAlias;
 @CXXHead(ARROW_API_H)
 @CXXHead(GAR_UTIL_UTIL_H)
 @FFITypeAlias("std::shared_ptr")
-@CXXTemplate(cxx = GAR_UTIL_INDEX_CONVERTER, java = "com.alibaba.graphar.util.IndexConverter")
-@CXXTemplate(cxx = ARROW_TABLE, java = "com.alibaba.graphar.arrow.ArrowTable")
-@CXXTemplate(cxx = ARROW_ARRAY, java = "com.alibaba.graphar.arrow.ArrowArray")
+@CXXTemplate(cxx = GAR_UTIL_INDEX_CONVERTER, java = "org.apache.graphar.util.IndexConverter")
+@CXXTemplate(cxx = ARROW_TABLE, java = "org.apache.graphar.arrow.ArrowTable")
+@CXXTemplate(cxx = ARROW_ARRAY, java = "org.apache.graphar.arrow.ArrowArray")
 public interface StdSharedPtr<T extends FFIPointer> extends FFIPointer {
     // & will return the pointer of T.
     // shall be cxxvalue?

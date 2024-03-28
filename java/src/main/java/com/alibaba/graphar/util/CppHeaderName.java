@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.alibaba.graphar.util;
+package org.apache.graphar.util;
 
 public class CppHeaderName {
     public static final String ARROW_API_H = "arrow/api.h";

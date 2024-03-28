@@ -17,15 +17,15 @@
  * under the License.
  */
 
-package com.alibaba.graphar.readers.chunkinfo;
+package org.apache.graphar.readers.chunkinfo;
 
-import static com.alibaba.graphar.graphinfo.GraphInfoTest.root;
+import static org.apache.graphar.graphinfo.GraphInfoTest.root;
 
-import com.alibaba.graphar.graphinfo.GraphInfo;
-import com.alibaba.graphar.graphinfo.PropertyGroup;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.util.GrapharStaticFunctions;
-import com.alibaba.graphar.util.Result;
+import org.apache.graphar.graphinfo.GraphInfo;
+import org.apache.graphar.graphinfo.PropertyGroup;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.util.GrapharStaticFunctions;
+import org.apache.graphar.util.Result;
 import org.junit.Assert;
 import org.junit.Test;
 

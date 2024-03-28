@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.graphinfo;
+package org.apache.graphar.graphinfo;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_GRAPH_INFO;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+import static org.apache.graphar.util.CppClassName.GAR_GRAPH_INFO;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -33,12 +33,12 @@ import com.alibaba.fastffi.FFILibrary;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.graphar.stdcxx.StdMap;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.types.AdjListType;
-import com.alibaba.graphar.util.InfoVersion;
-import com.alibaba.graphar.util.Result;
-import com.alibaba.graphar.util.Status;
+import org.apache.graphar.stdcxx.StdMap;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.types.AdjListType;
+import org.apache.graphar.util.InfoVersion;
+import org.apache.graphar.util.Result;
+import org.apache.graphar.util.Status;
 
 /** GraphInfo is a class to store the graph meta information. */
 @FFIGen

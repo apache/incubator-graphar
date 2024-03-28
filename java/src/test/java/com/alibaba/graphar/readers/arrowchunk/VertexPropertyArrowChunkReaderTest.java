@@ -17,17 +17,17 @@
  * under the License.
  */
 
-package com.alibaba.graphar.readers.arrowchunk;
+package org.apache.graphar.readers.arrowchunk;
 
-import static com.alibaba.graphar.graphinfo.GraphInfoTest.root;
+import static org.apache.graphar.graphinfo.GraphInfoTest.root;
 
-import com.alibaba.graphar.arrow.ArrowTable;
-import com.alibaba.graphar.graphinfo.GraphInfo;
-import com.alibaba.graphar.graphinfo.PropertyGroup;
-import com.alibaba.graphar.stdcxx.StdSharedPtr;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.util.GrapharStaticFunctions;
-import com.alibaba.graphar.util.Result;
+import org.apache.graphar.arrow.ArrowTable;
+import org.apache.graphar.graphinfo.GraphInfo;
+import org.apache.graphar.graphinfo.PropertyGroup;
+import org.apache.graphar.stdcxx.StdSharedPtr;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.util.GrapharStaticFunctions;
+import org.apache.graphar.util.Result;
 import org.junit.Assert;
 import org.junit.Test;
 

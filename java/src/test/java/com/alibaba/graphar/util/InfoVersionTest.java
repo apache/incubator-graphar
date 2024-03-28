@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.util;
+package org.apache.graphar.util;
 
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.stdcxx.StdVector;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.stdcxx.StdVector;
 import org.junit.Assert;
 import org.junit.Test;
 

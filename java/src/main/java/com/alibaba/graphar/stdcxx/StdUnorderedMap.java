@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.alibaba.graphar.stdcxx;
+package org.apache.graphar.stdcxx;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;

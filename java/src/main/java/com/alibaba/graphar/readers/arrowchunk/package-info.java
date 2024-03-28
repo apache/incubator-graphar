@@ -18,8 +18,8 @@
  */
 
 @FFIApplication(jniLibrary = GAR_JNI_LIBRARY_NAME)
-package com.alibaba.graphar.readers.arrowchunk;
+package org.apache.graphar.readers.arrowchunk;
 
-import static com.alibaba.graphar.util.JNILibraryName.GAR_JNI_LIBRARY_NAME;
+import static org.apache.graphar.util.JNILibraryName.GAR_JNI_LIBRARY_NAME;
 
 import com.alibaba.fastffi.FFIApplication;

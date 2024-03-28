@@ -17,16 +17,16 @@
  * under the License.
  */
 
-package com.alibaba.graphar.writers.builder;
+package org.apache.graphar.writers.builder;
 
-import static com.alibaba.graphar.graphinfo.GraphInfoTest.root;
+import static org.apache.graphar.graphinfo.GraphInfoTest.root;
 
-import com.alibaba.graphar.graphinfo.EdgeInfo;
-import com.alibaba.graphar.stdcxx.StdSharedPtr;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.types.AdjListType;
-import com.alibaba.graphar.types.ValidateLevel;
-import com.alibaba.graphar.util.Yaml;
+import org.apache.graphar.graphinfo.EdgeInfo;
+import org.apache.graphar.stdcxx.StdSharedPtr;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.types.AdjListType;
+import org.apache.graphar.types.ValidateLevel;
+import org.apache.graphar.util.Yaml;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;

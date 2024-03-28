@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.stdcxx;
+package org.apache.graphar.stdcxx;
 
-import static com.alibaba.graphar.util.CppClassName.STD_PAIR;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
+import static org.apache.graphar.util.CppClassName.STD_PAIR;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXTemplate;

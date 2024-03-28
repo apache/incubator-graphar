@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.util;
+package org.apache.graphar.util;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_UTIL_INDEX_CONVERTER;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_UTIL_UTIL_H;
+import static org.apache.graphar.util.CppClassName.GAR_UTIL_INDEX_CONVERTER;
+import static org.apache.graphar.util.CppHeaderName.GAR_UTIL_UTIL_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;

@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package com.alibaba.graphar.writers.builder;
+package org.apache.graphar.writers.builder;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_BUILDER_VERTEX;
-import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_VERTICES_BUILDER_H;
+import static org.apache.graphar.util.CppClassName.GAR_BUILDER_VERTEX;
+import static org.apache.graphar.util.CppClassName.GAR_ID_TYPE;
+import static org.apache.graphar.util.CppHeaderName.GAR_VERTICES_BUILDER_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -33,8 +33,8 @@ import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFISkip;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.stdcxx.StdUnorderedMap;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.stdcxx.StdUnorderedMap;
 
 /** Vertex is designed for constructing vertices builder. */
 @FFIGen

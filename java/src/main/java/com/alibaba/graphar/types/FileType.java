@@ -17,16 +17,16 @@
  * under the License.
  */
 
-package com.alibaba.graphar.types;
+package org.apache.graphar.types;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_FILE_TYPE;
+import static org.apache.graphar.util.CppClassName.GAR_FILE_TYPE;
 
 import com.alibaba.fastffi.CXXEnum;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeRefiner;
 
 @FFITypeAlias(GAR_FILE_TYPE)
-@FFITypeRefiner("com.alibaba.graphar.types.FileType.get")
+@FFITypeRefiner("org.apache.graphar.types.FileType.get")
 public enum FileType implements CXXEnum {
     CSV,
     PARQUET,

@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package com.alibaba.graphar.writers.builder;
+package org.apache.graphar.writers.builder;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_BUILDER_EDGES_BUILDER;
-import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_EDGES_BUILDER_H;
+import static org.apache.graphar.util.CppClassName.GAR_BUILDER_EDGES_BUILDER;
+import static org.apache.graphar.util.CppClassName.GAR_ID_TYPE;
+import static org.apache.graphar.util.CppHeaderName.GAR_EDGES_BUILDER_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -32,11 +32,11 @@ import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.graphar.graphinfo.EdgeInfo;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.types.AdjListType;
-import com.alibaba.graphar.types.ValidateLevel;
-import com.alibaba.graphar.util.Status;
+import org.apache.graphar.graphinfo.EdgeInfo;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.types.AdjListType;
+import org.apache.graphar.types.ValidateLevel;
+import org.apache.graphar.util.Status;
 
 /** EdgeBuilder is designed for building and writing a collection of edges. */
 @FFIGen

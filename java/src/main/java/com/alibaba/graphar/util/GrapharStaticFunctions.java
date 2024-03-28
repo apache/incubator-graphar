@@ -17,13 +17,13 @@
  * under the License.
  */
 
-package com.alibaba.graphar.util;
+package org.apache.graphar.util;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.util.CppClassName.GAR_NAMESPACE;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_ARROW_CHUNK_READER_H;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_CHUNK_INFO_READER_H;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
+import static org.apache.graphar.util.CppClassName.GAR_ID_TYPE;
+import static org.apache.graphar.util.CppClassName.GAR_NAMESPACE;
+import static org.apache.graphar.util.CppHeaderName.GAR_ARROW_CHUNK_READER_H;
+import static org.apache.graphar.util.CppHeaderName.GAR_CHUNK_INFO_READER_H;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXReference;
@@ -33,20 +33,20 @@ import com.alibaba.fastffi.FFILibrary;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.graphar.edges.EdgesCollection;
-import com.alibaba.graphar.graphinfo.GraphInfo;
-import com.alibaba.graphar.graphinfo.PropertyGroup;
-import com.alibaba.graphar.readers.arrowchunk.AdjListArrowChunkReader;
-import com.alibaba.graphar.readers.arrowchunk.AdjListOffsetArrowChunkReader;
-import com.alibaba.graphar.readers.arrowchunk.AdjListPropertyArrowChunkReader;
-import com.alibaba.graphar.readers.arrowchunk.VertexPropertyArrowChunkReader;
-import com.alibaba.graphar.readers.chunkinfo.AdjListChunkInfoReader;
-import com.alibaba.graphar.readers.chunkinfo.AdjListPropertyChunkInfoReader;
-import com.alibaba.graphar.readers.chunkinfo.VertexPropertyChunkInfoReader;
-import com.alibaba.graphar.stdcxx.StdSharedPtr;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.types.AdjListType;
-import com.alibaba.graphar.vertices.VerticesCollection;
+import org.apache.graphar.edges.EdgesCollection;
+import org.apache.graphar.graphinfo.GraphInfo;
+import org.apache.graphar.graphinfo.PropertyGroup;
+import org.apache.graphar.readers.arrowchunk.AdjListArrowChunkReader;
+import org.apache.graphar.readers.arrowchunk.AdjListOffsetArrowChunkReader;
+import org.apache.graphar.readers.arrowchunk.AdjListPropertyArrowChunkReader;
+import org.apache.graphar.readers.arrowchunk.VertexPropertyArrowChunkReader;
+import org.apache.graphar.readers.chunkinfo.AdjListChunkInfoReader;
+import org.apache.graphar.readers.chunkinfo.AdjListPropertyChunkInfoReader;
+import org.apache.graphar.readers.chunkinfo.VertexPropertyChunkInfoReader;
+import org.apache.graphar.stdcxx.StdSharedPtr;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.types.AdjListType;
+import org.apache.graphar.vertices.VerticesCollection;
 
 @FFIGen
 @CXXHead(GAR_CHUNK_INFO_READER_H)

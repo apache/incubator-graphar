@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.graphinfo;
+package org.apache.graphar.graphinfo;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_PROPERTY;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+import static org.apache.graphar.util.CppClassName.GAR_PROPERTY;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -32,8 +32,8 @@ import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFISetter;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.types.DataType;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.types.DataType;
 
 /** Property is a class to store the property information for a group. */
 @FFIGen

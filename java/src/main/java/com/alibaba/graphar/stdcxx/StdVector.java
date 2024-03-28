@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.stdcxx;
+package org.apache.graphar.stdcxx;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_PROPERTY;
-import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+import static org.apache.graphar.util.CppClassName.GAR_PROPERTY;
+import static org.apache.graphar.util.CppHeaderName.ARROW_API_H;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;
@@ -39,7 +39,7 @@ import com.alibaba.fastffi.FFITypeFactory;
 @FFITypeAlias("std::vector")
 @CXXTemplate(cxx = "char", java = "java.lang.Byte")
 @CXXTemplate(cxx = "int32_t", java = "java.lang.Integer")
-@CXXTemplate(cxx = GAR_PROPERTY, java = "com.alibaba.graphar.graphinfo.Property")
+@CXXTemplate(cxx = GAR_PROPERTY, java = "org.apache.graphar.graphinfo.Property")
 public interface StdVector<E> extends CXXPointer, FFISettablePointer {
 
     static Factory getStdVectorFactory(String foreignName) {

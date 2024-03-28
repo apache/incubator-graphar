@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.arrow;
+package org.apache.graphar.arrow;
 
-import static com.alibaba.graphar.util.CppClassName.ARROW_RESULT;
-import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
+import static org.apache.graphar.util.CppClassName.ARROW_RESULT;
+import static org.apache.graphar.util.CppHeaderName.ARROW_API_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXReference;

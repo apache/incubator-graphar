@@ -17,18 +17,18 @@
  * under the License.
  */
 
-package com.alibaba.graphar.writers;
+package org.apache.graphar.writers;
 
-import static com.alibaba.graphar.graphinfo.GraphInfoTest.root;
+import static org.apache.graphar.graphinfo.GraphInfoTest.root;
 
-import com.alibaba.graphar.arrow.ArrowTable;
-import com.alibaba.graphar.graphinfo.EdgeInfo;
-import com.alibaba.graphar.stdcxx.StdSharedPtr;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.types.AdjListType;
-import com.alibaba.graphar.types.ValidateLevel;
-import com.alibaba.graphar.util.Result;
-import com.alibaba.graphar.util.Yaml;
+import org.apache.graphar.arrow.ArrowTable;
+import org.apache.graphar.graphinfo.EdgeInfo;
+import org.apache.graphar.stdcxx.StdSharedPtr;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.types.AdjListType;
+import org.apache.graphar.types.ValidateLevel;
+import org.apache.graphar.util.Result;
+import org.apache.graphar.util.Yaml;
 import org.apache.arrow.dataset.file.FileFormat;
 import org.apache.arrow.dataset.file.FileSystemDatasetFactory;
 import org.apache.arrow.dataset.jni.NativeMemoryPool;

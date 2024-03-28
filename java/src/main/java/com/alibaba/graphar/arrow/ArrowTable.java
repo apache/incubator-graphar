@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.arrow;
+package org.apache.graphar.arrow;
 
-import static com.alibaba.graphar.util.CppClassName.ARROW_TABLE;
-import static com.alibaba.graphar.util.CppHeaderName.ARROW_API_H;
+import static org.apache.graphar.util.CppClassName.ARROW_TABLE;
+import static org.apache.graphar.util.CppHeaderName.ARROW_API_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -29,8 +29,8 @@ import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFILibrary;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.graphar.stdcxx.StdSharedPtr;
-import com.alibaba.graphar.stdcxx.StdString;
+import org.apache.graphar.stdcxx.StdSharedPtr;
+import org.apache.graphar.stdcxx.StdString;
 import org.apache.arrow.c.ArrowArray;
 import org.apache.arrow.c.ArrowSchema;
 import org.apache.arrow.c.Data;

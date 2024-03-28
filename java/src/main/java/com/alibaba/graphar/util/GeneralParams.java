@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.alibaba.graphar.util;
+package org.apache.graphar.util;
 
 public class GeneralParams {
     // column name

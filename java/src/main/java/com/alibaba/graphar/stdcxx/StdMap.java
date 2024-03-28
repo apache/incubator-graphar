@@ -17,12 +17,12 @@
  * under the License.
  */
 
-package com.alibaba.graphar.stdcxx;
+package org.apache.graphar.stdcxx;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_EDGE_INFO;
-import static com.alibaba.graphar.util.CppClassName.GAR_VERTEX_INFO;
-import static com.alibaba.graphar.util.CppClassName.STD_STRING;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+import static org.apache.graphar.util.CppClassName.GAR_EDGE_INFO;
+import static org.apache.graphar.util.CppClassName.GAR_VERTEX_INFO;
+import static org.apache.graphar.util.CppClassName.STD_STRING;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;
@@ -39,10 +39,10 @@ import com.alibaba.fastffi.FFITypeAlias;
 @FFITypeAlias("std::map")
 @CXXTemplate(
         cxx = {STD_STRING, GAR_EDGE_INFO},
-        java = {"com.alibaba.graphar.stdcxx.StdString", "com.alibaba.graphar.graphinfo.EdgeInfo"})
+        java = {"org.apache.graphar.stdcxx.StdString", "org.apache.graphar.graphinfo.EdgeInfo"})
 @CXXTemplate(
         cxx = {STD_STRING, GAR_VERTEX_INFO},
-        java = {"com.alibaba.graphar.stdcxx.StdString", "com.alibaba.graphar.graphinfo.VertexInfo"})
+        java = {"org.apache.graphar.stdcxx.StdString", "org.apache.graphar.graphinfo.VertexInfo"})
 public interface StdMap<K, V> extends FFIPointer {
 
     @CXXOperator("[]")

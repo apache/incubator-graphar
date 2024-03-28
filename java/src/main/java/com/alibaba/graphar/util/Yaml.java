@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.util;
+package org.apache.graphar.util;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_YAML;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_UTIL_YAML_H;
+import static org.apache.graphar.util.CppClassName.GAR_YAML;
+import static org.apache.graphar.util.CppHeaderName.GAR_UTIL_YAML_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXReference;
@@ -30,8 +30,8 @@ import com.alibaba.fastffi.FFILibrary;
 import com.alibaba.fastffi.FFIPointer;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.graphar.stdcxx.StdSharedPtr;
-import com.alibaba.graphar.stdcxx.StdString;
+import org.apache.graphar.stdcxx.StdSharedPtr;
+import org.apache.graphar.stdcxx.StdString;
 
 /** A wrapper of ::Yaml::Node to provide functions to parse yaml. */
 @FFIGen

@@ -17,16 +17,16 @@
  * under the License.
  */
 
-package com.alibaba.graphar.graphinfo;
+package org.apache.graphar.graphinfo;
 
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.stdcxx.StdVector;
-import com.alibaba.graphar.types.AdjListType;
-import com.alibaba.graphar.types.DataType;
-import com.alibaba.graphar.types.FileType;
-import com.alibaba.graphar.types.Type;
-import com.alibaba.graphar.util.InfoVersion;
-import com.alibaba.graphar.util.Result;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.stdcxx.StdVector;
+import org.apache.graphar.types.AdjListType;
+import org.apache.graphar.types.DataType;
+import org.apache.graphar.types.FileType;
+import org.apache.graphar.types.Type;
+import org.apache.graphar.util.InfoVersion;
+import org.apache.graphar.util.Result;
 import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;

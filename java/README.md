@@ -63,7 +63,7 @@ Then set GraphAr as a dependency in maven project:
 ```xml
 <dependencies>
     <dependency>
-      <groupId>com.alibaba.graphar</groupId>
+      <groupId>org.apache.graphar</groupId>
       <artifactId>gar-java</artifactId>
       <version>0.1.0</version>
     </dependency>

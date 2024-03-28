@@ -17,12 +17,12 @@
  * under the License.
  */
 
-package com.alibaba.graphar.edges;
+package org.apache.graphar.edges;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_EDGE;
-import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.util.CppClassName.STD_STRING;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_H;
+import static org.apache.graphar.util.CppClassName.GAR_EDGE;
+import static org.apache.graphar.util.CppClassName.GAR_ID_TYPE;
+import static org.apache.graphar.util.CppClassName.STD_STRING;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -33,11 +33,11 @@ import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFISkip;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.graphar.readers.arrowchunk.AdjListArrowChunkReader;
-import com.alibaba.graphar.readers.arrowchunk.AdjListPropertyArrowChunkReader;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.stdcxx.StdVector;
-import com.alibaba.graphar.util.Result;
+import org.apache.graphar.readers.arrowchunk.AdjListArrowChunkReader;
+import org.apache.graphar.readers.arrowchunk.AdjListPropertyArrowChunkReader;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.stdcxx.StdVector;
+import org.apache.graphar.util.Result;
 
 /** Edge contains information of certain edge. */
 @FFIGen
@@ -78,7 +78,7 @@ public interface Edge extends CXXPointer {
      *     (StdString) null);
      * @return Result: The property value or error.
      */
-    @CXXTemplate(cxx = STD_STRING, java = "com.alibaba.graphar.stdcxx.StdString")
+    @CXXTemplate(cxx = STD_STRING, java = "org.apache.graphar.stdcxx.StdString")
     @CXXTemplate(cxx = "int64_t", java = "java.lang.Long")
     @CXXValue
     <T> Result<T> property(@CXXReference StdString property, @FFISkip T tObject);

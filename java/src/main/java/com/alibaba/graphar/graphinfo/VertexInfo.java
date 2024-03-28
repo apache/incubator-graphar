@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package com.alibaba.graphar.graphinfo;
+package org.apache.graphar.graphinfo;
 
-import static com.alibaba.graphar.util.CppClassName.GAR_ID_TYPE;
-import static com.alibaba.graphar.util.CppClassName.GAR_VERTEX_INFO;
-import static com.alibaba.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+import static org.apache.graphar.util.CppClassName.GAR_ID_TYPE;
+import static org.apache.graphar.util.CppClassName.GAR_VERTEX_INFO;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -34,14 +34,14 @@ import com.alibaba.fastffi.FFILibrary;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
-import com.alibaba.graphar.stdcxx.StdSharedPtr;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.stdcxx.StdVector;
-import com.alibaba.graphar.types.DataType;
-import com.alibaba.graphar.util.InfoVersion;
-import com.alibaba.graphar.util.Result;
-import com.alibaba.graphar.util.Status;
-import com.alibaba.graphar.util.Yaml;
+import org.apache.graphar.stdcxx.StdSharedPtr;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.stdcxx.StdVector;
+import org.apache.graphar.types.DataType;
+import org.apache.graphar.util.InfoVersion;
+import org.apache.graphar.util.Result;
+import org.apache.graphar.util.Status;
+import org.apache.graphar.util.Yaml;
 
 /** VertexInfo is a class that stores metadata information about a vertex. */
 @FFIGen

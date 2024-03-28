@@ -17,16 +17,16 @@
  * under the License.
  */
 
-package com.alibaba.graphar.writers;
+package org.apache.graphar.writers;
 
-import static com.alibaba.graphar.graphinfo.GraphInfoTest.root;
+import static org.apache.graphar.graphinfo.GraphInfoTest.root;
 
-import com.alibaba.graphar.arrow.ArrowTable;
-import com.alibaba.graphar.graphinfo.VertexInfo;
-import com.alibaba.graphar.stdcxx.StdSharedPtr;
-import com.alibaba.graphar.stdcxx.StdString;
-import com.alibaba.graphar.types.ValidateLevel;
-import com.alibaba.graphar.util.Yaml;
+import org.apache.graphar.arrow.ArrowTable;
+import org.apache.graphar.graphinfo.VertexInfo;
+import org.apache.graphar.stdcxx.StdSharedPtr;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.types.ValidateLevel;
+import org.apache.graphar.util.Yaml;
 import java.io.File;
 import org.apache.arrow.dataset.file.FileFormat;
 import org.apache.arrow.dataset.file.FileSystemDatasetFactory;
