@@ -1,1 +1,1 @@
-../../../../../../../graphar/src/main/java/com/alibaba/graphar/GeneralParams.java
+../../../../../../../graphar/src/main/java/org/apache/graphar/GeneralParams.java
