@@ -29,7 +29,7 @@
 # see the license for the specific language governing permissions and
 # limitations under the license.
 
-"""Bidnings to com.alibaba.graphar.graph."""
+"""Bidnings to org.apache.graphar.graph."""
 
 from __future__ import annotations
 
