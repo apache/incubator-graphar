@@ -6,7 +6,6 @@ header:
   paths-ignore:
     - 'dist'
     - 'licenses'
-    - '**/*.md'
     - 'LICENSE'
     - 'NOTICE'
     - 'DISCLAIMER'
@@ -28,7 +27,10 @@ header:
     - 'cpp/misc/cpplint.py'
     - 'spark/datasources-32/src/main/scala/com/alibaba/graphar/datasources'
     - 'spark/datasources-33/src/main/scala/com/alibaba/graphar/datasources'
+    - 'java/src/main/java/com/alibaba/graphar/stdcxx/StdString.java'
+    - 'java/src/main/java/com/alibaba/graphar/stdcxx/StdVector.java'
     - '*.md'
+    - '**/*.md'
     - '*.rst'
     - '**/*.json'
     - 'pyspark/poetry.lock' # This file is generated automatically by Poetry-tool; there is no way to add license header
