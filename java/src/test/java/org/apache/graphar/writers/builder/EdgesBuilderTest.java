@@ -21,17 +21,17 @@ package org.apache.graphar.writers.builder;
 
 import static org.apache.graphar.graphinfo.GraphInfoTest.root;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.graphar.graphinfo.EdgeInfo;
 import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.types.AdjListType;
 import org.apache.graphar.types.ValidateLevel;
 import org.apache.graphar.util.Yaml;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 

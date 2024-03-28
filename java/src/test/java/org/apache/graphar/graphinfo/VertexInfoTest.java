@@ -19,6 +19,7 @@
 
 package org.apache.graphar.graphinfo;
 
+import java.io.File;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.stdcxx.StdVector;
 import org.apache.graphar.types.DataType;
@@ -26,7 +27,6 @@ import org.apache.graphar.types.FileType;
 import org.apache.graphar.types.Type;
 import org.apache.graphar.util.InfoVersion;
 import org.apache.graphar.util.Result;
-import java.io.File;
 import org.junit.Assert;
 import org.junit.Test;
 
