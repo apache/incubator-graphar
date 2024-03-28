@@ -1,31 +1,36 @@
 /*
- * Copyright 2022-2023 Alibaba Group Holding Limited.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
-package com.alibaba.graphar.info;
+package org.apache.graphar.info;
 
-import com.alibaba.graphar.info.type.AdjListType;
-import com.alibaba.graphar.info.type.DataType;
-import com.alibaba.graphar.info.yaml.EdgeYamlParser;
-import com.alibaba.graphar.util.GeneralParams;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.DataType;
+import org.apache.graphar.info.yaml.EdgeYamlParser;
+import org.apache.graphar.util.GeneralParams;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -41,7 +46,7 @@ public class EdgeInfo {
     private final long dstChunkSize;
     private final boolean directed;
     private final String prefix;
-    private final ImmutableMap<AdjListType, AdjacentList> adjacentLists;
+    private final Map<AdjListType, AdjacentList> adjacentLists;
     private final PropertyGroups propertyGroups;
     private final String version;
 
@@ -66,7 +71,7 @@ public class EdgeInfo {
         this.adjacentLists =
                 adjacentListsAsList.stream()
                         .collect(
-                                ImmutableMap.toImmutableMap(
+                                Collectors.toUnmodifiableMap(
                                         AdjacentList::getType, Function.identity()));
         this.propertyGroups = new PropertyGroups(propertyGroupsAsList);
         this.version = version;
@@ -84,10 +89,10 @@ public class EdgeInfo {
                 yamlParser.getPrefix(),
                 yamlParser.getAdjacent_lists().stream()
                         .map(AdjacentList::new)
-                        .collect(ImmutableList.toImmutableList()),
+                        .collect(Collectors.toUnmodifiableList()),
                 yamlParser.getProperty_groups().stream()
                         .map(PropertyGroup::new)
-                        .collect(ImmutableList.toImmutableList()),
+                        .collect(Collectors.toUnmodifiableList()),
                 yamlParser.getVersion());
     }
 
@@ -98,7 +103,7 @@ public class EdgeInfo {
             long dstChunkSize,
             boolean directed,
             String prefix,
-            ImmutableMap<AdjListType, AdjacentList> adjacentLists,
+            Map<AdjListType, AdjacentList> adjacentLists,
             PropertyGroups propertyGroups,
             String version) {
         this.edgeTriplet = edgeTriplet;
@@ -129,11 +134,13 @@ public class EdgeInfo {
         if (adjacentList == null || adjacentLists.containsKey(adjacentList.getType())) {
             return Optional.empty();
         }
-        ImmutableMap<AdjListType, AdjacentList> newAdjacentLists =
-                ImmutableMap.<AdjListType, AdjacentList>builder()
-                        .putAll(adjacentLists)
-                        .put(adjacentList.getType(), adjacentList)
-                        .build();
+        Map<AdjListType, AdjacentList> newAdjacentLists =
+                Stream.concat(
+                                adjacentLists.entrySet().stream(),
+                                Map.of(adjacentList.getType(), adjacentList).entrySet().stream())
+                        .collect(
+                                Collectors.toUnmodifiableMap(
+                                        Map.Entry::getKey, Map.Entry::getValue));
         return Optional.of(
                 new EdgeInfo(
                         edgeTriplet,
@@ -318,12 +325,12 @@ public class EdgeInfo {
         return prefix;
     }
 
-    public ImmutableMap<AdjListType, AdjacentList> getAdjacentLists() {
+    public Map<AdjListType, AdjacentList> getAdjacentLists() {
         return adjacentLists;
     }
 
-    public ImmutableList<PropertyGroup> getPropertyGroups() {
-        return propertyGroups.toList();
+    public List<PropertyGroup> getPropertyGroups() {
+        return propertyGroups.getPropertyGroupList();
     }
 
     public String getVersion() {
@@ -376,5 +383,4 @@ public class EdgeInfo {
             return dstLabel;
         }
     }
-
 }

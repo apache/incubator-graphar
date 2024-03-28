@@ -32,11 +32,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>33.1.0-jre</version>
-        </dependency>
-        <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>graphar-datasources</artifactId>
             <version>${graphar.version}</version>
@@ -141,7 +136,7 @@
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
                     <args>
-                        <arg>-target:jvm-1.8</arg>
+                        <arg>-target:jvm-11</arg>
                     </args>
                     <jvmArgs>
                         <jvmArg>-Xss4096K</jvmArg>

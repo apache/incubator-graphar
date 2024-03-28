@@ -1,29 +1,34 @@
 /*
- * Copyright 2022-2023 Alibaba Group Holding Limited.
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *   http://www.apache.org/licenses/LICENSE-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
-package com.alibaba.graphar.info;
+package org.apache.graphar.info;
 
-import com.alibaba.graphar.info.yaml.GraphYamlParser;
-import com.alibaba.graphar.util.GeneralParams;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import org.apache.graphar.info.yaml.GraphYamlParser;
+import org.apache.graphar.util.GeneralParams;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -34,11 +39,11 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 public class GraphInfo {
     private final String name;
-    private final ImmutableList<VertexInfo> vertexInfos;
-    private final ImmutableList<EdgeInfo> edgeInfos;
+    private final List<VertexInfo> vertexInfos;
+    private final List<EdgeInfo> edgeInfos;
     private final String prefix;
-    private final ImmutableMap<String, VertexInfo> vertexLabel2VertexInfo;
-    private final ImmutableMap<String, EdgeInfo> edgeConcat2EdgeInfo;
+    private final Map<String, VertexInfo> vertexLabel2VertexInfo;
+    private final Map<String, EdgeInfo> edgeConcat2EdgeInfo;
     private final String version;
 
     public GraphInfo(
@@ -48,25 +53,19 @@ public class GraphInfo {
             String prefix,
             String version) {
         this.name = name;
-        this.vertexInfos =
-                vertexInfos instanceof ImmutableList
-                        ? (ImmutableList<VertexInfo>) vertexInfos
-                        : ImmutableList.copyOf(vertexInfos);
-        this.edgeInfos =
-                edgeInfos instanceof ImmutableList
-                        ? (ImmutableList<EdgeInfo>) edgeInfos
-                        : ImmutableList.copyOf(edgeInfos);
+        this.vertexInfos = List.copyOf(vertexInfos);
+        this.edgeInfos = List.copyOf(edgeInfos);
         this.prefix = prefix;
         this.version = version;
         this.vertexLabel2VertexInfo =
                 vertexInfos.stream()
                         .collect(
-                                ImmutableMap.toImmutableMap(
+                                Collectors.toUnmodifiableMap(
                                         VertexInfo::getLabel, Function.identity()));
         this.edgeConcat2EdgeInfo =
                 edgeInfos.stream()
                         .collect(
-                                ImmutableMap.toImmutableMap(
+                                Collectors.toUnmodifiableMap(
                                         EdgeInfo::getConcat, Function.identity()));
     }
 
@@ -81,11 +80,11 @@ public class GraphInfo {
 
     private GraphInfo(
             String name,
-            ImmutableList<VertexInfo> vertexInfos,
-            ImmutableList<EdgeInfo> edgeInfos,
+            List<VertexInfo> vertexInfos,
+            List<EdgeInfo> edgeInfos,
             String prefix,
-            ImmutableMap<String, VertexInfo> vertexLabel2VertexInfo,
-            ImmutableMap<String, EdgeInfo> edgeConcat2EdgeInfo,
+            Map<String, VertexInfo> vertexLabel2VertexInfo,
+            Map<String, EdgeInfo> edgeConcat2EdgeInfo,
             String version) {
         this.name = name;
         this.vertexInfos = vertexInfos;
@@ -126,13 +125,16 @@ public class GraphInfo {
         if (vertexInfo == null || hasVertexInfo(vertexInfo.getLabel())) {
             return Optional.empty();
         }
-        ImmutableList<VertexInfo> newVertexInfos =
-                ImmutableList.<VertexInfo>builder().addAll(vertexInfos).add(vertexInfo).build();
-        ImmutableMap<String, VertexInfo> newVertexLabel2VertexInfo =
-                ImmutableMap.<String, VertexInfo>builder()
-                        .putAll(vertexLabel2VertexInfo)
-                        .put(vertexInfo.getLabel(), vertexInfo)
-                        .build();
+        List<VertexInfo> newVertexInfos =
+                Stream.concat(vertexInfos.stream(), Stream.of(vertexInfo))
+                        .collect(Collectors.toList());
+        Map<String, VertexInfo> newVertexLabel2VertexInfo =
+                Stream.concat(
+                                vertexLabel2VertexInfo.entrySet().stream(),
+                                Stream.of(Map.entry(vertexInfo.getLabel(), vertexInfo)))
+                        .collect(
+                                Collectors.toUnmodifiableMap(
+                                        Map.Entry::getKey, Map.Entry::getValue));
         return Optional.of(
                 new GraphInfo(
                         name,
@@ -150,13 +152,15 @@ public class GraphInfo {
                         edgeInfo.getSrcLabel(), edgeInfo.getEdgeLabel(), edgeInfo.getDstLabel())) {
             return Optional.empty();
         }
-        ImmutableList<EdgeInfo> newEdgeInfos =
-                ImmutableList.<EdgeInfo>builder().addAll(edgeInfos).add(edgeInfo).build();
-        ImmutableMap<String, EdgeInfo> newEdgeConcat2EdgeInfo =
-                ImmutableMap.<String, EdgeInfo>builder()
-                        .putAll(edgeConcat2EdgeInfo)
-                        .put(edgeInfo.getConcat(), edgeInfo)
-                        .build();
+        List<EdgeInfo> newEdgeInfos =
+                Stream.concat(edgeInfos.stream(), Stream.of(edgeInfo)).collect(Collectors.toList());
+        Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
+                Stream.concat(
+                                edgeConcat2EdgeInfo.entrySet().stream(),
+                                Stream.of(Map.entry(edgeInfo.getConcat(), edgeInfo)))
+                        .collect(
+                                Collectors.toUnmodifiableMap(
+                                        Map.Entry::getKey, Map.Entry::getValue));
         return Optional.of(
                 new GraphInfo(
                         name,
@@ -198,11 +202,11 @@ public class GraphInfo {
         return name;
     }
 
-    public ImmutableList<VertexInfo> getVertexInfos() {
+    public List<VertexInfo> getVertexInfos() {
         return vertexInfos;
     }
 
-    public ImmutableList<EdgeInfo> getEdgeInfos() {
+    public List<EdgeInfo> getEdgeInfos() {
         return edgeInfos;
     }
 
@@ -214,22 +218,22 @@ public class GraphInfo {
         return version;
     }
 
-    private static ImmutableList<VertexInfo> vertexFileNames2VertexInfos(
+    private static List<VertexInfo> vertexFileNames2VertexInfos(
             List<String> vertexFileNames, Configuration conf) throws IOException {
-        ImmutableList.Builder<VertexInfo> verticesBuilder = ImmutableList.builder();
+        ArrayList<VertexInfo> tempVertices = new ArrayList<>(vertexFileNames.size());
         for (String vertexFileName : vertexFileNames) {
-            verticesBuilder.add(VertexInfo.load(vertexFileName, conf));
+            tempVertices.add(VertexInfo.load(vertexFileName, conf));
         }
-        return verticesBuilder.build();
+        return List.copyOf(tempVertices);
     }
 
-    private static ImmutableList<EdgeInfo> edgeFileNames2EdgeInfos(
+    private static List<EdgeInfo> edgeFileNames2EdgeInfos(
             List<String> edgeFileNames, Configuration conf) throws IOException {
-        ImmutableList.Builder<EdgeInfo> edgesBuilder = ImmutableList.builder();
+        ArrayList<EdgeInfo> tempEdges = new ArrayList<>(edgeFileNames.size());
         for (String edgeFileName : edgeFileNames) {
-            edgesBuilder.add(EdgeInfo.load(edgeFileName, conf));
+            tempEdges.add(EdgeInfo.load(edgeFileName, conf));
         }
-        return edgesBuilder.build();
+        return List.copyOf(tempEdges);
     }
 
     private void checkVertexExist(String label) {
