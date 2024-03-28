@@ -29,7 +29,7 @@
 # see the license for the specific language governing permissions and
 # limitations under the license.
 
-"""Bindings to com.alibaba.graphar info classes."""
+"""Bindings to org.apache.graphar info classes."""
 
 # because we are using type-hints, we need to define few custom TypeVar
 # to describe returns of classmethods;

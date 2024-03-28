@@ -29,7 +29,7 @@
 # see the license for the specific language governing permissions and
 # limitations under the license.
 
-"""Bindings to com.alibaba.graphar.writer."""
+"""Bindings to org.apache.graphar.writer."""
 
 
 from __future__ import annotations

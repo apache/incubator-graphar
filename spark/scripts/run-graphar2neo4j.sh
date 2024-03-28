@@ -24,5 +24,5 @@ cur_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 jar_file="${cur_dir}/../graphar/target/graphar-commons-0.1.0-SNAPSHOT-shaded.jar"
 
 graph_info_path="${GRAPH_INFO_PATH:-/tmp/graphar/neo4j2graphar/MovieGraph.graph.yml}"
-spark-submit --class com.alibaba.graphar.example.GraphAr2Neo4j ${jar_file} \
+spark-submit --class org.apache.graphar.example.GraphAr2Neo4j ${jar_file} \
     ${graph_info_path}
