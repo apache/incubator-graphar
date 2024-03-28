@@ -49,8 +49,7 @@ The text of each license is the standard Apache 2.0 license.
 * arrow (https://github.com/apache/arrow)
 * fastFFI (https://github.com/alibaba/fastFFI)
     Files:
-      java/src/main/java/com/alibaba/graphar/stdcxx/StdSharedPtr.java
-      java/src/main/java/com/alibaba/graphar/stdcxx/StdUnorderedMap.java
+      java/src/main/java/com/alibaba/graphar/stdcxx/StdString.java
       java/src/main/java/com/alibaba/graphar/stdcxx/StdVector.java
       java/build.xml
     are modified from fastFFI.
