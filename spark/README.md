@@ -51,8 +51,8 @@ Build and run the unit tests:
 Build and run certain unit test:
 
 ```bash
-    $ mvn clean test -Dsuites='com.alibaba.graphar.GraphInfoSuite'   # run the GraphInfo test suite
-    $ mvn clean test -Dsuites='com.alibaba.graphar.GraphInfoSuite load graph info'  # run the `load graph info` test of test suite
+    $ mvn clean test -Dsuites='org.apache.graphar.GraphInfoSuite'   # run the GraphInfo test suite
+    $ mvn clean test -Dsuites='org.apache.graphar.GraphInfoSuite load graph info'  # run the `load graph info` test of test suite
 ```
 
 ### Generate API document
@@ -68,7 +68,7 @@ The API document is generated in the directory ``spark/graphar/target/site/scala
 ## Running Neo4j to GraphAr example
 
 Spark provides a simple example to convert Neo4j data to GraphAr data.
-The example is located in the directory ``spark/graphar/src/main/scala/com/alibaba/graphar/examples/``.
+The example is located in the directory ``spark/graphar/src/main/scala/org/apache/graphar/examples/``.
 
 To run the example, download Spark and Neo4j first.
 
@@ -159,7 +159,7 @@ We can write a json configuration file like `import/neo4j.json` to do the import
 Running this example requires `Docker` to be installed, if not, follow [this link](https://docs.docker.com/engine/install/). Run `docker version` to check it.
 
 Spark provides a simple example to convert NebulaGraph data to GraphAr data.
-The example is located in the directory ``spark/src/main/scala/com/alibaba/graphar/examples/``.
+The example is located in the directory ``spark/src/main/scala/org/apache/graphar/examples/``.
 
 To run the example, download Spark and Neo4j first.
 
@@ -242,7 +242,7 @@ You can include GraphAr as a dependency in your maven project
 </repositories>
 <dependencies>
     <dependency>
-        <groupId>com.alibaba</groupId>
+        <groupId>org.apache</groupId>
         <artifactId>graphar</artifactId>
         <version>0.1.0</version>
     </dependency>

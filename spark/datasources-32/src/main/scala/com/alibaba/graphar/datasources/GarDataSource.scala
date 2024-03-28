@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.datasources
+package org.apache.graphar.datasources
 
 import scala.collection.JavaConverters._
 import scala.util.matching.Regex

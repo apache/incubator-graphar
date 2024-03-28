@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.alibaba.graphar;
+package org.apache.graphar;
 
 import org.apache.spark.storage.StorageLevel;
 

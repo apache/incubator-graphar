@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.alibaba.graphar.util
+package org.apache.graphar.util
 
 import org.json4s._
 import org.json4s.jackson.Serialization.write
@@ -26,7 +26,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.conf.Configuration
 
-import com.alibaba.graphar.GeneralParams
+import org.apache.graphar.GeneralParams
 
 /** Helper object to write DataFrame to chunk files */
 object FileSystem {
@@ -78,7 +78,7 @@ object FileSystem {
           GeneralParams.offsetStartChunkIndexKey,
           offsetStartChunkIndex.get
         )
-        .format("com.alibaba.graphar.datasources.GarDataSource")
+        .format("org.apache.graphar.datasources.GarDataSource")
         .save(outputPrefix)
     }
     // write edge chunks DataFrame
@@ -93,7 +93,7 @@ object FileSystem {
           GeneralParams.aggNumListOfEdgeChunkKey,
           write(aggNumListOfEdgeChunk.get)
         )
-        .format("com.alibaba.graphar.datasources.GarDataSource")
+        .format("org.apache.graphar.datasources.GarDataSource")
         .save(outputPrefix)
     }
     // write vertex chunks DataFrame
@@ -101,7 +101,7 @@ object FileSystem {
       .mode("append")
       .option("header", "true")
       .option("fileFormat", fileType)
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .save(outputPrefix)
   }
 

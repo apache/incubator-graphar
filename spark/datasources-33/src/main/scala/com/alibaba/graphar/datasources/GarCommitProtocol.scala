@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.datasources
+package org.apache.graphar.datasources
 
-import com.alibaba.graphar.GeneralParams
+import org.apache.graphar.GeneralParams
 
 import org.json4s._
 import org.json4s.jackson.JsonMethods._

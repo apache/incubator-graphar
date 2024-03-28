@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package com.alibaba.graphar
+package org.apache.graphar
 
-import com.alibaba.graphar.graph.GraphWriter
+import org.apache.graphar.graph.GraphWriter
 
 import org.apache.spark.sql.SparkSession
 import org.scalatest.funsuite.AnyFunSuite

@@ -23,12 +23,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.alibaba</groupId>
+        <groupId>org.apache</groupId>
         <artifactId>graphar</artifactId>
         <version>${graphar.version}</version>
     </parent>
 
-    <groupId>com.alibaba</groupId>
+    <groupId>org.apache</groupId>
     <artifactId>graphar-datasources</artifactId>
     <version>${graphar.version}</version>
     <packaging>jar</packaging>

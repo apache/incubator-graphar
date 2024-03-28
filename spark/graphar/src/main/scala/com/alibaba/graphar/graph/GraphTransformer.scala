@@ -17,17 +17,17 @@
  * under the License.
  */
 
-package com.alibaba.graphar.graph
+package org.apache.graphar.graph
 
-import com.alibaba.graphar.{
+import org.apache.graphar.{
   AdjListType,
   GraphInfo,
   VertexInfo,
   EdgeInfo,
   GeneralParams
 }
-import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
-import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
+import org.apache.graphar.reader.{VertexReader, EdgeReader}
+import org.apache.graphar.writer.{VertexWriter, EdgeWriter}
 
 import org.apache.spark.sql.SparkSession
 

@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package com.alibaba.graphar.util
+package org.apache.graphar.util
 
-import com.alibaba.graphar.GeneralParams
+import org.apache.graphar.GeneralParams
 
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.DataFrame

@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package com.alibaba.graphar.example
+package org.apache.graphar.example
 
-import com.alibaba.graphar.graph.GraphReader
-import com.alibaba.graphar.{GeneralParams, GraphInfo}
-import com.alibaba.graphar.util.Utils
+import org.apache.graphar.graph.GraphReader
+import org.apache.graphar.{GeneralParams, GraphInfo}
+import org.apache.graphar.util.Utils
 
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 

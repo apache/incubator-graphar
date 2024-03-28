@@ -17,13 +17,13 @@
  * under the License.
  */
 
-package com.alibaba.graphar.util
+package org.apache.graphar.util
 
 import scala.util.matching.Regex
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
-import com.alibaba.graphar.{
+import org.apache.graphar.{
   PropertyGroup,
   Property,
   AdjList,

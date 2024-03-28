@@ -16,7 +16,7 @@
  * The implementation of GarWriteBuilder is referred from FileWriteBuilder of spark 3.1.1
  */
 
-package com.alibaba.graphar.datasources
+package org.apache.graphar.datasources
 
 import java.util.UUID
 

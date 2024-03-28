@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.importer
+package org.apache.graphar.importer
 
-import com.alibaba.graphar.datasources._
-import com.alibaba.graphar.graph.GraphWriter
+import org.apache.graphar.datasources._
+import org.apache.graphar.graph.GraphWriter
 
 import org.json4s._
 import org.json4s.jackson.JsonMethods._

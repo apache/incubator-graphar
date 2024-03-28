@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package com.alibaba.graphar.reader
+package org.apache.graphar.reader
 
-import com.alibaba.graphar.util.{IndexGenerator, DataFrameConcat}
-import com.alibaba.graphar.{VertexInfo, PropertyGroup, GeneralParams}
-import com.alibaba.graphar.util.FileSystem
+import org.apache.graphar.util.{IndexGenerator, DataFrameConcat}
+import org.apache.graphar.{VertexInfo, PropertyGroup, GeneralParams}
+import org.apache.graphar.util.FileSystem
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
@@ -77,7 +77,7 @@ class VertexReader(
     val df = spark.read
       .option("fileFormat", file_type)
       .option("header", "true")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(file_path)
     return df
   }
@@ -104,7 +104,7 @@ class VertexReader(
     val df = spark.read
       .option("fileFormat", file_type)
       .option("header", "true")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(file_path)
     return df
   }

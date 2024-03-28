@@ -16,7 +16,7 @@
  * The implementation of OrcWriteBuilder is referred from OrcWriteBuilder of spark 3.1.1
  */
 
-package com.alibaba.graphar.datasources.orc
+package org.apache.graphar.datasources.orc
 
 import org.apache.hadoop.mapred.JobConf
 import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
@@ -32,7 +32,7 @@ import org.apache.spark.sql.execution.datasources.orc.{OrcOptions, OrcUtils}
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types._
 
-import com.alibaba.graphar.datasources.GarWriteBuilder
+import org.apache.graphar.datasources.GarWriteBuilder
 
 object OrcWriteBuilder {
   // the getQuotedSchemaString method of spark OrcFileFormat

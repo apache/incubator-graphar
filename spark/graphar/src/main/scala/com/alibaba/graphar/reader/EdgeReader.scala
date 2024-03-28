@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package com.alibaba.graphar.reader
+package org.apache.graphar.reader
 
-import com.alibaba.graphar.util.{IndexGenerator, DataFrameConcat}
-import com.alibaba.graphar.{EdgeInfo, FileType, AdjListType, PropertyGroup}
-import com.alibaba.graphar.util.FileSystem
+import org.apache.graphar.util.{IndexGenerator, DataFrameConcat}
+import org.apache.graphar.{EdgeInfo, FileType, AdjListType, PropertyGroup}
+import org.apache.graphar.util.FileSystem
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._
@@ -130,7 +130,7 @@ class EdgeReader(
     val df = spark.read
       .option("fileFormat", file_type)
       .option("header", "true")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(file_path)
     return df
   }
@@ -159,7 +159,7 @@ class EdgeReader(
     val df = spark.read
       .option("fileFormat", file_type)
       .option("header", "true")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(file_path)
     return df
   }
@@ -185,7 +185,7 @@ class EdgeReader(
     val df = spark.read
       .option("fileFormat", file_type)
       .option("header", "true")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(file_path)
     if (addIndex) {
       return IndexGenerator.generateEdgeIndexColumn(df)
@@ -210,7 +210,7 @@ class EdgeReader(
       .option("fileFormat", file_type)
       .option("header", "true")
       .option("recursiveFileLookup", "true")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(file_path)
     if (addIndex) {
       return IndexGenerator.generateEdgeIndexColumn(df)
@@ -252,7 +252,7 @@ class EdgeReader(
     val df = spark.read
       .option("fileFormat", file_type)
       .option("header", "true")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(file_path)
     return df
   }
@@ -290,7 +290,7 @@ class EdgeReader(
     val df = spark.read
       .option("fileFormat", file_type)
       .option("header", "true")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(file_path)
     if (addIndex) {
       return IndexGenerator.generateEdgeIndexColumn(df)
@@ -326,7 +326,7 @@ class EdgeReader(
       .option("fileFormat", file_type)
       .option("header", "true")
       .option("recursiveFileLookup", "true")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(file_path)
     if (addIndex) {
       return IndexGenerator.generateEdgeIndexColumn(df)

@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package com.alibaba.graphar
+package org.apache.graphar
 
-import com.alibaba.graphar.reader.{VertexReader, EdgeReader}
+import org.apache.graphar.reader.{VertexReader, EdgeReader}
 
 import org.apache.spark.sql.SparkSession
 import org.scalatest.funsuite.AnyFunSuite
@@ -42,7 +42,7 @@ class ReaderSuite extends AnyFunSuite {
     val parquet_read_path = parquet_prefix + "vertex/person/id"
     val df1 = spark.read
       .option("fileFormat", "parquet")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(parquet_read_path)
     // validate reading results
     assert(df1.rdd.getNumPartitions == 10)
@@ -69,7 +69,7 @@ class ReaderSuite extends AnyFunSuite {
     val orc_read_path = orc_prefix + "vertex/person/id"
     val df2 = spark.read
       .option("fileFormat", "orc")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(orc_read_path)
     // validate reading results
     assert(df2.rdd.collect().deep == df1.rdd.collect().deep)
@@ -98,7 +98,7 @@ class ReaderSuite extends AnyFunSuite {
       .option("fileFormat", "csv")
       .option("header", "true")
       .option("recursiveFileLookup", "true")
-      .format("com.alibaba.graphar.datasources.GarDataSource")
+      .format("org.apache.graphar.datasources.GarDataSource")
       .load(csv_read_path)
     // validate reading results
     assert(df3.rdd.getNumPartitions == 11)
@@ -108,7 +108,7 @@ class ReaderSuite extends AnyFunSuite {
     assertThrows[IllegalArgumentException](
       spark.read
         .option("fileFormat", "invalid")
-        .format("com.alibaba.graphar.datasources.GarDataSource")
+        .format("org.apache.graphar.datasources.GarDataSource")
         .load(csv_read_path)
     )
   }

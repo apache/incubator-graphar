@@ -23,5 +23,5 @@ cur_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 jar_file="${cur_dir}/../graphar/target/graphar-commons-0.1.0-SNAPSHOT-shaded.jar"
 conf_path="$(readlink -f $1)"
 
-spark-submit --class com.alibaba.graphar.importer.Neo4j ${jar_file} \
+spark-submit --class org.apache.graphar.importer.Neo4j ${jar_file} \
     ${conf_path}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.datasources
+package org.apache.graphar.datasources
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.connector.read.{Scan, SupportsPushDownFilters}

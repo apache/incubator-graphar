@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.writer
+package org.apache.graphar.writer
 
-import com.alibaba.graphar.util.{FileSystem, EdgeChunkPartitioner}
-import com.alibaba.graphar.{
+import org.apache.graphar.util.{FileSystem, EdgeChunkPartitioner}
+import org.apache.graphar.{
   GeneralParams,
   EdgeInfo,
   FileType,

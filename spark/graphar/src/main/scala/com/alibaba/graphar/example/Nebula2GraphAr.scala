@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package com.alibaba.graphar.example
+package org.apache.graphar.example
 
-import com.alibaba.graphar.graph.GraphWriter
+import org.apache.graphar.graph.GraphWriter
 import com.facebook.thrift.protocol.TCompactProtocol
 import com.vesoft.nebula.connector.connector.NebulaDataFrameReader
 import com.vesoft.nebula.connector.{NebulaConnectionConfig, ReadNebulaConfig}

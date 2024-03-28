@@ -17,10 +17,10 @@
  * under the License.
  */
 
-package com.alibaba.graphar.writer
+package org.apache.graphar.writer
 
-import com.alibaba.graphar.util.{FileSystem, ChunkPartitioner, IndexGenerator}
-import com.alibaba.graphar.{GeneralParams, VertexInfo, PropertyGroup}
+import org.apache.graphar.util.{FileSystem, ChunkPartitioner, IndexGenerator}
+import org.apache.graphar.{GeneralParams, VertexInfo, PropertyGroup}
 
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._

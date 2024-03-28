@@ -16,7 +16,7 @@
  * The implementation of CSVWriteBuilder is refered from CSVWriteBuilder of spark 3.1.1
  */
 
-package com.alibaba.graphar.datasources.csv
+package org.apache.graphar.datasources.csv
 
 import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
 import org.apache.spark.sql.catalyst.csv.CSVOptions
@@ -31,7 +31,7 @@ import org.apache.spark.sql.execution.datasources.csv.CsvOutputWriter
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.{DataType, StructType}
 
-import com.alibaba.graphar.datasources.GarWriteBuilder
+import org.apache.graphar.datasources.GarWriteBuilder
 
 class CSVWriteBuilder(
     paths: Seq[String],

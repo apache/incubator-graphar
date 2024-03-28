@@ -17,9 +17,9 @@
  * under the License.
  */
 
-package com.alibaba.graphar
+package org.apache.graphar
 
-import com.alibaba.graphar.util.IndexGenerator
+import org.apache.graphar.util.IndexGenerator
 
 import org.apache.spark.sql.SparkSession
 import org.scalatest.funsuite.AnyFunSuite

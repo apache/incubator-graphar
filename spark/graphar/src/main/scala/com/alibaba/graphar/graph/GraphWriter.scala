@@ -17,12 +17,12 @@
  * under the License.
  */
 
-package com.alibaba.graphar.graph
+package org.apache.graphar.graph
 
-import com.alibaba.graphar.{AdjListType, GraphInfo, GeneralParams}
-import com.alibaba.graphar.writer.{VertexWriter, EdgeWriter}
-import com.alibaba.graphar.util.IndexGenerator
-import com.alibaba.graphar.util.Utils
+import org.apache.graphar.{AdjListType, GraphInfo, GeneralParams}
+import org.apache.graphar.writer.{VertexWriter, EdgeWriter}
+import org.apache.graphar.util.IndexGenerator
+import org.apache.graphar.util.Utils
 
 import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.types._

@@ -16,7 +16,7 @@
  * The implementation of OrcOutputWriter is referred from OrcOutputWriter of spark 3.1.1
  */
 
-package com.alibaba.graphar.datasources.orc
+package org.apache.graphar.datasources.orc
 
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.io.NullWritable

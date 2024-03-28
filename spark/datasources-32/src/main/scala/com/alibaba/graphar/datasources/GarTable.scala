@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alibaba.graphar.datasources
+package org.apache.graphar.datasources
 
 import scala.collection.JavaConverters._
 
@@ -31,9 +31,9 @@ import org.apache.spark.sql.execution.datasources.v2.FileTable
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
-import com.alibaba.graphar.datasources.csv.CSVWriteBuilder
-import com.alibaba.graphar.datasources.parquet.ParquetWriteBuilder
-import com.alibaba.graphar.datasources.orc.OrcWriteBuilder
+import org.apache.graphar.datasources.csv.CSVWriteBuilder
+import org.apache.graphar.datasources.parquet.ParquetWriteBuilder
+import org.apache.graphar.datasources.orc.OrcWriteBuilder
 
 /** GarTable is a class to represent the graph data in GraphAr as a table. */
 case class GarTable(
