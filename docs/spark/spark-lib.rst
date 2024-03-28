@@ -68,7 +68,7 @@ You can include GraphAr as a dependency in your maven project
    </repositories>
    <dependencies>
       <dependency>
-         <groupId>com.alibaba</groupId>
+         <groupId>org.apache</groupId>
          <artifactId>graphar</artifactId>
          <version>0.1.0</version>
       </dependency>

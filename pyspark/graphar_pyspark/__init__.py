@@ -40,7 +40,7 @@ class _GraphArSession:
         self.ss = spark_session  # Python SparkSession
         self.sc = spark_session.sparkContext  # Python SparkContext
         self.jvm = spark_session._jvm  # JVM
-        self.graphar = spark_session._jvm.com.alibaba.graphar  # Alias to scala graphar
+        self.graphar = spark_session._jvm.org.apache.graphar  # Alias to scala graphar
         self.jsc = spark_session._jsc  # Java SparkContext
         self.jss = spark_session._jsparkSession  # Java SparkSession
 

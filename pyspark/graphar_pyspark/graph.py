@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Bidnings to com.alibaba.graphar.graph."""
+"""Bidnings to org.apache.graphar.graph."""
 
 from __future__ import annotations
 
@@ -188,7 +188,7 @@ class GraphWriter:
     ) -> None:
         """Write graph data in graphar format.
 
-        Note: for default parameters check com.alibaba.graphar.GeneralParams;
+        Note: for default parameters check org.apache.graphar.GeneralParams;
         For this method None for any of arguments means that the default value will be used.
 
         :param path: the directory to write.
