@@ -20,39 +20,42 @@ The text of each license is the standard Apache 2.0 license.
 
 * spark (https://github.com/apache/spark)
     Files:
-      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarCommitProtocol.scala
-      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarDataSource.scala
-      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarScan.scala
-      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarScanBuilder.scala
-      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarScanTable.scala
-      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/GarWriteBuilder.scala
-      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/csv/CSVWriterBuilder.scala
-      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/orc/ORCOutputWriter.scala
-      spark/datasourcs-32/src/main/scala/com/alibaba/graphar/datasources/orc/ORCWriteBuilder.scala
-      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/parquet/ParquetWriteBuilder.scala
-      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarCommitProtocol.scala
-      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarDataSource.scala
-      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarScan.scala
-      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarScanBuilder.scala
-      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarScanTable.scala
-      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/GarWriteBuilder.scala
-      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/csv/CSVWriterBuilder.scala
-      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/orc/ORCOutputWriter.scala
-      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/orc/ORCWriteBuilder.scala
-      spark/datasourcs-33/src/main/scala/com/alibaba/graphar/datasources/parquet/ParquetWriteBuilder.scala
+      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarCommitProtocol.scala
+      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarDataSource.scala
+      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScan.scala
+      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScanBuilder.scala
+      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScanTable.scala
+      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarWriteBuilder.scala
+      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/csv/CSVWriterBuilder.scala
+      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/orc/ORCOutputWriter.scala
+      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/orc/ORCWriteBuilder.scala
+      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/parquet/ParquetWriteBuilder.scala
+      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarCommitProtocol.scala
+      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarDataSource.scala
+      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScan.scala
+      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScanBuilder.scala
+      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScanTable.scala
+      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarWriteBuilder.scala
+      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/csv/CSVWriterBuilder.scala
+      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/orc/ORCOutputWriter.scala
+      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/orc/ORCWriteBuilder.scala
+      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/parquet/ParquetWriteBuilder.scala
     are modified from spark.
 
-* styleguide (https://github.com/google/styleguide)
-    Files:
-      cpp/thirdparty/styleguide/cpplint.py
-
 * arrow (https://github.com/apache/arrow)
-* fastFFI (https://github.com/alibaba/fastFFI)
+* fastFFI (https://github.org/apache/fastFFI)
     Files:
-      java/src/main/java/com/alibaba/graphar/stdcxx/StdString.java
-      java/src/main/java/com/alibaba/graphar/stdcxx/StdVector.java
-      java/build.xml
+      java/src/main/java/org/apache/graphar/stdcxx/StdString.java
     are modified from fastFFI.
+
+* GraphScope (https://github.org/apache/GraphScope)
+    Files:
+      java/src/main/java/org/apache/graphar/stdcxx/StdVector.java
+      java/src/main/java/org/apache/graphar/stdcxx/StdMap.java
+      java/src/main/java/org/apache/graphar/stdcxx/StdSharedPtr.java
+      java/src/main/java/org/apache/graphar/stdcxx/StdUnorderedMap.java
+      java/build.xml
+    are modified from GraphScope.
 
 
 ================================================================
@@ -63,10 +66,21 @@ The text of each license is also included in licenses/LICENSE-[project].txt
 
 * result (https://github.com/bitwizeshift/result)
     Files:
-      cpp/include/gar/external/result.hpp are modified from cpp/thirdparty/result.hpp
+      cpp/include/gar/external/result.hpp are modified from result.
       cpp/thirdparty/result.hpp
 
 * mini-yaml (https://github.com/jimmiebergmann/mini-yaml)
     Files:
       cpp/thirdparty/mini-yam/Yaml.hpp
       cpp/thirdparty/mini-yaml/Yaml.cpp
+
+
+================================================================
+BSD 3-Clause licenses
+================================================================
+The following components are provided under the BSD 3-Clause License. See project link for details.
+The text of each license is also included in licenses/LICENSE-[project].txt
+
+* cpplint (https://github.com/cpplint/cpplint)
+    Files:
+      cpp/misc/cpplint.py
