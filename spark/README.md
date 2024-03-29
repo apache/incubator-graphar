@@ -229,26 +229,6 @@ scripts/run-graphar2nebula.sh
 
 The example will import the basketballplayer graph from GraphAr to NebulaGraph and you can check the result in NebulaGraph Studio.
 
-## Get GraphAr Spark from Maven
-
-You can include GraphAr as a dependency in your maven project
-
-```xml
-<repositories>
-    <repository>
-        <id>graphar-mvn-repo</id>
-        <url>https://github.com/alibaba/GraphAr/raw/mvn-repo/</url>
-    </repository>
-</repositories>
-<dependencies>
-    <dependency>
-        <groupId>org.apache</groupId>
-        <artifactId>graphar</artifactId>
-        <version>0.1.0</version>
-    </dependency>
-</dependencies>
-```
-
 ## How to use
 
 Please refer to our [GraphAr Spark Library Documentation](https://alibaba.github.io/GraphAr/spark/spark-lib.html).
