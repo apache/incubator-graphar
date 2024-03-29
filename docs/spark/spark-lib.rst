@@ -53,27 +53,6 @@ After compilation, a similar file *graphar-x.x.x-SNAPSHOT-shaded.jar* is generat
 
 Please refer to the `building steps <https://github.com/alibaba/GraphAr/tree/main/spark>`_ for more details.
 
-Get from Maven
-```````````````
-
-You can include GraphAr as a dependency in your maven project
-
-.. code-block:: shell
-
-   <repositories>
-      <repository>
-         <id>graphar-mvn-repo</id>
-         <url>https://github.com/alibaba/GraphAr/raw/mvn-repo/</url>
-      </repository>
-   </repositories>
-   <dependencies>
-      <dependency>
-         <groupId>org.apache</groupId>
-         <artifactId>graphar</artifactId>
-         <version>0.1.0</version>
-      </dependency>
-   </dependencies>
-
 
 How to Use
 -----------------
