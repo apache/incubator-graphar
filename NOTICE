@@ -59,6 +59,7 @@ The text of each license is the standard Apache 2.0 license.
       java/src/main/java/org/apache/graphar/stdcxx/StdSharedPtr.java
       java/src/main/java/org/apache/graphar/stdcxx/StdUnorderedMap.java
       java/build.xml
+    are modified from GraphScope.
 
 
 ================================================================
