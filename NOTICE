@@ -42,10 +42,6 @@ The text of each license is the standard Apache 2.0 license.
       spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/parquet/ParquetWriteBuilder.scala
     are modified from spark.
 
-* styleguide (https://github.com/google/styleguide)
-    Files:
-      cpp/thirdparty/styleguide/cpplint.py
-
 * arrow (https://github.com/apache/arrow)
 * fastFFI (https://github.org/apache/fastFFI)
     Files:
@@ -70,10 +66,21 @@ The text of each license is also included in licenses/LICENSE-[project].txt
 
 * result (https://github.com/bitwizeshift/result)
     Files:
-      cpp/include/gar/external/result.hpp are modified from cpp/thirdparty/result.hpp
+      cpp/include/gar/external/result.hpp are modified from result.
       cpp/thirdparty/result.hpp
 
 * mini-yaml (https://github.com/jimmiebergmann/mini-yaml)
     Files:
       cpp/thirdparty/mini-yam/Yaml.hpp
       cpp/thirdparty/mini-yaml/Yaml.cpp
+
+
+================================================================
+BSD 3-Clause licenses
+================================================================
+The following components are provided under the BSD 3-Clause License. See project link for details.
+The text of each license is also included in licenses/LICENSE-[project].txt
+
+* cpplint (https://github.com/cpplint/cpplint)
+    Files:
+      cpp/misc/cpplint.py
