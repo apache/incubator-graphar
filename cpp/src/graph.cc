@@ -26,6 +26,10 @@ namespace graphar {
 template <Type type>
 Status CastToAny(std::shared_ptr<arrow::Array> array,
                  std::any& any) {  // NOLINT
+  if (array->IsNull(0)) {
+    any = std::any();
+    return Status::OK();
+  }
   using ArrayType = typename TypeToArrowType<type>::ArrayType;
   auto column = std::dynamic_pointer_cast<ArrayType>(array);
   any = column->GetView(0);
