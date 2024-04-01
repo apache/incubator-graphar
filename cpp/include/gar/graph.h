@@ -85,7 +85,11 @@ class Vertex {
     if (properties_.find(property) != properties_.end()) {
       return properties_.at(property).has_value();
     }
-    return true;
+    if (list_properties_.find(property) != list_properties_.end()) {
+      return true;
+    }
+    throw std::invalid_argument("Property with name " +  property +
+                              " does not exist in the vertex.");
   }
 
  private:
@@ -142,7 +146,11 @@ class Edge {
     if (properties_.find(property) != properties_.end()) {
       return properties_.at(property).has_value();
     }
-    return true;
+    if (list_properties_.find(property) != list_properties_.end()) {
+      return true;
+    }
+    throw std::invalid_argument("Property with name " +  property +
+                              " does not exist in the edge.");
   }
 
  private:
