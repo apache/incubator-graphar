@@ -197,5 +197,35 @@ TEST_CASE("Graph") {
                               AdjListType::unordered_by_dest);
     REQUIRE(expect4.status().IsInvalid());
   }
+
+  SECTION("ValidateProperty") {
+    // read file and construct graph info
+    std::string path = root + "/neo4j/MovieGraph.graph.yml";
+    auto maybe_graph_info = GraphInfo::Load(path);
+    REQUIRE(maybe_graph_info.status().ok());
+    auto graph_info = maybe_graph_info.value();
+    // get vertices collection
+    std::string label = "Person", property = "born";
+    auto maybe_vertices_collection =
+        VerticesCollection::Make(graph_info, label);
+    REQUIRE(!maybe_vertices_collection.has_error());
+    auto vertices = maybe_vertices_collection.value();
+    // the count of valid property value
+    auto count = 0;
+    for (auto it = vertices->begin(); it != vertices->end(); ++it) {
+      // get a vertex and access its data
+      auto vertex = *it;
+      // property not exists
+      REQUIRE_THROWS_AS(vertex.IsValid("bornn"), std::invalid_argument);
+      if (vertex.IsValid(property)) {
+        REQUIRE(vertex.property<int64_t>("born").value() != 0);
+        count++;
+      } else
+        std::cout << "the property is not valid" << std::endl;
+    }
+    REQUIRE(count == 128);
+    auto last_invalid_vertex = *(vertices->end() + -1);
+    REQUIRE(last_invalid_vertex.property<int64_t>(property).has_error());
+  }
 }
 }  // namespace graphar
