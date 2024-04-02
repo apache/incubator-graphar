@@ -220,8 +220,9 @@ TEST_CASE("Graph") {
       if (vertex.IsValid(property)) {
         REQUIRE(vertex.property<int64_t>("born").value() != 0);
         count++;
-      } else
+      } else {
         std::cout << "the property is not valid" << std::endl;
+      }
     }
     REQUIRE(count == 128);
     auto last_invalid_vertex = *(vertices->end() + -1);
