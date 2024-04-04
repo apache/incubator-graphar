@@ -92,46 +92,10 @@ jobs:
           make html
         working-directory: ./docs
 
-      - name: Preview using surge
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
-        run: |
-          npm install -g surge
-          surge ./docs/_build/html \
-                alibaba-graphar-build-pr-${{ github.event.number }}.surge.sh \
-                --token ${{ secrets.SURGE_TOKEN }}
-
-      - name: Leave the comment on pull request when succeed
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
-        uses: actions-cool/maintain-one-comment@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body: |
-            🎊 PR Preview ${{ github.event.pull_request.head.sha }} has been successfully built and deployed to https://alibaba-graphar-build-pr-${{ github.event.number }}.surge.sh
-
-            <a href="https://github.com/alibaba/GraphAr/actions/runs/${{ github.run_id }}">
-              <img width="300" src="https://user-images.githubusercontent.com/507615/90250366-88233900-de6e-11ea-95a5-84f0762ffd39.png">
-            </a>
-
-            <sub>🤖 By [surge-preview](https://surge.sh/)</sub>
-          body-include: '<!-- Sticky Pull Request Comment: Surge Preview build -->'
-
-      - name: Leave the comment on pull request when failed
-        if: ${{ failure() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
-        uses: actions-cool/maintain-one-comment@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body: |
-            😭 Deploy PR Preview ${{ github.event.pull_request.head.sha }} failed. [Build logs](https://github.com/alibaba/GraphAr/runs/${{ github.run_id }})
-
-            <a href="https://github.com/alibaba/GraphAr/actions/runs/${{ github.run_id }}">
-              <img width="300" src="https://user-images.githubusercontent.com/507615/90250824-4e066700-de6f-11ea-8230-600ecc3d6a6b.png">
-            </a>
-
-            <sub>🤖 By [surge-preview](https://surge.sh/)</sub>
-          body-include: '<!-- Sticky Pull Request Comment: Surge Preview build -->'
-
       - name: Commit Doc
-        if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && github.repository == 'alibaba/GraphAr' }}
+        # TODO: open this when apache infrastructure is ready
+        # if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && github.repository == 'alibaba/GraphAr' }}
+        if: false
         run: |
           git config user.email github-actions@github.com
           git config user.name github-actions
