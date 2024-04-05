@@ -26,6 +26,10 @@ namespace graphar {
 template <Type type>
 Status CastToAny(std::shared_ptr<arrow::Array> array,
                  std::any& any) {  // NOLINT
+  if (array->IsNull(0)) {
+    any = std::any();
+    return Status::OK();
+  }
   using ArrayType = typename TypeToArrowType<type>::ArrayType;
   auto column = std::dynamic_pointer_cast<ArrayType>(array);
   any = column->GetView(0);
@@ -109,6 +113,8 @@ Result<T> Vertex::property(const std::string& property) const {
                               " does not exist in the vertex.");
     }
     try {
+      if (!properties_.at(property).has_value())
+        return Status::TypeError("The value of the ", property, " is null.");
       T ret = std::any_cast<T>(properties_.at(property));
       return ret;
     } catch (const std::bad_any_cast& e) {
@@ -125,6 +131,8 @@ Result<Date> Vertex::property(const std::string& property) const {
                             " does not exist in the vertex.");
   }
   try {
+    if (!properties_.at(property).has_value())
+      return Status::TypeError("The value of the ", property, " is null.");
     Date ret(std::any_cast<Date::c_type>(properties_.at(property)));
     return ret;
   } catch (const std::bad_any_cast& e) {
@@ -140,6 +148,8 @@ Result<Timestamp> Vertex::property(const std::string& property) const {
                             " does not exist in the vertex.");
   }
   try {
+    if (!properties_.at(property).has_value())
+      return Status::TypeError("The value of the ", property, " is null.");
     Timestamp ret(std::any_cast<Timestamp::c_type>(properties_.at(property)));
     return ret;
   } catch (const std::bad_any_cast& e) {
@@ -210,6 +220,8 @@ Result<T> Edge::property(const std::string& property) const {
                               " does not exist in the edge.");
     }
     try {
+      if (!properties_.at(property).has_value())
+        return Status::TypeError("The value of the ", property, " is null.");
       T ret = std::any_cast<T>(properties_.at(property));
       return ret;
     } catch (const std::bad_any_cast& e) {
@@ -226,6 +238,8 @@ Result<Date> Edge::property(const std::string& property) const {
                             " does not exist in the edge.");
   }
   try {
+    if (!properties_.at(property).has_value())
+      return Status::TypeError("The value of the ", property, " is null.");
     Date ret(std::any_cast<Date::c_type>(properties_.at(property)));
     return ret;
   } catch (const std::bad_any_cast& e) {
@@ -241,6 +255,8 @@ Result<Timestamp> Edge::property(const std::string& property) const {
                             " does not exist in the edge.");
   }
   try {
+    if (!properties_.at(property).has_value())
+      return Status::TypeError("The value of the ", property, " is null.");
     Timestamp ret(std::any_cast<Timestamp::c_type>(properties_.at(property)));
     return ret;
   } catch (const std::bad_any_cast& e) {

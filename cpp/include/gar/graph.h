@@ -75,6 +75,23 @@ class Vertex {
   template <typename T>
   Result<T> property(const std::string& property) const;
 
+  /**
+   * @brief Return true if value at the property is valid (not null).
+   *
+   * @param property The property name.
+   * @return True if value at the property is valid, False otherwise.
+   */
+  inline bool IsValid(const std::string& property) const {
+    if (properties_.find(property) != properties_.end()) {
+      return properties_.at(property).has_value();
+    }
+    if (list_properties_.find(property) != list_properties_.end()) {
+      return true;
+    }
+    throw std::invalid_argument("Property with name " + property +
+                                " does not exist in the vertex.");
+  }
+
  private:
   IdType id_;
   std::map<std::string, std::any> properties_;
@@ -118,6 +135,23 @@ class Edge {
    */
   template <typename T>
   Result<T> property(const std::string& property) const;
+
+  /**
+   * @brief Return true if value at the property is valid (not null).
+   *
+   * @param property The property name.
+   * @return True if value at the property is valid, False otherwise.
+   */
+  inline bool IsValid(const std::string& property) const {
+    if (properties_.find(property) != properties_.end()) {
+      return properties_.at(property).has_value();
+    }
+    if (list_properties_.find(property) != list_properties_.end()) {
+      return true;
+    }
+    throw std::invalid_argument("Property with name " + property +
+                                " does not exist in the edge.");
+  }
 
  private:
   IdType src_id_, dst_id_;

@@ -108,7 +108,8 @@ As a simple case, the following example shows how to read all vertices with labe
   for (auto it = vertices->begin(); it != vertices->end(); ++it) {
     // get a vertex and access its data
     auto vertex = *it;
-    std::cout << "id=" << vertex.property<int64_t>("id").value() << ", firstName=" << vertex.property<std::string>("firstName").value() << std::endl;
+    if (vertex.IsValid("id") && vertex.IsValid("firstName"))
+      std::cout << "id=" << vertex.property<int64_t>("id").value() << ", firstName=" << vertex.property<std::string>("firstName").value() << std::endl;
   }
 
 The next example reads all edges with label "person_knows_person" from the above graph and outputs the end vertices for each edge.

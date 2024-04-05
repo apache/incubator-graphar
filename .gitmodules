@@ -1,6 +1,6 @@
 [submodule "testing"]
 	path = testing
-	url = https://github.com/GraphScope/gar-test.git
+	url = https://github.com/apache/incubator-graphar-testing.git
 [submodule "cpp/thirdparty/Catch2"]
 	path = cpp/thirdparty/Catch2
 	url = https://github.com/catchorg/Catch2.git
