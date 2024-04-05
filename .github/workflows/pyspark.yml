@@ -26,14 +26,14 @@ on:
     paths:
       - 'spark/**'
       - 'pyspark/**'
-      - '.github/workflows/pyspark.yaml'
+      - '.github/workflows/pyspark.yml'
   pull_request:
     branches:
       - main
     paths:
       - 'spark/**'
       - 'pyspark/**'
-      - '.github/workflows/pyspark.yaml'
+      - '.github/workflows/pyspark.yml'
 
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
