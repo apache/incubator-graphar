@@ -18,7 +18,8 @@
 # See: https://cwiki.apache.org/confluence/display/INFRA/git+-+.asf.yaml+features
 
 github:
-  description: "An open source, standard data file format for graph data storage and retrieval."
+  description: >-
+    "An open source, standard data file format for graph data storage and retrieval."
   homepage: https://graphar.apache.org/
   labels:
     - big-data
@@ -44,8 +45,8 @@ github:
   features:
     issues: true
     discussions: true
-    wiki: false
-    projects: false
+    wiki: true
+    projects: true
 notifications:
   commits: commits@graphar.apache.org
   issues: commits@graphar.apache.org
