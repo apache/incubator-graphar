@@ -41,7 +41,7 @@ concurrency:
 
 jobs:
   GraphAr-spark:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
       with:
@@ -53,7 +53,12 @@ jobs:
         python-version: 3.9
 
     - name: Install Poetry
-      uses: abatilo/actions-poetry@v2
+      run: |
+        sudo apt update -y
+        sudo apt install -y pipx
+        pipx ensurepath
+        sudo pipx ensurepath --global
+        pipx install poetry==1.2.0
 
     - name: Install Spark Scala && PySpark
       run: |
