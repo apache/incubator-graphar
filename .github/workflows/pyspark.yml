@@ -54,11 +54,9 @@ jobs:
 
     - name: Install Poetry
       run: |
-        sudo apt update -y
-        sudo apt install -y pipx
-        pipx ensurepath
-        sudo pipx ensurepath --global
-        pipx install poetry==1.2.0
+        yes | sudo python3 -m pip install poetry --quiet
+        cd pyspark
+        poetry env use python3
 
     - name: Install Spark Scala && PySpark
       run: |

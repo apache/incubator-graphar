@@ -36,7 +36,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-20.04]
     steps:
       - uses: actions/setup-node@v3
         with:
@@ -67,10 +67,8 @@ jobs:
           sudo apt-get install -y ca-certificates doxygen
           curl -sSL https://install.python-poetry.org | python3 -
           # install poetry
-          sudo apt install -y pipx
-          pipx ensurepath
-          sudo pipx ensurepath --global
-          pipx install poetry==1.2.0
+          yes | sudo python3 -m pip install poetry --quiet
+          poetry env use python3
           # install dependencies with poetry
           poetry install --with=docs,spark
         working-directory: ./pyspark
