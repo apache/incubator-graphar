@@ -26,14 +26,14 @@ on:
     paths:
       - 'spark/**'
       - 'pyspark/**'
-      - '.github/workflows/pyspark.yaml'
+      - '.github/workflows/pyspark.yml'
   pull_request:
     branches:
       - main
     paths:
       - 'spark/**'
       - 'pyspark/**'
-      - '.github/workflows/pyspark.yaml'
+      - '.github/workflows/pyspark.yml'
 
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
@@ -41,7 +41,7 @@ concurrency:
 
 jobs:
   GraphAr-spark:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
       with:
@@ -53,7 +53,10 @@ jobs:
         python-version: 3.9
 
     - name: Install Poetry
-      uses: abatilo/actions-poetry@v2
+      run: |
+        yes | sudo python3 -m pip install poetry --quiet
+        cd pyspark
+        poetry env use python3
 
     - name: Install Spark Scala && PySpark
       run: |

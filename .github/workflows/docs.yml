@@ -56,33 +56,20 @@ jobs:
           config: .licenserc.yaml
           mode: check
 
-      - name: Leave the comment on pull request when started
-        if: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == 'alibaba/GraphAr' }}
-        uses: actions-cool/maintain-one-comment@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          body: |
-            ⚡️ Deploying PR Preview ${{ github.event.pull_request.head.sha }} to [surge.sh](https://alibaba-graphar-build-pr-${{ github.event.number }}.surge.sh) ... [Build logs](https://github.com/alibaba/GraphAr/runs/${{ github.run_id }})
-
-            <a href="https://github.com/alibaba/GraphAr/actions/runs/${{ github.run_id }}">
-              <img width="300" src="https://user-images.githubusercontent.com/507615/90240294-8d2abd00-de5b-11ea-8140-4840a0b2d571.gif">
-            </a>
-
-            <sub>🤖 By [surge-preview](https://surge.sh/)</sub>
-          body-include: '<!-- Sticky Pull Request Comment: Surge Preview build -->'
-
       - name: Install Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.9
 
-      - name: Install Poetry
-        uses: abatilo/actions-poetry@v2
-
       - name: Install dependencies
         run: |
           sudo apt-get update -y
           sudo apt-get install -y ca-certificates doxygen
+          curl -sSL https://install.python-poetry.org | python3 -
+          # install poetry
+          yes | sudo python3 -m pip install poetry --quiet
+          poetry env use python3
+          # install dependencies with poetry
           poetry install --with=docs,spark
         working-directory: ./pyspark
 
