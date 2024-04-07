@@ -19,10 +19,6 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.info.type.AdjListType;
-import org.apache.graphar.info.type.DataType;
-import org.apache.graphar.info.yaml.EdgeYamlParser;
-import org.apache.graphar.util.GeneralParams;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +26,14 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.DataType;
+import org.apache.graphar.info.yaml.EdgeYamlParser;
+import org.apache.graphar.info.yaml.GraphYamlParser;
+import org.apache.graphar.util.GeneralParams;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -121,9 +122,14 @@ public class EdgeInfo {
         if (conf == null) {
             conf = new Configuration();
         }
-        Path path = new Path(edgeInfoPath);
-        FileSystem fileSystem = path.getFileSystem(conf);
-        FSDataInputStream inputStream = fileSystem.open(path);
+        return load(edgeInfoPath, FileSystem.get(conf));
+    }
+
+    public static EdgeInfo load(String edgeInfoPath, FileSystem fileSystem) throws IOException {
+        if (fileSystem == null) {
+            fileSystem = FileSystem.get(new Configuration());
+        }
+        FSDataInputStream inputStream = fileSystem.open(new Path(edgeInfoPath));
         Yaml edgeInfoYamlLoader =
                 new Yaml(new Constructor(EdgeYamlParser.class, new LoaderOptions()));
         EdgeYamlParser edgeInfoYaml = edgeInfoYamlLoader.load(inputStream);
@@ -184,6 +190,9 @@ public class EdgeInfo {
     }
 
     public AdjacentList getAdjacentList(AdjListType adjListType) {
+        // AdjListType will be checked in this method,
+        // other methods which get adjacent list in this class should call this method first,
+        // so we don't check AdjListType in other methods.
         checkAdjListTypeExist(adjListType);
         return adjacentLists.get(adjListType);
     }
@@ -196,98 +205,73 @@ public class EdgeInfo {
         return propertyGroups.getPropertyGroup(property);
     }
 
-    // TODO(@Thespica): Implement file path get methods
+    public String getPropertyGroupPrefix(PropertyGroup propertyGroup) {
+        checkPropertyGroupExist(propertyGroup);
+        return getPrefix() + "/" + propertyGroup.getPrefix();
+    }
 
-    //    public String getVerticesNumFilePath(AdjListType adjListType) {
-    //    }
-    //
-    //    public String getEdgesNumFilePath(long vertexChunkIndex, AdjListType adjListType) {
-    //    }
-    //
-    //    public String getAdjListFilePath(long vertexChunkIndex, long edgeChunkIndex, AdjListType
-    // adjListType) {
-    //    }
-    //
-    //    public String getAdjListPathPrefix(AdjListType adjListType) {
-    //    }
-    //
-    //    /**
-    //     * Get the adjacency list offset chunk file path of vertex chunk
-    //     * the offset chunks is aligned with the vertex chunks
-    //     *
-    //     * @param vertexChunkIndex index of vertex chunk
-    //     * @param adjListType      The adjacency list type.
-    //     */
-    //    public String getAdjListOffsetFilePath(long vertexChunkIndex, AdjListType adjListType) {
-    //
-    //    }
-    //
-    //    /**
-    //     * Get the path prefix of the adjacency list offset chunk for the given
-    //     * adjacency list type.
-    //     *
-    //     * @param adjListType The adjacency list type.
-    //     * @return A Result object containing the path prefix, or a Status object
-    //     * indicating an error.
-    //     */
-    //    public String getOffsetPathPrefix(AdjListType adjListType) {
-    //
-    //    }
-    //
-    //    public String getPropertyFilePath(
-    //            PropertyGroup propertyGroup,
-    //            AdjListType adjListType, long vertexChunkIndex,
-    //            long edgeChunkIndex) {
-    //
-    //    }
-    //
-    //    /**
-    //     * Get the path prefix of the property group chunk for the given
-    //     * adjacency list type.
-    //     *
-    //     * @param propertyGroup property group.
-    //     * @param adjListType   The adjacency list type.
-    //     * @return A Result object containing the path prefix, or a Status object
-    //     * indicating an error.
-    //     */
-    //    public String getPropertyGroupPathPrefix(
-    //            PropertyGroup propertyGroup,
-    //            AdjListType adjListType) {
-    //
-    //    }
+    public String getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
+        // PropertyGroup will be checked in getPropertyGroupPrefix
+        return getPropertyGroupPrefix(propertyGroup) + "/chunk" + chunkIndex;
+    }
 
-    DataType getPropertyType(String propertyName) {
+    public String getAdjacentListPrefix(AdjListType adjListType) {
+        return getPrefix() + "/" + getAdjacentList(adjListType).getPrefix() + "/adj_list";
+    }
+
+    public String getAdjacentListChunkPath(AdjListType adjListType, long vertexChunkIndex) {
+        return getAdjacentListPrefix(adjListType) + "/chunk" + vertexChunkIndex;
+    }
+
+    public String getOffsetPrefix(AdjListType adjListType) {
+        return getAdjacentListPrefix(adjListType) + "/offset";
+    }
+
+    public String getOffsetChunkPath(AdjListType adjListType, long vertexChunkIndex) {
+        return getOffsetPrefix(adjListType) + "/chunk" + vertexChunkIndex;
+    }
+
+    public String getVerticesNumFilePath(AdjListType adjListType) {
+        return getAdjacentListPrefix(adjListType) + "/vertex_count";
+    }
+
+    public String getEdgesNumFilePath(AdjListType adjListType, long vertexChunkIndex) {
+        return getAdjacentListPrefix(adjListType) + "/edge_count" + vertexChunkIndex;
+    }
+
+    public DataType getPropertyType(String propertyName) {
         return propertyGroups.getPropertyType(propertyName);
     }
 
-    boolean isPrimaryKey(String propertyName) {
+    public boolean isPrimaryKey(String propertyName) {
         return propertyGroups.isPrimaryKey(propertyName);
     }
 
-    boolean isNullableKey(String propertyName) {
+    public boolean isNullableKey(String propertyName) {
         return propertyGroups.isNullableKey(propertyName);
     }
 
-    // TODO(@Thespica): Implement save and dump methods
-    //    /**
-    //     * Saves the edge info to a YAML file.
-    //     *
-    //     * @param fileName The name of the file to save to.
-    //     * @return A Status object indicating success or failure.
-    //     */
-    //    void save(String fileName) {
-    //
-    //    }
-    //
-    //    /**
-    //     * Returns the edge info as a YAML formatted string.
-    //     *
-    //     * @return A Result object containing the YAML string, or a Status object
-    //     * indicating an error.
-    //     */
-    //    public String dump() {
-    //
-    //    }
+    public void save(String filePath, Configuration conf) throws IOException {
+        if (conf == null) {
+            conf = new Configuration();
+        }
+        save(filePath, FileSystem.get(conf));
+    }
+
+    public void save(String fileName, FileSystem fileSystem) throws IOException {
+        if (fileSystem == null) {
+            fileSystem = FileSystem.get(new Configuration());
+        }
+        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
+        outputStream.writeBytes(dump());
+        outputStream.close();
+    }
+
+    public String dump() {
+        Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
+        EdgeYamlParser edgeYaml = new EdgeYamlParser(this);
+        return yaml.dump(edgeYaml);
+    }
 
     public String getConcat() {
         return edgeTriplet.getConcat();
@@ -338,12 +322,28 @@ public class EdgeInfo {
     }
 
     private void checkAdjListTypeExist(AdjListType adjListType) {
+        if (adjListType == null) {
+            throw new IllegalArgumentException("The adjacency list type is null");
+        }
         if (!adjacentLists.containsKey(adjListType)) {
             throw new IllegalArgumentException(
                     "The adjacency list type "
                             + adjListType
                             + " does not exist in the edge info "
                             + this.edgeTriplet.getConcat());
+        }
+    }
+
+    private void checkPropertyGroupExist(PropertyGroup propertyGroup) {
+        if (propertyGroup == null) {
+            throw new IllegalArgumentException("Property group is null");
+        }
+        if (!hasPropertyGroup(propertyGroup)) {
+            throw new IllegalArgumentException(
+                    "Property group "
+                            + propertyGroup
+                            + " does not exist in the edge "
+                            + getConcat());
         }
     }
 

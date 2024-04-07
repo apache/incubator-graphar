@@ -19,7 +19,10 @@
 
 package org.apache.graphar.info.yaml;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.graphar.info.VertexInfo;
 
 public class VertexYamlParser {
     private String label;
@@ -28,7 +31,24 @@ public class VertexYamlParser {
     private String prefix;
     private String version;
 
-    public VertexYamlParser() {}
+    public VertexYamlParser() {
+        this.label = "";
+        this.chunk_size = 0;
+        this.property_groups = new ArrayList<>();
+        this.prefix = "";
+        this.version = "";
+    }
+
+    public VertexYamlParser(VertexInfo vertexInfo) {
+        this.label = vertexInfo.getLabel();
+        this.chunk_size = vertexInfo.getChunkSize();
+        this.property_groups =
+                vertexInfo.getPropertyGroups().stream()
+                        .map(PropertyGroupYamlParser::new)
+                        .collect(Collectors.toList());
+        this.prefix = vertexInfo.getPrefix();
+        this.version = vertexInfo.getVersion();
+    }
 
     public String getLabel() {
         return label;
