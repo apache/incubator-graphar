@@ -101,12 +101,15 @@ public class GraphInfo {
     }
 
     public static GraphInfo load(String graphPath, FileSystem fileSystem) throws IOException {
-        return load(graphPath, fileSystem == null ? new Configuration() : fileSystem.getConf());
+        if (fileSystem == null) {
+            throw new IllegalArgumentException("FileSystem is null");
+        }
+        return load(graphPath, fileSystem.getConf());
     }
 
     public static GraphInfo load(String graphPath, Configuration conf) throws IOException {
-        if (graphPath == null) {
-            conf = new Configuration();
+        if (conf == null) {
+            throw new IllegalArgumentException("Configuration is null");
         }
         Path path = new Path(graphPath);
         FileSystem fileSystem = path.getFileSystem(conf);
@@ -117,16 +120,20 @@ public class GraphInfo {
         return new GraphInfo(graphYaml, conf);
     }
 
+    public void save(String filePath) throws IOException {
+        save(filePath, new Configuration());
+    }
+
     public void save(String filePath, Configuration conf) throws IOException {
         if (conf == null) {
-            conf = new Configuration();
+            throw new IllegalArgumentException("Configuration is null");
         }
         save(filePath, FileSystem.get(conf));
     }
 
     public void save(String fileName, FileSystem fileSystem) throws IOException {
         if (fileSystem == null) {
-            fileSystem = FileSystem.get(new Configuration());
+            throw new IllegalArgumentException("FileSystem is null");
         }
         FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
         outputStream.writeBytes(dump());

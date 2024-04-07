@@ -124,14 +124,14 @@ public class EdgeInfo {
 
     public static EdgeInfo load(String edgeInfoPath, Configuration conf) throws IOException {
         if (conf == null) {
-            conf = new Configuration();
+            throw new IllegalArgumentException("Configuration is null");
         }
         return load(edgeInfoPath, FileSystem.get(conf));
     }
 
     public static EdgeInfo load(String edgeInfoPath, FileSystem fileSystem) throws IOException {
         if (fileSystem == null) {
-            fileSystem = FileSystem.get(new Configuration());
+            throw new IllegalArgumentException("FileSystem is null");
         }
         FSDataInputStream inputStream = fileSystem.open(new Path(edgeInfoPath));
         Yaml edgeInfoYamlLoader =
@@ -255,16 +255,20 @@ public class EdgeInfo {
         return propertyGroups.isNullableKey(propertyName);
     }
 
+    public void save(String filePath) throws IOException {
+        save(filePath, new Configuration());
+    }
+
     public void save(String filePath, Configuration conf) throws IOException {
         if (conf == null) {
-            conf = new Configuration();
+            throw new IllegalArgumentException("Configuration is null");
         }
         save(filePath, FileSystem.get(conf));
     }
 
     public void save(String fileName, FileSystem fileSystem) throws IOException {
         if (fileSystem == null) {
-            fileSystem = FileSystem.get(new Configuration());
+            throw new IllegalArgumentException("FileSystem is null");
         }
         FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
         outputStream.writeBytes(dump());

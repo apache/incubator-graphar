@@ -85,14 +85,14 @@ public class VertexInfo {
 
     public static VertexInfo load(String vertexInfoPath, Configuration conf) throws IOException {
         if (conf == null) {
-            conf = new Configuration();
+            throw new IllegalArgumentException("Configuration is null");
         }
         return load(vertexInfoPath, FileSystem.get(conf));
     }
 
     public static VertexInfo load(String vertexInfoPath, FileSystem fileSystem) throws IOException {
         if (fileSystem == null) {
-            fileSystem = FileSystem.get(new Configuration());
+            throw new IllegalArgumentException("FileSystem is null");
         }
         FSDataInputStream inputStream = fileSystem.open(new Path(vertexInfoPath));
         Yaml vertexInfoYamlLoader =
@@ -101,7 +101,7 @@ public class VertexInfo {
         return new VertexInfo(vertexInfoYaml);
     }
 
-    Optional<VertexInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
+    public Optional<VertexInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
         return propertyGroups
                 .addPropertyGroupAsNew(propertyGroup)
                 .map(
@@ -110,27 +110,27 @@ public class VertexInfo {
                                         label, chunkSize, newPropertyGroups, prefix, version));
     }
 
-    int propertyGroupNum() {
+    public int propertyGroupNum() {
         return propertyGroups.getPropertyGroupNum();
     }
 
-    DataType getPropertyType(String propertyName) {
+    public DataType getPropertyType(String propertyName) {
         return propertyGroups.getPropertyType(propertyName);
     }
 
-    boolean hasProperty(String propertyName) {
+    public boolean hasProperty(String propertyName) {
         return propertyGroups.hasProperty(propertyName);
     }
 
-    boolean isPrimaryKey(String propertyName) {
+    public boolean isPrimaryKey(String propertyName) {
         return propertyGroups.isPrimaryKey(propertyName);
     }
 
-    boolean isNullableKey(String propertyName) {
+    public boolean isNullableKey(String propertyName) {
         return propertyGroups.isNullableKey(propertyName);
     }
 
-    boolean hasPropertyGroup(PropertyGroup propertyGroup) {
+    public boolean hasPropertyGroup(PropertyGroup propertyGroup) {
         return propertyGroups.hasPropertyGroup(propertyGroup);
     }
 
@@ -148,16 +148,20 @@ public class VertexInfo {
         return getPrefix() + "/vertex_count";
     }
 
+    public void save(String filePath) throws IOException {
+        save(filePath, new Configuration());
+    }
+
     public void save(String filePath, Configuration conf) throws IOException {
         if (conf == null) {
-            conf = new Configuration();
+            throw new IllegalArgumentException("Configuration is null");
         }
         save(filePath, FileSystem.get(conf));
     }
 
     public void save(String fileName, FileSystem fileSystem) throws IOException {
         if (fileSystem == null) {
-            fileSystem = FileSystem.get(new Configuration());
+            throw new IllegalArgumentException("FileSystem is null");
         }
         FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
         outputStream.writeBytes(dump());
