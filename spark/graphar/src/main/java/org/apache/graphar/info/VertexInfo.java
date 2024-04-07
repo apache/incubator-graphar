@@ -19,15 +19,16 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.info.type.DataType;
-import org.apache.graphar.info.yaml.VertexYamlParser;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import org.apache.graphar.info.type.DataType;
+import org.apache.graphar.info.yaml.GraphYamlParser;
+import org.apache.graphar.info.yaml.VertexYamlParser;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -78,20 +79,29 @@ public class VertexInfo {
         this.version = version;
     }
 
+    public static VertexInfo load(String vertexInfoPath) throws IOException {
+        return load(vertexInfoPath, new Configuration());
+    }
+
     public static VertexInfo load(String vertexInfoPath, Configuration conf) throws IOException {
         if (conf == null) {
-            conf = new Configuration();
+            throw new IllegalArgumentException("Configuration is null");
         }
-        Path path = new Path(vertexInfoPath);
-        FileSystem fileSystem = path.getFileSystem(conf);
-        FSDataInputStream inputStream = fileSystem.open(path);
+        return load(vertexInfoPath, FileSystem.get(conf));
+    }
+
+    public static VertexInfo load(String vertexInfoPath, FileSystem fileSystem) throws IOException {
+        if (fileSystem == null) {
+            throw new IllegalArgumentException("FileSystem is null");
+        }
+        FSDataInputStream inputStream = fileSystem.open(new Path(vertexInfoPath));
         Yaml vertexInfoYamlLoader =
                 new Yaml(new Constructor(VertexYamlParser.class, new LoaderOptions()));
         VertexYamlParser vertexInfoYaml = vertexInfoYamlLoader.load(inputStream);
         return new VertexInfo(vertexInfoYaml);
     }
 
-    Optional<VertexInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
+    public Optional<VertexInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
         return propertyGroups
                 .addPropertyGroupAsNew(propertyGroup)
                 .map(
@@ -100,59 +110,69 @@ public class VertexInfo {
                                         label, chunkSize, newPropertyGroups, prefix, version));
     }
 
-    int propertyGroupNum() {
+    public int propertyGroupNum() {
         return propertyGroups.getPropertyGroupNum();
     }
 
-    PropertyGroup getPropertyGroup(String propertyName) {
-        return propertyGroups.getPropertyGroup(propertyName);
-    }
-
-    DataType getPropertyType(String propertyName) {
+    public DataType getPropertyType(String propertyName) {
         return propertyGroups.getPropertyType(propertyName);
     }
 
-    boolean hasProperty(String propertyName) {
+    public boolean hasProperty(String propertyName) {
         return propertyGroups.hasProperty(propertyName);
     }
 
-    boolean isPrimaryKey(String propertyName) {
+    public boolean isPrimaryKey(String propertyName) {
         return propertyGroups.isPrimaryKey(propertyName);
     }
 
-    boolean isNullableKey(String propertyName) {
+    public boolean isNullableKey(String propertyName) {
         return propertyGroups.isNullableKey(propertyName);
     }
 
-    boolean hasPropertyGroup(PropertyGroup propertyGroup) {
+    public boolean hasPropertyGroup(PropertyGroup propertyGroup) {
         return propertyGroups.hasPropertyGroup(propertyGroup);
     }
 
-    // TODO(@Thespica): Implement file path get methods
-    //
-    //    String getFilePath(PropertyGroup propertyGroup,
-    //                                    long chunkIndex) {
-    //
-    //    }
-    //
-    //    String getPathPrefix(
-    //            PropertyGroup propertyGroup) {
-    //
-    //    }
-    //
-    //    String getVerticesNumFilePath() {
-    //
-    //    }
+    public String getPropertyGroupPrefix(PropertyGroup propertyGroup) {
+        checkPropertyGroupExist(propertyGroup);
+        return getPrefix() + "/" + propertyGroup.getPrefix();
+    }
 
-    // TODO(@Thespica): Implement save and dump methods
-    //
-    //    void save(String fileName) {
-    //
-    //    }
-    //
-    //    String Dump() {
-    //
-    //    }
+    public String getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
+        // PropertyGroup will be checked in getPropertyGroupPrefix
+        return getPropertyGroupPrefix(propertyGroup) + "/chunk" + chunkIndex;
+    }
+
+    public String getVerticesNumFilePath() {
+        return getPrefix() + "/vertex_count";
+    }
+
+    public void save(String filePath) throws IOException {
+        save(filePath, new Configuration());
+    }
+
+    public void save(String filePath, Configuration conf) throws IOException {
+        if (conf == null) {
+            throw new IllegalArgumentException("Configuration is null");
+        }
+        save(filePath, FileSystem.get(conf));
+    }
+
+    public void save(String fileName, FileSystem fileSystem) throws IOException {
+        if (fileSystem == null) {
+            throw new IllegalArgumentException("FileSystem is null");
+        }
+        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
+        outputStream.writeBytes(dump());
+        outputStream.close();
+    }
+
+    public String dump() {
+        Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
+        VertexYamlParser vertexYaml = new VertexYamlParser(this);
+        return yaml.dump(vertexYaml);
+    }
 
     public String getLabel() {
         return label;
@@ -172,5 +192,18 @@ public class VertexInfo {
 
     public String getVersion() {
         return version;
+    }
+
+    private void checkPropertyGroupExist(PropertyGroup propertyGroup) {
+        if (propertyGroup == null) {
+            throw new IllegalArgumentException("Property group is null");
+        }
+        if (!hasPropertyGroup(propertyGroup)) {
+            throw new IllegalArgumentException(
+                    "Property group "
+                            + propertyGroup
+                            + " does not exist in the vertex "
+                            + getLabel());
+        }
     }
 }

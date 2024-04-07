@@ -19,6 +19,8 @@
 
 package org.apache.graphar.info.yaml;
 
+import org.apache.graphar.info.AdjacentList;
+
 public class AdjacentListYamlParser {
     private boolean ordered;
     private String aligned_by;
@@ -30,6 +32,13 @@ public class AdjacentListYamlParser {
         this.aligned_by = "";
         this.file_type = "";
         this.prefix = "";
+    }
+
+    public AdjacentListYamlParser(AdjacentList adjacentList) {
+        this.ordered = adjacentList.getType().isOrdered();
+        this.aligned_by = adjacentList.getType().getAlignedBy();
+        this.file_type = adjacentList.getFileType().toString();
+        this.prefix = adjacentList.getPrefix();
     }
 
     public boolean isOrdered() {

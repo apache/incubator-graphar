@@ -39,4 +39,12 @@ public enum AdjListType {
                 throw new IllegalArgumentException("Invalid alignedBy: " + alignedBy);
         }
     }
+
+    public boolean isOrdered() {
+        return this == ordered_by_source || this == ordered_by_dest;
+    }
+
+    public String getAlignedBy() {
+        return this == ordered_by_source || this == unordered_by_source ? "src" : "dst";
+    }
 }

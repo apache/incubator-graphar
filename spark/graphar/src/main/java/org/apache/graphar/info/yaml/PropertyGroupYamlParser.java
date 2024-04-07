@@ -21,6 +21,8 @@ package org.apache.graphar.info.yaml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.graphar.info.PropertyGroup;
 
 public class PropertyGroupYamlParser {
     private List<PropertyYamlParser> properties;
@@ -31,6 +33,15 @@ public class PropertyGroupYamlParser {
         this.properties = new ArrayList<>();
         this.file_type = "";
         this.prefix = "";
+    }
+
+    public PropertyGroupYamlParser(PropertyGroup propertyGroup) {
+        this.properties =
+                propertyGroup.getPropertyList().stream()
+                        .map(PropertyYamlParser::new)
+                        .collect(Collectors.toList());
+        this.file_type = propertyGroup.getFileType().toString();
+        this.prefix = propertyGroup.getPrefix();
     }
 
     public List<PropertyYamlParser> getProperties() {

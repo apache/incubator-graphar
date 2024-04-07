@@ -19,8 +19,6 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.info.yaml.GraphYamlParser;
-import org.apache.graphar.util.GeneralParams;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,8 +27,11 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.graphar.info.yaml.GraphYamlParser;
+import org.apache.graphar.util.GeneralParams;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -96,12 +97,19 @@ public class GraphInfo {
     }
 
     public static GraphInfo load(String graphPath) throws IOException {
-        return load(graphPath, null);
+        return load(graphPath, new Configuration());
+    }
+
+    public static GraphInfo load(String graphPath, FileSystem fileSystem) throws IOException {
+        if (fileSystem == null) {
+            throw new IllegalArgumentException("FileSystem is null");
+        }
+        return load(graphPath, fileSystem.getConf());
     }
 
     public static GraphInfo load(String graphPath, Configuration conf) throws IOException {
-        if (graphPath == null) {
-            conf = new Configuration();
+        if (conf == null) {
+            throw new IllegalArgumentException("Configuration is null");
         }
         Path path = new Path(graphPath);
         FileSystem fileSystem = path.getFileSystem(conf);
@@ -112,16 +120,33 @@ public class GraphInfo {
         return new GraphInfo(graphYaml, conf);
     }
 
-    // TODO(@Thespica): Implement save and dump methods
-    //    public void save(String path) {
-    //
-    //    }
-    //
-    //    public String dump() {
-    //
-    //    }
+    public void save(String filePath) throws IOException {
+        save(filePath, new Configuration());
+    }
 
-    Optional<GraphInfo> addVertexAsNew(VertexInfo vertexInfo) {
+    public void save(String filePath, Configuration conf) throws IOException {
+        if (conf == null) {
+            throw new IllegalArgumentException("Configuration is null");
+        }
+        save(filePath, FileSystem.get(conf));
+    }
+
+    public void save(String fileName, FileSystem fileSystem) throws IOException {
+        if (fileSystem == null) {
+            throw new IllegalArgumentException("FileSystem is null");
+        }
+        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
+        outputStream.writeBytes(dump());
+        outputStream.close();
+    }
+
+    public String dump() {
+        Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
+        GraphYamlParser graphYaml = new GraphYamlParser(this);
+        return yaml.dump(graphYaml);
+    }
+
+    public Optional<GraphInfo> addVertexAsNew(VertexInfo vertexInfo) {
         if (vertexInfo == null || hasVertexInfo(vertexInfo.getLabel())) {
             return Optional.empty();
         }
@@ -146,7 +171,7 @@ public class GraphInfo {
                         version));
     }
 
-    Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
+    public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
         if (edgeInfo == null
                 || hasEdgeInfo(
                         edgeInfo.getSrcLabel(), edgeInfo.getEdgeLabel(), edgeInfo.getDstLabel())) {
