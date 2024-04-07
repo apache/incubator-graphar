@@ -58,7 +58,7 @@ public class GraphYamlParser {
                         .collect(Collectors.toList());
         this.edges =
                 graphInfo.getEdgeInfos().stream()
-                        .map(edgeInfo -> edgeInfo.getEdgeLabel() + ".edge.yaml")
+                        .map(edgeInfo -> edgeInfo.getConcat() + ".edge.yaml")
                         .collect(Collectors.toList());
         this.version = graphInfo.getVersion();
     }
