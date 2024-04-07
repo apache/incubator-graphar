@@ -79,6 +79,10 @@ public class VertexInfo {
         this.version = version;
     }
 
+    public static VertexInfo load(String vertexInfoPath) throws IOException {
+        return load(vertexInfoPath, new Configuration());
+    }
+
     public static VertexInfo load(String vertexInfoPath, Configuration conf) throws IOException {
         if (conf == null) {
             conf = new Configuration();

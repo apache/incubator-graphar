@@ -96,6 +96,10 @@ public class GraphInfo {
         this.version = version;
     }
 
+    public static GraphInfo load(String graphPath) throws IOException {
+        return load(graphPath, new Configuration());
+    }
+
     public static GraphInfo load(String graphPath, FileSystem fileSystem) throws IOException {
         return load(graphPath, fileSystem == null ? new Configuration() : fileSystem.getConf());
     }

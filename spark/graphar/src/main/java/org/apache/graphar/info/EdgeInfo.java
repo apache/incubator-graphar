@@ -118,6 +118,10 @@ public class EdgeInfo {
         this.version = version;
     }
 
+    public static EdgeInfo load(String edgeInfoPath) throws IOException {
+        return load(edgeInfoPath, new Configuration());
+    }
+
     public static EdgeInfo load(String edgeInfoPath, Configuration conf) throws IOException {
         if (conf == null) {
             conf = new Configuration();
