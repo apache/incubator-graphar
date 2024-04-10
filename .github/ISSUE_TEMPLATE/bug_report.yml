@@ -22,11 +22,11 @@ labels: [Bug]
 body:
   - type: markdown
     attributes:
-      value: ':stop_sign: _For support questions, please visit [GraphAr Discussions](https://github.com/alibaba/GraphAr/discussions) instead._'
+      value: ':stop_sign: _For support questions, please visit [GraphAr Discussions](https://github.com/apache/incubator-graphar/discussions) instead._'
   - type: checkboxes
     attributes:
       label: 'Is there an existing issue for this?'
-      description: 'Please [search :mag: the issues](https://github.com/alibaba/GraphAr/issues) to check if this bug has already been reported.'
+      description: 'Please [search :mag: the issues](https://github.com/apache/incubator-graphar/issues) to check if this bug has already been reported.'
       options:
       - label: 'I have searched the existing issues'
         required: true
@@ -83,4 +83,4 @@ body:
       required: false
   - type: markdown
     attributes:
-      value: ':stop_sign: _For support questions, please visit [GraphAr Discussions](https://github.com/alibaba/GraphAr/discussions) instead._'
+      value: ':stop_sign: _For support questions, please visit [GraphAr Discussions](https://github.com/apache/incubator-graphar/discussions) instead._'

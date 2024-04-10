@@ -90,4 +90,4 @@ Finally, we could use a **VerticesBuilder** of GraphAr to write the results to n
    builder.Dump();
 
 
-.. _bgl_example.cc: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/bgl_example.cc
+.. _bgl_example.cc: https://github.com/apache/incubator-graphar/blob/main/cpp/examples/bgl_example.cc

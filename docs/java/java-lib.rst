@@ -70,7 +70,7 @@ directory:
 
 .. code-block:: bash
 
-    $ git clone https://github.com/alibaba/GraphAr.git
+    $ git clone https://github.com/apache/incubator-graphar.git
     $ cd GraphAr
     $ git submodule update --init
     $ cd java
@@ -124,7 +124,7 @@ example code.
    }
 
 See `test for
-graphinfo <https://github.com/alibaba/GraphAr/tree/main/java/src/test/java/com/alibaba/graphar/graphinfo>`__
+graphinfo <https://github.com/apache/incubator-graphar/tree/main/java/src/test/java/com/apache/incubator-graphar/graphinfo>`__
 for the complete example.
 
 Writers
@@ -182,7 +182,7 @@ code.
    writer.sortAndWriteAdjListTable(table, 0, 0); // Write adj list of vertex chunk 0 to files
 
 See `test for
-writers <https://github.com/alibaba/GraphAr/tree/main/java/src/test/java/com/alibaba/graphar/writers>`__
+writers <https://github.com/apache/incubator-graphar/tree/main/java/src/test/java/com/apache/incubator-graphar/writers>`__
 for the complete example.
 
 Readers
@@ -217,5 +217,5 @@ code.
    StdPair<Long, Long> range = reader.getRange().value();
 
 See `test for
-readers <https://github.com/alibaba/GraphAr/tree/main/java/src/test/java/com/alibaba/graphar/readers>`__
+readers <https://github.com/apache/incubator-graphar/tree/main/java/src/test/java/com/apache/incubator-graphar/readers>`__
 for the complete example.

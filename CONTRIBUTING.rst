@@ -13,8 +13,8 @@ Reporting bug
 -------------------
 
 If you've noticed a bug in GraphAr, first make sure that you are testing against
-the `latest version of GraphAr <https://github.com/alibaba/GraphAr/tree/main>`_ -
-your issue may already have been fixed. If not, search our `issues list <https://github.com/alibaba/GraphAr/issues>`_
+the `latest version of GraphAr <https://github.com/apache/incubator-graphar/tree/main>`_ -
+your issue may already have been fixed. If not, search our `issues list <https://github.com/apache/incubator-graphar/issues>`_
 on GitHub in case a similar issue has already been opened.
 
 If you get confirmation of your bug, `file a bug issue`_ before starting to code.
@@ -194,7 +194,7 @@ up to date with GraphAr's main branch:
 
 .. code:: shell
 
-    $ git remote add upstream https://github.com/alibaba/GraphAr.git
+    $ git remote add upstream https://github.com/apache/incubator-graphar.git
     $ git checkout main
     $ git pull upstream main
 
@@ -267,7 +267,7 @@ Maintainers need to do the following to push out a release:
     $ git tag -a v0.1.0 -m "GraphAr v0.1.0"
     $ git push upstream v0.1.0
 
-3. The release draft will be automatically built to GitHub by GitHub Actions. You can edit the release notes draft on `GitHub <https://github.com/alibaba/GraphAr/releases>`_ to add more details.
+3. The release draft will be automatically built to GitHub by GitHub Actions. You can edit the release notes draft on `GitHub <https://github.com/apache/incubator-graphar/releases>`_ to add more details.
 4. Publish the release.
 
 .. the reviewing part document is referred and derived from
@@ -365,7 +365,7 @@ Approving a change
 ^^^^^^^^^^^^^^^^^^^
 
 Any GraphAr core collaborator (any GitHub user with commit rights in the
-:code:`alibaba/GraphAr` repository) is authorized to approve any other contributor's
+:code:`apache/incubator-graphar` repository) is authorized to approve any other contributor's
 work. Collaborators are not permitted to approve their own pull requests.
 
 Collaborators indicate that they have reviewed and approve of the changes in
@@ -413,7 +413,7 @@ Continuous integration testing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 All pull requests that contain changes to code must be run through
-continuous integration (CI) testing at `Github Actions <https://github.com/alibaba/GraphAr/actions>`_.
+continuous integration (CI) testing at `Github Actions <https://github.com/apache/incubator-graphar/actions>`_.
 
 The pull request change will trigger a CI testing run. Ideally, the code change
 will pass ("be green") on all platform configurations supported by GraphAr.
@@ -433,30 +433,30 @@ you can submit a pull request to the related libraries implementation to impleme
 
 .. _pre-commit: https://pre-commit.com/
 
-.. _Code of Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
+.. _Code of Conduct: https://github.com/apache/incubator-graphar/blob/main/CODE_OF_CONDUCT.md
 
-.. _file a bug issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=Bug&template=bug_report.yml&title=%5BBug%5D%3A+%3Ctitle%3E
+.. _file a bug issue: https://github.com/apache/incubator-graphar/issues/new?assignees=&labels=Bug&template=bug_report.yml&title=%5BBug%5D%3A+%3Ctitle%3E
 
-.. _Open a feature request issue: https://github.com/alibaba/GraphAr/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFeat%5D
+.. _Open a feature request issue: https://github.com/apache/incubator-graphar/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=%5BFeat%5D
 
 .. _fork GraphAr: https://help.github.com/articles/fork-a-repo
 
 .. _make a Pull Request: https://help.github.com/articles/creating-a-pull-request
 
-.. _Github Discussions: https://github.com/alibaba/GraphAr/discussions
+.. _Github Discussions: https://github.com/apache/incubator-graphar/discussions
 
 .. _git rebasing: http://git-scm.com/book/en/Git-Branching-Rebasing
 
 .. _interactive rebase: https://help.github.com/en/github/using-git/about-git-rebase
 
-.. _GraphAr C++ Dependencies: https://github.com/alibaba/GraphAr/tree/main/cpp#system-setup
+.. _GraphAr C++ Dependencies: https://github.com/apache/incubator-graphar/tree/main/cpp#system-setup
 
-.. _GraphAr Spark Dependencies: https://github.com/alibaba/GraphAr/tree/main/spark#system-setup
+.. _GraphAr Spark Dependencies: https://github.com/apache/incubator-graphar/tree/main/spark#system-setup
 
-.. _Contributor License Agreement: https://cla-assistant.io/alibaba/GraphAr
+.. _Contributor License Agreement: https://cla-assistant.io/apache/incubator-graphar
 
 .. _glossary: https://chromium.googlesource.com/chromiumos/docs/+/HEAD/glossary.md
 
-.. _format specification design: https://github.com/alibaba/GraphAr/tree/main/docs/format/file-format.rst
+.. _format specification design: https://github.com/apache/incubator-graphar/tree/main/docs/format/file-format.rst
 
-.. _implementation status: https://github.com/alibaba/GraphAr/tree/main/docs/format/status.rst
+.. _implementation status: https://github.com/apache/incubator-graphar/tree/main/docs/format/status.rst

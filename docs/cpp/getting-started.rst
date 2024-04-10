@@ -178,7 +178,7 @@ This program first reads in the graph information file to obtain the metadata; t
 
 Please refer to `more examples <examples/out-of-core.html>`_ to learn about the other available case studies utilizing GraphAr.
 
-.. _Building Steps: https://github.com/alibaba/GraphAr/blob/main/README.rst#building-libraries
+.. _Building Steps: https://github.com/apache/incubator-graphar/blob/main/README.rst#building-libraries
 
 .. _person.vertex.yml: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/person.vertex.yml
 
@@ -194,6 +194,6 @@ Please refer to `more examples <examples/out-of-core.html>`_ to learn about the 
 
 .. _./edge/person_knows_person/ordered_by_source/offset/chunk0: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0
 
-.. _example program: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/construct_info_example.cc
+.. _example program: https://github.com/apache/incubator-graphar/blob/main/cpp/examples/construct_info_example.cc
 
-.. _pagerank_example.cc: https://github.com/alibaba/GraphAr/blob/main/cpp/examples/pagerank_example.cc
+.. _pagerank_example.cc: https://github.com/apache/incubator-graphar/blob/main/cpp/examples/pagerank_example.cc

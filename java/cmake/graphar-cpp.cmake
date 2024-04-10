@@ -69,7 +69,7 @@ function(build_graphar_cpp)
 
     include(ExternalProject)
     ExternalProject_Add(graphar_ep
-            GIT_REPOSITORY https://github.com/alibaba/GraphAr.git
+            GIT_REPOSITORY https://github.com/apache/incubator-graphar.git
             GIT_TAG ${GAR_VERSION_TO_BUILD}
             GIT_SHALLOW TRUE
             GIT_SUBMODULES ""

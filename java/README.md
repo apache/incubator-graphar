@@ -43,7 +43,7 @@ Tips:
 Make the graphar-java-library directory as the current working directory:
 
  ```bash
-  $ git clone https://github.com/alibaba/GraphAr.git
+  $ git clone https://github.com/apache/incubator-graphar.git
   $ cd GraphAr
   $ git submodule update --init
   $ cd java

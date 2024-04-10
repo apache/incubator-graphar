@@ -223,44 +223,44 @@ Publication
   }
 
 
-.. _Apache License 2.0: https://github.com/alibaba/GraphAr/blob/main/LICENSE
+.. _Apache License 2.0: https://github.com/apache/incubator-graphar/blob/main/LICENSE
 
-.. |GraphAr CI| image:: https://github.com/alibaba/GraphAr/actions/workflows/ci.yml/badge.svg
-   :target: https://github.com/alibaba/GraphAr/actions
+.. |GraphAr CI| image:: https://github.com/apache/incubator-graphar/actions/workflows/ci.yml/badge.svg
+   :target: https://github.com/apache/incubator-graphar/actions
 
-.. |Docs CI| image:: https://github.com/alibaba/GraphAr/actions/workflows/docs.yml/badge.svg
-   :target: https://github.com/alibaba/GraphAr/actions
+.. |Docs CI| image:: https://github.com/apache/incubator-graphar/actions/workflows/docs.yml/badge.svg
+   :target: https://github.com/apache/incubator-graphar/actions
 
 .. |GraphAr Docs| image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
    :target: https://alibaba.github.io/GraphAr/
 
-.. |Good First Issue| image:: https://img.shields.io/github/labels/alibaba/GraphAr/Good%20First%20Issue?color=green&label=Contribute%20&style=plastic
-   :target: https://github.com/alibaba/GraphAr/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
+.. |Good First Issue| image:: https://img.shields.io/github/labels/apache/incubator-graphar/Good%20First%20Issue?color=green&label=Contribute%20&style=plastic
+   :target: https://github.com/apache/incubator-graphar/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22
 
 .. _GraphAr File Format: https://alibaba.github.io/GraphAr/user-guide/file-format.html
 
-.. _GraphAr Spark Library: https://github.com/alibaba/GraphAr/tree/main/spark
+.. _GraphAr Spark Library: https://github.com/apache/incubator-graphar/tree/main/spark
 
-.. _GraphAr PySpark Library: https://github.com/alibaba/GraphAr/tree/main/pyspark
+.. _GraphAr PySpark Library: https://github.com/apache/incubator-graphar/tree/main/pyspark
 
-.. _GraphAr C++ Library: https://github.com/alibaba/GraphAr/tree/main/cpp
+.. _GraphAr C++ Library: https://github.com/apache/incubator-graphar/tree/main/cpp
 
-.. _GraphAr Java Library: https://github.com/alibaba/GraphAr/tree/main/java
+.. _GraphAr Java Library: https://github.com/apache/incubator-graphar/tree/main/java
 
 .. _example files: https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/
 
-.. _contribution guidelines: https://github.com/alibaba/GraphAr/tree/main/CONTRIBUTING.rst
+.. _contribution guidelines: https://github.com/apache/incubator-graphar/tree/main/CONTRIBUTING.rst
 
-.. _Code of Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
+.. _Code of Conduct: https://github.com/apache/incubator-graphar/blob/main/CODE_OF_CONDUCT.md
 
 .. _GraphAr Slack: https://join.slack.com/t/grapharworkspace/shared_invite/zt-1wh5vo828-yxs0MlXYBPBBNvjOGhL4kQ
 
-.. _Weekly Community Meeting: https://github.com/alibaba/GraphAr/wiki/GraphAr-Weekly-Community-Meeting
+.. _Weekly Community Meeting: https://github.com/apache/incubator-graphar/wiki/GraphAr-Weekly-Community-Meeting
 
-.. _community introduction: https://github.com/alibaba/GraphAr/tree/main/docs/developers/community.rst
+.. _community introduction: https://github.com/apache/incubator-graphar/tree/main/docs/developers/community.rst
 
-.. _GitHub Issues: https://github.com/alibaba/GraphAr/issues/new
+.. _GitHub Issues: https://github.com/apache/incubator-graphar/issues/new
 
-.. _Github Discussions: https://github.com/alibaba/GraphAr/discussions
+.. _Github Discussions: https://github.com/apache/incubator-graphar/discussions
 
 .. _Alibaba-FastFFI: https://github.com/alibaba/fastFFI

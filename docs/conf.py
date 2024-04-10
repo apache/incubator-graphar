@@ -79,13 +79,13 @@ html_theme = "furo"
 html_theme_options = {
     "sidebar_hide_name": False,  # we use the logo
     "navigation_with_keys": True,
-    "source_repository": "https://github.com/alibaba/GraphAr/",
+    "source_repository": "https://github.com/apache/incubator-graphar/",
     "source_branch": "main",
     "source_directory": "docs/",
     "footer_icons": [
         {
             "name": "GitHub",
-            "url": "https://github.com/alibaba/GraphAr",
+            "url": "https://github.com/apache/incubator-graphar",
             "html": "",
             "class": "fa fa-solid fa-github fa-2x",
         },

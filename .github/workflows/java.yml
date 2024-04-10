@@ -69,7 +69,7 @@ jobs:
 
       - name: Run test
         run: |
-          # Temporarily using Java 8, related issue: https://github.com/alibaba/GraphAr/issues/277
+          # Temporarily using Java 8, related issue: https://github.com/apache/incubator-graphar/issues/277
           export JAVA_HOME=${JAVA_HOME_8_X64}
           export LLVM11_HOME=/usr/lib/llvm-11
           pushd java
