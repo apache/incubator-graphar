@@ -37,4 +37,3 @@
 
    Contributing Overview <developers/contributing>
    Java Development <developers/java-dev>
-   Community <developers/community>
