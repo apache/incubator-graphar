@@ -1,8 +1,10 @@
-Overview
-=========
+---
+id: overview
+title: Overview
+sidebar_position: 1
+---
 
-.. image:: ../images/overview.png
-   :alt: overview
+<img src="../images/overview.png" alt="overview" width="700"/>
 
 GraphAr is a project to standardize the graph data format and provide a set of libraries to generate, access and transform such formatted files.
 
@@ -10,7 +12,5 @@ It is intended to serve as the standard file format for importing/exporting and 
 
 Additionally, it can also serve as the direct data source for graph processing applications.
 
-
-`Motivation <motivation.html>`_
-
-`Concepts <concepts.html>`_
+### [Motivation](/docs/overview/motivation)
+### [Concepts](/docs/overview/concepts)

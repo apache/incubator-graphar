@@ -1,5 +1,8 @@
-Concepts
-=========
+---
+id: concepts
+title: Concepts
+sidebar_position: 3
+---
 
 Glossary of relevant concepts and terms.
 
