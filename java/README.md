@@ -43,7 +43,7 @@ Tips:
 Make the graphar-java-library directory as the current working directory:
 
  ```bash
-  $ git clone https://github.com/alibaba/GraphAr.git
+  $ git clone https://github.com/apache/incubator-graphar.git
   $ cd GraphAr
   $ git submodule update --init
   $ cd java
@@ -72,4 +72,4 @@ Then set GraphAr as a dependency in maven project:
 
 ## How to use
 
-Please refer to [GraphAr Java Library Documentation](https://alibaba.github.io/GraphAr/user-guide/java-lib.html).
+Please refer to [GraphAr Java Library Documentation](https://graphar.apache.org/GraphAr/user-guide/java-lib.html).

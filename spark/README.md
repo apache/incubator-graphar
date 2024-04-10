@@ -19,7 +19,7 @@ All the instructions below assume that you have cloned the GraphAr git
 repository and navigated to the ``spark`` subdirectory:
 
 ```bash
-    $ git clone https://github.com/alibaba/GraphAr.git
+    $ git clone https://github.com/apache/incubator-graphar.git
     $ cd GraphAr
     $ git submodule update --init
     $ cd spark
@@ -231,4 +231,4 @@ The example will import the basketballplayer graph from GraphAr to NebulaGraph a
 
 ## How to use
 
-Please refer to our [GraphAr Spark Library Documentation](https://alibaba.github.io/GraphAr/spark/spark-lib.html).
+Please refer to our [GraphAr Spark Library Documentation](https://graphar.apache.org/GraphAr/spark/spark-lib.html).

@@ -200,12 +200,12 @@ See `GraphAr2Neo4j.scala`_ for the complete example.
   - The Neo4j Spark Connector supports to use `Spark structured streaming API <https://neo4j.com/docs/spark/current/streaming/>`_, which works differently from Spark batching. One can utilize this API to read/write a stream from/to Neo4j, avoiding to maintain all data in the memory.
 
 
-.. _TestGraphTransformer.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestGraphTransformer.scala
+.. _TestGraphTransformer.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestGraphTransformer.scala
 
-.. _TransformExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TransformExample.scala
+.. _TransformExample.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TransformExample.scala
 
-.. _ComputeExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/ComputeExample.scala
+.. _ComputeExample.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/ComputeExample.scala
 
-.. _Neo4j2GraphAr.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/main/scala/com/alibaba/graphar/example/Neo4j2GraphAr.scala
+.. _Neo4j2GraphAr.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/main/scala/com/apache/incubator-graphar/example/Neo4j2GraphAr.scala
 
-.. _GraphAr2Neo4j.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/main/scala/com/alibaba/graphar/example/GraphAr2Neo4j.scala
+.. _GraphAr2Neo4j.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/main/scala/com/apache/incubator-graphar/example/GraphAr2Neo4j.scala

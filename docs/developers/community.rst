@@ -59,13 +59,13 @@ See the `community meeting notes`_ for the next meeting.
 
 Contributing
 ------------
-As mentioned above, we use `GitHub <https://github.com/alibaba/GraphAr>`_ for our issue tracker and for source control.
-See the `contribution guidelines <https://github.com/alibaba/GraphAr/tree/main/CONTRIBUTING.rst>`_ for more.
+As mentioned above, we use `GitHub <https://github.com/apache/incubator-graphar>`_ for our issue tracker and for source control.
+See the `contribution guidelines <https://github.com/apache/incubator-graphar/tree/main/CONTRIBUTING.rst>`_ for more.
 
-.. _GraphAr Code of Conduct: https://github.com/alibaba/GraphAr/blob/main/CODE_OF_CONDUCT.md
+.. _GraphAr Code of Conduct: https://github.com/apache/incubator-graphar/blob/main/CODE_OF_CONDUCT.md
 
 .. _GraphAr mailing list: https://groups.google.com/g/graphar
 
 .. _GraphAr Slack: https://join.slack.com/t/grapharworkspace/shared_invite/zt-1wh5vo828-yxs0MlXYBPBBNvjOGhL4kQ
 
-.. _community meeting notes: https://github.com/alibaba/GraphAr/wiki/Community-Meeting-Agenda
+.. _community meeting notes: https://github.com/apache/incubator-graphar/wiki/Community-Meeting-Agenda

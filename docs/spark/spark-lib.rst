@@ -51,7 +51,7 @@ GraphAr supports two Apache Spark versions for now and uses Maven Profiles to wo
 
 After compilation, a similar file *graphar-x.x.x-SNAPSHOT-shaded.jar* is generated in the directory *spark/graphar/target/*.
 
-Please refer to the `building steps <https://github.com/alibaba/GraphAr/tree/main/spark>`_ for more details.
+Please refer to the `building steps <https://github.com/apache/incubator-graphar/tree/main/spark>`_ for more details.
 
 
 How to Use
@@ -228,20 +228,20 @@ For more information on usage, please refer to the examples:
 - `Neo4j2GraphAr.scala`_ and `GraphAr2Neo4j.scala`_ are examples to conduct data importing/exporting for Neo4j.
 
 
-.. _TestGraphInfo.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestGraphInfo.scala
+.. _TestGraphInfo.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestGraphInfo.scala
 
-.. _TestIndexGenerator.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestIndexGenerator.scala
+.. _TestIndexGenerator.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestIndexGenerator.scala
 
-.. _TestWriter.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestWriter.scala
+.. _TestWriter.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestWriter.scala
 
-.. _TestReader.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestReader.scala
+.. _TestReader.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestReader.scala
 
-.. _TestGraphTransformer.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TestGraphTransformer.scala
+.. _TestGraphTransformer.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestGraphTransformer.scala
 
-.. _ComputeExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/ComputeExample.scala
+.. _ComputeExample.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/ComputeExample.scala
 
-.. _TransformExample.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/test/scala/com/alibaba/graphar/TransformExample.scala
+.. _TransformExample.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TransformExample.scala
 
-.. _Neo4j2GraphAr.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/main/scala/com/alibaba/graphar/example/Neo4j2GraphAr.scala
+.. _Neo4j2GraphAr.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/main/scala/com/apache/incubator-graphar/example/Neo4j2GraphAr.scala
 
-.. _GraphAr2Neo4j.scala: https://github.com/alibaba/GraphAr/blob/main/spark/src/main/scala/com/alibaba/graphar/example/GraphAr2Neo4j.scala
+.. _GraphAr2Neo4j.scala: https://github.com/apache/incubator-graphar/blob/main/spark/src/main/scala/com/apache/incubator-graphar/example/GraphAr2Neo4j.scala

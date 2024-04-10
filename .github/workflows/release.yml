@@ -31,7 +31,7 @@ concurrency:
 jobs:
   release:
     runs-on: ${{ matrix.os }}
-    if: ${{ github.repository == 'alibaba/GraphAr' }}
+    if: ${{ github.repository == 'apache/incubator-graphar' }}
     strategy:
       matrix:
         os: [ubuntu-latest]
@@ -39,12 +39,12 @@ jobs:
     steps:
       - name: Extract tag name
         id: tag
-        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.repository == 'alibaba/GraphAr' }}
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.repository == 'apache/incubator-graphar' }}
         run: echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Cut a versioned release
         uses: "marvinpinto/action-automatic-releases@latest"
-        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.repository == 'alibaba/GraphAr' }}
+        if: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') && github.repository == 'apache/incubator-graphar' }}
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: ${{ steps.tag.outputs.TAG }}

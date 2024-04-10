@@ -81,7 +81,7 @@ jobs:
 
       - name: Commit Doc
         # TODO: open this when apache infrastructure is ready
-        # if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && github.repository == 'alibaba/GraphAr' }}
+        # if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && github.repository == 'apache/incubator-graphar' }}
         if: false
         run: |
           git config user.email github-actions@github.com

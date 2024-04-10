@@ -57,7 +57,7 @@ How to use GraphAr PySpark package
 
    Now you can import, create and modify all the classes you can work
    call from `scala API of
-   GraphAr <https://alibaba.github.io/GraphAr/spark/reference/index.html>`__.
+   GraphAr <https://graphar.apache.org/docs/libraries/cpp>`__.
    For simplify using of graphar from python constants, like GAR-types,
    supported file-types, etc. are placed in ``graphar_pyspark.enums``.
 
@@ -79,7 +79,7 @@ How to use GraphAr PySpark package
    -  EdgeInfo
 
    You can check `Scala library
-   documentation <https://alibaba.github.io/GraphAr/spark/spark-lib.html#information-classes>`__
+   documentation <https://graphar.apache.org/GraphAr/spark/spark-lib.html#information-classes>`__
    for the more detailed information.
 
 .. container:: cell markdown

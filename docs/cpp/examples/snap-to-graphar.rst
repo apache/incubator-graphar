@@ -78,4 +78,4 @@ The code snippet that follows demonstrates the generation and preservation of th
   ASSERT(e_builder->Dump().ok());
   e_builder->Clear();
 
-For comprehensive insights into this example, please consult the accompanying `source code <https://github.com/alibaba/GraphAr/tree/main/docs/cpp/examples/snap_dataset_to_graphar.cc>`_ .
+For comprehensive insights into this example, please consult the accompanying `source code <https://github.com/apache/incubator-graphar/tree/main/docs/cpp/examples/snap_dataset_to_graphar.cc>`_ .
