@@ -72,4 +72,4 @@ Then set GraphAr as a dependency in maven project:
 
 ## How to use
 
-Please refer to [GraphAr Java Library Documentation](https://alibaba.github.io/GraphAr/user-guide/java-lib.html).
+Please refer to [GraphAr Java Library Documentation](https://graphar.apache.org/GraphAr/user-guide/java-lib.html).

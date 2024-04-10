@@ -10,7 +10,7 @@ CI](https://github.com/apache/incubator-graphar/actions/workflows/ci.yml/badge.s
 [![Docs
 CI](https://github.com/apache/incubator-graphar/actions/workflows/docs.yml/badge.svg)](https://github.com/apache/incubator-graphar/actions)
 [![GraphAr
-Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://alibaba.github.io/GraphAr/)
+Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://graphar.apache.org/docs/)
 [![Good First
 Issue](https://img.shields.io/github/labels/apache/incubator-graphar/Good%20First%20Issue?color=green&label=Contribute%20&style=plastic)](https://github.com/apache/incubator-graphar/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 

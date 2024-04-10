@@ -231,4 +231,4 @@ The example will import the basketballplayer graph from GraphAr to NebulaGraph a
 
 ## How to use
 
-Please refer to our [GraphAr Spark Library Documentation](https://alibaba.github.io/GraphAr/spark/spark-lib.html).
+Please refer to our [GraphAr Spark Library Documentation](https://graphar.apache.org/GraphAr/spark/spark-lib.html).

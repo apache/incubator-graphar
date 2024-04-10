@@ -123,5 +123,5 @@ The API document is generated in the directory ``cpp/apidoc/html``.
 
 ## How to use
 
-Please refer to our [GraphAr C++ API Reference](https://alibaba.github.io/GraphAr/reference/api-reference-cpp.html).
+Please refer to our [GraphAr C++ API Reference](https://graphar.apache.org/docs/libraries/cpp).
 
