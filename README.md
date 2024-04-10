@@ -108,7 +108,7 @@ reading all properties from the files, and to add properties for
 vertices without modifying the existing files, the columns of the
 logical table will be divided into several column groups.
 
-Take the "person" vertex table as an example, if the chunk size is set
+Take the `person` vertex table as an example, if the chunk size is set
 to be 500, the logical table will be separated into sub-logical-tables
 of 500 rows with the exception of the last one, which may have less than
 500 rows. The columns for maintaining properties will also be divided
@@ -141,7 +141,7 @@ destination. In this way, an offset table is required to store the start
 offset for each vertex's edges, and the edges with the same
 source/destination will be stored continuously in the logical table.
 
-Take the logical table for "person knows person" edges as an example,
+Take the logical table for `person knows person` edges as an example,
 the logical edge table looks like:
 
 <img src="docs/images/edge_logical_table.png" class="align-center"
@@ -187,7 +187,7 @@ table should be in alignment with the partition of the corresponding
 vertex table. The first row of each offset chunk is always 0, indicating
 the starting point for the corresponding sub-logical-table for edges.
 
-Take the "person knows person" edges to illustrate. Suppose the vertex
+Take the `person knows person` edges to illustrate. Suppose the vertex
 chunk size is set to 500 and the edge chunk size is 1024, and the edges
 are **ordered_by_source**, then the edges could be saved in the
 following physical tables:
