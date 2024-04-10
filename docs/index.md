@@ -16,5 +16,8 @@ Documentation about the GraphAr file format.
 ### [Libraries](/docs/libraries)
 Documentation about the libraries of GraphAr. 
 
+### [API Reference](/docs/api)
+API reference for the GraphAr libraries.
+
 ### [Developer Guide](/docs/developers)
 All developer resources for GraphAr.

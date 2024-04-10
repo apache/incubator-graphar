@@ -1,6 +1,6 @@
 ---
 id: spark
-title: GraphAr Spark Library
+title: Spark Library
 sidebar_position: 3
 ---
 

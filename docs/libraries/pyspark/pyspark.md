@@ -1,6 +1,6 @@
 ---
 id: pyspark
-title: GraphAr PySpark Library
+title: PySpark Library
 sidebar_position: 4
 ---
 
