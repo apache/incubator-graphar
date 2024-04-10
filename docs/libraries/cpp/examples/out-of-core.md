@@ -26,7 +26,7 @@ used by Google Search to rank web pages in their search engine results.
 The source code of PageRank based on GraphAr located at
 [pagerank_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/pagerank_example.cc),
 and the explanations can be found in the [Getting
-Started](../user-guide/getting-started.html#a-pagerank-example) page.
+Started](../getting-started#a-pagerank-example) page.
 
 ## Connected Components
 
@@ -35,7 +35,7 @@ for every pair of vertices in it, there is an undirected path connecting
 them. And [Connected Components
 (CC)](https://en.wikipedia.org/wiki/Connected_component) is an algorithm
 to identify all weakly connected components in a graph. [CC based on
-BGL](bgl.html) is provided in GraphAr, also, we implement out-of-core
+BGL](./bgl) is provided in GraphAr, also, we implement out-of-core
 algorithms for this application.
 
 A typical method for calculating CC is label propagation. In this

@@ -10,14 +10,8 @@ Welcome to the documentation for Apache GraphAr. Here, you can find information 
 ### [Overview](/docs/overview)
 Overview of the GraphAr project.
 
-### [Specification](/docs/specification)
+### [Specification](/docs/category/specification)
 Documentation about the GraphAr file format.
 
-### [Libraries](/docs/libraries)
+### [Libraries](/docs/category/libraries)
 Documentation about the libraries of GraphAr. 
-
-### [API Reference](/docs/api)
-API reference for the GraphAr libraries.
-
-### [Developer Guide](/docs/developers)
-All developer resources for GraphAr.

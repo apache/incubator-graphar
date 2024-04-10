@@ -30,9 +30,7 @@ The time performance of *ArrowFragmentBuilder* and *ArrowFragmentWriter*
 in GraphScope is heavily dependent on the partitioning of the graph into
 GAR files, that is, the *vertex chunk size* and *edge chunk size*, which
 are specified in the vertex information file and in the edge information
-file, respectively. See [GraphAr File
-Format](../user-guide/file-format.html) to understand the chunk size
-definitions in GAR.
+file, respectively. 
 
 Generally speaking, fewer chunks are created if the file size is large.
 On small graphs, this can be disadvantageous as it reduces the degree of
@@ -61,38 +59,3 @@ ecs.r6.6xlarge instances (24vCPU, 192GB memory), and using
 [com-friendster](https://snap.stanford.edu/data/com-Friendster.html) (a
 simple graph) and [ldbc-snb-30](https://ldbcouncil.org/benchmarks/snb/)
 (a multi-labeled property graph) as datasets.
-
-<table style="width:88%;">
-<colgroup>
-<col style="width: 23%" />
-<col style="width: 13%" />
-<col style="width: 25%" />
-<col style="width: 25%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th>Dataset</th>
-<th>Workers</th>
-<th>Default Loading</th>
-<th>GraphAr Loading</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>com-friendster</td>
-<td>4</td>
-<td>282s</td>
-<td><blockquote>
-<p>54s</p>
-</blockquote></td>
-</tr>
-<tr class="even">
-<td>ldbc-snb-30</td>
-<td>4</td>
-<td>196s</td>
-<td><blockquote>
-<p>40s</p>
-</blockquote></td>
-</tr>
-</tbody>
-</table>
