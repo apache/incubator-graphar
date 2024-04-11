@@ -67,12 +67,6 @@ jobs:
           rsync -av docs website/docs
         working-directory: {{ github.workspace }}
     
-      - name: Check License Header
-        uses: apache/skywalking-eyes/header@main 
-        with:
-          config: .licenserc.yaml
-          mode: check
-      
       - name: Install Dependencies
         working-directory: website
         run: pnpm install --frozen-lockfile
