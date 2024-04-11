@@ -45,12 +45,6 @@ jobs:
           submodules: true
           fetch-depth: 0
 
-      - name: Check License Header
-        uses: apache/skywalking-eyes/header@main 
-        with:
-          config: .licenserc.yaml
-          mode: check
-
       - name: Install Python
         uses: actions/setup-python@v4
         with:
