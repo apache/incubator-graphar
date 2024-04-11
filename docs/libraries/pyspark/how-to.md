@@ -46,7 +46,7 @@ initialize(spark)
 ## GraphAr objects
 
 Now you can import, create and modify all the classes you can
-call from [scala API of GraphAr](https://graphar.apache.org/docs/libraries/spark).
+call from [scala API of GraphAr](https://graphar.apache.org/docs/spark/).
 For simplify using of graphar from python constants, like GAR-types,
 supported file-types, etc. are placed in ``graphar_pyspark.enums``.
 
@@ -61,7 +61,7 @@ Main objects of GraphAr are the following:
 -  VertexInfo
 -  EdgeInfo
 
-You can check [Scala library documentation](https://graphar.apache.org/docs/spark#information-classes)
+You can check [Scala library documentation](../spark/spark.md)
 for the more detailed information.
 
 
