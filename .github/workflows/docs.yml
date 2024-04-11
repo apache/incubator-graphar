@@ -38,10 +38,7 @@ concurrency:
 
 jobs:
   build-website:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -58,7 +55,7 @@ jobs:
         with:
           node-version: '18'
 
-      - name: Checkout website
+      - name: Checkout Website
         uses: actions/checkout@v4
         with:
           repository: apache/incubator-graphar-website

@@ -1,4 +1,4 @@
-# Apache GraphAr Documentation
+# Apache GraphAr (incubating) Documentation
 
 This directory contains the source files for building the main
 project documentation for Apache GraphAr (incubating). This include

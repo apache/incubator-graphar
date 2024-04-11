@@ -74,9 +74,12 @@ either of **unordered_by_source**, **unordered_by_dest**,
 type of adjList, the meta information includes its file path prefix, the
 file type, as well as all the property groups attached.
 
-> [!NOTE]
-> It is allowed to store different types of adjLists for a group of
-> edges at the same time.
+:::note
+
+It is allowed to store different types of adjLists for a group of
+edges at the same time.
+
+::
 
 ## GAR Data Files
 
@@ -127,12 +130,15 @@ chunk of the first vertex chunk, and the adjList type of the edges is
 one for the source and one for the destination; it can be saved in CSV,
 ORC, or Parquet files.
 
-> [!NOTE]
-> If the edges are ordered, there may also be offset chunks to construct
-> the index for accessing edges of a single vertex. These chunks will
-> store the start offset of each vertex's edges, see
-> [./edge/person_knows_person/ordered_by_source/offset/chunk0](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0)
-> as an example.
+:::note
+
+If the edges are ordered, there may also be offset chunks to construct
+the index for accessing edges of a single vertex. These chunks will
+tore the start offset of each vertex's edges, see
+[./edge/person_knows_person/ordered_by_source/offset/chunk0](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0)
+as an example.
+
+:::
 
 ## How to Use GAR
 

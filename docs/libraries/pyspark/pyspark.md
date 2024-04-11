@@ -5,11 +5,15 @@ sidebar_position: 4
 ---
 
 
-> **note:** The current policy of GraphAr project is that for Apache Spark
-> the main API is Scala Spark API. PySpark API follows scala Spark API.
-> Please refer to [GraphAr Spark library](../spark/spark.md)
-> for more detailed information about how to use GraphAr with Apache
-> Spark.
+:::note
+
+The current policy of GraphAr project is that for Apache Spark
+the main API is Scala Spark API. PySpark API follows scala Spark API.
+Please refer to [GraphAr Spark library](../spark/spark.md)
+for more detailed information about how to use GraphAr with Apache
+Spark.
+
+:::
 
 ## Overview
 

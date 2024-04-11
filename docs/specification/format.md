@@ -96,8 +96,11 @@ Given an internal vertex id and the vertex label, a vertex is uniquely identifia
 
 <img src="../images/vertex_logical_table.png" alt="vertex logical table" width="700" align="center"/>
 
-> **Note:** In the logical vertex table, some property can be marked as the primary key, such as the "id" column of the "person" table.
+:::note
 
+In the logical vertex table, some property can be marked as the primary key, such as the "id" column of the "person" table.
+
+:::
 
 ### Physical table of vertices 
 
@@ -107,8 +110,11 @@ Take the "person" vertex table as an example, if the chunk size is set to be 500
 
 <img src="../images/vertex_physical_table.png" alt="vertex physical table" width="700" align="center"/>
 
+::: note
 
-> **Note:** For efficiently utilize the filter push-down of the payload file format like Parquet, the internal vertex id is stored in the payload file as a column. And since the internal vertex id is continuous, the payload file format can use the delta encoding for the internal vertex id column, which would not bring too much overhead for the storage.
+For efficiently utilize the filter push-down of the payload file format like Parquet, the internal vertex id is stored in the payload file as a column. And since the internal vertex id is continuous, the payload file format can use the delta encoding for the internal vertex id column, which would not bring too much overhead for the storage.
+
+:::
 
 ## Edge Chunks in GraphAr 
 
@@ -168,7 +174,11 @@ An edge information file which named "\<source label\>_\<edge label\>_\<destinat
 - the property groups attached to the edge for all adjLists;
 - the version of GraphAr.
 
-> **Note:** Please note that GraphAr supports the storage of multiple types of adjLists for a given group of edges, e.g., a group of edges could be accessed in both CSR and CSC way when two copies (one is **ordered_by_source** and the other is **ordered_by_dest**) of the relevant data are present in GraphAr.
+:::note
+
+Please note that GraphAr supports the storage of multiple types of adjLists for a given group of edges, e.g., a group of edges could be accessed in both CSR and CSC way when two copies (one is **ordered_by_source** and the other is **ordered_by_dest**) of the relevant data are present in GraphAr.
+
+:::
 
 See also [Gar Information Files](https://graphar.apache.org/docs/libraries/cpp/getting-started#gar-information-files) for an example.
 

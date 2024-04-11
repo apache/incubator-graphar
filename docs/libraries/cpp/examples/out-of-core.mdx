@@ -50,7 +50,7 @@ GraphAr's reading interface. That is to say, the edges are accessed and
 processed chunk by chunk, instead of being loaded into memory at once
 (as in the BGL example).
 
-``` C++
+```c++
 // construct the edge collection in GraphAr
 auto edges = ...
 auto it_begin = edges->begin(), it_end = edges->end();
@@ -89,17 +89,21 @@ neighbors. Please refer to
 [cc_push_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/cc_push_example.cc)
 for the complete code.
 
-> [!TIP]
-> In this example, two kinds of edges are used. The
-> **ordered_by_source** edges are used to access all outgoing edges of
-> an active vertex, and **ordered_by_dest** edges are used to access the
-> incoming edges. In this way, all the neighbors of an active vertex can
-> be accessed and processed.
->
-> Although GraphAr supports to get the outgoing (incoming) edges of a
-> single vertex for all adjList types, it is most efficient when the
-> type is **ordered_by_source** (**ordered_by_dest**) since it can avoid
-> to read redundant data.
+
+:::tip
+
+In this example, two kinds of edges are used. The
+**ordered_by_source** edges are used to access all outgoing edges of
+an active vertex, and **ordered_by_dest** edges are used to access the
+incoming edges. In this way, all the neighbors of an active vertex can
+be accessed and processed.
+
+Although GraphAr supports to get the outgoing (incoming) edges of a
+single vertex for all adjList types, it is most efficient when the
+type is **ordered_by_source** (**ordered_by_dest**) since it can avoid
+to read redundant data.
+
+:::
 
 ## Breadth First Search
 
@@ -120,7 +124,7 @@ vertices contain all vertices reachable from the root in *i* hops (i.e.,
 vertex is active. This algorithm terminates when there are no more
 active vertices.
 
-``` C++
+```c++
 // construct the edge collection in GraphAr
 auto edges = ...
 auto it_begin = edges->begin(), it_end = edges->end();
@@ -161,10 +165,13 @@ only traverses the edges that lead to non-visited vertices (i.e., the
 vertices that have not been traversed), as shown in
 [bfs_pull_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/bfs_pull_example.cc).
 
-> [!TIP]
-> In common cases of graph processing, the **push**-style is more
-> efficient when the set of active vertices is very sparse, while the
-> **pull**-style fits when it is dense.
+:::tip
+
+In common cases of graph processing, the **push**-style is more
+efficient when the set of active vertices is very sparse, while the
+**pull**-style fits when it is dense.
+
+:::
 
 In some cases, it is required to record the path of BFS, that is, to
 maintain each vertex's predecessor (also called *father*) in the

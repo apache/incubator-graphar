@@ -24,11 +24,11 @@ All libraries currently follow version 1.0.0 of the GraphAr format.
 | --------------------- | --- | ---- | ----- | ------ |
 | List (*)              | ✓   |      |       |        |
 
-
-Notes:
+:::note
 
 - \(\*) The data type of List is not supported by the CSV payload file format.
 
+:::
 
 ## Payload Data File Formats
 
@@ -41,9 +41,12 @@ Notes:
 | HDF5                        |         |         |       |            |
 | JSON                        |         |         |       |            |
 
-> Notes:
-> - *R* - Read supported
-> - *W* - Write supported
+:::note
+
+- *R* - Read supported
+- *W* - Write supported
+
+:::
 
 Supported compression methods for the file formats:
 
@@ -51,9 +54,11 @@ Supported compression methods for the file formats:
 |-----------------------------|---------|---------|-------|------------|
 | ZSTD (*)                    | ✓       | ✓       | ✓     | ✓          |
 
-Notes:
+:::note
 
 - \(\*) Compression is not supported by the CSV payload file format.
+
+:::
 
 
 ## Property
@@ -76,8 +81,7 @@ Supported operations in Property:
 
 ## Property Group
 
-| Property Group    | C++   |Java (1)| Scala |  Python (2)|
-| (operation)       |       |        |       |            |
+| Property Group (operation) | C++   |Java (1)| Scala |  Python (2)|
 |-------------------|-------|--------|-------|------------|
 | create            | ✓     | ✓      | ✓     | ✓          |
 | add property      | ✓     | ✓      | ✓     | ✓          | 
@@ -91,8 +95,7 @@ Supported operations in Property:
 
 ## Adjacency List
 
-| Adjacency List    | C++   | Java  | Scala |   Python   |
-| (type)            |       |       |       |            |
+| Adjacency List (type) | C++   | Java  | Scala |   Python   |
 |-------------------|-------|-------|-------|------------|
 | CSR               | ✓     | ✓     | ✓     | ✓          |
 | CSC               | ✓     | ✓     | ✓     | ✓          |
@@ -100,8 +103,7 @@ Supported operations in Property:
 
 Supported operations in Adjacency List:
 
-| Adjacency List    | C++   |Java (1)| Scala |  Python (2)|
-| (operation)       |       |        |       |            |
+| Adjacency List (operation) | C++   |Java (1)| Scala |  Python (2)|
 |-------------------|-------|--------|-------|------------|
 | create            | ✓     |        | ✓     | ✓          |
 | get adjacency type| ✓     |        | ✓     | ✓          |
@@ -121,15 +123,16 @@ Vertex features:
 | chunk based       | ✓     | ✓     | ✓     | ✓          |
 | property group    | ✓     | ✓     | ✓     | ✓          |
 
-Notes:
+:::note
 
 * *label* is the vertex label, which is a unique identifier for the vertex.
 * *tag* is the vertex tag, which is tag or category for the vertex.
 
+:::
+
 Supported operations in Vertex Info:
 
-| Vertex Info       | C++   |Java (1)| Scala | Python (2) |
-| (operation)       |       |        |       |            |
+| Vertex Info (operation) | C++   |Java (1)| Scala | Python (2) |
 |-------------------|-------|--------|-------|------------|
 | create            | ✓     | ✓      | ✓     | ✓          |
 | add group         | ✓     | ✓      | ✓     | ✓          |
@@ -158,8 +161,7 @@ Edge features:
 
 Supported operations in Edge Info:
 
-| Edge Info         | C++   |Java (1)| Scala | Python (2) |
-| (operation)       |       |        |       |            |
+| Edge Info (operation) | C++   |Java (1)| Scala | Python (2) |
 |-------------------|-------|--------|-------|------------|
 | create            | ✓     | ✓      | ✓     | ✓          |
 | add group         | ✓     | ✓      | ✓     | ✓          |
@@ -182,8 +184,11 @@ Supported operations in Edge Info:
 | serialize         | ✓     | ✓      | ✓     | ✓          |
 | deserialize       | ✓     | ✓      | ✓     | ✓          |
 
-> Notes:
-> - *\<source label, label, dest label\>* is the unique identifier for the edge type.
+:::note
+
+- *\<source label, label, dest label\>* is the unique identifier for the edge type.
+
+:::
 
 
 ## Graph
@@ -196,8 +201,7 @@ Supported operations in Edge Info:
 
 Supported operations in Graph Info:
 
-| Graph Info        | C++   |Java (1)| Scala | Python (2) |
-| (operation)       |       |        |       |            |
+| Graph Info (operation) | C++   |Java (1)| Scala | Python (2) |
 |-------------------|-------|--------|-------|------------|
 | create            | ✓     | ✓      | ✓     | ✓          |
 | add vertex        | ✓     | ✓      | ✓     | ✓          |
@@ -214,12 +218,13 @@ Supported operations in Graph Info:
 | serialize         | ✓     | ✓      | ✓     | ✓          |
 | deserialize       | ✓     | ✓      | ✓     | ✓          |
 
-
-Notes:
+:::note
 
 - \(1) Through fastFFI bindings to the GraphAr C++ library.
 
 - \(2) Through py4j bindings to the GraphAr Spark library.
+
+:::
 
 
 ## Libraries Version Compatibility
@@ -240,6 +245,9 @@ Notes:
 |-------------------------|----------------|-----------------|----------------|----------------|
 | 0.1.0                   | 3.8+           | 3.2.x           | 3              | 1.0.0          |
 
-Notes:
+:::note
+
 - Since the GraphAr PySpark library is bindings to the GraphAr Spark library,
   the PySpark version should be compatible with the Spark version.
+
+:::

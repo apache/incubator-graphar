@@ -59,3 +59,8 @@ ecs.r6.6xlarge instances (24vCPU, 192GB memory), and using
 [com-friendster](https://snap.stanford.edu/data/com-Friendster.html) (a
 simple graph) and [ldbc-snb-30](https://ldbcouncil.org/benchmarks/snb/)
 (a multi-labeled property graph) as datasets.
+
+| Dataset        | Workers | Default Loading | GraphAr Loading |
+|----------------|---------|-----------------|-----------------|
+| com-friendster | 4       | 282s            |  54s            |
+| ldbc-snb-30    | 4       | 196s            |  40s            |
