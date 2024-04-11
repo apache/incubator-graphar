@@ -15,34 +15,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: license
-
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-
-concurrency:
-  group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
-  cancel-in-progress: true
-
-jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-
-      - uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
-          submodules: false
-          fetch-depth: 0
-
-      - name: Check License Header
-        uses: apache/skywalking-eyes/header@main 
-        with:
-          config: .licenserc.yaml
-          mode: check
+label: 'Examples'
+collapsible: true
+collapsed: false
+link:
+  type: generated-index
