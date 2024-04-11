@@ -1,5 +1,4 @@
 ---
-id: implementation-status
 title: Implementation Status
 sidebar_position: 2
 ---

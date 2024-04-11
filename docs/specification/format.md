@@ -1,5 +1,4 @@
 ---
-id: format
 title: Format Specification
 sidebar_position: 1
 ---
@@ -171,7 +170,7 @@ An edge information file which named "\<source label\>_\<edge label\>_\<destinat
 
 > **Note:** Please note that GraphAr supports the storage of multiple types of adjLists for a given group of edges, e.g., a group of edges could be accessed in both CSR and CSC way when two copies (one is **ordered_by_source** and the other is **ordered_by_dest**) of the relevant data are present in GraphAr.
 
-See also [Gar Information Files](/docs/libraries/cpp) for an example.
+See also [Gar Information Files](https://graphar.apache.org/docs/libraries/cpp/getting-started#gar-information-files) for an example.
 
 ## Data files
 
@@ -184,8 +183,8 @@ As previously mentioned, each logical vertex/edge table is divided into multiple
 
 Both of Apache ORC and Apache Parquet are column-oriented data storage formats. In practice of graph processing, it is common to only query a subset of columns of the properties. Thus, the column-oriented formats are more efficient, which eliminate the need to read columns that are not relevant. They are also used by a large number of data processing frameworks like [Apache Spark](https://spark.apache.org/), [Apache Hive](https://hive.apache.org/), [Apache Flink](https://flink.apache.org/), and [Apache Hadoop](https://hadoop.apache.org/). 
 
-See also [GraphAr Data Files](/docs/libraries/cpp) for an example.
+See also [GraphAr Data Files](https://graphar.apache.org/docs/libraries/cpp/getting-started#gar-data-files) for an example.
 
 ## Implementation
 
-The GraphAr libraries may implement part of the GraphAr format. The implementation status of the GraphAr libraries can refer to the [GraphAr implementation status](/docs/specification/implementation-status.md).
+The GraphAr libraries may implement part of the GraphAr format. The implementation status of the GraphAr libraries can refer to the [GraphAr implementation status](implementation-status.md).

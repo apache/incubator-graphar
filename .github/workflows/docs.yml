@@ -24,65 +24,59 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'docs/**'
+      - 'cpp/**'
+      - 'java/**'
+      - 'spark/**'
+      - 'pyspark/**'
+      - '.github/workflows/docs.yml'
 
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
-  build:
+  # TODO(@acezen): generate the API docs for cpp, java, spark, pyspark and upload as artifacts first
+  build-website:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.ref }}
           submodules: true
           fetch-depth: 0
-
-      - name: Install Python
-        uses: actions/setup-python@v4
+      
+      - uses: pnpm/action-setup@v2
         with:
-          python-version: 3.9
+          version: 8
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y ca-certificates doxygen
-          curl -sSL https://install.python-poetry.org | python3 -
-          # install poetry
-          yes | sudo python3 -m pip install poetry --quiet
-          poetry env use python3
-          # install dependencies with poetry
-          poetry install --with=docs,spark
-        working-directory: ./pyspark
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
 
-      - name: Generate Doc
-        run: |
-          export JAVA_HOME=${JAVA_HOME_11_X64}
-          make html
-        working-directory: ./docs
+      - name: Checkout website
+        uses: actions/checkout@v4
+        with:
+          repository: apache/incubator-graphar-website
+          path: website
+          ref: main
 
-      - name: Commit Doc
-        # TODO: open this when apache infrastructure is ready
-        # if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && github.repository == 'apache/incubator-graphar' }}
-        if: false
-        run: |
-          git config user.email github-actions@github.com
-          git config user.name github-actions
-          git branch -D gh-pages || true
-          git checkout --orphan gh-pages
-          shopt -s extglob
-          rm -rf !(docs)
-          rm -rf .github .clang-format .gitattributes .gitmodules .gitignore
-          mv docs/_build/html/* ./
-          mv docs/_build/html/.nojekyll ./
-          rm -rf docs
-          git add -A
-          git commit -m "Generate latest docs on CI, from commit ${{ github.sha }}."
-          git push -f origin gh-pages
+      - name: Sync docs to website
+          rsync -av docs website/docs
+        working-directory: {{ github.workspace }}
+    
+      - name: Check License Header
+        uses: apache/skywalking-eyes/header@main 
+        with:
+          config: .licenserc.yaml
+          mode: check
+      
+      - name: Install Dependencies
+        working-directory: website
+        run: pnpm install --frozen-lockfile
+
+     - name: Build
+        working-directory: website
+        run: pnpm build

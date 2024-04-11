@@ -42,7 +42,7 @@ Compile package:
 mvn clean package -DskipTests
 ```
 
-GraphAr supports two Apache Spark versions for now and uses Maven Profiles to work with it. The command above built GrahpAr with Spark 3.2.2 by default. To built GraphAr with Spark 3.3.4 use the following command:
+GraphAr supports two Apache Spark versions for now and uses Maven Profiles to work with it. The command above built GraphAr with Spark 3.2.2 by default. To built GraphAr with Spark 3.3.4 use the following command:
 
 ```bash
 mvn clean package -DskipTests -P datasources-33
@@ -73,7 +73,7 @@ val edges = graph_info.getEdges
 val version = graph_info.getVersion
 ```
 
-See [TestGraphInfo.scala](test-graph-info) for the complete example.
+See [TestGraphInfo.scala][test-graph-info] for the complete example.
 
 
 ### IndexGenerator
@@ -104,7 +104,7 @@ val edge_df_src_index = IndexGenerator.generateSrcIndexForEdgesFromMapping(edge_
 val edge_df_src_dst_index = IndexGenerator.generateDstIndexForEdgesFromMapping(edge_df_src_index, "dst", vertex_mapping)
 ```
 
-See [TestIndexGenerator.scala](test-index-generator) for the complete example.
+See [TestIndexGenerator.scala][test-index-generator] for the complete example.
 
 
 ### Writer
@@ -143,7 +143,7 @@ writer.writeEdgeProperties(property_group)
 writer.writeEdges()
 ```
 
-See [TestWriter.scala](test-writer) for the complete example.
+See [TestWriter.scala][test-writer] for the complete example.
 
 
 ### Reader
@@ -179,14 +179,14 @@ val adj_list_df_chunk_2 = reader.readAdjListForVertexChunk(2)
 val edge_df = reader.readEdges()
 ```
 
-See [TestReader.scala](test-reader) for the complete example.
+See [TestReader.scala][test-reader] for the complete example.
 
 
 ### Graph-level APIs
 
 To improve the usability of the GraphAr Spark library, a set of APIs are provided to allow users to easily perform operations such as reading, writing, and transforming data at the graph level. These APIs are fairly easy to use, while the previous methods of using reader, writer and information classes are more flexibly and can be highly customized.
 
-The Graph Reader is a helper object which enables users to read all the chunk files from GraphAr for a single graph. The only input required is a GraphInfo object or the path to the information yaml file. On successful completion, it returns a set of vertex DataFrames and edge DataFrames, each of which can be accessed by specifying the vertex/edge label. The Graph Writer is used for writing all vertex DataFrames and edge DataFrames of a graph to generate GraphAr chunk files. For more details, please refer to the [API Reference](/docs/libraries/spark).
+The Graph Reader is a helper object which enables users to read all the chunk files from GraphAr for a single graph. The only input required is a GraphInfo object or the path to the information yaml file. On successful completion, it returns a set of vertex DataFrames and edge DataFrames, each of which can be accessed by specifying the vertex/edge label. The Graph Writer is used for writing all vertex DataFrames and edge DataFrames of a graph to generate GraphAr chunk files. For more details, please refer to the [API Reference](https://graphar.apache.org/docs/spark/).
 
 The Graph Transformer is a helper object in the GraphAr Spark library, designed to assist with data transformation at the graph level. It takes two GraphInfo objects (or paths of two yaml files) as inputs: one for the source graph, and one for the destination graph. The transformer will then load data from existing GAR files for the source graph, utilizing the GraphAr Spark Reader and the meta data defined in the source GraphInfo. After reorganizing the data according to the destination GraphInfo, it generates new GAR chunk files with the GraphAr Spark Writer.
 
@@ -203,7 +203,7 @@ val dest_info = ...
 GraphTransformer.transform(source_info, dest_info, spark)
 ```
 
-We provide an example in [TestGraphTransformer.scala](test-graph-transformer), which demonstrates how to conduct data transformation from the [source graph](https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/parquet/ldbc_sample.graph.yml) to the [destination graph](https://github.com/GraphScope/gar-test/blob/main/transformer/ldbc_sample.graph.yml).
+We provide an example in [TestGraphTransformer.scala][test-graph-transformer], which demonstrates how to conduct data transformation from the [source graph](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/parquet/ldbc_sample.graph.yml) to the [destination graph](https://github.com/apache/incubator-graphar-testing/blob/main/transformer/ldbc_sample.graph.yml).
 
 The Graph Transformer can be used for various purposes, including transforming GAR data between different file types (e.g. from ORC to Parquet), transforming between different adjList types (e.g. from COO to CSR), selecting properties or regrouping them, and setting a new chunk size.
 
@@ -219,9 +219,9 @@ The Graph Transformer can be used for various purposes, including transforming G
 
 For more information on usage, please refer to the examples:
 
-- [ComputeExample.scala](compute-example)  includes an example for constructing the GraphX graph from GAR files and executing a connected-components computation.
-- [TransformExample.scala](transform-example) shows an example for graph data conversion between different file types or different adjList types.
-- [Neo4j2GraphAr.scala](neo4j2graphar) and [GraphAr2Neo4j.scala](graphar2neo4j) are examples to conduct data importing/exporting for Neo4j.
+- [ComputeExample.scala][compute-example]  includes an example for constructing the GraphX graph from GAR files and executing a connected-components computation.
+- [TransformExample.scala][transform-example] shows an example for graph data conversion between different file types or different adjList types.
+- [Neo4j2GraphAr.scala][neo4j2graphar] and [GraphAr2Neo4j.scala][graphar2neo4j] are examples to conduct data importing/exporting for Neo4j.
 
 
 [test-graph-info]: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestGraphInfo.scala

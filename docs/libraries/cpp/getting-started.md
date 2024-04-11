@@ -47,7 +47,7 @@ it also lists all properties in this group, with every property contains
 the name, data type and if it is the primary key.
 
 The file
-[person.vertex.yml](https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/person.vertex.yml)
+[person.vertex.yml](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/csv/person.vertex.yml)
 located inside the test data contains an example of the vertex
 information file. In this example, the "person" vertices have two
 property groups. The first group contains only one property (named "id")
@@ -63,15 +63,14 @@ as the edge chunk size, the source vertex chunk size, the destination
 vertex chunk size, if the edges are directed or not, the relative file
 path for edge data files, the adjLists and the version of GraphAr. The
 file
-[person_knows_person.edge.yml](https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/person_knows_person.edge.yml)
+[person_knows_person.edge.yml](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/csv/person_knows_person.edge.yml)
 located inside the test data contains an example of the edge information
 file.
 
 In GAR format, separate data files are used to store the structure
 (called adjList) and the properties for edges. The adjList type can be
 either of **unordered_by_source**, **unordered_by_dest**,
-**ordered_by_source** or **ordered_by_dest** (see [Edges in
-GraphAr](file-format.html#edges-in-graphar) for more). For a specific
+**ordered_by_source** or **ordered_by_dest**. For a specific
 type of adjList, the meta information includes its file path prefix, the
 file type, as well as all the property groups attached.
 
@@ -88,14 +87,14 @@ chunk size specified by the vertex information file. Different property
 groups correspond to individual groups of data files. In our example,
 the property group ("first name", "last name", "gender") for vertex
 chunk 0 of "person" vertices are stored in
-[./vertex/person/firstName_lastName_gender/chunk0](https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/vertex/person/firstName_lastName_gender/chunk0).
+[./vertex/person/firstName_lastName_gender/chunk0](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/csv/vertex/person/firstName_lastName_gender/chunk0).
 
 In practice of graph processing, it is common to only query a subset of
 columns of the properties. Thus, the column-oriented formats like Apache
 ORC and Apache Parquet are more efficient, which eliminate the need to
 read columns that are not relevant. We also provide data files in ORC
 and Parquet for the example graph in the [test
-data](https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/).
+data](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/).
 
 Similar with vertices, the edge properties are stored in edge property
 chunks. For each vertex chunk, its associated edges (if the edge type is
@@ -107,7 +106,7 @@ are maintained in some edge chunks, with the size of each chunk not
 exceeding the edge chunk size specified in the edge information file.
 
 For instance, the file
-[./edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0](https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0)
+[./edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0)
 stores the property group "creationDate" of "person_knows_person" edges
 for the first edge chunk of the first vertex chunk, and the adjList type
 of the edges is **ordered_by_source**.
@@ -117,12 +116,12 @@ of the edges is **ordered_by_source**.
 The adjList in GAR describes the topology structure, i.e., the internal
 id of the source vertex and the destination vertex for each of a group
 of edges. As explained in [Edges in
-GraphAr](file-format.html#edges-in-graphar), the edges are separated
+GraphAr](https://graphar.apache.org/docs/specification/format), the edges are separated
 into edge chunks, and each edge chunk has its own adjList table and 0 or
 more property tables.
 
 For example, the file
-[./edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0](https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0)
+[./edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0)
 saves the adjList of "person_knows_person" edges for the first edge
 chunk of the first vertex chunk, and the adjList type of the edges is
 "ordered_by_source". This adjList table consists of only two columns:
@@ -133,7 +132,7 @@ ORC, or Parquet files.
 > If the edges are ordered, there may also be offset chunks to construct
 > the index for accessing edges of a single vertex. These chunks will
 > store the start offset of each vertex's edges, see
-> [./edge/person_knows_person/ordered_by_source/offset/chunk0](https://github.com/GraphScope/gar-test/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0)
+> [./edge/person_knows_person/ordered_by_source/offset/chunk0](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0)
 > as an example.
 
 ## How to Use GAR
@@ -208,8 +207,6 @@ for (auto it = edges->begin(); it != edges->end(); ++it) {
 }
 ```
 
-See also [C++ Reader API Reference](reference/index.html#readers).
-
 ### Write GAR files
 
 As same with the readers, the GAR writers provide different-level
@@ -253,9 +250,6 @@ builder.AddEdge(e);
 builder.Dump();
 ```
 
-See also [C++ Writer API
-Reference](reference/index.html#writer-and-builder).
-
 ### A PageRank Example
 
 Here we will go through an example of out-of-core graph analytic
@@ -275,5 +269,5 @@ with type "person" is extended to include a new property named
 *person-new-pagerank.vertex.yml* is saved) and the **VerticesBuilder**
 is used to write the results to new generated data chunks.
 
-Please refer to [more examples](examples/out-of-core.html) to learn
+Please refer to [more examples](examples/out-of-core.md) to learn
 about the other available case studies utilizing GraphAr.

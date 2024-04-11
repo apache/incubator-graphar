@@ -106,7 +106,7 @@ for the complete code.
 [Breadth First Search
 (BFS)](https://en.wikipedia.org/wiki/Breadth-first_search) is a
 traversing algorithm that starts from a selected vertex (the root) and
-traverse the graph layerwise thus exploring the neighbor vertices
+traverse the graph layer-wise thus exploring the neighbor vertices
 (vertices which are directly connected to the root), and then it moves
 towards the next-level neighbor vertices.
 

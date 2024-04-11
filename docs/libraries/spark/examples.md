@@ -16,8 +16,8 @@ Examples of this co-working integration have been provided as showcases.
 
 ### Transform GAR files
 
-We provide an example in [TestGraphTransformer.scala](test-graph-transformer), which demonstrates
-how to conduct data transformation at the graph level. [TransformExample.scala](transformer-example) is
+We provide an example in [TestGraphTransformer.scala][test-graph-transformer], which demonstrates
+how to conduct data transformation at the graph level. [TransformExample.scala][transformer-example] is
 another example for graph data conversion between different file types or different
 adjList types, which is implemented at the vertex/edge table level. To do this,
 the original data is first loaded into a Spark DataFrame using the GraphAr Spark Reader.
@@ -28,7 +28,7 @@ following the meta data defined in a new information file.
 ### Compute with GraphX
 
 Another important use case of GraphAr is to use it as a data source for graph
-computing or analytics; [ComputeExample.scala](compute-example) provides an example of constructing
+computing or analytics; [ComputeExample.scala][compute-example] provides an example of constructing
 a GraphX graph from reading GAR files and executing a connected-components computation.
 Also, executing queries with Spark SQL and running other graph analytic algorithms
 can be implemented in a similar fashion.
@@ -48,7 +48,7 @@ which is a mini graph application containing actors and directors that are relat
 Given some necessary information like the chunk size, the prefix of the file path, and the file type,
 the program can read the graph data from Neo4j and write it into GraphAr files.
 When exporting graph data from Neo4j and writing to GraphAr, please refer to the following code,
-with [Neo4j2GraphAr.scala](neo4j2graphar) providing a complete example.
+with [Neo4j2GraphAr.scala][neo4j2graphar] providing a complete example.
 
 ```scala
 def main(args: Array[String]): Unit = {
@@ -197,7 +197,7 @@ def putEdgeDataIntoNeo4j(graphInfo: GraphInfo,
 
 Finally, you will see the graph in Neo4j Browser after running the above code.
 
-See [GraphAr2Neo4j.scala](graphar2neo4j) for the complete example.
+See [GraphAr2Neo4j.scala][graphar2neo4j] for the complete example.
 
 > **tip:**
 > - The Neo4j Spark Connector offers different save modes and writing options, such as Append(CREATE) or Overwrite(MERGE). Please refer to its [documentation](https://neo4j.com/docs/spark/current/writing/) for more information and take the most appropriate method while using.
