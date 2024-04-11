@@ -39,7 +39,7 @@ concurrency:
 jobs:
   # TODO(@acezen): generate the API docs for cpp, java, spark, pyspark and upload as artifacts first
   build-website:
-  runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-20.04]
