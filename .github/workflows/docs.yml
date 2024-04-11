@@ -76,3 +76,5 @@ jobs:
       - name: Build
         working-directory: website
         run: pnpm build
+
+# TODO: enable markdownlint & typos
