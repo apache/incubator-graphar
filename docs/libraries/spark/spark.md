@@ -23,7 +23,7 @@ The GraphAr Spark library can be used in a range of scenarios:
 - Transforming GAR data between different adjList types (e.g., from COO to CSR).
 - Modifying existing GAR data (e.g., adding new vertices/edges).
 
-For more information on its usage, please refer to the `Examples <examples/spark.html>`_.
+For more information on its usage, please refer to the [Examples](examples.md).
 
 
 ## Get GraphAr Spark Library
@@ -50,7 +50,7 @@ mvn clean package -DskipTests -P datasources-33
 
 After compilation, a similar file *graphar-x.x.x-SNAPSHOT-shaded.jar* is generated in the directory *spark/graphar/target/*.
 
-Please refer to the `building steps <https://github.com/apache/incubator-graphar/tree/main/spark>`_ for more details.
+Please refer to the [building steps](https://github.com/apache/incubator-graphar/tree/main/spark) for more details.
 
 
 ## How to Use

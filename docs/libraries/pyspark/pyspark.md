@@ -90,7 +90,7 @@ You cannot install graphar-pyspark from PyPi for now.
 
 GraphAr PySpark is not a standalone library but bindings to GraphAr
 Scala. You need to have *graphar-spark-x.x.x.jar* in your *spark-jars*.
-Please refer to `GraphAr scala documentation <../spark/index>`\_ to get
+Please refer to [GraphAr scala documentation](../spark/spark.md) to get
 this JAR.
 
 

@@ -10,7 +10,7 @@ sidebar_position: 1
 ``graphar_pyspark`` is implemented as bindings to GraphAr spark scala
 library. You should have ``graphar-0.1.0-SNAPSHOT.jar`` in your
 Apache Spark JVM classpath. Otherwise you will get an exception. To
-add it spceify ``config("spark.jars", "path-to-graphar-jar")`` when
+add it specify ``config("spark.jars", "path-to-graphar-jar")`` when
 you create a SparkSession:
 
 ```python
@@ -21,7 +21,7 @@ spark = (
     .builder
     .master("local[1]")
     .appName("graphar-local-tests")
-    .config("spark.jars", "../../spark/target/graphar-0.1.0-SNAPSHOT.jar")
+    .config("spark.jars", "../../spark/graphar/target/graphar-0.1.0-SNAPSHOT.jar")
     .config("spark.log.level", "INFO")
     .getOrCreate()
 )
@@ -45,7 +45,7 @@ initialize(spark)
 
 ## GraphAr objects
 
-Now you can import, create and modify all the classes you can work
+Now you can import, create and modify all the classes you can
 call from [scala API of GraphAr](https://graphar.apache.org/docs/libraries/spark).
 For simplify using of graphar from python constants, like GAR-types,
 supported file-types, etc. are placed in ``graphar_pyspark.enums``.
@@ -98,7 +98,7 @@ print(type(python_property))
 ```
 
 You can always get a reference to the corresponding JVM object. For
-example, you want to use it in your own code and need a direct link
+example, if you want to use it in your own code and need a direct link
 to the underlaying instance of Scala Class, you can just call
 ``to_scala()`` method:
 
@@ -147,7 +147,7 @@ python_property.get_name()
 
 You can also modify fields, but be careful: when you modify field of
 instance of the Python class, you modify the underlaying Scala Object
-in the same moment!
+at the same moment!
 
 ```python
 new_name = "my_renamed_property"
