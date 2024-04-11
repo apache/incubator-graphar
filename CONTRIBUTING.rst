@@ -248,28 +248,6 @@ A PR can only be merged into main by a maintainer if:
 Any maintainer is allowed to merge a PR if all of these conditions are
 met.
 
-Shipping a release (maintainers only)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Maintainers need to do the following to push out a release:
-
-1. Switch to the main branch and make sure it's up to date.
-
-.. code:: shell
-
-    $ git checkout main
-    $ git pull upstream main
-
-2. Tag the release with a version number and push it to GitHub. Note that the version number should follow `semantic versioning <https://semver.org/#summary>`_. e.g.: v0.1.0.
-
-.. code:: shell
-
-    $ git tag -a v0.1.0 -m "GraphAr v0.1.0"
-    $ git push upstream v0.1.0
-
-3. The release draft will be automatically built to GitHub by GitHub Actions. You can edit the release notes draft on `GitHub <https://github.com/apache/incubator-graphar/releases>`_ to add more details.
-4. Publish the release.
-
 .. the reviewing part document is referred and derived from
 .. https://github.com/nodejs/node/blob/main/doc/contributing/pull-requests.md#the-process-of-making-changes
 

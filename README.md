@@ -262,7 +262,7 @@ we'd be happy to have you involved.
   Meeting](https://github.com/apache/incubator-graphar/wiki/GraphAr-Weekly-Community-Meeting).
 
 Read through our [community
-introduction](https://github.com/apache/incubator-graphar/tree/main/docs/developers/community.rst)
+introduction](https://graphar.apache.org/community/)
 to learn about our communication channels, governance, and more.
 
 # License
