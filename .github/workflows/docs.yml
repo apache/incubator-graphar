@@ -37,8 +37,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # TODO(@acezen): generate the API docs for cpp, java, spark, pyspark and upload as artifacts first
-  build:
+  build-website:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -67,8 +66,8 @@ jobs:
           ref: main
 
       - name: Sync docs to website
-          rsync -av docs website/docs
-        working-directory: {{ github.workspace }}
+        working-directory: ${{ github.workspace }}
+        run: rsync -av docs website/docs
     
       - name: Install Dependencies
         working-directory: website
