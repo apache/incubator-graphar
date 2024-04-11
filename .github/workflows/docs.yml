@@ -73,6 +73,6 @@ jobs:
         working-directory: website
         run: pnpm install --frozen-lockfile
 
-     - name: Build
+      - name: Build
         working-directory: website
         run: pnpm build
