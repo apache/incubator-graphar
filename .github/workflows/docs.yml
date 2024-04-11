@@ -67,7 +67,9 @@ jobs:
 
       - name: Sync docs to website
         working-directory: ${{ github.workspace }}
-        run: rsync -av docs website/docs
+        run: |
+          # Note: DO NOT omit the trailing slash in the source directory
+          rsync -av docs/ website/docs
     
       - name: Install Dependencies
         working-directory: website
