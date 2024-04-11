@@ -24,8 +24,6 @@ on:
   pull_request:
     branches:
       - main
-      - docs
-      - dev/docs
 
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
@@ -33,10 +31,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-20.04]
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v3
         with:
