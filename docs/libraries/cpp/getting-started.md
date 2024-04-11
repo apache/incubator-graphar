@@ -115,8 +115,7 @@ of the edges is **ordered_by_source**.
 
 The adjList in GAR describes the topology structure, i.e., the internal
 id of the source vertex and the destination vertex for each of a group
-of edges. As explained in [Edges in
-GraphAr](https://graphar.apache.org/docs/specification/format), the edges are separated
+of edges. As explained in [Edges in GraphAr](https://graphar.apache.org/docs/specification/format#edge-chunks-in-graphar), the edges are separated
 into edge chunks, and each edge chunk has its own adjList table and 0 or
 more property tables.
 
