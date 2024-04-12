@@ -79,7 +79,7 @@ file type, as well as all the property groups attached.
 It is allowed to store different types of adjLists for a group of
 edges at the same time.
 
-::
+:::
 
 ## GAR Data Files
 

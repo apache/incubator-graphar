@@ -199,10 +199,12 @@ Finally, you will see the graph in Neo4j Browser after running the above code.
 
 See [GraphAr2Neo4j.scala][graphar2neo4j] for the complete example.
 
-> **tip:**
-> - The Neo4j Spark Connector offers different save modes and writing options, such as Append(CREATE) or Overwrite(MERGE). Please refer to its [documentation](https://neo4j.com/docs/spark/current/writing/) for more information and take the most appropriate method while using.
-> - The Neo4j Spark Connector supports to use [Spark structured streaming API](https://neo4j.com/docs/spark/current/streaming), which works differently from Spark batching. One can utilize this API to read/write a stream from/to Neo4j, avoiding to maintain all data in the memory.
+:::tip
 
+- The Neo4j Spark Connector offers different save modes and writing options, such as Append(CREATE) or Overwrite(MERGE). Please refer to its [documentation](https://neo4j.com/docs/spark/current/writing/) for more information and take the most appropriate method while using.
+- The Neo4j Spark Connector supports to use [Spark structured streaming API](https://neo4j.com/docs/spark/current/streaming), which works differently from Spark batching. One can utilize this API to read/write a stream from/to Neo4j, avoiding to maintain all data in the memory.
+
+:::
 
 [test-graph-transformer]: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestGraphTransformer.scala
 [transformer-example]: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TransformExample.scala
