@@ -27,10 +27,6 @@ spark = (
 )
 ```
 
-
-   .. rubric:: GraphAr PySpark initialize
-      :name: graphar-pyspark-initialize
-
 ## GraphAr PySpark initialize
 
 PySpark bindings are heavily relying on JVM-calls via ``py4j``. To
@@ -70,9 +66,9 @@ for the more detailed information.
 GraphAr PySpark package provide two main ways how to initiate
 objects, like ``GraphInfo``:
 
-#. ``from_python(**args)`` when you create an object based on
+- ``from_python(**args)`` when you create an object based on
    python-arguments
-#. ``from_scala(jvm_ref)`` when you create an object from the
+- ``from_scala(jvm_ref)`` when you create an object from the
    corresponded JVM-object (``py4j.java_gateway.JavaObject``)
 
 
