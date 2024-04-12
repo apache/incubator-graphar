@@ -9,7 +9,7 @@ sidebar_position: 1
 
 This article is a quick guide that explains how to work with GraphAr
 C++. To begin with, please refer to the [Building
-Steps](https://github.com/apache/incubator-graphar/blob/main/README.rst#building-libraries)
+Steps](https://github.com/apache/incubator-graphar/blob/main/README.md#building-libraries)
 to install GraphAr.
 
 ## GAR Information Files
