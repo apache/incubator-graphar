@@ -9,7 +9,7 @@ sidebar_position: 1
 
 This article is a quick guide that explains how to work with GraphAr
 C++. To begin with, please refer to the [Building
-Steps](https://github.com/apache/incubator-graphar/blob/main/README.rst#building-libraries)
+Steps](https://github.com/apache/incubator-graphar/blob/main/README.md#building-libraries)
 to install GraphAr.
 
 ## GAR Information Files
@@ -79,7 +79,7 @@ file type, as well as all the property groups attached.
 It is allowed to store different types of adjLists for a group of
 edges at the same time.
 
-::
+:::
 
 ## GAR Data Files
 

@@ -213,7 +213,7 @@ There are certain limitations while using the Graph Transformer:
   -  The vertices (or edges) of the source and destination graphs are aligned by labels, meaning each vertex/edge label included in the destination graph must have an equivalent in the source graph, in order for the related chunks to be loaded as the data source.
   -  For each group of vertices/edges (i.e., each single label), each property included in the destination graph (defined in the relevant VertexInfo/EdgeInfo) must also be present in the source graph.
 
-  In addition, users can use the GraphAr Spark Reader/Writer to conduct data transformation more flexibly at the vertex/edge table level, as opposed to the graph level. This allows for a more granular approach to transforming data, as `TransformExample.scala`_ shows.
+  In addition, users can use the GraphAr Spark Reader/Writer to conduct data transformation more flexibly at the vertex/edge table level, as opposed to the graph level. This allows for a more granular approach to transforming data, as [TransformExample.scala][transform-example] shows.
 
 :::
 
@@ -226,12 +226,12 @@ For more information on usage, please refer to the examples:
 - [Neo4j2GraphAr.scala][neo4j2graphar] and [GraphAr2Neo4j.scala][graphar2neo4j] are examples to conduct data importing/exporting for Neo4j.
 
 
-[test-graph-info]: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestGraphInfo.scala
-[test-index-generator]: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestIndexGenerator.scala
-[test-writer]: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestWriter.scala
-[test-reader]: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestReader.scala
-[test-graph-transformer]: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TestGraphTransformer.scala
-[compute-example]: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/ComputeExample.scala
-[transform-example]: https://github.com/apache/incubator-graphar/blob/main/spark/src/test/scala/com/apache/incubator-graphar/TransformExample.scala
-[neo4j2graphar]: https://github.com/apache/incubator-graphar/blob/main/spark/src/main/scala/com/apache/incubator-graphar/example/Neo4j2GraphAr.scala
-[graphar2neo4j]: https://github.com/apache/incubator-graphar/blob/main/spark/src/main/scala/com/apache/incubator-graphar/example/GraphAr2Neo4j.scala
+[test-graph-info]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TestGraphInfo.scala
+[test-index-generator]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TestIndexGenerator.scala
+[test-writer]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TestWriter.scala
+[test-reader]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TestReader.scala
+[test-graph-transformer]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TestGraphTransformer.scala
+[compute-example]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/ComputeExample.scala
+[transform-example]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TransformExample.scala
+[neo4j2graphar]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/main/scala/org/apache/graphar/example/Neo4j2GraphAr.scala
+[graphar2neo4j]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/main/scala/org/apache/graphar/example/GraphAr2Neo4j.scala
