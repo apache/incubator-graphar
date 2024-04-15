@@ -33,8 +33,6 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: korandoru/hawkeye@v4
-
       - uses: actions/checkout@v4
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
