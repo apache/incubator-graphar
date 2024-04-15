@@ -33,7 +33,6 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-
       - uses: actions/checkout@v4
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
@@ -42,7 +41,4 @@ jobs:
           fetch-depth: 0
 
       - name: Check License Header
-        uses: apache/skywalking-eyes/header@main 
-        with:
-          config: .licenserc.yaml
-          mode: check
+        uses: korandoru/hawkeye@v4
