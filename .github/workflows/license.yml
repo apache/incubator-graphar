@@ -33,6 +33,7 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
+      - uses: korandoru/hawkeye@v4
 
       - uses: actions/checkout@v4
         with:
@@ -42,7 +43,4 @@ jobs:
           fetch-depth: 0
 
       - name: Check License Header
-        uses: apache/skywalking-eyes/header@main 
-        with:
-          config: .licenserc.yaml
-          mode: check
+        uses: korandoru/hawkeye@v4
