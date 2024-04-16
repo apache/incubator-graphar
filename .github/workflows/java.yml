@@ -64,13 +64,13 @@ jobs:
         working-directory: java
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64}
-          mvn spotless:check
+          mvn --no-transfer-progress spotless:check
       
       - name: Build Java Docs
         working-directory: java
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64}
-          mvn javadoc:javadoc
+          mvn --no-transfer-progress javadoc:javadoc
 
       - name: Run test
         working-directory: java
@@ -79,4 +79,4 @@ jobs:
           export JAVA_HOME=${JAVA_HOME_8_X64}
           export LLVM11_HOME=/usr/lib/llvm-11
           export GAR_TEST_DATA=$PWD/../testing/
-          mvn clean test -Dspotless.check.skip=true
+          mvn --no-transfer-progress clean test -Dspotless.check.skip=true

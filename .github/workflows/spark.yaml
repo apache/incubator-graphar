@@ -67,7 +67,7 @@ jobs:
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         echo "Build ${{ matrix.mvn-profile }}"
-        mvn clean package -DskipTests -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
+        mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
     
     - name: Build Spark Docs
       working-directory: spark
@@ -75,8 +75,8 @@ jobs:
         export JAVA_HOME=${JAVA_HOME_11_X64}
         echo "Build ${{ matrix.mvn-profile }}"
         # FIXME: the install is not necessary, but it is a workaround for the issue
-        mvn install --no-transfer-progress -DskipTests -Dspotless.check.skip=true
-        mvn scala:doc
+        mvn install --no-transfer-progress --no-transfer-progress -DskipTests -Dspotless.check.skip=true
+        mvn --no-transfer-progress scala:doc
 
     - name: Run test
       working-directory: spark
