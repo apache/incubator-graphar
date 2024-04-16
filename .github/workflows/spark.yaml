@@ -75,7 +75,7 @@ jobs:
         export JAVA_HOME=${JAVA_HOME_11_X64}
         echo "Build ${{ matrix.mvn-profile }}"
         # FIXME: the install is not necessary, but it is a workaround for the issue
-        mvn install -DskipTests -Dspotless.check.skip=true
+        mvn install --no-transfer-progress -DskipTests -Dspotless.check.skip=true
         mvn scala:doc
 
     - name: Run test
@@ -84,7 +84,7 @@ jobs:
         export JAVA_HOME=${JAVA_HOME_11_X64}
         export SPARK_TESTING=1
         echo "Test ${{ matrix.mvn-profile }}"
-        mvn test -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
+        mvn test --no-transfer-progress -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
 
     - name: Run Neo4j2GraphAr example
       working-directory: spark
