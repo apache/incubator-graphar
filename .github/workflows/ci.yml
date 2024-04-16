@@ -133,13 +133,13 @@ jobs:
       working-directory: "cpp/build"
       run: |
         export ASAN_OPTIONS=detect_leaks=0
-        export GAR_TEST_DATA=$PWD/../testing/
-        make test
+        export GAR_TEST_DATA=${workspace}/testing/
+        ctest --output-on-failure
     
     - name: Benchmark
       working-directory: "cpp/build"
       run: |
-        export GAR_TEST_DATA=$PWD/../testing/
+        export GAR_TEST_DATA=${workspace}/testing/
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
     
