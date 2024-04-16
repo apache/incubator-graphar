@@ -122,12 +122,12 @@ jobs:
     - name: Build Docs
       working-directory: "cpp/build"
       run: |
-        make gar-cpp-doc
+        cmake -DENABLE_DOCS=ON ..
+        make docs
 
     - name: Build GraphAr
       working-directory: "cpp/build"
-      run: |
-        make -j$(nproc)
+      run: make -j$(nproc)
 
     - name: Test
       working-directory: "cpp/build"
