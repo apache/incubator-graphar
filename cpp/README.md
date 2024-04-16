@@ -110,16 +110,13 @@ After the building, you can install the GraphAr C++ library with:
 
 ### Generate API document
 
-Building the API document with Doxygen:
+You should build the project with `ENABLE_DOCS` option. Then run:
 
 ```bash
-    $ cd GraphAr/cpp
-    $ pushd apidoc
-    $ doxgen
-    $ popd
+   make docs
 ```
 
-The API document is generated in the directory ``cpp/apidoc/html``.
+The API document is generated in the directory ``docs_doxygen``.
 
 ## How to use
 

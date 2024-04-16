@@ -38,10 +38,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  GraphAr-java:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
           
@@ -61,18 +61,22 @@ jobs:
           sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
           
       - name: Code Format Check
+        working-directory: java
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64}
-          pushd java 
           mvn spotless:check
-          popd
+      
+      - name: Build Java Docs
+        working-directory: java
+        run: |
+          export JAVA_HOME=${JAVA_HOME_11_X64}
+          mvn javadoc:javadoc
 
       - name: Run test
+        working-directory: java
         run: |
           # Temporarily using Java 8, related issue: https://github.com/apache/incubator-graphar/issues/277
           export JAVA_HOME=${JAVA_HOME_8_X64}
           export LLVM11_HOME=/usr/lib/llvm-11
-          pushd java
           export GAR_TEST_DATA=$PWD/../testing/
           mvn clean test -Dspotless.check.skip=true
-          popd

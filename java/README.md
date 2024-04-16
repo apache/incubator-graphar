@@ -70,6 +70,16 @@ Then set GraphAr as a dependency in maven project:
 </dependencies>
 ```
 
+## Generate API document
+
+Building the API document with maven:
+
+```bash
+mvn javadoc:javadoc
+```
+
+The API document will be generated in the `target/site/apidocs` directory.
+
 ## How to use
 
 Please refer to [GraphAr Java Library Documentation](https://graphar.apache.org/GraphAr/user-guide/java-lib.html).

@@ -43,6 +43,27 @@ project(graph-archive LANGUAGES C CXX VERSION ${GAR_VERSION})
 option(BUILD_TESTS "Build unit tests" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_BENCHMARKS "Build benchmarks" OFF)
+option(ENABLE_DOCS "Enable documentation" OFF)
+option(BUILD_DOCS_ONLY "Build docs only" OFF)
+
+if (ENABLE_DOCS OR BUILD_DOCS_ONLY)
+    set(PROJECT_DOCUMENT_SOURCE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/README.md)
+    string(REPLACE ";" " " PROJECT_DOCUMENT_SOURCE "${PROJECT_DOCUMENT_SOURCE}")
+    file(DOWNLOAD https://cdn.jsdelivr.net/gh/jothepro/doxygen-awesome-css@2.2.1/doxygen-awesome.min.css ${CMAKE_BINARY_DIR}/doxygen-awesome.css)
+    find_package(Doxygen REQUIRED)
+    set(DOXYGEN_IN ${PROJECT_SOURCE_DIR}/Doxyfile)
+    set(DOXYGEN_OUT ${CMAKE_BINARY_DIR}/Doxyfile.out)
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    add_custom_target(docs
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM)
+
+    if (BUILD_DOCS_ONLY)
+        return()
+    endif()
+endif()
 
 # ------------------------------------------------------------------------------
 # setting default cmake type to Release
@@ -451,19 +472,3 @@ add_custom_target(gar-cpplint
         COMMAND ${PROJECT_SOURCE_DIR}/misc/cpplint.py --root=${PROJECT_SOURCE_DIR}/include ${FILES_NEED_LINT}
         COMMENT "Running cpplint check."
         VERBATIM)
-
-# ------------------------------------------------------------------------------
-# build cpp api doc
-# ------------------------------------------------------------------------------
-find_program(doxygen_EXECUTABLE doxygen NO_CMAKE_SYSTEM_PATH)
-if(doxygen_EXECUTABLE)
-    add_custom_target(gar-cpp-doc
-        COMMAND ${doxygen_EXECUTABLE}
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/apidoc
-        VERBATIM
-    )
-else()
-    if(NOT doxygen_EXECUTABLE)
-        message(STATUS "Cannot find the doxygen executable.")
-    endif()
-endif()

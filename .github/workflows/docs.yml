@@ -21,15 +21,14 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'docs/**'
+      - '.github/workflows/docs.yml'
   pull_request:
     branches:
       - main
     paths:
       - 'docs/**'
-      - 'cpp/**'
-      - 'java/**'
-      - 'spark/**'
-      - 'pyspark/**'
       - '.github/workflows/docs.yml'
 
 concurrency:

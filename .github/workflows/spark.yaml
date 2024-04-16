@@ -38,7 +38,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  GraphAr-spark:
+  test:
     runs-on: ubuntu-20.04
     strategy:
       fail-fast: false
@@ -52,38 +52,44 @@ jobs:
             spark-hadoop: "spark-3.3.4-bin-hadoop3"
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
           submodules: true
 
     - name: Code Format Check
+      working-directory: spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
-        pushd spark
         mvn --no-transfer-progress spotless:check
-        popd
 
     - name: Build GraphAr Spark
+      working-directory: spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
-        pushd spark
         echo "Build ${{ matrix.mvn-profile }}"
-        mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
-        popd
+        mvn clean package -DskipTests -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
+    
+    - name: Build Spark Docs
+      working-directory: spark
+      run: |
+        export JAVA_HOME=${JAVA_HOME_11_X64}
+        echo "Build ${{ matrix.mvn-profile }}"
+        # FIXME: the install is not necessary, but it is a workaround for the issue
+        mvn install -DskipTests -Dspotless.check.skip=true
+        mvn scala:doc
 
     - name: Run test
+      working-directory: spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         export SPARK_TESTING=1
-        pushd spark
         echo "Test ${{ matrix.mvn-profile }}"
-        mvn --no-transfer-progress test -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
-        popd
+        mvn test -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
 
     - name: Run Neo4j2GraphAr example
+      working-directory: spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
-        pushd spark
         scripts/get-spark-to-home.sh ${{ matrix.spark }} ${{ matrix.spark-hadoop }}
         export SPARK_HOME="${HOME}/${{ matrix.spark-hadoop }}"
         export PATH="${SPARK_HOME}/bin":"${PATH}"
@@ -105,13 +111,10 @@ jobs:
         echo "match (a) -[r] -> () delete a, r;match (a) delete a;" | cypher-shell -u ${NEO4J_USR} -p ${NEO4J_PWD} -d neo4j --format plain
         scripts/run-graphar2neo4j.sh
 
-        # stop and clean
-        popd
-
     - name: Run Nebula2GraphAr example
+      working-directory: spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
-        pushd spark
         scripts/get-nebula-to-home.sh
         export SPARK_HOME="${HOME}/${{ matrix.spark-hadoop }}"
         export PATH="${SPARK_HOME}/bin":"${PATH}"
@@ -134,13 +137,10 @@ jobs:
         # import from GraphAr
         scripts/run-graphar2nebula.sh
 
-        # stop and clean
-        popd
-
     - name: Run Neo4j importer
+      working-directory: spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
-        pushd spark
         export SPARK_HOME="${HOME}/${{ matrix.spark-hadoop }}"
         export PATH="${SPARK_HOME}/bin":"${PATH}"
 
@@ -149,6 +149,3 @@ jobs:
         # run the importer
         cd import
         ./neo4j.sh neo4j.json
-
-        # stop and clean
-        popd
