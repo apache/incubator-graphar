@@ -18,7 +18,7 @@
 .PHONY: install_test
 install_test:
 		export JAVA_HOME=${JAVA_HOME_11_X64}
-		cd ../spark && mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true && cd ../pyspark
+		cd ../spark && mvn clean package -DskipTests -Dspotless.check.skip=true && cd ../pyspark
 		export PYSPARK_HADOOP_VERSION=3.2
 		poetry install --with=spark,tests
 
@@ -49,7 +49,7 @@ lint_fix:
 
 .PHONY: install_docs
 install_docs:
-		poetry install --with=docs
+		poetry install --with=spark,docs
 
 .PHONY: docs
 docs:
