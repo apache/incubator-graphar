@@ -45,3 +45,11 @@ lint:
 .PHONY: lint_fix
 lint_fix:
 		poetry run ruff check --fix graphar_pyspark/
+
+.PHONY: install_docs
+install_docs:
+		poetry install --with=spark,docs
+
+.PHONY: docs
+docs:
+		poetry run pdoc -t ./template --output-dir ./docs graphar_pyspark

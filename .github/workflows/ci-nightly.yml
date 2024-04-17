@@ -28,7 +28,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' && github.repository == 'apache/incubator-graphar' }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
           submodules: true
 

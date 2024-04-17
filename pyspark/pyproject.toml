@@ -50,17 +50,7 @@ pyyaml = "*"
 optional = true
 
 [tool.poetry.group.docs.dependencies]
-breathe = "*"
-docutils = "*"
-furo = "*" # sphinx theme
-nbsphinx = "*"
-sphinx = ">=3.0.2"
-jinja2 = ">=3.1.2"
-sphinx-copybutton = "*"
-sphinx-panels = "*"
-sphinxemoji = "*"
-sphinxext-opengraph = "*"
-markupsafe = "2.0.1"
+pdoc = "*"
 
 [tool.ruff]
 exclude = ["tests"]

@@ -40,10 +40,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  GraphAr-spark:
+  test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
           submodules: true
 
@@ -53,24 +53,27 @@ jobs:
         python-version: 3.9
 
     - name: Install Poetry
+      working-directory: pyspark
       run: |
         yes | sudo python3 -m pip install poetry --quiet
-        cd pyspark
         poetry env use python3
 
-    - name: Install Spark Scala && PySpark
-      run: |
-        cd pyspark
-        make install_test
-
-    - name: Run PyTest
-      run: |
-        cd pyspark
-        make test
-
     - name: Lint
+      working-directory: pyspark
       run: |
-        cd pyspark
         make install_lint
         make lint
+    
+    - name: Build Docs
+      working-directory: pyspark
+      run: |
+        make install_docs
+        make docs
 
+    - name: Install Spark Scala && PySpark
+      working-directory: pyspark
+      run: make install_test
+
+    - name: Run PyTest
+      working-directory: pyspark
+      run: make test

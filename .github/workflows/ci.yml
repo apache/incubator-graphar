@@ -40,6 +40,8 @@ concurrency:
 jobs:
   GraphAr-ubuntu-arrow-installed:
     runs-on: ubuntu-latest
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/testing/
     steps:
     - uses: actions/checkout@v3
       with:
@@ -57,7 +59,7 @@ jobs:
                             libarrow-dataset-dev=14.0.1-1 \
                             libarrow-acero-dev=14.0.1-1 \
                             libparquet-dev=14.0.1-1
-        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen
 
         # install benchmark
         git clone --branch v1.8.3 https://github.com/google/benchmark.git --depth 1
@@ -67,19 +69,18 @@ jobs:
         popd
 
     - name: CMake
+      working-directory: "cpp"
       run: |
         mkdir build
-        pushd build
-        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        popd
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
 
     - name: Cpp Format and lint
+      working-directory: "cpp/build"
       run: |
         # install clang-format
         sudo curl -L https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-22538c65/clang-format-8_linux-amd64 --output /usr/bin/clang-format
         sudo chmod +x /usr/bin/clang-format
-
-        pushd build
 
         # validate format
         function prepend() { while read line; do echo "${1}${line}"; done; }
@@ -120,29 +121,27 @@ jobs:
             exit -1
         fi
 
-        popd
+    - name: Build Docs
+      working-directory: "cpp/build"
+      run: |
+        cmake -DENABLE_DOCS=ON ..
+        make docs
 
     - name: Build GraphAr
-      run: |
-        pushd build
-        make -j$(nproc)
-        popd
+      working-directory: "cpp/build"
+      run: make -j$(nproc)
 
     - name: Test
+      working-directory: "cpp/build"
       run: |
-        pushd build
         export ASAN_OPTIONS=detect_leaks=0
-        export GAR_TEST_DATA=$PWD/../testing/
-        make test
-        popd
+        ctest --output-on-failure
     
     - name: Benchmark
+      working-directory: "cpp/build"
       run: |
-        pushd build
-        export GAR_TEST_DATA=$PWD/../testing/
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
-        popd
     
   GraphAr-centos-arrow-installed:
     runs-on: ubuntu-latest
@@ -178,9 +177,10 @@ jobs:
 
     - name: Build GraphAr
       shell: scl enable devtoolset-8 -- bash --noprofile --norc -eo pipefail {0}
+      working-directory: "cpp"
       run: |
         mkdir build
         pushd build
-        cmake ../cpp
+        cmake ..
         make -j$(nproc)
         popd

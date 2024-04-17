@@ -16,3 +16,14 @@ poetry install
 ```
 
 It creates a `tar.gz` file in `dist` directory.
+
+## Generating API documentation
+
+To generate API documentation, run the following command:
+
+```shell
+poetry install --with=docs
+poetry run pdoc -t ./template --output-dir ./docs graphar_pyspark
+```
+
+The documentation will be generated in the `docs` directory.
