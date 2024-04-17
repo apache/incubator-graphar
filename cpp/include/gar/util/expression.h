@@ -17,15 +17,14 @@
  * under the License.
  */
 
+#pragma once
+
 #include <memory>
 #include <string>
 
 #include "arrow/compute/api.h"
 
 #include "gar/graph_info.h"
-
-#ifndef GAR_UTIL_EXPRESSION_H_
-#define GAR_UTIL_EXPRESSION_H_
 
 namespace graphar {
 
@@ -357,4 +356,3 @@ template <typename T,
   return std::make_shared<ExpressionOr>(lhs, rhs);
 }
 }  // namespace graphar
-#endif  // GAR_UTIL_EXPRESSION_H_

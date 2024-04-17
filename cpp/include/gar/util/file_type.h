@@ -17,15 +17,14 @@
  * under the License.
  */
 
+#pragma once
+
 #include <map>
 #include <stdexcept>
 #include <string>
 
 #include "gar/fwd.h"
 #include "gar/util/macros.h"
-
-#ifndef GAR_UTIL_FILE_TYPE_H_
-#define GAR_UTIL_FILE_TYPE_H_
 
 namespace graphar {
 
@@ -50,4 +49,3 @@ static inline const char* FileTypeToString(FileType file_type) {
 }
 
 }  // namespace graphar
-#endif  // GAR_UTIL_FILE_TYPE_H_

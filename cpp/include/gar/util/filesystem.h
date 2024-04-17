@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_UTIL_FILESYSTEM_H_
-#define GAR_UTIL_FILESYSTEM_H_
+#pragma once
 
 #include <memory>
 #include <optional>
@@ -152,4 +151,3 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri, std::string* out_path = nullptr);
 
 }  // namespace graphar
-#endif  // GAR_UTIL_FILESYSTEM_H_

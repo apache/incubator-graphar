@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_UTIL_READER_UTIL_H_
-#define GAR_UTIL_READER_UTIL_H_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -77,4 +76,3 @@ Result<IdType> GetEdgeNum(const std::string& prefix,
 
 }  // namespace util
 }  // namespace graphar
-#endif  // GAR_UTIL_READER_UTIL_H_

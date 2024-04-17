@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_UTIL_RESULT_H_
-#define GAR_UTIL_RESULT_H_
+#pragma once
 
 #include <utility>
 
@@ -121,4 +120,3 @@ inline Status GenericToStatus(Result<T>&& res) {
 }  // namespace internal
 
 }  // namespace graphar
-#endif  // GAR_UTIL_RESULT_H_

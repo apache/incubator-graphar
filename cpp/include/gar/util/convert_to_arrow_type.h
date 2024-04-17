@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_UTIL_CONVERT_TO_ARROW_TYPE_H_
-#define GAR_UTIL_CONVERT_TO_ARROW_TYPE_H_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -79,5 +78,3 @@ CONVERT_TO_ARROW_TYPE(Type::DATE, Date, arrow::Date32Type, arrow::Date32Array,
                       arrow::Date32Builder, arrow::date32(), "date")
 
 }  // namespace graphar
-
-#endif  // GAR_UTIL_CONVERT_TO_ARROW_TYPE_H_

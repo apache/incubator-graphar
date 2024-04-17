@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_UTIL_YAML_H_
-#define GAR_UTIL_YAML_H_
+#pragma once
 
 #include <iosfwd>
 #include <memory>
@@ -69,4 +68,3 @@ class Yaml {
 };
 
 }  // namespace graphar
-#endif  // GAR_UTIL_YAML_H_

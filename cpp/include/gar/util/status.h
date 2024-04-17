@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_UTIL_STATUS_H_
-#define GAR_UTIL_STATUS_H_
+#pragma once
 
 #include <sstream>
 #include <string>
@@ -280,5 +279,3 @@ inline Status GenericToStatus(Status&& st) { return std::move(st); }
 }  // namespace internal
 
 }  // namespace graphar
-
-#endif  // GAR_UTIL_STATUS_H_

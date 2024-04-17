@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_GRAPH_INFO_H_
-#define GAR_GRAPH_INFO_H_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -875,4 +874,3 @@ class GraphInfo {
 };
 
 }  // namespace graphar
-#endif  // GAR_GRAPH_INFO_H_

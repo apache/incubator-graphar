@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_UTIL_DATA_TYPE_H_
-#define GAR_UTIL_DATA_TYPE_H_
+#pragma once
 
 #include <map>
 #include <memory>
@@ -160,5 +159,3 @@ class Date {
 };
 
 }  // namespace graphar
-
-#endif  // GAR_UTIL_DATA_TYPE_H_
