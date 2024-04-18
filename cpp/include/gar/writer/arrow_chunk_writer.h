@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_WRITER_ARROW_CHUNK_WRITER_H_
-#define GAR_WRITER_ARROW_CHUNK_WRITER_H_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -733,4 +732,3 @@ class EdgeChunkWriter {
 };
 
 }  // namespace graphar
-#endif  // GAR_WRITER_ARROW_CHUNK_WRITER_H_

@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_WRITER_VERTICES_BUILDER_H_
-#define GAR_WRITER_VERTICES_BUILDER_H_
+#pragma once
 
 #include <any>
 #include <memory>
@@ -350,4 +349,3 @@ class VerticesBuilder {
 
 }  // namespace builder
 }  // namespace graphar
-#endif  // GAR_WRITER_VERTICES_BUILDER_H_
