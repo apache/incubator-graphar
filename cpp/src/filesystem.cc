@@ -283,7 +283,9 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
         auto arrow_fs,
         arrow::fs::FileSystemFromUriOrPath(uri_string, out_path));
     // arrow would delete the last slash, so use uri string
-    *out_path = uri_string;
+    if (out_path != nullptr) {
+      *out_path = uri_string;
+    }
     return std::make_shared<FileSystem>(arrow_fs);
   }
 

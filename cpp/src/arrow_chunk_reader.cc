@@ -18,18 +18,110 @@
  */
 
 #include "arrow/api.h"
+#include "arrow/compute/api.h"
 
 #include "gar/graph_info.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/util/adj_list_type.h"
 #include "gar/util/data_type.h"
 #include "gar/util/filesystem.h"
+#include "gar/util/general_params.h"
 #include "gar/util/reader_util.h"
 #include "gar/util/result.h"
 #include "gar/util/status.h"
 #include "gar/util/util.h"
 
 namespace graphar {
+
+namespace {
+
+Result<std::shared_ptr<arrow::Schema>> PropertyGroupToSchema(
+    const std::shared_ptr<PropertyGroup> pg,
+    bool contain_index_column = false) {
+  std::vector<std::shared_ptr<arrow::Field>> fields;
+  if (contain_index_column) {
+    fields.push_back(std::make_shared<arrow::Field>(
+        GeneralParams::kVertexIndexCol, arrow::int64()));
+  }
+  for (const auto& prop : pg->GetProperties()) {
+    fields.push_back(std::make_shared<arrow::Field>(
+        prop.name, DataType::DataTypeToArrowDataType(prop.type)));
+  }
+  return arrow::schema(fields);
+}
+
+Status GeneralCast(const std::shared_ptr<arrow::Array>& in,
+                   const std::shared_ptr<arrow::DataType>& to_type,
+                   std::shared_ptr<arrow::Array>& out) {
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(out, arrow::compute::Cast(*in, to_type));
+  return Status::OK();
+}
+
+Status CastStringToLargeString(const std::shared_ptr<arrow::Array>& in,
+                               const std::shared_ptr<arrow::DataType>& to_type,
+                               std::shared_ptr<arrow::Array>& out) {
+  auto array_data = in->data()->Copy();
+  auto offset = array_data->buffers[1];
+  using from_offset_type = typename arrow::StringArray::offset_type;
+  using to_string_offset_type = typename arrow::LargeStringArray::offset_type;
+  auto raw_value_offsets_ =
+      offset == NULLPTR
+          ? NULLPTR
+          : reinterpret_cast<const from_offset_type*>(offset->data());
+  std::vector<to_string_offset_type> to_offset(offset->size() /
+                                               sizeof(from_offset_type));
+  for (size_t i = 0; i < to_offset.size(); ++i) {
+    to_offset[i] = raw_value_offsets_[i];
+  }
+  std::shared_ptr<arrow::Buffer> buffer;
+  arrow::TypedBufferBuilder<to_string_offset_type> buffer_builder;
+  RETURN_NOT_ARROW_OK(
+      buffer_builder.Append(to_offset.data(), to_offset.size()));
+  RETURN_NOT_ARROW_OK(buffer_builder.Finish(&buffer));
+  array_data->type = to_type;
+  array_data->buffers[1] = buffer;
+  out = arrow::MakeArray(array_data);
+  RETURN_NOT_ARROW_OK(out->ValidateFull());
+  return Status::OK();
+}
+
+// helper function to cast arrow::Table with a schema
+Status CastTableWithSchema(const std::shared_ptr<arrow::Table>& table,
+                           const std::shared_ptr<arrow::Schema>& schema,
+                           std::shared_ptr<arrow::Table>& out_table) {
+  if (table->schema()->Equals(*schema)) {
+    out_table = table;
+  }
+  std::vector<std::shared_ptr<arrow::ChunkedArray>> columns;
+  for (int64_t i = 0; i < table->num_columns(); ++i) {
+    auto column = table->column(i);
+    if (table->field(i)->type()->Equals(schema->field(i)->type())) {
+      columns.push_back(column);
+      continue;
+    }
+    auto from_t = table->field(i)->type();
+    auto to_t = schema->field(i)->type();
+    std::vector<std::shared_ptr<arrow::Array>> chunks;
+    // process cast for each chunk
+    for (int64_t j = 0; j < column->num_chunks(); ++j) {
+      auto chunk = column->chunk(j);
+      std::shared_ptr<arrow::Array> out;
+      if (arrow::compute::CanCast(*from_t, *to_t)) {
+        GAR_RETURN_NOT_OK(GeneralCast(chunk, to_t, out));
+        chunks.push_back(out);
+      } else if (from_t->Equals(arrow::utf8()) &&
+                 to_t->Equals(arrow::large_utf8())) {
+        GAR_RETURN_NOT_OK(CastStringToLargeString(chunk, to_t, out));
+        chunks.push_back(out);
+      }
+    }
+    columns.push_back(std::make_shared<arrow::ChunkedArray>(chunks, to_t));
+  }
+
+  out_table = arrow::Table::Make(schema, columns);
+  return Status::OK();
+}
+}  // namespace
 
 VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
     const std::shared_ptr<VertexInfo>& vertex_info,
@@ -39,6 +131,7 @@ VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
       property_group_(std::move(property_group)),
       chunk_index_(0),
       seek_id_(0),
+      schema_(nullptr),
       chunk_table_(nullptr),
       filter_options_(options) {
   GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
@@ -49,6 +142,8 @@ VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
                             util::GetVertexChunkNum(prefix_, vertex_info));
   GAR_ASSIGN_OR_RAISE_ERROR(vertex_num_,
                             util::GetVertexNum(prefix_, vertex_info_));
+  GAR_ASSIGN_OR_RAISE_ERROR(schema_,
+                            PropertyGroupToSchema(property_group_, true));
 }
 
 Status VertexPropertyArrowChunkReader::seek(IdType id) {
@@ -79,6 +174,11 @@ VertexPropertyArrowChunkReader::GetChunk() {
     GAR_ASSIGN_OR_RAISE(
         chunk_table_, fs_->ReadFileToTable(path, property_group_->GetFileType(),
                                            filter_options_));
+    // TODO: filter pushdown doesn't support cast schema now
+    if (schema_ != nullptr && filter_options_.filter == nullptr) {
+      GAR_RETURN_NOT_OK(
+          CastTableWithSchema(chunk_table_, schema_, chunk_table_));
+    }
   }
   IdType row_offset = seek_id_ - chunk_index_ * vertex_info_->GetChunkSize();
   return chunk_table_->Slice(row_offset);
@@ -469,6 +569,7 @@ AdjListPropertyArrowChunkReader::AdjListPropertyArrowChunkReader(
       vertex_chunk_index_(0),
       chunk_index_(0),
       seek_offset_(0),
+      schema_(nullptr),
       chunk_table_(nullptr),
       filter_options_(options),
       chunk_num_(-1) /* -1 means uninitialized */ {
@@ -480,6 +581,8 @@ AdjListPropertyArrowChunkReader::AdjListPropertyArrowChunkReader(
   GAR_ASSIGN_OR_RAISE_ERROR(
       vertex_chunk_num_,
       util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));
+  GAR_ASSIGN_OR_RAISE_ERROR(schema_,
+                            PropertyGroupToSchema(property_group, false));
 }
 
 AdjListPropertyArrowChunkReader::AdjListPropertyArrowChunkReader(
@@ -491,6 +594,7 @@ AdjListPropertyArrowChunkReader::AdjListPropertyArrowChunkReader(
       vertex_chunk_index_(other.vertex_chunk_index_),
       chunk_index_(other.chunk_index_),
       seek_offset_(other.seek_offset_),
+      schema_(other.schema_),
       chunk_table_(nullptr),
       filter_options_(other.filter_options_),
       vertex_chunk_num_(other.vertex_chunk_num_),
@@ -593,6 +697,11 @@ AdjListPropertyArrowChunkReader::GetChunk() {
     GAR_ASSIGN_OR_RAISE(
         chunk_table_, fs_->ReadFileToTable(path, property_group_->GetFileType(),
                                            filter_options_));
+    // TODO: filter pushdown doesn't support cast schema now
+    if (schema_ != nullptr && filter_options_.filter == nullptr) {
+      GAR_RETURN_NOT_OK(
+          CastTableWithSchema(chunk_table_, schema_, chunk_table_));
+    }
   }
   IdType row_offset = seek_offset_ - chunk_index_ * edge_info_->GetChunkSize();
   return chunk_table_->Slice(row_offset);
