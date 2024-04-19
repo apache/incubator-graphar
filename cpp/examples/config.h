@@ -17,11 +17,10 @@
  * under the License.
  */
 
+#pragma once
+
 #include <filesystem>
 #include <string>
-
-#ifndef CPP_EXAMPLES_CONFIG_H_
-#define CPP_EXAMPLES_CONFIG_H_
 
 // Define a new macro that is just like the standard C assert macro,
 // except that it works even in optimized builds (where NDEBUG is
@@ -65,5 +64,3 @@ static const std::string TEST_DATA_DIR =  // NOLINT
         .parent_path()
         .string() +
     "/testing";
-
-#endif  // CPP_EXAMPLES_CONFIG_H_

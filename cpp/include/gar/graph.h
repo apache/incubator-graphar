@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_GRAPH_H_
-#define GAR_GRAPH_H_
+#pragma once
 
 #include <any>
 #include <limits>
@@ -1094,5 +1093,3 @@ class UBDEdgesCollection : public EdgesCollection {
   }
 };
 }  // namespace graphar
-
-#endif  // GAR_GRAPH_H_

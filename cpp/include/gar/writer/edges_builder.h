@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_WRITER_EDGES_BUILDER_H_
-#define GAR_WRITER_EDGES_BUILDER_H_
+#pragma once
 
 #include <algorithm>
 #include <any>
@@ -429,4 +428,3 @@ class EdgesBuilder {
 
 }  // namespace builder
 }  // namespace graphar
-#endif  // GAR_WRITER_EDGES_BUILDER_H_

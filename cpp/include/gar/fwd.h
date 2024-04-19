@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_FWD_H_
-#define GAR_FWD_H_
+#pragma once
 
 #include <memory>
 #include <optional>
@@ -211,5 +210,3 @@ using ColumnNames =
 }  // namespace util
 
 }  // namespace graphar
-
-#endif  // GAR_FWD_H_

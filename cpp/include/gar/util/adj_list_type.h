@@ -17,14 +17,13 @@
  * under the License.
  */
 
+#pragma once
+
 #include <map>
 #include <string>
 #include <utility>
 
 #include "gar/util/macros.h"
-
-#ifndef GAR_UTIL_ADJ_LIST_TYPE_H_
-#define GAR_UTIL_ADJ_LIST_TYPE_H_
 
 namespace graphar {
 
@@ -90,4 +89,3 @@ static inline std::pair<bool, std::string> AdjListTypeToOrderedAligned(
 }
 
 }  // namespace graphar
-#endif  // GAR_UTIL_ADJ_LIST_TYPE_H_

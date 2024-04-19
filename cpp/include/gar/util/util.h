@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_UTIL_UTIL_H_
-#define GAR_UTIL_UTIL_H_
+#pragma once
 
 #include <memory>
 #include <numeric>
@@ -252,4 +251,3 @@ using DoubleArray = Array<double>;
 using StringArray = Array<std::string_view>;
 
 }  // namespace graphar
-#endif  // GAR_UTIL_UTIL_H_

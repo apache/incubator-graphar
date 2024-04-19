@@ -17,6 +17,8 @@
  * under the License.
  */
 
+#pragma once
+
 #include <filesystem>
 #include <memory>
 #include <string>
@@ -25,9 +27,6 @@
 
 #include "gar/graph_info.h"
 #include "gar/util/status.h"
-
-#ifndef CPP_BENCHMARKS_BENCHMARK_UTIL_H_
-#define CPP_BENCHMARKS_BENCHMARK_UTIL_H_
 
 namespace graphar {
 
@@ -61,5 +60,3 @@ class BenchmarkFixture : public ::benchmark::Fixture {
   std::shared_ptr<GraphInfo> graph_info_;
 };
 }  // namespace graphar
-
-#endif  // CPP_BENCHMARKS_BENCHMARK_UTIL_H_

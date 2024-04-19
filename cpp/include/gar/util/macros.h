@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_UTIL_MACROS_H_
-#define GAR_UTIL_MACROS_H_
+#pragma once
 
 #include <cstdint>
 
@@ -44,5 +43,3 @@
 #define GAR_PREDICT_FALSE(x) (x)
 #define GAR_PREDICT_TRUE(x) (x)
 #endif
-
-#endif  // GAR_UTIL_MACROS_H_

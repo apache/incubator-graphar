@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_UTIL_VERSION_PARSER_H_
-#define GAR_UTIL_VERSION_PARSER_H_
+#pragma once
 
 #include <map>
 #include <memory>
@@ -111,4 +110,3 @@ class InfoVersion {
 };
 
 }  // namespace graphar
-#endif  // GAR_UTIL_VERSION_PARSER_H_

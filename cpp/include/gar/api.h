@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_API_H_
-#define GAR_API_H_
+#pragma once
 
 #include "gar/graph_info.h"
 #include "gar/util/adj_list_type.h"
@@ -32,5 +31,3 @@
 #include "gar/util/util.h"
 #include "gar/util/version_parser.h"
 #include "gar/util/yaml.h"
-
-#endif  // GAR_API_H_

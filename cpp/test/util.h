@@ -17,13 +17,12 @@
  * under the License.
  */
 
+#pragma once
+
 #include <filesystem>
 #include <string>
 
 #include "gar/util/status.h"
-
-#ifndef CPP_TEST_UTIL_H_
-#define CPP_TEST_UTIL_H_
 
 namespace graphar {
 
@@ -40,5 +39,3 @@ Status GetTestResourceRoot(std::string* out) {
 }
 
 }  // namespace graphar
-
-#endif  // CPP_TEST_UTIL_H_

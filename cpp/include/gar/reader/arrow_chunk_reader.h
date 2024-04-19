@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_READER_ARROW_CHUNK_READER_H_
-#define GAR_READER_ARROW_CHUNK_READER_H_
+#pragma once
 
 #include <memory>
 #include <string>
@@ -508,4 +507,3 @@ class AdjListPropertyArrowChunkReader {
   std::shared_ptr<FileSystem> fs_;
 };
 }  // namespace graphar
-#endif  // GAR_READER_ARROW_CHUNK_READER_H_

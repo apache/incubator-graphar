@@ -17,8 +17,7 @@
  * under the License.
  */
 
-#ifndef GAR_UTIL_WRITER_UTIL_H_
-#define GAR_UTIL_WRITER_UTIL_H_
+#pragma once
 
 #include "gar/util/macros.h"
 
@@ -42,4 +41,3 @@ enum class ValidateLevel : char {
 };
 
 }  // namespace graphar
-#endif  // GAR_UTIL_WRITER_UTIL_H_
