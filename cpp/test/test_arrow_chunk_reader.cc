@@ -24,7 +24,9 @@
 #include "./util.h"
 #include "gar/reader/arrow_chunk_reader.h"
 #include "gar/util/adj_list_type.h"
+#include "gar/util/data_type.h"
 #include "gar/util/expression.h"
+#include "gar/util/filesystem.h"
 #include "gar/util/general_params.h"
 
 #define CATCH_CONFIG_MAIN
@@ -94,6 +96,40 @@ TEST_CASE("ArrowChunkReader") {
       REQUIRE(reader->next_chunk().IsIndexError());
 
       REQUIRE(reader->seek(1024).IsIndexError());
+    }
+
+    SECTION("CastDataType") {
+      std::string prefix = root + "/modern_graph/";
+      std::string vertex_info_path = prefix + "person.vertex.yml";
+      std::cout << "Vertex info path: " << vertex_info_path << std::endl;
+      auto fs = FileSystemFromUriOrPath(prefix).value();
+      auto yaml_content =
+          fs->ReadFileToValue<std::string>(vertex_info_path).value();
+      std::cout << yaml_content << std::endl;
+      auto maybe_vertex_info = VertexInfo::Load(yaml_content);
+      REQUIRE(maybe_vertex_info.status().ok());
+      auto vertex_info = maybe_vertex_info.value();
+      std::cout << vertex_info->Dump().value() << std::endl;
+      auto pg = vertex_info->GetPropertyGroup("id");
+      REQUIRE(pg != nullptr);
+      REQUIRE(pg->GetProperties().size() == 1);
+      auto origin_property = pg->GetProperties()[0];
+      REQUIRE(origin_property.type->Equals(int64()));
+
+      // change to int32_t
+      Property new_property("id", int32(), origin_property.is_primary,
+                            origin_property.is_nullable);
+      auto new_pg = CreatePropertyGroup({new_property}, pg->GetFileType(),
+                                        pg->GetPrefix());
+      auto maybe_reader =
+          VertexPropertyArrowChunkReader::Make(vertex_info, new_pg, prefix);
+      REQUIRE(maybe_reader.status().ok());
+      auto reader = maybe_reader.value();
+      auto result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      auto table = result.value();
+      REQUIRE(table->schema()->GetFieldByName("id")->type()->id() ==
+              arrow::Type::INT32);
     }
 
     SECTION("PropertyPushDown") {

@@ -30,6 +30,7 @@
 // forward declaration
 namespace arrow {
 class Array;
+class Schema;
 class Table;
 }  // namespace arrow
 
@@ -145,6 +146,7 @@ class VertexPropertyArrowChunkReader {
   IdType seek_id_;
   IdType chunk_num_;
   IdType vertex_num_;
+  std::shared_ptr<arrow::Schema> schema_;
   std::shared_ptr<arrow::Table> chunk_table_;
   util::FilterOptions filter_options_;
   std::shared_ptr<FileSystem> fs_;
@@ -500,6 +502,7 @@ class AdjListPropertyArrowChunkReader {
   std::string prefix_;
   IdType vertex_chunk_index_, chunk_index_;
   IdType seek_offset_;
+  std::shared_ptr<arrow::Schema> schema_;
   std::shared_ptr<arrow::Table> chunk_table_;
   util::FilterOptions filter_options_;
   IdType vertex_chunk_num_, chunk_num_;
