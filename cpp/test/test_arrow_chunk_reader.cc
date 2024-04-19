@@ -18,7 +18,6 @@
  */
 
 #include <cstdlib>
-#include <iostream>
 
 #include "arrow/api.h"
 
