@@ -13,7 +13,7 @@ be incorporated into GraphAr itself.
   - [Workflow](#workflow)
     - [Create a branch](#create-a-branch)
     - [GitHub Pull Requests](#github-pull-requests)
-      - [Pull Request Title](#pull-request-title)
+      - [Title](#title)
       - [Reviews & Approvals](#reviews--approvals)
       - [Merge Style](#merge-style)
       - [CI](#ci)

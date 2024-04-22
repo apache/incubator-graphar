@@ -15,16 +15,19 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Bug Report
-description: File a bug report
-labels: ["bug"]
+name: Enhancement Request
+description: Request an enhancement to the project
+labels: ["enhancement"]
 assignees: []
 body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to share your feedback on ways Apache GraphAr (incubating) can be improved!
   - type: textarea
     id: description
     attributes:
-      label: Describe the bug, including details regarding any error messages, version, and platform.
-      description: Please include what you expected.
+      label: Describe the enhancement requested
     validations:
       required: true
   - type: dropdown
