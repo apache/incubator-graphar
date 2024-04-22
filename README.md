@@ -14,11 +14,7 @@ Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://graphar
 [![Good First
 Issue](https://img.shields.io/github/labels/apache/incubator-graphar/Good%20First%20Issue?color=green&label=Contribute%20&style=plastic)](https://github.com/apache/incubator-graphar/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 
-📢 Join our [Weekly Community
-Meeting](https://github.com/apache/incubator-graphar/wiki/GraphAr-Weekly-Community-Meeting)
-to learn more about GraphAr and get involved!
-
-# What is GraphAr?
+## What is GraphAr?
 
 <img src="docs/images/overview.png" class="align-center" width="770"
 alt="Overview" />
@@ -53,7 +49,7 @@ By using GraphAr, you can:
 - Utilize Apache Spark to quickly manipulate and transform your GAR
   files
 
-# The GAR File Format
+## The GAR File Format
 
 The GAR file format is designed for storing property graphs. It uses
 metadata to record all the necessary information of a graph, and
@@ -79,9 +75,9 @@ vertices ("person" and "comment") and three types of edges.
 <img src="docs/images/property_graph.png" class="align-center"
 width="700" alt="property graph" />
 
-## Vertices in GraphAr
+### Vertices in GraphAr
 
-### Logical table of vertices
+#### Logical table of vertices
 
 Each type of vertices (with the same label) constructs a logical vertex
 table, with each vertex assigned with a global index inside this type
@@ -98,7 +94,7 @@ destination vertices when maintaining the topology of the graph.
 <img src="docs/images/vertex_logical_table.png" class="align-center"
 width="650" alt="vertex logical table" />
 
-### Physical table of vertices
+###  Physical table of vertices
 
 The logical vertex table will be partitioned into multiple continuous
 vertex chunks for enhancing the reading/writing efficiency. To maintain
@@ -126,9 +122,9 @@ continuous, the payload file format can use the delta encoding for the
 internal vertex id column, which would not bring too much overhead for
 the storage.
 
-## Edges in GraphAr
+### Edges in GraphAr
 
-### Logical table of edges
+#### Logical table of edges
 
 For maintaining a type of edges (that with the same triplet of the
 source label, edge label, and destination label), a logical edge table
@@ -147,7 +143,7 @@ the logical edge table looks like:
 <img src="docs/images/edge_logical_table.png" class="align-center"
 width="650" alt="edge logical table" />
 
-### Physical table of edges
+#### Physical table of edges
 
 As same with the vertex table, the logical edge table is also
 partitioned into some sub-logical-tables, with each sub-logical-table
@@ -198,20 +194,20 @@ width="650" alt="edge logical table1" />
 <img src="docs/images/edge_physical_table2.png" class="align-center"
 width="650" alt="edge logical table2" />
 
-# Building Libraries
+## Libraries
 
 GraphAr offers a collection of libraries for the purpose of reading,
 writing and transforming files. Currently, the following libraries are
 available, and plans are in place to expand support to additional
 programming language.
 
-## The C++ Library
+### The C++ Library
 
 See [GraphAr C++
 Library](https://github.com/apache/incubator-graphar/tree/main/cpp) for
 details about the building of the C++ library.
 
-## The Java Library
+### The Java Library
 
 The GraphAr Java library is created with bindings to the C++ library
 (currently at version v0.10.0), utilizing
@@ -220,59 +216,35 @@ implementation. See [GraphAr Java
 Library](https://github.com/apache/incubator-graphar/tree/main/java) for
 details about the building of the Java library.
 
-## The Spark Library
+### The Spark Library
 
 See [GraphAr Spark
 Library](https://github.com/apache/incubator-graphar/tree/main/spark)
 for details about the Spark library.
 
-## The PySpark Library
+### The PySpark Library
 
 The GraphAr PySpark library is developed as bindings to the GraphAr
 Spark library. See [GraphAr PySpark
 Library](https://github.com/apache/incubator-graphar/tree/main/pyspark)
 for details about the PySpark library.
 
-# Contributing
+## Contributing
 
-## Contributing Guidelines
+- Start with [Contributing Guide]().
+- Submit [Issues]() for bug reports, feature requests.
+- Discuss at [dev mailing list](mailto:dev@graphar.apache.org) ([subscribe](mailto:dev-subscribe@graphar.apache.org?subject=(send%20this%20email%20to%20subscribe)) / [unsubscribe](mailto:dev-unsubscribe@graphar.apache.org?subject=(send%20this%20email%20to%20unsubscribe)) / [archives](https://lists.apache.org/list.html?dev@graphar.apache.org)).
+- Asking questions on [GitHub Discussions](https://github.com/apache/graphar/discussions/new?category=q-a).
+- Join our [Weekly Community Meeting](https://github.com/apache/incubator-graphar/wiki/GraphAr-Weekly-Community-Meeting).
 
-Read through our [contribution
-guidelines](https://github.com/apache/incubator-graphar/tree/main/CONTRIBUTING.rst)
-to learn about our submission process, coding rules, and more.
-
-## Code of Conduct
-
-Help us keep GraphAr open and inclusive. Please read and follow our
-[Code of
-Conduct](https://github.com/apache/incubator-graphar/blob/main/CODE_OF_CONDUCT.md).
-
-# Getting Involved
-
-Join the conversation and help the community. Even if you do not plan to
-contribute to GraphAr itself or GraphAr integrations in other projects,
-we'd be happy to have you involved.
-
-- Ask questions on [GitHub
-  Discussions](https://github.com/apache/incubator-graphar/discussions).
-  We welcome all kinds of questions, from beginner to advanced!
-- Follow our activity and ask for feature requests on [GitHub
-  Issues](https://github.com/apache/incubator-graphar/issues/new).
-- Join our [Weekly Community
-  Meeting](https://github.com/apache/incubator-graphar/wiki/GraphAr-Weekly-Community-Meeting).
-
-Read through our [community
-introduction](https://graphar.apache.org/community/)
-to learn about our communication channels, governance, and more.
-
-# License
+## License
 
 **GraphAr** is distributed under [Apache License
 2.0](https://github.com/apache/incubator-graphar/blob/main/LICENSE).
 Please note that third-party libraries may not have the same license as
 GraphAr.
 
-# Publication
+## Publication
 
 - Xue Li, Weibin Zeng, Zhibin Wang, Diwen Zhu, Jingbo Xu, Wenyuan Yu,
   Jingren Zhou. [Enhancing Data Lakes with GraphAr: Efficient Graph Data

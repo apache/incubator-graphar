@@ -56,17 +56,6 @@ Release build:
     $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
 ```
 
-Build the Apache Arrow dependency from source:
-
-By default, GraphAr try to find Apache Arrow in the system. This can be configured to build Arrow dependency automatically from source:
-
-```bash
-    $ mkdir build
-    $ cd build
-    $ cmake -DBUILD_ARROW_FROM_SOURCE=ON ..
-    $ make -j8
-```
-
 Debug build with unit tests:
 
 ```bash
@@ -78,24 +67,16 @@ Debug build with unit tests:
     $ make test      # to run the tests
 ```
 
-Build with examples:
+Build with examples, you should build the project with `BUILD_EXAMPLES` option, then run:
 
 ```bash
-    $ export GAR_TEST_DATA=$PWD/../testing/
-    $ mkdir build-examples
-    $ cd build-examples
-    $ cmake -DBUILD_EXAMPLES=ON ..
     $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
     $ ./bgl_example  # run the BGL example
 ```
 
-Build with benchmarks:
+Build with benchmarks, you should build the project with `BUILD_BENCHMARKS` option, then run:
 
 ```bash
-    $ export GAR_TEST_DATA=$PWD/../testing/
-    $ mkdir build-benchmarks
-    $ cd build-benchmarks
-    $ cmake -DBUILD_BENCHMARKS=ON ..
     $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
     $ ./graph_info_benchmark  # run the graph info benchmark
 ```
@@ -121,4 +102,3 @@ The API document is generated in the directory ``docs_doxygen``.
 ## How to use
 
 Please refer to our [GraphAr C++ API Reference](https://graphar.apache.org/docs/libraries/cpp).
-
