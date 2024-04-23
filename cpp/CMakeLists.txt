@@ -234,9 +234,7 @@ macro(build_gar)
     target_include_directories(gar PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
                                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     )
-    target_include_directories(gar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml
-                                           ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
-    )
+    target_include_directories(gar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     if(BUILD_ARROW_FROM_SOURCE)
         target_include_directories(gar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
     endif()
@@ -297,7 +295,11 @@ if (BUILD_EXAMPLES)
         set(E_NAME ${CMAKE_MATCH_1})
         message(STATUS "Found example - " ${E_NAME})
         add_executable(${E_NAME} examples/${E_NAME}.cc)
-        target_include_directories(${E_NAME} PRIVATE examples ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
+        target_include_directories(${E_NAME} PRIVATE examples
+                                                     ${PROJECT_SOURCE_DIR}/include
+                                                     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
+                                                     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>
+        )
         target_include_directories(${E_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
         if(BUILD_ARROW_FROM_SOURCE)
             target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
@@ -343,7 +345,7 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/gar
         PATTERN "*.h"
 )
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/gar
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/thirdparty/result
         DESTINATION include
         FILES_MATCHING
         PATTERN "*.hpp"
@@ -380,6 +382,7 @@ if (BUILD_TESTS)
         cmake_parse_arguments(add_test "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
         add_executable(${target} ${add_test_SRCS})
         target_compile_features(${target} PRIVATE cxx_std_17)
+        target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
         if(BUILD_ARROW_FROM_SOURCE)
             target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
         endif()
@@ -439,6 +442,7 @@ if (BUILD_BENCHMARKS)
         cmake_parse_arguments(add_test "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
         add_executable(${target} ${add_test_SRCS})
         target_compile_features(${target} PRIVATE cxx_std_17)
+        target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
         target_link_libraries(${target} PRIVATE benchmark::benchmark_main gar Threads::Threads ${CMAKE_DL_LIBS})
 
         # if OpenSSL library exists, link the OpenSSL library.

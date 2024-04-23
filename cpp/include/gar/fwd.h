@@ -25,7 +25,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "gar/external/result.hpp"
+#include "result/result.hpp"
 
 #include "gar/util/macros.h"
 #include "gar/util/status.h"

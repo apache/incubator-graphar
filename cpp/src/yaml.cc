@@ -20,7 +20,7 @@
 #include <memory>
 #include <string>
 
-#include "yaml/Yaml.hpp"
+#include "mini-yaml/yaml/Yaml.hpp"
 
 #include "gar/util/result.h"
 #include "gar/util/yaml.h"

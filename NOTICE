@@ -66,8 +66,7 @@ The text of each license is also included in licenses/LICENSE-[project].txt
 
 * result (https://github.com/bitwizeshift/result)
     Files:
-      cpp/include/gar/external/result.hpp are modified from result.
-      cpp/thirdparty/result.hpp
+      cpp/thirdparty/result.hpp is modified from result.
 
 * mini-yaml (https://github.com/jimmiebergmann/mini-yaml)
     Files:
