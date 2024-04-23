@@ -74,6 +74,10 @@ The text of each license is also included in licenses/LICENSE-[project].txt
       cpp/thirdparty/mini-yam/Yaml.hpp
       cpp/thirdparty/mini-yaml/Yaml.cpp
 
+* simple-uri-parser (https://github.com/jholloc/simple-uri-parser)
+    Files:
+      cpp/thirdparty/simple-uri-parser/uri_parser.h
+
 
 ================================================================
 BSD 3-Clause licenses
