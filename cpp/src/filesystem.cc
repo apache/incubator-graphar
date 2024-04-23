@@ -79,12 +79,6 @@ static Status CastToLargeOffsetArray(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(out, arrow::ChunkedArray::Make(chunks));
   return Status::OK();
 }
-
-Result<arrow::internal::Uri> ParseFileSystemUri(const std::string& uri_string) {
-  arrow::internal::Uri uri;
-  RETURN_NOT_ARROW_OK(uri.Parse(uri_string));
-  return std::move(uri);
-}
 }  // namespace detail
 
 std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
