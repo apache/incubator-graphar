@@ -1,18 +1,47 @@
-## Proposed changes
+<!--
+Thanks for contributing to GraphAr.
+If this is your first pull request you can find detailed information on [CONTRIBUTING.md](https://github.com/apache/graphar/blob/main/CONTRIBUTING.md)
 
-Describe the big picture of your changes here to communicate to the maintainers why we should accept this pull request. If it fixes a bug or resolves a feature request, be sure to link to that issue.
+The Apache GraphAr (incubating) community has restrictions on the naming of pr title. You can find instructions in
+[CONTRIBUTING.md](https://github.com/apache/graphar/blob/main/CONTRIBUTING.md#title) too.
+-->
 
-## Checklist
+### Reason for this PR
+<!-- 
+Why are you proposing this change? If this is already tracked in an issue, please link to the issue here.
+Explaining clearly why this change is beneficial is important for the reviewers to understand the context.
+-->
 
-_Put an `x` in the boxes that apply. You can also fill these out after creating the PR. If you're unsure about any of them, don't hesitate to ask. We're here to help! This is simply a reminder of what we are going to look for before merging your code._
 
-- [ ] I have read the [CONTRIBUTING](https://github.com/apache/incubator-graphar/blob/main/CONTRIBUTING.rst) doc
-- [ ] I have signed the CLA
-- [ ] Lint and unit tests pass locally with my changes
-- [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] I have added necessary documentation (if appropriate)
+### What changes are included in this PR?
+<!-- 
+There is no need to duplicate the description in the issue here but it is sometimes worth providing a summary of the individual changes in this PR.
+-->
 
-## Further comments
+### Are these changes tested?
+<!--
+We typically require tests for all PRs in order to:
+1. Prevent the code from being accidentally broken by subsequent changes
+2. Serve as another way to document the expected behavior of the code
 
-If this is a relatively large or complex change, kick off the discussion by explaining why you chose the solution you did and what alternatives you considered, etc...
+If tests are not included in your PR, please explain why (for example, are they covered by existing tests)?
+-->
 
+### Are there any user-facing changes?
+<!--
+If there are user-facing changes then we may require documentation to be updated before approving the PR.
+-->
+
+<!--
+If there are any breaking changes to public APIs, please uncomment the line below and explain which changes are breaking.
+-->
+<!-- **BREAKING CHANGE: <description>** -->
+
+<!--
+Please uncomment the line below (and provide explanation) if the changes fix either
+(a) a security vulnerability,
+(b) a bug that caused incorrect or invalid data to be produced, or
+(c) a bug that causes a crash (even when the API contract is upheld). 
+We use this to highlight fixes to issues that may affect users without their knowledge. For this reason, fixing bugs that cause errors don't count, since those are usually obvious.
+-->
+<!-- **Critical Fix: <description>** -->
