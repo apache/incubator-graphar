@@ -238,7 +238,7 @@ macro(build_gar)
                                            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
     )
     if(BUILD_ARROW_FROM_SOURCE)
-        target_include_directories(gar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR}/th)
+        target_include_directories(gar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
     endif()
     target_link_libraries(gar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
 
