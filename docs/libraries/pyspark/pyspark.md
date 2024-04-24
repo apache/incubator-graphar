@@ -70,7 +70,7 @@ Make the graphar-pyspark-library directory as the current working
 directory:
 
 ```bash
-cd GraphAr/pyspark
+cd incubator-graphar/pyspark
 ```
 
 Build package:
