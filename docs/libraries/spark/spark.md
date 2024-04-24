@@ -33,7 +33,7 @@ For more information on its usage, please refer to the [Examples](examples.md).
 Make the graphar-spark-library directory as the current working directory:
 
 ```bash
-cd GraphAr/spark/
+cd incubator-graphar/spark/
 ```
 
 Compile package:
