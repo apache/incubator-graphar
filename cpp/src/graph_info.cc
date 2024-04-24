@@ -19,7 +19,7 @@
 
 #include <unordered_set>
 
-#include "yaml/Yaml.hpp"
+#include "mini-yaml/yaml/Yaml.hpp"
 
 #include "gar/graph_info.h"
 #include "gar/util/adj_list_type.h"
