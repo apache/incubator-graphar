@@ -54,6 +54,8 @@ if (ENABLE_DOCS OR BUILD_DOCS_ONLY)
     set(DOXYGEN_IN ${PROJECT_SOURCE_DIR}/Doxyfile)
     set(DOXYGEN_OUT ${CMAKE_BINARY_DIR}/Doxyfile.out)
     configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+    # Copy disclaimer_footer.html to the build directory
+    configure_file(${PROJECT_SOURCE_DIR}/disclaimer_footer.html ${CMAKE_BINARY_DIR}/disclaimer_footer.html COPYONLY)
     add_custom_target(docs
         COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
