@@ -27,11 +27,12 @@
     <parent>
         <groupId>org.apache.graphar</groupId>
         <artifactId>graphar-spark</artifactId>
-        <version>0.11.4-SNAPSHOT</version>
+        <version>${graphar.version}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>graphar-datasources</artifactId>
-    <version>0.11.4-SNAPSHOT</version>
+    <version>${graphar.version}</version>
     <packaging>jar</packaging>
 
     <dependencies>
