@@ -1,0 +1,16 @@
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/yaml/PropertyYamlParser.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/type/DataType.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/type/AdjListType.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/yaml/AdjacentListYamlParser.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/yaml/PropertyGroupYamlParser.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/yaml/VertexYamlParser.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/yaml/EdgeYamlParser.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/util/GeneralParams.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/VertexInfo.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/EdgeInfo.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/yaml/GraphYamlParser.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/type/FileType.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/GraphInfo.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/Property.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/PropertyGroup.java
+/home/john/graphar/incubator-graphar/java-info/src/main/java/org/apache/graphar/info/AdjacentList.java
