@@ -69,3 +69,4 @@ venv.bak/
 ### Scala ###
 *.bloop
 *.metals
+*/target/*
