@@ -25,21 +25,19 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.apache</groupId>
-        <artifactId>graphar</artifactId>
-        <version>${graphar.version}</version>
+        <groupId>org.apache.graphar</groupId>
+        <artifactId>graphar-spark</artifactId>
+        <version>0.11.4-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.apache</groupId>
     <artifactId>graphar-commons</artifactId>
-    <version>${graphar.version}</version>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache</groupId>
+            <groupId>org.apache.graphar</groupId>
             <artifactId>graphar-datasources</artifactId>
-            <version>${graphar.version}</version>
+            <version>0.11.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
