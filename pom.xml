@@ -35,6 +35,6 @@
   </modules>
 
   <properties>
-    <graphar.version>0.11.4-SNAPSHOT</graphar.version>
+    <graphar.version>0.1.0-SNAPSHOT</graphar.version>
   </properties>
 </project>
