@@ -25,12 +25,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.apache</groupId>
-        <artifactId>graphar</artifactId>
+        <groupId>org.apache.graphar</groupId>
+        <artifactId>graphar-spark</artifactId>
         <version>${graphar.version}</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.apache</groupId>
     <artifactId>graphar-datasources</artifactId>
     <version>${graphar.version}</version>
     <packaging>jar</packaging>

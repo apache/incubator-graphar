@@ -24,9 +24,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.apache</groupId>
-    <artifactId>graphar</artifactId>
-    <version>${graphar.version}</version>
+    <parent>
+        <groupId>org.apache.graphar</groupId>
+        <artifactId>graphar-root</artifactId>
+        <version>${graphar.version}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>graphar-spark</artifactId>
     <packaging>pom</packaging>
 
     <profiles>
@@ -44,7 +49,6 @@
                 <maven.compiler.source>1.8</maven.compiler.source>
                 <maven.compiler.target>1.8</maven.compiler.target>
                 <cupid.sdk.version>3.3.8-public</cupid.sdk.version>
-                <graphar.version>0.1.0-SNAPSHOT</graphar.version>
             </properties>
             <modules>
                 <module>graphar</module>
@@ -68,7 +72,6 @@
                 <maven.compiler.source>1.8</maven.compiler.source>
                 <maven.compiler.target>1.8</maven.compiler.target>
                 <cupid.sdk.version>3.3.8-public</cupid.sdk.version>
-                <graphar.version>0.1.0-SNAPSHOT</graphar.version>
             </properties>
             <modules>
                 <module>graphar</module>
