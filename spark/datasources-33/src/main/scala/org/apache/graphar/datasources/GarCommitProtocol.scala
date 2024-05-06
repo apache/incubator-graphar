@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+// Derived from Apache Spark 3.3.4
+// https://github.com/apache/spark/blob/18db204/core/src/main/scala/org/apache/spark/internal/io/HadoopMapReduceCommitProtocol.scala
+
 package org.apache.graphar.datasources
 
 import org.apache.graphar.GeneralParams
@@ -62,6 +65,7 @@ class GarCommitProtocol(
     with Serializable
     with Logging {
 
+  // override getFilename to customize the file name
   override def getFilename(
       taskContext: TaskAttemptContext,
       spec: FileNameSpec

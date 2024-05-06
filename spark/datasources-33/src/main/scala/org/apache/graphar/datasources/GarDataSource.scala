@@ -35,7 +35,8 @@ import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.sql.sources.DataSourceRegister
 import org.apache.spark.sql.connector.expressions.Transform
 
-object GarUtils
+// Derived from Apache Spark 3.1.1
+// https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileDataSourceV2.scala
 
 /**
  * GarDataSource is a class to provide gar files as the data source for spark.

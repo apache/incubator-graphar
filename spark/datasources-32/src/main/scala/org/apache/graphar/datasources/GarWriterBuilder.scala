@@ -12,9 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * The implementation of GarWriteBuilder is referred from FileWriteBuilder of spark 3.1.1
  */
+
+// Derived from Apache Spark 3.1.1
+// https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileWriteBuilder.scala
 
 package org.apache.graphar.datasources
 

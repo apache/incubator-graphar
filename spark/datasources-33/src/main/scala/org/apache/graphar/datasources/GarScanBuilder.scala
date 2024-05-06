@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+// Derived from Apache Spark 3.3.4
+// https://github.com/apache/spark/blob/18db204/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileScanBuilder.scala
+
 package org.apache.graphar.datasources
 
 import org.apache.spark.sql.SparkSession

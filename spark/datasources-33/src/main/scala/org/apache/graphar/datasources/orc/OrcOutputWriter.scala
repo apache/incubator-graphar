@@ -12,9 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * The implementation of OrcOutputWriter is referred from OrcOutputWriter of spark 3.1.1
  */
+
+// Derived from Apache Spark 3.1.1, since the OrcOutputWriter is private in the original source,
+// we have to reimplement it here.
+// https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/orc/OrcOutputWriter.scala
 
 package org.apache.graphar.datasources.orc
 
