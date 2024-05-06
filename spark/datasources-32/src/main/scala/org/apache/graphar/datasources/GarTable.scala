@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+// Derived from Apache Spark 3.1.1
+// https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileTable.scala
+
 package org.apache.graphar.datasources
 
 import scala.collection.JavaConverters._

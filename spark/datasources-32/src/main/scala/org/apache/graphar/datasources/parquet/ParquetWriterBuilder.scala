@@ -12,9 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * The implementation of ParquetWriteBuilder is referred from ParquetWriteBuilder of spark 3.1.1
  */
+
+// Derived from Apache Spark 3.1.1
+// https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/parquet/ParquetWriteBuilder.scala
 
 package org.apache.graphar.datasources.parquet
 
@@ -24,6 +25,7 @@ import org.apache.parquet.hadoop.ParquetOutputFormat.JobSummaryLevel
 import org.apache.parquet.hadoop.codec.CodecConfig
 import org.apache.parquet.hadoop.util.ContextUtil
 
+import org.apache.spark.sql.execution.datasources.parquet.ParquetOutputWriter
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.connector.write.LogicalWriteInfo
