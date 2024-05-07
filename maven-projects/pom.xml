@@ -30,7 +30,7 @@
 
   <name>Apache GraphAr Root POM</name>
   <modules>
-    <module>info</module>
+    <module>java</module>
     <module>spark</module>
   </modules>
 
