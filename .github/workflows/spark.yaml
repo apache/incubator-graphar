@@ -57,7 +57,7 @@ jobs:
           submodules: true
 
     - name: Code Format Check
-      working-directory: spark
+      working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         mvn --no-transfer-progress spotless:check
@@ -112,7 +112,7 @@ jobs:
         scripts/run-graphar2neo4j.sh
 
     - name: Run Nebula2GraphAr example
-      working-directory: spark
+      working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         scripts/get-nebula-to-home.sh
