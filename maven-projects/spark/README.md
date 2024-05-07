@@ -22,24 +22,24 @@ repository and navigated to the ``spark`` subdirectory:
     $ git clone https://github.com/apache/incubator-graphar.git
     $ cd incubator-graphar
     $ git submodule update --init
-    $ cd spark
+    $ cd mavens-projects/spark
 ```
 
 
 Build the package:
 
 ```bash
-    $ mvn clean package -DskipTests
+    $ mvn clean install -DskipTests
 ```
 
-GraphAr Spark uses Maven Profiles to support multiple Spark Versions. By default it is built with Spark 3.2.x or profile `datasources-32`. To built with Spark 3.3.4 use `-P datasources-33` (`mvn clean package -DskipTests -P datasources-33`).
+GraphAr Spark uses Maven Profiles to support multiple Spark Versions. By default it is built with Spark 3.2.x or profile `datasources-32`. To built with Spark 3.3.4 use `-P datasources-33` (`mvn clean install -DskipTests -P datasources-33`).
 
 After compilation, the package file graphar-x.x.x-SNAPSHOT-shaded.jar is generated in the directory ``spark/graphar/target/``.
 
 Build the package and run the unit tests:
 
 ```bash
-    $ mvn clean package
+    $ mvn clean install
 ```
 
 Build and run the unit tests:
@@ -231,4 +231,4 @@ The example will import the basketballplayer graph from GraphAr to NebulaGraph a
 
 ## How to use
 
-Please refer to our [GraphAr Spark Library Documentation](https://graphar.apache.org/GraphAr/spark/spark-lib.html).
+Please refer to our [GraphAr Spark Library Documentation](https://graphar.apache.org/docs/libraries/spark/).
