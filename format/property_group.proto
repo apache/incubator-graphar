@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package graphar;
+option java_package = "org.apache.graphar.info";
+
+import "types.proto";
+
+message Property {
+    string name = 1;
+    DataType type = 2;
+    bool is_primary_key = 3;
+    bool nullable = 4;
+    string prefix = 5;
+};
+
+message PropertyGroup {
+    repeated Property properties = 1;
+    FileType file_type = 2;
+    string prefix = 3;
+};

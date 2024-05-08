@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package graphar;
+option java_package = "org.apache.graphar.info";
+
+import "vertex_info.proto";
+import "edge_info.proto";
+
+message GraphInfo {
+    string name = 1;
+    repeated VertexInfo vertices = 2;
+    repeated EdgeInfo edges = 3;
+    string prefix = 4;
+
+    message Statistics {
+        int64 num_vertices = 1;
+        int64 num_edges = 2;
+    }
+    optional Statistics statistics = 5;
+
+    message KeyValue {
+        string key = 1;
+        string value = 2;
+    } 
+    map<string, string> metadata = 6;
+};

@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package graphar;
+option java_package = "org.apache.graphar.info";
+
+enum DataType {
+    BOOL = 0;
+    INT32 = 1;
+    INT64 = 2;
+    FLOAT = 3;
+    DOUBLE = 4;
+    STRING = 5;
+    LIST = 6;
+    DATE = 7;
+    TIMESTAMP = 8;
+    TIME = 9;
+};
+
+enum FileType {
+    CSV = 0;
+    PARQUET = 1;
+    ORC = 2;
+    JSON = 3;
+    AVRO = 4;
+    HDF5 = 5;
+};
+
+enum AdjListType {
+    UNORDERED_BY_SOURCE = 0;
+    UNORDERED_BY_TARGET = 1;
+    ORDERED_BY_SOURCE = 2;
+    ORDERED_BY_TARGET = 3;
+};

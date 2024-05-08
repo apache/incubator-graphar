@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package graphar;
+option java_package = "org.apache.graphar.info";
+
+import "types.proto";
+
+message AdjacentList {
+    AdjListType type = 1;
+    FileType file_type = 2;
+    string prefix = 3;
+
+    message Statistics {
+        int64 num_vertices = 1; 
+        int64 num_vertex_chunks = 2;
+        repeated int64 edge_nums_of_vertex_chunks = 3;
+    }
+    optional Statistics statistics = 4;
+};

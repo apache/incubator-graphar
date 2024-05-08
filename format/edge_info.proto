@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package graphar;
+option java_package = "org.apache.graphar.info";
+
+import "property_group.proto";
+import "adjacent_list.proto";
+
+message EdgeInfo {
+    string type = 1;
+    string source_vertex_type = 2;
+    string destination_vertex_type = 3;
+    int64 chunk_size = 4;
+    int64 source_vertex_chunk_size = 5;
+    int64 destination_vertex_chunk_size = 6;
+    repeated AdjacentList adjacent_list = 7;
+    repeated PropertyGroup properties = 8;
+    bool is_directed = 9;
+    string prefix = 10;
+
+    message Statistics {
+        int64 num_edges = 1;
+        int64 num_source_vertices = 2;
+        int64 num_destination_vertices = 3;
+    }
+    optional Statistics statistics = 11;
+};

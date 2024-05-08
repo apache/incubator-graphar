@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package graphar;
+option java_package = "org.apache.graphar.info";
+
+import "property_group.proto";
+
+message VertexInfo {
+    string type = 1;
+    int64 chunk_size = 2;
+    repeated PropertyGroup properties = 3;
+    string prefix = 4;
+
+    message Statistics {
+        int64 num_vertices = 5;
+        int64 num_chunks = 6; 
+    }
+    optional Statistics statistics = 7;
+};
