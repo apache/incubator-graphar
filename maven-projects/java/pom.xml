@@ -32,13 +32,13 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>gar-java</artifactId>
+    <artifactId>java</artifactId>
     <packaging>jar</packaging>
 
-    <name>gar-java</name>
+    <name>java</name>
 
     <properties>
-        <native.library.name>gar-java</native.library.name>
+        <native.library.name>java</native.library.name>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -49,8 +49,8 @@
         <arrow.version>13.0.0</arrow.version>
         <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
         <maven.javadoc.version>3.4.0</maven.javadoc.version>
-        <javadoc.output.directory>gar-java-javadoc</javadoc.output.directory>
-        <javadoc.output.destDir>gar-java-javadoc</javadoc.output.destDir>
+        <javadoc.output.directory>graphar-javadoc</javadoc.output.directory>
+        <javadoc.output.destDir>graphar-javadoc</javadoc.output.destDir>
         <buildGarCPP>ON</buildGarCPP>
     </properties>
 

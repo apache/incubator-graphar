@@ -30,10 +30,10 @@ For more information on its usage, please refer to the [Examples](examples.md).
 
 ### Building from source
 
-Make the graphar-spark-library directory as the current working directory:
+Make the spark-library directory as the current working directory:
 
 ```bash
-cd incubator-graphar/spark/
+cd incubator-graphar/maven_projects/spark/
 ```
 
 Compile package:
@@ -226,12 +226,12 @@ For more information on usage, please refer to the examples:
 - [Neo4j2GraphAr.scala][neo4j2graphar] and [GraphAr2Neo4j.scala][graphar2neo4j] are examples to conduct data importing/exporting for Neo4j.
 
 
-[test-graph-info]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TestGraphInfo.scala
-[test-index-generator]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TestIndexGenerator.scala
-[test-writer]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TestWriter.scala
-[test-reader]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TestReader.scala
-[test-graph-transformer]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TestGraphTransformer.scala
-[compute-example]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/ComputeExample.scala
-[transform-example]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/test/scala/org/apache/graphar/TransformExample.scala
-[neo4j2graphar]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/main/scala/org/apache/graphar/example/Neo4j2GraphAr.scala
-[graphar2neo4j]: https://github.com/apache/incubator-graphar/blob/main/spark/graphar/src/main/scala/org/apache/graphar/example/GraphAr2Neo4j.scala
+[test-graph-info]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TestGraphInfo.scala
+[test-index-generator]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TestIndexGenerator.scala
+[test-writer]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TestWriter.scala
+[test-reader]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TestReader.scala
+[test-graph-transformer]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TestGraphTransformer.scala
+[compute-example]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/ComputeExample.scala
+[transform-example]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TransformExample.scala
+[neo4j2graphar]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/main/scala/org/apache/graphar/example/Neo4j2GraphAr.scala
+[graphar2neo4j]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/main/scala/org/apache/graphar/example/GraphAr2Neo4j.scala

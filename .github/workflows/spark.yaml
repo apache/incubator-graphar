@@ -24,13 +24,13 @@ on:
     branches:
       - main
     paths:
-      - 'spark/**'
+      - 'maven-projects/spark/**'
       - '.github/workflows/spark.yaml'
   pull_request:
     branches:
       - main
     paths:
-      - 'spark/**'
+      - 'maven-projects/spark/**'
       - '.github/workflows/spark.yaml'
 
 concurrency:
@@ -57,20 +57,20 @@ jobs:
           submodules: true
 
     - name: Code Format Check
-      working-directory: spark
+      working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         mvn --no-transfer-progress spotless:check
 
     - name: Build GraphAr Spark
-      working-directory: spark
+      working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         echo "Build ${{ matrix.mvn-profile }}"
         mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
     
     - name: Build Spark Docs
-      working-directory: spark
+      working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         echo "Build ${{ matrix.mvn-profile }}"
@@ -79,7 +79,7 @@ jobs:
         mvn --no-transfer-progress scala:doc
 
     - name: Run test
-      working-directory: spark
+      working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         export SPARK_TESTING=1
@@ -87,7 +87,7 @@ jobs:
         mvn test --no-transfer-progress -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
 
     - name: Run Neo4j2GraphAr example
-      working-directory: spark
+      working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         scripts/get-spark-to-home.sh ${{ matrix.spark }} ${{ matrix.spark-hadoop }}
@@ -112,7 +112,7 @@ jobs:
         scripts/run-graphar2neo4j.sh
 
     - name: Run Nebula2GraphAr example
-      working-directory: spark
+      working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         scripts/get-nebula-to-home.sh
@@ -138,7 +138,7 @@ jobs:
         scripts/run-graphar2nebula.sh
 
     - name: Run Neo4j importer
-      working-directory: spark
+      working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         export SPARK_HOME="${HOME}/${{ matrix.spark-hadoop }}"

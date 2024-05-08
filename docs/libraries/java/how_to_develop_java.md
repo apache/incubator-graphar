@@ -80,7 +80,7 @@ Please refer to
 ## How To Test
 
 ```bash
-$ export GAR_TEST_DATA=$PWD/../testing/
+$ export GAR_TEST_DATA=$PWD/../../testing/
 $ mvn clean test
 ```
 

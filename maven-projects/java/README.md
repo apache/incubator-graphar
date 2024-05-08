@@ -46,7 +46,7 @@ Make the graphar-java-library directory as the current working directory:
   $ git clone https://github.com/apache/incubator-graphar.git
   $ cd incubator-graphar
   $ git submodule update --init
-  $ cd java
+  $ cd maven-projects/java
 ```
 
 Compile package:
@@ -64,7 +64,7 @@ Then set GraphAr as a dependency in maven project:
 <dependencies>
     <dependency>
       <groupId>org.apache.graphar</groupId>
-      <artifactId>gar-java</artifactId>
+      <artifactId>java</artifactId>
       <version>0.1.0</version>
     </dependency>
 </dependencies>
@@ -82,4 +82,4 @@ The API document will be generated in the `target/site/apidocs` directory.
 
 ## How to use
 
-Please refer to [GraphAr Java Library Documentation](https://graphar.apache.org/GraphAr/user-guide/java-lib.html).
+Please refer to [GraphAr Java Library Documentation](https://graphar.apache.org/docs/libraries/java/).

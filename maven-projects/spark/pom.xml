@@ -31,7 +31,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>graphar-spark</artifactId>
+    <artifactId>spark</artifactId>
     <packaging>pom</packaging>
 
     <profiles>

@@ -69,7 +69,7 @@ directory:
 $ git clone https://github.com/apache/incubator-graphar.git
 $ cd incubator-graphar
 $ git submodule update --init
-$ cd java
+$ cd maven-projects/java
 ```
 
 Compile package:
@@ -88,7 +88,7 @@ Then set GraphAr as a dependency in maven project:
 <dependencies>
     <dependency>
       <groupId>org.apache.graphar</groupId>
-      <artifactId>gar-java</artifactId>
+      <artifactId>java</artifactId>
       <version>0.1.0</version>
     </dependency>
 </dependencies>
@@ -120,7 +120,7 @@ if (!graphInfoResult.hasError()) {
 ```
 
 See [test for
-graphinfo](https://github.com/apache/incubator-graphar/tree/main/java/src/test/java/org/apache/graphar/graphinfo)
+graphinfo](https://github.com/apache/incubator-graphar/blob/main/maven-projects/java/src/test/java/org/apache/graphar/graphinfo)
 for the complete example.
 
 ### Writers
@@ -177,7 +177,7 @@ writer.sortAndWriteAdjListTable(table, 0, 0); // Write adj list of vertex chunk 
 ```
 
 See [test for
-writers](https://github.com/apache/incubator-graphar/tree/main/java/src/test/java/org/apache/graphar/writers)
+writers](https://github.com/apache/incubator-graphar/blob/main/maven-projects/java/src/test/java/org/apache/graphar/writers)
 for the complete example.
 
 ### Readers
@@ -211,5 +211,5 @@ StdPair<Long, Long> range = reader.getRange().value();
 ```
 
 See [test for
-readers](https://github.com/apache/incubator-graphar/tree/main/java/src/test/java/org/apache/graphar/readers)
+readers](https://github.com/apache/incubator-graphar/blob/main/maven-projects/java/src/test/java/org/apache/graphar/readers)
 for the complete example.

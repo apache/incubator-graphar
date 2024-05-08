@@ -26,7 +26,7 @@
 
     <parent>
         <groupId>org.apache.graphar</groupId>
-        <artifactId>graphar-spark</artifactId>
+        <artifactId>spark</artifactId>
         <version>${graphar.version}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>

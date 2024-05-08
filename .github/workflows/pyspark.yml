@@ -24,14 +24,14 @@ on:
     branches:
       - main
     paths:
-      - 'spark/**'
+      - 'maven-projects/spark/**'
       - 'pyspark/**'
       - '.github/workflows/pyspark.yml'
   pull_request:
     branches:
       - main
     paths:
-      - 'spark/**'
+      - 'maven-projects/spark/**'
       - 'pyspark/**'
       - '.github/workflows/pyspark.yml'
 

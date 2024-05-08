@@ -204,7 +204,7 @@ programming language.
 ### The C++ Library
 
 See [GraphAr C++
-Library](https://github.com/apache/incubator-graphar/tree/main/cpp) for
+Library](./cpp) for
 details about the building of the C++ library.
 
 ### The Java Library
@@ -213,20 +213,20 @@ The GraphAr Java library is created with bindings to the C++ library
 (currently at version v0.10.0), utilizing
 [Alibaba-FastFFI](https://github.com/alibaba/fastFFI) for
 implementation. See [GraphAr Java
-Library](https://github.com/apache/incubator-graphar/tree/main/java) for
+Library](./maven-projects/java) for
 details about the building of the Java library.
 
 ### The Spark Library
 
 See [GraphAr Spark
-Library](https://github.com/apache/incubator-graphar/tree/main/spark)
+Library](./maven-projects/spark)
 for details about the Spark library.
 
 ### The PySpark Library
 
 The GraphAr PySpark library is developed as bindings to the GraphAr
 Spark library. See [GraphAr PySpark
-Library](https://github.com/apache/incubator-graphar/tree/main/pyspark)
+Library](./pyspark)
 for details about the PySpark library.
 
 ## Contributing
