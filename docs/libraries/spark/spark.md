@@ -30,10 +30,10 @@ For more information on its usage, please refer to the [Examples](examples.md).
 
 ### Building from source
 
-Make the graphar-spark-library directory as the current working directory:
+Make the spark-library directory as the current working directory:
 
 ```bash
-cd incubator-graphar/spark/
+cd incubator-graphar/maven_projects/spark/
 ```
 
 Compile package:

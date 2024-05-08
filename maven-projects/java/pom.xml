@@ -49,8 +49,8 @@
         <arrow.version>13.0.0</arrow.version>
         <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
         <maven.javadoc.version>3.4.0</maven.javadoc.version>
-        <javadoc.output.directory>gar-javadoc</javadoc.output.directory>
-        <javadoc.output.destDir>gar-javadoc</javadoc.output.destDir>
+        <javadoc.output.directory>graphar-javadoc</javadoc.output.directory>
+        <javadoc.output.destDir>graphar-javadoc</javadoc.output.destDir>
         <buildGarCPP>ON</buildGarCPP>
     </properties>
 
