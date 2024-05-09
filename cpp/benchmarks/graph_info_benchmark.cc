@@ -19,7 +19,7 @@
 
 #include "benchmark/benchmark.h"
 
-#include "benchmark_util.h"
+#include "./benchmark_util.h"
 #include "graphar/graph_info.h"
 
 namespace graphar {

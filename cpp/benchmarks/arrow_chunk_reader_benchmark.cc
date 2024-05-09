@@ -19,7 +19,7 @@
 
 #include "benchmark/benchmark.h"
 
-#include "benchmark_util.h"
+#include "./benchmark_util.h"
 #include "graphar/graph_info.h"
 #include "graphar/reader/arrow_chunk_reader.h"
 #include "graphar/util/adj_list_type.h"
