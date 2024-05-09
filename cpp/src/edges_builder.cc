@@ -19,10 +19,10 @@
 
 #include "arrow/api.h"
 
-#include "gar/util/convert_to_arrow_type.h"
-#include "gar/util/general_params.h"
-#include "gar/util/result.h"
-#include "gar/writer/edges_builder.h"
+#include "graphar/util/convert_to_arrow_type.h"
+#include "graphar/util/general_params.h"
+#include "graphar/util/result.h"
+#include "graphar/writer/edges_builder.h"
 
 namespace graphar {
 namespace builder {

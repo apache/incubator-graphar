@@ -20,16 +20,16 @@
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
 
-#include "gar/graph_info.h"
-#include "gar/reader/arrow_chunk_reader.h"
-#include "gar/util/adj_list_type.h"
-#include "gar/util/data_type.h"
-#include "gar/util/filesystem.h"
-#include "gar/util/general_params.h"
-#include "gar/util/reader_util.h"
-#include "gar/util/result.h"
-#include "gar/util/status.h"
-#include "gar/util/util.h"
+#include "graphar/graph_info.h"
+#include "graphar/reader/arrow_chunk_reader.h"
+#include "graphar/util/adj_list_type.h"
+#include "graphar/util/data_type.h"
+#include "graphar/util/filesystem.h"
+#include "graphar/util/general_params.h"
+#include "graphar/util/reader_util.h"
+#include "graphar/util/result.h"
+#include "graphar/util/status.h"
+#include "graphar/util/util.h"
 
 namespace graphar {
 

@@ -23,9 +23,9 @@
 #include "arrow/filesystem/api.h"
 
 #include "./config.h"
-#include "gar/api.h"
-#include "gar/writer/edges_builder.h"
-#include "gar/writer/vertices_builder.h"
+#include "graphar/api.h"
+#include "graphar/writer/edges_builder.h"
+#include "graphar/writer/vertices_builder.h"
 
 void vertices_builder() {
   // construct vertices builder

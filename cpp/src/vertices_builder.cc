@@ -17,9 +17,9 @@
  * under the License.
  */
 
-#include "gar/writer/vertices_builder.h"
-#include "gar/graph_info.h"
-#include "gar/util/convert_to_arrow_type.h"
+#include "graphar/writer/vertices_builder.h"
+#include "graphar/graph_info.h"
+#include "graphar/util/convert_to_arrow_type.h"
 
 namespace graphar {
 namespace builder {

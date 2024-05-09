@@ -30,11 +30,11 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
   cmake_policy(SET CMP0135 NEW)
 endif()
 
-set(GAR_MAJOR_VERSION 0)
-set(GAR_MINOR_VERSION 11)
-set(GAR_PATCH_VERSION 4)
-set(GAR_VERSION ${GAR_MAJOR_VERSION}.${GAR_MINOR_VERSION}.${GAR_PATCH_VERSION})
-project(graph-archive LANGUAGES C CXX VERSION ${GAR_VERSION})
+set(GRAPHAR_MAJOR_VERSION 0)
+set(GRAPHAR_MINOR_VERSION 11)
+set(GRAPHAR_PATCH_VERSION 4)
+set(GREAPHAR_VERSION ${GRAPHAR_MAJOR_VERSION}.${GRAPHAR_MINOR_VERSION}.${GRAPHAR_PATCH_VERSION})
+project(graphar-cpp LANGUAGES C CXX VERSION ${GREAPHAR_VERSION})
 
 # ------------------------------------------------------------------------------
 # cmake options
@@ -84,11 +84,11 @@ if(NOT (CMAKE_CXX_COMPILER_LAUNCHER MATCHES "ccache") AND NOT (CMAKE_C_COMPILER_
     if(ccache_EXECUTABLE)
         set(CMAKE_C_COMPILER_LAUNCHER ${ccache_EXECUTABLE})
         set(CMAKE_CXX_COMPILER_LAUNCHER ${ccache_EXECUTABLE})
-        add_custom_target(gar-ccache-stats
+        add_custom_target(graphar-ccache-stats
             COMMAND ${ccache_EXECUTABLE} --show-stats
         )
     else()
-        add_custom_target(gar-ccache-stats
+        add_custom_target(graphar-ccache-stats
             COMMAND echo "ccache not found."
         )
     endif(ccache_EXECUTABLE)
@@ -106,7 +106,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fno-omit-frame-point
 set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -g")
 
-message(STATUS "[gar] will build in type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "[graphar] will build in type: ${CMAKE_BUILD_TYPE}")
 
 # ------------------------------------------------------------------------------
 # cmake configs
@@ -167,10 +167,10 @@ macro(find_catch2)
     set(CMAKE_WARN_DEPRECATED ON CACHE BOOL "" FORCE)
 endmacro()
 
-macro(install_gar_target target)
+macro(install_graphar_target target)
   # install
   install(TARGETS ${target}
-          EXPORT gar-targets
+          EXPORT graphar-targets
           ARCHIVE DESTINATION lib
           LIBRARY DESTINATION lib
           RUNTIME DESTINATION bin
@@ -226,44 +226,44 @@ macro(get_target_location var target)
 endmacro()
 
 # ------------------------------------------------------------------------------
-# generate gar library
+# generate graphar library
 # ------------------------------------------------------------------------------
-macro(build_gar)
+macro(build_graphar)
     file(GLOB_RECURSE CORE_SRC_FILES "src/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
-    add_library(gar SHARED ${CORE_SRC_FILES})
-    install_gar_target(gar)
-    target_compile_features(gar PRIVATE cxx_std_17)
-    target_include_directories(gar PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    add_library(graphar SHARED ${CORE_SRC_FILES})
+    install_graphar_target(graphar)
+    target_compile_features(graphar PRIVATE cxx_std_17)
+    target_include_directories(graphar PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
                                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     )
-    target_include_directories(gar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
+    target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     if(BUILD_ARROW_FROM_SOURCE)
-        target_include_directories(gar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+        target_include_directories(graphar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
     endif()
-    target_link_libraries(gar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
+    target_link_libraries(graphar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
 
     if(APPLE)
         if(BUILD_ARROW_FROM_SOURCE)
-            target_link_libraries(gar PRIVATE -Wl,-force_load gar_arrow_static
+            target_link_libraries(graphar PRIVATE -Wl,-force_load gar_arrow_static
                 "${GAR_PARQUET_STATIC_LIB}"
                 "${GAR_DATASET_STATIC_LIB}"
                 "${GAR_ACERO_STATIC_LIB}"
                 "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
         else()
-            target_link_libraries(gar PRIVATE -Wl,-force_load Arrow::arrow_shared
+            target_link_libraries(graphar PRIVATE -Wl,-force_load Arrow::arrow_shared
                 Parquet::parquet_shared
                 ArrowDataset::arrow_dataset_shared
                 ArrowAcero::arrow_acero_shared)
         endif()
     else()
         if(BUILD_ARROW_FROM_SOURCE)
-            target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
+            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
                 "${GAR_PARQUET_STATIC_LIB}"
                 "${GAR_DATASET_STATIC_LIB}"
                 "${GAR_ARROW_ACERO_STATIC_LIB}"
                 "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
         else()
-            target_link_libraries(gar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_shared
+            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_shared
                 Parquet::parquet_shared
                 ArrowDataset::arrow_dataset_shared
                 ArrowAcero::arrow_acero_shared -Wl,--no-whole-archive)
@@ -273,17 +273,14 @@ macro(build_gar)
     # if OpenSSL library exists, link the OpenSSL library.
     # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
     if(OPENSSL_FOUND)
-        target_link_libraries(gar PRIVATE OpenSSL::SSL)
+        target_link_libraries(graphar PRIVATE OpenSSL::SSL)
     endif()
     if (CURL_FOUND)
-        target_link_libraries(gar PRIVATE ${CURL_LIBRARIES})
-    endif()
-    if (APPLE)
-        target_link_libraries(gar "-framework CoreFoundation")
+        target_link_libraries(graphar PRIVATE ${CURL_LIBRARIES})
     endif()
 endmacro()
 
-build_gar()
+build_graphar()
 
 # ------------------------------------------------------------------------------
 # build example
@@ -306,7 +303,7 @@ if (BUILD_EXAMPLES)
         if(BUILD_ARROW_FROM_SOURCE)
             target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
         endif()
-        target_link_libraries(${E_NAME} PRIVATE gar ${Boost_LIBRARIES} Threads::Threads ${CMAKE_DL_LIBS})
+        target_link_libraries(${E_NAME} PRIVATE graphar ${Boost_LIBRARIES} Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
             if(BUILD_ARROW_FROM_SOURCE)
                 target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
@@ -341,7 +338,7 @@ endif()
 # ------------------------------------------------------------------------------
 # Install
 # ------------------------------------------------------------------------------
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/gar
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/graphar
         DESTINATION include
         FILES_MATCHING
         PATTERN "*.h"
@@ -353,22 +350,22 @@ install(DIRECTORY ${PROJECT_SOURCE_DIR}/thirdparty/result
         PATTERN "*.hpp"
 )
 
-configure_file(gar-config.in.cmake
-               "${PROJECT_BINARY_DIR}/gar-config.cmake" @ONLY
+configure_file(graphar-config.in.cmake
+               "${PROJECT_BINARY_DIR}/graphar-config.cmake" @ONLY
 )
 
-configure_file(gar-config-version.in.cmake
-               "${PROJECT_BINARY_DIR}/gar-config-version.cmake" @ONLY
+configure_file(graphar-config-version.in.cmake
+               "${PROJECT_BINARY_DIR}/graphar-config-version.cmake" @ONLY
 )
 
-install(FILES "${PROJECT_BINARY_DIR}/gar-config.cmake"
-              "${PROJECT_BINARY_DIR}/gar-config-version.cmake"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gar
+install(FILES "${PROJECT_BINARY_DIR}/graphar-config.cmake"
+              "${PROJECT_BINARY_DIR}/graphar-config-version.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/graphar
 )
 
-install(EXPORT gar-targets
-        FILE gar-targets.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gar
+install(EXPORT graphar-targets
+        FILE graphar-targets.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/graphar
 )
 
 # ------------------------------------------------------------------------------
@@ -388,7 +385,7 @@ if (BUILD_TESTS)
         if(BUILD_ARROW_FROM_SOURCE)
             target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
         endif()
-        target_link_libraries(${target} PRIVATE Catch2::Catch2 gar Threads::Threads ${CMAKE_DL_LIBS})
+        target_link_libraries(${target} PRIVATE Catch2::Catch2 graphar Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
             if(BUILD_ARROW_FROM_SOURCE)
                 target_link_libraries(${target} PRIVATE -Wl,-force_load gar_arrow_static
@@ -445,7 +442,7 @@ if (BUILD_BENCHMARKS)
         add_executable(${target} ${add_test_SRCS})
         target_compile_features(${target} PRIVATE cxx_std_17)
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
-        target_link_libraries(${target} PRIVATE benchmark::benchmark_main gar Threads::Threads ${CMAKE_DL_LIBS})
+        target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar Threads::Threads ${CMAKE_DL_LIBS})
 
         # if OpenSSL library exists, link the OpenSSL library.
         # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
@@ -462,21 +459,21 @@ endif()
 # ------------------------------------------------------------------------------
 # Format code & cpplint
 # ------------------------------------------------------------------------------
-file(GLOB_RECURSE FILES_NEED_FORMAT "include/gar/*.h" "src/*.cc"
+file(GLOB_RECURSE FILES_NEED_FORMAT "include/graphar/*.h" "src/*.cc"
                                     "test/*.h" "test/*.cc"
                                     "examples/*.h" "examples/*.cc"
                                     "benchmarks/*.h" "benchmarks/*.cc")
-file(GLOB_RECURSE FILES_NEED_LINT "include/gar/*.h" "src/*.cc"
+file(GLOB_RECURSE FILES_NEED_LINT "include/graphar/*.h" "src/*.cc"
                                   "test/*.h" "test/*.cc"
                                   "examples/*.h" "examples/*.cc"
                                   "benchmarks/*.h" "benchmarks/*.cc")
 
-add_custom_target(gar-clformat
+add_custom_target(graphar-clformat
                   COMMAND clang-format --style=file -i ${FILES_NEED_FORMAT}
                   COMMENT "Running clang-format."
                   VERBATIM)
 
-add_custom_target(gar-cpplint
+add_custom_target(graphar-cpplint
         COMMAND ${PROJECT_SOURCE_DIR}/misc/cpplint.py --root=${PROJECT_SOURCE_DIR}/include ${FILES_NEED_LINT}
         COMMENT "Running cpplint check."
         VERBATIM)

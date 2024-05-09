@@ -17,9 +17,9 @@
  * under the License.
  */
 
-#include "gar/graph.h"
-#include "gar/util/adj_list_type.h"
-#include "gar/util/convert_to_arrow_type.h"
+#include "graphar/graph.h"
+#include "graphar/util/adj_list_type.h"
+#include "graphar/util/convert_to_arrow_type.h"
 
 namespace graphar {
 

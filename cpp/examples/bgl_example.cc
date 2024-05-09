@@ -26,11 +26,11 @@
 #include "arrow/api.h"
 
 #include "./config.h"
-#include "gar/api.h"
-#include "gar/graph.h"
-#include "gar/reader/arrow_chunk_reader.h"
-#include "gar/writer/arrow_chunk_writer.h"
-#include "gar/writer/vertices_builder.h"
+#include "graphar/api.h"
+#include "graphar/graph.h"
+#include "graphar/reader/arrow_chunk_reader.h"
+#include "graphar/writer/arrow_chunk_writer.h"
+#include "graphar/writer/vertices_builder.h"
 
 int main(int argc, char* argv[]) {
   // read file and construct graph info

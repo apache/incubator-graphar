@@ -24,7 +24,7 @@
 
 #include "arrow/compute/api.h"
 
-#include "gar/graph_info.h"
+#include "graphar/graph_info.h"
 
 namespace graphar {
 

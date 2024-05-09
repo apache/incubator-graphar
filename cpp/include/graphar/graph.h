@@ -28,12 +28,12 @@
 #include <variant>
 #include <vector>
 
-#include "gar/graph_info.h"
-#include "gar/reader/arrow_chunk_reader.h"
-#include "gar/util/adj_list_type.h"
-#include "gar/util/filesystem.h"
-#include "gar/util/reader_util.h"
-#include "gar/util/util.h"
+#include "graphar/graph_info.h"
+#include "graphar/reader/arrow_chunk_reader.h"
+#include "graphar/util/adj_list_type.h"
+#include "graphar/util/filesystem.h"
+#include "graphar/util/reader_util.h"
+#include "graphar/util/util.h"
 
 // forward declarations
 namespace arrow {

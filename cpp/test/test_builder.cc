@@ -34,10 +34,10 @@
 #include "parquet/arrow/writer.h"
 
 #include "./util.h"
-#include "gar/graph_info.h"
-#include "gar/util/yaml.h"
-#include "gar/writer/edges_builder.h"
-#include "gar/writer/vertices_builder.h"
+#include "graphar/graph_info.h"
+#include "graphar/util/yaml.h"
+#include "graphar/writer/edges_builder.h"
+#include "graphar/writer/vertices_builder.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>

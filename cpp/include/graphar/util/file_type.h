@@ -19,15 +19,33 @@
 
 #pragma once
 
-#include "gar/graph_info.h"
-#include "gar/util/adj_list_type.h"
-#include "gar/util/data_type.h"
-#include "gar/util/file_type.h"
-#include "gar/util/filesystem.h"
-#include "gar/util/general_params.h"
-#include "gar/util/macros.h"
-#include "gar/util/result.h"
-#include "gar/util/status.h"
-#include "gar/util/util.h"
-#include "gar/util/version_parser.h"
-#include "gar/util/yaml.h"
+#include <map>
+#include <stdexcept>
+#include <string>
+
+#include "graphar/fwd.h"
+#include "graphar/util/macros.h"
+
+namespace graphar {
+
+static inline FileType StringToFileType(const std::string& str) {
+  static const std::map<std::string, FileType> str2file_type{
+      {"csv", FileType::CSV},
+      {"parquet", FileType::PARQUET},
+      {"orc", FileType::ORC}};
+  try {
+    return str2file_type.at(str.c_str());
+  } catch (const std::exception& e) {
+    throw std::runtime_error("KeyError: " + str);
+  }
+}
+
+static inline const char* FileTypeToString(FileType file_type) {
+  static const std::map<FileType, const char*> file_type2string{
+      {FileType::CSV, "csv"},
+      {FileType::PARQUET, "parquet"},
+      {FileType::ORC, "orc"}};
+  return file_type2string.at(file_type);
+}
+
+}  // namespace graphar

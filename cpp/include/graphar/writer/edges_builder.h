@@ -27,10 +27,10 @@
 #include <utility>
 #include <vector>
 
-#include "gar/fwd.h"
-#include "gar/graph_info.h"
-#include "gar/util/adj_list_type.h"
-#include "gar/writer/arrow_chunk_writer.h"
+#include "graphar/fwd.h"
+#include "graphar/graph_info.h"
+#include "graphar/util/adj_list_type.h"
+#include "graphar/writer/arrow_chunk_writer.h"
 
 namespace arrow {
 class Array;

@@ -43,7 +43,6 @@ excludes = [
   "**/.scalafmt.conf",
   "cpp/apidoc",
   "cpp/thirdparty",
-  "cpp/include/gar/external/result.hpp",
   "cpp/misc/cpplint.py",
   "spark/datasources-32/src/main/scala/org/apache/graphar/datasources",
   "spark/datasources-33/src/main/scala/org/apache/graphar/datasources",

@@ -32,15 +32,15 @@
 #include "arrow/dataset/plan.h"
 #include "arrow/dataset/scanner.h"
 
-#include "gar/graph_info.h"
-#include "gar/util/adj_list_type.h"
-#include "gar/util/data_type.h"
-#include "gar/util/filesystem.h"
-#include "gar/util/general_params.h"
-#include "gar/util/result.h"
-#include "gar/util/status.h"
-#include "gar/util/util.h"
-#include "gar/writer/arrow_chunk_writer.h"
+#include "graphar/graph_info.h"
+#include "graphar/util/adj_list_type.h"
+#include "graphar/util/data_type.h"
+#include "graphar/util/filesystem.h"
+#include "graphar/util/general_params.h"
+#include "graphar/util/result.h"
+#include "graphar/util/status.h"
+#include "graphar/util/util.h"
+#include "graphar/writer/arrow_chunk_writer.h"
 
 namespace graphar {
 // common methods

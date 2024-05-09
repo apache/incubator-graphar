@@ -23,9 +23,9 @@
 #include "arrow/filesystem/api.h"
 
 #include "./config.h"
-#include "gar/api.h"
-#include "gar/reader/arrow_chunk_reader.h"
-#include "gar/util/expression.h"
+#include "graphar/api.h"
+#include "graphar/reader/arrow_chunk_reader.h"
+#include "graphar/util/expression.h"
 
 void vertex_property_chunk_reader(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {

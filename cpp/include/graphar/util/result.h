@@ -21,8 +21,8 @@
 
 #include <utility>
 
-#include "gar/fwd.h"
-#include "gar/util/status.h"
+#include "graphar/fwd.h"
+#include "graphar/util/status.h"
 
 #define GAR_ASSIGN_OR_RAISE_IMPL(result_name, lhs, rexpr)          \
   auto&& result_name = (rexpr);                                    \

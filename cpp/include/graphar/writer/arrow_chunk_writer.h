@@ -23,8 +23,8 @@
 #include <string>
 #include <vector>
 
-#include "gar/fwd.h"
-#include "gar/util/writer_util.h"
+#include "graphar/fwd.h"
+#include "graphar/util/writer_util.h"
 
 // forward declaration
 namespace arrow {

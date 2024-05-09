@@ -27,8 +27,8 @@
 
 #include "result/result.hpp"
 
-#include "gar/util/macros.h"
-#include "gar/util/status.h"
+#include "graphar/util/macros.h"
+#include "graphar/util/status.h"
 
 namespace graphar {
 

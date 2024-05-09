@@ -24,12 +24,12 @@
 
 #include "./util.h"
 
-#include "gar/graph_info.h"
-#include "gar/util/adj_list_type.h"
-#include "gar/util/data_type.h"
-#include "gar/util/file_type.h"
-#include "gar/util/filesystem.h"
-#include "gar/util/version_parser.h"
+#include "graphar/graph_info.h"
+#include "graphar/util/adj_list_type.h"
+#include "graphar/util/data_type.h"
+#include "graphar/util/file_type.h"
+#include "graphar/util/filesystem.h"
+#include "graphar/util/version_parser.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>

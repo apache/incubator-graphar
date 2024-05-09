@@ -19,10 +19,10 @@
 
 #include "benchmark/benchmark.h"
 
-#include "./benchmark_util.h"
-#include "gar/graph_info.h"
-#include "gar/reader/arrow_chunk_reader.h"
-#include "gar/util/adj_list_type.h"
+#include "benchmark_util.h"
+#include "graphar/graph_info.h"
+#include "graphar/reader/arrow_chunk_reader.h"
+#include "graphar/util/adj_list_type.h"
 
 namespace graphar {
 

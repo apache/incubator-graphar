@@ -23,7 +23,7 @@
 #include <string>
 #include <utility>
 
-#include "gar/util/macros.h"
+#include "graphar/util/macros.h"
 
 #define GAR_RETURN_IF_(condition, status, _) \
   do {                                       \

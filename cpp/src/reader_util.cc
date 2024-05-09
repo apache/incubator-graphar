@@ -24,11 +24,11 @@
 #include "arrow/io/api.h"
 #include "parquet/arrow/reader.h"
 
-#include "gar/graph_info.h"
-#include "gar/util/adj_list_type.h"
-#include "gar/util/expression.h"
-#include "gar/util/filesystem.h"
-#include "gar/util/reader_util.h"
+#include "graphar/graph_info.h"
+#include "graphar/util/adj_list_type.h"
+#include "graphar/util/expression.h"
+#include "graphar/util/filesystem.h"
+#include "graphar/util/reader_util.h"
 
 namespace graphar {
 

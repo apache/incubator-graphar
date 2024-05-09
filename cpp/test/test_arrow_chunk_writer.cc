@@ -33,11 +33,11 @@
 #include "parquet/arrow/writer.h"
 
 #include "./util.h"
-#include "gar/graph_info.h"
-#include "gar/util/adj_list_type.h"
-#include "gar/util/general_params.h"
-#include "gar/util/yaml.h"
-#include "gar/writer/arrow_chunk_writer.h"
+#include "graphar/graph_info.h"
+#include "graphar/util/adj_list_type.h"
+#include "graphar/util/general_params.h"
+#include "graphar/util/yaml.h"
+#include "graphar/writer/arrow_chunk_writer.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>
