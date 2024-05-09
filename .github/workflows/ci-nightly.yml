@@ -57,7 +57,7 @@ jobs:
       run: |
         pushd build
         make -j$(nproc)
-        make gar-ccache-stats
+        make graphar-ccache-stats
         popd
 
     - name: Test

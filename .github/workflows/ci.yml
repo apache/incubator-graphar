@@ -85,7 +85,7 @@ jobs:
         # validate format
         function prepend() { while read line; do echo "${1}${line}"; done; }
 
-        make gar-clformat
+        make graphar-clformat
         GIT_DIFF=$(git diff --ignore-submodules)
         if [[ -n $GIT_DIFF ]]; then
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -109,7 +109,7 @@ jobs:
 
         function ec() { [[ "$1" == "-h" ]] && { shift && eval $* > /dev/null 2>&1; ec=$?; echo $ec; } || eval $*; ec=$?; }
 
-        ec make gar-cpplint
+        ec make graphar-cpplint
         if [[ "$ec" != "0" ]]; then
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             echo "| cpplint failures found! Run: "
