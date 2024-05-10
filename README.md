@@ -34,24 +34,24 @@ data, thereby reducing the burden on systems when working together.
 Additionally, it can serve as a direct data source for graph processing
 applications.
 
-To achieve this, GraphAr provides:
+To achieve this, GraphAr project provides:
 
-- The Graph Archive(GAR) file format: a standardized system-independent
-  file format for storing graph data
+- The GraphAr format: a standardized system-independent
+  format for storing graph data
 - Libraries: a set of libraries for reading, writing and transforming
-  GAR files
+  GraphAr format data
 
 By using GraphAr, you can:
 
 - Store and persist your graph data in a system-independent way with the
-  GAR file format
-- Easily access and generate GAR files using the libraries
-- Utilize Apache Spark to quickly manipulate and transform your GAR
-  files
+  GraphAr format
+- Easily access and generate GraphAr format data using the libraries
+- Utilize Apache Spark to quickly manipulate and transform your graphar 
+  format data
 
-## The GAR File Format
+## The GraphAr Format
 
-The GAR file format is designed for storing property graphs. It uses
+The GraphAr format is designed for storing property graphs. It uses
 metadata to record all the necessary information of a graph, and
 maintains the actual data in a chunked way.
 

@@ -551,7 +551,7 @@ class VertexInfo:
         :chunk_size: chunk size
         :prefix: vertex prefix
         :property_groups: list of property groups
-        :version: version of GAR
+        :version: version of GraphAr format
         """
         return VertexInfo(label, chunk_size, prefix, property_groups, version, None)
 
@@ -896,16 +896,16 @@ class EdgeInfo:
         )
 
     def get_version(self) -> str:
-        """Get GAR version from the corresponding JVM object.
+        """Get GraphAr format version from the corresponding JVM object.
 
-        :returns: GAR version
+        :returns: GraphAr format version
         """
         return self._jvm_edge_info_obj.getVersion()
 
     def set_version(self, version: str) -> None:
         """Mutate the corresponding JVM object.
 
-        :param version: the new GAR version
+        :param version: the new GraphAr format version
         """
         self._jvm_edge_info_obj.setVersion(version)
 
@@ -965,7 +965,7 @@ class EdgeInfo:
         :param prefix: path prefix
         :param adj_lists: sequence of AdjList objects
         :property_groups: sequence of of PropertyGroup objects
-        :param version: version of GAR format
+        :param version: version of GraphAr format
         """
         if not prefix.endswith(os.sep):
             prefix += os.sep
@@ -1374,7 +1374,7 @@ class GraphInfo:
         self._jvm_graph_info_obj.setEdges(edges)
 
     def get_version(self) -> str:
-        """Get GAR version from the corresponding JVM object.
+        """Get GraphAr format version from the corresponding JVM object.
 
         :returns: version
         """
@@ -1383,7 +1383,7 @@ class GraphInfo:
     def set_version(self, version: str) -> None:
         """Mutate the corresponding JVM object.
 
-        :param version: new version of GAR
+        :param version: new version of GraphAr format
         """
         self._jvm_graph_info_obj.setVersion(version)
 
@@ -1417,7 +1417,7 @@ class GraphInfo:
         :param prefix: path prefix
         :param vertices: list of vertices
         :param edges: list of edges
-        :param version: version of GAR format
+        :param version: version of GraphAr format
         """
         if not prefix.endswith(os.sep):
             prefix += os.sep

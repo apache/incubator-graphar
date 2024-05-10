@@ -24,12 +24,12 @@
 #include <string>
 #include <vector>
 
-#include "gar/util/file_type.h"
-#include "gar/util/result.h"
-#include "gar/util/status.h"
-#include "gar/util/util.h"
+#include "graphar/util/file_type.h"
+#include "graphar/util/result.h"
+#include "graphar/util/status.h"
+#include "graphar/util/util.h"
 
-#include "gar/util/reader_util.h"
+#include "graphar/util/reader_util.h"
 
 // forward declarations
 namespace arrow {

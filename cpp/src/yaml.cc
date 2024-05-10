@@ -22,8 +22,8 @@
 
 #include "mini-yaml/yaml/Yaml.hpp"
 
-#include "gar/util/result.h"
-#include "gar/util/yaml.h"
+#include "graphar/util/result.h"
+#include "graphar/util/yaml.h"
 
 namespace graphar {
 

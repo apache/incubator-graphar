@@ -20,9 +20,9 @@
 #include <cstdlib>
 
 #include "./util.h"
-#include "gar/graph_info.h"
-#include "gar/reader/chunk_info_reader.h"
-#include "gar/util/adj_list_type.h"
+#include "graphar/graph_info.h"
+#include "graphar/reader/chunk_info_reader.h"
+#include "graphar/util/adj_list_type.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>

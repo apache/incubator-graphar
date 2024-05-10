@@ -7,21 +7,21 @@ sidebar_position: 1
 
 ## Co-Work with Apache Spark
 
-[Apache Spark](https://spark.apache.org/) is a multi-language engine for executing data engineering, data science, and machine learning on single-node machines or clusters. The GraphAr Spark library is developed to make the integration of GraphAr with Spark easy. This library allows users to efficiently generate, load, and transform GAR files, and to integrate GraphAr with other Spark-compatible systems.
+[Apache Spark](https://spark.apache.org/) is a multi-language engine for executing data engineering, data science, and machine learning on single-node machines or clusters. The GraphAr Spark library is developed to make the integration of GraphAr with Spark easy. This library allows users to efficiently generate, load, and transform GraphAr format files, and to integrate GraphAr with other Spark-compatible systems.
 
 Examples of this co-working integration have been provided as showcases.
 
 
 ### Examples
 
-### Transform GAR files
+### Transform GraphAr format files
 
 We provide an example in [TestGraphTransformer.scala][test-graph-transformer], which demonstrates
 how to conduct data transformation at the graph level. [TransformExample.scala][transformer-example] is
 another example for graph data conversion between different file types or different
 adjList types, which is implemented at the vertex/edge table level. To do this,
 the original data is first loaded into a Spark DataFrame using the GraphAr Spark Reader.
-Then, the DataFrame is written into generated GAR files through a GraphAr Spark Writer,
+Then, the DataFrame is written into generated GraphAr format files through a GraphAr Spark Writer,
 following the meta data defined in a new information file.
 
 
@@ -29,7 +29,7 @@ following the meta data defined in a new information file.
 
 Another important use case of GraphAr is to use it as a data source for graph
 computing or analytics; [ComputeExample.scala][compute-example] provides an example of constructing
-a GraphX graph from reading GAR files and executing a connected-components computation.
+a GraphX graph from reading GraphAr format files and executing a connected-components computation.
 Also, executing queries with Spark SQL and running other graph analytic algorithms
 can be implemented in a similar fashion.
 
@@ -68,7 +68,7 @@ def main(args: Array[String]): Unit = {
     // put movie graph data into writer
     readAndPutDataIntoWriter(writer, spark)
 
-    // write in graphar format
+    // write in GraphAr format
     val outputPath: String = args(0)
     val vertexChunkSize: Long = args(1).toLong
     val edgeChunkSize: Long = args(2).toLong

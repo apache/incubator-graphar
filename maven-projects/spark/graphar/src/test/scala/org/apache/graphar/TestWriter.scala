@@ -57,7 +57,7 @@ class WriterSuite extends AnyFunSuite {
     val vertex_df_with_index =
       util.IndexGenerator.generateVertexIndexColumn(vertex_df)
 
-    // create writer object for person and generate the properties with GAR format
+    // create writer object for person and generate the properties with GraphAr format
     val prefix: String = "/tmp/"
     val writer = new VertexWriter(prefix, vertex_info, vertex_df_with_index)
 
@@ -124,7 +124,7 @@ class WriterSuite extends AnyFunSuite {
     val edge_df_with_index = util.IndexGenerator
       .generateSrcAndDstIndexUnitedlyForEdges(edge_df, "src", "dst")
 
-    // create writer object for person_knows_person and generate the adj list and properties with GAR format
+    // create writer object for person_knows_person and generate the adj list and properties with GraphAr format
     val writer = new EdgeWriter(
       prefix,
       edge_info,
@@ -276,7 +276,7 @@ class WriterSuite extends AnyFunSuite {
         vertex_mapping
       )
 
-    // create writer object for person_knows_person and generate the adj list and properties with GAR format
+    // create writer object for person_knows_person and generate the adj list and properties with GraphAr format
     val writer = new EdgeWriter(
       prefix,
       edge_info,

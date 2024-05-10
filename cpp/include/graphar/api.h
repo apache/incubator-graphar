@@ -19,25 +19,15 @@
 
 #pragma once
 
-#include "gar/util/macros.h"
-
-namespace graphar {
-
-/**
- * @brief The level for validating writing operations.
- */
-enum class ValidateLevel : char {
-  /// To use the default validate level of the writer/builder.
-  default_validate = 0,
-  /// To skip the validation.
-  no_validate = 1,
-  /// Weak validation: check if the index, count, adj_list type, property group
-  /// and the size of the table passed to the writer/builder are valid.
-  weak_validate = 2,
-  /// Strong validation: except for the weak validation, also check if the
-  /// schema (including each property name and data type) of the intput data
-  /// passed to the writer/builder is consistent with that defined in the info.
-  strong_validate = 3
-};
-
-}  // namespace graphar
+#include "graphar/graph_info.h"
+#include "graphar/util/adj_list_type.h"
+#include "graphar/util/data_type.h"
+#include "graphar/util/file_type.h"
+#include "graphar/util/filesystem.h"
+#include "graphar/util/general_params.h"
+#include "graphar/util/macros.h"
+#include "graphar/util/result.h"
+#include "graphar/util/status.h"
+#include "graphar/util/util.h"
+#include "graphar/util/version_parser.h"
+#include "graphar/util/yaml.h"

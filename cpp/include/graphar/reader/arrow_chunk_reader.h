@@ -24,8 +24,8 @@
 #include <utility>
 #include <vector>
 
-#include "gar/fwd.h"
-#include "gar/util/reader_util.h"
+#include "graphar/fwd.h"
+#include "graphar/util/reader_util.h"
 
 // forward declaration
 namespace arrow {

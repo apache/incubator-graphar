@@ -17,8 +17,8 @@
  * under the License.
  */
 
-#include "gar/util/expression.h"
-#include "gar/util/result.h"
+#include "graphar/util/expression.h"
+#include "graphar/util/result.h"
 
 namespace graphar {
 

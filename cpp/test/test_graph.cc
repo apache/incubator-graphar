@@ -20,8 +20,8 @@
 #include <iostream>
 
 #include "./util.h"
-#include "gar/graph.h"
-#include "gar/util/data_type.h"
+#include "graphar/graph.h"
+#include "graphar/util/data_type.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>

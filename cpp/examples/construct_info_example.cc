@@ -20,7 +20,7 @@
 #include <cassert>
 
 #include "./config.h"
-#include "gar/api.h"
+#include "graphar/api.h"
 
 int main(int argc, char* argv[]) {
   /*------------------construct vertex info------------------*/

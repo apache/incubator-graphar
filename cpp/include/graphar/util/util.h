@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-#include "gar/util/result.h"
+#include "graphar/util/result.h"
 
 #define REGULAR_SEPARATOR "_"
 

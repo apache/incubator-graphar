@@ -22,12 +22,12 @@
 #include "arrow/api.h"
 
 #include "./util.h"
-#include "gar/reader/arrow_chunk_reader.h"
-#include "gar/util/adj_list_type.h"
-#include "gar/util/data_type.h"
-#include "gar/util/expression.h"
-#include "gar/util/filesystem.h"
-#include "gar/util/general_params.h"
+#include "graphar/reader/arrow_chunk_reader.h"
+#include "graphar/util/adj_list_type.h"
+#include "graphar/util/data_type.h"
+#include "graphar/util/expression.h"
+#include "graphar/util/filesystem.h"
+#include "graphar/util/general_params.h"
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch.hpp>

@@ -21,13 +21,13 @@
 
 #include "mini-yaml/yaml/Yaml.hpp"
 
-#include "gar/graph_info.h"
-#include "gar/util/adj_list_type.h"
-#include "gar/util/data_type.h"
-#include "gar/util/filesystem.h"
-#include "gar/util/result.h"
-#include "gar/util/version_parser.h"
-#include "gar/util/yaml.h"
+#include "graphar/graph_info.h"
+#include "graphar/util/adj_list_type.h"
+#include "graphar/util/data_type.h"
+#include "graphar/util/filesystem.h"
+#include "graphar/util/result.h"
+#include "graphar/util/version_parser.h"
+#include "graphar/util/yaml.h"
 
 namespace graphar {
 

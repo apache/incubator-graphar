@@ -25,7 +25,7 @@
 #include "arrow/api.h"
 #include "arrow/type.h"
 
-#include "gar/util/data_type.h"
+#include "graphar/util/data_type.h"
 
 namespace graphar {
 

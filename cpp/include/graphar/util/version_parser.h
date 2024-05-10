@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-#include "gar/util/result.h"
+#include "graphar/util/result.h"
 
 namespace graphar {
 

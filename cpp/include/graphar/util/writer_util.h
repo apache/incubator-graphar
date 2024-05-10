@@ -19,33 +19,25 @@
 
 #pragma once
 
-#include <map>
-#include <stdexcept>
-#include <string>
-
-#include "gar/fwd.h"
-#include "gar/util/macros.h"
+#include "graphar/util/macros.h"
 
 namespace graphar {
 
-static inline FileType StringToFileType(const std::string& str) {
-  static const std::map<std::string, FileType> str2file_type{
-      {"csv", FileType::CSV},
-      {"parquet", FileType::PARQUET},
-      {"orc", FileType::ORC}};
-  try {
-    return str2file_type.at(str.c_str());
-  } catch (const std::exception& e) {
-    throw std::runtime_error("KeyError: " + str);
-  }
-}
-
-static inline const char* FileTypeToString(FileType file_type) {
-  static const std::map<FileType, const char*> file_type2string{
-      {FileType::CSV, "csv"},
-      {FileType::PARQUET, "parquet"},
-      {FileType::ORC, "orc"}};
-  return file_type2string.at(file_type);
-}
+/**
+ * @brief The level for validating writing operations.
+ */
+enum class ValidateLevel : char {
+  /// To use the default validate level of the writer/builder.
+  default_validate = 0,
+  /// To skip the validation.
+  no_validate = 1,
+  /// Weak validation: check if the index, count, adj_list type, property group
+  /// and the size of the table passed to the writer/builder are valid.
+  weak_validate = 2,
+  /// Strong validation: except for the weak validation, also check if the
+  /// schema (including each property name and data type) of the intput data
+  /// passed to the writer/builder is consistent with that defined in the info.
+  strong_validate = 3
+};
 
 }  // namespace graphar

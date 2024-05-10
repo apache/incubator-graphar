@@ -26,9 +26,9 @@
 #include <utility>
 #include <vector>
 
-#include "gar/graph_info.h"
-#include "gar/util/result.h"
-#include "gar/writer/arrow_chunk_writer.h"
+#include "graphar/graph_info.h"
+#include "graphar/util/result.h"
+#include "graphar/writer/arrow_chunk_writer.h"
 
 // forward declaration
 namespace arrow {

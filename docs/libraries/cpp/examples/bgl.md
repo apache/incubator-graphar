@@ -77,7 +77,7 @@ std::cout << "Total number of components: " << cc_num << std::endl;
 ```
 
 Finally, we could use a **VerticesBuilder** of GraphAr to write the
-results to new generated GAR files:
+results to new generated GraphAr format data:
 
 ``` C++
 // construct a new property group

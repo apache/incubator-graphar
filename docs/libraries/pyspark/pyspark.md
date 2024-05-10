@@ -18,7 +18,7 @@ Spark.
 ## Overview
 
 The GraphAr PySpark library is provided for generating, loading and
-transforming GAR files with PySpark.
+transforming GraphAr format files with PySpark.
 
 - **Information Classes**: As same with in the C++ library, the
   information classes are implemented as a part of the PySpark library
@@ -27,16 +27,16 @@ transforming GAR files with PySpark.
 - **IndexGenerator**: The IndexGenerator helps to generate the indices
   for vertex/edge DataFrames. In most cases, IndexGenerator is first
   utilized to generate the indices for a DataFrame (e.g., from primary
-  keys), and then this DataFrame can be written into GAR files through
+  keys), and then this DataFrame can be written into GraphAr format files through
   the writer.
 - **Writer**: The GraphAr PySpark writer provides a set of interfaces
-  that can be used to write Spark DataFrames into GAR files. Every time
+  that can be used to write Spark DataFrames into GraphAr format files. Every time
   it takes a DataFrame as the logical table for a type of vertices or
   edges, assembles the data in specified format (e.g., reorganize the
-  edges in the CSR way) and then dumps it to standard GAR files (CSV,
+  edges in the CSR way) and then dumps it to standard GraphAr format files (CSV,
   ORC or Parquet files) under the specific directory path.
 - **Reader**: The GraphAr PySpark reader provides a set of interfaces
-  that can be used to read GAR files. It reads a collection of vertices
+  that can be used to read GraphAr format files. It reads a collection of vertices
   or edges at a time and assembles the result into the Spark DataFrame.
   Similar with the reader in the C++ library, it supports the users to
   specify the data they need, e.g., reading a single property group
@@ -46,15 +46,15 @@ transforming GAR files with PySpark.
 
 The GraphAr Spark library can be used in a range of scenarios:
 
-- Taking GAR as a data source to execute SQL queries or do graph
+- Taking GraphAr format data as a data source to execute SQL queries or do graph
   processing (e.g., using GraphX).
-- Transforming data between GAR and other data sources (e.g., Hive,
+- Transforming data between GraphAr format data and other data sources (e.g., Hive,
   Neo4j, NebulaGraph, …).
-- Transforming GAR data between different file types (e.g., from ORC to
+- Transforming GraphAr format data between different file types (e.g., from ORC to
   Parquet).
-- Transforming GAR data between different adjList types (e.g., from COO
+- Transforming GraphAr format data between different adjList types (e.g., from COO
   to CSR).
-- Modifying existing GAR data (e.g., adding new vertices/edges).
+- Modifying existing GraphAr format data (e.g., adding new vertices/edges).
 
 ## Get GraphAr Spark Library
 
@@ -102,7 +102,7 @@ this JAR.
 // create a SparkSession from pyspark.sql import SparkSession
 
 spark = ( SparkSession .builder. … .conf(“spark-jars”,
-“path-to-graphara-spark-x.x.x.jar-file”) .getOrCreate() )
+“path-to-graphar-spark-x.x.x.jar-file”) .getOrCreate() )
 
 from graphar_pyspark import initialize initialize(spark)
 ```

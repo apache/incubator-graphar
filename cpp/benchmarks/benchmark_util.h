@@ -25,8 +25,8 @@
 
 #include "benchmark/benchmark.h"
 
-#include "gar/graph_info.h"
-#include "gar/util/status.h"
+#include "graphar/graph_info.h"
+#include "graphar/util/status.h"
 
 namespace graphar {
 

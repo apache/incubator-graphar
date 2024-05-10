@@ -6,22 +6,22 @@ sidebar_position: 3
 
 ## Overview
 
-The GraphAr Spark library is provided for generating, loading and transforming GAR files with Apache Spark easy. It consists of several components:
+The GraphAr Spark library is provided for generating, loading and transforming GraphAr format files with Apache Spark easy. It consists of several components:
 
 - **Information Classes**: As same with in the C++ library, the information classes are implemented as a part of the Spark library for constructing and accessing the meta information about the graphs, vertices and edges in GraphAr.
-- **IndexGenerator**: The IndexGenerator helps to generate the indices for vertex/edge DataFrames. In most cases, IndexGenerator is first utilized to generate the indices for a DataFrame (e.g., from primary keys), and then this DataFrame can be written into GAR files through the writer.
-- **Writer**: The GraphAr Spark writer provides a set of interfaces that can be used to write Spark DataFrames into GAR files. Every time it takes a DataFrame as the logical table for a type of vertices or edges, assembles the data in specified format (e.g., reorganize the edges in the CSR way) and then dumps it to standard GAR files (CSV, ORC or Parquet files) under the specific directory path.
-- **Reader**: The GraphAr Spark reader provides a set of interfaces that can be used to read GAR files. It reads a collection of vertices or edges at a time and assembles the result into the Spark DataFrame. Similar with the reader in the C++ library, it supports the users to specify the data they need, e.g., reading a single property group instead of all properties.
+- **IndexGenerator**: The IndexGenerator helps to generate the indices for vertex/edge DataFrames. In most cases, IndexGenerator is first utilized to generate the indices for a DataFrame (e.g., from primary keys), and then this DataFrame can be written into GraphAr format files through the writer.
+- **Writer**: The GraphAr Spark writer provides a set of interfaces that can be used to write Spark DataFrames into GraphAr format files. Every time it takes a DataFrame as the logical table for a type of vertices or edges, assembles the data in specified format (e.g., reorganize the edges in the CSR way) and then dumps it to standard GraphAr format files (CSV, ORC or Parquet files) under the specific directory path.
+- **Reader**: The GraphAr Spark reader provides a set of interfaces that can be used to read GraphAr format files. It reads a collection of vertices or edges at a time and assembles the result into the Spark DataFrame. Similar with the reader in the C++ library, it supports the users to specify the data they need, e.g., reading a single property group instead of all properties.
 
 ## Use Cases
 
 The GraphAr Spark library can be used in a range of scenarios:
 
-- Taking GAR as a data source to execute SQL queries or do graph processing (e.g., using GraphX).
-- Transforming data between GAR and other data sources (e.g., Hive, Neo4j, NebulaGraph, ...).
-- Transforming GAR data between different file types (e.g., from ORC to Parquet).
-- Transforming GAR data between different adjList types (e.g., from COO to CSR).
-- Modifying existing GAR data (e.g., adding new vertices/edges).
+- Taking GraphAr format as a data source to execute SQL queries or do graph processing (e.g., using GraphX).
+- Transforming data between GraphAr format and other data sources (e.g., Hive, Neo4j, NebulaGraph, ...).
+- Transforming GraphAr format data between different file types (e.g., from ORC to Parquet).
+- Transforming GraphAr format data between different adjList types (e.g., from COO to CSR).
+- Modifying existing GraphAr format data (e.g., adding new vertices/edges).
 
 For more information on its usage, please refer to the [Examples](examples.md).
 
@@ -80,10 +80,10 @@ See [TestGraphInfo.scala][test-graph-info] for the complete example.
 
 The GraphAr file format assigns each vertex with a unique index inside the vertex type (which called internal vertex id) starting from 0 and increasing continuously for each type of vertex (i.e., with the same vertex label). However, the vertex/edge tables in Spark often lack this information, requiring special attention. For example, an edge table typically uses the primary key (e.g., "id", which is a string) to identify its source and destination vertices.
 
-To address this issue, the GraphAr Spark library offers the IndexGenerator which is used to generate indices for vertex/edge DataFrames. For a vertex DataFrame, a mapping from the primary keys to GAR indices can be constructed, or an index column can be generated directly if no primary keys are available. For an edge DataFrame, source and destination columns can be generated from the vertex index mapping (when the end vertices are represented by the primary keys), or they may be generated directly without the mapping.
+To address this issue, the GraphAr Spark library offers the IndexGenerator which is used to generate indices for vertex/edge DataFrames. For a vertex DataFrame, a mapping from the primary keys to indices can be constructed, or an index column can be generated directly if no primary keys are available. For an edge DataFrame, source and destination columns can be generated from the vertex index mapping (when the end vertices are represented by the primary keys), or they may be generated directly without the mapping.
 
 > **tip:**
-> In most cases, IndexGenerator is first utilized to generate the indices for a DataFrame, and then this DataFrame can be written into GAR files through the writer.
+> In most cases, IndexGenerator is first utilized to generate the indices for a DataFrame, and then this DataFrame can be written into GraphAr format files through the writer.
 
 To utilize IndexGenerator, please refer to the following example code.
 
@@ -111,7 +111,7 @@ See [TestIndexGenerator.scala][test-index-generator] for the complete example.
 
 The GraphAr Spark writer provides the necessary Spark interfaces to write DataFrames into GraphAr formatted files in a batch-import fashion. With the VertexWriter, users can specify a particular property group to be written into its corresponding chunks, or choose to write all property groups. For edge chunks, besides the meta data (edge info), the adjList type should also be specified. The adjList/properties can be written alone, or alternatively, all adjList, properties, and the offset (for CSR and CSC format) chunks can be written simultaneously.
 
-To utilize the GAR Spark writer, please refer to the following example code.
+To utilize the GraphAr Spark writer, please refer to the following example code.
 
 ```scala
 // generate the vertex index column for vertex DataFrame
@@ -148,11 +148,11 @@ See [TestWriter.scala][test-writer] for the complete example.
 
 ### Reader
 
-The GraphAr Spark reader provides an extensive set of interfaces to read GAR files. It reads a collection of vertices or edges at a time and assembles the result into the Spark DataFrame. Similar with the reader in C++ library, it supports the users to specify the data they need, e.g., a single property group.
+The GraphAr Spark reader provides an extensive set of interfaces to read GraphAr format files. It reads a collection of vertices or edges at a time and assembles the result into the Spark DataFrame. Similar with the reader in C++ library, it supports the users to specify the data they need, e.g., a single property group.
 
-After content has been read into the Spark DataFrame, users can leverage it to do graph processing, execute SQL queries or perform various transformations (such as adding new vertices/edges, reorganizing the edge order, and changing the file type) and then write it back into GAR files if desired.
+After content has been read into the Spark DataFrame, users can leverage it to do graph processing, execute SQL queries or perform various transformations (such as adding new vertices/edges, reorganizing the edge order, and changing the file type) and then write it back into GraphAr format files if desired.
 
-To utilize the GAR Spark reader, please refer to the following example code.
+To utilize the GraphAr Spark reader, please refer to the following example code.
 
 ```scala
 // construct the vertex reader
@@ -188,7 +188,7 @@ To improve the usability of the GraphAr Spark library, a set of APIs are provide
 
 The Graph Reader is a helper object which enables users to read all the chunk files from GraphAr for a single graph. The only input required is a GraphInfo object or the path to the information yaml file. On successful completion, it returns a set of vertex DataFrames and edge DataFrames, each of which can be accessed by specifying the vertex/edge label. The Graph Writer is used for writing all vertex DataFrames and edge DataFrames of a graph to generate GraphAr chunk files. For more details, please refer to the [API Reference](https://graphar.apache.org/docs/spark/).
 
-The Graph Transformer is a helper object in the GraphAr Spark library, designed to assist with data transformation at the graph level. It takes two GraphInfo objects (or paths of two yaml files) as inputs: one for the source graph, and one for the destination graph. The transformer will then load data from existing GAR files for the source graph, utilizing the GraphAr Spark Reader and the meta data defined in the source GraphInfo. After reorganizing the data according to the destination GraphInfo, it generates new GAR chunk files with the GraphAr Spark Writer.
+The Graph Transformer is a helper object in the GraphAr Spark library, designed to assist with data transformation at the graph level. It takes two GraphInfo objects (or paths of two yaml files) as inputs: one for the source graph, and one for the destination graph. The transformer will then load data from existing GraphAr format files for the source graph, utilizing the GraphAr Spark Reader and the meta data defined in the source GraphInfo. After reorganizing the data according to the destination GraphInfo, it generates new GraphAr format chunk files with the GraphAr Spark Writer.
 
 ```scala
 // transform graphs by yaml paths
@@ -205,7 +205,7 @@ GraphTransformer.transform(source_info, dest_info, spark)
 
 We provide an example in [TestGraphTransformer.scala][test-graph-transformer], which demonstrates how to conduct data transformation from the [source graph](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/parquet/ldbc_sample.graph.yml) to the [destination graph](https://github.com/apache/incubator-graphar-testing/blob/main/transformer/ldbc_sample.graph.yml).
 
-The Graph Transformer can be used for various purposes, including transforming GAR data between different file types (e.g. from ORC to Parquet), transforming between different adjList types (e.g. from COO to CSR), selecting properties or regrouping them, and setting a new chunk size.
+The Graph Transformer can be used for various purposes, including transforming GraphAr format data between different file types (e.g. from ORC to Parquet), transforming between different adjList types (e.g. from COO to CSR), selecting properties or regrouping them, and setting a new chunk size.
 
 :::note
 
@@ -221,7 +221,7 @@ There are certain limitations while using the Graph Transformer:
 
 For more information on usage, please refer to the examples:
 
-- [ComputeExample.scala][compute-example]  includes an example for constructing the GraphX graph from GAR files and executing a connected-components computation.
+- [ComputeExample.scala][compute-example]  includes an example for constructing the GraphX graph from GraphAr format files and executing a connected-components computation.
 - [TransformExample.scala][transform-example] shows an example for graph data conversion between different file types or different adjList types.
 - [Neo4j2GraphAr.scala][neo4j2graphar] and [GraphAr2Neo4j.scala][graphar2neo4j] are examples to conduct data importing/exporting for Neo4j.
 

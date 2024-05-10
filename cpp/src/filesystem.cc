@@ -27,9 +27,9 @@
 #include "parquet/arrow/writer.h"
 #include "simple-uri-parser/uri_parser.h"
 
-#include "gar/fwd.h"
-#include "gar/util/expression.h"
-#include "gar/util/filesystem.h"
+#include "graphar/fwd.h"
+#include "graphar/util/expression.h"
+#include "graphar/util/filesystem.h"
 
 namespace graphar {
 namespace ds = arrow::dataset;

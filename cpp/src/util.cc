@@ -22,7 +22,7 @@
 
 #include "arrow/api.h"
 
-#include "gar/util/util.h"
+#include "graphar/util/util.h"
 
 namespace graphar {
 

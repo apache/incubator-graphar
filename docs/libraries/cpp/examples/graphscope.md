@@ -16,9 +16,9 @@ with other processors via synchronous message passing.
 
 To integrate GraphAr into GraphScope, we implemented
 *ArrowFragmentBuilder* and *ArrowFragmentWriter*. *ArrowFragmentBuilder*
-establishes the fragments for workers of GraphScope through reading GAR
-files in parallel. Conversely, *ArrowFragmentWriter* can take the
-GraphScope fragments and save them as GAR files. If you're interested in
+establishes the fragments for workers of GraphScope through reading GraphAr
+format data in parallel. Conversely, *ArrowFragmentWriter* can take the
+GraphScope fragments and save them as GraphAr format files. If you're interested in
 knowing more about the implementation, please refer to the [source
 code](https://github.com/v6d-io/v6d/commit/0eda2067e45fbb4ac46892398af0edc84fe1c27b).
 
@@ -28,7 +28,7 @@ code](https://github.com/v6d-io/v6d/commit/0eda2067e45fbb4ac46892398af0edc84fe1c
 
 The time performance of *ArrowFragmentBuilder* and *ArrowFragmentWriter*
 in GraphScope is heavily dependent on the partitioning of the graph into
-GAR files, that is, the *vertex chunk size* and *edge chunk size*, which
+GraphAr format files, that is, the *vertex chunk size* and *edge chunk size*, which
 are specified in the vertex information file and in the edge information
 file, respectively. 
 
@@ -39,7 +39,7 @@ many small files increases the overhead associated with the file system
 and the file parser.
 
 We have conducted micro benchmarks to compare the time performance for
-reading/writing GAR files by
+reading/writing GraphAr format files by
 *ArrowFragmentBuilder*/*ArrowFragmentWriter*, across different *vertex
 chunk size* and *edge chunk size* configurations. The settings we
 recommend for *vertex chunk size* and *edge chunk size* are **2^18** and

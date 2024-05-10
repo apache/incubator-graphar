@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "gar/fwd.h"
+#include "graphar/fwd.h"
 
 namespace graphar {
 
