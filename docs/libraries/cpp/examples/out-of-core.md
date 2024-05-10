@@ -1,7 +1,7 @@
 # Out-of-core Graph Algorithms
 
 An important application case of GraphAr is to serve out-of-core graph
-processing scenarios. With the graph data saved as GAR files in the
+processing scenarios. With the graph data saved as GraphAr format files in the
 disk, GraphAr provides a set of reading interfaces to allow to load part
 of graph data into memory when needed, to conduct analytics. While it is
 more convenient and efficient to store the entirety of the graph in

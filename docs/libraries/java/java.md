@@ -9,7 +9,7 @@ sidebar_position: 2
 Based on an efficient FFI for Java and C++ called
 [fastFFI](https://github.com/alibaba/fastFFI), the GraphAr Java
 library allows users to write Java for generating, loading and
-transforming GAR files. It consists of several components:
+transforming GraphAr format files. It consists of several components:
 
 -  **Information Classes**: As same with in the C++ library, the
    information classes are implemented to construct and access the meta
@@ -17,14 +17,14 @@ transforming GAR files. It consists of several components:
    GraphAr.
 
 -  **Writers**: The GraphAr Java writer provides a set of interfaces
-   that can be used to write Apache Arrow VectorSchemaRoot into GAR
+   that can be used to write Apache Arrow VectorSchemaRoot into GraphAr format
    files. Every time it takes a VectorSchemaRoot as the logical table
    for a type of vertices or edges, then convert it to ArrowTable, and
-   then dumps it to standard GAR files (CSV, ORC or Parquet files) under
+   then dumps it to standard GraphAr format files (CSV, ORC or Parquet files) under
    the specific directory path.
 
 -  **Readers**: The GraphAr Java reader provides a set of interfaces
-   that can be used to read GAR files. It reads a collection of vertices
+   that can be used to read GraphAr format files. It reads a collection of vertices
    or edges at a time and assembles the result into the ArrowTable.
    Similar with the reader in the C++ library, it supports the users to
    specify the data they need, e.g., reading a single property group
@@ -139,7 +139,7 @@ adjList type should also be specified. The adjList/properties can be
 written alone, or alternatively, all adjList, properties, and the offset
 (for CSR and CSC format) chunks can be written simultaneously.
 
-To utilize the GAR Java writer, please refer to the following example
+To utilize the GraphAr Java writer, please refer to the following example
 code.
 
 ```java
@@ -183,11 +183,11 @@ for the complete example.
 ### Readers
 
 The GraphAr Java reader provides an extensive set of interfaces to read
-GAR files. It reads a collection of vertices or edges at a time as
+GraphAr format files. It reads a collection of vertices or edges at a time as
 ArrowTable. Similar with the reader in C++ library, it supports the
 users to specify the data they need, e.g., a single property group.
 
-To utilize the GAR Java reader, please refer to the following example
+To utilize the GraphAr Java reader, please refer to the following example
 code.
 
 ```java

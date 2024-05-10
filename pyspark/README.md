@@ -5,7 +5,7 @@ This directory contains the code and build system for the GraphAr PySpark librar
 
 ## Introduction
 
-GraphAr PySpark project provides a PySpark API and utilities for working with GAR file format from PySpark. The project has the only python dependency -- `pyspark` itself. Currently only `pysaprk~=3.2` is supported, but in the future the scope of supported versions will be extended.
+GraphAr PySpark project provides a PySpark API and utilities for working with GraphAr file format from PySpark. The project has the only python dependency -- `pyspark` itself. Currently only `pysaprk~=3.2` is supported, but in the future the scope of supported versions will be extended.
 
 ## Installation
 

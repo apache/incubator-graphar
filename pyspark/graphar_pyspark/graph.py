@@ -166,7 +166,7 @@ class GraphWriter:
         self._jvm_graph_writer_obj.PutEdgeData(relation_jvm, df._jdf)
 
     def write_with_graph_info(self, graph_info: Union[GraphInfo, str]) -> None:
-        """Write the graph data in graphar format with graph info.
+        """Write the graph data in GraphAr format with graph info.
 
         Note: original method is `write` but there is not directly overloading in Python.
 
@@ -186,7 +186,7 @@ class GraphWriter:
         file_type: Optional[FileType] = None,
         version: Optional[str] = None,
     ) -> None:
-        """Write graph data in graphar format.
+        """Write graph data in GraphAr format.
 
         Note: for default parameters check org.apache.graphar.GeneralParams;
         For this method None for any of arguments means that the default value will be used.
@@ -196,7 +196,7 @@ class GraphWriter:
         :param vertex_chunk_size: the chunk size for vertices, default is 2^18
         :param edge_chunk_size: the chunk size for edges, default is 2^22
         :param file_type: the file type for data payload file, support [parquet, orc, csv], default is parquet.
-        :param version: version of graphar format, default is v1.
+        :param version: version of GraphAr format, default is v1.
         """
         if vertex_chunk_size is None:
             vertex_chunk_size = (

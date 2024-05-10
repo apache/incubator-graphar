@@ -63,7 +63,7 @@ build_graphar_cpp()
 # build the bridge JNI library
 add_library(${LIBNAME} SHARED ${SOURCES})
 # include graphar-cpp headers
-target_include_directories(${LIBNAME} SYSTEM BEFORE PRIVATE ${GAR_INCLUDE_DIR})
+target_include_directories(${LIBNAME} SYSTEM BEFORE PRIVATE ${GRAPHAR_INCLUDE_DIR})
 # link graphar-cpp and arrow
 target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} gar_shared)
 target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} Arrow::arrow_static)

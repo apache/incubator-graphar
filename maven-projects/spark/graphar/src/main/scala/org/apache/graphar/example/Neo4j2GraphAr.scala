@@ -58,7 +58,7 @@ object Neo4j2GraphAr {
     // file type
     val fileType: String = args(3)
 
-    // write in graphar format
+    // write in GraphAr format
     writer.write(
       outputPath,
       spark,

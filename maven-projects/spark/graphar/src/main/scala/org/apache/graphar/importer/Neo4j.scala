@@ -84,7 +84,7 @@ object Neo4j {
     // put movie graph data into writer
     readAndPutDataIntoWriter(writer, spark, schema)
 
-    // write in graphar format
+    // write in GraphAr format
     writer.write(
       gar.path,
       spark,

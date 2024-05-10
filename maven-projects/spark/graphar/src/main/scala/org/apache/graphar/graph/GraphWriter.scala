@@ -75,7 +75,7 @@ class GraphWriter() {
   }
 
   /**
-   * Write the graph data in graphar format with graph info.
+   * Write the graph data in GraphAr format with graph info.
    * @param graphInfo
    *   the graph info object for the graph.
    * @param spark
@@ -162,7 +162,7 @@ class GraphWriter() {
   }
 
   /**
-   * Write the graph data in graphar format with path of the graph info yaml.
+   * Write the graph data in GraphAr format with path of the graph info yaml.
    * @param graphInfoPath
    *   the path of the graph info yaml.
    * @param spark
@@ -175,7 +175,7 @@ class GraphWriter() {
   }
 
   /**
-   * Write graph data in graphar format.
+   * Write graph data in GraphAr format.
    *
    * @param path
    *   the directory to write.
@@ -191,7 +191,7 @@ class GraphWriter() {
    *   the file type for data payload file, support [parquet, orc, csv], default
    *   is parquet.
    * @param version
-   *   version of graphar format, default is v1.
+   *   version of GraphAr format, default is v1.
    */
   def write(
       path: String,

@@ -12,9 +12,9 @@ C++. To begin with, please refer to the [Building
 Steps](https://github.com/apache/incubator-graphar/blob/main/README.md#building-libraries)
 to install GraphAr.
 
-## GAR Information Files
+## Information Files
 
-GAR uses a group of Yaml files to save the meta information for a graph.
+GraphAr uses a group of Yaml files to save the meta information for a graph.
 
 ### Graph information
 
@@ -67,7 +67,7 @@ file
 located inside the test data contains an example of the edge information
 file.
 
-In GAR format, separate data files are used to store the structure
+In GraphAr format, separate data files are used to store the structure
 (called adjList) and the properties for edges. The adjList type can be
 either of **unordered_by_source**, **unordered_by_dest**,
 **ordered_by_source** or **ordered_by_dest**. For a specific
@@ -81,7 +81,7 @@ edges at the same time.
 
 :::
 
-## GAR Data Files
+## Data Files
 
 ### Property data
 
@@ -116,7 +116,7 @@ of the edges is **ordered_by_source**.
 
 ### AdjList data
 
-The adjList in GAR describes the topology structure, i.e., the internal
+The adjList in GraphAr describes the topology structure, i.e., the internal
 id of the source vertex and the destination vertex for each of a group
 of edges. As explained in [Edges in GraphAr](https://graphar.apache.org/docs/specification/format#edge-chunks-in-graphar), the edges are separated
 into edge chunks, and each edge chunk has its own adjList table and 0 or
@@ -140,11 +140,11 @@ as an example.
 
 :::
 
-## How to Use GAR
+## How to Use GraphAr
 
 ### Construct information
 
-It is convenient to construct the GAR metadata and dump it to generate
+It is convenient to construct the graphar metadata and dump it to generate
 information files. We provide an [example
 program](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/construct_info_example.cc)
 located in the source code which shows how to construct and dump the
@@ -172,12 +172,12 @@ if (edge_info != nullptr) {
 }
 ```
 
-### Read GAR files
+### Read GraphAr format files
 
-GAR supports the flexible reading of graph data, e.g., allowing to read
+GraphAr supports the flexible reading of graph data, e.g., allowing to read
 data of a single vertex, a vertex chunk, or all vertices with a specific
 label. In addition, necessary property groups can be selected to read
-and avoid reading all properties from the files. Furthermore, GAR
+and avoid reading all properties from the files. Furthermore, GraphAr
 provides convenient and flexible access to adjList, offset and property
 chunks for edges.
 
@@ -212,10 +212,10 @@ for (auto it = edges->begin(); it != edges->end(); ++it) {
 }
 ```
 
-### Write GAR files
+### Write GraphAr format files
 
-As same with the readers, the GAR writers provide different-level
-methods to output the graph data in memory into GAR files.
+As same with the readers, the GraphAr writers provide different-level
+methods to output the graph data in memory into GraphAr format files.
 
 As the simplest cases, the fist example below adds vertices to
 **VerticesBuilder**, and then dumps the data to files; the second
@@ -234,7 +234,7 @@ builder.AddVertex(v);
 // add other vertices
 // ...
 
-// write to GAR files
+// write to GraphAr format files
 builder.Dump();
 ```
 
@@ -251,14 +251,14 @@ builder.AddEdge(e);
 // add other edges
 // ...
 
-// write to GAR files
+// write to GraphAr format files
 builder.Dump();
 ```
 
 ### A PageRank Example
 
 Here we will go through an example of out-of-core graph analytic
-algorithms based on GAR which calculates the PageRank. Please look
+algorithms based on GraphAr which calculates the PageRank. Please look
 [here](https://en.wikipedia.org/wiki/PageRank) if you want a detailed
 explanation of the PageRank algorithm. And the source code can be found
 at
