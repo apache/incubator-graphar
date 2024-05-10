@@ -16,7 +16,7 @@ with other processors via synchronous message passing.
 
 To integrate GraphAr into GraphScope, we implemented
 *ArrowFragmentBuilder* and *ArrowFragmentWriter*. *ArrowFragmentBuilder*
-establishes the fragments for workers of GraphScope through reading graphar
+establishes the fragments for workers of GraphScope through reading GraphAr
 format data in parallel. Conversely, *ArrowFragmentWriter* can take the
 GraphScope fragments and save them as GraphAr format files. If you're interested in
 knowing more about the implementation, please refer to the [source

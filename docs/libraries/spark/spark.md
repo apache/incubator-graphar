@@ -83,7 +83,7 @@ The GraphAr file format assigns each vertex with a unique index inside the verte
 To address this issue, the GraphAr Spark library offers the IndexGenerator which is used to generate indices for vertex/edge DataFrames. For a vertex DataFrame, a mapping from the primary keys to indices can be constructed, or an index column can be generated directly if no primary keys are available. For an edge DataFrame, source and destination columns can be generated from the vertex index mapping (when the end vertices are represented by the primary keys), or they may be generated directly without the mapping.
 
 > **tip:**
-> In most cases, IndexGenerator is first utilized to generate the indices for a DataFrame, and then this DataFrame can be written intoGraphAr format files through the writer.
+> In most cases, IndexGenerator is first utilized to generate the indices for a DataFrame, and then this DataFrame can be written into GraphAr format files through the writer.
 
 To utilize IndexGenerator, please refer to the following example code.
 
