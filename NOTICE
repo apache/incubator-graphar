@@ -23,28 +23,3 @@ which includes the following in its NOTICE file:
 
   GraphScope
   Copyright 2020 Alibaba Group Holding Limited. 
-
---------------------------------------------------------------------------------
-
-This product includes code from https://github.com/alibaba/fastFFI (Apache 2.0)
-  * Copyright 1999-2021 Alibaba Group Holding Ltd.
-
---------------------------------------------------------------------------------
-
-This product includes code from https://github.com/bitwizeshift/result (The MIT License)
-  * Copyright (c) 2017-2021 Matthew Rodusek All rights reserved.
-
---------------------------------------------------------------------------------
-
-This product includes code from https://github.com/jimmiebergmann/mini-yaml (The MIT License)
-  * Copyright(c) 2018 Jimmie Bergmann
-
---------------------------------------------------------------------------------
-
-This product includes code from https://github.com/jimmiebergmann/mini-yaml (The MIT License)
-  * Copyright (c) 2021 Jonathan Hollocombe
-
---------------------------------------------------------------------------------
-
-This product includes code from cpplint (https://github.com/cpplint/cpplint) (BSD 3-Clause)
-  * Copyright (c) 2009 Google Inc. All rights reserved.
