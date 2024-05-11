@@ -4,86 +4,47 @@ Copyright 2024 The Apache Software Foundation
 This product includes software developed at
 The Apache Software Foundation (http://www.apache.org/).
 
-================================================================
+This product includes software from Apache Arrow project (Apache 2.0)
+  * Apache Arrow
+  * Copyright 2016-2019 The Apache Software Foundation
 
-This product includes a number of Dependencies with separate copyright notices
-and license terms. Your use of these submodules is subject to the terms and
-conditions of the following licenses.
+--------------------------------------------------------------------------------
 
-================================================================
+This product includes code from Apache Spark, which includes the following in
+its NOTICE file:
 
-================================================================
-Apache-2.0 licenses
-================================================================
-The following components are provided under the Apache-2.0 License. See project link for details.
-The text of each license is the standard Apache 2.0 license.
+  Apache Spark
+  Copyright 2014 and onwards The Apache Software Foundation.
 
-* spark (https://github.com/apache/spark)
-    Files:
-      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarCommitProtocol.scala
-      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarDataSource.scala
-      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScan.scala
-      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScanBuilder.scala
-      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScanTable.scala
-      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarWriteBuilder.scala
-      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/csv/CSVWriterBuilder.scala
-      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/orc/ORCOutputWriter.scala
-      spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/orc/ORCWriteBuilder.scala
-      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/parquet/ParquetWriteBuilder.scala
-      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarCommitProtocol.scala
-      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarDataSource.scala
-      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScan.scala
-      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScanBuilder.scala
-      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScanTable.scala
-      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarWriteBuilder.scala
-      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/csv/CSVWriterBuilder.scala
-      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/orc/ORCOutputWriter.scala
-      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/orc/ORCWriteBuilder.scala
-      spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/parquet/ParquetWriteBuilder.scala
-    are modified from spark.
+--------------------------------------------------------------------------------
 
-* arrow (https://github.com/apache/arrow)
-* fastFFI (https://github.org/apache/fastFFI)
-    Files:
-      java/src/main/java/org/apache/graphar/stdcxx/StdString.java
-    are modified from fastFFI.
+This product includes code from https://github.com/alibaba/GraphScope (Apache 2.0),
+which includes the following in its NOTICE file:
 
-* GraphScope (https://github.org/apache/GraphScope)
-    Files:
-      java/src/main/java/org/apache/graphar/stdcxx/StdVector.java
-      java/src/main/java/org/apache/graphar/stdcxx/StdMap.java
-      java/src/main/java/org/apache/graphar/stdcxx/StdSharedPtr.java
-      java/src/main/java/org/apache/graphar/stdcxx/StdUnorderedMap.java
-      java/build.xml
-    are modified from GraphScope.
+  GraphScope
+  Copyright 2020 Alibaba Group Holding Limited. 
 
+--------------------------------------------------------------------------------
 
-================================================================
-MIT licenses
-================================================================
-The following components are provided under the MIT License. See project link for details.
-The text of each license is also included in licenses/LICENSE-[project].txt
+This product includes code from https://github.com/alibaba/fastFFI (Apache 2.0)
+  * Copyright 1999-2021 Alibaba Group Holding Ltd.
 
-* result (https://github.com/bitwizeshift/result)
-    Files:
-      cpp/thirdparty/result.hpp is modified from result.
+--------------------------------------------------------------------------------
 
-* mini-yaml (https://github.com/jimmiebergmann/mini-yaml)
-    Files:
-      cpp/thirdparty/mini-yam/Yaml.hpp
-      cpp/thirdparty/mini-yaml/Yaml.cpp
+This product includes code from https://github.com/bitwizeshift/result (The MIT License)
+  * Copyright (c) 2017-2021 Matthew Rodusek All rights reserved.
 
-* simple-uri-parser (https://github.com/jholloc/simple-uri-parser)
-    Files:
-      cpp/thirdparty/simple-uri-parser/uri_parser.h
+--------------------------------------------------------------------------------
 
+This product includes code from https://github.com/jimmiebergmann/mini-yaml (The MIT License)
+  * Copyright(c) 2018 Jimmie Bergmann
 
-================================================================
-BSD 3-Clause licenses
-================================================================
-The following components are provided under the BSD 3-Clause License. See project link for details.
-The text of each license is also included in licenses/LICENSE-[project].txt
+--------------------------------------------------------------------------------
 
-* cpplint (https://github.com/cpplint/cpplint)
-    Files:
-      cpp/misc/cpplint.py
+This product includes code from https://github.com/jimmiebergmann/mini-yaml (The MIT License)
+  * Copyright (c) 2021 Jonathan Hollocombe
+
+--------------------------------------------------------------------------------
+
+This product includes code from cpplint (https://github.com/cpplint/cpplint) (BSD 3-Clause)
+  * Copyright (c) 2009 Google Inc. All rights reserved.
