@@ -257,16 +257,16 @@ MIT licenses
 The following components are provided under the MIT License. See project link for details.
 The text of each license is also included in licenses/LICENSE-[project].txt
 
-* result (https://github.com/bitwizeshift/result)
+* result v0.1.0 (https://github.com/bitwizeshift/result)
     Files:
       cpp/thirdparty/result.hpp is modified from result.
 
-* mini-yaml (https://github.com/jimmiebergmann/mini-yaml)
+* mini-yaml commit-22d3dc (https://github.com/jimmiebergmann/mini-yaml)
     Files:
       cpp/thirdparty/mini-yam/Yaml.hpp
       cpp/thirdparty/mini-yaml/Yaml.cpp
 
-* simple-uri-parser (https://github.com/jholloc/simple-uri-parser)
+* simple-uri-parser commit-bf7b037 (https://github.com/jholloc/simple-uri-parser)
     Files:
       cpp/thirdparty/simple-uri-parser/uri_parser.h
 
@@ -276,6 +276,6 @@ BSD 3-Clause licenses
 The following components are provided under the BSD 3-Clause License. See project link for details.
 The text of each license is also included in licenses/LICENSE-[project].txt
 
-* cpplint (https://github.com/cpplint/cpplint)
+* cpplint 1.5.4 (https://github.com/cpplint/cpplint)
     Files:
       cpp/misc/cpplint.py
