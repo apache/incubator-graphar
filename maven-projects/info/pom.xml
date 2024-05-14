@@ -32,10 +32,10 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>java-info</artifactId>
+    <artifactId>info</artifactId>
     <packaging>jar</packaging>
 
-    <name>java-info</name>
+    <name>info</name>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

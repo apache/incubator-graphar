@@ -32,7 +32,7 @@
   <modules>
     <module>java</module>
     <module>spark</module>
-    <module>java-info</module>
+    <module>info</module>
   </modules>
 
   <properties>
