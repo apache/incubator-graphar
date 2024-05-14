@@ -32,6 +32,7 @@
   <modules>
     <module>java</module>
     <module>spark</module>
+    <module>info</module>
   </modules>
 
   <properties>
