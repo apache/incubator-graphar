@@ -199,3 +199,83 @@
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
+
+================================================================
+This product includes a number of dependencies with separate license terms.
+Your use of these submodules is subject to the terms and conditions of the 
+following licenses.
+================================================================
+
+================================================================
+Apache-2.0 licenses
+================================================================
+The following components are provided under the Apache-2.0 License. See project link for details.
+The text of each license is the standard Apache 2.0 license.
+
+* spark 3.1.1 and 3.3.4 (https://github.com/apache/spark)
+    Files:
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarCommitProtocol.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarDataSource.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScan.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScanBuilder.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScanTable.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarWriteBuilder.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/csv/CSVWriterBuilder.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/orc/ORCOutputWriter.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/orc/ORCWriteBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/parquet/ParquetWriteBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarCommitProtocol.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarDataSource.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScan.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScanBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScanTable.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarWriteBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/csv/CSVWriterBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/orc/ORCOutputWriter.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/orc/ORCWriteBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/parquet/ParquetWriteBuilder.scala
+    are modified from spark.
+
+* arrow 12.0.0 (https://github.com/apache/arrow)
+* fastFFI v0.1.2 (https://github.com/alibaba/fastFFI)
+    Files:
+      maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdString.java
+    are modified from fastFFI.
+
+* GraphScope v0.25.0 (https://github.com/alibaba/GraphScope)
+    Files:
+      maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdVector.java
+      maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdMap.java
+      maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdSharedPtr.java
+      maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdUnorderedMap.java
+      maven-projects/java/build.xml
+    are modified from GraphScope.
+
+================================================================
+MIT licenses
+================================================================
+The following components are provided under the MIT License. See project link for details.
+The text of each license is also included in licenses/LICENSE-[project].txt
+
+* result v0.1.0 (https://github.com/bitwizeshift/result)
+    Files:
+      cpp/thirdparty/result.hpp is modified from result.
+
+* mini-yaml commit-22d3dc (https://github.com/jimmiebergmann/mini-yaml)
+    Files:
+      cpp/thirdparty/mini-yam/Yaml.hpp
+      cpp/thirdparty/mini-yaml/Yaml.cpp
+
+* simple-uri-parser commit-bf7b037 (https://github.com/jholloc/simple-uri-parser)
+    Files:
+      cpp/thirdparty/simple-uri-parser/uri_parser.h
+
+================================================================
+BSD 3-Clause licenses
+================================================================
+The following components are provided under the BSD 3-Clause License. See project link for details.
+The text of each license is also included in licenses/LICENSE-[project].txt
+
+* cpplint 1.5.4 (https://github.com/cpplint/cpplint)
+    Files:
+      cpp/misc/cpplint.py
