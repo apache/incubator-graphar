@@ -22,20 +22,58 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>31</version>
+    </parent>
+    <groupId>org.apache.graphar</groupId>
+    <artifactId>graphar-root</artifactId>
+    <version>${graphar.version}</version>
+    <packaging>pom</packaging>
 
-  <groupId>org.apache.graphar</groupId>
-  <artifactId>graphar-root</artifactId>
-  <version>${graphar.version}</version>
-  <packaging>pom</packaging>
+    <name>Apache GraphAr Root POM</name>
+    <description>Apache GraphAr(Incubating) is an open source, standard data file format for graph data storage and retrieval.</description>
+    <url>https://graphar.apache.org/</url>
 
-  <name>Apache GraphAr Root POM</name>
-  <modules>
-    <module>java</module>
-    <module>spark</module>
-    <module>info</module>
-  </modules>
-
-  <properties>
-    <graphar.version>0.1.0-SNAPSHOT</graphar.version>
-  </properties>
+    <mailingLists>
+        <mailingList>
+            <name>Developer List</name>
+            <subscribe>dev-subscribe@graphar.apache.org</subscribe>
+            <unsubscribe>dev-unsubscribe@graphar.apache.org</unsubscribe>
+            <post>dev@graphar.apache.org</post>
+            <archive>https://lists.apache.org/list.html?dev@graphar.apache.org</archive>
+        </mailingList>
+        <mailingList>
+            <name>Commits List</name>
+            <subscribe>commits-subscribe@graphar.apache.org</subscribe>
+            <unsubscribe>commits-unsubscribe@graphar.apache.org</unsubscribe>
+            <post>commits@graphar.apache.org</post>
+            <archive>https://lists.apache.org/list.html?commits@graphar.apache.org</archive>
+        </mailingList>
+    </mailingLists>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+<!--    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/apache/graphar/issues</url>
+    </issueManagement>
+    <scm>
+        <connection>scm:git:https://github.com/apache/graphar.git</connection>
+        <developerConnection>scm:git:https://github.com/apache/graphar.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/apache/graphar</url>
+    </scm>-->
+    <properties>
+        <graphar.version>0.1.0-SNAPSHOT</graphar.version>
+    </properties>
+    <modules>
+        <module>java</module>
+        <module>spark</module>
+        <module>info</module>
+    </modules>
 </project>
