@@ -23,3 +23,11 @@ which includes the following in its NOTICE file:
 
   GraphScope
   Copyright 2020 Alibaba Group Holding Limited. 
+
+--------------------------------------------------------------------------------
+
+This product includes code from https://github.com/alibaba/fastFFI (Apache 2.0),
+which includes the following in its NOTICE file:
+
+  fastFFI 
+  Copyright 1999-2021 Alibaba Group Holding Ltd.
