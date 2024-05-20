@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+// Derived from alibaba/fastFFI v0.1.2
+// https://github.com/alibaba/fastFFI/blob/1eca42b/llvm/src/main/java/com/alibaba/fastffi/stdcxx/StdString.java
+
 package org.apache.graphar.stdcxx;
 
 import com.alibaba.fastffi.CXXHead;

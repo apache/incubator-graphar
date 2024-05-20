@@ -14,6 +14,11 @@
   ~ limitations under the License.
   -->
 
+<!--
+ ~ Derived from alibaba/fastFFI v0.1.2
+ ~ https://github.com/alibaba/fastFFI/blob/1eca42b/build.xml
+-->
+
 <project name="llvm4jni">
     <target name="make">
         <echo message="Make native code" level="info"/>

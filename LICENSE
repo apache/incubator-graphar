@@ -240,6 +240,7 @@ The text of each license is the standard Apache 2.0 license.
 * fastFFI v0.1.2 (https://github.com/alibaba/fastFFI)
     Files:
       maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdString.java
+      maven-projects/java/build.xml
     are modified from fastFFI.
 
 * GraphScope v0.25.0 (https://github.com/alibaba/GraphScope)
@@ -248,7 +249,6 @@ The text of each license is the standard Apache 2.0 license.
       maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdMap.java
       maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdSharedPtr.java
       maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdUnorderedMap.java
-      maven-projects/java/build.xml
     are modified from GraphScope.
 
 ================================================================

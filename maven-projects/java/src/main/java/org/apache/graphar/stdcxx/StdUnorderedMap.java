@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-// Derived from GraphScope v0.22.0
-// https://github.com/alibaba/GraphScope/blob/99c9d15d/analytical_engine/java/grape-jdk/src/main/java/com/alibaba/graphscope/stdcxx/StdUnorderedMap.java
+// Derived from alibaba/GraphScope v0.25.0
+// https://github.com/alibaba/GraphScope/blob/8235b29/analytical_engine/java/grape-jdk/src/main/java/com/alibaba/graphscope/stdcxx/StdUnorderedMap.java
 
 package org.apache.graphar.stdcxx;
 

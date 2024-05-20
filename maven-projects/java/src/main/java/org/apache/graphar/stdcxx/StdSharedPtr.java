@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+// Derived from alibaba/GraphScope v0.25.0
+// https://github.com/alibaba/GraphScope/blob/8235b29/analytical_engine/java/grape-jdk/src/main/java/com/alibaba/graphscope/stdcxx/StdSharedPtr.java
+
 package org.apache.graphar.stdcxx;
 
 import static org.apache.graphar.util.CppClassName.ARROW_ARRAY;
