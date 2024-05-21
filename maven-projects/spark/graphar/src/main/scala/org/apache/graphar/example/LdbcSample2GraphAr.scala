@@ -92,7 +92,8 @@ object LdbcSample2GraphAr {
     writer.PutVertexData("Person", person_df)
 
     // read edges with type "Person"->"Knows"->"Person" from given path as a DataFrame
-    // FIXME(@acezen): the schema should be inferred from the data
+    // FIXME(@acezen): the schema should be inferred from the data, but graphar spark
+    // library does not support timestamp type yet
     val schema = StructType(
       Array(
         StructField("src", IntegerType, true),
