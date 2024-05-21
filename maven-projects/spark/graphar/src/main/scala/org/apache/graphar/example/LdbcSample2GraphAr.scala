@@ -26,7 +26,7 @@ import org.apache.spark.sql.SparkSession
 object LdbcSample2GraphAr {
 
   def main(args: Array[String]): Unit = {
-    // connect to the Neo4j instance
+    // initialize a Spark session
     val spark = SparkSession
       .builder()
       .appName("LdbcSample Data to GraphAr")
@@ -68,7 +68,7 @@ object LdbcSample2GraphAr {
     )
   }
 
-  // read data from Neo4j and put into writer
+  // read data from local ldbc sample csv files and put into writer
   def readAndPutDataIntoWriter(
       writer: GraphWriter,
       spark: SparkSession,
