@@ -149,3 +149,14 @@ jobs:
         # run the importer
         cd import
         ./neo4j.sh neo4j.json
+
+    - name: Run LdbcSample2GraphAr example
+      working-directory: maven-projects/spark
+      run: |
+        export JAVA_HOME=${JAVA_HOME_11_X64}
+        export SPARK_HOME="${HOME}/${{ matrix.spark-hadoop }}"
+        export PATH="${SPARK_HOME}/bin":"${PATH}"
+
+        scripts/build.sh ${{ matrix.mvn-profile }}
+
+        scripts/run-ldbc-sample2graphar.sh
