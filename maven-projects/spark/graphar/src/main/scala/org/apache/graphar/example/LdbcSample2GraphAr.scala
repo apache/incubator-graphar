@@ -22,6 +22,12 @@ package org.apache.graphar.example
 import org.apache.graphar.graph.GraphWriter
 
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.types.{
+  IntegerType,
+  StringType,
+  StructField,
+  StructType
+}
 
 object LdbcSample2GraphAr {
 
@@ -86,10 +92,18 @@ object LdbcSample2GraphAr {
     writer.PutVertexData("Person", person_df)
 
     // read edges with type "Person"->"Knows"->"Person" from given path as a DataFrame
+    // FIXME(@acezen): the schema should be inferred from the data
+    val schema = StructType(
+      Array(
+        StructField("src", IntegerType, true),
+        StructField("dst", IntegerType, true),
+        StructField("creationDate", StringType, true)
+      )
+    )
     val produced_edge_df = spark.read
       .option("delimiter", "|")
       .option("header", "true")
-      .option("inferSchema", "true")
+      .schema(schema)
       .format("csv")
       .load(personKnowsPersonInputPath)
     // put into writer, source vertex label is "Person", edge label is "Knows"
