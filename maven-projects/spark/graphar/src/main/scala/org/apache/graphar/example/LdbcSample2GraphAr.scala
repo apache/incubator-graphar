@@ -50,7 +50,12 @@ object LdbcSample2GraphAr {
     val fileType: String = args(5)
 
     // put Ldbc sample graph data into writer
-    readAndPutDataIntoWriter(writer, spark, personInputPath, personKnowsPersonInputPath)
+    readAndPutDataIntoWriter(
+      writer,
+      spark,
+      personInputPath,
+      personKnowsPersonInputPath
+    )
 
     // write in GraphAr format
     writer.write(
