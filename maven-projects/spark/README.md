@@ -229,6 +229,23 @@ scripts/run-graphar2nebula.sh
 
 The example will import the basketballplayer graph from GraphAr to NebulaGraph and you can check the result in NebulaGraph Studio.
 
+## Running the local LDBC sample data to GraphAr example
+
+we provide a simple example to convert LDBC sample data to GraphAr data.
+this example is located in the directory ``spark/src/main/scala/org/apache/graphar/examples/``.
+
+To run the example, first build the project:
+
+```bash
+scripts/build.sh
+```
+
+Then run the example:
+
+```bash
+scripts/run-ldbc-sample2graphar.sh
+```
+
 ## How to use
 
 Please refer to our [GraphAr Spark Library Documentation](https://graphar.apache.org/docs/libraries/spark/).
