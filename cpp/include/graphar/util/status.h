@@ -60,6 +60,26 @@
     ::graphar::Status __s = ::graphar::internal::GenericToStatus(status); \
     GAR_RAISE_ERROR_IF_(!__s.ok(), __s, GAR_STRINGIFY(status));           \
   } while (false)
+namespace graphar::util {
+template <typename Head>
+void StringBuilderRecursive(std::ostringstream& stream, Head&& head) {
+  stream << head;
+}
+
+template <typename Head, typename... Tail>
+void StringBuilderRecursive(std::ostringstream& stream, Head&& head,
+                            Tail&&... tail) {
+  StringBuilderRecursive(stream, std::forward<Head>(head));
+  StringBuilderRecursive(stream, std::forward<Tail>(tail)...);
+}
+
+template <typename... Args>
+std::string StringBuilder(Args&&... args) {
+  std::ostringstream ss;
+  StringBuilderRecursive(ss, std::forward<Args>(args)...);
+  return ss.str();
+}
+}  // namespace  graphar::util
 
 namespace graphar {
 /**
@@ -248,26 +268,6 @@ class Status {
 };
 
 }  // namespace graphar
-namespace graphar::util {
-template <typename Head>
-void StringBuilderRecursive(std::ostringstream& stream, Head&& head) {
-  stream << head;
-}
-
-template <typename Head, typename... Tail>
-void StringBuilderRecursive(std::ostringstream& stream, Head&& head,
-                            Tail&&... tail) {
-  StringBuilderRecursive(stream, std::forward<Head>(head));
-  StringBuilderRecursive(stream, std::forward<Tail>(tail)...);
-}
-
-template <typename... Args>
-std::string StringBuilder(Args&&... args) {
-  std::ostringstream ss;
-  StringBuilderRecursive(ss, std::forward<Args>(args)...);
-  return ss.str();
-}
-}  // namespace  graphar::util
 
 namespace graphar::internal {
 
