@@ -35,8 +35,6 @@
 namespace arrow {
 class Array;
 }
-
-
 namespace graphar::builder {
 
 /**

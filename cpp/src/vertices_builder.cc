@@ -232,4 +232,3 @@ Result<std::shared_ptr<arrow::Table>> VerticesBuilder::convertToTable() {
 }
 
 }  // namespace graphar::builder
-

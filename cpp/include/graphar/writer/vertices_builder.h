@@ -36,7 +36,6 @@ class Array;
 class Table;
 }  // namespace arrow
 
-
 namespace graphar::builder {
 
 /**

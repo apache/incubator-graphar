@@ -205,4 +205,3 @@ Result<IdType> GetEdgeNum(const std::string& prefix,
 }
 
 }  // namespace graphar::util
-

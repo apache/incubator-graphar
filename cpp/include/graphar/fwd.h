@@ -201,7 +201,6 @@ const std::shared_ptr<DataType>& timestamp();
  * @param value_type value type of the list
  */
 std::shared_ptr<DataType> list(const std::shared_ptr<DataType>& value_type);
-
 }  // namespace graphar
 
 

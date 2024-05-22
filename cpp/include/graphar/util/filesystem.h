@@ -35,19 +35,19 @@
 namespace arrow {
 class Buffer;
 class Table;
-}
+}//namespace arrow
 
 namespace arrow::fs {
 class FileSystem;
-}
+}//namespace arrow::fs
 
 namespace arrow::io {
 class RandomAccessFile;
-}
+}//namespace arrow::io
 
 namespace arrow::dataset {
 class FileFormat;
-} // namespace arrow
+} // namespace arrow::dataset
 
 namespace graphar {
 

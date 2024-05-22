@@ -116,6 +116,3 @@ inline Status GenericToStatus(Result<T>&& res) {
 }
 
 }  // namespace graphar::internal
-
-
-

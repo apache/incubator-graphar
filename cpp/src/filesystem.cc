@@ -311,5 +311,3 @@ template Status FileSystem::WriteValueToFile<IdType>(const IdType&,
                                                      const std::string&) const
     noexcept;
 }  // namespace graphar
-
-

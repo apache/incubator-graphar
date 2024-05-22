@@ -349,4 +349,3 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::getOffsetTable(
 }
 
 }  // namespace graphar::builder
-
