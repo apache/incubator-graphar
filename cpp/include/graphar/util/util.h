@@ -38,96 +38,6 @@ class Array;
 
 namespace graphar {
 
-namespace util {
-
-struct IndexConverter {
-  explicit IndexConverter(std::vector<IdType>&& edge_chunk_nums)
-      : edge_chunk_nums_(std::move(edge_chunk_nums)) {}
-  IdType IndexPairToGlobalChunkIndex(IdType vertex_chunk_index,
-                                     IdType edge_chunk_index) {
-    IdType global_edge_chunk_index = 0;
-    for (IdType i = 0; i < vertex_chunk_index; ++i) {
-      global_edge_chunk_index += edge_chunk_nums_[i];
-    }
-    return global_edge_chunk_index + edge_chunk_index;
-  }
-
-  // covert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
-  std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(IdType global_index) {
-    std::pair<IdType, IdType> index_pair(0, 0);
-    for (size_t i = 0; i < edge_chunk_nums_.size(); ++i) {
-      if (global_index < edge_chunk_nums_[i]) {
-        index_pair.first = static_cast<IdType>(i);
-        index_pair.second = global_index;
-        break;
-      }
-      global_index -= edge_chunk_nums_[i];
-    }
-    return index_pair;
-  }
-
- private:
-  std::vector<IdType> edge_chunk_nums_;
-};
-
-static inline IdType IndexPairToGlobalChunkIndex(
-    const std::vector<IdType>& edge_chunk_nums, IdType vertex_chunk_index,
-    IdType edge_chunk_index) {
-  IdType global_edge_chunk_index = 0;
-  for (IdType i = 0; i < vertex_chunk_index; ++i) {
-    global_edge_chunk_index += edge_chunk_nums[i];
-  }
-  return global_edge_chunk_index + edge_chunk_index;
-}
-
-// covert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
-static inline std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(
-    const std::vector<IdType>& edge_chunk_nums, IdType global_index) {
-  std::pair<IdType, IdType> index_pair(0, 0);
-  for (size_t i = 0; i < edge_chunk_nums.size(); ++i) {
-    if (global_index < edge_chunk_nums[i]) {
-      index_pair.first = static_cast<IdType>(i);
-      index_pair.second = global_index;
-      break;
-    }
-    global_index -= edge_chunk_nums[i];
-  }
-  return index_pair;
-}
-
-std::shared_ptr<arrow::ChunkedArray> GetArrowColumnByName(
-    std::shared_ptr<arrow::Table> const& table, const std::string& name);
-
-std::shared_ptr<arrow::Array> GetArrowArrayByChunkIndex(
-    std::shared_ptr<arrow::ChunkedArray> const& chunk_array,
-    int64_t chunk_index);
-
-Result<const void*> GetArrowArrayData(
-    std::shared_ptr<arrow::Array> const& array);
-
-static inline std::string ConcatStringWithDelimiter(
-    const std::vector<std::string>& str_vec, const std::string& delimiter) {
-  return std::accumulate(
-      std::begin(str_vec), std::end(str_vec), std::string(),
-      [&delimiter](const std::string& ss, const std::string& s) {
-        return ss.empty() ? s : ss + delimiter + s;
-      });
-}
-
-template <typename T>
-struct ValueGetter {
-  inline static T Value(const void* data, int64_t offset) {
-    return reinterpret_cast<const T*>(data)[offset];
-  }
-};
-
-template <>
-struct ValueGetter<std::string> {
-  static std::string Value(const void* data, int64_t offset);
-};
-
-}  // namespace util
-
 template <typename T>
 class Array final {
  public:
@@ -251,3 +161,93 @@ using DoubleArray = Array<double>;
 using StringArray = Array<std::string_view>;
 
 }  // namespace graphar
+
+namespace graphar::util {
+
+struct IndexConverter {
+  explicit IndexConverter(std::vector<IdType>&& edge_chunk_nums)
+      : edge_chunk_nums_(std::move(edge_chunk_nums)) {}
+  IdType IndexPairToGlobalChunkIndex(IdType vertex_chunk_index,
+                                     IdType edge_chunk_index) {
+    IdType global_edge_chunk_index = 0;
+    for (IdType i = 0; i < vertex_chunk_index; ++i) {
+      global_edge_chunk_index += edge_chunk_nums_[i];
+    }
+    return global_edge_chunk_index + edge_chunk_index;
+  }
+
+  // covert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
+  std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(IdType global_index) {
+    std::pair<IdType, IdType> index_pair(0, 0);
+    for (size_t i = 0; i < edge_chunk_nums_.size(); ++i) {
+      if (global_index < edge_chunk_nums_[i]) {
+        index_pair.first = static_cast<IdType>(i);
+        index_pair.second = global_index;
+        break;
+      }
+      global_index -= edge_chunk_nums_[i];
+    }
+    return index_pair;
+  }
+
+ private:
+  std::vector<IdType> edge_chunk_nums_;
+};
+
+static inline IdType IndexPairToGlobalChunkIndex(
+    const std::vector<IdType>& edge_chunk_nums, IdType vertex_chunk_index,
+    IdType edge_chunk_index) {
+  IdType global_edge_chunk_index = 0;
+  for (IdType i = 0; i < vertex_chunk_index; ++i) {
+    global_edge_chunk_index += edge_chunk_nums[i];
+  }
+  return global_edge_chunk_index + edge_chunk_index;
+}
+
+// covert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
+static inline std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(
+    const std::vector<IdType>& edge_chunk_nums, IdType global_index) {
+  std::pair<IdType, IdType> index_pair(0, 0);
+  for (size_t i = 0; i < edge_chunk_nums.size(); ++i) {
+    if (global_index < edge_chunk_nums[i]) {
+      index_pair.first = static_cast<IdType>(i);
+      index_pair.second = global_index;
+      break;
+    }
+    global_index -= edge_chunk_nums[i];
+  }
+  return index_pair;
+}
+
+std::shared_ptr<arrow::ChunkedArray> GetArrowColumnByName(
+    std::shared_ptr<arrow::Table> const& table, const std::string& name);
+
+std::shared_ptr<arrow::Array> GetArrowArrayByChunkIndex(
+    std::shared_ptr<arrow::ChunkedArray> const& chunk_array,
+    int64_t chunk_index);
+
+Result<const void*> GetArrowArrayData(
+    std::shared_ptr<arrow::Array> const& array);
+
+static inline std::string ConcatStringWithDelimiter(
+    const std::vector<std::string>& str_vec, const std::string& delimiter) {
+  return std::accumulate(
+      std::begin(str_vec), std::end(str_vec), std::string(),
+      [&delimiter](const std::string& ss, const std::string& s) {
+        return ss.empty() ? s : ss + delimiter + s;
+      });
+}
+
+template <typename T>
+struct ValueGetter {
+  inline static T Value(const void* data, int64_t offset) {
+    return reinterpret_cast<const T*>(data)[offset];
+  }
+};
+
+template <>
+struct ValueGetter<std::string> {
+  static std::string Value(const void* data, int64_t offset);
+};
+
+}  // namespace graphar::util

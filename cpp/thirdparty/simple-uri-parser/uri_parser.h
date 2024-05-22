@@ -89,7 +89,7 @@ struct Uri {
         {}
 };
 
-}
+} //namespace urigit push
 
 namespace {
 

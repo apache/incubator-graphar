@@ -62,28 +62,6 @@
   } while (false)
 
 namespace graphar {
-
-namespace util {
-template <typename Head>
-void StringBuilderRecursive(std::ostringstream& stream, Head&& head) {
-  stream << head;
-}
-
-template <typename Head, typename... Tail>
-void StringBuilderRecursive(std::ostringstream& stream, Head&& head,
-                            Tail&&... tail) {
-  StringBuilderRecursive(stream, std::forward<Head>(head));
-  StringBuilderRecursive(stream, std::forward<Tail>(tail)...);
-}
-
-template <typename... Args>
-std::string StringBuilder(Args&&... args) {
-  std::ostringstream ss;
-  StringBuilderRecursive(ss, std::forward<Args>(args)...);
-  return ss.str();
-}
-}  // namespace util
-
 /**
  * An enum class representing the status codes for success or error outcomes.
  */
@@ -269,13 +247,33 @@ class Status {
   State* state_;
 };
 
-namespace internal {
+}  // namespace graphar
+namespace graphar::util {
+template <typename Head>
+void StringBuilderRecursive(std::ostringstream& stream, Head&& head) {
+  stream << head;
+}
+
+template <typename Head, typename... Tail>
+void StringBuilderRecursive(std::ostringstream& stream, Head&& head,
+                            Tail&&... tail) {
+  StringBuilderRecursive(stream, std::forward<Head>(head));
+  StringBuilderRecursive(stream, std::forward<Tail>(tail)...);
+}
+
+template <typename... Args>
+std::string StringBuilder(Args&&... args) {
+  std::ostringstream ss;
+  StringBuilderRecursive(ss, std::forward<Args>(args)...);
+  return ss.str();
+}
+}  // namespace  graphar::util
+
+namespace graphar::internal {
 
 // Extract Status from Status or Result<T>
 // Useful for the status check macros such as RETURN_NOT_OK.
 inline const Status& GenericToStatus(const Status& st) { return st; }
 inline Status GenericToStatus(Status&& st) { return std::move(st); }
 
-}  // namespace internal
-
-}  // namespace graphar
+}  // namespace graphar::internal

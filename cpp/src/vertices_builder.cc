@@ -21,8 +21,7 @@
 #include "graphar/graph_info.h"
 #include "graphar/util/convert_to_arrow_type.h"
 
-namespace graphar {
-namespace builder {
+namespace graphar::builder {
 
 Status VerticesBuilder::validate(const Vertex& v, IdType index,
                                  ValidateLevel validate_level) const {
@@ -232,5 +231,5 @@ Result<std::shared_ptr<arrow::Table>> VerticesBuilder::convertToTable() {
   return arrow::Table::Make(schema, arrays);
 }
 
-}  // namespace builder
-}  // namespace graphar
+}  // namespace graphar::builder
+

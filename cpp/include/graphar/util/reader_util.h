@@ -26,9 +26,9 @@
 
 #include "graphar/fwd.h"
 
-namespace graphar {
 
-namespace util {
+
+namespace graphar::util {
 struct FilterOptions {
   // The row filter to apply to the table.
   Filter filter = nullptr;
@@ -74,5 +74,4 @@ Result<IdType> GetEdgeNum(const std::string& prefix,
                           AdjListType adj_list_type,
                           IdType vertex_chunk_index) noexcept;
 
-}  // namespace util
-}  // namespace graphar
+}  // namespace graphar::util
