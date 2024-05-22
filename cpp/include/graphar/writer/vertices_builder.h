@@ -347,4 +347,3 @@ class VerticesBuilder {
 };
 
 }  // namespace graphar::builder
-

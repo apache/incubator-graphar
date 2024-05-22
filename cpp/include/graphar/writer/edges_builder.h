@@ -425,4 +425,3 @@ class EdgesBuilder {
 };
 
 }  // namespace graphar::builder
-
