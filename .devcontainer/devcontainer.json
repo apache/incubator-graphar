@@ -51,7 +51,7 @@
 	"remoteUser": "graphar",
 
 	// Use 'postCreateCommand' to run commands before the container is created.
-	"initializeCommand": "sudo docker pull registry.cn-hongkong.aliyuncs.com/graphscope/graphar-dev:latest",
+	"initializeCommand": "sudo docker pull graphar/graphar-dev:latest",
 
 	// Uncomment this to enable C++ and Rust debugging in containers
 	// "capAdd": ["SYS_PTRACE"],
