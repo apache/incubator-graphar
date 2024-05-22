@@ -88,7 +88,6 @@ struct Uri {
         , fragment(std::move(fragment))
         {}
 };
-
 } 
 
 namespace {

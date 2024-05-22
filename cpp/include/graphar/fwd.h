@@ -202,6 +202,7 @@ const std::shared_ptr<DataType>& timestamp();
  */
 std::shared_ptr<DataType> list(const std::shared_ptr<DataType>& value_type);
 }  // namespace graphar
+
 namespace graphar::util {
 struct FilterOptions;
 using Filter = std::shared_ptr<Expression>;
