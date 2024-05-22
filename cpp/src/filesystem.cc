@@ -30,7 +30,53 @@
 #include "graphar/fwd.h"
 #include "graphar/util/expression.h"
 #include "graphar/util/filesystem.h"
+namespace graphar::detail {
+template <typename U, typename T>
+static Status CastToLargeOffsetArray(
+    const std::shared_ptr<arrow::Array>& in,
+    const std::shared_ptr<arrow::DataType>& to_type,
+    std::shared_ptr<arrow::Array>& out) {  // NOLINT(runtime/references)
+  auto array_data = in->data()->Copy();
+  auto offset = array_data->buffers[1];
+  using from_offset_type = typename U::offset_type;
+  using to_string_offset_type = typename T::offset_type;
+  auto raw_value_offsets_ =
+      offset == NULLPTR
+          ? NULLPTR
+          : reinterpret_cast<const from_offset_type*>(offset->data());
+  std::vector<to_string_offset_type> to_offset(offset->size() /
+                                               sizeof(from_offset_type));
+  for (size_t i = 0; i < to_offset.size(); ++i) {
+    to_offset[i] = raw_value_offsets_[i];
+  }
+  std::shared_ptr<arrow::Buffer> buffer;
+  arrow::TypedBufferBuilder<to_string_offset_type> buffer_builder;
+  RETURN_NOT_ARROW_OK(
+      buffer_builder.Append(to_offset.data(), to_offset.size()));
+  RETURN_NOT_ARROW_OK(buffer_builder.Finish(&buffer));
+  array_data->type = to_type;
+  array_data->buffers[1] = buffer;
+  out = arrow::MakeArray(array_data);
+  RETURN_NOT_ARROW_OK(out->ValidateFull());
+  return Status::OK();
+}
 
+template <typename U, typename T>
+static Status CastToLargeOffsetArray(
+    const std::shared_ptr<arrow::ChunkedArray>& in,
+    const std::shared_ptr<arrow::DataType>& to_type,
+    std::shared_ptr<arrow::ChunkedArray>& out) {  // NOLINT(runtime/references)
+  std::vector<std::shared_ptr<arrow::Array>> chunks;
+  for (auto const& chunk : in->chunks()) {
+    std::shared_ptr<arrow::Array> array;
+    auto status = CastToLargeOffsetArray<U, T>(chunk, to_type, array);
+    GAR_RETURN_NOT_OK(status);
+    chunks.emplace_back(array);
+  }
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(out, arrow::ChunkedArray::Make(chunks));
+  return Status::OK();
+}
+}  // namespace graphar::detail
 namespace graphar {
 namespace ds = arrow::dataset;
 
@@ -266,50 +312,4 @@ template Status FileSystem::WriteValueToFile<IdType>(const IdType&,
     noexcept;
 }  // namespace graphar
 
-namespace graphar::detail {
-template <typename U, typename T>
-static Status CastToLargeOffsetArray(
-    const std::shared_ptr<arrow::Array>& in,
-    const std::shared_ptr<arrow::DataType>& to_type,
-    std::shared_ptr<arrow::Array>& out) {  // NOLINT(runtime/references)
-  auto array_data = in->data()->Copy();
-  auto offset = array_data->buffers[1];
-  using from_offset_type = typename U::offset_type;
-  using to_string_offset_type = typename T::offset_type;
-  auto raw_value_offsets_ =
-      offset == NULLPTR
-          ? NULLPTR
-          : reinterpret_cast<const from_offset_type*>(offset->data());
-  std::vector<to_string_offset_type> to_offset(offset->size() /
-                                               sizeof(from_offset_type));
-  for (size_t i = 0; i < to_offset.size(); ++i) {
-    to_offset[i] = raw_value_offsets_[i];
-  }
-  std::shared_ptr<arrow::Buffer> buffer;
-  arrow::TypedBufferBuilder<to_string_offset_type> buffer_builder;
-  RETURN_NOT_ARROW_OK(
-      buffer_builder.Append(to_offset.data(), to_offset.size()));
-  RETURN_NOT_ARROW_OK(buffer_builder.Finish(&buffer));
-  array_data->type = to_type;
-  array_data->buffers[1] = buffer;
-  out = arrow::MakeArray(array_data);
-  RETURN_NOT_ARROW_OK(out->ValidateFull());
-  return Status::OK();
-}
 
-template <typename U, typename T>
-static Status CastToLargeOffsetArray(
-    const std::shared_ptr<arrow::ChunkedArray>& in,
-    const std::shared_ptr<arrow::DataType>& to_type,
-    std::shared_ptr<arrow::ChunkedArray>& out) {  // NOLINT(runtime/references)
-  std::vector<std::shared_ptr<arrow::Array>> chunks;
-  for (auto const& chunk : in->chunks()) {
-    std::shared_ptr<arrow::Array> array;
-    auto status = CastToLargeOffsetArray<U, T>(chunk, to_type, array);
-    GAR_RETURN_NOT_OK(status);
-    chunks.emplace_back(array);
-  }
-  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(out, arrow::ChunkedArray::Make(chunks));
-  return Status::OK();
-}
-}  // namespace graphar::detail

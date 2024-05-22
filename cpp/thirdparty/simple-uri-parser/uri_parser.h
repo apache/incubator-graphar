@@ -89,7 +89,7 @@ struct Uri {
         {}
 };
 
-} //namespace uri
+} 
 
 namespace {
 
