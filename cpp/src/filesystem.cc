@@ -30,6 +30,7 @@
 #include "graphar/fwd.h"
 #include "graphar/util/expression.h"
 #include "graphar/util/filesystem.h"
+
 namespace graphar::detail {
 template <typename U, typename T>
 static Status CastToLargeOffsetArray(
@@ -77,6 +78,7 @@ static Status CastToLargeOffsetArray(
   return Status::OK();
 }
 }  // namespace graphar::detail
+
 namespace graphar {
 namespace ds = arrow::dataset;
 

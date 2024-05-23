@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "graphar/fwd.h"
+
 namespace graphar::util {
 struct FilterOptions {
   // The row filter to apply to the table.
