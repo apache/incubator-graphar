@@ -72,4 +72,3 @@ Result<IdType> GetEdgeNum(const std::string& prefix,
                           IdType vertex_chunk_index) noexcept;
 
 }  // namespace graphar::util
-
