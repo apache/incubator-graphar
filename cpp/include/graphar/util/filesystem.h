@@ -25,11 +25,10 @@
 #include <vector>
 
 #include "graphar/util/file_type.h"
+#include "graphar/util/reader_util.h"
 #include "graphar/util/result.h"
 #include "graphar/util/status.h"
 #include "graphar/util/util.h"
-
-#include "graphar/util/reader_util.h"
 
 // forward declarations
 namespace arrow {
@@ -100,8 +99,8 @@ class FileSystem {
    * @return A Status indicating OK if successful, or an error if unsuccessful.
    */
   template <typename T>
-  Status WriteValueToFile(const T& value, const std::string& path) const
-      noexcept;
+  Status WriteValueToFile(const T& value,
+                          const std::string& path) const noexcept;
 
   /**
    * @brief Write a table to a file with a specific type.
@@ -111,8 +110,8 @@ class FileSystem {
    * @return A Status indicating OK if successful, or an error if unsuccessful.
    */
   Status WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
-                          FileType file_type, const std::string& path) const
-      noexcept;
+                          FileType file_type,
+                          const std::string& path) const noexcept;
 
   /**
    * Copy a file.
@@ -154,4 +153,3 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri, std::string* out_path = nullptr);
 
 }  // namespace graphar
-
