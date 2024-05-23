@@ -61,9 +61,7 @@
     GAR_RAISE_ERROR_IF_(!__s.ok(), __s, GAR_STRINGIFY(status));           \
   } while (false)
 
-namespace graphar {
-
-namespace util {
+namespace graphar::util {
 template <typename Head>
 void StringBuilderRecursive(std::ostringstream& stream, Head&& head) {
   stream << head;
@@ -82,8 +80,9 @@ std::string StringBuilder(Args&&... args) {
   StringBuilderRecursive(ss, std::forward<Args>(args)...);
   return ss.str();
 }
-}  // namespace util
+}  // namespace  graphar::util
 
+namespace graphar {
 /**
  * An enum class representing the status codes for success or error outcomes.
  */
@@ -269,13 +268,13 @@ class Status {
   State* state_;
 };
 
-namespace internal {
+}  // namespace graphar
+
+namespace graphar::internal {
 
 // Extract Status from Status or Result<T>
 // Useful for the status check macros such as RETURN_NOT_OK.
 inline const Status& GenericToStatus(const Status& st) { return st; }
 inline Status GenericToStatus(Status&& st) { return std::move(st); }
 
-}  // namespace internal
-
-}  // namespace graphar
+}  // namespace graphar::internal

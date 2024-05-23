@@ -36,8 +36,7 @@ namespace arrow {
 class Array;
 }
 
-namespace graphar {
-namespace builder {
+namespace graphar::builder {
 
 /**
  * @brief Edge is designed for constructing edges builder.
@@ -426,5 +425,4 @@ class EdgesBuilder {
   ValidateLevel validate_level_;
 };
 
-}  // namespace builder
-}  // namespace graphar
+}  // namespace graphar::builder

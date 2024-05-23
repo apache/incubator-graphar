@@ -24,8 +24,7 @@
 #include "graphar/util/result.h"
 #include "graphar/writer/edges_builder.h"
 
-namespace graphar {
-namespace builder {
+namespace graphar::builder {
 
 Status EdgesBuilder::Dump() {
   // construct the writer
@@ -349,5 +348,4 @@ Result<std::shared_ptr<arrow::Table>> EdgesBuilder::getOffsetTable(
   return arrow::Table::Make(schema, arrays);
 }
 
-}  // namespace builder
-}  // namespace graphar
+}  // namespace graphar::builder

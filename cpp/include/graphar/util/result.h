@@ -102,9 +102,7 @@
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN_IMPL(             \
       GAR_ASSIGN_OR_RAISE_NAME(_error_or_value, __COUNTER__), lhs, rexpr);
 
-namespace graphar {
-
-namespace internal {
+namespace graphar::internal {
 
 // Extract Status from Status or Result<T>
 // Useful for the status check macros such as RETURN_NOT_OK.
@@ -117,6 +115,4 @@ inline Status GenericToStatus(Result<T>&& res) {
   return std::move(res).status();
 }
 
-}  // namespace internal
-
-}  // namespace graphar
+}  // namespace graphar::internal

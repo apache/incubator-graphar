@@ -24,9 +24,7 @@
 
 #include "graphar/util/util.h"
 
-namespace graphar {
-
-namespace util {
+namespace graphar::util {
 
 std::shared_ptr<arrow::ChunkedArray> GetArrowColumnByName(
     std::shared_ptr<arrow::Table> const& table, const std::string& name) {
@@ -99,5 +97,4 @@ std::string ValueGetter<std::string>::Value(const void* data, int64_t offset) {
       reinterpret_cast<const arrow::LargeStringArray*>(data)->GetView(offset));
 }
 
-}  // namespace util
-}  // namespace graphar
+}  // namespace graphar::util

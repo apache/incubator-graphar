@@ -36,8 +36,7 @@ class Array;
 class Table;
 }  // namespace arrow
 
-namespace graphar {
-namespace builder {
+namespace graphar::builder {
 
 /**
  * @brief Vertex is designed for constructing vertices builder.
@@ -347,5 +346,4 @@ class VerticesBuilder {
   ValidateLevel validate_level_;
 };
 
-}  // namespace builder
-}  // namespace graphar
+}  // namespace graphar::builder

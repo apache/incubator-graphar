@@ -31,9 +31,7 @@
 #include "graphar/util/expression.h"
 #include "graphar/util/filesystem.h"
 
-namespace graphar {
-namespace ds = arrow::dataset;
-namespace detail {
+namespace graphar::detail {
 template <typename U, typename T>
 static Status CastToLargeOffsetArray(
     const std::shared_ptr<arrow::Array>& in,
@@ -79,7 +77,10 @@ static Status CastToLargeOffsetArray(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(out, arrow::ChunkedArray::Make(chunks));
   return Status::OK();
 }
-}  // namespace detail
+}  // namespace graphar::detail
+
+namespace graphar {
+namespace ds = arrow::dataset;
 
 std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
     const FileType type) const {

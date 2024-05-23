@@ -30,9 +30,7 @@
 #include "graphar/util/filesystem.h"
 #include "graphar/util/reader_util.h"
 
-namespace graphar {
-
-namespace util {
+namespace graphar::util {
 
 /**
  * @brief Checks whether the property names in the FilterOptions match the
@@ -206,6 +204,4 @@ Result<IdType> GetEdgeNum(const std::string& prefix,
   return edge_num;
 }
 
-}  // namespace util
-
-}  // namespace graphar
+}  // namespace graphar::util
