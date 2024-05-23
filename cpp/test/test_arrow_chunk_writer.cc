@@ -45,11 +45,7 @@
 namespace graphar {
 
 TEST_CASE("test_vertex_property_writer_from_file") {
-  std::string root;
-  REQUIRE(GetTestResourceRoot(&root).ok());
-
-  REQUIRE(!root.empty());
-  std::string path = root + "/ldbc_sample/person_0_0.csv";
+  std::string path = TEST_DATA_DIR + "/ldbc_sample/person_0_0.csv";
   arrow::io::IOContext io_context = arrow::io::default_io_context();
 
   auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
@@ -75,7 +71,7 @@ TEST_CASE("test_vertex_property_writer_from_file") {
 
   // Construct the writer
   std::string vertex_meta_file =
-      root + "/ldbc_sample/parquet/" + "person.vertex.yml";
+      TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = VertexInfo::Load(vertex_meta).value();
   auto maybe_writer = VertexPropertyWriter::Make(vertex_info, "/tmp/");
@@ -123,14 +119,11 @@ TEST_CASE("test_vertex_property_writer_from_file") {
 }
 
 TEST_CASE("test_orc_and_parquet_reader") {
-  std::string root;
-  REQUIRE(GetTestResourceRoot(&root).ok());
-
   arrow::Status st;
   arrow::MemoryPool* pool = arrow::default_memory_pool();
-  std::string path1 = root + "/ldbc_sample/orc" +
+  std::string path1 = TEST_DATA_DIR + "/ldbc_sample/orc" +
                       "/vertex/person/firstName_lastName_gender/chunk1";
-  std::string path2 = root + "/ldbc_sample/parquet" +
+  std::string path2 = TEST_DATA_DIR + "/ldbc_sample/parquet" +
                       "/vertex/person/firstName_lastName_gender/chunk1";
   arrow::io::IOContext io_context = arrow::io::default_io_context();
 
@@ -165,12 +158,9 @@ TEST_CASE("test_orc_and_parquet_reader") {
 }
 
 TEST_CASE("test_edge_chunk_writer") {
-  std::string root;
-  REQUIRE(GetTestResourceRoot(&root).ok());
-
   arrow::Status st;
   arrow::MemoryPool* pool = arrow::default_memory_pool();
-  std::string path = root +
+  std::string path = TEST_DATA_DIR +
                      "/ldbc_sample/parquet/edge/person_knows_person/"
                      "unordered_by_source/adj_list/part0/chunk0";
   auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
@@ -193,7 +183,7 @@ TEST_CASE("test_edge_chunk_writer") {
 
   // Construct the writer
   std::string edge_meta_file =
-      root + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
+      TEST_DATA_DIR + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
   auto edge_meta = Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = EdgeInfo::Load(edge_meta).value();
   auto adj_list_type = AdjListType::ordered_by_source;

@@ -20,22 +20,20 @@
 #pragma once
 
 #include <filesystem>
+#include <iostream>
 #include <string>
 
 #include "graphar/util/status.h"
 
 namespace graphar {
 
-// Return the value of the GAR_TEST_DATA environment variable or return error
-// Status
-Status GetTestResourceRoot(std::string* out) {
-  const char* c_root = std::getenv("GAR_TEST_DATA");
-  if (!c_root) {
-    return Status::IOError(
-        "Test resources not found, set GAR_TEST_DATA to <repo root>/testing");
-  }
-  *out = std::string(c_root);
-  return Status::OK();
-}
+static const std::string TEST_DATA_DIR =  // NOLINT
+    std::filesystem::path(__FILE__)
+        .parent_path()
+        .parent_path()
+        .parent_path()
+        .parent_path()
+        .string() +
+    "/testing";
 
 }  // namespace graphar
