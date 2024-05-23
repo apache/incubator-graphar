@@ -154,3 +154,4 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri, std::string* out_path = nullptr);
 
 }  // namespace graphar
+
