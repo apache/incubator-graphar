@@ -60,7 +60,7 @@
     ::graphar::Status __s = ::graphar::internal::GenericToStatus(status); \
     GAR_RAISE_ERROR_IF_(!__s.ok(), __s, GAR_STRINGIFY(status));           \
   } while (false)
-  
+
 namespace graphar::util {
 template <typename Head>
 void StringBuilderRecursive(std::ostringstream& stream, Head&& head) {
