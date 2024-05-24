@@ -15,10 +15,11 @@
 # specific language governing permissions and limitations
 # under the License.
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.5)
 
-if(POLICY CMP0026)
-  cmake_policy(SET CMP0026 OLD)
+# Avoid mixing plain and keyword signature of target_link_libraries
+if (POLICY CMP0023)
+  cmake_policy(SET CMP0023 NEW)
 endif()
 
 if(POLICY CMP0048)
@@ -183,11 +184,7 @@ endmacro()
 # ------------------------------------------------------------------------------
 find_package(Threads REQUIRED)
 find_package(OpenSSL QUIET)
-if (APPLE)
-    find_package(curl REQUIRED)
-else()
-    find_package(CURL REQUIRED)
-endif()
+find_package(CURL REQUIRED)
 if(OPENSSL_FOUND)
     if(OPENSSL_VERSION LESS "1.1.0")
         message(ERROR "The OpenSSL must be greater than or equal to 1.1.0, current version is  ${OPENSSL_VERSION}")
@@ -392,7 +389,7 @@ if (BUILD_TESTS)
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
             else()
-                target_link_libraries(${target} Arrow::arrow_shared
+                target_link_libraries(${target} PRIVATE Arrow::arrow_shared
                     Parquet::parquet_shared)
             endif()
         else()
