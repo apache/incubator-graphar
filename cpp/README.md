@@ -59,7 +59,6 @@ Release build:
 Debug build with unit tests:
 
 ```bash
-    $ export GAR_TEST_DATA=$PWD/../testing/
     $ mkdir build-debug
     $ cd build-debug
     $ cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON ..

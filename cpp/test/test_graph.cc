@@ -28,11 +28,9 @@
 
 namespace graphar {
 TEST_CASE("Graph") {
-  std::string root;
-  REQUIRE(GetTestResourceRoot(&root).ok());
-
   // read file and construct graph info
-  std::string path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+  std::string path =
+      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto maybe_graph_info = GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
@@ -87,7 +85,8 @@ TEST_CASE("Graph") {
   SECTION("ListProperty") {
     // read file and construct graph info
     std::string path =
-        root + "/ldbc_sample/parquet/ldbc_sample_with_feature.graph.yml";
+        TEST_DATA_DIR +
+        "/ldbc_sample/parquet/ldbc_sample_with_feature.graph.yml";
     auto maybe_graph_info = GraphInfo::Load(path);
     REQUIRE(maybe_graph_info.status().ok());
     auto graph_info = maybe_graph_info.value();
@@ -200,7 +199,7 @@ TEST_CASE("Graph") {
 
   SECTION("ValidateProperty") {
     // read file and construct graph info
-    std::string path = root + "/neo4j/MovieGraph.graph.yml";
+    std::string path = TEST_DATA_DIR + "/neo4j/MovieGraph.graph.yml";
     auto maybe_graph_info = GraphInfo::Load(path);
     REQUIRE(maybe_graph_info.status().ok());
     auto graph_info = maybe_graph_info.value();
