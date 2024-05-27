@@ -48,5 +48,3 @@ RUN useradd -m graphar -u 1001 \
     && echo 'graphar ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 USER graphar
 WORKDIR /home/graphar
-
-
