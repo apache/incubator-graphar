@@ -12,15 +12,14 @@ RUN apt-get update && apt-get install -y ca-certificates lsb-release wget \
     && apt-get install -y ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
     && apt-get update \
     && apt-get install -y \
+       cmake \
+       build-essential \
        libarrow-dev \
        libarrow-dataset-dev \
        libarrow-acero-dev \
        libparquet-dev \
        libboost-graph-dev \
        doxygen \
-       clang \
-       libclang-dev \
-       cmake \
        npm \
        default-jdk \
        git \
@@ -29,6 +28,7 @@ RUN apt-get update && apt-get install -y ca-certificates lsb-release wget \
        sudo \
        tzdata \
        maven \
+    && curl -sSL https://install.python-poetry.org | python3 - \
     && wget https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-22538c65/clang-format-8_linux-amd64 -O /usr/bin/clang-format \
     && chmod +x /usr/bin/clang-format \
     && apt-get clean -y \
