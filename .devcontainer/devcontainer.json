@@ -48,42 +48,5 @@
 	},
 
 	// Set `remoteUser` to `root` to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "graphar",
-
-	// Use 'postCreateCommand' to run commands before the container is created.
-	"initializeCommand": "sudo docker pull graphar/graphar-dev:latest",
-
-	// Uncomment this to enable C++ and Rust debugging in containers
-	// "capAdd": ["SYS_PTRACE"],
-	// "securityOpt": ["seccomp=unconfined"],
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [3000],
-
-	// Use 'portsAttributes' to set default properties for specific forwarded ports.
-	// More info: https://containers.dev/implementors/json_reference/#port-attributes
-	// "portsAttributes": {
-	// 	"9000": {
-	// 		"label": "Hello Remote World",
-	// 		"onAutoForward": "notify"
-	// 	}
-	// },
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "yarn install"
-
-	// Improve performance
-
-	// Uncomment these to mount a folder to a volume
-	// https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-targeted-named-volume
-	// "mounts": [
-    // 	"source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
-	// ],
-
-
-	// Uncomment these to use a named volume for your entire source tree
-	// https://code.visualstudio.com/remote/advancedcontainers/improve-performance#_use-a-named-volume-for-your-entire-source-tree
-	// "workspaceMount": "source=gs,target=/workspaces,type=volume",
-	// "workspaceFolder": "/workspaces"
-	"postCreateCommand": "sudo chown -R graphar /workspaces && bash pre-commit/install-hook.sh && bash pre-commit/prepare-commit-msg"
+	"remoteUser": "graphar"
 }
