@@ -37,7 +37,7 @@ RUN apt-get update && apt-get install -y ca-certificates lsb-release wget \
 RUN git clone --branch v1.8.3 https://github.com/google/benchmark.git /tmp/benchmark --depth 1 \
     && cd /tmp/benchmark \
     && cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_TESTING=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF . \
-    && make -j32 \
+    && make -j`nproc` \
     && make install \
     && rm -rf /tmp/benchmark
 
