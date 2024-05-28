@@ -35,7 +35,7 @@ void vertices_collection(
   auto vertices = maybe_vertices_collection.value();
 
   // use vertices collection
-  auto count = 0;
+  size_t count = 0;
   // iterate through vertices collection
   for (auto it = vertices->begin(); it != vertices->end(); ++it) {
     count++;
