@@ -198,10 +198,11 @@ jobs:
             macos-version: "14"
     steps:
     - uses: actions/checkout@v3
+      with:
+          submodules: true
 
     - name: Install dependencies
       run: |
-        brew update
         brew bundle --file=cpp/Brewfile
 
     - name: Build GraphAr
@@ -212,3 +213,9 @@ jobs:
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
         make -j$(nproc)
         popd
+
+    - name: Running Test
+      working-directory: "cpp/build"
+      run: |
+        export ASAN_OPTIONS=detect_leaks=0
+        ctest --output-on-failure
