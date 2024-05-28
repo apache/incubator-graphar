@@ -182,34 +182,26 @@ endmacro()
 # ------------------------------------------------------------------------------
 # building or find third party library
 # ------------------------------------------------------------------------------
-find_package(Threads REQUIRED)
-find_package(OpenSSL QUIET)
-find_package(CURL REQUIRED)
-if(OPENSSL_FOUND)
-    if(OPENSSL_VERSION LESS "1.1.0")
-        message(ERROR "The OpenSSL must be greater than or equal to 1.1.0, current version is  ${OPENSSL_VERSION}")
-    endif()
-endif()
-
 # check if arrow is installed
 find_package(Arrow QUIET)
+if (NOT ${Arrow_FOUND})
+    message(FATAL_ERROR "apache-arrow is required, please install it and retry")
+endif()
 find_package(ArrowDataset QUIET)
-find_package(ArrowAcero QUIET)
+if (NOT ${ArrowDataset_FOUND})
+    message(FATAL_ERROR "apache-arrow-dataset is required, please install it and retry")
+endif()
+if (${Arrow_VERSION} VERSION_GREATER_EQUAL "12.0.0")
+    # ArrowAcero is available in Arrow 12.0.0 and later
+    find_package(ArrowAcero QUIET)
+    if (NOT ${ArrowAcero_FOUND})
+        message(FATAL_ERROR "apache-arrow-acero is required, please install it and retry")
+    endif()
+endif()
 find_package(Parquet QUIET)
-
-if (NOT Arrow_FOUND OR NOT ArrowDataset_FOUND OR NOT ArrowAcero_FOUND OR NOT Parquet_FOUND)
-    message(STATUS "Arrow is not installed, will build from source.")
-    set(BUILD_ARROW_FROM_SOURCE ON)
-else()
-    message(STATUS "-- Found Arrow: ${Arrow_VERSION}")
-    set(BUILD_ARROW_FROM_SOURCE OFF)
+if (NOT ${Parquet_FOUND})
+    message(FATAL_ERROR "parquet is required, please install it and retry")
 endif()
-
-if(BUILD_ARROW_FROM_SOURCE)
-    include(apache-arrow)
-    build_arrow()
-endif()
-
 
 macro(get_target_location var target)
   if(TARGET ${target})
@@ -234,46 +226,18 @@ macro(build_graphar)
                                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     )
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
-    if(BUILD_ARROW_FROM_SOURCE)
-        target_include_directories(graphar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
-    endif()
     target_link_libraries(graphar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
 
     if(APPLE)
-        if(BUILD_ARROW_FROM_SOURCE)
-            target_link_libraries(graphar PRIVATE -Wl,-force_load gar_arrow_static
-                "${GAR_PARQUET_STATIC_LIB}"
-                "${GAR_DATASET_STATIC_LIB}"
-                "${GAR_ACERO_STATIC_LIB}"
-                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
-        else()
-            target_link_libraries(graphar PRIVATE -Wl,-force_load Arrow::arrow_shared
-                Parquet::parquet_shared
-                ArrowDataset::arrow_dataset_shared
-                ArrowAcero::arrow_acero_shared)
-        endif()
+        target_link_libraries(graphar PRIVATE -Wl,-force_load Arrow::arrow_shared
+            Parquet::parquet_shared
+            ArrowDataset::arrow_dataset_shared
+            ArrowAcero::arrow_acero_shared)
     else()
-        if(BUILD_ARROW_FROM_SOURCE)
-            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
-                "${GAR_PARQUET_STATIC_LIB}"
-                "${GAR_DATASET_STATIC_LIB}"
-                "${GAR_ARROW_ACERO_STATIC_LIB}"
-                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
-        else()
-            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_shared
-                Parquet::parquet_shared
-                ArrowDataset::arrow_dataset_shared
-                ArrowAcero::arrow_acero_shared -Wl,--no-whole-archive)
-        endif()
-    endif()
-
-    # if OpenSSL library exists, link the OpenSSL library.
-    # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
-    if(OPENSSL_FOUND)
-        target_link_libraries(graphar PRIVATE OpenSSL::SSL)
-    endif()
-    if (CURL_FOUND)
-        target_link_libraries(graphar PRIVATE ${CURL_LIBRARIES})
+        target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_shared
+            Parquet::parquet_shared
+            ArrowDataset::arrow_dataset_shared
+            ArrowAcero::arrow_acero_shared -Wl,--no-whole-archive)
     endif()
 endmacro()
 
@@ -297,37 +261,13 @@ if (BUILD_EXAMPLES)
                                                      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>
         )
         target_include_directories(${E_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
-        if(BUILD_ARROW_FROM_SOURCE)
-            target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
-        endif()
         target_link_libraries(${E_NAME} PRIVATE graphar ${Boost_LIBRARIES} Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
-            if(BUILD_ARROW_FROM_SOURCE)
-                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
-                    "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
-            else()
-                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
-                    Parquet::parquet_shared)
-            endif()
+            target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
+                Parquet::parquet_shared)
         else()
-            if(BUILD_ARROW_FROM_SOURCE)
-                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
-                    "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
-            else()
-                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
-                    Parquet::parquet_shared)
-            endif()
-        endif()
-
-        # if OpenSSL library exists, link the OpenSSL library.
-        # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
-        if(OPENSSL_FOUND)
-            target_link_libraries(${E_NAME} PRIVATE OpenSSL::SSL)
-        endif()
-        if (CURL_FOUND)
-            target_link_libraries(${E_NAME} PRIVATE CURL::libcurl)
+            target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
+                Parquet::parquet_shared)
         endif()
     endforeach()
 endif()
@@ -379,43 +319,18 @@ if (BUILD_TESTS)
         add_executable(${target} ${add_test_SRCS})
         target_compile_features(${target} PRIVATE cxx_std_17)
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
-        if(BUILD_ARROW_FROM_SOURCE)
-            target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
-        endif()
         target_link_libraries(${target} PRIVATE Catch2::Catch2 graphar Threads::Threads ${CMAKE_DL_LIBS})
         if(APPLE)
-            if(BUILD_ARROW_FROM_SOURCE)
-                target_link_libraries(${target} PRIVATE -Wl,-force_load gar_arrow_static
-                    "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
-            else()
-                target_link_libraries(${target} PRIVATE Arrow::arrow_shared
-                    Parquet::parquet_shared)
-            endif()
+            target_link_libraries(${target} PRIVATE Arrow::arrow_shared
+                Parquet::parquet_shared)
         else()
-            if(BUILD_ARROW_FROM_SOURCE)
-                target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
-                    "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
-            else()
-                target_link_libraries(${target} PRIVATE Arrow::arrow_shared
-                    Parquet::parquet_shared)
-            endif()
+            target_link_libraries(${target} PRIVATE Arrow::arrow_shared
+                Parquet::parquet_shared)
         endif()
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
-        target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
         include(CTest)
         include(Catch)
         catch_discover_tests(${target})
-
-        # if OpenSSL library exists, link the OpenSSL library.
-        # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
-        if(OPENSSL_FOUND)
-            target_link_libraries(${target} PRIVATE OpenSSL::SSL)
-        endif()
-        if (CURL_FOUND)
-            target_link_libraries(${target} PRIVATE CURL::libcurl)
-        endif()
     endmacro()
 
     add_test(test_info SRCS test/test_info.cc)
@@ -440,15 +355,6 @@ if (BUILD_BENCHMARKS)
         target_compile_features(${target} PRIVATE cxx_std_17)
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
         target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar Threads::Threads ${CMAKE_DL_LIBS})
-
-        # if OpenSSL library exists, link the OpenSSL library.
-        # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
-        if(OPENSSL_FOUND)
-            target_link_libraries(${target} PRIVATE OpenSSL::SSL)
-        endif()
-        if (CURL_FOUND)
-            target_link_libraries(${target} PRIVATE CURL::libcurl)
-        endif()
     endmacro()
     add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
     add_benchmark(graph_info_benchmark SRCS benchmarks/graph_info_benchmark.cc)
