@@ -38,7 +38,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  GraphAr-ubuntu-arrow-installed:
+  ubuntu:
     runs-on: ubuntu-latest
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/testing/
@@ -143,7 +143,7 @@ jobs:
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
     
-  GraphAr-centos-arrow-installed:
+  centos:
     runs-on: ubuntu-latest
     container:
       image: centos:7
@@ -177,6 +177,35 @@ jobs:
 
     - name: Build GraphAr
       shell: scl enable devtoolset-8 -- bash --noprofile --norc -eo pipefail {0}
+      working-directory: "cpp"
+      run: |
+        mkdir build
+        pushd build
+        cmake ..
+        make -j$(nproc)
+        popd
+  
+  macos:
+    name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
+    runs-on: macos-${{ matrix.macos-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: AMD64
+            macos-version: "12"
+          - architecture: ARM64
+            macos-version: "14"
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies
+      shell: scl enable devtoolset-8 -- bash --noprofile --norc -eo pipefail {0}
+      run: |
+        brew update
+        brew bundle --file=cpp/Brewfile
+
+    - name: Build GraphAr
       working-directory: "cpp"
       run: |
         mkdir build

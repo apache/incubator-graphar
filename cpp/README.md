@@ -24,16 +24,46 @@ Building requires:
   sufficient. For MacOS, at least clang 5 is required
 - CMake 3.5 or higher
 - On Linux and macOS, ``make`` build utilities
-- curl-devel with SSL (Linux) or curl (macOS), for s3 filesystem support
-- Apache Arrow C++ (>= 12.0.0, requires `arrow-dev`, `arrow-dataset`, `arrow-acero` and `parquet` modules) for Arrow filesystem support and can use `BUILD_ARROW_FROM_SOURCE` option to build with GraphAr automatically. You can refer to [Apache Arrow Installation](https://arrow.apache.org/install/) to install Arrow directly too.
+- Apache Arrow C++ (>= 12.0.0, requires `arrow-dev`, `arrow-dataset`, `arrow-acero` and `parquet` modules) for Arrow filesystem support. You can refer to [Apache Arrow Installation](https://arrow.apache.org/install/) to install the required modules.
 
 Dependencies for optional features:
 
 - [Doxygen](https://www.doxygen.nl/index.html) (>= 1.8) for generating documentation
-
-Extra dependencies are required by examples:
-
+- `clang-format-8` for code formatting
 - [BGL](https://www.boost.org/doc/libs/1_80_0/libs/graph/doc/index.html) (>= 1.58)
+- [Google Benchmark](https://github.com/google/benchmark) (>= 1.6.0) for benchmarking
+
+On Ubuntu/Debian, you can install the required packages with:
+
+```bash
+sudo apt-get install \
+    build-essential \
+    cmake \
+    libboost-graph-dev \
+    doxygen
+```
+
+Arrow C++ dependencies can refer to [Apache Arrow Installation](https://arrow.apache.org/install/).
+
+On Fedora Linux:
+
+```bash
+sudo dnf install \
+     cmake \
+     gcc \
+     gcc-c++ \
+     make
+```
+
+Arrow C++ dependencies can refer to [Apache Arrow Installation](https://arrow.apache.org/install/).
+
+On macOS, you can use [Homebrew](https://brew.sh) to install the required packages:
+
+```bash
+git clone https:://github.com/apache/graphar.git
+cd graphar
+brew update && brew bundle --file=cpp/Brewfile
+```
 
 ### Building
 
