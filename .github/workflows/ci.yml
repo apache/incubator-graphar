@@ -209,6 +209,6 @@ jobs:
       run: |
         mkdir build
         pushd build
-        cmake ..
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
         make -j$(nproc)
         popd
