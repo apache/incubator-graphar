@@ -23,7 +23,6 @@ RUN apt-get update && apt-get install -y ca-certificates lsb-release wget \
        npm \
        default-jdk \
        git \
-       libbenchmark-dev \
        vim \
        sudo \
        tzdata \
