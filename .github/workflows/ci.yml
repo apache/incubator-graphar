@@ -39,6 +39,7 @@ concurrency:
 
 jobs:
   ubuntu:
+    name: Ubuntu 22.04 C++
     runs-on: ubuntu-latest
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/testing/
@@ -143,7 +144,8 @@ jobs:
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
     
-  centos:
+  centoo:
+    name: CentOS 7 C++
     runs-on: ubuntu-latest
     container:
       image: centos:7
