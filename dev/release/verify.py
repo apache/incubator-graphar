@@ -20,7 +20,6 @@
 # https://github.com/apache/opendal/blob/84586e5/scripts/verify.py
 
 import subprocess
-import sys
 import os
 from pathlib import Path
 
@@ -69,55 +68,53 @@ def check_notice(dir):
     print(f"{GREEN}> NOTICE file exists in {dir}{ENDCOLOR}")
 
 
-def check_rust():
-    try:
-        subprocess.run(["cargo", "--version"], check=True)
-        return True
-    except FileNotFoundError:
-        return False
-    except Exception as e:
-        raise Exception("Check rust met unexpected error", e)
+def setup_conda(dependencies):
+    print("Configuring conda environment...")
+    create_env_command = ["conda", "create", "--name", "graphar", "--yes", "python=3.8"]
+    subprocess.run(create_env_command, check=True, stderr=subprocess.STDOUT)
+    install_deps_command = ["conda", "install", "--name", "graphar", "--yes"] + dependencies
+    subprocess.run(install_deps_command, check=True, stderr=subprocess.STDOUT)
 
 
-def check_java():
-    try:
-        subprocess.run(["java", "-version"], check=True)
-        return True
-    except FileNotFoundError:
-        return False
-    except Exception as e:
-        raise Exception("Check java met unexpected error", e)
+def build_and_test_cpp(dir):
+    print("Start building, install and test C++ library")
 
+    setup_conda(["--file", f"{dir}/dev/release/conda_env_cpp.txt"])
 
-def build_core(dir):
-    print("Start building opendal core")
-
+    cmake_command = ["cmake", ".", "-DBUILD_TEST=ON", "-DBUILD_EXAMPLES=ON", "-DBUILD_BENCHMARKS=ON"]
     subprocess.run(
-        ["cargo", "build", "--release"],
-        cwd=dir / "core",
+        cmake_command,
+        cwd=dir / "cpp",
         check=True,
-        stderr=subprocess.DEVNULL,
+        stderr=subprocess.STDOUT,
+    )
+    build_and_install_command = [
+        "cmake",
+        "--build",
+        ".",
+        "--target",
+        "install",
+    ]
+    subprocess.run(
+        build_and_install_command,
+        cwd=dir / "cpp",
+        check=True,
+        stderr=subprocess.STDOUT,
+    )
+    test_command = [
+        "ctest",
+        "--output-on-failure",
+        "--timeout",
+        "300",
+        "-VV"
+    ]
+    subprocess.run(
+        test_command,
+        cwd=dir / "cpp",
+        check=True,
+        stderr=subprocess.STDOUT,
     )
     print(f"{GREEN}Success to build opendal core{ENDCOLOR}")
-
-
-def build_java_binding(dir):
-    print("Start building opendal java binding")
-
-    subprocess.run(
-        [
-            "./mvnw",
-            "clean",
-            "install",
-            "-DskipTests=true",
-            "-Dcargo-build.profile=release",
-        ],
-        check=True,
-        cwd=dir / "bindings/java",
-        stderr=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-    )
-    print(f"> {GREEN}Success to build opendal java binding{ENDCOLOR}")
 
 
 if __name__ == "__main__":
@@ -140,3 +137,4 @@ if __name__ == "__main__":
     for dir in BASE_DIR.glob("apache-graphar-*-src/"):
         check_license(dir)
         check_notice(dir)
+        build_and_test_cpp(dir)
