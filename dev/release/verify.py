@@ -68,7 +68,7 @@ def check_notice(dir):
     print(f"{GREEN}> NOTICE file exists in {dir}{ENDCOLOR}")
 
 
-def setup_conda(dependencies):
+def maybe_setup_conda(dependencies):
     print("Configuring conda environment...")
     create_env_command = ["conda", "create", "--name", "graphar", "--yes", "python=3.8"]
     subprocess.run(create_env_command, check=True, stderr=subprocess.STDOUT)
@@ -79,7 +79,7 @@ def setup_conda(dependencies):
 def build_and_test_cpp(dir):
     print("Start building, install and test C++ library")
 
-    setup_conda(["--file", f"{dir}/dev/release/conda_env_cpp.txt"])
+    maybe_setup_conda(["--file", f"{dir}/dev/release/conda_env_cpp.txt"])
 
     cmake_command = ["cmake", ".", "-DBUILD_TEST=ON", "-DBUILD_EXAMPLES=ON", "-DBUILD_BENCHMARKS=ON"]
     subprocess.run(
@@ -114,8 +114,30 @@ def build_and_test_cpp(dir):
         check=True,
         stderr=subprocess.STDOUT,
     )
-    print(f"{GREEN}Success to build opendal core{ENDCOLOR}")
+    print(f"{GREEN}Success to build graphar c++{ENDCOLOR}")
 
+
+def build_and_test_scala(dir):
+    print("Start building, install and test Scala with Spark library")
+
+    maybe_setup_conda(["--file", f"{dir}/dev/release/conda_env_scala.txt"])
+
+    build_command_32=["mvn", "clean", "package", "-P", "datasource32"]
+    subprocess.run(
+        build_command_32,
+        cwd=dir / "maven-projects/spark",
+        check=True,
+        stderr=subprocess.STDOUT,
+    )
+    build_command_33=["mvn", "clean", "package", "-P", "datasource33"]
+    subprocess.run(
+        build_command_33,
+        cwd=dir / "maven-projects/spark",
+        check=True,
+        stderr=subprocess.STDOUT,
+    )
+
+    print(f"{GREEN}Success to build graphar scala{ENDCOLOR}")
 
 if __name__ == "__main__":
     # Get a list of all files in the current directory
@@ -138,3 +160,4 @@ if __name__ == "__main__":
         check_license(dir)
         check_notice(dir)
         build_and_test_cpp(dir)
+        build_and_test_scala(dir)
