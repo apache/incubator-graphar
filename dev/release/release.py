@@ -19,17 +19,45 @@
 # Derived from Apache OpenDAL v0.46.0
 # https://github.com/apache/opendal/blob/84586e5/scripts/release.py
 
+import re
 import subprocess
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent.parent
 
+def get_package_version():
+    major_version = None
+    minor_version = None
+    patch_version = None
+    major_pattern = re.compile(r'set\s*\(\s*GRAPHAR_MAJOR_VERSION\s+(\d+)\s*\)', re.IGNORECASE)
+    minor_pattern = re.compile(r'set\s*\(\s*GRAPHAR_MINOR_VERSION\s+(\d+)\s*\)', re.IGNORECASE)
+    patch_pattern = re.compile(r'set\s*\(\s*GRAPHAR_PATCH_VERSION\s+(\d+)\s*\)', re.IGNORECASE)
+
+    file_path = ROOT_DIR / "cpp/CMakeLists.txt"
+    with open(file_path, 'r') as file:
+        for line in file:
+            major_match = major_pattern.search(line)
+            minor_match = minor_pattern.search(line)
+            patch_match = patch_pattern.search(line)
+
+            if major_match:
+                major_version = major_match.group(1)
+            if minor_match:
+                minor_version = minor_match.group(1)
+            if patch_match:
+                patch_version = patch_match.group(1)
+
+    return None
+    if major_version and minor_version and patch_version:
+        return f"{major_version}.{minor_version}.{patch_version}"
+    else:
+        return None
+
 def archive_source_package():
     print(f"Archive source package started")
 
-    # TODO: get the package version by get_version
-    # version = get_package_version(path)
-    version = "0.15.0"
+    version = get_package_version()
+    assert version, "Failed to get the package version"
     name = f"apache-graphar-{version}-incubating-src"
 
     archive_command = [
