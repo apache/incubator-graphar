@@ -68,12 +68,23 @@ def check_notice(dir):
     print(f"{GREEN}> NOTICE file exists in {dir}{ENDCOLOR}")
 
 
+def install_conda():
+    print("Start installing conda")
+    subprocess.run(["wget", "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"], check=True)
+    subprocess.run(["bash", "Miniconda3-latest-Linux-x86_64.sh", "-b"], check=True)
+    print(f"{GREEN}Success to install conda{ENDCOLOR}")
+
+
 def maybe_setup_conda(dependencies):
-    print("Configuring conda environment...")
-    create_env_command = ["conda", "create", "--name", "graphar", "--yes", "python=3.8"]
-    subprocess.run(create_env_command, check=True, stderr=subprocess.STDOUT)
-    install_deps_command = ["conda", "install", "--name", "graphar", "--yes"] + dependencies
-    subprocess.run(install_deps_command, check=True, stderr=subprocess.STDOUT)
+    # Optionally setup a conda environment with the given dependencies
+    if ("USE_CONDA" in os.environ) and (os.environ["USE_CONDA"] > 0):
+        print("Configuring conda environment...")
+        subprocess.run(["conda", "deactivate"], check=False, stderr=subprocess.STDOUT)
+        create_env_command = ["conda", "create", "--name", "graphar", "--yes", "python=3.8"]
+        subprocess.run(create_env_command, check=True, stderr=subprocess.STDOUT)
+        install_deps_command = ["conda", "install", "--name", "graphar", "--yes"] + dependencies
+        subprocess.run(install_deps_command, check=True, stderr=subprocess.STDOUT)
+        subprocess.run(["conda", "activate", "graphar"], check=True, stderr=subprocess.STDOUT, shell=True)
 
 
 def build_and_test_cpp(dir):
