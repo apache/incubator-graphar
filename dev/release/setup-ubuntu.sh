@@ -44,5 +44,5 @@ apt-get update -y -q
 apt-get install -y -q --no-install-recommends \
   libarrow-dev \
   libarrow-dataset-dev \
-  libarrow-aceros-dev \
+  libarrow-acero-dev \
   libparquet-dev

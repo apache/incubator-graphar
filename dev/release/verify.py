@@ -92,7 +92,7 @@ def build_and_test_cpp(dir):
 
     maybe_setup_conda(["--file", f"{dir}/dev/release/conda_env_cpp.txt"])
 
-    cmake_command = ["cmake", ".", "-DBUILD_TEST=ON", "-DBUILD_EXAMPLES=ON", "-DBUILD_BENCHMARKS=ON"]
+    cmake_command = ["cmake", ".", "-DBUILD_TESTS=ON"]
     subprocess.run(
         cmake_command,
         cwd=dir / "cpp",
