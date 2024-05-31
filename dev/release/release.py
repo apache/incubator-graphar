@@ -47,7 +47,6 @@ def get_package_version():
             if patch_match:
                 patch_version = patch_match.group(1)
 
-    return None
     if major_version and minor_version and patch_version:
         return f"{major_version}.{minor_version}.{patch_version}"
     else:
