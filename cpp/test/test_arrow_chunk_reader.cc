@@ -17,6 +17,8 @@
  * under the License.
  */
 
+#include <catch2/catch_test_macros.hpp>
+
 #include <cstdlib>
 
 #include "arrow/api.h"
@@ -29,8 +31,6 @@
 #include "graphar/util/filesystem.h"
 #include "graphar/util/general_params.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
 
 namespace graphar {
 

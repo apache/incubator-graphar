@@ -24,8 +24,7 @@
 #include "graphar/reader/chunk_info_reader.h"
 #include "graphar/util/adj_list_type.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 namespace graphar {
 

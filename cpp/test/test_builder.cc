@@ -39,9 +39,7 @@
 #include "graphar/writer/edges_builder.h"
 #include "graphar/writer/vertices_builder.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
-
+#include <catch2/catch_test_macros.hpp>
 namespace graphar {
 TEST_CASE("test_vertices_builder") {
   std::cout << "Test vertex builder" << std::endl;

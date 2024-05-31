@@ -31,8 +31,7 @@
 #include "graphar/util/filesystem.h"
 #include "graphar/util/version_parser.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 namespace graphar {
 
@@ -780,7 +779,7 @@ extra_info:
   }
 }
 
-TEST_CASE("LoadFromS3", "[!hide]") {
+TEST_CASE("LoadFromS3", "[.hidden]") {
   std::string path =
       "s3://graphar/ldbc/ldbc.graph.yml"
       "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
