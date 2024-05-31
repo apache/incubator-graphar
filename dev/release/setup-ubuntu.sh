@@ -37,9 +37,9 @@ apt-get install -y -q --no-install-recommends \
   pkg-config \
   tzdata
 
-wget -c https://apache.jfrog.io/artifactory/arrow/$(id)/apache-arrow-apt-source-latest-$(codename).deb \
+wget -c https://apache.jfrog.io/artifactory/arrow/${id}/apache-arrow-apt-source-latest-${codename}.deb \
     -P /tmp/
-apt-get install -y -q /tmp/apache-arrow-apt-source-latest-$(codename).deb
+apt-get install -y -q /tmp/apache-arrow-apt-source-latest-${codename}.deb
 apt-get update -y -q
 apt-get install -y -q --no-install-recommends \
   libarrow-dev \
