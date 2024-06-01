@@ -31,7 +31,6 @@
 #include "graphar/util/filesystem.h"
 #include "graphar/util/general_params.h"
 
-
 namespace graphar {
 
 TEST_CASE("ArrowChunkReader") {
