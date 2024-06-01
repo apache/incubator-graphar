@@ -17,7 +17,6 @@
  * under the License.
  */
 
-#include <catch2/catch_test_macros.hpp>
 
 #include <cstdlib>
 
@@ -31,6 +30,7 @@
 #include "graphar/util/filesystem.h"
 #include "graphar/util/general_params.h"
 
+#include <catch2/catch_test_macros.hpp>
 namespace graphar {
 
 TEST_CASE("ArrowChunkReader") {
