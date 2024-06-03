@@ -22,24 +22,14 @@ package org.apache.graphar
 import org.apache.graphar.reader.{VertexReader, EdgeReader}
 import org.apache.graphar.writer.{VertexWriter, EdgeWriter}
 
-import org.apache.spark.sql.SparkSession
 import org.apache.hadoop.fs.{Path, FileSystem}
-import org.scalatest.funsuite.AnyFunSuite
 
-class TransformExampleSuite extends AnyFunSuite {
-  val spark = SparkSession
-    .builder()
-    .enableHiveSupport()
-    .master("local[*]")
-    .getOrCreate()
+class TransformExampleSuite extends BaseTestSuite {
 
   test("transform file type") {
     // read from orc files
-    val file_path = "gar-test/ldbc_sample/orc/"
-    val prefix = getClass.getClassLoader.getResource(file_path).getPath
-    val vertex_yaml = getClass.getClassLoader
-      .getResource(file_path + "person.vertex.yml")
-      .getPath
+    val prefix = testData + "/ldbc_sample/orc/"
+    val vertex_yaml = prefix + "person.vertex.yml"
     val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
 
     val reader = new VertexReader(prefix, vertex_info, spark)
@@ -48,11 +38,8 @@ class TransformExampleSuite extends AnyFunSuite {
     assert(vertex_df_with_index.count() == vertices_num)
 
     // write to parquet files
-    val output_file_path = "gar-test/ldbc_sample/parquet/"
     val output_prefix: String = "/tmp/example/"
-    val output_vertex_yaml = getClass.getClassLoader
-      .getResource(output_file_path + "person.vertex.yml")
-      .getPath
+    val output_vertex_yaml = testData + "/ldbc_sample/parquet/person.vertex.yml"
     val output_vertex_info =
       VertexInfo.loadVertexInfo(output_vertex_yaml, spark)
 
@@ -72,20 +59,15 @@ class TransformExampleSuite extends AnyFunSuite {
   }
 
   test("transform adjList type") {
-    val file_path = "gar-test/ldbc_sample/parquet/"
-    val prefix = getClass.getClassLoader.getResource(file_path).getPath
+    val prefix = testData + "/ldbc_sample/parquet/"
     // get vertex num
-    val vertex_yaml = getClass.getClassLoader
-      .getResource(file_path + "person.vertex.yml")
-      .getPath
+    val vertex_yaml = prefix + "person.vertex.yml"
     val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
     // construct the vertex reader
     val vreader = new VertexReader(prefix, vertex_info, spark)
     val vertexNum = vreader.readVerticesNumber()
     // read edges of unordered_by_source type
-    val edge_yaml = getClass.getClassLoader
-      .getResource(file_path + "person_knows_person.edge.yml")
-      .getPath
+    val edge_yaml = prefix + "person_knows_person.edge.yml"
     val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
 
     val adj_list_type = AdjListType.unordered_by_source

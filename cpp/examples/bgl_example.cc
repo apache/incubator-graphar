@@ -35,7 +35,7 @@
 int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+      GetTestingResourceRoot() + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto graph_info = graphar::GraphInfo::Load(path).value();
   ASSERT(graph_info->GetVertexInfos().size() == 1);
   ASSERT(graph_info->GetEdgeInfos().size() == 1);

@@ -30,7 +30,7 @@
 void vertices_builder() {
   // construct vertices builder
   std::string vertex_meta_file =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person.vertex.yml";
+      GetTestingResourceRoot() + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = graphar::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
   graphar::IdType start_index = 0;
@@ -71,8 +71,9 @@ void vertices_builder() {
 
 void edges_builder() {
   // construct edges builder
-  std::string edge_meta_file =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
+  std::string edge_meta_file = GetTestingResourceRoot() +
+                               "/ldbc_sample/parquet/" +
+                               "person_knows_person.edge.yml";
   auto edge_meta = graphar::Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = graphar::EdgeInfo::Load(edge_meta).value();
   auto vertex_count = 3;

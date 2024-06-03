@@ -21,24 +21,14 @@ package org.apache.graphar
 
 import org.apache.graphar.graph.GraphWriter
 
-import org.apache.spark.sql.SparkSession
-import org.scalatest.funsuite.AnyFunSuite
-
-class TestGraphWriterSuite extends AnyFunSuite {
-  val spark = SparkSession
-    .builder()
-    .enableHiveSupport()
-    .master("local[*]")
-    .getOrCreate()
+class TestGraphWriterSuite extends BaseTestSuite {
 
   test("write graphs with data frames") {
     // initialize a graph writer
     val writer = new GraphWriter()
 
     // put the vertex data and edge data into writer
-    val vertex_file_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/person_0_0.csv")
-      .getPath
+    val vertex_file_path = testData + "/ldbc_sample/person_0_0.csv"
     val vertex_df = spark.read
       .option("delimiter", "|")
       .option("header", "true")
@@ -46,9 +36,7 @@ class TestGraphWriterSuite extends AnyFunSuite {
     val label = "person"
     writer.PutVertexData(label, vertex_df, "id")
 
-    val file_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv")
-      .getPath
+    val file_path = testData + "/ldbc_sample/person_knows_person_0_0.csv"
     val edge_df = spark.read
       .option("delimiter", "|")
       .option("header", "true")

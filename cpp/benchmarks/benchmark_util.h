@@ -30,19 +30,16 @@
 
 namespace graphar {
 
-static const std::string TEST_DATA_DIR =  // NOLINT
-    std::filesystem::path(__FILE__)
-        .parent_path()
-        .parent_path()
-        .parent_path()
-        .parent_path()
-        .string() +
-    "/testing";
-
 class BenchmarkFixture : public ::benchmark::Fixture {
  public:
   void SetUp(const ::benchmark::State& state) override {
-    path_ = TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+    const char* c_root = std::getenv("GAR_TEST_DATA");
+    if (!c_root) {
+      throw std::runtime_error(
+          "Test resources not found, set GAR_TEST_DATA to auxiliary testing "
+          "data");
+    }
+    path_ = std::string(c_root) + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
     auto maybe_graph_info = GraphInfo::Load(path_);
     graph_info_ = maybe_graph_info.value();
   }

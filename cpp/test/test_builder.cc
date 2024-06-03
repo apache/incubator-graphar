@@ -41,12 +41,12 @@
 
 #include <catch2/catch_test_macros.hpp>
 namespace graphar {
-TEST_CASE("test_vertices_builder") {
+TEST_CASE_METHOD(GlobalFixture, "test_vertices_builder") {
   std::cout << "Test vertex builder" << std::endl;
 
   // construct vertex builder
   std::string vertex_meta_file =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person.vertex.yml";
+      test_data_dir + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = VertexInfo::Load(vertex_meta).value();
   IdType start_index = 0;
@@ -78,7 +78,7 @@ TEST_CASE("test_vertices_builder") {
   REQUIRE(builder->GetNum() == 0);
 
   // add vertices
-  std::ifstream fp(TEST_DATA_DIR + "/ldbc_sample/person_0_0.csv");
+  std::ifstream fp(test_data_dir + "/ldbc_sample/person_0_0.csv");
   std::string line;
   getline(fp, line);
   int m = 4;
@@ -120,7 +120,7 @@ TEST_CASE("test_vertices_builder") {
   REQUIRE(builder->AddVertex(v).IsInvalid());
 
   // check the number of vertices dumped
-  auto fs = arrow::fs::FileSystemFromUriOrPath(TEST_DATA_DIR).ValueOrDie();
+  auto fs = arrow::fs::FileSystemFromUriOrPath(test_data_dir).ValueOrDie();
   auto input =
       fs->OpenInputStream("/tmp/vertex/person/vertex_count").ValueOrDie();
   auto num = input->Read(sizeof(IdType)).ValueOrDie();
@@ -128,11 +128,11 @@ TEST_CASE("test_vertices_builder") {
   REQUIRE((*ptr) == start_index + builder->GetNum());
 }
 
-TEST_CASE("test_edges_builder") {
+TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
   std::cout << "Test edge builder" << std::endl;
   // construct edge builder
   std::string edge_meta_file =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
+      test_data_dir + "/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
   auto edge_meta = Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = EdgeInfo::Load(edge_meta).value();
   auto vertices_num = 903;
@@ -160,7 +160,7 @@ TEST_CASE("test_edges_builder") {
   REQUIRE(builder->GetNum() == 0);
 
   // add edges
-  std::ifstream fp(TEST_DATA_DIR + "/ldbc_sample/person_knows_person_0_0.csv");
+  std::ifstream fp(test_data_dir + "/ldbc_sample/person_knows_person_0_0.csv");
   std::string line;
   getline(fp, line);
   std::vector<std::string> names;
@@ -201,7 +201,7 @@ TEST_CASE("test_edges_builder") {
   REQUIRE(builder->AddEdge(e).IsInvalid());
 
   // check the number of vertices dumped
-  auto fs = arrow::fs::FileSystemFromUriOrPath(TEST_DATA_DIR).ValueOrDie();
+  auto fs = arrow::fs::FileSystemFromUriOrPath(test_data_dir).ValueOrDie();
   auto input =
       fs->OpenInputStream(
             "/tmp/edge/person_knows_person/ordered_by_dest/vertex_count")
