@@ -24,25 +24,49 @@ Building requires:
   sufficient. For MacOS, at least clang 5 is required
 - CMake 3.5 or higher
 - On Linux and macOS, ``make`` build utilities
-- curl-devel with SSL (Linux) or curl (macOS), for s3 filesystem support
-- Apache Arrow C++ (>= 12.0.0, requires `arrow-dev`, `arrow-dataset`, `arrow-acero` and `parquet` modules) for Arrow filesystem support and can use `BUILD_ARROW_FROM_SOURCE` option to build with GraphAr automatically. You can refer to [Apache Arrow Installation](https://arrow.apache.org/install/) to install Arrow directly too.
+- Apache Arrow C++ (>= 12.0.0, requires `arrow-dev`, `arrow-dataset`, `arrow-acero` and `parquet` modules) for Arrow filesystem support. You can refer to [Apache Arrow Installation](https://arrow.apache.org/install/) to install the required modules.
 
 Dependencies for optional features:
 
 - [Doxygen](https://www.doxygen.nl/index.html) (>= 1.8) for generating documentation
-
-Extra dependencies are required by examples:
-
+- `clang-format-8` for code formatting
 - [BGL](https://www.boost.org/doc/libs/1_80_0/libs/graph/doc/index.html) (>= 1.58)
+- [Google Benchmark](https://github.com/google/benchmark) (>= 1.6.0) for benchmarking
+
+On Ubuntu/Debian, you can install the required packages with:
+
+```bash
+sudo apt-get install \
+    build-essential \
+    cmake \
+    libboost-graph-dev \
+    doxygen
+
+# Arrow C++ dependencies
+wget -c \
+    https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
+    -P /tmp/
+sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
+sudo apt-get update
+sudo apt-get install -y libarrow-dev libarrow-dataset-dev libarrow-acero-dev libparquet-dev
+```
+
+On macOS, you can use [Homebrew](https://brew.sh) to install the required packages:
+
+```bash
+git clone https:://github.com/apache/graphar.git
+cd graphar
+brew update && brew bundle --file=cpp/Brewfile
+```
 
 ### Building
 
 All the instructions below assume that you have cloned the GraphAr git
-repository and navigated to the ``cpp`` subdirectory:
+repository and navigated to the ``cpp`` subdirectory with:
 
 ```bash
-    $ git clone https://github.com/apache/incubator-graphar.git
-    $ cd incubator-graphar
+    $ git clone https://github.com/apache/graphar.git
+    $ cd graphar
     $ git submodule update --init
     $ cd cpp
 ```
@@ -93,10 +117,20 @@ After the building, you can install the GraphAr C++ library with:
 You should build the project with `ENABLE_DOCS` option. Then run:
 
 ```bash
-   make docs
+   $ make docs
 ```
 
 The API document is generated in the directory ``docs_doxygen``.
+
+### Code formatting and linting
+
+To format and lint the code, run:
+
+```bash
+    $ cmake ..
+    $ make graphar-clformat # format the code
+    $ make graphar-cpplint   # lint the code
+```
 
 ## How to use
 

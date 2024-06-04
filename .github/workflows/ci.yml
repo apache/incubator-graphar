@@ -38,7 +38,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  GraphAr-ubuntu-arrow-installed:
+  ubuntu:
+    name: Ubuntu 22.04 C++
     runs-on: ubuntu-latest
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/testing/
@@ -143,7 +144,8 @@ jobs:
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
     
-  GraphAr-centos-arrow-installed:
+  centoo:
+    name: CentOS 7 C++
     runs-on: ubuntu-latest
     container:
       image: centos:7
@@ -184,3 +186,38 @@ jobs:
         cmake ..
         make -j$(nproc)
         popd
+  
+  macos:
+    name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
+    runs-on: macos-${{ matrix.macos-version }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: AMD64
+            macos-version: "12"
+          - architecture: ARM64
+            macos-version: "14"
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          submodules: true
+
+    - name: Install dependencies
+      run: |
+        brew bundle --file=cpp/Brewfile
+
+    - name: Build GraphAr
+      working-directory: "cpp"
+      run: |
+        mkdir build
+        pushd build
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        make -j$(nproc)
+        popd
+
+    - name: Running Test
+      working-directory: "cpp/build"
+      run: |
+        export ASAN_OPTIONS=detect_leaks=0
+        ctest --output-on-failure
