@@ -43,13 +43,8 @@
 
 namespace graphar {
 
-<<<<<<< HEAD
-TEST_CASE("TestVertexPropertyWriter") {
-  std::string path = TEST_DATA_DIR + "/ldbc_sample/person_0_0.csv";
-=======
-TEST_CASE_METHOD(GlobalFixture, "test_vertex_property_writer_from_file") {
+TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
   std::string path = test_data_dir + "/ldbc_sample/person_0_0.csv";
->>>>>>> 9fd665b (Feat(CI): Use  environment variable to specify the location of testing data)
   arrow::io::IOContext io_context = arrow::io::default_io_context();
 
   auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
