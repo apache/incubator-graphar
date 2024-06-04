@@ -159,15 +159,6 @@ macro(find_yaml_cpp)
     set(CMAKE_WARN_DEPRECATED ON CACHE BOOL "" FORCE)
 endmacro()
 
-macro(find_catch2)
-    set(MESSAGE_QUIET ON)
-    set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
-    add_subdirectory_shared(thirdparty/Catch2)
-    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/contrib")
-    unset(MESSAGE_QUIET)
-    set(CMAKE_WARN_DEPRECATED ON CACHE BOOL "" FORCE)
-endmacro()
-
 macro(install_graphar_target target)
   # install
   install(TARGETS ${target}
@@ -226,7 +217,7 @@ macro(build_graphar)
                                           $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
     )
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
-    target_link_libraries(graphar PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
+    target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
 
     if(APPLE)
         target_link_libraries(graphar PRIVATE -Wl,-force_load Arrow::arrow_shared
@@ -261,7 +252,7 @@ if (BUILD_EXAMPLES)
                                                      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>
         )
         target_include_directories(${E_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
-        target_link_libraries(${E_NAME} PRIVATE graphar ${Boost_LIBRARIES} Threads::Threads ${CMAKE_DL_LIBS})
+        target_link_libraries(${E_NAME} PRIVATE graphar ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
         if(APPLE)
             target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
                 Parquet::parquet_shared)
@@ -309,7 +300,7 @@ install(EXPORT graphar-targets
 # Test targets
 # ------------------------------------------------------------------------------
 if (BUILD_TESTS)
-    find_catch2()
+    find_package(Catch2 3 REQUIRED)
 
     macro(add_test target)
         set(options)
@@ -319,7 +310,7 @@ if (BUILD_TESTS)
         add_executable(${target} ${add_test_SRCS})
         target_compile_features(${target} PRIVATE cxx_std_17)
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
-        target_link_libraries(${target} PRIVATE Catch2::Catch2 graphar Threads::Threads ${CMAKE_DL_LIBS})
+        target_link_libraries(${target} PRIVATE Catch2::Catch2WithMain graphar ${CMAKE_DL_LIBS})
         if(APPLE)
             target_link_libraries(${target} PRIVATE Arrow::arrow_shared
                 Parquet::parquet_shared)
@@ -354,7 +345,7 @@ if (BUILD_BENCHMARKS)
         add_executable(${target} ${add_test_SRCS})
         target_compile_features(${target} PRIVATE cxx_std_17)
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
-        target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar Threads::Threads ${CMAKE_DL_LIBS})
+        target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar ${CMAKE_DL_LIBS})
     endmacro()
     add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
     add_benchmark(graph_info_benchmark SRCS benchmarks/graph_info_benchmark.cc)

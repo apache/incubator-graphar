@@ -23,8 +23,7 @@
 #include "graphar/graph.h"
 #include "graphar/util/data_type.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 namespace graphar {
 TEST_CASE("Graph") {
