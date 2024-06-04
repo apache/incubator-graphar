@@ -32,6 +32,7 @@ Dependencies for optional features:
 - `clang-format-8` for code formatting
 - [BGL](https://www.boost.org/doc/libs/1_80_0/libs/graph/doc/index.html) (>= 1.58)
 - [Google Benchmark](https://github.com/google/benchmark) (>= 1.6.0) for benchmarking
+- [Catch2](https://github.com/catchorg/Catch2) v3 for unit testing
 
 On Ubuntu/Debian, you can install the required packages with:
 
