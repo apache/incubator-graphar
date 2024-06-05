@@ -17,22 +17,17 @@
 // Derived from Apache Spark 3.1.1
 // https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/csv/CSVWriteBuilder.scala
 
-package org.apache.graphar.datasources.csv
+package org.apache.spark.sql.graphar.csv
 
 import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
 import org.apache.spark.sql.catalyst.csv.CSVOptions
 import org.apache.spark.sql.catalyst.util.CompressionCodecs
 import org.apache.spark.sql.connector.write.LogicalWriteInfo
-import org.apache.spark.sql.execution.datasources.{
-  CodecStreams,
-  OutputWriter,
-  OutputWriterFactory
-}
+import org.apache.spark.sql.execution.datasources.{CodecStreams, OutputWriter, OutputWriterFactory}
 import org.apache.spark.sql.execution.datasources.csv.CsvOutputWriter
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.{DataType, StructType}
-
-import org.apache.graphar.datasources.GarWriteBuilder
+import org.apache.spark.sql.graphar.GarWriteBuilder
 
 class CSVWriteBuilder(
     paths: Seq[String],

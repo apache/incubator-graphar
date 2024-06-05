@@ -17,7 +17,7 @@
 // Derived from Apache Spark 3.3.4
 // https://github.com/apache/spark/blob/18db204/core/src/main/scala/org/apache/spark/internal/io/HadoopMapReduceCommitProtocol.scala
 
-package org.apache.graphar.datasources
+package org.apache.spark.sql.graphar
 
 import org.apache.graphar.GeneralParams
 
@@ -73,16 +73,14 @@ class GarCommitProtocol(
     val partitionId = taskContext.getTaskAttemptID.getTaskID.getId
     if (options.contains(GeneralParams.offsetStartChunkIndexKey)) {
       // offset chunk file name, looks like chunk0
-      val chunk_index = options
-        .get(GeneralParams.offsetStartChunkIndexKey)
-        .get
+      val chunk_index = options(GeneralParams.offsetStartChunkIndexKey)
         .toInt + partitionId
       return f"chunk$chunk_index"
     }
     if (options.contains(GeneralParams.aggNumListOfEdgeChunkKey)) {
       // edge chunk file name, looks like part0/chunk0
       val jValue = parse(
-        options.get(GeneralParams.aggNumListOfEdgeChunkKey).get
+        options(GeneralParams.aggNumListOfEdgeChunkKey)
       )
       implicit val formats =
         DefaultFormats // initialize a default formats for json4s

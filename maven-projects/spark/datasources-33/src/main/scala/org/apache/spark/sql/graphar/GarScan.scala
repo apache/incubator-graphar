@@ -17,39 +17,30 @@
 // Derived from Apache Spark 3.3.4
 // https://github.com/apache/spark/blob/18db204/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileScan.scala
 
-package org.apache.graphar.datasources
-
-import scala.collection.JavaConverters._
-import scala.collection.mutable.ArrayBuffer
+package org.apache.spark.sql.graphar
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.apache.parquet.hadoop.ParquetInputFormat
-
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExprUtils}
 import org.apache.spark.sql.catalyst.csv.CSVOptions
+import org.apache.spark.sql.catalyst.expressions.{ExprUtils, Expression}
 import org.apache.spark.sql.connector.read.PartitionReaderFactory
 import org.apache.spark.sql.execution.PartitionedFileUtil
-import org.apache.spark.sql.execution.datasources.{
-  FilePartition,
-  PartitioningAwareFileIndex,
-  PartitionedFile
-}
-import org.apache.spark.sql.execution.datasources.parquet.{
-  ParquetOptions,
-  ParquetReadSupport,
-  ParquetWriteSupport
-}
+import org.apache.spark.sql.execution.datasources.{FilePartition, PartitionedFile, PartitioningAwareFileIndex}
+import org.apache.spark.sql.execution.datasources.parquet.{ParquetOptions, ParquetReadSupport, ParquetWriteSupport}
 import org.apache.spark.sql.execution.datasources.v2.FileScan
-import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetPartitionReaderFactory
-import org.apache.spark.sql.execution.datasources.v2.orc.OrcPartitionReaderFactory
 import org.apache.spark.sql.execution.datasources.v2.csv.CSVPartitionReaderFactory
+import org.apache.spark.sql.execution.datasources.v2.orc.OrcPartitionReaderFactory
+import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetPartitionReaderFactory
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.util.SerializableConfiguration
+
+import scala.collection.mutable.ArrayBuffer
+import scala.jdk.CollectionConverters._
 
 /** GarScan is a class to implement the file scan for GarDataSource. */
 case class GarScan(

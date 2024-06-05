@@ -17,7 +17,7 @@
 // Derived from Apache Spark 3.3.4
 // https://github.com/apache/spark/blob/18db204/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileWriteBuilder.scala
 
-package org.apache.graphar.datasources
+package org.apache.spark.sql.graphar
 
 import java.util.UUID
 
