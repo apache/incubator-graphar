@@ -199,6 +199,8 @@ jobs:
   macos:
     name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
     runs-on: macos-${{ matrix.macos-version }}
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     strategy:
       fail-fast: false
       matrix:
@@ -215,6 +217,7 @@ jobs:
     - name: Install dependencies
       run: |
         brew bundle --file=cpp/Brewfile
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
     - name: Build GraphAr
       working-directory: "cpp"
