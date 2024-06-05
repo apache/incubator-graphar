@@ -38,21 +38,27 @@ After compilation, the package file graphar-x.x.x-SNAPSHOT-shaded.jar is generat
 
 Build the package and run the unit tests:
 
+first, you need to download the testing data:
+
 ```bash
-    $ mvn clean install
+    $ git clone https://github.com/apache/incubator-graphar-testing.git testing
+```
+
+```bash
+    $ GRA_TEST_DATA=./testing mvn clean install
 ```
 
 Build and run the unit tests:
 
 ```bash
-    $ mvn clean test
+    $ GRA_TEST_DATA=./testing mvn clean test
 ```
 
 Build and run certain unit test:
 
 ```bash
-    $ mvn clean test -Dsuites='org.apache.graphar.GraphInfoSuite'   # run the GraphInfo test suite
-    $ mvn clean test -Dsuites='org.apache.graphar.GraphInfoSuite load graph info'  # run the `load graph info` test of test suite
+    $ GRA_TEST_DATA=${PWD}/testing mvn clean test -Dsuites='org.apache.graphar.GraphInfoSuite'   # run the GraphInfo test suite
+    $ GRA_TEST_DATA=${PWD}/testing mvn clean test -Dsuites='org.apache.graphar.GraphInfoSuite load graph info'  # run the `load graph info` test of test suite
 ```
 
 ### Generate API document
@@ -242,7 +248,11 @@ scripts/build.sh
 
 Then run the example:
 
+
 ```bash
+# you first need to specify the `GAR_TEST_DATA` environment variable to the testing data directory:
+export GAR_TEST_DATA=xxxx # the path to the testing data directory
+
 scripts/run-ldbc-sample2graphar.sh
 ```
 

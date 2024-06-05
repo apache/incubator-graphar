@@ -17,35 +17,33 @@
  * under the License.
  */
 
-#pragma once
+package org.apache.graphar
 
-#include <filesystem>
-#include <iostream>
-#include <string>
+import org.apache.spark.sql.SparkSession
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.funsuite.AnyFunSuite
 
-namespace graphar {
+abstract class BaseTestSuite extends AnyFunSuite with BeforeAndAfterAll {
 
-// Define the fixture
-struct GlobalFixture {
-  GlobalFixture() {
-    // Setup code here, this runs before each test case
-    setup();
-  }
+  var testData: String = _
+  var spark: SparkSession = _
 
-  ~GlobalFixture() {}
-
-  void setup() {
-    const char* c_root = std::getenv("GAR_TEST_DATA");
-    if (!c_root) {
-      throw std::runtime_error(
-          "Test resources not found, set GAR_TEST_DATA to auxiliary testing "
-          "data");
+  override def beforeAll(): Unit = {
+    if (System.getenv("GAR_TEST_DATA") == null) {
+      throw new IllegalArgumentException("GAR_TEST_DATA is not set")
     }
-    test_data_dir = std::string(c_root);
+    testData = System.getenv("GAR_TEST_DATA")
+    spark = SparkSession
+      .builder()
+      .enableHiveSupport()
+      .master("local[*]")
+      .getOrCreate()
+    spark.sparkContext.setLogLevel("Error")
+    super.beforeAll()
   }
 
-  // test data dir to be used in tests
-  std::string test_data_dir;
-};
-
-}  // namespace graphar
+  override def afterAll(): Unit = {
+    // spark.stop()
+    super.afterAll()
+  }
+}

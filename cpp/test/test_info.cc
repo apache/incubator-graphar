@@ -35,7 +35,7 @@
 
 namespace graphar {
 
-TEST_CASE("InfoVersion") {
+TEST_CASE_METHOD(GlobalFixture, "InfoVersion") {
   InfoVersion info_version(1);
   REQUIRE(info_version.version() == 1);
   REQUIRE(info_version.user_define_types() == std::vector<std::string>({}));
@@ -66,7 +66,7 @@ TEST_CASE("InfoVersion") {
   }
 }
 
-TEST_CASE("Property") {
+TEST_CASE_METHOD(GlobalFixture, "Property") {
   Property p0("p0", int32(), true);
   Property p1("p1", int32(), false);
 
@@ -78,7 +78,7 @@ TEST_CASE("Property") {
   REQUIRE(p1.is_nullable == true);
 }
 
-TEST_CASE("PropertyGroup") {
+TEST_CASE_METHOD(GlobalFixture, "PropertyGroup") {
   Property p0("p0", int32(), true);
   Property p1("p1", int32(), false);
   Property p2("p2", string(), false);
@@ -146,7 +146,7 @@ TEST_CASE("PropertyGroup") {
   }
 }
 
-TEST_CASE("AdjacentList") {
+TEST_CASE_METHOD(GlobalFixture, "AdjacentList") {
   AdjacentList adj_list0(AdjListType::unordered_by_source, FileType::CSV,
                          "adj_list0/");
   AdjacentList adj_list1(AdjListType::ordered_by_source, FileType::PARQUET);
@@ -180,7 +180,7 @@ TEST_CASE("AdjacentList") {
   }
 }
 
-TEST_CASE("VertexInfo") {
+TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
   std::string label = "test_vertex";
   int chunk_size = 100;
   auto version = std::make_shared<InfoVersion>(1);
@@ -303,7 +303,7 @@ version: gar/v1
   }
 }
 
-TEST_CASE("EdgeInfo") {
+TEST_CASE_METHOD(GlobalFixture, "EdgeInfo") {
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   int chunk_size = 1024;
   int src_chunk_size = 100;
@@ -519,7 +519,7 @@ version: gar/v1
   }
 }
 
-TEST_CASE("GraphInfo") {
+TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
   std::string name = "test_graph";
   auto version = std::make_shared<InfoVersion>(1);
   auto pg = CreatePropertyGroup(
@@ -683,7 +683,7 @@ vertices:
   }
 }
 
-TEST_CASE("LoadFromYaml") {
+TEST_CASE_METHOD(GlobalFixture, "LoadFromYaml") {
   std::string vertex_info_yaml = R"(label: person
 chunk_size: 100
 prefix: vertex/person/
@@ -779,7 +779,7 @@ extra_info:
   }
 }
 
-TEST_CASE("LoadFromS3", "[.hidden]") {
+TEST_CASE_METHOD(GlobalFixture, "LoadFromS3", "[.hidden]") {
   std::string path =
       "s3://graphar/ldbc/ldbc.graph.yml"
       "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";

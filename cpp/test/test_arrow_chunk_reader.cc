@@ -32,10 +32,10 @@
 #include <catch2/catch_test_macros.hpp>
 namespace graphar {
 
-TEST_CASE("ArrowChunkReader") {
+TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
   // read file and construct graph info
   std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+      test_data_dir + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   std::string vertex_property_name = "id";
   std::string edge_property_name = "creationDate";
@@ -95,7 +95,7 @@ TEST_CASE("ArrowChunkReader") {
     }
 
     SECTION("CastDataType") {
-      std::string prefix = TEST_DATA_DIR + "/modern_graph/";
+      std::string prefix = test_data_dir + "/modern_graph/";
       std::string vertex_info_path = prefix + "person.vertex.yml";
       std::cout << "Vertex info path: " << vertex_info_path << std::endl;
       auto fs = FileSystemFromUriOrPath(prefix).value();

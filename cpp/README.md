@@ -88,21 +88,27 @@ Debug build with unit tests:
     $ cd build-debug
     $ cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON ..
     $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
-    $ make test      # to run the tests
+```
+
+After building, you can run the unit tests with:
+
+```bash
+    $ git clone https://github.com/apache/incubator-graphar-testing.git testing  # download the testing data
+    $ GAR_TEST_DATA=${PWD}/testing ctest
 ```
 
 Build with examples, you should build the project with `BUILD_EXAMPLES` option, then run:
 
 ```bash
     $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
-    $ ./bgl_example  # run the BGL example
+    $ GAR_TEST_DATA=${PWD}/testing ./bgl_example  # run the BGL example
 ```
 
 Build with benchmarks, you should build the project with `BUILD_BENCHMARKS` option, then run:
 
 ```bash
     $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
-    $ ./graph_info_benchmark  # run the graph info benchmark
+    $ GAR_TEST_DATA=${PWD}/testing ./graph_info_benchmark  # run the graph info benchmark
 ```
 
 ### Install

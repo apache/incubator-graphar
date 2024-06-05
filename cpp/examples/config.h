@@ -56,11 +56,12 @@
 #define DASSERT(x)
 #endif
 
-static const std::string TEST_DATA_DIR =  // NOLINT
-    std::filesystem::path(__FILE__)
-        .parent_path()
-        .parent_path()
-        .parent_path()
-        .parent_path()
-        .string() +
-    "/testing";
+std::string GetTestingResourceRoot() {
+  const char* c_root = std::getenv("GAR_TEST_DATA");
+  if (!c_root) {
+    throw std::runtime_error(
+        "Test resources not found, set GAR_TEST_DATA to auxiliary testing "
+        "data");
+  }
+  return std::string(c_root);
+}
