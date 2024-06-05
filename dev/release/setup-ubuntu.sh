@@ -35,7 +35,8 @@ apt-get install -y -q --no-install-recommends \
   openjdk-11-jdk \
   wget \
   pkg-config \
-  tzdata
+  tzdata \
+  subversion
 
 wget -c https://apache.jfrog.io/artifactory/arrow/${id}/apache-arrow-apt-source-latest-${codename}.deb \
     -P /tmp/

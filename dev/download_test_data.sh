@@ -30,4 +30,3 @@ else
     echo "Test data has been cloned to /tmp/graphar-testing, please run"
     echo "    export GAR_TEST_DATA=/tmp/graphar-testing"
 fi
-
