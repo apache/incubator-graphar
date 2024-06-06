@@ -17,16 +17,14 @@
 // Derived from Apache Spark 3.1.1
 // https://github.com/apache/spark/blob/1d550c4/core/src/main/scala/org/apache/spark/internal/io/HadoopMapReduceCommitProtocol.scala
 
-package org.apache.graphar.datasources
+package org.apache.spark.sql.graphar
 
 import org.apache.graphar.GeneralParams
-
-import org.json4s._
-import org.json4s.jackson.JsonMethods._
-
-import org.apache.spark.sql.execution.datasources.SQLHadoopMapReduceCommitProtocol
 import org.apache.hadoop.mapreduce._
 import org.apache.spark.internal.Logging
+import org.apache.spark.sql.execution.datasources.SQLHadoopMapReduceCommitProtocol
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
 
 object GarCommitProtocol {
   private def binarySearchPair(aggNums: Array[Int], key: Int): (Int, Int) = {
@@ -52,23 +50,23 @@ object GarCommitProtocol {
 }
 
 class GarCommitProtocol(
-    jobId: String,
-    path: String,
-    options: Map[String, String],
-    dynamicPartitionOverwrite: Boolean = false
-) extends SQLHadoopMapReduceCommitProtocol(
-      jobId,
-      path,
-      dynamicPartitionOverwrite
-    )
-    with Serializable
-    with Logging {
+                         jobId: String,
+                         path: String,
+                         options: Map[String, String],
+                         dynamicPartitionOverwrite: Boolean = false
+                       ) extends SQLHadoopMapReduceCommitProtocol(
+  jobId,
+  path,
+  dynamicPartitionOverwrite
+)
+  with Serializable
+  with Logging {
 
   // override getFilename to customize the file name
   override def getFilename(
-      taskContext: TaskAttemptContext,
-      ext: String
-  ): String = {
+                            taskContext: TaskAttemptContext,
+                            ext: String
+                          ): String = {
     val partitionId = taskContext.getTaskAttemptID.getTaskID.getId
     if (options.contains(GeneralParams.offsetStartChunkIndexKey)) {
       // offset chunk file name, looks like chunk0

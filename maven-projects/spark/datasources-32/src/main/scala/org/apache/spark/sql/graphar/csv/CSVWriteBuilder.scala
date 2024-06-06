@@ -17,35 +17,30 @@
 // Derived from Apache Spark 3.1.1
 // https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/csv/CSVWriteBuilder.scala
 
-package org.apache.graphar.datasources.csv
+package org.apache.spark.sql.graphar.csv
 
 import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
 import org.apache.spark.sql.catalyst.csv.CSVOptions
 import org.apache.spark.sql.catalyst.util.CompressionCodecs
 import org.apache.spark.sql.connector.write.LogicalWriteInfo
-import org.apache.spark.sql.execution.datasources.{
-  CodecStreams,
-  OutputWriter,
-  OutputWriterFactory
-}
 import org.apache.spark.sql.execution.datasources.csv.CsvOutputWriter
+import org.apache.spark.sql.execution.datasources.{CodecStreams, OutputWriter, OutputWriterFactory}
+import org.apache.spark.sql.graphar.GarWriteBuilder
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.{DataType, StructType}
 
-import org.apache.graphar.datasources.GarWriteBuilder
-
 class CSVWriteBuilder(
-    paths: Seq[String],
-    formatName: String,
-    supportsDataType: DataType => Boolean,
-    info: LogicalWriteInfo
-) extends GarWriteBuilder(paths, formatName, supportsDataType, info) {
+                       paths: Seq[String],
+                       formatName: String,
+                       supportsDataType: DataType => Boolean,
+                       info: LogicalWriteInfo
+                     ) extends GarWriteBuilder(paths, formatName, supportsDataType, info) {
   override def prepareWrite(
-      sqlConf: SQLConf,
-      job: Job,
-      options: Map[String, String],
-      dataSchema: StructType
-  ): OutputWriterFactory = {
+                             sqlConf: SQLConf,
+                             job: Job,
+                             options: Map[String, String],
+                             dataSchema: StructType
+                           ): OutputWriterFactory = {
     val conf = job.getConfiguration
     val csvOptions = new CSVOptions(
       options,
@@ -58,10 +53,10 @@ class CSVWriteBuilder(
 
     new OutputWriterFactory {
       override def newInstance(
-          path: String,
-          dataSchema: StructType,
-          context: TaskAttemptContext
-      ): OutputWriter = {
+                                path: String,
+                                dataSchema: StructType,
+                                context: TaskAttemptContext
+                              ): OutputWriter = {
         new CsvOutputWriter(path, dataSchema, context, csvOptions)
       }
 

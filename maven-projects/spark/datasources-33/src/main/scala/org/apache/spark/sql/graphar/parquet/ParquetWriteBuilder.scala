@@ -39,19 +39,19 @@ import org.apache.spark.sql.types._
 import org.apache.spark.sql.graphar.GarWriteBuilder
 
 class ParquetWriteBuilder(
-    paths: Seq[String],
-    formatName: String,
-    supportsDataType: DataType => Boolean,
-    info: LogicalWriteInfo
-) extends GarWriteBuilder(paths, formatName, supportsDataType, info)
-    with Logging {
+                           paths: Seq[String],
+                           formatName: String,
+                           supportsDataType: DataType => Boolean,
+                           info: LogicalWriteInfo
+                         ) extends GarWriteBuilder(paths, formatName, supportsDataType, info)
+  with Logging {
 
   override def prepareWrite(
-      sqlConf: SQLConf,
-      job: Job,
-      options: Map[String, String],
-      dataSchema: StructType
-  ): OutputWriterFactory = {
+                             sqlConf: SQLConf,
+                             job: Job,
+                             options: Map[String, String],
+                             dataSchema: StructType
+                           ): OutputWriterFactory = {
     val parquetOptions = new ParquetOptions(options, sqlConf)
 
     val conf = ContextUtil.getConfiguration(job)
@@ -118,14 +118,14 @@ class ParquetWriteBuilder(
     // SPARK-15719: Disables writing Parquet summary files by default.
     if (
       conf.get(ParquetOutputFormat.JOB_SUMMARY_LEVEL) == null
-      && conf.get(ParquetOutputFormat.ENABLE_JOB_SUMMARY) == null
+        && conf.get(ParquetOutputFormat.ENABLE_JOB_SUMMARY) == null
     ) {
       conf.setEnum(ParquetOutputFormat.JOB_SUMMARY_LEVEL, JobSummaryLevel.NONE)
     }
 
     if (
       ParquetOutputFormat.getJobSummaryLevel(conf) == JobSummaryLevel.NONE
-      && !classOf[ParquetOutputCommitter].isAssignableFrom(committerClass)
+        && !classOf[ParquetOutputCommitter].isAssignableFrom(committerClass)
     ) {
       // output summary is requested, but the class is not a Parquet Committer
       logWarning(
@@ -137,10 +137,10 @@ class ParquetWriteBuilder(
 
     new OutputWriterFactory {
       override def newInstance(
-          path: String,
-          dataSchema: StructType,
-          context: TaskAttemptContext
-      ): OutputWriter = {
+                                path: String,
+                                dataSchema: StructType,
+                                context: TaskAttemptContext
+                              ): OutputWriter = {
         new ParquetOutputWriter(path, context)
       }
 

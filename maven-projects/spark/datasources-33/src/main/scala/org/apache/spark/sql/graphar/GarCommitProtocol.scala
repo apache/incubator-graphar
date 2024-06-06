@@ -53,23 +53,23 @@ object GarCommitProtocol {
 }
 
 class GarCommitProtocol(
-    jobId: String,
-    path: String,
-    options: Map[String, String],
-    dynamicPartitionOverwrite: Boolean = false
-) extends SQLHadoopMapReduceCommitProtocol(
-      jobId,
-      path,
-      dynamicPartitionOverwrite
-    )
-    with Serializable
-    with Logging {
+                         jobId: String,
+                         path: String,
+                         options: Map[String, String],
+                         dynamicPartitionOverwrite: Boolean = false
+                       ) extends SQLHadoopMapReduceCommitProtocol(
+  jobId,
+  path,
+  dynamicPartitionOverwrite
+)
+  with Serializable
+  with Logging {
 
   // override getFilename to customize the file name
   override def getFilename(
-      taskContext: TaskAttemptContext,
-      spec: FileNameSpec
-  ): String = {
+                            taskContext: TaskAttemptContext,
+                            spec: FileNameSpec
+                          ): String = {
     val partitionId = taskContext.getTaskAttemptID.getTaskID.getId
     if (options.contains(GeneralParams.offsetStartChunkIndexKey)) {
       // offset chunk file name, looks like chunk0

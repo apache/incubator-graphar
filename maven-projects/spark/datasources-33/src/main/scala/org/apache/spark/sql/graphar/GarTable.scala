@@ -38,18 +38,18 @@ import scala.collection.JavaConverters._
 
 /** GarTable is a class to represent the graph data in GraphAr as a table. */
 case class GarTable(
-    name: String,
-    sparkSession: SparkSession,
-    options: CaseInsensitiveStringMap,
-    paths: Seq[String],
-    userSpecifiedSchema: Option[StructType],
-    fallbackFileFormat: Class[_ <: FileFormat]
-) extends FileTable(sparkSession, options, paths, userSpecifiedSchema) {
+                     name: String,
+                     sparkSession: SparkSession,
+                     options: CaseInsensitiveStringMap,
+                     paths: Seq[String],
+                     userSpecifiedSchema: Option[StructType],
+                     fallbackFileFormat: Class[_ <: FileFormat]
+                   ) extends FileTable(sparkSession, options, paths, userSpecifiedSchema) {
 
   /** Construct a new scan builder. */
   override def newScanBuilder(
-      options: CaseInsensitiveStringMap
-  ): GarScanBuilder =
+                               options: CaseInsensitiveStringMap
+                             ): GarScanBuilder =
     new GarScanBuilder(
       sparkSession,
       fileIndex,
@@ -114,9 +114,9 @@ case class GarTable(
 
     case ArrayType(elementType, _) =>
       formatName match {
-        case "orc"     => supportsDataType(elementType)
+        case "orc" => supportsDataType(elementType)
         case "parquet" => supportsDataType(elementType)
-        case _         => false
+        case _ => false
       }
 
     // case MapType(keyType, valueType, _) =>

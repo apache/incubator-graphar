@@ -17,41 +17,39 @@
 // Derived from Apache Spark 3.1.1
 // https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileTable.scala
 
-package org.apache.graphar.datasources
-
-import scala.collection.JavaConverters._
+package org.apache.spark.sql.graphar
 
 import org.apache.hadoop.fs.FileStatus
-
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.connector.write.{LogicalWriteInfo, WriteBuilder}
 import org.apache.spark.sql.catalyst.csv.CSVOptions
+import org.apache.spark.sql.connector.write.{LogicalWriteInfo, WriteBuilder}
 import org.apache.spark.sql.execution.datasources.FileFormat
 import org.apache.spark.sql.execution.datasources.csv.CSVDataSource
 import org.apache.spark.sql.execution.datasources.orc.OrcUtils
 import org.apache.spark.sql.execution.datasources.parquet.ParquetUtils
 import org.apache.spark.sql.execution.datasources.v2.FileTable
+import org.apache.spark.sql.graphar.csv.CSVWriteBuilder
+import org.apache.spark.sql.graphar.orc.OrcWriteBuilder
+import org.apache.spark.sql.graphar.parquet.ParquetWriteBuilder
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
-import org.apache.graphar.datasources.csv.CSVWriteBuilder
-import org.apache.graphar.datasources.parquet.ParquetWriteBuilder
-import org.apache.graphar.datasources.orc.OrcWriteBuilder
+import scala.collection.JavaConverters._
 
 /** GarTable is a class to represent the graph data in GraphAr as a table. */
 case class GarTable(
-    name: String,
-    sparkSession: SparkSession,
-    options: CaseInsensitiveStringMap,
-    paths: Seq[String],
-    userSpecifiedSchema: Option[StructType],
-    fallbackFileFormat: Class[_ <: FileFormat]
-) extends FileTable(sparkSession, options, paths, userSpecifiedSchema) {
+                     name: String,
+                     sparkSession: SparkSession,
+                     options: CaseInsensitiveStringMap,
+                     paths: Seq[String],
+                     userSpecifiedSchema: Option[StructType],
+                     fallbackFileFormat: Class[_ <: FileFormat]
+                   ) extends FileTable(sparkSession, options, paths, userSpecifiedSchema) {
 
   /** Construct a new scan builder. */
   override def newScanBuilder(
-      options: CaseInsensitiveStringMap
-  ): GarScanBuilder =
+                               options: CaseInsensitiveStringMap
+                             ): GarScanBuilder =
     new GarScanBuilder(
       sparkSession,
       fileIndex,
@@ -116,9 +114,9 @@ case class GarTable(
 
     case ArrayType(elementType, _) =>
       formatName match {
-        case "orc"     => supportsDataType(elementType)
+        case "orc" => supportsDataType(elementType)
         case "parquet" => supportsDataType(elementType)
-        case _         => false
+        case _ => false
       }
 
     // case MapType(keyType, valueType, _) =>

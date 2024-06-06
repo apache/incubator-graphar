@@ -17,46 +17,33 @@
 // Derived from Apache Spark 3.1.1
 // https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileWriteBuilder.scala
 
-package org.apache.graphar.datasources
-
-import java.util.UUID
-
-import scala.collection.JavaConverters._
+package org.apache.spark.sql.graphar
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
-import org.apache.hadoop.mapreduce.Job
-
-import org.apache.spark.sql.execution.datasources.OutputWriterFactory
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.expressions.AttributeReference
 import org.apache.spark.sql.catalyst.util.{CaseInsensitiveMap, DateTimeUtils}
-import org.apache.spark.sql.connector.write.{
-  BatchWrite,
-  LogicalWriteInfo,
-  WriteBuilder
-}
-import org.apache.spark.sql.execution.datasources.{
-  BasicWriteJobStatsTracker,
-  DataSource,
-  OutputWriterFactory,
-  WriteJobDescription
-}
+import org.apache.spark.sql.connector.write.{BatchWrite, LogicalWriteInfo, WriteBuilder}
+import org.apache.spark.sql.execution.datasources.v2.FileBatchWrite
+import org.apache.spark.sql.execution.datasources.{BasicWriteJobStatsTracker, DataSource, OutputWriterFactory, WriteJobDescription}
 import org.apache.spark.sql.execution.metric.SQLMetric
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.apache.spark.util.SerializableConfiguration
-import org.apache.spark.sql.execution.datasources.v2.FileBatchWrite
-import org.apache.spark.sql.catalyst.expressions.AttributeReference
+
+import java.util.UUID
+import scala.collection.JavaConverters._
 
 abstract class GarWriteBuilder(
-    paths: Seq[String],
-    formatName: String,
-    supportsDataType: DataType => Boolean,
-    info: LogicalWriteInfo
-) extends WriteBuilder {
+                                paths: Seq[String],
+                                formatName: String,
+                                supportsDataType: DataType => Boolean,
+                                info: LogicalWriteInfo
+                              ) extends WriteBuilder {
   private val schema = info.schema()
   private val queryId = info.queryId()
   private val options = info.options()
@@ -90,11 +77,11 @@ abstract class GarWriteBuilder(
   }
 
   def prepareWrite(
-      sqlConf: SQLConf,
-      job: Job,
-      options: Map[String, String],
-      dataSchema: StructType
-  ): OutputWriterFactory
+                    sqlConf: SQLConf,
+                    job: Job,
+                    options: Map[String, String],
+                    dataSchema: StructType
+                  ): OutputWriterFactory
 
   private def validateInputs(caseSensitiveAnalysis: Boolean): Unit = {
     assert(schema != null, "Missing input data schema")
@@ -127,12 +114,12 @@ abstract class GarWriteBuilder(
   }
 
   private def createWriteJobDescription(
-      sparkSession: SparkSession,
-      hadoopConf: Configuration,
-      job: Job,
-      pathName: String,
-      options: Map[String, String]
-  ): WriteJobDescription = {
+                                         sparkSession: SparkSession,
+                                         hadoopConf: Configuration,
+                                         job: Job,
+                                         pathName: String,
+                                         options: Map[String, String]
+                                       ): WriteJobDescription = {
     val caseInsensitiveOptions = CaseInsensitiveMap(options)
     // Note: prepareWrite has side effect. It sets "job".
     val outputWriterFactory =

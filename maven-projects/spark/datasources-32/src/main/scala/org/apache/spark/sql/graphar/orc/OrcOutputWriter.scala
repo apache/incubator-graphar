@@ -18,37 +18,33 @@
 // we have to reimplement it here.
 // https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/orc/OrcOutputWriter.scala
 
-package org.apache.graphar.datasources.orc
+package org.apache.spark.sql.graphar.orc
 
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.io.NullWritable
 import org.apache.hadoop.mapreduce.TaskAttemptContext
 import org.apache.orc.OrcFile
-import org.apache.orc.mapred.{
-  OrcOutputFormat => OrcMapRedOutputFormat,
-  OrcStruct
-}
+import org.apache.orc.mapred.{OrcStruct, OrcOutputFormat => OrcMapRedOutputFormat}
 import org.apache.orc.mapreduce.{OrcMapreduceRecordWriter, OrcOutputFormat}
-
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.execution.datasources.OutputWriter
 import org.apache.spark.sql.execution.datasources.orc.{OrcSerializer, OrcUtils}
 import org.apache.spark.sql.types._
 
 class OrcOutputWriter(
-    val path: String,
-    dataSchema: StructType,
-    context: TaskAttemptContext
-) extends OutputWriter {
+                       val path: String,
+                       dataSchema: StructType,
+                       context: TaskAttemptContext
+                     ) extends OutputWriter {
 
   private[this] val serializer = new OrcSerializer(dataSchema)
 
   private val recordWriter = {
     val orcOutputFormat = new OrcOutputFormat[OrcStruct]() {
       override def getDefaultWorkFile(
-          context: TaskAttemptContext,
-          extension: String
-      ): Path = {
+                                       context: TaskAttemptContext,
+                                       extension: String
+                                     ): Path = {
         new Path(path)
       }
     }
