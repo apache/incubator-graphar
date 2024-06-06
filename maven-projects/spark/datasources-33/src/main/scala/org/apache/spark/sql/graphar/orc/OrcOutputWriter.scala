@@ -36,19 +36,19 @@ import org.apache.spark.sql.execution.datasources.orc.{OrcSerializer, OrcUtils}
 import org.apache.spark.sql.types._
 
 class OrcOutputWriter(
-                       val path: String,
-                       dataSchema: StructType,
-                       context: TaskAttemptContext
-                     ) extends OutputWriter {
+    val path: String,
+    dataSchema: StructType,
+    context: TaskAttemptContext
+) extends OutputWriter {
 
   private[this] val serializer = new OrcSerializer(dataSchema)
 
   private val recordWriter = {
     val orcOutputFormat = new OrcOutputFormat[OrcStruct]() {
       override def getDefaultWorkFile(
-                                       context: TaskAttemptContext,
-                                       extension: String
-                                     ): Path = {
+          context: TaskAttemptContext,
+          extension: String
+      ): Path = {
         new Path(path)
       }
     }

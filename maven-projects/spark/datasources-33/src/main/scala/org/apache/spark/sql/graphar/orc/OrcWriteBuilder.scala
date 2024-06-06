@@ -53,18 +53,18 @@ object OrcWriteBuilder {
 }
 
 class OrcWriteBuilder(
-                       paths: Seq[String],
-                       formatName: String,
-                       supportsDataType: DataType => Boolean,
-                       info: LogicalWriteInfo
-                     ) extends GarWriteBuilder(paths, formatName, supportsDataType, info) {
+    paths: Seq[String],
+    formatName: String,
+    supportsDataType: DataType => Boolean,
+    info: LogicalWriteInfo
+) extends GarWriteBuilder(paths, formatName, supportsDataType, info) {
 
   override def prepareWrite(
-                             sqlConf: SQLConf,
-                             job: Job,
-                             options: Map[String, String],
-                             dataSchema: StructType
-                           ): OutputWriterFactory = {
+      sqlConf: SQLConf,
+      job: Job,
+      options: Map[String, String],
+      dataSchema: StructType
+  ): OutputWriterFactory = {
     val orcOptions = new OrcOptions(options, sqlConf)
 
     val conf = job.getConfiguration
@@ -84,10 +84,10 @@ class OrcWriteBuilder(
 
     new OutputWriterFactory {
       override def newInstance(
-                                path: String,
-                                dataSchema: StructType,
-                                context: TaskAttemptContext
-                              ): OutputWriter = {
+          path: String,
+          dataSchema: StructType,
+          context: TaskAttemptContext
+      ): OutputWriter = {
         new OrcOutputWriter(path, dataSchema, context)
       }
 

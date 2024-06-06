@@ -33,13 +33,13 @@ import scala.collection.JavaConverters._
 
 /** GarScanBuilder is a class to build the file scan for GarDataSource. */
 case class GarScanBuilder(
-                           sparkSession: SparkSession,
-                           fileIndex: PartitioningAwareFileIndex,
-                           schema: StructType,
-                           dataSchema: StructType,
-                           options: CaseInsensitiveStringMap,
-                           formatName: String
-                         ) extends FileScanBuilder(sparkSession, fileIndex, dataSchema) {
+    sparkSession: SparkSession,
+    fileIndex: PartitioningAwareFileIndex,
+    schema: StructType,
+    dataSchema: StructType,
+    options: CaseInsensitiveStringMap,
+    formatName: String
+) extends FileScanBuilder(sparkSession, fileIndex, dataSchema) {
   lazy val hadoopConf = {
     val caseSensitiveMap = options.asCaseSensitiveMap.asScala.toMap
     // Hadoop Configurations are case sensitive.
@@ -51,8 +51,8 @@ case class GarScanBuilder(
   override def pushDataFilters(dataFilters: Array[Filter]): Array[Filter] = {
     this.filters = dataFilters
     formatName match {
-      case "csv" => Array.empty[Filter]
-      case "orc" => pushedOrcFilters
+      case "csv"     => Array.empty[Filter]
+      case "orc"     => pushedOrcFilters
       case "parquet" => pushedParquetFilters
       case _ =>
         throw new IllegalArgumentException("Invalid format name: " + formatName)

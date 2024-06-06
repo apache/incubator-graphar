@@ -27,12 +27,20 @@ import org.apache.spark.sql.catalyst.csv.CSVOptions
 import org.apache.spark.sql.catalyst.expressions.{ExprUtils, Expression}
 import org.apache.spark.sql.connector.read.PartitionReaderFactory
 import org.apache.spark.sql.execution.PartitionedFileUtil
-import org.apache.spark.sql.execution.datasources.parquet.{ParquetOptions, ParquetReadSupport, ParquetWriteSupport}
+import org.apache.spark.sql.execution.datasources.parquet.{
+  ParquetOptions,
+  ParquetReadSupport,
+  ParquetWriteSupport
+}
 import org.apache.spark.sql.execution.datasources.v2.FileScan
 import org.apache.spark.sql.execution.datasources.v2.csv.CSVPartitionReaderFactory
 import org.apache.spark.sql.execution.datasources.v2.orc.OrcPartitionReaderFactory
 import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetPartitionReaderFactory
-import org.apache.spark.sql.execution.datasources.{FilePartition, PartitionedFile, PartitioningAwareFileIndex}
+import org.apache.spark.sql.execution.datasources.{
+  FilePartition,
+  PartitionedFile,
+  PartitioningAwareFileIndex
+}
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
@@ -44,18 +52,18 @@ import scala.collection.mutable.ArrayBuffer
 
 /** GarScan is a class to implement the file scan for GarDataSource. */
 case class GarScan(
-                    sparkSession: SparkSession,
-                    hadoopConf: Configuration,
-                    fileIndex: PartitioningAwareFileIndex,
-                    dataSchema: StructType,
-                    readDataSchema: StructType,
-                    readPartitionSchema: StructType,
-                    pushedFilters: Array[Filter],
-                    options: CaseInsensitiveStringMap,
-                    formatName: String,
-                    partitionFilters: Seq[Expression] = Seq.empty,
-                    dataFilters: Seq[Expression] = Seq.empty
-                  ) extends FileScan {
+    sparkSession: SparkSession,
+    hadoopConf: Configuration,
+    fileIndex: PartitioningAwareFileIndex,
+    dataSchema: StructType,
+    readDataSchema: StructType,
+    readPartitionSchema: StructType,
+    pushedFilters: Array[Filter],
+    options: CaseInsensitiveStringMap,
+    formatName: String,
+    partitionFilters: Seq[Expression] = Seq.empty,
+    dataFilters: Seq[Expression] = Seq.empty
+) extends FileScan {
 
   /** The gar format is not splitable. */
   override def isSplitable(path: Path): Boolean = false
@@ -63,8 +71,8 @@ case class GarScan(
   /** Create the reader factory according to the actual file format. */
   override def createReaderFactory(): PartitionReaderFactory =
     formatName match {
-      case "csv" => createCSVReaderFactory()
-      case "orc" => createOrcReaderFactory()
+      case "csv"     => createCSVReaderFactory()
+      case "orc"     => createOrcReaderFactory()
       case "parquet" => createParquetReaderFactory()
       case _ =>
         throw new IllegalArgumentException("Invalid format name: " + formatName)
@@ -223,9 +231,9 @@ case class GarScan(
    * chunk file in GraphAr to a single partition.
    */
   private def getFilePartitions(
-                                 sparkSession: SparkSession,
-                                 partitionedFiles: Seq[PartitionedFile]
-                               ): Seq[FilePartition] = {
+      sparkSession: SparkSession,
+      partitionedFiles: Seq[PartitionedFile]
+  ): Seq[FilePartition] = {
     val partitions = new ArrayBuffer[FilePartition]
     val currentFiles = new ArrayBuffer[PartitionedFile]
 
@@ -261,8 +269,8 @@ case class GarScan(
 
   /** Get the hash code of the object. */
   override def hashCode(): Int = formatName match {
-    case "csv" => super.hashCode()
-    case "orc" => getClass.hashCode()
+    case "csv"     => super.hashCode()
+    case "orc"     => getClass.hashCode()
     case "parquet" => getClass.hashCode()
     case _ =>
       throw new IllegalArgumentException("Invalid format name: " + formatName)
@@ -280,8 +288,8 @@ case class GarScan(
 
   /** Construct the file scan with filters. */
   override def withFilters(
-                            partitionFilters: Seq[Expression],
-                            dataFilters: Seq[Expression]
-                          ): FileScan =
+      partitionFilters: Seq[Expression],
+      dataFilters: Seq[Expression]
+  ): FileScan =
     this.copy(partitionFilters = partitionFilters, dataFilters = dataFilters)
 }

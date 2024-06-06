@@ -25,7 +25,10 @@ import org.apache.orc.OrcConf.{COMPRESS, MAPRED_OUTPUT_SCHEMA}
 import org.apache.orc.mapred.OrcStruct
 import org.apache.spark.sql.connector.write.LogicalWriteInfo
 import org.apache.spark.sql.execution.datasources.orc.{OrcOptions, OrcUtils}
-import org.apache.spark.sql.execution.datasources.{OutputWriter, OutputWriterFactory}
+import org.apache.spark.sql.execution.datasources.{
+  OutputWriter,
+  OutputWriterFactory
+}
 import org.apache.spark.sql.graphar.GarWriteBuilder
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types._
@@ -48,18 +51,18 @@ object OrcWriteBuilder {
 }
 
 class OrcWriteBuilder(
-                       paths: Seq[String],
-                       formatName: String,
-                       supportsDataType: DataType => Boolean,
-                       info: LogicalWriteInfo
-                     ) extends GarWriteBuilder(paths, formatName, supportsDataType, info) {
+    paths: Seq[String],
+    formatName: String,
+    supportsDataType: DataType => Boolean,
+    info: LogicalWriteInfo
+) extends GarWriteBuilder(paths, formatName, supportsDataType, info) {
 
   override def prepareWrite(
-                             sqlConf: SQLConf,
-                             job: Job,
-                             options: Map[String, String],
-                             dataSchema: StructType
-                           ): OutputWriterFactory = {
+      sqlConf: SQLConf,
+      job: Job,
+      options: Map[String, String],
+      dataSchema: StructType
+  ): OutputWriterFactory = {
     val orcOptions = new OrcOptions(options, sqlConf)
 
     val conf = job.getConfiguration
@@ -79,10 +82,10 @@ class OrcWriteBuilder(
 
     new OutputWriterFactory {
       override def newInstance(
-                                path: String,
-                                dataSchema: StructType,
-                                context: TaskAttemptContext
-                              ): OutputWriter = {
+          path: String,
+          dataSchema: StructType,
+          context: TaskAttemptContext
+      ): OutputWriter = {
         new OrcOutputWriter(path, dataSchema, context)
       }
 
