@@ -16,8 +16,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Derived from Apache OpenDAL v0.46.0
-# https://github.com/apache/opendal/blob/84586e5/scripts/verify.py
+# Derived from Apache OpenDAL v0.45.1
+# https://github.com/apache/opendal/blob//5079125/scripts/verify.py
 
 import subprocess
 import os

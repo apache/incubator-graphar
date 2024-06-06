@@ -16,8 +16,8 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Derived from Apache OpenDAL v0.46.0
-# https://github.com/apache/opendal/blob/84586e5/scripts/release.py
+# Derived from Apache OpenDAL v0.45.1
+# https://github.com/apache/opendal/blob/5079125/scripts/release.py
 
 import re
 import subprocess
@@ -63,7 +63,7 @@ def archive_source_package():
         "git",
         "archive",
         "--prefix",
-        f"apache-graphar-incubating-{version}-src/",
+        f"apache-graphar-{version}-incubating-src/",
         "-o",
         f"{ROOT_DIR}/dist/{name}.tar.gz",
         "HEAD",

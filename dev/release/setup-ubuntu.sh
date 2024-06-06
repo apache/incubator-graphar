@@ -17,6 +17,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# Derived from Apache Arrow 12.0.0
+# https://github.com/apache/arrow/blob/9736dde/dev/release/setup-ubuntu.sh
+
 # A script to install dependencies required for release
 # verification on Ubuntu.
 
