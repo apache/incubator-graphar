@@ -19,3 +19,4 @@ cmake
 conda-forge::arrow-cpp=13.0.0
 make
 clangxx_linux-64
+conda-forge::catch2=3.6.0
