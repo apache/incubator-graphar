@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-// Derived from Apache Spark 3.1.1
-// https://github.com/apache/spark/blob/1d550c4/core/src/main/scala/org/apache/spark/internal/io/HadoopMapReduceCommitProtocol.scala
+// Derived from Apache Spark 3.3.4
+// https://github.com/apache/spark/blob/18db204/core/src/main/scala/org/apache/spark/internal/io/HadoopMapReduceCommitProtocol.scala
 
-package org.apache.graphar.datasources
+package org.apache.spark.sql.graphar
 
 import org.apache.graphar.GeneralParams
 
@@ -27,6 +27,7 @@ import org.json4s.jackson.JsonMethods._
 import org.apache.spark.sql.execution.datasources.SQLHadoopMapReduceCommitProtocol
 import org.apache.hadoop.mapreduce._
 import org.apache.spark.internal.Logging
+import org.apache.spark.internal.io.FileNameSpec
 
 object GarCommitProtocol {
   private def binarySearchPair(aggNums: Array[Int], key: Int): (Int, Int) = {
@@ -67,21 +68,19 @@ class GarCommitProtocol(
   // override getFilename to customize the file name
   override def getFilename(
       taskContext: TaskAttemptContext,
-      ext: String
+      spec: FileNameSpec
   ): String = {
     val partitionId = taskContext.getTaskAttemptID.getTaskID.getId
     if (options.contains(GeneralParams.offsetStartChunkIndexKey)) {
       // offset chunk file name, looks like chunk0
-      val chunk_index = options
-        .get(GeneralParams.offsetStartChunkIndexKey)
-        .get
-        .toInt + partitionId
+      val chunk_index =
+        options(GeneralParams.offsetStartChunkIndexKey).toInt + partitionId
       return f"chunk$chunk_index"
     }
     if (options.contains(GeneralParams.aggNumListOfEdgeChunkKey)) {
       // edge chunk file name, looks like part0/chunk0
       val jValue = parse(
-        options.get(GeneralParams.aggNumListOfEdgeChunkKey).get
+        options(GeneralParams.aggNumListOfEdgeChunkKey)
       )
       implicit val formats =
         DefaultFormats // initialize a default formats for json4s

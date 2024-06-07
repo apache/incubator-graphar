@@ -17,23 +17,21 @@
 // Derived from Apache Spark 3.1.1
 // https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/orc/ORCWriteBuilder.scala
 
-package org.apache.graphar.datasources.orc
+package org.apache.spark.sql.graphar.orc
 
 import org.apache.hadoop.mapred.JobConf
 import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
 import org.apache.orc.OrcConf.{COMPRESS, MAPRED_OUTPUT_SCHEMA}
 import org.apache.orc.mapred.OrcStruct
-
 import org.apache.spark.sql.connector.write.LogicalWriteInfo
+import org.apache.spark.sql.execution.datasources.orc.{OrcOptions, OrcUtils}
 import org.apache.spark.sql.execution.datasources.{
   OutputWriter,
   OutputWriterFactory
 }
-import org.apache.spark.sql.execution.datasources.orc.{OrcOptions, OrcUtils}
+import org.apache.spark.sql.graphar.GarWriteBuilder
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types._
-
-import org.apache.graphar.datasources.GarWriteBuilder
 
 object OrcWriteBuilder {
   // the getQuotedSchemaString method of spark OrcFileFormat

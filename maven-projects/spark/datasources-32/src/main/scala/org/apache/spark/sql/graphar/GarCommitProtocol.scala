@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-// Derived from Apache Spark 3.3.4
-// https://github.com/apache/spark/blob/18db204/core/src/main/scala/org/apache/spark/internal/io/HadoopMapReduceCommitProtocol.scala
+// Derived from Apache Spark 3.1.1
+// https://github.com/apache/spark/blob/1d550c4/core/src/main/scala/org/apache/spark/internal/io/HadoopMapReduceCommitProtocol.scala
 
-package org.apache.graphar.datasources
+package org.apache.spark.sql.graphar
 
 import org.apache.graphar.GeneralParams
-
-import org.json4s._
-import org.json4s.jackson.JsonMethods._
-
-import org.apache.spark.sql.execution.datasources.SQLHadoopMapReduceCommitProtocol
 import org.apache.hadoop.mapreduce._
 import org.apache.spark.internal.Logging
-import org.apache.spark.internal.io.FileNameSpec
+import org.apache.spark.sql.execution.datasources.SQLHadoopMapReduceCommitProtocol
+import org.json4s._
+import org.json4s.jackson.JsonMethods._
 
 object GarCommitProtocol {
   private def binarySearchPair(aggNums: Array[Int], key: Int): (Int, Int) = {
@@ -68,7 +65,7 @@ class GarCommitProtocol(
   // override getFilename to customize the file name
   override def getFilename(
       taskContext: TaskAttemptContext,
-      spec: FileNameSpec
+      ext: String
   ): String = {
     val partitionId = taskContext.getTaskAttemptID.getTaskID.getId
     if (options.contains(GeneralParams.offsetStartChunkIndexKey)) {

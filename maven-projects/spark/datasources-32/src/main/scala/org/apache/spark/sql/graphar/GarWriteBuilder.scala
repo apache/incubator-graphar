@@ -14,30 +14,25 @@
  * limitations under the License.
  */
 
-// Derived from Apache Spark 3.3.4
-// https://github.com/apache/spark/blob/18db204/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileWriteBuilder.scala
+// Derived from Apache Spark 3.1.1
+// https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileWriteBuilder.scala
 
-package org.apache.graphar.datasources
-
-import java.util.UUID
-
-import scala.collection.JavaConverters._
+package org.apache.spark.sql.graphar
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
-import org.apache.hadoop.mapreduce.Job
-
-import org.apache.spark.sql.execution.datasources.OutputWriterFactory
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.expressions.AttributeReference
 import org.apache.spark.sql.catalyst.util.{CaseInsensitiveMap, DateTimeUtils}
 import org.apache.spark.sql.connector.write.{
   BatchWrite,
   LogicalWriteInfo,
   WriteBuilder
 }
+import org.apache.spark.sql.execution.datasources.v2.FileBatchWrite
 import org.apache.spark.sql.execution.datasources.{
   BasicWriteJobStatsTracker,
   DataSource,
@@ -48,8 +43,9 @@ import org.apache.spark.sql.execution.metric.SQLMetric
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types.{DataType, StructType}
 import org.apache.spark.util.SerializableConfiguration
-import org.apache.spark.sql.execution.datasources.v2.FileBatchWrite
-import org.apache.spark.sql.catalyst.expressions.AttributeReference
+
+import java.util.UUID
+import scala.collection.JavaConverters._
 
 abstract class GarWriteBuilder(
     paths: Seq[String],
@@ -161,7 +157,7 @@ abstract class GarWriteBuilder(
       allColumns = allColumns,
       dataColumns = allColumns,
       partitionColumns = Seq.empty,
-      bucketSpec = None,
+      bucketIdExpression = None,
       path = pathName,
       customPartitionLocations = Map.empty,
       maxRecordsPerFile = caseInsensitiveOptions

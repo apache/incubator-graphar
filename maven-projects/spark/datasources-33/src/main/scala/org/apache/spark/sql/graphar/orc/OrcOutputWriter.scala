@@ -18,7 +18,7 @@
 // we have to reimplement it here.
 // https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/orc/OrcOutputWriter.scala
 
-package org.apache.graphar.datasources.orc
+package org.apache.spark.sql.graphar.orc
 
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.io.NullWritable

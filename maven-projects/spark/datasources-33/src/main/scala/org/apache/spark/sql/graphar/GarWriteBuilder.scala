@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-// Derived from Apache Spark 3.1.1
-// https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileWriteBuilder.scala
+// Derived from Apache Spark 3.3.4
+// https://github.com/apache/spark/blob/18db204/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileWriteBuilder.scala
 
-package org.apache.graphar.datasources
+package org.apache.spark.sql.graphar
 
 import java.util.UUID
 
@@ -27,7 +27,6 @@ import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.mapreduce.Job
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
-import org.apache.hadoop.mapreduce.Job
 
 import org.apache.spark.sql.execution.datasources.OutputWriterFactory
 import org.apache.spark.sql.SparkSession
@@ -41,7 +40,6 @@ import org.apache.spark.sql.connector.write.{
 import org.apache.spark.sql.execution.datasources.{
   BasicWriteJobStatsTracker,
   DataSource,
-  OutputWriterFactory,
   WriteJobDescription
 }
 import org.apache.spark.sql.execution.metric.SQLMetric
@@ -161,7 +159,7 @@ abstract class GarWriteBuilder(
       allColumns = allColumns,
       dataColumns = allColumns,
       partitionColumns = Seq.empty,
-      bucketIdExpression = None,
+      bucketSpec = None,
       path = pathName,
       customPartitionLocations = Map.empty,
       maxRecordsPerFile = caseInsensitiveOptions
