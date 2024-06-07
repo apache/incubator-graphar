@@ -158,8 +158,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
                       << '\n';
             std::cout << "Column Nums: " << table->num_columns() << "\n";
             std::cout << "Column Names: ";
-            for (int i = 0;
-                 i < table->num_columns() && i < expected_cols.size(); i++) {
+            for (int i = 0; i < table->num_columns(); i++) {
               REQUIRE(table->ColumnNames()[i] == expected_cols[i]);
               std::cout << "`" << table->ColumnNames()[i] << "` ";
             }
