@@ -22,7 +22,7 @@ repository and navigated to the ``spark`` subdirectory:
     $ git clone https://github.com/apache/incubator-graphar.git
     $ cd incubator-graphar
     $ git submodule update --init
-    $ cd mavens-projects/spark
+    $ cd maven-projects/spark
 ```
 
 
