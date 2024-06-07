@@ -33,6 +33,7 @@
 
     <artifactId>spark</artifactId>
     <packaging>pom</packaging>
+    <version>${graphar.version}</version>
 
     <profiles>
         <profile>

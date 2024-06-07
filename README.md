@@ -209,6 +209,8 @@ details about the building of the C++ library.
 
 ### The Java Library
 
+The Java library is under development. 
+
 The GraphAr Java library is created with bindings to the C++ library
 (currently at version v0.10.0), utilizing
 [Alibaba-FastFFI](https://github.com/alibaba/fastFFI) for
