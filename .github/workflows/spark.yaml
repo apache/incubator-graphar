@@ -40,6 +40,8 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-20.04
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     strategy:
       fail-fast: false
       matrix:
@@ -61,6 +63,10 @@ jobs:
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         mvn --no-transfer-progress spotless:check
+
+    - name: Download test data
+      run: |
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
     - name: Build GraphAr Spark
       working-directory: maven-projects/spark

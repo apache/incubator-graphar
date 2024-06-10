@@ -29,15 +29,13 @@
 #include "graphar/util/filesystem.h"
 #include "graphar/util/general_params.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
-
+#include <catch2/catch_test_macros.hpp>
 namespace graphar {
 
-TEST_CASE("ArrowChunkReader") {
+TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
   // read file and construct graph info
   std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+      test_data_dir + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   std::string vertex_property_name = "id";
   std::string edge_property_name = "creationDate";
@@ -97,7 +95,7 @@ TEST_CASE("ArrowChunkReader") {
     }
 
     SECTION("CastDataType") {
-      std::string prefix = TEST_DATA_DIR + "/modern_graph/";
+      std::string prefix = test_data_dir + "/modern_graph/";
       std::string vertex_info_path = prefix + "person.vertex.yml";
       std::cout << "Vertex info path: " << vertex_info_path << std::endl;
       auto fs = FileSystemFromUriOrPath(prefix).value();
@@ -133,7 +131,9 @@ TEST_CASE("ArrowChunkReader") {
     SECTION("PropertyPushDown") {
       std::string filter_property = "gender";
       auto filter = _Equal(_Property(filter_property), _Literal("female"));
-      std::vector<std::string> expected_cols{"firstName", "lastName"};
+      std::vector<std::string> expected_cols;
+      expected_cols.push_back("firstName");
+      expected_cols.push_back("lastName");
       // print reader result
       auto walkReader =
           [&](std::shared_ptr<VertexPropertyArrowChunkReader>& reader) {
@@ -150,7 +150,8 @@ TEST_CASE("ArrowChunkReader") {
               sum += table->num_rows();
             } while (!reader->next_chunk().IsIndexError());
             REQUIRE(idx == reader->GetChunkNum());
-            REQUIRE(table->num_columns() == (int) expected_cols.size());
+            REQUIRE(table->num_columns() ==
+                    static_cast<int>(expected_cols.size()));
 
             std::cout << "Total Nums: " << sum << "/"
                       << reader->GetChunkNum() * vertex_info->GetChunkSize()
@@ -205,10 +206,11 @@ TEST_CASE("ArrowChunkReader") {
       SECTION("pushdown column that don't exist") {
         std::cout << "Vertex property pushdown column that don't exist:\n";
         auto filter = _Literal(true);
-        std::vector<std::string> expected_cols{"id"};
+        std::vector<std::string> expected_cols_2;
+        expected_cols_2.push_back("id");
         util::FilterOptions options;
         options.filter = filter;
-        options.columns = expected_cols;
+        options.columns = expected_cols_2;
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
             graph_info, src_label, filter_property, options);
         REQUIRE(maybe_reader.status().ok());
@@ -355,7 +357,8 @@ TEST_CASE("ArrowChunkReader") {
           _Equal(_Property(edge_property_name), _Property(edge_property_name));
       auto filter = _And(expr1, expr2);
 
-      std::vector<std::string> expected_cols{"creationDate"};
+      std::vector<std::string> expected_cols;
+      expected_cols.push_back("creationDate");
 
       util::FilterOptions options;
       options.filter = filter;

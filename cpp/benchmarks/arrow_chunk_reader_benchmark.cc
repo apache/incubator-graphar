@@ -87,9 +87,9 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, VertexPropertyArrowChunkReaderReadChunk)
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    reader->seek(0);
-    reader->GetChunk();
-    reader->next_chunk();
+    assert(reader->seek(0).ok());
+    assert(reader->GetChunk().status().ok());
+    assert(reader->next_chunk().ok());
   }
 }
 
@@ -103,9 +103,9 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListArrowChunkReaderReadChunk)
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    reader->seek(0);
-    reader->GetChunk();
-    reader->next_chunk();
+    assert(reader->seek(0).ok());
+    assert(reader->GetChunk().status().ok());
+    assert(reader->next_chunk().ok());
   }
 }
 
@@ -119,9 +119,9 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListOffsetArrowChunkReaderReadChunk)
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    reader->seek(0);
-    reader->GetChunk();
-    reader->next_chunk();
+    assert(reader->seek(0).ok());
+    assert(reader->GetChunk().status().ok());
+    assert(reader->next_chunk().ok());
   }
 }
 
@@ -136,9 +136,9 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListPropertyArrowChunkReaderReadChunk)
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    reader->seek(0);
-    reader->GetChunk();
-    reader->next_chunk();
+    assert(reader->seek(0).ok());
+    assert(reader->GetChunk().status().ok());
+    assert(reader->next_chunk().ok());
   }
 }
 

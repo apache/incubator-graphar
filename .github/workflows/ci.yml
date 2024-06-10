@@ -38,10 +38,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  GraphAr-ubuntu-arrow-installed:
+  ubuntu:
+    name: Ubuntu 22.04 C++
     runs-on: ubuntu-latest
     env:
-      GAR_TEST_DATA: ${{ github.workspace }}/testing/
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     steps:
     - uses: actions/checkout@v3
       with:
@@ -67,6 +68,15 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_TESTING=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF .
         sudo make install
         popd
+
+        # install Catch2 v3
+        git clone --branch v3.6.0 https://github.com/catchorg/Catch2.git --depth 1
+        pushd Catch2
+        cmake -Bbuild -H. -DBUILD_TESTING=OFF
+        sudo cmake --build build/ --target install
+        popd
+
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
     - name: CMake
       working-directory: "cpp"
@@ -143,7 +153,8 @@ jobs:
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
     
-  GraphAr-centos-arrow-installed:
+  centoo:
+    name: CentOS 7 C++
     runs-on: ubuntu-latest
     container:
       image: centos:7
@@ -184,3 +195,41 @@ jobs:
         cmake ..
         make -j$(nproc)
         popd
+  
+  macos:
+    name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
+    runs-on: macos-${{ matrix.macos-version }}
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: AMD64
+            macos-version: "12"
+          - architecture: ARM64
+            macos-version: "14"
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          submodules: true
+
+    - name: Install dependencies
+      run: |
+        brew bundle --file=cpp/Brewfile
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+
+    - name: Build GraphAr
+      working-directory: "cpp"
+      run: |
+        mkdir build
+        pushd build
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        make -j$(nproc)
+        popd
+
+    - name: Running Test
+      working-directory: "cpp/build"
+      run: |
+        export ASAN_OPTIONS=detect_leaks=0
+        ctest --output-on-failure

@@ -19,25 +19,12 @@
 
 package org.apache.graphar
 
-import org.scalatest.funsuite.AnyFunSuite
-import org.apache.spark.sql.SparkSession
-
-class GraphInfoSuite extends AnyFunSuite {
-  val spark = SparkSession
-    .builder()
-    .enableHiveSupport()
-    .master("local[*]")
-    .getOrCreate()
+class GraphInfoSuite extends BaseTestSuite {
 
   test("load graph info") {
     // read graph yaml
-    val yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/csv/ldbc_sample.graph.yml")
-      .getPath
-    val prefix =
-      getClass.getClassLoader
-        .getResource("gar-test/ldbc_sample/csv/")
-        .getPath
+    val prefix = testData + "/ldbc_sample/csv/"
+    val yaml_path = prefix + "ldbc_sample.graph.yml"
     val graph_info = GraphInfo.loadGraphInfo(yaml_path, spark)
 
     val vertex_info = graph_info.getVertexInfo("person")
@@ -57,9 +44,7 @@ class GraphInfoSuite extends AnyFunSuite {
   }
 
   test("load vertex info") {
-    val yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/csv/person.vertex.yml")
-      .getPath
+    val yaml_path = testData + "/ldbc_sample/csv/person.vertex.yml"
     val vertex_info = VertexInfo.loadVertexInfo(yaml_path, spark)
 
     assert(vertex_info.getLabel == "person")
@@ -136,9 +121,7 @@ class GraphInfoSuite extends AnyFunSuite {
   }
 
   test("load edge info") {
-    val yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml")
-      .getPath
+    val yaml_path = testData + "/ldbc_sample/csv/person_knows_person.edge.yml"
     val edge_info = EdgeInfo.loadEdgeInfo(yaml_path, spark)
 
     assert(edge_info.getSrc_label == "person")

@@ -69,7 +69,7 @@
         <url>https://github.com/apache/graphar</url>
     </scm>-->
     <properties>
-        <graphar.version>0.1.0-SNAPSHOT</graphar.version>
+        <graphar.version>0.12.0-SNAPSHOT</graphar.version>
     </properties>
     <modules>
         <module>java</module>

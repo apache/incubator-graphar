@@ -21,25 +21,14 @@ package org.apache.graphar
 
 import org.apache.graphar.graph.GraphTransformer
 
-import org.apache.spark.sql.SparkSession
 import org.apache.hadoop.fs.{Path, FileSystem}
-import org.scalatest.funsuite.AnyFunSuite
 
-class TestGraphTransformerSuite extends AnyFunSuite {
-  val spark = SparkSession
-    .builder()
-    .enableHiveSupport()
-    .master("local[*]")
-    .getOrCreate()
+class TestGraphTransformerSuite extends BaseTestSuite {
 
   test("transform graphs by yaml paths") {
     // conduct transformation
-    val source_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml")
-      .getPath
-    val dest_path = getClass.getClassLoader
-      .getResource("gar-test/transformer/ldbc_sample.graph.yml")
-      .getPath
+    val source_path = testData + "/ldbc_sample/parquet/ldbc_sample.graph.yml"
+    val dest_path = testData + "/transformer/ldbc_sample.graph.yml"
     GraphTransformer.transform(source_path, dest_path, spark)
 
     val dest_graph_info = GraphInfo.loadGraphInfo(dest_path, spark)
@@ -73,15 +62,11 @@ class TestGraphTransformerSuite extends AnyFunSuite {
 
   test("transform graphs by graph infos") {
     // load source graph info
-    val source_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml")
-      .getPath
+    val source_path = testData + "/ldbc_sample/parquet/ldbc_sample.graph.yml"
     val source_graph_info = GraphInfo.loadGraphInfo(source_path, spark)
 
     // load dest graph info
-    val dest_path = getClass.getClassLoader
-      .getResource("gar-test/transformer/ldbc_sample.graph.yml")
-      .getPath
+    val dest_path = testData + "/transformer/ldbc_sample.graph.yml"
     val dest_graph_info = GraphInfo.loadGraphInfo(dest_path, spark)
 
     // conduct transformation
