@@ -96,6 +96,7 @@ object FileType extends Enumeration {
   val CSV = Value(0)
   val PARQUET = Value(1)
   val ORC = Value(2)
+  val JSON = Value(3)
 
   /**
    * File type to string.
@@ -109,6 +110,7 @@ object FileType extends Enumeration {
     case FileType.CSV     => "csv"
     case FileType.PARQUET => "parquet"
     case FileType.ORC     => "orc"
+    case FileType.JSON    => "json"
     case _ => throw new IllegalArgumentException("Unknown file type")
   }
 
@@ -124,6 +126,7 @@ object FileType extends Enumeration {
     case "csv"     => FileType.CSV
     case "parquet" => FileType.PARQUET
     case "orc"     => FileType.ORC
+    case "json"    => FileType.JSON
     case _ => throw new IllegalArgumentException("Unknown file type: " + str)
   }
 

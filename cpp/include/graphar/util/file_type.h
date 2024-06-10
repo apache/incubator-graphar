@@ -31,6 +31,7 @@ namespace graphar {
 static inline FileType StringToFileType(const std::string& str) {
   static const std::map<std::string, FileType> str2file_type{
       {"csv", FileType::CSV},
+      {"json", FileType::JSON},
       {"parquet", FileType::PARQUET},
       {"orc", FileType::ORC}};
   try {
@@ -43,6 +44,7 @@ static inline FileType StringToFileType(const std::string& str) {
 static inline const char* FileTypeToString(FileType file_type) {
   static const std::map<FileType, const char*> file_type2string{
       {FileType::CSV, "csv"},
+      {FileType::JSON, "json"},
       {FileType::PARQUET, "parquet"},
       {FileType::ORC, "orc"}};
   return file_type2string.at(file_type);

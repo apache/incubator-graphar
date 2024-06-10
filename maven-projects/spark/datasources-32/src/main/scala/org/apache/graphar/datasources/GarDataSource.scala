@@ -26,6 +26,7 @@ import org.apache.spark.sql.execution.datasources._
 import org.apache.spark.sql.execution.datasources.csv.CSVFileFormat
 import org.apache.spark.sql.execution.datasources.orc.OrcFileFormat
 import org.apache.spark.sql.execution.datasources.parquet.ParquetFileFormat
+import org.apache.spark.sql.execution.datasources.json.JsonFileFormat
 import org.apache.spark.sql.graphar.GarTable
 import org.apache.spark.sql.sources.DataSourceRegister
 import org.apache.spark.sql.types.StructType
@@ -174,6 +175,7 @@ class GarDataSource extends TableProvider with DataSourceRegister {
     case "csv"     => classOf[CSVFileFormat]
     case "orc"     => classOf[OrcFileFormat]
     case "parquet" => classOf[ParquetFileFormat]
+    case "json"    => classOf[JsonFileFormat]
     case _         => throw new IllegalArgumentException
   }
 }

@@ -1,0 +1,23 @@
+chunk_size: 100
+prefix: vertex/Person/
+property_groups:
+  - file_type: json
+    properties:
+      - is_nullable: false
+        is_primary: true
+        name: id
+        data_type: int64
+      - is_nullable: true
+        is_primary: false
+        name: firstName
+        data_type: string
+      - is_nullable: true
+        is_primary: false
+        name: lastName
+        data_type: string
+      - is_nullable: true
+        is_primary: false
+        name: gender
+        data_type: string
+label: Person
+version: gar/v1

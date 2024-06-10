@@ -73,7 +73,7 @@ using IdType = int64_t;
 enum class Type;
 class DataType;
 /** Type of file format */
-enum FileType { CSV = 0, PARQUET = 1, ORC = 2 };
+enum FileType { CSV = 0, PARQUET = 1, ORC = 2, JSON = 3 };
 enum class AdjListType : uint8_t;
 
 template <typename T>

@@ -1,0 +1,22 @@
+dst_chunk_size: 100
+src_label: Person
+chunk_size: 1024
+src_chunk_size: 100
+prefix: edge/Person_Knows_Person/
+property_groups:
+  - file_type: json
+    properties:
+      - is_nullable: true
+        is_primary: false
+        name: creationDate
+        data_type: string
+adj_lists:
+  - ordered: true
+    aligned_by: src
+    file_type: json
+  - ordered: true
+    aligned_by: dst
+    file_type: json
+dst_label: Person
+edge_label: Knows
+version: gar/v1
