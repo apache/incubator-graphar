@@ -32,8 +32,6 @@
 #include <catch2/catch_test_macros.hpp>
 namespace graphar {
 
-std::string test_data_dir = "/datadrive/APACHE_GRAPHAR/incubator-graphar/tmp/";
-
 TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
   // read file and construct graph info
   std::string path = test_data_dir + "/ldbc_sample/LdbcSample.graph.yml";
