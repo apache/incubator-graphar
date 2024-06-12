@@ -38,6 +38,10 @@ message EdgeInfo {
     bool is_directed = 9;
     string prefix = 10;
 
+    # Statistics message of the edge, including
+    # 1. num_edges: the number of edges
+    # 2. num_source_vertices: the number of source vertices
+    # 3. num_destination_vertices: the number of destination vertices
     message Statistics {
         int64 num_edges = 1;
         int64 num_source_vertices = 2;

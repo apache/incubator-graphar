@@ -29,7 +29,7 @@ message Property {
     string name = 1;
     DataType type = 2;
     bool is_primary_key = 3;
-    bool nullable = 4;
+    bool is_nullable = 4;
     string prefix = 5;
 };
 
