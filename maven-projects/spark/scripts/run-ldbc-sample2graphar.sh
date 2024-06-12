@@ -22,9 +22,9 @@ set -eu
 
 cur_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 jar_file="${cur_dir}/../graphar/target/graphar-commons-0.12.0-SNAPSHOT-shaded.jar"
-person_input_file="/datadrive/APACHE_GRAPHAR/incubator-graphar/testing/ldbc_sample/person_0_0.csv"
-person_knows_person_input_file="/datadrive/APACHE_GRAPHAR/incubator-graphar/testing/ldbc_sample/person_knows_person_0_0.csv"
-output_dir="/tmp/graphar/ldbc_sample/"
+person_input_file="${GAR_TEST_DATA}/ldbc_sample/person_0_0.csv"
+person_knows_person_input_file="${GAR_TEST_DATA}/ldbc_sample/person_knows_person_0_0.csv"
+output_dir="/tmp/graphar/ldbc_sample"
 
 vertex_chunk_size=100
 edge_chunk_size=1024
