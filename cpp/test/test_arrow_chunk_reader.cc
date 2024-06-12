@@ -465,8 +465,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
 
 TEST_CASE_METHOD(GlobalFixture, "JSON_TEST") {
   // read file and construct graph info
-  std::string path =
-      test_data_dir + "/ldbc_sample/json/LdbcSample.graph.yml";
+  std::string path = test_data_dir + "/ldbc_sample/json/LdbcSample.graph.yml";
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   std::string vertex_property_name = "id";
   std::string edge_property_name = "creationDate";
@@ -526,7 +525,8 @@ TEST_CASE_METHOD(GlobalFixture, "JSON_TEST") {
     }
 
     SECTION("CastDataType") {
-      std::string vertex_info_path = test_data_dir + "ldbc_sample/json/Person.vertex.yml";
+      std::string vertex_info_path =
+          test_data_dir + "ldbc_sample/json/Person.vertex.yml";
       std::cout << "Vertex info path: " << vertex_info_path << std::endl;
       auto fs = FileSystemFromUriOrPath(prefix).value();
       auto yaml_content =

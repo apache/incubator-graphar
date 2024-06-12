@@ -172,8 +172,8 @@ Result<T> FileSystem::ReadFileToValue(const std::string& path) const noexcept {
 }
 
 template <>
-Result<std::string> FileSystem::ReadFileToValue(const std::string& path) const
-    noexcept {
+Result<std::string> FileSystem::ReadFileToValue(
+    const std::string& path) const noexcept {
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto access_file,
                                        arrow_fs_->OpenInputFile(path));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto bytes, access_file->GetSize());
@@ -311,7 +311,6 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
 template Result<IdType> FileSystem::ReadFileToValue<IdType>(
     const std::string&) const noexcept;
 /// template specialization for std::string
-template Status FileSystem::WriteValueToFile<IdType>(const IdType&,
-                                                     const std::string&) const
-    noexcept;
+template Status FileSystem::WriteValueToFile<IdType>(
+    const IdType&, const std::string&) const noexcept;
 }  // namespace graphar
