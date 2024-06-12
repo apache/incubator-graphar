@@ -207,7 +207,16 @@ See [GraphAr C++
 Library](./cpp) for
 details about the building of the C++ library.
 
+
+### The Scala with Spark Library
+
+See [GraphAr Spark
+Library](./maven-projects/spark)
+for details about the Scala with Spark library.
+
 ### The Java Library
+
+The Java library is under development. 
 
 The GraphAr Java library is created with bindings to the C++ library
 (currently at version v0.10.0), utilizing
@@ -216,15 +225,11 @@ implementation. See [GraphAr Java
 Library](./maven-projects/java) for
 details about the building of the Java library.
 
-### The Spark Library
+### The Python with PySpark Library
 
-See [GraphAr Spark
-Library](./maven-projects/spark)
-for details about the Spark library.
+The Python with PySpark library is under development.
 
-### The PySpark Library
-
-The GraphAr PySpark library is developed as bindings to the GraphAr
+The PySpark library is developed as bindings to the GraphAr
 Spark library. See [GraphAr PySpark
 Library](./pyspark)
 for details about the PySpark library.

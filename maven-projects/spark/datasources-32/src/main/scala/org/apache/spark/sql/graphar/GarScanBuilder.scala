@@ -17,20 +17,19 @@
 // Derived from Apache Spark 3.1.1
 // https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileScanBuilder.scala
 
-package org.apache.graphar.datasources
+package org.apache.spark.sql.graphar
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.connector.read.{Scan, SupportsPushDownFilters}
 import org.apache.spark.sql.execution.datasources.PartitioningAwareFileIndex
-
 import org.apache.spark.sql.execution.datasources.v2.FileScanBuilder
+import org.apache.spark.sql.execution.datasources.v2.orc.OrcScanBuilder
+import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetScanBuilder
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
 import scala.collection.JavaConverters._
-import org.apache.spark.sql.execution.datasources.v2.orc.OrcScanBuilder
-import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetScanBuilder
 
 /** GarScanBuilder is a class to build the file scan for GarDataSource. */
 case class GarScanBuilder(
@@ -49,6 +48,7 @@ case class GarScanBuilder(
   }
 
   private var filters: Array[Filter] = Array.empty
+
   override def pushFilters(filters: Array[Filter]): Array[Filter] = {
     this.filters = filters
     filters
