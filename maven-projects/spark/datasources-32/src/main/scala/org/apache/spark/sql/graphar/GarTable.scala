@@ -35,7 +35,6 @@ import org.apache.spark.sql.graphar.json.JSONWriteBuilder
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.sql.execution.datasources.json.JsonDataSource
-//import org.apache.spark.sql.execution.datasources.v2.json.JsonWrite
 import org.apache.spark.sql.catalyst.json.JSONOptions
 
 import scala.collection.JavaConverters._
