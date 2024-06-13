@@ -43,5 +43,5 @@ message GraphInfo {
         string key = 1;
         string value = 2;
     } 
-    map<string, string> metadata = 6;
+    repeated KeyValue key_value_metadata = 6;
 };
