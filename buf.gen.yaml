@@ -12,7 +12,7 @@ plugins:
     out: pyspark/graphar_pyspark/proto/
   # Cpp
   - remote: buf.build/protocolbuffers/cpp:v27.1
-    out: cpp/src/proto
+    out: cpp/proto
   # Java
   - remote: buf.build/protocolbuffers/java:v27.1
     out: maven-projects/info/src/main/java/
