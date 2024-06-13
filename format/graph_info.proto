@@ -32,7 +32,7 @@ message GraphInfo {
     repeated EdgeInfo edges = 3;
     string prefix = 4;
 
-    # Statistics of the graph, including the number of vertices and edges
+    // Statistics of the graph, including the number of vertices and edges
     message Statistics {
         int64 num_vertices = 1;
         int64 num_edges = 2;

@@ -30,10 +30,10 @@ message AdjacentList {
     FileType file_type = 2;
     string prefix = 3;
 
-    # Statistics message, including
-    # 1. the number of vertices base on the AdjListType
-    # 2. the number of vertex chunks base on the AdjListType
-    # 3. the number of edges of each vertex chunk
+    // Statistics message, including
+    // 1. the number of vertices base on the AdjListType
+    // 2. the number of vertex chunks base on the AdjListType
+    // 3. the number of edges of each vertex chunk
     message Statistics {
         int64 num_vertices = 1; 
         int64 num_vertex_chunks = 2;

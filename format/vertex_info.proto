@@ -31,8 +31,8 @@ message VertexInfo {
     repeated PropertyGroup properties = 3;
     string prefix = 4;
 
-    # Statistics message, including the number of vertices and chunks
-    # of this type of vertex
+    // Statistics message, including the number of vertices and chunks
+    // of this type of vertex
     message Statistics {
         int64 num_vertices = 1;
         int64 num_chunks = 2;
