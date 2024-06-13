@@ -32,6 +32,7 @@
     </parent>
 
     <artifactId>graphar-commons</artifactId>
+    <version>${graphar.version}</version>
     <packaging>jar</packaging>
 
     <dependencies>

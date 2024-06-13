@@ -67,9 +67,7 @@ repository and navigated to the ``cpp`` subdirectory with:
 
 ```bash
     $ git clone https://github.com/apache/graphar.git
-    $ cd graphar
-    $ git submodule update --init
-    $ cd cpp
+    $ cd graphar/cpp
 ```
 
 Release build:

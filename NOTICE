@@ -31,3 +31,11 @@ which includes the following in its NOTICE file:
 
   fastFFI 
   Copyright 1999-2021 Alibaba Group Holding Ltd.
+
+--------------------------------------------------------------------------------
+
+This product includes code from Apache OpenDAL, which includes the following in
+its NOTICE file:
+
+  Apache OpenDAL
+  Copyright 2022 and onwards The Apache Software Foundation.

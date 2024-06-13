@@ -21,6 +21,7 @@ from pyspark.sql import SparkSession
 
 from graphar_pyspark.errors import GraphArIsNotInitializedError
 
+__version__ = "0.13.0.dev"
 
 class _GraphArSession:
     """Singleton GraphAr helper object, that contains SparkSession and JVM.

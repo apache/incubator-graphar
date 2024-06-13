@@ -40,6 +40,12 @@ RUN git clone --branch v1.8.3 https://github.com/google/benchmark.git /tmp/bench
     && make install \
     && rm -rf /tmp/benchmark
 
+RUN git clone --branch v3.6.0 https://github.com/catchorg/Catch2.git /tmp/catch2 --depth 1 \
+    && cd /tmp/catch2 \
+    && cmake -Bbuild -H. -DBUILD_TESTING=OFF \
+    && cmake --build build/ --target install \
+    && rm -rf /tmp/catch2
+
 ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib:/usr/local/lib64
 ENV JAVA_HOME=/usr/lib/jvm/default-java
 

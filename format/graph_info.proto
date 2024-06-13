@@ -20,7 +20,8 @@
 syntax = "proto3";
 
 package graphar;
-option java_package = "org.apache.graphar.info";
+option java_multiple_files = true;
+option java_package = "org.apache.graphar.info.proto";
 
 import "vertex_info.proto";
 import "edge_info.proto";

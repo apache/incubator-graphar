@@ -34,6 +34,7 @@
 
     <artifactId>java</artifactId>
     <packaging>jar</packaging>
+    <version>0.13.0.dev-SNAPSHOT</version>
 
     <name>java</name>
 

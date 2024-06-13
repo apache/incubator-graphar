@@ -17,27 +17,24 @@
 // Derived from Apache Spark 3.1.1
 // https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/parquet/ParquetWriteBuilder.scala
 
-package org.apache.graphar.datasources.parquet
+package org.apache.spark.sql.graphar.parquet
 
 import org.apache.hadoop.mapreduce.{Job, OutputCommitter, TaskAttemptContext}
-import org.apache.parquet.hadoop.{ParquetOutputCommitter, ParquetOutputFormat}
 import org.apache.parquet.hadoop.ParquetOutputFormat.JobSummaryLevel
 import org.apache.parquet.hadoop.codec.CodecConfig
 import org.apache.parquet.hadoop.util.ContextUtil
-
-import org.apache.spark.sql.execution.datasources.parquet.ParquetOutputWriter
+import org.apache.parquet.hadoop.{ParquetOutputCommitter, ParquetOutputFormat}
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.connector.write.LogicalWriteInfo
+import org.apache.spark.sql.execution.datasources.parquet._
 import org.apache.spark.sql.execution.datasources.{
   OutputWriter,
   OutputWriterFactory
 }
-import org.apache.spark.sql.execution.datasources.parquet._
+import org.apache.spark.sql.graphar.GarWriteBuilder
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types._
-
-import org.apache.graphar.datasources.GarWriteBuilder
 
 class ParquetWriteBuilder(
     paths: Seq[String],

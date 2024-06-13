@@ -1,5 +1,5 @@
 #!/bin/bash
-
+#
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -17,12 +17,16 @@
 # specific language governing permissions and limitations
 # under the License.
 
+# A script to download test data for GraphAr
 
-set -eu
-
-cur_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-jar_file="${cur_dir}/../graphar/target/graphar-commons-0.12.0-SNAPSHOT-shaded.jar"
-
-graph_info_path="${GRAPH_INFO_PATH:-/tmp/graphar/neo4j2graphar/MovieGraph.graph.yml}"
-spark-submit --class org.apache.graphar.example.GraphAr2Neo4j ${jar_file} \
-    ${graph_info_path}
+if [ -n "${GAR_TEST_DATA}" ]; then
+    if [[ ! -d "$GAR_TEST_DATA" ]]; then
+        echo "GAR_TEST_DATA is set but the directory does not exist, cloning the test data to $GAR_TEST_DATA"
+        git clone https://github.com/apache/incubator-graphar-testing.git "$GAR_TEST_DATA" --depth 1 || true
+    fi
+else
+    echo "GAR_TEST_DATA is not set, cloning the test data to /tmp/graphar-testing"
+    git clone https://github.com/apache/incubator-graphar-testing.git /tmp/graphar-testing --depth 1 || true
+    echo "Test data has been cloned to /tmp/graphar-testing, please run"
+    echo "    export GAR_TEST_DATA=/tmp/graphar-testing"
+fi
