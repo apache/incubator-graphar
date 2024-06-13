@@ -1,0 +1,18 @@
+version: v2
+managed:
+  enabled: true
+  disable:
+    - file_option: java_package
+plugins:
+  # Python classes
+  - remote: buf.build/protocolbuffers/python:v27.1
+    out: pyspark/graphar_pyspark/proto/
+  # Python headers for IDEs and MyPy
+  - remote: buf.build/protocolbuffers/pyi
+    out: pyspark/graphar_pyspark/proto/
+  # Cpp
+  - remote: buf.build/protocolbuffers/cpp:v27.1
+    out: cpp/src/proto
+  # Java
+  - remote: buf.build/protocolbuffers/java:v27.1
+    out: maven-projects/info/src/main/java/
