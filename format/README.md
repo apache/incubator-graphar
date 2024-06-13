@@ -6,6 +6,7 @@ This folder contains protocol definitions for the GraphAr format.
 
 ### Prerequisites
 
+- [protoc](https://developers.google.com/protocol-buffers/docs/downloads)
 - [buf](https://buf.build/docs/installation)
 
 ### Build
