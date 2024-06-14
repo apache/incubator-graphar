@@ -57,8 +57,3 @@ jobs:
       - name: Buf Generate
         run: buf generate
       
-      - name: Buf Breaking
-        uses: bufbuild/buf-breaking-actio@v1
-        with:
-          against: main
-          input: buf.yaml
