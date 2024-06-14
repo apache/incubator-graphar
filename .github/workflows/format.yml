@@ -1,0 +1,64 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: GraphAr Format 
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'format/**'
+      - '.github/workflows/format.yml'
+      - 'buf.gen.yaml'
+      - 'buf.yaml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'format/**'
+      - '.github/workflows/format.yml'
+      - 'buf.gen.yaml'
+      - 'buf.yaml'
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          submodules: false
+          fetch-depth: 0
+
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          version: "1.32.0"
+
+      - name: Buf Generate
+        run: buf generate
+      
+      - name: Buf Breaking
+        use: bufbuild/buf-breaking-actio@v1
+        with:
+          against: main
+          input: buf.yaml
