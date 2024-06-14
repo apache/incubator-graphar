@@ -40,7 +40,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  check:
+  generate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -56,4 +56,4 @@ jobs:
 
       - name: Buf Generate
         run: buf generate
-      
+ 
