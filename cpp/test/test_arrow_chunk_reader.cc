@@ -525,8 +525,9 @@ TEST_CASE_METHOD(GlobalFixture, "JSON_TEST") {
     }
 
     SECTION("CastDataType") {
+      std::string prefix = test_data_dir + "/ldbc_sample/";
       std::string vertex_info_path =
-          test_data_dir + "ldbc_sample/json/Person.vertex.yml";
+          prefix + "json/Person.vertex.yml";
       std::cout << "Vertex info path: " << vertex_info_path << std::endl;
       auto fs = FileSystemFromUriOrPath(prefix).value();
       auto yaml_content =
