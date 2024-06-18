@@ -153,7 +153,7 @@ jobs:
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
     
-  centoo:
+  centos:
     name: CentOS 7 C++
     runs-on: ubuntu-latest
     container:
@@ -218,6 +218,14 @@ jobs:
       run: |
         brew bundle --file=cpp/Brewfile
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+    
+    - name: Install arrow with vcpkg
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        ./bootstrap-vcpkg.sh
+        ./vcpkg integrate install
+        ./vcpkg install arrow
 
     - name: Build GraphAr
       working-directory: "cpp"
