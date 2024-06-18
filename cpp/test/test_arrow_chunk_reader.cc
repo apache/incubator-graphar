@@ -291,6 +291,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       auto maybe_reader = AdjListArrowChunkReader::Make(
           graph_info, src_label, edge_label, dst_label,
           AdjListType::ordered_by_source);
+      REQUIRE(maybe_reader.status().ok());
       auto reader = maybe_reader.value();
       // check reader start from vertex chunk 0
       auto result = reader->GetChunk();
