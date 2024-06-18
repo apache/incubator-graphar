@@ -199,6 +199,9 @@ jobs:
   macos:
     name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
     runs-on: macos-${{ matrix.macos-version }}
+    # TODO: enable this when the arrow of brew enable ARROW_ORC again
+    # see https://github.com/Homebrew/homebrew-core/blob/4588359b7248b07379094de5310ee7ff89afa17e/Formula/a/apache-arrow.rb#L53
+    if: false
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     strategy:
@@ -219,14 +222,6 @@ jobs:
         brew bundle --file=cpp/Brewfile
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
     
-    - name: Install arrow with vcpkg
-      run: |
-        git clone https://github.com/Microsoft/vcpkg.git
-        cd vcpkg
-        ./bootstrap-vcpkg.sh
-        ./vcpkg integrate install
-        ./vcpkg install arrow
-
     - name: Build GraphAr
       working-directory: "cpp"
       run: |

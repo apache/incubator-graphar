@@ -54,6 +54,8 @@ sudo apt-get install -y libarrow-dev libarrow-dataset-dev libarrow-acero-dev lib
 
 On macOS, you can use [Homebrew](https://brew.sh) to install the required packages:
 
+Note: Currently, the Arrow C++ library is [disable ARROW_ORC](https://github.com/Homebrew/homebrew-core/blob/4588359b7248b07379094de5310ee7ff89afa17e/Formula/a/apache-arrow.rb#L53) in the brew formula, so you need to install the Arrow C++ library manually.
+
 ```bash
 git clone https:://github.com/apache/graphar.git
 cd graphar
