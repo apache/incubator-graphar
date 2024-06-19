@@ -92,7 +92,7 @@ object LdbcSample2GraphAr {
     writer.PutVertexData("Person", person_df)
 
     // read edges with type "Person"->"Knows"->"Person" from given path as a DataFrame
-    val produced_edge_df = spark.read
+    val knows_edge_df = spark.read
       .option("delimiter", "|")
       .option("header", "true")
       .option("inferSchema", "true")
@@ -100,6 +100,6 @@ object LdbcSample2GraphAr {
       .load(personKnowsPersonInputPath)
     // put into writer, source vertex label is "Person", edge label is "Knows"
     // target vertex label is "Person"
-    writer.PutEdgeData(("Person", "Knows", "Person"), produced_edge_df)
+    writer.PutEdgeData(("Person", "Knows", "Person"), knows_edge_df)
   }
 }
