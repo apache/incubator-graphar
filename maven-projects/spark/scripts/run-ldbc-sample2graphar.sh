@@ -28,6 +28,6 @@ output_dir="/tmp/graphar/ldbc_sample"
 
 vertex_chunk_size=100
 edge_chunk_size=1024
-file_type="parquet"
+file_type="csv"
 spark-submit --class org.apache.graphar.example.LdbcSample2GraphAr ${jar_file} \
     ${person_input_file} ${person_knows_person_input_file} ${output_dir} ${vertex_chunk_size} ${edge_chunk_size} ${file_type}
