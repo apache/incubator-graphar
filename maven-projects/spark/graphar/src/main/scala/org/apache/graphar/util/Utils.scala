@@ -61,6 +61,7 @@ object Utils {
       case "long"    => "int64"
       case "double"  => "double"
       case "boolean" => "bool"
+      case "timestamp" => "timestamp"
       case _ =>
         throw new IllegalArgumentException(
           "Expected string, integral, double or boolean type, got " + typeName + " type"
