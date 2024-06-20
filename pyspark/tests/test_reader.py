@@ -104,13 +104,13 @@ def test_vertex_reader_with_json(spark):
     initialize(spark)
 
     vertex_info = VertexInfo.load_vertex_info(
-        GRAPHAR_TESTS_EXAMPLES.joinpath("/ldbc_sample/json/")
+        GRAPHAR_TESTS_EXAMPLES.joinpath("ldbc_sample/json")
         .joinpath("Person.vertex.yml")
         .absolute()
         .__str__()
     )
     vertex_reader = VertexReader.from_python(
-        GRAPHAR_TESTS_EXAMPLES.joinpath("/ldbc_sample/json/").absolute().__str__(),
+        GRAPHAR_TESTS_EXAMPLES.joinpath("ldbc_sample/json/").absolute().__str__(),
         vertex_info,
     )
     assert VertexReader.from_scala(vertex_reader.to_scala()) is not None
