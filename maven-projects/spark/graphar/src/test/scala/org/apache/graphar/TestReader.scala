@@ -206,7 +206,7 @@ class ReaderSuite extends BaseTestSuite {
 
     // test reading a single property chunk
     val single_chunk_df = reader.readVertexPropertyChunk(property_group, 0)
-    assert(single_chunk_df.columns.length == 4)
+    assert(single_chunk_df.columns.length == 5)
     assert(single_chunk_df.count() == 100)
   }
 
