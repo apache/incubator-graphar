@@ -56,11 +56,11 @@ object Utils {
   def sparkDataType2GraphArTypeName(dataType: DataType): String = {
     val typeName = dataType.typeName
     val grapharTypeName = typeName match {
-      case "string"  => "string"
-      case "integer" => "int"
-      case "long"    => "int64"
-      case "double"  => "double"
-      case "boolean" => "bool"
+      case "string"    => "string"
+      case "integer"   => "int"
+      case "long"      => "int64"
+      case "double"    => "double"
+      case "boolean"   => "bool"
       case "timestamp" => "timestamp"
       case _ =>
         throw new IllegalArgumentException(
