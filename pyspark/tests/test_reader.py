@@ -117,7 +117,7 @@ def test_vertex_reader_with_json(spark):
     assert vertex_reader.read_vertices_number() > 0
     assert (
         vertex_reader.read_vertex_property_group(
-            vertex_info.get_property_group("name")
+            vertex_info.get_property_group("firstName")
         ).count()
         > 0
     )
@@ -130,12 +130,12 @@ def test_vertex_reader_with_json(spark):
     assert (
         vertex_reader.read_all_vertex_property_groups().count()
         >= vertex_reader.read_vertex_property_group(
-            vertex_info.get_property_group("age")
+            vertex_info.get_property_group("lastName")
         ).count()
     )
     assert (
         vertex_reader.read_multiple_vertex_property_groups(
-            [vertex_info.get_property_group("name")]
+            [vertex_info.get_property_group("gender")]
         ).count()
         > 0
     )
