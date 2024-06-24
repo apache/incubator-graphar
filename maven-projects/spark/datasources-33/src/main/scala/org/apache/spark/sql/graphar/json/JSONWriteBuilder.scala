@@ -47,7 +47,6 @@ class JSONWriteBuilder(
       dataSchema: StructType
   ): OutputWriterFactory = {
     val conf = job.getConfiguration
-    //val parsedOptions = null
     val parsedOptions = new JSONOptions(
       options,
       sqlConf.sessionLocalTimeZone,
