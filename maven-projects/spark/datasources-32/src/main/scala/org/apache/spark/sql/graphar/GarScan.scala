@@ -24,7 +24,9 @@ import org.apache.hadoop.fs.Path
 import org.apache.parquet.hadoop.ParquetInputFormat
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.csv.CSVOptions
+import org.apache.spark.sql.catalyst.json.JSONOptionsInRead
 import org.apache.spark.sql.catalyst.expressions.{ExprUtils, Expression}
+import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
 import org.apache.spark.sql.connector.read.PartitionReaderFactory
 import org.apache.spark.sql.execution.PartitionedFileUtil
 import org.apache.spark.sql.execution.datasources.parquet.{
@@ -34,6 +36,7 @@ import org.apache.spark.sql.execution.datasources.parquet.{
 }
 import org.apache.spark.sql.execution.datasources.v2.FileScan
 import org.apache.spark.sql.execution.datasources.v2.csv.CSVPartitionReaderFactory
+import org.apache.spark.sql.execution.datasources.v2.json.JsonPartitionReaderFactory
 import org.apache.spark.sql.execution.datasources.v2.orc.OrcPartitionReaderFactory
 import org.apache.spark.sql.execution.datasources.v2.parquet.ParquetPartitionReaderFactory
 import org.apache.spark.sql.execution.datasources.{
@@ -74,6 +77,7 @@ case class GarScan(
       case "csv"     => createCSVReaderFactory()
       case "orc"     => createOrcReaderFactory()
       case "parquet" => createParquetReaderFactory()
+      case "json"    => createJSONReaderFactory()
       case _ =>
         throw new IllegalArgumentException("Invalid format name: " + formatName)
     }
@@ -193,6 +197,46 @@ case class GarScan(
     )
   }
 
+  // Create the reader factory for the JSON format.
+  private def createJSONReaderFactory(): PartitionReaderFactory = {
+    val parsedOptions = new JSONOptionsInRead(
+      CaseInsensitiveMap(options.asScala.toMap),
+      sparkSession.sessionState.conf.sessionLocalTimeZone,
+      sparkSession.sessionState.conf.columnNameOfCorruptRecord
+    )
+
+    // Check a field requirement for corrupt records here to throw an exception in a driver side
+    ExprUtils.verifyColumnNameOfCorruptRecord(
+      dataSchema,
+      parsedOptions.columnNameOfCorruptRecord
+    )
+    // Don't push any filter which refers to the "virtual" column which cannot present in the input.
+    // Such filters will be applied later on the upper layer.
+    val actualFilters =
+      pushedFilters.filterNot(
+        _.references.contains(parsedOptions.columnNameOfCorruptRecord)
+      )
+
+    val caseSensitiveMap = options.asCaseSensitiveMap.asScala.toMap
+    // Hadoop Configurations are case sensitive.
+    val hadoopConf =
+      sparkSession.sessionState.newHadoopConfWithOptions(caseSensitiveMap)
+    val broadcastedConf = sparkSession.sparkContext.broadcast(
+      new SerializableConfiguration(hadoopConf)
+    )
+    // The partition values are already truncated in `FileScan.partitions`.
+    // We should use `readPartitionSchema` as the partition schema here.
+    JsonPartitionReaderFactory(
+      sparkSession.sessionState.conf,
+      broadcastedConf,
+      dataSchema,
+      readDataSchema,
+      readPartitionSchema,
+      parsedOptions,
+      actualFilters
+    )
+  }
+
   /**
    * Override "partitions" of
    * org.apache.spark.sql.execution.datasources.v2.FileScan to disable splitting
@@ -272,6 +316,7 @@ case class GarScan(
     case "csv"     => super.hashCode()
     case "orc"     => getClass.hashCode()
     case "parquet" => getClass.hashCode()
+    case "json"    => super.hashCode()
     case _ =>
       throw new IllegalArgumentException("Invalid format name: " + formatName)
   }

@@ -31,8 +31,11 @@ import org.apache.spark.sql.execution.datasources.v2.FileTable
 import org.apache.spark.sql.graphar.csv.CSVWriteBuilder
 import org.apache.spark.sql.graphar.orc.OrcWriteBuilder
 import org.apache.spark.sql.graphar.parquet.ParquetWriteBuilder
+import org.apache.spark.sql.graphar.json.JSONWriteBuilder
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
+import org.apache.spark.sql.execution.datasources.json.JsonDataSource
+import org.apache.spark.sql.catalyst.json.JSONOptions
 
 import scala.collection.JavaConverters._
 
@@ -82,8 +85,21 @@ case class GarTable(
         OrcUtils.inferSchema(sparkSession, files, options.asScala.toMap)
       case "parquet" =>
         ParquetUtils.inferSchema(sparkSession, options.asScala.toMap, files)
+      case "json" => {
+        val parsedOptions = new JSONOptions(
+          options.asScala.toMap,
+          sparkSession.sessionState.conf.sessionLocalTimeZone
+        )
+
+        JsonDataSource(parsedOptions).inferSchema(
+          sparkSession,
+          files,
+          parsedOptions
+        )
+      }
       case _ =>
         throw new IllegalArgumentException("Invalid format name: " + formatName)
+
     }
 
   /** Construct a new write builder according to the actual file format. */
@@ -95,6 +111,8 @@ case class GarTable(
         new OrcWriteBuilder(paths, formatName, supportsDataType, info)
       case "parquet" =>
         new ParquetWriteBuilder(paths, formatName, supportsDataType, info)
+      case "json" =>
+        new JSONWriteBuilder(paths, formatName, supportsDataType, info)
       case _ =>
         throw new IllegalArgumentException("Invalid format name: " + formatName)
     }

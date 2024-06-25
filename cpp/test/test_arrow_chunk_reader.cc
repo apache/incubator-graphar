@@ -291,7 +291,6 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       auto maybe_reader = AdjListArrowChunkReader::Make(
           graph_info, src_label, edge_label, dst_label,
           AdjListType::ordered_by_source);
-      REQUIRE(maybe_reader.status().ok());
       auto reader = maybe_reader.value();
       // check reader start from vertex chunk 0
       auto result = reader->GetChunk();
@@ -461,6 +460,69 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
     REQUIRE(array->length() == 4);
     REQUIRE(reader->next_chunk().IsIndexError());
     REQUIRE(reader->seek(1024).IsIndexError());
+  }
+}
+
+TEST_CASE_METHOD(GlobalFixture, "JSON_TEST") {
+  // read file and construct graph info
+  std::string path = test_data_dir + "/ldbc_sample/json/LdbcSample.graph.yml";
+  std::string src_label = "Person", edge_label = "Knows", dst_label = "Person";
+  std::string vertex_property_name = "id";
+  std::string edge_property_name = "creationDate";
+  auto maybe_graph_info = GraphInfo::Load(path);
+  REQUIRE(maybe_graph_info.status().ok());
+  auto graph_info = maybe_graph_info.value();
+  auto vertex_info = graph_info->GetVertexInfo(src_label);
+  REQUIRE(vertex_info != nullptr);
+  auto v_pg = vertex_info->GetPropertyGroup(vertex_property_name);
+  REQUIRE(v_pg != nullptr);
+  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  REQUIRE(edge_info != nullptr);
+  auto e_pg = edge_info->GetPropertyGroup(edge_property_name);
+  REQUIRE(e_pg != nullptr);
+
+  SECTION("VertexPropertyArrowChunkReader") {
+    auto maybe_reader = VertexPropertyArrowChunkReader::Make(
+        graph_info, src_label, vertex_property_name);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    REQUIRE(reader->GetChunkNum() == 10);
+
+    SECTION("Basics") {
+      auto result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      auto table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+
+      // seek
+      REQUIRE(reader->seek(100).ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      REQUIRE(reader->next_chunk().ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      REQUIRE(reader->seek(900).ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 3);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      REQUIRE(reader->GetChunkNum() == 10);
+      REQUIRE(reader->next_chunk().IsIndexError());
+
+      REQUIRE(reader->seek(1024).IsIndexError());
+    }
   }
 }
 }  // namespace graphar

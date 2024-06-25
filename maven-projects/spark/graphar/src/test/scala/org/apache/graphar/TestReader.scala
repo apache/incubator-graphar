@@ -191,6 +191,25 @@ class ReaderSuite extends BaseTestSuite {
     )
   }
 
+  test("json test") {
+    // construct the vertex information
+    val prefix = testData + "/ldbc_sample/json/"
+    val vertex_yaml = prefix + "Person.vertex.yml"
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
+
+    // construct the vertex reader
+    val reader = new VertexReader(prefix, vertex_info, spark)
+
+    // test reading the number of vertices
+    assert(reader.readVerticesNumber() == 903)
+    val property_group = vertex_info.getPropertyGroup("gender")
+
+    // test reading a single property chunk
+    val single_chunk_df = reader.readVertexPropertyChunk(property_group, 0)
+    assert(single_chunk_df.columns.length == 5)
+    assert(single_chunk_df.count() == 100)
+  }
+
   test("read edge chunks") {
     // construct the edge information
     val prefix = testData + "/ldbc_sample/csv/"

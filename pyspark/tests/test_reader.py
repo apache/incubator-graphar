@@ -100,6 +100,45 @@ def test_edge_reader(spark):
     assert edge_reader.read_edges_number(0) == 0
     assert edge_reader.read_offset(0).count() > 0
 
+def test_vertex_reader_with_json(spark):
+    initialize(spark)
+
+    vertex_info = VertexInfo.load_vertex_info(
+        GRAPHAR_TESTS_EXAMPLES.joinpath("ldbc_sample/json")
+        .joinpath("Person.vertex.yml")
+        .absolute()
+        .__str__()
+    )
+    vertex_reader = VertexReader.from_python(
+        GRAPHAR_TESTS_EXAMPLES.joinpath("ldbc_sample/json/").absolute().__str__(),
+        vertex_info,
+    )
+    assert VertexReader.from_scala(vertex_reader.to_scala()) is not None
+    assert vertex_reader.read_vertices_number() > 0
+    assert (
+        vertex_reader.read_vertex_property_group(
+            vertex_info.get_property_group("firstName")
+        ).count()
+        > 0
+    )
+    assert (
+        vertex_reader.read_vertex_property_chunk(
+            vertex_info.get_property_groups()[0], 0
+        ).count()
+        > 0
+    )
+    assert (
+        vertex_reader.read_all_vertex_property_groups().count()
+        >= vertex_reader.read_vertex_property_group(
+            vertex_info.get_property_group("lastName")
+        ).count()
+    )
+    assert (
+        vertex_reader.read_multiple_vertex_property_groups(
+            [vertex_info.get_property_group("gender")]
+        ).count()
+        > 0
+    )
 
 def test_graph_reader(spark):
     initialize(spark)

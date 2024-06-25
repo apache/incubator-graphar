@@ -91,6 +91,8 @@ std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
     return std::make_shared<ds::ParquetFileFormat>();
   case ORC:
     return std::make_shared<ds::OrcFileFormat>();
+  case JSON:
+    return std::make_shared<ds::JsonFileFormat>();
   default:
     return nullptr;
   }

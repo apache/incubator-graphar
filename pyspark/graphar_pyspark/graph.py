@@ -195,7 +195,7 @@ class GraphWriter:
         :param name: the name of graph, default is 'grpah'
         :param vertex_chunk_size: the chunk size for vertices, default is 2^18
         :param edge_chunk_size: the chunk size for edges, default is 2^22
-        :param file_type: the file type for data payload file, support [parquet, orc, csv], default is parquet.
+        :param file_type: the file type for data payload file, support [parquet, orc, csv, json], default is parquet.
         :param version: version of GraphAr format, default is v1.
         """
         if vertex_chunk_size is None:
