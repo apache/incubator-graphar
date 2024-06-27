@@ -37,9 +37,9 @@ All libraries currently follow version 1.0.0 of the GraphAr format.
 | CSV                         | R/W     | R (1)   | R/W   | R/W (2)    |
 | ORC                         | R/W     | R (1)   | R/W   | R/W (2)    |
 | Parquet                     | R/W     | R (1)   | R/W   | R/W (2)    |
+| JSON                        | R       |         | R/W   | R/W (2)    |
 | Avro                        |         |         |       |            |
 | HDF5                        |         |         |       |            |
-| JSON                        |         |         |       |            |
 
 :::note
 
