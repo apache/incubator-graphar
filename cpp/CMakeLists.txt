@@ -205,11 +205,15 @@ macro(get_target_location var target)
   endif()
 endmacro()
 
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
+include_directories(src)
+
 # ------------------------------------------------------------------------------
 # generate graphar library
 # ------------------------------------------------------------------------------
 macro(build_graphar)
-    file(GLOB_RECURSE CORE_SRC_FILES "src/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
+
+    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
     add_library(graphar SHARED ${CORE_SRC_FILES})
     install_graphar_target(graphar)
     target_compile_features(graphar PRIVATE cxx_std_17)
@@ -350,6 +354,7 @@ if (BUILD_BENCHMARKS)
     add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
     add_benchmark(graph_info_benchmark SRCS benchmarks/graph_info_benchmark.cc)
 endif()
+
 # ------------------------------------------------------------------------------
 # Format code & cpplint
 # ------------------------------------------------------------------------------
