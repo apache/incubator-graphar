@@ -153,49 +153,6 @@ jobs:
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
     
-  centos:
-    name: CentOS 7 C++
-    runs-on: ubuntu-latest
-    container:
-      image: centos:7
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Set up devtoolset-8 
-      run: |
-        # install gcc and g++ 8
-        yum install -y centos-release-scl
-        yum install -y devtoolset-8
-
-    - name: Install dependencies
-      shell: scl enable devtoolset-8 -- bash --noprofile --norc -eo pipefail {0}
-      run: |
-        # install cmake
-        yum install -y wget
-        wget https://cmake.org/files/v3.12/cmake-3.12.3.tar.gz -P /tmp/ && \
-            tar -zxf /tmp/cmake-3.12.3.tar.gz -C /tmp/ && \
-            pushd /tmp/cmake-3.12.3 && \
-            ./bootstrap --prefix=/usr/local && \
-            make -j$(nproc) && \
-            make install && \
-            popd
-        echo "cmake version: $(cmake --version)"
-
-        #install arrow
-        yum install -y epel-release || yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1).noarch.rpm
-        yum install -y https://apache.jfrog.io/artifactory/arrow/centos/$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)/apache-arrow-release-latest.rpm
-        yum install -y --enablerepo=epel arrow-devel arrow-dataset-devel arrow-acero-devel parquet-devel
-
-    - name: Build GraphAr
-      shell: scl enable devtoolset-8 -- bash --noprofile --norc -eo pipefail {0}
-      working-directory: "cpp"
-      run: |
-        mkdir build
-        pushd build
-        cmake ..
-        make -j$(nproc)
-        popd
-  
   macos:
     name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
     runs-on: macos-${{ matrix.macos-version }}
