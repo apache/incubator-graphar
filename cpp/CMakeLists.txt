@@ -358,11 +358,11 @@ endif()
 # ------------------------------------------------------------------------------
 # Format code & cpplint
 # ------------------------------------------------------------------------------
-file(GLOB_RECURSE FILES_NEED_FORMAT "include/graphar/*.h" "src/*.cc"
+file(GLOB_RECURSE FILES_NEED_FORMAT "src/graphar/*.h" "src/graphar/*.cc"
                                     "test/*.h" "test/*.cc"
                                     "examples/*.h" "examples/*.cc"
                                     "benchmarks/*.h" "benchmarks/*.cc")
-file(GLOB_RECURSE FILES_NEED_LINT "include/graphar/*.h" "src/*.cc"
+file(GLOB_RECURSE FILES_NEED_LINT "src/graphar/*.h" "src/graphar/*.cc"
                                   "test/*.h" "test/*.cc"
                                   "examples/*.h" "examples/*.cc"
                                   "benchmarks/*.h" "benchmarks/*.cc")

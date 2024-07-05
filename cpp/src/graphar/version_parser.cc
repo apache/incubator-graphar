@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <algorithm>
 #include <iostream>
 #include <regex>  // NOLINT
 #include <string>

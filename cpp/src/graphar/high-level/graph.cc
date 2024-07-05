@@ -17,10 +17,10 @@
  * under the License.
  */
 
-#include "graphar/types.h"
+#include "graphar/high-level/graph.h"
 #include "graphar/convert_to_arrow_type.h"
+#include "graphar/types.h"
 
-#include "graph.h"
 namespace graphar {
 
 template <Type type>

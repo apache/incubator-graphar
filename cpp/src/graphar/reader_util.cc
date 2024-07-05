@@ -24,11 +24,11 @@
 #include "arrow/io/api.h"
 #include "parquet/arrow/reader.h"
 
-#include "graphar/graph_info.h"
-#include "graphar/types.h"
 #include "graphar/expression.h"
 #include "graphar/filesystem.h"
+#include "graphar/graph_info.h"
 #include "graphar/reader_util.h"
+#include "graphar/types.h"
 
 namespace graphar::util {
 

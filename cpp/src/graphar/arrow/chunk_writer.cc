@@ -18,6 +18,7 @@
  */
 
 #include <iostream>
+#include <utility>
 
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
@@ -32,14 +33,14 @@
 #include "arrow/dataset/plan.h"
 #include "arrow/dataset/scanner.h"
 
-#include "graphar/graph_info.h"
-#include "graphar/types.h"
+#include "graphar/arrow/chunk_writer.h"
 #include "graphar/filesystem.h"
 #include "graphar/general_params.h"
+#include "graphar/graph_info.h"
 #include "graphar/result.h"
 #include "graphar/status.h"
+#include "graphar/types.h"
 #include "graphar/util.h"
-#include "graphar/arrow/chunk_writer.h"
 
 namespace graphar {
 // common methods

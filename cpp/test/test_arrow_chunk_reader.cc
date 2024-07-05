@@ -24,7 +24,6 @@
 #include "./util.h"
 #include "graphar/api/arrow_reader.h"
 
-
 #include <catch2/catch_test_macros.hpp>
 namespace graphar {
 

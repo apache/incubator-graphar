@@ -17,10 +17,9 @@
  * under the License.
  */
 
-#include "graphar/graph_info.h"
+#include "graphar/high-level/vertices_builder.h"
 #include "graphar/convert_to_arrow_type.h"
-
-#include "vertices_builder.h"
+#include "graphar/graph_info.h"
 
 namespace graphar::builder {
 

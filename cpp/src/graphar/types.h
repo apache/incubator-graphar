@@ -159,7 +159,6 @@ class Date {
   c_type value_;
 };
 
-
 /** Adj list type enumeration for adjacency list of graph. */
 enum class AdjListType : std::uint8_t {
   /// collection of edges by source, but unordered, can represent COO format

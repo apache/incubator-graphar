@@ -17,11 +17,11 @@
  * under the License.
  */
 
-#include "graphar/graph_info.h"
 #include "graphar/chunk_info_writer.h"
-#include "graphar/types.h"
 #include "graphar/filesystem.h"
+#include "graphar/graph_info.h"
 #include "graphar/result.h"
+#include "graphar/types.h"
 #include "graphar/util.h"
 
 namespace graphar {
@@ -72,10 +72,9 @@ Status VertexChunkInfoWriter::WriteChunk(
   return fs_->CopyFile(file_name, path);
 }
 
-EdgeChunkInfoWriter::EdgeChunkInfoWriter(const std::shared_ptr<EdgeInfo>& edge_info,
-                                 const std::string& prefix,
-                                 AdjListType adj_list_type,
-                                 const ValidateLevel& validate_level)
+EdgeChunkInfoWriter::EdgeChunkInfoWriter(
+    const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
+    AdjListType adj_list_type, const ValidateLevel& validate_level)
     : edge_info_(edge_info),
       adj_list_type_(adj_list_type),
       validate_level_(validate_level) {
@@ -105,8 +104,9 @@ EdgeChunkInfoWriter::EdgeChunkInfoWriter(const std::shared_ptr<EdgeInfo>& edge_i
 }
 
 // Check if the operation of writing number or copying a file is allowed.
-Status EdgeChunkInfoWriter::validate(IdType count_or_index1, IdType count_or_index2,
-                                 ValidateLevel validate_level) const {
+Status EdgeChunkInfoWriter::validate(IdType count_or_index1,
+                                     IdType count_or_index2,
+                                     ValidateLevel validate_level) const {
   // use the writer's validate level
   if (validate_level == ValidateLevel::default_validate)
     validate_level = validate_level_;
@@ -149,10 +149,9 @@ Status EdgeChunkInfoWriter::validate(
   return Status::OK();
 }
 
-Status EdgeChunkInfoWriter::WriteAdjListChunk(const std::string& file_name,
-                                          IdType vertex_chunk_index,
-                                          IdType chunk_index,
-                                          ValidateLevel validate_level) const {
+Status EdgeChunkInfoWriter::WriteAdjListChunk(
+    const std::string& file_name, IdType vertex_chunk_index, IdType chunk_index,
+    ValidateLevel validate_level) const {
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   GAR_ASSIGN_OR_RAISE(
       auto suffix, edge_info_->GetAdjListFilePath(vertex_chunk_index,
@@ -161,9 +160,9 @@ Status EdgeChunkInfoWriter::WriteAdjListChunk(const std::string& file_name,
   return fs_->CopyFile(file_name, path);
 }
 
-Status EdgeChunkInfoWriter::WriteOffsetChunk(const std::string& file_name,
-                                         IdType vertex_chunk_index,
-                                         ValidateLevel validate_level) const {
+Status EdgeChunkInfoWriter::WriteOffsetChunk(
+    const std::string& file_name, IdType vertex_chunk_index,
+    ValidateLevel validate_level) const {
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, 0, validate_level));
   GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_->GetAdjListOffsetFilePath(
                                        vertex_chunk_index, adj_list_type_));
@@ -184,4 +183,4 @@ Status EdgeChunkInfoWriter::WritePropertyChunk(
   std::string path = prefix_ + suffix;
   return fs_->CopyFile(file_name, path);
 }
-}
+}  // namespace graphar

@@ -24,9 +24,9 @@
 #include <string>
 #include <vector>
 
-#include "graphar/types.h"
 #include "graphar/result.h"
 #include "graphar/status.h"
+#include "graphar/types.h"
 #include "graphar/util.h"
 
 #include "graphar/reader_util.h"

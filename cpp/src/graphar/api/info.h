@@ -20,9 +20,9 @@
 #pragma once
 
 // Infos
-#include "graphar/graph_info.h"
 #include "graphar/filesystem.h"
 #include "graphar/general_params.h"
+#include "graphar/graph_info.h"
 #include "graphar/macros.h"
 #include "graphar/result.h"
 #include "graphar/status.h"

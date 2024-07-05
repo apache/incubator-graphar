@@ -76,7 +76,6 @@ class VertexChunkInfoWriter {
 };
 
 class EdgeChunkInfoWriter {
-
   /**
    * @brief Initialize the EdgeChunkWriter.
    *
@@ -105,7 +104,8 @@ class EdgeChunkInfoWriter {
    */
   Status WriteAdjListChunk(
       const std::string& file_name, IdType vertex_chunk_index,
-      IdType chunk_index, ValidateLevel validate_level = ValidateLevel::default_validate) const;
+      IdType chunk_index,
+      ValidateLevel validate_level = ValidateLevel::default_validate) const;
 
   /**
    * @brief Copy a file as a offset chunk.
@@ -173,4 +173,4 @@ class EdgeChunkInfoWriter {
   std::shared_ptr<FileSystem> fs_;
   ValidateLevel validate_level_;
 };
-}
+}  // namespace graphar

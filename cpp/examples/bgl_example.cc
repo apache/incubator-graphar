@@ -26,9 +26,9 @@
 #include "arrow/api.h"
 
 #include "./config.h"
+#include "graphar/api/arrow_writer.h"
 #include "graphar/api/high_level_reader.h"
 #include "graphar/api/high_level_writer.h"
-#include "graphar/api/arrow_writer.h"
 
 int main(int argc, char* argv[]) {
   // read file and construct graph info

@@ -17,8 +17,8 @@
  * under the License.
  */
 
-# pragma once
+#pragma once
 
 #include "graphar/api/info.h"
-#include "graphar/high-level/vertices_builder.h"
 #include "graphar/high-level/edges_builder.h"
+#include "graphar/high-level/vertices_builder.h"

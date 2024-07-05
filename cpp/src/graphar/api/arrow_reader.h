@@ -17,7 +17,7 @@
  * under the License.
  */
 
-# pragma once
+#pragma once
 
 #include "graphar/api/info.h"
 #include "graphar/arrow/chunk_reader.h"

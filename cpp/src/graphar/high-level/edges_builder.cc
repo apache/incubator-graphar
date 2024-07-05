@@ -21,9 +21,8 @@
 
 #include "graphar/convert_to_arrow_type.h"
 #include "graphar/general_params.h"
+#include "graphar/high-level/edges_builder.h"
 #include "graphar/result.h"
-
-#include "edges_builder.h"
 
 namespace graphar::builder {
 

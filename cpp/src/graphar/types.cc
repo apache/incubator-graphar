@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <algorithm>
 #include <memory>
 
 #include "arrow/api.h"

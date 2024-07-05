@@ -27,9 +27,9 @@
 #include "parquet/arrow/writer.h"
 #include "simple-uri-parser/uri_parser.h"
 
-#include "graphar/fwd.h"
 #include "graphar/expression.h"
 #include "graphar/filesystem.h"
+#include "graphar/fwd.h"
 
 namespace graphar::detail {
 template <typename U, typename T>
