@@ -23,8 +23,7 @@
 #include "arrow/filesystem/api.h"
 
 #include "./config.h"
-#include "graphar/api.h"
-#include "graphar/reader/chunk_info_reader.h"
+#include "graphar/api/basic_reader.h"
 
 void vertex_property_chunk_info_reader(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {

@@ -29,7 +29,7 @@
 #include <vector>
 
 #include "graphar/graph_info.h"
-#include "graphar/arrow/arrow_chunk_reader.h"
+#include "graphar/arrow/chunk_reader.h"
 #include "graphar/types.h"
 #include "graphar/filesystem.h"
 #include "graphar/reader_util.h"

@@ -39,7 +39,7 @@
 #include "graphar/result.h"
 #include "graphar/status.h"
 #include "graphar/util.h"
-#include "graphar/arrow/arrow_chunk_writer.h"
+#include "graphar/arrow/chunk_writer.h"
 
 namespace graphar {
 // common methods

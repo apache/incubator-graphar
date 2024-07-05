@@ -20,9 +20,7 @@
 #include <cstdlib>
 
 #include "./util.h"
-#include "graphar/graph_info.h"
-#include "graphar/reader/chunk_info_reader.h"
-#include "graphar/util/adj_list_type.h"
+#include "graphar/api/basic_reader.h"
 
 #include <catch2/catch_test_macros.hpp>
 

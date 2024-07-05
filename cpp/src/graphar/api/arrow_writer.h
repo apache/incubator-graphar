@@ -20,4 +20,4 @@
 # pragma once
 
 #include "graphar/api/info.h"
-#include "graphar/arrow_chunk_reader.h"
+#include "graphar/arrow/chunk_writer.h"

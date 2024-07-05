@@ -270,7 +270,7 @@ endif()
 # ------------------------------------------------------------------------------
 # Install
 # ------------------------------------------------------------------------------
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/graphar
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/graphar
         DESTINATION include
         FILES_MATCHING
         PATTERN "*.h"

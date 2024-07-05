@@ -30,7 +30,7 @@
 #include "graphar/fwd.h"
 #include "graphar/graph_info.h"
 #include "graphar/types.h"
-#include "graphar/arrow/arrow_chunk_writer.h"
+#include "graphar/arrow/chunk_writer.h"
 
 namespace arrow {
 class Array;

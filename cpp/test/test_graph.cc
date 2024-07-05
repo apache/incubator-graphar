@@ -20,8 +20,7 @@
 #include <iostream>
 
 #include "./util.h"
-#include "graphar/graph.h"
-#include "graphar/util/data_type.h"
+#include "graphar/api/high_level_reader.h"
 
 #include <catch2/catch_test_macros.hpp>
 

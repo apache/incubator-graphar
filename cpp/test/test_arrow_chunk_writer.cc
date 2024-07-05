@@ -33,11 +33,7 @@
 #include "parquet/arrow/writer.h"
 
 #include "./util.h"
-#include "graphar/graph_info.h"
-#include "graphar/util/adj_list_type.h"
-#include "graphar/util/general_params.h"
-#include "graphar/util/yaml.h"
-#include "graphar/writer/arrow_chunk_writer.h"
+#include "graphar/api/arrow_writer.h"
 
 #include <catch2/catch_test_macros.hpp>
 

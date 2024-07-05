@@ -17,8 +17,14 @@
  * under the License.
  */
 
+#include "graphar/graph_info.h"
 #include "graphar/chunk_info_writer.h"
+#include "graphar/types.h"
+#include "graphar/filesystem.h"
+#include "graphar/result.h"
+#include "graphar/util.h"
 
+namespace graphar {
 
 VertexChunkInfoWriter::VertexChunkInfoWriter(
     const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
@@ -122,6 +128,27 @@ Status EdgeChunkInfoWriter::validate(IdType count_or_index1, IdType count_or_ind
   return Status::OK();
 }
 
+// Check if the operation of copying a file as a property chunk is allowed.
+Status EdgeChunkInfoWriter::validate(
+    const std::shared_ptr<PropertyGroup>& property_group,
+    IdType vertex_chunk_index, IdType chunk_index,
+    ValidateLevel validate_level) const {
+  // use the writer's validate level
+  if (validate_level == ValidateLevel::default_validate)
+    validate_level = validate_level_;
+  // no validate
+  if (validate_level == ValidateLevel::no_validate)
+    return Status::OK();
+  // validate for adj list type & index
+  GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
+  // weak & strong validate for property group
+  if (!edge_info_->HasPropertyGroup(property_group)) {
+    return Status::KeyError("Property group", " does not exist in the ",
+                            edge_info_->GetEdgeLabel(), " edge info.");
+  }
+  return Status::OK();
+}
+
 Status EdgeChunkInfoWriter::WriteAdjListChunk(const std::string& file_name,
                                           IdType vertex_chunk_index,
                                           IdType chunk_index,
@@ -144,18 +171,6 @@ Status EdgeChunkInfoWriter::WriteOffsetChunk(const std::string& file_name,
   return fs_->CopyFile(file_name, path);
 }
 
-Status EdgeChunkInfoWriter::WriteAdjListChunk(const std::string& file_name,
-                                          IdType vertex_chunk_index,
-                                          IdType chunk_index,
-                                          ValidateLevel validate_level) const {
-  GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
-  GAR_ASSIGN_OR_RAISE(
-      auto suffix, edge_info_->GetAdjListFilePath(vertex_chunk_index,
-                                                  chunk_index, adj_list_type_));
-  std::string path = prefix_ + suffix;
-  return fs_->CopyFile(file_name, path);
-}
-
 Status EdgeChunkInfoWriter::WritePropertyChunk(
     const std::string& file_name,
     const std::shared_ptr<PropertyGroup>& property_group,
@@ -168,4 +183,5 @@ Status EdgeChunkInfoWriter::WritePropertyChunk(
                                        vertex_chunk_index, chunk_index));
   std::string path = prefix_ + suffix;
   return fs_->CopyFile(file_name, path);
+}
 }

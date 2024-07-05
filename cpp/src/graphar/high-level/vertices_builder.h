@@ -28,7 +28,7 @@
 
 #include "graphar/graph_info.h"
 #include "graphar/result.h"
-#include "graphar/arrow/arrow_chunk_writer.h"
+#include "graphar/arrow/chunk_writer.h"
 
 // forward declaration
 namespace arrow {

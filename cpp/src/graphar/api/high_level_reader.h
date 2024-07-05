@@ -20,4 +20,4 @@
 # pragma once
 
 #include "graphar/api/info.h"
-#include "graphar/graph.h"
+#include "graphar/high-level/graph.h"

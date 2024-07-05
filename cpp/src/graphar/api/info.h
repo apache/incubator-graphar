@@ -27,6 +27,5 @@
 #include "graphar/result.h"
 #include "graphar/status.h"
 #include "graphar/types.h"
-#include "graphar.h"
 #include "graphar/version_parser.h"
 #include "graphar/yaml.h"

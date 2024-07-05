@@ -24,6 +24,7 @@
 #include <string>
 #include <utility>
 
+#include "graphar/fwd.h"
 #include "graphar/macros.h"
 
 // forward declaration

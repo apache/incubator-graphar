@@ -24,8 +24,7 @@
 #include "arrow/result.h"
 
 #include "./config.h"
-#include "graphar/api.h"
-#include "graphar/writer/arrow_chunk_writer.h"
+#include "graphar/api/arrow_writer.h"
 
 arrow::Result<std::shared_ptr<arrow::Table>> generate_vertex_table() {
   // property "id"

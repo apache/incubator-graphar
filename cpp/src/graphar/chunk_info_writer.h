@@ -105,7 +105,7 @@ class EdgeChunkInfoWriter {
    */
   Status WriteAdjListChunk(
       const std::string& file_name, IdType vertex_chunk_index,
-      IdType chunk_index) const;
+      IdType chunk_index, ValidateLevel validate_level = ValidateLevel::default_validate) const;
 
   /**
    * @brief Copy a file as a offset chunk.
@@ -148,6 +148,20 @@ class EdgeChunkInfoWriter {
    * @return Status: ok or error.
    */
   Status validate(IdType count_or_index1, IdType count_or_index2,
+                  ValidateLevel validate_level) const;
+
+  /**
+   * @brief Check if the operation of copying a file as a property chunk is
+   * allowed.
+   *
+   * @param property_group The property group to write.
+   * @param vertex_chunk_index The index of the vertex chunk.
+   * @param chunk_index The index of the edge chunk inside the vertex chunk.
+   * @param validate_level The validate level for this operation.
+   * @return Status: ok or error.
+   */
+  Status validate(const std::shared_ptr<PropertyGroup>& property_group,
+                  IdType vertex_chunk_index, IdType chunk_index,
                   ValidateLevel validate_level) const;
 
  private:
