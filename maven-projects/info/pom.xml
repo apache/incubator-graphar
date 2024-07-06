@@ -44,7 +44,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <os.plugin.version>1.6.2</os.plugin.version>
         <protobuf.plugin.version>0.6.1</protobuf.plugin.version>
-        <protobuf.version>3.11.0</protobuf.version>
+        <protobuf.version>3.21.1</protobuf.version>
     </properties>
 
     <dependencies>

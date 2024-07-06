@@ -47,5 +47,5 @@ message EdgeInfo {
         int64 num_source_vertices = 2;
         int64 num_destination_vertices = 3;
     }
-    Statistics statistics = 11;
+    optional Statistics statistics = 11;
 };
