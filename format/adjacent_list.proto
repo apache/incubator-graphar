@@ -39,5 +39,5 @@ message AdjacentList {
         int64 num_vertex_chunks = 2;
         repeated int64 edge_nums_of_vertex_chunks = 3;
     }
-    optional Statistics statistics = 4;
+    Statistics statistics = 4;
 };
