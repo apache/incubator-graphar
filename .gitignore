@@ -72,4 +72,4 @@ venv.bak/
 
 ### Java ###
 target/
-maven-projects/info/src/main/java/org/apache/graphar/info/proto
+maven-projects/proto/src/main/java

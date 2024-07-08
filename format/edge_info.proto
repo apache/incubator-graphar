@@ -21,7 +21,7 @@ syntax = "proto3";
 
 package graphar;
 option java_multiple_files = true;
-option java_package = "org.apache.graphar.info.proto";
+option java_package = "org.apache.graphar.proto";
 
 import "property_group.proto";
 import "adjacent_list.proto";
