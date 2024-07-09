@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#include "graphar/high-level/graph.h"
+#include "graphar/high-level/graph_reader.h"
 #include "graphar/convert_to_arrow_type.h"
 #include "graphar/types.h"
 

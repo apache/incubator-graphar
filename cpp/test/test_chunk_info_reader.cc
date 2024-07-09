@@ -20,7 +20,7 @@
 #include <cstdlib>
 
 #include "./util.h"
-#include "graphar/api/basic_reader.h"
+#include "graphar/api/meta_reader.h"
 
 #include <catch2/catch_test_macros.hpp>
 
