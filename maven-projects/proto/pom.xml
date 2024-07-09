@@ -42,41 +42,40 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <os.plugin.version>1.6.2</os.plugin.version>
-        <protobuf.plugin.version>0.6.1</protobuf.plugin.version>
-        <protobuf.version>3.23.0</protobuf.version>
+        <protobuf-maven-plugin.version>2.3.0</protobuf-maven-plugin.version>
+        <protobuf.version>4.27.1</protobuf.version>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
     <build>
-        <extensions>
-            <extension>
-                <groupId>kr.motd.maven</groupId>
-                <artifactId>os-maven-plugin</artifactId>
-                <version>${os.plugin.version}</version>
-            </extension>
-        </extensions>
         <plugins>
             <plugin>
-                <groupId>org.xolstice.maven.plugins</groupId>
+                <groupId>io.github.ascopes</groupId>
                 <artifactId>protobuf-maven-plugin</artifactId>
-                <version>${protobuf.plugin.version}</version>
-                <extensions>true</extensions>
+                <version>${protobuf-maven-plugin.version}</version>
                 <configuration>
-                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
-                    <protoSourceRoot>${project.basedir}/../../format</protoSourceRoot>
+                    <sourceDirectories>
+                        <sourceDirectory>${project.basedir}/../../format</sourceDirectory>
+                    </sourceDirectories>
                     <outputDirectory>${project.basedir}/src/main/java</outputDirectory>
-                    <clearOutputDirectory>true</clearOutputDirectory>
+                    <protocVersion>${protobuf.version}</protocVersion>
                 </configuration>
                 <executions>
                     <execution>
-                        <phase>compile</phase>
                         <goals>
-                            <goal>compile</goal>
+                            <goal>generate</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
         </plugins>
     </build>
-
 </project>
