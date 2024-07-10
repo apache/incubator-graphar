@@ -79,7 +79,7 @@ void adj_list_chunk_info_reader(
   ASSERT(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
   std::cout
-      << "path of fisrt adj_list chunk for outgoing edges of vertex id 100: "
+      << "path of first adj_list chunk for outgoing edges of vertex id 100: "
       << chunk_path << std::endl;
   // next chunk
   ASSERT(reader->next_chunk().ok());
