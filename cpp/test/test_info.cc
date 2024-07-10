@@ -24,12 +24,7 @@
 
 #include "./util.h"
 
-#include "graphar/graph_info.h"
-#include "graphar/util/adj_list_type.h"
-#include "graphar/util/data_type.h"
-#include "graphar/util/file_type.h"
-#include "graphar/util/filesystem.h"
-#include "graphar/util/version_parser.h"
+#include "graphar/api/info.h"
 
 #include <catch2/catch_test_macros.hpp>
 

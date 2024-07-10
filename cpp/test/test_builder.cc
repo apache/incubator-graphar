@@ -34,10 +34,7 @@
 #include "parquet/arrow/writer.h"
 
 #include "./util.h"
-#include "graphar/graph_info.h"
-#include "graphar/util/yaml.h"
-#include "graphar/writer/edges_builder.h"
-#include "graphar/writer/vertices_builder.h"
+#include "graphar/api/high_level_writer.h"
 
 #include <catch2/catch_test_macros.hpp>
 namespace graphar {

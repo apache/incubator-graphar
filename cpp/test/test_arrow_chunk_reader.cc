@@ -22,12 +22,7 @@
 #include "arrow/api.h"
 
 #include "./util.h"
-#include "graphar/reader/arrow_chunk_reader.h"
-#include "graphar/util/adj_list_type.h"
-#include "graphar/util/data_type.h"
-#include "graphar/util/expression.h"
-#include "graphar/util/filesystem.h"
-#include "graphar/util/general_params.h"
+#include "graphar/api/arrow_reader.h"
 
 #include <catch2/catch_test_macros.hpp>
 namespace graphar {

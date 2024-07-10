@@ -23,7 +23,7 @@
 #include "arrow/filesystem/api.h"
 
 #include "./config.h"
-#include "graphar/graph.h"
+#include "graphar/api/high_level_reader.h"
 
 void vertices_collection(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {
