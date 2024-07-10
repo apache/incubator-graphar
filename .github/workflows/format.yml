@@ -60,6 +60,6 @@ jobs:
       - name: Java Code Generate
         run: |
           pushd maven-projects/proto
-          mvn clean compile
+          mvn protobuf:generate
           popd
              
