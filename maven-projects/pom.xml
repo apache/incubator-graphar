@@ -75,5 +75,6 @@
         <module>java</module>
         <module>spark</module>
         <module>info</module>
+        <module>proto</module>
     </modules>
 </project>

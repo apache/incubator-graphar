@@ -56,4 +56,10 @@ jobs:
 
       - name: Buf Generate
         run: buf generate
- 
+
+      - name: Java Code Generate
+        run: |
+          pushd maven-projects/proto
+          mvn protobuf:generate
+          popd
+             
