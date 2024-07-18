@@ -111,6 +111,11 @@ Build with benchmarks, you should build the project with `BUILD_BENCHMARKS` opti
     $ GAR_TEST_DATA=${PWD}/testing ./graph_info_benchmark  # run the graph info benchmark
 ```
 
+Extra Build Options:
+
+1. `-DGRAPHAR_BUILD_STATIC=ON`: Build GraphAr as static libraries.
+2. `-DUSE_STATIC_ARROW=ON`: Link arrow static library to build GraphAr. If set this option, the option `GRAPHAR_BUILD_STATIC=ON` will be set.
+
 ### Install
 
 After the building, you can install the GraphAr C++ library with:

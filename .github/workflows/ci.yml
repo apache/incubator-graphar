@@ -153,6 +153,17 @@ jobs:
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
     
+    - name: Use Static Arrow
+      working-directory: "cpp"
+      run: |
+        mkdir build-static
+        pushd build-static
+        cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        make -j$(nproc)
+        export ASAN_OPTIONS=detect_leaks=0
+        ctest --output-on-failure
+        popd
+
   macos:
     name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
     runs-on: macos-${{ matrix.macos-version }}
@@ -185,6 +196,24 @@ jobs:
         mkdir build
         pushd build
         cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        make -j$(nproc)
+        popd
+    
+    - name: Use Static Arrow
+      working-directory: "cpp"
+      run: |
+        mkdir build
+        pushd build
+        cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        make -j$(nproc)
+        popd
+
+    - name: Build static GraphAr
+      working-directory: "cpp"
+      run: |
+        mkdir build
+        pushd build
+        cmake .. -DGRAPHAR_BUILD_STATIC=ON -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
         make -j$(nproc)
         popd
 

@@ -46,6 +46,12 @@ option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_BENCHMARKS "Build benchmarks" OFF)
 option(ENABLE_DOCS "Enable documentation" OFF)
 option(BUILD_DOCS_ONLY "Build docs only" OFF)
+option(USE_STATIC_ARROW "Link arrow static library" OFF)
+option(GRAPHAR_BUILD_STATIC "Build GraphAr as static libraries" OFF)
+
+if (USE_STATIC_ARROW)
+    set(GRAPHAR_BUILD_STATIC ON)
+endif()
 
 if (ENABLE_DOCS OR BUILD_DOCS_ONLY)
     set(PROJECT_DOCUMENT_SOURCE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/README.md)
@@ -214,7 +220,11 @@ include_directories(src)
 macro(build_graphar)
 
     file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
-    add_library(graphar SHARED ${CORE_SRC_FILES})
+    if(GRAPHAR_BUILD_STATIC)
+        add_library(graphar STATIC ${CORE_SRC_FILES})
+    else()
+        add_library(graphar SHARED ${CORE_SRC_FILES})
+    endif()
     install_graphar_target(graphar)
     target_compile_features(graphar PRIVATE cxx_std_17)
     target_include_directories(graphar PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
@@ -224,15 +234,31 @@ macro(build_graphar)
     target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
 
     if(APPLE)
-        target_link_libraries(graphar PRIVATE -Wl,-force_load Arrow::arrow_shared
-            Parquet::parquet_shared
-            ArrowDataset::arrow_dataset_shared
-            ArrowAcero::arrow_acero_shared)
+        if(USE_STATIC_ARROW)
+            target_link_libraries(graphar PRIVATE -Wl,-force_load
+                Arrow::arrow_static
+                Parquet::parquet_static
+                ArrowDataset::arrow_dataset_static
+                ArrowAcero::arrow_acero_static)
+        else()
+            target_link_libraries(graphar PRIVATE -Wl,-force_load Arrow::arrow_shared
+                Parquet::parquet_shared
+                ArrowDataset::arrow_dataset_shared
+                ArrowAcero::arrow_acero_shared)
+        endif()
     else()
-        target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_shared
-            Parquet::parquet_shared
-            ArrowDataset::arrow_dataset_shared
-            ArrowAcero::arrow_acero_shared -Wl,--no-whole-archive)
+        if(USE_STATIC_ARROW)
+            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
+                Arrow::arrow_static
+                Parquet::parquet_static
+                ArrowDataset::arrow_dataset_static
+                ArrowAcero::arrow_acero_static -Wl,--no-whole-archive)
+        else()
+            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_shared
+                Parquet::parquet_shared
+                ArrowDataset::arrow_dataset_shared
+                ArrowAcero::arrow_acero_shared -Wl,--no-whole-archive)
+        endif()
     endif()
 endmacro()
 
@@ -258,11 +284,23 @@ if (BUILD_EXAMPLES)
         target_include_directories(${E_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
         target_link_libraries(${E_NAME} PRIVATE graphar ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
         if(APPLE)
-            target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
-                Parquet::parquet_shared)
+            if(USE_STATIC_ARROW)
+                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load
+                    Arrow::arrow_static
+                    Parquet::parquet_static)
+            else()
+                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
+                    Parquet::parquet_shared)
+            endif()
         else()
-            target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
-                Parquet::parquet_shared)
+            if(USE_STATIC_ARROW)
+                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive 
+                    Arrow::arrow_static 
+                    Parquet::parquet_static -Wl,--no-whole-archive)
+            else()
+                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
+                    Parquet::parquet_shared)
+            endif()
         endif()
     endforeach()
 endif()
@@ -316,11 +354,23 @@ if (BUILD_TESTS)
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
         target_link_libraries(${target} PRIVATE Catch2::Catch2WithMain graphar ${CMAKE_DL_LIBS})
         if(APPLE)
-            target_link_libraries(${target} PRIVATE Arrow::arrow_shared
-                Parquet::parquet_shared)
+            if(USE_STATIC_ARROW)
+                target_link_libraries(${target} PRIVATE -Wl,-force_load 
+                    Arrow::arrow_static
+                    Parquet::parquet_static)
+            else()
+                target_link_libraries(${target} PRIVATE Arrow::arrow_shared
+                    Parquet::parquet_shared)
+            endif()
         else()
-            target_link_libraries(${target} PRIVATE Arrow::arrow_shared
-                Parquet::parquet_shared)
+            if(USE_STATIC_ARROW)
+                target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
+                    Arrow::arrow_static
+                    Parquet::parquet_static -Wl,--no-whole-archive)
+            else()
+                target_link_libraries(${target} PRIVATE Arrow::arrow_shared
+                    Parquet::parquet_shared)
+            endif()
         endif()
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
         include(CTest)
