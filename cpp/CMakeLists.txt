@@ -195,6 +195,11 @@ if (${Arrow_VERSION} VERSION_GREATER_EQUAL "12.0.0")
         message(FATAL_ERROR "apache-arrow-acero is required, please install it and retry")
     endif()
 endif()
+# Check if ORC is enabled.
+if (NOT ${ARROW_ORC})
+    message(FATAL_ERROR "apache-arrow ORC extension is required.")
+endif()
+
 find_package(Parquet QUIET)
 if (NOT ${Parquet_FOUND})
     message(FATAL_ERROR "parquet is required, please install it and retry")
