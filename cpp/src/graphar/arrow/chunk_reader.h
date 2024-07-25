@@ -198,7 +198,7 @@ class AdjListArrowChunkReader {
 
   /**
    * @brief Return the current chunk of chunk position indicator as
-   * arrow::Table
+   * arrow::Table, if the chunk is empty, return nullptr.
    */
   Result<std::shared_ptr<arrow::Table>> GetChunk();
 
@@ -400,7 +400,7 @@ class AdjListPropertyArrowChunkReader {
 
   /**
    * @brief Return the current chunk of chunk position indicator as
-   * arrow::Table
+   * arrow::Table, if the chunk is empty, return nullptr.
    */
   Result<std::shared_ptr<arrow::Table>> GetChunk();
 

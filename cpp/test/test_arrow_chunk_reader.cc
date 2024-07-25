@@ -458,6 +458,41 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
   }
 }
 
+TEST_CASE_METHOD(GlobalFixture, "EmptyChunkTest") {
+  // read file and construct graph info
+  std::string path = test_data_dir + "/neo4j/MovieGraph.graph.yml";
+  std::string src_label = "Person", edge_label = "REVIEWED",
+              dst_label = "Movie";
+  std::string edge_property_name = "rating";
+  auto maybe_graph_info = GraphInfo::Load(path);
+  REQUIRE(maybe_graph_info.status().ok());
+  auto graph_info = maybe_graph_info.value();
+
+  SECTION("AdjListArrowChunkReader") {
+    auto maybe_reader = AdjListArrowChunkReader::Make(
+        graph_info, src_label, edge_label, dst_label,
+        AdjListType::ordered_by_source);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    auto result = reader->GetChunk();
+    REQUIRE(!result.has_error());
+    // the edge chunk is empty, should return nullptr
+    REQUIRE(result.value() == nullptr);
+  }
+
+  SECTION("AdjListPropertyArrowChunkReader") {
+    auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
+        graph_info, src_label, edge_label, dst_label, edge_property_name,
+        AdjListType::ordered_by_source);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    auto result = reader->GetChunk();
+    REQUIRE(!result.has_error());
+    // the edge chunk is empty, should return nullptr
+    REQUIRE(result.value() == nullptr);
+  }
+}
+
 TEST_CASE_METHOD(GlobalFixture, "JSON_TEST") {
   // read file and construct graph info
   std::string path = test_data_dir + "/ldbc_sample/json/LdbcSample.graph.yml";
