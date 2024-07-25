@@ -368,6 +368,13 @@ Status AdjListArrowChunkReader::seek(IdType offset) {
 
 Result<std::shared_ptr<arrow::Table>> AdjListArrowChunkReader::GetChunk() {
   if (chunk_table_ == nullptr) {
+    // check if the edge num of the current vertex chunk is 0
+    GAR_ASSIGN_OR_RAISE(auto edge_num,
+                        util::GetEdgeNum(prefix_, edge_info_,
+                                         adj_list_type_, vertex_chunk_index_));
+    if (edge_num == 0) {
+      return nullptr;
+    }
     GAR_ASSIGN_OR_RAISE(auto chunk_file_path,
                         edge_info_->GetAdjListFilePath(
                             vertex_chunk_index_, chunk_index_, adj_list_type_));
@@ -691,6 +698,13 @@ Result<std::shared_ptr<arrow::Table>>
 AdjListPropertyArrowChunkReader::GetChunk() {
   GAR_RETURN_NOT_OK(util::CheckFilterOptions(filter_options_, property_group_));
   if (chunk_table_ == nullptr) {
+    // check if the edge num of the current vertex chunk is 0
+    GAR_ASSIGN_OR_RAISE(auto edge_num,
+                        util::GetEdgeNum(prefix_, edge_info_,
+                                         adj_list_type_, vertex_chunk_index_));
+    if (edge_num == 0) {
+      return nullptr;
+    }
     GAR_ASSIGN_OR_RAISE(
         auto chunk_file_path,
         edge_info_->GetPropertyFilePath(property_group_, adj_list_type_,
