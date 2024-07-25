@@ -180,7 +180,7 @@ endmacro()
 # building or find third party library
 # ------------------------------------------------------------------------------
 # check if arrow is installed
-find_package(Arrow)
+find_package(Arrow QUIET)
 if (NOT ${Arrow_FOUND})
     message(FATAL_ERROR "apache-arrow is required, please install it and retry")
 endif()
