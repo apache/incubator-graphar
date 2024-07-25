@@ -370,8 +370,8 @@ Result<std::shared_ptr<arrow::Table>> AdjListArrowChunkReader::GetChunk() {
   if (chunk_table_ == nullptr) {
     // check if the edge num of the current vertex chunk is 0
     GAR_ASSIGN_OR_RAISE(auto edge_num,
-                        util::GetEdgeNum(prefix_, edge_info_,
-                                         adj_list_type_, vertex_chunk_index_));
+                        util::GetEdgeNum(prefix_, edge_info_, adj_list_type_,
+                                         vertex_chunk_index_));
     if (edge_num == 0) {
       return nullptr;
     }
@@ -700,8 +700,8 @@ AdjListPropertyArrowChunkReader::GetChunk() {
   if (chunk_table_ == nullptr) {
     // check if the edge num of the current vertex chunk is 0
     GAR_ASSIGN_OR_RAISE(auto edge_num,
-                        util::GetEdgeNum(prefix_, edge_info_,
-                                         adj_list_type_, vertex_chunk_index_));
+                        util::GetEdgeNum(prefix_, edge_info_, adj_list_type_,
+                                         vertex_chunk_index_));
     if (edge_num == 0) {
       return nullptr;
     }
