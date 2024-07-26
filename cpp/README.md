@@ -53,14 +53,11 @@ sudo apt-get install -y libarrow-dev libarrow-dataset-dev libarrow-acero-dev lib
 ```
 
 On macOS, you can use [Homebrew](https://brew.sh) to install the required packages:
-
-Note: Currently, the Arrow C++ library is [disable ARROW_ORC](https://github.com/Homebrew/homebrew-core/blob/4588359b7248b07379094de5310ee7ff89afa17e/Formula/a/apache-arrow.rb#L53) in the brew formula, so you need to install the Arrow C++ library manually.
-
 ```bash
-git clone https:://github.com/apache/graphar.git
-cd graphar
 brew update && brew bundle --file=cpp/Brewfile
 ```
+> [!NOTE]
+> Currently, the Arrow C++ library has [disabled ARROW_ORC](https://github.com/Homebrew/homebrew-core/blob/4588359b7248b07379094de5310ee7ff89afa17e/Formula/a/apache-arrow.rb#L53) in the brew formula, so you need to build and install the Arrow C++ library manually (with `-DARROW_ORC=True`).
 
 ### Building
 
@@ -68,47 +65,47 @@ All the instructions below assume that you have cloned the GraphAr git
 repository and navigated to the ``cpp`` subdirectory with:
 
 ```bash
-    $ git clone https://github.com/apache/graphar.git
-    $ cd graphar/cpp
+git clone https://github.com/apache/graphar.git
+cd graphar/cpp
 ```
 
 Release build:
 
 ```bash
-    $ mkdir build-release
-    $ cd build-release
-    $ cmake ..
-    $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
+mkdir build-release
+cd build-release
+cmake ..
+make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
 ```
 
 Debug build with unit tests:
 
 ```bash
-    $ mkdir build-debug
-    $ cd build-debug
-    $ cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON ..
-    $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
+mkdir build-debug
+cd build-debug
+cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON ..
+make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
 ```
 
 After building, you can run the unit tests with:
 
 ```bash
-    $ git clone https://github.com/apache/incubator-graphar-testing.git testing  # download the testing data
-    $ GAR_TEST_DATA=${PWD}/testing ctest
+git clone https://github.com/apache/incubator-graphar-testing.git testing  # download the testing data
+GAR_TEST_DATA=${PWD}/testing ctest
 ```
 
 Build with examples, you should build the project with `BUILD_EXAMPLES` option, then run:
 
 ```bash
-    $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
-    $ GAR_TEST_DATA=${PWD}/testing ./bgl_example  # run the BGL example
+make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
+GAR_TEST_DATA=${PWD}/testing ./bgl_example  # run the BGL example
 ```
 
 Build with benchmarks, you should build the project with `BUILD_BENCHMARKS` option, then run:
 
 ```bash
-    $ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
-    $ GAR_TEST_DATA=${PWD}/testing ./graph_info_benchmark  # run the graph info benchmark
+make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
+GAR_TEST_DATA=${PWD}/testing ./graph_info_benchmark  # run the graph info benchmark
 ```
 
 Extra Build Options:
@@ -121,7 +118,7 @@ Extra Build Options:
 After the building, you can install the GraphAr C++ library with:
 
 ```bash
-    $ sudo make install       # run in directory you build, like build-release, build and so on
+sudo make install       # run in directory you build, like build-release, build and so on
 ```
 
 ### Generate API document
@@ -129,7 +126,7 @@ After the building, you can install the GraphAr C++ library with:
 You should build the project with `ENABLE_DOCS` option. Then run:
 
 ```bash
-   $ make docs
+make docs
 ```
 
 The API document is generated in the directory ``docs_doxygen``.
@@ -139,9 +136,9 @@ The API document is generated in the directory ``docs_doxygen``.
 To format and lint the code, run:
 
 ```bash
-    $ cmake ..
-    $ make graphar-clformat # format the code
-    $ make graphar-cpplint   # lint the code
+cmake ..
+make graphar-clformat # format the code
+make graphar-cpplint   # lint the code
 ```
 
 ## How to use
