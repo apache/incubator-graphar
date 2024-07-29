@@ -22,7 +22,9 @@
 #include <sstream>
 #include <string>
 
+#ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
+#endif
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/filesystem/api.h"
@@ -112,6 +114,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
   auto pg3 = vertex_info->GetPropertyGroup("id");
   REQUIRE(writer->WriteTable(tmp_table, pg3, 0).IsTypeError());
 
+#ifdef ARROW_ORC
   SECTION("TestOrcParquetReader") {
     arrow::Status st;
     arrow::MemoryPool* pool = arrow::default_memory_pool();
@@ -150,6 +153,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     REQUIRE(table1->GetColumnByName("gender")->ToString() ==
             table2->GetColumnByName("gender")->ToString());
   }
+#endif
 
   SECTION("TestEdgeChunkWriter") {
     arrow::Status st;
