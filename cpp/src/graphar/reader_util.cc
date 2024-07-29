@@ -17,7 +17,9 @@
  * under the License.
  */
 
+#ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
+#endif
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/filesystem/api.h"
