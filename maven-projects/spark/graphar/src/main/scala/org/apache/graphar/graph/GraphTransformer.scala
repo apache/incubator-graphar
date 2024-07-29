@@ -64,7 +64,7 @@ object GraphTransformer {
     while (dest_vertices_it.hasNext()) {
       // load dest edge info
       val path = dest_prefix + dest_vertices_it.next()
-      val dest_vertex_info = VertexInfo.loadVertexInfo(path, spark)
+      val dest_vertex_info = VertexInfo.loadVertexInfo(path, Some(spark))
       // load source vertex info
       val label = dest_vertex_info.getLabel()
       if (!sourceVertexInfosMap.contains(label)) {
@@ -114,7 +114,7 @@ object GraphTransformer {
     while (dest_edges_it.hasNext()) {
       // load dest edge info
       val path = dest_prefix + dest_edges_it.next()
-      val dest_edge_info = EdgeInfo.loadEdgeInfo(path, spark)
+      val dest_edge_info = EdgeInfo.loadEdgeInfo(path, Some(spark))
       // load source edge info
       val key = dest_edge_info.getConcatKey()
       if (!sourceEdgeInfosMap.contains(key)) {
@@ -233,10 +233,12 @@ object GraphTransformer {
       spark: SparkSession
   ): Unit = {
     // load source graph info
-    val source_graph_info = GraphInfo.loadGraphInfo(sourceGraphInfoPath, spark)
+    val source_graph_info =
+      GraphInfo.loadGraphInfo(sourceGraphInfoPath, Some(spark))
 
     // load dest graph info
-    val dest_graph_info = GraphInfo.loadGraphInfo(destGraphInfoPath, spark)
+    val dest_graph_info =
+      GraphInfo.loadGraphInfo(destGraphInfoPath, Some(spark))
 
     // conduct transformation
     transform(source_graph_info, dest_graph_info, spark)

@@ -26,6 +26,9 @@ import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
 import org.yaml.snakeyaml.LoaderOptions
 
+import java.io.InputStream
+import java.nio.file.{Files, Paths}
+
 /** Main data type in gar enumeration */
 object GarType extends Enumeration {
   type GarType = Value
@@ -374,14 +377,24 @@ class GraphInfo() {
 object GraphInfo {
 
   /** Load a yaml file from path and construct a GraphInfo from it. */
-  def loadGraphInfo(graphInfoPath: String, spark: SparkSession): GraphInfo = {
-    val path = new Path(graphInfoPath)
-    val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
-    val input = fs.open(path)
+  def loadGraphInfo(
+      graphInfoPath: String,
+      spark: Option[SparkSession] = None
+  ): GraphInfo = {
+    val inputStream: InputStream = spark match {
+      case Some(s) =>
+        val path = new Path(graphInfoPath)
+        val fs = path.getFileSystem(s.sparkContext.hadoopConfiguration)
+        fs.open(path)
+      case None =>
+        Files.newInputStream(Paths.get(graphInfoPath))
+    }
     val yaml = new Yaml(
       new Constructor(classOf[GraphInfo], new LoaderOptions())
     )
-    val graph_info = yaml.load(input).asInstanceOf[GraphInfo]
+    val graph_info =
+      try yaml.loadAs(inputStream, classOf[GraphInfo])
+      finally inputStream.close()
     if (graph_info.getPrefix == "") {
       val pos = graphInfoPath.lastIndexOf('/')
       if (pos != -1) {
@@ -407,6 +420,6 @@ object GraphInfo {
       val edge_info = EdgeInfo.loadEdgeInfo(path, spark)
       graph_info.addEdgeInfo(edge_info)
     }
-    return graph_info
+    graph_info
   }
 }

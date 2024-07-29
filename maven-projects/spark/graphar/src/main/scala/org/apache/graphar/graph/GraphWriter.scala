@@ -170,7 +170,7 @@ class GraphWriter() {
    */
   def write(graphInfoPath: String, spark: SparkSession): Unit = {
     // load graph info
-    val graph_info = GraphInfo.loadGraphInfo(graphInfoPath, spark)
+    val graph_info = GraphInfo.loadGraphInfo(graphInfoPath, Some(spark))
     write(graph_info, spark)
   }
 

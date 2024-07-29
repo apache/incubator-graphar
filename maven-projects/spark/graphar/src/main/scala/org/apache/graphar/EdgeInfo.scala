@@ -27,6 +27,9 @@ import org.yaml.snakeyaml.constructor.Constructor
 import scala.beans.BeanProperty
 import org.yaml.snakeyaml.LoaderOptions
 
+import java.io.InputStream
+import java.nio.file.{Files, Paths}
+
 /** Edge info is a class to store the edge meta information. */
 class EdgeInfo() {
   @BeanProperty var src_label: String = ""
@@ -629,11 +632,20 @@ class EdgeInfo() {
 object EdgeInfo {
 
   /** Load a yaml file from path and construct a EdgeInfo from it. */
-  def loadEdgeInfo(edgeInfoPath: String, spark: SparkSession): EdgeInfo = {
-    val path = new Path(edgeInfoPath)
-    val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
-    val input = fs.open(path)
+  def loadEdgeInfo(
+      edgeInfoPath: String,
+      spark: Option[SparkSession]
+  ): EdgeInfo = {
+    val inputStream: InputStream = spark match {
+      case Some(s) =>
+        val path = new Path(edgeInfoPath)
+        val fs = path.getFileSystem(s.sparkContext.hadoopConfiguration)
+        fs.open(path)
+      case None =>
+        Files.newInputStream(Paths.get(edgeInfoPath))
+    }
     val yaml = new Yaml(new Constructor(classOf[EdgeInfo], new LoaderOptions()))
-    return yaml.load(input).asInstanceOf[EdgeInfo]
+    try yaml.loadAs(inputStream, classOf[EdgeInfo])
+    finally inputStream.close()
   }
 }

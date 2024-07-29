@@ -31,7 +31,7 @@ class TestGraphTransformerSuite extends BaseTestSuite {
     val dest_path = testData + "/transformer/ldbc_sample.graph.yml"
     GraphTransformer.transform(source_path, dest_path, spark)
 
-    val dest_graph_info = GraphInfo.loadGraphInfo(dest_path, spark)
+    val dest_graph_info = GraphInfo.loadGraphInfo(dest_path, Some(spark))
     val prefix = dest_graph_info.getPrefix
     val fs = FileSystem.get(
       new Path(prefix).toUri(),
@@ -63,11 +63,11 @@ class TestGraphTransformerSuite extends BaseTestSuite {
   test("transform graphs by graph infos") {
     // load source graph info
     val source_path = testData + "/ldbc_sample/parquet/ldbc_sample.graph.yml"
-    val source_graph_info = GraphInfo.loadGraphInfo(source_path, spark)
+    val source_graph_info = GraphInfo.loadGraphInfo(source_path, Some(spark))
 
     // load dest graph info
     val dest_path = testData + "/transformer/ldbc_sample.graph.yml"
-    val dest_graph_info = GraphInfo.loadGraphInfo(dest_path, spark)
+    val dest_graph_info = GraphInfo.loadGraphInfo(dest_path, Some(spark))
 
     // conduct transformation
     GraphTransformer.transform(source_graph_info, dest_graph_info, spark)

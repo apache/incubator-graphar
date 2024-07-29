@@ -29,7 +29,7 @@ class ComputeExampleSuite extends BaseTestSuite {
     // read vertex DataFrame
     val prefix = testData + "/ldbc_sample/parquet/"
     val vertex_yaml = prefix + "/person.vertex.yml"
-    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, Some(spark))
 
     val vertex_reader = new VertexReader(prefix, vertex_info, spark)
     val vertices_num = vertex_reader.readVerticesNumber()
@@ -40,7 +40,7 @@ class ComputeExampleSuite extends BaseTestSuite {
 
     // read edge DataFrame
     val edge_yaml = prefix + "person_knows_person.edge.yml"
-    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
+    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, Some(spark))
     val adj_list_type = AdjListType.ordered_by_source
 
     val edge_reader = new EdgeReader(prefix, edge_info, adj_list_type, spark)

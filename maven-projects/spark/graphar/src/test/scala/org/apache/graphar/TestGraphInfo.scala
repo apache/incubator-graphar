@@ -25,7 +25,7 @@ class GraphInfoSuite extends BaseTestSuite {
     // read graph yaml
     val prefix = testData + "/ldbc_sample/csv/"
     val yaml_path = prefix + "ldbc_sample.graph.yml"
-    val graph_info = GraphInfo.loadGraphInfo(yaml_path, spark)
+    val graph_info = GraphInfo.loadGraphInfo(yaml_path, Some(spark))
 
     val vertex_info = graph_info.getVertexInfo("person")
     assert(vertex_info.getLabel == "person")
@@ -45,7 +45,7 @@ class GraphInfoSuite extends BaseTestSuite {
 
   test("load vertex info") {
     val yaml_path = testData + "/ldbc_sample/csv/person.vertex.yml"
-    val vertex_info = VertexInfo.loadVertexInfo(yaml_path, spark)
+    val vertex_info = VertexInfo.loadVertexInfo(yaml_path, Some(spark))
 
     assert(vertex_info.getLabel == "person")
     assert(vertex_info.isValidated)
@@ -122,7 +122,7 @@ class GraphInfoSuite extends BaseTestSuite {
 
   test("load edge info") {
     val yaml_path = testData + "/ldbc_sample/csv/person_knows_person.edge.yml"
-    val edge_info = EdgeInfo.loadEdgeInfo(yaml_path, spark)
+    val edge_info = EdgeInfo.loadEdgeInfo(yaml_path, Some(spark))
 
     assert(edge_info.getSrc_label == "person")
     assert(edge_info.getDst_label == "person")

@@ -47,7 +47,7 @@ class TestGraphReaderSuite extends BaseTestSuite {
   test("read graphs by graph infos") {
     // load graph info
     val path = testData + "/ldbc_sample/parquet/ldbc_sample.graph.yml"
-    val graph_info = GraphInfo.loadGraphInfo(path, spark)
+    val graph_info = GraphInfo.loadGraphInfo(path, Some(spark))
 
     // conduct reading
     val vertex_edge_df_pair = GraphReader.readWithGraphInfo(graph_info, spark)

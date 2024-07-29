@@ -30,7 +30,7 @@ class TransformExampleSuite extends BaseTestSuite {
     // read from orc files
     val prefix = testData + "/ldbc_sample/orc/"
     val vertex_yaml = prefix + "person.vertex.yml"
-    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, Some(spark))
 
     val reader = new VertexReader(prefix, vertex_info, spark)
     val vertices_num = reader.readVerticesNumber()
@@ -41,7 +41,7 @@ class TransformExampleSuite extends BaseTestSuite {
     val output_prefix: String = "/tmp/example/"
     val output_vertex_yaml = testData + "/ldbc_sample/parquet/person.vertex.yml"
     val output_vertex_info =
-      VertexInfo.loadVertexInfo(output_vertex_yaml, spark)
+      VertexInfo.loadVertexInfo(output_vertex_yaml, Some(spark))
 
     val writer =
       new VertexWriter(output_prefix, output_vertex_info, vertex_df_with_index)
@@ -62,13 +62,13 @@ class TransformExampleSuite extends BaseTestSuite {
     val prefix = testData + "/ldbc_sample/parquet/"
     // get vertex num
     val vertex_yaml = prefix + "person.vertex.yml"
-    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, Some(spark))
     // construct the vertex reader
     val vreader = new VertexReader(prefix, vertex_info, spark)
     val vertexNum = vreader.readVerticesNumber()
     // read edges of unordered_by_source type
     val edge_yaml = prefix + "person_knows_person.edge.yml"
-    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
+    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, Some(spark))
 
     val adj_list_type = AdjListType.unordered_by_source
     val reader = new EdgeReader(prefix, edge_info, adj_list_type, spark)

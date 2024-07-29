@@ -20,11 +20,15 @@
 package org.apache.graphar
 
 import org.apache.hadoop.fs.Path
-import org.apache.spark.sql.{SparkSession}
-import org.yaml.snakeyaml.{Yaml, DumperOptions}
+import org.apache.spark.sql.SparkSession
+import org.yaml.snakeyaml.{DumperOptions, Yaml}
 import org.yaml.snakeyaml.constructor.Constructor
+
 import scala.beans.BeanProperty
 import org.yaml.snakeyaml.LoaderOptions
+
+import java.io.InputStream
+import java.nio.file.{Files, Paths}
 
 /** VertexInfo is a class to store the vertex meta information. */
 class VertexInfo() {
@@ -311,14 +315,20 @@ object VertexInfo {
   /** Load a yaml file from path and construct a VertexInfo from it. */
   def loadVertexInfo(
       vertexInfoPath: String,
-      spark: SparkSession
+      spark: Option[SparkSession] = None
   ): VertexInfo = {
-    val path = new Path(vertexInfoPath)
-    val fs = path.getFileSystem(spark.sparkContext.hadoopConfiguration)
-    val input = fs.open(path)
+    val inputStream: InputStream = spark match {
+      case Some(s) =>
+        val path = new Path(vertexInfoPath)
+        val fs = path.getFileSystem(s.sparkContext.hadoopConfiguration)
+        fs.open(path)
+      case None =>
+        Files.newInputStream(Paths.get(vertexInfoPath))
+    }
     val yaml = new Yaml(
       new Constructor(classOf[VertexInfo], new LoaderOptions())
     )
-    return yaml.load(input).asInstanceOf[VertexInfo]
+    try yaml.loadAs(inputStream, classOf[VertexInfo])
+    finally inputStream.close()
   }
 }

@@ -47,7 +47,7 @@ object GraphAr2Neo4j {
 
     // path to the graph information file
     val graphInfoPath: String = args(0)
-    val graphInfo = GraphInfo.loadGraphInfo(graphInfoPath, spark)
+    val graphInfo = GraphInfo.loadGraphInfo(graphInfoPath, Some(spark))
 
     val graphData = GraphReader.read(graphInfoPath, spark)
     val vertexData = graphData._1

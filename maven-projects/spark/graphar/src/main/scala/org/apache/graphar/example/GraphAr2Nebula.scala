@@ -54,7 +54,7 @@ object GraphAr2Nebula {
 
     // path to the graph information file
     val graphInfoPath: String = args(0)
-    val graphInfo = GraphInfo.loadGraphInfo(graphInfoPath, spark)
+    val graphInfo = GraphInfo.loadGraphInfo(graphInfoPath, Some(spark))
 
     // The edge data need to convert src and dst to the vertex id,
     // so we need to read the vertex data with index column.

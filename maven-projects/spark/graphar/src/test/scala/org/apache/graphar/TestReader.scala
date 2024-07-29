@@ -100,7 +100,7 @@ class ReaderSuite extends BaseTestSuite {
     // construct the vertex information
     val prefix = testData + "/ldbc_sample/parquet/"
     val vertex_yaml = prefix + "person.vertex.yml"
-    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, Some(spark))
 
     // construct the vertex reader
     val reader = new VertexReader(prefix, vertex_info, spark)
@@ -195,7 +195,7 @@ class ReaderSuite extends BaseTestSuite {
     // construct the vertex information
     val prefix = testData + "/ldbc_sample/json/"
     val vertex_yaml = prefix + "Person.vertex.yml"
-    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
+    val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, Some(spark))
 
     // construct the vertex reader
     val reader = new VertexReader(prefix, vertex_info, spark)
@@ -214,7 +214,7 @@ class ReaderSuite extends BaseTestSuite {
     // construct the edge information
     val prefix = testData + "/ldbc_sample/csv/"
     val edge_yaml = prefix + "person_knows_person.edge.yml"
-    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
+    val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, Some(spark))
 
     // construct the edge reader
     val adj_list_type = AdjListType.ordered_by_source

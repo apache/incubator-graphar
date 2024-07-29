@@ -153,7 +153,7 @@ object GraphReader {
     Map[String, DataFrame]
   ]] = {
     // load graph info
-    val graph_info = GraphInfo.loadGraphInfo(graphInfoPath, spark)
+    val graph_info = GraphInfo.loadGraphInfo(graphInfoPath, Some(spark))
 
     // conduct reading
     readWithGraphInfo(graph_info, spark)
