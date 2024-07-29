@@ -143,4 +143,4 @@ make graphar-cpplint   # lint the code
 
 ## How to use
 
-Please refer to our [GraphAr C++ API Reference](https://graphar.apache.org/docs/libraries/cpp).
+Please refer to our [GraphAr C++ API Reference](https://graphar.apache.org/docs/category/c-library).
