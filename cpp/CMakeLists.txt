@@ -197,7 +197,9 @@ if (${Arrow_VERSION} VERSION_GREATER_EQUAL "12.0.0")
 endif()
 # Check if ORC is enabled.
 if (NOT ${ARROW_ORC})
-    message(WARNING "apache-arrow is built without ORC extension, ORC related functionalties will be disabled.")
+    message(WARNING "apache-arrow is built without ORC extension, ORC related functionalities will be disabled.")
+else()
+    add_definitions(-DARROW_ORC) # Add macro, otherwise inconsistent in build phase on ubuntu.
 endif()
 
 find_package(Parquet QUIET)
