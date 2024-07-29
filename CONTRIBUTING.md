@@ -106,9 +106,9 @@ Please pick up your favorite runtime environment.
 Different components of GraphAr may require different setup steps. Please refer to their respective `README` documentation for more details.
 
 - [C++ Library](cpp/README.md)
-- [Scala with Spark Library](spark/README.md)
+- [Scala with Spark Library](maven-projects/spark/README.md)
 - [Python with PySpark Library](pyspark/README.md) (under development)
-- [Java Library](java/README.md) (under development)
+- [Java Library](maven-projects/java/README.md) (under development)
 
 ----
 

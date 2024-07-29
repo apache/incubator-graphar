@@ -17,7 +17,9 @@
  * under the License.
  */
 
+#ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
+#endif
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
@@ -89,10 +91,12 @@ std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
     return std::make_shared<ds::CsvFileFormat>();
   case PARQUET:
     return std::make_shared<ds::ParquetFileFormat>();
-  case ORC:
-    return std::make_shared<ds::OrcFileFormat>();
   case JSON:
     return std::make_shared<ds::JsonFileFormat>();
+#ifdef ARROW_ORC
+  case ORC:
+    return std::make_shared<ds::OrcFileFormat>();
+#endif
   default:
     return nullptr;
   }
@@ -233,6 +237,7 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
         builder.build(), parquet::default_arrow_writer_properties()));
     break;
   }
+#ifdef ARROW_ORC
   case FileType::ORC: {
     auto writer_options = arrow::adapters::orc::WriteOptions();
     writer_options.compression = arrow::Compression::type::ZSTD;
@@ -243,6 +248,7 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
     RETURN_NOT_ARROW_OK(writer->Close());
     break;
   }
+#endif
   default:
     return Status::Invalid(
         "Unsupported file type: ", FileTypeToString(file_type), " for wrting.");

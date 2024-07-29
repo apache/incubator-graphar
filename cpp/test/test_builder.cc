@@ -24,7 +24,6 @@
 #include <sstream>
 #include <string>
 
-#include "arrow/adapters/orc/adapter.h"
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/filesystem/api.h"
