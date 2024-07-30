@@ -207,6 +207,9 @@ if (NOT ${Parquet_FOUND})
     message(FATAL_ERROR "parquet is required, please install it and retry")
 endif()
 
+find_package(Protobuf REQUIRED)
+include_directories(${PROTOBUF_INCLUDE_DIRS})
+
 macro(get_target_location var target)
   if(TARGET ${target})
     foreach(prop LOCATION LOCATION_NOCONFIG LOCATION_DEBUG LOCATION_RELEASE)
