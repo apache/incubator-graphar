@@ -25,7 +25,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  REGISTRY: ghcr.io/apache/graphar
+  REGISTRY: ghcr.io/apache
 
 jobs:
   build:
