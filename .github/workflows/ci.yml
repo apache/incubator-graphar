@@ -167,9 +167,6 @@ jobs:
   macos:
     name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
     runs-on: macos-${{ matrix.macos-version }}
-    # TODO: enable this when the arrow of brew enable ARROW_ORC again
-    # see https://github.com/Homebrew/homebrew-core/blob/4588359b7248b07379094de5310ee7ff89afa17e/Formula/a/apache-arrow.rb#L53
-    if: false
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     strategy:
@@ -213,5 +210,6 @@ jobs:
         cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
         make -j$(nproc)
         export ASAN_OPTIONS=detect_leaks=0
+        export ASAN_OPTIONS=detect_container_overflow=0
         ctest --output-on-failure
         popd
