@@ -48,5 +48,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and push docker image
+        working-directory: ".devcontainer"
         run: |
           make docker-release
