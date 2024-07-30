@@ -21,7 +21,7 @@ repository and navigated to the ``spark`` subdirectory:
 ```bash
     $ git clone https://github.com/apache/incubator-graphar.git
     $ cd incubator-graphar
-    $ cd mavens-projects/spark
+    $ cd maven-projects/spark
 ```
 
 
