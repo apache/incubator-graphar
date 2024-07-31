@@ -4,7 +4,7 @@ title: Overview
 sidebar_position: 1
 ---
 
-<img src="../images/overview.png" alt="overview" width="700"/>
+<img src="/docs/images/overview.png" alt="overview" width="700"/>
 
 GraphAr is a project to standardize the graph data format and provide a set of libraries to generate, access and transform such formatted files.
 
