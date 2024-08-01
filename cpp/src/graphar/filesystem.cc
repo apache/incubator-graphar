@@ -313,6 +313,11 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
   return std::make_shared<FileSystem>(arrow_fs);
 }
 
+Status FinalizeS3() {
+  RETURN_NOT_ARROW_OK(arrow::fs::FinalizeS3());
+  return Status::OK();
+}
+
 /// template specialization for std::string
 template Result<IdType> FileSystem::ReadFileToValue<IdType>(
     const std::string&) const noexcept;

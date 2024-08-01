@@ -153,4 +153,15 @@ class FileSystem {
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri, std::string* out_path = nullptr);
 
+/**
+ * @brief Shutdown the S3 APIs.
+ * 
+ * This function should be called before the program exits to ensure that
+ * all S3 resources are properly released.
+ * 
+ * This function calls arrow:fs::FinalizeS3() internally. 
+ * 
+ */
+Status FinalizeS3();
+
 }  // namespace graphar

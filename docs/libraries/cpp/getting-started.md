@@ -276,3 +276,15 @@ is used to write the results to new generated data chunks.
 
 Please refer to [more examples](examples/out-of-core.md) to learn
 about the other available case studies utilizing GraphAr.
+
+### Working with Cloud Storage (S3, OSS)
+
+GraphAr supports reading and writing data from and to cloud storage, including
+AWS S3 and Alibaba Cloud OSS.
+
+To read data from cloud storage, you can specify the path of the data files
+with URI schema, e.g., "s3://bucket-name/path/to/data" or "s3://\[access-key:secret-key\]@bucket-name/path/to/data".
+
+[Code example]() demonstrates how to read data from S3.
+
+Note that once you use cloud storage, you need to call `graphar::FinalizeS3()` to release the resources after finishing the work.
