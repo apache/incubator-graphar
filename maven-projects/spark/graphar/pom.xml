@@ -89,34 +89,6 @@
             <version>2.0</version>
         </dependency>
         <dependency>
-            <groupId>com.aliyun.odps</groupId>
-            <artifactId>hadoop-fs-oss</artifactId>
-            <version>${cupid.sdk.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-common</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.aliyun.odps</groupId>
-            <artifactId>odps-spark-datasource_2.11</artifactId>
-            <version>${cupid.sdk.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.jpountz.lz4</groupId>
-                    <artifactId>lz4</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.aliyun.odps</groupId>
-            <artifactId>cupid-sdk</artifactId>
-            <version>${cupid.sdk.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org.neo4j</groupId>
             <artifactId>neo4j-connector-apache-spark_2.12</artifactId>
             <version>5.0.0_for_spark_3</version>
