@@ -225,6 +225,13 @@ For more information on usage, please refer to the examples:
 - [TransformExample.scala][transform-example] shows an example for graph data conversion between different file types or different adjList types.
 - [Neo4j2GraphAr.scala][neo4j2graphar] and [GraphAr2Neo4j.scala][graphar2neo4j] are examples to conduct data importing/exporting for Neo4j.
 
+### Working with Cloud Storage (AWS S3, aliyun OSS)
+
+The Spark library for GraphAr supports reading and writing data from/to cloud storage services such as AWS S3, to do so, you need to include the Hadoop AWS dependency in your project. See the reference documentation for more details.
+
+- [AWS S3](https://spark.apache.org/docs/latest/cloud-integration.html)
+- [Aliyun OSS](https://hadoop.apache.org/docs/stable/hadoop-aliyun/tools/hadoop-aliyun/index.html)
+
 
 [test-graph-info]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TestGraphInfo.scala
 [test-index-generator]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TestIndexGenerator.scala
