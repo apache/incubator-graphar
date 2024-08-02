@@ -1,8 +1,8 @@
-# 忽略 MD013，因为文档需要较长的行以保持代码示例的完整性
+# Ignore MD013 because the document requires long lines to keep code examples intact
 MD013: false
 
-# 忽略 MD033，因为某些情况下内联 HTML 是必要的，例如特定的格式化需求
+# Ignore MD033 because inline HTML is necessary in some cases, such as specific formatting needs
 MD033: false
 
-# 忽略 MD025，因为文档结构需要多个顶级标题来反映不同的章节或部分
+# Ignore MD025 because the document structure requires multiple top-level headings to reflect different chapters or sections
 MD025: false
