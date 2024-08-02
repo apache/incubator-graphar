@@ -77,6 +77,12 @@
                 <module>datasources-33</module>
             </modules>
         </profile>
+        <profile>
+            <id>graphar-cli</id>
+            <modules>
+                <module>graphar-cli</module>
+            </modules>
+        </profile>
     </profiles>
     <build>
         <plugins>
