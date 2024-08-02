@@ -59,7 +59,7 @@ class GraphWriter() {
   }
 
   /**
-   * Put the egde dataframe into writer.
+   * Put the edge dataframe into writer.
    * @param relation
    *   3-Tuple (source label, edge label, target label) to indicate edge type.
    * @param df
