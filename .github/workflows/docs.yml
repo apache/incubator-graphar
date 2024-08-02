@@ -61,7 +61,9 @@ jobs:
 
       - name: Run typos
         run: |
-          curl -L https://github.com/crate-ci/typos/releases/latest/download/typos-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          curl -sSL https://github.com/crate-ci/typos/releases/latest/download/typos-x86_64-unknown-linux-gnu.tar.gz -o typos.tar.gz
+          tar -xzf typos.tar.gz
+          chmod +x typos
           ./typos -r docs
 
       - name: Checkout Website
