@@ -57,8 +57,7 @@ jobs:
       - name: Run markdownlint
         run: |
           npm install -g markdownlint-cli
-          markdownlint --fix 'docs/**/*.md'
-          markdownlint "docs/**/*.md" --config "docs/.markdownlint.yaml"
+          markdownlint 'docs/**/*.md' --fix --config 'docs/.markdownlint.yaml'
 
       - name: Run typos
         run: |
