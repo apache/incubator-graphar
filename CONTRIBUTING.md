@@ -97,8 +97,7 @@ For small or first-time contributions, we recommend the dev container method. An
 ### Using a dev container environment
 
 GraphAr provides a pre-configured [dev container](https://containers.dev/)
-that could be used in [GitHub Codespaces](https://github.com/features/codespaces),
-[VSCode](https://code.visualstudio.com/docs/devcontainers/containers), [JetBrains](https://www.jetbrains.com/remote-development/gateway/),
+that could be used in [VSCode](https://code.visualstudio.com/docs/devcontainers/containers), [JetBrains](https://www.jetbrains.com/remote-development/gateway/),
 [JupyterLab](https://jupyterlab.readthedocs.io/en/stable/).
 Please pick up your favorite runtime environment.
 
@@ -107,6 +106,10 @@ Please pick up your favorite runtime environment.
 Different components of GraphAr may require different setup steps. Please refer to their respective `README` documentation for more details.
 
 - [C++ Library](cpp/README.md)
-- [Java Library](java/README.md)
-- [Spark Library](spark/README.md)
-- [PySpark Library](pyspark/README.md)
+- [Scala with Spark Library](maven-projects/spark/README.md)
+- [Python with PySpark Library](pyspark/README.md) (under development)
+- [Java Library](maven-projects/java/README.md) (under development)
+
+----
+
+This doc refer from [Apache OpenDAL](https://opendal.apache.org/)

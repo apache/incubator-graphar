@@ -32,6 +32,7 @@
     </parent>
 
     <artifactId>graphar-commons</artifactId>
+    <version>${graphar.version}</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -86,34 +87,6 @@
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.aliyun.odps</groupId>
-            <artifactId>hadoop-fs-oss</artifactId>
-            <version>${cupid.sdk.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-common</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.aliyun.odps</groupId>
-            <artifactId>odps-spark-datasource_2.11</artifactId>
-            <version>${cupid.sdk.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.jpountz.lz4</groupId>
-                    <artifactId>lz4</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.aliyun.odps</groupId>
-            <artifactId>cupid-sdk</artifactId>
-            <version>${cupid.sdk.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.neo4j</groupId>

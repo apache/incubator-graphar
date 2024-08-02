@@ -33,6 +33,7 @@
 
     <artifactId>spark</artifactId>
     <packaging>pom</packaging>
+    <version>${graphar.version}</version>
 
     <profiles>
         <profile>
@@ -48,7 +49,6 @@
                 <spark.version>3.2.2</spark.version>
                 <maven.compiler.source>1.8</maven.compiler.source>
                 <maven.compiler.target>1.8</maven.compiler.target>
-                <cupid.sdk.version>3.3.8-public</cupid.sdk.version>
             </properties>
             <modules>
                 <module>graphar</module>
@@ -71,7 +71,6 @@
                 <spark.version>3.3.4</spark.version>
                 <maven.compiler.source>1.8</maven.compiler.source>
                 <maven.compiler.target>1.8</maven.compiler.target>
-                <cupid.sdk.version>3.3.8-public</cupid.sdk.version>
             </properties>
             <modules>
                 <module>graphar</module>

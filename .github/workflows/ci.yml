@@ -38,10 +38,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  GraphAr-ubuntu-arrow-installed:
+  ubuntu:
+    name: Ubuntu 22.04 C++
     runs-on: ubuntu-latest
     env:
-      GAR_TEST_DATA: ${{ github.workspace }}/testing/
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     steps:
     - uses: actions/checkout@v3
       with:
@@ -55,10 +56,10 @@ jobs:
             -P /tmp/
         sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
         sudo apt-get update -y
-        sudo apt install -y libarrow-dev=14.0.1-1 \
-                            libarrow-dataset-dev=14.0.1-1 \
-                            libarrow-acero-dev=14.0.1-1 \
-                            libparquet-dev=14.0.1-1
+        sudo apt install -y libarrow-dev \
+                            libarrow-dataset-dev \
+                            libarrow-acero-dev \
+                            libparquet-dev
         sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen
 
         # install benchmark
@@ -67,6 +68,15 @@ jobs:
         cmake -DCMAKE_BUILD_TYPE=Release -DBENCHMARK_ENABLE_TESTING=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF .
         sudo make install
         popd
+
+        # install Catch2 v3
+        git clone --branch v3.6.0 https://github.com/catchorg/Catch2.git --depth 1
+        pushd Catch2
+        cmake -Bbuild -H. -DBUILD_TESTING=OFF
+        sudo cmake --build build/ --target install
+        popd
+
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
     - name: CMake
       working-directory: "cpp"
@@ -95,7 +105,7 @@ jobs:
             echo "|"
             echo "| Run: "
             echo "|"
-            echo "|    make clformat"
+            echo "|    make graphar-clformat"
             echo "|"
             echo "| to fix this error."
             echo "|"
@@ -114,7 +124,7 @@ jobs:
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             echo "| cpplint failures found! Run: "
             echo "|"
-            echo "|    make vineyard_cpplint"
+            echo "|    make graphar-cpplint"
             echo "|"
             echo "| to fix this error."
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -143,44 +153,63 @@ jobs:
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
     
-  GraphAr-centos-arrow-installed:
-    runs-on: ubuntu-latest
-    container:
-      image: centos:7
+    - name: Use Static Arrow
+      working-directory: "cpp"
+      run: |
+        mkdir build-static
+        pushd build-static
+        cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        make -j$(nproc)
+        export ASAN_OPTIONS=detect_leaks=0
+        ctest --output-on-failure
+        popd
+
+  macos:
+    name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
+    runs-on: macos-${{ matrix.macos-version }}
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: AMD64
+            macos-version: "12"
+          - architecture: ARM64
+            macos-version: "14"
     steps:
     - uses: actions/checkout@v3
-
-    - name: Set up devtoolset-8 
-      run: |
-        # install gcc and g++ 8
-        yum install -y centos-release-scl
-        yum install -y devtoolset-8
+      with:
+          submodules: true
 
     - name: Install dependencies
-      shell: scl enable devtoolset-8 -- bash --noprofile --norc -eo pipefail {0}
       run: |
-        # install cmake
-        yum install -y wget
-        wget https://cmake.org/files/v3.12/cmake-3.12.3.tar.gz -P /tmp/ && \
-            tar -zxf /tmp/cmake-3.12.3.tar.gz -C /tmp/ && \
-            pushd /tmp/cmake-3.12.3 && \
-            ./bootstrap --prefix=/usr/local && \
-            make -j$(nproc) && \
-            make install && \
-            popd
-        echo "cmake version: $(cmake --version)"
-
-        #install arrow
-        yum install -y epel-release || yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1).noarch.rpm
-        yum install -y https://apache.jfrog.io/artifactory/arrow/centos/$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)/apache-arrow-release-latest.rpm
-        yum install -y --enablerepo=epel arrow-devel arrow-dataset-devel arrow-acero-devel parquet-devel
-
+        brew bundle --file=cpp/Brewfile
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+    
     - name: Build GraphAr
-      shell: scl enable devtoolset-8 -- bash --noprofile --norc -eo pipefail {0}
       working-directory: "cpp"
       run: |
         mkdir build
         pushd build
-        cmake ..
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
         make -j$(nproc)
+        popd
+
+    - name: Running Test
+      working-directory: "cpp/build"
+      run: |
+        export ASAN_OPTIONS=detect_leaks=0
+        ctest --output-on-failure
+
+    - name: Use Static Arrow
+      working-directory: "cpp"
+      run: |
+        mkdir build-static
+        pushd build-static
+        cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        make -j$(nproc)
+        export ASAN_OPTIONS=detect_leaks=0
+        export ASAN_OPTIONS=detect_container_overflow=0
+        ctest --output-on-failure
         popd

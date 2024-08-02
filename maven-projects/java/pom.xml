@@ -34,6 +34,7 @@
 
     <artifactId>java</artifactId>
     <packaging>jar</packaging>
+    <version>0.13.0.dev-SNAPSHOT</version>
 
     <name>java</name>
 
@@ -49,6 +50,7 @@
         <arrow.version>13.0.0</arrow.version>
         <maven-source-plugin.version>2.2.1</maven-source-plugin.version>
         <maven.javadoc.version>3.4.0</maven.javadoc.version>
+        <maven-spotless-plugin.version>2.20.0</maven-spotless-plugin.version>
         <javadoc.output.directory>graphar-javadoc</javadoc.output.directory>
         <javadoc.output.destDir>graphar-javadoc</javadoc.output.destDir>
         <buildGarCPP>ON</buildGarCPP>
@@ -311,7 +313,7 @@
                 <plugin>
                     <groupId>com.diffplug.spotless</groupId>
                     <artifactId>spotless-maven-plugin</artifactId>
-                    <version>2.20.0</version>
+                    <version>${maven-spotless-plugin.version}</version>
                     <configuration>
                         <java>
                             <googleJavaFormat>

@@ -23,8 +23,7 @@
 #include "arrow/filesystem/api.h"
 
 #include "./config.h"
-#include "graphar/api.h"
-#include "graphar/reader/chunk_info_reader.h"
+#include "graphar/api/meta_reader.h"
 
 void vertex_property_chunk_info_reader(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {
@@ -80,7 +79,7 @@ void adj_list_chunk_info_reader(
   ASSERT(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
   std::cout
-      << "path of fisrt adj_list chunk for outgoing edges of vertex id 100: "
+      << "path of first adj_list chunk for outgoing edges of vertex id 100: "
       << chunk_path << std::endl;
   // next chunk
   ASSERT(reader->next_chunk().ok());
@@ -128,7 +127,7 @@ void adj_list_property_chunk_info_reader(
 int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+      GetTestingResourceRoot() + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto graph_info = graphar::GraphInfo::Load(path).value();
 
   // vertex property chunk info reader

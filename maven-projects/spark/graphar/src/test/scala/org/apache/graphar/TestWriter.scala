@@ -21,23 +21,14 @@ package org.apache.graphar
 
 import org.apache.graphar.writer.{VertexWriter, EdgeWriter}
 
-import org.apache.spark.sql.SparkSession
-import org.scalatest.funsuite.AnyFunSuite
 import org.apache.hadoop.fs.{Path, FileSystem}
 import scala.io.Source.fromFile
 
-class WriterSuite extends AnyFunSuite {
-  val spark = SparkSession
-    .builder()
-    .enableHiveSupport()
-    .master("local[*]")
-    .getOrCreate()
+class WriterSuite extends BaseTestSuite {
 
   test("test vertex writer with only vertex table") {
     // read vertex DataFrame
-    val file_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/person_0_0.csv")
-      .getPath
+    val file_path = testData + "/ldbc_sample/person_0_0.csv"
     val vertex_df = spark.read
       .option("delimiter", "|")
       .option("header", "true")
@@ -48,9 +39,7 @@ class WriterSuite extends AnyFunSuite {
     )
 
     // read vertex yaml
-    val vertex_yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/parquet/person.vertex.yml")
-      .getPath
+    val vertex_yaml_path = testData + "/ldbc_sample/parquet/person.vertex.yml"
     val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml_path, spark)
 
     // generate vertex index column for vertex DataFrame
@@ -94,9 +83,7 @@ class WriterSuite extends AnyFunSuite {
 
   test("test edge writer with only edge table") {
     // read edge DataFrame
-    val file_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv")
-      .getPath
+    val file_path = testData + "/ldbc_sample/person_knows_person_0_0.csv"
     val edge_df = spark.read
       .option("delimiter", "|")
       .option("header", "true")
@@ -108,9 +95,8 @@ class WriterSuite extends AnyFunSuite {
     )
 
     // read edge yaml
-    val edge_yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml")
-      .getPath
+    val edge_yaml_path =
+      testData + "/ldbc_sample/csv/person_knows_person.edge.yml"
     val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml_path, spark)
     val adj_list_type = AdjListType.ordered_by_source
 
@@ -221,9 +207,7 @@ class WriterSuite extends AnyFunSuite {
 
   test("test edge writer with vertex table and edge table") {
     // read vertex DataFrame
-    val vertex_file_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/person_0_0.csv")
-      .getPath
+    val vertex_file_path = testData + "/ldbc_sample/person_0_0.csv"
     val vertex_df = spark.read
       .option("delimiter", "|")
       .option("header", "true")
@@ -231,9 +215,7 @@ class WriterSuite extends AnyFunSuite {
     val vertex_num = vertex_df.count()
 
     // read edge DataFrame
-    val file_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv")
-      .getPath
+    val file_path = testData + "/ldbc_sample/person_knows_person_0_0.csv"
     val edge_df = spark.read
       .option("delimiter", "|")
       .option("header", "true")
@@ -247,15 +229,12 @@ class WriterSuite extends AnyFunSuite {
     val adj_list_type = AdjListType.ordered_by_source
 
     // read vertex yaml
-    val vertex_yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/csv/person.vertex.yml")
-      .getPath
+    val vertex_yaml_path = testData + "/ldbc_sample/csv/person.vertex.yml"
     val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml_path, spark)
 
     // read edge yaml
-    val edge_yaml_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/csv/person_knows_person.edge.yml")
-      .getPath
+    val edge_yaml_path =
+      testData + "/ldbc_sample/csv/person_knows_person.edge.yml"
     val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml_path, spark)
     val vertex_chunk_size = edge_info.getSrc_chunk_size()
     val vertex_chunk_num =
@@ -325,11 +304,8 @@ class WriterSuite extends AnyFunSuite {
     // compare with correct offset chunk value
     val offset_file_path =
       prefix + edge_info.getAdjListOffsetFilePath(0, adj_list_type)
-    val correct_offset_file_path = getClass.getClassLoader
-      .getResource(
-        "gar-test/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0"
-      )
-      .getPath
+    val correct_offset_file_path = testData +
+      "/ldbc_sample/csv/edge/person_knows_person/ordered_by_source/offset/chunk0"
     val generated_offset_array = fromFile(offset_file_path).getLines.toArray
     val expected_offset_array =
       fromFile(correct_offset_file_path).getLines.toArray

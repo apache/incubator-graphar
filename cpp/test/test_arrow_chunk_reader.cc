@@ -22,22 +22,15 @@
 #include "arrow/api.h"
 
 #include "./util.h"
-#include "graphar/reader/arrow_chunk_reader.h"
-#include "graphar/util/adj_list_type.h"
-#include "graphar/util/data_type.h"
-#include "graphar/util/expression.h"
-#include "graphar/util/filesystem.h"
-#include "graphar/util/general_params.h"
+#include "graphar/api/arrow_reader.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
-
+#include <catch2/catch_test_macros.hpp>
 namespace graphar {
 
-TEST_CASE("ArrowChunkReader") {
+TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
   // read file and construct graph info
   std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+      test_data_dir + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   std::string vertex_property_name = "id";
   std::string edge_property_name = "creationDate";
@@ -97,7 +90,7 @@ TEST_CASE("ArrowChunkReader") {
     }
 
     SECTION("CastDataType") {
-      std::string prefix = TEST_DATA_DIR + "/modern_graph/";
+      std::string prefix = test_data_dir + "/modern_graph/";
       std::string vertex_info_path = prefix + "person.vertex.yml";
       std::cout << "Vertex info path: " << vertex_info_path << std::endl;
       auto fs = FileSystemFromUriOrPath(prefix).value();
@@ -133,7 +126,9 @@ TEST_CASE("ArrowChunkReader") {
     SECTION("PropertyPushDown") {
       std::string filter_property = "gender";
       auto filter = _Equal(_Property(filter_property), _Literal("female"));
-      std::vector<std::string> expected_cols{"firstName", "lastName"};
+      std::vector<std::string> expected_cols;
+      expected_cols.push_back("firstName");
+      expected_cols.push_back("lastName");
       // print reader result
       auto walkReader =
           [&](std::shared_ptr<VertexPropertyArrowChunkReader>& reader) {
@@ -150,7 +145,8 @@ TEST_CASE("ArrowChunkReader") {
               sum += table->num_rows();
             } while (!reader->next_chunk().IsIndexError());
             REQUIRE(idx == reader->GetChunkNum());
-            REQUIRE(table->num_columns() == (int) expected_cols.size());
+            REQUIRE(table->num_columns() ==
+                    static_cast<int>(expected_cols.size()));
 
             std::cout << "Total Nums: " << sum << "/"
                       << reader->GetChunkNum() * vertex_info->GetChunkSize()
@@ -205,10 +201,11 @@ TEST_CASE("ArrowChunkReader") {
       SECTION("pushdown column that don't exist") {
         std::cout << "Vertex property pushdown column that don't exist:\n";
         auto filter = _Literal(true);
-        std::vector<std::string> expected_cols{"id"};
+        std::vector<std::string> expected_cols_2;
+        expected_cols_2.push_back("id");
         util::FilterOptions options;
         options.filter = filter;
-        options.columns = expected_cols;
+        options.columns = expected_cols_2;
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
             graph_info, src_label, filter_property, options);
         REQUIRE(maybe_reader.status().ok());
@@ -355,7 +352,8 @@ TEST_CASE("ArrowChunkReader") {
           _Equal(_Property(edge_property_name), _Property(edge_property_name));
       auto filter = _And(expr1, expr2);
 
-      std::vector<std::string> expected_cols{"creationDate"};
+      std::vector<std::string> expected_cols;
+      expected_cols.push_back("creationDate");
 
       util::FilterOptions options;
       options.filter = filter;
@@ -457,6 +455,104 @@ TEST_CASE("ArrowChunkReader") {
     REQUIRE(array->length() == 4);
     REQUIRE(reader->next_chunk().IsIndexError());
     REQUIRE(reader->seek(1024).IsIndexError());
+  }
+}
+
+TEST_CASE_METHOD(GlobalFixture, "EmptyChunkTest") {
+  // read file and construct graph info
+  std::string path = test_data_dir + "/neo4j/MovieGraph.graph.yml";
+  std::string src_label = "Person", edge_label = "REVIEWED",
+              dst_label = "Movie";
+  std::string edge_property_name = "rating";
+  auto maybe_graph_info = GraphInfo::Load(path);
+  REQUIRE(maybe_graph_info.status().ok());
+  auto graph_info = maybe_graph_info.value();
+
+  SECTION("AdjListArrowChunkReader") {
+    auto maybe_reader = AdjListArrowChunkReader::Make(
+        graph_info, src_label, edge_label, dst_label,
+        AdjListType::ordered_by_source);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    auto result = reader->GetChunk();
+    REQUIRE(!result.has_error());
+    // the edge chunk is empty, should return nullptr
+    REQUIRE(result.value() == nullptr);
+  }
+
+  SECTION("AdjListPropertyArrowChunkReader") {
+    auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
+        graph_info, src_label, edge_label, dst_label, edge_property_name,
+        AdjListType::ordered_by_source);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    auto result = reader->GetChunk();
+    REQUIRE(!result.has_error());
+    // the edge chunk is empty, should return nullptr
+    REQUIRE(result.value() == nullptr);
+  }
+}
+
+TEST_CASE_METHOD(GlobalFixture, "JSON_TEST") {
+  // read file and construct graph info
+  std::string path = test_data_dir + "/ldbc_sample/json/LdbcSample.graph.yml";
+  std::string src_label = "Person", edge_label = "Knows", dst_label = "Person";
+  std::string vertex_property_name = "id";
+  std::string edge_property_name = "creationDate";
+  auto maybe_graph_info = GraphInfo::Load(path);
+  REQUIRE(maybe_graph_info.status().ok());
+  auto graph_info = maybe_graph_info.value();
+  auto vertex_info = graph_info->GetVertexInfo(src_label);
+  REQUIRE(vertex_info != nullptr);
+  auto v_pg = vertex_info->GetPropertyGroup(vertex_property_name);
+  REQUIRE(v_pg != nullptr);
+  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  REQUIRE(edge_info != nullptr);
+  auto e_pg = edge_info->GetPropertyGroup(edge_property_name);
+  REQUIRE(e_pg != nullptr);
+
+  SECTION("VertexPropertyArrowChunkReader") {
+    auto maybe_reader = VertexPropertyArrowChunkReader::Make(
+        graph_info, src_label, vertex_property_name);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    REQUIRE(reader->GetChunkNum() == 10);
+
+    SECTION("Basics") {
+      auto result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      auto table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+
+      // seek
+      REQUIRE(reader->seek(100).ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      REQUIRE(reader->next_chunk().ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      REQUIRE(reader->seek(900).ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 3);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      REQUIRE(reader->GetChunkNum() == 10);
+      REQUIRE(reader->next_chunk().IsIndexError());
+
+      REQUIRE(reader->seek(1024).IsIndexError());
+    }
   }
 }
 }  // namespace graphar

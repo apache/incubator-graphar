@@ -21,20 +21,10 @@ package org.apache.graphar
 
 import org.apache.graphar.util.IndexGenerator
 
-import org.apache.spark.sql.SparkSession
-import org.scalatest.funsuite.AnyFunSuite
-
-class IndexGeneratorSuite extends AnyFunSuite {
-  val spark = SparkSession
-    .builder()
-    .enableHiveSupport()
-    .master("local[*]")
-    .getOrCreate()
+class IndexGeneratorSuite extends BaseTestSuite {
 
   test("generate vertex index") {
-    val file_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/person_0_0.csv")
-      .getPath
+    val file_path = testData + "/ldbc_sample/person_0_0.csv"
     val vertex_df = spark.read
       .option("delimiter", "|")
       .option("header", "true")
@@ -48,9 +38,7 @@ class IndexGeneratorSuite extends AnyFunSuite {
   }
 
   test("generate edge index") {
-    val file_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv")
-      .getPath
+    val file_path = testData + "/ldbc_sample/person_knows_person_0_0.csv"
     val edge_df = spark.read
       .option("delimiter", "|")
       .option("header", "true")
@@ -64,12 +52,8 @@ class IndexGeneratorSuite extends AnyFunSuite {
   }
 
   test("generate edge index with vertex") {
-    val vertex_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/person_0_0.csv")
-      .getPath
-    val edge_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/person_knows_person_0_0.csv")
-      .getPath
+    val vertex_path = testData + "/ldbc_sample/person_0_0.csv"
+    val edge_path = testData + "/ldbc_sample/person_knows_person_0_0.csv"
     val vertex_df = spark.read
       .option("delimiter", "|")
       .option("header", "true")

@@ -21,13 +21,13 @@
 set -eu
 
 cur_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-jar_file="${cur_dir}/../graphar/target/graphar-commons-0.1.0-SNAPSHOT-shaded.jar"
-person_input_file="${cur_dir}/../../../testing/ldbc_sample/person_0_0.csv"
-person_knows_person_input_file="${cur_dir}/../../../testing/ldbc_sample/person_knows_person_0_0.csv"
+jar_file="${cur_dir}/../graphar/target/graphar-commons-0.12.0-SNAPSHOT-shaded.jar"
+person_input_file="${GAR_TEST_DATA}/ldbc_sample/person_0_0.csv"
+person_knows_person_input_file="${GAR_TEST_DATA}/ldbc_sample/person_knows_person_0_0.csv"
 output_dir="/tmp/graphar/ldbc_sample"
 
 vertex_chunk_size=100
 edge_chunk_size=1024
-file_type="parquet"
+file_type="csv"
 spark-submit --class org.apache.graphar.example.LdbcSample2GraphAr ${jar_file} \
     ${person_input_file} ${person_knows_person_input_file} ${output_dir} ${vertex_chunk_size} ${edge_chunk_size} ${file_type}

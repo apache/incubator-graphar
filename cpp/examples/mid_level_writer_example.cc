@@ -24,8 +24,7 @@
 #include "arrow/result.h"
 
 #include "./config.h"
-#include "graphar/api.h"
-#include "graphar/writer/arrow_chunk_writer.h"
+#include "graphar/api/arrow_writer.h"
 
 arrow::Result<std::shared_ptr<arrow::Table>> generate_vertex_table() {
   // property "id"
@@ -105,7 +104,7 @@ void vertex_property_writer(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // create writer
   std::string vertex_meta_file =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/" + "person.vertex.yml";
+      GetTestingResourceRoot() + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = graphar::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
   ASSERT(vertex_info->GetLabel() == "person");
@@ -141,8 +140,8 @@ void vertex_property_writer(
 
 void edge_chunk_writer(const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // construct writer
-  std::string edge_meta_file =
-      TEST_DATA_DIR + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
+  std::string edge_meta_file = GetTestingResourceRoot() + "/ldbc_sample/csv/" +
+                               "person_knows_person.edge.yml";
   auto edge_meta = graphar::Yaml::LoadFile(edge_meta_file).value();
   auto edge_info = graphar::EdgeInfo::Load(edge_meta).value();
   auto adj_list_type = graphar::AdjListType::ordered_by_source;
@@ -194,7 +193,7 @@ void edge_chunk_writer(const std::shared_ptr<graphar::GraphInfo>& graph_info) {
 int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+      GetTestingResourceRoot() + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto graph_info = graphar::GraphInfo::Load(path).value();
 
   // vertex property writer

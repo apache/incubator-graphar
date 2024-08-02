@@ -21,9 +21,7 @@
 #include <iostream>
 
 #include "./config.h"
-#include "graphar/api.h"
-#include "graphar/writer/edges_builder.h"
-#include "graphar/writer/vertices_builder.h"
+#include "graphar/api/high_level_writer.h"
 
 // using facebook_combined.txt from SNAP dataset
 // available at https://snap.stanford.edu/data/ego-Facebook.html

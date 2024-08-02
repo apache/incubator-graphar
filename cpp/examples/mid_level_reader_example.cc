@@ -23,9 +23,7 @@
 #include "arrow/filesystem/api.h"
 
 #include "./config.h"
-#include "graphar/api.h"
-#include "graphar/reader/arrow_chunk_reader.h"
-#include "graphar/util/expression.h"
+#include "graphar/api/arrow_reader.h"
 
 void vertex_property_chunk_reader(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {
@@ -215,7 +213,7 @@ void adj_list_offset_chunk_reader(
 int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+      GetTestingResourceRoot() + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto graph_info = graphar::GraphInfo::Load(path).value();
 
   // vertex property chunk reader

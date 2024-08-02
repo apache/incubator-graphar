@@ -20,17 +20,15 @@
 #include <iostream>
 
 #include "./util.h"
-#include "graphar/graph.h"
-#include "graphar/util/data_type.h"
+#include "graphar/api/high_level_reader.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 namespace graphar {
-TEST_CASE("Graph") {
+TEST_CASE_METHOD(GlobalFixture, "Graph") {
   // read file and construct graph info
   std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+      test_data_dir + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto maybe_graph_info = GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
@@ -85,7 +83,7 @@ TEST_CASE("Graph") {
   SECTION("ListProperty") {
     // read file and construct graph info
     std::string path =
-        TEST_DATA_DIR +
+        test_data_dir +
         "/ldbc_sample/parquet/ldbc_sample_with_feature.graph.yml";
     auto maybe_graph_info = GraphInfo::Load(path);
     REQUIRE(maybe_graph_info.status().ok());
@@ -199,7 +197,7 @@ TEST_CASE("Graph") {
 
   SECTION("ValidateProperty") {
     // read file and construct graph info
-    std::string path = TEST_DATA_DIR + "/neo4j/MovieGraph.graph.yml";
+    std::string path = test_data_dir + "/neo4j/MovieGraph.graph.yml";
     auto maybe_graph_info = GraphInfo::Load(path);
     REQUIRE(maybe_graph_info.status().ok());
     auto graph_info = maybe_graph_info.value();

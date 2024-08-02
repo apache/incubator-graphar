@@ -20,7 +20,7 @@
 set -eu
 
 cur_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-jar_file="${cur_dir}/../graphar/target/graphar-commons-0.1.0-SNAPSHOT-shaded.jar"
+jar_file="${cur_dir}/../graphar/target/graphar-commons-0.12.0-SNAPSHOT-shaded.jar"
 
 vertex_chunk_size=100
 edge_chunk_size=1024

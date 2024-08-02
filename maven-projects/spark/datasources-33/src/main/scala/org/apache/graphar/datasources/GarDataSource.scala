@@ -19,21 +19,21 @@ package org.apache.graphar.datasources
 import scala.collection.JavaConverters._
 import scala.util.matching.Regex
 import java.util
-
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
-
 import org.apache.spark.sql.connector.catalog.{Table, TableProvider}
 import org.apache.spark.sql.execution.datasources._
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.execution.datasources.csv.CSVFileFormat
 import org.apache.spark.sql.execution.datasources.orc.OrcFileFormat
 import org.apache.spark.sql.execution.datasources.parquet.ParquetFileFormat
+import org.apache.spark.sql.execution.datasources.json.JsonFileFormat
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.sql.sources.DataSourceRegister
 import org.apache.spark.sql.connector.expressions.Transform
+import org.apache.spark.sql.graphar.GarTable
 
 // Derived from Apache Spark 3.1.1
 // https://github.com/apache/spark/blob/1d550c4/sql/core/src/main/scala/org/apache/spark/sql/execution/datasources/v2/FileDataSourceV2.scala
@@ -174,6 +174,7 @@ class GarDataSource extends TableProvider with DataSourceRegister {
     case "csv"     => classOf[CSVFileFormat]
     case "orc"     => classOf[OrcFileFormat]
     case "parquet" => classOf[ParquetFileFormat]
+    case "json"    => classOf[JsonFileFormat]
     case _         => throw new IllegalArgumentException
   }
 }

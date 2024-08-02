@@ -21,21 +21,11 @@ package org.apache.graphar
 
 import org.apache.graphar.graph.GraphReader
 
-import org.apache.spark.sql.SparkSession
-import org.scalatest.funsuite.AnyFunSuite
-
-class TestGraphReaderSuite extends AnyFunSuite {
-  val spark = SparkSession
-    .builder()
-    .enableHiveSupport()
-    .master("local[*]")
-    .getOrCreate()
+class TestGraphReaderSuite extends BaseTestSuite {
 
   test("read graphs by yaml paths") {
     // conduct reading
-    val graph_path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml")
-      .getPath
+    val graph_path = testData + "/ldbc_sample/parquet/ldbc_sample.graph.yml"
     val vertex_edge_df_pair = GraphReader.read(graph_path, spark)
     val vertex_dataframes = vertex_edge_df_pair._1
     val edge_dataframes = vertex_edge_df_pair._2
@@ -56,9 +46,7 @@ class TestGraphReaderSuite extends AnyFunSuite {
 
   test("read graphs by graph infos") {
     // load graph info
-    val path = getClass.getClassLoader
-      .getResource("gar-test/ldbc_sample/parquet/ldbc_sample.graph.yml")
-      .getPath
+    val path = testData + "/ldbc_sample/parquet/ldbc_sample.graph.yml"
     val graph_info = GraphInfo.loadGraphInfo(path, spark)
 
     // conduct reading

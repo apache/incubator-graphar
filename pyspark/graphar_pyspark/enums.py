@@ -58,6 +58,7 @@ class FileType(Enum):
     """Type of  file format."""
 
     CSV = "csv"
+    JSON = "json"
     PARQUET = "parquet"
     ORC = "orc"
 

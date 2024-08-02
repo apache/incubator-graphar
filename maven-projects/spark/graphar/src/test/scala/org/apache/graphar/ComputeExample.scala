@@ -21,24 +21,14 @@ package org.apache.graphar
 
 import org.apache.graphar.reader.{VertexReader, EdgeReader}
 
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.graphx._
-import org.scalatest.funsuite.AnyFunSuite
 
-class ComputeExampleSuite extends AnyFunSuite {
-  val spark = SparkSession
-    .builder()
-    .enableHiveSupport()
-    .master("local[*]")
-    .getOrCreate()
+class ComputeExampleSuite extends BaseTestSuite {
 
   test("run cc using graphx") {
     // read vertex DataFrame
-    val file_path = "gar-test/ldbc_sample/parquet/"
-    val prefix = getClass.getClassLoader.getResource(file_path).getPath
-    val vertex_yaml = getClass.getClassLoader
-      .getResource(file_path + "person.vertex.yml")
-      .getPath
+    val prefix = testData + "/ldbc_sample/parquet/"
+    val vertex_yaml = prefix + "/person.vertex.yml"
     val vertex_info = VertexInfo.loadVertexInfo(vertex_yaml, spark)
 
     val vertex_reader = new VertexReader(prefix, vertex_info, spark)
@@ -49,9 +39,7 @@ class ComputeExampleSuite extends AnyFunSuite {
     assert(vertex_df.count() == vertices_num)
 
     // read edge DataFrame
-    val edge_yaml = getClass.getClassLoader
-      .getResource(file_path + "person_knows_person.edge.yml")
-      .getPath
+    val edge_yaml = prefix + "person_knows_person.edge.yml"
     val edge_info = EdgeInfo.loadEdgeInfo(edge_yaml, spark)
     val adj_list_type = AdjListType.ordered_by_source
 

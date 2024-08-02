@@ -20,19 +20,16 @@
 #include <cstdlib>
 
 #include "./util.h"
-#include "graphar/graph_info.h"
-#include "graphar/reader/chunk_info_reader.h"
-#include "graphar/util/adj_list_type.h"
+#include "graphar/api/meta_reader.h"
 
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 namespace graphar {
 
-TEST_CASE("ChunkInfoReader") {
+TEST_CASE_METHOD(GlobalFixture, "ChunkInfoReader") {
   // read file and construct graph info
   std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+      test_data_dir + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   std::string src_label = "person", edge_label = "knows", dst_label = "person";
   std::string vertex_property_name = "id";
   std::string edge_property_name = "creationDate";
@@ -62,24 +59,24 @@ TEST_CASE("ChunkInfoReader") {
       REQUIRE(maybe_chunk_path.status().ok());
       std::string chunk_path = maybe_chunk_path.value();
       REQUIRE(chunk_path ==
-              TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk0");
+              test_data_dir + "/ldbc_sample/parquet/vertex/person/id/chunk0");
       REQUIRE(reader->seek(520).ok());
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
       REQUIRE(chunk_path ==
-              TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk5");
+              test_data_dir + "/ldbc_sample/parquet/vertex/person/id/chunk5");
       REQUIRE(reader->next_chunk().ok());
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
       REQUIRE(chunk_path ==
-              TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk6");
+              test_data_dir + "/ldbc_sample/parquet/vertex/person/id/chunk6");
       REQUIRE(reader->seek(900).ok());
       maybe_chunk_path = reader->GetChunk();
       chunk_path = maybe_chunk_path.value();
       REQUIRE(chunk_path ==
-              TEST_DATA_DIR + "/ldbc_sample/parquet/vertex/person/id/chunk9");
+              test_data_dir + "/ldbc_sample/parquet/vertex/person/id/chunk9");
       // now is end of the chunks
       REQUIRE(reader->next_chunk().IsIndexError());
       // test seek the id not in the chunks
@@ -115,21 +112,21 @@ TEST_CASE("ChunkInfoReader") {
       auto maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       auto chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/adj_list/part0/chunk0");
       REQUIRE(reader->seek(100).ok());
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/adj_list/part0/chunk0");
       REQUIRE(reader->next_chunk().ok());
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/adj_list/part1/chunk0");
 
@@ -138,14 +135,14 @@ TEST_CASE("ChunkInfoReader") {
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/adj_list/part1/chunk0");
       REQUIRE(reader->seek_src(900).ok());
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/adj_list/part9/chunk0");
       REQUIRE(reader->next_chunk().IsIndexError());
@@ -165,7 +162,7 @@ TEST_CASE("ChunkInfoReader") {
       auto maybe_chunk_path = dst_reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       auto chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_dest/adj_list/part1/chunk0");
       // seek an invalid dst id
@@ -186,27 +183,27 @@ TEST_CASE("ChunkInfoReader") {
       auto maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       std::string chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/offset/chunk0");
       REQUIRE(reader->seek(520).ok());
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/offset/chunk5");
       REQUIRE(reader->next_chunk().ok());
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/offset/chunk6");
       REQUIRE(reader->seek(900).ok());
       maybe_chunk_path = reader->GetChunk();
       chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/offset/chunk9");
       // now is end of the chunks
@@ -235,21 +232,21 @@ TEST_CASE("ChunkInfoReader") {
       auto maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       auto chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/creationDate/part0/chunk0");
       REQUIRE(reader->seek(100).ok());
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/creationDate/part0/chunk0");
       REQUIRE(reader->next_chunk().ok());
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/creationDate/part1/chunk0");
 
@@ -258,14 +255,14 @@ TEST_CASE("ChunkInfoReader") {
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/creationDate/part1/chunk0");
       REQUIRE(reader->seek_src(900).ok());
       maybe_chunk_path = reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_source/creationDate/part9/chunk0");
       REQUIRE(reader->next_chunk().IsIndexError());
@@ -286,7 +283,7 @@ TEST_CASE("ChunkInfoReader") {
       auto maybe_chunk_path = dst_reader->GetChunk();
       REQUIRE(maybe_chunk_path.status().ok());
       auto chunk_path = maybe_chunk_path.value();
-      REQUIRE(chunk_path == TEST_DATA_DIR +
+      REQUIRE(chunk_path == test_data_dir +
                                 "/ldbc_sample/parquet/edge/person_knows_person/"
                                 "ordered_by_dest/creationDate/part1/chunk0");
 

@@ -212,7 +212,7 @@ Apache-2.0 licenses
 The following components are provided under the Apache-2.0 License. See project link for details.
 The text of each license is the standard Apache 2.0 license.
 
-* spark 3.1.1 and 3.3.4 (https://github.com/apache/spark)
+* Apache Spark 3.1.1 and 3.3.4 (https://github.com/apache/spark)
     Files:
       maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarCommitProtocol.scala
       maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarDataSource.scala
@@ -234,9 +234,13 @@ The text of each license is the standard Apache 2.0 license.
       maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/orc/ORCOutputWriter.scala
       maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/orc/ORCWriteBuilder.scala
       maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/parquet/ParquetWriteBuilder.scala
-    are modified from spark.
+    are modified from Apache Spark.
 
-* arrow 12.0.0 (https://github.com/apache/arrow)
+* Apache Arrow 12.0.0 (https://github.com/apache/arrow)
+    Files:
+      dev/release/setup-ubuntu.sh
+    are modified from Apache Arrow.
+
 * fastFFI v0.1.2 (https://github.com/alibaba/fastFFI)
     Files:
       maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdString.java
@@ -250,6 +254,12 @@ The text of each license is the standard Apache 2.0 license.
       maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdSharedPtr.java
       maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdUnorderedMap.java
     are modified from GraphScope.
+
+* Apache OpenDAL v0.45.1 (https://github.com/apache/opendal)
+    Files:
+      dev/release/release.py
+      dev/release/verify.py
+    are modified from OpenDAL.
 
 ================================================================
 MIT licenses

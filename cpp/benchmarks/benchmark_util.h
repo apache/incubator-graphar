@@ -25,30 +25,20 @@
 
 #include "benchmark/benchmark.h"
 
-#include "graphar/graph_info.h"
-#include "graphar/util/status.h"
+#include "graphar/api/info.h"
 
 namespace graphar {
-
-// Return the value of the GAR_TEST_DATA environment variable or return error
-// Status
-Status GetTestResourceRoot(std::string* out) {
-  const char* c_root = std::getenv("GAR_TEST_DATA");
-  if (!c_root) {
-    return Status::IOError(
-        "Test resources not found, set GAR_TEST_DATA to <repo root>/testing");
-  }
-  // FIXME(@acezen): This is a hack to get around the fact that the testing
-  *out = std::string(c_root);
-  return Status::OK();
-}
 
 class BenchmarkFixture : public ::benchmark::Fixture {
  public:
   void SetUp(const ::benchmark::State& state) override {
-    std::string root;
-    Status status = GetTestResourceRoot(&root);
-    path_ = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+    const char* c_root = std::getenv("GAR_TEST_DATA");
+    if (!c_root) {
+      throw std::runtime_error(
+          "Test resources not found, set GAR_TEST_DATA to auxiliary testing "
+          "data");
+    }
+    path_ = std::string(c_root) + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
     auto maybe_graph_info = GraphInfo::Load(path_);
     graph_info_ = maybe_graph_info.value();
   }

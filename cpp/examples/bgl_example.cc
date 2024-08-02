@@ -26,16 +26,14 @@
 #include "arrow/api.h"
 
 #include "./config.h"
-#include "graphar/api.h"
-#include "graphar/graph.h"
-#include "graphar/reader/arrow_chunk_reader.h"
-#include "graphar/writer/arrow_chunk_writer.h"
-#include "graphar/writer/vertices_builder.h"
+#include "graphar/api/arrow_writer.h"
+#include "graphar/api/high_level_reader.h"
+#include "graphar/api/high_level_writer.h"
 
 int main(int argc, char* argv[]) {
   // read file and construct graph info
   std::string path =
-      TEST_DATA_DIR + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+      GetTestingResourceRoot() + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   auto graph_info = graphar::GraphInfo::Load(path).value();
   ASSERT(graph_info->GetVertexInfos().size() == 1);
   ASSERT(graph_info->GetEdgeInfos().size() == 1);

@@ -23,17 +23,29 @@
 #include <iostream>
 #include <string>
 
-#include "graphar/util/status.h"
-
 namespace graphar {
 
-static const std::string TEST_DATA_DIR =  // NOLINT
-    std::filesystem::path(__FILE__)
-        .parent_path()
-        .parent_path()
-        .parent_path()
-        .parent_path()
-        .string() +
-    "/testing";
+// Define the fixture
+struct GlobalFixture {
+  GlobalFixture() {
+    // Setup code here, this runs before each test case
+    setup();
+  }
+
+  ~GlobalFixture() {}
+
+  void setup() {
+    const char* c_root = std::getenv("GAR_TEST_DATA");
+    if (!c_root) {
+      throw std::runtime_error(
+          "Test resources not found, set GAR_TEST_DATA to auxiliary testing "
+          "data");
+    }
+    test_data_dir = std::string(c_root);
+  }
+
+  // test data dir to be used in tests
+  std::string test_data_dir;
+};
 
 }  // namespace graphar
