@@ -775,6 +775,9 @@ extra_info:
 }
 
 TEST_CASE_METHOD(GlobalFixture, "LoadFromS3") {
+  // explicitly call InitS3 to initialize S3 APIs before using
+  // S3 file system.
+  InitializeS3();
   std::string path =
       "s3://graphar/ldbc/ldbc.graph.yml"
       "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";

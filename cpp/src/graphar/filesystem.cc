@@ -313,6 +313,12 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
   return std::make_shared<FileSystem>(arrow_fs);
 }
 
+Status InitializeS3() {
+  RETURN_NOT_ARROW_OK(
+      arrow::fs::InitializeS3(arrow::fs::S3GlobalOptions::Defaults()));
+  return Status::OK();
+}
+
 Status FinalizeS3() {
   RETURN_NOT_ARROW_OK(arrow::fs::FinalizeS3());
   return Status::OK();
