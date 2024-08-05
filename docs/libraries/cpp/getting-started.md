@@ -287,4 +287,4 @@ with URI schema, e.g., "s3://bucket-name/path/to/data" or "s3://\[access-key:sec
 
 [Code example](https://github.com/apache/incubator-graphar/blob/main/cpp/test/test_info.cc#L777-L792) demonstrates how to read data from S3.
 
-Note that once you use cloud storage, you need to call `graphar::FinalizeS3()` to release the resources after finishing the work.
+Note that once you use cloud storage, you need to call `graphar::InitalizeS3` to initialize S3 APIs before starting the work and call`graphar::FinalizeS3()` to shut down the APIs after the work finish.
