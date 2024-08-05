@@ -15,7 +15,7 @@ Before converting, download the ego-Facebook dataset from the SNAP
 website. The dataset is a text file with each line representing an edge
 in the graph.
 
-``` bash
+```bash
 cd /path/to/your/dataset
 wget https://snap.stanford.edu/data/facebook_combined.txt.gz
 gunzip facebook_combined.txt.gz
@@ -28,7 +28,7 @@ GraphInfo objects, which are subsequently serialized into YAML files.
 For instance, the code snippet below illustrates the creation and
 storage of the vertex information file.
 
-``` C++
+```cpp
 auto version = graphar::InfoVersion::Parse("gar/v1").value();
 
 // meta info
@@ -58,7 +58,7 @@ by the GraphAr C++ library to generate payload data files with vertex
 and edge data. The code snippet that follows demonstrates the generation
 and preservation of the edge data file.
 
-``` C++
+```cpp
 // construct edges builder
 auto e_builder = graphar::builder::EdgesBuilder::Make(
                      edge_info, save_path, ADJLIST_TYPE, VERTEX_COUNT)

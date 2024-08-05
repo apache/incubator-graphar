@@ -21,7 +21,7 @@ The source code of CC based on BGL can be found at
 In this program, the graph information file is first read to get the
 metadata:
 
-``` C++
+```cpp
 std::string path = ... // the path of the graph information file
 auto graph_info = graphar::GraphInfo::Load(path).value();
 ```
@@ -29,7 +29,7 @@ auto graph_info = graphar::GraphInfo::Load(path).value();
 And then, the vertex collection and the edge collection are established
 as the handles to access the graph data:
 
-``` C++
+```cpp
 auto maybe_vertices = graphar::VerticesCollection::Make(graph_info, "person");
 auto vertices = maybe_vertices.value();
 auto maybe_edges = graphar::EdgesCollection::Make(graph_info, "person", "knows", "person", graphar::AdjListType::ordered_by_source);
@@ -40,7 +40,7 @@ Next, we construct the in-memory graph data structure for BGL by
 traversing the vertices and edges via GraphAr's high-level reading
 interface (the vertex iterator and the edge iterator):
 
-``` C++
+```cpp
 // define the Graph type in BGL
 typedef boost::adjacency_list<boost::vecS, // use vector to store edges
                               boost::vecS, // use vector to store vertices
@@ -68,7 +68,7 @@ for (auto it = v_it_begin; it != v_it_end; ++it) {
 
 After that, an internal CC algorithm provided by BGL is called:
 
-``` C++
+```cpp
 // define the external vertex property "component"
 std::vector<int> component(num_vertices);
 // call algorithm: cc
@@ -79,7 +79,7 @@ std::cout << "Total number of components: " << cc_num << std::endl;
 Finally, we could use a **VerticesBuilder** of GraphAr to write the
 results to new generated GraphAr format data:
 
-``` C++
+```cpp
 // construct a new property group
 graphar::Property cc = {"cc", graphar::int32(), false};
 std::vector<graphar::Property> property_vector = {cc};
