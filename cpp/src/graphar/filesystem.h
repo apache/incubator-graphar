@@ -153,4 +153,27 @@ class FileSystem {
 Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
     const std::string& uri, std::string* out_path = nullptr);
 
+/**
+ * @brief Initialize the S3 APIs.
+ *
+ * It is required to call this function at least once before using S3
+ * FileSystem. Once this function is called you MUST call FinalizeS3 before the
+ * end of the application in order to avoid a segmentation fault at shutdown.
+ *
+ * This function calls arrow:fs::Initialize() internally.
+ *
+ */
+Status InitializeS3();
+
+/**
+ * @brief Shutdown the S3 APIs.
+ *
+ * This function should be called before the program exits to ensure that
+ * all S3 resources are properly released.
+ *
+ * This function calls arrow:fs::FinalizeS3() internally.
+ *
+ */
+Status FinalizeS3();
+
 }  // namespace graphar
