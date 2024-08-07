@@ -166,7 +166,7 @@ Running this example requires `Docker` to be installed, if not, follow [this lin
 Spark provides a simple example to convert NebulaGraph data to GraphAr data.
 The example is located in the directory ``spark/src/main/scala/org/apache/graphar/examples/``.
 
-To run the example, download Spark and Neo4j first.
+To run the example, download Spark and NebulaGraph first.
 
 ### Spark 3.2.x
 
