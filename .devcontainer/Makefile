@@ -27,7 +27,7 @@ docker-build:
 docker-push:
 	@{\
 		docker buildx create --use --driver docker-container --name graphar-dev ;\
-		docker buildx build --push -t $(REGISTRY)/$(REPO):$(VERSION) -t $(REGISTRY)/$(REPO):latest . ;\
+		docker buildx build --push --platform linux/amd64,linux/arm64 -t $(REGISTRY)/$(REPO):$(VERSION) -t $(REGISTRY)/$(REPO):latest . ;\
 		build_exit_code=$$? ;\
 		docker buildx rm graphar-dev ;\
 		exit $$build_exit_code;\
