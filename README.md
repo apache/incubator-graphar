@@ -9,6 +9,7 @@
 CI](https://github.com/apache/incubator-graphar/actions/workflows/ci.yml/badge.svg)](https://github.com/apache/incubator-graphar/actions)
 [![Docs
 CI](https://github.com/apache/incubator-graphar/actions/workflows/docs.yml/badge.svg)](https://github.com/apache/incubator-graphar/actions)
+[![codecov](https://codecov.io/gh/apache/incubator-graphar/graph/badge.svg)](https://codecov.io/gh/apache/incubator-graphar)
 [![GraphAr
 Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://graphar.apache.org/docs/)
 [![Good First
