@@ -47,7 +47,7 @@ We expect all community members to follow our [Code of Conduct](https://www.apac
 A good branch name would be the issue number you are working on and a short description of the change,
 like (where issue \#42 is the ticket you're working on):
 
-``` shell
+```shell
 $ git checkout -b 42-add-chinese-translations
 ```
 

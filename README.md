@@ -257,7 +257,7 @@ GraphAr.
   Scheme\[J\]](https://arxiv.org/abs/2312.09577). arXiv preprint
   arXiv:2312.09577, 2023.
 
-``` bibtex
+```bibtex
 @article{li2023enhancing,
   author = {Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
   title = {Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme},

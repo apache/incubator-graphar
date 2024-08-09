@@ -774,7 +774,10 @@ extra_info:
   }
 }
 
-TEST_CASE_METHOD(GlobalFixture, "LoadFromS3", "[.hidden]") {
+TEST_CASE_METHOD(GlobalFixture, "LoadFromS3") {
+  // explicitly call InitS3 to initialize S3 APIs before using
+  // S3 file system.
+  InitializeS3();
   std::string path =
       "s3://graphar/ldbc/ldbc.graph.yml"
       "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
@@ -787,5 +790,7 @@ TEST_CASE_METHOD(GlobalFixture, "LoadFromS3", "[.hidden]") {
   const auto& edge_infos = graph_info->GetEdgeInfos();
   REQUIRE(vertex_infos.size() == 8);
   REQUIRE(edge_infos.size() == 23);
+  // explicitly call FinalizeS3 to avoid memory leak
+  FinalizeS3();
 }
 }  // namespace graphar

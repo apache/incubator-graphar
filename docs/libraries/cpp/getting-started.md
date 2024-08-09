@@ -25,7 +25,7 @@ GraphAr. For example, the file "ldbc_sample.graph.yml" defines an
 example graph named "ldbc_sample", which includes one type of vertices
 ("person") and one type of edges ("person knows person").
 
-``` Yaml
+```yaml
 name: ldbc_sample
 prefix: ./
 vertices:
@@ -154,7 +154,7 @@ Also, the metadata of a graph can be constructed easily through reading
 the already existed information files, as the following code
 illustrates:
 
-``` C++
+```cpp
 // construct graph information from file
 std::string path = ... // the path of the graph information file (e.g., ldbc_sample.graph.yml)
 auto graph_info = graphar::GraphInfo::Load(path).value();
@@ -185,7 +185,7 @@ As a simple case, the following example shows how to read all vertices
 with label "person" of the graph defined by "graph_info" and output the
 values of "id" and "firstName" for each vertex.
 
-``` C++
+```cpp
 graph_info = ...
 auto vertices = graphar::VerticesCollection::Make(graph_info, "person").value();
 
@@ -200,7 +200,7 @@ for (auto it = vertices->begin(); it != vertices->end(); ++it) {
 The next example reads all edges with label "person_knows_person" from
 the above graph and outputs the end vertices for each edge.
 
-``` C++
+```cpp
 graph_info = ...
 auto expect = graphar::EdgesCollection::Make(graph_info, "person", "knows", "person", graphar::AdjListType::ordered_by_source);
 auto edges = expect.value();
@@ -221,7 +221,7 @@ As the simplest cases, the fist example below adds vertices to
 **VerticesBuilder**, and then dumps the data to files; the second
 example constructs a collection of edges and then dumps them.
 
-``` C++
+```cpp
 vertex_info = ...
 prefix = ...
 graphar::builder::VerticesBuilder builder(vertex_info,  prefix);
@@ -238,7 +238,7 @@ builder.AddVertex(v);
 builder.Dump();
 ```
 
-``` C++
+```cpp
 edge_info = ...
 prefix = ...
 vertices_num = ...
@@ -276,3 +276,15 @@ is used to write the results to new generated data chunks.
 
 Please refer to [more examples](examples/out-of-core.md) to learn
 about the other available case studies utilizing GraphAr.
+
+### Working with Cloud Storage (S3, OSS)
+
+GraphAr supports reading and writing data from and to cloud storage, including
+AWS S3 and Alibaba Cloud OSS.
+
+To read data from cloud storage, you can specify the path of the data files
+with URI schema, e.g., "s3://bucket-name/path/to/data" or "s3://\[access-key:secret-key\]@bucket-name/path/to/data".
+
+[Code example](https://github.com/apache/incubator-graphar/blob/main/cpp/test/test_info.cc#L777-L792) demonstrates how to read data from S3.
+
+Note that once you use cloud storage, you need to call `graphar::InitalizeS3` to initialize S3 APIs before starting the work and call`graphar::FinalizeS3()` to shut down the APIs after the work finish.

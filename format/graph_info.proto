@@ -22,6 +22,7 @@ syntax = "proto3";
 package graphar;
 option java_multiple_files = true;
 option java_package = "org.apache.graphar.proto";
+option go_package = "./graphar";
 
 import "vertex_info.proto";
 import "edge_info.proto";
