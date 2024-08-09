@@ -1,0 +1,8 @@
+# Ignore MD013 because the document requires long lines to keep code examples intact
+MD013: false
+
+# Ignore MD033 because inline HTML is necessary in some cases, such as specific formatting needs
+MD033: false
+
+# Ignore MD025 because the document structure requires multiple top-level headings to reflect different chapters or sections
+MD025: false

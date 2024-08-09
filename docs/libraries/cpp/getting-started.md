@@ -202,7 +202,7 @@ the above graph and outputs the end vertices for each edge.
 
 ```cpp
 graph_info = ...
-auto expect = graphar::EdgesCollection::Make(graph_info, "person", "konws", "person", graphar::AdjListType::ordered_by_source);
+auto expect = graphar::EdgesCollection::Make(graph_info, "person", "knows", "person", graphar::AdjListType::ordered_by_source);
 auto edges = expect.value();
 
 for (auto it = edges->begin(); it != edges->end(); ++it) {
@@ -287,4 +287,4 @@ with URI schema, e.g., "s3://bucket-name/path/to/data" or "s3://\[access-key:sec
 
 [Code example](https://github.com/apache/incubator-graphar/blob/main/cpp/test/test_info.cc#L777-L792) demonstrates how to read data from S3.
 
-Note that once you use cloud storage, you need to call `graphar::InitalizeS3` to initialize S3 APIs before starting the work and call`graphar::FinalizeS3()` to shut down the APIs after the work finish.
+Note that once you use cloud storage, you need to call `graphar::InitializeS3` to initialize S3 APIs before starting the work and call`graphar::FinalizeS3()` to shut down the APIs after the work finish.

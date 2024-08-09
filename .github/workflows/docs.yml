@@ -54,6 +54,18 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Run markdownlint
+        run: |
+          npm install -g markdownlint-cli
+          markdownlint 'docs/**/*.md' --fix --config 'docs/.markdownlint.yaml'
+
+      - name: Run typos
+        run: |
+          curl -sSL https://github.com/crate-ci/typos/releases/download/v1.23.6/typos-v1.23.6-x86_64-unknown-linux-musl.tar.gz -o typos.tar.gz
+          tar -xzf typos.tar.gz
+          chmod +x typos
+          ./typos docs
+
       - name: Checkout Website
         uses: actions/checkout@v4
         with:
@@ -74,5 +86,3 @@ jobs:
       - name: Build
         working-directory: website
         run: pnpm build
-
-# TODO: enable markdownlint & typos

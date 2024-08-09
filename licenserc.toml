@@ -25,6 +25,7 @@ excludes = [
   # Documents
   "**/*.md",
   "**/*.mdx",
+  "docs/.markdownlint.yaml",
 
   # Meta files
   "NOTICE",
