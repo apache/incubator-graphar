@@ -281,11 +281,11 @@ class GraphWriter() {
   }
 
   val vertices: scala.collection.mutable.Map[String, DataFrame] =
-    scala.collection.mutable.Map[String, DataFrame]()
+    scala.collection.mutable.Map.empty
   val edges: scala.collection.mutable.Map[(String, String, String), DataFrame] =
-    scala.collection.mutable.Map[(String, String, String), DataFrame]()
+    scala.collection.mutable.Map.empty
   val vertexNums: scala.collection.mutable.Map[String, Long] =
-    scala.collection.mutable.Map[String, Long]()
+    scala.collection.mutable.Map.empty
   val primaryKeys: scala.collection.mutable.Map[String, String] =
-    scala.collection.mutable.Map[String, String]()
+    scala.collection.mutable.Map.empty
 }
