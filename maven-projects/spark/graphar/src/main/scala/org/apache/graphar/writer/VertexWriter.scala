@@ -137,7 +137,7 @@ class VertexWriter(
       val property = it.next()
       property_list += "`" + property.getName() + "`"
     }
-    val pg_df = chunks.select(property_list.map(col): _*)
+    val pg_df = chunks.select(property_list.map(col).toSeq: _*)
     FileSystem.writeDataFrame(
       pg_df,
       propertyGroup.getFile_type(),

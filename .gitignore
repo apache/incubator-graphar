@@ -4,6 +4,11 @@
 .DS_store
 .cache
 .ccls-cache
+.dir-locals.el
+.classpath
+.project
+.settings
+.factorypath
 
 compile_commands.json
 
