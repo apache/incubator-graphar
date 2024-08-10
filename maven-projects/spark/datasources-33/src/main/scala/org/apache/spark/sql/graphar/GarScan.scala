@@ -212,7 +212,8 @@ case class GarScan(
     val parsedOptions = new JSONOptionsInRead(
       CaseInsensitiveMap(options.asScala.toMap),
       sparkSession.sessionState.conf.sessionLocalTimeZone,
-      sparkSession.sessionState.conf.columnNameOfCorruptRecord)
+      sparkSession.sessionState.conf.columnNameOfCorruptRecord
+    )
 
     // Check a field requirement for corrupt records here to throw an exception in a driver side
     ExprUtils.verifyColumnNameOfCorruptRecord(

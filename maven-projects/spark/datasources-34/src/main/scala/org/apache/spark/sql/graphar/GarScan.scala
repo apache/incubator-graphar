@@ -145,8 +145,11 @@ case class GarScan(
       partitionSchema = readPartitionSchema,
       filters = pushedFilters,
       aggregation = None,
-      options = new OrcOptions(Map.empty[String, String], sparkSession.sessionState.conf),
-      memoryMode = MemoryMode.ON_HEAP,
+      options = new OrcOptions(
+        Map.empty[String, String],
+        sparkSession.sessionState.conf
+      ),
+      memoryMode = MemoryMode.ON_HEAP
     )
   }
 
@@ -220,7 +223,8 @@ case class GarScan(
     val parsedOptions = new JSONOptionsInRead(
       CaseInsensitiveMap(options.asScala.toMap),
       sparkSession.sessionState.conf.sessionLocalTimeZone,
-      sparkSession.sessionState.conf.columnNameOfCorruptRecord)
+      sparkSession.sessionState.conf.columnNameOfCorruptRecord
+    )
 
     // Check a field requirement for corrupt records here to throw an exception in a driver side
     ExprUtils.verifyColumnNameOfCorruptRecord(
@@ -281,7 +285,7 @@ case class GarScan(
         }
         .toArray
         .sortBy(_.filePath.toPath)
-        // starting from 3.4 PartitionedFile.filePath is SparkPath, not String
+    // starting from 3.4 PartitionedFile.filePath is SparkPath, not String
     }
 
     getFilePartitions(sparkSession, splitFiles)

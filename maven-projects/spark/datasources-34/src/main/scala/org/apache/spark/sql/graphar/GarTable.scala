@@ -86,20 +86,20 @@ case class GarTable(
       case "parquet" =>
         ParquetUtils.inferSchema(sparkSession, options.asScala.toMap, files)
       case "json" => {
-         val parsedOptions = new JSONOptions(
-           options.asScala.toMap,
-           sparkSession.sessionState.conf.sessionLocalTimeZone
-         )
+        val parsedOptions = new JSONOptions(
+          options.asScala.toMap,
+          sparkSession.sessionState.conf.sessionLocalTimeZone
+        )
 
-         JsonDataSource(parsedOptions).inferSchema(
-           sparkSession,
-           files,
-           parsedOptions
-         )
+        JsonDataSource(parsedOptions).inferSchema(
+          sparkSession,
+          files,
+          parsedOptions
+        )
       }
       case _ =>
         throw new IllegalArgumentException("Invalid format name: " + formatName)
-        
+
     }
 
   /** Construct a new write builder according to the actual file format. */

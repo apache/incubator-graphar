@@ -118,10 +118,13 @@ object GraphReader {
   def readWithGraphInfo(
       graphInfo: GraphInfo,
       spark: SparkSession
-  ): (Map[String, DataFrame], Map[
-    (String, String, String),
-    Map[String, DataFrame]
-  ]) = {
+  ): (
+      Map[String, DataFrame],
+      Map[
+        (String, String, String),
+        Map[String, DataFrame]
+      ]
+  ) = {
     val prefix = graphInfo.getPrefix
     val vertex_infos = graphInfo.getVertexInfos()
     val edge_infos = graphInfo.getEdgeInfos()
@@ -148,10 +151,13 @@ object GraphReader {
   def read(
       graphInfoPath: String,
       spark: SparkSession
-  ): (Map[String, DataFrame], Map[
-    (String, String, String),
-    Map[String, DataFrame]
-  ]) = {
+  ): (
+      Map[String, DataFrame],
+      Map[
+        (String, String, String),
+        Map[String, DataFrame]
+      ]
+  ) = {
     // load graph info
     val graph_info = GraphInfo.loadGraphInfo(graphInfoPath, spark)
 
