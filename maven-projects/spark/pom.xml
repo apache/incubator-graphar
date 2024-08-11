@@ -36,12 +36,13 @@
     <version>${graphar.version}</version>
 
     <properties>
-        <scala.version>2.13.14</scala.version>
-        <scala.binary.version>2.13</scala.binary.version>
+        <scala.version>2.12.15</scala.version>
+        <scala.binary.version>2.12</scala.binary.version>
         <PermGen>512m</PermGen>
         <MaxPermGen>1024m</MaxPermGen>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <semanticdb-scalac.version>4.8.15</semanticdb-scalac.version>
     </properties>
 
     <profiles>

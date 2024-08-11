@@ -219,7 +219,7 @@
                         <compilerPlugin>
                             <groupId>org.scalameta</groupId>
                             <artifactId>semanticdb-scalac_${scala.version}</artifactId>
-                            <version>4.9.9</version>
+                            <version>${semanticdb-scalac.version}</version>
                         </compilerPlugin>
                     </compilerPlugins>
                 </configuration>

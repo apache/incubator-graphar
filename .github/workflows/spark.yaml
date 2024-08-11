@@ -48,13 +48,13 @@ jobs:
         include:
           - mvn-profile: "datasources-32"
             spark: "spark-3.2.3"
-            spark-hadoop: "spark-3.2.3-bin-hadoop3-scala2.13"
+            spark-hadoop: "spark-3.2.3-bin-hadoop3"
           - mvn-profile: "datasources-33"
             spark: "spark-3.3.4"
-            spark-hadoop: "spark-3.3.4-bin-hadoop3-scala2.13"
+            spark-hadoop: "spark-3.3.4-bin-hadoop3"
           - mvn-profile: "datasources-34"
             spark: "spark-3.4.3"
-            spark-hadoop: "spark-3.4.3-bin-hadoop3-scala2.13"
+            spark-hadoop: "spark-3.4.3-bin-hadoop3"
 
     steps:
     - uses: actions/checkout@v4

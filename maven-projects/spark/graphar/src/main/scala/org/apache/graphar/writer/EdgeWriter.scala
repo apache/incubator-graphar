@@ -18,7 +18,6 @@
  */
 
 package org.apache.graphar.writer
-import scala.collection.parallel.CollectionConverters._
 import org.apache.graphar.util.{FileSystem, EdgeChunkPartitioner}
 import org.apache.graphar.{
   GeneralParams,
