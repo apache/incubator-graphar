@@ -43,6 +43,9 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <semanticdb-scalac.version>4.8.15</semanticdb-scalac.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <jackson.version>2.15.4</jackson.version>
     </properties>
 
     <profiles>
@@ -51,8 +54,6 @@
             <properties>
                 <sbt.project.name>graphar</sbt.project.name>
                 <spark.version>3.2.4</spark.version>
-                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-                <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
             </properties>
             <modules>
                 <module>graphar</module>
@@ -64,8 +65,6 @@
             <properties>
                 <sbt.project.name>graphar</sbt.project.name>
                 <spark.version>3.3.4</spark.version>
-                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-                <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
             </properties>
             <modules>
                 <module>graphar</module>
@@ -77,12 +76,21 @@
             <properties>
                 <sbt.project.name>graphar</sbt.project.name>
                 <spark.version>3.4.3</spark.version>
-                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-                <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
             </properties>
             <modules>
                 <module>graphar</module>
                 <module>datasources-34</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>datasources-35</id>
+            <properties>
+                <sbt.project.name>graphar</sbt.project.name>
+                <spark.version>3.5.1</spark.version>
+            </properties>
+            <modules>
+                <module>graphar</module>
+                <module>datasources-35</module>
             </modules>
             <activation>
                 <activeByDefault>true</activeByDefault>

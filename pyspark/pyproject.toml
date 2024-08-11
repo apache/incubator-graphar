@@ -30,7 +30,7 @@ python = "^3.10"
 optional = true
 
 [tool.poetry.group.spark.dependencies]
-pyspark = "3.4.3" # TODO: relax requirement when scala part will be available for multiple spark versions
+pyspark = "3.5.1" # TODO: relax requirement when scala part will be available for multiple spark versions
 
 [tool.poetry.group.lint]
 optional = true
