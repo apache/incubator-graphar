@@ -47,8 +47,8 @@ jobs:
       matrix:
         include:
           - mvn-profile: "datasources-32"
-            spark: "spark-3.2.3"
-            spark-hadoop: "spark-3.2.3-bin-hadoop3"
+            spark: "spark-3.2.4"
+            spark-hadoop: "spark-3.2.4-bin-hadoop3.2"
           - mvn-profile: "datasources-33"
             spark: "spark-3.3.4"
             spark-hadoop: "spark-3.3.4-bin-hadoop3"
