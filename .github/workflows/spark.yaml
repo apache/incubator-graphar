@@ -55,6 +55,9 @@ jobs:
           - mvn-profile: "datasources-34"
             spark: "spark-3.4.3"
             spark-hadoop: "spark-3.4.3-bin-hadoop3"
+          - mvn-profile: "datasources-35"
+            spark: "spark-3.5.1"
+            spark-hadoop: "spark-3.5.1-bin-hadoop3"
 
     steps:
     - uses: actions/checkout@v4
@@ -123,7 +126,7 @@ jobs:
     # Apache Spark version 3.4.3 is not supported by the current NebulaGraph Spark Connector.
     - name: Run Nebula2GraphAr example
       # https://github.com/orgs/community/discussions/37883#discussioncomment-4021318
-      if: ${{ matrix.spark != 'spark-3.4.3' }}
+      if: ${{ matrix.spark < 'spark-3.4.3' }}
       working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
