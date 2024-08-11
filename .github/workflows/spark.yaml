@@ -120,7 +120,9 @@ jobs:
         echo "match (a) -[r] -> () delete a, r;match (a) delete a;" | cypher-shell -u ${NEO4J_USR} -p ${NEO4J_PWD} -d neo4j --format plain
         scripts/run-graphar2neo4j.sh
 
+    # Apache Spark version 3.4.3 is not supported by the current NebulaGraph Spark Connector.
     - name: Run Nebula2GraphAr example
+      if: matrix.spark != "3.4.3"
       working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}

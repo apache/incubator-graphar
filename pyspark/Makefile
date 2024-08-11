@@ -19,7 +19,7 @@
 install_test:
 		export JAVA_HOME=${JAVA_HOME_11_X64}
 		cd ../maven-projects/spark && mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true && cd ../../pyspark 
-		export PYSPARK_HADOOP_VERSION=3.2
+		export PYSPARK_HADOOP_VERSION=3.4
 		poetry install --with=spark,tests
 
 .PHONY: test

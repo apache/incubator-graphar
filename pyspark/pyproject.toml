@@ -24,13 +24,13 @@ readme = "README.md"
 packages = [{include = "graphar_pyspark"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 
 [tool.poetry.group.spark]
 optional = true
 
 [tool.poetry.group.spark.dependencies]
-pyspark = "3.2.2" # TODO: relax requirement when scala part will be available for multiple spark versions
+pyspark = "3.4.3" # TODO: relax requirement when scala part will be available for multiple spark versions
 
 [tool.poetry.group.lint]
 optional = true
