@@ -122,7 +122,8 @@ jobs:
 
     # Apache Spark version 3.4.3 is not supported by the current NebulaGraph Spark Connector.
     - name: Run Nebula2GraphAr example
-      if: matrix.spark != "3.4.3"
+      # https://github.com/orgs/community/discussions/37883#discussioncomment-4021318
+      if: ${{ matrix.spark != "3.4.3" }}
       working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
