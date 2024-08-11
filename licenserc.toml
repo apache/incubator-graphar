@@ -50,6 +50,8 @@ excludes = [
   "spark/datasources-33/src/main/scala/org/apache/spark/sql/graphar",
   "spark/datasources-34/src/main/scala/org/apache/graphar/datasources",
   "spark/datasources-34/src/main/scala/org/apache/spark/sql/graphar",
+  "spark/datasources-35/src/main/scala/org/apache/graphar/datasources",
+  "spark/datasources-35/src/main/scala/org/apache/spark/sql/graphar",
   "java/src/main/java/org/apache/graphar/stdcxx/StdString.java",
   "java/src/main/java/org/apache/graphar/stdcxx/StdVector.java",
   "java/src/main/java/org/apache/graphar/stdcxx/StdSharedPtr.java",
