@@ -44,20 +44,20 @@ first, you need to download the testing data:
 ```
 
 ```bash
-    $ GRA_TEST_DATA=./testing mvn clean install
+    $ GAR_TEST_DATA=./testing mvn clean install
 ```
 
 Build and run the unit tests:
 
 ```bash
-    $ GRA_TEST_DATA=./testing mvn clean test
+    $ GAR_TEST_DATA=./testing mvn clean test
 ```
 
 Build and run certain unit test:
 
 ```bash
-    $ GRA_TEST_DATA=${PWD}/testing mvn clean test -Dsuites='org.apache.graphar.GraphInfoSuite'   # run the GraphInfo test suite
-    $ GRA_TEST_DATA=${PWD}/testing mvn clean test -Dsuites='org.apache.graphar.GraphInfoSuite load graph info'  # run the `load graph info` test of test suite
+    $ GAR_TEST_DATA=${PWD}/testing mvn clean test -Dsuites='org.apache.graphar.GraphInfoSuite'   # run the GraphInfo test suite
+    $ GAR_TEST_DATA=${PWD}/testing mvn clean test -Dsuites='org.apache.graphar.GraphInfoSuite load graph info'  # run the `load graph info` test of test suite
 ```
 
 ### Generate API document
