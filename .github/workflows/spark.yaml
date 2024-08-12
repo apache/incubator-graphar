@@ -47,11 +47,17 @@ jobs:
       matrix:
         include:
           - mvn-profile: "datasources-32"
-            spark: "spark-3.2.2"
-            spark-hadoop: "spark-3.2.2-bin-hadoop3.2"
+            spark: "spark-3.2.4"
+            spark-hadoop: "spark-3.2.4-bin-hadoop3.2"
           - mvn-profile: "datasources-33"
             spark: "spark-3.3.4"
             spark-hadoop: "spark-3.3.4-bin-hadoop3"
+          - mvn-profile: "datasources-34"
+            spark: "spark-3.4.3"
+            spark-hadoop: "spark-3.4.3-bin-hadoop3"
+          - mvn-profile: "datasources-35"
+            spark: "spark-3.5.1"
+            spark-hadoop: "spark-3.5.1-bin-hadoop3"
 
     steps:
     - uses: actions/checkout@v4
@@ -117,7 +123,10 @@ jobs:
         echo "match (a) -[r] -> () delete a, r;match (a) delete a;" | cypher-shell -u ${NEO4J_USR} -p ${NEO4J_PWD} -d neo4j --format plain
         scripts/run-graphar2neo4j.sh
 
+    # Apache Spark version 3.4.3 is not supported by the current NebulaGraph Spark Connector.
     - name: Run Nebula2GraphAr example
+      # https://github.com/orgs/community/discussions/37883#discussioncomment-4021318
+      if: ${{ matrix.spark < 'spark-3.4.3' }}
       working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}

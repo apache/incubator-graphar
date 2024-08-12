@@ -35,47 +35,66 @@
     <packaging>pom</packaging>
     <version>${graphar.version}</version>
 
+    <properties>
+        <scala.version>2.12.15</scala.version>
+        <scala.binary.version>2.12</scala.binary.version>
+        <PermGen>512m</PermGen>
+        <MaxPermGen>1024m</MaxPermGen>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <semanticdb-scalac.version>4.8.15</semanticdb-scalac.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <jackson.version>2.15.4</jackson.version>
+    </properties>
+
     <profiles>
         <profile>
             <id>datasources-32</id>
             <properties>
                 <sbt.project.name>graphar</sbt.project.name>
-                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-                <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-                <scala.version>2.12.10</scala.version>
-                <scala.binary.version>2.12</scala.binary.version>
-                <PermGen>512m</PermGen>
-                <MaxPermGen>1024m</MaxPermGen>
-                <spark.version>3.2.2</spark.version>
-                <maven.compiler.source>1.8</maven.compiler.source>
-                <maven.compiler.target>1.8</maven.compiler.target>
+                <spark.version>3.2.4</spark.version>
             </properties>
             <modules>
                 <module>graphar</module>
                 <module>datasources-32</module>
             </modules>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
         </profile>
         <profile>
             <id>datasources-33</id>
             <properties>
                 <sbt.project.name>graphar</sbt.project.name>
-                <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-                <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-                <scala.version>2.12.12</scala.version>
-                <scala.binary.version>2.12</scala.binary.version>
-                <PermGen>512m</PermGen>
-                <MaxPermGen>1024m</MaxPermGen>
                 <spark.version>3.3.4</spark.version>
-                <maven.compiler.source>1.8</maven.compiler.source>
-                <maven.compiler.target>1.8</maven.compiler.target>
             </properties>
             <modules>
                 <module>graphar</module>
                 <module>datasources-33</module>
             </modules>
+        </profile>
+        <profile>
+            <id>datasources-34</id>
+            <properties>
+                <sbt.project.name>graphar</sbt.project.name>
+                <spark.version>3.4.3</spark.version>
+            </properties>
+            <modules>
+                <module>graphar</module>
+                <module>datasources-34</module>
+            </modules>
+        </profile>
+        <profile>
+            <id>datasources-35</id>
+            <properties>
+                <sbt.project.name>graphar</sbt.project.name>
+                <spark.version>3.5.1</spark.version>
+            </properties>
+            <modules>
+                <module>graphar</module>
+                <module>datasources-35</module>
+            </modules>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
         </profile>
     </profiles>
     <build>
@@ -108,7 +127,7 @@
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
                     <args>
-                        <arg>-target:jvm-1.8</arg>
+                        <arg>-target:jvm-${maven.compiler.target}</arg>
                     </args>
                     <jvmArgs>
                         <jvmArg>-Xss4096K</jvmArg>

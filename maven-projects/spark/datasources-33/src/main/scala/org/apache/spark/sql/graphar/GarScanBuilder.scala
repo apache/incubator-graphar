@@ -52,7 +52,7 @@ case class GarScanBuilder(
     this.filters = dataFilters
     formatName match {
       case "csv"     => Array.empty[Filter]
-      case "json"     => Array.empty[Filter]
+      case "json"    => Array.empty[Filter]
       case "orc"     => pushedOrcFilters
       case "parquet" => pushedParquetFilters
       case _ =>
@@ -84,9 +84,9 @@ case class GarScanBuilder(
   // Check if the file format supports nested schema pruning.
   override protected val supportsNestedSchemaPruning: Boolean =
     formatName match {
-      case "csv" => false
+      case "csv"  => false
       case "json" => false
-      case "orc" => sparkSession.sessionState.conf.nestedSchemaPruningEnabled
+      case "orc"  => sparkSession.sessionState.conf.nestedSchemaPruningEnabled
       case "parquet" =>
         sparkSession.sessionState.conf.nestedSchemaPruningEnabled
       case _ =>

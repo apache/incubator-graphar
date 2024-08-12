@@ -20,6 +20,7 @@
 package org.apache.graphar
 
 import org.apache.graphar.reader.{VertexReader, EdgeReader}
+import org.scalatest.matchers.should.Matchers._
 
 class ReaderSuite extends BaseTestSuite {
 
@@ -57,7 +58,9 @@ class ReaderSuite extends BaseTestSuite {
       .format("org.apache.graphar.datasources.GarDataSource")
       .load(orc_read_path)
     // validate reading results
-    assert(df2.rdd.collect().deep == df1.rdd.collect().deep)
+    val left = df2.rdd.collect()
+    val right = df1.rdd.collect()
+    left should contain theSameElementsAs right
     df_pd = df1.filter(cond)
 
     /**

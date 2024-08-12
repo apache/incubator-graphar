@@ -18,7 +18,6 @@
  */
 
 package org.apache.graphar.writer
-
 import org.apache.graphar.util.{FileSystem, EdgeChunkPartitioner}
 import org.apache.graphar.{
   GeneralParams,
@@ -160,9 +159,9 @@ object EdgeWriter {
             val filterRDD = edgeCountsByPrimaryKey
               .filter(v => v._1 / vertexChunkSize == i)
               .map { case (k, v) => (k - i * vertexChunkSize + 1, v) }
-            val initRDD = spark.sparkContext.parallelize(
-              (0L to vertexChunkSize).map(key => (key, 0))
-            )
+            val initRDD = spark.sparkContext
+              .range(0L, vertexChunkSize + 1)
+              .map(key => (key, 0))
             val unionRDD = spark.sparkContext
               .union(filterRDD, initRDD)
               .reduceByKey(_ + _)
@@ -353,7 +352,8 @@ class EdgeWriter(
       val property = pIter.next()
       propertyList += "`" + property.getName() + "`"
     }
-    val propertyGroupDf = edgeDfAndOffsetDf._1.select(propertyList.map(col): _*)
+    val propertyGroupDf =
+      edgeDfAndOffsetDf._1.select(propertyList.map(col).toSeq: _*)
     val outputPrefix =
       prefix + edgeInfo.getPropertyGroupPathPrefix(propertyGroup, adjListType)
     FileSystem.writeDataFrame(
