@@ -25,7 +25,7 @@ Glossary of relevant concepts and terms.
   edges of each vertex are stored in a separate array.
 
 - **Coordinate List (COO)**: The storage layout the edges of certain vertex type. Corresponding to the unordered
-  by source vertex id or unordered by target vertex id adjacency list, the edges are stored in a single array and
+  by source vertex id or unordered by destination vertex id adjacency list, the edges are stored in a single array and
   no offsets are stored.
 
 - **Vertex Chunk**: The storage unit of vertex. Each vertex chunk contains a fixed number of vertices and is stored
