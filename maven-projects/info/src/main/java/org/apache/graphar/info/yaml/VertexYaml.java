@@ -24,38 +24,45 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.VertexInfo;
 
-public class VertexYaml {
-    private String type;
+public class VertexYamlParser {
+    private String label;
     private long chunk_size;
-    private List<PropertyGroupYaml> property_groups;
+    private List<PropertyGroupYamlParser> property_groups;
     private String prefix;
     private String version;
 
-    public VertexYaml() {
-        this.type = "";
+    public VertexYamlParser() {
+        this.label = "";
         this.chunk_size = 0;
         this.property_groups = new ArrayList<>();
         this.prefix = "";
-        this.version = "";
+        this.version = "v1";
     }
 
-    public VertexYaml(VertexInfo vertexInfo) {
-        this.type = vertexInfo.getLabel();
+    public VertexYamlParser(VertexInfo vertexInfo) {
+        this.label = vertexInfo.getType();
         this.chunk_size = vertexInfo.getChunkSize();
         this.property_groups =
                 vertexInfo.getPropertyGroups().stream()
-                        .map(PropertyGroupYaml::new)
+                        .map(PropertyGroupYamlParser::new)
                         .collect(Collectors.toList());
         this.prefix = vertexInfo.getPrefix();
-        this.version = vertexInfo.getVersion();
     }
 
-    public String getType() {
-        return type;
+    public VertexInfo toVertexInfo() {
+        return new VertexInfo(
+                label,
+                chunk_size,
+                property_groups.stream().map(PropertyGroupYamlParser::toPropertyGroup).collect(Collectors.toList()),
+                prefix);
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public long getChunk_size() {
@@ -66,11 +73,11 @@ public class VertexYaml {
         this.chunk_size = chunk_size;
     }
 
-    public List<PropertyGroupYaml> getProperty_groups() {
+    public List<PropertyGroupYamlParser> getProperty_groups() {
         return property_groups;
     }
 
-    public void setProperty_groups(List<PropertyGroupYaml> property_groups) {
+    public void setProperty_groups(List<PropertyGroupYamlParser> property_groups) {
         this.property_groups = property_groups;
     }
 

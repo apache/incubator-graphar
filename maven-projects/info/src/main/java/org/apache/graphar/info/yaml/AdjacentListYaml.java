@@ -19,26 +19,37 @@
 
 package org.apache.graphar.info.yaml;
 
-public class AdjacentListYaml {
+import org.apache.graphar.info.AdjacentList;
+import org.apache.graphar.proto.AdjListType;
+
+public class AdjacentListYamlParser {
     private boolean ordered;
     private String aligned_by;
     private String file_type;
     private String prefix;
 
-    public AdjacentListYaml() {
+    public AdjacentListYamlParser() {
         this.ordered = false;
         this.aligned_by = "";
         this.file_type = "";
         this.prefix = "";
     }
 
-    public AdjacentListYaml(org.apache.graphar.info.AdjacentList adjacentList) {
-        this.ordered = adjacentList.getType().isOrdered();
-        this.aligned_by = adjacentList.getType().getAlignedBy();
-        this.file_type = adjacentList.getFileType().toString();
+    public AdjacentListYamlParser(AdjacentList adjacentList) {
+        final var adjListType = adjacentList.getType();
+        this.ordered = adjListType == AdjListType.ORDERED_BY_SOURCE || adjListType == AdjListType.ORDERED_BY_TARGET;
+        this.aligned_by = adjListType == AdjListType.ORDERED_BY_SOURCE || adjListType == AdjListType.UNORDERED_BY_SOURCE ? "src" : "dst";
+        this.file_type = EnumTransferTools.fileType2String(adjacentList.getFileType());
         this.prefix = adjacentList.getPrefix();
     }
 
+    public AdjacentList toAdjacentList() {
+        return new AdjacentList(
+                EnumTransferTools.orderedAndAlignedBy2AdjListType(ordered, aligned_by),
+                EnumTransferTools.string2FileType(file_type),
+                prefix
+        );
+    }
     public boolean isOrdered() {
         return ordered;
     }
@@ -70,4 +81,6 @@ public class AdjacentListYaml {
     public void setPrefix(String prefix) {
         this.prefix = prefix;
     }
+
+
 }

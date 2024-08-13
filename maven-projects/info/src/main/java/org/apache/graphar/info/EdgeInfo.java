@@ -26,10 +26,12 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.graphar.info.type.AdjListType;
-import org.apache.graphar.info.type.DataType;
-import org.apache.graphar.info.yaml.EdgeYaml;
-import org.apache.graphar.info.yaml.GraphYaml;
+
+import org.apache.graphar.info.yaml.AdjacentListYamlParser;
+import org.apache.graphar.info.yaml.EdgeYamlParser;
+import org.apache.graphar.info.yaml.GraphYamlParser;
+import org.apache.graphar.proto.AdjListType;
+import org.apache.graphar.proto.DataType;
 import org.apache.graphar.util.GeneralParams;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -41,15 +43,9 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 public class EdgeInfo {
-    private final EdgeTriplet edgeTriplet;
-    private final long chunkSize;
-    private final long srcChunkSize;
-    private final long dstChunkSize;
-    private final boolean directed;
-    private final String prefix;
-    private final Map<AdjListType, AdjacentList> adjacentLists;
-    private final PropertyGroups propertyGroups;
-    private final String version;
+    private final org.apache.graphar.proto.EdgeInfo protoEdgeInfo;
+    private final Map<AdjListType, AdjacentList> cachedAdjacentLists;
+    private final PropertyGroups cachedPropertyGroups;
 
     public EdgeInfo(
             String srcLabel,
@@ -61,62 +57,46 @@ public class EdgeInfo {
             boolean directed,
             String prefix,
             List<AdjacentList> adjacentListsAsList,
-            List<PropertyGroup> propertyGroupsAsList,
-            String version) {
-        this.edgeTriplet = new EdgeTriplet(srcLabel, edgeLabel, dstLabel);
-        this.chunkSize = chunkSize;
-        this.srcChunkSize = srcChunkSize;
-        this.dstChunkSize = dstChunkSize;
-        this.directed = directed;
-        this.prefix = prefix;
-        this.adjacentLists =
+            List<PropertyGroup> propertyGroupsAsList) {
+        this.cachedAdjacentLists =
                 adjacentListsAsList.stream()
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         AdjacentList::getType, Function.identity()));
-        this.propertyGroups = new PropertyGroups(propertyGroupsAsList);
-        this.version = version;
-    }
-
-    private EdgeInfo(EdgeYaml yamlParser) {
-        this(
-                yamlParser.getSrc_type(),
-                yamlParser.getEdge_type(),
-                yamlParser.getDst_type(),
-                yamlParser.getChunk_size(),
-                yamlParser.getSrc_chunk_size(),
-                yamlParser.getDst_chunk_size(),
-                yamlParser.isDirected(),
-                yamlParser.getPrefix(),
-                yamlParser.getAdj_lists().stream()
-                        .map(AdjacentList::new)
-                        .collect(Collectors.toUnmodifiableList()),
-                yamlParser.getProperty_groups().stream()
-                        .map(PropertyGroup::new)
-                        .collect(Collectors.toUnmodifiableList()),
-                yamlParser.getVersion());
+        this.cachedPropertyGroups = new PropertyGroups(propertyGroupsAsList);
+        this.protoEdgeInfo = org.apache.graphar.proto.EdgeInfo.newBuilder()
+                .setSourceVertexType(srcLabel)
+                .setType(edgeLabel)
+                .setDestinationVertexChunkSize(dstChunkSize)
+                .setChunkSize(chunkSize)
+                .setSourceVertexChunkSize(srcChunkSize)
+                .setDestinationVertexType(dstLabel)
+                .setIsDirected(directed)
+                .setPrefix(prefix)
+                .addAllAdjacentList(
+                        adjacentListsAsList.stream()
+                                .map(AdjacentList::getProto)
+                                .collect(Collectors.toUnmodifiableList()))
+                .addAllProperties(
+                        propertyGroupsAsList.stream()
+                                .map(PropertyGroup::getProto)
+                                .collect(Collectors.toUnmodifiableList()))
+                .build();
     }
 
     private EdgeInfo(
-            EdgeTriplet edgeTriplet,
-            long chunkSize,
-            long srcChunkSize,
-            long dstChunkSize,
-            boolean directed,
-            String prefix,
-            Map<AdjListType, AdjacentList> adjacentLists,
-            PropertyGroups propertyGroups,
-            String version) {
-        this.edgeTriplet = edgeTriplet;
-        this.chunkSize = chunkSize;
-        this.srcChunkSize = srcChunkSize;
-        this.dstChunkSize = dstChunkSize;
-        this.directed = directed;
-        this.prefix = prefix;
-        this.adjacentLists = adjacentLists;
-        this.propertyGroups = propertyGroups;
-        this.version = version;
+            org.apache.graphar.proto.EdgeInfo protoEdgeInfo,
+            Map<AdjListType, AdjacentList> cachedAdjacentLists,
+            PropertyGroups cachedPropertyGroups) {
+        this.protoEdgeInfo = protoEdgeInfo;
+        this.cachedAdjacentLists = cachedAdjacentLists;
+        this.cachedPropertyGroups = cachedPropertyGroups;
     }
+
+    org.apache.graphar.proto.EdgeInfo getProto() {
+        return protoEdgeInfo;
+    }
+
 
     public static EdgeInfo load(String edgeInfoPath) throws IOException {
         return load(edgeInfoPath, new Configuration());
@@ -134,62 +114,56 @@ public class EdgeInfo {
             throw new IllegalArgumentException("FileSystem is null");
         }
         FSDataInputStream inputStream = fileSystem.open(new Path(edgeInfoPath));
-        Yaml edgeInfoYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
-        EdgeYaml edgeInfoYaml = edgeInfoYamlLoader.load(inputStream);
-        return new EdgeInfo(edgeInfoYaml);
+        Yaml edgeInfoYamlLoader =
+                new Yaml(new Constructor(EdgeYamlParser.class, new LoaderOptions()));
+        EdgeYamlParser edgeInfoYaml = edgeInfoYamlLoader.load(inputStream);
+        return edgeInfoYaml.toEdgeInfo();
+    }
+
+    public static String concat(String srcLabel, String edgeLabel, String dstLabel) {
+        return srcLabel + GeneralParams.regularSeparator + edgeLabel + GeneralParams.regularSeparator + dstLabel;
     }
 
     public Optional<EdgeInfo> addAdjacentListAsNew(AdjacentList adjacentList) {
-        if (adjacentList == null || adjacentLists.containsKey(adjacentList.getType())) {
+        if (adjacentList == null || cachedAdjacentLists.containsKey(adjacentList.getType())) {
             return Optional.empty();
         }
         Map<AdjListType, AdjacentList> newAdjacentLists =
                 Stream.concat(
-                                adjacentLists.entrySet().stream(),
+                                cachedAdjacentLists.entrySet().stream(),
                                 Map.of(adjacentList.getType(), adjacentList).entrySet().stream())
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));
         return Optional.of(
                 new EdgeInfo(
-                        edgeTriplet,
-                        chunkSize,
-                        srcChunkSize,
-                        dstChunkSize,
-                        directed,
-                        prefix,
+                        protoEdgeInfo,
                         newAdjacentLists,
-                        propertyGroups,
-                        version));
+                        cachedPropertyGroups));
     }
 
     public Optional<EdgeInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
-        return propertyGroups
+        // do not need check property group exist, because PropertyGroups will check it
+        return cachedPropertyGroups
                 .addPropertyGroupAsNew(propertyGroup)
                 .map(
                         newPropertyGroups ->
                                 new EdgeInfo(
-                                        edgeTriplet,
-                                        chunkSize,
-                                        srcChunkSize,
-                                        dstChunkSize,
-                                        directed,
-                                        prefix,
-                                        adjacentLists,
-                                        newPropertyGroups,
-                                        version));
+                                        protoEdgeInfo,
+                                        cachedAdjacentLists,
+                                        newPropertyGroups));
     }
 
     public boolean hasAdjListType(AdjListType adjListType) {
-        return adjacentLists.containsKey(adjListType);
+        return cachedAdjacentLists.containsKey(adjListType);
     }
 
     public boolean hasProperty(String propertyName) {
-        return propertyGroups.hasProperty(propertyName);
+        return cachedPropertyGroups.hasProperty(propertyName);
     }
 
     public boolean hasPropertyGroup(PropertyGroup propertyGroup) {
-        return propertyGroups.hasPropertyGroup(propertyGroup);
+        return cachedPropertyGroups.hasPropertyGroup(propertyGroup);
     }
 
     public AdjacentList getAdjacentList(AdjListType adjListType) {
@@ -197,15 +171,15 @@ public class EdgeInfo {
         // other methods which get adjacent list in this class should call this method first,
         // so we don't check AdjListType in other methods.
         checkAdjListTypeExist(adjListType);
-        return adjacentLists.get(adjListType);
+        return cachedAdjacentLists.get(adjListType);
     }
 
     public int getPropertyGroupNum() {
-        return propertyGroups.getPropertyGroupNum();
+        return cachedPropertyGroups.getPropertyGroupNum();
     }
 
     public PropertyGroup getPropertyGroup(String property) {
-        return propertyGroups.getPropertyGroup(property);
+        return cachedPropertyGroups.getPropertyGroup(property);
     }
 
     public String getPropertyGroupPrefix(PropertyGroup propertyGroup) {
@@ -243,15 +217,15 @@ public class EdgeInfo {
     }
 
     public DataType getPropertyType(String propertyName) {
-        return propertyGroups.getPropertyType(propertyName);
+        return cachedPropertyGroups.getPropertyType(propertyName);
     }
 
     public boolean isPrimaryKey(String propertyName) {
-        return propertyGroups.isPrimaryKey(propertyName);
+        return cachedPropertyGroups.isPrimaryKey(propertyName);
     }
 
     public boolean isNullableKey(String propertyName) {
-        return propertyGroups.isNullableKey(propertyName);
+        return cachedPropertyGroups.isNullableKey(propertyName);
     }
 
     public void save(String filePath) throws IOException {
@@ -275,69 +249,65 @@ public class EdgeInfo {
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
-        EdgeYaml edgeYaml = new EdgeYaml(this);
+        Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
+        EdgeYamlParser edgeYaml = new EdgeYamlParser(this);
         return yaml.dump(edgeYaml);
     }
 
     public String getConcat() {
-        return edgeTriplet.getConcat();
+        return concat(getSrcLabel(), getEdgeLabel(), getDstLabel());
     }
 
     public String getSrcLabel() {
-        return edgeTriplet.getSrcLabel();
+        return protoEdgeInfo.getSourceVertexType();
     }
 
     public String getEdgeLabel() {
-        return edgeTriplet.getEdgeLabel();
+        return protoEdgeInfo.getType();
     }
 
     public String getDstLabel() {
-        return edgeTriplet.getDstLabel();
+        return protoEdgeInfo.getDestinationVertexType();
     }
 
     public long getChunkSize() {
-        return chunkSize;
+        return protoEdgeInfo.getChunkSize();
     }
 
     public long getSrcChunkSize() {
-        return srcChunkSize;
+        return protoEdgeInfo.getSourceVertexChunkSize();
     }
 
     public long getDstChunkSize() {
-        return dstChunkSize;
+        return protoEdgeInfo.getDestinationVertexChunkSize();
     }
 
     public boolean isDirected() {
-        return directed;
+        return protoEdgeInfo.getIsDirected();
     }
 
     public String getPrefix() {
-        return prefix;
+        return protoEdgeInfo.getPrefix();
     }
 
     public Map<AdjListType, AdjacentList> getAdjacentLists() {
-        return adjacentLists;
+        return cachedAdjacentLists;
     }
 
     public List<PropertyGroup> getPropertyGroups() {
-        return propertyGroups.getPropertyGroupList();
-    }
-
-    public String getVersion() {
-        return version;
+        return cachedPropertyGroups.getPropertyGroupList();
     }
 
     private void checkAdjListTypeExist(AdjListType adjListType) {
         if (adjListType == null) {
             throw new IllegalArgumentException("The adjacency list type is null");
         }
-        if (!adjacentLists.containsKey(adjListType)) {
+        if (!cachedAdjacentLists.containsKey(adjListType)) {
             throw new IllegalArgumentException(
                     "The adjacency list type "
                             + adjListType
                             + " does not exist in the edge info "
-                            + this.edgeTriplet.getConcat());
+                            + getConcat());
         }
     }
 
@@ -351,43 +321,6 @@ public class EdgeInfo {
                             + propertyGroup
                             + " does not exist in the edge "
                             + getConcat());
-        }
-    }
-
-    private static class EdgeTriplet {
-        private final String srcLabel;
-        private final String edgeLabel;
-        private final String dstLabel;
-
-        public EdgeTriplet(String srcLabel, String edgeLabel, String dstLabel) {
-            this.srcLabel = srcLabel;
-            this.edgeLabel = edgeLabel;
-            this.dstLabel = dstLabel;
-        }
-
-        public String getConcat() {
-            return srcLabel
-                    + GeneralParams.regularSeparator
-                    + edgeLabel
-                    + GeneralParams.regularSeparator
-                    + dstLabel;
-        }
-
-        @Override
-        public String toString() {
-            return getConcat();
-        }
-
-        public String getSrcLabel() {
-            return srcLabel;
-        }
-
-        public String getEdgeLabel() {
-            return edgeLabel;
-        }
-
-        public String getDstLabel() {
-            return dstLabel;
         }
     }
 }

@@ -42,9 +42,15 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <proto-info.version>${version}</proto-info.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.graphar</groupId>
+            <artifactId>proto</artifactId>
+            <version>${proto-info.version}</version>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

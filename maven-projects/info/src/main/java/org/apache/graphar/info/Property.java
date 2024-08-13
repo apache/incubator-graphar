@@ -19,42 +19,42 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.info.type.DataType;
-import org.apache.graphar.info.yaml.PropertyYaml;
+import org.apache.graphar.info.yaml.PropertyYamlParser;
+import org.apache.graphar.proto.DataType;
 
 public class Property {
-    private final String name;
-    private final DataType dataType;
-    private final boolean primary;
-    private final boolean nullable;
+    private final org.apache.graphar.proto.Property protoProperty;
 
     public Property(String name, DataType dataType, boolean primary, boolean nullable) {
-        this.name = name;
-        this.dataType = dataType;
-        this.primary = primary;
-        this.nullable = nullable;
+        protoProperty = org.apache.graphar.proto.Property.newBuilder()
+                .setName(name)
+                .setType(dataType)
+                .setIsPrimaryKey(primary)
+                .setIsNullable(nullable)
+                .build();
     }
 
-    Property(PropertyYaml yamlParser) {
-        this.name = yamlParser.getName();
-        this.dataType = DataType.fromString(yamlParser.getData_type());
-        this.primary = yamlParser.getIs_primary();
-        this.nullable = yamlParser.getIs_nullable();
+    Property(org.apache.graphar.proto.Property protoProperty) {
+        this.protoProperty = protoProperty;
     }
 
     public String getName() {
-        return name;
+        return protoProperty.getName();
     }
 
     public DataType getDataType() {
-        return dataType;
+        return protoProperty.getType();
     }
 
     public boolean isPrimary() {
-        return primary;
+        return protoProperty.getIsPrimaryKey();
     }
 
     public boolean isNullable() {
-        return nullable;
+        return protoProperty.getIsNullable();
+    }
+
+    org.apache.graphar.proto.Property getProto() {
+        return protoProperty;
     }
 }

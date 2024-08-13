@@ -48,7 +48,7 @@ public class EdgeYaml {
         this.prefix = "";
         this.adj_lists = new ArrayList<>();
         this.property_groups = new ArrayList<>();
-        this.version = "";
+        this.version = "v1";
     }
 
     public EdgeYaml(EdgeInfo edgeInfo) {
@@ -68,7 +68,21 @@ public class EdgeYaml {
                 edgeInfo.getPropertyGroups().stream()
                         .map(PropertyGroupYaml::new)
                         .collect(Collectors.toList());
-        this.version = edgeInfo.getVersion();
+    }
+
+    public EdgeInfo toEdgeInfo() {
+        return new EdgeInfo(
+                src_label,
+                edge_label,
+                dst_label,
+                chunk_size,
+                src_chunk_size,
+                dst_chunk_size,
+                directed,
+                prefix,
+                adjacent_lists.stream().map(AdjacentListYamlParser::toAdjacentList).collect(Collectors.toUnmodifiableList()),
+                property_groups.stream().map(PropertyGroupYamlParser::toPropertyGroup).collect(Collectors.toList())
+        );
     }
 
     public String getSrc_type() {
