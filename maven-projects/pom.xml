@@ -33,7 +33,9 @@
     <packaging>pom</packaging>
 
     <name>Apache GraphAr Root POM</name>
-    <description>Apache GraphAr(Incubating) is an open source, standard data file format for graph data storage and retrieval.</description>
+    <description>Apache GraphAr(Incubating) is an open source, standard data file format for graph data storage and
+        retrieval.
+    </description>
     <url>https://graphar.apache.org/</url>
 
     <mailingLists>
@@ -58,18 +60,19 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-<!--    <issueManagement>
-        <system>GitHub</system>
-        <url>https://github.com/apache/graphar/issues</url>
-    </issueManagement>
-    <scm>
-        <connection>scm:git:https://github.com/apache/graphar.git</connection>
-        <developerConnection>scm:git:https://github.com/apache/graphar.git</developerConnection>
-        <tag>HEAD</tag>
-        <url>https://github.com/apache/graphar</url>
-    </scm>-->
+    <!--    <issueManagement>
+            <system>GitHub</system>
+            <url>https://github.com/apache/graphar/issues</url>
+        </issueManagement>
+        <scm>
+            <connection>scm:git:https://github.com/apache/graphar.git</connection>
+            <developerConnection>scm:git:https://github.com/apache/graphar.git</developerConnection>
+            <tag>HEAD</tag>
+            <url>https://github.com/apache/graphar</url>
+        </scm>-->
     <properties>
         <graphar.version>0.12.0-SNAPSHOT</graphar.version>
+        <spotless-maven-plugin.version>2.20.0</spotless-maven-plugin.version>
     </properties>
     <modules>
         <module>java</module>
@@ -77,4 +80,16 @@
         <module>info</module>
         <module>proto</module>
     </modules>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.diffplug.spotless</groupId>
+                    <artifactId>spotless-maven-plugin</artifactId>
+                    <version>${spotless-maven-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>
