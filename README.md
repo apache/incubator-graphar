@@ -12,7 +12,8 @@ CI](https://github.com/apache/incubator-graphar/actions/workflows/docs.yml/badge
 [![GraphAr
 Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://graphar.apache.org/docs/)
 [![Good First
-Issue](https://img.shields.io/github/labels/apache/incubator-graphar/Good%20First%20Issue?color=green&label=Contribute%20&style=plastic)](https://github.com/apache/incubator-graphar/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+Issue](https://img.shields.io/github/labels/apache/incubator-graphar/Good%20First%20Issue?color=green&label=Contribute)](https://github.com/apache/incubator-graphar/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+[![README-zh](https://shields.io/badge/README-%E4%B8%AD%E6%96%87-blue)](README-zh-cn.md)
 
 ## What is GraphAr?
 
@@ -115,7 +116,8 @@ table, which can be seen from the following figure.
 <img src="docs/images/vertex_physical_table.png" class="align-center"
 width="650" alt="vertex physical table" />
 
-**Note**: For efficiently utilize the filter push-down of the payload
+> [!NOTE]
+> For efficiently utilize the filter push-down of the payload
 file format like Parquet, the internal vertex id is stored in the
 payload file as a column. And since the internal vertex id is
 continuous, the payload file format can use the delta encoding for the
@@ -216,7 +218,8 @@ for details about the Scala with Spark library.
 
 ### The Java Library
 
-The Java library is under development. 
+> [!NOTE] 
+> The Java library is under development. 
 
 The GraphAr Java library is created with bindings to the C++ library
 (currently at version v0.10.0), utilizing
@@ -227,7 +230,8 @@ details about the building of the Java library.
 
 ### The Python with PySpark Library
 
-The Python with PySpark library is under development.
+> [!NOTE] 
+> The Python with PySpark library is under development.
 
 The PySpark library is developed as bindings to the GraphAr
 Spark library. See [GraphAr PySpark
