@@ -132,8 +132,7 @@ For maintaining a type of edges (that with the same triplet of the
 source label, edge label, and destination label), a logical edge table
 is established. And in order to support quickly creating a graph from
 the graph storage file, the logical edge table could maintain the
-topology information in a way similar to CSR/CSC (learn more about
-[CSR/CSC](https://en.wikipedia.org/wiki/Sparse_matrix)), that is, the
+topology information in a way similar to [CSR/CSC](https://en.wikipedia.org/wiki/Sparse_matrix), that is, the
 edges are ordered by the internal vertex id of either source or
 destination. In this way, an offset table is required to store the start
 offset for each vertex's edges, and the edges with the same
