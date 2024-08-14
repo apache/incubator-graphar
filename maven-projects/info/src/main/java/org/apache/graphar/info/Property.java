@@ -19,7 +19,6 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.info.yaml.PropertyYamlParser;
 import org.apache.graphar.proto.DataType;
 
 public class Property {

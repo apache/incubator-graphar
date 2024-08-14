@@ -28,7 +28,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.graphar.info.yaml.PropertyGroupYamlParser;
 import org.apache.graphar.proto.DataType;
 import org.apache.graphar.proto.FileType;
 import org.apache.graphar.util.GeneralParams;

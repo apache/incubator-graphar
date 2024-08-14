@@ -240,24 +240,6 @@ public class GraphInfo {
         return protoGraphInfo.getPrefix();
     }
 
-    private static List<VertexInfo> vertexFileNames2VertexInfos(
-            List<String> vertexFileNames, Configuration conf) throws IOException {
-        ArrayList<VertexInfo> tempVertices = new ArrayList<>(vertexFileNames.size());
-        for (String vertexFileName : vertexFileNames) {
-            tempVertices.add(VertexInfo.load(vertexFileName, conf));
-        }
-        return List.copyOf(tempVertices);
-    }
-
-    private static List<EdgeInfo> edgeFileNames2EdgeInfos(
-            List<String> edgeFileNames, Configuration conf) throws IOException {
-        ArrayList<EdgeInfo> tempEdges = new ArrayList<>(edgeFileNames.size());
-        for (String edgeFileName : edgeFileNames) {
-            tempEdges.add(EdgeInfo.load(edgeFileName, conf));
-        }
-        return List.copyOf(tempEdges);
-    }
-
     private void checkVertexExist(String label) {
         if (!hasVertexInfo(label)) {
             throw new IllegalArgumentException(

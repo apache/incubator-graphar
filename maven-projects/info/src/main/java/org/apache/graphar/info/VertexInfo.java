@@ -55,15 +55,6 @@ public class VertexInfo {
                 .build();
     }
 
-    VertexInfo(
-            org.apache.graphar.proto.VertexInfo protoVertexInfo) {
-        this.protoVertexInfo = protoVertexInfo;
-        this.cachedPropertyGroups = new PropertyGroups(
-                protoVertexInfo.getPropertiesList().stream()
-                        .map(PropertyGroup::new)
-                        .collect(Collectors.toUnmodifiableList()));
-    }
-
     org.apache.graphar.proto.VertexInfo getProto() {
         return protoVertexInfo;
     }

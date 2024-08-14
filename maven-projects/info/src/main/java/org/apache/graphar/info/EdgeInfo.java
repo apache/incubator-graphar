@@ -27,7 +27,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.apache.graphar.info.yaml.AdjacentListYamlParser;
 import org.apache.graphar.info.yaml.EdgeYamlParser;
 import org.apache.graphar.info.yaml.GraphYamlParser;
 import org.apache.graphar.proto.AdjListType;

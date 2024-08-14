@@ -115,7 +115,7 @@ public class EnumTransferTools {
             case "src":
                 return ordered ? AdjListType.ORDERED_BY_SOURCE : AdjListType.UNORDERED_BY_SOURCE;
             case "dst":
-                return ordered ? AdjListType.ORDERED_BY_TARGET : AdjListType.UNORDERED_BY_TARGET;
+                return ordered ? AdjListType.ORDERED_BY_DESTINATION : AdjListType.UNORDERED_BY_DESTINATION;
             default:
                 throw new IllegalArgumentException("Invalid alignedBy: " + alignedBy);
         }

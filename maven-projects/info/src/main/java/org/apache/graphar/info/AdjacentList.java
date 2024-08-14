@@ -19,7 +19,6 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.info.yaml.AdjacentListYamlParser;
 import org.apache.graphar.proto.AdjListType;
 import org.apache.graphar.proto.FileType;
 
