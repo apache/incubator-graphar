@@ -20,7 +20,6 @@
 package org.apache.graphar.info;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,10 +45,7 @@ public class GraphInfo {
     private final Map<String, EdgeInfo> cachedEdgeInfoMap;
 
     public GraphInfo(
-            String name,
-            List<VertexInfo> vertexInfos,
-            List<EdgeInfo> edgeInfos,
-            String prefix) {
+            String name, List<VertexInfo> vertexInfos, List<EdgeInfo> edgeInfos, String prefix) {
         this.cachedVertexInfoList = List.copyOf(vertexInfos);
         this.cachedEdgeInfoList = List.copyOf(edgeInfos);
         this.cachedVertexInfoMap =
@@ -82,8 +78,7 @@ public class GraphInfo {
             List<VertexInfo> cachedVertexInfoList,
             List<EdgeInfo> cachedEdgeInfoList,
             Map<String, VertexInfo> cachedVertexInfoMap,
-            Map<String, EdgeInfo> cachedEdgeInfoMap
-            ) {
+            Map<String, EdgeInfo> cachedEdgeInfoMap) {
 
         this.protoGraphInfo = protoGraphInfo;
         this.cachedVertexInfoList = cachedVertexInfoList;
@@ -166,8 +161,7 @@ public class GraphInfo {
                         newVertexInfoList,
                         cachedEdgeInfoList,
                         newVertexInfoMap,
-                        cachedEdgeInfoMap
-                        ));
+                        cachedEdgeInfoMap));
     }
 
     public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
@@ -181,7 +175,8 @@ public class GraphInfo {
                         .addEdges(edgeInfo.getProto())
                         .build();
         final List<EdgeInfo> newEdgeInfos =
-                Stream.concat(cachedEdgeInfoList.stream(), Stream.of(edgeInfo)).collect(Collectors.toList());
+                Stream.concat(cachedEdgeInfoList.stream(), Stream.of(edgeInfo))
+                        .collect(Collectors.toList());
         final Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
                 Stream.concat(
                                 cachedEdgeInfoMap.entrySet().stream(),

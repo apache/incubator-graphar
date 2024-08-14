@@ -26,11 +26,12 @@ public class AdjacentList {
     private final org.apache.graphar.proto.AdjacentList protoAdjacentList;
 
     public AdjacentList(AdjListType type, FileType fileType, String prefix) {
-        protoAdjacentList = org.apache.graphar.proto.AdjacentList.newBuilder()
-                .setType(type)
-                .setFileType(fileType)
-                .setPrefix(prefix)
-                .build();
+        protoAdjacentList =
+                org.apache.graphar.proto.AdjacentList.newBuilder()
+                        .setType(type)
+                        .setFileType(fileType)
+                        .setPrefix(prefix)
+                        .build();
     }
 
     public AdjListType getType() {

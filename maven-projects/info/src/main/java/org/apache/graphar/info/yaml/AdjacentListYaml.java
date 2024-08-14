@@ -37,8 +37,14 @@ public class AdjacentListYamlParser {
 
     public AdjacentListYamlParser(AdjacentList adjacentList) {
         final var adjListType = adjacentList.getType();
-        this.ordered = adjListType == AdjListType.ORDERED_BY_SOURCE || adjListType == AdjListType.ORDERED_BY_DESTINATION;
-        this.aligned_by = adjListType == AdjListType.ORDERED_BY_SOURCE || adjListType == AdjListType.UNORDERED_BY_SOURCE ? "src" : "dst";
+        this.ordered =
+                adjListType == AdjListType.ORDERED_BY_SOURCE
+                        || adjListType == AdjListType.ORDERED_BY_DESTINATION;
+        this.aligned_by =
+                adjListType == AdjListType.ORDERED_BY_SOURCE
+                                || adjListType == AdjListType.UNORDERED_BY_SOURCE
+                        ? "src"
+                        : "dst";
         this.file_type = EnumTransferTools.fileType2String(adjacentList.getFileType());
         this.prefix = adjacentList.getPrefix();
     }
@@ -47,9 +53,9 @@ public class AdjacentListYamlParser {
         return new AdjacentList(
                 EnumTransferTools.orderedAndAlignedBy2AdjListType(ordered, aligned_by),
                 EnumTransferTools.string2FileType(file_type),
-                prefix
-        );
+                prefix);
     }
+
     public boolean isOrdered() {
         return ordered;
     }
@@ -81,6 +87,4 @@ public class AdjacentListYamlParser {
     public void setPrefix(String prefix) {
         this.prefix = prefix;
     }
-
-
 }

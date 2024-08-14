@@ -53,7 +53,9 @@ public class VertexYamlParser {
         return new VertexInfo(
                 label,
                 chunk_size,
-                property_groups.stream().map(PropertyGroupYamlParser::toPropertyGroup).collect(Collectors.toList()),
+                property_groups.stream()
+                        .map(PropertyGroupYamlParser::toPropertyGroup)
+                        .collect(Collectors.toList()),
                 prefix);
     }
 

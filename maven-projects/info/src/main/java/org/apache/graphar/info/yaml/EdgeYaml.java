@@ -80,9 +80,12 @@ public class EdgeYaml {
                 dst_chunk_size,
                 directed,
                 prefix,
-                adjacent_lists.stream().map(AdjacentListYamlParser::toAdjacentList).collect(Collectors.toUnmodifiableList()),
-                property_groups.stream().map(PropertyGroupYamlParser::toPropertyGroup).collect(Collectors.toList())
-        );
+                adjacent_lists.stream()
+                        .map(AdjacentListYamlParser::toAdjacentList)
+                        .collect(Collectors.toUnmodifiableList()),
+                property_groups.stream()
+                        .map(PropertyGroupYamlParser::toPropertyGroup)
+                        .collect(Collectors.toList()));
     }
 
     public String getSrc_type() {

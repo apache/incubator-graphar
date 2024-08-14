@@ -47,8 +47,7 @@ public class PropertyYaml {
                 name,
                 EnumTransferTools.string2DataType(data_type),
                 is_primary,
-                is_nullable.orElseGet(() -> !is_primary)
-        );
+                is_nullable.orElseGet(() -> !is_primary));
     }
 
     public String getName() {

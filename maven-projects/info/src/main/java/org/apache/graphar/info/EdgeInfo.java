@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.graphar.info.yaml.EdgeYamlParser;
 import org.apache.graphar.info.yaml.GraphYamlParser;
 import org.apache.graphar.proto.AdjListType;
@@ -63,24 +62,25 @@ public class EdgeInfo {
                                 Collectors.toUnmodifiableMap(
                                         AdjacentList::getType, Function.identity()));
         this.cachedPropertyGroups = new PropertyGroups(propertyGroupsAsList);
-        this.protoEdgeInfo = org.apache.graphar.proto.EdgeInfo.newBuilder()
-                .setSourceVertexType(srcLabel)
-                .setType(edgeLabel)
-                .setDestinationVertexChunkSize(dstChunkSize)
-                .setChunkSize(chunkSize)
-                .setSourceVertexChunkSize(srcChunkSize)
-                .setDestinationVertexType(dstLabel)
-                .setIsDirected(directed)
-                .setPrefix(prefix)
-                .addAllAdjacentList(
-                        adjacentListsAsList.stream()
-                                .map(AdjacentList::getProto)
-                                .collect(Collectors.toUnmodifiableList()))
-                .addAllProperties(
-                        propertyGroupsAsList.stream()
-                                .map(PropertyGroup::getProto)
-                                .collect(Collectors.toUnmodifiableList()))
-                .build();
+        this.protoEdgeInfo =
+                org.apache.graphar.proto.EdgeInfo.newBuilder()
+                        .setSourceVertexType(srcLabel)
+                        .setType(edgeLabel)
+                        .setDestinationVertexChunkSize(dstChunkSize)
+                        .setChunkSize(chunkSize)
+                        .setSourceVertexChunkSize(srcChunkSize)
+                        .setDestinationVertexType(dstLabel)
+                        .setIsDirected(directed)
+                        .setPrefix(prefix)
+                        .addAllAdjacentList(
+                                adjacentListsAsList.stream()
+                                        .map(AdjacentList::getProto)
+                                        .collect(Collectors.toUnmodifiableList()))
+                        .addAllProperties(
+                                propertyGroupsAsList.stream()
+                                        .map(PropertyGroup::getProto)
+                                        .collect(Collectors.toUnmodifiableList()))
+                        .build();
     }
 
     private EdgeInfo(
@@ -95,7 +95,6 @@ public class EdgeInfo {
     org.apache.graphar.proto.EdgeInfo getProto() {
         return protoEdgeInfo;
     }
-
 
     public static EdgeInfo load(String edgeInfoPath) throws IOException {
         return load(edgeInfoPath, new Configuration());
@@ -120,7 +119,11 @@ public class EdgeInfo {
     }
 
     public static String concat(String srcLabel, String edgeLabel, String dstLabel) {
-        return srcLabel + GeneralParams.regularSeparator + edgeLabel + GeneralParams.regularSeparator + dstLabel;
+        return srcLabel
+                + GeneralParams.regularSeparator
+                + edgeLabel
+                + GeneralParams.regularSeparator
+                + dstLabel;
     }
 
     public Optional<EdgeInfo> addAdjacentListAsNew(AdjacentList adjacentList) {
@@ -134,11 +137,7 @@ public class EdgeInfo {
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));
-        return Optional.of(
-                new EdgeInfo(
-                        protoEdgeInfo,
-                        newAdjacentLists,
-                        cachedPropertyGroups));
+        return Optional.of(new EdgeInfo(protoEdgeInfo, newAdjacentLists, cachedPropertyGroups));
     }
 
     public Optional<EdgeInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
@@ -148,9 +147,7 @@ public class EdgeInfo {
                 .map(
                         newPropertyGroups ->
                                 new EdgeInfo(
-                                        protoEdgeInfo,
-                                        cachedAdjacentLists,
-                                        newPropertyGroups));
+                                        protoEdgeInfo, cachedAdjacentLists, newPropertyGroups));
     }
 
     public boolean hasAdjListType(AdjListType adjListType) {

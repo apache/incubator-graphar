@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.graphar.proto.DataType;
 import org.apache.graphar.proto.FileType;
 import org.apache.graphar.util.GeneralParams;
@@ -44,17 +43,28 @@ public class PropertyGroup implements Iterable<Property> {
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Property::getName, Function.identity()));
-        this.protoPropertyGroup = org.apache.graphar.proto.PropertyGroup.newBuilder()
-                .addAllProperties(cachedPropertyList.stream().map(Property::getProto).collect(Collectors.toList()))
-                .setFileType(fileType)
-                .setPrefix(prefix)
-                .build();
+        this.protoPropertyGroup =
+                org.apache.graphar.proto.PropertyGroup.newBuilder()
+                        .addAllProperties(
+                                cachedPropertyList.stream()
+                                        .map(Property::getProto)
+                                        .collect(Collectors.toList()))
+                        .setFileType(fileType)
+                        .setPrefix(prefix)
+                        .build();
     }
 
     PropertyGroup(org.apache.graphar.proto.PropertyGroup protoPropertyGroup) {
         this.protoPropertyGroup = protoPropertyGroup;
-        this.cachedPropertyList = protoPropertyGroup.getPropertiesList().stream().map(Property::new).collect(Collectors.toUnmodifiableList());
-        this.cachedPropertyMap = cachedPropertyList.stream().collect(Collectors.toUnmodifiableMap(Property::getName, Function.identity()));
+        this.cachedPropertyList =
+                protoPropertyGroup.getPropertiesList().stream()
+                        .map(Property::new)
+                        .collect(Collectors.toUnmodifiableList());
+        this.cachedPropertyMap =
+                cachedPropertyList.stream()
+                        .collect(
+                                Collectors.toUnmodifiableMap(
+                                        Property::getName, Function.identity()));
     }
 
     public Optional<PropertyGroup> addPropertyAsNew(Property property) {
@@ -62,9 +72,15 @@ public class PropertyGroup implements Iterable<Property> {
             return Optional.empty();
         }
         List<Property> newPropertyList =
-                Stream.concat(protoPropertyGroup.getPropertiesList().stream().map(Property::new), Stream.of(property))
+                Stream.concat(
+                                protoPropertyGroup.getPropertiesList().stream().map(Property::new),
+                                Stream.of(property))
                         .collect(Collectors.toUnmodifiableList());
-        return Optional.of(new PropertyGroup(newPropertyList, protoPropertyGroup.getFileType(), protoPropertyGroup.getPrefix()));
+        return Optional.of(
+                new PropertyGroup(
+                        newPropertyList,
+                        protoPropertyGroup.getFileType(),
+                        protoPropertyGroup.getPrefix()));
     }
 
     @Override
@@ -105,9 +121,9 @@ public class PropertyGroup implements Iterable<Property> {
 }
 
 /**
- * PropertyGroups is a helper class to manage a list of PropertyGroup objects,
- * which can be used by {@link org.apache.graphar.info.VertexInfo} and {@link org.apache.graphar.info.EdgeInfo} conveniently.
- * but should not be exposed to outer side of the package.
+ * PropertyGroups is a helper class to manage a list of PropertyGroup objects, which can be used by
+ * {@link org.apache.graphar.info.VertexInfo} and {@link org.apache.graphar.info.EdgeInfo}
+ * conveniently. but should not be exposed to outer side of the package.
  */
 class PropertyGroups {
     private final List<PropertyGroup> propertyGroupList;
@@ -118,7 +134,9 @@ class PropertyGroups {
         this.propertyGroupList = List.copyOf(propertyGroupList);
         this.properties =
                 propertyGroupList.stream()
-                        .flatMap(propertyGroup -> propertyGroup.getCachedPropertyMap().values().stream())
+                        .flatMap(
+                                propertyGroup ->
+                                        propertyGroup.getCachedPropertyMap().values().stream())
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Property::getName, Function.identity()));
@@ -165,9 +183,7 @@ class PropertyGroups {
                                         Property::getName, Function.identity()));
         return Optional.of(
                 new PropertyGroups(
-                        newPropertyGroupsAsList,
-                        Map.copyOf(tempPropertyGroupMap),
-                        newProperties));
+                        newPropertyGroupsAsList, Map.copyOf(tempPropertyGroupMap), newProperties));
     }
 
     boolean hasProperty(String propertyName) {

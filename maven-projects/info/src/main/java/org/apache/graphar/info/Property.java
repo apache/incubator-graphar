@@ -25,12 +25,13 @@ public class Property {
     private final org.apache.graphar.proto.Property protoProperty;
 
     public Property(String name, DataType dataType, boolean primary, boolean nullable) {
-        protoProperty = org.apache.graphar.proto.Property.newBuilder()
-                .setName(name)
-                .setType(dataType)
-                .setIsPrimaryKey(primary)
-                .setIsNullable(nullable)
-                .build();
+        protoProperty =
+                org.apache.graphar.proto.Property.newBuilder()
+                        .setName(name)
+                        .setType(dataType)
+                        .setIsPrimaryKey(primary)
+                        .setIsNullable(nullable)
+                        .build();
     }
 
     Property(org.apache.graphar.proto.Property protoProperty) {

@@ -40,19 +40,18 @@ public class VertexInfo {
     private final PropertyGroups cachedPropertyGroups;
 
     public VertexInfo(
-            String type,
-            long chunkSize,
-            List<PropertyGroup> propertyGroups,
-            String prefix) {
+            String type, long chunkSize, List<PropertyGroup> propertyGroups, String prefix) {
         this.cachedPropertyGroups = new PropertyGroups(propertyGroups);
-        this.protoVertexInfo = org.apache.graphar.proto.VertexInfo.newBuilder()
-                .setType(type)
-                .setChunkSize(chunkSize)
-                .addAllProperties(propertyGroups.stream()
-                        .map(PropertyGroup::getProto)
-                        .collect(Collectors.toList()))
-                .setPrefix(prefix)
-                .build();
+        this.protoVertexInfo =
+                org.apache.graphar.proto.VertexInfo.newBuilder()
+                        .setType(type)
+                        .setChunkSize(chunkSize)
+                        .addAllProperties(
+                                propertyGroups.stream()
+                                        .map(PropertyGroup::getProto)
+                                        .collect(Collectors.toList()))
+                        .setPrefix(prefix)
+                        .build();
     }
 
     org.apache.graphar.proto.VertexInfo getProto() {
@@ -87,7 +86,8 @@ public class VertexInfo {
                 .addPropertyGroupAsNew(propertyGroup)
                 .map(
                         newPropertyGroups ->
-                                new VertexInfo(protoVertexInfo.getType(),
+                                new VertexInfo(
+                                        protoVertexInfo.getType(),
                                         protoVertexInfo.getChunkSize(),
                                         newPropertyGroups.getPropertyGroupList(),
                                         protoVertexInfo.getPrefix()));
