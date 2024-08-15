@@ -13,6 +13,7 @@ CI](https://github.com/apache/incubator-graphar/actions/workflows/docs.yml/badge
 Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://graphar.apache.org/docs/)
 [![Good First
 Issue](https://img.shields.io/github/labels/apache/incubator-graphar/Good%20First%20Issue?color=green&label=Contribute)](https://github.com/apache/incubator-graphar/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+[![README-en](https://shields.io/badge/README-English-blue)](README.md)
 
 ## GraphAr 项目简介
 
@@ -58,9 +59,9 @@ width="700" alt="property graph" />
 
 #### 顶点的逻辑表
 
-每种类型的顶点（即具有相同标签的顶点）构成一个逻辑顶点表，每个顶点在此类型内被分配一个全局索引（称为内部顶点ID），从0开始，对应于逻辑顶点表中顶点的行号。下图中提供了标签为“person”的顶点逻辑表的示例布局供参考。
+每种类型的顶点（即具有相同标签的顶点）构成一个逻辑顶点表，每个顶点在此类型内被分配一个全局索引（称为内部顶点 ID），从 0 开始，对应于逻辑顶点表中顶点的行号。下图中提供了标签为 “person” 的顶点逻辑表的示例布局供参考。
 
-通过内部顶点ID和顶点标签，可以唯一标识一个顶点，并且可以从该表中访问其相应的属性。内部顶点ID还用于在维护图的拓扑结构时标识边的起始顶点和终止顶点。
+通过内部顶点 ID 和顶点标签，可以唯一标识一个顶点，并且可以从该表中访问其相应的属性。内部顶点 ID 还用于在维护图的拓扑结构时标识边的起始顶点和终止顶点。
 
 <img src="docs/images/vertex_logical_table.png" class="align-center"
 width="650" alt="vertex logical table" />
@@ -69,19 +70,19 @@ width="650" alt="vertex logical table" />
 
 为了提高读写效率，逻辑顶点表将被分割成多个连续的顶点块。为了保持随机访问的能力，相同标签的顶点块大小是固定的。为了支持访问所需属性而无需从文件中读取所有属性，并且能够在不修改现有文件的情况下为顶点添加属性，逻辑表的列将被分为多个列组。
 
-以 person 顶点表为例，如果块大小设置为500，那么逻辑表将被分成每个 500 行的子逻辑表，最后一个子逻辑表可能少于500行。用于维护属性的列也将被分成不同的组（例如，在我们的示例中为2个组）。因此，总共创建了 4 个物理顶点表来存储该示例逻辑表，如下图所示。
+以 person 顶点表为例，如果块大小设置为 500，那么逻辑表将被分成每个 500 行的子逻辑表，最后一个子逻辑表可能少于 500 行。用于维护属性的列也将被分成不同的组（例如，在我们的示例中为 2 个组）。因此，总共创建了 4 个物理顶点表来存储该示例逻辑表，如下图所示。
 
 <img src="docs/images/vertex_physical_table.png" class="align-center"
 width="650" alt="vertex physical table" />
 
 > [!NOTE]
-> 为了有效利用诸如 Parquet 之类 payload 文件格式的过滤下推功能，内部顶点ID作为一列存储在 payload 文件中。由于内部顶点ID是连续的，payload 文件格式可以对内部顶点ID列使用增量编码，这不会给存储带来太多的开销。
+> 为了有效利用诸如 Parquet 之类 payload 文件格式的过滤下推功能，内部顶点 ID 作为一列存储在 payload 文件中。由于内部顶点 ID 是连续的，payload 文件格式可以对内部顶点 ID 列使用增量编码，这不会给存储带来太多的开销。
 
 ### GraphAr 的边
 
 #### 边的逻辑表
 
-为了维护一种类型的边（具有相同的源标签、边标签和目标标签），会建立一个逻辑边表。为了支持从图存储文件中快速创建图，逻辑边表可以以类似于 [CSR/CSC](https://en.wikipedia.org/wiki/Sparse_matrix) 的方式维护拓扑信息，即边按照源或目标的内部顶点ID排序。通过这种方式，需要一个偏移表来存储每个顶点的边的起始偏移量，并且具有相同源/目标的边将连续存储在逻辑表中。
+为了维护一种类型的边（具有相同的源标签、边标签和目标标签），会建立一个逻辑边表。为了支持从图存储文件中快速创建图，逻辑边表可以以类似于 [CSR/CSC](https://en.wikipedia.org/wiki/Sparse_matrix) 的方式维护拓扑信息，即边按照源或目标的内部顶点 ID 排序。通过这种方式，需要一个偏移表来存储每个顶点的边的起始偏移量，并且具有相同源/目标的边将连续存储在逻辑表中。
 
 以 person knows person 边的逻辑表为例，逻辑边表看起来如下所示：
 
@@ -89,21 +90,21 @@ width="650" alt="vertex physical table" />
 width="650" alt="edge logical table" />
 
 #### 边的物理表
-与顶点表相同，逻辑边表也被分割为一些子逻辑表，每个子逻辑表包含源（或目标）顶点在相同顶点块中的边。根据分区策略和边的顺序，边可以按照以下四种类型之一存储在GraphAr中：
+与顶点表相同，逻辑边表也被分割为一些子逻辑表，每个子逻辑表包含源（或目标）顶点在相同顶点块中的边。根据分区策略和边的顺序，边可以按照以下四种类型之一存储在 GraphAr 中：
 
-- **ordered_by_source**：逻辑表中的所有边按照源的内部顶点ID排序，并进一步按源顶点ID进行分区，这可以看作是CSR格式。
-- **ordered_by_dest**：逻辑表中的所有边按照目标的内部顶点ID排序，并进一步按目标顶点ID进行分区，这可以看作是CSC格式。
-- **unordered_by_source**：使用源顶点的内部ID作为分区键，将边分割成不同的子逻辑表，并且每个子逻辑表中的边是无序的，这可以看作是COO格式。
-- **unordered_by_dest**：使用目标顶点的内部ID作为分区键，将边分割成不同的子逻辑表，并且每个子逻辑表中的边是无序的，这也可以看作是COO格式。
+- **ordered_by_source**：逻辑表中的所有边按照源的内部顶点 ID 排序，并进一步按源顶点 ID 进行分区，这可以看作是 CSR 格式。
+- **ordered_by_dest**：逻辑表中的所有边按照目标的内部顶点 ID 排序，并进一步按目标顶点 ID 进行分区，这可以看作是 CSC 格式。
+- **unordered_by_source**：使用源顶点的内部 ID 作为分区键，将边分割成不同的子逻辑表，并且每个子逻辑表中的边是无序的，这可以看作是 COO 格式。
+- **unordered_by_dest**：使用目标顶点的内部 ID 作为分区键，将边分割成不同的子逻辑表，并且每个子逻辑表中的边是无序的，这也可以看作是 COO 格式。
 
 之后，一个子逻辑表会进一步被划分为具有预定义固定行数的边块（称为边块大小）。最终，一个边块会按照以下方式分离为物理表：
 
-- 一个adjList表（仅包含两列：源和目标的内部顶点ID）。
-- 0个或多个边属性表，每个表包含一组属性。
+- 一个 `adjList` 表（仅包含两列：源和目标的内部顶点 ID）。
+- 0 个或多个边属性表，每个表包含一组属性。
 
-此外，对于**ordered_by_source** 或 **ordered_by_dest** 类型的边，还会有一个偏移表。偏移表用于记录每个顶点的边的起始点。偏移表的分区应与相应的顶点表的分区保持一致。每个偏移块的第一行总是0，表示对应子逻辑边表的起始点。
+此外，对于 **ordered_by_source** 或 **ordered_by_dest** 类型的边，还会有一个偏移表。偏移表用于记录每个顶点的边的起始点。偏移表的分区应与相应的顶点表的分区保持一致。每个偏移块的第一行总是 0，表示对应子逻辑边表的起始点。
 
-以 `person knows person` 边为例来说明。假设顶点块大小设置为500，边块大小为1024，并且边是**ordered_by_source**类型的，那么这些边可以存储在以下物理表中：
+以 `person--knows->person` 边为例来说明。假设顶点块大小设置为 500，边块大小为 1024，并且边是 **ordered_by_source** 类型的，那么这些边可以存储在以下物理表中：
 
 <img src="docs/images/edge_physical_table1.png" class="align-center"
 width="650" alt="edge logical table1" />
@@ -139,11 +140,11 @@ PySpark 库是作为 GraphAr Spark 库的绑定进行开发的。有关 PySpark 
 
 ## 参与本项目
 
-- 请参阅[贡献指南](https://github.com/apache/incubator-graphar/blob/main/CONTRIBUTING.md)。
-- 提交[问题](https://github.com/apache/incubator-graphar/issues)以报告错误或提出功能请求。
-- 在[开发者邮件列表](mailto:dev@graphar.apache.org)上讨论（[订阅](mailto:dev-subscribe@graphar.apache.org?subject=(send%20this%20email%20to%20subscribe)) / [取消订阅](mailto:dev-unsubscribe@graphar.apache.org?subject=(send%20this%20email%20to%20unsubscribe)) / [档案](https://lists.apache.org/list.html?dev@graphar.apache.org)）。
-- 在[GitHub讨论](https://github.com/apache/graphar/discussions/new?category=q-a)中提出问题。
-- 加入我们的[每周社区会议](https://github.com/apache/incubator-graphar/wiki/GraphAr-Weekly-Community-Meeting)。
+- 请参阅 [贡献指南](https://github.com/apache/incubator-graphar/blob/main/CONTRIBUTING.md)。
+- 提交 [Github Issue](https://github.com/apache/incubator-graphar/issues) 以报告错误或提出功能请求。
+- 在 [开发者邮件列表](mailto:dev@graphar.apache.org)上讨论（[订阅](mailto:dev-subscribe@graphar.apache.org?subject=(send%20this%20email%20to%20subscribe)) / [取消订阅](mailto:dev-unsubscribe@graphar.apache.org?subject=(send%20this%20email%20to%20unsubscribe)) / [归档](https://lists.apache.org/list.html?dev@graphar.apache.org)）。
+- 在 [GitHub Discussion](https://github.com/apache/graphar/discussions/new?category=q-a) 中提出问题。
+- 加入我们的 [每周社区会议](https://github.com/apache/incubator-graphar/wiki/GraphAr-Weekly-Community-Meeting)。
 
 ## 开源协议
 
