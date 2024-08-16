@@ -60,7 +60,7 @@ jobs:
                             libarrow-dataset-dev \
                             libarrow-acero-dev \
                             libparquet-dev
-        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen lcov
 
         # install benchmark
         git clone --branch v1.8.3 https://github.com/google/benchmark.git --depth 1
@@ -83,7 +83,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON  -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_C_FLAGS="--coverage"
 
     - name: Cpp Format and lint
       working-directory: "cpp/build"
@@ -146,12 +146,26 @@ jobs:
       run: |
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
+      
+    - name: Generate coverage info
+      working-directory: "cpp/build"
+      run: |
+        lcov --capture --directory . --output-file coverage.info
+        lcov --remove coverage.info '/usr/*' --output-file coverage.info
+        lcov --list coverage.info
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
     
     - name: Benchmark
       working-directory: "cpp/build"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
+
+
     
     - name: Use Static Arrow
       working-directory: "cpp"
