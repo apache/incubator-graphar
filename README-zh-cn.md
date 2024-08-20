@@ -144,7 +144,7 @@ PySpark 库是作为 GraphAr Spark 库的绑定进行开发的。有关 PySpark 
 - 提交 [Github Issue](https://github.com/apache/incubator-graphar/issues) 以报告错误或提出功能请求。
 - 在 [开发者邮件列表](mailto:dev@graphar.apache.org)上讨论（[订阅](mailto:dev-subscribe@graphar.apache.org?subject=(send%20this%20email%20to%20subscribe)) / [取消订阅](mailto:dev-unsubscribe@graphar.apache.org?subject=(send%20this%20email%20to%20unsubscribe)) / [归档](https://lists.apache.org/list.html?dev@graphar.apache.org)）。
 - 在 [GitHub Discussion](https://github.com/apache/graphar/discussions/new?category=q-a) 中提出问题。
-- 加入我们的 [每周社区会议](https://github.com/apache/incubator-graphar/wiki/GraphAr-Weekly-Community-Meeting)。
+- 加入我们的 [两周一次的社区会议](https://github.com/apache/incubator-graphar/wiki/GraphAr-Community-Meeting)。
 
 ## 开源协议
 
