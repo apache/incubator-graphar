@@ -35,24 +35,6 @@ import org.apache.graphar.{
 
 object Utils {
 
-  private val REDACTION_REPLACEMENT_TEXT = "*********(redacted)"
-
-  /**
-   * Redact the sensitive information in the given string.
-   */
-  // folk of Utils.redact of spark
-  def redact(regex: Option[Regex], text: String): String = {
-    regex match {
-      case None => text
-      case Some(r) =>
-        if (text == null || text.isEmpty) {
-          text
-        } else {
-          r.replaceAllIn(text, REDACTION_REPLACEMENT_TEXT)
-        }
-    }
-  }
-
   def sparkDataType2GraphArTypeName(dataType: DataType): String = {
     val typeName = dataType.typeName
     val grapharTypeName = typeName match {
