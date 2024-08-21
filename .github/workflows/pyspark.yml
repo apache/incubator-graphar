@@ -74,6 +74,12 @@ jobs:
       working-directory: pyspark
       run: make install_test
 
-    - name: Run PyTest
+    - name: Run PyTest and Generate Coverage Report
       working-directory: pyspark
-      run: make test
+      run: make coverage_report
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: ./coverage.xml
+        token: ${{ secrets.CODECOV_TOKEN }}
