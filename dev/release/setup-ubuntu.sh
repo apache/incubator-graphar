@@ -30,6 +30,7 @@ id=$(. /etc/os-release && echo ${ID})
 
 apt-get install -y -q --no-install-recommends \
   build-essential \
+  libprotobuf-dev \
   cmake \
   git \
   gnupg \
