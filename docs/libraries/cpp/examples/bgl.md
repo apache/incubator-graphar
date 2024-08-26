@@ -86,9 +86,9 @@ std::vector<graphar::Property> property_vector = {cc};
 auto group = graphar::CreatePropertyGroup(property_vector, graphar::FileType::PARQUET);
 
 // construct the new vertex info
-std::string vertex_type = "cc_result", vertex_prefix = "result/";
+std::string vertex_label = "cc_result", vertex_prefix = "result/";
 int chunk_size = 100;
-auto new_info = graphar::CreateVertexInfo(vertex_type, chunk_size, {group}, vertex_prefix);
+auto new_info = graphar::CreateVertexInfo(vertex_label, chunk_size, {group}, vertex_prefix);
 
 // access the vertices via the index map and vertex iterator of BGL
 typedef boost::property_map<Graph, boost::vertex_index_t>::type IndexMap;
