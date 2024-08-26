@@ -107,7 +107,6 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       auto origin_property = pg->GetProperties()[0];
       REQUIRE(origin_property.type->Equals(int64()));
 
-
       // change to int32_t
       Property new_property("id", int32(), origin_property.is_primary,
                             origin_property.is_nullable);
@@ -235,9 +234,9 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
   }
 
   SECTION("AdjListArrowChunkReader") {
-    auto maybe_reader = AdjListArrowChunkReader::Make(
-        graph_info, src_type, edge_type, dst_type,
-        AdjListType::ordered_by_source);
+    auto maybe_reader =
+        AdjListArrowChunkReader::Make(graph_info, src_type, edge_type, dst_type,
+                                      AdjListType::ordered_by_source);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     SECTION("Basics") {
@@ -462,17 +461,16 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
 TEST_CASE_METHOD(GlobalFixture, "EmptyChunkTest") {
   // read file and construct graph info
   std::string path = test_data_dir + "/neo4j/MovieGraph.graph.yml";
-  std::string src_type = "Person", edge_type = "REVIEWED",
-              dst_type = "Movie";
+  std::string src_type = "Person", edge_type = "REVIEWED", dst_type = "Movie";
   std::string edge_property_name = "rating";
   auto maybe_graph_info = GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
 
   SECTION("AdjListArrowChunkReader") {
-    auto maybe_reader = AdjListArrowChunkReader::Make(
-        graph_info, src_type, edge_type, dst_type,
-        AdjListType::ordered_by_source);
+    auto maybe_reader =
+        AdjListArrowChunkReader::Make(graph_info, src_type, edge_type, dst_type,
+                                      AdjListType::ordered_by_source);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     auto result = reader->GetChunk();

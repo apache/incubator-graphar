@@ -49,8 +49,8 @@ int main(int argc, char* argv[]) {
   std::string type = "node", vertex_prefix = "vertex/node/";
 
   // create vertex info
-  auto vertex_info = graphar::CreateVertexInfo(type, VERTEX_CHUNK_SIZE,
-                                               {}, vertex_prefix, version);
+  auto vertex_info = graphar::CreateVertexInfo(type, VERTEX_CHUNK_SIZE, {},
+                                               vertex_prefix, version);
 
   // save & dump
   ASSERT(!vertex_info->Dump().has_error());

@@ -223,8 +223,8 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
     REQUIRE(vertex_info->IsValidated() == true);
     auto invalid_pg =
         CreatePropertyGroup({Property("p0", nullptr, true)}, FileType::CSV);
-    auto invalid_vertex_info0 = CreateVertexInfo(
-        type, chunk_size, {invalid_pg}, "test_vertex/", version);
+    auto invalid_vertex_info0 = CreateVertexInfo(type, chunk_size, {invalid_pg},
+                                                 "test_vertex/", version);
     REQUIRE(invalid_vertex_info0->IsValidated() == false);
     VertexInfo invalid_vertex_info1("", chunk_size, {pg}, "test_vertex/",
                                     version);
@@ -415,17 +415,17 @@ TEST_CASE_METHOD(GlobalFixture, "EdgeInfo") {
     for (int i = 0; i < 3; i++) {
       std::vector<std::string> types = {src_type, edge_type, dst_type};
       types[i] = "";
-      auto edge_info = CreateEdgeInfo(
-          types[0], types[1], types[2], chunk_size, src_chunk_size,
-          dst_chunk_size, directed, {adj_list}, {pg}, "test_edge/", version);
+      auto edge_info = CreateEdgeInfo(types[0], types[1], types[2], chunk_size,
+                                      src_chunk_size, dst_chunk_size, directed,
+                                      {adj_list}, {pg}, "test_edge/", version);
       REQUIRE(edge_info == nullptr);
     }
     for (int i = 0; i < 3; i++) {
       std::vector<int> sizes = {chunk_size, src_chunk_size, dst_chunk_size};
       sizes[i] = 0;
-      auto edge_info = CreateEdgeInfo(src_type, edge_type, dst_type,
-                                      sizes[0], sizes[1], sizes[2], directed,
-                                      {adj_list}, {pg}, "test_edge/", version);
+      auto edge_info = CreateEdgeInfo(src_type, edge_type, dst_type, sizes[0],
+                                      sizes[1], sizes[2], directed, {adj_list},
+                                      {pg}, "test_edge/", version);
       REQUIRE(edge_info == nullptr);
     }
     auto edge_info_empty_adjlist = CreateEdgeInfo(
@@ -667,8 +667,9 @@ vertices:
     REQUIRE(extend_info->EdgeInfoNum() == 2);
     REQUIRE(extend_info->GetEdgeInfoByIndex(1)->GetEdgeType() == "knows2");
     REQUIRE(extend_info->GetEdgeInfoByIndex(2) == nullptr);
-    REQUIRE(extend_info->GetEdgeInfo("person", "knows2", "person")
-                ->GetEdgeType() == "knows2");
+    REQUIRE(
+        extend_info->GetEdgeInfo("person", "knows2", "person")->GetEdgeType() ==
+        "knows2");
     REQUIRE(extend_info->GetEdgeInfo("not_exist", "knows2", "person") ==
             nullptr);
     REQUIRE(extend_info->GetEdgeInfos().size() == 2);

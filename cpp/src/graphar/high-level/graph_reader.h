@@ -716,10 +716,9 @@ class EdgesCollection {
    * default max.
    */
   static Result<std::shared_ptr<EdgesCollection>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_type, const std::string& edge_type,
-      const std::string& dst_type, AdjListType adj_list_type,
-      const IdType vertex_chunk_begin = 0,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      AdjListType adj_list_type, const IdType vertex_chunk_begin = 0,
       const IdType vertex_chunk_end =
           std::numeric_limits<int64_t>::max()) noexcept;
 

@@ -732,12 +732,12 @@ Status AdjListPropertyArrowChunkReader::next_chunk() {
   while (chunk_index_ >= chunk_num_) {
     ++vertex_chunk_index_;
     if (vertex_chunk_index_ >= vertex_chunk_num_) {
-      return Status::IndexError(
-          "vertex chunk index ", vertex_chunk_index_,
-          " is out-of-bounds for vertex chunk num ", vertex_chunk_num_,
-          " of edge ", edge_info_->GetEdgeType(), " of adj list type ",
-          AdjListTypeToString(adj_list_type_), ", property group ",
-          property_group_, ".");
+      return Status::IndexError("vertex chunk index ", vertex_chunk_index_,
+                                " is out-of-bounds for vertex chunk num ",
+                                vertex_chunk_num_, " of edge ",
+                                edge_info_->GetEdgeType(), " of adj list type ",
+                                AdjListTypeToString(adj_list_type_),
+                                ", property group ", property_group_, ".");
     }
     chunk_index_ = 0;
     GAR_RETURN_NOT_OK(initOrUpdateEdgeChunkNum());
@@ -814,8 +814,8 @@ AdjListPropertyArrowChunkReader::Make(
   auto property_group = edge_info->GetPropertyGroup(property_name);
   if (!property_group) {
     return Status::KeyError("The property ", property_name,
-                            " doesn't exist in edge ", src_type, " ",
-                            edge_type, " ", dst_type, ".");
+                            " doesn't exist in edge ", src_type, " ", edge_type,
+                            " ", dst_type, ".");
   }
   return Make(edge_info, property_group, adj_list_type, graph_info->GetPrefix(),
               options);

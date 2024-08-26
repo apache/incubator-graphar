@@ -76,9 +76,9 @@ void vertices_collection(
 void edges_collection(const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // construct edges collection
   std::string src_type = "person", edge_type = "knows", dst_type = "person";
-  auto expect = graphar::EdgesCollection::Make(
-      graph_info, src_type, edge_type, dst_type,
-      graphar::AdjListType::ordered_by_source);
+  auto expect =
+      graphar::EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
+                                     graphar::AdjListType::ordered_by_source);
   ASSERT(!expect.has_error());
   auto edges = expect.value();
 

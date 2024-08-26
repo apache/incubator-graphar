@@ -43,8 +43,8 @@ int main(int argc, char* argv[]) {
       graphar::CreatePropertyGroup(property_vector_2, graphar::FileType::ORC);
 
   // create vertex info
-  auto vertex_info = graphar::CreateVertexInfo(
-      type, chunk_size, {group1}, vertex_prefix, version);
+  auto vertex_info = graphar::CreateVertexInfo(type, chunk_size, {group1},
+                                               vertex_prefix, version);
 
   ASSERT(vertex_info != nullptr);
   ASSERT(vertex_info->GetType() == type);

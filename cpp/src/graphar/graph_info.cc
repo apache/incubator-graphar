@@ -380,8 +380,8 @@ std::shared_ptr<VertexInfo> CreateVertexInfo(
   if (type.empty() || chunk_size <= 0) {
     return nullptr;
   }
-  return std::make_shared<VertexInfo>(type, chunk_size, property_groups,
-                                      prefix, version);
+  return std::make_shared<VertexInfo>(type, chunk_size, property_groups, prefix,
+                                      version);
 }
 
 Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(
@@ -430,8 +430,8 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(
           std::make_shared<PropertyGroup>(property_vec, file_type, pg_prefix));
     }
   }
-  return std::make_shared<VertexInfo>(type, chunk_size, property_groups,
-                                      prefix, version);
+  return std::make_shared<VertexInfo>(type, chunk_size, property_groups, prefix,
+                                      version);
 }
 
 Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(const std::string& input) {
@@ -504,8 +504,8 @@ class EdgeInfo::Impl {
         property_groups_(std::move(property_groups)),
         version_(std::move(version)) {
     if (prefix_.empty()) {
-      prefix_ = src_type_ + REGULAR_SEPARATOR + edge_type_ +
-                REGULAR_SEPARATOR + dst_type_ + "/";  // default prefix
+      prefix_ = src_type_ + REGULAR_SEPARATOR + edge_type_ + REGULAR_SEPARATOR +
+                dst_type_ + "/";  // default prefix
     }
     for (size_t i = 0; i < adjacent_lists_.size(); i++) {
       if (!adjacent_lists_[i]) {
@@ -590,9 +590,9 @@ EdgeInfo::EdgeInfo(const std::string& src_type, const std::string& edge_type,
                    const PropertyGroupVector& property_groups,
                    const std::string& prefix,
                    std::shared_ptr<const InfoVersion> version)
-    : impl_(new Impl(src_type, edge_type, dst_type, chunk_size,
-                     src_chunk_size, dst_chunk_size, directed, prefix,
-                     adjacent_lists, property_groups, version)) {}
+    : impl_(new Impl(src_type, edge_type, dst_type, chunk_size, src_chunk_size,
+                     dst_chunk_size, directed, prefix, adjacent_lists,
+                     property_groups, version)) {}
 
 EdgeInfo::~EdgeInfo() = default;
 
@@ -782,9 +782,9 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddAdjacentList(
                            AdjListTypeToString(adj_list->GetType()));
   }
   return std::make_shared<EdgeInfo>(
-      impl_->src_type_, impl_->edge_type_, impl_->dst_type_,
-      impl_->chunk_size_, impl_->src_chunk_size_, impl_->dst_chunk_size_,
-      impl_->directed_, AddVectorElement(impl_->adjacent_lists_, adj_list),
+      impl_->src_type_, impl_->edge_type_, impl_->dst_type_, impl_->chunk_size_,
+      impl_->src_chunk_size_, impl_->dst_chunk_size_, impl_->directed_,
+      AddVectorElement(impl_->adjacent_lists_, adj_list),
       impl_->property_groups_, impl_->prefix_, impl_->version_);
 }
 
@@ -800,9 +800,9 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddPropertyGroup(
     }
   }
   return std::make_shared<EdgeInfo>(
-      impl_->src_type_, impl_->edge_type_, impl_->dst_type_,
-      impl_->chunk_size_, impl_->src_chunk_size_, impl_->dst_chunk_size_,
-      impl_->directed_, impl_->adjacent_lists_,
+      impl_->src_type_, impl_->edge_type_, impl_->dst_type_, impl_->chunk_size_,
+      impl_->src_chunk_size_, impl_->dst_chunk_size_, impl_->directed_,
+      impl_->adjacent_lists_,
       AddVectorElement(impl_->property_groups_, property_group), impl_->prefix_,
       impl_->version_);
 }
@@ -821,10 +821,9 @@ std::shared_ptr<EdgeInfo> CreateEdgeInfo(
       adjacent_lists.empty()) {
     return nullptr;
   }
-  return std::make_shared<EdgeInfo>(src_type, edge_type, dst_type,
-                                    chunk_size, src_chunk_size, dst_chunk_size,
-                                    directed, adjacent_lists, property_groups,
-                                    prefix, version);
+  return std::make_shared<EdgeInfo>(
+      src_type, edge_type, dst_type, chunk_size, src_chunk_size, dst_chunk_size,
+      directed, adjacent_lists, property_groups, prefix, version);
 }
 
 Result<std::shared_ptr<EdgeInfo>> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
@@ -897,10 +896,9 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
           std::make_shared<PropertyGroup>(property_vec, file_type, pg_prefix));
     }
   }
-  return std::make_shared<EdgeInfo>(src_type, edge_type, dst_type,
-                                    chunk_size, src_chunk_size, dst_chunk_size,
-                                    directed, adjacent_lists, property_groups,
-                                    prefix, version);
+  return std::make_shared<EdgeInfo>(
+      src_type, edge_type, dst_type, chunk_size, src_chunk_size, dst_chunk_size,
+      directed, adjacent_lists, property_groups, prefix, version);
 }
 
 Result<std::shared_ptr<EdgeInfo>> EdgeInfo::Load(const std::string& input) {

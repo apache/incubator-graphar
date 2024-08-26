@@ -188,9 +188,9 @@ class AdjListChunkInfoReader {
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListChunkInfoReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_type, const std::string& edge_type,
-      const std::string& dst_type, AdjListType adj_list_type);
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      AdjListType adj_list_type);
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;
@@ -261,9 +261,9 @@ class AdjListOffsetChunkInfoReader {
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListOffsetChunkInfoReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_type, const std::string& edge_type,
-      const std::string& dst_type, AdjListType adj_list_type);
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      AdjListType adj_list_type);
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;
@@ -351,9 +351,8 @@ class AdjListPropertyChunkInfoReader {
    * @param adj_list_type The adj list type for the edge.
    */
   static Result<std::shared_ptr<AdjListPropertyChunkInfoReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_type, const std::string& edge_type,
-      const std::string& dst_type,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
       const std::shared_ptr<PropertyGroup>& property_group,
       AdjListType adj_list_type);
 
@@ -370,10 +369,9 @@ class AdjListPropertyChunkInfoReader {
    * @param adj_list_type The adj list type for the edge.
    */
   static Result<std::shared_ptr<AdjListPropertyChunkInfoReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_type, const std::string& edge_type,
-      const std::string& dst_type, const std::string& property_name,
-      AdjListType adj_list_type);
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      const std::string& property_name, AdjListType adj_list_type);
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;

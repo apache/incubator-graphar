@@ -113,8 +113,7 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
   }
 
   SECTION("EdgesCollection") {
-    std::string src_type = "person", edge_type = "knows",
-                dst_type = "person";
+    std::string src_type = "person", edge_type = "knows", dst_type = "person";
     // iterate edges of vertex chunk 0
     auto expect =
         EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,

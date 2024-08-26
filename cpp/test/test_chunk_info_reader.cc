@@ -102,8 +102,8 @@ TEST_CASE_METHOD(GlobalFixture, "ChunkInfoReader") {
 
   SECTION("AdjListChunkInfoReader") {
     auto maybe_reader =
-        AdjListChunkInfoReader::Make(graph_info, src_type, edge_type,
-                                     dst_type, AdjListType::ordered_by_source);
+        AdjListChunkInfoReader::Make(graph_info, src_type, edge_type, dst_type,
+                                     AdjListType::ordered_by_source);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
 
