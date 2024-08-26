@@ -142,7 +142,7 @@ Status VertexPropertyWriter::validate(
   // weak & strong validate
   if (!vertex_info_->HasPropertyGroup(property_group)) {
     return Status::KeyError("The property group", " does not exist in ",
-                            vertex_info_->GetLabel(), " vertex info.");
+                            vertex_info_->GetType(), " vertex info.");
   }
   if (chunk_index < 0) {
     return Status::IndexError("Negative chunk index ", chunk_index, ".");
@@ -227,7 +227,7 @@ Status VertexPropertyWriter::WriteChunk(
     if (indice == -1) {
       return Status::Invalid("Column named ", property.name,
                              " of property group ", property_group,
-                             " of vertex ", vertex_info_->GetLabel(),
+                             " of vertex ", vertex_info_->GetType(),
                              " does not exist in the input table.");
     }
     indices.push_back(indice);
@@ -374,7 +374,7 @@ Status EdgeChunkWriter::validate(IdType count_or_index1, IdType count_or_index2,
   if (!edge_info_->HasAdjacentListType(adj_list_type_)) {
     return Status::KeyError(
         "Adj list type ", AdjListTypeToString(adj_list_type_),
-        " does not exist in the ", edge_info_->GetEdgeLabel(), " edge info.");
+        " does not exist in the ", edge_info_->GetEdgeType(), " edge info.");
   }
   // weak & strong validate for count or index
   if (count_or_index1 < 0 || count_or_index2 < 0) {
@@ -401,7 +401,7 @@ Status EdgeChunkWriter::validate(
   // weak & strong validate for property group
   if (!edge_info_->HasPropertyGroup(property_group)) {
     return Status::KeyError("Property group", " does not exist in the ",
-                            edge_info_->GetEdgeLabel(), " edge info.");
+                            edge_info_->GetEdgeType(), " edge info.");
   }
   return Status::OK();
 }
@@ -477,7 +477,7 @@ Status EdgeChunkWriter::validate(
   if (input_table->num_rows() > edge_info_->GetChunkSize()) {
     return Status::Invalid(
         "The number of rows of input table is ", input_table->num_rows(),
-        " which is larger than the ", edge_info_->GetEdgeLabel(),
+        " which is larger than the ", edge_info_->GetEdgeType(),
         " edge chunk size ", edge_info_->GetChunkSize(), ".");
   }
   // strong validate for the input table
@@ -531,7 +531,7 @@ Status EdgeChunkWriter::validate(
   if (input_table->num_rows() > edge_info_->GetChunkSize()) {
     return Status::Invalid(
         "The number of rows of input table is ", input_table->num_rows(),
-        " which is larger than the ", edge_info_->GetEdgeLabel(),
+        " which is larger than the ", edge_info_->GetEdgeType(),
         " edge chunk size ", edge_info_->GetChunkSize(), ".");
   }
   // strong validate for the input table
@@ -646,7 +646,7 @@ Status EdgeChunkWriter::WritePropertyChunk(
     if (indice == -1) {
       return Status::Invalid("Column named ", property.name,
                              " of property group ", property_group, " of edge ",
-                             edge_info_->GetEdgeLabel(),
+                             edge_info_->GetEdgeType(),
                              " does not exist in the input table.");
     }
     indices.push_back(indice);
@@ -884,20 +884,20 @@ Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
   if (!edge_info->HasAdjacentListType(adj_list_type)) {
     return Status::KeyError(
         "The adjacent list type ", AdjListTypeToString(adj_list_type),
-        " doesn't exist in edge ", edge_info->GetEdgeLabel(), ".");
+        " doesn't exist in edge ", edge_info->GetEdgeType(), ".");
   }
   return std::make_shared<EdgeChunkWriter>(edge_info, prefix, adj_list_type,
                                            validate_level);
 }
 
 Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
-    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
-    const std::string& edge_label, const std::string& dst_label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+    const std::string& edge_type, const std::string& dst_type,
     AdjListType adj_list_type, const ValidateLevel& validate_level) {
-  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
   if (!edge_info) {
-    return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
-                            dst_label, " doesn't exist.");
+    return Status::KeyError("The edge ", src_type, " ", edge_type, " ",
+                            dst_type, " doesn't exist.");
   }
   return Make(edge_info, graph_info->GetPrefix(), adj_list_type,
               validate_level);

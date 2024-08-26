@@ -139,9 +139,9 @@ std::shared_ptr<VertexInfo> CreateVertexInfo(
 /**
  * @brief Create an EdgeInfo instance
  *
- * @param src_label The label of the source vertex.
- * @param edge_label The label of the edge
- * @param dst_label The label of the destination vertex
+ * @param src_type The label of the source vertex.
+ * @param edge_type The label of the edge
+ * @param dst_type The label of the destination vertex
  * @param chunk_size The number of edges in each edge chunk
  * @param src_chunk_size The number of source vertices in each vertex chunk
  * @param dst_chunk_size The number of destination vertices in each vertex
@@ -154,8 +154,8 @@ std::shared_ptr<VertexInfo> CreateVertexInfo(
  * @return edge_info shared_ptr to EdgeInfo
  */
 std::shared_ptr<EdgeInfo> CreateEdgeInfo(
-    const std::string& src_label, const std::string& edge_label,
-    const std::string& dst_label, IdType chunk_size, IdType src_chunk_size,
+    const std::string& src_type, const std::string& edge_type,
+    const std::string& dst_type, IdType chunk_size, IdType src_chunk_size,
     IdType dst_chunk_size, bool directed,
     const AdjacentListVector& adjacent_lists,
     const PropertyGroupVector& property_groups, const std::string& prefix = "",

@@ -240,15 +240,15 @@ class AdjListArrowChunkReader {
    * @brief Create an AdjListArrowChunkReader instance from graph info.
    *
    * @param graph_info The graph info.
-   * @param src_label The source vertex label.
-   * @param edge_label The edge label.
-   * @param dst_label The destination vertex label.
+   * @param src_type The source vertex label.
+   * @param edge_type The edge label.
+   * @param dst_type The destination vertex label.
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListArrowChunkReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label, AdjListType adj_list_type);
+      const std::string& src_type, const std::string& edge_type,
+      const std::string& dst_type, AdjListType adj_list_type);
 
  private:
   Status initOrUpdateEdgeChunkNum();
@@ -326,15 +326,15 @@ class AdjListOffsetArrowChunkReader {
    * @brief Create an AdjListOffsetArrowChunkReader instance from graph info.
    *
    * @param graph_info The graph info.
-   * @param src_label The source vertex label.
-   * @param edge_label The edge label.
-   * @param dst_label The destination vertex label.
+   * @param src_type The source vertex label.
+   * @param edge_type The edge label.
+   * @param dst_type The destination vertex label.
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListOffsetArrowChunkReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label, AdjListType adj_list_type);
+      const std::string& src_type, const std::string& edge_type,
+      const std::string& dst_type, AdjListType adj_list_type);
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;
@@ -458,9 +458,9 @@ class AdjListPropertyArrowChunkReader {
    * and property group.
    *
    * @param graph_info The graph info that describes the graph.
-   * @param src_label The source vertex label.
-   * @param edge_label The edge label.
-   * @param dst_label The destination vertex label.
+   * @param src_type The source vertex label.
+   * @param edge_type The edge label.
+   * @param dst_type The destination vertex label.
    * @param property_group The property group that describes the property
    * group.
    * @param adj_list_type The adj list type for the edges.
@@ -468,8 +468,8 @@ class AdjListPropertyArrowChunkReader {
    */
   static Result<std::shared_ptr<AdjListPropertyArrowChunkReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label,
+      const std::string& src_type, const std::string& edge_type,
+      const std::string& dst_type,
       const std::shared_ptr<PropertyGroup>& property_group,
       AdjListType adj_list_type, const util::FilterOptions& options = {});
 
@@ -478,9 +478,9 @@ class AdjListPropertyArrowChunkReader {
    * and property name.
    *
    * @param graph_info The graph info that describes the graph.
-   * @param src_label The source vertex label.
-   * @param edge_label The edge label.
-   * @param dst_label The destination vertex label.
+   * @param src_type The source vertex label.
+   * @param edge_type The edge label.
+   * @param dst_type The destination vertex label.
    * @param property_name The name of one property in the property group you
    * want to read.
    * @param adj_list_type The adj list type for the edges.
@@ -488,8 +488,8 @@ class AdjListPropertyArrowChunkReader {
    */
   static Result<std::shared_ptr<AdjListPropertyArrowChunkReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label, const std::string& property_name,
+      const std::string& src_type, const std::string& edge_type,
+      const std::string& dst_type, const std::string& property_name,
       AdjListType adj_list_type, const util::FilterOptions& options = {});
 
  private:

@@ -53,7 +53,7 @@ Status VertexChunkInfoWriter::validate(
   // weak & strong validate
   if (!vertex_info_->HasPropertyGroup(property_group)) {
     return Status::KeyError("The property group", " does not exist in ",
-                            vertex_info_->GetLabel(), " vertex info.");
+                            vertex_info_->GetType(), " vertex info.");
   }
   if (chunk_index < 0) {
     return Status::IndexError("Negative chunk index ", chunk_index, ".");
@@ -117,7 +117,7 @@ Status EdgeChunkInfoWriter::validate(IdType count_or_index1,
   if (!edge_info_->HasAdjacentListType(adj_list_type_)) {
     return Status::KeyError(
         "Adj list type ", AdjListTypeToString(adj_list_type_),
-        " does not exist in the ", edge_info_->GetEdgeLabel(), " edge info.");
+        " does not exist in the ", edge_info_->GetEdgeType(), " edge info.");
   }
   // weak & strong validate for count or index
   if (count_or_index1 < 0 || count_or_index2 < 0) {
@@ -144,7 +144,7 @@ Status EdgeChunkInfoWriter::validate(
   // weak & strong validate for property group
   if (!edge_info_->HasPropertyGroup(property_group)) {
     return Status::KeyError("Property group", " does not exist in the ",
-                            edge_info_->GetEdgeLabel(), " edge info.");
+                            edge_info_->GetEdgeType(), " edge info.");
   }
   return Status::OK();
 }

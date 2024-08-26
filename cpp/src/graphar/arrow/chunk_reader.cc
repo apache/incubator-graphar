@@ -160,7 +160,7 @@ Status VertexPropertyArrowChunkReader::seek(IdType id) {
   if (chunk_index_ >= chunk_num_) {
     return Status::IndexError("Internal vertex id ", id, " is out of range [0,",
                               chunk_num_ * vertex_info_->GetChunkSize(),
-                              ") of vertex ", vertex_info_->GetLabel());
+                              ") of vertex ", vertex_info_->GetType());
   }
   return Status::OK();
 }
@@ -190,7 +190,7 @@ Status VertexPropertyArrowChunkReader::next_chunk() {
   if (++chunk_index_ >= chunk_num_) {
     return Status::IndexError(
         "vertex chunk index ", chunk_index_, " is out-of-bounds for vertex ",
-        vertex_info_->GetLabel(), " chunk num ", chunk_num_);
+        vertex_info_->GetType(), " chunk num ", chunk_num_);
   }
   seek_id_ = chunk_index_ * vertex_info_->GetChunkSize();
   chunk_table_.reset();
@@ -285,7 +285,7 @@ Status AdjListArrowChunkReader::seek_src(IdType id) {
   if (adj_list_type_ != AdjListType::unordered_by_source &&
       adj_list_type_ != AdjListType::ordered_by_source) {
     return Status::Invalid("The seek_src operation is invalid in edge ",
-                           edge_info_->GetEdgeLabel(), " reader with ",
+                           edge_info_->GetEdgeType(), " reader with ",
                            AdjListTypeToString(adj_list_type_), " type.");
   }
 
@@ -294,7 +294,7 @@ Status AdjListArrowChunkReader::seek_src(IdType id) {
     return Status::IndexError(
         "The source internal id ", id, " is out of range [0,",
         edge_info_->GetSrcChunkSize() * vertex_chunk_num_, ") of edge ",
-        edge_info_->GetEdgeLabel(), " reader.");
+        edge_info_->GetEdgeType(), " reader.");
   }
   if (chunk_num_ < 0 || vertex_chunk_index_ != new_vertex_chunk_index) {
     // initialize or update chunk_num_
@@ -318,7 +318,7 @@ Status AdjListArrowChunkReader::seek_dst(IdType id) {
   if (adj_list_type_ != AdjListType::unordered_by_dest &&
       adj_list_type_ != AdjListType::ordered_by_dest) {
     return Status::Invalid("The seek_dst operation is invalid in edge ",
-                           edge_info_->GetEdgeLabel(), " reader with ",
+                           edge_info_->GetEdgeType(), " reader with ",
                            AdjListTypeToString(adj_list_type_), " type.");
   }
 
@@ -327,7 +327,7 @@ Status AdjListArrowChunkReader::seek_dst(IdType id) {
     return Status::IndexError(
         "The destination internal id ", id, " is out of range [0,",
         edge_info_->GetDstChunkSize() * vertex_chunk_num_, ") of edge ",
-        edge_info_->GetEdgeLabel(), " reader.");
+        edge_info_->GetEdgeType(), " reader.");
   }
   if (chunk_num_ < 0 || vertex_chunk_index_ != new_vertex_chunk_index) {
     // initialize or update chunk_num_
@@ -361,7 +361,7 @@ Status AdjListArrowChunkReader::seek(IdType offset) {
     return Status::IndexError("The edge offset ", offset,
                               " is out of range [0,",
                               edge_info_->GetChunkSize() * chunk_num_,
-                              "), edge label: ", edge_info_->GetEdgeLabel());
+                              "), edge label: ", edge_info_->GetEdgeType());
   }
   return Status::OK();
 }
@@ -440,20 +440,20 @@ Result<std::shared_ptr<AdjListArrowChunkReader>> AdjListArrowChunkReader::Make(
   if (!edge_info->HasAdjacentListType(adj_list_type)) {
     return Status::KeyError(
         "The adjacent list type ", AdjListTypeToString(adj_list_type),
-        " doesn't exist in edge ", edge_info->GetEdgeLabel(), ".");
+        " doesn't exist in edge ", edge_info->GetEdgeType(), ".");
   }
   return std::make_shared<AdjListArrowChunkReader>(edge_info, adj_list_type,
                                                    prefix);
 }
 
 Result<std::shared_ptr<AdjListArrowChunkReader>> AdjListArrowChunkReader::Make(
-    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
-    const std::string& edge_label, const std::string& dst_label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+    const std::string& edge_type, const std::string& dst_type,
     AdjListType adj_list_type) {
-  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
   if (!edge_info) {
-    return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
-                            dst_label, " doesn't exist.");
+    return Status::KeyError("The edge ", src_type, " ", edge_type, " ",
+                            dst_type, " doesn't exist.");
   }
   return Make(edge_info, adj_list_type, graph_info->GetPrefix());
 }
@@ -505,7 +505,7 @@ Status AdjListOffsetArrowChunkReader::seek(IdType id) {
   if (chunk_index_ >= vertex_chunk_num_) {
     return Status::IndexError("Internal vertex id ", id, "is out of range [0,",
                               vertex_chunk_num_ * vertex_chunk_size_,
-                              "), of edge ", edge_info_->GetEdgeLabel(),
+                              "), of edge ", edge_info_->GetEdgeType(),
                               " of adj list type ",
                               AdjListTypeToString(adj_list_type_), ".");
   }
@@ -531,7 +531,7 @@ Status AdjListOffsetArrowChunkReader::next_chunk() {
     return Status::IndexError("vertex chunk index ", chunk_index_,
                               " is out-of-bounds for vertex chunk num ",
                               vertex_chunk_num_, " of edge ",
-                              edge_info_->GetEdgeLabel(), " of adj list type ",
+                              edge_info_->GetEdgeType(), " of adj list type ",
                               AdjListTypeToString(adj_list_type_), ".");
   }
   seek_id_ = chunk_index_ * vertex_chunk_size_;
@@ -547,7 +547,7 @@ AdjListOffsetArrowChunkReader::Make(const std::shared_ptr<EdgeInfo>& edge_info,
   if (!edge_info->HasAdjacentListType(adj_list_type)) {
     return Status::KeyError(
         "The adjacent list type ", AdjListTypeToString(adj_list_type),
-        " doesn't exist in edge ", edge_info->GetEdgeLabel(), ".");
+        " doesn't exist in edge ", edge_info->GetEdgeType(), ".");
   }
   return std::make_shared<AdjListOffsetArrowChunkReader>(edge_info,
                                                          adj_list_type, prefix);
@@ -555,13 +555,13 @@ AdjListOffsetArrowChunkReader::Make(const std::shared_ptr<EdgeInfo>& edge_info,
 
 Result<std::shared_ptr<AdjListOffsetArrowChunkReader>>
 AdjListOffsetArrowChunkReader::Make(
-    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
-    const std::string& edge_label, const std::string& dst_label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+    const std::string& edge_type, const std::string& dst_type,
     AdjListType adj_list_type) {
-  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
   if (!edge_info) {
-    return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
-                            dst_label, " doesn't exist.");
+    return Status::KeyError("The edge ", src_type, " ", edge_type, " ",
+                            dst_type, " doesn't exist.");
   }
   return Make(edge_info, adj_list_type, graph_info->GetPrefix());
 }
@@ -615,7 +615,7 @@ Status AdjListPropertyArrowChunkReader::seek_src(IdType id) {
   if (adj_list_type_ != AdjListType::unordered_by_source &&
       adj_list_type_ != AdjListType::ordered_by_source) {
     return Status::Invalid("The seek_src operation is invalid in edge ",
-                           edge_info_->GetEdgeLabel(), " reader with ",
+                           edge_info_->GetEdgeType(), " reader with ",
                            AdjListTypeToString(adj_list_type_), " type.");
   }
 
@@ -624,7 +624,7 @@ Status AdjListPropertyArrowChunkReader::seek_src(IdType id) {
     return Status::IndexError(
         "The source internal id ", id, " is out of range [0,",
         edge_info_->GetSrcChunkSize() * vertex_chunk_num_, ") of edge ",
-        edge_info_->GetEdgeLabel(), " reader.");
+        edge_info_->GetEdgeType(), " reader.");
   }
   if (chunk_num_ < 0 || vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
@@ -647,7 +647,7 @@ Status AdjListPropertyArrowChunkReader::seek_dst(IdType id) {
   if (adj_list_type_ != AdjListType::unordered_by_dest &&
       adj_list_type_ != AdjListType::ordered_by_dest) {
     return Status::Invalid("The seek_dst operation is invalid in edge ",
-                           edge_info_->GetEdgeLabel(), " reader with ",
+                           edge_info_->GetEdgeType(), " reader with ",
                            AdjListTypeToString(adj_list_type_), " type.");
   }
 
@@ -656,7 +656,7 @@ Status AdjListPropertyArrowChunkReader::seek_dst(IdType id) {
     return Status::IndexError(
         "The destination internal id ", id, " is out of range [0,",
         edge_info_->GetDstChunkSize() * vertex_chunk_num_, ") of edge ",
-        edge_info_->GetEdgeLabel(), " reader.");
+        edge_info_->GetEdgeType(), " reader.");
   }
   if (chunk_num_ < 0 || vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
@@ -689,7 +689,7 @@ Status AdjListPropertyArrowChunkReader::seek(IdType offset) {
     return Status::IndexError("The edge offset ", offset,
                               " is out of range [0,",
                               edge_info_->GetChunkSize() * chunk_num_,
-                              "), edge label: ", edge_info_->GetEdgeLabel());
+                              "), edge label: ", edge_info_->GetEdgeType());
   }
   return Status::OK();
 }
@@ -735,7 +735,7 @@ Status AdjListPropertyArrowChunkReader::next_chunk() {
       return Status::IndexError(
           "vertex chunk index ", vertex_chunk_index_,
           " is out-of-bounds for vertex chunk num ", vertex_chunk_num_,
-          " of edge ", edge_info_->GetEdgeLabel(), " of adj list type ",
+          " of edge ", edge_info_->GetEdgeType(), " of adj list type ",
           AdjListTypeToString(adj_list_type_), ", property group ",
           property_group_, ".");
     }
@@ -779,7 +779,7 @@ AdjListPropertyArrowChunkReader::Make(
   if (!edge_info->HasAdjacentListType(adj_list_type)) {
     return Status::KeyError(
         "The adjacent list type ", AdjListTypeToString(adj_list_type),
-        " doesn't exist in edge ", edge_info->GetEdgeLabel(), ".");
+        " doesn't exist in edge ", edge_info->GetEdgeType(), ".");
   }
   return std::make_shared<AdjListPropertyArrowChunkReader>(
       edge_info, property_group, adj_list_type, prefix, options);
@@ -787,14 +787,14 @@ AdjListPropertyArrowChunkReader::Make(
 
 Result<std::shared_ptr<AdjListPropertyArrowChunkReader>>
 AdjListPropertyArrowChunkReader::Make(
-    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
-    const std::string& edge_label, const std::string& dst_label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+    const std::string& edge_type, const std::string& dst_type,
     const std::shared_ptr<PropertyGroup>& property_group,
     AdjListType adj_list_type, const util::FilterOptions& options) {
-  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
   if (!edge_info) {
-    return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
-                            dst_label, " doesn't exist.");
+    return Status::KeyError("The edge ", src_type, " ", edge_type, " ",
+                            dst_type, " doesn't exist.");
   }
   return Make(edge_info, property_group, adj_list_type, graph_info->GetPrefix(),
               options);
@@ -802,20 +802,20 @@ AdjListPropertyArrowChunkReader::Make(
 
 Result<std::shared_ptr<AdjListPropertyArrowChunkReader>>
 AdjListPropertyArrowChunkReader::Make(
-    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_label,
-    const std::string& edge_label, const std::string& dst_label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+    const std::string& edge_type, const std::string& dst_type,
     const std::string& property_name, AdjListType adj_list_type,
     const util::FilterOptions& options) {
-  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
   if (!edge_info) {
-    return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
-                            dst_label, " doesn't exist.");
+    return Status::KeyError("The edge ", src_type, " ", edge_type, " ",
+                            dst_type, " doesn't exist.");
   }
   auto property_group = edge_info->GetPropertyGroup(property_name);
   if (!property_group) {
     return Status::KeyError("The property ", property_name,
-                            " doesn't exist in edge ", src_label, " ",
-                            edge_label, " ", dst_label, ".");
+                            " doesn't exist in edge ", src_type, " ",
+                            edge_type, " ", dst_type, ".");
   }
   return Make(edge_info, property_group, adj_list_type, graph_info->GetPrefix(),
               options);

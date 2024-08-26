@@ -59,7 +59,7 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
       if (!vertex_info_->HasProperty(property.first)) {
         return Status::KeyError("Property with name ", property.first,
                                 " is not contained in the ",
-                                vertex_info_->GetLabel(), " vertex info.");
+                                vertex_info_->GetType(), " vertex info.");
       }
       // check if the property type is correct
       auto type = vertex_info_->GetPropertyType(property.first).value();

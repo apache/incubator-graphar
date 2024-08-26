@@ -48,9 +48,9 @@ int main(int argc, char* argv[]) {
   std::cout << "num_vertices: " << num_vertices << std::endl;
 
   // construct edges collection
-  std::string src_label = "person", edge_label = "knows", dst_label = "person";
+  std::string src_type = "person", edge_type = "knows", dst_type = "person";
   auto maybe_edges = graphar::EdgesCollection::Make(
-      graph_info, src_label, edge_label, dst_label,
+      graph_info, src_type, edge_type, dst_type,
       graphar::AdjListType::ordered_by_source);
   ASSERT(!maybe_edges.has_error());
   auto& edges = maybe_edges.value();
@@ -108,10 +108,10 @@ int main(int argc, char* argv[]) {
   auto group =
       graphar::CreatePropertyGroup(property_vector, graphar::FileType::PARQUET);
   // construct new vertex info
-  std::string vertex_label = "cc_result", vertex_prefix = "result/";
+  std::string type = "cc_result", vertex_prefix = "result/";
   int chunk_size = 100;
   auto version = graphar::InfoVersion::Parse("gar/v1").value();
-  auto new_info = graphar::CreateVertexInfo(vertex_label, chunk_size, {group},
+  auto new_info = graphar::CreateVertexInfo(type, chunk_size, {group},
                                             vertex_prefix, version);
   // dump new vertex info
   ASSERT(new_info->IsValidated());

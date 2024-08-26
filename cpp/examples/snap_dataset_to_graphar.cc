@@ -46,10 +46,10 @@ int main(int argc, char* argv[]) {
   auto version = graphar::InfoVersion::Parse("gar/v1").value();
 
   // meta info
-  std::string vertex_label = "node", vertex_prefix = "vertex/node/";
+  std::string type = "node", vertex_prefix = "vertex/node/";
 
   // create vertex info
-  auto vertex_info = graphar::CreateVertexInfo(vertex_label, VERTEX_CHUNK_SIZE,
+  auto vertex_info = graphar::CreateVertexInfo(type, VERTEX_CHUNK_SIZE,
                                                {}, vertex_prefix, version);
 
   // save & dump
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
   ASSERT(vertex_info->Save(save_path + "node.vertex.yml").ok());
 
   /*------------------construct edge info------------------*/
-  std::string src_label = "node", edge_label = "links", dst_label = "node",
+  std::string src_type = "node", edge_type = "links", dst_type = "node",
               edge_prefix = "edge/node_links_node/";
   bool directed = IS_DIRECTED;
 
@@ -66,7 +66,7 @@ int main(int argc, char* argv[]) {
       graphar::CreateAdjacentList(ADJLIST_TYPE, PAYLOAD_TYPE)};
   // create edge info
   auto edge_info = graphar::CreateEdgeInfo(
-      src_label, edge_label, dst_label, EDGE_CHUNK_SIZE, VERTEX_CHUNK_SIZE,
+      src_type, edge_type, dst_type, EDGE_CHUNK_SIZE, VERTEX_CHUNK_SIZE,
       VERTEX_CHUNK_SIZE, directed, adjacent_lists, {}, edge_prefix, version);
 
   // save & dump

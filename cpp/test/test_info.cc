@@ -176,17 +176,17 @@ TEST_CASE_METHOD(GlobalFixture, "AdjacentList") {
 }
 
 TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
-  std::string label = "test_vertex";
+  std::string type = "test_vertex";
   int chunk_size = 100;
   auto version = std::make_shared<InfoVersion>(1);
   auto pg = CreatePropertyGroup(
       {Property("p0", int32(), true), Property("p1", string(), false)},
       FileType::CSV, "p0_p1/");
   auto vertex_info =
-      CreateVertexInfo(label, chunk_size, {pg}, "test_vertex", version);
+      CreateVertexInfo(type, chunk_size, {pg}, "test_vertex", version);
 
   SECTION("Basics") {
-    REQUIRE(vertex_info->GetLabel() == label);
+    REQUIRE(vertex_info->GetType() == type);
     REQUIRE(vertex_info->GetChunkSize() == chunk_size);
     REQUIRE(vertex_info->GetPrefix() == "test_vertex");
     REQUIRE(vertex_info->version()->ToString() == "gar/v1");
@@ -224,16 +224,16 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
     auto invalid_pg =
         CreatePropertyGroup({Property("p0", nullptr, true)}, FileType::CSV);
     auto invalid_vertex_info0 = CreateVertexInfo(
-        label, chunk_size, {invalid_pg}, "test_vertex/", version);
+        type, chunk_size, {invalid_pg}, "test_vertex/", version);
     REQUIRE(invalid_vertex_info0->IsValidated() == false);
     VertexInfo invalid_vertex_info1("", chunk_size, {pg}, "test_vertex/",
                                     version);
     REQUIRE(invalid_vertex_info1.IsValidated() == false);
-    VertexInfo invalid_vertex_info2(label, 0, {pg}, "test_vertex/", version);
+    VertexInfo invalid_vertex_info2(type, 0, {pg}, "test_vertex/", version);
     REQUIRE(invalid_vertex_info2.IsValidated() == false);
     // check if prefix empty
     auto vertex_info_empty_prefix =
-        CreateVertexInfo(label, chunk_size, {pg}, "", version);
+        CreateVertexInfo(type, chunk_size, {pg}, "", version);
     REQUIRE(vertex_info_empty_prefix->IsValidated() == true);
   }
 
@@ -241,7 +241,7 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
     auto vertex_info3 = CreateVertexInfo("", chunk_size, {pg}, "test_vertex/");
     REQUIRE(vertex_info3 == nullptr);
 
-    auto vertex_info4 = CreateVertexInfo(label, 0, {pg}, "test_vertex/");
+    auto vertex_info4 = CreateVertexInfo(type, 0, {pg}, "test_vertex/");
     REQUIRE(vertex_info4 == nullptr);
   }
 
@@ -249,7 +249,6 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
     auto dump_result = vertex_info->Dump();
     REQUIRE(dump_result.status().ok());
     std::string expected = R"(chunk_size: 100
-label: test_vertex
 prefix: test_vertex
 property_groups: 
   - file_type: csv
@@ -263,19 +262,20 @@ property_groups:
         is_nullable: true
         is_primary: false
         name: p1
+type: test_vertex
 version: gar/v1
 )";
     REQUIRE(dump_result.value() == expected);
     auto vertex_info_empty_version =
-        CreateVertexInfo(label, chunk_size, {pg}, "test_vertex/");
+        CreateVertexInfo(type, chunk_size, {pg}, "test_vertex/");
     REQUIRE(vertex_info_empty_version->Dump().status().ok());
   }
 
   SECTION("Save") {
     // save to a simple output path
-    REQUIRE(vertex_info->Save("/tmp/" + label + ".vertex.yml").ok());
+    REQUIRE(vertex_info->Save("/tmp/" + type + ".vertex.yml").ok());
     // save to a URI path
-    REQUIRE(vertex_info->Save("file:///tmp/" + label + ".vertex.yml").ok());
+    REQUIRE(vertex_info->Save("file:///tmp/" + type + ".vertex.yml").ok());
   }
 
   SECTION("AddPropertyGroup") {
@@ -299,7 +299,7 @@ version: gar/v1
 }
 
 TEST_CASE_METHOD(GlobalFixture, "EdgeInfo") {
-  std::string src_label = "person", edge_label = "knows", dst_label = "person";
+  std::string src_type = "person", edge_type = "knows", dst_type = "person";
   int chunk_size = 1024;
   int src_chunk_size = 100;
   int dst_chunk_size = 100;
@@ -311,14 +311,14 @@ TEST_CASE_METHOD(GlobalFixture, "EdgeInfo") {
   auto pg = CreatePropertyGroup(
       {Property("p0", int32(), true), Property("p1", string(), false)},
       FileType::CSV, "p0_p1/");
-  auto edge_info = CreateEdgeInfo(src_label, edge_label, dst_label, chunk_size,
+  auto edge_info = CreateEdgeInfo(src_type, edge_type, dst_type, chunk_size,
                                   src_chunk_size, dst_chunk_size, directed,
                                   {adj_list}, {pg}, "test_edge/", version);
 
   SECTION("Basics") {
-    REQUIRE(edge_info->GetSrcLabel() == src_label);
-    REQUIRE(edge_info->GetEdgeLabel() == edge_label);
-    REQUIRE(edge_info->GetDstLabel() == dst_label);
+    REQUIRE(edge_info->GetSrcType() == src_type);
+    REQUIRE(edge_info->GetEdgeType() == edge_type);
+    REQUIRE(edge_info->GetDstType() == dst_type);
     REQUIRE(edge_info->GetChunkSize() == chunk_size);
     REQUIRE(edge_info->GetSrcChunkSize() == src_chunk_size);
     REQUIRE(edge_info->GetDstChunkSize() == dst_chunk_size);
@@ -383,14 +383,14 @@ TEST_CASE_METHOD(GlobalFixture, "EdgeInfo") {
     auto invalid_pg =
         CreatePropertyGroup({Property("p0", nullptr, true)}, FileType::CSV);
     auto invalid_edge_info0 =
-        CreateEdgeInfo(src_label, edge_label, dst_label, chunk_size,
+        CreateEdgeInfo(src_type, edge_type, dst_type, chunk_size,
                        src_chunk_size, dst_chunk_size, directed, {adj_list},
                        {invalid_pg}, "test_edge/", version);
     REQUIRE(invalid_edge_info0->IsValidated() == false);
     for (int i = 0; i < 3; i++) {
-      std::vector<std::string> labels = {src_label, edge_label, dst_label};
-      labels[i] = "";
-      EdgeInfo invalid_edge_info1(labels[0], labels[1], labels[2], chunk_size,
+      std::vector<std::string> types = {src_type, edge_type, dst_type};
+      types[i] = "";
+      EdgeInfo invalid_edge_info1(types[0], types[1], types[2], chunk_size,
                                   src_chunk_size, dst_chunk_size, directed,
                                   {adj_list}, {pg}, "test_edge/", version);
       REQUIRE(invalid_edge_info1.IsValidated() == false);
@@ -398,7 +398,7 @@ TEST_CASE_METHOD(GlobalFixture, "EdgeInfo") {
     for (int i = 0; i < 3; i++) {
       std::vector<int> sizes = {chunk_size, src_chunk_size, dst_chunk_size};
       sizes[i] = 0;
-      EdgeInfo invalid_edge_info2(src_label, edge_label, dst_label, sizes[0],
+      EdgeInfo invalid_edge_info2(src_type, edge_type, dst_type, sizes[0],
                                   sizes[1], sizes[2], directed, {adj_list},
                                   {pg}, "test_edge/", version);
       REQUIRE(invalid_edge_info2.IsValidated() == false);
@@ -406,30 +406,30 @@ TEST_CASE_METHOD(GlobalFixture, "EdgeInfo") {
 
     // check if prefix empty
     auto edge_info_with_empty_prefix = CreateEdgeInfo(
-        src_label, edge_label, dst_label, chunk_size, src_chunk_size,
+        src_type, edge_type, dst_type, chunk_size, src_chunk_size,
         dst_chunk_size, directed, {adj_list}, {pg}, "", version);
     REQUIRE(edge_info_with_empty_prefix->IsValidated() == true);
   }
 
   SECTION("CreateEdgeInfo") {
     for (int i = 0; i < 3; i++) {
-      std::vector<std::string> labels = {src_label, edge_label, dst_label};
-      labels[i] = "";
+      std::vector<std::string> types = {src_type, edge_type, dst_type};
+      types[i] = "";
       auto edge_info = CreateEdgeInfo(
-          labels[0], labels[1], labels[2], chunk_size, src_chunk_size,
+          types[0], types[1], types[2], chunk_size, src_chunk_size,
           dst_chunk_size, directed, {adj_list}, {pg}, "test_edge/", version);
       REQUIRE(edge_info == nullptr);
     }
     for (int i = 0; i < 3; i++) {
       std::vector<int> sizes = {chunk_size, src_chunk_size, dst_chunk_size};
       sizes[i] = 0;
-      auto edge_info = CreateEdgeInfo(src_label, edge_label, dst_label,
+      auto edge_info = CreateEdgeInfo(src_type, edge_type, dst_type,
                                       sizes[0], sizes[1], sizes[2], directed,
                                       {adj_list}, {pg}, "test_edge/", version);
       REQUIRE(edge_info == nullptr);
     }
     auto edge_info_empty_adjlist = CreateEdgeInfo(
-        src_label, edge_label, dst_label, chunk_size, src_chunk_size,
+        src_type, edge_type, dst_type, chunk_size, src_chunk_size,
         dst_chunk_size, directed, {}, {pg}, "test_edge/");
     REQUIRE(edge_info_empty_adjlist == nullptr);
   }
@@ -445,8 +445,8 @@ TEST_CASE_METHOD(GlobalFixture, "EdgeInfo") {
 chunk_size: 1024
 directed: true
 dst_chunk_size: 100
-dst_label: person
-edge_label: knows
+dst_type: person
+edge_type: knows
 prefix: test_edge/
 property_groups: 
   - file_type: csv
@@ -461,21 +461,21 @@ property_groups:
         is_primary: false
         name: p1
 src_chunk_size: 100
-src_label: person
+src_type: person
 version: gar/v1
 )";
     REQUIRE(dump_result.value() == expected);
     auto edge_info_empty_version = CreateEdgeInfo(
-        src_label, edge_label, dst_label, chunk_size, src_chunk_size,
+        src_type, edge_type, dst_type, chunk_size, src_chunk_size,
         dst_chunk_size, directed, {adj_list}, {pg});
     REQUIRE(edge_info_empty_version->Dump().status().ok());
   }
 
   SECTION("Save") {
     // save to a simple output path
-    REQUIRE(edge_info->Save("/tmp/" + edge_label + ".edge.yml").ok());
+    REQUIRE(edge_info->Save("/tmp/" + edge_type + ".edge.yml").ok());
     // save to a URI path
-    REQUIRE(edge_info->Save("file:///tmp/" + edge_label + ".edge.yml").ok());
+    REQUIRE(edge_info->Save("file:///tmp/" + edge_type + ".edge.yml").ok());
   }
 
   SECTION("AddAdjacentList") {
@@ -556,25 +556,25 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
 
   SECTION("VertexInfo") {
     REQUIRE(graph_info->VertexInfoNum() == 1);
-    REQUIRE(graph_info->GetVertexInfoByIndex(0)->GetLabel() == "test_vertex");
+    REQUIRE(graph_info->GetVertexInfoByIndex(0)->GetType() == "test_vertex");
     REQUIRE(graph_info->GetVertexInfoByIndex(1) == nullptr);
-    REQUIRE(graph_info->GetVertexInfo("test_vertex")->GetLabel() ==
+    REQUIRE(graph_info->GetVertexInfo("test_vertex")->GetType() ==
             "test_vertex");
     REQUIRE(graph_info->GetVertexInfo("not_exist") == nullptr);
     REQUIRE(graph_info->GetVertexInfos().size() == 1);
-    REQUIRE(graph_info->GetVertexInfos()[0]->GetLabel() == "test_vertex");
+    REQUIRE(graph_info->GetVertexInfos()[0]->GetType() == "test_vertex");
   }
 
   SECTION("EdgeInfo") {
     REQUIRE(graph_info->EdgeInfoNum() == 1);
-    REQUIRE(graph_info->GetEdgeInfoByIndex(0)->GetEdgeLabel() == "knows");
+    REQUIRE(graph_info->GetEdgeInfoByIndex(0)->GetEdgeType() == "knows");
     REQUIRE(graph_info->GetEdgeInfoByIndex(1) == nullptr);
     REQUIRE(
-        graph_info->GetEdgeInfo("person", "knows", "person")->GetEdgeLabel() ==
+        graph_info->GetEdgeInfo("person", "knows", "person")->GetEdgeType() ==
         "knows");
     REQUIRE(graph_info->GetEdgeInfo("not_exist", "knows", "person") == nullptr);
     REQUIRE(graph_info->GetEdgeInfos().size() == 1);
-    REQUIRE(graph_info->GetEdgeInfos()[0]->GetEdgeLabel() == "knows");
+    REQUIRE(graph_info->GetEdgeInfos()[0]->GetEdgeType() == "knows");
   }
 
   SECTION("IsValidated") {
@@ -644,13 +644,13 @@ vertices:
     REQUIRE(maybe_extend_info.status().ok());
     auto extend_info = maybe_extend_info.value();
     REQUIRE(extend_info->VertexInfoNum() == 2);
-    REQUIRE(extend_info->GetVertexInfoByIndex(1)->GetLabel() == "test_vertex2");
+    REQUIRE(extend_info->GetVertexInfoByIndex(1)->GetType() == "test_vertex2");
     REQUIRE(extend_info->GetVertexInfoByIndex(2) == nullptr);
-    REQUIRE(extend_info->GetVertexInfo("test_vertex2")->GetLabel() ==
+    REQUIRE(extend_info->GetVertexInfo("test_vertex2")->GetType() ==
             "test_vertex2");
     REQUIRE(extend_info->GetVertexInfo("not_exist") == nullptr);
     REQUIRE(extend_info->GetVertexInfos().size() == 2);
-    REQUIRE(extend_info->GetVertexInfos()[1]->GetLabel() == "test_vertex2");
+    REQUIRE(extend_info->GetVertexInfos()[1]->GetType() == "test_vertex2");
     auto extend_info2 = extend_info->AddVertex(vertex_info2);
     REQUIRE(!extend_info2.status().ok());
   }
@@ -665,21 +665,21 @@ vertices:
     REQUIRE(maybe_extend_info.status().ok());
     auto extend_info = maybe_extend_info.value();
     REQUIRE(extend_info->EdgeInfoNum() == 2);
-    REQUIRE(extend_info->GetEdgeInfoByIndex(1)->GetEdgeLabel() == "knows2");
+    REQUIRE(extend_info->GetEdgeInfoByIndex(1)->GetEdgeType() == "knows2");
     REQUIRE(extend_info->GetEdgeInfoByIndex(2) == nullptr);
     REQUIRE(extend_info->GetEdgeInfo("person", "knows2", "person")
-                ->GetEdgeLabel() == "knows2");
+                ->GetEdgeType() == "knows2");
     REQUIRE(extend_info->GetEdgeInfo("not_exist", "knows2", "person") ==
             nullptr);
     REQUIRE(extend_info->GetEdgeInfos().size() == 2);
-    REQUIRE(extend_info->GetEdgeInfos()[1]->GetEdgeLabel() == "knows2");
+    REQUIRE(extend_info->GetEdgeInfos()[1]->GetEdgeType() == "knows2");
     auto extend_info2 = extend_info->AddEdge(edge_info2);
     REQUIRE(!extend_info2.status().ok());
   }
 }
 
 TEST_CASE_METHOD(GlobalFixture, "LoadFromYaml") {
-  std::string vertex_info_yaml = R"(label: person
+  std::string vertex_info_yaml = R"(type: person
 chunk_size: 100
 prefix: vertex/person/
 property_groups:
@@ -705,9 +705,9 @@ property_groups:
     file_type: parquet
 version: gar/v1
 )";
-  std::string edge_info_yaml = R"(src_label: person
-edge_label: knows
-dst_label: person
+  std::string edge_info_yaml = R"(src_type: person
+edge_type: knows
+dst_type: person
 chunk_size: 1024
 src_chunk_size: 100
 dst_chunk_size: 100
@@ -744,7 +744,7 @@ extra_info:
     auto maybe_vertex_info = VertexInfo::Load(vertex_info_yaml);
     REQUIRE(!maybe_vertex_info.has_error());
     auto vertex_info = maybe_vertex_info.value();
-    REQUIRE(vertex_info->GetLabel() == "person");
+    REQUIRE(vertex_info->GetType() == "person");
     REQUIRE(vertex_info->GetChunkSize() == 100);
     REQUIRE(vertex_info->GetPrefix() == "vertex/person/");
     REQUIRE(vertex_info->version()->ToString() == "gar/v1");
@@ -754,9 +754,9 @@ extra_info:
     auto maybe_edge_info = EdgeInfo::Load(edge_info_yaml);
     REQUIRE(!maybe_edge_info.has_error());
     auto edge_info = maybe_edge_info.value();
-    REQUIRE(edge_info->GetSrcLabel() == "person");
-    REQUIRE(edge_info->GetEdgeLabel() == "knows");
-    REQUIRE(edge_info->GetDstLabel() == "person");
+    REQUIRE(edge_info->GetSrcType() == "person");
+    REQUIRE(edge_info->GetEdgeType() == "knows");
+    REQUIRE(edge_info->GetDstType() == "person");
   }
 
   SECTION("GraphInfo::Load") {

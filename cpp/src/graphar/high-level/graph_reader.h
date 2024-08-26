@@ -707,9 +707,9 @@ class EdgesCollection {
    * @brief Construct an EdgesCollection from graph info and edge label.
    *
    * @param graph_info The graph info.
-   * @param src_label The source vertex label.
-   * @param edge_label The edge label.
-   * @param dst_label The destination vertex label.
+   * @param src_type The source vertex label.
+   * @param edge_type The edge label.
+   * @param dst_type The destination vertex label.
    * @param adj_list_type The type of adjList.
    * @param vertex_chunk_begin The index of the begin vertex chunk, default 0.
    * @param vertex_chunk_end The index of the end vertex chunk (not included),
@@ -717,8 +717,8 @@ class EdgesCollection {
    */
   static Result<std::shared_ptr<EdgesCollection>> Make(
       const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label, AdjListType adj_list_type,
+      const std::string& src_type, const std::string& edge_type,
+      const std::string& dst_type, AdjListType adj_list_type,
       const IdType vertex_chunk_begin = 0,
       const IdType vertex_chunk_end =
           std::numeric_limits<int64_t>::max()) noexcept;
