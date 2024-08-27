@@ -33,12 +33,12 @@ from graphar_pyspark.info import GraphInfo
 
 
 @dataclass(frozen=True)
-class EdgeLabels:
-    """A triplet that describe edge. Contains source, edge and dest labels. Immutable."""
+class EdgeTypes:
+    """A triplet that describe edge. Contains source, edge and dest types. Immutable."""
 
-    src_label: str
-    edge_label: str
-    dst_label: str
+    src_type: str
+    edge_type: str
+    dst_type: str
 
 
 @dataclass(frozen=True)
@@ -46,7 +46,7 @@ class GraphReaderResult:
     """A simple immutable class, that represent results of reading a graph with GraphReader."""
 
     vertex_dataframes: Mapping[str, DataFrame]
-    edge_dataframes: Mapping[EdgeLabels, Mapping[str, DataFrame]]
+    edge_dataframes: Mapping[EdgeTypes, Mapping[str, DataFrame]]
 
     @staticmethod
     def from_scala(
@@ -85,7 +85,7 @@ class GraphReaderResult:
                     GraphArSession.ss,
                 )
 
-            second_dict[EdgeLabels(k._1(), k._2(), k._3())] = inner_dict
+            second_dict[EdgeTypes(k._1(), k._2(), k._3())] = inner_dict
 
         return GraphReaderResult(
             vertex_dataframes=first_dict,
@@ -145,20 +145,20 @@ class GraphWriter:
         """Create an instance of the Class from Python arguments."""
         return GraphWriter(GraphArSession.graphar.graph.GraphWriter())
 
-    def put_vertex_data(self, label: str, df: DataFrame, primary_key: str) -> None:
+    def put_vertex_data(self, vertex_type: str, df: DataFrame, primary_key: str) -> None:
         """Put the vertex DataFrame into writer.
 
-        :param label: label of vertex.
+        :param type: type of vertex.
         :param df: DataFrame of the vertex type.
         :param primary_key: primary key of the vertex type, default is empty, which take the first property column as primary key.
         """
-        self._jvm_graph_writer_obj.PutVertexData(label, df._jdf, primary_key)
+        self._jvm_graph_writer_obj.PutVertexData(vertex_type, df._jdf, primary_key)
 
     def put_edge_data(self, relation: tuple[str, str, str], df: DataFrame) -> None:
         """Put the egde datafrme into writer.
 
-        :param relation: 3-Tuple (source label, edge label, target label) to indicate edge type.
-        :param df: data frame of edge type.
+        :param relation: 3-Tuple (source type, edge type, target type) to indicate edge relation.
+        :param df: data frame of edge relation.
         """
         relation_jvm = GraphArSession.jvm.scala.Tuple3(
             relation[0], relation[1], relation[2],

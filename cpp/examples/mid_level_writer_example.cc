@@ -107,7 +107,7 @@ void vertex_property_writer(
       GetTestingResourceRoot() + "/ldbc_sample/parquet/" + "person.vertex.yml";
   auto vertex_meta = graphar::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
-  ASSERT(vertex_info->GetLabel() == "person");
+  ASSERT(vertex_info->GetType() == "person");
 
   auto maybe_writer = graphar::VertexPropertyWriter::Make(vertex_info, "/tmp/");
   ASSERT(maybe_writer.status().ok());

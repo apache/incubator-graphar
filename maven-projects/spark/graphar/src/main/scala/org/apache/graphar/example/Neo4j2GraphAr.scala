@@ -82,7 +82,7 @@ object Neo4j2GraphAr {
       .option("query", "MATCH (n:Person) RETURN n.name AS name, n.born as born")
       .option("schema.flatten.limit", 1)
       .load()
-    // put into writer, vertex label is "Person"
+    // put into writer, vertex type is "Person"
     writer.PutVertexData("Person", person_df)
 
     // read vertices with label "Movie" from Neo4j as a DataFrame
@@ -94,7 +94,7 @@ object Neo4j2GraphAr {
       )
       .option("schema.flatten.limit", 1)
       .load()
-    // put into writer, vertex label is "Movie"
+    // put into writer, vertex type is "Movie"
     writer.PutVertexData("Movie", movie_df)
 
     // read edges with type "Person"->"PRODUCED"->"Movie" from Neo4j as a DataFrame
@@ -106,8 +106,8 @@ object Neo4j2GraphAr {
       )
       .option("schema.flatten.limit", 1)
       .load()
-    // put into writer, source vertex label is "Person", edge label is "PRODUCED"
-    // target vertex label is "Movie"
+    // put into writer, source vertex type is "Person", edge type is "PRODUCED"
+    // target vertex type is "Movie"
     writer.PutEdgeData(("Person", "PRODUCED", "Movie"), produced_edge_df)
 
     // read edges with type "Person"->"ACTED_IN"->"Movie" from Neo4j as a DataFrame
@@ -119,8 +119,8 @@ object Neo4j2GraphAr {
       )
       .option("schema.flatten.limit", 1)
       .load()
-    // put into writer, source vertex label is "Person", edge label is "ACTED_IN"
-    // target vertex label is "Movie"
+    // put into writer, source vertex type is "Person", edge type is "ACTED_IN"
+    // target vertex type is "Movie"
     writer.PutEdgeData(("Person", "ACTED_IN", "Movie"), acted_in_edge_df)
 
     // read edges with type "Person"->"DIRECTED"->"Movie" from Neo4j as a DataFrame
@@ -132,8 +132,8 @@ object Neo4j2GraphAr {
       )
       .option("schema.flatten.limit", 1)
       .load()
-    // put into writer, source vertex label is "Person", edge label is "DIRECTED"
-    // target vertex label is "Movie"
+    // put into writer, source vertex type is "Person", edge type is "DIRECTED"
+    // target vertex type is "Movie"
     writer.PutEdgeData(("Person", "DIRECTED", "Movie"), directed_edge_df)
 
     // read edges with type "Person"->"FOLLOWS"->"Person" from Neo4j as a DataFrame
@@ -145,8 +145,8 @@ object Neo4j2GraphAr {
       )
       .option("schema.flatten.limit", 1)
       .load()
-    // put into writer, source vertex label is "Person", edge label is "FOLLOWS"
-    // target vertex label is "Person"
+    // put into writer, source vertex type is "Person", edge type is "FOLLOWS"
+    // target vertex type is "Person"
     writer.PutEdgeData(("Person", "FOLLOWS", "Person"), follows_edge_df)
 
     // read edges with type "Person"->"REVIEWED"->"Movie" from Neo4j as a DataFrame
@@ -158,8 +158,8 @@ object Neo4j2GraphAr {
       )
       .option("schema.flatten.limit", 1)
       .load()
-    // put into writer, source vertex label is "Person", edge label is "REVIEWED"
-    // target vertex label is "Movie"
+    // put into writer, source vertex type is "Person", edge type is "REVIEWED"
+    // target vertex type is "Movie"
     writer.PutEdgeData(("Person", "REVIEWED", "Movie"), reviewed_edge_df)
 
     // read edges with type "Person"->"WROTE"->"Movie" from Neo4j as a DataFrame
@@ -171,8 +171,8 @@ object Neo4j2GraphAr {
       )
       .option("schema.flatten.limit", 1)
       .load()
-    // put into writer, source vertex label is "Person", edge label is "WROTE"
-    // target vertex label is "Movie"
+    // put into writer, source vertex type is "Person", edge type is "WROTE"
+    // target vertex type is "Movie"
     writer.PutEdgeData(("Person", "WROTE", "Movie"), wrote_edge_df)
   }
 }

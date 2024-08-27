@@ -31,24 +31,24 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
   // read file and construct graph info
   std::string path =
       test_data_dir + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-  std::string src_label = "person", edge_label = "knows", dst_label = "person";
+  std::string src_type = "person", edge_type = "knows", dst_type = "person";
   std::string vertex_property_name = "id";
   std::string edge_property_name = "creationDate";
   auto maybe_graph_info = GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
-  auto vertex_info = graph_info->GetVertexInfo(src_label);
+  auto vertex_info = graph_info->GetVertexInfo(src_type);
   REQUIRE(vertex_info != nullptr);
   auto v_pg = vertex_info->GetPropertyGroup(vertex_property_name);
   REQUIRE(v_pg != nullptr);
-  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
   REQUIRE(edge_info != nullptr);
   auto e_pg = edge_info->GetPropertyGroup(edge_property_name);
   REQUIRE(e_pg != nullptr);
 
   SECTION("VertexPropertyArrowChunkReader") {
     auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-        graph_info, src_label, vertex_property_name);
+        graph_info, src_type, vertex_property_name);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     REQUIRE(reader->GetChunkNum() == 10);
@@ -167,7 +167,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
         options.filter = filter;
         options.columns = expected_cols;
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-            graph_info, src_label, filter_property, options);
+            graph_info, src_type, filter_property, options);
         REQUIRE(maybe_reader.status().ok());
         walkReader(maybe_reader.value());
       }
@@ -175,7 +175,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       SECTION("pushdown by function Filter() & Select()") {
         std::cout << "Vertex property pushdown by Filter() & Select():\n";
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-            graph_info, src_label, filter_property);
+            graph_info, src_type, filter_property);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
         reader->Filter(filter);
@@ -190,7 +190,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
         options.filter = filter;
         options.columns = expected_cols;
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-            graph_info, src_label, filter_property, options);
+            graph_info, src_type, filter_property, options);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
         auto result = reader->GetChunk();
@@ -207,7 +207,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
         options.filter = filter;
         options.columns = expected_cols_2;
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-            graph_info, src_label, filter_property, options);
+            graph_info, src_type, filter_property, options);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
         auto result = reader->GetChunk();
@@ -218,7 +218,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
 
     SECTION("Make from graph info and property group") {
       auto maybe_reader =
-          VertexPropertyArrowChunkReader::Make(graph_info, src_label, v_pg);
+          VertexPropertyArrowChunkReader::Make(graph_info, src_type, v_pg);
       REQUIRE(maybe_reader.status().ok());
       auto reader = maybe_reader.value();
       REQUIRE(reader->GetChunkNum() == 10);
@@ -234,9 +234,9 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
   }
 
   SECTION("AdjListArrowChunkReader") {
-    auto maybe_reader = AdjListArrowChunkReader::Make(
-        graph_info, src_label, edge_label, dst_label,
-        AdjListType::ordered_by_source);
+    auto maybe_reader =
+        AdjListArrowChunkReader::Make(graph_info, src_type, edge_type, dst_type,
+                                      AdjListType::ordered_by_source);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     SECTION("Basics") {
@@ -284,7 +284,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
 
     SECTION("set start vertex chunk index by seek_chunk_index") {
       auto maybe_reader = AdjListArrowChunkReader::Make(
-          graph_info, src_label, edge_label, dst_label,
+          graph_info, src_type, edge_type, dst_type,
           AdjListType::ordered_by_source);
       auto reader = maybe_reader.value();
       // check reader start from vertex chunk 0
@@ -303,7 +303,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
 
   SECTION("AdjListPropertyArrowChunkReader") {
     auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
-        graph_info, src_label, edge_label, dst_label, edge_property_name,
+        graph_info, src_type, edge_type, dst_type, edge_property_name,
         AdjListType::ordered_by_source);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
@@ -390,7 +390,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       SECTION("pushdown by helper function") {
         std::cout << "Adj list property pushdown by helper function: \n";
         auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
-            graph_info, src_label, edge_label, dst_label, edge_property_name,
+            graph_info, src_type, edge_type, dst_type, edge_property_name,
             AdjListType::ordered_by_source, options);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
@@ -401,7 +401,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
         std::cout << "Adj list property pushdown by Filter() & Select():"
                   << std::endl;
         auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
-            graph_info, src_label, edge_label, dst_label, edge_property_name,
+            graph_info, src_type, edge_type, dst_type, edge_property_name,
             AdjListType::ordered_by_source);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
@@ -413,7 +413,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
 
     SECTION("set start vertex chunk index by seek_chunk_index") {
       auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
-          graph_info, src_label, edge_label, dst_label, edge_property_name,
+          graph_info, src_type, edge_type, dst_type, edge_property_name,
           AdjListType::ordered_by_source);
       REQUIRE(maybe_reader.status().ok());
       auto reader = maybe_reader.value();
@@ -433,7 +433,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
 
   SECTION("AdjListOffsetArrowChunkReader") {
     auto maybe_reader = AdjListOffsetArrowChunkReader::Make(
-        graph_info, src_label, edge_label, dst_label,
+        graph_info, src_type, edge_type, dst_type,
         AdjListType::ordered_by_source);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
@@ -461,17 +461,16 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
 TEST_CASE_METHOD(GlobalFixture, "EmptyChunkTest") {
   // read file and construct graph info
   std::string path = test_data_dir + "/neo4j/MovieGraph.graph.yml";
-  std::string src_label = "Person", edge_label = "REVIEWED",
-              dst_label = "Movie";
+  std::string src_type = "Person", edge_type = "REVIEWED", dst_type = "Movie";
   std::string edge_property_name = "rating";
   auto maybe_graph_info = GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
 
   SECTION("AdjListArrowChunkReader") {
-    auto maybe_reader = AdjListArrowChunkReader::Make(
-        graph_info, src_label, edge_label, dst_label,
-        AdjListType::ordered_by_source);
+    auto maybe_reader =
+        AdjListArrowChunkReader::Make(graph_info, src_type, edge_type, dst_type,
+                                      AdjListType::ordered_by_source);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     auto result = reader->GetChunk();
@@ -482,7 +481,7 @@ TEST_CASE_METHOD(GlobalFixture, "EmptyChunkTest") {
 
   SECTION("AdjListPropertyArrowChunkReader") {
     auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
-        graph_info, src_label, edge_label, dst_label, edge_property_name,
+        graph_info, src_type, edge_type, dst_type, edge_property_name,
         AdjListType::ordered_by_source);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
@@ -496,24 +495,24 @@ TEST_CASE_METHOD(GlobalFixture, "EmptyChunkTest") {
 TEST_CASE_METHOD(GlobalFixture, "JSON_TEST") {
   // read file and construct graph info
   std::string path = test_data_dir + "/ldbc_sample/json/LdbcSample.graph.yml";
-  std::string src_label = "Person", edge_label = "Knows", dst_label = "Person";
+  std::string src_type = "Person", edge_type = "Knows", dst_type = "Person";
   std::string vertex_property_name = "id";
   std::string edge_property_name = "creationDate";
   auto maybe_graph_info = GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
   auto graph_info = maybe_graph_info.value();
-  auto vertex_info = graph_info->GetVertexInfo(src_label);
+  auto vertex_info = graph_info->GetVertexInfo(src_type);
   REQUIRE(vertex_info != nullptr);
   auto v_pg = vertex_info->GetPropertyGroup(vertex_property_name);
   REQUIRE(v_pg != nullptr);
-  auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+  auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
   REQUIRE(edge_info != nullptr);
   auto e_pg = edge_info->GetPropertyGroup(edge_property_name);
   REQUIRE(e_pg != nullptr);
 
   SECTION("VertexPropertyArrowChunkReader") {
     auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-        graph_info, src_label, vertex_property_name);
+        graph_info, src_type, vertex_property_name);
     REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
     REQUIRE(reader->GetChunkNum() == 10);

@@ -84,10 +84,10 @@ object GraphAr2Nebula {
       edgeData: Map[(String, String, String), Map[String, DataFrame]]
   ): Unit = {
     // write each edge type to Nebula
-    edgeData.foreach { case (srcEdgeDstLabels, orderMap) =>
-      val sourceTag = srcEdgeDstLabels._1
-      val edgeType = srcEdgeDstLabels._2
-      val targetTag = srcEdgeDstLabels._3
+    edgeData.foreach { case (srcEdgeDstTypes, orderMap) =>
+      val sourceTag = srcEdgeDstTypes._1
+      val edgeType = srcEdgeDstTypes._2
+      val targetTag = srcEdgeDstTypes._3
       val sourcePrimaryKey = graphInfo.getVertexInfo(sourceTag).getPrimaryKey()
       val targetPrimaryKey = graphInfo.getVertexInfo(targetTag).getPrimaryKey()
       val sourceDF = vertexData(sourceTag)

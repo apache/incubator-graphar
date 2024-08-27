@@ -49,7 +49,7 @@ object EdgeWriter {
       edgeDf: DataFrame,
       edgeInfo: EdgeInfo,
       adjListType: AdjListType.Value,
-      vertexNumOfPrimaryVertexLabel: Long
+      vertexNumOfPrimaryVertexType: Long
   ): (DataFrame, ParSeq[(Int, DataFrame)], Array[Long], Map[Long, Int]) = {
     val edgeSchema = edgeDf.schema
     val colName = if (
@@ -63,7 +63,7 @@ object EdgeWriter {
     else edgeInfo.getDst_chunk_size()
     val edgeChunkSize: Long = edgeInfo.getChunk_size()
     val vertexChunkNum: Int =
-      ((vertexNumOfPrimaryVertexLabel + vertexChunkSize - 1) / vertexChunkSize).toInt // ceil
+      ((vertexNumOfPrimaryVertexType + vertexChunkSize - 1) / vertexChunkSize).toInt // ceil
 
     // sort by primary key and generate continue edge id for edge records
     val sortedDfRDD = edgeDf.sort(colName).rdd
@@ -212,7 +212,7 @@ object EdgeWriter {
  * @param adjListType
  *   the adj list type for the edge.
  * @param vertexNum
- *   vertex number of the primary vertex label
+ *   vertex number of the primary vertex type
  * @param edgeDf
  *   the input edge DataFrame.
  */

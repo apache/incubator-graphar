@@ -289,7 +289,7 @@ class EdgesBuilder {
     if (!edge_info->HasAdjacentListType(adj_list_type)) {
       return Status::KeyError(
           "The adjacent list type ", AdjListTypeToString(adj_list_type),
-          " doesn't exist in edge ", edge_info->GetEdgeLabel(), ".");
+          " doesn't exist in edge ", edge_info->GetEdgeType(), ".");
     }
     return std::make_shared<EdgesBuilder>(edge_info, prefix, adj_list_type,
                                           num_vertices, validate_level);
@@ -299,24 +299,23 @@ class EdgesBuilder {
    * @brief Construct an EdgesBuilder from graph info.
    *
    * @param graph_info The graph info that describes the graph.
-   * @param src_label The label of the source vertex type.
-   * @param edge_label The label of the edge type.
-   * @param dst_label The label of the destination vertex type.
+   * @param src_type The label of the source vertex type.
+   * @param edge_type The label of the edge type.
+   * @param dst_type The label of the destination vertex type.
    * @param adj_list_type The adj list type of the edges.
    * @param num_vertices The total number of vertices for source or destination.
    * @param validate_level The global validate level for the builder, default is
    * no_validate.
    */
   static Result<std::shared_ptr<EdgesBuilder>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label, const AdjListType& adj_list_type,
-      IdType num_vertices,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      const AdjListType& adj_list_type, IdType num_vertices,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
-    auto edge_info = graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+    auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
     if (!edge_info) {
-      return Status::KeyError("The edge ", src_label, " ", edge_label, " ",
-                              dst_label, " doesn't exist.");
+      return Status::KeyError("The edge ", src_type, " ", edge_type, " ",
+                              dst_type, " doesn't exist.");
     }
     return Make(edge_info, graph_info->GetPrefix(), adj_list_type, num_vertices,
                 validate_level);

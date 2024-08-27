@@ -98,7 +98,7 @@ object Utils {
         val vertexInfo = new VertexInfo()
         val prefix = "vertex/" + key + "/"
         vertexInfo.setPrefix(prefix)
-        vertexInfo.setLabel(key)
+        vertexInfo.setType(key)
         vertexInfo.setChunk_size(vertexChunkSize)
         vertexInfo.setVersion("gar/" + version)
         vertexInfo.getProperty_groups().add(new PropertyGroup())
@@ -128,9 +128,9 @@ object Utils {
     edgeSchemas.foreach {
       case (key, schema) => {
         val edgeInfo = new EdgeInfo()
-        edgeInfo.setSrc_label(key._1)
-        edgeInfo.setEdge_label(key._2)
-        edgeInfo.setDst_label(key._3)
+        edgeInfo.setSrc_type(key._1)
+        edgeInfo.setEdge_type(key._2)
+        edgeInfo.setDst_type(key._3)
         edgeInfo.setChunk_size(edgeChunkSize)
         edgeInfo.setSrc_chunk_size(vertexChunkSize)
         edgeInfo.setDst_chunk_size(vertexChunkSize)

@@ -169,7 +169,7 @@ class AdjacentList {
 /**
  * \class VertexInfo
  * \brief VertexInfo is a class to describe the vertex information, including
- * the vertex label, chunk size, property groups, and prefix.
+ * the vertex type, chunk size, property groups, and prefix.
  */
 class VertexInfo {
  public:
@@ -177,14 +177,14 @@ class VertexInfo {
    * Construct a VertexInfo object with the given information and property
    * group.
    *
-   * @param label The label of the vertex.
+   * @param type The type of the vertex.
    * @param chunk_size The number of vertices in each vertex chunk.
    * @param property_groups The property group vector of the vertex.
    * @param prefix The prefix of the vertex info. If left empty, the default
-   *        prefix will be set to the label of the vertex.
+   *        prefix will be set to the type of the vertex.
    * @param version The format version of the vertex info.
    */
-  explicit VertexInfo(const std::string& label, IdType chunk_size,
+  explicit VertexInfo(const std::string& type, IdType chunk_size,
                       const PropertyGroupVector& property_groups,
                       const std::string& prefix = "",
                       std::shared_ptr<const InfoVersion> version = nullptr);
@@ -200,11 +200,11 @@ class VertexInfo {
       std::shared_ptr<PropertyGroup> property_group) const;
 
   /**
-   * Get the label of the vertex.
+   * Get the type of the vertex.
    *
-   * @return The label of the vertex.
+   * @return The type of the vertex.
    */
-  const std::string& GetLabel() const;
+  const std::string& GetType() const;
 
   /**
    * Get the chunk size of the vertex.
@@ -376,7 +376,7 @@ class VertexInfo {
 /**
  * \class EdgeInfo
  * \brief EdgeInfo is a class to describe the edge information, including the
- * source vertex label, edge label, destination vertex label, chunk size,
+ * source vertex type, edge type, destination vertex type, chunk size,
  * adjacent list property groups, and prefix.
  */
 class EdgeInfo {
@@ -385,9 +385,9 @@ class EdgeInfo {
    * @brief Construct an EdgeInfo object with the given information and property
    * groups.
    *
-   * @param src_label The label of the source vertex.
-   * @param edge_label The label of the edge.
-   * @param dst_label The label of the destination vertex.
+   * @param src_type The type of the source vertex.
+   * @param edge_type The type of the edge.
+   * @param dst_type The type of the destination vertex.
    * @param chunk_size The number of edges in each edge chunk.
    * @param src_chunk_size The number of source vertices in each vertex chunk.
    * @param dst_chunk_size The number of destination vertices in each vertex
@@ -398,8 +398,8 @@ class EdgeInfo {
    * @param prefix The path prefix of the edge info.
    * @param version The version of the edge info.
    */
-  explicit EdgeInfo(const std::string& src_label, const std::string& edge_label,
-                    const std::string& dst_label, IdType chunk_size,
+  explicit EdgeInfo(const std::string& src_type, const std::string& edge_type,
+                    const std::string& dst_type, IdType chunk_size,
                     IdType src_chunk_size, IdType dst_chunk_size, bool directed,
                     const AdjacentListVector& adjacent_lists,
                     const PropertyGroupVector& property_groups,
@@ -427,22 +427,22 @@ class EdgeInfo {
       std::shared_ptr<PropertyGroup> property_group) const;
 
   /**
-   * Get the label of the source vertex.
-   * @return The label of the source vertex.
+   * Get the type of the source vertex.
+   * @return The type of the source vertex.
    */
-  const std::string& GetSrcLabel() const;
+  const std::string& GetSrcType() const;
 
   /**
-   * Get the label of the edge.
-   * @return The label of the edge.
+   * Get the type of the edge.
+   * @return The type of the edge.
    */
-  const std::string& GetEdgeLabel() const;
+  const std::string& GetEdgeType() const;
 
   /**
-   * Get the label of the destination vertex.
-   * @return The label of the destination vertex.
+   * Get the type of the destination vertex.
+   * @return The type of the destination vertex.
    */
-  const std::string& GetDstLabel() const;
+  const std::string& GetDstType() const;
 
   /**
    * Get the number of edges in each edge chunk.
@@ -774,36 +774,36 @@ class GraphInfo {
   const std::unordered_map<std::string, std::string>& GetExtraInfo() const;
 
   /**
-   * @brief Get the vertex info with the given label.
-   * @param label The label of the vertex.
-   * @return vertex info may be nullptr if the label is not found.
+   * @brief Get the vertex info with the given type.
+   * @param type The type of the vertex.
+   * @return vertex info may be nullptr if the type is not found.
    */
-  std::shared_ptr<VertexInfo> GetVertexInfo(const std::string& label) const;
+  std::shared_ptr<VertexInfo> GetVertexInfo(const std::string& type) const;
 
   /**
-   * @brief Get the edge info with the given source vertex label, edge label,
-   * and destination vertex label.
-   * @param src_label The label of the source vertex.
-   * @param edge_label The label of the edge.
-   * @param dst_label The label of the destination vertex.
-   * @return edge info may be nullptr if the label is not found.
+   * @brief Get the edge info with the given source vertex type, edge type,
+   * and destination vertex type.
+   * @param src_type The type of the source vertex.
+   * @param edge_type The type of the edge.
+   * @param dst_type The type of the destination vertex.
+   * @return edge info may be nullptr if the type is not found.
    */
-  std::shared_ptr<EdgeInfo> GetEdgeInfo(const std::string& src_label,
-                                        const std::string& edge_label,
-                                        const std::string& dst_label) const;
+  std::shared_ptr<EdgeInfo> GetEdgeInfo(const std::string& src_type,
+                                        const std::string& edge_type,
+                                        const std::string& dst_type) const;
 
   /**
-   * @brief Get the vertex info index with the given label.
+   * @brief Get the vertex info index with the given type.
    */
-  int GetVertexInfoIndex(const std::string& label) const;
+  int GetVertexInfoIndex(const std::string& type) const;
 
   /**
-   * @brief Get the edge info index with the given source vertex label, edge
-   * label, and destination label.
+   * @brief Get the edge info index with the given source vertex type, edge
+   * type, and destination type.
    */
-  int GetEdgeInfoIndex(const std::string& src_label,
-                       const std::string& edge_label,
-                       const std::string& dst_label) const;
+  int GetEdgeInfoIndex(const std::string& src_type,
+                       const std::string& edge_type,
+                       const std::string& dst_type) const;
 
   /**
    * @brief Get the number of vertex infos.

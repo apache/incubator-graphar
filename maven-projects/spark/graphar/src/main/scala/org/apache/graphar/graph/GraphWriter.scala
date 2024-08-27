@@ -36,8 +36,8 @@ class GraphWriter() {
   /**
    * Put the vertex DataFrame into writer.
    *
-   * @param label
-   *   label of vertex.
+   * @param type
+   *   type of vertex.
    * @param df
    *   DataFrame of the vertex type.
    * @param primaryKey
@@ -45,23 +45,23 @@ class GraphWriter() {
    *   property column as primary key.
    */
   def PutVertexData(
-      label: String,
+      vertexType: String,
       df: DataFrame,
       primaryKey: String = ""
   ): Unit = {
-    if (vertices.exists(_._1 == label)) {
+    if (vertices.exists(_._1 == vertexType)) {
       throw new IllegalArgumentException(
-        "Vertex data of label " + label + " has been put."
+        "Vertex data of type " + vertexType + " has been put."
       )
     }
-    vertices += label -> df
-    primaryKeys += label -> primaryKey
+    vertices += vertexType -> df
+    primaryKeys += vertexType -> primaryKey
   }
 
   /**
    * Put the edge dataframe into writer.
    * @param relation
-   *   3-Tuple (source label, edge label, target label) to indicate edge type.
+   *   3-Tuple (source type, edge type, target type) to indicate edge relation.
    * @param df
    *   data frame of edge type.
    */
@@ -88,25 +88,28 @@ class GraphWriter() {
     var indexMappings: scala.collection.mutable.Map[String, DataFrame] =
       scala.collection.mutable.Map[String, DataFrame]()
     vertexInfos.foreach {
-      case (label, vertexInfo) => {
-        val primaryKey = primaryKeys(label)
-        vertices(label).persist(
+      case (vertexType, vertexInfo) => {
+        val primaryKey = primaryKeys(vertexType)
+        vertices(vertexType).persist(
           GeneralParams.defaultStorageLevel
         ) // cache the vertex DataFrame
         val df_and_mapping = IndexGenerator
-          .generateVertexIndexColumnAndIndexMapping(vertices(label), primaryKey)
+          .generateVertexIndexColumnAndIndexMapping(
+            vertices(vertexType),
+            primaryKey
+          )
         df_and_mapping._1.persist(
           GeneralParams.defaultStorageLevel
         ) // cache the vertex DataFrame with index
         df_and_mapping._2.persist(
           GeneralParams.defaultStorageLevel
         ) // cache the index mapping DataFrame
-        vertices(label).unpersist() // unpersist the vertex DataFrame
+        vertices(vertexType).unpersist() // unpersist the vertex DataFrame
         val df_with_index = df_and_mapping._1
-        indexMappings += label -> df_and_mapping._2
+        indexMappings += vertexType -> df_and_mapping._2
         val writer =
           new VertexWriter(prefix, vertexInfo, df_with_index)
-        vertexNums += label -> writer.getVertexNum()
+        vertexNums += vertexType -> writer.getVertexNum()
         writer.writeVertexProperties()
         df_with_index.unpersist()
       }
@@ -114,19 +117,19 @@ class GraphWriter() {
 
     edgeInfos.foreach {
       case (key, edgeInfo) => {
-        val srcLabel = edgeInfo.getSrc_label
-        val dstLabel = edgeInfo.getDst_label
-        val edgeLabel = edgeInfo.getEdge_label
-        val src_vertex_index_mapping = indexMappings(srcLabel)
+        val srcType = edgeInfo.getSrc_type
+        val dstType = edgeInfo.getDst_type
+        val edgeType = edgeInfo.getEdge_type
+        val src_vertex_index_mapping = indexMappings(srcType)
         val dst_vertex_index_mapping = {
-          if (srcLabel == dstLabel)
+          if (srcType == dstType)
             src_vertex_index_mapping
           else
-            indexMappings(dstLabel)
+            indexMappings(dstType)
         }
         val edge_df_with_index =
           IndexGenerator.generateSrcAndDstIndexForEdgesFromMapping(
-            edges((srcLabel, edgeLabel, dstLabel)),
+            edges((srcType, edgeType, dstType)),
             src_vertex_index_mapping,
             dst_vertex_index_mapping
           )
@@ -142,9 +145,9 @@ class GraphWriter() {
             if (
               adj_list_type == AdjListType.ordered_by_source || adj_list_type == AdjListType.unordered_by_source
             ) {
-              vertexNums(srcLabel)
+              vertexNums(srcType)
             } else {
-              vertexNums(dstLabel)
+              vertexNums(dstType)
             }
           }
           val writer = new EdgeWriter(

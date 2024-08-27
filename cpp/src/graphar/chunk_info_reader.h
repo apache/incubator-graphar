@@ -182,15 +182,15 @@ class AdjListChunkInfoReader {
    * @brief Create an AdjListChunkInfoReader instance from graph info.
    *
    * @param graph_info The graph info.
-   * @param src_label The source vertex label.
-   * @param edge_label The edge label.
-   * @param dst_label The destination vertex label.
+   * @param src_type The source vertex label.
+   * @param edge_type The edge label.
+   * @param dst_type The destination vertex label.
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListChunkInfoReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label, AdjListType adj_list_type);
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      AdjListType adj_list_type);
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;
@@ -255,15 +255,15 @@ class AdjListOffsetChunkInfoReader {
    * @brief Create an AdjListOffsetChunkInfoReader instance from graph info.
    *
    * @param graph_info The graph info.
-   * @param src_label The source vertex label.
-   * @param edge_label The edge label.
-   * @param dst_label The destination vertex label.
+   * @param src_type The source vertex label.
+   * @param edge_type The edge label.
+   * @param dst_type The destination vertex label.
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListOffsetChunkInfoReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label, AdjListType adj_list_type);
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      AdjListType adj_list_type);
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;
@@ -344,16 +344,15 @@ class AdjListPropertyChunkInfoReader {
    * and property group.
    *
    * @param graph_info The graph info.
-   * @param src_label The source vertex label.
-   * @param edge_label The edge label.
-   * @param dst_label The destination vertex label.
+   * @param src_type The source vertex label.
+   * @param edge_type The edge label.
+   * @param dst_type The destination vertex label.
    * @param property_group The property group of the edge property.
    * @param adj_list_type The adj list type for the edge.
    */
   static Result<std::shared_ptr<AdjListPropertyChunkInfoReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
       const std::shared_ptr<PropertyGroup>& property_group,
       AdjListType adj_list_type);
 
@@ -362,18 +361,17 @@ class AdjListPropertyChunkInfoReader {
    * and property name.
    *
    * @param graph_info The graph info.
-   * @param src_label The source vertex label.
-   * @param edge_label The edge label.
-   * @param dst_label The destination vertex label.
+   * @param src_type The source vertex label.
+   * @param edge_type The edge label.
+   * @param dst_type The destination vertex label.
    * @param property_name The name of one property in the property group you
    * want to read.
    * @param adj_list_type The adj list type for the edge.
    */
   static Result<std::shared_ptr<AdjListPropertyChunkInfoReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info,
-      const std::string& src_label, const std::string& edge_label,
-      const std::string& dst_label, const std::string& property_name,
-      AdjListType adj_list_type);
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      const std::string& property_name, AdjListType adj_list_type);
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;

@@ -102,7 +102,7 @@ Status EdgesBuilder::validate(const Edge& e,
   if (!edge_info_->HasAdjacentListType(adj_list_type_)) {
     return Status::KeyError(
         "Adj list type ", AdjListTypeToString(adj_list_type_),
-        " does not exist in the ", edge_info_->GetEdgeLabel(), " edge info.");
+        " does not exist in the ", edge_info_->GetEdgeType(), " edge info.");
   }
 
   // strong validate
@@ -112,7 +112,7 @@ Status EdgesBuilder::validate(const Edge& e,
       if (!edge_info_->HasProperty(property.first)) {
         return Status::KeyError("Property with name ", property.first,
                                 " is not contained in the ",
-                                edge_info_->GetEdgeLabel(), " edge info.");
+                                edge_info_->GetEdgeType(), " edge info.");
       }
       // check if the property type is correct
       auto type = edge_info_->GetPropertyType(property.first).value();

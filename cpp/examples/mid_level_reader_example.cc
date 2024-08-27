@@ -89,9 +89,9 @@ void vertex_property_chunk_reader(
 void adj_list_chunk_reader(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // create reader
-  std::string src_label = "person", edge_label = "knows", dst_label = "person";
+  std::string src_type = "person", edge_type = "knows", dst_type = "person";
   auto maybe_reader = graphar::AdjListArrowChunkReader::Make(
-      graph_info, src_label, edge_label, dst_label,
+      graph_info, src_type, edge_type, dst_type,
       graphar::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
 
@@ -124,10 +124,10 @@ void adj_list_chunk_reader(
 void adj_list_property_chunk_reader(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // create reader
-  std::string src_label = "person", edge_label = "knows", dst_label = "person",
+  std::string src_type = "person", edge_type = "knows", dst_type = "person",
               property_name = "creationDate";
   auto maybe_reader = graphar::AdjListPropertyArrowChunkReader::Make(
-      graph_info, src_label, edge_label, dst_label, property_name,
+      graph_info, src_type, edge_type, dst_type, property_name,
       graphar::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
@@ -165,7 +165,7 @@ void adj_list_property_chunk_reader(
   auto filter = graphar::_And(expr1, expr2);
   std::vector<std::string> expected_cols{"creationDate"};
   auto maybe_filter_reader = graphar::AdjListPropertyArrowChunkReader::Make(
-      graph_info, src_label, edge_label, dst_label, property_name,
+      graph_info, src_type, edge_type, dst_type, property_name,
       graphar::AdjListType::ordered_by_source);
   ASSERT(maybe_filter_reader.status().ok());
   auto filter_reader = maybe_filter_reader.value();
@@ -181,9 +181,9 @@ void adj_list_property_chunk_reader(
 void adj_list_offset_chunk_reader(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // create reader
-  std::string src_label = "person", edge_label = "knows", dst_label = "person";
+  std::string src_type = "person", edge_type = "knows", dst_type = "person";
   auto maybe_reader = graphar::AdjListOffsetArrowChunkReader::Make(
-      graph_info, src_label, edge_label, dst_label,
+      graph_info, src_type, edge_type, dst_type,
       graphar::AdjListType::ordered_by_source);
   ASSERT(maybe_reader.status().ok());
   auto reader = maybe_reader.value();

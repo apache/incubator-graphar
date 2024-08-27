@@ -27,7 +27,7 @@ int main(int argc, char* argv[]) {
   auto version = graphar::InfoVersion::Parse("gar/v1").value();
 
   // meta info
-  std::string vertex_label = "person", vertex_prefix = "vertex/person/";
+  std::string type = "person", vertex_prefix = "vertex/person/";
   int chunk_size = 100;
 
   // construct properties and property groups
@@ -43,11 +43,11 @@ int main(int argc, char* argv[]) {
       graphar::CreatePropertyGroup(property_vector_2, graphar::FileType::ORC);
 
   // create vertex info
-  auto vertex_info = graphar::CreateVertexInfo(
-      vertex_label, chunk_size, {group1}, vertex_prefix, version);
+  auto vertex_info = graphar::CreateVertexInfo(type, chunk_size, {group1},
+                                               vertex_prefix, version);
 
   ASSERT(vertex_info != nullptr);
-  ASSERT(vertex_info->GetLabel() == vertex_label);
+  ASSERT(vertex_info->GetType() == type);
   ASSERT(vertex_info->GetChunkSize() == chunk_size);
   ASSERT(vertex_info->GetPropertyGroups().size() == 1);
   ASSERT(vertex_info->HasProperty("id"));
@@ -75,7 +75,7 @@ int main(int argc, char* argv[]) {
 
   /*------------------construct edge info------------------*/
   // meta info
-  std::string src_label = "person", edge_label = "knows", dst_label = "person",
+  std::string src_type = "person", edge_type = "knows", dst_type = "person",
               edge_prefix = "edge/person_knows_person/";
   int edge_chunk_size = 1024, src_chunk_size = 100, dst_chunk_size = 100;
   bool directed = false;
@@ -94,13 +94,13 @@ int main(int argc, char* argv[]) {
 
   // create edge info
   auto edge_info = graphar::CreateEdgeInfo(
-      src_label, edge_label, dst_label, edge_chunk_size, src_chunk_size,
+      src_type, edge_type, dst_type, edge_chunk_size, src_chunk_size,
       dst_chunk_size, directed, adjacent_lists, {group3}, edge_prefix, version);
 
   ASSERT(edge_info != nullptr);
-  ASSERT(edge_info->GetSrcLabel() == src_label);
-  ASSERT(edge_info->GetEdgeLabel() == edge_label);
-  ASSERT(edge_info->GetDstLabel() == dst_label);
+  ASSERT(edge_info->GetSrcType() == src_type);
+  ASSERT(edge_info->GetEdgeType() == edge_type);
+  ASSERT(edge_info->GetDstType() == dst_type);
   ASSERT(edge_info->GetChunkSize() == edge_chunk_size);
   ASSERT(edge_info->GetSrcChunkSize() == src_chunk_size);
   ASSERT(edge_info->GetDstChunkSize() == dst_chunk_size);
@@ -154,14 +154,14 @@ int main(int argc, char* argv[]) {
   ASSERT(graph_info->GetName() == name);
   ASSERT(graph_info->GetPrefix() == prefix);
   ASSERT(graph_info->GetVertexInfos().size() == 1);
-  ASSERT(graph_info->GetVertexInfo(vertex_label) != nullptr);
-  auto vertex_info_from_graph = graph_info->GetVertexInfo(vertex_label);
+  ASSERT(graph_info->GetVertexInfo(type) != nullptr);
+  auto vertex_info_from_graph = graph_info->GetVertexInfo(type);
   ASSERT(vertex_info_from_graph != nullptr);
   ASSERT(vertex_info_from_graph->HasPropertyGroup(group1));
   ASSERT(vertex_info_from_graph->HasPropertyGroup(group2));
   ASSERT(graph_info->GetEdgeInfos().size() == 1);
   auto edge_info_from_graph =
-      graph_info->GetEdgeInfo(src_label, edge_label, dst_label);
+      graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
   ASSERT(edge_info_from_graph != nullptr);
   ASSERT(edge_info_from_graph->PropertyGroupNum() == 1);
   ASSERT(edge_info_from_graph->HasPropertyGroup(group3));

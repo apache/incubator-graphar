@@ -41,10 +41,10 @@ int main(int argc, char* argv[]) {
   std::cout << "num_vertices: " << num_vertices << std::endl;
 
   // get the "person_knows_person" edges of graph
-  std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto maybe_edges = graphar::EdgesCollection::Make(
-      graph_info, src_label, edge_label, dst_label,
-      graphar::AdjListType::unordered_by_source);
+  std::string src_type = "person", edge_type = "knows", dst_type = "person";
+  auto maybe_edges =
+      graphar::EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
+                                     graphar::AdjListType::unordered_by_source);
   ASSERT(!maybe_edges.has_error());
   auto& edges = maybe_edges.value();
 
@@ -130,16 +130,16 @@ int main(int argc, char* argv[]) {
   ASSERT(writer.WriteTable(table, group, 0).ok());
 
   // construct a new graph
-  src_label = "person";
-  edge_label = "bfs";
-  dst_label = "person";
+  src_type = "person";
+  edge_type = "bfs";
+  dst_type = "person";
   int edge_chunk_size = 1024, src_chunk_size = 100, dst_chunk_size = 100;
   bool directed = true;
   auto version = graphar::InfoVersion::Parse("gar/v1").value();
   auto al = graphar::CreateAdjacentList(graphar::AdjListType::ordered_by_source,
                                         graphar::FileType::CSV);
   auto new_edge_info = graphar::CreateEdgeInfo(
-      src_label, edge_label, dst_label, edge_chunk_size, src_chunk_size,
+      src_type, edge_type, dst_type, edge_chunk_size, src_chunk_size,
       dst_chunk_size, directed, {al}, {}, "", version);
   ASSERT(new_edge_info->IsValidated());
   // save & dump

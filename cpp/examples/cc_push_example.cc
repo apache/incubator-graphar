@@ -42,15 +42,15 @@ int main(int argc, char* argv[]) {
   std::cout << "num_vertices: " << num_vertices << std::endl;
 
   // construct edges collection
-  std::string src_label = "person", edge_label = "knows", dst_label = "person";
-  auto expect1 = graphar::EdgesCollection::Make(
-      graph_info, src_label, edge_label, dst_label,
-      graphar::AdjListType::ordered_by_source);
+  std::string src_type = "person", edge_type = "knows", dst_type = "person";
+  auto expect1 =
+      graphar::EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
+                                     graphar::AdjListType::ordered_by_source);
   ASSERT(!expect1.has_error());
   auto& edges1 = expect1.value();
-  auto expect2 = graphar::EdgesCollection::Make(
-      graph_info, src_label, edge_label, dst_label,
-      graphar::AdjListType::ordered_by_dest);
+  auto expect2 =
+      graphar::EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
+                                     graphar::AdjListType::ordered_by_dest);
   ASSERT(!expect2.has_error());
   auto& edges2 = expect2.value();
 

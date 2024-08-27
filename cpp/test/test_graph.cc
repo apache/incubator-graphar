@@ -113,11 +113,10 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
   }
 
   SECTION("EdgesCollection") {
-    std::string src_label = "person", edge_label = "knows",
-                dst_label = "person";
+    std::string src_type = "person", edge_type = "knows", dst_type = "person";
     // iterate edges of vertex chunk 0
     auto expect =
-        EdgesCollection::Make(graph_info, src_label, edge_label, dst_label,
+        EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
                               AdjListType::ordered_by_source, 0, 1);
     REQUIRE(!expect.has_error());
     auto edges = expect.value();
@@ -144,7 +143,7 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
 
     // iterate edges of vertex chunk [2, 4)
     auto expect1 =
-        EdgesCollection::Make(graph_info, src_label, edge_label, dst_label,
+        EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
                               AdjListType::ordered_by_dest, 2, 4);
     REQUIRE(!expect1.has_error());
     auto edges1 = expect1.value();
@@ -158,7 +157,7 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
 
     // iterate all edges
     auto expect2 =
-        EdgesCollection::Make(graph_info, src_label, edge_label, dst_label,
+        EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
                               AdjListType::ordered_by_source);
     REQUIRE(!expect2.has_error());
     auto& edges2 = expect2.value();
@@ -175,7 +174,7 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
 
     // empty collection
     auto expect3 =
-        EdgesCollection::Make(graph_info, src_label, edge_label, dst_label,
+        EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
                               AdjListType::unordered_by_source, 5, 5);
     REQUIRE(!expect2.has_error());
     auto edges3 = expect3.value();
@@ -190,7 +189,7 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
 
     // invalid adjlist type
     auto expect4 =
-        EdgesCollection::Make(graph_info, src_label, edge_label, dst_label,
+        EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
                               AdjListType::unordered_by_dest);
     REQUIRE(expect4.status().IsInvalid());
   }

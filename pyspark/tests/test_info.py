@@ -155,12 +155,12 @@ def test_vertex_info(spark):
     yaml_string = vertex_info_from_py.dump()
     restored_py_obj = yaml.safe_load(yaml_string)
 
-    assert restored_py_obj["label"] == "label"
+    assert restored_py_obj["type"] == "label"
     assert restored_py_obj["prefix"] == "prefix"
 
     # test setters
-    vertex_info_from_py.set_label("new_label")
-    assert vertex_info_from_py.get_label() == "new_label"
+    vertex_info_from_py.set_type("new_label")
+    assert vertex_info_from_py.get_type() == "new_label"
 
     vertex_info_from_py.set_chunk_size(101)
     assert vertex_info_from_py.get_chunk_size() == 101
@@ -206,7 +206,7 @@ def test_vertex_info(spark):
         .absolute()
         .__str__()
     )
-    assert person_info.get_label() == "person"
+    assert person_info.get_type() == "person"
     assert person_info.get_chunk_size() == 50
     assert person_info.get_prefix() == "vertex/person/"
     assert person_info.get_version() == "gar/v1"
@@ -249,9 +249,9 @@ def test_edge_info(spark):
     initialize(spark)
 
     py_edge_info = EdgeInfo.from_python(
-        src_label="src_label",
-        edge_label="edge_label",
-        dst_label="dst_label",
+        src_type="src_label",
+        edge_type="edge_label",
+        dst_type="dst_label",
         chunk_size=100,
         src_chunk_size=101,
         dst_chunk_size=102,
@@ -263,14 +263,14 @@ def test_edge_info(spark):
     )
 
     # getters/setters
-    py_edge_info.set_src_label("new_src_label")
-    assert py_edge_info.get_src_label() == "new_src_label"
+    py_edge_info.set_src_type("new_src_label")
+    assert py_edge_info.get_src_type() == "new_src_label"
 
-    py_edge_info.set_dst_label("new_dst_label")
-    assert py_edge_info.get_dst_label() == "new_dst_label"
+    py_edge_info.set_dst_type("new_dst_label")
+    assert py_edge_info.get_dst_type() == "new_dst_label"
 
-    py_edge_info.set_edge_label("new_edge_label")
-    assert py_edge_info.get_edge_label() == "new_edge_label"
+    py_edge_info.set_edge_type("new_edge_label")
+    assert py_edge_info.get_edge_type() == "new_edge_label"
 
     py_edge_info.set_chunk_size(101)
     assert py_edge_info.get_chunk_size() == 101

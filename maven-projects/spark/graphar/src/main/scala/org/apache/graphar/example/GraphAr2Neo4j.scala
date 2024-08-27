@@ -88,15 +88,15 @@ object GraphAr2Neo4j {
     // write each edge type to Neo4j
     edgeData.foreach {
       case (key, value) => {
-        val sourceLabel = key._1
-        val edgeLabel = key._2
-        val targetLabel = key._3
+        val sourceType = key._1
+        val edgeType = key._2
+        val targetType = key._3
         val sourcePrimaryKey =
-          graphInfo.getVertexInfo(sourceLabel).getPrimaryKey()
+          graphInfo.getVertexInfo(sourceType).getPrimaryKey()
         val targetPrimaryKey =
-          graphInfo.getVertexInfo(targetLabel).getPrimaryKey()
-        val sourceDf = vertexData(sourceLabel)
-        val targetDf = vertexData(targetLabel)
+          graphInfo.getVertexInfo(targetType).getPrimaryKey()
+        val sourceDf = vertexData(sourceType)
+        val targetDf = vertexData(targetType)
         // convert the source and target index column to the primary key column
         val df = Utils.joinEdgesWithVertexPrimaryKey(
           value.head._2,
@@ -107,17 +107,17 @@ object GraphAr2Neo4j {
         ) // use the first DataFrame of (adj_list_type_str, DataFrame) map
 
         // FIXME: use properties message in edge info
-        val properties = if (edgeLabel == "REVIEWED") "rating,summary" else ""
+        val properties = if (edgeType == "REVIEWED") "rating,summary" else ""
 
         df.write
           .format("org.neo4j.spark.DataSource")
           .mode(SaveMode.Overwrite)
-          .option("relationship", edgeLabel)
+          .option("relationship", edgeType)
           .option("relationship.save.strategy", "keys")
-          .option("relationship.source.labels", ":" + sourceLabel)
+          .option("relationship.source.labels", ":" + sourceType)
           .option("relationship.source.save.mode", "match")
           .option("relationship.source.node.keys", "src:" + sourcePrimaryKey)
-          .option("relationship.target.labels", ":" + targetLabel)
+          .option("relationship.target.labels", ":" + targetType)
           .option("relationship.target.save.mode", "match")
           .option("relationship.target.node.keys", "dst:" + targetPrimaryKey)
           .option("relationship.properties", properties)

@@ -46,7 +46,7 @@ object GraphTransformer {
    * @param destGraphInfo
    *   The info object for the destination graph.
    * @param sourceVertexInfosMap
-   *   The map of (vertex label -> VertexInfo) for the source graph.
+   *   The map of (vertex type -> VertexInfo) for the source graph.
    * @param spark
    *   The Spark session for the transformer.
    */
@@ -66,13 +66,13 @@ object GraphTransformer {
       val path = dest_prefix + dest_vertices_it.next()
       val dest_vertex_info = VertexInfo.loadVertexInfo(path, spark)
       // load source vertex info
-      val label = dest_vertex_info.getLabel()
-      if (!sourceVertexInfosMap.contains(label)) {
+      val vertex_type = dest_vertex_info.getType()
+      if (!sourceVertexInfosMap.contains(vertex_type)) {
         throw new IllegalArgumentException(
-          "vertex info of " + label + " not found in graph info."
+          "vertex info of " + vertex_type + " not found in graph info."
         )
       }
-      val source_vertex_info = sourceVertexInfosMap(label)
+      val source_vertex_info = sourceVertexInfosMap(vertex_type)
       // read vertex chunks from the source graph
       val reader = new VertexReader(source_prefix, source_vertex_info, spark)
       val df = reader.readAllVertexPropertyGroups()
@@ -93,9 +93,9 @@ object GraphTransformer {
    * @param destGraphInfo
    *   The info object for the destination graph.
    * @param sourceVertexInfosMap
-   *   The map of (vertex label -> VertexInfo) for the source graph.
+   *   The map of (vertex type -> VertexInfo) for the source graph.
    * @param sourceEdgeInfosMap
-   *   The map of (edge label -> EdgeInfo) for the source graph.
+   *   The map of (edge type -> EdgeInfo) for the source graph.
    * @param spark
    *   The Spark session for the transformer.
    */
@@ -153,20 +153,20 @@ object GraphTransformer {
         }
 
         // read vertices number
-        val vertex_label = {
+        val vertex_type = {
           if (
             dest_adj_list_type == AdjListType.ordered_by_source || dest_adj_list_type == AdjListType.unordered_by_source
           )
-            dest_edge_info.getSrc_label
+            dest_edge_info.getSrc_type
           else
-            dest_edge_info.getDst_label
+            dest_edge_info.getDst_type
         }
-        if (!sourceVertexInfosMap.contains(vertex_label)) {
+        if (!sourceVertexInfosMap.contains(vertex_type)) {
           throw new IllegalArgumentException(
-            "vertex info of " + vertex_label + " not found in graph info."
+            "vertex info of " + vertex_type + " not found in graph info."
           )
         }
-        val vertex_info = sourceVertexInfosMap(vertex_label)
+        val vertex_info = sourceVertexInfosMap(vertex_type)
         val reader = new VertexReader(source_prefix, vertex_info, spark)
         val vertex_num = reader.readVerticesNumber()
 

@@ -297,7 +297,7 @@ class VertexInfo:
 
     def __init__(
         self,
-        label: Optional[str],
+        vertex_type: Optional[str],
         chunk_size: Optional[int],
         prefix: Optional[str],
         property_groups: Optional[Sequence[PropertyGroup]],
@@ -310,7 +310,7 @@ class VertexInfo:
             self._jvm_vertex_info_obj = jvm_obj
         else:
             vertex_info = GraphArSession.graphar.VertexInfo()
-            vertex_info.setLabel(label)
+            vertex_info.setType(vertex_type)
             vertex_info.setChunk_size(chunk_size)
             vertex_info.setPrefix(prefix)
             vertex_info.setProperty_groups(
@@ -319,19 +319,19 @@ class VertexInfo:
             vertex_info.setVersion(version)
             self._jvm_vertex_info_obj = vertex_info
 
-    def get_label(self) -> str:
-        """Get label from the corresponding JVM object.
+    def get_type(self) -> str:
+        """Get type from the corresponding JVM object.
 
-        :returns: label
+        :returns: type
         """
-        return self._jvm_vertex_info_obj.getLabel()
+        return self._jvm_vertex_info_obj.getType()
 
-    def set_label(self, label: str) -> None:
+    def set_type(self, vertex_type: str) -> None:
         """Mutate the corresponding JVM object.
 
-        :param label: new label
+        :param vertex_type: new type of vertex
         """
-        self._jvm_vertex_info_obj.setLabel(label)
+        self._jvm_vertex_info_obj.setType(vertex_type)
 
     def get_chunk_size(self) -> int:
         """Get chunk size from the corresponding JVM object.
@@ -539,7 +539,7 @@ class VertexInfo:
     @classmethod
     def from_python(
         cls: type[VertexInfoType],
-        label: str,
+        vertex_type: str,
         chunk_size: int,
         prefix: str,
         property_groups: Sequence[PropertyGroup],
@@ -547,13 +547,13 @@ class VertexInfo:
     ) -> VertexInfoType:
         """Create an instance of the class based on python args.
 
-        :param label: label of the vertex
+        :param vertex_type: type of the vertex
         :chunk_size: chunk size
         :prefix: vertex prefix
         :property_groups: list of property groups
         :version: version of GraphAr format
         """
-        return VertexInfo(label, chunk_size, prefix, property_groups, version, None)
+        return VertexInfo(vertex_type, chunk_size, prefix, property_groups, version, None)
 
 
 # Return type of AdjList classmethods
@@ -707,9 +707,9 @@ class EdgeInfo:
 
     def __init__(
         self,
-        src_label: Optional[str],
-        edge_label: Optional[str],
-        dst_label: Optional[str],
+        src_type: Optional[str],
+        edge_type: Optional[str],
+        dst_type: Optional[str],
         chunk_size: Optional[int],
         src_chunk_size: Optional[int],
         dst_chunk_size: Optional[int],
@@ -726,9 +726,9 @@ class EdgeInfo:
             self._jvm_edge_info_obj = jvm_edge_info_obj
         else:
             edge_info = GraphArSession.graphar.EdgeInfo()
-            edge_info.setSrc_label(src_label)
-            edge_info.setEdge_label(edge_label)
-            edge_info.setDst_label(dst_label)
+            edge_info.setSrc_type(src_type)
+            edge_info.setEdge_type(edge_type)
+            edge_info.setDst_type(dst_type)
             edge_info.setChunk_size(chunk_size)
             edge_info.setSrc_chunk_size(src_chunk_size)
             edge_info.setDst_chunk_size(dst_chunk_size)
@@ -743,47 +743,47 @@ class EdgeInfo:
             edge_info.setVersion(version)
             self._jvm_edge_info_obj = edge_info
 
-    def get_src_label(self) -> str:
-        """Get src label from the corresponding JVM object.
+    def get_src_type(self) -> str:
+        """Get src type from the corresponding JVM object.
 
-        :returns: src label
+        :returns: src type
         """
-        return self._jvm_edge_info_obj.getSrc_label()
+        return self._jvm_edge_info_obj.getSrc_type()
 
-    def set_src_label(self, src_label: str) -> None:
+    def set_src_type(self, src_type: str) -> None:
         """Mutate the corresponding JVM object.
 
-        :param src_label: the new src label
+        :param src_type: the new src type
         """
-        self._jvm_edge_info_obj.setSrc_label(src_label)
+        self._jvm_edge_info_obj.setSrc_type(src_type)
 
-    def get_edge_label(self) -> str:
-        """Get edge label from the corresponding JVM object.
+    def get_edge_type(self) -> str:
+        """Get edge type from the corresponding JVM object.
 
-        :returns: edge label
+        :returns: edge type
         """
-        return self._jvm_edge_info_obj.getEdge_label()
+        return self._jvm_edge_info_obj.getEdge_type()
 
-    def set_edge_label(self, edge_label: str) -> None:
+    def set_edge_type(self, edge_type: str) -> None:
         """Mutate the corresponding JVM object.
 
-        :param edge_label: the new edge label
+        :param edge_type: the new edge type
         """
-        self._jvm_edge_info_obj.setEdge_label(edge_label)
+        self._jvm_edge_info_obj.setEdge_type(edge_type)
 
-    def get_dst_label(self) -> str:
-        """Get dst label from the corresponding JVM object.
+    def get_dst_type(self) -> str:
+        """Get dst type from the corresponding JVM object.
 
-        :returns: dst label
+        :returns: dst type
         """
-        return self._jvm_edge_info_obj.getDst_label()
+        return self._jvm_edge_info_obj.getDst_type()
 
-    def set_dst_label(self, dst_label: str) -> None:
+    def set_dst_type(self, dst_type: str) -> None:
         """Mutate the corresponding JVM object.
 
-        :param dst_label: the new dst label
+        :param dst_type: the new dst type
         """
-        self._jvm_edge_info_obj.setDst_label(dst_label)
+        self._jvm_edge_info_obj.setDst_type(dst_type)
 
     def get_chunk_size(self) -> int:
         """Get chunk size from the corresponding JVM object.
@@ -941,9 +941,9 @@ class EdgeInfo:
     @classmethod
     def from_python(
         cls: type[EdgeInfoType],
-        src_label: str,
-        edge_label: str,
-        dst_label: str,
+        src_type: str,
+        edge_type: str,
+        dst_type: str,
         chunk_size: int,
         src_chunk_size: int,
         dst_chunk_size: int,
@@ -955,9 +955,9 @@ class EdgeInfo:
     ) -> EdgeInfoType:
         """Create an instance of the class from python arguments.
 
-        :param src_label: source vertex label
-        :param edge_label: edges label
-        :param dst_label: destination vertex label
+        :param src_type: source vertex type
+        :param edge_type: edges type
+        :param dst_type: destination vertex type
         :param chunk_size: chunk size
         :param src_chunk_size: source chunk size
         :param dst_chunk_size: destination chunk size
@@ -971,9 +971,9 @@ class EdgeInfo:
             prefix += os.sep
 
         return EdgeInfo(
-            src_label,
-            edge_label,
-            dst_label,
+            src_type,
+            edge_type,
+            dst_type,
             chunk_size,
             src_chunk_size,
             dst_chunk_size,
@@ -1437,33 +1437,33 @@ class GraphInfo:
         """
         self._jvm_graph_info_obj.addEdgeInfo(edge_info.to_scala())
 
-    def get_vertex_info(self, label: str) -> VertexInfo:
+    def get_vertex_info(self, vertex_type: str) -> VertexInfo:
         """Get vertex info from the corresponding JVM object.
 
-        :param label: label of vertex
+        :param vertex_type: type of vertex
         """
-        return VertexInfo.from_scala(self._jvm_graph_info_obj.getVertexInfo(label))
+        return VertexInfo.from_scala(self._jvm_graph_info_obj.getVertexInfo(vertex_type))
 
     def get_edge_info(
         self,
-        src_label: str,
-        edge_label: str,
-        dst_label: str,
+        src_type: str,
+        edge_type: str,
+        dst_type: str,
     ) -> EdgeInfo:
         """Get edge info from the corresponding JVM object.
 
-        :param src_label: source label
-        :param edge_label: edge label
-        :param dst_label: destination label
+        :param src_type: source type
+        :param edge_type: edge type
+        :param dst_type: destination type
         """
         return EdgeInfo.from_scala(
-            self._jvm_graph_info_obj.getEdgeInfo(src_label, edge_label, dst_label),
+            self._jvm_graph_info_obj.getEdgeInfo(src_type, edge_type, dst_type),
         )
 
     def get_vertex_infos(self) -> dict[str, VertexInfo]:
         """Get all vertex infos from the corresponding JVM object.
 
-        :returns: Mapping label -> VertexInfo
+        :returns: Mapping type -> VertexInfo
         """
         scala_map = self._jvm_graph_info_obj.getVertexInfos()
         keys_set_iter = scala_map.keySet().iterator()
@@ -1477,7 +1477,7 @@ class GraphInfo:
     def get_edge_infos(self) -> dict[str, EdgeInfo]:
         """Get all edge infos from the corresponding JVM object.
 
-        :returns: Mapping {src_label}_{edge_label}_{dst_label} -> EdgeInfo
+        :returns: Mapping {src_type}_{edge_type}_{dst_type} -> EdgeInfo
         """
         scala_map = self._jvm_graph_info_obj.getEdgeInfos()
         keys_set_iter = scala_map.keySet().iterator()

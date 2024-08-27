@@ -28,7 +28,7 @@ import org.yaml.snakeyaml.LoaderOptions
 
 /** VertexInfo is a class to store the vertex meta information. */
 class VertexInfo() {
-  @BeanProperty var label: String = ""
+  @BeanProperty var `type`: String = ""
   @BeanProperty var chunk_size: Long = 0
   @BeanProperty var prefix: String = ""
   @BeanProperty var property_groups = new java.util.ArrayList[PropertyGroup]()
@@ -200,7 +200,7 @@ class VertexInfo() {
    *   true if the vertex info is validated, otherwise return false.
    */
   def isValidated(): Boolean = {
-    if (label == "" || chunk_size <= 0) {
+    if (`type` == "" || chunk_size <= 0) {
       return false
     }
     val len: Int = property_groups.size
@@ -283,7 +283,7 @@ class VertexInfo() {
   /** Dump to Yaml string. */
   def dump(): String = {
     val data = new java.util.HashMap[String, Object]()
-    data.put("label", label)
+    data.put("type", `type`)
     data.put("chunk_size", new java.lang.Long(chunk_size))
     if (prefix != "") data.put("prefix", prefix)
     data.put("version", version)

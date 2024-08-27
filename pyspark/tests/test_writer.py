@@ -105,8 +105,8 @@ def test_graph_writer(spark):
     assert GraphWriter.from_scala(graph_writer.to_scala()) is not None
     vertex_file_path = GRAPHAR_TESTS_EXAMPLES.joinpath("ldbc_sample/person_0_0.csv").absolute().__str__()
     vertex_df = spark.read.option("delimiter", "|").option("header", "true").csv(vertex_file_path)
-    label = "person"
-    graph_writer.put_vertex_data(label, vertex_df, "id")
+    type = "person"
+    graph_writer.put_vertex_data(type, vertex_df, "id")
 
     edge_file_path = GRAPHAR_TESTS_EXAMPLES.joinpath("ldbc_sample/person_knows_person_0_0.csv").absolute().__str__()
     edge_df = spark.read.option("delimiter", "|").option("header", "true").csv(edge_file_path)
