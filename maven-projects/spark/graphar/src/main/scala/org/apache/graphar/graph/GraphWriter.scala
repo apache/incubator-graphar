@@ -94,7 +94,10 @@ class GraphWriter() {
           GeneralParams.defaultStorageLevel
         ) // cache the vertex DataFrame
         val df_and_mapping = IndexGenerator
-          .generateVertexIndexColumnAndIndexMapping(vertices(vertexType), primaryKey)
+          .generateVertexIndexColumnAndIndexMapping(
+            vertices(vertexType),
+            primaryKey
+          )
         df_and_mapping._1.persist(
           GeneralParams.defaultStorageLevel
         ) // cache the vertex DataFrame with index

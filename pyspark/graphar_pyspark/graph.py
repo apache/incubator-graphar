@@ -145,14 +145,14 @@ class GraphWriter:
         """Create an instance of the Class from Python arguments."""
         return GraphWriter(GraphArSession.graphar.graph.GraphWriter())
 
-    def put_vertex_data(self, type: str, df: DataFrame, primary_key: str) -> None:
+    def put_vertex_data(self, vertex_type: str, df: DataFrame, primary_key: str) -> None:
         """Put the vertex DataFrame into writer.
 
         :param type: type of vertex.
         :param df: DataFrame of the vertex type.
         :param primary_key: primary key of the vertex type, default is empty, which take the first property column as primary key.
         """
-        self._jvm_graph_writer_obj.PutVertexData(type, df._jdf, primary_key)
+        self._jvm_graph_writer_obj.PutVertexData(vertex_type, df._jdf, primary_key)
 
     def put_edge_data(self, relation: tuple[str, str, str], df: DataFrame) -> None:
         """Put the egde datafrme into writer.

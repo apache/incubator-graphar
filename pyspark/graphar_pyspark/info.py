@@ -297,7 +297,7 @@ class VertexInfo:
 
     def __init__(
         self,
-        type: Optional[str],
+        vertex_type: Optional[str],
         chunk_size: Optional[int],
         prefix: Optional[str],
         property_groups: Optional[Sequence[PropertyGroup]],
@@ -310,7 +310,7 @@ class VertexInfo:
             self._jvm_vertex_info_obj = jvm_obj
         else:
             vertex_info = GraphArSession.graphar.VertexInfo()
-            vertex_info.setType(type)
+            vertex_info.setType(vertex_type)
             vertex_info.setChunk_size(chunk_size)
             vertex_info.setPrefix(prefix)
             vertex_info.setProperty_groups(
@@ -326,12 +326,12 @@ class VertexInfo:
         """
         return self._jvm_vertex_info_obj.getType()
 
-    def set_type(self, type: str) -> None:
+    def set_type(self, vertex_type: str) -> None:
         """Mutate the corresponding JVM object.
 
-        :param type: new type
+        :param vertex_type: new type of vertex
         """
-        self._jvm_vertex_info_obj.setType(type)
+        self._jvm_vertex_info_obj.setType(vertex_type)
 
     def get_chunk_size(self) -> int:
         """Get chunk size from the corresponding JVM object.
@@ -539,7 +539,7 @@ class VertexInfo:
     @classmethod
     def from_python(
         cls: type[VertexInfoType],
-        type: str,
+        vertex_type: str,
         chunk_size: int,
         prefix: str,
         property_groups: Sequence[PropertyGroup],
@@ -547,13 +547,13 @@ class VertexInfo:
     ) -> VertexInfoType:
         """Create an instance of the class based on python args.
 
-        :param type: type of the vertex
+        :param vertex_type: type of the vertex
         :chunk_size: chunk size
         :prefix: vertex prefix
         :property_groups: list of property groups
         :version: version of GraphAr format
         """
-        return VertexInfo(type, chunk_size, prefix, property_groups, version, None)
+        return VertexInfo(vertex_type, chunk_size, prefix, property_groups, version, None)
 
 
 # Return type of AdjList classmethods
@@ -1437,12 +1437,12 @@ class GraphInfo:
         """
         self._jvm_graph_info_obj.addEdgeInfo(edge_info.to_scala())
 
-    def get_vertex_info(self, type: str) -> VertexInfo:
+    def get_vertex_info(self, vertex_type: str) -> VertexInfo:
         """Get vertex info from the corresponding JVM object.
 
-        :param type: type of vertex
+        :param vertex_type: type of vertex
         """
-        return VertexInfo.from_scala(self._jvm_graph_info_obj.getVertexInfo(type))
+        return VertexInfo.from_scala(self._jvm_graph_info_obj.getVertexInfo(vertex_type))
 
     def get_edge_info(
         self,
