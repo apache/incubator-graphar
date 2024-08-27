@@ -72,7 +72,7 @@ object GraphAr2Neo4j {
           .write
           .format("org.neo4j.spark.DataSource")
           .mode(SaveMode.Overwrite)
-          .option("types", ":" + key)
+          .option("labels", ":" + key)
           .option("node.keys", primaryKey)
           .save()
       }
@@ -114,10 +114,10 @@ object GraphAr2Neo4j {
           .mode(SaveMode.Overwrite)
           .option("relationship", edgeType)
           .option("relationship.save.strategy", "keys")
-          .option("relationship.source.types", ":" + sourceType)
+          .option("relationship.source.labels", ":" + sourceType)
           .option("relationship.source.save.mode", "match")
           .option("relationship.source.node.keys", "src:" + sourcePrimaryKey)
-          .option("relationship.target.types", ":" + targetType)
+          .option("relationship.target.labels", ":" + targetType)
           .option("relationship.target.save.mode", "match")
           .option("relationship.target.node.keys", "dst:" + targetPrimaryKey)
           .option("relationship.properties", properties)
