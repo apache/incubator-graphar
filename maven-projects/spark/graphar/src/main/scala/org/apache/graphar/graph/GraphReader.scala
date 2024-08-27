@@ -35,11 +35,11 @@ object GraphReader {
    * @param prefix
    *   The absolute prefix.
    * @param vertexInfos
-   *   The map of (vertex label -> VertexInfo) for the graph.
+   *   The map of (vertex type -> VertexInfo) for the graph.
    * @param spark
    *   The Spark session for the reading.
    * @return
-   *   The map of (vertex label -> DataFrame)
+   *   The map of (vertex type -> DataFrame)
    */
   private def readAllVertices(
       prefix: String,
@@ -47,9 +47,9 @@ object GraphReader {
       spark: SparkSession
   ): Map[String, DataFrame] = {
     val vertex_dataframes: Map[String, DataFrame] = vertexInfos.map {
-      case (label, vertexInfo) => {
+      case (vertex_type, vertexInfo) => {
         val reader = new VertexReader(prefix, vertexInfo, spark)
-        (label, reader.readAllVertexPropertyGroups())
+        (vertex_type, reader.readAllVertexPropertyGroups())
       }
     }
     return vertex_dataframes
@@ -61,11 +61,11 @@ object GraphReader {
    * @param prefix
    *   The absolute prefix.
    * @param edgeInfos
-   *   The map of ((srcLabel, edgeLabel, dstLabel) -> EdgeInfo) for the graph.
+   *   The map of ((srcType, edgeType, dstType) -> EdgeInfo) for the graph.
    * @param spark
    *   The Spark session for the reading.
    * @return
-   *   The map of ((srcLabel, edgeLabel, dstLabel) -> (adj_list_type_str ->
+   *   The map of ((srcType, edgeType, dstType) -> (adj_list_type_str ->
    *   DataFrame))
    */
   private def readAllEdges(
@@ -91,9 +91,9 @@ object GraphReader {
           }
           (
             (
-              edgeInfo.getSrc_label(),
-              edgeInfo.getEdge_label(),
-              edgeInfo.getDst_label()
+              edgeInfo.getSrc_type(),
+              edgeInfo.getEdge_type(),
+              edgeInfo.getDst_type()
             ),
             adj_list_type_edge_df_map
           )
@@ -111,8 +111,8 @@ object GraphReader {
    *   The Spark session for the loading.
    * @return
    *   Pair of vertex DataFrames and edge DataFrames, the vertex DataFrames are
-   *   stored as the map of (vertex_label -> DataFrame) the edge DataFrames are
-   *   stored as a map of ((srcLabel, edgeLabel, dstLabel) -> (adj_list_type_str
+   *   stored as the map of (vertex_type -> DataFrame) the edge DataFrames are
+   *   stored as a map of ((srcType, edgeType, dstType) -> (adj_list_type_str
    * -> DataFrame))
    */
   def readWithGraphInfo(
@@ -144,8 +144,8 @@ object GraphReader {
    *   The Spark session for the loading.
    * @return
    *   Pair of vertex DataFrames and edge DataFrames, the vertex DataFrames are
-   *   stored as the map of (vertex_label -> DataFrame) the edge DataFrames are
-   *   stored as a map of (srcLabel_edgeLabel_dstLabel -> (adj_list_type_str ->
+   *   stored as the map of (vertex_type -> DataFrame) the edge DataFrames are
+   *   stored as a map of (srcType_edgeType_dstType -> (adj_list_type_str ->
    *   DataFrame))
    */
   def read(

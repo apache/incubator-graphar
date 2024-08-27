@@ -158,7 +158,7 @@ class EdgeWriter:
         :param prefix: the absolute prefix.
         :param edge_info: the edge info that describes the ede type.
         :param adj_list_type: the adj list type for the edge.
-        :param vertex_num: vertex number of the primary vertex label
+        :param vertex_num: vertex number of the primary vertex type
         :param edge_df: the input edge DataFrame.
         """
         if not prefix.endswith(os.sep):

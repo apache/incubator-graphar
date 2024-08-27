@@ -38,12 +38,12 @@ object Neo4j {
       fileType: String
   )
   case class Neo4j(url: String, username: String, password: String)
-  case class Vertex(label: String, properties: List[String])
+  case class Vertex(vertexType: String, properties: List[String])
   case class Edge(
-      label: String,
-      srcLabel: String,
+      edgeType: String,
+      srcType: String,
       srcProp: String,
-      dstLabel: String,
+      dstType: String,
       dstProp: String,
       properties: List[String]
   )
@@ -105,7 +105,7 @@ object Neo4j {
     for (vertex <- schema.vertices) {
       // construct the cypher
       val cypherBuf = new StringBuilder
-      cypherBuf.append(s"MATCH (n:${vertex.label}) RETURN")
+      cypherBuf.append(s"MATCH (n:${vertex.vertexType}) RETURN")
       for (prop <- vertex.properties) {
         cypherBuf.append(s" n.$prop AS $prop,")
       }
@@ -119,7 +119,7 @@ object Neo4j {
         .option("query", cypherBuf.toString)
         .load()
       // put into writer
-      writer.PutVertexData(vertex.label, vertex_df)
+      writer.PutVertexData(vertex.vertexType, vertex_df)
     }
 
     // read edges
@@ -128,7 +128,7 @@ object Neo4j {
       val cypherBuf = new StringBuilder
       cypherBuf
         .append(
-          s"MATCH (a:${edge.srcLabel})-[r:${edge.label}]->(b:${edge.dstLabel}) RETURN"
+          s"MATCH (a:${edge.srcType})-[r:${edge.edgeType}]->(b:${edge.dstType}) RETURN"
         )
         .append(s" a.${edge.srcProp} AS src,")
         .append(s" b.${edge.dstProp} AS dst")
@@ -142,7 +142,7 @@ object Neo4j {
         .option("query", cypherBuf.toString)
         .load()
       // put into writer
-      writer.PutEdgeData((edge.srcLabel, edge.label, edge.dstLabel), edge_df)
+      writer.PutEdgeData((edge.srcType, edge.edgeType, edge.dstType), edge_df)
     }
   }
 }

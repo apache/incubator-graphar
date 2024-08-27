@@ -33,8 +33,8 @@ class TestGraphWriterSuite extends BaseTestSuite {
       .option("delimiter", "|")
       .option("header", "true")
       .csv(vertex_file_path)
-    val label = "person"
-    writer.PutVertexData(label, vertex_df, "id")
+    val vertex_type = "person"
+    writer.PutVertexData(vertex_type, vertex_df, "id")
 
     val file_path = testData + "/ldbc_sample/person_knows_person_0_0.csv"
     val edge_df = spark.read

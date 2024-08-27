@@ -323,24 +323,24 @@ class GraphInfo() {
   var edgeInfos: Map[String, EdgeInfo] = Map[String, EdgeInfo]()
 
   def addVertexInfo(vertexInfo: VertexInfo): Unit = {
-    vertexInfos += (vertexInfo.getLabel -> vertexInfo)
+    vertexInfos += (vertexInfo.getType -> vertexInfo)
   }
 
   def addEdgeInfo(edgeInfo: EdgeInfo): Unit = {
     edgeInfos += (edgeInfo.getConcatKey() -> edgeInfo)
   }
 
-  def getVertexInfo(label: String): VertexInfo = {
-    vertexInfos(label)
+  def getVertexInfo(vertexType: String): VertexInfo = {
+    vertexInfos(vertexType)
   }
 
   def getEdgeInfo(
-      srcLabel: String,
-      edgeLabel: String,
-      dstLabel: String
+      srcType: String,
+      edgeType: String,
+      dstType: String
   ): EdgeInfo = {
     val key =
-      srcLabel + GeneralParams.regularSeparator + edgeLabel + GeneralParams.regularSeparator + dstLabel
+      srcType + GeneralParams.regularSeparator + edgeType + GeneralParams.regularSeparator + dstType
     edgeInfos(key)
   }
 

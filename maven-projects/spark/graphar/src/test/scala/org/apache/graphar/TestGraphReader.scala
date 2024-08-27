@@ -66,9 +66,9 @@ class TestGraphReaderSuite extends BaseTestSuite {
     edgeInfos.foreach {
       case (key, edgeInfo) => {
         val edge_tag = (
-          edgeInfo.getSrc_label(),
-          edgeInfo.getEdge_label(),
-          edgeInfo.getDst_label()
+          edgeInfo.getSrc_type(),
+          edgeInfo.getEdge_type(),
+          edgeInfo.getDst_type()
         )
         assert(edge_dataframes contains edge_tag)
         val adj_list_type_dataframes = edge_dataframes(edge_tag)

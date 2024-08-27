@@ -28,7 +28,7 @@ class GraphInfoSuite extends BaseTestSuite {
     val graph_info = GraphInfo.loadGraphInfo(yaml_path, spark)
 
     val vertex_info = graph_info.getVertexInfo("person")
-    assert(vertex_info.getLabel == "person")
+    assert(vertex_info.getType == "person")
 
     assert(graph_info.getName == "ldbc_sample")
     assert(graph_info.getPrefix == prefix)
@@ -47,7 +47,7 @@ class GraphInfoSuite extends BaseTestSuite {
     val yaml_path = testData + "/ldbc_sample/csv/person.vertex.yml"
     val vertex_info = VertexInfo.loadVertexInfo(yaml_path, spark)
 
-    assert(vertex_info.getLabel == "person")
+    assert(vertex_info.getType == "person")
     assert(vertex_info.isValidated)
     assert(vertex_info.getVerticesNumFilePath() == "vertex/person/vertex_count")
     assert(vertex_info.getPrimaryKey() == "id")
@@ -124,9 +124,9 @@ class GraphInfoSuite extends BaseTestSuite {
     val yaml_path = testData + "/ldbc_sample/csv/person_knows_person.edge.yml"
     val edge_info = EdgeInfo.loadEdgeInfo(yaml_path, spark)
 
-    assert(edge_info.getSrc_label == "person")
-    assert(edge_info.getDst_label == "person")
-    assert(edge_info.getEdge_label == "knows")
+    assert(edge_info.getSrc_type == "person")
+    assert(edge_info.getDst_type == "person")
+    assert(edge_info.getEdge_type == "knows")
     assert(edge_info.getChunk_size == 1024)
     assert(edge_info.getSrc_chunk_size == 100)
     assert(edge_info.getDst_chunk_size == 100)

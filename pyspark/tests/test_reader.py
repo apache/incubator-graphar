@@ -19,7 +19,7 @@ from pathlib import Path
 
 from graphar_pyspark import initialize
 from graphar_pyspark.enums import AdjListType
-from graphar_pyspark.graph import EdgeLabels, GraphReader
+from graphar_pyspark.graph import EdgeTypes, GraphReader
 from graphar_pyspark.info import EdgeInfo, GraphInfo, VertexInfo
 from graphar_pyspark.reader import EdgeReader, VertexReader
 
@@ -154,15 +154,15 @@ def test_graph_reader(spark):
     assert len(graph_info.edge_dataframes.keys()) > 0
     assert "person" in graph_info.vertex_dataframes.keys()
     assert (
-        EdgeLabels("person", "created", "software") in graph_info.edge_dataframes.keys()
+        EdgeTypes("person", "created", "software") in graph_info.edge_dataframes.keys()
     )
     assert graph_info.vertex_dataframes["person"].count() > 0
     assert (
         "ordered_by_source"
-        in graph_info.edge_dataframes[EdgeLabels("person", "created", "software")]
+        in graph_info.edge_dataframes[EdgeTypes("person", "created", "software")]
     )
     assert (
-        graph_info.edge_dataframes[EdgeLabels("person", "created", "software")][
+        graph_info.edge_dataframes[EdgeTypes("person", "created", "software")][
             "ordered_by_source"
         ].count()
         > 0

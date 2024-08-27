@@ -29,9 +29,9 @@ import org.yaml.snakeyaml.LoaderOptions
 
 /** Edge info is a class to store the edge meta information. */
 class EdgeInfo() {
-  @BeanProperty var src_label: String = ""
-  @BeanProperty var edge_label: String = ""
-  @BeanProperty var dst_label: String = ""
+  @BeanProperty var src_type: String = ""
+  @BeanProperty var edge_type: String = ""
+  @BeanProperty var dst_type: String = ""
   @BeanProperty var chunk_size: Long = 0
   @BeanProperty var src_chunk_size: Long = 0
   @BeanProperty var dst_chunk_size: Long = 0
@@ -277,7 +277,7 @@ class EdgeInfo() {
 
   /** Check if the edge info is validated. */
   def isValidated(): Boolean = {
-    if (src_label == "" || edge_label == "" || dst_label == "") {
+    if (src_type == "" || edge_type == "" || dst_type == "") {
       return false
     }
     if (chunk_size <= 0 || src_chunk_size <= 0 || dst_chunk_size <= 0) {
@@ -585,15 +585,15 @@ class EdgeInfo() {
   }
 
   def getConcatKey(): String = {
-    return getSrc_label + GeneralParams.regularSeparator + getEdge_label + GeneralParams.regularSeparator + getDst_label
+    return getSrc_type + GeneralParams.regularSeparator + getEdge_type + GeneralParams.regularSeparator + getDst_type
   }
 
   /** Dump to Yaml string. */
   def dump(): String = {
     val data = new java.util.HashMap[String, Object]()
-    data.put("src_label", src_label)
-    data.put("edge_label", edge_label)
-    data.put("dst_label", dst_label)
+    data.put("src_type", src_type)
+    data.put("edge_type", edge_type)
+    data.put("dst_type", dst_type)
     data.put("chunk_size", new java.lang.Long(chunk_size))
     data.put("src_chunk_size", new java.lang.Long(src_chunk_size))
     data.put("dst_chunk_size", new java.lang.Long(dst_chunk_size))
