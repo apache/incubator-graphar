@@ -41,9 +41,9 @@ object Neo4j {
   case class Vertex(label: String, properties: List[String])
   case class Edge(
       label: String,
-      srcType: String,
+      srcLabel: String,
       srcProp: String,
-      dstType: String,
+      dstLabel: String,
       dstProp: String,
       properties: List[String]
   )
