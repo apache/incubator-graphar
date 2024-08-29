@@ -32,9 +32,9 @@ int main(int argc, char* argv[]) {
   auto graph_info = graphar::GraphInfo::Load(path).value();
 
   // get the person vertices of graph
-  std::string label = "person";
-  ASSERT(graph_info->GetVertexInfo(label) != nullptr);
-  auto maybe_vertices = graphar::VerticesCollection::Make(graph_info, label);
+  std::string type = "person";
+  ASSERT(graph_info->GetVertexInfo(type) != nullptr);
+  auto maybe_vertices = graphar::VerticesCollection::Make(graph_info, type);
   ASSERT(maybe_vertices.status().ok());
   auto vertices = maybe_vertices.value();
   int num_vertices = vertices->size();
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
       graphar::CreatePropertyGroup(property_vector, graphar::FileType::CSV);
 
   // extend the vertex_info
-  auto vertex_info = graph_info->GetVertexInfo(label);
+  auto vertex_info = graph_info->GetVertexInfo(type);
   auto maybe_extend_info = vertex_info->AddPropertyGroup(group);
   ASSERT(maybe_extend_info.status().ok());
   auto extend_info = maybe_extend_info.value();

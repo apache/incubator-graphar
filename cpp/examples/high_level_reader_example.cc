@@ -28,9 +28,9 @@
 void vertices_collection(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // construct vertices collection
-  std::string label = "person", property = "firstName";
+  std::string type = "person", property = "firstName";
   auto maybe_vertices_collection =
-      graphar::VerticesCollection::Make(graph_info, label);
+      graphar::VerticesCollection::Make(graph_info, type);
   ASSERT(!maybe_vertices_collection.has_error());
   auto vertices = maybe_vertices_collection.value();
 

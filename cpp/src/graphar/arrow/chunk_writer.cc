@@ -298,11 +298,11 @@ Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
 }
 
 Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
-    const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
     const ValidateLevel& validate_level) {
-  auto vertex_info = graph_info->GetVertexInfo(label);
+  auto vertex_info = graph_info->GetVertexInfo(type);
   if (!vertex_info) {
-    return Status::KeyError("The vertex ", label, " doesn't exist.");
+    return Status::KeyError("The vertex ", type, " doesn't exist.");
   }
   return Make(vertex_info, graph_info->GetPrefix(), validate_level);
 }

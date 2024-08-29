@@ -87,11 +87,11 @@ class VertexPropertyChunkInfoReader {
    * property group
    *
    * @param graph_info The graph info.
-   * @param label The vertex label.
+   * @param type The vertex type.
    * @param property_group The property group of the vertex property.
    */
   static Result<std::shared_ptr<VertexPropertyChunkInfoReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
       const std::shared_ptr<PropertyGroup>& property_group);
 
   /**
@@ -99,12 +99,12 @@ class VertexPropertyChunkInfoReader {
    * property name
    *
    * @param graph_info The graph info.
-   * @param label The vertex label.
+   * @param type The vertex type.
    * @param property_name The name of one property in the property group you
    * want to read.
    */
   static Result<std::shared_ptr<VertexPropertyChunkInfoReader>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
       const std::string& property_name);
 
  private:
@@ -182,9 +182,9 @@ class AdjListChunkInfoReader {
    * @brief Create an AdjListChunkInfoReader instance from graph info.
    *
    * @param graph_info The graph info.
-   * @param src_type The source vertex label.
-   * @param edge_type The edge label.
-   * @param dst_type The destination vertex label.
+   * @param src_type The source vertex type.
+   * @param edge_type The edge type.
+   * @param dst_type The destination vertex type.
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListChunkInfoReader>> Make(
@@ -255,9 +255,9 @@ class AdjListOffsetChunkInfoReader {
    * @brief Create an AdjListOffsetChunkInfoReader instance from graph info.
    *
    * @param graph_info The graph info.
-   * @param src_type The source vertex label.
-   * @param edge_type The edge label.
-   * @param dst_type The destination vertex label.
+   * @param src_type The source vertex type.
+   * @param edge_type The edge type.
+   * @param dst_type The destination vertex type.
    * @param adj_list_type The adj list type for the edges.
    */
   static Result<std::shared_ptr<AdjListOffsetChunkInfoReader>> Make(
@@ -344,9 +344,9 @@ class AdjListPropertyChunkInfoReader {
    * and property group.
    *
    * @param graph_info The graph info.
-   * @param src_type The source vertex label.
-   * @param edge_type The edge label.
-   * @param dst_type The destination vertex label.
+   * @param src_type The source vertex type.
+   * @param edge_type The edge type.
+   * @param dst_type The destination vertex type.
    * @param property_group The property group of the edge property.
    * @param adj_list_type The adj list type for the edge.
    */
@@ -361,9 +361,9 @@ class AdjListPropertyChunkInfoReader {
    * and property name.
    *
    * @param graph_info The graph info.
-   * @param src_type The source vertex label.
-   * @param edge_type The edge label.
-   * @param dst_type The destination vertex label.
+   * @param src_type The source vertex type.
+   * @param edge_type The edge type.
+   * @param dst_type The destination vertex type.
    * @param property_name The name of one property in the property group you
    * want to read.
    * @param adj_list_type The adj list type for the edge.

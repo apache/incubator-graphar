@@ -85,27 +85,27 @@ VertexPropertyChunkInfoReader::Make(
 
 Result<std::shared_ptr<VertexPropertyChunkInfoReader>>
 VertexPropertyChunkInfoReader::Make(
-    const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
     const std::shared_ptr<PropertyGroup>& property_group) {
-  auto vertex_info = graph_info->GetVertexInfo(label);
+  auto vertex_info = graph_info->GetVertexInfo(type);
   if (!vertex_info) {
-    return Status::KeyError("The vertex ", label, " doesn't exist.");
+    return Status::KeyError("The vertex ", type, " doesn't exist.");
   }
   return Make(vertex_info, property_group, graph_info->GetPrefix());
 }
 
 Result<std::shared_ptr<VertexPropertyChunkInfoReader>>
 VertexPropertyChunkInfoReader::Make(
-    const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
     const std::string& property_name) {
-  auto vertex_info = graph_info->GetVertexInfo(label);
+  auto vertex_info = graph_info->GetVertexInfo(type);
   if (!vertex_info) {
-    return Status::KeyError("The vertex ", label, " doesn't exist.");
+    return Status::KeyError("The vertex ", type, " doesn't exist.");
   }
   auto property_group = vertex_info->GetPropertyGroup(property_name);
   if (!property_group) {
     return Status::KeyError("The property ", property_name,
-                            " doesn't exist in vertex ", label, ".");
+                            " doesn't exist in vertex ", type, ".");
   }
   return Make(vertex_info, property_group, graph_info->GetPrefix());
 }
@@ -428,7 +428,7 @@ Status AdjListPropertyChunkInfoReader::seek(IdType offset) {
     return Status::IndexError("The edge offset ", offset,
                               " is out of range [0,",
                               edge_info_->GetChunkSize() * chunk_num_,
-                              "), edge label: ", edge_info_->GetEdgeType());
+                              "), edge type: ", edge_info_->GetEdgeType());
   }
   return Status::OK();
 }
