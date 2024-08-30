@@ -167,6 +167,7 @@ std::shared_ptr<EdgeInfo> CreateEdgeInfo(
  * @param name The name of the graph
  * @param vertex_infos The vertex info vector of the graph
  * @param edge_infos The edge info vector of the graph
+ * @param labels The vertex labels of the graph.
  * @param prefix The absolute path prefix to store chunk files of the graph.
  *               Defaults to "./"
  * @param version The version of the graph info
@@ -175,8 +176,8 @@ std::shared_ptr<EdgeInfo> CreateEdgeInfo(
  */
 std::shared_ptr<GraphInfo> CreateGraphInfo(
     const std::string& name, const VertexInfoVector& vertex_infos,
-    const EdgeInfoVector& edge_infos, const std::string& prefix,
-    std::shared_ptr<const InfoVersion> version = nullptr,
+    const EdgeInfoVector& edge_infos, const std::vector<std::string>& labels,
+    const std::string& prefix, std::shared_ptr<const InfoVersion> version = nullptr,
     const std::unordered_map<std::string, std::string>& extra_info = {});
 
 /// @brief Return a boolean DataType instance
