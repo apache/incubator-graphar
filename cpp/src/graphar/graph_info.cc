@@ -1042,7 +1042,15 @@ static Result<std::shared_ptr<GraphInfo>> ConstructGraphInfo(
       edge_infos.push_back(edge_info);
     }
   }
-  return std::make_shared<GraphInfo>(name, vertex_infos, edge_infos, prefix,
+
+  std::vector<std::string> labels;
+  const auto& labels_node = graph_meta->operator[]("labels");
+  if (labels_node.IsSequence()) {
+    for (auto it = labels_node.Begin(); it != labels_node.End(); it++) {
+      labels.push_back((*it).second.As<std::string>());
+    }
+  }
+  return std::make_shared<GraphInfo>(name, vertex_infos, edge_infos, labels, prefix,
                                      version, extra_info);
 }
 
@@ -1051,12 +1059,13 @@ static Result<std::shared_ptr<GraphInfo>> ConstructGraphInfo(
 class GraphInfo::Impl {
  public:
   Impl(const std::string& graph_name, VertexInfoVector vertex_infos,
-       EdgeInfoVector edge_infos, const std::string& prefix,
-       std::shared_ptr<const InfoVersion> version,
+       EdgeInfoVector edge_infos, const std::vector<std::string>& labels, 
+       const std::string& prefix, std::shared_ptr<const InfoVersion> version,
        const std::unordered_map<std::string, std::string>& extra_info)
       : name_(graph_name),
         vertex_infos_(std::move(vertex_infos)),
         edge_infos_(std::move(edge_infos)),
+        labels_(labels),
         prefix_(prefix),
         version_(std::move(version)),
         extra_info_(extra_info) {
@@ -1099,6 +1108,7 @@ class GraphInfo::Impl {
   std::string name_;
   VertexInfoVector vertex_infos_;
   EdgeInfoVector edge_infos_;
+  std::vector<std::string> labels_;
   std::string prefix_;
   std::shared_ptr<const InfoVersion> version_;
   std::unordered_map<std::string, std::string> extra_info_;
@@ -1108,15 +1118,17 @@ class GraphInfo::Impl {
 
 GraphInfo::GraphInfo(
     const std::string& graph_name, VertexInfoVector vertex_infos,
-    EdgeInfoVector edge_infos, const std::string& prefix,
-    std::shared_ptr<const InfoVersion> version,
+    EdgeInfoVector edge_infos, const std::vector<std::string>& labels,
+    const std::string& prefix, std::shared_ptr<const InfoVersion> version,
     const std::unordered_map<std::string, std::string>& extra_info)
-    : impl_(new Impl(graph_name, std::move(vertex_infos), std::move(edge_infos),
-                     prefix, version, extra_info)) {}
+    : impl_(new Impl(graph_name, std::move(vertex_infos), std::move(edge_infos), 
+                     labels, prefix, version, extra_info)) {}
 
 GraphInfo::~GraphInfo() = default;
 
 const std::string& GraphInfo::GetName() const { return impl_->name_; }
+
+const std::vector<std::string>& GraphInfo::GetLabels() const {return impl_->labels_; }
 
 const std::string& GraphInfo::GetPrefix() const { return impl_->prefix_; }
 
@@ -1196,7 +1208,7 @@ Result<std::shared_ptr<GraphInfo>> GraphInfo::AddVertex(
   }
   return std::make_shared<GraphInfo>(
       impl_->name_, AddVectorElement(impl_->vertex_infos_, vertex_info),
-      impl_->edge_infos_, impl_->prefix_, impl_->version_);
+      impl_->edge_infos_, impl_->labels_, impl_->prefix_, impl_->version_);
 }
 
 Result<std::shared_ptr<GraphInfo>> GraphInfo::AddEdge(
@@ -1210,19 +1222,19 @@ Result<std::shared_ptr<GraphInfo>> GraphInfo::AddEdge(
   }
   return std::make_shared<GraphInfo>(
       impl_->name_, impl_->vertex_infos_,
-      AddVectorElement(impl_->edge_infos_, edge_info), impl_->prefix_,
-      impl_->version_);
+      AddVectorElement(impl_->edge_infos_, edge_info), impl_->labels_, 
+      impl_->prefix_, impl_->version_);
 }
 
 std::shared_ptr<GraphInfo> CreateGraphInfo(
     const std::string& name, const VertexInfoVector& vertex_infos,
-    const EdgeInfoVector& edge_infos, const std::string& prefix,
-    std::shared_ptr<const InfoVersion> version,
+    const EdgeInfoVector& edge_infos, const std::vector<std::string>& labels,
+    const std::string& prefix, std::shared_ptr<const InfoVersion> version,
     const std::unordered_map<std::string, std::string>& extra_info) {
   if (name.empty()) {
     return nullptr;
   }
-  return std::make_shared<GraphInfo>(name, vertex_infos, edge_infos, prefix,
+  return std::make_shared<GraphInfo>(name, vertex_infos, edge_infos, labels, prefix,
                                      version, extra_info);
 }
 
@@ -1274,6 +1286,13 @@ Result<std::string> GraphInfo::Dump() const {
           ConcatEdgeTriple(edge->GetSrcType(), edge->GetEdgeType(),
                            edge->GetDstType()) +
           ".edge.yaml";
+    }
+    if (impl_->labels_.size() > 0) {
+      node["labels"];
+      for (const auto& label : impl_->labels_) {
+        node["labels"].PushBack();
+        node["labels"][node["labels"].Size() - 1] = label;
+      }
     }
     if (impl_->version_ != nullptr) {
       node["version"] = impl_->version_->ToString();

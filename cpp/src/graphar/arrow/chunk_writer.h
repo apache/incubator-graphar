@@ -118,6 +118,21 @@ class VertexPropertyWriter {
       ValidateLevel validate_level = ValidateLevel::default_validate) const;
 
   /**
+   * @brief Write all labels of a single vertex chunk
+   * to corresponding files.
+   *
+   * @param input_table The table containing data.
+   * @param chunk_index The index of the vertex chunk.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
+   * @return Status: ok or error.
+   */
+  Status WriteLabelChunk(
+      const std::shared_ptr<arrow::Table>& input_table, IdType chunk_index,
+      FileType file_type, 
+      ValidateLevel validate_level = ValidateLevel::default_validate) const;
+
+  /**
    * @brief Write all property groups of a single vertex chunk
    * to corresponding files.
    *
@@ -161,6 +176,21 @@ class VertexPropertyWriter {
   Status WriteTable(
       const std::shared_ptr<arrow::Table>& input_table,
       IdType start_chunk_index,
+      ValidateLevel validate_level = ValidateLevel::default_validate) const;
+
+  /**
+   * @brief Write all labels for multiple vertex chunks
+   * to corresponding files.
+   *
+   * @param input_table The table containing data.
+   * @param start_chunk_index The start index of the vertex chunks.
+   * @param validate_level The validate level for this operation,
+   * which is the writer's validate level by default.
+   * @return Status: ok or error.
+   */
+  Status WriteLabelTable(
+      const std::shared_ptr<arrow::Table>& input_table,
+      IdType start_chunk_index, FileType file_type,
       ValidateLevel validate_level = ValidateLevel::default_validate) const;
 
   /**

@@ -694,6 +694,7 @@ class GraphInfo {
    * @param graph_name The name of the graph.
    * @param vertex_infos The vertex info vector of the graph.
    * @param edge_infos The edge info vector of the graph.
+   * @param labels The vertex labels of the graph.
    * @param prefix The absolute path prefix to store chunk files of the graph.
    *               Defaults to "./".
    * @param version The version of the graph info.
@@ -701,8 +702,8 @@ class GraphInfo {
    */
   explicit GraphInfo(
       const std::string& graph_name, VertexInfoVector vertex_infos,
-      EdgeInfoVector edge_infos, const std::string& prefix = "./",
-      std::shared_ptr<const InfoVersion> version = nullptr,
+      EdgeInfoVector edge_infos, const std::vector<std::string>& labels = {},
+      const std::string& prefix = "./", std::shared_ptr<const InfoVersion> version = nullptr,
       const std::unordered_map<std::string, std::string>& extra_info = {});
 
   ~GraphInfo();
@@ -752,6 +753,12 @@ class GraphInfo {
    * @return The name of the graph.
    */
   const std::string& GetName() const;
+
+    /**
+   * @brief Get the vertex labels of the graph.
+   * @return The vertex labels of the graph.
+   */
+  const std::vector<std::string>& GetLabels() const;
 
   /**
    * @brief Get the absolute path prefix of the chunk files.

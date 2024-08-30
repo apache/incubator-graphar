@@ -251,6 +251,35 @@ Status VertexPropertyWriter::WriteChunk(
   return Status::OK();
 }
 
+Status VertexPropertyWriter::WriteLabelChunk(
+    const std::shared_ptr<arrow::Table>& input_table,
+    IdType chunk_index, FileType file_type,
+    ValidateLevel validate_level) const {
+  // GAR_RETURN_NOT_OK(
+  //     validate(input_table, property_group, chunk_index, validate_level));
+  // auto file_type = vertex_info_->GetFileType();
+  auto schema = input_table->schema();
+  int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
+  // if (indice == -1) {
+  //   return Status::Invalid("The internal id Column named ",
+  //                          GeneralParams::kVertexIndexCol,
+  //                          " does not exist in the input table.");
+  // }
+  std::vector<int> indices;
+  for(int i=0; i<schema->num_fields(); i++){
+    indices.push_back(i);
+  }
+  
+
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto in_table,
+                                       input_table->SelectColumns(indices));
+  std::string suffix = vertex_info_->GetPrefix() +"labels/chunk" + std::to_string(chunk_index);
+  // GAR_ASSIGN_OR_RAISE(auto suffix,
+  //                     vertex_info_->GetFilePath(property_group, chunk_index));
+  std::string path = prefix_ + suffix;
+  return fs_->WriteTableToFile(input_table, file_type, path);
+}
+
 Status VertexPropertyWriter::WriteTable(
     const std::shared_ptr<arrow::Table>& input_table,
     const std::shared_ptr<PropertyGroup>& property_group,
@@ -286,6 +315,30 @@ Status VertexPropertyWriter::WriteTable(
   for (auto& property_group : property_groups) {
     GAR_RETURN_NOT_OK(WriteTable(table_with_index, property_group,
                                  start_chunk_index, validate_level));
+  }
+  return Status::OK();
+}
+
+Status VertexPropertyWriter::WriteLabelTable(
+    const std::shared_ptr<arrow::Table>& input_table, IdType start_chunk_index,
+    FileType file_type,
+    ValidateLevel validate_level) const {
+  auto schema = input_table->schema();
+  int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
+  // if (indice == -1) {
+  //   // add index column
+  //   GAR_ASSIGN_OR_RAISE(table_with_index,
+  //                       addIndexColumn(input_table, start_chunk_index,
+  //                                      vertex_info_->GetChunkSize()));
+  // }
+  IdType chunk_size = vertex_info_->GetChunkSize();
+  int64_t length = input_table->num_rows();
+  IdType chunk_index = start_chunk_index;
+  for (int64_t offset = 0; offset < length;
+       offset += chunk_size, chunk_index++) {
+    auto in_chunk = input_table->Slice(offset, chunk_size);
+    GAR_RETURN_NOT_OK(WriteLabelChunk(in_chunk,
+                                chunk_index, file_type, validate_level));
   }
   return Status::OK();
 }
