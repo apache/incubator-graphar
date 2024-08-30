@@ -39,9 +39,9 @@ int main(int argc, char* argv[]) {
   ASSERT(graph_info->GetEdgeInfos().size() == 1);
 
   // construct vertices collection
-  std::string label = "person";
-  ASSERT(graph_info->GetVertexInfo(label) != nullptr);
-  auto maybe_vertices = graphar::VerticesCollection::Make(graph_info, label);
+  std::string type = "person";
+  ASSERT(graph_info->GetVertexInfo(type) != nullptr);
+  auto maybe_vertices = graphar::VerticesCollection::Make(graph_info, type);
   ASSERT(maybe_vertices.status().ok());
   auto& vertices = maybe_vertices.value();
   int num_vertices = vertices->size();
@@ -108,10 +108,10 @@ int main(int argc, char* argv[]) {
   auto group =
       graphar::CreatePropertyGroup(property_vector, graphar::FileType::PARQUET);
   // construct new vertex info
-  std::string type = "cc_result", vertex_prefix = "result/";
+  std::string vertex_type = "cc_result", vertex_prefix = "result/";
   int chunk_size = 100;
   auto version = graphar::InfoVersion::Parse("gar/v1").value();
-  auto new_info = graphar::CreateVertexInfo(type, chunk_size, {group},
+  auto new_info = graphar::CreateVertexInfo(vertex_type, chunk_size, {group},
                                             vertex_prefix, version);
   // dump new vertex info
   ASSERT(new_info->IsValidated());
@@ -132,7 +132,7 @@ int main(int argc, char* argv[]) {
 
   // method 2 for writing results: extend the original vertex info and write
   // results using writer extend the vertex_info
-  auto vertex_info = graph_info->GetVertexInfo(label);
+  auto vertex_info = graph_info->GetVertexInfo(vertex_type);
   auto maybe_extend_info = vertex_info->AddPropertyGroup(group);
   ASSERT(maybe_extend_info.status().ok());
   auto extend_info = maybe_extend_info.value();

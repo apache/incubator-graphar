@@ -530,7 +530,7 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
                                          FileType::CSV, "adj_list/")},
                      {pg}, "test_edge/", version);
   auto graph_info = CreateGraphInfo(name, {vertex_info}, {edge_info},
-                                    "test_graph/", version, extra_info);
+                                    {}, "test_graph/", version, extra_info);
 
   SECTION("Basics") {
     REQUIRE(graph_info->GetName() == name);
@@ -544,7 +544,7 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
 
   SECTION("ExtraInfo") {
     auto graph_info_with_extra_info =
-        CreateGraphInfo(name, {vertex_info}, {edge_info}, "test_graph/",
+        CreateGraphInfo(name, {vertex_info}, {edge_info}, {}, "test_graph/",
                         version, {{"key1", "value1"}, {"key2", "value2"}});
     const auto& extra_info = graph_info_with_extra_info->GetExtraInfo();
     REQUIRE(extra_info.size() == 2);
@@ -582,7 +582,7 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
     auto invalid_vertex_info =
         CreateVertexInfo("", 100, {pg}, "test_vertex/", version);
     auto invalid_graph_info0 = CreateGraphInfo(
-        name, {invalid_vertex_info}, {edge_info}, "test_graph/", version);
+        name, {invalid_vertex_info}, {edge_info}, {}, "test_graph/", version);
     REQUIRE(invalid_graph_info0->IsValidated() == false);
     auto invalid_edge_info =
         CreateEdgeInfo("", "knows", "person", 1024, 100, 100, true,
@@ -590,23 +590,23 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
                                            FileType::CSV, "adj_list/")},
                        {pg}, "test_edge/", version);
     auto invalid_graph_info1 = CreateGraphInfo(
-        name, {vertex_info}, {invalid_edge_info}, "test_graph/", version);
+        name, {vertex_info}, {invalid_edge_info}, {}, "test_graph/", version);
     REQUIRE(invalid_graph_info1->IsValidated() == false);
-    GraphInfo invalid_graph_info2("", {vertex_info}, {edge_info}, "test_graph/",
+    GraphInfo invalid_graph_info2("", {vertex_info}, {edge_info}, {}, "test_graph/",
                                   version);
     REQUIRE(invalid_graph_info2.IsValidated() == false);
-    GraphInfo invalid_graph_info3(name, {vertex_info}, {edge_info}, "",
+    GraphInfo invalid_graph_info3(name, {vertex_info}, {edge_info}, {}, "",
                                   version);
     REQUIRE(invalid_graph_info3.IsValidated() == false);
     // check if prefix empty, graph_info with empty prefix is invalid
     auto graph_info_with_empty_prefix =
-        CreateGraphInfo(name, {vertex_info}, {edge_info}, "", version);
+        CreateGraphInfo(name, {vertex_info}, {edge_info}, {}, "", version);
     REQUIRE(graph_info_with_empty_prefix->IsValidated() == false);
   }
 
   SECTION("CreateGraphInfo") {
     auto graph_info_empty_name =
-        CreateGraphInfo("", {vertex_info}, {edge_info}, "test_graph/");
+       CreateGraphInfo("", {vertex_info}, {edge_info}, {}, "test_graph/");
     REQUIRE(graph_info_empty_name == nullptr);
   }
 
@@ -626,7 +626,7 @@ vertices:
 )";
     REQUIRE(dump_result.value() == expected);
     auto graph_info_empty_version =
-        CreateGraphInfo(name, {vertex_info}, {edge_info}, "test_graph/");
+        CreateGraphInfo(name, {vertex_info}, {edge_info}, {}, "test_graph/");
     REQUIRE(graph_info_empty_version->Dump().status().ok());
   }
 
