@@ -299,9 +299,9 @@ class EdgesBuilder {
    * @brief Construct an EdgesBuilder from graph info.
    *
    * @param graph_info The graph info that describes the graph.
-   * @param src_type The label of the source vertex type.
-   * @param edge_type The label of the edge type.
-   * @param dst_type The label of the destination vertex type.
+   * @param src_type The type of the source vertex type.
+   * @param edge_type The type of the edge type.
+   * @param dst_type The type of the destination vertex type.
    * @param adj_list_type The adj list type of the edges.
    * @param num_vertices The total number of vertices for source or destination.
    * @param validate_level The global validate level for the builder, default is

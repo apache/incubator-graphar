@@ -123,25 +123,25 @@ std::shared_ptr<AdjacentList> CreateAdjacentList(
 /**
  * @brief Create a VertexInfo instance
  *
- * @param label The label of the vertex
+ * @param type The type of the vertex
  * @param chunk_size The number of vertices in each vertex chunk
  * @param property_groups The property group vector of the vertex
  * @param prefix The prefix of the vertex info. If left empty, the default
- *        prefix will be set to the label of the vertex
+ *        prefix will be set to the type of the vertex
  * @param version The format version of the vertex info
  * @return vertex_info shared_ptr to VertexInfo
  */
 std::shared_ptr<VertexInfo> CreateVertexInfo(
-    const std::string& label, IdType chunk_size,
+    const std::string& type, IdType chunk_size,
     const PropertyGroupVector& property_groups, const std::string& prefix = "",
     std::shared_ptr<const InfoVersion> version = nullptr);
 
 /**
  * @brief Create an EdgeInfo instance
  *
- * @param src_type The label of the source vertex.
- * @param edge_type The label of the edge
- * @param dst_type The label of the destination vertex
+ * @param src_type The type of the source vertex.
+ * @param edge_type The type of the edge
+ * @param dst_type The type of the destination vertex
  * @param chunk_size The number of edges in each edge chunk
  * @param src_chunk_size The number of source vertices in each vertex chunk
  * @param dst_chunk_size The number of destination vertices in each vertex

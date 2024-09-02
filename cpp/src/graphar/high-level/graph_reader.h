@@ -297,16 +297,16 @@ class VerticesCollection {
   size_t size() const noexcept { return vertex_num_; }
 
   /**
-   * @brief Construct a VerticesCollection from graph info and vertex label.
+   * @brief Construct a VerticesCollection from graph info and vertex type.
    *
    * @param graph_info The graph info.
-   * @param label The vertex label.
+   * @param type The vertex type.
    */
   static Result<std::shared_ptr<VerticesCollection>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& label) {
-    auto vertex_info = graph_info->GetVertexInfo(label);
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type) {
+    auto vertex_info = graph_info->GetVertexInfo(type);
     if (!vertex_info) {
-      return Status::KeyError("The vertex ", label, " doesn't exist.");
+      return Status::KeyError("The vertex ", type, " doesn't exist.");
     }
     return std::make_shared<VerticesCollection>(vertex_info,
                                                 graph_info->GetPrefix());
@@ -704,12 +704,12 @@ class EdgesCollection {
   virtual EdgeIter find_dst(IdType id, const EdgeIter& from) = 0;
 
   /**
-   * @brief Construct an EdgesCollection from graph info and edge label.
+   * @brief Construct an EdgesCollection from graph info and edge type.
    *
    * @param graph_info The graph info.
-   * @param src_type The source vertex label.
-   * @param edge_type The edge label.
-   * @param dst_type The destination vertex label.
+   * @param src_type The source vertex type.
+   * @param edge_type The edge type.
+   * @param dst_type The destination vertex type.
    * @param adj_list_type The type of adjList.
    * @param vertex_chunk_begin The index of the begin vertex chunk, default 0.
    * @param vertex_chunk_end The index of the end vertex chunk (not included),

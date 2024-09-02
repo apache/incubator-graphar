@@ -775,12 +775,16 @@ extra_info:
   }
 }
 
+/*
+TODO(acezen): need to mock S3 server to test this case, this private
+service is not available for public access.
+
 TEST_CASE_METHOD(GlobalFixture, "LoadFromS3") {
   // explicitly call InitS3 to initialize S3 APIs before using
   // S3 file system.
   InitializeS3();
   std::string path =
-      "s3://graphar/ldbc/ldbc.graph.yml"
+      "s3://graphscope/graphar/ldbc/ldbc.graph.yml"
       "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
   auto graph_info_result = GraphInfo::Load(path);
   std::cout << graph_info_result.status().message() << std::endl;
@@ -794,4 +798,5 @@ TEST_CASE_METHOD(GlobalFixture, "LoadFromS3") {
   // explicitly call FinalizeS3 to avoid memory leak
   FinalizeS3();
 }
+*/
 }  // namespace graphar

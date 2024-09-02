@@ -176,15 +176,15 @@ class VertexPropertyWriter {
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   /**
-   * @brief Construct a VertexPropertyWriter from graph info and vertex label.
+   * @brief Construct a VertexPropertyWriter from graph info and vertex type.
    *
    * @param graph_info The graph info that describes the graph.
-   * @param label The vertex label.
+   * @param type The vertex type.
    * @param validate_level The global validate level for the writer, default is
    * no_validate.
    */
   static Result<std::shared_ptr<VertexPropertyWriter>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
  private:
@@ -546,12 +546,12 @@ class EdgeChunkWriter {
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   /**
-   * @brief Construct an EdgeChunkWriter from graph info and edge label.
+   * @brief Construct an EdgeChunkWriter from graph info and edge type.
    *
    * @param graph_info The graph info that describes the graph.
-   * @param src_type The source vertex label.
-   * @param edge_type The edge label.
-   * @param dst_type The destination vertex label.
+   * @param src_type The source vertex type.
+   * @param edge_type The edge type.
+   * @param dst_type The destination vertex type.
    * @param adj_list_type The adj list type for the edges.
    * @param validate_level The global validate level for the writer, default is
    * no_validate.

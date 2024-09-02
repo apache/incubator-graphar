@@ -217,12 +217,12 @@ VertexPropertyArrowChunkReader::Make(
 
 Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
 VertexPropertyArrowChunkReader::Make(
-    const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
     const std::shared_ptr<PropertyGroup>& property_group,
     const util::FilterOptions& options) {
-  auto vertex_info = graph_info->GetVertexInfo(label);
+  auto vertex_info = graph_info->GetVertexInfo(type);
   if (!vertex_info) {
-    return Status::KeyError("The vertex type ", label,
+    return Status::KeyError("The vertex type ", type,
                             " doesn't exist in graph ", graph_info->GetName(),
                             ".");
   }
@@ -231,18 +231,18 @@ VertexPropertyArrowChunkReader::Make(
 
 Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
 VertexPropertyArrowChunkReader::Make(
-    const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
     const std::string& property_name, const util::FilterOptions& options) {
-  auto vertex_info = graph_info->GetVertexInfo(label);
+  auto vertex_info = graph_info->GetVertexInfo(type);
   if (!vertex_info) {
-    return Status::KeyError("The vertex type ", label,
+    return Status::KeyError("The vertex type ", type,
                             " doesn't exist in graph ", graph_info->GetName(),
                             ".");
   }
   auto property_group = vertex_info->GetPropertyGroup(property_name);
   if (!property_group) {
     return Status::KeyError("The property ", property_name,
-                            " doesn't exist in vertex type ", label, ".");
+                            " doesn't exist in vertex type ", type, ".");
   }
   return Make(vertex_info, property_group, graph_info->GetPrefix(), options);
 }
@@ -361,7 +361,7 @@ Status AdjListArrowChunkReader::seek(IdType offset) {
     return Status::IndexError("The edge offset ", offset,
                               " is out of range [0,",
                               edge_info_->GetChunkSize() * chunk_num_,
-                              "), edge label: ", edge_info_->GetEdgeType());
+                              "), edge type: ", edge_info_->GetEdgeType());
   }
   return Status::OK();
 }
@@ -689,7 +689,7 @@ Status AdjListPropertyArrowChunkReader::seek(IdType offset) {
     return Status::IndexError("The edge offset ", offset,
                               " is out of range [0,",
                               edge_info_->GetChunkSize() * chunk_num_,
-                              "), edge label: ", edge_info_->GetEdgeType());
+                              "), edge type: ", edge_info_->GetEdgeType());
   }
   return Status::OK();
 }

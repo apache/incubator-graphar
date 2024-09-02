@@ -35,9 +35,8 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
 
   SECTION("VerticesCollection") {
     // construct vertices collection
-    std::string label = "person", property = "firstName";
-    auto maybe_vertices_collection =
-        VerticesCollection::Make(graph_info, label);
+    std::string type = "person", property = "firstName";
+    auto maybe_vertices_collection = VerticesCollection::Make(graph_info, type);
     REQUIRE(!maybe_vertices_collection.has_error());
     auto vertices = maybe_vertices_collection.value();
     auto count = 0;
@@ -88,13 +87,12 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
     auto maybe_graph_info = GraphInfo::Load(path);
     REQUIRE(maybe_graph_info.status().ok());
     auto graph_info = maybe_graph_info.value();
-    std::string label = "person", list_property = "feature";
-    auto maybe_vertices_collection =
-        VerticesCollection::Make(graph_info, label);
+    std::string type = "person", list_property = "feature";
+    auto maybe_vertices_collection = VerticesCollection::Make(graph_info, type);
     REQUIRE(!maybe_vertices_collection.has_error());
     auto vertices = maybe_vertices_collection.value();
     auto count = 0;
-    auto vertex_info = graph_info->GetVertexInfo(label);
+    auto vertex_info = graph_info->GetVertexInfo(type);
     auto data_type = vertex_info->GetPropertyType(list_property).value();
     REQUIRE(data_type->id() == Type::LIST);
     REQUIRE(data_type->value_type()->id() == Type::FLOAT);
@@ -201,9 +199,8 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
     REQUIRE(maybe_graph_info.status().ok());
     auto graph_info = maybe_graph_info.value();
     // get vertices collection
-    std::string label = "Person", property = "born";
-    auto maybe_vertices_collection =
-        VerticesCollection::Make(graph_info, label);
+    std::string type = "Person", property = "born";
+    auto maybe_vertices_collection = VerticesCollection::Make(graph_info, type);
     REQUIRE(!maybe_vertices_collection.has_error());
     auto vertices = maybe_vertices_collection.value();
     // the count of valid property value

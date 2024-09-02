@@ -273,21 +273,21 @@ class VerticesBuilder {
   }
 
   /**
-   * @brief Construct a VertexBuilder from graph info and vertex label.
+   * @brief Construct a VertexBuilder from graph info and vertex type.
    *
    * @param graph_info The graph info that describes the graph.
-   * @param label The label of the vertex.
+   * @param type The type of the vertex.
    * @param start_vertex_index The start index of the vertices collection.
    * @param validate_level The global validate level for the builder, default is
    * no_validate.
    */
   static Result<std::shared_ptr<VerticesBuilder>> Make(
-      const std::shared_ptr<GraphInfo>& graph_info, const std::string& label,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
       IdType start_vertex_index = 0,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
-    const auto vertex_info = graph_info->GetVertexInfo(label);
+    const auto vertex_info = graph_info->GetVertexInfo(type);
     if (!vertex_info) {
-      return Status::KeyError("The vertex type ", label,
+      return Status::KeyError("The vertex type ", type,
                               " doesn't exist in graph ", graph_info->GetName(),
                               ".");
     }

@@ -28,9 +28,9 @@
 void vertex_property_chunk_info_reader(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // constuct reader
-  std::string label = "person", property_name = "id";
+  std::string type = "person", property_name = "id";
   auto maybe_reader = graphar::VertexPropertyChunkInfoReader::Make(
-      graph_info, label, property_name);
+      graph_info, type, property_name);
   ASSERT(!maybe_reader.has_error());
   auto reader = maybe_reader.value();
 
