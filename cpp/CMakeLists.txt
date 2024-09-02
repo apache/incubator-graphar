@@ -385,7 +385,6 @@ if (BUILD_TESTS)
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
         include(CTest)
         include(Catch)
-        catch_discover_tests(${target})
     endmacro()
 
     add_test(test_info SRCS test/test_info.cc)
