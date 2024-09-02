@@ -149,7 +149,7 @@ int main(int argc, char* argv[]) {
   std::string name = "graph", prefix = "file:///tmp/";
 
   // create graph info
-  auto graph_info = graphar::CreateGraphInfo(name, {vertex_info}, {edge_info},
+  auto graph_info = graphar::CreateGraphInfo(name, {vertex_info}, {edge_info}, {}, 
                                              prefix, version);
   ASSERT(graph_info->GetName() == name);
   ASSERT(graph_info->GetPrefix() == prefix);

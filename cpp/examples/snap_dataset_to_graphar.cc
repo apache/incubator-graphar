@@ -76,7 +76,7 @@ int main(int argc, char* argv[]) {
   /*------------------construct graph info------------------*/
   // create graph info
   auto graph_info = graphar::CreateGraphInfo(graph_name, {vertex_info},
-                                             {edge_info}, save_path, version);
+                                             {edge_info}, {}, save_path, version);
   // save & dump
   ASSERT(!graph_info->Dump().has_error());
   ASSERT(graph_info->Save(save_path + graph_name + ".graph.yml").ok());
