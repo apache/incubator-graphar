@@ -41,6 +41,7 @@ jobs:
   ubuntu:
     name: Ubuntu 22.04 C++
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     steps:
@@ -165,8 +166,6 @@ jobs:
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
 
-
-    
     - name: Use Static Arrow
       working-directory: "cpp"
       run: |
@@ -181,6 +180,7 @@ jobs:
   macos:
     name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
     runs-on: macos-${{ matrix.macos-version }}
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     strategy:
