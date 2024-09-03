@@ -41,7 +41,7 @@ jobs:
   ubuntu:
     name: Ubuntu 22.04 C++
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') && !github.event.pull_request.draft }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     steps:
