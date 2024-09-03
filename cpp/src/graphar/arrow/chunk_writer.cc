@@ -41,6 +41,7 @@
 #include "graphar/status.h"
 #include "graphar/types.h"
 #include "graphar/util.h"
+#include "chunk_writer.h"
 
 namespace graphar {
 // common methods
@@ -255,16 +256,8 @@ Status VertexPropertyWriter::WriteLabelChunk(
     const std::shared_ptr<arrow::Table>& input_table,
     IdType chunk_index, FileType file_type,
     ValidateLevel validate_level) const {
-  // GAR_RETURN_NOT_OK(
-  //     validate(input_table, property_group, chunk_index, validate_level));
-  // auto file_type = vertex_info_->GetFileType();
   auto schema = input_table->schema();
   int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
-  // if (indice == -1) {
-  //   return Status::Invalid("The internal id Column named ",
-  //                          GeneralParams::kVertexIndexCol,
-  //                          " does not exist in the input table.");
-  // }
   std::vector<int> indices;
   for(int i=0; i<schema->num_fields(); i++){
     indices.push_back(i);
@@ -274,8 +267,6 @@ Status VertexPropertyWriter::WriteLabelChunk(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto in_table,
                                        input_table->SelectColumns(indices));
   std::string suffix = vertex_info_->GetPrefix() +"labels/chunk" + std::to_string(chunk_index);
-  // GAR_ASSIGN_OR_RAISE(auto suffix,
-  //                     vertex_info_->GetFilePath(property_group, chunk_index));
   std::string path = prefix_ + suffix;
   return fs_->WriteTableToFile(input_table, file_type, path);
 }
@@ -316,21 +307,35 @@ Status VertexPropertyWriter::WriteTable(
     GAR_RETURN_NOT_OK(WriteTable(table_with_index, property_group,
                                  start_chunk_index, validate_level));
   }
+  auto labels = vertex_info_->GetLabels();
+  if(!labels.empty()){
+    GAR_ASSIGN_OR_RAISE(auto label_table, GetLabelTable(input_table, labels))
+    GAR_RETURN_NOT_OK(WriteLabelTable(label_table, 
+                                 start_chunk_index, FileType::PARQUET, validate_level));
+  };
+  
   return Status::OK();
 }
 
+
+// Helper function to split a string by a delimiter
+std::vector<std::string> SplitString(const std::string& str, char delimiter) {
+    std::vector<std::string> tokens;
+    std::string token;
+    std::istringstream tokenStream(str);
+    while (std::getline(tokenStream, token, delimiter)) {
+        tokens.push_back(token);
+    }
+    return tokens;
+}
+
 Status VertexPropertyWriter::WriteLabelTable(
-    const std::shared_ptr<arrow::Table>& input_table, IdType start_chunk_index,
+    const std::shared_ptr<arrow::Table>& input_table, 
+    IdType start_chunk_index,
     FileType file_type,
     ValidateLevel validate_level) const {
   auto schema = input_table->schema();
   int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
-  // if (indice == -1) {
-  //   // add index column
-  //   GAR_ASSIGN_OR_RAISE(table_with_index,
-  //                       addIndexColumn(input_table, start_chunk_index,
-  //                                      vertex_info_->GetChunkSize()));
-  // }
   IdType chunk_size = vertex_info_->GetChunkSize();
   int64_t length = input_table->num_rows();
   IdType chunk_index = start_chunk_index;
@@ -343,6 +348,63 @@ Status VertexPropertyWriter::WriteLabelTable(
   return Status::OK();
 }
 
+Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::GetLabelTable(
+    const std::shared_ptr<arrow::Table>& input_table, 
+    const std::vector<std::string>& labels) const {
+          // Find the :LABEL column index
+    auto label_col_idx = input_table->schema()->GetFieldIndex(":LABEL");
+    if (label_col_idx == -1) {
+       return Status::KeyError(":LABEL column not found in the input table.");
+    }
+
+    // Access the :LABEL column
+    auto label_column = std::static_pointer_cast<arrow::StringArray>(input_table->column(label_col_idx)->chunk(0));
+
+    // Create a map for labels to column indices
+    std::unordered_map<std::string, int> label_to_index;
+    for (size_t i = 0; i < labels.size(); ++i) {
+        label_to_index[labels[i]] = i;
+    }
+
+    // Create a matrix of booleans with dimensions [number of rows, number of labels]
+    std::vector<std::vector<bool>> bool_matrix(label_column->length(), std::vector<bool>(labels.size(), false));
+
+    // Populate the matrix based on :LABEL column values
+    for (int64_t row = 0; row < label_column->length(); ++row) {
+        if (label_column->IsValid(row)) {
+            std::string labels_string = label_column->GetString(row);
+            auto row_labels = SplitString(labels_string, ';');
+
+            for (const auto& lbl : row_labels) {
+                if (label_to_index.find(lbl) != label_to_index.end()) {
+                    bool_matrix[row][label_to_index[lbl]] = true;
+                }
+            }
+        }
+    }
+
+    // Create Arrow arrays for each label column
+    arrow::FieldVector fields;
+    arrow::ArrayVector arrays;
+
+    for (const auto& label : labels) {
+        arrow::BooleanBuilder builder;
+        for (const auto& row : bool_matrix) {
+            builder.Append(row[label_to_index[label]]);
+        }
+
+        std::shared_ptr<arrow::Array> array;
+        builder.Finish(&array);
+        fields.push_back(arrow::field(label, arrow::boolean()));
+        arrays.push_back(array);
+    }
+
+    // Create the Arrow Table with the boolean columns
+    auto schema = std::make_shared<arrow::Schema>(fields);
+    auto result_table = arrow::Table::Make(schema, arrays);
+
+    return result_table;
+}
 Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
     const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
     const ValidateLevel& validate_level) {

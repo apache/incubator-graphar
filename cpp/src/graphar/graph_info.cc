@@ -191,10 +191,12 @@ class VertexInfo::Impl {
  public:
   Impl(const std::string& type, IdType chunk_size, const std::string& prefix,
        const PropertyGroupVector& property_groups,
+       const std::vector<std::string>& labels, 
        std::shared_ptr<const InfoVersion> version)
       : type_(type),
         chunk_size_(chunk_size),
         property_groups_(std::move(property_groups)),
+        labels_(labels),
         prefix_(prefix),
         version_(std::move(version)) {
     if (prefix_.empty()) {
@@ -241,6 +243,7 @@ class VertexInfo::Impl {
   std::string type_;
   IdType chunk_size_;
   PropertyGroupVector property_groups_;
+  std::vector<std::string> labels_;
   std::string prefix_;
   std::shared_ptr<const InfoVersion> version_;
   std::unordered_map<std::string, int> property_name_to_index_;
@@ -252,9 +255,10 @@ class VertexInfo::Impl {
 
 VertexInfo::VertexInfo(const std::string& type, IdType chunk_size,
                        const PropertyGroupVector& property_groups,
+                       const std::vector<std::string>& labels,
                        const std::string& prefix,
                        std::shared_ptr<const InfoVersion> version)
-    : impl_(new Impl(type, chunk_size, prefix, property_groups, version)) {}
+    : impl_(new Impl(type, chunk_size, prefix, property_groups, labels, version)) {}
 
 VertexInfo::~VertexInfo() = default;
 
@@ -263,6 +267,8 @@ const std::string& VertexInfo::GetType() const { return impl_->type_; }
 IdType VertexInfo::GetChunkSize() const { return impl_->chunk_size_; }
 
 const std::string& VertexInfo::GetPrefix() const { return impl_->prefix_; }
+
+const std::vector<std::string>& VertexInfo::GetLabels() const {return impl_->labels_; }
 
 const std::shared_ptr<const InfoVersion>& VertexInfo::version() const {
   return impl_->version_;
@@ -367,7 +373,9 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::AddPropertyGroup(
   }
   return std::make_shared<VertexInfo>(
       impl_->type_, impl_->chunk_size_,
-      AddVectorElement(impl_->property_groups_, property_group), impl_->prefix_,
+      AddVectorElement(impl_->property_groups_, property_group), 
+      impl_->labels_,
+      impl_->prefix_,
       impl_->version_);
 }
 
@@ -375,12 +383,14 @@ bool VertexInfo::IsValidated() const { return impl_->is_validated(); }
 
 std::shared_ptr<VertexInfo> CreateVertexInfo(
     const std::string& type, IdType chunk_size,
-    const PropertyGroupVector& property_groups, const std::string& prefix,
+    const PropertyGroupVector& property_groups, 
+    const std::vector<std::string>& labels,
+    const std::string& prefix,
     std::shared_ptr<const InfoVersion> version) {
   if (type.empty() || chunk_size <= 0) {
     return nullptr;
   }
-  return std::make_shared<VertexInfo>(type, chunk_size, property_groups, prefix,
+  return std::make_shared<VertexInfo>(type, chunk_size, property_groups, labels, prefix, 
                                       version);
 }
 
@@ -395,6 +405,13 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(
   std::string prefix;
   if (!yaml->operator[]("prefix").IsNone()) {
     prefix = yaml->operator[]("prefix").As<std::string>();
+  }
+  std::vector<std::string> labels;
+  const auto& labels_node = yaml->operator[]("labels");
+  if (labels_node.IsSequence()) {
+    for (auto it = labels_node.Begin(); it != labels_node.End(); it++) {
+      labels.push_back((*it).second.As<std::string>());
+    }
   }
   std::shared_ptr<const InfoVersion> version = nullptr;
   if (!yaml->operator[]("version").IsNone()) {
@@ -430,7 +447,7 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(
           std::make_shared<PropertyGroup>(property_vec, file_type, pg_prefix));
     }
   }
-  return std::make_shared<VertexInfo>(type, chunk_size, property_groups, prefix,
+  return std::make_shared<VertexInfo>(type, chunk_size, property_groups, labels, prefix, 
                                       version);
 }
 
@@ -449,6 +466,13 @@ Result<std::string> VertexInfo::Dump() const noexcept {
     node["type"] = impl_->type_;
     node["chunk_size"] = std::to_string(impl_->chunk_size_);
     node["prefix"] = impl_->prefix_;
+    if (impl_->labels_.size() > 0) {
+      node["labels"];
+      for (const auto& label : impl_->labels_) {
+        node["labels"].PushBack();
+        node["labels"][node["labels"].Size() - 1] = label;
+      }
+    }
     for (const auto& pg : impl_->property_groups_) {
       ::Yaml::Node pg_node;
       if (!pg->GetPrefix().empty()) {

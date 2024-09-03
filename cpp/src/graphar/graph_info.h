@@ -180,14 +180,17 @@ class VertexInfo {
    * @param type The type of the vertex.
    * @param chunk_size The number of vertices in each vertex chunk.
    * @param property_groups The property group vector of the vertex.
+   * @param labels The labels of the vertex.
    * @param prefix The prefix of the vertex info. If left empty, the default
    *        prefix will be set to the type of the vertex.
    * @param version The format version of the vertex info.
    */
   explicit VertexInfo(const std::string& type, IdType chunk_size,
                       const PropertyGroupVector& property_groups,
+                      const std::vector<std::string>& labels = {},
                       const std::string& prefix = "",
                       std::shared_ptr<const InfoVersion> version = nullptr);
+
 
   ~VertexInfo();
 
@@ -226,6 +229,12 @@ class VertexInfo {
    * @return The version info of the vertex.
    */
   const std::shared_ptr<const InfoVersion>& version() const;
+
+    /**
+   * Get the labels of the vertex.
+   * @return The labels of the vertex.
+   */
+  const std::vector<std::string>& GetLabels() const;
 
   /**
    * Get the number of property groups of the vertex.

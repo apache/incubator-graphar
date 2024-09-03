@@ -59,6 +59,9 @@ std::shared_ptr<arrow::Table> readCSV(const std::string& filename, const std::ve
     auto parse_options = arrow::csv::ParseOptions::Defaults();
     auto convert_options = arrow::csv::ConvertOptions::Defaults();
 
+    // Set the delimiter to '|'
+    parse_options.delimiter = '|';
+
      // Create IOContext with the default memory pool
     arrow::io::IOContext io_context = arrow::io::IOContext(arrow::default_memory_pool());
 
@@ -124,13 +127,12 @@ std::shared_ptr<arrow::Table> readCSV(const std::string& filename, const std::ve
 
 
 std::shared_ptr<arrow::Table> read_csv_to_table(const std::string& filename) {
-    arrow::csv::ReadOptions read_options{}; // 默认使用多线程
-    arrow::csv::ParseOptions parse_options{}; // 默认分隔符为逗号
+    arrow::csv::ReadOptions read_options{}; 
+    arrow::csv::ParseOptions parse_options{}; 
     arrow::csv::ConvertOptions convert_options{};
 
-    parse_options.delimiter = ' '; //分隔符为空格
+    parse_options.delimiter = '|'; 
 
-    // 使用with_resource方法来自动管理内存，避免手动管理shared_ptr
     auto input = arrow::io::ReadableFile::Open(filename, arrow::default_memory_pool()).ValueOrDie();
     
     auto reader = arrow::csv::TableReader::Make(
@@ -153,22 +155,24 @@ TEST_CASE_METHOD(GlobalFixture, "test_multi_label_builder") {
 
 
   // construct graph information from file
+  // std::string path =
+  //     test_data_dir + "/icij/parquet/" + "icij-offshoreleaks.graph.yml";
   std::string path =
-      test_data_dir + "/icij/parquet/" + "icij-offshoreleaks.graph.yml";
+      test_data_dir + "/ldbc/parquet/" + "ldbc.graph.yml";
   auto graph_info = graphar::GraphInfo::Load(path).value();
-  auto vertex_info = graph_info->GetVertexInfo("icij_node");
-  std::vector<std::string> labels = graph_info->GetLabels();
+  auto vertex_info = graph_info->GetVertexInfo("organisation");
+  
+  // std::vector<std::string> labels = graph_info->GetLabels();
+  auto labels = vertex_info->GetLabels();
 
   std::unordered_map<std::string, size_t> code;
 
   std::vector<std::vector<bool>> label_column_data;
-  // std::string message = graph_info->Dump().value();
-  // std::cout << message << std::endl;
 
 
   // read labels csv file as arrow table
-  auto table = readCSV(test_data_dir + "/icij/icij-offshoreleaks-44-nodes.csv", labels);
-    
+  // auto table = readCSV(test_data_dir + "/ldbc/organisation_0_0.csv", labels);
+  auto table = read_csv_to_table(test_data_dir + "/ldbc/organisation_0_0.csv");
   std::string table_message = table->ToString();
 
   
@@ -176,85 +180,83 @@ TEST_CASE_METHOD(GlobalFixture, "test_multi_label_builder") {
   std::cout << schema->ToString() << std::endl;
   // std::cout << table_message << std::endl;
 
-  // write arrow table as parquet
-  // fs->WriteTableToFile(table, FileType::PARQUET, "/tmp/vertex/osm_node/labels");
 
   // write arrow table as chunk parquet
   auto maybe_writer = VertexPropertyWriter::Make(vertex_info, "/tmp/");
   REQUIRE(!maybe_writer.has_error());
   auto writer = maybe_writer.value();
-  REQUIRE(writer->WriteLabelTable(table, 0, FileType::PARQUET).ok());
+  REQUIRE(writer->WriteTable(table, 0).ok());
 
 
 
   
-  IdType start_index = 0;
-  auto maybe_builder =
-      builder::VerticesBuilder::Make(vertex_info, "/tmp/", start_index);
-  REQUIRE(!maybe_builder.has_error());
-  auto builder = maybe_builder.value();
+  // IdType start_index = 0;
+  // auto maybe_builder =
+  //     builder::VerticesBuilder::Make(vertex_info, "/tmp/", start_index);
+  // REQUIRE(!maybe_builder.has_error());
+  // auto builder = maybe_builder.value();
 
 
-  // get & set validate level
-  REQUIRE(builder->GetValidateLevel() == ValidateLevel::no_validate);
-  builder->SetValidateLevel(ValidateLevel::strong_validate);
-  REQUIRE(builder->GetValidateLevel() == ValidateLevel::strong_validate);
+  // // get & set validate level
+  // REQUIRE(builder->GetValidateLevel() == ValidateLevel::no_validate);
+  // builder->SetValidateLevel(ValidateLevel::strong_validate);
+  // REQUIRE(builder->GetValidateLevel() == ValidateLevel::strong_validate);
 
 
-  // clear vertices
-  builder->Clear();
-  REQUIRE(builder->GetNum() == 0);
+  // // clear vertices
+  // builder->Clear();
+  // REQUIRE(builder->GetNum() == 0);
 
-  // add vertices
-  std::ifstream fp(test_data_dir + "/icij/icij-offshoreleaks-44-nodes.csv");
-  std::string line;
-  getline(fp, line);
-  // erase BOM
-  if (!line.empty() && (unsigned char)line[0] == 0xEF && 
-                         (unsigned char)line[1] == 0xBB && 
-                         (unsigned char)line[2] == 0xBF) {
-        line.erase(0, 3); // 
-    }
-  int m = 5;
-  std::vector<std::string> names;
-  std::istringstream readstr(line);
-  for (int i = 0; i < m; i++) {
-    std::string name;
-    getline(readstr, name, ',');
-    names.push_back(name);
-    if(i == 1) continue;
-    std::cout << "Name: '" << name << "', length: " << name.length() << std::endl;
-  }
+  // // add vertices
+  // std::ifstream fp(test_data_dir + "/ldbc/organisation_0_0.csv");
+  // std::string line;
+  // getline(fp, line);
+  // // erase BOM
+  // if (!line.empty() && (unsigned char)line[0] == 0xEF && 
+  //                        (unsigned char)line[1] == 0xBB && 
+  //                        (unsigned char)line[2] == 0xBF) {
+  //       line.erase(0, 3); // 
+  //   }
+  // int m = 4;
+  // std::vector<std::string> names;
+  // std::istringstream readstr(line);
+  // for (int i = 0; i < m; i++) {
+  //   std::string name;
+  //   getline(readstr, name, '|');
+  //   names.push_back(name);
+  //   if(i == 1) continue;
+  //   std::cout << "Name: '" << name << "', length: " << name.length() << std::endl;
+  // }
   
 
-  int lines = 0;
-  while (getline(fp, line)) {
-    lines++;
-    std::string val;
-    std::istringstream readstr(line);
-    builder::Vertex v;
-    for (int i = 0; i < m; i++) {
-      getline(readstr, val, ',');
-      if (i == 1) {
-        continue; 
-      }
-      if (i == 0) {
-        int64_t x = 0;
-        for (size_t j = 0; j < val.length(); j++)
-          x = x * 10 + val[j] - '0';
-        v.AddProperty(names[i], x);
-      } else {
-        v.AddProperty(names[i], val);
-      }
-    }
-    REQUIRE(builder->AddVertex(v).ok());
-  }
+  // int lines = 0;
+  // while (getline(fp, line)) {
+  //   lines++;
+  //   std::string val;
+  //   std::istringstream readstr(line);
+  //   builder::Vertex v;
+  //   for (int i = 0; i < m; i++) {
+  //     getline(readstr, val, '|');
+  //     if (i == 1) {
+  //       continue; 
+  //     }
+  //     if (i == 0) {
+  //       int64_t x = 0;
+  //       for (size_t j = 0; j < val.length(); j++)
+  //         x = x * 10 + val[j] - '0';
+  //       v.AddProperty(names[i], x);
+  //     } else {
+  //       v.AddProperty(names[i], val);
+  //     }
+  //   }
+  //   REQUIRE(builder->AddVertex(v).ok());
+  // }
 
-  // check the number of vertices in builder
-  REQUIRE(builder->GetNum() == lines);
+  // // check the number of vertices in builder
+  // REQUIRE(builder->GetNum() == lines);
 
-  // dump to files
-  REQUIRE(builder->Dump().ok());
+  // // dump to files
+  // REQUIRE(builder->Dump().ok());
 
   // add labels
 

@@ -44,7 +44,7 @@ int main(int argc, char* argv[]) {
 
   // create vertex info
   auto vertex_info = graphar::CreateVertexInfo(type, chunk_size, {group1},
-                                               vertex_prefix, version);
+                                               {}, vertex_prefix, version);
 
   ASSERT(vertex_info != nullptr);
   ASSERT(vertex_info->GetType() == type);

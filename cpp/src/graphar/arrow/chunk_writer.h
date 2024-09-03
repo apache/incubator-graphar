@@ -188,10 +188,18 @@ class VertexPropertyWriter {
    * which is the writer's validate level by default.
    * @return Status: ok or error.
    */
-  Status WriteLabelTable(
-      const std::shared_ptr<arrow::Table>& input_table,
-      IdType start_chunk_index, FileType file_type,
-      ValidateLevel validate_level = ValidateLevel::default_validate) const;
+  Status WriteLabelTable(const std::shared_ptr<arrow::Table>& input_table,
+                    IdType start_chunk_index, FileType file_type,
+                    ValidateLevel validate_level = ValidateLevel::default_validate) const;
+
+    /**
+   * @brief Get label column from table to formulate label table
+   * @param input_table The table containing data.
+   * @param labels The labels.
+   * @return The table only containing label columns
+   * */
+  Result<std::shared_ptr<arrow::Table>> GetLabelTable(const std::shared_ptr<arrow::Table>& input_table,
+                        const std::vector<std::string>& labels) const;
 
   /**
    * @brief Construct a VertexPropertyWriter from vertex info.

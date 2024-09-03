@@ -50,7 +50,7 @@ int main(int argc, char* argv[]) {
 
   // create vertex info
   auto vertex_info = graphar::CreateVertexInfo(type, VERTEX_CHUNK_SIZE, {},
-                                               vertex_prefix, version);
+                                               {}, vertex_prefix, version);
 
   // save & dump
   ASSERT(!vertex_info->Dump().has_error());

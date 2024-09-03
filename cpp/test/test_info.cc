@@ -183,7 +183,7 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
       {Property("p0", int32(), true), Property("p1", string(), false)},
       FileType::CSV, "p0_p1/");
   auto vertex_info =
-      CreateVertexInfo(type, chunk_size, {pg}, "test_vertex", version);
+      CreateVertexInfo(type, chunk_size, {pg}, {}, "test_vertex", version);
 
   SECTION("Basics") {
     REQUIRE(vertex_info->GetType() == type);
@@ -224,24 +224,24 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
     auto invalid_pg =
         CreatePropertyGroup({Property("p0", nullptr, true)}, FileType::CSV);
     auto invalid_vertex_info0 = CreateVertexInfo(type, chunk_size, {invalid_pg},
-                                                 "test_vertex/", version);
+                                                 {}, "test_vertex/", version);
     REQUIRE(invalid_vertex_info0->IsValidated() == false);
-    VertexInfo invalid_vertex_info1("", chunk_size, {pg}, "test_vertex/",
+    VertexInfo invalid_vertex_info1("", chunk_size, {pg}, {}, "test_vertex/",
                                     version);
     REQUIRE(invalid_vertex_info1.IsValidated() == false);
-    VertexInfo invalid_vertex_info2(type, 0, {pg}, "test_vertex/", version);
+    VertexInfo invalid_vertex_info2(type, 0, {pg}, {}, "test_vertex/", version);
     REQUIRE(invalid_vertex_info2.IsValidated() == false);
     // check if prefix empty
     auto vertex_info_empty_prefix =
-        CreateVertexInfo(type, chunk_size, {pg}, "", version);
+        CreateVertexInfo(type, chunk_size, {pg}, {}, "", version);
     REQUIRE(vertex_info_empty_prefix->IsValidated() == true);
   }
 
   SECTION("CreateVertexInfo") {
-    auto vertex_info3 = CreateVertexInfo("", chunk_size, {pg}, "test_vertex/");
+    auto vertex_info3 = CreateVertexInfo("", chunk_size, {pg}, {}, "test_vertex/");
     REQUIRE(vertex_info3 == nullptr);
 
-    auto vertex_info4 = CreateVertexInfo(type, 0, {pg}, "test_vertex/");
+    auto vertex_info4 = CreateVertexInfo(type, 0, {pg}, {}, "test_vertex/");
     REQUIRE(vertex_info4 == nullptr);
   }
 
@@ -267,7 +267,7 @@ version: gar/v1
 )";
     REQUIRE(dump_result.value() == expected);
     auto vertex_info_empty_version =
-        CreateVertexInfo(type, chunk_size, {pg}, "test_vertex/");
+        CreateVertexInfo(type, chunk_size, {pg}, {}, "test_vertex/");
     REQUIRE(vertex_info_empty_version->Dump().status().ok());
   }
 
@@ -521,7 +521,7 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
       {Property("p0", int32(), true), Property("p1", string(), false)},
       FileType::CSV, "p0_p1/");
   auto vertex_info =
-      CreateVertexInfo("test_vertex", 100, {pg}, "test_vertex/", version);
+      CreateVertexInfo("test_vertex", 100, {pg}, {}, "test_vertex/", version);
   std::unordered_map<std::string, std::string> extra_info = {
       {"category", "test graph"}};
   auto edge_info =
@@ -580,7 +580,7 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
   SECTION("IsValidated") {
     REQUIRE(graph_info->IsValidated() == true);
     auto invalid_vertex_info =
-        CreateVertexInfo("", 100, {pg}, "test_vertex/", version);
+        CreateVertexInfo("", 100, {pg}, {}, "test_vertex/", version);
     auto invalid_graph_info0 = CreateGraphInfo(
         name, {invalid_vertex_info}, {edge_info}, {}, "test_graph/", version);
     REQUIRE(invalid_graph_info0->IsValidated() == false);
@@ -639,7 +639,7 @@ vertices:
 
   SECTION("AddVertex") {
     auto vertex_info2 =
-        CreateVertexInfo("test_vertex2", 100, {pg}, "test_vertex2/", version);
+        CreateVertexInfo("test_vertex2", 100, {pg}, {}, "test_vertex2/", version);
     auto maybe_extend_info = graph_info->AddVertex(vertex_info2);
     REQUIRE(maybe_extend_info.status().ok());
     auto extend_info = maybe_extend_info.value();
