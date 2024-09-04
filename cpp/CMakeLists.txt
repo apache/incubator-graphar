@@ -48,6 +48,7 @@ option(ENABLE_DOCS "Enable documentation" OFF)
 option(BUILD_DOCS_ONLY "Build docs only" OFF)
 option(USE_STATIC_ARROW "Link arrow static library" OFF)
 option(GRAPHAR_BUILD_STATIC "Build GraphAr as static libraries" OFF)
+option(BUILD_ARROW_FROM_SOURCE "Build Arrow from source" OFF)
 
 if (USE_STATIC_ARROW)
     set(GRAPHAR_BUILD_STATIC ON)
@@ -176,59 +177,7 @@ macro(install_graphar_target target)
   )
 endmacro()
 
-# ------------------------------------------------------------------------------
-# building or find third party library
-# ------------------------------------------------------------------------------
-# check if arrow is installed
-find_package(Arrow QUIET)
-if (NOT ${Arrow_FOUND})
-    message(FATAL_ERROR "apache-arrow is required, please install it and retry")
-endif()
-find_package(ArrowDataset QUIET)
-if (NOT ${ArrowDataset_FOUND})
-    message(FATAL_ERROR "apache-arrow-dataset is required, please install it and retry")
-endif()
-if (${Arrow_VERSION} VERSION_GREATER_EQUAL "12.0.0")
-    # ArrowAcero is available in Arrow 12.0.0 and later
-    find_package(ArrowAcero QUIET)
-    if (NOT ${ArrowAcero_FOUND})
-        message(FATAL_ERROR "apache-arrow-acero is required, please install it and retry")
-    endif()
-endif()
-# Check if ORC is enabled.
-if (NOT ${ARROW_ORC})
-    message(WARNING "apache-arrow is built without ORC extension, ORC related functionalities will be disabled.")
-else()
-    add_definitions(-DARROW_ORC) # Add macro, otherwise inconsistent in build phase on ubuntu.
-endif()
-
-find_package(Parquet QUIET)
-if (NOT ${Parquet_FOUND})
-    message(FATAL_ERROR "parquet is required, please install it and retry")
-endif()
-
-find_package(Protobuf REQUIRED)
-include_directories(${PROTOBUF_INCLUDE_DIRS})
-
-macro(get_target_location var target)
-  if(TARGET ${target})
-    foreach(prop LOCATION LOCATION_NOCONFIG LOCATION_DEBUG LOCATION_RELEASE)
-      get_target_property(${var} ${target} ${prop})
-      if(NOT ("${${var}}" STREQUAL "${var}-NOTFOUND"))
-        break ()
-      endif()
-    endforeach()
-  endif()
-endmacro()
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
-include_directories(src)
-
-# ------------------------------------------------------------------------------
-# generate graphar library
-# ------------------------------------------------------------------------------
 macro(build_graphar)
-
     file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
     if(GRAPHAR_BUILD_STATIC)
         add_library(graphar STATIC ${CORE_SRC_FILES})
@@ -272,7 +221,82 @@ macro(build_graphar)
     endif()
 endmacro()
 
-build_graphar()
+macro(build_graphar_with_arrow_bundled)
+    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
+    if(GRAPHAR_BUILD_STATIC)
+        add_library(graphar STATIC ${CORE_SRC_FILES})
+    else()
+        add_library(graphar SHARED ${CORE_SRC_FILES})
+    endif()
+    install_graphar_target(graphar)
+    target_compile_features(graphar PRIVATE cxx_std_17)
+    target_include_directories(graphar PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+                                          $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+    )
+    target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
+    target_include_directories(graphar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+    target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
+
+    if(APPLE)
+        target_link_libraries(graphar PRIVATE -Wl,-force_load gar_arrow_static
+                "${GAR_PARQUET_STATIC_LIB}"
+                "${GAR_DATASET_STATIC_LIB}"
+                "${GAR_ACERO_STATIC_LIB}"
+                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+    else()
+        target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
+                "${GAR_PARQUET_STATIC_LIB}"
+                "${GAR_DATASET_STATIC_LIB}"
+                "${GAR_ARROW_ACERO_STATIC_LIB}"
+                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive) 
+    endif()
+endmacro()
+
+# ------------------------------------------------------------------------------
+# building or find third party library
+# ------------------------------------------------------------------------------
+
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
+include_directories(src)
+
+if (BUILD_ARROW_FROM_SOURCE)
+    include(apache-arrow)
+    build_arrow()
+    build_graphar_with_arrow_bundled()
+else()
+    # check if arrow is installed
+    find_package(Arrow QUIET)
+    if (NOT ${Arrow_FOUND})
+        message(FATAL_ERROR "apache-arrow is required, please install it and retry")
+    endif()
+    find_package(ArrowDataset QUIET)
+    if (NOT ${ArrowDataset_FOUND})
+        message(FATAL_ERROR "apache-arrow-dataset is required, please install it and retry")
+    endif()
+    if (${Arrow_VERSION} VERSION_GREATER_EQUAL "12.0.0")
+        # ArrowAcero is available in Arrow 12.0.0 and later
+        find_package(ArrowAcero QUIET)
+        if (NOT ${ArrowAcero_FOUND})
+            message(FATAL_ERROR "apache-arrow-acero is required, please install it and retry")
+        endif()
+    endif()
+    # Check if ORC is enabled.
+    if (NOT ${ARROW_ORC})
+        message(WARNING "apache-arrow is built without ORC extension, ORC related functionalities will be disabled.")
+    else()
+        add_definitions(-DARROW_ORC) # Add macro, otherwise inconsistent in build phase on ubuntu.
+    endif()
+
+    find_package(Parquet QUIET)
+    if (NOT ${Parquet_FOUND})
+        message(FATAL_ERROR "parquet is required, please install it and retry")
+    endif()
+
+    find_package(Protobuf REQUIRED)
+    include_directories(${PROTOBUF_INCLUDE_DIRS})
+
+    build_graphar()
+endif()
 
 # ------------------------------------------------------------------------------
 # build example
@@ -293,23 +317,36 @@ if (BUILD_EXAMPLES)
         )
         target_include_directories(${E_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
         target_link_libraries(${E_NAME} PRIVATE graphar ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
-        if(APPLE)
-            if(USE_STATIC_ARROW)
-                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load
-                    Arrow::arrow_static
-                    Parquet::parquet_static)
+        if (BUILD_ARROW_FROM_SOURCE)
+            target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+            if (APPLE)
+                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
             else()
-                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
-                    Parquet::parquet_shared)
+                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive) 
             endif()
         else()
-            if(USE_STATIC_ARROW)
-                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive 
-                    Arrow::arrow_static 
-                    Parquet::parquet_static -Wl,--no-whole-archive)
+            if(APPLE)
+                if(USE_STATIC_ARROW)
+                    target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load
+                        Arrow::arrow_static
+                        Parquet::parquet_static)
+                else()
+                    target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
+                        Parquet::parquet_shared)
+                endif()
             else()
-                target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
-                    Parquet::parquet_shared)
+                if(USE_STATIC_ARROW)
+                    target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive 
+                        Arrow::arrow_static 
+                        Parquet::parquet_static -Wl,--no-whole-archive)
+                else()
+                    target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
+                        Parquet::parquet_shared)
+                endif()
             endif()
         endif()
     endforeach()
@@ -363,23 +400,36 @@ if (BUILD_TESTS)
         target_compile_features(${target} PRIVATE cxx_std_17)
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
         target_link_libraries(${target} PRIVATE Catch2::Catch2WithMain graphar ${CMAKE_DL_LIBS})
-        if(APPLE)
-            if(USE_STATIC_ARROW)
-                target_link_libraries(${target} PRIVATE -Wl,-force_load 
-                    Arrow::arrow_static
-                    Parquet::parquet_static)
+        if (BUILD_ARROW_FROM_SOURCE)
+            target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+            if (APPLE)
+                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
             else()
-                target_link_libraries(${target} PRIVATE Arrow::arrow_shared
-                    Parquet::parquet_shared)
+                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive) 
             endif()
         else()
-            if(USE_STATIC_ARROW)
-                target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
-                    Arrow::arrow_static
-                    Parquet::parquet_static -Wl,--no-whole-archive)
+            if(APPLE)
+                if(USE_STATIC_ARROW)
+                    target_link_libraries(${target} PRIVATE -Wl,-force_load 
+                        Arrow::arrow_static
+                        Parquet::parquet_static)
+                else()
+                    target_link_libraries(${target} PRIVATE Arrow::arrow_shared
+                        Parquet::parquet_shared)
+                endif()
             else()
-                target_link_libraries(${target} PRIVATE Arrow::arrow_shared
-                    Parquet::parquet_shared)
+                if(USE_STATIC_ARROW)
+                    target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
+                        Arrow::arrow_static
+                        Parquet::parquet_static -Wl,--no-whole-archive)
+                else()
+                    target_link_libraries(${target} PRIVATE Arrow::arrow_shared
+                        Parquet::parquet_shared)
+                endif()
             endif()
         endif()
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/include $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>)
