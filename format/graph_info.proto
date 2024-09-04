@@ -45,4 +45,5 @@ message GraphInfo {
         string value = 2;
     } 
     repeated KeyValue key_value_metadata = 6;
+    string version = 7;
 };
