@@ -29,8 +29,8 @@ import "edge_info.proto";
 
 message GraphInfo {
     string name = 1;
-    repeated VertexInfo vertices = 2;
-    repeated EdgeInfo edges = 3;
+    repeated string vertices = 2;
+    repeated string edges = 3;
     string prefix = 4;
 
     // Statistics of the graph, including the number of vertices and edges
