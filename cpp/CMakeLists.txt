@@ -238,11 +238,14 @@ macro(build_graphar_with_arrow_bundled)
     target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
 
     if(APPLE)
+        message(STATUS "Linking arrow bundled dependencies " ${GAR_PARQUET_STATIC_LIB} ${GAR_ACERO_STATIC_LIB})
         target_link_libraries(graphar PRIVATE -Wl,-force_load gar_arrow_static
                 "${GAR_PARQUET_STATIC_LIB}"
                 "${GAR_DATASET_STATIC_LIB}"
-                "${GAR_ACERO_STATIC_LIB}"
-                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+                "${GAR_ARROW_ACERO_STATIC_LIB}"
+                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
+                "-framework CoreFoundation"
+                "-framework Security")
     else()
         target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
                 "${GAR_PARQUET_STATIC_LIB}"
@@ -280,6 +283,7 @@ if (BUILD_ARROW_FROM_SOURCE)
 
     include(apache-arrow)
     build_arrow()
+    add_definitions(-DARROW_ORC) # Add macro, otherwise inconsistent in build phase with not from source.
     build_graphar_with_arrow_bundled()
 else()
     # check if arrow is installed
@@ -419,13 +423,13 @@ if (BUILD_TESTS)
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
         target_link_libraries(${target} PRIVATE Catch2::Catch2WithMain graphar ${CMAKE_DL_LIBS})
         if (BUILD_ARROW_FROM_SOURCE)
-            target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+            target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
             if (APPLE)
-                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
+                target_link_libraries(${target} PRIVATE -Wl,-force_load gar_arrow_static
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
             else()
-                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
+                target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive) 
             endif()

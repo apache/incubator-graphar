@@ -21,7 +21,6 @@
 #include "arrow/adapters/orc/adapter.h"
 #endif
 #include "arrow/api.h"
-#include "arrow/adapters/orc/adapter.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
 #if defined(ARROW_VERSION) && ARROW_VERSION <= 12000000
