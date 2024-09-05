@@ -83,6 +83,17 @@ public class EdgeInfo {
                         .build();
     }
 
+    public EdgeInfo(org.apache.graphar.proto.EdgeInfo protoEdgeInfo) {
+        this.protoEdgeInfo = protoEdgeInfo;
+        this.cachedAdjacentLists =
+                protoEdgeInfo.getAdjacentListList().stream()
+                        .map(AdjacentList::new)
+                        .collect(
+                                Collectors.toUnmodifiableMap(
+                                        AdjacentList::getType, Function.identity()));
+        this.cachedPropertyGroups = new PropertyGroups(protoEdgeInfo.getPropertiesList());
+    }
+
     private EdgeInfo(
             org.apache.graphar.proto.EdgeInfo protoEdgeInfo,
             Map<AdjListType, AdjacentList> cachedAdjacentLists,
@@ -94,28 +105,6 @@ public class EdgeInfo {
 
     org.apache.graphar.proto.EdgeInfo getProto() {
         return protoEdgeInfo;
-    }
-
-    public static EdgeInfo load(String edgeInfoPath) throws IOException {
-        return load(edgeInfoPath, new Configuration());
-    }
-
-    public static EdgeInfo load(String edgeInfoPath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        return load(edgeInfoPath, FileSystem.get(conf));
-    }
-
-    public static EdgeInfo load(String edgeInfoPath, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataInputStream inputStream = fileSystem.open(new Path(edgeInfoPath));
-        Yaml edgeInfoYamlLoader =
-                new Yaml(new Constructor(EdgeYamlParser.class, new LoaderOptions()));
-        EdgeYamlParser edgeInfoYaml = edgeInfoYamlLoader.load(inputStream);
-        return edgeInfoYaml.toEdgeInfo();
     }
 
     public static String concat(String srcLabel, String edgeLabel, String dstLabel) {
@@ -224,26 +213,6 @@ public class EdgeInfo {
         return cachedPropertyGroups.isNullableKey(propertyName);
     }
 
-    public void save(String filePath) throws IOException {
-        save(filePath, new Configuration());
-    }
-
-    public void save(String filePath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        save(filePath, FileSystem.get(conf));
-    }
-
-    public void save(String fileName, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
-        outputStream.writeBytes(dump());
-        outputStream.close();
-    }
-
     public String dump() {
         Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
         EdgeYamlParser edgeYaml = new EdgeYamlParser(this);
@@ -284,6 +253,10 @@ public class EdgeInfo {
 
     public String getPrefix() {
         return protoEdgeInfo.getPrefix();
+    }
+
+    public String getEdgePath() {
+        return getPrefix() + "/" + getConcat() + ".edge.yaml";
     }
 
     public Map<AdjListType, AdjacentList> getAdjacentLists() {

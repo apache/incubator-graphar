@@ -63,11 +63,11 @@ public class GraphInfo {
                         .setName(name)
                         .addAllVertices(
                                 vertexInfos.stream()
-                                        .map(VertexInfo::getProto)
+                                        .map(VertexInfo::getVertexPath)
                                         .collect(Collectors.toList()))
                         .addAllEdges(
                                 edgeInfos.stream()
-                                        .map(EdgeInfo::getProto)
+                                        .map(EdgeInfo::getEdgePath)
                                         .collect(Collectors.toList()))
                         .setPrefix(prefix)
                         .build();
@@ -87,50 +87,6 @@ public class GraphInfo {
         this.cachedEdgeInfoMap = cachedEdgeInfoMap;
     }
 
-    public static GraphInfo load(String graphPath) throws IOException {
-        return load(graphPath, new Configuration());
-    }
-
-    public static GraphInfo load(String graphPath, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        return load(graphPath, fileSystem.getConf());
-    }
-
-    public static GraphInfo load(String graphPath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        Path path = new Path(graphPath);
-        FileSystem fileSystem = path.getFileSystem(conf);
-        FSDataInputStream inputStream = fileSystem.open(path);
-        Yaml graphYamlLoader =
-                new Yaml(new Constructor(GraphYamlParser.class, new LoaderOptions()));
-        GraphYamlParser graphYaml = graphYamlLoader.load(inputStream);
-        return graphYaml.toGraphInfo(conf);
-    }
-
-    public void save(String filePath) throws IOException {
-        save(filePath, new Configuration());
-    }
-
-    public void save(String filePath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        save(filePath, FileSystem.get(conf));
-    }
-
-    public void save(String fileName, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
-        outputStream.writeBytes(dump());
-        outputStream.close();
-    }
-
     public String dump() {
         Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
         GraphYamlParser graphYaml = new GraphYamlParser(this);
@@ -143,7 +99,7 @@ public class GraphInfo {
         }
         final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
                 org.apache.graphar.proto.GraphInfo.newBuilder(protoGraphInfo)
-                        .addVertices(vertexInfo.getProto())
+                        .addVertices(vertexInfo.getVertexPath())
                         .build();
         final List<VertexInfo> newVertexInfoList =
                 Stream.concat(cachedVertexInfoList.stream(), Stream.of(vertexInfo))
@@ -172,7 +128,7 @@ public class GraphInfo {
         }
         final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
                 org.apache.graphar.proto.GraphInfo.newBuilder(protoGraphInfo)
-                        .addEdges(edgeInfo.getProto())
+                        .addEdges(edgeInfo.getEdgePath())
                         .build();
         final List<EdgeInfo> newEdgeInfos =
                 Stream.concat(cachedEdgeInfoList.stream(), Stream.of(edgeInfo))

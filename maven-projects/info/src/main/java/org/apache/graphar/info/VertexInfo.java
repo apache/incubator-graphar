@@ -54,30 +54,13 @@ public class VertexInfo {
                         .build();
     }
 
+    public VertexInfo(org.apache.graphar.proto.VertexInfo protoVertexInfo) {
+        this.protoVertexInfo = protoVertexInfo;
+        this.cachedPropertyGroups = new PropertyGroups(protoVertexInfo.getPropertiesList());
+    }
+
     org.apache.graphar.proto.VertexInfo getProto() {
         return protoVertexInfo;
-    }
-
-    public static VertexInfo load(String vertexInfoPath) throws IOException {
-        return load(vertexInfoPath, new Configuration());
-    }
-
-    public static VertexInfo load(String vertexInfoPath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        return load(vertexInfoPath, FileSystem.get(conf));
-    }
-
-    public static VertexInfo load(String vertexInfoPath, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataInputStream inputStream = fileSystem.open(new Path(vertexInfoPath));
-        Yaml vertexInfoYamlLoader =
-                new Yaml(new Constructor(VertexYamlParser.class, new LoaderOptions()));
-        VertexYamlParser vertexInfoYaml = vertexInfoYamlLoader.load(inputStream);
-        return vertexInfoYaml.toVertexInfo();
     }
 
     public Optional<VertexInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
@@ -131,26 +114,6 @@ public class VertexInfo {
         return getPrefix() + "/vertex_count";
     }
 
-    public void save(String filePath) throws IOException {
-        save(filePath, new Configuration());
-    }
-
-    public void save(String filePath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        save(filePath, FileSystem.get(conf));
-    }
-
-    public void save(String fileName, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
-        outputStream.writeBytes(dump());
-        outputStream.close();
-    }
-
     public String dump() {
         Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
         VertexYamlParser vertexYaml = new VertexYamlParser(this);
@@ -171,6 +134,10 @@ public class VertexInfo {
 
     public String getPrefix() {
         return protoVertexInfo.getPrefix();
+    }
+
+    public String getVertexPath() {
+        return getPrefix() + "/" + getType() + ".vertex.yaml";
     }
 
     private void checkPropertyGroupExist(PropertyGroup propertyGroup) {

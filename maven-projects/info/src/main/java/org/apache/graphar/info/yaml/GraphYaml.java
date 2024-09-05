@@ -26,6 +26,8 @@ import java.util.stream.Collectors;
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
+import org.apache.graphar.info.loader.Loader;
+import org.apache.graphar.info.loader.LocalYamlLoader;
 import org.apache.hadoop.conf.Configuration;
 import org.yaml.snakeyaml.DumperOptions;
 
@@ -66,14 +68,14 @@ public class GraphYaml {
                         .collect(Collectors.toList());
     }
 
-    public GraphInfo toGraphInfo(Configuration conf) throws IOException {
+    public GraphInfo toGraphInfo(Loader loader) throws IOException {
         List<VertexInfo> vertexInfos = new ArrayList<>(vertices.size());
         for (String vertex : vertices) {
-            vertexInfos.add(VertexInfo.load(vertex, conf));
+            vertexInfos.add(loader.loadVertex(vertex));
         }
         List<EdgeInfo> edgeInfos = new ArrayList<>(edges.size());
         for (String edge : edges) {
-            edgeInfos.add(EdgeInfo.load(edge, conf));
+            edgeInfos.add(loader.loadEdge(edge));
         }
         return new GraphInfo(name, vertexInfos, edgeInfos, prefix);
     }

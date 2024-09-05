@@ -149,6 +149,10 @@ class PropertyGroups {
         this.propertyGroupMap = Map.copyOf(tempPropertyGroupMap);
     }
 
+    PropertyGroups(List<org.apache.graphar.proto.PropertyGroup> protoPropertyGroups) {
+        this(protoPropertyGroups.stream().map(PropertyGroup::new).collect(Collectors.toList()));
+    }
+
     private PropertyGroups(
             List<PropertyGroup> propertyGroupList,
             Map<String, PropertyGroup> propertyGroupMap,
