@@ -186,9 +186,6 @@ macro(build_graphar)
     endif()
     install_graphar_target(graphar)
     target_compile_features(graphar PRIVATE cxx_std_17)
-    target_include_directories(graphar PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-                                          $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    )
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
 
@@ -230,9 +227,6 @@ macro(build_graphar_with_arrow_bundled)
     endif()
     install_graphar_target(graphar)
     target_compile_features(graphar PRIVATE cxx_std_17)
-    target_include_directories(graphar PUBLIC $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-                                          $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-    )
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     target_include_directories(graphar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
     target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
@@ -333,9 +327,7 @@ if (BUILD_EXAMPLES)
         message(STATUS "Found example - " ${E_NAME})
         add_executable(${E_NAME} examples/${E_NAME}.cc)
         target_include_directories(${E_NAME} PRIVATE examples
-                                                     ${PROJECT_SOURCE_DIR}/include
                                                      ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
-                                                     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/Catch2/single_include>
         )
         target_include_directories(${E_NAME} SYSTEM PRIVATE ${Boost_INCLUDE_DIRS})
         target_link_libraries(${E_NAME} PRIVATE graphar ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
