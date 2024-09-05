@@ -323,8 +323,7 @@ Status InitializeS3() {
   arrow::fs::S3GlobalOptions options;
   options.log_level = arrow::fs::S3LogLevel::Fatal;
 #endif
-  RETURN_NOT_ARROW_OK(
-      arrow::fs::InitializeS3(options));
+  RETURN_NOT_ARROW_OK(arrow::fs::InitializeS3(options));
   return Status::OK();
 }
 
