@@ -20,6 +20,7 @@ find_package(pybind11 CONFIG REQUIRED)
 # this)
 python_add_library(_core MODULE src/main.cc WITH_SOABI)
 target_link_libraries(_core PRIVATE pybind11::headers graphar)
+target_link_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cpp/src)
 
 # This is passing in the version as a define just as an example
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
