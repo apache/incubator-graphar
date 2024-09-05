@@ -250,6 +250,15 @@ macro(build_graphar_with_arrow_bundled)
                 "${GAR_ARROW_ACERO_STATIC_LIB}"
                 "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive) 
     endif()
+
+    # if OpenSSL library exists, link the OpenSSL library.
+    # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
+    if(OPENSSL_FOUND)
+        target_link_libraries(graphar PRIVATE OpenSSL::SSL)
+    endif()
+    if (CURL_FOUND)
+        target_link_libraries(graphar PRIVATE ${CURL_LIBRARIES})
+    endif()
 endmacro()
 
 # ------------------------------------------------------------------------------
@@ -260,6 +269,15 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
 include_directories(src)
 
 if (BUILD_ARROW_FROM_SOURCE)
+    # the nessary dependencies for building arrow from source
+    find_package(OpenSSL REQUIRED)
+    if(OPENSSL_FOUND)
+        if(OPENSSL_VERSION LESS "1.1.0")
+            message(ERROR "The OpenSSL must be greater than or equal to 1.1.0, current version is  ${OPENSSL_VERSION}")
+        endif()
+    endif()
+    find_package(CURL REQUIRED)
+
     include(apache-arrow)
     build_arrow()
     build_graphar_with_arrow_bundled()
