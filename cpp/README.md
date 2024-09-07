@@ -65,7 +65,7 @@ All the instructions below assume that you have cloned the GraphAr git
 repository and navigated to the ``cpp`` subdirectory with:
 
 ```bash
-git clone https://github.com/apache/graphar.git
+git clone https://github.com/apache/incubator-graphar.git
 cd graphar/cpp
 ```
 
