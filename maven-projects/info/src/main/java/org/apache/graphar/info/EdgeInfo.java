@@ -19,7 +19,6 @@
 
 package org.apache.graphar.info;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,14 +30,7 @@ import org.apache.graphar.info.yaml.GraphYamlParser;
 import org.apache.graphar.proto.AdjListType;
 import org.apache.graphar.proto.DataType;
 import org.apache.graphar.util.GeneralParams;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 public class EdgeInfo {
     private final org.apache.graphar.proto.EdgeInfo protoEdgeInfo;
@@ -87,11 +79,11 @@ public class EdgeInfo {
         this.protoEdgeInfo = protoEdgeInfo;
         this.cachedAdjacentLists =
                 protoEdgeInfo.getAdjacentListList().stream()
-                        .map(AdjacentList::new)
+                        .map(AdjacentList::ofProto)
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         AdjacentList::getType, Function.identity()));
-        this.cachedPropertyGroups = new PropertyGroups(protoEdgeInfo.getPropertiesList());
+        this.cachedPropertyGroups = PropertyGroups.ofProto(protoEdgeInfo.getPropertiesList());
     }
 
     private EdgeInfo(

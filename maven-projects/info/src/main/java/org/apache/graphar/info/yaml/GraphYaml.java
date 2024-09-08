@@ -27,8 +27,6 @@ import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
 import org.apache.graphar.info.loader.Loader;
-import org.apache.graphar.info.loader.LocalYamlLoader;
-import org.apache.hadoop.conf.Configuration;
 import org.yaml.snakeyaml.DumperOptions;
 
 public class GraphYaml {

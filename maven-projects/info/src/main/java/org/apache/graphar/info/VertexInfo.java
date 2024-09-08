@@ -19,21 +19,13 @@
 
 package org.apache.graphar.info;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.yaml.GraphYamlParser;
 import org.apache.graphar.info.yaml.VertexYamlParser;
 import org.apache.graphar.proto.DataType;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 public class VertexInfo {
     private final org.apache.graphar.proto.VertexInfo protoVertexInfo;
@@ -54,9 +46,13 @@ public class VertexInfo {
                         .build();
     }
 
-    public VertexInfo(org.apache.graphar.proto.VertexInfo protoVertexInfo) {
+    private VertexInfo(org.apache.graphar.proto.VertexInfo protoVertexInfo) {
         this.protoVertexInfo = protoVertexInfo;
-        this.cachedPropertyGroups = new PropertyGroups(protoVertexInfo.getPropertiesList());
+        this.cachedPropertyGroups = PropertyGroups.ofProto(protoVertexInfo.getPropertiesList());
+    }
+
+    public static VertexInfo ofProto(org.apache.graphar.proto.VertexInfo protoVertexInfo) {
+        return new VertexInfo(protoVertexInfo);
     }
 
     org.apache.graphar.proto.VertexInfo getProto() {

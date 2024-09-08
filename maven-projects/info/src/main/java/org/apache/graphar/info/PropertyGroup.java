@@ -54,11 +54,11 @@ public class PropertyGroup implements Iterable<Property> {
                         .build();
     }
 
-    PropertyGroup(org.apache.graphar.proto.PropertyGroup protoPropertyGroup) {
+    private PropertyGroup(org.apache.graphar.proto.PropertyGroup protoPropertyGroup) {
         this.protoPropertyGroup = protoPropertyGroup;
         this.cachedPropertyList =
                 protoPropertyGroup.getPropertiesList().stream()
-                        .map(Property::new)
+                        .map(Property::ofProto)
                         .collect(Collectors.toUnmodifiableList());
         this.cachedPropertyMap =
                 cachedPropertyList.stream()
@@ -67,13 +67,18 @@ public class PropertyGroup implements Iterable<Property> {
                                         Property::getName, Function.identity()));
     }
 
+    public static PropertyGroup ofProto(org.apache.graphar.proto.PropertyGroup protoPropertyGroup) {
+        return new PropertyGroup(protoPropertyGroup);
+    }
+
     public Optional<PropertyGroup> addPropertyAsNew(Property property) {
         if (property == null || cachedPropertyMap.containsKey(property.getName())) {
             return Optional.empty();
         }
         List<Property> newPropertyList =
                 Stream.concat(
-                                protoPropertyGroup.getPropertiesList().stream().map(Property::new),
+                                protoPropertyGroup.getPropertiesList().stream()
+                                        .map(Property::ofProto),
                                 Stream.of(property))
                         .collect(Collectors.toUnmodifiableList());
         return Optional.of(
@@ -149,10 +154,6 @@ class PropertyGroups {
         this.propertyGroupMap = Map.copyOf(tempPropertyGroupMap);
     }
 
-    PropertyGroups(List<org.apache.graphar.proto.PropertyGroup> protoPropertyGroups) {
-        this(protoPropertyGroups.stream().map(PropertyGroup::new).collect(Collectors.toList()));
-    }
-
     private PropertyGroups(
             List<PropertyGroup> propertyGroupList,
             Map<String, PropertyGroup> propertyGroupMap,
@@ -160,6 +161,14 @@ class PropertyGroups {
         this.propertyGroupList = propertyGroupList;
         this.propertyGroupMap = propertyGroupMap;
         this.properties = properties;
+    }
+
+    static PropertyGroups ofProto(
+            List<org.apache.graphar.proto.PropertyGroup> protoPropertyGroups) {
+        return new PropertyGroups(
+                protoPropertyGroups.stream()
+                        .map(PropertyGroup::ofProto)
+                        .collect(Collectors.toList()));
     }
 
     Optional<PropertyGroups> addPropertyGroupAsNew(PropertyGroup propertyGroup) {

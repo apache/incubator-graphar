@@ -34,8 +34,12 @@ public class Property {
                         .build();
     }
 
-    Property(org.apache.graphar.proto.Property protoProperty) {
+    private Property(org.apache.graphar.proto.Property protoProperty) {
         this.protoProperty = protoProperty;
+    }
+
+    public static Property ofProto(org.apache.graphar.proto.Property protoProperty) {
+        return new Property(protoProperty);
     }
 
     public String getName() {

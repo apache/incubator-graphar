@@ -17,6 +17,7 @@
 
 package org.apache.graphar.info.loader;
 
+import java.io.IOException;
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -31,23 +32,14 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-import java.io.IOException;
-
 public class LocalYamlLoader implements Loader {
-    private static final FileSystem fileSystem;
-
-    static {
-        try {
-            fileSystem = FileSystem.get(new Configuration());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private static FileSystem fileSystem = null;
 
     public LocalYamlLoader() {}
 
     @Override
     public GraphInfo loadGraph(String path) throws IOException {
+        checkFileSystem();
         FSDataInputStream inputStream = fileSystem.open(new Path(path));
         Yaml graphYamlLoader =
                 new Yaml(new Constructor(GraphYamlParser.class, new LoaderOptions()));
@@ -57,6 +49,7 @@ public class LocalYamlLoader implements Loader {
 
     @Override
     public VertexInfo loadVertex(String path) throws IOException {
+        checkFileSystem();
         FSDataInputStream inputStream = fileSystem.open(new Path(path));
         Yaml vertexYamlLoader =
                 new Yaml(new Constructor(VertexYamlParser.class, new LoaderOptions()));
@@ -66,10 +59,16 @@ public class LocalYamlLoader implements Loader {
 
     @Override
     public EdgeInfo loadEdge(String path) throws IOException {
+        checkFileSystem();
         FSDataInputStream inputStream = fileSystem.open(new Path(path));
-        Yaml edgeYamlLoader =
-                new Yaml(new Constructor(EdgeYamlParser.class, new LoaderOptions()));
+        Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYamlParser.class, new LoaderOptions()));
         EdgeYamlParser edgeYaml = edgeYamlLoader.load(inputStream);
         return edgeYaml.toEdgeInfo();
+    }
+
+    private static void checkFileSystem() throws IOException {
+        if (fileSystem == null) {
+            fileSystem = FileSystem.get(new Configuration());
+        }
     }
 }

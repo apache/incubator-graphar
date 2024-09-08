@@ -34,8 +34,12 @@ public class AdjacentList {
                         .build();
     }
 
-    public AdjacentList(org.apache.graphar.proto.AdjacentList protoAdjacentList) {
+    private AdjacentList(org.apache.graphar.proto.AdjacentList protoAdjacentList) {
         this.protoAdjacentList = protoAdjacentList;
+    }
+
+    public static AdjacentList ofProto(org.apache.graphar.proto.AdjacentList protoAdjacentList) {
+        return new AdjacentList(protoAdjacentList);
     }
 
     public AdjListType getType() {
