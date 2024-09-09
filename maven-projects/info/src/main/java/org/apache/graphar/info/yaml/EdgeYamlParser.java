@@ -25,42 +25,42 @@ import java.util.stream.Collectors;
 import org.apache.graphar.info.EdgeInfo;
 
 public class EdgeYamlParser {
-    private String src_label;
-    private String edge_label;
-    private String dst_label;
+    private String src_type;
+    private String edge_type;
+    private String dst_type;
     private long chunk_size;
     private long src_chunk_size;
     private long dst_chunk_size;
     private boolean directed;
     private String prefix;
-    private List<AdjacentListYamlParser> adjacent_lists;
+    private List<AdjacentListYamlParser> adj_lists;
     private List<PropertyGroupYamlParser> property_groups;
     private String version;
 
     public EdgeYamlParser() {
-        this.src_label = "";
-        this.edge_label = "";
-        this.dst_label = "";
+        this.src_type = "";
+        this.edge_type = "";
+        this.dst_type = "";
         this.chunk_size = 0;
         this.src_chunk_size = 0;
         this.dst_chunk_size = 0;
         this.directed = false;
         this.prefix = "";
-        this.adjacent_lists = new ArrayList<>();
+        this.adj_lists = new ArrayList<>();
         this.property_groups = new ArrayList<>();
         this.version = "";
     }
 
     public EdgeYamlParser(EdgeInfo edgeInfo) {
-        this.src_label = edgeInfo.getSrcLabel();
-        this.edge_label = edgeInfo.getEdgeLabel();
-        this.dst_label = edgeInfo.getDstLabel();
+        this.src_type = edgeInfo.getSrcLabel();
+        this.edge_type = edgeInfo.getEdgeLabel();
+        this.dst_type = edgeInfo.getDstLabel();
         this.chunk_size = edgeInfo.getChunkSize();
         this.src_chunk_size = edgeInfo.getSrcChunkSize();
         this.dst_chunk_size = edgeInfo.getDstChunkSize();
         this.directed = edgeInfo.isDirected();
         this.prefix = edgeInfo.getPrefix();
-        this.adjacent_lists =
+        this.adj_lists =
                 edgeInfo.getAdjacentLists().values().stream()
                         .map(AdjacentListYamlParser::new)
                         .collect(Collectors.toList());
@@ -71,28 +71,28 @@ public class EdgeYamlParser {
         this.version = edgeInfo.getVersion();
     }
 
-    public String getSrc_label() {
-        return src_label;
+    public String getSrc_type() {
+        return src_type;
     }
 
-    public void setSrc_label(String src_label) {
-        this.src_label = src_label;
+    public void setSrc_type(String src_type) {
+        this.src_type = src_type;
     }
 
-    public String getEdge_label() {
-        return edge_label;
+    public String getEdge_type() {
+        return edge_type;
     }
 
-    public void setEdge_label(String edge_label) {
-        this.edge_label = edge_label;
+    public void setEdge_type(String edge_type) {
+        this.edge_type = edge_type;
     }
 
-    public String getDst_label() {
-        return dst_label;
+    public String getDst_type() {
+        return dst_type;
     }
 
-    public void setDst_label(String dst_label) {
-        this.dst_label = dst_label;
+    public void setDst_type(String dst_type) {
+        this.dst_type = dst_type;
     }
 
     public boolean isDirected() {
@@ -135,12 +135,12 @@ public class EdgeYamlParser {
         this.prefix = prefix;
     }
 
-    public List<AdjacentListYamlParser> getAdjacent_lists() {
-        return adjacent_lists;
+    public List<AdjacentListYamlParser> getAdj_lists() {
+        return adj_lists;
     }
 
-    public void setAdjacent_lists(List<AdjacentListYamlParser> adjacent_lists) {
-        this.adjacent_lists = adjacent_lists;
+    public void setAdj_lists(List<AdjacentListYamlParser> adj_lists) {
+        this.adj_lists = adj_lists;
     }
 
     public List<PropertyGroupYamlParser> getProperty_groups() {

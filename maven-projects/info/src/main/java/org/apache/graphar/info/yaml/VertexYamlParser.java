@@ -25,14 +25,14 @@ import java.util.stream.Collectors;
 import org.apache.graphar.info.VertexInfo;
 
 public class VertexYamlParser {
-    private String label;
+    private String type;
     private long chunk_size;
     private List<PropertyGroupYamlParser> property_groups;
     private String prefix;
     private String version;
 
     public VertexYamlParser() {
-        this.label = "";
+        this.type = "";
         this.chunk_size = 0;
         this.property_groups = new ArrayList<>();
         this.prefix = "";
@@ -40,7 +40,7 @@ public class VertexYamlParser {
     }
 
     public VertexYamlParser(VertexInfo vertexInfo) {
-        this.label = vertexInfo.getLabel();
+        this.type = vertexInfo.getLabel();
         this.chunk_size = vertexInfo.getChunkSize();
         this.property_groups =
                 vertexInfo.getPropertyGroups().stream()
@@ -50,12 +50,12 @@ public class VertexYamlParser {
         this.version = vertexInfo.getVersion();
     }
 
-    public String getLabel() {
-        return label;
+    public String getType() {
+        return type;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public long getChunk_size() {

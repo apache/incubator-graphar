@@ -57,7 +57,7 @@ public class VertexInfo {
 
     private VertexInfo(VertexYamlParser parser) {
         this(
-                parser.getLabel(),
+                parser.getType(),
                 parser.getChunk_size(),
                 parser.getProperty_groups().stream()
                         .map(PropertyGroup::new)

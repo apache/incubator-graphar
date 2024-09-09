@@ -80,15 +80,15 @@ public class EdgeInfo {
 
     private EdgeInfo(EdgeYamlParser yamlParser) {
         this(
-                yamlParser.getSrc_label(),
-                yamlParser.getEdge_label(),
-                yamlParser.getDst_label(),
+                yamlParser.getSrc_type(),
+                yamlParser.getEdge_type(),
+                yamlParser.getDst_type(),
                 yamlParser.getChunk_size(),
                 yamlParser.getSrc_chunk_size(),
                 yamlParser.getDst_chunk_size(),
                 yamlParser.isDirected(),
                 yamlParser.getPrefix(),
-                yamlParser.getAdjacent_lists().stream()
+                yamlParser.getAdj_lists().stream()
                         .map(AdjacentList::new)
                         .collect(Collectors.toUnmodifiableList()),
                 yamlParser.getProperty_groups().stream()
