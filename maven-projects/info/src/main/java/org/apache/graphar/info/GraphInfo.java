@@ -114,8 +114,7 @@ public class GraphInfo {
         Path path = new Path(graphPath);
         FileSystem fileSystem = path.getFileSystem(conf);
         FSDataInputStream inputStream = fileSystem.open(path);
-        Yaml graphYamlLoader =
-                new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
+        Yaml graphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
         GraphYaml graphYaml = graphYamlLoader.load(inputStream);
         return new GraphInfo(graphYaml, conf);
     }

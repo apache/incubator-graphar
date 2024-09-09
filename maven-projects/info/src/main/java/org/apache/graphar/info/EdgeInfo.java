@@ -134,8 +134,7 @@ public class EdgeInfo {
             throw new IllegalArgumentException("FileSystem is null");
         }
         FSDataInputStream inputStream = fileSystem.open(new Path(edgeInfoPath));
-        Yaml edgeInfoYamlLoader =
-                new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
+        Yaml edgeInfoYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
         EdgeYaml edgeInfoYaml = edgeInfoYamlLoader.load(inputStream);
         return new EdgeInfo(edgeInfoYaml);
     }
