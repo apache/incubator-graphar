@@ -24,38 +24,38 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.VertexInfo;
 
-public class VertexYamlParser {
-    private String label;
+public class VertexYaml {
+    private String type;
     private long chunk_size;
-    private List<PropertyGroupYamlParser> property_groups;
+    private List<PropertyGroupYaml> property_groups;
     private String prefix;
     private String version;
 
-    public VertexYamlParser() {
-        this.label = "";
+    public VertexYaml() {
+        this.type = "";
         this.chunk_size = 0;
         this.property_groups = new ArrayList<>();
         this.prefix = "";
         this.version = "";
     }
 
-    public VertexYamlParser(VertexInfo vertexInfo) {
-        this.label = vertexInfo.getLabel();
+    public VertexYaml(VertexInfo vertexInfo) {
+        this.type = vertexInfo.getLabel();
         this.chunk_size = vertexInfo.getChunkSize();
         this.property_groups =
                 vertexInfo.getPropertyGroups().stream()
-                        .map(PropertyGroupYamlParser::new)
+                        .map(PropertyGroupYaml::new)
                         .collect(Collectors.toList());
         this.prefix = vertexInfo.getPrefix();
         this.version = vertexInfo.getVersion();
     }
 
-    public String getLabel() {
-        return label;
+    public String getType() {
+        return type;
     }
 
-    public void setLabel(String label) {
-        this.label = label;
+    public void setType(String type) {
+        this.type = type;
     }
 
     public long getChunk_size() {
@@ -66,11 +66,11 @@ public class VertexYamlParser {
         this.chunk_size = chunk_size;
     }
 
-    public List<PropertyGroupYamlParser> getProperty_groups() {
+    public List<PropertyGroupYaml> getProperty_groups() {
         return property_groups;
     }
 
-    public void setProperty_groups(List<PropertyGroupYamlParser> property_groups) {
+    public void setProperty_groups(List<PropertyGroupYaml> property_groups) {
         this.property_groups = property_groups;
     }
 

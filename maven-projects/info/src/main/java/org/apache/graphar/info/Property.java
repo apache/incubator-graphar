@@ -20,7 +20,7 @@
 package org.apache.graphar.info;
 
 import org.apache.graphar.info.type.DataType;
-import org.apache.graphar.info.yaml.PropertyYamlParser;
+import org.apache.graphar.info.yaml.PropertyYaml;
 
 public class Property {
     private final String name;
@@ -35,7 +35,7 @@ public class Property {
         this.nullable = nullable;
     }
 
-    Property(PropertyYamlParser yamlParser) {
+    Property(PropertyYaml yamlParser) {
         this.name = yamlParser.getName();
         this.dataType = DataType.fromString(yamlParser.getData_type());
         this.primary = yamlParser.getIs_primary();

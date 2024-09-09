@@ -19,22 +19,20 @@
 
 package org.apache.graphar.info.yaml;
 
-import org.apache.graphar.info.AdjacentList;
-
-public class AdjacentListYamlParser {
+public class AdjacentListYaml {
     private boolean ordered;
     private String aligned_by;
     private String file_type;
     private String prefix;
 
-    public AdjacentListYamlParser() {
+    public AdjacentListYaml() {
         this.ordered = false;
         this.aligned_by = "";
         this.file_type = "";
         this.prefix = "";
     }
 
-    public AdjacentListYamlParser(AdjacentList adjacentList) {
+    public AdjacentListYaml(org.apache.graphar.info.AdjacentList adjacentList) {
         this.ordered = adjacentList.getType().isOrdered();
         this.aligned_by = adjacentList.getType().getAlignedBy();
         this.file_type = adjacentList.getFileType().toString();

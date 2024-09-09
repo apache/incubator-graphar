@@ -22,20 +22,20 @@ package org.apache.graphar.info.yaml;
 import java.util.Optional;
 import org.apache.graphar.info.Property;
 
-public class PropertyYamlParser {
+public class PropertyYaml {
     private String name;
     private String data_type;
     private boolean is_primary;
     private Optional<Boolean> is_nullable;
 
-    public PropertyYamlParser() {
+    public PropertyYaml() {
         this.name = "";
         this.data_type = "";
         this.is_primary = false;
         this.is_nullable = Optional.empty();
     }
 
-    public PropertyYamlParser(Property property) {
+    public PropertyYaml(Property property) {
         this.name = property.getName();
         this.data_type = property.getDataType().toString();
         this.is_primary = property.isPrimary();
