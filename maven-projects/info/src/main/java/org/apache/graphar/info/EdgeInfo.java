@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
-import org.apache.graphar.info.yaml.EdgeYamlParser;
-import org.apache.graphar.info.yaml.GraphYamlParser;
+import org.apache.graphar.info.yaml.EdgeYaml;
+import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.util.GeneralParams;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -78,7 +78,7 @@ public class EdgeInfo {
         this.version = version;
     }
 
-    private EdgeInfo(EdgeYamlParser yamlParser) {
+    private EdgeInfo(EdgeYaml yamlParser) {
         this(
                 yamlParser.getSrc_type(),
                 yamlParser.getEdge_type(),
@@ -135,8 +135,8 @@ public class EdgeInfo {
         }
         FSDataInputStream inputStream = fileSystem.open(new Path(edgeInfoPath));
         Yaml edgeInfoYamlLoader =
-                new Yaml(new Constructor(EdgeYamlParser.class, new LoaderOptions()));
-        EdgeYamlParser edgeInfoYaml = edgeInfoYamlLoader.load(inputStream);
+                new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
+        EdgeYaml edgeInfoYaml = edgeInfoYamlLoader.load(inputStream);
         return new EdgeInfo(edgeInfoYaml);
     }
 
@@ -276,8 +276,8 @@ public class EdgeInfo {
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
-        EdgeYamlParser edgeYaml = new EdgeYamlParser(this);
+        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
+        EdgeYaml edgeYaml = new EdgeYaml(this);
         return yaml.dump(edgeYaml);
     }
 

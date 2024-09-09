@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.type.DataType;
-import org.apache.graphar.info.yaml.GraphYamlParser;
-import org.apache.graphar.info.yaml.VertexYamlParser;
+import org.apache.graphar.info.yaml.GraphYaml;
+import org.apache.graphar.info.yaml.VertexYaml;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -55,7 +55,7 @@ public class VertexInfo {
         this.version = version;
     }
 
-    private VertexInfo(VertexYamlParser parser) {
+    private VertexInfo(VertexYaml parser) {
         this(
                 parser.getType(),
                 parser.getChunk_size(),
@@ -96,8 +96,8 @@ public class VertexInfo {
         }
         FSDataInputStream inputStream = fileSystem.open(new Path(vertexInfoPath));
         Yaml vertexInfoYamlLoader =
-                new Yaml(new Constructor(VertexYamlParser.class, new LoaderOptions()));
-        VertexYamlParser vertexInfoYaml = vertexInfoYamlLoader.load(inputStream);
+                new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
+        VertexYaml vertexInfoYaml = vertexInfoYamlLoader.load(inputStream);
         return new VertexInfo(vertexInfoYaml);
     }
 
@@ -169,8 +169,8 @@ public class VertexInfo {
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
-        VertexYamlParser vertexYaml = new VertexYamlParser(this);
+        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
+        VertexYaml vertexYaml = new VertexYaml(this);
         return yaml.dump(vertexYaml);
     }
 

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.EdgeInfo;
 
-public class EdgeYamlParser {
+public class EdgeYaml {
     private String src_type;
     private String edge_type;
     private String dst_type;
@@ -33,11 +33,11 @@ public class EdgeYamlParser {
     private long dst_chunk_size;
     private boolean directed;
     private String prefix;
-    private List<AdjacentListYamlParser> adj_lists;
-    private List<PropertyGroupYamlParser> property_groups;
+    private List<AdjacentListYaml> adj_lists;
+    private List<PropertyGroupYaml> property_groups;
     private String version;
 
-    public EdgeYamlParser() {
+    public EdgeYaml() {
         this.src_type = "";
         this.edge_type = "";
         this.dst_type = "";
@@ -51,7 +51,7 @@ public class EdgeYamlParser {
         this.version = "";
     }
 
-    public EdgeYamlParser(EdgeInfo edgeInfo) {
+    public EdgeYaml(EdgeInfo edgeInfo) {
         this.src_type = edgeInfo.getSrcLabel();
         this.edge_type = edgeInfo.getEdgeLabel();
         this.dst_type = edgeInfo.getDstLabel();
@@ -62,11 +62,11 @@ public class EdgeYamlParser {
         this.prefix = edgeInfo.getPrefix();
         this.adj_lists =
                 edgeInfo.getAdjacentLists().values().stream()
-                        .map(AdjacentListYamlParser::new)
+                        .map(AdjacentListYaml::new)
                         .collect(Collectors.toList());
         this.property_groups =
                 edgeInfo.getPropertyGroups().stream()
-                        .map(PropertyGroupYamlParser::new)
+                        .map(PropertyGroupYaml::new)
                         .collect(Collectors.toList());
         this.version = edgeInfo.getVersion();
     }
@@ -135,19 +135,19 @@ public class EdgeYamlParser {
         this.prefix = prefix;
     }
 
-    public List<AdjacentListYamlParser> getAdj_lists() {
+    public List<AdjacentListYaml> getAdj_lists() {
         return adj_lists;
     }
 
-    public void setAdj_lists(List<AdjacentListYamlParser> adj_lists) {
+    public void setAdj_lists(List<AdjacentListYaml> adj_lists) {
         this.adj_lists = adj_lists;
     }
 
-    public List<PropertyGroupYamlParser> getProperty_groups() {
+    public List<PropertyGroupYaml> getProperty_groups() {
         return property_groups;
     }
 
-    public void setProperty_groups(List<PropertyGroupYamlParser> property_groups) {
+    public void setProperty_groups(List<PropertyGroupYaml> property_groups) {
         this.property_groups = property_groups;
     }
 

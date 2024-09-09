@@ -24,14 +24,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.VertexInfo;
 
-public class VertexYamlParser {
+public class VertexYaml {
     private String type;
     private long chunk_size;
-    private List<PropertyGroupYamlParser> property_groups;
+    private List<PropertyGroupYaml> property_groups;
     private String prefix;
     private String version;
 
-    public VertexYamlParser() {
+    public VertexYaml() {
         this.type = "";
         this.chunk_size = 0;
         this.property_groups = new ArrayList<>();
@@ -39,12 +39,12 @@ public class VertexYamlParser {
         this.version = "";
     }
 
-    public VertexYamlParser(VertexInfo vertexInfo) {
+    public VertexYaml(VertexInfo vertexInfo) {
         this.type = vertexInfo.getLabel();
         this.chunk_size = vertexInfo.getChunkSize();
         this.property_groups =
                 vertexInfo.getPropertyGroups().stream()
-                        .map(PropertyGroupYamlParser::new)
+                        .map(PropertyGroupYaml::new)
                         .collect(Collectors.toList());
         this.prefix = vertexInfo.getPrefix();
         this.version = vertexInfo.getVersion();
@@ -66,11 +66,11 @@ public class VertexYamlParser {
         this.chunk_size = chunk_size;
     }
 
-    public List<PropertyGroupYamlParser> getProperty_groups() {
+    public List<PropertyGroupYaml> getProperty_groups() {
         return property_groups;
     }
 
-    public void setProperty_groups(List<PropertyGroupYamlParser> property_groups) {
+    public void setProperty_groups(List<PropertyGroupYaml> property_groups) {
         this.property_groups = property_groups;
     }
 
