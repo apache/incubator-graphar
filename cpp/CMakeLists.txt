@@ -251,10 +251,10 @@ macro(build_graphar_with_arrow_bundled)
     # if OpenSSL library exists, link the OpenSSL library.
     # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
     if(OPENSSL_FOUND)
-        target_link_libraries(graphar PRIVATE OpenSSL::SSL)
+        target_link_libraries(graphar PUBLIC OpenSSL::SSL)
     endif()
     if (CURL_FOUND)
-        target_link_libraries(graphar PRIVATE ${CURL_LIBRARIES})
+        target_link_libraries(graphar PUBLIC ${CURL_LIBRARIES})
     endif()
 endmacro()
 
