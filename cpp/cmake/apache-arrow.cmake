@@ -108,10 +108,10 @@ function(build_arrow)
 
     find_package(Threads)
     find_package(Arrow QUIET)
-    set(ARROW_VERSION_TO_BUILD "15.0.0" CACHE INTERNAL "arrow version")
-    if (Arrow_FOUND) # arrow is installed, build the same version as the installed one
-       set(ARROW_VERSION_TO_BUILD "${Arrow_VERSION}" CACHE INTERNAL "arrow version")
-    endif ()
+    set(ARROW_VERSION_TO_BUILD "13.0.0" CACHE INTERNAL "arrow version")
+    # if (Arrow_FOUND) # arrow is installed, build the same version as the installed one
+    #    set(ARROW_VERSION_TO_BUILD "${Arrow_VERSION}" CACHE INTERNAL "arrow version")
+    # endif ()
     if(DEFINED ENV{GAR_ARROW_SOURCE_URL})
         set(GAR_ARROW_SOURCE_URL "$ENV{GAR_ARROW_SOURCE_URL}")
     else()
