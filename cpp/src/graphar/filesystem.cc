@@ -317,7 +317,7 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
 }
 
 Status InitializeS3() {
-#if defined(ARROW_VERSION) && ARROW_VERSION > 12000000
+#if defined(ARROW_VERSION) && ARROW_VERSION > 14000000
   auto options = arrow::fs::S3GlobalOptions::Defaults();
 #else
   arrow::fs::S3GlobalOptions options;

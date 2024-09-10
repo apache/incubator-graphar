@@ -108,16 +108,19 @@ function(build_arrow)
 
     find_package(Threads)
     find_package(Arrow QUIET)
-    set(ARROW_VERSION_TO_BUILD "15.0.0" CACHE INTERNAL "arrow version")
-    if (Arrow_FOUND) # arrow is installed, build the same version as the installed one
-       message(STATUS "Found Arrow installed, align to version: ${Arrow_VERSION}")
-       set(ARROW_VERSION_TO_BUILD "${Arrow_VERSION}" CACHE INTERNAL "arrow version")
+    if(DEFINED ENV{GAR_ARROW_SOURCE_URL})
+        set(GAR_ARROW_SOURCE_URL "$ENV{GAR_ARROW_SOURCE_URL}")
+    else()
+        set(ARROW_VERSION_TO_BUILD "15.0.0" CACHE INTERNAL "arrow version")
+        if (Arrow_FOUND) # arrow is installed, build the same version as the installed one
+            set(ARROW_VERSION_TO_BUILD "${Arrow_VERSION}" CACHE INTERNAL "arrow version")
+        endif()
+        set(GAR_ARROW_SOURCE_URL "https://www.apache.org/dyn/closer.lua?action=download&filename=arrow/arrow-${ARROW_VERSION_TO_BUILD}/apache-arrow-${ARROW_VERSION_TO_BUILD}.tar.gz")
     endif ()
-    set(GAR_ARROW_SOURCE_FILE "https://www.apache.org/dyn/closer.lua?action=download&filename=arrow/arrow-${ARROW_VERSION_TO_BUILD}/apache-arrow-${ARROW_VERSION_TO_BUILD}.tar.gz")
 
     include(ExternalProject)
     externalproject_add(arrow_ep
-            URL "${GAR_ARROW_SOURCE_FILE}"
+            URL "${GAR_ARROW_SOURCE_URL}"
             SOURCE_SUBDIR cpp
             BINARY_DIR "${GAR_ARROW_BINARY_DIR}"
             CMAKE_ARGS "${GAR_ARROW_CMAKE_ARGS}"
