@@ -23,6 +23,9 @@
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
+#if defined(ARROW_VERSION) && ARROW_VERSION <= 12000000
+#include "arrow/dataset/file_json.h"
+#endif
 #include "arrow/filesystem/api.h"
 #include "arrow/filesystem/s3fs.h"
 #include "arrow/ipc/writer.h"
@@ -314,8 +317,13 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
 }
 
 Status InitializeS3() {
-  RETURN_NOT_ARROW_OK(
-      arrow::fs::InitializeS3(arrow::fs::S3GlobalOptions::Defaults()));
+#if defined(ARROW_VERSION) && ARROW_VERSION > 12000000
+  auto options = arrow::fs::S3GlobalOptions::Defaults();
+#else
+  arrow::fs::S3GlobalOptions options;
+  options.log_level = arrow::fs::S3LogLevel::Fatal;
+#endif
+  RETURN_NOT_ARROW_OK(arrow::fs::InitializeS3(options));
   return Status::OK();
 }
 

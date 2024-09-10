@@ -113,6 +113,16 @@ Extra Build Options:
 1. `-DGRAPHAR_BUILD_STATIC=ON`: Build GraphAr as static libraries.
 2. `-DUSE_STATIC_ARROW=ON`: Link arrow static library to build GraphAr. If set this option, the option `GRAPHAR_BUILD_STATIC=ON` will be set.
 
+### Building with Arrow from source
+In case you want to build GraphAr as single static library including all dependencies, we include a [apache-arrow.cmake](cmake/apache-arrow.cmake) file that allows you to build Arrow and its dependencies from source and link it statically. To do this, you can follow the steps below:
+
+```bash
+mkdir build-static
+cd build-static
+cmake -DGRAPHAR_BUILD_STATIC=ON -DBUILD_ARROW_FROM_SOURCE=ON ..
+make -j8    # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
+```
+
 ### Install
 
 After the building, you can install the GraphAr C++ library with:
