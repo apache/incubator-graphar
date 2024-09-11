@@ -53,7 +53,7 @@ public class EdgeYaml {
 
     public EdgeYaml(EdgeInfo edgeInfo) {
         this.src_type = edgeInfo.getSrcLabel();
-        this.edge_type = edgeInfo.getEdgeLabel();
+        this.edge_type = edgeInfo.getSrcLabel();
         this.dst_type = edgeInfo.getDstLabel();
         this.chunk_size = edgeInfo.getChunkSize();
         this.src_chunk_size = edgeInfo.getSrcChunkSize();
@@ -72,19 +72,19 @@ public class EdgeYaml {
 
     public EdgeInfo toEdgeInfo() {
         return new EdgeInfo(
-                src_label,
-                edge_label,
-                dst_label,
+                src_type,
+                edge_type,
+                dst_type,
                 chunk_size,
                 src_chunk_size,
                 dst_chunk_size,
                 directed,
                 prefix,
-                adjacent_lists.stream()
-                        .map(AdjacentListYamlParser::toAdjacentList)
+                adj_lists.stream()
+                        .map(AdjacentListYaml::toAdjacentList)
                         .collect(Collectors.toUnmodifiableList()),
                 property_groups.stream()
-                        .map(PropertyGroupYamlParser::toPropertyGroup)
+                        .map(PropertyGroupYaml::toPropertyGroup)
                         .collect(Collectors.toList()));
     }
 

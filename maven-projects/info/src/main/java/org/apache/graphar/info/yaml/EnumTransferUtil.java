@@ -22,7 +22,7 @@ package org.apache.graphar.info.yaml;
 import org.apache.graphar.proto.AdjListType;
 import org.apache.graphar.proto.FileType;
 
-public class EnumTransferTools {
+public class EnumTransferUtil {
     static String fileType2String(FileType fileType) {
         switch (fileType) {
             case CSV:

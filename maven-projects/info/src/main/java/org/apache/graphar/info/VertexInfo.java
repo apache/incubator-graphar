@@ -22,9 +22,18 @@ package org.apache.graphar.info;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.apache.graphar.info.yaml.GraphYamlParser;
-import org.apache.graphar.info.yaml.VertexYamlParser;
+
+import org.apache.graphar.info.yaml.GraphYaml;
+import org.apache.graphar.info.yaml.VertexYaml;
 import org.apache.graphar.proto.DataType;
+import org.apache.graphar.info.yaml.GraphYaml;
+import org.apache.graphar.info.yaml.VertexYaml;
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 
 public class VertexInfo {
@@ -111,8 +120,8 @@ public class VertexInfo {
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
-        VertexYamlParser vertexYaml = new VertexYamlParser(this);
+        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
+        VertexYaml vertexYaml = new VertexYaml(this);
         return yaml.dump(vertexYaml);
     }
 

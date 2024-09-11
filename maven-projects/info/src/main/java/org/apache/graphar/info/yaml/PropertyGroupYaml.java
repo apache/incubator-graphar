@@ -24,40 +24,40 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.PropertyGroup;
 
-public class PropertyGroupYamlParser {
-    private List<PropertyYamlParser> properties;
+public class PropertyGroupYaml {
+    private List<PropertyYaml> properties;
     private String file_type;
     private String prefix;
 
-    public PropertyGroupYamlParser() {
+    public PropertyGroupYaml() {
         this.properties = new ArrayList<>();
         this.file_type = "";
         this.prefix = "";
     }
 
-    public PropertyGroupYamlParser(PropertyGroup propertyGroup) {
+    public PropertyGroupYaml(PropertyGroup propertyGroup) {
         this.properties =
                 propertyGroup.getPropertyList().stream()
-                        .map(PropertyYamlParser::new)
+                        .map(PropertyYaml::new)
                         .collect(Collectors.toList());
-        this.file_type = EnumTransferTools.fileType2String(propertyGroup.getFileType());
+        this.file_type = EnumTransferUtil.fileType2String(propertyGroup.getFileType());
         this.prefix = propertyGroup.getPrefix();
     }
 
     PropertyGroup toPropertyGroup() {
         return new PropertyGroup(
                 properties.stream()
-                        .map(PropertyYamlParser::toProperty)
+                        .map(PropertyYaml::toProperty)
                         .collect(Collectors.toList()),
-                EnumTransferTools.string2FileType(file_type),
+                EnumTransferUtil.string2FileType(file_type),
                 prefix);
     }
 
-    public List<PropertyYamlParser> getProperties() {
+    public List<PropertyYaml> getProperties() {
         return properties;
     }
 
-    public void setProperties(List<PropertyYamlParser> properties) {
+    public void setProperties(List<PropertyYaml> properties) {
         this.properties = properties;
     }
 

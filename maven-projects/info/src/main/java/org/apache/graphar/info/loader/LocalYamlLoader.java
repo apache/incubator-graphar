@@ -21,9 +21,9 @@ import java.io.IOException;
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
-import org.apache.graphar.info.yaml.EdgeYamlParser;
-import org.apache.graphar.info.yaml.GraphYamlParser;
-import org.apache.graphar.info.yaml.VertexYamlParser;
+import org.apache.graphar.info.yaml.EdgeYaml;
+import org.apache.graphar.info.yaml.GraphYaml;
+import org.apache.graphar.info.yaml.VertexYaml;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
@@ -42,8 +42,8 @@ public class LocalYamlLoader implements Loader {
         checkFileSystem();
         FSDataInputStream inputStream = fileSystem.open(new Path(path));
         Yaml graphYamlLoader =
-                new Yaml(new Constructor(GraphYamlParser.class, new LoaderOptions()));
-        GraphYamlParser graphYaml = graphYamlLoader.load(inputStream);
+                new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
+        GraphYaml graphYaml = graphYamlLoader.load(inputStream);
         return graphYaml.toGraphInfo(this);
     }
 
@@ -52,8 +52,8 @@ public class LocalYamlLoader implements Loader {
         checkFileSystem();
         FSDataInputStream inputStream = fileSystem.open(new Path(path));
         Yaml vertexYamlLoader =
-                new Yaml(new Constructor(VertexYamlParser.class, new LoaderOptions()));
-        VertexYamlParser vertexYaml = vertexYamlLoader.load(inputStream);
+                new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
+        VertexYaml vertexYaml = vertexYamlLoader.load(inputStream);
         return vertexYaml.toVertexInfo();
     }
 
@@ -61,8 +61,8 @@ public class LocalYamlLoader implements Loader {
     public EdgeInfo loadEdge(String path) throws IOException {
         checkFileSystem();
         FSDataInputStream inputStream = fileSystem.open(new Path(path));
-        Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYamlParser.class, new LoaderOptions()));
-        EdgeYamlParser edgeYaml = edgeYamlLoader.load(inputStream);
+        Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
+        EdgeYaml edgeYaml = edgeYamlLoader.load(inputStream);
         return edgeYaml.toEdgeInfo();
     }
 

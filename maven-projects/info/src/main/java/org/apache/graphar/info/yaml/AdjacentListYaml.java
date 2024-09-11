@@ -22,37 +22,37 @@ package org.apache.graphar.info.yaml;
 import org.apache.graphar.info.AdjacentList;
 import org.apache.graphar.proto.AdjListType;
 
-public class AdjacentListYamlParser {
+public class AdjacentListYaml {
     private boolean ordered;
     private String aligned_by;
     private String file_type;
     private String prefix;
 
-    public AdjacentListYamlParser() {
+    public AdjacentListYaml() {
         this.ordered = false;
         this.aligned_by = "";
         this.file_type = "";
         this.prefix = "";
     }
 
-    public AdjacentListYamlParser(AdjacentList adjacentList) {
+    public AdjacentListYaml(org.apache.graphar.info.AdjacentList adjacentList) {
         final var adjListType = adjacentList.getType();
         this.ordered =
                 adjListType == AdjListType.ORDERED_BY_SOURCE
                         || adjListType == AdjListType.ORDERED_BY_DESTINATION;
         this.aligned_by =
                 adjListType == AdjListType.ORDERED_BY_SOURCE
-                                || adjListType == AdjListType.UNORDERED_BY_SOURCE
+                        || adjListType == AdjListType.UNORDERED_BY_SOURCE
                         ? "src"
                         : "dst";
-        this.file_type = EnumTransferTools.fileType2String(adjacentList.getFileType());
+        this.file_type = EnumTransferUtil.fileType2String(adjacentList.getFileType());
         this.prefix = adjacentList.getPrefix();
     }
 
     public AdjacentList toAdjacentList() {
         return new AdjacentList(
-                EnumTransferTools.orderedAndAlignedBy2AdjListType(ordered, aligned_by),
-                EnumTransferTools.string2FileType(file_type),
+                EnumTransferUtil.orderedAndAlignedBy2AdjListType(ordered, aligned_by),
+                EnumTransferUtil.string2FileType(file_type),
                 prefix);
     }
 

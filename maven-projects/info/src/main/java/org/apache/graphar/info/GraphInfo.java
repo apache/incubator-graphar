@@ -25,7 +25,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.graphar.info.yaml.GraphYamlParser;
+
+import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.util.GeneralParams;
 import org.yaml.snakeyaml.Yaml;
 
@@ -80,8 +81,8 @@ public class GraphInfo {
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
-        GraphYamlParser graphYaml = new GraphYamlParser(this);
+        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
+        GraphYaml graphYaml = new GraphYaml(this);
         return yaml.dump(graphYaml);
     }
 
