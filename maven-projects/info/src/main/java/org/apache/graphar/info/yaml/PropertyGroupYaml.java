@@ -46,9 +46,7 @@ public class PropertyGroupYaml {
 
     PropertyGroup toPropertyGroup() {
         return new PropertyGroup(
-                properties.stream()
-                        .map(PropertyYaml::toProperty)
-                        .collect(Collectors.toList()),
+                properties.stream().map(PropertyYaml::toProperty).collect(Collectors.toList()),
                 EnumTransferUtil.string2FileType(file_type),
                 prefix);
     }

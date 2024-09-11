@@ -26,7 +26,7 @@ import org.apache.hadoop.fs.FSDataOutputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
-public class LocalYamlSaver implements Saver {
+public class LocalYamlGraphSaver implements GraphSaver {
     private static final FileSystem fileSystem;
 
     static {
@@ -38,22 +38,29 @@ public class LocalYamlSaver implements Saver {
     }
 
     @Override
-    public void saveGraph(String path, GraphInfo graphInfo) throws IOException {
-        try (FSDataOutputStream outputStream = fileSystem.create(new Path(path))) {
+    public void save(String path, GraphInfo graphInfo) throws IOException {
+        try (FSDataOutputStream outputStream =
+                fileSystem.create(new Path(path + "/" + graphInfo.getName() + ".graph.yaml"))) {
             outputStream.writeBytes(graphInfo.dump());
+            for (VertexInfo vertexInfo : graphInfo.getVertexInfos()) {
+                saveVertex(path, vertexInfo);
+            }
+            for (EdgeInfo edgeInfo : graphInfo.getEdgeInfos()) {
+                saveEdge(path, edgeInfo);
+            }
         }
     }
 
-    @Override
-    public void saveVertex(String path, VertexInfo vertexInfo) throws IOException {
-        try (FSDataOutputStream outputStream = fileSystem.create(new Path(path))) {
+    private void saveVertex(String path, VertexInfo vertexInfo) throws IOException {
+        try (FSDataOutputStream outputStream =
+                fileSystem.create(new Path(path + "/" + vertexInfo.getType() + ".vertex.yaml"))) {
             outputStream.writeBytes(vertexInfo.dump());
         }
     }
 
-    @Override
-    public void saveEdge(String path, EdgeInfo edgeInfo) throws IOException {
-        try (FSDataOutputStream outputStream = fileSystem.create(new Path(path))) {
+    private void saveEdge(String path, EdgeInfo edgeInfo) throws IOException {
+        try (FSDataOutputStream outputStream =
+                fileSystem.create(new Path(path + "/" + edgeInfo.getConcat() + ".edge.yaml"))) {
             outputStream.writeBytes(edgeInfo.dump());
         }
     }

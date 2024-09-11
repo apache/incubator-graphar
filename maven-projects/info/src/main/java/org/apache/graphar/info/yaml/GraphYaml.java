@@ -19,14 +19,10 @@
 
 package org.apache.graphar.info.yaml;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
-import org.apache.graphar.info.VertexInfo;
-import org.apache.graphar.info.loader.Loader;
 import org.yaml.snakeyaml.DumperOptions;
 
 public class GraphYaml {
@@ -66,18 +62,18 @@ public class GraphYaml {
                         .collect(Collectors.toList());
     }
 
-    public GraphInfo toGraphInfo(Loader loader) throws IOException {
-        List<VertexInfo> vertexInfos = new ArrayList<>(vertices.size());
-        for (String vertex : vertices) {
-            vertexInfos.add(loader.loadVertex(vertex));
-        }
-        List<EdgeInfo> edgeInfos = new ArrayList<>(edges.size());
-        for (String edge : edges) {
-            edgeInfos.add(loader.loadEdge(edge));
-        }
-        return new GraphInfo(name, vertexInfos, edgeInfos, prefix);
-    }
-
+    //    public GraphInfo toGraphInfo(GraphLoader graphLoader) throws IOException {
+    //        List<VertexInfo> vertexInfos = new ArrayList<>(vertices.size());
+    //        for (String vertex : vertices) {
+    //            vertexInfos.add(graphLoader.loadVertex(vertex));
+    //        }
+    //        List<EdgeInfo> edgeInfos = new ArrayList<>(edges.size());
+    //        for (String edge : edges) {
+    //            edgeInfos.add(graphLoader.loadEdge(edge));
+    //        }
+    //        return new GraphInfo(name, vertexInfos, edgeInfos, prefix);
+    //    }
+    //
     public static DumperOptions getDumperOptions() {
         return dumperOption;
     }

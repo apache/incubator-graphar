@@ -15,17 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.graphar.info.saver;
+package org.apache.graphar.info.loader;
 
 import java.io.IOException;
-import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
-import org.apache.graphar.info.VertexInfo;
 
-public interface Saver {
-    void saveGraph(String path, GraphInfo graphInfo) throws IOException;
-
-    void saveVertex(String path, VertexInfo vertexInfo) throws IOException;
-
-    void saveEdge(String path, EdgeInfo edgeInfo) throws IOException;
+@FunctionalInterface
+public interface GraphLoader {
+    public GraphInfo load(String graphYamlPath) throws IOException;
 }

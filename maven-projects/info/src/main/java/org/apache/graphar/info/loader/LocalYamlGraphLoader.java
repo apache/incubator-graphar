@@ -18,6 +18,8 @@
 package org.apache.graphar.info.loader;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -32,43 +34,46 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-public class LocalYamlLoader implements Loader {
+public class LocalYamlGraphLoader implements GraphLoader {
     private static FileSystem fileSystem = null;
 
-    public LocalYamlLoader() {}
+    public LocalYamlGraphLoader() {}
 
     @Override
-    public GraphInfo loadGraph(String path) throws IOException {
-        checkFileSystem();
-        FSDataInputStream inputStream = fileSystem.open(new Path(path));
-        Yaml graphYamlLoader =
-                new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
-        GraphYaml graphYaml = graphYamlLoader.load(inputStream);
-        return graphYaml.toGraphInfo(this);
+    public GraphInfo load(String graphYamlPath) throws IOException {
+        if (fileSystem == null) {
+            fileSystem = FileSystem.get(new Configuration());
+        }
+        // load graph itself
+        final Path path = new Path(graphYamlPath);
+        final FSDataInputStream inputStream = fileSystem.open(path);
+        final Yaml yamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
+        final GraphYaml graphYaml = yamlLoader.load(inputStream);
+        // load vertices
+        final String ABSOLUTE_PREFIX = path.getParent().toString();
+        List<VertexInfo> vertexInfos = new ArrayList<>(graphYaml.getVertices().size());
+        for (String vertexYamlName : graphYaml.getVertices()) {
+            vertexInfos.add(loadVertex(ABSOLUTE_PREFIX + "/" + vertexYamlName));
+        }
+        // load edges
+        List<EdgeInfo> edgeInfos = new ArrayList<>(graphYaml.getEdges().size());
+        for (String edgeYamlName : graphYaml.getEdges()) {
+            edgeInfos.add(loadEdge(ABSOLUTE_PREFIX + "/" + edgeYamlName));
+        }
+        return new GraphInfo(graphYaml.getName(), vertexInfos, edgeInfos, graphYaml.getPrefix());
     }
 
-    @Override
-    public VertexInfo loadVertex(String path) throws IOException {
-        checkFileSystem();
+    private VertexInfo loadVertex(String path) throws IOException {
         FSDataInputStream inputStream = fileSystem.open(new Path(path));
-        Yaml vertexYamlLoader =
-                new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
+        Yaml vertexYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
         VertexYaml vertexYaml = vertexYamlLoader.load(inputStream);
         return vertexYaml.toVertexInfo();
     }
 
-    @Override
-    public EdgeInfo loadEdge(String path) throws IOException {
-        checkFileSystem();
+    private EdgeInfo loadEdge(String path) throws IOException {
         FSDataInputStream inputStream = fileSystem.open(new Path(path));
         Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
         EdgeYaml edgeYaml = edgeYamlLoader.load(inputStream);
         return edgeYaml.toEdgeInfo();
-    }
-
-    private static void checkFileSystem() throws IOException {
-        if (fileSystem == null) {
-            fileSystem = FileSystem.get(new Configuration());
-        }
     }
 }

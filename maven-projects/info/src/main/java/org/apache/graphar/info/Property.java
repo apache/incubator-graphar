@@ -20,7 +20,6 @@
 package org.apache.graphar.info;
 
 import org.apache.graphar.proto.DataType;
-import org.apache.graphar.info.yaml.PropertyYaml;
 
 public class Property {
     private final org.apache.graphar.proto.Property protoProperty;

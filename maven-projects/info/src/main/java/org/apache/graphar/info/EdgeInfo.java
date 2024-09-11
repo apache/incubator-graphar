@@ -25,10 +25,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.graphar.info.yaml.EdgeYaml;
-import org.apache.graphar.info.yaml.EdgeYaml;
-import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.proto.AdjListType;
 import org.apache.graphar.proto.DataType;

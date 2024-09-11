@@ -42,7 +42,7 @@ public class AdjacentListYaml {
                         || adjListType == AdjListType.ORDERED_BY_DESTINATION;
         this.aligned_by =
                 adjListType == AdjListType.ORDERED_BY_SOURCE
-                        || adjListType == AdjListType.UNORDERED_BY_SOURCE
+                                || adjListType == AdjListType.UNORDERED_BY_SOURCE
                         ? "src"
                         : "dst";
         this.file_type = EnumTransferUtil.fileType2String(adjacentList.getFileType());
