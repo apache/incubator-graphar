@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
-import org.apache.graphar.info.yaml.PropertyGroupYamlParser;
+import org.apache.graphar.info.yaml.PropertyGroupYaml;
 import org.apache.graphar.util.GeneralParams;
 
 public class PropertyGroup implements Iterable<Property> {
@@ -49,7 +49,7 @@ public class PropertyGroup implements Iterable<Property> {
         this.prefix = prefix;
     }
 
-    PropertyGroup(PropertyGroupYamlParser yamlParser) {
+    PropertyGroup(PropertyGroupYaml yamlParser) {
         this(
                 yamlParser.getProperties().stream()
                         .map(Property::new)

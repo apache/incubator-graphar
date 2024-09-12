@@ -39,4 +39,5 @@ message VertexInfo {
         int64 num_chunks = 2;
     }
     optional Statistics statistics = 5;
+    string version = 6;
 };

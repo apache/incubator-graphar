@@ -27,7 +27,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.apache.graphar.info.yaml.GraphYamlParser;
+import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.util.GeneralParams;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -70,7 +70,7 @@ public class GraphInfo {
                                         EdgeInfo::getConcat, Function.identity()));
     }
 
-    private GraphInfo(GraphYamlParser graphYaml, Configuration conf) throws IOException {
+    private GraphInfo(GraphYaml graphYaml, Configuration conf) throws IOException {
         this(
                 graphYaml.getName(),
                 vertexFileNames2VertexInfos(graphYaml.getVertices(), conf),
@@ -114,9 +114,8 @@ public class GraphInfo {
         Path path = new Path(graphPath);
         FileSystem fileSystem = path.getFileSystem(conf);
         FSDataInputStream inputStream = fileSystem.open(path);
-        Yaml graphYamlLoader =
-                new Yaml(new Constructor(GraphYamlParser.class, new LoaderOptions()));
-        GraphYamlParser graphYaml = graphYamlLoader.load(inputStream);
+        Yaml graphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
+        GraphYaml graphYaml = graphYamlLoader.load(inputStream);
         return new GraphInfo(graphYaml, conf);
     }
 
@@ -141,8 +140,8 @@ public class GraphInfo {
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYamlParser.getDumperOptions());
-        GraphYamlParser graphYaml = new GraphYamlParser(this);
+        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
+        GraphYaml graphYaml = new GraphYaml(this);
         return yaml.dump(graphYaml);
     }
 

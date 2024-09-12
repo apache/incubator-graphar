@@ -24,13 +24,10 @@ option java_multiple_files = true;
 option java_package = "org.apache.graphar.proto";
 option go_package = "./graphar";
 
-import "vertex_info.proto";
-import "edge_info.proto";
-
 message GraphInfo {
     string name = 1;
-    repeated VertexInfo vertices = 2;
-    repeated EdgeInfo edges = 3;
+    repeated string vertices = 2;
+    repeated string edges = 3;
     string prefix = 4;
 
     // Statistics of the graph, including the number of vertices and edges
@@ -45,4 +42,5 @@ message GraphInfo {
         string value = 2;
     } 
     repeated KeyValue key_value_metadata = 6;
+    string version = 7;
 };

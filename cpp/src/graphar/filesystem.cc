@@ -23,6 +23,9 @@
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
+#if defined(ARROW_VERSION) && ARROW_VERSION <= 12000000
+#include "arrow/dataset/file_json.h"
+#endif
 #include "arrow/filesystem/api.h"
 #include "arrow/filesystem/s3fs.h"
 #include "arrow/ipc/writer.h"
@@ -313,14 +316,24 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
   return std::make_shared<FileSystem>(arrow_fs);
 }
 
+// arrow::fs::InitializeS3 and arrow::fs::FinalizeS3 need arrow_version >= 15
 Status InitializeS3() {
-  RETURN_NOT_ARROW_OK(
-      arrow::fs::InitializeS3(arrow::fs::S3GlobalOptions::Defaults()));
+#if defined(ARROW_VERSION) && ARROW_VERSION > 14000000
+  auto options = arrow::fs::S3GlobalOptions::Defaults();
+#else
+  arrow::fs::S3GlobalOptions options;
+  options.log_level = arrow::fs::S3LogLevel::Fatal;
+#endif
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000
+  RETURN_NOT_ARROW_OK(arrow::fs::InitializeS3(options));
+#endif
   return Status::OK();
 }
 
 Status FinalizeS3() {
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000
   RETURN_NOT_ARROW_OK(arrow::fs::FinalizeS3());
+#endif
   return Status::OK();
 }
 

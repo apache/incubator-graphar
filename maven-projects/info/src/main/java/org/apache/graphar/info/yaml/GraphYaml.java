@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import org.apache.graphar.info.GraphInfo;
 import org.yaml.snakeyaml.DumperOptions;
 
-public class GraphYamlParser {
+public class GraphYaml {
     private String name;
     private String prefix;
     private List<String> vertices;
@@ -41,7 +41,7 @@ public class GraphYamlParser {
         dumperOption.setPrettyFlow(true);
     }
 
-    public GraphYamlParser() {
+    public GraphYaml() {
         this.name = "";
         this.prefix = "";
         this.vertices = new ArrayList<>();
@@ -49,7 +49,7 @@ public class GraphYamlParser {
         this.version = "";
     }
 
-    public GraphYamlParser(GraphInfo graphInfo) {
+    public GraphYaml(GraphInfo graphInfo) {
         this.name = graphInfo.getName();
         this.prefix = graphInfo.getPrefix();
         this.vertices =

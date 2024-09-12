@@ -21,7 +21,7 @@ package org.apache.graphar.info;
 
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.FileType;
-import org.apache.graphar.info.yaml.AdjacentListYamlParser;
+import org.apache.graphar.info.yaml.AdjacentListYaml;
 
 public class AdjacentList {
     private final AdjListType type;
@@ -34,7 +34,7 @@ public class AdjacentList {
         this.prefix = prefix;
     }
 
-    AdjacentList(AdjacentListYamlParser yamlParser) {
+    AdjacentList(AdjacentListYaml yamlParser) {
         this.type =
                 AdjListType.fromOrderedAndAlignedBy(
                         yamlParser.isOrdered(), yamlParser.isAligned_by());
