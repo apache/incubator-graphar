@@ -243,7 +243,7 @@ for details about the PySpark library.
 - Start with [Contributing Guide](https://github.com/apache/incubator-graphar/blob/main/CONTRIBUTING.md).
 - Submit [Issues](https://github.com/apache/incubator-graphar/issues) for bug reports, feature requests.
 - Discuss at [dev mailing list](mailto:dev@graphar.apache.org) ([subscribe](mailto:dev-subscribe@graphar.apache.org?subject=(send%20this%20email%20to%20subscribe)) / [unsubscribe](mailto:dev-unsubscribe@graphar.apache.org?subject=(send%20this%20email%20to%20unsubscribe)) / [archives](https://lists.apache.org/list.html?dev@graphar.apache.org)).
-- Asking questions on [GitHub Discussions](https://github.com/apache/graphar/discussions/new?category=q-a).
+- Asking questions on [GitHub Discussions](https://github.com/apache/incubator-graphar/discussions/new?category=q-a).
 - Join our [Biweekly Community Meeting](https://github.com/apache/incubator-graphar/wiki/GraphAr-Community-Meeting).
 
 ## License

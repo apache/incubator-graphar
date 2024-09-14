@@ -73,7 +73,7 @@ The API document is generated in the directory ``spark/graphar/target/site/scala
 ## Running Neo4j to GraphAr example
 
 Spark provides a simple example to convert Neo4j data to GraphAr data.
-The example is located in the directory ``spark/graphar/src/main/scala/org/apache/graphar/example/``.
+The example is located in the directory ``spark/graphar/src/main/scala/org/apache/incubator-graphar/example/``.
 
 To run the example, download Spark and Neo4j first.
 
@@ -164,7 +164,7 @@ We can write a json configuration file like `import/neo4j.json` to do the import
 Running this example requires `Docker` to be installed, if not, follow [this link](https://docs.docker.com/engine/install/). Run `docker version` to check it.
 
 Spark provides a simple example to convert NebulaGraph data to GraphAr data.
-The example is located in the directory ``spark/graphar/src/main/scala/org/apache/graphar/example/``.
+The example is located in the directory ``spark/graphar/src/main/scala/org/apache/incubator-graphar/example/``.
 
 To run the example, download Spark and NebulaGraph first.
 
@@ -237,7 +237,7 @@ The example will import the basketballplayer graph from GraphAr to NebulaGraph a
 ## Running the local LDBC sample data to GraphAr example
 
 we provide a simple example to convert LDBC sample data to GraphAr data.
-this example is located in the directory ``spark/graphar/src/main/scala/org/apache/graphar/example/``.
+this example is located in the directory ``spark/graphar/src/main/scala/org/apache/incubator-graphar/example/``.
 
 To run the example, first build the project:
 

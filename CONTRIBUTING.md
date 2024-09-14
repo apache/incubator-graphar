@@ -27,8 +27,8 @@ We expect all community members to follow our [Code of Conduct](https://www.apac
 
 ## First Contribution
 
-1. Ensure your change has an issue! Find an [existing issue](https://github.com/apache/graphar/issues) or [open a new issue](https://github.com/apache/graphar/issues/new).
-1. [Fork the GraphAr repository](https://github.com/apache/graphar/fork) in your own GitHub account.
+1. Ensure your change has an issue! Find an [existing issue](https://github.com/apache/incubator-graphar/issues) or [open a new issue](https://github.com/apache/incubator-graphar/issues/new).
+1. [Fork the GraphAr repository](https://github.com/apache/incubator-graphar/fork) in your own GitHub account.
 1. [Create a new Git branch](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-and-deleting-branches-within-your-repository).
 1. Make your changes.
 1. [Submit the branch as a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request-from-a-fork) to the main GraphAr repo. An GraphAr team member should comment and/or review your pull request within a few days. Although, depending on the circumstances, it may take longer.
@@ -54,7 +54,7 @@ $ git checkout -b 42-add-chinese-translations
 ### GitHub Pull Requests
 
 Once your changes are ready you must submit your branch as a [pull request](
-https://github.com/apache/graphar/pulls)
+https://github.com/apache/incubator-graphar/pulls)
 
 #### Title
 
@@ -82,7 +82,7 @@ All pull requests should be reviewed by at least one GraphAr committer.
 All pull requests are squash merged.
 We generally discourage large pull requests that are over 300–500 lines of diff.
 If you would like to propose a change that is larger, we suggest
-coming onto our [Discussions](https://github.com/apache/graphar/discussions) and discussing it with us.
+coming onto our [Discussions](https://github.com/apache/incubator-graphar/discussions) and discussing it with us.
 This way we can talk through the solution and discuss if a change that large is even needed!
 This will produce a quicker response to the change and likely produce code that aligns better with our process.
 

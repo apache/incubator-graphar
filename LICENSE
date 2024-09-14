@@ -214,26 +214,26 @@ The text of each license is the standard Apache 2.0 license.
 
 * Apache Spark 3.1.1 and 3.3.4 (https://github.com/apache/spark)
     Files:
-      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarCommitProtocol.scala
-      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarDataSource.scala
-      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScan.scala
-      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScanBuilder.scala
-      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarScanTable.scala
-      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/GarWriteBuilder.scala
-      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/csv/CSVWriterBuilder.scala
-      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/orc/ORCOutputWriter.scala
-      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/graphar/datasources/orc/ORCWriteBuilder.scala
-      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/parquet/ParquetWriteBuilder.scala
-      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarCommitProtocol.scala
-      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarDataSource.scala
-      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScan.scala
-      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScanBuilder.scala
-      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarScanTable.scala
-      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/GarWriteBuilder.scala
-      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/csv/CSVWriterBuilder.scala
-      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/orc/ORCOutputWriter.scala
-      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/orc/ORCWriteBuilder.scala
-      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/graphar/datasources/parquet/ParquetWriteBuilder.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/incubator-graphar/datasources/GarCommitProtocol.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/incubator-graphar/datasources/GarDataSource.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/incubator-graphar/datasources/GarScan.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/incubator-graphar/datasources/GarScanBuilder.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/incubator-graphar/datasources/GarScanTable.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/incubator-graphar/datasources/GarWriteBuilder.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/incubator-graphar/datasources/csv/CSVWriterBuilder.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/incubator-graphar/datasources/orc/ORCOutputWriter.scala
+      maven-projects/spark/datasourcs-32/src/main/scala/org/apache/incubator-graphar/datasources/orc/ORCWriteBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/incubator-graphar/datasources/parquet/ParquetWriteBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/incubator-graphar/datasources/GarCommitProtocol.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/incubator-graphar/datasources/GarDataSource.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/incubator-graphar/datasources/GarScan.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/incubator-graphar/datasources/GarScanBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/incubator-graphar/datasources/GarScanTable.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/incubator-graphar/datasources/GarWriteBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/incubator-graphar/datasources/csv/CSVWriterBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/incubator-graphar/datasources/orc/ORCOutputWriter.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/incubator-graphar/datasources/orc/ORCWriteBuilder.scala
+      maven-projects/spark/datasourcs-33/src/main/scala/org/apache/incubator-graphar/datasources/parquet/ParquetWriteBuilder.scala
     are modified from Apache Spark.
 
 * Apache Arrow 12.0.0 (https://github.com/apache/arrow)
@@ -243,16 +243,16 @@ The text of each license is the standard Apache 2.0 license.
 
 * fastFFI v0.1.2 (https://github.com/alibaba/fastFFI)
     Files:
-      maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdString.java
+      maven-projects/java/src/main/java/org/apache/incubator-graphar/stdcxx/StdString.java
       maven-projects/java/build.xml
     are modified from fastFFI.
 
 * GraphScope v0.25.0 (https://github.com/alibaba/GraphScope)
     Files:
-      maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdVector.java
-      maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdMap.java
-      maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdSharedPtr.java
-      maven-projects/java/src/main/java/org/apache/graphar/stdcxx/StdUnorderedMap.java
+      maven-projects/java/src/main/java/org/apache/incubator-graphar/stdcxx/StdVector.java
+      maven-projects/java/src/main/java/org/apache/incubator-graphar/stdcxx/StdMap.java
+      maven-projects/java/src/main/java/org/apache/incubator-graphar/stdcxx/StdSharedPtr.java
+      maven-projects/java/src/main/java/org/apache/incubator-graphar/stdcxx/StdUnorderedMap.java
     are modified from GraphScope.
 
 * Apache OpenDAL v0.45.1 (https://github.com/apache/opendal)
