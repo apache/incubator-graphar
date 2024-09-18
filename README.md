@@ -5,12 +5,10 @@
     An open source, standard data file format for graph data storage and retrieval
 </p>
 
-This project is a research initiative by GraphAr (short for "Graph Archive") aimed at providing an efficient storage scheme for graph data in data lakes. It is designed to enhance the efficiency of data lakes utilizing the capabilities of existing formats, with a specific focus on [Apache Parquet](https://github.com/apache/parquet-format). GraphAr ensures seamless integration with existing tools and introduces innovative additions specifically tailored to handle LPGs (Labeled Property Graphs).
-Leveraging the strengths of Parquet, GraphAr captures LPG semantics precisely and facilitates graph-specific operations such as neighbor retrieval and label filtering. Through innovative data organization, encoding, and decoding techniques, GraphAr dramatically improves performance. 
+This project is a research initiative by GraphAr (short for "Graph Archive") aimed at providing an efficient storage scheme for graph data in data lakes. It is designed to enhance the efficiency of data lakes utilizing the capabilities of existing formats, with a specific focus on [Apache Parquet](https://github.com/apache/parquet-format). GraphAr ensures seamless integration with existing tools and introduces innovative additions specifically tailored to handle LPGs (Labeled Property Graphs). 
 
-## The GraphAr Format
-
-See [GraphAr Format](https://github.com/apache/incubator-graphar/blob/research/GRAPHAR.md) for more details about the GraphAr format.
+Leveraging the strengths of Parquet, GraphAr captures LPG semantics precisely and facilitates graph-specific operations such as neighbor retrieval and label filtering.
+See [GraphAr Format](https://github.com/apache/incubator-graphar/blob/research/GRAPHAR.md) for more details about the GraphAr format. And refer to the [Research Paper](https://arxiv.org/abs/2312.09577) for the detailed design and implementation of our encoding/decoding techniques.
 
 
 ## Dependencies
@@ -45,16 +43,14 @@ See [GraphAr Format](https://github.com/apache/incubator-graphar/blob/research/G
 
 ## Preparing Graph Datasets
 
-Before running the benchmarking experiments, you need to prepare the graph datasets. You could download public graph datasets, or generate synthetic graph datasets using our data generator.
+Before running the benchmarking experiments, you need to prepare the graph datasets. You could download from public graph datasets, or generate synthetic graph datasets using our data generator.
 
 ### Topology Graphs
 
-#### Step 1
 Suppose we want to use the facebook dataset. First, download the dataset from the [SNAP](https://snap.stanford.edu/data/egonets-Facebook.html) website and extract the dataset.
-As an example, we have included the facebook dataset in the `dataset' directory.
+As an example, we have included the facebook dataset in the `dataset` directory.
 
-#### Step 2
-Convert the dataset into the Parquet format using the following command:
+Then, convert the dataset into the Parquet format:
 
 ```bash
     $ ./release/Csv2Parquet {input_path} {output_path} {ignore_line_num}
@@ -65,13 +61,13 @@ Or, you could use the following command to convert the dataset into the GraphAr 
     $ ./release/data-generator {input_path} {output_path} {vertex_num} {is_directed} {is_weighted} {is_sorted} {is_reverse} {delimiter} {ignore_line_num}
 ```
 
-For example, 
+For example, running the command:
 
 ```bash
     $ ./release/data-generator {path_to_graphar}/dataset/facebook/facebook.txt {path_to_graphar}/dataset/facebook/facebook 4039 false false true false space 0
 ```
 
-The above command will convert the facebook dataset into the Parquet and GraphAr format and store the output in the `dataset` directory.
+The above commands will convert the facebook dataset into the Parquet and GraphAr format and store the output in the `dataset` directory.
 
 
 ### Labeled Graphs
