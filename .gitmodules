@@ -5,6 +5,6 @@
 	path = cpp/thirdparty/Catch2
 	url = https://github.com/catchorg/Catch2.git
 [submodule "research"]
-	path = research
+	path = encoding
 	url = https://github.com/acezen/arrow.git
 	branch = encoding-graphar
