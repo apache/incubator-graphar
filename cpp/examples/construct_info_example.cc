@@ -43,7 +43,7 @@ int main(int argc, char* argv[]) {
       graphar::CreatePropertyGroup(property_vector_2, graphar::FileType::ORC);
 
   // create vertex info
-  auto vertex_info = graphar::CreateVertexInfo(type, chunk_size, {group1},
+  auto vertex_info = graphar::CreateVertexInfo(type, chunk_size, {group1}, {},
                                                vertex_prefix, version);
 
   ASSERT(vertex_info != nullptr);
@@ -150,7 +150,7 @@ int main(int argc, char* argv[]) {
 
   // create graph info
   auto graph_info = graphar::CreateGraphInfo(name, {vertex_info}, {edge_info},
-                                             prefix, version);
+                                             {}, prefix, version);
   ASSERT(graph_info->GetName() == name);
   ASSERT(graph_info->GetPrefix() == prefix);
   ASSERT(graph_info->GetVertexInfos().size() == 1);

@@ -18,6 +18,10 @@
  */
 
 #include "graphar/high-level/graph_reader.h"
+#include "../label.h"
+#include "arrow/array.h"
+#include "graph_reader.h"
+#include "graphar/api/arrow_reader.h"
 #include "graphar/convert_to_arrow_type.h"
 #include "graphar/types.h"
 
@@ -93,6 +97,284 @@ Vertex::Vertex(IdType id,
     }
   }
 }
+
+Result<bool> VertexIter::label(const std::string& label) noexcept {
+  std::shared_ptr<arrow::ChunkedArray> column(nullptr);
+  label_reader_.seek(cur_offset_);
+  GAR_ASSIGN_OR_RAISE(auto chunk_table, label_reader_.GetLabelChunk());
+  column = util::GetArrowColumnByName(chunk_table, label);
+  if (column != nullptr) {
+    auto array = util::GetArrowArrayByChunkIndex(column, 0);
+    auto bool_array = std::dynamic_pointer_cast<arrow::BooleanArray>(array);
+    return bool_array->Value(0);
+  }
+  return Status::KeyError("label with name ", label,
+                          " does not exist in the vertex.");
+}
+
+Result<std::vector<std::string>> VertexIter::label() noexcept {
+  std::shared_ptr<arrow::ChunkedArray> column(nullptr);
+  std::vector<std::string> vertex_label;
+  if (is_filtered_)
+    label_reader_.seek(filtered_ids_[cur_offset_]);
+  else
+    label_reader_.seek(cur_offset_);
+  GAR_ASSIGN_OR_RAISE(auto chunk_table, label_reader_.GetLabelChunk());
+  for (auto label : labels_) {
+    column = util::GetArrowColumnByName(chunk_table, label);
+    if (column != nullptr) {
+      auto array = util::GetArrowArrayByChunkIndex(column, 0);
+      auto bool_array = std::dynamic_pointer_cast<arrow::BooleanArray>(array);
+      if (bool_array->Value(0)) {
+        vertex_label.push_back(label);
+      }
+    }
+  }
+  return vertex_label;
+}
+
+static inline bool IsValid(bool* state, int column_number) {
+  for (int i = 0; i < column_number; ++i) {
+    // AND case
+    if (!state[i])
+      return false;
+    // OR case
+    // if (state[i]) return true;
+  }
+  // AND case
+  return true;
+  // OR case
+  // return false;
+}
+
+Result<std::vector<IdType>> VerticesCollection::filter(
+    std::vector<std::string> filter_labels) const {
+  std::vector<int> indices;
+  const int TOT_ROWS_NUM = vertex_num_;
+  const int CHUNK_SIZE = vertex_info_->GetChunkSize();
+  const int TOT_LABEL_NUM = labels_.size();
+  const int TESTED_LABEL_NUM = filter_labels.size();
+  std::vector<int> tested_label_ids;
+
+  for (const auto& filter_label : filter_labels) {
+    auto it = std::find(labels_.begin(), labels_.end(), filter_label);
+    if (it != labels_.end()) {
+      tested_label_ids.push_back(std::distance(labels_.begin(), it));
+    }
+  }
+
+  uint64_t* bitmap = new uint64_t[TOT_ROWS_NUM / 64 + 1];
+  memset(bitmap, 0, sizeof(uint64_t) * (TOT_ROWS_NUM / 64 + 1));
+  int total_count = 0;
+  int row_num;
+  for (int chunk_idx = 0; chunk_idx * CHUNK_SIZE < TOT_ROWS_NUM; ++chunk_idx) {
+    row_num = std::min(CHUNK_SIZE, TOT_ROWS_NUM - chunk_idx * CHUNK_SIZE);
+    std::string new_filename =
+        prefix_ + vertex_info_->GetPrefix() + "labels/chunk";
+    int count = read_parquet_file_and_get_valid_indices(
+        new_filename.c_str(), row_num, TOT_LABEL_NUM, TESTED_LABEL_NUM,
+        tested_label_ids, IsValid, chunk_idx, CHUNK_SIZE, &indices, bitmap,
+        QUERY_TYPE::INDEX);
+    total_count += count;
+  }
+  // std::cout << "Total valid count: " << total_count << std::endl;
+  std::vector<int64_t> indices64;
+
+  for (int value : indices) {
+    indices64.push_back(static_cast<int64_t>(value));
+  }
+
+  return indices64;
+}
+
+Result<std::vector<IdType>> VerticesCollection::filter_by_acero(
+    std::vector<std::string> filter_labels) const {
+  std::vector<int> indices;
+  const int TOT_ROWS_NUM = vertex_num_;
+  const int CHUNK_SIZE = vertex_info_->GetChunkSize();
+  const int TOT_LABEL_NUM = labels_.size();
+  const int TESTED_LABEL_NUM = filter_labels.size();
+  std::vector<int> tested_label_ids;
+  for (const auto& filter_label : filter_labels) {
+    auto it = std::find(labels_.begin(), labels_.end(), filter_label);
+    if (it != labels_.end()) {
+      tested_label_ids.push_back(std::distance(labels_.begin(), it));
+    }
+  }
+  int total_count = 0;
+  int row_num;
+  std::vector<std::shared_ptr<Expression>> filters;
+  std::shared_ptr<Expression> combined_filter = nullptr;
+
+  for (const auto& label : filter_labels) {
+    filters.emplace_back(
+        graphar::_Equal(graphar::_Property(label), graphar::_Literal(true)));
+  }
+
+  for (const auto& filter : filters) {
+    if (!combined_filter) {
+      combined_filter = graphar::_And(filter, filter);
+    } else {
+      combined_filter = graphar::_And(combined_filter, filter);
+    }
+  }
+
+  std::string new_filename =
+      prefix_ + vertex_info_->GetPrefix() + "labels/chunk";
+  auto maybe_filter_reader = graphar::VertexPropertyArrowChunkReader::Make(
+      vertex_info_, labels_, prefix_, {});
+  auto filter_reader = maybe_filter_reader.value();
+  for (int chunk_idx = 0; chunk_idx * CHUNK_SIZE < TOT_ROWS_NUM; ++chunk_idx) {
+    filter_reader->Filter(combined_filter);
+    auto filter_result = filter_reader->GetLabelChunk();
+    auto filter_table = filter_result.value();
+    total_count += filter_table->num_rows();
+    filter_reader->next_chunk();
+  }
+  // std::cout << "Total valid count: " << total_count << std::endl;
+  std::vector<int64_t> indices64;
+
+  for (int value : indices) {
+    indices64.push_back(static_cast<int64_t>(value));
+  }
+
+  return indices64;
+}
+
+Result<std::shared_ptr<VerticesCollection>>
+VerticesCollection::verticesWithLabel(
+    const std::string& filter_label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type) {
+  auto prefix = graph_info->GetPrefix();
+  auto vertex_info = graph_info->GetVertexInfo(type);
+  auto labels = vertex_info->GetLabels();
+  auto vertices_collection =
+      std::make_shared<VerticesCollection>(vertex_info, prefix);
+  vertices_collection->filtered_ids_ =
+      vertices_collection->filter({filter_label}).value();
+  vertices_collection->is_filtered_ = true;
+  return vertices_collection;
+}
+
+Result<std::shared_ptr<VerticesCollection>>
+VerticesCollection::verticesWithLabelbyAcero(
+    const std::string& filter_label,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type) {
+  auto prefix = graph_info->GetPrefix();
+  auto vertex_info = graph_info->GetVertexInfo(type);
+  auto labels = vertex_info->GetLabels();
+  auto vertices_collection =
+      std::make_shared<VerticesCollection>(vertex_info, prefix);
+  vertices_collection->filtered_ids_ =
+      vertices_collection->filter_by_acero({filter_label}).value();
+  vertices_collection->is_filtered_ = true;
+  return vertices_collection;
+}
+
+Result<std::shared_ptr<VerticesCollection>>
+VerticesCollection::verticesWithLabel(
+    const std::string& filter_label,
+    const std::shared_ptr<VerticesCollection>& vertices_collection) {
+  auto filtered_ids = vertices_collection->filter({filter_label}).value();
+  if (vertices_collection->is_filtered_) {
+    std::unordered_set<IdType> origin_set(
+        vertices_collection->filtered_ids_.begin(),
+        vertices_collection->filtered_ids_.end());
+    std::unordered_set<int> intersection;
+    for (int num : filtered_ids) {
+      if (origin_set.count(num)) {
+        intersection.insert(num);
+      }
+    }
+    filtered_ids =
+        std::vector<IdType>(intersection.begin(), intersection.end());
+  }
+  return std::make_shared<VerticesCollection>(vertices_collection->vertex_info_,
+                                              vertices_collection->prefix_,
+                                              true, filtered_ids);
+}
+
+Result<std::shared_ptr<VerticesCollection>>
+VerticesCollection::verticesWithMultipleLabels(
+    const std::vector<std::string>& filter_labels,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type) {
+  auto prefix = graph_info->GetPrefix();
+  auto vertex_info = graph_info->GetVertexInfo(type);
+  auto labels = vertex_info->GetLabels();
+  auto vertices_collection =
+      std::make_shared<VerticesCollection>(vertex_info, prefix);
+  vertices_collection->filtered_ids_ =
+      vertices_collection->filter(filter_labels).value();
+  vertices_collection->is_filtered_ = true;
+  return vertices_collection;
+}
+
+Result<std::shared_ptr<VerticesCollection>>
+VerticesCollection::verticesWithMultipleLabelsbyAcero(
+    const std::vector<std::string>& filter_labels,
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type) {
+  auto prefix = graph_info->GetPrefix();
+  auto vertex_info = graph_info->GetVertexInfo(type);
+  auto labels = vertex_info->GetLabels();
+  auto vertices_collection =
+      std::make_shared<VerticesCollection>(vertex_info, prefix);
+  vertices_collection->filtered_ids_ =
+      vertices_collection->filter_by_acero(filter_labels).value();
+  vertices_collection->is_filtered_ = true;
+  return vertices_collection;
+}
+
+Result<std::shared_ptr<VerticesCollection>>
+VerticesCollection::verticesWithMultipleLabels(
+    const std::vector<std::string>& filter_labels,
+    const std::shared_ptr<VerticesCollection>& vertices_collection) {
+  auto filtered_ids = vertices_collection->filter(filter_labels).value();
+  if (vertices_collection->is_filtered_) {
+    std::unordered_set<IdType> origin_set(
+        vertices_collection->filtered_ids_.begin(),
+        vertices_collection->filtered_ids_.end());
+    std::unordered_set<int> intersection;
+    for (int num : filtered_ids) {
+      if (origin_set.count(num)) {
+        intersection.insert(num);
+      }
+    }
+    filtered_ids =
+        std::vector<IdType>(intersection.begin(), intersection.end());
+  }
+  return std::make_shared<VerticesCollection>(vertices_collection->vertex_info_,
+                                              vertices_collection->prefix_,
+                                              true, filtered_ids);
+}
+
+// Result<std::shared_ptr<VerticesCollection>>
+// VerticesCollection::verticesWithLabelAndProperty(
+//     const std::string& filter_label,
+//     const std::vector<std::shared_ptr<Property>>& filter_properties,
+//     const std::vector<std::string>& filter_properties_val,
+//     const std::shared_ptr<GraphInfo>& graph_info,
+//     const std::string& type) {
+//       auto prefix = graph_info->GetPrefix();
+//       auto vertex_info = graph_info->GetVertexInfo(type);
+//       auto labels = vertex_info->GetLabels();
+//       auto vertices_collection =
+//       std::make_shared<VerticesCollection>(vertex_info, prefix); auto
+//       filtered_ids = vertices_collection->filter({filter_label});
+//       std::vector<IdType> new_filtered_ids;
+//       for (auto it = vertices_collection->begin(); it !=
+//       vertices_collection->end(); ++it) {
+//         for(auto pg : filter_properties) {
+//           if(it.property<>(pg->name) != filter_properties_val) {
+//             continue;
+//           }
+//         }
+//         new_filtered_ids.push_back(it.id());
+//       }
+
+//       return std::make_shared<VerticesCollection>(vertex_info, prefix,true,
+//       filtered_ids.value());
+
+// }
 
 template <typename T>
 Result<T> Vertex::property(const std::string& property) const {

@@ -32,11 +32,11 @@ storage of the vertex information file.
 auto version = graphar::InfoVersion::Parse("gar/v1").value();
 
 // meta info
-std::string vertex_label = "node", vertex_prefix = "vertex/node/";
+std::string vertex_type = "node", vertex_prefix = "vertex/node/";
 
 // create vertex info
 auto vertex_info = graphar::CreateVertexInfo(
-    vertex_label, VERTEX_CHUNK_SIZE, {}, vertex_prefix, version);
+    vertex_type, VERTEX_CHUNK_SIZE, {}, vertex_prefix, version);
 
 // save & dump vertex info
 ASSERT(!vertex_info->Dump().has_error());
