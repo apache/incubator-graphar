@@ -62,18 +62,6 @@ public class GraphYaml {
                         .collect(Collectors.toList());
     }
 
-    //    public GraphInfo toGraphInfo(GraphLoader graphLoader) throws IOException {
-    //        List<VertexInfo> vertexInfos = new ArrayList<>(vertices.size());
-    //        for (String vertex : vertices) {
-    //            vertexInfos.add(graphLoader.loadVertex(vertex));
-    //        }
-    //        List<EdgeInfo> edgeInfos = new ArrayList<>(edges.size());
-    //        for (String edge : edges) {
-    //            edgeInfos.add(graphLoader.loadEdge(edge));
-    //        }
-    //        return new GraphInfo(name, vertexInfos, edgeInfos, prefix);
-    //    }
-    //
     public static DumperOptions getDumperOptions() {
         return dumperOption;
     }
