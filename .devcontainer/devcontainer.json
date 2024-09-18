@@ -22,7 +22,7 @@
 {
 	"name": "GraphAr",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "ghcr.io/apache/incubator-graphar-dev:latest",
+	"image": "ghcr.io/apache/graphar-dev:latest",
 	// Or use image on DockerHub registry:
 	// "image": "graphar/graphar-dev:latest",
 

@@ -203,8 +203,8 @@ See [GraphAr2Neo4j.scala][graphar2neo4j] for the complete example.
 
 :::
 
-[test-graph-transformer]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/incubator-graphar/TestGraphTransformer.scala
-[transformer-example]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/incubator-graphar/TransformExample.scala
-[compute-example]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/incubator-graphar/ComputeExample.scala
-[neo4j2graphar]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/main/scala/org/apache/incubator-graphar/example/Neo4j2GraphAr.scala
-[graphar2neo4j]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/main/scala/org/apache/incubator-graphar/example/GraphAr2Neo4j.scala
+[test-graph-transformer]: https://github.com/apache/graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TestGraphTransformer.scala
+[transformer-example]: https://github.com/apache/graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TransformExample.scala
+[compute-example]: https://github.com/apache/graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/ComputeExample.scala
+[neo4j2graphar]: https://github.com/apache/graphar/blob/main/maven-projects/spark/graphar/src/main/scala/org/apache/graphar/example/Neo4j2GraphAr.scala
+[graphar2neo4j]: https://github.com/apache/graphar/blob/main/maven-projects/spark/graphar/src/main/scala/org/apache/graphar/example/GraphAr2Neo4j.scala
