@@ -121,9 +121,9 @@ Other datasets could be used in the same way, with the corresponding parameters 
 
 ### Label Filtering
 
-To running the label filtering benchmarking component, please adjust the parameters according to the dataset (refer to `script/label_filtering.md` for reference), at the beginning of the [[TODO]simple condition test]() and [[TODO]complex condition test]().
+To running the label filtering benchmarking component, please adjust the parameters according to the dataset (refer to `script/label_filtering.md`) for [simple condition test](encoding/cpp/examples/parquet/graphar/test-all.cc) and [complex condition test](encoding/cpp/examples/parquet/graphar/test.cc).
 
-Then, you could use the following command:
+Then, you could run the test using the following command:
 
 ```bash
     $ ./release/parquet-graphar-label-all-example < {graph_path} # simple-condition filtering
