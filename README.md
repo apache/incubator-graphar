@@ -94,12 +94,18 @@ To enable the label filtering benchmarking component, original label data must b
 
 
 ### Graphs from the LDBC Benchmark
-Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool. As an illustration, you could use the following command to convert a LDBC dataset into the Parquet and GraphAr format:
+
+Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool. 
+Once the dataset is generated, you could convert the dataset into the Parquet and GraphAr format using the `Csv2Parquet` or `data-generator` tool, with the workflow similar to that described above.
+
+The following command would generate the Parquet file for post_hasTag_tag edges of SF30 dataset:
 
 ```bash
-    $ [TODO]
+    $ ./release/Csv2Parquet /root/dataset/sf30/social_network/dynamic/post_hasTag_tag_0_0.csv /root/dataset/sf30/social_network/parquet/bi/post_hasTag_tag_0_0 0
+    $ [TODO]: Generate the GraphAr file
 ```
 
+Refer to `script/generate_ldbc.sh` for more details on the LDBC dataset preparation.
 
 ## Running Benchmarking Components
 
