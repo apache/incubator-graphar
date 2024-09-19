@@ -148,7 +148,7 @@ static inline bool IsValid(bool* state, int column_number) {
 }
 
 Result<std::vector<IdType>> VerticesCollection::filter(
-    std::vector<std::string> filter_labels) const {
+    std::vector<std::string> filter_labels, std::vector<IdType>* new_valid_chunk) {
   std::vector<int> indices;
   const int TOT_ROWS_NUM = vertex_num_;
   const int CHUNK_SIZE = vertex_info_->GetChunkSize();
@@ -162,12 +162,26 @@ Result<std::vector<IdType>> VerticesCollection::filter(
       tested_label_ids.push_back(std::distance(labels_.begin(), it));
     }
   }
+  if(tested_label_ids.empty()) return  Status::KeyError("query label"
+                          " does not exist in the vertex.");
 
   uint64_t* bitmap = new uint64_t[TOT_ROWS_NUM / 64 + 1];
   memset(bitmap, 0, sizeof(uint64_t) * (TOT_ROWS_NUM / 64 + 1));
   int total_count = 0;
   int row_num;
-  for (int chunk_idx = 0; chunk_idx * CHUNK_SIZE < TOT_ROWS_NUM; ++chunk_idx) {
+
+  if(is_filtered_) {
+    for (int chunk_idx : valid_chunk_) {
+    row_num = std::min(CHUNK_SIZE, TOT_ROWS_NUM - chunk_idx * CHUNK_SIZE);
+      std::string new_filename =
+          prefix_ + vertex_info_->GetPrefix() + "labels/chunk";
+      int count = read_parquet_file_and_get_valid_indices(
+          new_filename.c_str(), row_num, TOT_LABEL_NUM, TESTED_LABEL_NUM,
+          tested_label_ids, IsValid, chunk_idx, CHUNK_SIZE, &indices, bitmap,
+          QUERY_TYPE::INDEX);
+      if(count != 0 && new_valid_chunk!= nullptr) new_valid_chunk->emplace_back(static_cast<IdType>(chunk_idx));
+  }} else {
+     for (int chunk_idx = 0; chunk_idx * CHUNK_SIZE < TOT_ROWS_NUM; ++chunk_idx) {
     row_num = std::min(CHUNK_SIZE, TOT_ROWS_NUM - chunk_idx * CHUNK_SIZE);
     std::string new_filename =
         prefix_ + vertex_info_->GetPrefix() + "labels/chunk";
@@ -175,7 +189,9 @@ Result<std::vector<IdType>> VerticesCollection::filter(
         new_filename.c_str(), row_num, TOT_LABEL_NUM, TESTED_LABEL_NUM,
         tested_label_ids, IsValid, chunk_idx, CHUNK_SIZE, &indices, bitmap,
         QUERY_TYPE::INDEX);
-    total_count += count;
+    if(count != 0) valid_chunk_.emplace_back(static_cast<IdType>(chunk_idx));
+    
+  }
   }
   // std::cout << "Total valid count: " << total_count << std::endl;
   std::vector<int64_t> indices64;
@@ -185,6 +201,7 @@ Result<std::vector<IdType>> VerticesCollection::filter(
   }
 
   return indices64;
+  
 }
 
 Result<std::vector<IdType>> VerticesCollection::filter_by_acero(
@@ -275,7 +292,9 @@ Result<std::shared_ptr<VerticesCollection>>
 VerticesCollection::verticesWithLabel(
     const std::string& filter_label,
     const std::shared_ptr<VerticesCollection>& vertices_collection) {
-  auto filtered_ids = vertices_collection->filter({filter_label}).value();
+  auto new_vertices_collection = std::make_shared<VerticesCollection>(vertices_collection->vertex_info_,
+                                              vertices_collection->prefix_);
+  auto filtered_ids = new_vertices_collection->filter({filter_label}, &new_vertices_collection->valid_chunk_).value();
   if (vertices_collection->is_filtered_) {
     std::unordered_set<IdType> origin_set(
         vertices_collection->filtered_ids_.begin(),
@@ -288,10 +307,12 @@ VerticesCollection::verticesWithLabel(
     }
     filtered_ids =
         std::vector<IdType>(intersection.begin(), intersection.end());
+   
+    new_vertices_collection->is_filtered_ = true;
   }
-  return std::make_shared<VerticesCollection>(vertices_collection->vertex_info_,
-                                              vertices_collection->prefix_,
-                                              true, filtered_ids);
+   new_vertices_collection->filtered_ids_ = filtered_ids;
+  
+  return new_vertices_collection;
 }
 
 Result<std::shared_ptr<VerticesCollection>>
@@ -328,7 +349,10 @@ Result<std::shared_ptr<VerticesCollection>>
 VerticesCollection::verticesWithMultipleLabels(
     const std::vector<std::string>& filter_labels,
     const std::shared_ptr<VerticesCollection>& vertices_collection) {
-  auto filtered_ids = vertices_collection->filter(filter_labels).value();
+      
+  auto new_vertices_collection = std::make_shared<VerticesCollection>(vertices_collection->vertex_info_,
+                                              vertices_collection->prefix_);
+  auto filtered_ids = vertices_collection->filter(filter_labels, &new_vertices_collection->valid_chunk_).value();
   if (vertices_collection->is_filtered_) {
     std::unordered_set<IdType> origin_set(
         vertices_collection->filtered_ids_.begin(),
@@ -341,10 +365,12 @@ VerticesCollection::verticesWithMultipleLabels(
     }
     filtered_ids =
         std::vector<IdType>(intersection.begin(), intersection.end());
+   
+    new_vertices_collection->is_filtered_ = true;
   }
-  return std::make_shared<VerticesCollection>(vertices_collection->vertex_info_,
-                                              vertices_collection->prefix_,
-                                              true, filtered_ids);
+   new_vertices_collection->filtered_ids_ = filtered_ids;
+  
+  return new_vertices_collection;
 }
 
 // Result<std::shared_ptr<VerticesCollection>>
