@@ -94,7 +94,7 @@ To enable the label filtering benchmarking component, original label data must b
 
 
 ### Graphs from LDBC Benchmark
-Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool. As an illustration, we have included a `SF1` dataset (scale factor 1) in the `dataset` directory. You could use the following command to convert the LDBC dataset into the Parquet and GraphAr format:
+Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool. As an illustration, you could use the following command to convert a LDBC dataset into the Parquet and GraphAr format:
 
 ```bash
     $ [TODO]
@@ -139,10 +139,10 @@ For example,
 
 ### LDBC Workload
 
-Once the LDBC dataset is converted into the Parquet and GraphAr format, you could run the LDBC workload using the command like below:
+Once the LDBC dataset is converted into the Parquet and GraphAr format, you could run the LDBC workload IS-3 using the command on SF30 like below:
 
 ```bash
-    $ [TODO]
+    $ ./release/run-work-load {path_to_dataset}/sf-30/person_knows_person {path_to_dataset}/sf-30/person_knows_person-vertex-base 165430 70220 delta
 ```
 Please refer to the `script/run-is3.sh`, `script/run-ic8.sh`, and `script/run-bi2.sh` for complete end-to-end LDBC workload execution.
 
