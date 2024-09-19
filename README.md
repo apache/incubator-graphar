@@ -44,9 +44,9 @@ See [GraphAr Format](https://github.com/apache/incubator-graphar/blob/research/G
 
 Before running the benchmarking components, you need to prepare the graph datasets. You could download from public graph datasets, or generate synthetic graph datasets using our data generator.
 
-### Preparing Topology Data
+### Preparing Topology Graphs
 
-#### Transforming Public Topology Graphs into GraphAr Format
+#### Transforming Public Graphs
 
 Suppose we want to use the facebook dataset. First, download the dataset from the [SNAP](https://snap.stanford.edu/data/egonets-Facebook.html) website and extract the dataset.
 As an example, we have already included this facebook dataset in the `dataset` directory.
@@ -71,9 +71,9 @@ For example, running the command for the facebook dataset:
 
 The above commands will convert the facebook dataset into the Parquet and GraphAr format and store the output in the `dataset/facebook` directory.
 
-#### Generating Synthetic Topology Graphs
+#### Generating Synthetic Graphs
 
-We also provide a data generator to generate synthetic graph datasets. The data generator is located in the `data-generator` directory. You could use the following command to generate a synthetic graph dataset:
+We also provide a data generator to generate synthetic graph datasets. The data generator is located in the `synthetic` directory. You could use the following command to generate a synthetic graph dataset:
 
 ```bash
     $ [TODO]
@@ -81,14 +81,17 @@ We also provide a data generator to generate synthetic graph datasets. The data 
 
 It will generate a synthetic graph dataset with the specified number of vertices, in the CSV format. Afterward, you could convert this CSV file into the Parquet or GraphAr format using the `Csv2Parquet` or `data-generator` tool, as described above.
 
-### Preparing Label Data
+### Preparing Labeled Graphs
 
 ### Graphs from Neo4j and OGBN
 [TODO]
 
 ### Graphs from LDBC Benchmark
-[TODO]
+Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool. As an illustration, we have included a `SF1` dataset (scale factor 1) in the `dataset` directory. You could use the following command to convert the LDBC dataset into the Parquet and GraphAr format:
 
+```bash
+    $ ./release/data-generator {path_to_graphar}/dataset/ldbc/SF1 {path_to_graphar}/dataset/ldbc/SF1 1000000 false false true false space 0
+```
 
 
 ## Running Benchmarking Components
@@ -107,13 +110,17 @@ For example,
     $ ../script/run_neighbor_retrieval.sh {path_to_graphar}/dataset/facebook/facebook 4039 1642
 ```
 
-Other datasets could be used in the same way, with the corresponding parameters specified as needed. We also provide a script in `[TODO]` for reference.
+Other datasets could be used in the same way, with the corresponding parameters specified as needed. We also provide a script in `script/run_neighbor_retrieval_all.sh` for reference.
 
 ### Label Filtering
 
 [TODO]
 
 ### LDBC Workload
+
+[TODO]
+
+### Integration with GraphScope
 
 [TODO]
 
