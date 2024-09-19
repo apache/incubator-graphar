@@ -88,8 +88,10 @@ It will generate a synthetic graph dataset with the specified number of vertices
 
 ### Preparing Labeled Graphs
 
-### Graphs from Neo4j and OGBN
-[TODO]
+### Generating Label Data
+
+To enable the label filtering benchmarking component, original label data must be extracted from graphs obtained from various sources. We use the CSV file to store the label data, where each row represents a vertex and each column represents a label, i.e., in the form of a binary matrix. For example, the `dataset/bloom` directory contains the label data for the [bloom](https://github.com/neo4j-graph-examples/bloom/tree/main) dataset. This dataset includes 32,960 vertices and 18 labels.
+
 
 ### Graphs from LDBC Benchmark
 Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool. As an illustration, we have included a `SF1` dataset (scale factor 1) in the `dataset` directory. You could use the following command to convert the LDBC dataset into the Parquet and GraphAr format:
@@ -119,7 +121,21 @@ Other datasets could be used in the same way, with the corresponding parameters 
 
 ### Label Filtering
 
-[TODO]
+To running the label filtering benchmarking component, please adjust the parameters according to the dataset (refer to `script/label_filtering.md` for reference), at the beginning of the [TODO: test-all.cc]() and [test.cc]().
+
+Then, you could use the following command:
+
+```bash
+    $ ./release/parquet-graphar-label-all-example < {graph_path} # simple-condition filtering
+    $ ./release/parquet-graphar-label-example < {graph_path}     # complex-condition filtering
+```
+
+For example, 
+
+```bash
+    $ ./release/parquet-graphar-label-all-example < {path_to_graphar}/dataset/bloom/bloom-43-nodes.csv
+    $ ./release/parquet-graphar-label-example < {path_to_graphar}/dataset/bloom/bloom-43-nodes.csv
+```
 
 ### LDBC Workload
 
