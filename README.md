@@ -16,10 +16,9 @@ See [GraphAr Format](https://github.com/apache/incubator-graphar/blob/research/G
 **GraphAr** is developed and tested on Ubuntu 20.04.5 LTS. It should also work on other unix-like distributions. Building GraphAr requires the following softwares installed as dependencies:
 
 - A C++17-enabled compiler. On Linux, gcc 7.1 and higher should be sufficient. For MacOS, at least clang 5 is required
-- CMake 3.5 or higher
+- CMake 3.16 or higher
 - On Linux and macOS, ``make`` build utilities
 - curl-devel with SSL (Linux) or curl (macOS), for s3 filesystem support
-- Apache Arrow C++ (>= 12.0.0, requires `arrow-dev`, `arrow-dataset`, `arrow-acero` and `parquet` modules) for Arrow filesystem support
 
 
 ## Building Steps
@@ -41,47 +40,61 @@ See [GraphAr Format](https://github.com/apache/incubator-graphar/blob/research/G
     $ ../script/build.sh
 ```
 
-## Preparing Graph Datasets
+## Preparing Graph Data
 
-Before running the benchmarking experiments, you need to prepare the graph datasets. You could download from public graph datasets, or generate synthetic graph datasets using our data generator.
+Before running the benchmarking components, you need to prepare the graph datasets. You could download from public graph datasets, or generate synthetic graph datasets using our data generator.
 
-### Topology Graphs
+### Preparing Topology Data
+
+#### Transforming Public Topology Graphs into GraphAr Format
 
 Suppose we want to use the facebook dataset. First, download the dataset from the [SNAP](https://snap.stanford.edu/data/egonets-Facebook.html) website and extract the dataset.
-As an example, we have included the facebook dataset in the `dataset` directory.
+As an example, we have already included this facebook dataset in the `dataset` directory.
 
 Then, convert the dataset into the Parquet format:
 
 ```bash
-    $ ./release/Csv2Parquet {input_path} {output_path} {ignore_line_num}
+    $ ./release/Csv2Parquet {input_path} {output_path} {header_line_num}
 ```
 Or, you could use the following command to convert the dataset into the GraphAr format:
 
 ```bash
-    $ ./release/data-generator {input_path} {output_path} {vertex_num} {is_directed} {is_weighted} {is_sorted} {is_reverse} {delimiter} {ignore_line_num}
+    $ ./release/data-generator {input_path} {output_path} {vertex_num} {is_directed} {is_weighted} {is_sorted} {is_reversed} {delimiter} {header_line_num}
 ```
 
-For example, running the command:
+For example, running the command for the facebook dataset:
 
 ```bash
     $ ./release/data-generator {path_to_graphar}/dataset/facebook/facebook.txt {path_to_graphar}/dataset/facebook/facebook 4039 false false true false space 0
 ```
 
-The above commands will convert the facebook dataset into the Parquet and GraphAr format and store the output in the `dataset` directory.
+The above commands will convert the facebook dataset into the Parquet and GraphAr format and store the output in the `dataset/facebook` directory.
+
+#### Generating Synthetic Topology Graphs
+
+We also provide a data generator to generate synthetic graph datasets. The data generator is located in the `data-generator` directory. You could use the following command to generate a synthetic graph dataset:
+
+```bash
+    $ [TODO]
+```
+
+It will generate a synthetic graph dataset with the specified number of vertices, in the CSV format. Afterward, you could convert this CSV file into the Parquet or GraphAr format using the `Csv2Parquet` or `data-generator` tool, as described above.
+
+### Preparing Label Data
+
+### Graphs from Neo4j and OGBN
+[TODO]
+
+### Graphs from LDBC Benchmark
+[TODO]
 
 
-### Labeled Graphs
 
-### LDBC Graphs
-
-### Graphs Generated using Our Data Generator
-
-
-## Running Benchmarking Experiments
+## Running Benchmarking Components
 
 ### Neighbor Retrieval
 
-For testing the neighbor retrieval performance, using the following command:
+For running the neighbor retrieval benchmarking component, you could use the following command:
 
 ```bash
     $ ../script/run_neighbor_retrieval.sh {graph_path} {vertex_num} {source_vertex}
@@ -93,9 +106,15 @@ For example,
     $ ../script/run_neighbor_retrieval.sh {path_to_graphar}/dataset/facebook/facebook 4039 1642
 ```
 
+Other datasets could be used in the same way, with the corresponding parameters specified as needed. We also provide a script in `[TODO]` for reference.
+
 ### Label Filtering
 
+[TODO]
+
 ### LDBC Workload
+
+[TODO]
 
 
 ## Publication
