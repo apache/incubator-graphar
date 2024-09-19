@@ -90,7 +90,7 @@ It will generate a synthetic graph dataset with the specified number of vertices
 Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool. As an illustration, we have included a `SF1` dataset (scale factor 1) in the `dataset` directory. You could use the following command to convert the LDBC dataset into the Parquet and GraphAr format:
 
 ```bash
-    $ ./release/data-generator {path_to_graphar}/dataset/ldbc/SF1 {path_to_graphar}/dataset/ldbc/SF1 1000000 false false true false space 0
+    $ [TODO]
 ```
 
 
