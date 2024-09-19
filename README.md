@@ -27,7 +27,7 @@ See [GraphAr Format](https://github.com/apache/incubator-graphar/blob/research/G
 
 ```bash
     $ git clone https://github.com/apache/incubator-graphar.git
-    $ cd incubator-graphar"
+    $ cd incubator-graphar
     $ git checkout research
     $ git submodule update --init
 ```
@@ -54,6 +54,7 @@ As an example, we have already included this facebook dataset in the `dataset` d
 Then, convert the dataset into the Parquet format:
 
 ```bash
+    $ cd incubator-graphar/build
     $ ./release/Csv2Parquet {input_path} {output_path} {header_line_num}
 ```
 Or, you could use the following command to convert the dataset into the GraphAr format:
