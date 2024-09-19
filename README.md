@@ -121,7 +121,7 @@ Other datasets could be used in the same way, with the corresponding parameters 
 
 ### Label Filtering
 
-To running the label filtering benchmarking component, please adjust the parameters according to the dataset (refer to `script/label_filtering.md` for reference), at the beginning of the [TODO: test-all.cc]() and [test.cc]().
+To running the label filtering benchmarking component, please adjust the parameters according to the dataset (refer to `script/label_filtering.md` for reference), at the beginning of the [[TODO]simple condition test]() and [[TODO]complex condition test]().
 
 Then, you could use the following command:
 
