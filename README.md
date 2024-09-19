@@ -88,12 +88,12 @@ It will generate a synthetic graph dataset with the specified number of vertices
 
 ### Preparing Labeled Graphs
 
-### Generating Label Data
+### Preparing Label Data
 
 To enable the label filtering benchmarking component, original label data must be extracted from graphs obtained from various sources. We use the CSV file to store the label data, where each row represents a vertex and each column represents a label, i.e., in the form of a binary matrix. For example, the `dataset/bloom` directory contains the label data for the [bloom](https://github.com/neo4j-graph-examples/bloom/tree/main) dataset. This dataset includes 32,960 vertices and 18 labels.
 
 
-### Graphs from LDBC Benchmark
+### Graphs from the LDBC Benchmark
 Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool. As an illustration, you could use the following command to convert a LDBC dataset into the Parquet and GraphAr format:
 
 ```bash
@@ -139,10 +139,11 @@ For example,
 
 ### LDBC Workload
 
-Once the LDBC dataset is converted into the Parquet and GraphAr format, you could run the LDBC workload IS-3 using the command on SF30 like below:
+Once the LDBC dataset is converted into the Parquet and GraphAr format, you could run the LDBC workload using the command on SF30 like below:
 
 ```bash
-    $ ./release/run-work-load {path_to_dataset}/sf-30/person_knows_person {path_to_dataset}/sf-30/person_knows_person-vertex-base 165430 70220 delta
+    $ ./release/run-work-load {path_to_dataset}/sf-30/person_knows_person {path_to_dataset}/sf-30/person_knows_person-vertex-base 165430 70220 delta # IS-3
+    $ [TODO]: IC-8 and BI-2
 ```
 Please refer to the `script/run-is3.sh`, `script/run-ic8.sh`, and `script/run-bi2.sh` for complete end-to-end LDBC workload execution.
 
