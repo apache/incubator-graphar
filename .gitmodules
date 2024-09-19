@@ -8,3 +8,6 @@
 	path = encoding
 	url = https://github.com/lixueclaire/arrow.git
 	branch = encoding-graphar
+[submodule "synthetic"]
+	path = synthetic
+	url = https://github.com/lixueclaire/synthetic
