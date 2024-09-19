@@ -155,8 +155,8 @@ Please refer to the `script/run-is3.sh`, `script/run-ic8.sh`, and `script/run-bi
 
 ### Integration with GraphScope
 
-[TODO]
-
+[TODO: add more details]
+Refer to the [Documentation](https://graphar.apache.org/docs/libraries/cpp/examples/graphscope) about the implementation of integrating GraphAr with GraphScope. And Refer to the [GraphScope](https://graphscope.io/docs/storage_engine/graphar) to learn how to use GraphAr inside GraphScope.
 
 ## Publication
 
