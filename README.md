@@ -148,9 +148,9 @@ For example,
 Once the LDBC dataset is converted into the Parquet and GraphAr format, you could run the LDBC workload using the command on SF30 like below:
 
 ```bash
-    $ ./release/run-work-load {path_to_dataset}/sf-30/person_knows_person {path_to_dataset}/sf-30/person_knows_person-vertex-base 165430 70220 delta # IS-3
-    $ [TODO]: IC-8 and BI-2
+    $ ./release/run-work-load {path_to_dataset}/sf-30/person_knows_person {path_to_dataset}/sf-30/person_knows_person-vertex-base 165430 70220 delta
 ```
+
 Please refer to the `script/run-is3.sh`, `script/run-ic8.sh`, and `script/run-bi2.sh` for complete end-to-end LDBC workload execution.
 
 ### Integration with GraphScope
