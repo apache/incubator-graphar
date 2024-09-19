@@ -40,14 +40,23 @@ public class VertexYaml {
     }
 
     public VertexYaml(VertexInfo vertexInfo) {
-        this.type = vertexInfo.getLabel();
+        this.type = vertexInfo.getType();
         this.chunk_size = vertexInfo.getChunkSize();
         this.property_groups =
                 vertexInfo.getPropertyGroups().stream()
                         .map(PropertyGroupYaml::new)
                         .collect(Collectors.toList());
         this.prefix = vertexInfo.getPrefix();
-        this.version = vertexInfo.getVersion();
+    }
+
+    public VertexInfo toVertexInfo() {
+        return new VertexInfo(
+                type,
+                chunk_size,
+                property_groups.stream()
+                        .map(PropertyGroupYaml::toPropertyGroup)
+                        .collect(Collectors.toList()),
+                prefix);
     }
 
     public String getType() {

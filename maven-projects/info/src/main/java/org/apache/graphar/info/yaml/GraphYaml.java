@@ -54,13 +54,12 @@ public class GraphYaml {
         this.prefix = graphInfo.getPrefix();
         this.vertices =
                 graphInfo.getVertexInfos().stream()
-                        .map(vertexInfo -> vertexInfo.getLabel() + ".vertex.yaml")
+                        .map(vertexInfo -> vertexInfo.getType() + ".vertex.yaml")
                         .collect(Collectors.toList());
         this.edges =
                 graphInfo.getEdgeInfos().stream()
                         .map(edgeInfo -> edgeInfo.getConcat() + ".edge.yaml")
                         .collect(Collectors.toList());
-        this.version = graphInfo.getVersion();
     }
 
     public static DumperOptions getDumperOptions() {

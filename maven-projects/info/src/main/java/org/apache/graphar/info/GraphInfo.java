@@ -19,8 +19,6 @@
 
 package org.apache.graphar.info;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,114 +27,56 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.util.GeneralParams;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 public class GraphInfo {
-    private final String name;
-    private final List<VertexInfo> vertexInfos;
-    private final List<EdgeInfo> edgeInfos;
-    private final String prefix;
-    private final Map<String, VertexInfo> vertexLabel2VertexInfo;
-    private final Map<String, EdgeInfo> edgeConcat2EdgeInfo;
-    private final String version;
+    private final org.apache.graphar.proto.GraphInfo protoGraphInfo;
+    private final List<VertexInfo> cachedVertexInfoList;
+    private final List<EdgeInfo> cachedEdgeInfoList;
+    private final Map<String, VertexInfo> cachedVertexInfoMap;
+    private final Map<String, EdgeInfo> cachedEdgeInfoMap;
 
     public GraphInfo(
-            String name,
-            List<VertexInfo> vertexInfos,
-            List<EdgeInfo> edgeInfos,
-            String prefix,
-            String version) {
-        this.name = name;
-        this.vertexInfos = List.copyOf(vertexInfos);
-        this.edgeInfos = List.copyOf(edgeInfos);
-        this.prefix = prefix;
-        this.version = version;
-        this.vertexLabel2VertexInfo =
+            String name, List<VertexInfo> vertexInfos, List<EdgeInfo> edgeInfos, String prefix) {
+        this.cachedVertexInfoList = List.copyOf(vertexInfos);
+        this.cachedEdgeInfoList = List.copyOf(edgeInfos);
+        this.cachedVertexInfoMap =
                 vertexInfos.stream()
                         .collect(
                                 Collectors.toUnmodifiableMap(
-                                        VertexInfo::getLabel, Function.identity()));
-        this.edgeConcat2EdgeInfo =
+                                        VertexInfo::getType, Function.identity()));
+        this.cachedEdgeInfoMap =
                 edgeInfos.stream()
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         EdgeInfo::getConcat, Function.identity()));
-    }
-
-    private GraphInfo(GraphYaml graphYaml, Configuration conf) throws IOException {
-        this(
-                graphYaml.getName(),
-                vertexFileNames2VertexInfos(graphYaml.getVertices(), conf),
-                edgeFileNames2EdgeInfos(graphYaml.getEdges(), conf),
-                graphYaml.getPrefix(),
-                graphYaml.getVersion());
+        this.protoGraphInfo =
+                org.apache.graphar.proto.GraphInfo.newBuilder()
+                        .setName(name)
+                        .addAllVertices(
+                                vertexInfos.stream()
+                                        .map(VertexInfo::getVertexPath)
+                                        .collect(Collectors.toList()))
+                        .addAllEdges(
+                                edgeInfos.stream()
+                                        .map(EdgeInfo::getEdgePath)
+                                        .collect(Collectors.toList()))
+                        .setPrefix(prefix)
+                        .build();
     }
 
     private GraphInfo(
-            String name,
-            List<VertexInfo> vertexInfos,
-            List<EdgeInfo> edgeInfos,
-            String prefix,
-            Map<String, VertexInfo> vertexLabel2VertexInfo,
-            Map<String, EdgeInfo> edgeConcat2EdgeInfo,
-            String version) {
-        this.name = name;
-        this.vertexInfos = vertexInfos;
-        this.edgeInfos = edgeInfos;
-        this.prefix = prefix;
-        this.vertexLabel2VertexInfo = vertexLabel2VertexInfo;
-        this.edgeConcat2EdgeInfo = edgeConcat2EdgeInfo;
-        this.version = version;
-    }
+            org.apache.graphar.proto.GraphInfo protoGraphInfo,
+            List<VertexInfo> cachedVertexInfoList,
+            List<EdgeInfo> cachedEdgeInfoList,
+            Map<String, VertexInfo> cachedVertexInfoMap,
+            Map<String, EdgeInfo> cachedEdgeInfoMap) {
 
-    public static GraphInfo load(String graphPath) throws IOException {
-        return load(graphPath, new Configuration());
-    }
-
-    public static GraphInfo load(String graphPath, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        return load(graphPath, fileSystem.getConf());
-    }
-
-    public static GraphInfo load(String graphPath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        Path path = new Path(graphPath);
-        FileSystem fileSystem = path.getFileSystem(conf);
-        FSDataInputStream inputStream = fileSystem.open(path);
-        Yaml graphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
-        GraphYaml graphYaml = graphYamlLoader.load(inputStream);
-        return new GraphInfo(graphYaml, conf);
-    }
-
-    public void save(String filePath) throws IOException {
-        save(filePath, new Configuration());
-    }
-
-    public void save(String filePath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        save(filePath, FileSystem.get(conf));
-    }
-
-    public void save(String fileName, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
-        outputStream.writeBytes(dump());
-        outputStream.close();
+        this.protoGraphInfo = protoGraphInfo;
+        this.cachedVertexInfoList = cachedVertexInfoList;
+        this.cachedEdgeInfoList = cachedEdgeInfoList;
+        this.cachedVertexInfoMap = cachedVertexInfoMap;
+        this.cachedEdgeInfoMap = cachedEdgeInfoMap;
     }
 
     public String dump() {
@@ -146,28 +86,30 @@ public class GraphInfo {
     }
 
     public Optional<GraphInfo> addVertexAsNew(VertexInfo vertexInfo) {
-        if (vertexInfo == null || hasVertexInfo(vertexInfo.getLabel())) {
+        if (vertexInfo == null || hasVertexInfo(vertexInfo.getType())) {
             return Optional.empty();
         }
-        List<VertexInfo> newVertexInfos =
-                Stream.concat(vertexInfos.stream(), Stream.of(vertexInfo))
+        final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
+                org.apache.graphar.proto.GraphInfo.newBuilder(protoGraphInfo)
+                        .addVertices(vertexInfo.getVertexPath())
+                        .build();
+        final List<VertexInfo> newVertexInfoList =
+                Stream.concat(cachedVertexInfoList.stream(), Stream.of(vertexInfo))
                         .collect(Collectors.toList());
-        Map<String, VertexInfo> newVertexLabel2VertexInfo =
+        final Map<String, VertexInfo> newVertexInfoMap =
                 Stream.concat(
-                                vertexLabel2VertexInfo.entrySet().stream(),
-                                Stream.of(Map.entry(vertexInfo.getLabel(), vertexInfo)))
+                                cachedVertexInfoMap.entrySet().stream(),
+                                Stream.of(Map.entry(vertexInfo.getType(), vertexInfo)))
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));
         return Optional.of(
                 new GraphInfo(
-                        name,
-                        newVertexInfos,
-                        edgeInfos,
-                        prefix,
-                        newVertexLabel2VertexInfo,
-                        edgeConcat2EdgeInfo,
-                        version));
+                        newProtoGraphInfo,
+                        newVertexInfoList,
+                        cachedEdgeInfoList,
+                        newVertexInfoMap,
+                        cachedEdgeInfoMap));
     }
 
     public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
@@ -176,88 +118,69 @@ public class GraphInfo {
                         edgeInfo.getSrcLabel(), edgeInfo.getEdgeLabel(), edgeInfo.getDstLabel())) {
             return Optional.empty();
         }
-        List<EdgeInfo> newEdgeInfos =
-                Stream.concat(edgeInfos.stream(), Stream.of(edgeInfo)).collect(Collectors.toList());
-        Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
+        final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
+                org.apache.graphar.proto.GraphInfo.newBuilder(protoGraphInfo)
+                        .addEdges(edgeInfo.getEdgePath())
+                        .build();
+        final List<EdgeInfo> newEdgeInfos =
+                Stream.concat(cachedEdgeInfoList.stream(), Stream.of(edgeInfo))
+                        .collect(Collectors.toList());
+        final Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
                 Stream.concat(
-                                edgeConcat2EdgeInfo.entrySet().stream(),
+                                cachedEdgeInfoMap.entrySet().stream(),
                                 Stream.of(Map.entry(edgeInfo.getConcat(), edgeInfo)))
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));
         return Optional.of(
                 new GraphInfo(
-                        name,
-                        vertexInfos,
+                        newProtoGraphInfo,
+                        cachedVertexInfoList,
                         newEdgeInfos,
-                        prefix,
-                        vertexLabel2VertexInfo,
-                        newEdgeConcat2EdgeInfo,
-                        version));
+                        cachedVertexInfoMap,
+                        newEdgeConcat2EdgeInfo));
     }
 
     public boolean hasVertexInfo(String label) {
-        return vertexLabel2VertexInfo.containsKey(label);
+        return cachedVertexInfoMap.containsKey(label);
     }
 
     public boolean hasEdgeInfo(String srcLabel, String edgeLabel, String dstLabel) {
-        return edgeConcat2EdgeInfo.containsKey(srcLabel + dstLabel + edgeLabel);
+        return cachedEdgeInfoMap.containsKey(EdgeInfo.concat(srcLabel, edgeLabel, dstLabel));
     }
 
     public VertexInfo getVertexInfo(String label) {
         checkVertexExist(label);
-        return vertexLabel2VertexInfo.get(label);
+        return cachedVertexInfoMap.get(label);
     }
 
     public EdgeInfo getEdgeInfo(String srcLabel, String edgeLabel, String dstLabel) {
         checkEdgeExist(srcLabel, edgeLabel, dstLabel);
-        return edgeConcat2EdgeInfo.get(srcLabel + edgeLabel + dstLabel);
+        return cachedEdgeInfoMap.get(EdgeInfo.concat(srcLabel, edgeLabel, dstLabel));
     }
 
     public int getVertexInfoNum() {
-        return vertexInfos.size();
+        return cachedVertexInfoList.size();
     }
 
     public int getEdgeInfoNum() {
-        return edgeInfos.size();
+        return cachedEdgeInfoList.size();
     }
 
     public String getName() {
-        return name;
+        return protoGraphInfo.getName();
     }
 
     public List<VertexInfo> getVertexInfos() {
-        return vertexInfos;
+        return cachedVertexInfoList;
     }
 
     public List<EdgeInfo> getEdgeInfos() {
-        return edgeInfos;
+        return cachedEdgeInfoList;
     }
 
     public String getPrefix() {
-        return prefix;
-    }
-
-    public String getVersion() {
-        return version;
-    }
-
-    private static List<VertexInfo> vertexFileNames2VertexInfos(
-            List<String> vertexFileNames, Configuration conf) throws IOException {
-        ArrayList<VertexInfo> tempVertices = new ArrayList<>(vertexFileNames.size());
-        for (String vertexFileName : vertexFileNames) {
-            tempVertices.add(VertexInfo.load(vertexFileName, conf));
-        }
-        return List.copyOf(tempVertices);
-    }
-
-    private static List<EdgeInfo> edgeFileNames2EdgeInfos(
-            List<String> edgeFileNames, Configuration conf) throws IOException {
-        ArrayList<EdgeInfo> tempEdges = new ArrayList<>(edgeFileNames.size());
-        for (String edgeFileName : edgeFileNames) {
-            tempEdges.add(EdgeInfo.load(edgeFileName, conf));
-        }
-        return List.copyOf(tempEdges);
+        return protoGraphInfo.getPrefix();
     }
 
     private void checkVertexExist(String label) {
