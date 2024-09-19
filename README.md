@@ -121,7 +121,7 @@ Other datasets could be used in the same way, with the corresponding parameters 
 
 ### Label Filtering
 
-To running the label filtering benchmarking component, please adjust the parameters according to the dataset (refer to `script/label_filtering.md`) for [simple condition test](encoding/cpp/examples/parquet/graphar/test-all.cc) and [complex condition test](encoding/cpp/examples/parquet/graphar/test.cc).
+To run the label filtering benchmarking component, please adjust the parameters according to the dataset (refer to `script/label_filtering.md`) for [simple condition test](encoding/cpp/examples/parquet/graphar/test-all.cc) and [complex condition test](encoding/cpp/examples/parquet/graphar/test.cc).
 
 Then, you could run the test using the following command:
 
@@ -139,7 +139,12 @@ For example,
 
 ### LDBC Workload
 
-[TODO]
+Once the LDBC dataset is converted into the Parquet and GraphAr format, you could run the LDBC workload using the command like below:
+
+```bash
+    $ [TODO]
+```
+Please refer to the `script/run-is3.sh`, `script/run-ic8.sh`, and `script/run-bi2.sh` for complete end-to-end LDBC workload execution.
 
 ### Integration with GraphScope
 

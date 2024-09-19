@@ -1,0 +1,14 @@
+dataset/SF1/social_network/dynamic/comment_hasTag_tag_0_0.csv filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/dynamic/comment_hasTag_tag_0_0.parquet filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/dynamic/post_hasTag_tag_0_0.csv filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/dynamic/post_hasTag_tag_0_0.csv.bak filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/static/tagclass_0_0.csv filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/dynamic/comment_0_0_origin.csv filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/dynamic/comment_0_0.csv filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/static/tag_0_0.csv filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/dynamic/Csv2Parquet filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/dynamic/post_0_0.csv filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/dynamic/post_0_0_origin.csv filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/dynamic/post_hasTag_tag_0_0_origin.csv filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/dynamic/post_hasTag_tag_0_0.parquet filter=lfs diff=lfs merge=lfs -text
+dataset/SF1/social_network/dynamic/comment_hasTag_tag_0_0_origin.csv filter=lfs diff=lfs merge=lfs -text
