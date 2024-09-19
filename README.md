@@ -121,7 +121,7 @@ Other datasets could be used in the same way, with the corresponding parameters 
 
 ### Label Filtering
 
-To run the label filtering benchmarking component, please adjust the parameters according to the dataset (refer to `script/label_filtering.md`) for [simple condition test](encoding/cpp/examples/parquet/graphar/test-all.cc) and [complex condition test](encoding/cpp/examples/parquet/graphar/test.cc).
+To run the label filtering benchmarking component, please adjust the parameters according to the dataset (refer to `script/label_filtering.md`) for [simple condition test](https://github.com/lixueclaire/arrow/blob/encoding-graphar/cpp/examples/parquet/graphar/test-all.cc) and [complex condition test](https://github.com/lixueclaire/arrow/blob/encoding-graphar/cpp/examples/parquet/graphar/test.cc).
 
 Then, you could run the test using the following command:
 
