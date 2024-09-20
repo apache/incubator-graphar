@@ -104,7 +104,7 @@ For example, the `dataset/bloom` directory contains the label data for the [Bloo
 
 ### Graphs from the LDBC Benchmark
 
-Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool in CSV format. Each dataset consists of multiple CSV files, where each file represents a specific edge or vertex type, e.g., `person_knows_person_0_0.csv` and `person_0_0.csv`.
+Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool in CSV format. Each dataset consists of multiple CSV files, where each file represents a specific edge or vertex type, e.g., [person_knows_person_0_0.csv](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/person_knows_person_0_0.csv) and [person_0_0.csv](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/person_0_0.csv).
 Once the original dataset is generated, you can convert it into Parquet/GraphAr format as described above.
 
 The following command will generate the Parquet and GraphAr files for `person_knows_person` data of the SF30 dataset:
