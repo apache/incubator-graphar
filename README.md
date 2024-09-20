@@ -159,8 +159,28 @@ Once the LDBC dataset is converted into the Parquet and GraphAr format, you coul
 ```
 This command will run the LDBC workload IS-3 on the SF-30 dataset, in the format of GraphAr. The total number of person vertices is 165,430, and the query vertex id is 70,220. The delta parameter is used to specify using the delta encoding technique. Please refer to the `script/run-is3.sh`, `script/run-ic8.sh`, and `script/run-bi2.sh` for complete end-to-end LDBC workload execution.
 
-[TODO: add more details]
-Refer to the [Documentation](https://graphar.apache.org/docs/libraries/cpp/examples/graphscope) about the implementation of integrating GraphAr with GraphScope. And Refer to the [GraphScope](https://graphscope.io/docs/storage_engine/graphar) to learn how to use GraphAr inside GraphScope.
+### Integration with GraphScope
+
+#### Serving as the Archive Format
+
+To run the graph loading benchmarking, you could:
+
+- First, build and install [Vineyard](https://github.com/v6d-io/v6d) (which is GraphScope's default storage backend) and [GraphScope](https://github.com/alibaba/GraphScope) following the instructions in the official documentation.
+- Then, run the `script/graphscope_run_writer.sh` and `script/graphscope_run_loader.sh` to dump/load the graph data from/into GraphScope using GraphAr format.
+
+Please refer to the [Documentation](https://graphar.apache.org/docs/libraries/cpp/examples/graphscope) about more details of integrating GraphAr with GraphScope. And Refer to the [documentation](https://graphscope.io/docs/storage_engine/graphar) to learn how to use GraphAr inside GraphScope.
+
+#### Serving as the Storage Backend
+
+Leveraging the capabilities for graph-related querying, the graph query engine within GraphScope can execute queries directly on the GraphAr data in an out-of-core manner. 
+The source code for this integration is available in the [GraphScope project](https://github.com/shirly121/GraphScope/tree/gie-grin/interactive_engine/executor/assembly/grin_graphar/src).
+
+For running the BI execution benchmarking, please:
+
+- First, build and install the GraphScope project.
+- Then, deploy the GIE (GraphScope interactive engine) following the instructions in the [documentation](https://graphscope.io/docs/interactive_engine/deployment).
+- Then, run the generic benchmark tool for GIE following the steps in the [documentation](https://5165d22e.graphscope-docs-preview.pages.dev/interactive_engine/benchmark_tool).
+
 
 ## Publication
 
