@@ -103,16 +103,16 @@ For example, the `dataset/bloom` directory contains the label data for the [bloo
 
 ### Graphs from the LDBC Benchmark
 
-Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool. 
-Once the dataset is generated, you could convert the dataset into the Parquet and GraphAr format using the `Csv2Parquet` or `data-generator` tool, with the workflow similar to that described above.
+Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool, in the CSV format. Each dataset consists of multiple CSV files, where each file represents a specific edge or vertex type, e.g., `person_knows_person_0_0.csv` and `person_0_0.csv`.
+Once the original dataset is generated, you could convert the dataset into the Parquet and GraphAr format using the tools provided, as described above.
 
-The following command would generate the Parquet and GraphAr file for person_knows_person data of SF30 dataset:
+The following command would generate the Parquet and GraphAr file for `person_knows_person` data of SF30 dataset:
 
 ```bash
     $ ../script/generate_ldbc.sh {path_to_dataset}/sf30/social_network/dynamic/person_knows_person_0_0.csv  {path_to_dataset}/sf30/social_network/dynamic/person_0_0.csv {path_to_dataset}/sf30/person_knows_person
 ```
 
-Refer to `script/generate_ldbc_all.sh` for more details on this preparation process.
+Please refer to `script/generate_ldbc_all.sh` for more details on this preparation process.
 
 ## Running Benchmarking Components
 
