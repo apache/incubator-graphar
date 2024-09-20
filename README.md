@@ -81,7 +81,7 @@ We also provide a data generator to generate synthetic graph datasets. The data 
     $ cd build
     $ cmake ..
     $ make
-    $ ./DataGenerator {vertex_num} {output_path} # e.g., ./DataGenerator 100 output.csv
+    $ ./DataGenerator {vertex_num} {output_path} # e.g., ./DataGenerator 100 synthetic-graph
 ```
 
 It will generate a synthetic graph dataset with the specified number of vertices, in the CSV format. Afterward, you could convert this CSV file into the Parquet or GraphAr format using the `Csv2Parquet` or `data-generator` tool, as described above.
