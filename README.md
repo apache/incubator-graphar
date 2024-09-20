@@ -5,244 +5,183 @@
     An open source, standard data file format for graph data storage and retrieval
 </p>
 
-[![GraphAr
-CI](https://github.com/apache/incubator-graphar/actions/workflows/ci.yml/badge.svg)](https://github.com/apache/incubator-graphar/actions)
-[![Docs
-CI](https://github.com/apache/incubator-graphar/actions/workflows/docs.yml/badge.svg)](https://github.com/apache/incubator-graphar/actions)
-[![GraphAr
-Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://graphar.apache.org/docs/)
-[![Good First
-Issue](https://img.shields.io/github/labels/apache/incubator-graphar/Good%20First%20Issue?color=green&label=Contribute%20&style=plastic)](https://github.com/apache/incubator-graphar/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+This project is a research initiative by GraphAr (short for "Graph Archive") aimed at providing an efficient storage scheme for graph data in data lakes. It is designed to enhance the efficiency of data lakes utilizing the capabilities of existing formats, with a specific focus on [Apache Parquet](https://github.com/apache/parquet-format). GraphAr ensures seamless integration with existing tools and introduces innovative additions specifically tailored to handle LPGs (Labeled Property Graphs). 
 
-## What is GraphAr?
+Leveraging the strengths of Parquet, GraphAr captures LPG semantics precisely and facilitates graph-specific operations such as neighbor retrieval and label filtering.
+See [GraphAr Format](https://github.com/apache/incubator-graphar/blob/research/GRAPHAR.md) for more details about the GraphAr format. And refer to the [Research Paper](https://arxiv.org/abs/2312.09577) for the detailed design and implementation of our encoding/decoding techniques.
 
-<img src="docs/images/overview.png" class="align-center" width="770"
-alt="Overview" />
 
-Graph processing serves as the essential building block for a diverse
-variety of real-world applications such as social network analytics,
-data mining, network routing, and scientific computing.
+## Dependencies
 
-GraphAr (short for "Graph Archive") is a project that aims to make it
-easier for diverse applications and systems (in-memory and out-of-core
-storages, databases, graph computing systems, and interactive graph
-query frameworks) to build and access graph data conveniently and
-efficiently.
+**GraphAr** is developed and tested on Ubuntu 20.04.5 LTS. It should also work on other unix-like distributions. Building GraphAr requires the following software installed as dependencies:
 
-It can be used for importing/exporting and persistent storage of graph
-data, thereby reducing the burden on systems when working together.
-Additionally, it can serve as a direct data source for graph processing
-applications.
+- A C++17-enabled compiler. On Linux, GCC 7.1 or higher should be sufficient. For macOS, at least Clang 5 is required
+- CMake 3.16 or higher
+- On Linux and macOS, ``make`` build utilities
+- curl-devel with SSL (Linux) or curl (macOS) for s3 filesystem support
 
-To achieve this, GraphAr provides:
 
-- The Graph Archive(GAR) file format: a standardized system-independent
-  file format for storing graph data
-- Libraries: a set of libraries for reading, writing and transforming
-  GAR files
+## Building Steps
 
-By using GraphAr, you can:
+### Step 1: Clone the Repository
 
-- Store and persist your graph data in a system-independent way with the
-  GAR file format
-- Easily access and generate GAR files using the libraries
-- Utilize Apache Spark to quickly manipulate and transform your GAR
-  files
+```bash
+    $ git clone https://github.com/apache/incubator-graphar.git
+    $ cd incubator-graphar
+    $ git checkout research
+    $ git submodule update --init
+```
 
-## The GAR File Format
+### Step 2: Build the Project
+```bash
+    $ mkdir build
+    $ cd build
+    $ chmod +x ../script/build.sh
+    $ ../script/build.sh
+```
 
-The GAR file format is designed for storing property graphs. It uses
-metadata to record all the necessary information of a graph, and
-maintains the actual data in a chunked way.
+## Preparing Graph Data
 
-A property graph consists of vertices and edges, with each vertex
-contains a unique identifier and:
+Before running the benchmarking components, you need to prepare the graph datasets. You can download from public graph datasets or generate synthetic graph datasets using our data generator.
 
-- A text label that describes the vertex type.
-- A collection of properties, with each property can be represented by a
-  key-value pair.
+### Preparing Topology Graphs
 
-Each edge contains a unique identifier and:
+#### Transforming Public Graphs
 
-- The outgoing vertex (source).
-- The incoming vertex (destination).
-- A text label that describes the relationship between the two vertices.
-- A collection of properties.
+Suppose we want to use the Facebook dataset. First, download the dataset from the [SNAP](https://snap.stanford.edu/data/egonets-Facebook.html) website and extract it.
+As an example, we have already included this Facebook dataset in the `dataset` directory.
 
-The following is an example property graph containing two types of
-vertices ("person" and "comment") and three types of edges.
+Then, convert the dataset into Parquet format:
 
-<img src="docs/images/property_graph.png" class="align-center"
-width="700" alt="property graph" />
+```bash
+    $ cd incubator-graphar/build
+    $ ./release/Csv2Parquet {input_path} {output_path} {header_line_num}
+```
+Or, you could use the following command to convert the dataset into the GraphAr format:
 
-### Vertices in GraphAr
+```bash
+    $ ./release/data-generator {input_path} {output_path} {vertex_num} {is_directed} {is_weighted} {is_sorted} {is_reversed} {delimiter} {header_line_num}
+```
 
-#### Logical table of vertices
+For example, running the command for the Facebook dataset:
 
-Each type of vertices (with the same label) constructs a logical vertex
-table, with each vertex assigned with a global index inside this type
-(called internal vertex id) starting from 0, corresponding to the row
-number of the vertex in the logical vertex table. An example layout for
-a logical table of vertices under the label "person" is provided for
-reference.
+```bash
+    $ ./release/Csv2Parquet {path_to_graphar}/dataset/facebook/facebook.txt {path_to_graphar}/dataset/facebook/facebook 0
+    $ ./release/data-generator {path_to_graphar}/dataset/facebook/facebook.txt {path_to_graphar}/dataset/facebook/facebook 4039 false false true false space 0
+```
 
-Given an internal vertex id and the vertex label, a vertex is uniquely
-identifiable and its respective properties can be accessed from this
-table. The internal vertex id is further used to identify the source and
-destination vertices when maintaining the topology of the graph.
+The above commands will convert the facebook dataset into the Parquet and GraphAr format and store the output in the `dataset/facebook` directory.
 
-<img src="docs/images/vertex_logical_table.png" class="align-center"
-width="650" alt="vertex logical table" />
+#### Generating Synthetic Graphs
 
-###  Physical table of vertices
+We also provide a data generator to generate synthetic graph datasets. The data generator is located in the `synthetic` directory. You can use the following command to generate a synthetic graph dataset:
 
-The logical vertex table will be partitioned into multiple continuous
-vertex chunks for enhancing the reading/writing efficiency. To maintain
-the ability of random access, the size of vertex chunks for the same
-label is fixed. To support to access required properties avoiding
-reading all properties from the files, and to add properties for
-vertices without modifying the existing files, the columns of the
-logical table will be divided into several column groups.
+```bash
+    $ cd synthetic
+    $ mkdir build
+    $ cd build
+    $ cmake ..
+    $ make
+    $ ./DataGenerator {vertex_num} {output_path} # e.g., ./DataGenerator 100 example-synthetic-graph
+```
 
-Take the `person` vertex table as an example, if the chunk size is set
-to be 500, the logical table will be separated into sub-logical-tables
-of 500 rows with the exception of the last one, which may have less than
-500 rows. The columns for maintaining properties will also be divided
-into distinct groups (e.g., 2 for our example). As a result, a total of
-4 physical vertex tables are created for storing the example logical
-table, which can be seen from the following figure.
+It will generate a synthetic graph with the specified number of vertices in CSV format. Afterward, you can convert this CSV file into Parquet or GraphAr format using the `Csv2Parquet` or `data-generator` tool, as described above.
 
-<img src="docs/images/vertex_physical_table.png" class="align-center"
-width="650" alt="vertex physical table" />
+### Preparing Labeled Graphs
 
-**Note**: For efficiently utilize the filter push-down of the payload
-file format like Parquet, the internal vertex id is stored in the
-payload file as a column. And since the internal vertex id is
-continuous, the payload file format can use the delta encoding for the
-internal vertex id column, which would not bring too much overhead for
-the storage.
+### Preparing Label Data
 
-### Edges in GraphAr
+To enable the label filtering benchmarking component, original label data must be extracted from graphs obtained from various sources. We use a CSV file to store the original label data, where each row represents a vertex and each column represents a label, formatted as a binary matrix:
 
-#### Logical table of edges
+| Label 1 | Label 2 | ... | Label N |
+|---------|---------|-----|---------|
+| 1       | 0       | ... | 0       |
+| 1       | 1       | ... | 0       |
+| ...     | ...     | ... | ...     |
 
-For maintaining a type of edges (that with the same triplet of the
-source label, edge label, and destination label), a logical edge table
-is established. And in order to support quickly creating a graph from
-the graph storage file, the logical edge table could maintain the
-topology information in a way similar to CSR/CSC (learn more about
-[CSR/CSC](https://en.wikipedia.org/wiki/Sparse_matrix)), that is, the
-edges are ordered by the internal vertex id of either source or
-destination. In this way, an offset table is required to store the start
-offset for each vertex's edges, and the edges with the same
-source/destination will be stored continuously in the logical table.
+For example, the `dataset/bloom` directory contains the label data for the [Bloom](https://github.com/neo4j-graph-examples/bloom/tree/main) dataset. This dataset includes 32,960 vertices and 18 labels.
 
-Take the logical table for `person knows person` edges as an example,
-the logical edge table looks like:
 
-<img src="docs/images/edge_logical_table.png" class="align-center"
-width="650" alt="edge logical table" />
+### Graphs from the LDBC Benchmark
 
-#### Physical table of edges
+Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool in CSV format. Each dataset consists of multiple CSV files, where each file represents a specific edge or vertex type, e.g., [person_knows_person_0_0.csv](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/person_knows_person_0_0.csv) and [person_0_0.csv](https://github.com/apache/incubator-graphar-testing/blob/main/ldbc_sample/person_0_0.csv).
+Once the original dataset is generated, you can convert it into Parquet/GraphAr format as described above.
 
-As same with the vertex table, the logical edge table is also
-partitioned into some sub-logical-tables, with each sub-logical-table
-contains edges that the source (or destination) vertices are in the same
-vertex chunk. According to the partition strategy and the order of the
-edges, edges can be stored in GraphAr following one of the four types:
+The following command will generate the Parquet and GraphAr files for `person_knows_person` data of the SF30 dataset:
 
-- **ordered_by_source**: all the edges in the logical table are ordered
-  and further partitioned by the internal vertex id of the source, which
-  can be seen as the CSR format.
-- **ordered_by_dest**: all the edges in the logical table are ordered
-  and further partitioned by the internal vertex id of the destination,
-  which can be seen as the CSC format.
-- **unordered_by_source**: the internal id of the source vertex is used
-  as the partition key to divide the edges into different
-  sub-logical-tables, and the edges in each sub-logical-table are
-  unordered, which can be seen as the COO format.
-- **unordered_by_dest**: the internal id of the destination vertex is
-  used as the partition key to divide the edges into different
-  sub-logical-tables, and the edges in each sub-logical-table are
-  unordered, which can also be seen as the COO format.
+```bash
+    $ ../script/generate_ldbc.sh {path_to_dataset}/sf30/social_network/dynamic/person_knows_person_0_0.csv  {path_to_dataset}/sf30/social_network/dynamic/person_0_0.csv {path_to_dataset}/sf30/person_knows_person
+```
 
-After that, a sub-logical-table is further divided into edge chunks of a
-predefined, fixed number of rows (referred to as edge chunk size).
-Finally, an edge chunk is separated into physical tables in the
-following way:
+Please refer to `script/generate_ldbc_all.sh` for more details on this preparation process.
 
-- an adjList table (which contains only two columns: the internal vertex
-  id of the source and the destination).
-- 0 or more edge property tables, with each table contains a group of
-  properties.
+## Running Benchmarking Components
 
-Additionally, there would be an offset table for **ordered_by_source**
-or **ordered_by_dest** edges. The offset table is used to record the
-starting point of the edges for each vertex. The partition of the offset
-table should be in alignment with the partition of the corresponding
-vertex table. The first row of each offset chunk is always 0, indicating
-the starting point for the corresponding sub-logical-table for edges.
+### Neighbor Retrieval
 
-Take the `person knows person` edges to illustrate. Suppose the vertex
-chunk size is set to 500 and the edge chunk size is 1024, and the edges
-are **ordered_by_source**, then the edges could be saved in the
-following physical tables:
+To run the neighbor retrieval benchmarking component, you can use the following command:
 
-<img src="docs/images/edge_physical_table1.png" class="align-center"
-width="650" alt="edge logical table1" />
+```bash
+    $ ../script/run_neighbor_retrieval.sh {graph_path} {vertex_num} {source_vertex}
+```
 
-<img src="docs/images/edge_physical_table2.png" class="align-center"
-width="650" alt="edge logical table2" />
+For example: 
 
-## Libraries
+```bash
+    $ ../script/run_neighbor_retrieval.sh {path_to_graphar}/dataset/facebook/facebook 4039 1642
+```
 
-GraphAr offers a collection of libraries for the purpose of reading,
-writing and transforming files. Currently, the following libraries are
-available, and plans are in place to expand support to additional
-programming language.
+Other datasets can be used in the same way, with the corresponding parameters specified as needed. We also provide a script in `script/run_neighbor_retrieval_all.sh` for reference.
 
-### The C++ Library
+### Label Filtering
 
-See [GraphAr C++
-Library](https://github.com/apache/incubator-graphar/tree/main/cpp) for
-details about the building of the C++ library.
+To run the label filtering benchmarking component, please adjust the parameters according to the dataset (refer to `script/label_filtering.md`) for both [simple condition test](https://github.com/lixueclaire/arrow/blob/encoding-graphar/cpp/examples/parquet/graphar/test-all.cc) and [complex condition test](https://github.com/lixueclaire/arrow/blob/encoding-graphar/cpp/examples/parquet/graphar/test.cc).
 
-### The Java Library
+Then, run the tests using the following commands:
 
-The GraphAr Java library is created with bindings to the C++ library
-(currently at version v0.10.0), utilizing
-[Alibaba-FastFFI](https://github.com/alibaba/fastFFI) for
-implementation. See [GraphAr Java
-Library](https://github.com/apache/incubator-graphar/tree/main/java) for
-details about the building of the Java library.
+```bash
+    $ ./release/parquet-graphar-label-all-example < {graph_path} # simple-condition filtering
+    $ ./release/parquet-graphar-label-example < {graph_path}     # complex-condition filtering
+```
 
-### The Spark Library
+For example:
 
-See [GraphAr Spark
-Library](https://github.com/apache/incubator-graphar/tree/main/spark)
-for details about the Spark library.
+```bash
+    $ ./release/parquet-graphar-label-all-example < {path_to_graphar}/dataset/bloom/bloom-43-nodes.csv
+    $ ./release/parquet-graphar-label-example < {path_to_graphar}/dataset/bloom/bloom-43-nodes.csv
+```
 
-### The PySpark Library
+### End-to-End Workload
 
-The GraphAr PySpark library is developed as bindings to the GraphAr
-Spark library. See [GraphAr PySpark
-Library](https://github.com/apache/incubator-graphar/tree/main/pyspark)
-for details about the PySpark library.
+Once the LDBC dataset is converted into Parquet and GraphAr format, you can run the LDBC workload using a command like the following:
 
-## Contributing
+```bash
+    $ ./release/run-work-load {path_to_dataset}/sf-30/person_knows_person {path_to_dataset}/sf-30/person_knows_person-vertex-base 165430 70220 delta
+```
+This command will run the LDBC workload IS-3 on the SF-30 dataset, formatted in GraphAr. The total number of person vertices is 165,430, and the query vertex id is 70,220. The delta parameter specifies the use of the delta encoding technique. For complete end-to-end LDBC workload execution, please refer to `script/run-is3.sh`, `script/run-ic8.sh`, and `script/run-bi2.sh`.
 
-- Start with [Contributing Guide]().
-- Submit [Issues]() for bug reports, feature requests.
-- Discuss at [dev mailing list](mailto:dev@graphar.apache.org) ([subscribe](mailto:dev-subscribe@graphar.apache.org?subject=(send%20this%20email%20to%20subscribe)) / [unsubscribe](mailto:dev-unsubscribe@graphar.apache.org?subject=(send%20this%20email%20to%20unsubscribe)) / [archives](https://lists.apache.org/list.html?dev@graphar.apache.org)).
-- Asking questions on [GitHub Discussions](https://github.com/apache/graphar/discussions/new?category=q-a).
-- Join our [Weekly Community Meeting](https://github.com/apache/incubator-graphar/wiki/GraphAr-Weekly-Community-Meeting).
+## Integration with GraphScope
 
-## License
+### Serving as the Archive Format
 
-**GraphAr** is distributed under [Apache License
-2.0](https://github.com/apache/incubator-graphar/blob/main/LICENSE).
-Please note that third-party libraries may not have the same license as
-GraphAr.
+To run the graph loading benchmarking: 
+
+- First, build and install [Vineyard](https://github.com/v6d-io/v6d) (which is GraphScope's default storage backend) and [GraphScope](https://github.com/alibaba/GraphScope), following the instructions in the official documentation.
+- Then, run the `script/graphscope_run_writer.sh` and `script/graphscope_run_loader.sh` scripts to dump/load the graph data from/into GraphScope using GraphAr format.
+
+Please refer to this [page](https://graphar.apache.org/docs/libraries/cpp/examples/graphscope) for more details on  integrating GraphAr with GraphScope. Additionally, consult the [documentation](https://graphscope.io/docs/storage_engine/graphar) to learn how to use GraphAr inside GraphScope.
+
+### Serving as the Storage Backend
+
+Leveraging the capabilities for graph-related querying, the graph query engine within GraphScope can execute queries directly on the GraphAr data in an out-of-core manner. 
+The source code for this integration is available in the [GraphScope project](https://github.com/shirly121/GraphScope/tree/gie-grin/interactive_engine/executor/assembly/grin_graphar/src).
+
+For running the BI execution benchmarking, please:
+
+- First, build and install the GraphScope project.
+- Then, deploy the GIE (GraphScope Interactive Engine) following the instructions in the [documentation](https://graphscope.io/docs/interactive_engine/deployment).
+- Finally, run the generic benchmark tool for GIE, following the steps outlined in the [documentation](https://5165d22e.graphscope-docs-preview.pages.dev/interactive_engine/benchmark_tool).
+
 
 ## Publication
 
@@ -251,6 +190,8 @@ GraphAr.
   Management with a Specialized Storage
   Scheme\[J\]](https://arxiv.org/abs/2312.09577). arXiv preprint
   arXiv:2312.09577, 2023.
+
+Please cite the paper in your publications if our work helps your research.
 
 ``` bibtex
 @article{li2023enhancing,

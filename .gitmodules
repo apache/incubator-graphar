@@ -4,7 +4,10 @@
 [submodule "cpp/thirdparty/Catch2"]
 	path = cpp/thirdparty/Catch2
 	url = https://github.com/catchorg/Catch2.git
-[submodule "research"]
-	path = research
-	url = https://github.com/acezen/arrow.git
+[submodule "encoding"]
+	path = encoding
+	url = https://github.com/lixueclaire/arrow.git
 	branch = encoding-graphar
+[submodule "synthetic"]
+	path = synthetic
+	url = https://github.com/lixueclaire/synthetic
