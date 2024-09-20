@@ -157,8 +157,7 @@ Once the LDBC dataset is converted into the Parquet and GraphAr format, you coul
 ```bash
     $ ./release/run-work-load {path_to_dataset}/sf-30/person_knows_person {path_to_dataset}/sf-30/person_knows_person-vertex-base 165430 70220 delta
 ```
-
-Please refer to the `script/run-is3.sh`, `script/run-ic8.sh`, and `script/run-bi2.sh` for complete end-to-end LDBC workload execution.
+This command will run the LDBC workload IS-3 on the SF-30 dataset, in the format of GraphAr. The total number of person vertices is 165,430, and the query vertex id is 70,220. The delta parameter is used to specify using the delta encoding technique. Please refer to the `script/run-is3.sh`, `script/run-ic8.sh`, and `script/run-bi2.sh` for complete end-to-end LDBC workload execution.
 
 [TODO: add more details]
 Refer to the [Documentation](https://graphar.apache.org/docs/libraries/cpp/examples/graphscope) about the implementation of integrating GraphAr with GraphScope. And Refer to the [GraphScope](https://graphscope.io/docs/storage_engine/graphar) to learn how to use GraphAr inside GraphScope.
