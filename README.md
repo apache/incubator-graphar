@@ -90,7 +90,15 @@ It will generate a synthetic graph dataset with the specified number of vertices
 
 ### Preparing Label Data
 
-To enable the label filtering benchmarking component, original label data must be extracted from graphs obtained from various sources. We use the CSV file to store the label data, where each row represents a vertex and each column represents a label, i.e., in the form of a binary matrix. For example, the `dataset/bloom` directory contains the label data for the [bloom](https://github.com/neo4j-graph-examples/bloom/tree/main) dataset. This dataset includes 32,960 vertices and 18 labels.
+To enable the label filtering benchmarking component, original label data must be extracted from graphs obtained from various sources. We use the CSV file to store the label data, where each row represents a vertex and each column represents a label, i.e., in the form of a binary matrix:
+
+| Label 1 | Label 2 | ... | Label N |
+|---------|---------|-----|---------|
+| 0       | 1       | ... | 0       |
+| 1       | 0       | ... | 1       |
+| ...     | ...     | ... | ...     |
+
+For example, the `dataset/bloom` directory contains the label data for the [bloom](https://github.com/neo4j-graph-examples/bloom/tree/main) dataset. This dataset includes 32,960 vertices and 18 labels.
 
 
 ### Graphs from the LDBC Benchmark
@@ -98,14 +106,13 @@ To enable the label filtering benchmarking component, original label data must b
 Graphs from the LDBC benchmark are generated using the [LDBC SNB Data Generator](https://ldbcouncil.org/post/snb-data-generator-getting-started/) tool. 
 Once the dataset is generated, you could convert the dataset into the Parquet and GraphAr format using the `Csv2Parquet` or `data-generator` tool, with the workflow similar to that described above.
 
-The following command would generate the Parquet file for post_hasTag_tag edges of SF30 dataset:
+The following command would generate the Parquet and GraphAr file for person_knows_person data of SF30 dataset:
 
 ```bash
-    $ ./release/Csv2Parquet /root/dataset/sf30/social_network/dynamic/post_hasTag_tag_0_0.csv /root/dataset/sf30/social_network/parquet/bi/post_hasTag_tag_0_0 0
-    $ [TODO]: Generate the GraphAr file
+    $ ../script/generate_ldbc.sh {path_to_dataset}/sf30/social_network/dynamic/person_knows_person_0_0.csv  {path_to_dataset}/sf30/social_network/dynamic/person_0_0.csv {path_to_dataset}/sf30/person_knows_person
 ```
 
-Refer to `script/generate_ldbc.sh` for more details on the LDBC dataset preparation.
+Refer to `script/generate_ldbc_all.sh` for more details on this preparation process.
 
 ## Running Benchmarking Components
 
@@ -143,17 +150,15 @@ For example,
     $ ./release/parquet-graphar-label-example < {path_to_graphar}/dataset/bloom/bloom-43-nodes.csv
 ```
 
-### LDBC Workload
+### End-to-End Workload
 
-Once the LDBC dataset is converted into the Parquet and GraphAr format, you could run the LDBC workload using the command on SF30 like below:
+Once the LDBC dataset is converted into the Parquet and GraphAr format, you could run the LDBC workload using the command like below:
 
 ```bash
     $ ./release/run-work-load {path_to_dataset}/sf-30/person_knows_person {path_to_dataset}/sf-30/person_knows_person-vertex-base 165430 70220 delta
 ```
 
 Please refer to the `script/run-is3.sh`, `script/run-ic8.sh`, and `script/run-bi2.sh` for complete end-to-end LDBC workload execution.
-
-### Integration with GraphScope
 
 [TODO: add more details]
 Refer to the [Documentation](https://graphar.apache.org/docs/libraries/cpp/examples/graphscope) about the implementation of integrating GraphAr with GraphScope. And Refer to the [GraphScope](https://graphscope.io/docs/storage_engine/graphar) to learn how to use GraphAr inside GraphScope.
