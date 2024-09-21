@@ -40,7 +40,7 @@ Build the package and run the unit tests:
 first, you need to download the testing data:
 
 ```bash
-    $ git clone https://github.com/apache/graphar-testing.git testing
+    $ git clone https://github.com/apache/incubator-graphar-testing.git testing
 ```
 
 ```bash
