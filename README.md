@@ -66,7 +66,6 @@ Or, you could use the following command to convert the dataset into the GraphAr 
 For example, running the command for the Facebook dataset:
 
 ```bash
-    $ ./release/Csv2Parquet {path_to_graphar}/dataset/facebook/facebook.txt {path_to_graphar}/dataset/facebook/facebook 0
     $ ./release/data-generator {path_to_graphar}/dataset/facebook/facebook.txt {path_to_graphar}/dataset/facebook/facebook 4039 false false true false space 0
 ```
 
