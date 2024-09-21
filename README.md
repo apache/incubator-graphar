@@ -99,7 +99,7 @@ To enable the label filtering benchmarking component, original label data must b
 | 1       | 1       | ... | 0       |
 | ...     | ...     | ... | ...     |
 
-For example, the `dataset/bloom` directory contains the label data for the [Bloom](https://github.com/neo4j-graph-examples/bloom/tree/main) dataset. This dataset includes 32,960 vertices and 18 labels.
+For example, the `dataset/bloom` directory contains the label data for the [Bloom](https://github.com/neo4j-graph-examples/bloom/tree/main) dataset. This dataset includes 32,960 vertices and 18 labels. The `dataset/label` directory contains extracted label data for various datasets outlined in `script/label_filtering.md`, excluding extremely large datasets.
 
 
 ### Graphs from the LDBC Benchmark
