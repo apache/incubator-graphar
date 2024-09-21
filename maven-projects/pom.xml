@@ -62,13 +62,13 @@
     </licenses>
     <!--    <issueManagement>
             <system>GitHub</system>
-            <url>https://github.com/apache/incubator-graphar/issues</url>
+            <url>https://github.com/apache/graphar/issues</url>
         </issueManagement>
         <scm>
-            <connection>scm:git:https://github.com/apache/incubator-graphar.git</connection>
-            <developerConnection>scm:git:https://github.com/apache/incubator-graphar.git</developerConnection>
+            <connection>scm:git:https://github.com/apache/graphar.git</connection>
+            <developerConnection>scm:git:https://github.com/apache/graphar.git</developerConnection>
             <tag>HEAD</tag>
-            <url>https://github.com/apache/incubator-graphar</url>
+            <url>https://github.com/apache/graphar</url>
         </scm>-->
     <properties>
         <graphar.version>0.12.0-SNAPSHOT</graphar.version>

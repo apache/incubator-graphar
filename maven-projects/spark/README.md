@@ -19,7 +19,7 @@ All the instructions below assume that you have cloned the GraphAr git
 repository and navigated to the ``spark`` subdirectory:
 
 ```bash
-    $ git clone https://github.com/apache/incubator-graphar.git
+    $ git clone https://github.com/apache/graphar.git
     $ cd incubator-graphar
     $ cd maven-projects/spark
 ```
@@ -40,7 +40,7 @@ Build the package and run the unit tests:
 first, you need to download the testing data:
 
 ```bash
-    $ git clone https://github.com/apache/incubator-graphar-testing.git testing
+    $ git clone https://github.com/apache/graphar-testing.git testing
 ```
 
 ```bash

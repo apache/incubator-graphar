@@ -6,13 +6,13 @@
 </p>
 
 [![GraphAr
-CI](https://github.com/apache/incubator-graphar/actions/workflows/ci.yml/badge.svg)](https://github.com/apache/incubator-graphar/actions)
+CI](https://github.com/apache/graphar/actions/workflows/ci.yml/badge.svg)](https://github.com/apache/graphar/actions)
 [![Docs
-CI](https://github.com/apache/incubator-graphar/actions/workflows/docs.yml/badge.svg)](https://github.com/apache/incubator-graphar/actions)
+CI](https://github.com/apache/graphar/actions/workflows/docs.yml/badge.svg)](https://github.com/apache/graphar/actions)
 [![GraphAr
 Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://graphar.apache.org/docs/)
 [![Good First
-Issue](https://img.shields.io/github/labels/apache/incubator-graphar/Good%20First%20Issue?color=green&label=Contribute)](https://github.com/apache/incubator-graphar/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+Issue](https://img.shields.io/github/labels/apache/graphar/Good%20First%20Issue?color=green&label=Contribute)](https://github.com/apache/graphar/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 [![README-en](https://shields.io/badge/README-English-blue)](README.md)
 
 ## GraphAr 项目简介
@@ -140,15 +140,15 @@ PySpark 库是作为 GraphAr Spark 库的绑定进行开发的。有关 PySpark 
 
 ## 参与本项目
 
-- 请参阅 [贡献指南](https://github.com/apache/incubator-graphar/blob/main/CONTRIBUTING.md)。
-- 提交 [Github Issue](https://github.com/apache/incubator-graphar/issues) 以报告错误或提出功能请求。
+- 请参阅 [贡献指南](https://github.com/apache/graphar/blob/main/CONTRIBUTING.md)。
+- 提交 [Github Issue](https://github.com/apache/graphar/issues) 以报告错误或提出功能请求。
 - 在 [开发者邮件列表](mailto:dev@graphar.apache.org)上讨论（[订阅](mailto:dev-subscribe@graphar.apache.org?subject=(send%20this%20email%20to%20subscribe)) / [取消订阅](mailto:dev-unsubscribe@graphar.apache.org?subject=(send%20this%20email%20to%20unsubscribe)) / [归档](https://lists.apache.org/list.html?dev@graphar.apache.org)）。
-- 在 [GitHub Discussion](https://github.com/apache/incubator-graphar/discussions/new?category=q-a) 中提出问题。
-- 加入我们的 [两周一次的社区会议](https://github.com/apache/incubator-graphar/wiki/GraphAr-Community-Meeting)。
+- 在 [GitHub Discussion](https://github.com/apache/graphar/discussions/new?category=q-a) 中提出问题。
+- 加入我们的 [两周一次的社区会议](https://github.com/apache/graphar/wiki/GraphAr-Community-Meeting)。
 
 ## 开源协议
 
-**GraphAr** 遵循 [Apache License 2.0](https://github.com/apache/incubator-graphar/blob/main/LICENSE) 开源协议分发。同时请注意，某些依赖的第三方库可能采用了与 GraphAr 不同的开源许可协议。
+**GraphAr** 遵循 [Apache License 2.0](https://github.com/apache/graphar/blob/main/LICENSE) 开源协议分发。同时请注意，某些依赖的第三方库可能采用了与 GraphAr 不同的开源许可协议。
 
 ## 论文
 

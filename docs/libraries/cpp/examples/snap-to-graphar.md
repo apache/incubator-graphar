@@ -87,5 +87,5 @@ e_builder->Clear();
 
 For comprehensive insights into this example, please consult the
 accompanying [source
-code](https://github.com/apache/incubator-graphar/tree/main/cpp/examples/snap_dataset_to_graphar.cc)
+code](https://github.com/apache/graphar/tree/main/cpp/examples/snap_dataset_to_graphar.cc)
 .

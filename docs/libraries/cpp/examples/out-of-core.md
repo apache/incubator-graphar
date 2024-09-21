@@ -24,7 +24,7 @@ usually building blocks for constructing other graph algorithms.
 [PageRank (PR)](https://en.wikipedia.org/wiki/PageRank) is an algorithm
 used by Google Search to rank web pages in their search engine results.
 The source code of PageRank based on GraphAr located at
-[pagerank_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/pagerank_example.cc),
+[pagerank_example.cc](https://github.com/apache/graphar/blob/main/cpp/examples/pagerank_example.cc),
 and the explanations can be found in the [Getting
 Started](../getting-started#a-pagerank-example) page.
 
@@ -80,13 +80,13 @@ for (int iter = 0; ; iter++) {
 ```
 
 The file
-[cc_stream_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/cc_stream_example.cc)
+[cc_stream_example.cc](https://github.com/apache/graphar/blob/main/cpp/examples/cc_stream_example.cc)
 located inside the source tree contains the complete implementation for
 this algorithm. Also, we can only process active vertices (the vertices
 which are updated in the last iteration) and the corresponding edges for
 each iteration, since an inactive vertex does not need to update its
 neighbors. Please refer to
-[cc_push_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/cc_push_example.cc)
+[cc_push_example.cc](https://github.com/apache/graphar/blob/main/cpp/examples/cc_push_example.cc)
 for the complete code.
 
 :::tip
@@ -152,17 +152,17 @@ for (int iter = 0; ; iter++) {
 
 The above algorithm is implemented based on streaming all edges for each
 iteration, the source code can be found at
-[bfs_stream_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/bfs_stream_example.cc).
+[bfs_stream_example.cc](https://github.com/apache/graphar/blob/main/cpp/examples/bfs_stream_example.cc).
 
 Meanwhile, BFS could be implemented in a **push**-style which only
 traverses the edges that from active vertices for each iteration, which
 is typically more efficient on real-world graphs. This implementation
 can be found at
-[bfs_push_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/bfs_push_example.cc).
+[bfs_push_example.cc](https://github.com/apache/graphar/blob/main/cpp/examples/bfs_push_example.cc).
 Similarly, we provide a BFS implementation in a **pull**-style which
 only traverses the edges that lead to non-visited vertices (i.e., the
 vertices that have not been traversed), as shown in
-[bfs_pull_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/bfs_pull_example.cc).
+[bfs_pull_example.cc](https://github.com/apache/graphar/blob/main/cpp/examples/bfs_pull_example.cc).
 
 :::tip
 
@@ -176,4 +176,4 @@ In some cases, it is required to record the path of BFS, that is, to
 maintain each vertex's predecessor (also called *father*) in the
 traversing tree rather than only recording the distance. The
 implementation of BFS with recording fathers can be found at
-[bfs_father_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/bfs_father_example.cc).
+[bfs_father_example.cc](https://github.com/apache/graphar/blob/main/cpp/examples/bfs_father_example.cc).

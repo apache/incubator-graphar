@@ -112,7 +112,7 @@ public class GraphInfoTest {
     }
 
     @Ignore(
-            "Problem about arrow 12.0.0 with S3, see https://github.com/apache/incubator-graphar/issues/187")
+            "Problem about arrow 12.0.0 with S3, see https://github.com/apache/graphar/issues/187")
     public void testGraphInfoLoadFromS3() {
         // arrow::fs::Fi
         // nalizeS3 was not called even though S3 was initialized.  This could lead to a

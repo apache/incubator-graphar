@@ -6,14 +6,14 @@
 </p>
 
 [![GraphAr
-CI](https://github.com/apache/incubator-graphar/actions/workflows/ci.yml/badge.svg)](https://github.com/apache/incubator-graphar/actions)
+CI](https://github.com/apache/graphar/actions/workflows/ci.yml/badge.svg)](https://github.com/apache/graphar/actions)
 [![Docs
-CI](https://github.com/apache/incubator-graphar/actions/workflows/docs.yml/badge.svg)](https://github.com/apache/incubator-graphar/actions)
-[![codecov](https://codecov.io/gh/apache/incubator-graphar/graph/badge.svg)](https://codecov.io/gh/apache/incubator-graphar)
+CI](https://github.com/apache/graphar/actions/workflows/docs.yml/badge.svg)](https://github.com/apache/graphar/actions)
+[![codecov](https://codecov.io/gh/apache/graphar/graph/badge.svg)](https://codecov.io/gh/apache/graphar)
 [![GraphAr
 Docs](https://img.shields.io/badge/docs-latest-brightgreen.svg)](https://graphar.apache.org/docs/)
 [![Good First
-Issue](https://img.shields.io/github/labels/apache/incubator-graphar/Good%20First%20Issue?color=green&label=Contribute)](https://github.com/apache/incubator-graphar/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+Issue](https://img.shields.io/github/labels/apache/graphar/Good%20First%20Issue?color=green&label=Contribute)](https://github.com/apache/graphar/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 [![README-zh](https://shields.io/badge/README-%E4%B8%AD%E6%96%87-blue)](README-zh-cn.md)
 
 ## What is GraphAr?
@@ -240,16 +240,16 @@ for details about the PySpark library.
 
 ## Contributing
 
-- Start with [Contributing Guide](https://github.com/apache/incubator-graphar/blob/main/CONTRIBUTING.md).
-- Submit [Issues](https://github.com/apache/incubator-graphar/issues) for bug reports, feature requests.
+- Start with [Contributing Guide](https://github.com/apache/graphar/blob/main/CONTRIBUTING.md).
+- Submit [Issues](https://github.com/apache/graphar/issues) for bug reports, feature requests.
 - Discuss at [dev mailing list](mailto:dev@graphar.apache.org) ([subscribe](mailto:dev-subscribe@graphar.apache.org?subject=(send%20this%20email%20to%20subscribe)) / [unsubscribe](mailto:dev-unsubscribe@graphar.apache.org?subject=(send%20this%20email%20to%20unsubscribe)) / [archives](https://lists.apache.org/list.html?dev@graphar.apache.org)).
-- Asking questions on [GitHub Discussions](https://github.com/apache/incubator-graphar/discussions/new?category=q-a).
-- Join our [Biweekly Community Meeting](https://github.com/apache/incubator-graphar/wiki/GraphAr-Community-Meeting).
+- Asking questions on [GitHub Discussions](https://github.com/apache/graphar/discussions/new?category=q-a).
+- Join our [Biweekly Community Meeting](https://github.com/apache/graphar/wiki/GraphAr-Community-Meeting).
 
 ## License
 
 **GraphAr** is distributed under [Apache License
-2.0](https://github.com/apache/incubator-graphar/blob/main/LICENSE).
+2.0](https://github.com/apache/graphar/blob/main/LICENSE).
 Please note that third-party libraries may not have the same license as
 GraphAr.
 

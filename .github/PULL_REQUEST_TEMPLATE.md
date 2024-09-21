@@ -1,9 +1,9 @@
 <!--
 Thanks for contributing to GraphAr.
-If this is your first pull request you can find detailed information on [CONTRIBUTING.md](https://github.com/apache/incubator-graphar/blob/main/CONTRIBUTING.md)
+If this is your first pull request you can find detailed information on [CONTRIBUTING.md](https://github.com/apache/graphar/blob/main/CONTRIBUTING.md)
 
 The Apache GraphAr (incubating) community has restrictions on the naming of pr title. You can find instructions in
-[CONTRIBUTING.md](https://github.com/apache/incubator-graphar/blob/main/CONTRIBUTING.md#title) too.
+[CONTRIBUTING.md](https://github.com/apache/graphar/blob/main/CONTRIBUTING.md#title) too.
 -->
 
 ### Reason for this PR
