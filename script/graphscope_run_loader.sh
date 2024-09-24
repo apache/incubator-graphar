@@ -15,9 +15,9 @@ fi
 socket_file=/tmp/vineyard.sock
 bin_home=./bin
 test_dir=/home/graphscope/v6d/gstest
-graph_yaml=/mnt/ldbc/weibin/snb/cf/cf.graph.yml_18_22
+graph_yaml=/mnt/dataset/cf/cf.graph.yml_18_22
 function start_vineyard() {
-  pkill vineyardd || true
+  pkill vineyardd ||
   pkill etcd || true
   rm ${socket_file} || true
   echo "[INFO] vineyardd will using the socket_file on ${socket_file}"

@@ -165,8 +165,9 @@ This command will run the LDBC workload IS-3 on the SF-30 dataset, formatted in 
 
 To run the graph loading benchmarking: 
 
-- First, build and install [Vineyard](https://github.com/v6d-io/v6d) (which is GraphScope's default storage backend) and [GraphScope](https://github.com/alibaba/GraphScope), following the instructions in the official documentation.
-- Then, run the `script/graphscope_run_writer.sh` and `script/graphscope_run_loader.sh` scripts to dump/load the graph data from/into GraphScope using GraphAr format.
+- First, build and install [Vineyard](https://github.com/v6d-io/v6d), which is the default storage backend of [GraphScope](https://github.com/alibaba/GraphScope), following the instructions in the official documentation.
+- Enter the build directory of Vineyard, and run the `script/graphscope_run_writer.sh` script to dump the graph data into GraphAr format.
+- Run the `script/graphscope_run_loader.sh` script to load the graph data into GraphScope using GraphAr format.
 
 Please refer to this [page](https://graphar.apache.org/docs/libraries/cpp/examples/graphscope) for more details on  integrating GraphAr with GraphScope. Additionally, consult the [documentation](https://graphscope.io/docs/storage_engine/graphar) to learn how to use GraphAr inside GraphScope.
 
@@ -177,7 +178,7 @@ The source code for this integration is available in the [GraphScope project](ht
 
 For running the BI execution benchmarking, please:
 
-- First, build and install the GraphScope project.
+- First, build and install the GraphScope project with GraphAr integration.
 - Then, deploy the GIE (GraphScope Interactive Engine) following the instructions in the [documentation](https://graphscope.io/docs/interactive_engine/deployment).
 - Finally, run the generic benchmark tool for GIE, following the steps outlined in the [documentation](https://5165d22e.graphscope-docs-preview.pages.dev/interactive_engine/benchmark_tool).
 

@@ -14,8 +14,8 @@ fi
 
 socket_file=/tmp/vineyard.sock
 bin_home=./bin
-test_dir=/mnt/ldbc
-graph_yaml=/mnt/ldbc/weibin/snb/cf/cf.graph.yml_18_22
+test_dir=/mnt/dataset/raw
+graph_yaml=/mnt/dataset/cf/cf.graph.yml_18_22
 function start_vineyard() {
   pkill vineyardd || true
   pkill etcd || true
