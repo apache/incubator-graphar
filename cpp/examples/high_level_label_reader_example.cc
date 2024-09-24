@@ -109,6 +109,33 @@ std::cout << "Test vertices with property" << std::endl;
     std::cout << std::endl;
   }
 
+std::cout << "Test vertices with property in a filtered vertices set" << std::endl;
+  std::cout << "--------------------------------------" << std::endl;
+  filter = graphar::_Equal(graphar::_Property("name"),
+                                graphar::_Literal("Safi_Airways"));
+  auto maybe_filter_vertices_collection_5 =
+      graphar::VerticesCollection::verticesWithProperty(
+          std::string("name"), filter, filter_vertices_2);
+  ASSERT(!maybe_filter_vertices_collection_5.has_error());
+  auto filter_vertices_5 = maybe_filter_vertices_collection_5.value();
+  std::cout << "valid vertices num: " << filter_vertices_5->size() << std::endl;
+
+  for (auto it = filter_vertices_5->begin(); it != filter_vertices_5->end();
+       ++it) {
+    // get a node's all labels
+    auto label_result = it.label();
+    std::cout << "id: " << it.id() << " ";
+    if (!label_result.has_error()) {
+      for (auto label : label_result.value()) {
+        std::cout << label << " ";
+      }
+    }
+    std::cout << "name: ";
+    auto property = it.property<std::string>("name").value();
+    std::cout << property << " ";
+    std::cout << std::endl;
+  }
+
 }
 int main(int argc, char* argv[]) {
   // read file and construct graph info

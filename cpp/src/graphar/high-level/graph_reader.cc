@@ -459,32 +459,36 @@ VerticesCollection::verticesWithProperty(
   return vertices_collection;
 }
 
-// Result<std::shared_ptr<VerticesCollection>>
-// VerticesCollection::verticesWithProperty(
-//     const graphar::util::Filter filter,
-//     const std::shared_ptr<VerticesCollection>& vertices_collection
-//     ) {
-//       auto prefix = graph_info->GetPrefix();
-//       auto vertex_info = graph_info->GetVertexInfo(type);
-//       auto labels = vertex_info->GetLabels();
-//       auto vertices_collection =
-//       std::make_shared<VerticesCollection>(vertex_info, prefix); auto
-    
-//       std::vector<IdType> new_filtered_ids;
-//       for (auto it = vertices_collection->begin(); it !=
-//       vertices_collection->end(); ++it) {
-//         for(auto pg : filter_properties) {
-//           if(it.property<>(pg->name) != filter_properties_val) {
-//             continue;
-//           }
-//         }
-//         new_filtered_ids.push_back(it.id());
-//       }
+Result<std::shared_ptr<VerticesCollection>>
+VerticesCollection::verticesWithProperty(
+    const std::string property_name,
+    const graphar::util::Filter filter,
+    const std::shared_ptr<VerticesCollection>& vertices_collection) {
+  auto new_vertices_collection = std::make_shared<VerticesCollection>(
+      vertices_collection->vertex_info_, vertices_collection->prefix_);
+  auto filtered_ids =
+      new_vertices_collection
+          ->filter(property_name, filter, &new_vertices_collection->valid_chunk_)
+          .value();
+  if (vertices_collection->is_filtered_) {
+    std::unordered_set<IdType> origin_set(
+        vertices_collection->filtered_ids_.begin(),
+        vertices_collection->filtered_ids_.end());
+    std::unordered_set<int> intersection;
+    for (int num : filtered_ids) {
+      if (origin_set.count(num)) {
+        intersection.insert(num);
+      }
+    }
+    filtered_ids =
+        std::vector<IdType>(intersection.begin(), intersection.end());
 
-//       return std::make_shared<VerticesCollection>(vertex_info, prefix,true,
-//       filtered_ids.value());
+    new_vertices_collection->is_filtered_ = true;
+  }
+  new_vertices_collection->filtered_ids_ = filtered_ids;
 
-// }
+  return new_vertices_collection;
+}
 
 template <typename T>
 Result<T> Vertex::property(const std::string& property) const {
