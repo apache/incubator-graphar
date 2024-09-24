@@ -81,14 +81,14 @@ width="700" alt="property graph" />
 
 #### Logical table of vertices
 
-Each type of vertices (with the same label) constructs a logical vertex
+Each type of vertices (with the same type) constructs a logical vertex
 table, with each vertex assigned with a global index inside this type
 (called internal vertex id) starting from 0, corresponding to the row
 number of the vertex in the logical vertex table. An example layout for
-a logical table of vertices under the label "person" is provided for
+a logical table of vertices under the type "person" is provided for
 reference.
 
-Given an internal vertex id and the vertex label, a vertex is uniquely
+Given an internal vertex id and the vertex type, a vertex is uniquely
 identifiable and its respective properties can be accessed from this
 table. The internal vertex id is further used to identify the source and
 destination vertices when maintaining the topology of the graph.
@@ -101,7 +101,7 @@ width="650" alt="vertex logical table" />
 The logical vertex table will be partitioned into multiple continuous
 vertex chunks for enhancing the reading/writing efficiency. To maintain
 the ability of random access, the size of vertex chunks for the same
-label is fixed. To support to access required properties avoiding
+type is fixed. To support to access required properties avoiding
 reading all properties from the files, and to add properties for
 vertices without modifying the existing files, the columns of the
 logical table will be divided into several column groups.
@@ -130,7 +130,7 @@ the storage.
 #### Logical table of edges
 
 For maintaining a type of edges (that with the same triplet of the
-source label, edge label, and destination label), a logical edge table
+source type, edge type, and destination type), a logical edge table
 is established. And in order to support quickly creating a graph from
 the graph storage file, the logical edge table could maintain the
 topology information in a way similar to [CSR/CSC](https://en.wikipedia.org/wiki/Sparse_matrix), that is, the
