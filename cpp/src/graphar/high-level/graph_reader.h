@@ -375,7 +375,8 @@ class VerticesCollection {
 
   /** The vertex id list that satisfies the label filter condition. */
   Result<std::vector<IdType>> filter(
-      std::vector<std::string> filter_labels, std::vector<IdType>* new_valid_chunk=nullptr);
+      std::vector<std::string> filter_labels,
+      std::vector<IdType>* new_valid_chunk = nullptr);
 
   Result<std::vector<IdType>> filter_by_acero(
       std::vector<std::string> filter_labels) const;
@@ -476,7 +477,7 @@ class VerticesCollection {
     return std::make_shared<VerticesCollection>(vertex_info,
                                                 graph_info->GetPrefix());
   }
- 
+
  private:
   std::shared_ptr<VertexInfo> vertex_info_;
   std::string prefix_;

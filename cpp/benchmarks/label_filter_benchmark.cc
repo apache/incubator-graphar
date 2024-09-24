@@ -25,7 +25,8 @@
 
 namespace graphar {
 
-std::shared_ptr<graphar::VerticesCollection> SingleLabelFilter(const std::shared_ptr<graphar::GraphInfo>& graph_info) {
+std::shared_ptr<graphar::VerticesCollection> SingleLabelFilter(
+    const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   std::string type = "comment";
   auto vertex_info = graph_info->GetVertexInfo(type);
   auto labels = vertex_info->GetLabels();
@@ -71,15 +72,16 @@ void MultiLabelFilterbyAcero(
   auto filter_vertices = maybe_filter_vertices_collection.value();
 }
 
-std::shared_ptr<graphar::VerticesCollection> LabelFilterFromSet(const std::shared_ptr<graphar::GraphInfo>& graph_info, 
+std::shared_ptr<graphar::VerticesCollection> LabelFilterFromSet(
+    const std::shared_ptr<graphar::GraphInfo>& graph_info,
     const std::shared_ptr<VerticesCollection>& vertices_collection) {
   std::string type = "comment";
   auto vertex_info = graph_info->GetVertexInfo(type);
   auto labels = vertex_info->GetLabels();
-  std::vector<std::string> filter_label = { "Firefox", "Internet Explorer"};
+  std::vector<std::string> filter_label = {"Firefox", "Internet Explorer"};
   auto maybe_filter_vertices_collection =
       VerticesCollection::verticesWithMultipleLabels(filter_label,
-                                                            vertices_collection);
+                                                     vertices_collection);
   auto filter_vertices = maybe_filter_vertices_collection.value();
   return filter_vertices;
 }
@@ -117,17 +119,18 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, LabelFilterFromSet)
   for (auto _ : state) {
     state.PauseTiming();
     auto vertices_collection = SingleLabelFilter(second_graph_info_);
-    auto vertices_collection_2 = LabelFilterFromSet(second_graph_info_, vertices_collection);
+    auto vertices_collection_2 =
+        LabelFilterFromSet(second_graph_info_, vertices_collection);
     state.ResumeTiming();
     LabelFilterFromSet(second_graph_info_, vertices_collection_2);
   }
 }
 
 BENCHMARK_REGISTER_F(BenchmarkFixture, SingleLabelFilter)->Iterations(10);
-// BENCHMARK_REGISTER_F(BenchmarkFixture, SingleLabelFilterbyAcero)
-//     ->Iterations(10);
-// BENCHMARK_REGISTER_F(BenchmarkFixture, MultiLabelFilter)->Iterations(10);
-// BENCHMARK_REGISTER_F(BenchmarkFixture, MultiLabelFilterbyAcero)->Iterations(10);
+BENCHMARK_REGISTER_F(BenchmarkFixture, SingleLabelFilterbyAcero)
+    ->Iterations(10);
+BENCHMARK_REGISTER_F(BenchmarkFixture, MultiLabelFilter)->Iterations(10);
+BENCHMARK_REGISTER_F(BenchmarkFixture, MultiLabelFilterbyAcero)->Iterations(10);
 BENCHMARK_REGISTER_F(BenchmarkFixture, LabelFilterFromSet)->Iterations(10);
 
 }  // namespace graphar
