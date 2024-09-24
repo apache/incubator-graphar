@@ -17,7 +17,7 @@
  * under the License.
  */
 
-#include <iostream>
+#include <unordered_map>
 #include <utility>
 
 #include "arrow/api.h"
@@ -251,6 +251,23 @@ Status VertexPropertyWriter::WriteChunk(
   return Status::OK();
 }
 
+Status VertexPropertyWriter::WriteLabelChunk(
+    const std::shared_ptr<arrow::Table>& input_table, IdType chunk_index,
+    FileType file_type, ValidateLevel validate_level) const {
+  auto schema = input_table->schema();
+  std::vector<int> indices;
+  for (int i = 0; i < schema->num_fields(); i++) {
+    indices.push_back(i);
+  }
+
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto in_table,
+                                       input_table->SelectColumns(indices));
+  std::string suffix =
+      vertex_info_->GetPrefix() + "labels/chunk" + std::to_string(chunk_index);
+  std::string path = prefix_ + suffix;
+  return fs_->WriteTableToFile(input_table, file_type, path);
+}
+
 Status VertexPropertyWriter::WriteTable(
     const std::shared_ptr<arrow::Table>& input_table,
     const std::shared_ptr<PropertyGroup>& property_group,
@@ -287,7 +304,114 @@ Status VertexPropertyWriter::WriteTable(
     GAR_RETURN_NOT_OK(WriteTable(table_with_index, property_group,
                                  start_chunk_index, validate_level));
   }
+  auto labels = vertex_info_->GetLabels();
+  if (!labels.empty()) {
+    GAR_ASSIGN_OR_RAISE(auto label_table, GetLabelTable(input_table, labels))
+    // WARNING!!! WARNING!!!  WARNING!!! This is using for experiments
+    // GAR_ASSIGN_OR_RAISE(auto label_table, GetLabelTableAndRandomlyAddLabels
+    // (input_table, labels))
+    GAR_RETURN_NOT_OK(WriteLabelTable(label_table, start_chunk_index,
+                                      FileType::PARQUET, validate_level));
+  }
+
   return Status::OK();
+}
+
+// Helper function to split a string by a delimiter
+std::vector<std::string> SplitString(const std::string& str, char delimiter) {
+  std::vector<std::string> tokens;
+  std::string token;
+  std::istringstream tokenStream(str);
+  while (std::getline(tokenStream, token, delimiter)) {
+    tokens.push_back(token);
+  }
+  return tokens;
+}
+
+Status VertexPropertyWriter::WriteLabelTable(
+    const std::shared_ptr<arrow::Table>& input_table, IdType start_chunk_index,
+    FileType file_type, ValidateLevel validate_level) const {
+  auto schema = input_table->schema();
+  int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
+  IdType chunk_size = vertex_info_->GetChunkSize();
+  int64_t length = input_table->num_rows();
+  IdType chunk_index = start_chunk_index;
+  for (int64_t offset = 0; offset < length;
+       offset += chunk_size, chunk_index++) {
+    auto in_chunk = input_table->Slice(offset, chunk_size);
+    GAR_RETURN_NOT_OK(
+        WriteLabelChunk(in_chunk, chunk_index, file_type, validate_level));
+  }
+  return Status::OK();
+}
+
+Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::GetLabelTable(
+    const std::shared_ptr<arrow::Table>& input_table,
+    const std::vector<std::string>& labels) const {
+  // Find the label column index
+  auto label_col_idx =
+      input_table->schema()->GetFieldIndex(GeneralParams::kLabelCol);
+  if (label_col_idx == -1) {
+    return Status::KeyError("label column not found in the input table.");
+  }
+
+  // Create a matrix of booleans with dimensions [number of rows, number of
+  // labels]
+  std::vector<std::vector<bool>> bool_matrix(
+      input_table->num_rows(), std::vector<bool>(labels.size(), false));
+
+  // Create a map for labels to column indices
+  std::unordered_map<std::string, int> label_to_index;
+  for (size_t i = 0; i < labels.size(); ++i) {
+    label_to_index[labels[i]] = i;
+  }
+
+  int row_offset = 0;  // Offset for where to fill the bool_matrix
+  // Iterate through each chunk of the :LABEL column
+  for (int64_t chunk_idx = 0;
+       chunk_idx < input_table->column(label_col_idx)->num_chunks();
+       ++chunk_idx) {
+    auto chunk = input_table->column(label_col_idx)->chunk(chunk_idx);
+    auto label_column = std::static_pointer_cast<arrow::StringArray>(chunk);
+
+    // Populate the matrix based on :LABEL column values
+    for (int64_t row = 0; row < label_column->length(); ++row) {
+      if (label_column->IsValid(row)) {
+        std::string labels_string = label_column->GetString(row);
+        auto row_labels = SplitString(labels_string, ';');
+        for (const auto& lbl : row_labels) {
+          if (label_to_index.find(lbl) != label_to_index.end()) {
+            bool_matrix[row_offset + row][label_to_index[lbl]] = true;
+          }
+        }
+      }
+    }
+
+    row_offset +=
+        label_column->length();  // Update the row offset for the next chunk
+  }
+
+  // Create Arrow arrays for each label column
+  arrow::FieldVector fields;
+  arrow::ArrayVector arrays;
+
+  for (const auto& label : labels) {
+    arrow::BooleanBuilder builder;
+    for (const auto& row : bool_matrix) {
+      builder.Append(row[label_to_index[label]]);
+    }
+
+    std::shared_ptr<arrow::Array> array;
+    builder.Finish(&array);
+    fields.push_back(arrow::field(label, arrow::boolean()));
+    arrays.push_back(array);
+  }
+
+  // Create the Arrow Table with the boolean columns
+  auto schema = std::make_shared<arrow::Schema>(fields);
+  auto result_table = arrow::Table::Make(schema, arrays);
+
+  return result_table;
 }
 
 Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
