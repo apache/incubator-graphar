@@ -325,36 +325,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v0.1.0] - 2023-01-11
 ### Added
-- Add ccache to github actions by @acezen in https://github.com/apache/incubator-graphar/pull/12
-- Add issue template and pull request template to help user easy to get… by @acezen in https://github.com/apache/incubator-graphar/pull/13
-- Add CODE_OF_CONDUCT.md by @acezen in https://github.com/apache/incubator-graphar/pull/26
-- Add InfoVersion to store version information of info and support data type extension base on info version by @acezen in https://github.com/apache/incubator-graphar/pull/27
-- Initialize the spark tool of GraphAr and implement the Info and IndexGenerator  by @acezen in https://github.com/apache/incubator-graphar/pull/45
-- organize an example pagerank app employing the gar library (#44) by @andydiwenzhu in https://github.com/apache/incubator-graphar/pull/46
-- Initialize the implementation of spark writer by @acezen in https://github.com/apache/incubator-graphar/pull/51
-- Initialize implementation for spark reader by @lixueclaire in https://github.com/apache/incubator-graphar/pull/52
-- Add release and reviewing tutorial to contributing guide by @acezen in https://github.com/apache/incubator-graphar/pull/53
-- Add introduction about GraphAr Spark tools in document  by @lixueclaire in https://github.com/apache/incubator-graphar/pull/58
-- Add spark tool api reference to doc by @acezen in https://github.com/apache/incubator-graphar/pull/59
-- Add Spark application examples using GraphAr Spark tools by @lixueclaire in https://github.com/apache/incubator-graphar/pull/61
+- Add ccache to github actions by @acezen in https://github.com/apache/graphar/pull/12
+- Add issue template and pull request template to help user easy to get… by @acezen in https://github.com/apache/graphar/pull/13
+- Add CODE_OF_CONDUCT.md by @acezen in https://github.com/apache/graphar/pull/26
+- Add InfoVersion to store version information of info and support data type extension base on info version by @acezen in https://github.com/apache/graphar/pull/27
+- Initialize the spark tool of GraphAr and implement the Info and IndexGenerator  by @acezen in https://github.com/apache/graphar/pull/45
+- organize an example pagerank app employing the gar library (#44) by @andydiwenzhu in https://github.com/apache/graphar/pull/46
+- Initialize the implementation of spark writer by @acezen in https://github.com/apache/graphar/pull/51
+- Initialize implementation for spark reader by @lixueclaire in https://github.com/apache/graphar/pull/52
+- Add release and reviewing tutorial to contributing guide by @acezen in https://github.com/apache/graphar/pull/53
+- Add introduction about GraphAr Spark tools in document  by @lixueclaire in https://github.com/apache/graphar/pull/58
+- Add spark tool api reference to doc by @acezen in https://github.com/apache/graphar/pull/59
+- Add Spark application examples using GraphAr Spark tools by @lixueclaire in https://github.com/apache/graphar/pull/61
 ### Changed
 
-- Use the apache URL to download apache-arrow. by @sighingnow in https://github.com/apache/incubator-graphar/pull/7
-- Update gar-test submodule url by @acezen in https://github.com/apache/incubator-graphar/pull/6
-- Update README.rst by @yecol in https://github.com/apache/incubator-graphar/pull/11
-- Revise image links in docs by @lixueclaire in https://github.com/apache/incubator-graphar/pull/10
-- Refine documentation about integrating into GraphScope by @lixueclaire in https://github.com/apache/incubator-graphar/pull/15
-- Refine the contributing doc to more readable and easy to get started by @acezen in https://github.com/apache/incubator-graphar/pull/16
-- [Minor] Remove `docutils` version limit to fix docs ci by @acezen in https://github.com/apache/incubator-graphar/pull/57
-- Remove `include "arrow/api.h" from graph.h by @acezen in https://github.com/apache/incubator-graphar/pull/50
-- [Improve][Doc] Revise the README and APIs docstring of GraphAr by @acezen in https://github.com/apache/incubator-graphar/pull/64
-- [Improve][Doc] Refine the documentation about user guide and applications by @lixueclaire in https://github.com/apache/incubator-graphar/pull/69
+- Use the apache URL to download apache-arrow. by @sighingnow in https://github.com/apache/graphar/pull/7
+- Update gar-test submodule url by @acezen in https://github.com/apache/graphar/pull/6
+- Update README.rst by @yecol in https://github.com/apache/graphar/pull/11
+- Revise image links in docs by @lixueclaire in https://github.com/apache/graphar/pull/10
+- Refine documentation about integrating into GraphScope by @lixueclaire in https://github.com/apache/graphar/pull/15
+- Refine the contributing doc to more readable and easy to get started by @acezen in https://github.com/apache/graphar/pull/16
+- [Minor] Remove `docutils` version limit to fix docs ci by @acezen in https://github.com/apache/graphar/pull/57
+- Remove `include "arrow/api.h" from graph.h by @acezen in https://github.com/apache/graphar/pull/50
+- [Improve][Doc] Revise the README and APIs docstring of GraphAr by @acezen in https://github.com/apache/graphar/pull/64
+- [Improve][Doc] Refine the documentation about user guide and applications by @lixueclaire in https://github.com/apache/graphar/pull/69
 
 ### Fixed
 
-- Fix the inconsistent prefix for vertex property chunks and update image links by @acezen in https://github.com/apache/incubator-graphar/pull/4
-- Fix the file suffix of bug report template by @acezen in https://github.com/apache/incubator-graphar/pull/17
-- Fix prefix of GAR files in document by @lixueclaire in https://github.com/apache/incubator-graphar/pull/56
-- [BugFix][Spark] Fix offset chunk output path and offset value of spark writer by @acezen in https://github.com/apache/incubator-graphar/pull/63
-- [MinorFix] Remove unnecessary file by @acezen in https://github.com/apache/incubator-graphar/pull/43
-- [BugFix] Hide the interface of dependencies of GraphAr with  `PRIVATE` link type by @acezen in https://github.com/apache/incubator-graphar/pull/71
+- Fix the inconsistent prefix for vertex property chunks and update image links by @acezen in https://github.com/apache/graphar/pull/4
+- Fix the file suffix of bug report template by @acezen in https://github.com/apache/graphar/pull/17
+- Fix prefix of GAR files in document by @lixueclaire in https://github.com/apache/graphar/pull/56
+- [BugFix][Spark] Fix offset chunk output path and offset value of spark writer by @acezen in https://github.com/apache/graphar/pull/63
+- [MinorFix] Remove unnecessary file by @acezen in https://github.com/apache/graphar/pull/43
+- [BugFix] Hide the interface of dependencies of GraphAr with  `PRIVATE` link type by @acezen in https://github.com/apache/graphar/pull/71

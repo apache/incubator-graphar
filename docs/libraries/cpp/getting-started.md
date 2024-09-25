@@ -9,7 +9,7 @@ sidebar_position: 1
 
 This article is a quick guide that explains how to work with GraphAr
 C++. To begin with, please refer to the [Building
-Steps](https://github.com/apache/incubator-graphar/blob/main/README.md#building-libraries)
+Steps](https://github.com/apache/graphar/blob/main/README.md#building-libraries)
 to install GraphAr.
 
 ## Information Files
@@ -146,7 +146,7 @@ as an example.
 
 It is convenient to construct the graphar metadata and dump it to generate
 information files. We provide an [example
-program](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/construct_info_example.cc)
+program](https://github.com/apache/graphar/blob/main/cpp/examples/construct_info_example.cc)
 located in the source code which shows how to construct and dump the
 files for graph information, vertex information and edge information.
 
@@ -262,7 +262,7 @@ algorithms based on GraphAr which calculates the PageRank. Please look
 [here](https://en.wikipedia.org/wiki/PageRank) if you want a detailed
 explanation of the PageRank algorithm. And the source code can be found
 at
-[pagerank_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/pagerank_example.cc).
+[pagerank_example.cc](https://github.com/apache/graphar/blob/main/cpp/examples/pagerank_example.cc).
 
 This program first reads in the graph information file to obtain the
 metadata; then, it constructs the vertex and edge collections to enable
@@ -285,6 +285,6 @@ AWS S3 and Alibaba Cloud OSS.
 To read data from cloud storage, you can specify the path of the data files
 with URI schema, e.g., "s3://bucket-name/path/to/data" or "s3://\[access-key:secret-key\]@bucket-name/path/to/data".
 
-[Code example](https://github.com/apache/incubator-graphar/blob/main/cpp/test/test_info.cc#L777-L792) demonstrates how to read data from S3.
+[Code example](https://github.com/apache/graphar/blob/main/cpp/test/test_info.cc#L777-L792) demonstrates how to read data from S3.
 
 Note that once you use cloud storage, you need to call `graphar::InitializeS3` to initialize S3 APIs before starting the work and call`graphar::FinalizeS3()` to shut down the APIs after the work finish.

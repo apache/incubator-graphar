@@ -17,7 +17,7 @@ in a graph. Learn more about [the CC
 algorithm](https://en.wikipedia.org/wiki/Connected_component).
 
 The source code of CC based on BGL can be found at
-[bgl_example.cc](https://github.com/apache/incubator-graphar/blob/main/cpp/examples/bgl_example.cc).
+[bgl_example.cc](https://github.com/apache/graphar/blob/main/cpp/examples/bgl_example.cc).
 In this program, the graph information file is first read to get the
 metadata:
 
