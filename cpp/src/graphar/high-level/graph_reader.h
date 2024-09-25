@@ -380,6 +380,9 @@ class VerticesCollection {
 
   Result<std::vector<IdType>> filter_by_acero(
       std::vector<std::string> filter_labels) const;
+  
+  Result<std::vector<IdType>> filter(
+      std::string property_name, std::shared_ptr<Expression> filter_expression, std::vector<IdType>* new_valid_chunk=nullptr);
 
   /**
    * @brief Query vertices with a specific label
@@ -443,9 +446,8 @@ class VerticesCollection {
       const std::shared_ptr<VerticesCollection>& vertices_collection);
 
   /**
-   * @brief Query vertices with a specific label and properties
+   * @brief Query vertices with specific properties
    *
-   * @param filter_label The label to query vertices by
    * @param properties A vector of shared pointers to Property objects that the
    * vertices should match
    * @param graph_info A smart pointer to GraphInfo that contains details about
@@ -455,12 +457,16 @@ class VerticesCollection {
    * specified label and match the given properties
    */
   static Result<std::shared_ptr<VerticesCollection>>
-  verticesWithLabelAndProperty(
-      const std::string& filter_label,
-      const std::vector<std::shared_ptr<Property>>& filter_properties,
-      const std::vector<std::string>& filter_properties_val,
+  verticesWithProperty(
+      const std::string property_name,
+      const graphar::util::Filter filter,
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type);
 
+static Result<std::shared_ptr<VerticesCollection>>
+  verticesWithProperty(
+      const std::string property_name,
+      const graphar::util::Filter filter,
+      const std::shared_ptr<VerticesCollection>& vertices_collection);
   /**
    * @brief Construct a VerticesCollection from graph info and vertex label.
    *
