@@ -1,3 +1,5 @@
+This page contains instructions to prepare the graph datasets outlined in the paper.
+
 ## Preparing Graph Data
 
 Before running the benchmarking components, you need to prepare the graph datasets. You can download from public graph datasets or generate synthetic graph datasets using our data generator.
