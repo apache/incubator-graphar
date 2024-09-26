@@ -10,7 +10,7 @@
 
 This repository contains the artifacts for the VLDB2025 submission of GraphAr, with all source code and guide to reproduce the results presented in the paper:
 
-- Xue Li, Weibin Zeng, Zhibin Wang, Diwen Zhu, Jingbo Xu, Wenyuan Yu, Jingren Zhou. [GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes\[J\]](https://arxiv.org/abs/2312.09577). arXiv preprint arXiv:2312.09577, 2023.
+- Xue Li, Weibin Zeng, Zhibin Wang, Diwen Zhu, Jingbo Xu, Wenyuan Yu, Jingren Zhou. [GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes\[J\]](https://arxiv.org/abs/2312.09577). arXiv preprint arXiv:2312.09577, 2024.
 
 
 
@@ -143,15 +143,13 @@ For running the BI execution benchmarking, please:
 Please cite the paper in your publications if our work helps your research.
 
 ``` bibtex
-@article{li2023enhancing,
-  author = {Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
-  title = {GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes},
-  year = {2023},
-  url = {https://doi.org/10.48550/arXiv.2312.09577},
-  doi = {10.48550/ARXIV.2312.09577},
-  eprinttype = {arXiv},
-  eprint = {2312.09577},
-  biburl = {https://dblp.org/rec/journals/corr/abs-2312-09577.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
+@misc{li2024grapharefficientstoragescheme,
+      title={GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes}, 
+      author={Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
+      year={2024},
+      eprint={2312.09577},
+      archivePrefix={arXiv},
+      primaryClass={cs.DB},
+      url={https://arxiv.org/abs/2312.09577}, 
 }
 ```
