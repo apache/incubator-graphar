@@ -50,8 +50,8 @@ To download the graphs, please use the following command:
 ```
 
 The data will be downloaded to the specified directory.
-Please be aware that the total size of the data is approximately 2.2TB, and the download may take a long time.
-We also provide some small datasets located in the `dataset` directory for testing purposes.
+Please be aware that the total size of the data exceeds 2TB, and the download may take a long time.
+Alternatively, we also provide some small datasets located in the `dataset` directory for testing purposes.
 
 ## Micro-Benchmark of Neighbor Retrieval
 
