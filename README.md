@@ -10,11 +10,7 @@
 
 This repository contains the artifacts for the VLDB2025 submission of GraphAr, with all source code and guide to reproduce the results presented in the paper:
 
-- Xue Li, Weibin Zeng, Zhibin Wang, Diwen Zhu, Jingbo Xu, Wenyuan Yu,
-  Jingren Zhou. [Enhancing Data Lakes with GraphAr: Efficient Graph Data
-  Management with a Specialized Storage
-  Scheme\[J\]](https://arxiv.org/abs/2312.09577). arXiv preprint
-  arXiv:2312.09577, 2023.
+- Xue Li, Weibin Zeng, Zhibin Wang, Diwen Zhu, Jingbo Xu, Wenyuan Yu, Jingren Zhou. [GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes\[J\]](https://arxiv.org/abs/2312.09577). arXiv preprint arXiv:2312.09577, 2024.
 
 
 
@@ -44,21 +40,25 @@ chmod +x ../script/build.sh
 
 ## Getting Graph Data
 
-TODO: make it available.    
-We stored all graph data listed in the paper Table 1 on an Aliyun OSS bucket.
-To download the graphs, please use the command below:
+Table 1 of the paper lists the graphs used in the evaluation, sourced from various datasets. We offer [instructions](https://github.com/apache/incubator-graphar/tree/research/dataset) on how to prepare the data for the evaluation, either for public datasets or synthetic datasets.
+
+Additionally, we have stored all graph data for benchmarking in an Aliyun OSS bucket. 
+To download the graphs, please use the following command:
 
 ```bash
-./script/dl-data.sh
+../script/download_data.sh {path_to_dataset}
 ```
-The data will be downloaded to the `dataset` directory.
 
+The data will be downloaded to the specified directory.
+Please be aware that the total size of the data exceeds 2TB, and the download may take a long time.
+Alternatively, we also provide some small datasets located in the `dataset` directory for testing purposes.
 
 ## Micro-Benchmark of Neighbor Retrieval
 
 This section outlines the steps to reproduce the neighbor retrieval benchmarking results reported in Section 6.2 of the paper. You may want to use the following commands.
 
 ```bash
+cd incubator-graphar/build
 ../script/run_neighbor_retrieval.sh {graph_path} {vertex_num} {source_vertex}
 ```
 
@@ -93,6 +93,12 @@ For example:
 
 ./release/parquet-graphar-label-example < {path_to_graphar}/dataset/bloom/bloom-43-nodes.csv
 ```
+
+## Storage Media
+
+The evaluation of different storage media is reported in Section 6.4 of the paper. This test employs the same methodology as the previously mentioned micro-benchmarks, using graph data stored across various storage options. 
+The storage media can be specified in the path, e.g., `OSS:://bucket/dataset/facebook/facebook`, to indicate that the data is stored on OSS rather than relying on the local file system.
+
 
 ## End-to-End Graph Query Workloads
 
@@ -137,15 +143,13 @@ For running the BI execution benchmarking, please:
 Please cite the paper in your publications if our work helps your research.
 
 ``` bibtex
-@article{li2023enhancing,
-  author = {Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
-  title = {Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme},
-  year = {2023},
-  url = {https://doi.org/10.48550/arXiv.2312.09577},
-  doi = {10.48550/ARXIV.2312.09577},
-  eprinttype = {arXiv},
-  eprint = {2312.09577},
-  biburl = {https://dblp.org/rec/journals/corr/abs-2312-09577.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
+@misc{li2024grapharefficientstoragescheme,
+      title={GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes}, 
+      author={Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
+      year={2024},
+      eprint={2312.09577},
+      archivePrefix={arXiv},
+      primaryClass={cs.DB},
+      url={https://arxiv.org/abs/2312.09577}, 
 }
 ```
