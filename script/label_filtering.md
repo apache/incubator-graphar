@@ -1,4 +1,4 @@
-| Dataset Name and Data Sourcd                   | Row Number | Label Number | Complex Test |
+| Dataset Name and Data Source                   | Row Number | Label Number | Complex Test |
 |------------------------------------------------|------------|--------------|--------------|
 | [bloom-43-nodes](https://github.com/neo4j-graph-examples/bloom)                     | 32960      | 18           | 8, 9, OR     |
 | [pole-43-nodes](https://github.com/neo4j-graph-examples/pole)                       | 61534      | 11           | 1, 5, OR     |
@@ -12,3 +12,5 @@
 | [icij-offshoreleaks-44-nodes](https://github.com/neo4j-graph-examples/icij-offshoreleaks) | 1969309    | 5            | 1, 3, OR     |
 | [ogbn-proteins](https://ogb.stanford.edu/docs/nodeprop/#ogbn-mag)                   | 132534     | 112          | 0, 1, AND    |
 | [ogbn-products](https://ogb.stanford.edu/docs/nodeprop/#ogbn-mag)                   | 2449029    | 47           | 0, 1, OR     |
+| synthetic-5                                                                         | 75000000   | 112            | 0, 1, OR    |
+| synthetic-7                                                                         | 100000000  | 112            | 0, 1, OR    |
