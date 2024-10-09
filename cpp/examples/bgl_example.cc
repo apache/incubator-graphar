@@ -112,7 +112,7 @@ int main(int argc, char* argv[]) {
   int chunk_size = 100;
   auto version = graphar::InfoVersion::Parse("gar/v1").value();
   auto new_info = graphar::CreateVertexInfo(vertex_type, chunk_size, {group},
-                                            vertex_prefix, version);
+                                            {}, vertex_prefix, version);
   // dump new vertex info
   ASSERT(new_info->IsValidated());
   ASSERT(new_info->Dump().status().ok());
