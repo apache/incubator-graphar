@@ -72,8 +72,10 @@ jobs:
 
     - name: Install Spark Scala && PySpark
       working-directory: pyspark
-      run: make install_test
-
+      run: |
+        make clean
+        make install_test
+        
     - name: Run PyTest and Generate Coverage Report
       working-directory: pyspark
       run: make coverage_report

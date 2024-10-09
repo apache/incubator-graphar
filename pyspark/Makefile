@@ -53,3 +53,7 @@ install_docs:
 .PHONY: docs
 docs:
 		poetry run pdoc -t ./template --output-dir ./docs graphar_pyspark
+
+.PHONY: clean
+clean:
+		rm -rf /tmp/vertex /tmp/edge /tmp/ldbc || true
