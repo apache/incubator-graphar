@@ -1,6 +1,4 @@
-/build/
-/build-test/
-/build-test-rename/
+/build*/
 /examples/*/build/
 /cmake-build-debug
 
