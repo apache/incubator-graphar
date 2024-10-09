@@ -177,6 +177,16 @@ macro(install_graphar_target target)
   )
 endmacro()
 
+# ------------------------------------------------------------------------------
+#  clean output data
+# ------------------------------------------------------------------------------
+add_custom_target(clean_data
+    COMMAND ${CMAKE_COMMAND} -E remove_directory /tmp/vertex || true
+    COMMAND ${CMAKE_COMMAND} -E remove_directory /tmp/edge || true
+    COMMAND ${CMAKE_COMMAND} -E remove_directory /tmp/ldbc || true
+)
+
+
 macro(build_graphar)
     file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
     if(GRAPHAR_BUILD_STATIC)
