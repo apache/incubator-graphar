@@ -17,11 +17,12 @@
  * under the License.
  */
 
+#include <iostream>
 #include <utility>
 
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
-
+#include "chunk_reader.h"
 #include "graphar/arrow/chunk_reader.h"
 #include "graphar/filesystem.h"
 #include "graphar/general_params.h"
@@ -31,7 +32,6 @@
 #include "graphar/status.h"
 #include "graphar/types.h"
 #include "graphar/util.h"
-
 namespace graphar {
 
 namespace {
@@ -51,6 +51,18 @@ Result<std::shared_ptr<arrow::Schema>> PropertyGroupToSchema(
   return arrow::schema(fields);
 }
 
+Result<std::shared_ptr<arrow::Schema>> LabelToSchema(
+    std::vector<std::string> labels, bool contain_index_column = false) {
+  std::vector<std::shared_ptr<arrow::Field>> fields;
+  if (contain_index_column) {
+    fields.push_back(std::make_shared<arrow::Field>(
+        GeneralParams::kVertexIndexCol, arrow::int64()));
+  }
+  for (const auto& lab : labels) {
+    fields.push_back(std::make_shared<arrow::Field>(lab, arrow::boolean()));
+  }
+  return arrow::schema(fields);
+}
 Status GeneralCast(const std::shared_ptr<arrow::Array>& in,
                    const std::shared_ptr<arrow::DataType>& to_type,
                    std::shared_ptr<arrow::Array>* out) {
@@ -148,6 +160,30 @@ VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
                             PropertyGroupToSchema(property_group_, true));
 }
 
+// initialize for labels
+VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
+    const std::shared_ptr<VertexInfo>& vertex_info,
+    const std::vector<std::string>& labels, const std::string& prefix,
+    const util::FilterOptions& options)
+    : vertex_info_(std::move(vertex_info)),
+      labels_(labels),
+      chunk_index_(0),
+      seek_id_(0),
+      schema_(nullptr),
+      chunk_table_(nullptr),
+      filter_options_(options) {
+  GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
+  // GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
+  //                           vertex_info->GetPathPrefix(property_group));
+  std::string base_dir = prefix_ + vertex_info_->GetPrefix() + "labels/chunk" +
+                         std::to_string(chunk_index_);
+  GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
+                            util::GetVertexChunkNum(prefix_, vertex_info));
+  GAR_ASSIGN_OR_RAISE_ERROR(vertex_num_,
+                            util::GetVertexNum(prefix_, vertex_info_));
+  GAR_ASSIGN_OR_RAISE_ERROR(schema_, LabelToSchema(labels));
+}
+
 Status VertexPropertyArrowChunkReader::seek(IdType id) {
   seek_id_ = id;
   IdType pre_chunk_index = chunk_index_;
@@ -186,6 +222,33 @@ VertexPropertyArrowChunkReader::GetChunk() {
   return chunk_table_->Slice(row_offset);
 }
 
+Result<std::shared_ptr<arrow::Table>>
+VertexPropertyArrowChunkReader::GetLabelChunk() {
+  // GAR_RETURN_NOT_OK(util::CheckFilterOptions(filter_options_,
+  // property_group_));
+  FileType filetype = FileType::PARQUET;
+  // TODO(elssky): rebuild GetFilePath for label chunks
+  if (chunk_table_ == nullptr) {
+    // GAR_ASSIGN_OR_RAISE(
+    //     auto chunk_file_path,
+    //     vertex_info_->GetFilePath(property_group_, chunk_index_));
+    std::string path = prefix_ + vertex_info_->GetPrefix() + "labels/chunk" +
+                       std::to_string(chunk_index_);
+    // std::string path = prefix_ + chunk_file_path;
+    GAR_ASSIGN_OR_RAISE(chunk_table_,
+                        fs_->ReadFileToTable(path, filetype, filter_options_));
+    // TODO(acezen): filter pushdown doesn't support cast schema now
+    // if (schema_ != nullptr && filter_options_.filter == nullptr) {
+    //   GAR_RETURN_NOT_OK(
+    //       CastTableWithSchema(chunk_table_, schema_, &chunk_table_));
+    // }
+  }
+  // std::cout<<chunk_table_->column(0)->type()->ToString()<<std::endl;
+  // std::cout<<chunk_table_->column(1)->type()->ToString()<<std::endl;
+  IdType row_offset = seek_id_ - chunk_index_ * vertex_info_->GetChunkSize();
+  return chunk_table_->Slice(row_offset);
+}
+
 Status VertexPropertyArrowChunkReader::next_chunk() {
   if (++chunk_index_ >= chunk_num_) {
     return Status::IndexError(
@@ -213,6 +276,16 @@ VertexPropertyArrowChunkReader::Make(
     const std::string& prefix, const util::FilterOptions& options) {
   return std::make_shared<VertexPropertyArrowChunkReader>(
       vertex_info, property_group, prefix, options);
+}
+
+// Make for labels
+Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
+VertexPropertyArrowChunkReader::Make(
+    const std::shared_ptr<VertexInfo>& vertex_info,
+    const std::vector<std::string>& labels, const std::string& prefix,
+    const util::FilterOptions& options) {
+  return std::make_shared<VertexPropertyArrowChunkReader>(vertex_info, labels,
+                                                          prefix, options);
 }
 
 Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
