@@ -183,7 +183,7 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
       {Property("p0", int32(), true), Property("p1", string(), false)},
       FileType::CSV, "p0_p1/");
   auto vertex_info =
-      CreateVertexInfo(type, chunk_size, {pg}, "test_vertex", version);
+      CreateVertexInfo(type, chunk_size, {pg}, {}, "test_vertex", version);
 
   SECTION("Basics") {
     REQUIRE(vertex_info->GetType() == type);
@@ -224,24 +224,25 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
     auto invalid_pg =
         CreatePropertyGroup({Property("p0", nullptr, true)}, FileType::CSV);
     auto invalid_vertex_info0 = CreateVertexInfo(type, chunk_size, {invalid_pg},
-                                                 "test_vertex/", version);
+                                                 {}, "test_vertex/", version);
     REQUIRE(invalid_vertex_info0->IsValidated() == false);
-    VertexInfo invalid_vertex_info1("", chunk_size, {pg}, "test_vertex/",
+    VertexInfo invalid_vertex_info1("", chunk_size, {pg}, {}, "test_vertex/",
                                     version);
     REQUIRE(invalid_vertex_info1.IsValidated() == false);
-    VertexInfo invalid_vertex_info2(type, 0, {pg}, "test_vertex/", version);
+    VertexInfo invalid_vertex_info2(type, 0, {pg}, {}, "test_vertex/", version);
     REQUIRE(invalid_vertex_info2.IsValidated() == false);
     // check if prefix empty
     auto vertex_info_empty_prefix =
-        CreateVertexInfo(type, chunk_size, {pg}, "", version);
+        CreateVertexInfo(type, chunk_size, {pg}, {}, "", version);
     REQUIRE(vertex_info_empty_prefix->IsValidated() == true);
   }
 
   SECTION("CreateVertexInfo") {
-    auto vertex_info3 = CreateVertexInfo("", chunk_size, {pg}, "test_vertex/");
+    auto vertex_info3 =
+        CreateVertexInfo("", chunk_size, {pg}, {}, "test_vertex/");
     REQUIRE(vertex_info3 == nullptr);
 
-    auto vertex_info4 = CreateVertexInfo(type, 0, {pg}, "test_vertex/");
+    auto vertex_info4 = CreateVertexInfo(type, 0, {pg}, {}, "test_vertex/");
     REQUIRE(vertex_info4 == nullptr);
   }
 
@@ -267,7 +268,7 @@ version: gar/v1
 )";
     REQUIRE(dump_result.value() == expected);
     auto vertex_info_empty_version =
-        CreateVertexInfo(type, chunk_size, {pg}, "test_vertex/");
+        CreateVertexInfo(type, chunk_size, {pg}, {}, "test_vertex/");
     REQUIRE(vertex_info_empty_version->Dump().status().ok());
   }
 
@@ -521,7 +522,7 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
       {Property("p0", int32(), true), Property("p1", string(), false)},
       FileType::CSV, "p0_p1/");
   auto vertex_info =
-      CreateVertexInfo("test_vertex", 100, {pg}, "test_vertex/", version);
+      CreateVertexInfo("test_vertex", 100, {pg}, {}, "test_vertex/", version);
   std::unordered_map<std::string, std::string> extra_info = {
       {"category", "test graph"}};
   auto edge_info =
@@ -529,7 +530,7 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
                      {CreateAdjacentList(AdjListType::ordered_by_source,
                                          FileType::CSV, "adj_list/")},
                      {pg}, "test_edge/", version);
-  auto graph_info = CreateGraphInfo(name, {vertex_info}, {edge_info},
+  auto graph_info = CreateGraphInfo(name, {vertex_info}, {edge_info}, {},
                                     "test_graph/", version, extra_info);
 
   SECTION("Basics") {
@@ -544,7 +545,7 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
 
   SECTION("ExtraInfo") {
     auto graph_info_with_extra_info =
-        CreateGraphInfo(name, {vertex_info}, {edge_info}, "test_graph/",
+        CreateGraphInfo(name, {vertex_info}, {edge_info}, {}, "test_graph/",
                         version, {{"key1", "value1"}, {"key2", "value2"}});
     const auto& extra_info = graph_info_with_extra_info->GetExtraInfo();
     REQUIRE(extra_info.size() == 2);
@@ -580,9 +581,9 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
   SECTION("IsValidated") {
     REQUIRE(graph_info->IsValidated() == true);
     auto invalid_vertex_info =
-        CreateVertexInfo("", 100, {pg}, "test_vertex/", version);
+        CreateVertexInfo("", 100, {pg}, {}, "test_vertex/", version);
     auto invalid_graph_info0 = CreateGraphInfo(
-        name, {invalid_vertex_info}, {edge_info}, "test_graph/", version);
+        name, {invalid_vertex_info}, {edge_info}, {}, "test_graph/", version);
     REQUIRE(invalid_graph_info0->IsValidated() == false);
     auto invalid_edge_info =
         CreateEdgeInfo("", "knows", "person", 1024, 100, 100, true,
@@ -590,23 +591,23 @@ TEST_CASE_METHOD(GlobalFixture, "GraphInfo") {
                                            FileType::CSV, "adj_list/")},
                        {pg}, "test_edge/", version);
     auto invalid_graph_info1 = CreateGraphInfo(
-        name, {vertex_info}, {invalid_edge_info}, "test_graph/", version);
+        name, {vertex_info}, {invalid_edge_info}, {}, "test_graph/", version);
     REQUIRE(invalid_graph_info1->IsValidated() == false);
-    GraphInfo invalid_graph_info2("", {vertex_info}, {edge_info}, "test_graph/",
-                                  version);
+    GraphInfo invalid_graph_info2("", {vertex_info}, {edge_info}, {},
+                                  "test_graph/", version);
     REQUIRE(invalid_graph_info2.IsValidated() == false);
-    GraphInfo invalid_graph_info3(name, {vertex_info}, {edge_info}, "",
+    GraphInfo invalid_graph_info3(name, {vertex_info}, {edge_info}, {}, "",
                                   version);
     REQUIRE(invalid_graph_info3.IsValidated() == false);
     // check if prefix empty, graph_info with empty prefix is invalid
     auto graph_info_with_empty_prefix =
-        CreateGraphInfo(name, {vertex_info}, {edge_info}, "", version);
+        CreateGraphInfo(name, {vertex_info}, {edge_info}, {}, "", version);
     REQUIRE(graph_info_with_empty_prefix->IsValidated() == false);
   }
 
   SECTION("CreateGraphInfo") {
     auto graph_info_empty_name =
-        CreateGraphInfo("", {vertex_info}, {edge_info}, "test_graph/");
+        CreateGraphInfo("", {vertex_info}, {edge_info}, {}, "test_graph/");
     REQUIRE(graph_info_empty_name == nullptr);
   }
 
@@ -626,7 +627,7 @@ vertices:
 )";
     REQUIRE(dump_result.value() == expected);
     auto graph_info_empty_version =
-        CreateGraphInfo(name, {vertex_info}, {edge_info}, "test_graph/");
+        CreateGraphInfo(name, {vertex_info}, {edge_info}, {}, "test_graph/");
     REQUIRE(graph_info_empty_version->Dump().status().ok());
   }
 
@@ -638,8 +639,8 @@ vertices:
   }
 
   SECTION("AddVertex") {
-    auto vertex_info2 =
-        CreateVertexInfo("test_vertex2", 100, {pg}, "test_vertex2/", version);
+    auto vertex_info2 = CreateVertexInfo("test_vertex2", 100, {pg}, {},
+                                         "test_vertex2/", version);
     auto maybe_extend_info = graph_info->AddVertex(vertex_info2);
     REQUIRE(maybe_extend_info.status().ok());
     auto extend_info = maybe_extend_info.value();
@@ -778,25 +779,25 @@ extra_info:
 /*
 TODO(acezen): need to mock S3 server to test this case, this private
 service is not available for public access.
-
-TEST_CASE_METHOD(GlobalFixture, "LoadFromS3") {
-  // explicitly call InitS3 to initialize S3 APIs before using
-  // S3 file system.
-  InitializeS3();
-  std::string path =
-      "s3://graphscope/graphar/ldbc/ldbc.graph.yml"
-      "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
-  auto graph_info_result = GraphInfo::Load(path);
-  std::cout << graph_info_result.status().message() << std::endl;
-  REQUIRE(!graph_info_result.has_error());
-  auto graph_info = graph_info_result.value();
-  REQUIRE(graph_info->GetName() == "ldbc");
-  const auto& vertex_infos = graph_info->GetVertexInfos();
-  const auto& edge_infos = graph_info->GetEdgeInfos();
-  REQUIRE(vertex_infos.size() == 8);
-  REQUIRE(edge_infos.size() == 23);
-  // explicitly call FinalizeS3 to avoid memory leak
-  FinalizeS3();
-}
 */
+// TEST_CASE_METHOD(GlobalFixture, "LoadFromS3") {
+//   // explicitly call InitS3 to initialize S3 APIs before using
+//   // S3 file system.
+//   InitializeS3();
+//   std::string path =
+//       "s3://graphar/ldbc/ldbc.graph.yml"
+//       "?endpoint_override=graphscope.oss-cn-beijing.aliyuncs.com";
+//   auto graph_info_result = GraphInfo::Load(path);
+//   std::cout << graph_info_result.status().message() << std::endl;
+//   REQUIRE(!graph_info_result.has_error());
+//   auto graph_info = graph_info_result.value();
+//   REQUIRE(graph_info->GetName() == "ldbc");
+//   const auto& vertex_infos = graph_info->GetVertexInfos();
+//   const auto& edge_infos = graph_info->GetEdgeInfos();
+//   REQUIRE(vertex_infos.size() == 8);
+//   REQUIRE(edge_infos.size() == 23);
+//   // explicitly call FinalizeS3 to avoid memory leak
+//   FinalizeS3();
+// }
+
 }  // namespace graphar
