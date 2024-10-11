@@ -277,6 +277,105 @@ is used to write the results to new generated data chunks.
 Please refer to [more examples](examples/out-of-core.md) to learn
 about the other available case studies utilizing GraphAr.
 
+### Processing Graph Data with Labels
+
+As GraphAr supports LPG data, users can add labels for vertices and use related label filtering functions to obtain specified vertices.
+The standard csv format of graph data with labels supported by GraphAr is `id|:LABEL|property_1|property_2`, if a vertex has multiple labels, use ; to separate them. Here is an example.
+
+```csv
+id|:LABEL|name|url
+0|company;public|Kam_Air|http://dbpedia.org/resource/Kam_Air
+1|company|Balkh_Airlines|http://dbpedia.org/resource/Balkh_Airlines
+2|company|Khyber_Afghan_Airlines|http://dbpedia.org/resource/Khyber_Afghan_Airlines
+
+```
+
+When you have the data ready, you can read the file into `arrow::Table` by using arrow IO function.
+
+``` cpp
+    arrow::csv::ReadOptions read_options{}; 
+    arrow::csv::ParseOptions parse_options{}; 
+    arrow::csv::ConvertOptions convert_options{};
+
+    parse_options.delimiter = '|'; 
+
+    auto input = arrow::io::ReadableFile::Open(test_data_dir + "/ldbc/organisation_0_0.csv", arrow::default_memory_pool()).ValueOrDie();
+
+    auto reader = arrow::csv::TableReader::Make(
+        arrow::io::default_io_context(),
+        input,
+        read_options,
+        parse_options,
+        convert_options).ValueOrDie();
+
+    std::shared_ptr<arrow::Table> table;
+    table = reader->Read().ValueOrDie();
+```
+You can export label table to disk in parquet format, and read it back into memory in the following way.
+``` cpp
+  // write arrow table as parquet chunk
+  auto maybe_writer =
+      VertexPropertyWriter::Make(vertex_info, test_data_dir + "/ldbc/parquet/");
+  REQUIRE(!maybe_writer.has_error());
+  auto writer = maybe_writer.value();
+  REQUIRE(writer->WriteTable(table, 0).ok());
+  REQUIRE(writer->WriteVerticesNum(table->num_rows()).ok());
+
+  // read parquet chunk as arrow table
+  auto maybe_reader =
+      VertexPropertyArrowChunkReader::Make(graph_info, "organisation", labels);
+  assert(maybe_reader.status().ok());
+  auto reader = maybe_reader.value();
+  assert(reader->seek(0).ok());
+  assert(reader->GetLabelChunk().status().ok());
+  assert(reader->next_chunk().ok());
+```
+### Using Label Filtering Functions
+
+By calling the `graphar::VerticesCollection::verticesWithLabel` or `graphar::VerticesCollection::verticesWithMultipleLabels` API, we can specify a certain type of vertices on a certain graph, then filter out all vertices that match one or more labels. Here we introduce several examples of using label filtering.
+
+
+
+```cpp
+  graph_info = ...
+  auto vertex_info = graph_info->GetVertexInfo("organisation");
+  auto labels = vertex_info->GetLabels();
+
+  // query vertices with a specific label
+  auto maybe_filter_vertices_collection =
+      graphar::VerticesCollection::verticesWithLabel(std::string("company"), graph_info, type);
+  ASSERT(!maybe_filter_vertices_collection.has_error());
+  auto filter_vertices = maybe_filter_vertices_collection.value();
+  
+  // iterate vertices with label "company"
+  for (auto it = filter_vertices->begin(); it != filter_vertices->end();
+       ++it) {
+    // get a node's all labels
+    auto label_result = it.label();
+    std::cout << "id: " << it.id() << " ";
+    if (!label_result.has_error()) {
+      for (auto label : label_result.value()) {
+        std::cout << label << " ";
+      }
+    }
+    // ...
+  }
+
+  // query vertices based on a query result
+  auto maybe_filter_vertices_collection =
+      graphar::VerticesCollection::verticesWithLabel(std::string("public"),
+                                                     filter_vertices);
+
+  // query vertices with multi labels
+  auto maybe_filter_vertices_collection =
+    graphar::VerticesCollection::verticesWithMultipleLabels({"company", "public"}, graph_info, type);
+  // ...
+
+ 
+```
+Notice that, if the first two queries are executed successively, the result is equivalent to the third query.
+
+
 ### Working with Cloud Storage (S3, OSS)
 
 GraphAr supports reading and writing data from and to cloud storage, including
