@@ -19,119 +19,81 @@
 
 package org.apache.graphar.info;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.yaml.snakeyaml.LoaderOptions;
+import org.apache.graphar.proto.DataType;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 public class VertexInfo {
-    private final String label;
-    private final long chunkSize;
-    private final PropertyGroups propertyGroups;
-    private final String prefix;
-    private final String version;
+    private final org.apache.graphar.proto.VertexInfo protoVertexInfo;
+    private final PropertyGroups cachedPropertyGroups;
 
     public VertexInfo(
-            String label,
-            long chunkSize,
-            List<PropertyGroup> propertyGroups,
-            String prefix,
-            String version) {
-        this.label = label;
-        this.chunkSize = chunkSize;
-        this.propertyGroups = new PropertyGroups(propertyGroups);
-        this.prefix = prefix;
-        this.version = version;
+            String type, long chunkSize, List<PropertyGroup> propertyGroups, String prefix) {
+        this.cachedPropertyGroups = new PropertyGroups(propertyGroups);
+        this.protoVertexInfo =
+                org.apache.graphar.proto.VertexInfo.newBuilder()
+                        .setType(type)
+                        .setChunkSize(chunkSize)
+                        .addAllProperties(
+                                propertyGroups.stream()
+                                        .map(PropertyGroup::getProto)
+                                        .collect(Collectors.toList()))
+                        .setPrefix(prefix)
+                        .build();
     }
 
-    private VertexInfo(VertexYaml parser) {
-        this(
-                parser.getType(),
-                parser.getChunk_size(),
-                parser.getProperty_groups().stream()
-                        .map(PropertyGroup::new)
-                        .collect(Collectors.toUnmodifiableList()),
-                parser.getPrefix(),
-                parser.getVersion());
+    private VertexInfo(org.apache.graphar.proto.VertexInfo protoVertexInfo) {
+        this.protoVertexInfo = protoVertexInfo;
+        this.cachedPropertyGroups = PropertyGroups.ofProto(protoVertexInfo.getPropertiesList());
     }
 
-    private VertexInfo(
-            String label,
-            long chunkSize,
-            PropertyGroups propertyGroups,
-            String prefix,
-            String version) {
-        this.label = label;
-        this.chunkSize = chunkSize;
-        this.propertyGroups = propertyGroups;
-        this.prefix = prefix;
-        this.version = version;
+    public static VertexInfo ofProto(org.apache.graphar.proto.VertexInfo protoVertexInfo) {
+        return new VertexInfo(protoVertexInfo);
     }
 
-    public static VertexInfo load(String vertexInfoPath) throws IOException {
-        return load(vertexInfoPath, new Configuration());
-    }
-
-    public static VertexInfo load(String vertexInfoPath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        return load(vertexInfoPath, FileSystem.get(conf));
-    }
-
-    public static VertexInfo load(String vertexInfoPath, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataInputStream inputStream = fileSystem.open(new Path(vertexInfoPath));
-        Yaml vertexInfoYamlLoader =
-                new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
-        VertexYaml vertexInfoYaml = vertexInfoYamlLoader.load(inputStream);
-        return new VertexInfo(vertexInfoYaml);
+    org.apache.graphar.proto.VertexInfo getProto() {
+        return protoVertexInfo;
     }
 
     public Optional<VertexInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
-        return propertyGroups
+        // do not need check property group exist, because PropertyGroups will check it
+        return cachedPropertyGroups
                 .addPropertyGroupAsNew(propertyGroup)
                 .map(
                         newPropertyGroups ->
                                 new VertexInfo(
-                                        label, chunkSize, newPropertyGroups, prefix, version));
+                                        protoVertexInfo.getType(),
+                                        protoVertexInfo.getChunkSize(),
+                                        newPropertyGroups.getPropertyGroupList(),
+                                        protoVertexInfo.getPrefix()));
     }
 
     public int propertyGroupNum() {
-        return propertyGroups.getPropertyGroupNum();
+        return cachedPropertyGroups.getPropertyGroupNum();
     }
 
     public DataType getPropertyType(String propertyName) {
-        return propertyGroups.getPropertyType(propertyName);
+        return cachedPropertyGroups.getPropertyType(propertyName);
     }
 
     public boolean hasProperty(String propertyName) {
-        return propertyGroups.hasProperty(propertyName);
+        return cachedPropertyGroups.hasProperty(propertyName);
     }
 
     public boolean isPrimaryKey(String propertyName) {
-        return propertyGroups.isPrimaryKey(propertyName);
+        return cachedPropertyGroups.isPrimaryKey(propertyName);
     }
 
     public boolean isNullableKey(String propertyName) {
-        return propertyGroups.isNullableKey(propertyName);
+        return cachedPropertyGroups.isNullableKey(propertyName);
     }
 
     public boolean hasPropertyGroup(PropertyGroup propertyGroup) {
-        return propertyGroups.hasPropertyGroup(propertyGroup);
+        return cachedPropertyGroups.hasPropertyGroup(propertyGroup);
     }
 
     public String getPropertyGroupPrefix(PropertyGroup propertyGroup) {
@@ -148,50 +110,30 @@ public class VertexInfo {
         return getPrefix() + "/vertex_count";
     }
 
-    public void save(String filePath) throws IOException {
-        save(filePath, new Configuration());
-    }
-
-    public void save(String filePath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        save(filePath, FileSystem.get(conf));
-    }
-
-    public void save(String fileName, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
-        outputStream.writeBytes(dump());
-        outputStream.close();
-    }
-
     public String dump() {
         Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
         VertexYaml vertexYaml = new VertexYaml(this);
         return yaml.dump(vertexYaml);
     }
 
-    public String getLabel() {
-        return label;
+    public String getType() {
+        return protoVertexInfo.getType();
     }
 
     public long getChunkSize() {
-        return chunkSize;
+        return protoVertexInfo.getChunkSize();
     }
 
     public List<PropertyGroup> getPropertyGroups() {
-        return propertyGroups.getPropertyGroupList();
+        return cachedPropertyGroups.getPropertyGroupList();
     }
 
     public String getPrefix() {
-        return prefix;
+        return protoVertexInfo.getPrefix();
     }
 
-    public String getVersion() {
-        return version;
+    public String getVertexPath() {
+        return getPrefix() + "/" + getType() + ".vertex.yaml";
     }
 
     private void checkPropertyGroupExist(PropertyGroup propertyGroup) {
@@ -203,7 +145,7 @@ public class VertexInfo {
                     "Property group "
                             + propertyGroup
                             + " does not exist in the vertex "
-                            + getLabel());
+                            + getType());
         }
     }
 }

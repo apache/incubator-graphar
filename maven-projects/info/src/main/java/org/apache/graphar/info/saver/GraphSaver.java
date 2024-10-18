@@ -17,26 +17,12 @@
  * under the License.
  */
 
-package org.apache.graphar.info.type;
+package org.apache.graphar.info.saver;
 
-public enum FileType {
-    CSV,
-    PARQUET,
-    ORC;
+import java.io.IOException;
+import org.apache.graphar.info.GraphInfo;
 
-    public static FileType fromString(String fileType) {
-        if (fileType == null) {
-            return null;
-        }
-        switch (fileType) {
-            case "csv":
-                return CSV;
-            case "parquet":
-                return PARQUET;
-            case "orc":
-                return ORC;
-            default:
-                throw new IllegalArgumentException("Unknown file type: " + fileType);
-        }
-    }
+@FunctionalInterface
+public interface GraphSaver {
+    void save(String path, GraphInfo graphInfo) throws IOException;
 }

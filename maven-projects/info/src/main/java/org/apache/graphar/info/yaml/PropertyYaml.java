@@ -37,9 +37,17 @@ public class PropertyYaml {
 
     public PropertyYaml(Property property) {
         this.name = property.getName();
-        this.data_type = property.getDataType().toString();
+        this.data_type = EnumTransferUtil.dataType2String(property.getDataType());
         this.is_primary = property.isPrimary();
         this.is_nullable = Optional.of(property.isNullable());
+    }
+
+    Property toProperty() {
+        return new Property(
+                name,
+                EnumTransferUtil.string2DataType(data_type),
+                is_primary,
+                is_nullable.orElseGet(() -> !is_primary));
     }
 
     public String getName() {

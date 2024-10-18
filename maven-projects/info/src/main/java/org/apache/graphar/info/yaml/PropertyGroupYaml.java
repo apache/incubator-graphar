@@ -40,8 +40,15 @@ public class PropertyGroupYaml {
                 propertyGroup.getPropertyList().stream()
                         .map(PropertyYaml::new)
                         .collect(Collectors.toList());
-        this.file_type = propertyGroup.getFileType().toString();
+        this.file_type = EnumTransferUtil.fileType2String(propertyGroup.getFileType());
         this.prefix = propertyGroup.getPrefix();
+    }
+
+    PropertyGroup toPropertyGroup() {
+        return new PropertyGroup(
+                properties.stream().map(PropertyYaml::toProperty).collect(Collectors.toList()),
+                EnumTransferUtil.string2FileType(file_type),
+                prefix);
     }
 
     public List<PropertyYaml> getProperties() {

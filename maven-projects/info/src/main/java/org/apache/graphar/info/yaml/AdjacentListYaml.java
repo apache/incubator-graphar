@@ -19,6 +19,9 @@
 
 package org.apache.graphar.info.yaml;
 
+import org.apache.graphar.info.AdjacentList;
+import org.apache.graphar.proto.AdjListType;
+
 public class AdjacentListYaml {
     private boolean ordered;
     private String aligned_by;
@@ -33,10 +36,24 @@ public class AdjacentListYaml {
     }
 
     public AdjacentListYaml(org.apache.graphar.info.AdjacentList adjacentList) {
-        this.ordered = adjacentList.getType().isOrdered();
-        this.aligned_by = adjacentList.getType().getAlignedBy();
-        this.file_type = adjacentList.getFileType().toString();
+        final var adjListType = adjacentList.getType();
+        this.ordered =
+                adjListType == AdjListType.ORDERED_BY_SOURCE
+                        || adjListType == AdjListType.ORDERED_BY_DESTINATION;
+        this.aligned_by =
+                adjListType == AdjListType.ORDERED_BY_SOURCE
+                                || adjListType == AdjListType.UNORDERED_BY_SOURCE
+                        ? "src"
+                        : "dst";
+        this.file_type = EnumTransferUtil.fileType2String(adjacentList.getFileType());
         this.prefix = adjacentList.getPrefix();
+    }
+
+    public AdjacentList toAdjacentList() {
+        return new AdjacentList(
+                EnumTransferUtil.orderedAndAlignedBy2AdjListType(ordered, aligned_by),
+                EnumTransferUtil.string2FileType(file_type),
+                prefix);
     }
 
     public boolean isOrdered() {
