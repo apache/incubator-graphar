@@ -20,7 +20,6 @@ graphar-cli = "graphar_cli.graphar_cli:main"
 [tool.scikit-build]
 build-dir = "build"
 
-
 [tool.ruff]
 src = ["src"]
 line-length = 100
