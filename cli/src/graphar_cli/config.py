@@ -1,8 +1,11 @@
+from logging import getLogger
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
 from pydantic import BaseModel, field_validator, model_validator
 from typing_extensions import Self
+
+logger = getLogger("graphar_cli")
 
 default_file_type = "parquet"
 default_source_file_type = "csv"
@@ -23,6 +26,16 @@ class GraphArConfig(BaseModel):
     source_file_type: Literal["parquet", "orc", "csv", "json"] = default_source_file_type
     version: Optional[str] = default_version
 
+    @field_validator("path")
+    def check_path(cls, v):
+        path = Path(v)
+        if not path.exists():
+            path.mkdir(parents=True, exist_ok=True)
+        elif any(path.iterdir()):
+            msg = f"Warning: Path {v} already exists and contains files."
+            logger.warning(msg)
+        return v
+
 
 class Property(BaseModel):
     name: str
@@ -38,7 +51,7 @@ class Property(BaseModel):
         if self.is_primary:
             self.nullable = False
         elif self.nullable is None:
-                self.nullable = True
+            self.nullable = True
         return self
 
 

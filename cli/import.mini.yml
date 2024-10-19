@@ -1,0 +1,71 @@
+graphar:
+  path: /workspaces/incubator-graphar/graphar/movie
+  name: MovieGraph
+
+import_schema:
+  vertices:
+    - type: Person
+      property_groups:
+        - properties:
+            - name: name
+              data_type: string
+              is_primary: true
+            - name: born
+              data_type: int64
+      sources:
+        - path: /workspaces/incubator-graphar/testing/neo4j/data/Person.parquet
+          columns:
+            name: name
+            born: born
+    - type: Movie
+      property_groups:
+        - properties:
+            - name: title
+              data_type: string
+              is_primary: true
+            - name: tagline
+              data_type: string
+      sources:
+        - path: /workspaces/incubator-graphar/testing/neo4j/data/Movie.parquet
+          columns:
+            title: title
+            tagline: tagline
+  edges:
+    - edge_type: WROTE
+      src_type: Person
+      src_prop: name
+      dst_type: Movie
+      dst_prop: title
+      sources:
+        - path: /workspaces/incubator-graphar/testing/neo4j/data/Person_WROTE_Movie.csv
+          columns:
+            srcIndex: _graphArSrcIndex
+            dstIndex: _graphArDstIndex
+    - edge_type: ACTED_IN
+      src_type: Person
+      src_prop: name
+      dst_type: Movie
+      dst_prop: title
+      sources:
+        - path: /workspaces/incubator-graphar/testing/neo4j/data/Person_ACTED_IN_Movie.csv
+          columns:
+            srcIndex: _graphArSrcIndex
+            dstIndex: _graphArDstIndex
+    - edge_type: REVIEWED
+      src_type: Person
+      src_prop: name
+      dst_type: Movie
+      dst_prop: title
+      property_groups:
+        - properties:
+          - name: rating
+            data_type: int64
+          - name: summary
+            data_type: string
+      sources:
+        - path: /workspaces/incubator-graphar/testing/neo4j/data/Person_REVIEWED_Movie.csv
+          columns:
+            srcIndex: _graphArSrcIndex
+            dstIndex: _graphArDstIndex
+            summary: summary
+            rating: rating

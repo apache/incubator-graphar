@@ -1,76 +1,101 @@
+from logging import getLogger
+
 from .config import ImportConfig
 
+logger = getLogger("graphar_cli")
 
-def validate(config: ImportConfig):
+
+def validate(import_config: ImportConfig):
     vertex_types = set()
-    for vertex in config.import_schema.vertices:
+    for vertex in import_config.import_schema.vertices:
         if vertex.type in vertex_types:
             msg = f"Duplicate vertex type {vertex.type}"
             raise ValueError(msg)
         vertex_types.add(vertex.type)
 
         prop_names = set()
-        for prop in vertex.properties:
-            if prop.name in prop_names:
-                msg = f"Duplicate property {prop.name} in vertex properties"
-                raise ValueError(msg)
-            prop_names.add(prop.name)
-            if prop.name == vertex.primary and prop.nullable:
-                msg = f"Primary key {vertex.primary} cannot be nullable"
-                raise ValueError(msg)
-        if vertex.primary not in prop_names:
-            msg = f"Primary key {vertex.primary} not found in vertex properties"
-            raise ValueError(msg)
-        prop_names_in_groups = set()
-        for prop_group in vertex.propertyGroups:
-            for prop_name in prop_group:
-                if prop_name not in prop_names:
-                    msg = f"Property {prop} not found in vertex properties"
+        primary_keys = []
+        for prop_group in vertex.property_groups:
+            for prop in prop_group.properties:
+                if prop.name in prop_names:
+                    msg = f"Duplicate property `{prop.name}` in vertex `{vertex.type}`"
                     raise ValueError(msg)
-                if prop_name in prop_names_in_groups:
-                    msg = f"Property {prop} found in multiple property groups"
-                    raise ValueError(msg)
-                prop_names_in_groups.add(prop_name)
+                prop_names.add(prop.name)
+                if prop.is_primary:
+                    if len(primary_keys):
+                        msg = (
+                            f"Multiple primary keys `{primary_keys[0]}` and `{prop.name}` "
+                            f"found in vertex `{vertex.type}`"
+                        )
+                        raise ValueError(msg)
+                    primary_keys.append(prop.name)
+                    if prop.nullable:
+                        msg = f"Primary key `{prop.name}` in `{vertex.type}` cannot be nullable"
+                        raise ValueError(msg)
+        source_keys = [key for source in vertex.sources for key in source.columns]
         for prop_name in prop_names:
-            if prop_name not in vertex.source.columns:
-                msg = f"Property {prop_name} not found in source columns"
+            if prop_name not in source_keys:
+                msg = (
+                    f"Property `{prop_name}` in vertex `{vertex.type}` not found in source columns"
+                )
                 raise ValueError(msg)
-        
+        logger.debug("Validated vertex %s", vertex.type)
+
     edge_types = set()
-    for edge in config.import_schema.edges:
-        if edge.type in edge_types:
+    for edge in import_config.import_schema.edges:
+        if edge.edge_type in edge_types:
             msg = f"Duplicate edge type {edge.type}"
             raise ValueError(msg)
-        edge_types.add(edge.type)
+        edge_types.add(edge.edge_type)
 
-        if edge.srcType not in vertex_types:
-            msg = f"Source vertex type {edge.srcType} not found"
+        if edge.src_type not in vertex_types:
+            msg = f"Source vertex type {edge.src_type} not found"
             raise ValueError(msg)
-        if edge.dstType not in vertex_types:
-            msg = f"Destination vertex type {edge.dstType} not found"
+        if edge.dst_type not in vertex_types:
+            msg = f"Destination vertex type {edge.dst_type} not found"
             raise ValueError(msg)
-        # TODO: Check that source and destination properties are present in the source vertex
+        src_vertex = next(
+            vertex
+            for vertex in import_config.import_schema.vertices
+            if vertex.type == edge.src_type
+        )
+        if edge.src_prop not in [
+            prop.name for prop_group in src_vertex.property_groups for prop in prop_group.properties
+        ]:
+            msg = (
+                f"Source property `{edge.src_prop}` "
+                f"not found in source vertex `{edge.src_type}` "
+                f"in edge `{edge.edge_type}`"
+            )
+            raise ValueError(msg)
+        dst_vertex = next(
+            vertex
+            for vertex in import_config.import_schema.vertices
+            if vertex.type == edge.dst_type
+        )
+        if edge.dst_prop not in [
+            prop.name for prop_group in dst_vertex.property_groups for prop in prop_group.properties
+        ]:
+            msg = (
+                f"Destination property `{edge.dst_prop}` "
+                f"not found in destination vertex `{edge.dst_type}` "
+                f"in edge `{edge.edge_type}`"
+            )
+            raise ValueError(msg)
         prop_names = set()
-        for prop in edge.properties:
-            if prop.name in prop_names:
-                msg = f"Duplicate property {prop.name} in edge properties"
-                raise ValueError(msg)
-            prop_names.add(prop.name)
-        prop_names_in_groups = set()
-        for prop_group in edge.propertyGroups:
-            for prop_name in prop_group:
-                if prop_name not in prop_names:
-                    msg = f"Property {prop} not found in edge properties"
+        for prop_group in edge.property_groups:
+            for prop in prop_group.properties:
+                if prop.name in prop_names:
+                    msg = f"Duplicate property `{prop.name}` in edge `{edge.edge_type}`"
                     raise ValueError(msg)
-                if prop_name in prop_names_in_groups:
-                    msg = f"Property {prop} found in multiple property groups"
-                    raise ValueError(msg)
-                prop_names_in_groups.add(prop_name)
-        for prop_name in prop_names:
-            if prop_name not in edge.source.columns:
-                msg = f"Property {prop_name} not found in source columns"
-                raise ValueError(msg)
-        
+                prop_names.add(prop.name)
 
-def do_import(config: ImportConfig):
-    pass
+        source_keys = [key for source in edge.sources for key in source.columns]
+        for prop_name in prop_names:
+            if prop_name not in source_keys:
+                msg = (
+                    f"Property `{prop_name}` in edge `{edge.edge_type}` "
+                    f"not found in source columns"
+                )
+                raise ValueError(msg)
+        logger.debug("Validated edge %s %s %s", edge.src_type, edge.edge_type, edge.dst_type)
