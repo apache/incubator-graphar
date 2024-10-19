@@ -5,28 +5,41 @@ from typing import List
 
 import pandas as pd
 import typer
+import yaml
 
-from ._core import (
+from ._core import (  # type: ignore  # noqa: PGH003
     check_edge,
     check_graph,
     check_vertex,
+    do_import,
+    get_edge_count,
     get_edge_types,
+    get_vertex_count,
     get_vertex_types,
     show_edge,
     show_graph,
     show_vertex,
 )
 from .config import ImportConfig
-from .importer import do_import, validate
+from .importer import validate
 from .logging import setup_logging
 
-app = typer.Typer(help="GraphAr Cli", no_args_is_help=True, add_completion=False)
+app = typer.Typer(
+    help="GraphAr Cli",
+    no_args_is_help=True,
+    add_completion=False,
+    context_settings={"help_option_names": ["-h", "--help"]},
+)
 
 setup_logging()
 logger = getLogger(__name__)
 
 
-@app.command(context_settings={"help_option_names": ["-h", "--help"]}, help="Show the metadata")
+@app.command(
+    context_settings={"help_option_names": ["-h", "--help"]},
+    help="Show the metadata",
+    no_args_is_help=True,
+)
 def show(
     path: str = typer.Option(None, "--path", "-p", help="Path to the GraphAr config file"),
     vertex: str = typer.Option(None, "--vertex", "-v", help="Vertex type to show"),
@@ -46,13 +59,14 @@ def show(
         if vertex not in vertex_types:
             logger.error("Vertex %s not found in the graph", vertex)
             raise typer.Exit(1)
+        logger.info("Vertex count: %s", get_vertex_count(path, vertex))
         logger.info(show_vertex(path, vertex))
-        raise typer.Exit(0)
+        raise typer.Exit()
     if edge or edge_src or edge_dst:
         if not (edge and edge_src and edge_dst):
             logger.error("Edge source, edge, and edge destination must all be set")
             raise typer.Exit(1)
-        edge_types = get_edge_types(path)
+        edge_types: List[List[str]] = get_edge_types(path)
         found = False
         for edge_type in edge_types:
             if edge_type[0] == edge_src and edge_type[1] == edge and edge_type[2] == edge_dst:
@@ -66,12 +80,17 @@ def show(
                 edge_dst,
             )
             raise typer.Exit(1)
-        logger.info(show_edge(path, edge))
-        raise typer.Exit(1)
+        logger.info("Edge count: %s", get_edge_count(path, edge_src, edge, edge_dst))
+        logger.info(show_edge(path, edge_src, edge, edge_dst))
+        raise typer.Exit()
     logger.info(show_graph(path))
 
 
-@app.command(context_settings={"help_option_names": ["-h", "--help"]}, help="Check the metadata")
+@app.command(
+    context_settings={"help_option_names": ["-h", "--help"]},
+    help="Check the metadata",
+    no_args_is_help=True,
+)
 def check(
     path: str = typer.Option(None, "--path", "-p", help="Path to the GraphAr config file"),
 ):
@@ -104,15 +123,35 @@ def check(
     logger.info("Graph is valid")
 
 
-@app.command("import", context_settings={"help_option_names": ["-h", "--help"]}, help="Import data")
+@app.command(
+    "import",
+    context_settings={"help_option_names": ["-h", "--help"]},
+    help="Import data",
+    no_args_is_help=True,
+)
 def import_data(
-    config_file: str = typer.Option(None, "--config", "-c", help="Path to the GraphAr config file"),
+    config_file: str = typer.Option(None, "--config", "-c", help="Path of the GraphAr config file"),
+    config_type: str = typer.Option(
+        "yaml",
+        "--type",
+        "-t",
+        help="Type of config file",
+        show_choices=True,
+        show_default=True,
+    ),
 ):
-    if not Path(config_file).exists():
+    if not Path(config_file).is_file():
         logger.error("File not found: %s", config_file)
         raise typer.Exit(1)
-    with Path(config_file).open(encoding="utf-8") as file:
-        config = json.load(file)
+    if config_type == "json":
+        with Path(config_file).open(encoding="utf-8") as file:
+            config = json.load(file)
+    elif config_type == "yaml":
+        with Path(config_file).open(encoding="utf-8") as file:
+            config = yaml.safe_load(file)
+    else:
+        logger.error("Config type %s not supported", config_type)
+        raise typer.Exit(1)
     try:
         import_config = ImportConfig(**config)
         validate(import_config)
@@ -120,11 +159,12 @@ def import_data(
         logger.error("Invalid config: %s", e)
         raise typer.Exit(1) from None
     try:
-        do_import(import_config)
+        logger.info("Starting import")
+        res = do_import(import_config.model_dump())
+        logger.info(res)
     except Exception as e:
         logger.error("Import failed: %s", e)
         raise typer.Exit(1) from None
-    logger.info(config)
 
 
 @app.command(
@@ -136,16 +176,16 @@ def merge_data(
     output: str = typer.Option(None, "--output", "-o", help="Output file"),
 ):
     if type == "parquet":
-        data = pd.concat([pd.read_parquet(file) for file in files], axis=1)
+        data = pd.concat([pd.read_parquet(file) for file in files], ignore_index=True)
         data.to_parquet(output)
     elif type == "csv":
-        data = pd.concat([pd.read_csv(file) for file in files], axis=1)
+        data = pd.concat([pd.read_csv(file) for file in files], ignore_index=True)
         data.to_csv(output)
     elif type == "orc":
-        data = pd.concat([pd.read_orc(file) for file in files], axis=1)
+        data = pd.concat([pd.read_orc(file) for file in files], ignore_index=True)
         data.to_orc(output)
     elif type == "json":
-        data = pd.concat([pd.read_json(file) for file in files], axis=1)
+        data = pd.concat([pd.read_json(file) for file in files], ignore_index=True)
         data.to_json(output)
     else:
         logger.error("Type %s not supported", type)
