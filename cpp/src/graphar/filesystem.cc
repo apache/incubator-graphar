@@ -35,6 +35,7 @@
 #include "graphar/expression.h"
 #include "graphar/filesystem.h"
 #include "graphar/fwd.h"
+#include "graphar/general_params.h"
 
 namespace graphar::detail {
 template <typename U, typename T>
@@ -233,8 +234,11 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
     break;
   }
   case FileType::PARQUET: {
+    auto schema = table->schema();
+    auto column_num = schema->num_fields();
     parquet::WriterProperties::Builder builder;
     builder.compression(arrow::Compression::type::ZSTD);  // enable compression
+    builder.encoding(graphar::GeneralParams::kLabelCol, parquet::Encoding::RLE);
     RETURN_NOT_ARROW_OK(parquet::arrow::WriteTable(
         *table, arrow::default_memory_pool(), output_stream, 64 * 1024 * 1024,
         builder.build(), parquet::default_arrow_writer_properties()));

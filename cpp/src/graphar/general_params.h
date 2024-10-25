@@ -27,6 +27,7 @@ struct GeneralParams {
   static constexpr const char* kDstIndexCol = "_graphArDstIndex";
   static constexpr const char* kOffsetCol = "_graphArOffset";
   static constexpr const char* kPrimaryCol = "_graphArPrimary";
+  static constexpr const char* kLabelCol = "_graphArLabel";
 };
 
 }  // namespace graphar
