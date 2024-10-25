@@ -34,12 +34,19 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../cpp ${CMAKE_BINARY_DIR}/graphar)
 find_package(Python REQUIRED COMPONENTS Interpreter Development.Module)
 find_package(pybind11 CONFIG REQUIRED)
 find_package(Arrow REQUIRED)
+find_package(ArrowDataset REQUIRED)
+find_package(ArrowAcero REQUIRED)
+find_package(Parquet REQUIRED)
 
 # Add a library using FindPython's tooling (pybind11 also provides a helper like
 # this)
 python_add_library(_core MODULE src/main.cc WITH_SOABI)
 
-target_link_libraries(_core PRIVATE pybind11::headers graphar Arrow::arrow_shared)
+target_link_libraries(_core PRIVATE pybind11::headers graphar Arrow::arrow_shared
+                                    Parquet::parquet_shared
+                                    ArrowDataset::arrow_dataset_shared
+                                    ArrowAcero::arrow_acero_shared
+                                    )
 target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cpp/src)
 target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cpp/thirdparty)
