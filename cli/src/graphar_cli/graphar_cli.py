@@ -20,7 +20,6 @@ from logging import getLogger
 from pathlib import Path
 from typing import List
 
-import pandas as pd
 import typer
 import yaml
 
