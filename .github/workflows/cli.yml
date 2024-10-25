@@ -64,7 +64,7 @@ jobs:
                             libparquet-dev
         sudo apt-get install -y ccache libcurl4-openssl-dev
 
-    - name: Install GraphAr CLI
+    - name: Install GraphAr CLI and Run Tests
       working-directory: "cli"
       run: |
         pip install ./ -v

@@ -47,7 +47,7 @@ class GraphArConfig(BaseModel):
 
     @field_validator("path")
     def check_path(cls, v):
-        path = Path(v)
+        path = Path(v).resolve().absolute()
         if not path.exists():
             path.mkdir(parents=True, exist_ok=True)
         elif any(path.iterdir()):
@@ -94,8 +94,9 @@ class Source(BaseModel):
 
     @field_validator("path")
     def check_path(cls, v):
-        if not Path(v).is_file():
-            msg = f"{v} is not a file."
+        path = Path(v).resolve().absolute()
+        if not path.is_file():
+            msg = f"'{path}' is not a file."
             raise ValueError(msg)
         return v
 

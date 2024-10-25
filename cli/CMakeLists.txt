@@ -25,7 +25,7 @@ project(
   ${SKBUILD_PROJECT_NAME}
   VERSION ${SKBUILD_PROJECT_VERSION}
   LANGUAGES CXX)
-
+set(CMAKE_CXX_FLAGS "-g  -std=c++17 -lstdc++fs")
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../cpp ${CMAKE_BINARY_DIR}/graphar)
 
 # Find the module development requirements (requires FindPython from 3.17 or
@@ -36,7 +36,8 @@ find_package(pybind11 CONFIG REQUIRED)
 # Add a library using FindPython's tooling (pybind11 also provides a helper like
 # this)
 python_add_library(_core MODULE src/main.cc WITH_SOABI)
-target_link_libraries(_core PRIVATE pybind11::headers graphar)
+
+target_link_libraries(_core PRIVATE pybind11::headers graphar stdc++fs)
 target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cpp/src)
 target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cpp/thirdparty)
