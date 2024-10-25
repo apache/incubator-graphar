@@ -97,8 +97,12 @@ jobs:
         brew bundle --file=cpp/Brewfile
         
     
-    - name: Build GraphAr
+    - name: Build GraphAr And Run Tests
       working-directory: "cli"
       run: |
         pip install ./ -vvv
         graphar-cli --help
+        graphar-cli check -f ../testing/neo4j/MovieGraph.graph.yml
+        graphar-cli show -f ../testing/neo4j/MovieGraph.graph.yml -v Person
+        graphar-cli show -f ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
+        graphar-cli import -c import.mini.yml

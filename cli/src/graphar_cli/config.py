@@ -1,17 +1,19 @@
 from logging import getLogger
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional
+from typing import Dict, List, Literal, Optional
 
 from pydantic import BaseModel, field_validator, model_validator
 from typing_extensions import Self
 
 logger = getLogger("graphar_cli")
 
+# TODO: convert to constants
 default_file_type = "parquet"
-default_source_file_type = "csv"
 default_adj_list_type = "ordered_by_source"
 default_regular_separator = "_"
+default_validate_level = "weak"
 default_version = "gar/v1"
+support_file_types = {"parquet", "orc", "csv", "json"}
 
 
 class GraphArConfig(BaseModel):
@@ -23,7 +25,7 @@ class GraphArConfig(BaseModel):
     adj_list_type: Literal[
         "ordered_by_source", "ordered_by_dest", "unordered_by_source", "unordered_by_dest"
     ] = default_adj_list_type
-    source_file_type: Literal["parquet", "orc", "csv", "json"] = default_source_file_type
+    validate_level: Literal["no", "weak", "strong"] = default_validate_level
     version: Optional[str] = default_version
 
     @field_validator("path")
@@ -87,11 +89,25 @@ class Source(BaseModel):
             raise ValueError(msg)
         return v
 
+    @model_validator(mode="after")
+    def check_file_type(self) -> Self:
+        if not self.file_type:
+            file_type = Path(self.path).suffix.removeprefix(".")
+            if file_type == "":
+                msg = f"File {self.path} has no file type suffix"
+                raise ValueError(msg)
+            if file_type not in support_file_types:
+                msg = f"File type {file_type} not supported"
+                raise ValueError(msg)
+            self.file_type = file_type
+        return self
+
 
 class Vertex(BaseModel):
     type: str
     labels: List[str] = []
     chunk_size: Optional[int] = None
+    validate_level: Optional[Literal["no", "weak", "strong"]] = None
     prefix: Optional[str] = None
     property_groups: List[PropertyGroup]
     sources: List[Source]
@@ -133,6 +149,7 @@ class Edge(BaseModel):
     dst_prop: Optional[str] = None
     labels: List[str] = []
     chunk_size: Optional[int] = None
+    validate_level: Optional[Literal["no", "weak", "strong"]] = None
     adj_lists: List[AdjList] = []
     property_groups: List[PropertyGroup] = []
     sources: List[Source]
@@ -176,49 +193,43 @@ class ImportConfig(BaseModel):
     graphar: GraphArConfig
     import_schema: ImportSchema
 
-    @field_validator("import_schema")
-    def replace_none_values(cls, v: ImportSchema, values: Dict[str, Any]):
-        config = values.data["graphar"]
-        for vertex in v.vertices:
+    @model_validator(mode="after")
+    def check_none_types(self) -> Self:
+        for vertex in self.import_schema.vertices:
             if vertex.chunk_size is None:
-                vertex.chunk_size = config.vertex_chunk_size
+                vertex.chunk_size = self.graphar.vertex_chunk_size
+            if vertex.validate_level is None:
+                vertex.validate_level = self.graphar.validate_level
             for property_group in vertex.property_groups:
                 if property_group.file_type is None:
-                    property_group.file_type = config.file_type
-            for source in vertex.sources:
-                if source.file_type is None:
-                    source.file_type = config.source_file_type
-        for edge in v.edges:
+                    property_group.file_type = self.graphar.file_type
+        for edge in self.import_schema.edges:
             if edge.chunk_size is None:
-                edge.chunk_size = config.edge_chunk_size
+                edge.chunk_size = self.graphar.edge_chunk_size
+            if edge.validate_level is None:
+                edge.validate_level = self.graphar.validate_level
             if len(edge.adj_lists) == 0:
-                if config.adj_list_type == "ordered_by_source":
+                if self.graphar.adj_list_type == "ordered_by_source":
                     edge.adj_lists.append(
-                        AdjList(ordered=True, aligned_by="src", file_type=config.file_type)
+                        AdjList(ordered=True, aligned_by="src", file_type=self.graphar.file_type)
                     )
-                elif config.adj_list_type == "ordered_by_dest":
+                elif self.graphar.adj_list_type == "ordered_by_dest":
                     edge.adj_lists.append(
-                        AdjList(ordered=True, aligned_by="dst", file_type=config.file_type)
+                        AdjList(ordered=True, aligned_by="dst", file_type=self.graphar.file_type)
                     )
-                elif config.adj_list_type == "unordered_by_source":
+                elif self.graphar.adj_list_type == "unordered_by_source":
                     edge.adj_lists.append(
-                        AdjList(ordered=False, aligned_by="src", file_type=config.file_type)
+                        AdjList(ordered=False, aligned_by="src", file_type=self.graphar.file_type)
                     )
-                elif config.adj_list_type == "unordered_by_dest":
+                elif self.graphar.adj_list_type == "unordered_by_dest":
                     edge.adj_lists.append(
-                        AdjList(ordered=False, aligned_by="dst", file_type=config.file_type)
+                        AdjList(ordered=False, aligned_by="dst", file_type=self.graphar.file_type)
                     )
                 else:
-                    msg = "Invalid adj_list_type"
+                    msg = f"Invalid adj_list_type '{self.graphar.adj_list_type}'"
                     raise ValueError(msg)
-            else:
-                for adj_list in edge.adj_lists:
-                    if adj_list.file_type is None:
-                        adj_list.file_type = config.file_type
             for property_group in edge.property_groups:
                 if property_group.file_type is None:
-                    property_group.file_type = config.file_type
-            for source in edge.sources:
-                if source.file_type is None:
-                    source.file_type = config.source_file_type
-        return v
+                    property_group.file_type = self.graphar.file_type
+
+        return self

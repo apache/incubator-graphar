@@ -26,7 +26,7 @@ import_schema:
             - name: tagline
               data_type: string
       sources:
-        - path: /workspaces/incubator-graphar/testing/neo4j/data/Movie.parquet
+        - path: /workspaces/incubator-graphar/testing/neo4j/data/Movie.orc
           columns:
             title: title
             tagline: tagline
@@ -39,18 +39,18 @@ import_schema:
       sources:
         - path: /workspaces/incubator-graphar/testing/neo4j/data/Person_WROTE_Movie.csv
           columns:
-            srcIndex: _graphArSrcIndex
-            dstIndex: _graphArDstIndex
+            name: name
+            title: title
     - edge_type: ACTED_IN
       src_type: Person
       src_prop: name
       dst_type: Movie
       dst_prop: title
       sources:
-        - path: /workspaces/incubator-graphar/testing/neo4j/data/Person_ACTED_IN_Movie.csv
+        - path: /workspaces/incubator-graphar/testing/neo4j/data/Person_ACTED_IN_Movie.json
           columns:
-            srcIndex: _graphArSrcIndex
-            dstIndex: _graphArDstIndex
+            name: name
+            title: title
     - edge_type: REVIEWED
       src_type: Person
       src_prop: name
@@ -65,7 +65,7 @@ import_schema:
       sources:
         - path: /workspaces/incubator-graphar/testing/neo4j/data/Person_REVIEWED_Movie.csv
           columns:
-            srcIndex: _graphArSrcIndex
-            dstIndex: _graphArDstIndex
+            name: name
+            title: title
             summary: summary
             rating: rating

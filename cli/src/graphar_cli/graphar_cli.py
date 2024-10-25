@@ -41,7 +41,7 @@ logger = getLogger(__name__)
     no_args_is_help=True,
 )
 def show(
-    path: str = typer.Option(None, "--path", "-p", help="Path to the GraphAr config file"),
+    path: str = typer.Option(None, "--path", "-f", help="Path to the GraphAr config file"),
     vertex: str = typer.Option(None, "--vertex", "-v", help="Vertex type to show"),
     edge_src: str = typer.Option(None, "--edge-src", "-es", help="Source of the edge type to show"),
     edge: str = typer.Option(None, "--edge", "-e", help="Edge type to show"),
@@ -92,7 +92,7 @@ def show(
     no_args_is_help=True,
 )
 def check(
-    path: str = typer.Option(None, "--path", "-p", help="Path to the GraphAr config file"),
+    path: str = typer.Option(None, "--path", "-f", help="Path to the GraphAr config file"),
 ):
     if not Path(path).exists():
         logger.error("File not found: %s", path)
@@ -165,32 +165,6 @@ def import_data(
     except Exception as e:
         logger.error("Import failed: %s", e)
         raise typer.Exit(1) from None
-
-
-@app.command(
-    "merge", context_settings={"help_option_names": ["-h", "--help"]}, help="Merge source files"
-)
-def merge_data(
-    files: List[str] = typer.Option(None, "--file", "-f", help="Files to merge"),  # noqa: B008
-    type: str = typer.Option(None, "--type", "-t", help="Type of data to merge"),
-    output: str = typer.Option(None, "--output", "-o", help="Output file"),
-):
-    if type == "parquet":
-        data = pd.concat([pd.read_parquet(file) for file in files], ignore_index=True)
-        data.to_parquet(output)
-    elif type == "csv":
-        data = pd.concat([pd.read_csv(file) for file in files], ignore_index=True)
-        data.to_csv(output)
-    elif type == "orc":
-        data = pd.concat([pd.read_orc(file) for file in files], ignore_index=True)
-        data.to_orc(output)
-    elif type == "json":
-        data = pd.concat([pd.read_json(file) for file in files], ignore_index=True)
-        data.to_json(output)
-    else:
-        logger.error("Type %s not supported", type)
-        raise typer.Exit(1)
-    logger.info("Merged data saved to %s", output)
 
 
 def main() -> None:

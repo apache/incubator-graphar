@@ -18,27 +18,29 @@ def validate(import_config: ImportConfig):
         for prop_group in vertex.property_groups:
             for prop in prop_group.properties:
                 if prop.name in prop_names:
-                    msg = f"Duplicate property `{prop.name}` in vertex `{vertex.type}`"
+                    msg = f"Duplicate property '{prop.name}' in vertex '{vertex.type}'"
                     raise ValueError(msg)
                 prop_names.add(prop.name)
                 if prop.is_primary:
                     if len(primary_keys):
                         msg = (
-                            f"Multiple primary keys `{primary_keys[0]}` and `{prop.name}` "
-                            f"found in vertex `{vertex.type}`"
+                            f"Multiple primary keys '{primary_keys[0]}' and '{prop.name}' "
+                            f"found in vertex '{vertex.type}'"
                         )
                         raise ValueError(msg)
                     primary_keys.append(prop.name)
                     if prop.nullable:
-                        msg = f"Primary key `{prop.name}` in `{vertex.type}` cannot be nullable"
+                        msg = f"Primary key '{prop.name}' in '{vertex.type}' cannot be nullable"
                         raise ValueError(msg)
-        source_keys = [key for source in vertex.sources for key in source.columns]
+        source_values = [value for source in vertex.sources for value in source.columns.values()]
         for prop_name in prop_names:
-            if prop_name not in source_keys:
+            if prop_name not in source_values:
                 msg = (
-                    f"Property `{prop_name}` in vertex `{vertex.type}` not found in source columns"
+                    f"Property '{prop_name}' in vertex '{vertex.type}' not found in source columns"
                 )
                 raise ValueError(msg)
+        msg = f"Source columns are more than the properties in vertex '{vertex.type}'"
+        assert len(source_values) == len(prop_names), msg
         logger.debug("Validated vertex %s", vertex.type)
 
     edge_types = set()
@@ -63,9 +65,9 @@ def validate(import_config: ImportConfig):
             prop.name for prop_group in src_vertex.property_groups for prop in prop_group.properties
         ]:
             msg = (
-                f"Source property `{edge.src_prop}` "
-                f"not found in source vertex `{edge.src_type}` "
-                f"in edge `{edge.edge_type}`"
+                f"Source property '{edge.src_prop}' "
+                f"not found in source vertex '{edge.src_type}' "
+                f"in edge '{edge.edge_type}'"
             )
             raise ValueError(msg)
         dst_vertex = next(
@@ -77,25 +79,27 @@ def validate(import_config: ImportConfig):
             prop.name for prop_group in dst_vertex.property_groups for prop in prop_group.properties
         ]:
             msg = (
-                f"Destination property `{edge.dst_prop}` "
-                f"not found in destination vertex `{edge.dst_type}` "
-                f"in edge `{edge.edge_type}`"
+                f"Destination property '{edge.dst_prop}' "
+                f"not found in destination vertex '{edge.dst_type}' "
+                f"in edge '{edge.edge_type}'"
             )
             raise ValueError(msg)
         prop_names = set()
         for prop_group in edge.property_groups:
             for prop in prop_group.properties:
                 if prop.name in prop_names:
-                    msg = f"Duplicate property `{prop.name}` in edge `{edge.edge_type}`"
+                    msg = f"Duplicate property '{prop.name}' in edge '{edge.edge_type}'"
                     raise ValueError(msg)
                 prop_names.add(prop.name)
 
-        source_keys = [key for source in edge.sources for key in source.columns]
+        source_values = [value for source in edge.sources for value in source.columns.values()]
         for prop_name in prop_names:
-            if prop_name not in source_keys:
+            if prop_name not in source_values:
                 msg = (
-                    f"Property `{prop_name}` in edge `{edge.edge_type}` "
+                    f"Property '{prop_name}' in edge "
+                    f"'{edge.dst_prop}_{edge.edge_type}_{edge.edge_type}' "
                     f"not found in source columns"
                 )
                 raise ValueError(msg)
+        # TODO: Validate source columns
         logger.debug("Validated edge %s %s %s", edge.src_type, edge.edge_type, edge.dst_type)

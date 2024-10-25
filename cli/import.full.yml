@@ -1,12 +1,12 @@
-graphar:
-  path: /workspaces/incubator-graphar/graphar/movie
-  name: MovieGraph
-  vertex_chunk_size: 100
-  edge_chunk_size: 1024
-  file_type: parquet
-  adj_list_type: ordered_by_source
-  source_file_type: parquet
-  version: gar/v1
+graphar:                                              # Global configuration of imported data
+  path: /workspaces/incubator-graphar/graphar/movie   # (Required) Path to the graphar directory
+  name: MovieGraph                                    # (Required) Name of the graph
+  vertex_chunk_size: 100                              # Number of vertices per chunk
+  edge_chunk_size: 1024                               # Number of edges per chunk
+  file_type: parquet                                  # Default file type for vertices and edges, can be "parquet", "orc", "csv", "json"
+  adj_list_type: ordered_by_source                    # Default adjacency list type, can be "ordered_by_source", "ordered_by_dest", "unordered_by_source", "unordered_by_dest"
+  validate_level: weak                                # Default validation level for vertices and edges, can be "no", "weak", "strong"
+  version: gar/v1                                     # Version of the graphar schema
 
 import_schema:
   vertices:
@@ -14,6 +14,7 @@ import_schema:
       labels:
         - Person
       chunk_size: 100
+      validate_level: "no"
       prefix: vertex/Person/
       property_groups:
         - file_type: parquet
@@ -36,6 +37,7 @@ import_schema:
       labels:
         - Movie
       chunk_size: 100
+      validate_level: "no"
       prefix: vertex/Movie/
       property_groups:
         - file_type: parquet
@@ -49,8 +51,8 @@ import_schema:
               is_primary: false
               nullable: true
       sources:
-        - file_type: parquet
-          path: /workspaces/incubator-graphar/testing/neo4j/data/Movie.parquet
+        - file_type: orc
+          path: /workspaces/incubator-graphar/testing/neo4j/data/Movie.orc
           columns:
             title: title
             tagline: tagline
@@ -63,6 +65,7 @@ import_schema:
       labels:
         - WROTE
       chunk_size: 1024
+      validate_level: "no"
       prefix: edge/Person_WROTE_Movie/
       adj_lists:
         - ordered: true
@@ -76,13 +79,14 @@ import_schema:
           delimiter: ","
           path: /workspaces/incubator-graphar/testing/neo4j/data/Person_WROTE_Movie.csv
           columns:
-            srcIndex: _graphArSrcIndex
-            dstIndex: _graphArDstIndex
+            name: name
+            title: title
     - edge_type: ACTED_IN
       src_type: Person
       src_prop: name
       dst_type: Movie
       dst_prop: title
+      validate_level: "no"
       labels:
         - ACTED_IN
       chunk_size: 1024
@@ -95,12 +99,12 @@ import_schema:
           aligned_by: dst
           file_type: parquet
       sources:
-        - file_type: csv
-          delimiter: ","
-          path: /workspaces/incubator-graphar/testing/neo4j/data/Person_ACTED_IN_Movie.csv
+        - file_type: json
+          delimiter: ","    # will be ignored
+          path: /workspaces/incubator-graphar/testing/neo4j/data/Person_ACTED_IN_Movie.json
           columns:
-            srcIndex: _graphArSrcIndex
-            dstIndex: _graphArDstIndex
+            name: name
+            title: title
     - edge_type: REVIEWED
       src_type: Person
       src_prop: name
@@ -109,6 +113,7 @@ import_schema:
       labels:
         - Review
       chunk_size: 1024
+      validate_level: "no"
       prefix: edge/Person_REVIEWED_Movie/
       property_groups:
         - file_type: parquet
