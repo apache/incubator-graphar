@@ -1,5 +1,5 @@
 graphar:
-  path: /workspaces/incubator-graphar/graphar/movie
+  path: /temp/graphar/movie
   name: MovieGraph
 
 import_schema:
@@ -13,7 +13,7 @@ import_schema:
             - name: born
               data_type: int64
       sources:
-        - path: /workspaces/incubator-graphar/testing/neo4j/data/Person.parquet
+        - path: ../testing/neo4j/data/Person.parquet
           columns:
             name: name
             born: born
@@ -26,7 +26,7 @@ import_schema:
             - name: tagline
               data_type: string
       sources:
-        - path: /workspaces/incubator-graphar/testing/neo4j/data/Movie.orc
+        - path: ../testing/neo4j/data/Movie.orc
           columns:
             title: title
             tagline: tagline
@@ -37,7 +37,7 @@ import_schema:
       dst_type: Movie
       dst_prop: title
       sources:
-        - path: /workspaces/incubator-graphar/testing/neo4j/data/Person_WROTE_Movie.csv
+        - path: ../testing/neo4j/data/Person_WROTE_Movie.csv
           columns:
             name: name
             title: title
@@ -47,7 +47,7 @@ import_schema:
       dst_type: Movie
       dst_prop: title
       sources:
-        - path: /workspaces/incubator-graphar/testing/neo4j/data/Person_ACTED_IN_Movie.json
+        - path: ../testing/neo4j/data/Person_ACTED_IN_Movie.json
           columns:
             name: name
             title: title
@@ -63,7 +63,7 @@ import_schema:
           - name: summary
             data_type: string
       sources:
-        - path: /workspaces/incubator-graphar/testing/neo4j/data/Person_REVIEWED_Movie.csv
+        - path: ../testing/neo4j/data/Person_REVIEWED_Movie.csv
           columns:
             name: name
             title: title
