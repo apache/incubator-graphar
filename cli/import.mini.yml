@@ -1,5 +1,5 @@
 graphar:
-  path: /temp/graphar/movie
+  path: /tmp/graphar/movie
   name: MovieGraph
 
 import_schema:
