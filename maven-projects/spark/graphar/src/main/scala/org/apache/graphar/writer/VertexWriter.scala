@@ -94,9 +94,9 @@ class VertexWriter(
   chunks.persist(GeneralParams.defaultStorageLevel)
 
   private def validate(): Unit = {
-    // check if vertex DataFrame contains the index_filed
-    val index_filed = StructField(GeneralParams.vertexIndexCol, LongType)
-    if (vertexDf.schema.contains(index_filed) == false) {
+    // check if vertex DataFrame contains the index_field
+    val index_field = StructField(GeneralParams.vertexIndexCol, LongType)
+    if (vertexDf.schema.contains(index_field) == false) {
       throw new IllegalArgumentException(
         "vertex DataFrame must contain index column."
       )

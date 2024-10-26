@@ -185,7 +185,7 @@ class GraphWriter() {
    * @param spark
    *   the spark session for the writing.
    * @param name
-   *   the name of graph, default is 'grpah'
+   *   the name of graph, default is 'graph'
    * @param vertex_chunk_size
    *   the chunk size for vertices, default is 2^18
    * @param edge_chunk_size
