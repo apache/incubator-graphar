@@ -140,7 +140,9 @@ jobs:
 
     - name: Build GraphAr
       working-directory: "cpp/build"
-      run: make -j$(nproc)
+      run: |
+        make clean_data
+        make -j$(nproc)
 
     - name: Test
       working-directory: "cpp/build"
