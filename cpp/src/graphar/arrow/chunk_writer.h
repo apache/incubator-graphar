@@ -187,6 +187,10 @@ class VertexPropertyWriter {
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
+  Result<std::shared_ptr<arrow::Table>> addIndexColumn(
+      const std::shared_ptr<arrow::Table>& table, IdType chunk_index,
+      IdType chunk_size) const;
+
  private:
   /**
    * @brief Check if the operation of writing vertices number is allowed.
@@ -220,10 +224,6 @@ class VertexPropertyWriter {
   Status validate(const std::shared_ptr<arrow::Table>& input_table,
                   const std::shared_ptr<PropertyGroup>& property_group,
                   IdType chunk_index, ValidateLevel validate_level) const;
-
-  Result<std::shared_ptr<arrow::Table>> addIndexColumn(
-      const std::shared_ptr<arrow::Table>& table, IdType chunk_index,
-      IdType chunk_size) const;
 
  private:
   std::shared_ptr<VertexInfo> vertex_info_;

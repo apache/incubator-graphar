@@ -61,4 +61,6 @@ excludes = [
   "java/build.xml",
   "**/*.json",
   "pyspark/poetry.lock",
+  "cli/*.yml",
+  "cli/*.toml",
 ]
