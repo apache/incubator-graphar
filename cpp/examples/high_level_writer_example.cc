@@ -52,7 +52,7 @@ void vertices_builder() {
     v.AddProperty(property_names[0], id[i]);
     v.AddProperty(property_names[1], firstName[i]);
     v.AddProperty(property_names[2], lastName[i]);
-    v.AddProperty(property_names[2], gender[i]);
+    v.AddProperty(property_names[3], gender[i]);
     ASSERT(builder.AddVertex(v).ok());
   }
 
