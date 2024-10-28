@@ -51,6 +51,18 @@ Result<std::shared_ptr<arrow::Schema>> PropertyGroupToSchema(
   return arrow::schema(fields);
 }
 
+Result<std::shared_ptr<arrow::Schema>> LabelToSchema(
+    std::vector<std::string> labels, bool contain_index_column = false) {
+  std::vector<std::shared_ptr<arrow::Field>> fields;
+  if (contain_index_column) {
+    fields.push_back(std::make_shared<arrow::Field>(
+        GeneralParams::kVertexIndexCol, arrow::int64()));
+  }
+  for (const auto& lab : labels) {
+    fields.push_back(std::make_shared<arrow::Field>(lab, arrow::boolean()));
+  }
+  return arrow::schema(fields);
+}
 Status GeneralCast(const std::shared_ptr<arrow::Array>& in,
                    const std::shared_ptr<arrow::DataType>& to_type,
                    std::shared_ptr<arrow::Array>* out) {
@@ -148,6 +160,29 @@ VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
                             PropertyGroupToSchema(property_group_, true));
 }
 
+// initialize for labels
+VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
+    const std::shared_ptr<VertexInfo>& vertex_info,
+    const std::vector<std::string>& labels, const std::string& prefix,
+    const util::FilterOptions& options)
+    : vertex_info_(std::move(vertex_info)),
+      labels_(labels),
+      chunk_index_(0),
+      seek_id_(0),
+      schema_(nullptr),
+      chunk_table_(nullptr),
+      filter_options_(options) {
+  GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
+
+  std::string base_dir = prefix_ + vertex_info_->GetPrefix() + "labels/chunk" +
+                         std::to_string(chunk_index_);
+  GAR_ASSIGN_OR_RAISE_ERROR(chunk_num_,
+                            util::GetVertexChunkNum(prefix_, vertex_info));
+  GAR_ASSIGN_OR_RAISE_ERROR(vertex_num_,
+                            util::GetVertexNum(prefix_, vertex_info_));
+  GAR_ASSIGN_OR_RAISE_ERROR(schema_, LabelToSchema(labels));
+}
+
 Status VertexPropertyArrowChunkReader::seek(IdType id) {
   seek_id_ = id;
   IdType pre_chunk_index = chunk_index_;
@@ -181,6 +216,24 @@ VertexPropertyArrowChunkReader::GetChunk() {
       GAR_RETURN_NOT_OK(
           CastTableWithSchema(chunk_table_, schema_, &chunk_table_));
     }
+  }
+  IdType row_offset = seek_id_ - chunk_index_ * vertex_info_->GetChunkSize();
+  return chunk_table_->Slice(row_offset);
+}
+
+Result<std::shared_ptr<arrow::Table>>
+VertexPropertyArrowChunkReader::GetLabelChunk() {
+  FileType filetype = FileType::PARQUET;
+  if (chunk_table_ == nullptr) {
+    std::string path = prefix_ + vertex_info_->GetPrefix() + "labels/chunk" +
+                       std::to_string(chunk_index_);
+    GAR_ASSIGN_OR_RAISE(chunk_table_,
+                        fs_->ReadFileToTable(path, filetype, filter_options_));
+    // TODO(acezen): filter pushdown doesn't support cast schema now
+    // if (schema_ != nullptr && filter_options_.filter == nullptr) {
+    //   GAR_RETURN_NOT_OK(
+    //       CastTableWithSchema(chunk_table_, schema_, &chunk_table_));
+    // }
   }
   IdType row_offset = seek_id_ - chunk_index_ * vertex_info_->GetChunkSize();
   return chunk_table_->Slice(row_offset);
@@ -245,6 +298,29 @@ VertexPropertyArrowChunkReader::Make(
                             " doesn't exist in vertex type ", type, ".");
   }
   return Make(vertex_info, property_group, graph_info->GetPrefix(), options);
+}
+
+Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
+VertexPropertyArrowChunkReader::Make(
+    const std::shared_ptr<VertexInfo>& vertex_info,
+    const std::vector<std::string>& labels, const std::string& prefix,
+    const util::FilterOptions& options) {
+  return std::make_shared<VertexPropertyArrowChunkReader>(vertex_info, labels,
+                                                          prefix, options);
+}
+
+Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
+VertexPropertyArrowChunkReader::Make(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+    const std::vector<std::string>& labels,
+    const util::FilterOptions& options) {
+  auto vertex_info = graph_info->GetVertexInfo(type);
+  if (!vertex_info) {
+    return Status::KeyError("The vertex type ", type,
+                            " doesn't exist in graph ", graph_info->GetName(),
+                            ".");
+  }
+  return Make(vertex_info, labels, graph_info->GetPrefix(), options);
 }
 
 AdjListArrowChunkReader::AdjListArrowChunkReader(

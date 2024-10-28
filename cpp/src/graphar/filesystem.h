@@ -115,6 +115,15 @@ class FileSystem {
       noexcept;
 
   /**
+   * @brief Write a label table to a file with parquet type.
+   * @param input_table The label table to write.
+   * @param path The path of the output file.
+   * @return A Status indicating OK if successful, or an error if unsuccessful.
+   */
+  Status WriteLabelTableToFile(const std::shared_ptr<arrow::Table>& table,
+                               const std::string& path) const noexcept;
+
+  /**
    * Copy a file.
    *
    * If the destination exists and is a directory, an Status::ArrowError is

@@ -238,7 +238,6 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
     auto column_num = schema->num_fields();
     parquet::WriterProperties::Builder builder;
     builder.compression(arrow::Compression::type::ZSTD);  // enable compression
-    builder.encoding(graphar::GeneralParams::kLabelCol, parquet::Encoding::RLE);
     RETURN_NOT_ARROW_OK(parquet::arrow::WriteTable(
         *table, arrow::default_memory_pool(), output_stream, 64 * 1024 * 1024,
         builder.build(), parquet::default_arrow_writer_properties()));
@@ -260,6 +259,24 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
     return Status::Invalid(
         "Unsupported file type: ", FileTypeToString(file_type), " for wrting.");
   }
+  return Status::OK();
+}
+
+Status FileSystem::WriteLabelTableToFile(
+    const std::shared_ptr<arrow::Table>& table, const std::string& path) const
+    noexcept {
+  // try to create the directory, oss filesystem may not support this, ignore
+  ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto output_stream,
+                                       arrow_fs_->OpenOutputStream(path));
+  auto schema = table->schema();
+  auto column_num = schema->num_fields();
+  parquet::WriterProperties::Builder builder;
+  builder.compression(arrow::Compression::type::ZSTD);  // enable compression
+  builder.encoding(parquet::Encoding::RLE);
+  RETURN_NOT_ARROW_OK(parquet::arrow::WriteTable(
+      *table, arrow::default_memory_pool(), output_stream, 64 * 1024 * 1024,
+      builder.build(), parquet::default_arrow_writer_properties()));
   return Status::OK();
 }
 

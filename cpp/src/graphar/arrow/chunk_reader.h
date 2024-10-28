@@ -53,6 +53,19 @@ class VertexPropertyArrowChunkReader {
       const std::shared_ptr<PropertyGroup>& property_group,
       const std::string& prefix, const util::FilterOptions& options = {});
 
+  VertexPropertyArrowChunkReader() : vertex_info_(nullptr), prefix_("") {}
+
+  /**
+   * @brief Initialize the VertexPropertyArrowChunkReader.
+   *
+   * @param vertex_info The vertex info that describes the vertex type.
+   * @param labels The labels of the vertex type.
+   * @param prefix The absolute prefix.
+   */
+  VertexPropertyArrowChunkReader(const std::shared_ptr<VertexInfo>& vertex_info,
+                                 const std::vector<std::string>& labels,
+                                 const std::string& prefix,
+                                 const util::FilterOptions& options = {});
   /**
    * @brief Sets chunk position indicator for reader by internal vertex id.
    *    If internal vertex id is not found, will return Status::IndexError
@@ -67,7 +80,11 @@ class VertexPropertyArrowChunkReader {
    * @brief Return the current arrow chunk table of chunk position indicator.
    */
   Result<std::shared_ptr<arrow::Table>> GetChunk();
-
+  /**
+   * @brief Return the current arrow label chunk table of chunk position
+   * indicator.
+   */
+  Result<std::shared_ptr<arrow::Table>> GetLabelChunk();
   /**
    * @brief Sets chunk position indicator to next chunk.
    *
@@ -138,10 +155,40 @@ class VertexPropertyArrowChunkReader {
       const std::string& property_name,
       const util::FilterOptions& options = {});
 
+  /**
+   * @brief Create a VertexPropertyArrowChunkReader instance from vertex info
+   * for labels.
+   *
+   * @param vertex_info The vertex info.
+   * @param labels The name of labels you want to read.
+   * @param prefix The absolute prefix of the graph.
+   * @param options The filter options, default is empty.
+   */
+  static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
+      const std::shared_ptr<VertexInfo>& vertex_info,
+      const std::vector<std::string>& labels, const std::string& prefix,
+      const util::FilterOptions& options = {});
+
+  /**
+   * @brief Create a VertexPropertyArrowChunkReader instance from graph info
+   * for labels.
+   *
+   * @param graph_info The graph info.
+   * @param type The vertex type.
+   * @param labels The name of labels you want to read.
+   * @param prefix The absolute prefix of the graph.
+   * @param options The filter options, default is empty.
+   */
+  static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+      const std::vector<std::string>& labels,
+      const util::FilterOptions& options = {});
+
  private:
   std::shared_ptr<VertexInfo> vertex_info_;
   std::shared_ptr<PropertyGroup> property_group_;
   std::string prefix_;
+  std::vector<std::string> labels_;
   IdType chunk_index_;
   IdType seek_id_;
   IdType chunk_num_;
