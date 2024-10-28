@@ -51,6 +51,168 @@ By using GraphAr, you can:
 - Utilize Apache Spark to quickly manipulate and transform your graphar 
   format data
 
+## Benchmark
+Our experiments are conducted on an Alibaba Cloud r6.6xlarge instance, equipped with a
+24-core Intel(R) Xeon(R) Platinum 8269CY CPU at 2.50GHz and
+192GB RAM, running 64-bit Ubuntu 20.04 LTS. The data is hosted
+on a 200GB PL0 ESSD with a peak I/O throughput of 180MB/s.
+Additional tests on other platforms and S3-like storage yield similar
+results.
+We mainly conduct experiments from three aspects: Storage consumption, I/O speed and Query efficiency.
+
+
+<table>
+    <thead>
+        <tr>
+            <th>Abbr.</th>
+            <th>Graph</th>
+            <th>|V|</th>
+            <th>|E|</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>A5</td>
+            <td>Alibaba synthetic (scale 5)</td>
+            <td>75.0M</td>
+            <td>4.93B</td>
+        </tr>
+        <tr>
+            <td>A7</td>
+            <td>Alibaba synthetic (scale 7)</td>
+            <td>100M</td>
+            <td>6.69B</td>
+        </tr>
+        <tr>
+            <td>SF30</td>
+            <td><a href="https://dl.acm.org/doi/10.1145/2723372.2742786" target="_blank">SNB Interactive SF-30</a></td>
+            <td>99.4M</td>
+            <td>655M</td>
+        </tr>
+        <tr>
+            <td>SF100</td>
+            <td><a href="https://dl.acm.org/doi/10.1145/2723372.2742786" target="_blank">SNB Interactive SF-100</a></td>
+            <td>318M</td>
+            <td>2.15B</td>
+        </tr>
+        <tr>
+            <td>SF300</td>
+            <td><a href="https://dl.acm.org/doi/10.1145/2723372.2742786" target="_blank">SNB Interactive SF-300</a></td>
+            <td>908M</td>
+            <td>6.29B</td>
+        </tr>
+    </tbody>
+</table>
+All datasets have more than tens of millions of vertices and hundreds of millions of edges.
+
+
+### Storage consumption
+
+### I/O speed
+
+### Query efficiency
+<table>
+    <caption>Query Execution Times (in seconds)</caption>
+    <thead>
+        <tr>
+            <th>Query</th>
+            <th>SF30</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>SF100</th>
+            <th></th>
+            <th></th>
+            <th></th>
+            <th>SF300</th>
+            <th></th>
+            <th></th>
+            <th></th>
+        </tr>
+        <tr>
+            <th></th>
+            <th>P</th>
+            <th>N</th>
+            <th>A</th>
+            <th>G</th>
+            <th>P</th>
+            <th>N</th>
+            <th>A</th>
+            <th>G</th>
+            <th>P</th>
+            <th>N</th>
+            <th>A</th>
+            <th>G</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>ETL</td>
+            <td>6024</td>
+            <td>390</td>
+            <td>—</td>
+            <td>—</td>
+            <td>17726</td>
+            <td>2094</td>
+            <td>—</td>
+            <td>—</td>
+            <td>OM</td>
+            <td>9122</td>
+            <td>—</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td>IS-3</td>
+            <td>1.00</td>
+            <td>0.30</td>
+            <td>0.16</td>
+            <td><strong>0.01</strong></td>
+            <td>6.59</td>
+            <td>2.09</td>
+            <td>0.48</td>
+            <td><strong>0.01</strong></td>
+            <td>OM</td>
+            <td>4.12</td>
+            <td>1.39</td>
+            <td><strong>0.03</strong></td>
+        </tr>
+        <tr>
+            <td>IC-8</td>
+            <td>1.35</td>
+            <td><strong>0.37</strong></td>
+            <td>72.2</td>
+            <td>3.36</td>
+            <td>8.43</td>
+            <td><strong>1.26</strong></td>
+            <td>246</td>
+            <td>6.56</td>
+            <td>OM</td>
+            <td><strong>2.98</strong></td>
+            <td>894</td>
+            <td>23.3</td>
+        </tr>
+        <tr>
+            <td>BI-2</td>
+            <td>125</td>
+            <td>45.0</td>
+            <td>67.7</td>
+            <td><strong>4.30</strong></td>
+            <td>3884</td>
+            <td>1101</td>
+            <td>232</td>
+            <td><strong>16.3</strong></td>
+            <td>OM</td>
+            <td>6636</td>
+            <td>756</td>
+            <td><strong>50.0</strong></td>
+        </tr>
+    </tbody>
+</table>
+<p><strong>Notes: <a href="https://github.com/apache/pinot" target="_blank">Pinot (P)</a>, <a href="https://github.com/neo4j/neo4j" target="_blank">Neo4j (N)</a>, <a href="https://arrow.apache.org/docs/cpp/streaming_execution.html" target="_blank">Acero (A)</a>, and GraphAr (G).
+“OM” denotes failed execution due to out-of-memory errors.</strong></p>
+
+
+
 ## The GraphAr Format
 
 The GraphAr format is designed for storing property graphs. It uses
