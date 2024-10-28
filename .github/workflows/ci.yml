@@ -178,6 +178,7 @@ jobs:
         popd
 
     - name: Upload libgraphar.a artifact
+      if: github.event_name == 'push'
       uses: actions/upload-artifact@v3
       with:
         name: ubuntu-libgraphar.a
@@ -235,6 +236,7 @@ jobs:
         popd
 
     - name: Upload libgraphar.a artifact
+      if: github.event_name == 'push'
       uses: actions/upload-artifact@v3
       with:
         name: macos-${{ matrix.macos-version }}-libgraphar.a
