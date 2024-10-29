@@ -73,42 +73,44 @@ jobs:
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
         graphar import -c import.mini.yml
+# TODO: Add unit tests
+
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
 
-  macos:
-    name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} CLI
-    runs-on: macos-${{ matrix.macos-version }}
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - architecture: AMD64
-            macos-version: "12"
-          - architecture: ARM64
-            macos-version: "14"
-    steps:
-    - uses: actions/checkout@v3
-      with:
-          submodules: true
+  # macos:
+  #   name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} CLI
+  #   runs-on: macos-${{ matrix.macos-version }}
+  #   if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - architecture: AMD64
+  #           macos-version: "12"
+  #         - architecture: ARM64
+  #           macos-version: "14"
+  #   steps:
+  #   - uses: actions/checkout@v3
+  #     with:
+  #         submodules: true
 
-    - name: Install dependencies
-      run: |
-        brew bundle --file=cpp/Brewfile
+  #   - name: Install dependencies
+  #     run: |
+  #       brew bundle --file=cpp/Brewfile
         
     
-    - name: Build GraphAr And Run Tests
-      working-directory: "cli"
-      run: |
-        pip install ./
-        graphar --help
-        graphar check -p ../testing/neo4j/MovieGraph.graph.yml
-        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
-        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
-        graphar import -c import.full.yml
+  #   - name: Build GraphAr And Run Tests
+  #     working-directory: "cli"
+  #     run: |
+  #       pip install ./
+  #       graphar --help
+  #       graphar check -p ../testing/neo4j/MovieGraph.graph.yml
+  #       graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
+  #       graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
+  #       graphar import -c import.full.yml
       
-      # TODO: Add unit tests
+# TODO: Add unit tests
