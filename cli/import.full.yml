@@ -1,5 +1,5 @@
 graphar:                                              # Global configuration of imported data
-  path: /workspaces/incubator-graphar/graphar/movie   # (Required) Path to the graphar directory
+  path: /tmp/graphar/movie   # (Required) Path to the graphar directory
   name: MovieGraph                                    # (Required) Name of the graph
   vertex_chunk_size: 100                              # Number of vertices per chunk
   edge_chunk_size: 1024                               # Number of edges per chunk

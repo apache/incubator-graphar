@@ -82,7 +82,6 @@ struct Edge {
   std::string src_prop;
   std::string dst_type;
   std::string dst_prop;
-  std::vector<std::string> labels;
   int chunk_size;
   std::string validate_level;
   std::string prefix;
@@ -161,7 +160,6 @@ ImportConfig ConvertPyDictToConfig(const py::dict& config_dict) {
     edge.src_prop = edge_dict["src_prop"].cast<std::string>();
     edge.dst_type = edge_dict["dst_type"].cast<std::string>();
     edge.dst_prop = edge_dict["dst_prop"].cast<std::string>();
-    edge.labels = edge_dict["labels"].cast<std::vector<std::string>>();
     edge.chunk_size = edge_dict["chunk_size"].cast<int>();
     edge.validate_level = edge_dict["validate_level"].cast<std::string>();
     edge.prefix = edge_dict["prefix"].cast<std::string>();
