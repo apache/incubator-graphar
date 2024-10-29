@@ -68,11 +68,11 @@ jobs:
       working-directory: "cli"
       run: |
         pip install ./ -v
-        graphar-cli --help
-        graphar-cli check -f ../testing/neo4j/MovieGraph.graph.yml
-        graphar-cli show -f ../testing/neo4j/MovieGraph.graph.yml -v Person
-        graphar-cli show -f ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
-        graphar-cli import -c import.mini.yml
+        graphar --help
+        graphar check -p ../testing/neo4j/MovieGraph.graph.yml
+        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
+        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
+        graphar import -c import.mini.yml
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v4.0.1
