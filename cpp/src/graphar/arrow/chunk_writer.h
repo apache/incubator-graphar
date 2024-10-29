@@ -187,7 +187,7 @@ class VertexPropertyWriter {
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
-  Result<std::shared_ptr<arrow::Table>> addIndexColumn(
+  Result<std::shared_ptr<arrow::Table>> AddIndexColumn(
       const std::shared_ptr<arrow::Table>& table, IdType chunk_index,
       IdType chunk_size) const;
 

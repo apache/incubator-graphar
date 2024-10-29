@@ -57,7 +57,7 @@ logger = getLogger(__name__)
     no_args_is_help=True,
 )
 def show(
-    path: str = typer.Option(None, "--path", "-f", help="Path to the GraphAr config file"),
+    path: str = typer.Option(None, "--path", "-p", help="Path to the GraphAr config file"),
     vertex: str = typer.Option(None, "--vertex", "-v", help="Vertex type to show"),
     edge_src: str = typer.Option(None, "--edge-src", "-es", help="Source of the edge type to show"),
     edge: str = typer.Option(None, "--edge", "-e", help="Edge type to show"),
@@ -108,7 +108,7 @@ def show(
     no_args_is_help=True,
 )
 def check(
-    path: str = typer.Option(None, "--path", "-f", help="Path to the GraphAr config file"),
+    path: str = typer.Option(None, "--path", "-p", help="Path to the GraphAr config file"),
 ):
     if not Path(path).exists():
         logger.error("File not found: %s", path)

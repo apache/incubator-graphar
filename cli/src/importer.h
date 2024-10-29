@@ -21,14 +21,14 @@
 
 #include <filesystem>
 
-#include "pybind11/pybind11.h"
-#include "pybind11/stl.h"
 #include "arrow/api.h"
 #include "graphar/api/arrow_writer.h"
 #include "graphar/api/high_level_writer.h"
 #include "graphar/convert_to_arrow_type.h"
 #include "graphar/graph_info.h"
 #include "graphar/high-level/graph_reader.h"
+#include "pybind11/pybind11.h"
+#include "pybind11/stl.h"
 
 #include "util.h"
 
@@ -265,8 +265,9 @@ std::string DoImport(const py::dict& config_dict) {
       pgs.emplace_back(property_group);
     }
 
-    auto vertex_info = graphar::CreateVertexInfo(vertex.type, vertex.chunk_size,
-                                                 pgs, vertex.prefix, version);
+    auto vertex_info =
+        graphar::CreateVertexInfo(vertex.type, vertex.chunk_size, pgs,
+                                  vertex.labels, vertex.prefix, version);
     auto file_name = vertex.type + ".vertex.yml";
     vertex_info->Save(save_path / file_name);
     auto save_path_str = save_path.string();
@@ -329,7 +330,7 @@ std::string DoImport(const py::dict& config_dict) {
 
     auto vertex_table_with_index =
         vertex_prop_writer
-            ->addIndexColumn(merged_vertex_table, start_chunk_index,
+            ->AddIndexColumn(merged_vertex_table, start_chunk_index,
                              vertex_info->GetChunkSize())
             .value();
     for (const auto& property_group : pgs) {

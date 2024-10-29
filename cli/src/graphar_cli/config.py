@@ -166,7 +166,6 @@ class Edge(BaseModel):
     src_prop: str
     dst_type: str
     dst_prop: str
-    labels: List[str] = []
     chunk_size: Optional[int] = None
     validate_level: Optional[Literal["no", "weak", "strong"]] = None
     adj_lists: List[AdjList] = []

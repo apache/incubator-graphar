@@ -62,8 +62,6 @@ import_schema:
       src_prop: name
       dst_type: Movie
       dst_prop: title
-      labels:
-        - WROTE
       chunk_size: 1024
       validate_level: "no"
       prefix: edge/Person_WROTE_Movie/
@@ -87,8 +85,6 @@ import_schema:
       dst_type: Movie
       dst_prop: title
       validate_level: "no"
-      labels:
-        - ACTED_IN
       chunk_size: 1024
       prefix: edge/Person_ACTED_IN_Movie/
       adj_lists:
@@ -110,8 +106,6 @@ import_schema:
       src_prop: name
       dst_type: Movie
       dst_prop: title
-      labels:
-        - Review
       chunk_size: 1024
       validate_level: "no"
       prefix: edge/Person_REVIEWED_Movie/
