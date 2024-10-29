@@ -17,33 +17,33 @@
 
 from logging import getLogger
 from pathlib import Path
-from typing import Dict, List, Literal, Optional
+from typing import Dict, List, Literal, Optional  # TODO: move to the TYPE_CHECKING block
 
 from pydantic import BaseModel, field_validator, model_validator
 from typing_extensions import Self
 
 logger = getLogger("graphar_cli")
 
-# TODO: convert to constants
-default_file_type = "parquet"
-default_adj_list_type = "ordered_by_source"
-default_regular_separator = "_"
-default_validate_level = "weak"
-default_version = "gar/v1"
-support_file_types = {"parquet", "orc", "csv", "json"}
+# TODO: move them to constants.py
 
+DEFAULT_FILE_TYPE = "parquet"
+DEFAULT_ADJ_LIST_TYPE = "ordered_by_source"
+DEFAULT_REGULAR_SEPARATOR = "_"
+DEFAULT_VALIDATE_LEVEL = "weak"
+DEFAULT_VERSION = "gar/v1"
+SUPPORT_FILE_TYPES = {"parquet", "orc", "csv", "json"}
 
 class GraphArConfig(BaseModel):
     path: str
     name: str
     vertex_chunk_size: Optional[int] = 100
     edge_chunk_size: Optional[int] = 1024
-    file_type: Literal["parquet", "orc", "csv", "json"] = default_file_type
+    file_type: Literal["parquet", "orc", "csv", "json"] = DEFAULT_FILE_TYPE
     adj_list_type: Literal[
         "ordered_by_source", "ordered_by_dest", "unordered_by_source", "unordered_by_dest"
-    ] = default_adj_list_type
-    validate_level: Literal["no", "weak", "strong"] = default_validate_level
-    version: Optional[str] = default_version
+    ] = DEFAULT_ADJ_LIST_TYPE
+    validate_level: Literal["no", "weak", "strong"] = DEFAULT_VALIDATE_LEVEL
+    version: Optional[str] = DEFAULT_VERSION
 
     @field_validator("path")
     def check_path(cls, v):
@@ -57,6 +57,7 @@ class GraphArConfig(BaseModel):
 
 
 class Property(BaseModel):
+
     name: str
     data_type: Literal["bool", "int32", "int64", "float", "double", "string", "date", "timestamp"]
     is_primary: bool = False
@@ -114,7 +115,7 @@ class Source(BaseModel):
             if file_type == "":
                 msg = f"File {self.path} has no file type suffix"
                 raise ValueError(msg)
-            if file_type not in support_file_types:
+            if file_type not in SUPPORT_FILE_TYPES:
                 msg = f"File type {file_type} not supported"
                 raise ValueError(msg)
             self.file_type = file_type
@@ -162,9 +163,9 @@ class AdjList(BaseModel):
 class Edge(BaseModel):
     edge_type: str
     src_type: str
-    src_prop: Optional[str] = None
+    src_prop: str
     dst_type: str
-    dst_prop: Optional[str] = None
+    dst_prop: str
     labels: List[str] = []
     chunk_size: Optional[int] = None
     validate_level: Optional[Literal["no", "weak", "strong"]] = None
@@ -189,8 +190,8 @@ class Edge(BaseModel):
         if not prefix:
             self.prefix = (
                 f"edge/{src_type}"
-                f"{default_regular_separator}{edge_type}"
-                f"{default_regular_separator}{dst_type}/"
+                f"{DEFAULT_REGULAR_SEPARATOR}{edge_type}"
+                f"{DEFAULT_REGULAR_SEPARATOR}{dst_type}/"
             )
         return self
 

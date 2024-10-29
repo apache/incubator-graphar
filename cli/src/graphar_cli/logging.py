@@ -16,7 +16,7 @@
 # under the License.
 
 import logging
-from typing import Union
+from typing import Union  # TODO: move to the TYPE_CHECKING block
 
 from rich.console import Console
 from rich.logging import RichHandler

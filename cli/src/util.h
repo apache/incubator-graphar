@@ -19,18 +19,18 @@
 
 #pragma once
 
-#include <arrow/adapters/orc/adapter.h>
-#include <arrow/api.h>
-#include <arrow/compute/api.h>
-#include <arrow/csv/api.h>
-#include <arrow/io/api.h>
-#include <arrow/json/api.h>
-#include <graphar/api/arrow_writer.h>
-#include <graphar/api/high_level_writer.h>
-#include <graphar/graph_info.h>
-#include <parquet/arrow/reader.h>
-
-#include <iostream>
+#ifdef ARROW_ORC
+#include "arrow/adapters/orc/adapter.h"
+#endif
+#include "arrow/api.h"
+#include "arrow/compute/api.h"
+#include "arrow/csv/api.h"
+#include "arrow/io/api.h"
+#include "arrow/json/api.h"
+#include "graphar/api/arrow_writer.h"
+#include "graphar/api/high_level_writer.h"
+#include "graphar/graph_info.h"
+#include "parquet/arrow/reader.h"
 
 std::string ConcatEdgeTriple(const std::string& src_type,
                              const std::string& edge_type,
@@ -173,6 +173,7 @@ std::shared_ptr<arrow::Table> GetDataFromCsvFile(
   return table;
 }
 
+#ifdef ARROW_ORC
 std::shared_ptr<arrow::Table> GetDataFromOrcFile(
     const std::string& path, const std::vector<std::string>& column_names) {
   // Open the ORC file
@@ -205,6 +206,7 @@ std::shared_ptr<arrow::Table> GetDataFromOrcFile(
 
   return table;
 }
+#endif
 
 std::shared_ptr<arrow::Table> GetDataFromJsonFile(
     const std::string& path, const std::vector<std::string>& column_names) {
@@ -254,12 +256,15 @@ std::shared_ptr<arrow::Table> GetDataFromFile(
     const std::string& path, const std::vector<std::string>& column_names,
     const char& delimiter, const std::string& file_type) {
   // TODO: use explicit schema
+  // TODO: use switch case
   if (file_type == "parquet") {
     return GetDataFromParquetFile(path, column_names);
   } else if (file_type == "csv") {
     return GetDataFromCsvFile(path, column_names, delimiter);
+#ifdef ARROW_ORC
   } else if (file_type == "orc") {
     return GetDataFromOrcFile(path, column_names);
+#endif
   } else if (file_type == "json") {
     return GetDataFromJsonFile(path, column_names);
   } else {

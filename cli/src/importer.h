@@ -21,15 +21,14 @@
 
 #include <filesystem>
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
-
-#include <arrow/api.h>
-#include <graphar/api/arrow_writer.h>
-#include <graphar/api/high_level_writer.h>
-#include <graphar/convert_to_arrow_type.h>
-#include <graphar/graph_info.h>
-#include <graphar/high-level/graph_reader.h>
+#include "pybind11/pybind11.h"
+#include "pybind11/stl.h"
+#include "arrow/api.h"
+#include "graphar/api/arrow_writer.h"
+#include "graphar/api/high_level_writer.h"
+#include "graphar/convert_to_arrow_type.h"
+#include "graphar/graph_info.h"
+#include "graphar/high-level/graph_reader.h"
 
 #include "util.h"
 

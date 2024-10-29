@@ -17,18 +17,19 @@
  * under the License.
  */
 
-#include <pybind11/pybind11.h>
-#include <pybind11/stl.h>
+#include "pybind11/pybind11.h"
+#include "pybind11/stl.h"
 
-#include <graphar/filesystem.h>
-#include <graphar/graph_info.h>
-#include <graphar/reader_util.h>
+#include "graphar/filesystem.h"
+#include "graphar/graph_info.h"
+#include "graphar/reader_util.h"
 #include "importer.h"
 
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 
 std::string ShowGraph(const std::string& path) {
+  // TODO: check all the result values
   auto graph_info = graphar::GraphInfo::Load(path).value();
   return graph_info->Dump().value();
 }
@@ -127,7 +128,7 @@ int64_t GetEdgeCount(const std::string& path, const std::string& src_type,
 std::vector<std::string> GetVertexTypes(const std::string& path) {
   auto graph_info = graphar::GraphInfo::Load(path).value();
   auto vertex_infos = graph_info->GetVertexInfos();
-  std::vector<std::string> vertex_types;
+  std::vector<std::string> vertex_types(vertex_infos.size());  
   for (const auto& vertex_info : vertex_infos) {
     vertex_types.push_back(vertex_info->GetType());
   }
@@ -137,7 +138,7 @@ std::vector<std::string> GetVertexTypes(const std::string& path) {
 std::vector<std::vector<std::string>> GetEdgeTypes(const std::string& path) {
   auto graph_info = graphar::GraphInfo::Load(path).value();
   auto edge_infos = graph_info->GetEdgeInfos();
-  std::vector<std::vector<std::string>> edge_types;
+  std::vector<std::vector<std::string>> edge_types(edge_infos.size());  
   for (const auto& edge_info : edge_infos) {
     std::vector<std::string> edge_type;
     edge_type.push_back(edge_info->GetSrcType());

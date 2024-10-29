@@ -27,19 +27,19 @@ And using Python in conda or venv is a good choice.
 ## Usage
 
 ```bash
-graphar-cli --help
+graphar --help
 
 # check the metadata, verify whether the vertex edge information and attribute information of the graph are valid
-graphar-cli check -f ../testing/neo4j/MovieGraph.graph.yml
+graphar check -p ../testing/neo4j/MovieGraph.graph.yml
 
 # show the vertex
-graphar-cli show -f ../testing/neo4j/MovieGraph.graph.yml -v Person
+graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
 
 # show the edge
-graphar-cli show -f ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
+graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
 
 # import graph data by using a config file
-graphar-cli import -c import.mini.yml
+graphar import -c import.mini.yml
 ```
 
 ## Import config file
@@ -57,7 +57,7 @@ In the yaml config files, we provide brief comments on the fields, which can be 
 
 **Example**
 
-To import the movie graph data from the `testing` directory, you first need to prepare data files. Supported file types include `csv`, `json`(as well as`jsonline`, but should have the `.json` extension), `parquet`, and `orc` files. Please ensure the correct file extensions are set in advance, or specify the file type in the source section of the configuration.
+To import the movie graph data from the `testing` directory, you first need to prepare data files. Supported file types include `csv`, `json`(as well as`jsonline`, but should have the `.json` extension), `parquet`, and `orc` files. Please ensure the correct file extensions are set in advance, or specify the `file_type` field in the source section of the configuration. The `file_type` field will ignore the file extension.
 
 Next, write a configuration file following the provided sample. Any empty fields in the `graphar` configuration will be filled with default values. In the `import_schema`, empty fields will use the global configuration values from `graphar`. If fields in `import_schema` are not empty, they will override the values from `graphar`.
 
