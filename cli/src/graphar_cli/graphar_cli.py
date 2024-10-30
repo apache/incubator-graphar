@@ -147,28 +147,14 @@ def check(
 )
 def import_data(
     config_file: str = typer.Option(None, "--config", "-c", help="Path of the GraphAr config file"),
-    config_type: str = typer.Option(
-        "yaml",
-        "--type",
-        "-t",
-        help="Type of config file",
-        show_choices=True,
-        show_default=True,
-    ),
 ):
     if not Path(config_file).is_file():
         logger.error("File not found: %s", config_file)
         raise typer.Exit(1)
-    if config_type == "json":
-        with Path(config_file).open(encoding="utf-8") as file:
-            config = json.load(file)
-    elif config_type == "yaml":
+
+    try:
         with Path(config_file).open(encoding="utf-8") as file:
             config = yaml.safe_load(file)
-    else:
-        logger.error("Config type %s not supported", config_type)
-        raise typer.Exit(1)
-    try:
         import_config = ImportConfig(**config)
         validate(import_config)
     except Exception as e:

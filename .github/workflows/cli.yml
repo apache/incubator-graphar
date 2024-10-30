@@ -72,7 +72,7 @@ jobs:
         graphar check -p ../testing/neo4j/MovieGraph.graph.yml
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
-        graphar import -c import.mini.yml
+        graphar import -c ../testing/neo4j/data/import.mini.yml
 # TODO: Add unit tests
 
 
@@ -84,7 +84,8 @@ jobs:
   macos:
     name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} CLI
     runs-on: macos-${{ matrix.macos-version }}
-    if: false
+    # TODO: Remove this when the macos issue is fixed
+    if: false   
     strategy:
       fail-fast: false
       matrix:
@@ -111,6 +112,6 @@ jobs:
         graphar check -p ../testing/neo4j/MovieGraph.graph.yml
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
-        graphar import -c import.full.yml
+        graphar import -c ../testing/neo4j/data/import.mini.yml
       
 # TODO: Add unit tests

@@ -39,12 +39,12 @@ graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
 graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
 
 # import graph data by using a config file
-graphar import -c import.mini.yml
+graphar import -c ../testing/neo4j/data/import.mini.yml
 ```
 
 ## Import config file
 
-The config file supports two data types. We provide two reference templates for each type: full and mini.
+The config file supports `yaml` data type. We provide two reference templates for it: full and mini.
 
 The full version of the configuration file contains all configurable fields, and additional fields will be automatically ignored.
 
@@ -52,8 +52,7 @@ The mini version of the configuration file is a simplified version of the full c
 
 For the full configuration file, if all fields can be set to their default values, you can simplify it to the mini version. However, it cannot be further reduced beyond the mini version.
 
-
-In the yaml config files, we provide brief comments on the fields, which can be used as a reference
+In the full `yaml` config file, we provide brief comments on the fields, which can be used as a reference.
 
 **Example**
 
