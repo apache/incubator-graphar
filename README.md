@@ -51,168 +51,6 @@ By using GraphAr, you can:
 - Utilize Apache Spark to quickly manipulate and transform your graphar 
   format data
 
-## Benchmark
-Our experiments are conducted on an Alibaba Cloud r6.6xlarge instance, equipped with a
-24-core Intel(R) Xeon(R) Platinum 8269CY CPU at 2.50GHz and
-192GB RAM, running 64-bit Ubuntu 20.04 LTS. The data is hosted
-on a 200GB PL0 ESSD with a peak I/O throughput of 180MB/s.
-Additional tests on other platforms and S3-like storage yield similar
-results.
-We mainly conduct experiments from three aspects: Storage consumption, I/O speed and Query efficiency.
-
-
-<table>
-    <thead>
-        <tr>
-            <th>Abbr.</th>
-            <th>Graph</th>
-            <th>|V|</th>
-            <th>|E|</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>A5</td>
-            <td>Alibaba synthetic (scale 5)</td>
-            <td>75.0M</td>
-            <td>4.93B</td>
-        </tr>
-        <tr>
-            <td>A7</td>
-            <td>Alibaba synthetic (scale 7)</td>
-            <td>100M</td>
-            <td>6.69B</td>
-        </tr>
-        <tr>
-            <td>SF30</td>
-            <td><a href="https://dl.acm.org/doi/10.1145/2723372.2742786" target="_blank">SNB Interactive SF-30</a></td>
-            <td>99.4M</td>
-            <td>655M</td>
-        </tr>
-        <tr>
-            <td>SF100</td>
-            <td><a href="https://dl.acm.org/doi/10.1145/2723372.2742786" target="_blank">SNB Interactive SF-100</a></td>
-            <td>318M</td>
-            <td>2.15B</td>
-        </tr>
-        <tr>
-            <td>SF300</td>
-            <td><a href="https://dl.acm.org/doi/10.1145/2723372.2742786" target="_blank">SNB Interactive SF-300</a></td>
-            <td>908M</td>
-            <td>6.29B</td>
-        </tr>
-    </tbody>
-</table>
-All datasets have more than tens of millions of vertices and hundreds of millions of edges.
-
-
-### Storage consumption
-
-### I/O speed
-
-### Query efficiency
-<table>
-    <caption>Query Execution Times (in seconds)</caption>
-    <thead>
-        <tr>
-            <th>Query</th>
-            <th>SF30</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th>SF100</th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th>SF300</th>
-            <th></th>
-            <th></th>
-            <th></th>
-        </tr>
-        <tr>
-            <th></th>
-            <th>P</th>
-            <th>N</th>
-            <th>A</th>
-            <th>G</th>
-            <th>P</th>
-            <th>N</th>
-            <th>A</th>
-            <th>G</th>
-            <th>P</th>
-            <th>N</th>
-            <th>A</th>
-            <th>G</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>ETL</td>
-            <td>6024</td>
-            <td>390</td>
-            <td>—</td>
-            <td>—</td>
-            <td>17726</td>
-            <td>2094</td>
-            <td>—</td>
-            <td>—</td>
-            <td>OM</td>
-            <td>9122</td>
-            <td>—</td>
-            <td>—</td>
-        </tr>
-        <tr>
-            <td>IS-3</td>
-            <td>1.00</td>
-            <td>0.30</td>
-            <td>0.16</td>
-            <td><strong>0.01</strong></td>
-            <td>6.59</td>
-            <td>2.09</td>
-            <td>0.48</td>
-            <td><strong>0.01</strong></td>
-            <td>OM</td>
-            <td>4.12</td>
-            <td>1.39</td>
-            <td><strong>0.03</strong></td>
-        </tr>
-        <tr>
-            <td>IC-8</td>
-            <td>1.35</td>
-            <td><strong>0.37</strong></td>
-            <td>72.2</td>
-            <td>3.36</td>
-            <td>8.43</td>
-            <td><strong>1.26</strong></td>
-            <td>246</td>
-            <td>6.56</td>
-            <td>OM</td>
-            <td><strong>2.98</strong></td>
-            <td>894</td>
-            <td>23.3</td>
-        </tr>
-        <tr>
-            <td>BI-2</td>
-            <td>125</td>
-            <td>45.0</td>
-            <td>67.7</td>
-            <td><strong>4.30</strong></td>
-            <td>3884</td>
-            <td>1101</td>
-            <td>232</td>
-            <td><strong>16.3</strong></td>
-            <td>OM</td>
-            <td>6636</td>
-            <td>756</td>
-            <td><strong>50.0</strong></td>
-        </tr>
-    </tbody>
-</table>
-<p><strong>Notes: <a href="https://github.com/apache/pinot" target="_blank">Pinot (P)</a>, <a href="https://github.com/neo4j/neo4j" target="_blank">Neo4j (N)</a>, <a href="https://arrow.apache.org/docs/cpp/streaming_execution.html" target="_blank">Acero (A)</a>, and GraphAr (G).
-“OM” denotes failed execution due to out-of-memory errors.</strong></p>
-
-
-
 ## The GraphAr Format
 
 The GraphAr format is designed for storing property graphs. It uses
@@ -357,6 +195,207 @@ width="650" alt="edge logical table1" />
 
 <img src="docs/images/edge_physical_table2.png" class="align-center"
 width="650" alt="edge logical table2" />
+
+## Benchmark
+Our experiments are conducted on an Alibaba Cloud r6.6xlarge instance, equipped with a
+24-core Intel(R) Xeon(R) Platinum 8269CY CPU at 2.50GHz and
+192GB RAM, running 64-bit Ubuntu 20.04 LTS. The data is hosted
+on a 200GB PL0 ESSD with a peak I/O throughput of 180MB/s.
+Additional tests on other platforms and S3-like storage yield similar
+results.
+
+### dataset 
+Here we show statistics of datasets with hundreds of millions of vertices from [Graph500](Graph500.org) and [LDBC](https://doi.org/10.1145/2723372.2742786). Other datasets involved in the experiment can be found in  [paper](https://arxiv.org/abs/2312.09577).
+
+<table>
+    <thead>
+        <tr>
+            <th>Abbr.</th>
+            <th>Graph</th>
+            <th>|V|</th>
+            <th>|E|</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>G8</td>
+            <td>Graph500-28</td>
+            <td>268M</td>
+            <td>4.29B</td>
+        </tr>
+        <tr>
+            <td>G9</td>
+            <td>Graph500-29</td>
+            <td>537M</td>
+            <td>8.59B</td>
+        </tr>
+        <tr>
+            <td>SF30</td>
+            <td>SNB Interactive SF-30</td>
+            <td>99.4M</td>
+            <td>655M</td>
+        </tr>
+        <tr>
+            <td>SF100</td>
+            <td>SNB Interactive SF-100</td>
+            <td>318M</td>
+            <td>2.15B</td>
+        </tr>
+        <tr>
+            <td>SF300</td>
+            <td>SNB Interactive SF-300</td>
+            <td>908M</td>
+            <td>6.29B</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- We mainly conduct experiments from three aspects: Storage consumption, I/O efficiency and Query Time. -->
+
+### Storage efficiency
+<img src="docs/images/benchmark_storage.png" class="align-center"
+width="700" alt="storage consumption" />
+
+Two baseline approaches are
+considered: 1) “plain”, which employs plain encoding for the
+source and destination columns, and 2) “plain + offset”, which
+extends the “plain” method by sorting edges and adding an
+offset column to mark each vertex’s starting edge position.
+The result
+is a notable storage advantage: on average, GraphAr requires
+only 27.3% of the storage needed by the baseline “plain +
+offset”, which is due to delta encoding.
+
+### I/O speed
+<img src="docs/images/benchmark_IO_time.png" class="align-center"
+width="700" alt="I/O time" />
+
+In (a) indicate that GraphAr significantly
+outperforms the baseline (CSV), achieving an average speedup of 4.9×. In Figure (b), the immutable (“Imm”) and mutable (“Mut”) variants are two native in-memory storage of GraphScope. It demonstrates that although the querying time with GraphAr exceeds that of the in-memory storages, attributable to intrinsic I/O overhead, it significantly surpasses the process of loading and then
+executing the query, by 2.4× and 2.5×, respectively. This indicates that GraphAr is a viable option for executing infrequent queries.
+
+
+<!-- ### Neighbor Retrieval
+<img src="docs/images/benchmark_neighbor_retrival.png" class="align-center"
+width="700" alt="Neighbor retrival" />
+
+We query vertices with the largest
+degree in selected graphs, maintaining edges in CSR-like or CSC-like formats depending on the degree type. GraphAr significantly outperforms the baselines, achieving an average speedup of 4452× over the “plain” method, 3.05× over “plain + offset”, and 1.23× over “delta + offset”. -->
+### Label Filtering
+<img src="docs/images/benchmark_label_simple_filter.png" class="align-center"
+width="700" alt="Simple condition filtering" />
+
+**Performance of simple condition filtering.**
+For each graph, we perform experiments where we consider
+each label individually as the target label for filtering.
+GraphAr consistently outperforms the baselines. On average, it achieves a speedup of 14.8× over the “string” method, 8.9× over the “binary (plain)” method, and 7.4× over the  “binary (RLE)” method.
+
+<img src="docs/images/benchmark_label_complex_filter.png" class="align-center"
+width="700" alt="Complex condition filtering" />
+
+**Performance of complex condition filtering.**
+For each graph,
+we combine two labels by AND or OR as the filtering condition.
+The merge-based decoding method yields the largest gain, where “binary (RLE) + merge” outperforms the “binary (RLE)” method by up to 60.5×.
+<!-- ### Query efficiency
+<table>
+    <caption style="text-align: center;">Query Execution Times (in seconds)</caption>
+    <thead>
+        <tr>
+            <th rowspan="2">Query</th>
+            <th colspan="4" scope="colgroup">SF30</th>
+            <th colspan="4" scope="colgroup">SF100</th>
+            <th colspan="4" scope="colgroup">SF300</th>
+        </tr>
+        <tr>
+            <th>P</th>
+            <th>N</th>
+            <th>A</th>
+            <th>G</th>
+            <th>P</th>
+            <th>N</th>
+            <th>A</th>
+            <th>G</th>
+            <th>P</th>
+            <th>N</th>
+            <th>A</th>
+            <th>G</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>ETL</td>
+            <td>6024</td>
+            <td>390</td>
+            <td>—</td>
+            <td>—</td>
+            <td>17726</td>
+            <td>2094</td>
+            <td>—</td>
+            <td>—</td>
+            <td>OM</td>
+            <td>9122</td>
+            <td>—</td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td>IS-3</td>
+            <td>1.00</td>
+            <td>0.30</td>
+            <td>0.16</td>
+            <td><strong>0.01</strong></td>
+            <td>6.59</td>
+            <td>2.09</td>
+            <td>0.48</td>
+            <td><strong>0.01</strong></td>
+            <td>OM</td>
+            <td>4.12</td>
+            <td>1.39</td>
+            <td><strong>0.03</strong></td>
+        </tr>
+        <tr>
+            <td>IC-8</td>
+            <td>1.35</td>
+            <td><strong>0.37</strong></td>
+            <td>72.2</td>
+            <td>3.36</td>
+            <td>8.43</td>
+            <td><strong>1.26</strong></td>
+            <td>246</td>
+            <td>6.56</td>
+            <td>OM</td>
+            <td><strong>2.98</strong></td>
+            <td>894</td>
+            <td>23.3</td>
+        </tr>
+        <tr>
+            <td>BI-2</td>
+            <td>125</td>
+            <td>45.0</td>
+            <td>67.7</td>
+            <td><strong>4.30</strong></td>
+            <td>3884</td>
+            <td>1101</td>
+            <td>232</td>
+            <td><strong>16.3</strong></td>
+            <td>OM</td>
+            <td>6636</td>
+            <td>756</td>
+            <td><strong>50.0</strong></td>
+        </tr>
+    </tbody>
+</table>
+<p><strong>Notes: <a href="https://github.com/apache/pinot" target="_blank">Pinot (P)</a>, <a href="https://github.com/neo4j/neo4j" target="_blank">Neo4j (N)</a>, <a href="https://arrow.apache.org/docs/cpp/streaming_execution.html" target="_blank">Acero (A)</a>, and GraphAr (G).
+“OM” denotes failed execution due to out-of-memory errors. 
+While both Pinot and Neo4j are widely-used, they
+are not natively designed for data lakes and require an Extract-Transform-Load (ETL) process for integration. The three representative queries includes neighbor retrieval and label filtering, reference to <a href="https://github.com/ldbc/ldbc_snb_bi" target="_blank">LDBC SNB Business Intelligence</a> and <a href="https://github.com/ldbc/ldbc_snb_interactive_v1_impls" target="_blank">LDBC SNB Interactive v1 </a> workload implementations. </strong></p>
+
+GraphAr significantly outperforms Acero, achieving an
+average speedup of 29.5×. A closer analysis of the results reveals
+that the performance gains stem from the following factors: 1) data
+layout design and encoding/decoding optimizations we proposed,
+to enable efficient neighbor retrieval (IS-3, IC-8, BI-2) and label
+filtering (BI-2); 2) bitmap generation can be utilized in selection steps (IS-3, IC-8, BI-2). -->
 
 ## Libraries
 
