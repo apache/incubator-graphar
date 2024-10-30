@@ -477,6 +477,7 @@ if (BUILD_BENCHMARKS)
         target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar ${CMAKE_DL_LIBS})
     endmacro()
     add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
+    add_benchmark(label_filter_benchmark SRCS benchmarks/label_filter_benchmark.cc)
     add_benchmark(graph_info_benchmark SRCS benchmarks/graph_info_benchmark.cc)
 endif()
 

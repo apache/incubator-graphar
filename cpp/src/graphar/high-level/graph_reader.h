@@ -75,6 +75,13 @@ class Vertex {
   Result<T> property(const std::string& property) const;
 
   /**
+   * @brief Get the label of the vertex.
+   * @return Result: The label of the vertex.
+   */
+  template <typename T>
+  Result<T> label() const;
+
+  /**
    * @brief Return true if value at the property is valid (not null).
    *
    * @param property The property name.
@@ -172,40 +179,80 @@ class VertexIter {
    * @param offset The current offset of the readers.
    */
   explicit VertexIter(const std::shared_ptr<VertexInfo>& vertex_info,
-                      const std::string& prefix, IdType offset) noexcept {
+                      const std::string& prefix, IdType offset,
+                      const std::vector<std::string>& labels,
+                      const bool& is_filtered = false,
+                      const std::vector<IdType>& filtered_ids = {}) noexcept {
+    if (!labels.empty()) {
+      labels_ = labels;
+      label_reader_ =
+          VertexPropertyArrowChunkReader(vertex_info, labels, prefix);
+    }
     for (const auto& pg : vertex_info->GetPropertyGroups()) {
       readers_.emplace_back(vertex_info, pg, prefix);
     }
+    is_filtered_ = is_filtered;
+    filtered_ids_ = filtered_ids;
     cur_offset_ = offset;
   }
 
   /** Copy constructor. */
   VertexIter(const VertexIter& other)
-      : readers_(other.readers_), cur_offset_(other.cur_offset_) {}
+      : readers_(other.readers_),
+        cur_offset_(other.cur_offset_),
+        labels_(other.labels_),
+        label_reader_(other.label_reader_),
+        is_filtered_(other.is_filtered_),
+        filtered_ids_(other.filtered_ids_) {}
 
   /** Construct and return the vertex of the current offset. */
   Vertex operator*() noexcept {
-    for (auto& reader : readers_) {
-      reader.seek(cur_offset_);
+    if (is_filtered_) {
+      for (auto& reader : readers_) {
+        reader.seek(filtered_ids_[cur_offset_]);
+      }
+    } else {
+      for (auto& reader : readers_) {
+        reader.seek(cur_offset_);
+      }
     }
+
     return Vertex(cur_offset_, readers_);
   }
 
   /** Get the vertex id of the current offset. */
-  IdType id() { return cur_offset_; }
+  IdType id() {
+    if (is_filtered_) {
+      return filtered_ids_[cur_offset_];
+    } else {
+      return cur_offset_;
+    }
+  }
 
   /** Get the value for a property of the current vertex. */
   template <typename T>
   Result<T> property(const std::string& property) noexcept {
     std::shared_ptr<arrow::ChunkedArray> column(nullptr);
-    for (auto& reader : readers_) {
-      reader.seek(cur_offset_);
-      GAR_ASSIGN_OR_RAISE(auto chunk_table, reader.GetChunk());
-      column = util::GetArrowColumnByName(chunk_table, property);
-      if (column != nullptr) {
-        break;
+    if (is_filtered_) {
+      for (auto& reader : readers_) {
+        reader.seek(filtered_ids_[cur_offset_]);
+        GAR_ASSIGN_OR_RAISE(auto chunk_table, reader.GetChunk());
+        column = util::GetArrowColumnByName(chunk_table, property);
+        if (column != nullptr) {
+          break;
+        }
+      }
+    } else {
+      for (auto& reader : readers_) {
+        reader.seek(cur_offset_);
+        GAR_ASSIGN_OR_RAISE(auto chunk_table, reader.GetChunk());
+        column = util::GetArrowColumnByName(chunk_table, property);
+        if (column != nullptr) {
+          break;
+        }
       }
     }
+
     if (column != nullptr) {
       auto array = util::GetArrowArrayByChunkIndex(column, 0);
       GAR_ASSIGN_OR_RAISE(auto data, util::GetArrowArrayData(array));
@@ -214,6 +261,12 @@ class VertexIter {
     return Status::KeyError("Property with name ", property,
                             " does not exist in the vertex.");
   }
+
+  /** Determine whether a vertex has the input label. */
+  Result<bool> hasLabel(const std::string& label) noexcept;
+
+  /** Get the labels of the current vertex. */
+  Result<std::vector<std::string>> label() noexcept;
 
   /** The prefix increment operator. */
   VertexIter& operator++() noexcept {
@@ -253,7 +306,11 @@ class VertexIter {
 
  private:
   std::vector<VertexPropertyArrowChunkReader> readers_;
+  VertexPropertyArrowChunkReader label_reader_;
+  std::vector<std::string> labels_;
   IdType cur_offset_;
+  bool is_filtered_;
+  std::vector<IdType> filtered_ids_;
 };
 
 /**
@@ -266,11 +323,18 @@ class VerticesCollection {
    * @brief Initialize the VerticesCollection.
    *
    * @param vertex_info The vertex info that describes the vertex type.
+   * @param labels The labels of the vertex.
    * @param prefix The absolute prefix.
    */
   explicit VerticesCollection(const std::shared_ptr<VertexInfo>& vertex_info,
-                              const std::string& prefix)
-      : vertex_info_(std::move(vertex_info)), prefix_(prefix) {
+                              const std::string& prefix,
+                              const bool is_filtered = false,
+                              const std::vector<IdType> filtered_ids = {})
+      : vertex_info_(std::move(vertex_info)),
+        prefix_(prefix),
+        labels_(vertex_info->GetLabels()),
+        is_filtered_(is_filtered),
+        filtered_ids_(filtered_ids) {
     // get the vertex num
     std::string base_dir;
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
@@ -283,21 +347,104 @@ class VerticesCollection {
   }
 
   /** The iterator pointing to the first vertex. */
-  VertexIter begin() noexcept { return VertexIter(vertex_info_, prefix_, 0); }
+  VertexIter begin() noexcept {
+    return VertexIter(vertex_info_, prefix_, 0, labels_, is_filtered_,
+                      filtered_ids_);
+  }
 
   /** The iterator pointing to the past-the-end element. */
   VertexIter end() noexcept {
-    return VertexIter(vertex_info_, prefix_, vertex_num_);
+    if (is_filtered_)
+      return VertexIter(vertex_info_, prefix_, filtered_ids_.size(), labels_,
+                        is_filtered_, filtered_ids_);
+    return VertexIter(vertex_info_, prefix_, vertex_num_, labels_, is_filtered_,
+                      filtered_ids_);
   }
 
   /** The iterator pointing to the vertex with specific id. */
-  VertexIter find(IdType id) { return VertexIter(vertex_info_, prefix_, id); }
+  VertexIter find(IdType id) {
+    return VertexIter(vertex_info_, prefix_, id, labels_);
+  }
 
   /** Get the number of vertices in the collection. */
-  size_t size() const noexcept { return vertex_num_; }
+  size_t size() const noexcept {
+    if (is_filtered_)
+      return filtered_ids_.size();
+    else
+      return vertex_num_;
+  }
+
+  /** The vertex id list that satisfies the label filter condition. */
+  Result<std::vector<IdType>> filter(
+      std::vector<std::string> filter_labels,
+      std::vector<IdType>* new_valid_chunk = nullptr);
+
+  Result<std::vector<IdType>> filter_by_acero(
+      std::vector<std::string> filter_labels) const;
 
   /**
-   * @brief Construct a VerticesCollection from graph info and vertex type.
+   * @brief Query vertices with a specific label
+   *
+   * @param filter_label The label to query vertices by
+   * @param graph_info A smart pointer to GraphInfo that contains details about
+   * the graph
+   * @param type The type of vertices to query
+   * @return A VerticesCollection containing all vertices that have the
+   * specified label
+   */
+  static Result<std::shared_ptr<VerticesCollection>> verticesWithLabel(
+      const std::string& filter_label,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type);
+
+  static Result<std::shared_ptr<VerticesCollection>> verticesWithLabelbyAcero(
+      const std::string& filter_label,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type);
+
+  /**
+   * @brief Query vertices with a specific label within a given collection
+   *
+   * @param filter_label The label to query vertices by
+   * @param vertices_collection The collection of vertices to search within
+   * @return A VerticesCollection containing all vertices from the specified
+   * collection that have the specified label
+   */
+  static Result<std::shared_ptr<VerticesCollection>> verticesWithLabel(
+      const std::string& filter_label,
+      const std::shared_ptr<VerticesCollection>& vertices_collection);
+
+  /**
+   * @brief Query vertices with multiple labels
+   *
+   * @param filter_labels A vector of labels to query vertices by
+   * @param graph_info A smart pointer to GraphInfo that contains details about
+   * the graph
+   * @param type The type of vertices to query
+   * @return A VerticesCollection containing all vertices that have all of the
+   * specified labels
+   */
+  static Result<std::shared_ptr<VerticesCollection>> verticesWithMultipleLabels(
+      const std::vector<std::string>& filter_labels,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type);
+
+  static Result<std::shared_ptr<VerticesCollection>>
+  verticesWithMultipleLabelsbyAcero(
+      const std::vector<std::string>& filter_labels,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type);
+
+  /**
+   * @brief Query vertices with multiple labels within a given collection
+   *
+   * @param filter_labels A vector of labels to query vertices by
+   * @param vertices_collection The collection of vertices to search within
+   * @return A VerticesCollection containing all vertices from the specified
+   * collection that have all of the specified labels
+   */
+  static Result<std::shared_ptr<VerticesCollection>> verticesWithMultipleLabels(
+      const std::vector<std::string>& filter_labels,
+      const std::shared_ptr<VerticesCollection>& vertices_collection);
+
+  /**
+   * @brief Construct a VerticesCollection from graph info and vertex label.
    *
    * @param graph_info The graph info.
    * @param type The vertex type.
@@ -305,6 +452,7 @@ class VerticesCollection {
   static Result<std::shared_ptr<VerticesCollection>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type) {
     auto vertex_info = graph_info->GetVertexInfo(type);
+    auto labels = vertex_info->GetLabels();
     if (!vertex_info) {
       return Status::KeyError("The vertex ", type, " doesn't exist.");
     }
@@ -315,6 +463,10 @@ class VerticesCollection {
  private:
   std::shared_ptr<VertexInfo> vertex_info_;
   std::string prefix_;
+  std::vector<std::string> labels_;
+  bool is_filtered_;
+  std::vector<IdType> filtered_ids_;
+  std::vector<IdType> valid_chunk_;
   IdType vertex_num_;
 };
 
