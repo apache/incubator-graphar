@@ -46,7 +46,7 @@ class GraphArConfig(BaseModel):
     name: str
     vertex_chunk_size: Optional[int] = 100
     edge_chunk_size: Optional[int] = 1024
-    file_type: Literal["parquet", "orc", "csv", "json"] = DEFAULT_FILE_TYPE
+    file_type: FileType = DEFAULT_FILE_TYPE
     adj_list_type: Literal[
         "ordered_by_source", "ordered_by_dest", "unordered_by_source", "unordered_by_dest"
     ] = DEFAULT_ADJ_LIST_TYPE
