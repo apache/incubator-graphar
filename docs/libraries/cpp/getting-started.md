@@ -287,10 +287,38 @@ id|:LABEL|name|url
 0|company;public|Kam_Air|http://dbpedia.org/resource/Kam_Air
 1|company|Balkh_Airlines|http://dbpedia.org/resource/Balkh_Airlines
 2|company|Khyber_Afghan_Airlines|http://dbpedia.org/resource/Khyber_Afghan_Airlines
+...
+1575|university|Paktia_University|http://dbpedia.org/resource/Paktia_University
+```
+At the beginning, we need to add label information into the `yml` file of  vertex. For this example, it should be as follows.
+
+```yml
+# organisation.vertex.yml
+
+type: organisation
+chunk_size: 4096
+prefix: vertex/organisation/
+# add the label infos
+labels:
+  - university
+  - company
+  - public
+property_groups:
+  - file_type: parquet
+    properties:
+      - name: name
+        data_type: string
+        is_primary: false
+      - name: url
+        data_type: string
+        is_primary: false
+      - name: id
+        data_type: int64
+        is_primary: true
+version: gar/v1
 
 ```
-
-When you have the data ready, you can read the file into `arrow::Table` by using arrow IO function.
+When you have the data ready, you can read the file into `arrow::Table` by using arrow I/O function.
 
 ``` cpp
     arrow::csv::ReadOptions read_options{}; 
