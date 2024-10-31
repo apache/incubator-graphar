@@ -38,6 +38,8 @@ class Property {
   bool is_primary;                 // primary key tag
   bool is_nullable;                // nullable tag for non-primary key
 
+  Property() = default;
+
   explicit Property(const std::string& name,
                     const std::shared_ptr<DataType>& type = nullptr,
                     bool is_primary = false, bool is_nullable = true)

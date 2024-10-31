@@ -278,7 +278,7 @@ Status VertexPropertyWriter::WriteTable(
   if (indice == -1) {
     // add index column
     GAR_ASSIGN_OR_RAISE(table_with_index,
-                        addIndexColumn(input_table, start_chunk_index,
+                        AddIndexColumn(input_table, start_chunk_index,
                                        vertex_info_->GetChunkSize()));
   }
   IdType chunk_size = vertex_info_->GetChunkSize();
@@ -298,7 +298,7 @@ Status VertexPropertyWriter::WriteTable(
     ValidateLevel validate_level) const {
   auto property_groups = vertex_info_->GetPropertyGroups();
   GAR_ASSIGN_OR_RAISE(auto table_with_index,
-                      addIndexColumn(input_table, start_chunk_index,
+                      AddIndexColumn(input_table, start_chunk_index,
                                      vertex_info_->GetChunkSize()));
   for (auto& property_group : property_groups) {
     GAR_RETURN_NOT_OK(WriteTable(table_with_index, property_group,
@@ -428,7 +428,7 @@ Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
   return Make(vertex_info, graph_info->GetPrefix(), validate_level);
 }
 
-Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::addIndexColumn(
+Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::AddIndexColumn(
     const std::shared_ptr<arrow::Table>& table, IdType chunk_index,
     IdType chunk_size) const {
   arrow::Int64Builder array_builder;

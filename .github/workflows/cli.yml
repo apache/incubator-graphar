@@ -1,0 +1,117 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: GraphAr CLI CI
+
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+    paths:
+      - 'cpp/**'
+      - 'cli/**'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/cli.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'cpp/**'
+      - 'cli/**'
+      - '.github/workflows/ci.yml'
+      - '.github/workflows/cli.yml'
+concurrency:
+  group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  ubuntu:
+    name: Ubuntu 22.04 CLI
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') && !github.event.pull_request.draft }}
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          submodules: true
+
+    - name: Install dependencies
+      run: |
+
+        # install the latest arrow deb to test arrow
+        wget -c https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
+            -P /tmp/
+        sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
+        sudo apt-get update -y
+        sudo apt install -y libarrow-dev \
+                            libarrow-dataset-dev \
+                            libarrow-acero-dev \
+                            libparquet-dev
+        sudo apt-get install -y ccache libcurl4-openssl-dev
+
+    - name: Install GraphAr CLI and Run Tests
+      working-directory: "cli"
+      run: |
+        pip install ./ -v
+        graphar --help
+        graphar check -p ../testing/neo4j/MovieGraph.graph.yml
+        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
+        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
+        graphar import -c ../testing/neo4j/data/import.mini.yml
+# TODO: Add unit tests
+
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+  macos:
+    name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} CLI
+    runs-on: macos-${{ matrix.macos-version }}
+    # TODO: Remove this when the macos issue is fixed
+    if: false   
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - architecture: AMD64
+            macos-version: "12"
+          - architecture: ARM64
+            macos-version: "14"
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          submodules: true
+
+    - name: Install dependencies
+      run: |
+        brew bundle --file=cpp/Brewfile
+        
+    
+    - name: Build GraphAr And Run Tests
+      working-directory: "cli"
+      run: |
+        pip install ./
+        graphar --help
+        graphar check -p ../testing/neo4j/MovieGraph.graph.yml
+        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
+        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
+        graphar import -c ../testing/neo4j/data/import.mini.yml
+      
+# TODO: Add unit tests

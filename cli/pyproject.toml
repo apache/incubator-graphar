@@ -1,0 +1,57 @@
+[build-system]
+requires = ["scikit-build-core>=0.3.3", "pybind11"]
+build-backend = "scikit_build_core.build"
+
+
+[project]
+name = "graphar_cli"
+version = "0.0.1"
+description = "GraphAr command line tool"
+readme = "README.md"
+authors = [{ name = "GraphAr community", email = "dev@graphar.apache.org" }]
+requires-python = ">=3.7"
+dependencies = ["typer ~= 0.1", "pydantic ~= 2.0, < 2.7", "pyyaml ~= 6.0"]
+
+[project.optional-dependencies]
+test = ["pandas ~= 2.0", "typing_extensions ~= 4.0"]
+
+[project.scripts]
+graphar = "graphar_cli.graphar_cli:main"
+
+
+[tool.scikit-build]
+build-dir = "build"
+
+[tool.ruff]
+src = ["src"]
+line-length = 100
+
+
+[tool.ruff.lint]
+extend-select = [
+  "B",   # flake8-bugbear
+  "I",   # isort
+  "ARG", # flake8-unused-arguments
+  "C4",  # flake8-comprehensions
+  "EM",  # flake8-errmsg
+  "ICN", # flake8-import-conventions
+  "G",   # flake8-logging-format
+  "PGH", # pygrep-hooks
+  "PIE", # flake8-pie
+  "PL",  # pylint
+  "PT",  # flake8-pytest-style
+  "PTH", # flake8-use-pathlib
+  "RET", # flake8-return
+  "RUF", # Ruff-specific
+  "SIM", # flake8-simplify
+  "T20", # flake8-print
+  "UP",  # pyupgrade
+  "YTT", # flake8-2020
+  "EXE", # flake8-executable
+  "NPY", # NumPy specific rules
+  "PD",  # pandas-vet
+]
+ignore = [
+  "PLR09",   # Too many X
+  "PLR2004", # Magic comparison
+]
