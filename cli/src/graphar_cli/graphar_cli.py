@@ -15,7 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import json
 from logging import getLogger
 from pathlib import Path
 from typing import List

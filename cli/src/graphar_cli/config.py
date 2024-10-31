@@ -15,11 +15,12 @@
 # specific language governing permissions and limitations
 # under the License.
 
+from enum import Enum
 from logging import getLogger
 from pathlib import Path
 from typing import Dict, List, Literal, Optional  # TODO: move to the TYPE_CHECKING block
 
-from pydantic import BaseModel, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 from typing_extensions import Self
 
 logger = getLogger("graphar_cli")
@@ -31,7 +32,14 @@ DEFAULT_ADJ_LIST_TYPE = "ordered_by_source"
 DEFAULT_REGULAR_SEPARATOR = "_"
 DEFAULT_VALIDATE_LEVEL = "weak"
 DEFAULT_VERSION = "gar/v1"
-SUPPORT_FILE_TYPES = {"parquet", "orc", "csv", "json"}
+
+
+class FileType(str, Enum):
+    parquet = "parquet"
+    csv = "csv"
+    orc = "orc"
+    json = "json"
+
 
 class GraphArConfig(BaseModel):
     path: str
@@ -57,7 +65,6 @@ class GraphArConfig(BaseModel):
 
 
 class Property(BaseModel):
-
     name: str
     data_type: Literal["bool", "int32", "int64", "float", "double", "string", "date", "timestamp"]
     is_primary: bool = False
@@ -77,7 +84,7 @@ class Property(BaseModel):
 
 class PropertyGroup(BaseModel):
     properties: List[Property]
-    file_type: Optional[Literal["parquet", "orc", "csv", "json"]] = None
+    file_type: Optional[FileType] = None
 
     @field_validator("properties")
     def check_properties_length(cls, v):
@@ -88,7 +95,7 @@ class PropertyGroup(BaseModel):
 
 
 class Source(BaseModel):
-    file_type: Optional[Literal["parquet", "orc", "csv", "json"]] = None
+    file_type: Optional[FileType] = None
     path: str
     delimiter: str = ","
     columns: Dict[str, str]
@@ -115,8 +122,8 @@ class Source(BaseModel):
             if file_type == "":
                 msg = f"File {self.path} has no file type suffix"
                 raise ValueError(msg)
-            if file_type not in SUPPORT_FILE_TYPES:
-                msg = f"File type {file_type} not supported"
+            if file_type not in FileType.__members__:
+                msg = f"Invalid file type '{file_type}'"
                 raise ValueError(msg)
             self.file_type = file_type
         return self
@@ -157,7 +164,7 @@ class Vertex(BaseModel):
 class AdjList(BaseModel):
     ordered: bool
     aligned_by: Literal["src", "dst"]
-    file_type: Literal["parquet", "orc", "csv", "json"]
+    file_type: Optional[FileType] = None
 
 
 class Edge(BaseModel):
@@ -208,6 +215,8 @@ class ImportSchema(BaseModel):
 
 
 class ImportConfig(BaseModel):
+    model_config = ConfigDict(use_enum_values=True)
+
     graphar: GraphArConfig
     import_schema: ImportSchema
 
@@ -246,6 +255,9 @@ class ImportConfig(BaseModel):
                 else:
                     msg = f"Invalid adj_list_type '{self.graphar.adj_list_type}'"
                     raise ValueError(msg)
+            for adj_list in edge.adj_lists:
+                if adj_list.file_type is None:
+                    adj_list.file_type = self.graphar.file_type
             for property_group in edge.property_groups:
                 if property_group.file_type is None:
                     property_group.file_type = self.graphar.file_type
