@@ -351,8 +351,8 @@ macro(build_graphar_with_arrow_bundled)
                 "-framework CoreFoundation"
                 "-framework Security")
     else()
-        target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
-                graphar_bundled_dependencies -Wl,--no-whole-archive)
+        target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL
+                graphar_bundled_dependencies)
     endif()
 
     # if OpenSSL library exists, link the OpenSSL library.
