@@ -41,6 +41,10 @@ class BenchmarkFixture : public ::benchmark::Fixture {
     path_ = std::string(c_root) + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
     auto maybe_graph_info = GraphInfo::Load(path_);
     graph_info_ = maybe_graph_info.value();
+
+    second_path_ = std::string(c_root) + "/ldbc/parquet/ldbc.graph.yml";
+    auto second_maybe_graph_info = GraphInfo::Load(second_path_);
+    second_graph_info_ = second_maybe_graph_info.value();
   }
 
   void TearDown(const ::benchmark::State& state) override {}
@@ -48,5 +52,7 @@ class BenchmarkFixture : public ::benchmark::Fixture {
  protected:
   std::string path_;
   std::shared_ptr<GraphInfo> graph_info_;
+  std::string second_path_;
+  std::shared_ptr<GraphInfo> second_graph_info_;
 };
 }  // namespace graphar
