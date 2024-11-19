@@ -382,6 +382,10 @@ class VerticesCollection {
   Result<std::vector<IdType>> filter_by_acero(
       std::vector<std::string> filter_labels) const;
 
+  Result<std::vector<IdType>> filter(
+      std::string property_name, std::shared_ptr<Expression> filter_expression,
+      std::vector<IdType>* new_valid_chunk = nullptr);
+
   /**
    * @brief Query vertices with a specific label
    *
@@ -430,6 +434,14 @@ class VerticesCollection {
   verticesWithMultipleLabelsbyAcero(
       const std::vector<std::string>& filter_labels,
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type);
+
+  static Result<std::shared_ptr<VerticesCollection>> verticesWithProperty(
+      const std::string property_name, const graphar::util::Filter filter,
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type);
+
+  static Result<std::shared_ptr<VerticesCollection>> verticesWithProperty(
+      const std::string property_name, const graphar::util::Filter filter,
+      const std::shared_ptr<VerticesCollection>& vertices_collection);
 
   /**
    * @brief Query vertices with multiple labels within a given collection
