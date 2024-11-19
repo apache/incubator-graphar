@@ -126,6 +126,7 @@ std::shared_ptr<AdjacentList> CreateAdjacentList(
  * @param type The type of the vertex
  * @param chunk_size The number of vertices in each vertex chunk
  * @param property_groups The property group vector of the vertex
+ * @param labels The labels of the vertex.
  * @param prefix The prefix of the vertex info. If left empty, the default
  *        prefix will be set to the type of the vertex
  * @param version The format version of the vertex info
