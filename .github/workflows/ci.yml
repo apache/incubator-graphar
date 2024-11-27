@@ -179,7 +179,7 @@ jobs:
 
     - name: Upload libgraphar.a artifact
       if: github.event_name == 'push'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ubuntu-libgraphar.a
         path: cpp/build-static/libgraphar.a  
@@ -237,7 +237,7 @@ jobs:
 
     - name: Upload libgraphar.a artifact
       if: github.event_name == 'push'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: macos-${{ matrix.macos-version }}-libgraphar.a
         path: cpp/build-static/libgraphar.a  
