@@ -177,6 +177,94 @@ macro(install_graphar_target target)
   )
 endmacro()
 
+# Implementations of lisp "car" and "cdr" functions
+macro(GRAPHAR_CAR var)
+  set(${var} ${ARGV1})
+endmacro()
+
+macro(GRAPHAR_CDR var rest)
+  set(${var} ${ARGN})
+endmacro()
+
+# Based on MIT-licensed
+# https://gist.github.com/cristianadam/ef920342939a89fae3e8a85ca9459b49
+function(graphar_create_merged_static_lib output_target)
+  set(options)
+  set(one_value_args NAME ROOT)
+  set(multi_value_args TO_MERGE)
+  cmake_parse_arguments(ARG
+                        "${options}"
+                        "${one_value_args}"
+                        "${multi_value_args}"
+                        ${ARGN})
+  if(ARG_UNPARSED_ARGUMENTS)
+    message(SEND_ERROR "Error: unrecognized arguments: ${ARG_UNPARSED_ARGUMENTS}")
+  endif()
+
+  set(output_lib_path
+      ${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_STATIC_LIBRARY_PREFIX}${ARG_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX}
+  )
+
+  set(all_library_paths $<TARGET_FILE:${ARG_ROOT}>)
+  foreach(lib ${ARG_TO_MERGE})
+    list(APPEND all_library_paths $<TARGET_FILE:${lib}>)
+  endforeach()
+
+  if(APPLE)
+    set(BUNDLE_COMMAND "libtool" "-no_warning_for_no_symbols" "-static" "-o"
+                       ${output_lib_path} ${all_library_paths})
+  elseif(CMAKE_CXX_COMPILER_ID MATCHES "^(Clang|GNU|Intel)$")
+    set(ar_script_path ${CMAKE_BINARY_DIR}/${ARG_NAME}.ar)
+
+    file(WRITE ${ar_script_path}.in "CREATE ${output_lib_path}\n")
+    file(APPEND ${ar_script_path}.in "ADDLIB $<TARGET_FILE:${ARG_ROOT}>\n")
+
+    foreach(lib ${ARG_TO_MERGE})
+      file(APPEND ${ar_script_path}.in "ADDLIB $<TARGET_FILE:${lib}>\n")
+    endforeach()
+
+    file(APPEND ${ar_script_path}.in "SAVE\nEND\n")
+    file(GENERATE
+         OUTPUT ${ar_script_path}
+         INPUT ${ar_script_path}.in)
+    set(ar_tool ${CMAKE_AR})
+
+    if(CMAKE_INTERPROCEDURAL_OPTIMIZATION)
+      set(ar_tool ${CMAKE_CXX_COMPILER_AR})
+    endif()
+
+    set(BUNDLE_COMMAND ${ar_tool} -M < ${ar_script_path})
+
+  elseif(MSVC)
+    if(CMAKE_LIBTOOL)
+      set(BUNDLE_TOOL ${CMAKE_LIBTOOL})
+    else()
+      find_program(BUNDLE_TOOL lib HINTS "${CMAKE_CXX_COMPILER}/..")
+      if(NOT BUNDLE_TOOL)
+        message(FATAL_ERROR "Cannot locate lib.exe to bundle libraries")
+      endif()
+    endif()
+    set(BUNDLE_COMMAND ${BUNDLE_TOOL} /NOLOGO /OUT:${output_lib_path}
+                       ${all_library_paths})
+  else()
+    message(FATAL_ERROR "Unknown bundle scenario!")
+  endif()
+
+  add_custom_target(${output_target}_merge ALL
+                    ${BUNDLE_COMMAND}
+                    DEPENDS ${ARG_ROOT} ${ARG_TO_MERGE}
+                    BYPRODUCTS ${output_lib_path}
+                    COMMENT "Bundling ${output_lib_path}"
+                    VERBATIM)
+
+  message(STATUS "Creating bundled static library target ${output_target} at ${output_lib_path}"
+  )
+
+  add_library(${output_target} STATIC IMPORTED)
+  set_target_properties(${output_target} PROPERTIES IMPORTED_LOCATION ${output_lib_path})
+  add_dependencies(${output_target} ${output_target}_merge)
+endfunction()
+
 macro(build_graphar)
     file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
     if(GRAPHAR_BUILD_STATIC)
@@ -231,21 +319,40 @@ macro(build_graphar_with_arrow_bundled)
     target_include_directories(graphar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
     target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
 
+    set(GAR_BUNDLED_DEPS_STATIC_LIBS)
+    list(APPEND GAR_BUNDLED_DEPS_STATIC_LIBS
+        gar_arrow_static
+        gar_parquet_static
+        gar_dataset_static
+        gar_acero_static
+        gar_arrow_bundled_dependencies_static)
+    graphar_car(_FIRST_LIB ${GAR_BUNDLED_DEPS_STATIC_LIBS})
+    graphar_cdr(_OTHER_LIBS ${GAR_BUNDLED_DEPS_STATIC_LIBS})
+
+    graphar_create_merged_static_lib(graphar_bundled_dependencies
+                                    NAME
+                                    graphar_bundled_dependencies
+                                    ROOT
+                                    ${_FIRST_LIB}
+                                    TO_MERGE
+                                    ${_OTHER_LIBS})
+    # We can't use install(TARGETS) here because
+    # graphar_bundled_dependencies is an IMPORTED library.
+    get_target_property(graphar_bundled_dependencies_path graphar_bundled_dependencies
+                        IMPORTED_LOCATION)
+    install(FILES ${CMAKE_BINARY_DIR}/${graphar_bundled_dependencies_path} ${INSTALL_IS_OPTIONAL}
+            DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    string(APPEND ARROW_PC_LIBS_PRIVATE " -lgraphar_bundled_dependencies")
+    list(INSERT ARROW_STATIC_INSTALL_INTERFACE_LIBS 0 "graphar_bundled_dependencies")
+
     if(APPLE)
-        message(STATUS "Linking arrow bundled dependencies " ${GAR_PARQUET_STATIC_LIB} ${GAR_ACERO_STATIC_LIB})
-        target_link_libraries(graphar PRIVATE -Wl,-force_load gar_arrow_static
-                "${GAR_PARQUET_STATIC_LIB}"
-                "${GAR_DATASET_STATIC_LIB}"
-                "${GAR_ARROW_ACERO_STATIC_LIB}"
-                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
+        target_link_libraries(graphar PRIVATE -Wl,-force_load
+                graphar_bundled_dependencies
                 "-framework CoreFoundation"
                 "-framework Security")
     else()
-        target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
-                "${GAR_PARQUET_STATIC_LIB}"
-                "${GAR_DATASET_STATIC_LIB}"
-                "${GAR_ARROW_ACERO_STATIC_LIB}"
-                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive) 
+        target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL
+                graphar_bundled_dependencies)
     endif()
 
     # if OpenSSL library exists, link the OpenSSL library.
@@ -266,7 +373,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/src)
 include_directories(src)
 
 if (BUILD_ARROW_FROM_SOURCE)
-    # the nessary dependencies for building arrow from source
+    # the necessary dependencies for building arrow from source
     find_package(OpenSSL REQUIRED)
     if(OPENSSL_FOUND)
         if(OPENSSL_VERSION LESS "1.1.0")
@@ -334,11 +441,11 @@ if (BUILD_EXAMPLES)
         if (BUILD_ARROW_FROM_SOURCE)
             target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
             if (APPLE)
-                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load gar_arrow_static
+                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load ${GAR_ARROW_STATIC_LIB}
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
             else()
-                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
+                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive ${GAR_ARROW_STATIC_LIB}
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive) 
             endif()
