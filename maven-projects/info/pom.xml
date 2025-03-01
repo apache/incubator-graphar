@@ -94,7 +94,6 @@
                     <artifactSet>
                         <includes>
                             <include>com.google.protobuf:*</include>
-                            <include>com.amazon.deequ:*</include>
                         </includes>
                     </artifactSet>
                     <relocations>
