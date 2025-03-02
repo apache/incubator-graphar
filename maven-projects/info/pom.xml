@@ -32,24 +32,26 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>info</artifactId>
+    <artifactId>graphar-info</artifactId>
     <packaging>jar</packaging>
-    <version>0.13.0.dev-SNAPSHOT</version>
+    <version>${graphar.version}</version>
 
-    <name>info</name>
+    <name>graphar-info</name>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <proto-info.version>0.13.0.dev-SNAPSHOT</proto-info.version>
+        <protobuf-maven-plugin.version>2.3.0</protobuf-maven-plugin.version>
+        <protobuf.version>4.27.1</protobuf.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.graphar</groupId>
-            <artifactId>proto</artifactId>
-            <version>${proto-info.version}</version>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -71,6 +73,24 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>io.github.ascopes</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>${protobuf-maven-plugin.version}</version>
+                <configuration>
+                    <sourceDirectories>
+                        <sourceDirectory>${project.basedir}/../../format</sourceDirectory>
+                    </sourceDirectories>
+                    <protocVersion>${protobuf.version}</protocVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
