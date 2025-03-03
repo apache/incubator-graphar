@@ -19,38 +19,37 @@
 
 package org.apache.graphar.info.loader;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
 import org.apache.graphar.info.yaml.EdgeYaml;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-public class LocalYamlGraphLoader implements GraphLoader {
-    private static FileSystem fileSystem = null;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
-    public LocalYamlGraphLoader() {}
+public class LocalYamlGraphLoader implements GraphLoader {
+    public LocalYamlGraphLoader() {
+    }
 
     @Override
     public GraphInfo load(String graphYamlPath) throws IOException {
-        if (fileSystem == null) {
-            fileSystem = FileSystem.get(new Configuration());
-        }
+        final Path path = FileSystems.getDefault().getPath(graphYamlPath);
         // load graph itself
-        final Path path = new Path(graphYamlPath);
-        final FSDataInputStream inputStream = fileSystem.open(path);
+        final BufferedReader reader = Files.newBufferedReader(path);
         final Yaml yamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
-        final GraphYaml graphYaml = yamlLoader.load(inputStream);
+        final GraphYaml graphYaml = yamlLoader.load(reader);
+        reader.close();
+
         // load vertices
         final String ABSOLUTE_PREFIX = path.getParent().toString();
         List<VertexInfo> vertexInfos = new ArrayList<>(graphYaml.getVertices().size());
@@ -66,16 +65,20 @@ public class LocalYamlGraphLoader implements GraphLoader {
     }
 
     private VertexInfo loadVertex(String path) throws IOException {
-        FSDataInputStream inputStream = fileSystem.open(new Path(path));
+        final Path vertexPath = FileSystems.getDefault().getPath(path);
+        final BufferedReader reader = Files.newBufferedReader(vertexPath);
         Yaml vertexYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
-        VertexYaml vertexYaml = vertexYamlLoader.load(inputStream);
+        VertexYaml vertexYaml = vertexYamlLoader.load(reader);
+        reader.close();
         return vertexYaml.toVertexInfo();
     }
 
     private EdgeInfo loadEdge(String path) throws IOException {
-        FSDataInputStream inputStream = fileSystem.open(new Path(path));
+        final Path edgePath = FileSystems.getDefault().getPath(path);
+        final BufferedReader reader = Files.newBufferedReader(edgePath);
         Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
-        EdgeYaml edgeYaml = edgeYamlLoader.load(inputStream);
+        EdgeYaml edgeYaml = edgeYamlLoader.load(reader);
+        reader.close();
         return edgeYaml.toEdgeInfo();
     }
 }
