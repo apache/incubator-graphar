@@ -114,22 +114,22 @@
                     <artifactSet>
                         <includes>
                             <include>com.google.protobuf:*</include>
-                            <include>org.yaml.snakeyaml:*</include>
+                            <include>org.yaml:*</include>
                         </includes>
                     </artifactSet>
                     <relocations>
                         <relocation>
                             <pattern>com.google.protobuf</pattern>
-                            <shadedPattern>org.grpahar.protobuf</shadedPattern>
+                            <shadedPattern>org.graphar.protobuf</shadedPattern>
                             <includes>
                                 <include>com.google.protobuf.**</include>
                             </includes>
                         </relocation>
                         <relocation>
-                            <pattern>org.yaml.snakeyaml</pattern>
-                            <shadedPattern>org.graphar.snakeyaml</shadedPattern>
+                            <pattern>org.yaml</pattern>
+                            <shadedPattern>org.graphar.yaml</shadedPattern>
                             <includes>
-                                <include>org.yaml.snakeyaml</include>
+                                <include>org.yaml.**</include>
                             </includes>
                         </relocation>
                     </relocations>
@@ -138,6 +138,7 @@
                             <artifact>*:*</artifact>
                             <excludes>
                                 <exclude>google/protobuf/**</exclude>
+                                <exclude>yaml/snakeyaml/**</exclude>
                             </excludes>
                         </filter>
                     </filters>
