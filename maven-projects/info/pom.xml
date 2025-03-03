@@ -32,24 +32,26 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>info</artifactId>
+    <artifactId>graphar-info</artifactId>
     <packaging>jar</packaging>
-    <version>0.13.0.dev-SNAPSHOT</version>
+    <version>${graphar.version}</version>
 
-    <name>info</name>
+    <name>graphar-info</name>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <proto-info.version>0.13.0.dev-SNAPSHOT</proto-info.version>
+        <protobuf-maven-plugin.version>2.3.0</protobuf-maven-plugin.version>
+        <protobuf.version>4.27.1</protobuf.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.graphar</groupId>
-            <artifactId>proto</artifactId>
-            <version>${proto-info.version}</version>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>${protobuf.version}</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -72,17 +74,83 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>io.github.ascopes</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>${protobuf-maven-plugin.version}</version>
+                <configuration>
+                    <sourceDirectories>
+                        <sourceDirectory>${project.basedir}/../../format</sourceDirectory>
+                    </sourceDirectories>
+                    <protocVersion>${protobuf.version}</protocVersion>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>com.diffplug.spotless</groupId>
                 <artifactId>spotless-maven-plugin</artifactId>
                 <version>${spotless-maven-plugin.version}</version>
                 <configuration>
                     <java>
                         <googleJavaFormat>
-                            <version>1.7</version>
+                            <version>11</version>
                             <style>AOSP</style>
                         </googleJavaFormat>
                     </java>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <shadedArtifactAttached>false</shadedArtifactAttached>
+                    <shadeTestJar>false</shadeTestJar>
+                    <artifactSet>
+                        <includes>
+                            <include>com.google.protobuf:*</include>
+                            <include>org.yaml:*</include>
+                        </includes>
+                    </artifactSet>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.google.protobuf</pattern>
+                            <shadedPattern>org.graphar.protobuf</shadedPattern>
+                            <includes>
+                                <include>com.google.protobuf.**</include>
+                            </includes>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.yaml</pattern>
+                            <shadedPattern>org.graphar.yaml</shadedPattern>
+                            <includes>
+                                <include>org.yaml.**</include>
+                            </includes>
+                        </relocation>
+                    </relocations>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>google/protobuf/**</exclude>
+                                <exclude>yaml/snakeyaml/**</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
