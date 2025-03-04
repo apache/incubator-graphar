@@ -19,51 +19,56 @@
 
 package org.apache.graphar.info.saver;
 
-import java.io.IOException;
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class LocalYamlGraphSaver implements GraphSaver {
-    private static final FileSystem fileSystem;
-
-    static {
-        try {
-            fileSystem = FileSystem.get(new Configuration());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public void save(String path, GraphInfo graphInfo) throws IOException {
-        try (FSDataOutputStream outputStream =
-                fileSystem.create(new Path(path + "/" + graphInfo.getName() + ".graph.yaml"))) {
-            outputStream.writeBytes(graphInfo.dump());
-            for (VertexInfo vertexInfo : graphInfo.getVertexInfos()) {
-                saveVertex(path, vertexInfo);
-            }
-            for (EdgeInfo edgeInfo : graphInfo.getEdgeInfos()) {
-                saveEdge(path, edgeInfo);
-            }
+        final Path outputPath = FileSystems
+            .getDefault()
+            .getPath(path + FileSystems.getDefault().getSeparator() + graphInfo.getName() + ".graph.yaml");
+        Files.createDirectories(outputPath.getParent());
+        Files.createFile(outputPath);
+        final BufferedWriter writer = Files.newBufferedWriter(outputPath);
+        writer.write(graphInfo.dump());
+        writer.close();
+
+        for (VertexInfo vertexInfo : graphInfo.getVertexInfos()) {
+            saveVertex(path, vertexInfo);
+        }
+        for (EdgeInfo edgeInfo : graphInfo.getEdgeInfos()) {
+            saveEdge(path, edgeInfo);
         }
     }
 
     private void saveVertex(String path, VertexInfo vertexInfo) throws IOException {
-        try (FSDataOutputStream outputStream =
-                fileSystem.create(new Path(path + "/" + vertexInfo.getType() + ".vertex.yaml"))) {
-            outputStream.writeBytes(vertexInfo.dump());
-        }
+        final Path outputPath = FileSystems
+            .getDefault()
+            .getPath(path + FileSystems.getDefault().getSeparator() + vertexInfo.getType() + ".vertex.yaml");
+        Files.createDirectories(outputPath.getParent());
+        Files.createFile(outputPath);
+        final BufferedWriter writer = Files.newBufferedWriter(outputPath);
+        writer.write(vertexInfo.dump());
+        writer.close();
     }
 
     private void saveEdge(String path, EdgeInfo edgeInfo) throws IOException {
-        try (FSDataOutputStream outputStream =
-                fileSystem.create(new Path(path + "/" + edgeInfo.getConcat() + ".edge.yaml"))) {
-            outputStream.writeBytes(edgeInfo.dump());
-        }
+        final Path outputPath = FileSystems
+            .getDefault()
+            .getPath(path + FileSystems.getDefault().getSeparator() + edgeInfo.getConcat() + ".edge.yaml");
+        Files.createDirectories(outputPath.getParent());
+        Files.createFile(outputPath);
+        final BufferedWriter writer = Files.newBufferedWriter(outputPath);
+        writer.write(edgeInfo.dump());
+        writer.close();
     }
 }
