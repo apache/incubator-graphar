@@ -255,22 +255,19 @@ GraphAr.
 
 ## Publication
 
-- Xue Li, Weibin Zeng, Zhibin Wang, Diwen Zhu, Jingbo Xu, Wenyuan Yu,
-  Jingren Zhou. [Enhancing Data Lakes with GraphAr: Efficient Graph Data
-  Management with a Specialized Storage
-  Scheme\[J\]](https://arxiv.org/abs/2312.09577). arXiv preprint
-  arXiv:2312.09577, 2023.
+- Xue Li, Weibin Zeng, Zhibin Wang, Diwen Zhu, Jingbo Xu, Wenyuan Yu, Jingren Zhou. GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes. PVLDB, 18(3): 530 - 543, 2024.
 
 ```bibtex
-@article{li2023enhancing,
+@article{li2024graphar,
   author = {Xue Li and Weibin Zeng and Zhibin Wang and Diwen Zhu and Jingbo Xu and Wenyuan Yu and Jingren Zhou},
-  title = {Enhancing Data Lakes with GraphAr: Efficient Graph Data Management with a Specialized Storage Scheme},
-  year = {2023},
-  url = {https://doi.org/10.48550/arXiv.2312.09577},
-  doi = {10.48550/ARXIV.2312.09577},
-  eprinttype = {arXiv},
-  eprint = {2312.09577},
-  biburl = {https://dblp.org/rec/journals/corr/abs-2312-09577.bib},
-  bibsource = {dblp computer science bibliography, https://dblp.org}
+  title = {GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes},
+  journal = {Proceedings of the VLDB Endowment},
+  year = {2024},
+  volume = {18},
+  number = {3},
+  pages = {530--543},
+  publisher = {VLDB Endowment},
 }
 ```
+
+The source code, data, and/or other artifacts of the research paper have been made available at the [research branch](https://github.com/apache/incubator-graphar/tree/research).
