@@ -66,7 +66,7 @@ repository and navigated to the ``cpp`` subdirectory with:
 
 ```bash
 git clone https://github.com/apache/incubator-graphar.git
-cd graphar/cpp
+cd incubator-graphar/cpp
 ```
 
 Release build:
