@@ -224,8 +224,7 @@ for details about the Scala with Spark library.
 The GraphAr Java library is created with bindings to the C++ library
 (currently at version v0.10.0), utilizing
 [Alibaba-FastFFI](https://github.com/alibaba/fastFFI) for
-implementation. See [GraphAr Java
-Library](./maven-projects/java) for
+implementation. See [GraphAr Java Library](./maven-projects/java) for
 details about the building of the Java library.
 
 ### The Python with PySpark Library
