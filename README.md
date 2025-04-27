@@ -235,8 +235,7 @@ details about the building of the Java library.
 
 The PySpark library is developed as bindings to the GraphAr
 Spark library. See [GraphAr PySpark
-Library](./pyspark)
-for details about the PySpark library.
+Library](./pyspark) for details about the PySpark library.
 
 ## Contributing
 
