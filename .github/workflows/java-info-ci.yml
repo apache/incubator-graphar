@@ -56,6 +56,5 @@ jobs:
         working-directory: maven-projects/info # Adjusted working directory
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64} # Using Java 11
-          # LLVM11_HOME export removed
           export GAR_TEST_DATA=$GITHUB_WORKSPACE/testing/ # Standard way to reference repo root
           mvn --no-transfer-progress clean test
