@@ -75,8 +75,8 @@ public class EdgeYaml {
                 src_type,
                 edge_type,
                 dst_type,
-                src_chunk_size,  // Swapped with chunk_size
-                chunk_size,      // Swapped with src_chunk_size (this is the edge's own chunk size)
+                src_chunk_size, // Swapped with chunk_size
+                chunk_size, // Swapped with src_chunk_size (this is the edge's own chunk size)
                 dst_chunk_size,
                 directed,
                 prefix,

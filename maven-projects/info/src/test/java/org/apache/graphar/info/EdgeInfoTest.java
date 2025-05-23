@@ -31,7 +31,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-import org.apache.graphar.graphinfo.AdjList;
 import org.apache.graphar.graphinfo.EdgeInfo;
 import org.apache.graphar.graphinfo.Property;
 import org.apache.graphar.graphinfo.PropertyGroup;
@@ -89,49 +88,49 @@ public class EdgeInfoTest {
         // Property: course_id (in first property group)
         PropertyGroup pg1 = teachesEdgeInfo.getPropertyGroup("course_id");
         assertNotNull(pg1);
-        Property courseIdProp = pg1.getProperties().stream()
-                .filter(p -> p.getName().equals("course_id"))
-                .findFirst()
-                .orElse(null);
+        Property courseIdProp =
+                pg1.getProperties().stream()
+                        .filter(p -> p.getName().equals("course_id"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(courseIdProp);
         assertEquals("course_id", courseIdProp.getName());
         assertEquals(DataType.Type.STRING, courseIdProp.getDataType().getType());
         assertFalse(courseIdProp.isIsPrimary()); // Edge properties not primary
         assertFalse(courseIdProp.isIsNullable());
-        assertEquals(
-                DataType.Type.STRING, teachesEdgeInfo.getPropertyType("course_id").getType());
+        assertEquals(DataType.Type.STRING, teachesEdgeInfo.getPropertyType("course_id").getType());
         assertFalse(teachesEdgeInfo.isPrimaryKey("course_id"));
         assertFalse(teachesEdgeInfo.isNullableKey("course_id"));
 
         // Property: course_year (in first property group)
-        Property courseYearProp = pg1.getProperties().stream()
-                .filter(p -> p.getName().equals("course_year"))
-                .findFirst()
-                .orElse(null);
+        Property courseYearProp =
+                pg1.getProperties().stream()
+                        .filter(p -> p.getName().equals("course_year"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(courseYearProp);
         assertEquals("course_year", courseYearProp.getName());
         assertEquals(DataType.Type.INT32, courseYearProp.getDataType().getType());
         assertFalse(courseYearProp.isIsPrimary());
         assertFalse(courseYearProp.isIsNullable());
-        assertEquals(
-                DataType.Type.INT32, teachesEdgeInfo.getPropertyType("course_year").getType());
+        assertEquals(DataType.Type.INT32, teachesEdgeInfo.getPropertyType("course_year").getType());
         assertFalse(teachesEdgeInfo.isPrimaryKey("course_year"));
         assertFalse(teachesEdgeInfo.isNullableKey("course_year"));
 
         // Property: semester (in second property group)
         PropertyGroup pg2 = teachesEdgeInfo.getPropertyGroup("semester");
         assertNotNull(pg2);
-        Property semesterProp = pg2.getProperties().stream()
-                .filter(p -> p.getName().equals("semester"))
-                .findFirst()
-                .orElse(null);
+        Property semesterProp =
+                pg2.getProperties().stream()
+                        .filter(p -> p.getName().equals("semester"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(semesterProp);
         assertEquals("semester", semesterProp.getName());
         assertEquals(DataType.Type.STRING, semesterProp.getDataType().getType());
         assertFalse(semesterProp.isIsPrimary());
         assertTrue(semesterProp.isIsNullable()); // Nullable as per YAML
-        assertEquals(
-                DataType.Type.STRING, teachesEdgeInfo.getPropertyType("semester").getType());
+        assertEquals(DataType.Type.STRING, teachesEdgeInfo.getPropertyType("semester").getType());
         assertFalse(teachesEdgeInfo.isPrimaryKey("semester"));
         assertTrue(teachesEdgeInfo.isNullableKey("semester"));
 

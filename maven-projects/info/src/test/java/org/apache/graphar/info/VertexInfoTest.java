@@ -63,8 +63,7 @@ public class VertexInfoTest {
         String lecturerVertexInfoPath = Paths.get(basePath, "lecturer.vertex.yml").toString();
 
         studentVertexInfo = GrapharStaticFunctions.INSTANCE.loadVertexInfo(studentVertexInfoPath);
-        lecturerVertexInfo =
-                GrapharStaticFunctions.INSTANCE.loadVertexInfo(lecturerVertexInfoPath);
+        lecturerVertexInfo = GrapharStaticFunctions.INSTANCE.loadVertexInfo(lecturerVertexInfoPath);
         studentVertexInfoRootNode =
                 YamlUtil.INSTANCE.loadTree(new FileInputStream(studentVertexInfoPath));
         lecturerVertexInfoRootNode =
@@ -88,10 +87,11 @@ public class VertexInfoTest {
         // Property: student_id (in first property group)
         PropertyGroup pg1 = studentVertexInfo.getPropertyGroup("student_id");
         assertNotNull(pg1);
-        Property studentIdProp = pg1.getProperties().stream()
-                .filter(p -> p.getName().equals("student_id"))
-                .findFirst()
-                .orElse(null);
+        Property studentIdProp =
+                pg1.getProperties().stream()
+                        .filter(p -> p.getName().equals("student_id"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(studentIdProp);
         assertEquals("student_id", studentIdProp.getName());
         assertEquals(DataType.Type.INT64, studentIdProp.getDataType().getType());
@@ -105,10 +105,11 @@ public class VertexInfoTest {
         // Property: name (in second property group)
         PropertyGroup pg2 = studentVertexInfo.getPropertyGroup("name");
         assertNotNull(pg2);
-        Property nameProp = pg2.getProperties().stream()
-                .filter(p -> p.getName().equals("name"))
-                .findFirst()
-                .orElse(null);
+        Property nameProp =
+                pg2.getProperties().stream()
+                        .filter(p -> p.getName().equals("name"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(nameProp);
         assertEquals("name", nameProp.getName());
         assertEquals(DataType.Type.STRING, nameProp.getDataType().getType());
@@ -119,10 +120,11 @@ public class VertexInfoTest {
         assertFalse(studentVertexInfo.isNullableKey("name"));
 
         // Property: major (in second property group)
-        Property majorProp = pg2.getProperties().stream()
-                .filter(p -> p.getName().equals("major"))
-                .findFirst()
-                .orElse(null);
+        Property majorProp =
+                pg2.getProperties().stream()
+                        .filter(p -> p.getName().equals("major"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(majorProp);
         assertEquals("major", majorProp.getName());
         assertEquals(DataType.Type.STRING, majorProp.getDataType().getType());
@@ -133,10 +135,11 @@ public class VertexInfoTest {
         assertTrue(studentVertexInfo.isNullableKey("major"));
 
         // Property: enrollment_year (in second property group)
-        Property enrollmentYearProp = pg2.getProperties().stream()
-                .filter(p -> p.getName().equals("enrollment_year"))
-                .findFirst()
-                .orElse(null);
+        Property enrollmentYearProp =
+                pg2.getProperties().stream()
+                        .filter(p -> p.getName().equals("enrollment_year"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(enrollmentYearProp);
         assertEquals("enrollment_year", enrollmentYearProp.getName());
         assertEquals(DataType.Type.INT32, enrollmentYearProp.getDataType().getType());
@@ -147,7 +150,6 @@ public class VertexInfoTest {
                 studentVertexInfo.getPropertyType("enrollment_year").getType());
         assertFalse(studentVertexInfo.isPrimaryKey("enrollment_year"));
         assertFalse(studentVertexInfo.isNullableKey("enrollment_year"));
-
 
         // Test dump
         String dumpString = studentVertexInfo.dump();
@@ -192,66 +194,66 @@ public class VertexInfoTest {
         // Property: lecturer_id
         PropertyGroup pg1Lecturer = lecturerVertexInfo.getPropertyGroup("lecturer_id");
         assertNotNull(pg1Lecturer);
-        Property lecturerIdProp = pg1Lecturer.getProperties().stream()
-                .filter(p -> p.getName().equals("lecturer_id"))
-                .findFirst()
-                .orElse(null);
+        Property lecturerIdProp =
+                pg1Lecturer.getProperties().stream()
+                        .filter(p -> p.getName().equals("lecturer_id"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(lecturerIdProp);
         assertEquals("lecturer_id", lecturerIdProp.getName());
         assertEquals(DataType.Type.INT64, lecturerIdProp.getDataType().getType());
         assertTrue(lecturerIdProp.isIsPrimary());
         assertFalse(lecturerIdProp.isIsNullable());
         assertEquals(
-                DataType.Type.INT64,
-                lecturerVertexInfo.getPropertyType("lecturer_id").getType());
+                DataType.Type.INT64, lecturerVertexInfo.getPropertyType("lecturer_id").getType());
         assertTrue(lecturerVertexInfo.isPrimaryKey("lecturer_id"));
         assertFalse(lecturerVertexInfo.isNullableKey("lecturer_id"));
 
         // Property: name
         PropertyGroup pg2Lecturer = lecturerVertexInfo.getPropertyGroup("name");
         assertNotNull(pg2Lecturer);
-        Property nameLecturerProp = pg2Lecturer.getProperties().stream()
-                .filter(p -> p.getName().equals("name"))
-                .findFirst()
-                .orElse(null);
+        Property nameLecturerProp =
+                pg2Lecturer.getProperties().stream()
+                        .filter(p -> p.getName().equals("name"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(nameLecturerProp);
         assertEquals("name", nameLecturerProp.getName());
         assertEquals(DataType.Type.STRING, nameLecturerProp.getDataType().getType());
         assertFalse(nameLecturerProp.isIsPrimary());
         assertFalse(nameLecturerProp.isIsNullable());
-        assertEquals(
-                DataType.Type.STRING, lecturerVertexInfo.getPropertyType("name").getType());
+        assertEquals(DataType.Type.STRING, lecturerVertexInfo.getPropertyType("name").getType());
         assertFalse(lecturerVertexInfo.isPrimaryKey("name"));
         assertFalse(lecturerVertexInfo.isNullableKey("name"));
 
         // Property: email
-        Property emailLecturerProp = pg2Lecturer.getProperties().stream()
-                .filter(p -> p.getName().equals("email"))
-                .findFirst()
-                .orElse(null);
+        Property emailLecturerProp =
+                pg2Lecturer.getProperties().stream()
+                        .filter(p -> p.getName().equals("email"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(emailLecturerProp);
         assertEquals("email", emailLecturerProp.getName());
         assertEquals(DataType.Type.STRING, emailLecturerProp.getDataType().getType());
         assertFalse(emailLecturerProp.isIsPrimary());
         assertTrue(emailLecturerProp.isIsNullable()); // Nullable as per YAML
-        assertEquals(
-                DataType.Type.STRING, lecturerVertexInfo.getPropertyType("email").getType());
+        assertEquals(DataType.Type.STRING, lecturerVertexInfo.getPropertyType("email").getType());
         assertFalse(lecturerVertexInfo.isPrimaryKey("email"));
         assertTrue(lecturerVertexInfo.isNullableKey("email"));
 
         // Property: department
-        Property departmentLecturerProp = pg2Lecturer.getProperties().stream()
-                .filter(p -> p.getName().equals("department"))
-                .findFirst()
-                .orElse(null);
+        Property departmentLecturerProp =
+                pg2Lecturer.getProperties().stream()
+                        .filter(p -> p.getName().equals("department"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(departmentLecturerProp);
         assertEquals("department", departmentLecturerProp.getName());
         assertEquals(DataType.Type.STRING, departmentLecturerProp.getDataType().getType());
         assertFalse(departmentLecturerProp.isIsPrimary());
         assertFalse(departmentLecturerProp.isIsNullable());
         assertEquals(
-                DataType.Type.STRING,
-                lecturerVertexInfo.getPropertyType("department").getType());
+                DataType.Type.STRING, lecturerVertexInfo.getPropertyType("department").getType());
         assertFalse(lecturerVertexInfo.isPrimaryKey("department"));
         assertFalse(lecturerVertexInfo.isNullableKey("department"));
 

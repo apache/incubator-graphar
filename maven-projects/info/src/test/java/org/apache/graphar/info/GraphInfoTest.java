@@ -24,15 +24,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import org.apache.graphar.util.GrapharStaticFunctions;
 import org.apache.graphar.util.YamlUtil;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -91,8 +87,7 @@ public class GraphInfoTest {
         assertEquals("student", graphInfo.getVertexInfo("student").getType());
         assertNotNull(graphInfo.getEdgeInfo("lecturer", "teaches", "student"));
         assertEquals(
-                "teaches",
-                graphInfo.getEdgeInfo("lecturer", "teaches", "student").getEdgeType());
+                "teaches", graphInfo.getEdgeInfo("lecturer", "teaches", "student").getEdgeType());
 
         // Test dump
         String dumpString = graphInfo.dump();
@@ -104,9 +99,7 @@ public class GraphInfoTest {
         }
         assertNotNull(dumpedNode);
         assertEquals(graphInfoRootNode.get("name").asText(), dumpedNode.get("name").asText());
-        assertEquals(
-                graphInfoRootNode.get("prefix").asText(), dumpedNode.get("prefix").asText());
-        assertEquals(
-                graphInfoRootNode.get("version").asText(), dumpedNode.get("version").asText());
+        assertEquals(graphInfoRootNode.get("prefix").asText(), dumpedNode.get("prefix").asText());
+        assertEquals(graphInfoRootNode.get("version").asText(), dumpedNode.get("version").asText());
     }
 }
