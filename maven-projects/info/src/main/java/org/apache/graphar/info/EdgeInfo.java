@@ -45,9 +45,9 @@ public class EdgeInfo {
             String srcLabel,
             String edgeLabel,
             String dstLabel,
-            long chunkSize, // Corrected order as per EdgeYaml and typical usage
-            long srcChunkSize,
-            long dstChunkSize,
+            long srcChunkSize, // New order: srcChunkSize
+            long edgeChunkSize, // New order: edgeChunkSize (was chunkSize)
+            long dstChunkSize, // New order: dstChunkSize
             boolean directed,
             String prefix,
             List<AdjacentList> adjacentListsAsList,
@@ -64,9 +64,9 @@ public class EdgeInfo {
                         .setSourceVertexType(srcLabel)
                         .setType(edgeLabel)
                         .setDestinationVertexType(dstLabel)
-                        .setChunkSize(chunkSize)
-                        .setSourceVertexChunkSize(srcChunkSize)
-                        .setDestinationVertexChunkSize(dstChunkSize)
+                        .setSourceVertexChunkSize(srcChunkSize) // Corrected assignment
+                        .setChunkSize(edgeChunkSize) // Corrected assignment (edge's own chunk size)
+                        .setDestinationVertexChunkSize(dstChunkSize) // Corrected assignment
                         .setIsDirected(directed)
                         .setPrefix(prefix)
                         .addAllAdjacentList(

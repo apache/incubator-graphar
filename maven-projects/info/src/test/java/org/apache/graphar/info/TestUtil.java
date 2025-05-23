@@ -124,9 +124,9 @@ public class TestUtil {
                         "person",
                         "knows",
                         "person",
-                        1024,
-                        100,
-                        100,
+                        100,  // srcChunkSize
+                        1024, // edgeChunkSize (was original chunkSize)
+                        100,  // dstChunkSize
                         false,
                         "edge/person_knows_person/",
                         List.of(orderedBySource, orderedByDest),

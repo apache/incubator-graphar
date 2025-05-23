@@ -47,11 +47,11 @@ public class InfoTest {
 
         Assert.assertNotNull(graphInfo);
         Assert.assertEquals("ldbc_sample", graphInfo.getName());
-        // The prefix in ldbc_sample.graph.yml is "./csv/" and graphInfoPath is
-        // /path/to/ldbc_sample/csv/ldbc_sample.graph.yml
-        // So the absolute prefix should be /path/to/ldbc_sample/csv/
+        // The prefix field is absent in ldbc_sample.graph.yml.
+        // graphInfoPath is /path/to/GAR_TEST_DATA/ldbc_sample/csv/ldbc_sample.graph.yml
+        // So the absolute prefix for GraphInfo should be /path/to/GAR_TEST_DATA/ldbc_sample/csv/
         String expectedPrefix =
-                graphInfoPath.substring(0, graphInfoPath.lastIndexOf("/") + 1) + "csv/";
+                graphInfoPath.substring(0, graphInfoPath.lastIndexOf("/") + 1);
         Assert.assertEquals(expectedPrefix, graphInfo.getPrefix());
         // Assert.assertEquals("gar/v1", graphInfo.getVersion()); // No getVersion() method in
         // GraphInfo
