@@ -44,15 +44,7 @@ jobs:
         with:
           submodules: true # Keep this, as GAR_TEST_DATA might be in a submodule or the C++ parts might be needed indirectly
 
-      - name: Install dependencies
-        run: |
-          # Using the same dependency installation as java.yml for now
-          wget -c https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb             -P /tmp/
-          sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
-          sudo apt-get update -y
-          sudo apt install -y libarrow-dev=14.0.1-1                             libarrow-dataset-dev=14.0.1-1                             libarrow-acero-dev=14.0.1-1                             libparquet-dev=14.0.1-1
-          sudo apt-get install libcurl4-openssl-dev -y
-          sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
+      # "Install dependencies" step removed
 
       - name: Code Format Check
         working-directory: maven-projects/info
@@ -64,6 +56,6 @@ jobs:
         working-directory: maven-projects/info # Adjusted working directory
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64} # Using Java 11
-          export LLVM11_HOME=/usr/lib/llvm-11 # Keep if any native code might be involved indirectly
+          # LLVM11_HOME export removed
           export GAR_TEST_DATA=$GITHUB_WORKSPACE/testing/ # Standard way to reference repo root
           mvn --no-transfer-progress clean test
