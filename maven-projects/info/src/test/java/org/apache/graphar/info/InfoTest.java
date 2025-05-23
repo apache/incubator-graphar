@@ -22,8 +22,8 @@ package org.apache.graphar.info;
 import java.io.IOException;
 import java.util.List;
 import org.apache.graphar.info.loader.LocalYamlGraphLoader;
-import org.apache.graphar.util.DataType;
-import org.apache.graphar.util.FileType;
+import org.apache.graphar.proto.AdjListType;
+import org.apache.graphar.proto.DataType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -87,8 +87,8 @@ public class InfoTest {
         // directly on VertexInfo
         String primaryKey = "";
         for (PropertyGroup pg : vertexInfo.getPropertyGroups()) {
-            for (org.apache.graphar.info.Property p : pg.getProperties()) {
-                if (p.isIs_primary()) {
+            for (org.apache.graphar.info.Property p : pg.getPropertyList()) { // Changed
+                if (p.isPrimary()) { // Changed
                     primaryKey = p.getName();
                     break;
                 }
@@ -108,9 +108,9 @@ public class InfoTest {
         // Use the new getPropertyGroup method
         PropertyGroup pg1 = vertexInfo.getPropertyGroup("id");
         Assert.assertNotNull(pg1);
-        Assert.assertEquals(1, pg1.getProperties().size());
-        Assert.assertEquals("id", pg1.getProperties().get(0).getName());
-        Assert.assertEquals(FileType.CSV, pg1.getFile_type());
+        Assert.assertEquals(1, pg1.getPropertyList().size()); // Changed
+        Assert.assertEquals("id", pg1.getPropertyList().get(0).getName()); // Changed
+        Assert.assertEquals(org.apache.graphar.proto.FileType.CSV, pg1.getFileType()); // Changed
         Assert.assertEquals("id/", pg1.getPrefix()); // Prefix of the property group itself
         Assert.assertTrue(vertexInfo.hasProperty("id"));
 
@@ -121,8 +121,8 @@ public class InfoTest {
         Assert.assertSame(pg2, vertexInfo.getPropertyGroup("lastName"));
         Assert.assertSame(pg2, vertexInfo.getPropertyGroup("gender"));
 
-        Assert.assertEquals(3, pg2.getProperties().size());
-        Assert.assertEquals(FileType.CSV, pg2.getFile_type());
+        Assert.assertEquals(3, pg2.getPropertyList().size()); // Changed
+        Assert.assertEquals(org.apache.graphar.proto.FileType.CSV, pg2.getFileType()); // Changed
         Assert.assertEquals("firstName_lastName_gender/", pg2.getPrefix());
         Assert.assertTrue(vertexInfo.hasProperty("firstName"));
         Assert.assertTrue(vertexInfo.hasProperty("lastName"));
@@ -181,29 +181,36 @@ public class InfoTest {
         // Ordered By Source
         AdjacentList adjListSrc = edgeInfo.getAdjacentList(AdjListType.ORDERED_BY_SOURCE);
         Assert.assertNotNull(adjListSrc);
-        Assert.assertEquals(AdjListType.ORDERED_BY_SOURCE, adjListSrc.getType());
         Assert.assertEquals(
-                org.apache.graphar.util.FileType.CSV,
-                adjListSrc.getFile_type()); // Assuming FileType is in util
+                org.apache.graphar.proto.AdjListType.ORDERED_BY_SOURCE, adjListSrc.getType());
+        Assert.assertEquals(
+                org.apache.graphar.proto.FileType.CSV, adjListSrc.getFileType()); // Changed
         Assert.assertEquals("ordered_by_source/", adjListSrc.getPrefix());
-        Assert.assertTrue(edgeInfo.hasAdjListType(AdjListType.ORDERED_BY_SOURCE));
+        Assert.assertTrue(
+                edgeInfo.hasAdjListType(org.apache.graphar.proto.AdjListType.ORDERED_BY_SOURCE));
 
         // Ordered By Destination
-        AdjacentList adjListDst = edgeInfo.getAdjacentList(AdjListType.ORDERED_BY_DESTINATION);
+        AdjacentList adjListDst =
+                edgeInfo.getAdjacentList(
+                        org.apache.graphar.proto.AdjListType.ORDERED_BY_DESTINATION);
         Assert.assertNotNull(adjListDst);
-        Assert.assertEquals(AdjListType.ORDERED_BY_DESTINATION, adjListDst.getType());
-        Assert.assertEquals(org.apache.graphar.util.FileType.CSV, adjListDst.getFile_type());
+        Assert.assertEquals(
+                org.apache.graphar.proto.AdjListType.ORDERED_BY_DESTINATION, adjListDst.getType());
+        Assert.assertEquals(
+                org.apache.graphar.proto.FileType.CSV, adjListDst.getFileType()); // Changed
         Assert.assertEquals("ordered_by_dest/", adjListDst.getPrefix());
-        Assert.assertTrue(edgeInfo.hasAdjListType(AdjListType.ORDERED_BY_DESTINATION));
+        Assert.assertTrue(
+                edgeInfo.hasAdjListType(
+                        org.apache.graphar.proto.AdjListType.ORDERED_BY_DESTINATION));
 
         Assert.assertNotNull(edgeInfo.getPropertyGroups());
         Assert.assertEquals(1, edgeInfo.getPropertyGroups().size());
 
         PropertyGroup pg = edgeInfo.getPropertyGroup("creationDate");
         Assert.assertNotNull(pg);
-        Assert.assertEquals(1, pg.getProperties().size());
-        Assert.assertEquals("creationDate", pg.getProperties().get(0).getName());
-        Assert.assertEquals(org.apache.graphar.util.FileType.CSV, pg.getFile_type());
+        Assert.assertEquals(1, pg.getPropertyList().size()); // Changed
+        Assert.assertEquals("creationDate", pg.getPropertyList().get(0).getName()); // Changed
+        Assert.assertEquals(org.apache.graphar.proto.FileType.CSV, pg.getFileType()); // Changed
         Assert.assertEquals("creationDate/", pg.getPrefix());
         Assert.assertTrue(edgeInfo.hasProperty("creationDate"));
 
@@ -272,44 +279,47 @@ public class InfoTest {
         Assert.assertNotNull(pg_details_loaded);
 
         // 2. Verify attributes of the "id" property group (pg_id_loaded)
-        Assert.assertNotNull(pg_id_loaded.getProperties());
-        Assert.assertEquals(1, pg_id_loaded.getProperties().size());
+        Assert.assertNotNull(pg_id_loaded.getPropertyList()); // Changed
+        Assert.assertEquals(1, pg_id_loaded.getPropertyList().size()); // Changed
         Property idPropLoaded = pg_id_loaded.getProperty("id");
         Assert.assertNotNull(idPropLoaded);
         Assert.assertEquals("id", idPropLoaded.getName());
-        Assert.assertEquals(DataType.INT64, idPropLoaded.getDataType());
+        Assert.assertEquals(org.apache.graphar.proto.DataType.INT64, idPropLoaded.getDataType());
         Assert.assertTrue(idPropLoaded.isPrimary());
         Assert.assertFalse(idPropLoaded.isNullable());
-        Assert.assertEquals(org.apache.graphar.util.FileType.CSV, pg_id_loaded.getFileType());
+        Assert.assertEquals(org.apache.graphar.proto.FileType.CSV, pg_id_loaded.getFileType());
         Assert.assertEquals("id/", pg_id_loaded.getPrefix());
 
         // 3. Verify attributes of the "firstName_lastName_gender" property group
         // (pg_details_loaded)
-        Assert.assertNotNull(pg_details_loaded.getProperties());
-        Assert.assertEquals(3, pg_details_loaded.getProperties().size());
+        Assert.assertNotNull(pg_details_loaded.getPropertyList()); // Changed
+        Assert.assertEquals(3, pg_details_loaded.getPropertyList().size()); // Changed
 
         Property firstNamePropLoaded = pg_details_loaded.getProperty("firstName");
         Assert.assertNotNull(firstNamePropLoaded);
         Assert.assertEquals("firstName", firstNamePropLoaded.getName());
-        Assert.assertEquals(DataType.STRING, firstNamePropLoaded.getDataType());
+        Assert.assertEquals(
+                org.apache.graphar.proto.DataType.STRING, firstNamePropLoaded.getDataType());
         Assert.assertFalse(firstNamePropLoaded.isPrimary());
         Assert.assertFalse(firstNamePropLoaded.isNullable());
 
         Property lastNamePropLoaded = pg_details_loaded.getProperty("lastName");
         Assert.assertNotNull(lastNamePropLoaded);
         Assert.assertEquals("lastName", lastNamePropLoaded.getName());
-        Assert.assertEquals(DataType.STRING, lastNamePropLoaded.getDataType());
+        Assert.assertEquals(
+                org.apache.graphar.proto.DataType.STRING, lastNamePropLoaded.getDataType());
         Assert.assertFalse(lastNamePropLoaded.isPrimary());
         Assert.assertFalse(lastNamePropLoaded.isNullable());
 
         Property genderPropLoaded = pg_details_loaded.getProperty("gender");
         Assert.assertNotNull(genderPropLoaded);
         Assert.assertEquals("gender", genderPropLoaded.getName());
-        Assert.assertEquals(DataType.STRING, genderPropLoaded.getDataType());
+        Assert.assertEquals(
+                org.apache.graphar.proto.DataType.STRING, genderPropLoaded.getDataType());
         Assert.assertFalse(genderPropLoaded.isPrimary());
         Assert.assertTrue(genderPropLoaded.isNullable()); // Gender is nullable
 
-        Assert.assertEquals(org.apache.graphar.util.FileType.CSV, pg_details_loaded.getFileType());
+        Assert.assertEquals(org.apache.graphar.proto.FileType.CSV, pg_details_loaded.getFileType());
         Assert.assertEquals("firstName_lastName_gender/", pg_details_loaded.getPrefix());
 
         // 4. Test PropertyGroup.hasProperty(String name)
@@ -326,23 +336,27 @@ public class InfoTest {
 
         // 6. Test equality (equals() and hashCode())
         // Manually create Property and PropertyGroup instances matching TestUtil definitions
-        Property id_manual_prop = new Property("id", DataType.INT64, true, false);
+        Property id_manual_prop =
+                new Property("id", org.apache.graphar.proto.DataType.INT64, true, false);
         PropertyGroup pg1_manual =
                 new PropertyGroup(
-                        List.of(id_manual_prop), org.apache.graphar.util.FileType.CSV, "id/");
+                        List.of(id_manual_prop), org.apache.graphar.proto.FileType.CSV, "id/");
         PropertyGroup pg2_manual =
                 new PropertyGroup(
                         List.of(id_manual_prop),
-                        org.apache.graphar.util.FileType.CSV,
+                        org.apache.graphar.proto.FileType.CSV,
                         "id/"); // Identical to pg1_manual
 
-        Property firstName_manual_prop = new Property("firstName", DataType.STRING, false, false);
-        Property lastName_manual_prop = new Property("lastName", DataType.STRING, false, false);
-        Property gender_manual_prop = new Property("gender", DataType.STRING, false, true);
+        Property firstName_manual_prop =
+                new Property("firstName", org.apache.graphar.proto.DataType.STRING, false, false);
+        Property lastName_manual_prop =
+                new Property("lastName", org.apache.graphar.proto.DataType.STRING, false, false);
+        Property gender_manual_prop =
+                new Property("gender", org.apache.graphar.proto.DataType.STRING, false, true);
         PropertyGroup pg_details_manual =
                 new PropertyGroup(
                         List.of(firstName_manual_prop, lastName_manual_prop, gender_manual_prop),
-                        org.apache.graphar.util.FileType.CSV,
+                        org.apache.graphar.proto.FileType.CSV,
                         "firstName_lastName_gender/");
 
         // Test equals and hashCode basic contracts
@@ -360,25 +374,29 @@ public class InfoTest {
 
         // Test inequality if a property within a list differs
         Property id_manual_prop_changed_nullability =
-                new Property("id", DataType.INT64, true, true); // nullable changed
+                new Property(
+                        "id",
+                        org.apache.graphar.proto.DataType.INT64,
+                        true,
+                        true); // nullable changed
         PropertyGroup pg_id_prop_changed =
                 new PropertyGroup(
                         List.of(id_manual_prop_changed_nullability),
-                        org.apache.graphar.util.FileType.CSV,
+                        org.apache.graphar.proto.FileType.CSV,
                         "id/");
         Assert.assertNotEquals(pg1_manual, pg_id_prop_changed);
 
         // Test inequality if file type differs
         PropertyGroup pg_filetype_changed =
                 new PropertyGroup(
-                        List.of(id_manual_prop), org.apache.graphar.util.FileType.ORC, "id/");
+                        List.of(id_manual_prop), org.apache.graphar.proto.FileType.ORC, "id/");
         Assert.assertNotEquals(pg1_manual, pg_filetype_changed);
 
         // Test inequality if prefix differs
         PropertyGroup pg_prefix_changed =
                 new PropertyGroup(
                         List.of(id_manual_prop),
-                        org.apache.graphar.util.FileType.CSV,
+                        org.apache.graphar.proto.FileType.CSV,
                         "id_changed/");
         Assert.assertNotEquals(pg1_manual, pg_prefix_changed);
 
@@ -387,14 +405,14 @@ public class InfoTest {
         // For a single property group, order doesn't make sense to test this way.
         // For a group with multiple properties, if PropertyGroup's
         // cachedPropertyList.equals(that.cachedPropertyList) is used, order matters.
-        Property p1 = new Property("p1", DataType.INT32, false, false);
-        Property p2 = new Property("p2", DataType.STRING, false, false);
+        Property p1 = new Property("p1", org.apache.graphar.proto.DataType.INT32, false, false);
+        Property p2 = new Property("p2", org.apache.graphar.proto.DataType.STRING, false, false);
         PropertyGroup pg_multi1 =
-                new PropertyGroup(List.of(p1, p2), org.apache.graphar.util.FileType.CSV, "multi/");
+                new PropertyGroup(List.of(p1, p2), org.apache.graphar.proto.FileType.CSV, "multi/");
         PropertyGroup pg_multi2 =
                 new PropertyGroup(
                         List.of(p2, p1),
-                        org.apache.graphar.util.FileType.CSV,
+                        org.apache.graphar.proto.FileType.CSV,
                         "multi/"); // Same properties, different order
         Assert.assertNotEquals(pg_multi1, pg_multi2); // Because List.equals is order-sensitive
     }
@@ -406,38 +424,46 @@ public class InfoTest {
                 TestUtil.getTestData() + "/ldbc_sample/csv/person_knows_person.edge.yml";
         EdgeInfo edgeInfo = EdgeInfo.loadEdgeInfo(edgeYamlPath);
 
-        AdjacentList adjList_obs_loaded = edgeInfo.getAdjacentList(AdjListType.ORDERED_BY_SOURCE);
+        AdjacentList adjList_obs_loaded =
+                edgeInfo.getAdjacentList(org.apache.graphar.proto.AdjListType.ORDERED_BY_SOURCE);
         Assert.assertNotNull(adjList_obs_loaded);
         AdjacentList adjList_obd_loaded =
-                edgeInfo.getAdjacentList(AdjListType.ORDERED_BY_DESTINATION);
+                edgeInfo.getAdjacentList(
+                        org.apache.graphar.proto.AdjListType.ORDERED_BY_DESTINATION);
         Assert.assertNotNull(adjList_obd_loaded);
 
         // 2. Verify attributes of the "ORDERED_BY_SOURCE" AdjacentList
-        Assert.assertEquals(AdjListType.ORDERED_BY_SOURCE, adjList_obs_loaded.getType());
-        Assert.assertEquals(org.apache.graphar.util.FileType.CSV, adjList_obs_loaded.getFileType());
+        Assert.assertEquals(
+                org.apache.graphar.proto.AdjListType.ORDERED_BY_SOURCE,
+                adjList_obs_loaded.getType());
+        Assert.assertEquals(
+                org.apache.graphar.proto.FileType.CSV, adjList_obs_loaded.getFileType());
         Assert.assertEquals("ordered_by_source/", adjList_obs_loaded.getPrefix());
 
         // 3. Verify attributes of the "ORDERED_BY_DESTINATION" AdjacentList
-        Assert.assertEquals(AdjListType.ORDERED_BY_DESTINATION, adjList_obd_loaded.getType());
-        Assert.assertEquals(org.apache.graphar.util.FileType.CSV, adjList_obd_loaded.getFileType());
+        Assert.assertEquals(
+                org.apache.graphar.proto.AdjListType.ORDERED_BY_DESTINATION,
+                adjList_obd_loaded.getType());
+        Assert.assertEquals(
+                org.apache.graphar.proto.FileType.CSV, adjList_obd_loaded.getFileType());
         Assert.assertEquals("ordered_by_dest/", adjList_obd_loaded.getPrefix());
 
         // 4. Test equality (equals() and hashCode())
         // Manually create AdjacentList instances
         AdjacentList al_obs_manual1 =
                 new AdjacentList(
-                        AdjListType.ORDERED_BY_SOURCE,
-                        org.apache.graphar.util.FileType.CSV,
+                        org.apache.graphar.proto.AdjListType.ORDERED_BY_SOURCE,
+                        org.apache.graphar.proto.FileType.CSV,
                         "ordered_by_source/");
         AdjacentList al_obs_manual2 =
                 new AdjacentList(
-                        AdjListType.ORDERED_BY_SOURCE,
-                        org.apache.graphar.util.FileType.CSV,
+                        org.apache.graphar.proto.AdjListType.ORDERED_BY_SOURCE,
+                        org.apache.graphar.proto.FileType.CSV,
                         "ordered_by_source/");
         AdjacentList al_obd_manual =
                 new AdjacentList(
-                        AdjListType.ORDERED_BY_DESTINATION,
-                        org.apache.graphar.util.FileType.CSV,
+                        org.apache.graphar.proto.AdjListType.ORDERED_BY_DESTINATION,
+                        org.apache.graphar.proto.FileType.CSV,
                         "ordered_by_dest/");
 
         // Test equals and hashCode basic contracts
@@ -456,24 +482,24 @@ public class InfoTest {
         // Test inequality with different AdjListType
         AdjacentList al_ubs_manual =
                 new AdjacentList(
-                        AdjListType.UNORDERED_BY_SOURCE,
-                        org.apache.graphar.util.FileType.CSV,
+                        org.apache.graphar.proto.AdjListType.UNORDERED_BY_SOURCE,
+                        org.apache.graphar.proto.FileType.CSV,
                         "ordered_by_source/");
         Assert.assertNotEquals(al_obs_manual1, al_ubs_manual);
 
         // Test inequality with different FileType
         AdjacentList al_obs_orc_manual =
                 new AdjacentList(
-                        AdjListType.ORDERED_BY_SOURCE,
-                        org.apache.graphar.util.FileType.ORC,
+                        org.apache.graphar.proto.AdjListType.ORDERED_BY_SOURCE,
+                        org.apache.graphar.proto.FileType.ORC,
                         "ordered_by_source/");
         Assert.assertNotEquals(al_obs_manual1, al_obs_orc_manual);
 
         // Test inequality with different prefix
         AdjacentList al_obs_prefix_manual =
                 new AdjacentList(
-                        AdjListType.ORDERED_BY_SOURCE,
-                        org.apache.graphar.util.FileType.CSV,
+                        org.apache.graphar.proto.AdjListType.ORDERED_BY_SOURCE,
+                        org.apache.graphar.proto.FileType.CSV,
                         "prefix_changed/");
         Assert.assertNotEquals(al_obs_manual1, al_obs_prefix_manual);
     }
@@ -497,21 +523,27 @@ public class InfoTest {
 
         // 2. Verify attributes of the "id" Property (loaded)
         Assert.assertEquals("id", idPropLoaded.getName());
-        Assert.assertEquals(DataType.INT64, idPropLoaded.getDataType());
+        Assert.assertEquals(org.apache.graphar.proto.DataType.INT64, idPropLoaded.getDataType());
         Assert.assertTrue(idPropLoaded.isPrimary());
         Assert.assertFalse(idPropLoaded.isNullable());
 
         // 3. Verify attributes of the "firstName" Property (loaded)
         Assert.assertEquals("firstName", firstNamePropLoaded.getName());
-        Assert.assertEquals(DataType.STRING, firstNamePropLoaded.getDataType());
+        Assert.assertEquals(
+                org.apache.graphar.proto.DataType.STRING, firstNamePropLoaded.getDataType());
         Assert.assertFalse(firstNamePropLoaded.isPrimary());
         Assert.assertFalse(firstNamePropLoaded.isNullable());
 
         // 4. Test equality (equals() and hashCode())
         // Create Property objects programmatically
-        Property p1_manual = new Property("id", DataType.INT64, true, false);
+        Property p1_manual =
+                new Property("id", org.apache.graphar.proto.DataType.INT64, true, false);
         Property p2_manual =
-                new Property("id", DataType.INT64, true, false); // Identical to p1_manual
+                new Property(
+                        "id",
+                        org.apache.graphar.proto.DataType.INT64,
+                        true,
+                        false); // Identical to p1_manual
 
         // Assert p1_manual.equals(p2_manual) is true and hashCodes are equal
         Assert.assertEquals(p1_manual, p2_manual);
@@ -522,7 +554,8 @@ public class InfoTest {
         Assert.assertEquals(p1_manual.hashCode(), idPropLoaded.hashCode());
 
         // Create a different Property object ("firstName")
-        Property p3_manual_firstName = new Property("firstName", DataType.STRING, false, false);
+        Property p3_manual_firstName =
+                new Property("firstName", org.apache.graphar.proto.DataType.STRING, false, false);
         Assert.assertNotEquals(p1_manual, p3_manual_firstName);
 
         // Compare loaded firstName with manually created firstName
@@ -530,16 +563,20 @@ public class InfoTest {
         Assert.assertEquals(p3_manual_firstName.hashCode(), firstNamePropLoaded.hashCode());
 
         // Modify attributes and assert inequality
-        Property p_name_changed = new Property("id_changed", DataType.INT64, true, false);
+        Property p_name_changed =
+                new Property("id_changed", org.apache.graphar.proto.DataType.INT64, true, false);
         Assert.assertNotEquals(p1_manual, p_name_changed);
 
-        Property p_type_changed = new Property("id", DataType.STRING, true, false);
+        Property p_type_changed =
+                new Property("id", org.apache.graphar.proto.DataType.STRING, true, false);
         Assert.assertNotEquals(p1_manual, p_type_changed);
 
-        Property p_primary_changed = new Property("id", DataType.INT64, false, false);
+        Property p_primary_changed =
+                new Property("id", org.apache.graphar.proto.DataType.INT64, false, false);
         Assert.assertNotEquals(p1_manual, p_primary_changed);
 
-        Property p_nullable_changed = new Property("id", DataType.INT64, true, true);
+        Property p_nullable_changed =
+                new Property("id", org.apache.graphar.proto.DataType.INT64, true, true);
         Assert.assertNotEquals(p1_manual, p_nullable_changed);
     }
 }
