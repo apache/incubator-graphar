@@ -19,9 +19,6 @@
 
 package org.apache.graphar.info;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,6 +26,10 @@ import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
 import org.apache.graphar.proto.DataType;
 import org.yaml.snakeyaml.Yaml;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class VertexInfo {
     private final org.apache.graphar.proto.VertexInfo protoVertexInfo;
@@ -70,18 +71,17 @@ public class VertexInfo {
     // Adjust ofProto if it needs to handle versioning from proto.
     // For now, this might create a VertexInfo with null version if called directly.
     // Or we might need a version string here too if this path is important for versioned objects.
-    // Let's assume this path is less relevant for the current task or version is implicitly
-    // "unknown".
+    // Let's assume this path is less relevant for the current task or version is implicitly "unknown".
     public static VertexInfo ofProto(org.apache.graphar.proto.VertexInfo protoVertexInfo) {
         return new VertexInfo(protoVertexInfo, null); // Or handle version appropriately
     }
+
 
     public static VertexInfo loadVertexInfo(String yamlPath) throws IOException {
         String yamlContent = Files.readString(Paths.get(yamlPath));
         Yaml yaml = new Yaml();
         VertexYaml vertexYaml = yaml.loadAs(yamlContent, VertexYaml.class);
-        // toVertexInfo in VertexYaml needs to be updated to pass the version to VertexInfo
-        // constructor
+        // toVertexInfo in VertexYaml needs to be updated to pass the version to VertexInfo constructor
         return vertexYaml.toVertexInfo();
     }
 
@@ -91,7 +91,7 @@ public class VertexInfo {
 
     public PropertyGroup getPropertyGroup(String propertyName) {
         for (PropertyGroup pg : cachedPropertyGroups.getPropertyGroupList()) {
-            if (pg.getProperties().stream().anyMatch(p -> p.getName().equals(propertyName))) {
+            if (pg.getPropertyList().stream().anyMatch(p -> p.getName().equals(propertyName))) { // Changed getProperties() to getPropertyList()
                 return pg;
             }
         }
@@ -185,10 +185,8 @@ public class VertexInfo {
     // This constructor is problematic if used to create versioned VertexInfo without version.
     // Let's remove it or make it private if the main one is sufficient.
     // For now, keeping the change minimal to the main constructor.
-    // The constructor `public VertexInfo(String type, long chunkSize, List<PropertyGroup>
-    // propertyGroups, String prefix)`
-    // was changed. If there was an implicit one or another one with these exact params, it's now
-    // shadowed.
+    // The constructor `public VertexInfo(String type, long chunkSize, List<PropertyGroup> propertyGroups, String prefix)`
+    // was changed. If there was an implicit one or another one with these exact params, it's now shadowed.
 
     private void checkPropertyGroupExist(PropertyGroup propertyGroup) {
         if (propertyGroup == null) {

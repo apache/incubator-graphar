@@ -19,26 +19,23 @@
 
 package org.apache.graphar.info.saver;
 
+import org.apache.graphar.info.EdgeInfo;
+import org.apache.graphar.info.GraphInfo;
+import org.apache.graphar.info.VertexInfo;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import org.apache.graphar.info.EdgeInfo;
-import org.apache.graphar.info.GraphInfo;
-import org.apache.graphar.info.VertexInfo;
 
 public class LocalYamlGraphSaver implements GraphSaver {
 
     @Override
     public void save(String path, GraphInfo graphInfo) throws IOException {
-        final Path outputPath =
-                FileSystems.getDefault()
-                        .getPath(
-                                path
-                                        + FileSystems.getDefault().getSeparator()
-                                        + graphInfo.getName()
-                                        + ".graph.yaml");
+        final Path outputPath = FileSystems
+            .getDefault()
+            .getPath(path + FileSystems.getDefault().getSeparator() + graphInfo.getName() + ".graph.yaml");
         Files.createDirectories(outputPath.getParent());
         Files.createFile(outputPath);
         final BufferedWriter writer = Files.newBufferedWriter(outputPath);
@@ -54,13 +51,9 @@ public class LocalYamlGraphSaver implements GraphSaver {
     }
 
     private void saveVertex(String path, VertexInfo vertexInfo) throws IOException {
-        final Path outputPath =
-                FileSystems.getDefault()
-                        .getPath(
-                                path
-                                        + FileSystems.getDefault().getSeparator()
-                                        + vertexInfo.getType()
-                                        + ".vertex.yaml");
+        final Path outputPath = FileSystems
+            .getDefault()
+            .getPath(path + FileSystems.getDefault().getSeparator() + vertexInfo.getType() + ".vertex.yaml");
         Files.createDirectories(outputPath.getParent());
         Files.createFile(outputPath);
         final BufferedWriter writer = Files.newBufferedWriter(outputPath);
@@ -69,13 +62,9 @@ public class LocalYamlGraphSaver implements GraphSaver {
     }
 
     private void saveEdge(String path, EdgeInfo edgeInfo) throws IOException {
-        final Path outputPath =
-                FileSystems.getDefault()
-                        .getPath(
-                                path
-                                        + FileSystems.getDefault().getSeparator()
-                                        + edgeInfo.getConcat()
-                                        + ".edge.yaml");
+        final Path outputPath = FileSystems
+            .getDefault()
+            .getPath(path + FileSystems.getDefault().getSeparator() + edgeInfo.getConcat() + ".edge.yaml");
         Files.createDirectories(outputPath.getParent());
         Files.createFile(outputPath);
         final BufferedWriter writer = Files.newBufferedWriter(outputPath);

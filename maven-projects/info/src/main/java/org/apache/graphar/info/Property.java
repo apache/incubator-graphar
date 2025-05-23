@@ -72,10 +72,10 @@ public class Property {
         }
         Property that = (Property) o;
         // Compare all fields from protoProperty
-        return protoProperty.getName().equals(that.protoProperty.getName())
-                && protoProperty.getType() == that.protoProperty.getType()
-                && protoProperty.getIsPrimaryKey() == that.protoProperty.getIsPrimaryKey()
-                && protoProperty.getIsNullable() == that.protoProperty.getIsNullable();
+        return protoProperty.getName().equals(that.protoProperty.getName()) &&
+               protoProperty.getType() == that.protoProperty.getType() &&
+               protoProperty.getIsPrimaryKey() == that.protoProperty.getIsPrimaryKey() &&
+               protoProperty.getIsNullable() == that.protoProperty.getIsNullable();
     }
 
     @Override

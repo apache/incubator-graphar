@@ -68,9 +68,9 @@ public class AdjacentList {
         }
         AdjacentList that = (AdjacentList) o;
         // Compare all fields from protoAdjacentList
-        return protoAdjacentList.getType() == that.protoAdjacentList.getType()
-                && protoAdjacentList.getFileType() == that.protoAdjacentList.getFileType()
-                && protoAdjacentList.getPrefix().equals(that.protoAdjacentList.getPrefix());
+        return protoAdjacentList.getType() == that.protoAdjacentList.getType() &&
+               protoAdjacentList.getFileType() == that.protoAdjacentList.getFileType() &&
+               protoAdjacentList.getPrefix().equals(that.protoAdjacentList.getPrefix());
     }
 
     @Override
