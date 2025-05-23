@@ -57,4 +57,27 @@ public class AdjacentList {
     org.apache.graphar.proto.AdjacentList getProto() {
         return protoAdjacentList;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AdjacentList that = (AdjacentList) o;
+        // Compare all fields from protoAdjacentList
+        return protoAdjacentList.getType() == that.protoAdjacentList.getType() &&
+               protoAdjacentList.getFileType() == that.protoAdjacentList.getFileType() &&
+               protoAdjacentList.getPrefix().equals(that.protoAdjacentList.getPrefix());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = protoAdjacentList.getType().hashCode();
+        result = 31 * result + protoAdjacentList.getFileType().hashCode();
+        result = 31 * result + protoAdjacentList.getPrefix().hashCode();
+        return result;
+    }
 }

@@ -56,7 +56,8 @@ public class VertexYaml {
                 property_groups.stream()
                         .map(PropertyGroupYaml::toPropertyGroup)
                         .collect(Collectors.toList()),
-                prefix);
+                prefix,
+                version); // Pass the version from VertexYaml
     }
 
     public String getType() {

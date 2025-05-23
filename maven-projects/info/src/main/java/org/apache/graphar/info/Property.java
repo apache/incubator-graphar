@@ -61,4 +61,29 @@ public class Property {
     org.apache.graphar.proto.Property getProto() {
         return protoProperty;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Property that = (Property) o;
+        // Compare all fields from protoProperty
+        return protoProperty.getName().equals(that.protoProperty.getName()) &&
+               protoProperty.getType() == that.protoProperty.getType() &&
+               protoProperty.getIsPrimaryKey() == that.protoProperty.getIsPrimaryKey() &&
+               protoProperty.getIsNullable() == that.protoProperty.getIsNullable();
+    }
+
+    @Override
+    public int hashCode() {
+        int result = protoProperty.getName().hashCode();
+        result = 31 * result + protoProperty.getType().hashCode();
+        result = 31 * result + Boolean.hashCode(protoProperty.getIsPrimaryKey());
+        result = 31 * result + Boolean.hashCode(protoProperty.getIsNullable());
+        return result;
+    }
 }

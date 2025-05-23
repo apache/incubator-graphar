@@ -85,7 +85,8 @@ public class EdgeYaml {
                         .collect(Collectors.toUnmodifiableList()),
                 property_groups.stream()
                         .map(PropertyGroupYaml::toPropertyGroup)
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList()),
+                version); // Pass the version from EdgeYaml
     }
 
     public String getSrc_type() {

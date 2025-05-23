@@ -75,8 +75,16 @@ public class TestUtil {
         PropertyGroup pg1 = new PropertyGroup(List.of(id), FileType.CSV, "id/");
         PropertyGroup pg2 =
                 new PropertyGroup(
-                        List.of(firstName, lastName, gender), FileType.CSV, "firstName_lastName");
-        VertexInfo person = new VertexInfo("person", 100, List.of(pg1, pg2), "vertex/person/");
+                        List.of(firstName, lastName, gender),
+                        FileType.CSV,
+                        "firstName_lastName_gender/"); // Match the actual prefix in YAML
+        VertexInfo person =
+                new VertexInfo(
+                        "person",
+                        100,
+                        List.of(pg1, pg2),
+                        "vertex/person/",
+                        "gar/v1"); // Added version
 
         // create edge info of yaml:
         // src_type: person
@@ -122,7 +130,8 @@ public class TestUtil {
                         false,
                         "edge/person_knows_person/",
                         List.of(orderedBySource, orderedByDest),
-                        List.of(pg3));
+                        List.of(pg3),
+                        "gar/v1"); // Added version
 
         // create graph info of yaml:
         // name: ldbc_sample

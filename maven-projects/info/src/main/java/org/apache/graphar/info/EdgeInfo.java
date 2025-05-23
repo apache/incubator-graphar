@@ -31,23 +31,28 @@ import org.apache.graphar.proto.AdjListType;
 import org.apache.graphar.proto.DataType;
 import org.apache.graphar.util.GeneralParams;
 import org.yaml.snakeyaml.Yaml;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class EdgeInfo {
     private final org.apache.graphar.proto.EdgeInfo protoEdgeInfo;
     private final Map<AdjListType, AdjacentList> cachedAdjacentLists;
     private final PropertyGroups cachedPropertyGroups;
+    private final String version; // Added version field
 
     public EdgeInfo(
             String srcLabel,
             String edgeLabel,
             String dstLabel,
+            long chunkSize, // Corrected order as per EdgeYaml and typical usage
             long srcChunkSize,
-            long chunkSize,
             long dstChunkSize,
             boolean directed,
             String prefix,
             List<AdjacentList> adjacentListsAsList,
-            List<PropertyGroup> propertyGroupsAsList) {
+            List<PropertyGroup> propertyGroupsAsList,
+            String version) { // Added version parameter
         this.cachedAdjacentLists =
                 adjacentListsAsList.stream()
                         .collect(
@@ -58,10 +63,10 @@ public class EdgeInfo {
                 org.apache.graphar.proto.EdgeInfo.newBuilder()
                         .setSourceVertexType(srcLabel)
                         .setType(edgeLabel)
-                        .setDestinationVertexChunkSize(dstChunkSize)
+                        .setDestinationVertexType(dstLabel)
                         .setChunkSize(chunkSize)
                         .setSourceVertexChunkSize(srcChunkSize)
-                        .setDestinationVertexType(dstLabel)
+                        .setDestinationVertexChunkSize(dstChunkSize)
                         .setIsDirected(directed)
                         .setPrefix(prefix)
                         .addAllAdjacentList(
@@ -73,9 +78,12 @@ public class EdgeInfo {
                                         .map(PropertyGroup::getProto)
                                         .collect(Collectors.toUnmodifiableList()))
                         .build();
+        this.version = version; // Store version
     }
 
-    public EdgeInfo(org.apache.graphar.proto.EdgeInfo protoEdgeInfo) {
+    // Constructor for internal use or from proto, adjust version handling as needed.
+    // For loadEdgeInfo, the main constructor above will be used via EdgeYaml.toEdgeInfo().
+    public EdgeInfo(org.apache.graphar.proto.EdgeInfo protoEdgeInfo, String version) {
         this.protoEdgeInfo = protoEdgeInfo;
         this.cachedAdjacentLists =
                 protoEdgeInfo.getAdjacentListList().stream()
@@ -84,15 +92,34 @@ public class EdgeInfo {
                                 Collectors.toUnmodifiableMap(
                                         AdjacentList::getType, Function.identity()));
         this.cachedPropertyGroups = PropertyGroups.ofProto(protoEdgeInfo.getPropertiesList());
+        this.version = version; // May be null if proto didn't originate from versioned YAML
     }
+    // Overload for existing code that might call this without version
+    public EdgeInfo(org.apache.graphar.proto.EdgeInfo protoEdgeInfo) {
+        this(protoEdgeInfo, null); // Default to null version
+    }
+
 
     private EdgeInfo(
             org.apache.graphar.proto.EdgeInfo protoEdgeInfo,
             Map<AdjListType, AdjacentList> cachedAdjacentLists,
-            PropertyGroups cachedPropertyGroups) {
+            PropertyGroups cachedPropertyGroups,
+            String version) { // Added version
         this.protoEdgeInfo = protoEdgeInfo;
         this.cachedAdjacentLists = cachedAdjacentLists;
         this.cachedPropertyGroups = cachedPropertyGroups;
+        this.version = version;
+    }
+
+    public static EdgeInfo loadEdgeInfo(String yamlPath) throws IOException {
+        String yamlContent = Files.readString(Paths.get(yamlPath));
+        Yaml yaml = new Yaml();
+        EdgeYaml edgeYaml = yaml.loadAs(yamlContent, EdgeYaml.class);
+        return edgeYaml.toEdgeInfo();
+    }
+
+    public String getVersion() {
+        return version;
     }
 
     org.apache.graphar.proto.EdgeInfo getProto() {
@@ -118,7 +145,7 @@ public class EdgeInfo {
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));
-        return Optional.of(new EdgeInfo(protoEdgeInfo, newAdjacentLists, cachedPropertyGroups));
+        return Optional.of(new EdgeInfo(protoEdgeInfo, newAdjacentLists, cachedPropertyGroups, this.version));
     }
 
     public Optional<EdgeInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
@@ -128,7 +155,7 @@ public class EdgeInfo {
                 .map(
                         newPropertyGroups ->
                                 new EdgeInfo(
-                                        protoEdgeInfo, cachedAdjacentLists, newPropertyGroups));
+                                        protoEdgeInfo, cachedAdjacentLists, newPropertyGroups, this.version));
     }
 
     public boolean hasAdjListType(AdjListType adjListType) {
@@ -173,24 +200,33 @@ public class EdgeInfo {
         return getPrefix() + "/" + getAdjacentList(adjListType).getPrefix() + "/adj_list";
     }
 
-    public String getAdjacentListChunkPath(AdjListType adjListType, long vertexChunkIndex) {
-        return getAdjacentListPrefix(adjListType) + "/chunk" + vertexChunkIndex;
-    }
-
-    public String getOffsetPrefix(AdjListType adjListType) {
-        return getAdjacentListPrefix(adjListType) + "/offset";
+    public String getAdjacentListChunkPath(AdjListType adjListType, long vertexChunkIndex, long chunkFileIndex) {
+        // Path: {prefix}/{adj_list_type_prefix}/adj_list/part{vertex_chunk_index}/chunk{chunk_file_index}
+        return getAdjacentListPrefix(adjListType) + "/part" + vertexChunkIndex + "/chunk" + chunkFileIndex;
     }
 
     public String getOffsetChunkPath(AdjListType adjListType, long vertexChunkIndex) {
-        return getOffsetPrefix(adjListType) + "/chunk" + vertexChunkIndex;
+        // Path: {prefix}/{adj_list_type_prefix}/offset/chunk{vertex_chunk_index}
+        return getAdjacentListPrefix(adjListType) + "/offset/chunk" + vertexChunkIndex;
     }
-
-    public String getVerticesNumFilePath(AdjListType adjListType) {
+    
+    // Renaming this to avoid confusion with vertex_count file for vertex info itself
+    public String getAdjListVerticesNumFilePath(AdjListType adjListType) {
+        // Path: {prefix}/{adj_list_type_prefix}/vertex_count
+        // This seems to count vertices in this specific adj list context, perhaps related to total vertices in source/dest of this edge type.
+        // The scala test refers to this as `vertex_count` directly under adj_list_prefix.
         return getAdjacentListPrefix(adjListType) + "/vertex_count";
     }
 
-    public String getEdgesNumFilePath(AdjListType adjListType, long vertexChunkIndex) {
+    public String getAdjListEdgesNumFilePath(AdjListType adjListType, long vertexChunkIndex) {
+        // Path: {prefix}/{adj_list_type_prefix}/edge_count{vertex_chunk_index}
         return getAdjacentListPrefix(adjListType) + "/edge_count" + vertexChunkIndex;
+    }
+
+    public String getPropertyGroupChunkPath(PropertyGroup propertyGroup, AdjListType adjListType, long vertexChunkIndex, long chunkFileIndex) {
+        // Path: {prefix}/{adj_list_type_prefix}/{property_group_prefix}/part{vertex_chunk_index}/chunk{chunk_file_index}
+        checkPropertyGroupExist(propertyGroup);
+        return getAdjacentListPrefix(adjListType) + "/" + propertyGroup.getPrefix() + "/part" + vertexChunkIndex + "/chunk" + chunkFileIndex;
     }
 
     public DataType getPropertyType(String propertyName) {
