@@ -1,0 +1,27 @@
+type: "student"
+chunk_size: 100
+prefix: "student_vertex_data/"
+version: "gar/v1"
+property_groups:
+  - file_type: "parquet"
+    prefix: "id_group/"
+    properties:
+      - name: "student_id"
+        data_type: "int64"
+        is_primary: true
+        is_nullable: false
+  - file_type: "csv"
+    prefix: "details_group/"
+    properties:
+      - name: "name"
+        data_type: "string"
+        is_primary: false
+        is_nullable: false
+      - name: "major"
+        data_type: "string"
+        is_primary: false
+        is_nullable: true
+      - name: "enrollment_year"
+        data_type: "int32"
+        is_primary: false
+        is_nullable: false

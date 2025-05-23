@@ -1,0 +1,27 @@
+type: "lecturer"
+chunk_size: 50
+prefix: "lecturer_vertex_data/"
+version: "gar/v1"
+property_groups:
+  - file_type: "orc"
+    prefix: "id_group/"
+    properties:
+      - name: "lecturer_id"
+        data_type: "int64"
+        is_primary: true
+        is_nullable: false
+  - file_type: "json"
+    prefix: "contact_group/"
+    properties:
+      - name: "name"
+        data_type: "string"
+        is_primary: false
+        is_nullable: false
+      - name: "email"
+        data_type: "string"
+        is_primary: false
+        is_nullable: true
+      - name: "department"
+        data_type: "string"
+        is_primary: false
+        is_nullable: false

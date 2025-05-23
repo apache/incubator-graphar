@@ -1,0 +1,37 @@
+src_type: "lecturer"
+edge_type: "teaches"
+dst_type: "student"
+chunk_size: 200
+src_chunk_size: 50
+dst_chunk_size: 100
+directed: true
+prefix: "teaches_edge_data/"
+version: "gar/v1"
+adj_lists:
+  - ordered: true
+    aligned_by: "src"
+    file_type: "parquet"
+    prefix: "adj_src_ordered/"
+  - ordered: true
+    aligned_by: "dst"
+    file_type: "csv"
+    prefix: "adj_dst_ordered/"
+property_groups:
+  - file_type: "orc"
+    prefix: "course_details/"
+    properties:
+      - name: "course_id"
+        data_type: "string"
+        is_primary: false
+        is_nullable: false
+      - name: "course_year"
+        data_type: "int32"
+        is_primary: false
+        is_nullable: false
+  - file_type: "json"
+    prefix: "semester_info/"
+    properties:
+      - name: "semester"
+        data_type: "string"
+        is_primary: false
+        is_nullable: true
