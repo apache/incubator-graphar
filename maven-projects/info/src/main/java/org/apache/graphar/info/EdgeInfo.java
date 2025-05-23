@@ -19,6 +19,9 @@
 
 package org.apache.graphar.info;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,9 +34,6 @@ import org.apache.graphar.proto.AdjListType;
 import org.apache.graphar.proto.DataType;
 import org.apache.graphar.util.GeneralParams;
 import org.yaml.snakeyaml.Yaml;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class EdgeInfo {
     private final org.apache.graphar.proto.EdgeInfo protoEdgeInfo;
@@ -99,7 +99,6 @@ public class EdgeInfo {
         this(protoEdgeInfo, null); // Default to null version
     }
 
-
     private EdgeInfo(
             org.apache.graphar.proto.EdgeInfo protoEdgeInfo,
             Map<AdjListType, AdjacentList> cachedAdjacentLists,
@@ -145,7 +144,8 @@ public class EdgeInfo {
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));
-        return Optional.of(new EdgeInfo(protoEdgeInfo, newAdjacentLists, cachedPropertyGroups, this.version));
+        return Optional.of(
+                new EdgeInfo(protoEdgeInfo, newAdjacentLists, cachedPropertyGroups, this.version));
     }
 
     public Optional<EdgeInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
@@ -155,7 +155,10 @@ public class EdgeInfo {
                 .map(
                         newPropertyGroups ->
                                 new EdgeInfo(
-                                        protoEdgeInfo, cachedAdjacentLists, newPropertyGroups, this.version));
+                                        protoEdgeInfo,
+                                        cachedAdjacentLists,
+                                        newPropertyGroups,
+                                        this.version));
     }
 
     public boolean hasAdjListType(AdjListType adjListType) {
@@ -200,20 +203,27 @@ public class EdgeInfo {
         return getPrefix() + "/" + getAdjacentList(adjListType).getPrefix() + "/adj_list";
     }
 
-    public String getAdjacentListChunkPath(AdjListType adjListType, long vertexChunkIndex, long chunkFileIndex) {
-        // Path: {prefix}/{adj_list_type_prefix}/adj_list/part{vertex_chunk_index}/chunk{chunk_file_index}
-        return getAdjacentListPrefix(adjListType) + "/part" + vertexChunkIndex + "/chunk" + chunkFileIndex;
+    public String getAdjacentListChunkPath(
+            AdjListType adjListType, long vertexChunkIndex, long chunkFileIndex) {
+        // Path:
+        // {prefix}/{adj_list_type_prefix}/adj_list/part{vertex_chunk_index}/chunk{chunk_file_index}
+        return getAdjacentListPrefix(adjListType)
+                + "/part"
+                + vertexChunkIndex
+                + "/chunk"
+                + chunkFileIndex;
     }
 
     public String getOffsetChunkPath(AdjListType adjListType, long vertexChunkIndex) {
         // Path: {prefix}/{adj_list_type_prefix}/offset/chunk{vertex_chunk_index}
         return getAdjacentListPrefix(adjListType) + "/offset/chunk" + vertexChunkIndex;
     }
-    
+
     // Renaming this to avoid confusion with vertex_count file for vertex info itself
     public String getAdjListVerticesNumFilePath(AdjListType adjListType) {
         // Path: {prefix}/{adj_list_type_prefix}/vertex_count
-        // This seems to count vertices in this specific adj list context, perhaps related to total vertices in source/dest of this edge type.
+        // This seems to count vertices in this specific adj list context, perhaps related to total
+        // vertices in source/dest of this edge type.
         // The scala test refers to this as `vertex_count` directly under adj_list_prefix.
         return getAdjacentListPrefix(adjListType) + "/vertex_count";
     }
@@ -223,10 +233,21 @@ public class EdgeInfo {
         return getAdjacentListPrefix(adjListType) + "/edge_count" + vertexChunkIndex;
     }
 
-    public String getPropertyGroupChunkPath(PropertyGroup propertyGroup, AdjListType adjListType, long vertexChunkIndex, long chunkFileIndex) {
-        // Path: {prefix}/{adj_list_type_prefix}/{property_group_prefix}/part{vertex_chunk_index}/chunk{chunk_file_index}
+    public String getPropertyGroupChunkPath(
+            PropertyGroup propertyGroup,
+            AdjListType adjListType,
+            long vertexChunkIndex,
+            long chunkFileIndex) {
+        // Path:
+        // {prefix}/{adj_list_type_prefix}/{property_group_prefix}/part{vertex_chunk_index}/chunk{chunk_file_index}
         checkPropertyGroupExist(propertyGroup);
-        return getAdjacentListPrefix(adjListType) + "/" + propertyGroup.getPrefix() + "/part" + vertexChunkIndex + "/chunk" + chunkFileIndex;
+        return getAdjacentListPrefix(adjListType)
+                + "/"
+                + propertyGroup.getPrefix()
+                + "/part"
+                + vertexChunkIndex
+                + "/chunk"
+                + chunkFileIndex;
     }
 
     public DataType getPropertyType(String propertyName) {

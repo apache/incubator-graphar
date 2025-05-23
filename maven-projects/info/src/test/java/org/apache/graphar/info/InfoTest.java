@@ -19,24 +19,14 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.info.GraphInfo;
-import org.apache.graphar.info.VertexInfo;
-import org.apache.graphar.info.EdgeInfo;
-import org.apache.graphar.info.PropertyGroup;
+import java.io.IOException;
+import java.util.List;
 import org.apache.graphar.info.loader.LocalYamlGraphLoader;
-import org.apache.graphar.info.yaml.VertexYaml;
 import org.apache.graphar.util.DataType;
 import org.apache.graphar.util.FileType;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.yaml.snakeyaml.Yaml;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
-
 
 public class InfoTest {
 
@@ -57,11 +47,14 @@ public class InfoTest {
 
         Assert.assertNotNull(graphInfo);
         Assert.assertEquals("ldbc_sample", graphInfo.getName());
-        // The prefix in ldbc_sample.graph.yml is "./csv/" and graphInfoPath is /path/to/ldbc_sample/csv/ldbc_sample.graph.yml
+        // The prefix in ldbc_sample.graph.yml is "./csv/" and graphInfoPath is
+        // /path/to/ldbc_sample/csv/ldbc_sample.graph.yml
         // So the absolute prefix should be /path/to/ldbc_sample/csv/
-        String expectedPrefix = graphInfoPath.substring(0, graphInfoPath.lastIndexOf("/") + 1) + "csv/";
+        String expectedPrefix =
+                graphInfoPath.substring(0, graphInfoPath.lastIndexOf("/") + 1) + "csv/";
         Assert.assertEquals(expectedPrefix, graphInfo.getPrefix());
-        // Assert.assertEquals("gar/v1", graphInfo.getVersion()); // No getVersion() method in GraphInfo
+        // Assert.assertEquals("gar/v1", graphInfo.getVersion()); // No getVersion() method in
+        // GraphInfo
 
         Assert.assertNotNull(graphInfo.getVertexInfos());
         Assert.assertEquals(1, graphInfo.getVertexInfos().size());
@@ -90,7 +83,8 @@ public class InfoTest {
         Assert.assertEquals("gar/v1", vertexInfo.getVersion()); // Assert version
 
         // Property "id" is the primary key
-        // Let's find the primary key by iterating through properties, as getPrimaryKey() is not directly on VertexInfo
+        // Let's find the primary key by iterating through properties, as getPrimaryKey() is not
+        // directly on VertexInfo
         String primaryKey = "";
         for (PropertyGroup pg : vertexInfo.getPropertyGroups()) {
             for (org.apache.graphar.info.Property p : pg.getProperties()) {
@@ -105,8 +99,9 @@ public class InfoTest {
         }
         Assert.assertEquals("id", primaryKey);
 
-
-        List<PropertyGroup> propertyGroups = vertexInfo.getPropertyGroups(); // Still useful for iterating if needed or checking size
+        List<PropertyGroup> propertyGroups =
+                vertexInfo.getPropertyGroups(); // Still useful for iterating if needed or checking
+        // size
         Assert.assertNotNull(propertyGroups);
         Assert.assertEquals(2, propertyGroups.size());
 
@@ -119,7 +114,8 @@ public class InfoTest {
         Assert.assertEquals("id/", pg1.getPrefix()); // Prefix of the property group itself
         Assert.assertTrue(vertexInfo.hasProperty("id"));
 
-        PropertyGroup pg2 = vertexInfo.getPropertyGroup("firstName"); // Can get by any property in the group
+        PropertyGroup pg2 =
+                vertexInfo.getPropertyGroup("firstName"); // Can get by any property in the group
         Assert.assertNotNull(pg2);
         // Also test getting by another property in the same group
         Assert.assertSame(pg2, vertexInfo.getPropertyGroup("lastName"));
@@ -139,26 +135,33 @@ public class InfoTest {
 
         Assert.assertEquals(DataType.STRING, vertexInfo.getPropertyType("firstName"));
         Assert.assertFalse(vertexInfo.isPrimaryKey("firstName"));
-        Assert.assertFalse(vertexInfo.isNullableKey("firstName")); // As per TestUtil programmatic definition
+        Assert.assertFalse(
+                vertexInfo.isNullableKey("firstName")); // As per TestUtil programmatic definition
 
         Assert.assertEquals(DataType.STRING, vertexInfo.getPropertyType("gender"));
         Assert.assertFalse(vertexInfo.isPrimaryKey("gender"));
-        Assert.assertTrue(vertexInfo.isNullableKey("gender")); // As per TestUtil programmatic definition
+        Assert.assertTrue(
+                vertexInfo.isNullableKey("gender")); // As per TestUtil programmatic definition
 
         Assert.assertEquals("vertex/person/vertex_count", vertexInfo.getVerticesNumFilePath());
 
         // For the first property group ("id")
-        Assert.assertEquals("vertex/person/id/chunk0", vertexInfo.getPropertyGroupChunkPath(pg1, 0));
+        Assert.assertEquals(
+                "vertex/person/id/chunk0", vertexInfo.getPropertyGroupChunkPath(pg1, 0));
         Assert.assertEquals("vertex/person/id/", vertexInfo.getPropertyGroupPrefix(pg1));
 
         // For the second property group ("firstName_lastName_gender")
-        Assert.assertEquals("vertex/person/firstName_lastName_gender/chunk0", vertexInfo.getPropertyGroupChunkPath(pg2, 0));
-        Assert.assertEquals("vertex/person/firstName_lastName_gender/", vertexInfo.getPropertyGroupPrefix(pg2));
+        Assert.assertEquals(
+                "vertex/person/firstName_lastName_gender/chunk0",
+                vertexInfo.getPropertyGroupChunkPath(pg2, 0));
+        Assert.assertEquals(
+                "vertex/person/firstName_lastName_gender/", vertexInfo.getPropertyGroupPrefix(pg2));
     }
 
     @Test
     public void testLoadEdgeInfo() throws IOException {
-        String edgeYamlPath = TestUtil.getTestData() + "/ldbc_sample/csv/person_knows_person.edge.yml";
+        String edgeYamlPath =
+                TestUtil.getTestData() + "/ldbc_sample/csv/person_knows_person.edge.yml";
         EdgeInfo edgeInfo = EdgeInfo.loadEdgeInfo(edgeYamlPath);
 
         Assert.assertNotNull(edgeInfo);
@@ -179,7 +182,9 @@ public class InfoTest {
         AdjacentList adjListSrc = edgeInfo.getAdjacentList(AdjListType.ORDERED_BY_SOURCE);
         Assert.assertNotNull(adjListSrc);
         Assert.assertEquals(AdjListType.ORDERED_BY_SOURCE, adjListSrc.getType());
-        Assert.assertEquals(org.apache.graphar.util.FileType.CSV, adjListSrc.getFile_type()); // Assuming FileType is in util
+        Assert.assertEquals(
+                org.apache.graphar.util.FileType.CSV,
+                adjListSrc.getFile_type()); // Assuming FileType is in util
         Assert.assertEquals("ordered_by_source/", adjListSrc.getPrefix());
         Assert.assertTrue(edgeInfo.hasAdjListType(AdjListType.ORDERED_BY_SOURCE));
 
@@ -204,36 +209,54 @@ public class InfoTest {
 
         Assert.assertEquals(DataType.STRING, edgeInfo.getPropertyType("creationDate"));
         Assert.assertFalse(edgeInfo.isPrimaryKey("creationDate"));
-        Assert.assertFalse(edgeInfo.isNullableKey("creationDate")); // As per TestUtil programmatic definition
+        Assert.assertFalse(
+                edgeInfo.isNullableKey("creationDate")); // As per TestUtil programmatic definition
 
         // Test path generation methods (using AdjListType.ORDERED_BY_SOURCE for example)
         AdjListType adjType = AdjListType.ORDERED_BY_SOURCE;
         String expectedAdjListPrefix = edgeInfo.getPrefix() + adjListSrc.getPrefix() + "adj_list/";
         Assert.assertEquals(expectedAdjListPrefix, edgeInfo.getAdjacentListPrefix(adjType));
 
-        // getAdjListFilePath(0, 0, adjListType) -> getAdjacentListChunkPath(adjListType, vertexChunkIndex, chunkFileIndex)
-        Assert.assertEquals(expectedAdjListPrefix + "part0/chunk0", edgeInfo.getAdjacentListChunkPath(adjType, 0, 0));
+        // getAdjListFilePath(0, 0, adjListType) -> getAdjacentListChunkPath(adjListType,
+        // vertexChunkIndex, chunkFileIndex)
+        Assert.assertEquals(
+                expectedAdjListPrefix + "part0/chunk0",
+                edgeInfo.getAdjacentListChunkPath(adjType, 0, 0));
 
         // getOffsetPathPrefix -> no direct method, but it's part of getOffsetChunkPath
         String expectedOffsetPrefix = expectedAdjListPrefix + "offset/";
-        // Assert.assertEquals(expectedOffsetPrefix, edgeInfo.getOffsetPrefix(adjType)); // No direct getOffsetPrefix method
-        
-        // getAdjListOffsetFilePath(0, adjListType) -> getOffsetChunkPath(adjListType, vertexChunkIndex)
-        Assert.assertEquals(expectedOffsetPrefix + "chunk0", edgeInfo.getOffsetChunkPath(adjType, 0));
-        
-        // getEdgesNumFilePath(0, adjListType) -> getAdjListEdgesNumFilePath(adjListType, vertexChunkIndex)
-        Assert.assertEquals(expectedAdjListPrefix + "edge_count0", edgeInfo.getAdjListEdgesNumFilePath(adjType, 0));
+        // Assert.assertEquals(expectedOffsetPrefix, edgeInfo.getOffsetPrefix(adjType)); // No
+        // direct getOffsetPrefix method
+
+        // getAdjListOffsetFilePath(0, adjListType) -> getOffsetChunkPath(adjListType,
+        // vertexChunkIndex)
+        Assert.assertEquals(
+                expectedOffsetPrefix + "chunk0", edgeInfo.getOffsetChunkPath(adjType, 0));
+
+        // getEdgesNumFilePath(0, adjListType) -> getAdjListEdgesNumFilePath(adjListType,
+        // vertexChunkIndex)
+        Assert.assertEquals(
+                expectedAdjListPrefix + "edge_count0",
+                edgeInfo.getAdjListEdgesNumFilePath(adjType, 0));
 
         // getVerticesNumFilePath(adjListType) -> getAdjListVerticesNumFilePath(adjListType)
-        Assert.assertEquals(expectedAdjListPrefix + "vertex_count", edgeInfo.getAdjListVerticesNumFilePath(adjType));
+        Assert.assertEquals(
+                expectedAdjListPrefix + "vertex_count",
+                edgeInfo.getAdjListVerticesNumFilePath(adjType));
 
         // getPropertyGroupPathPrefix(pg, adjListType) -> this is not a direct method.
-        // The path is constructed using edgeInfo.getAdjacentListPrefix + "property_groups/" + pg.getPrefix()
-        String expectedPropertyGroupBasePath = expectedAdjListPrefix + "property_groups/" + pg.getPrefix();
-        // Assert.assertEquals(expectedPropertyGroupBasePath, edgeInfo.getPropertyGroupPathPrefix(pg, adjType)); // No direct method
+        // The path is constructed using edgeInfo.getAdjacentListPrefix + "property_groups/" +
+        // pg.getPrefix()
+        String expectedPropertyGroupBasePath =
+                expectedAdjListPrefix + "property_groups/" + pg.getPrefix();
+        // Assert.assertEquals(expectedPropertyGroupBasePath,
+        // edgeInfo.getPropertyGroupPathPrefix(pg, adjType)); // No direct method
 
-        // getPropertyFilePath(pg, adjListType, 0, 0) -> getPropertyGroupChunkPath(pg, adjListType, vertexChunkIndex, chunkFileIndex)
-        Assert.assertEquals(expectedPropertyGroupBasePath + "part0/chunk0", edgeInfo.getPropertyGroupChunkPath(pg, adjType, 0, 0));
+        // getPropertyFilePath(pg, adjListType, 0, 0) -> getPropertyGroupChunkPath(pg, adjListType,
+        // vertexChunkIndex, chunkFileIndex)
+        Assert.assertEquals(
+                expectedPropertyGroupBasePath + "part0/chunk0",
+                edgeInfo.getPropertyGroupChunkPath(pg, adjType, 0, 0));
     }
 
     @Test
@@ -244,7 +267,8 @@ public class InfoTest {
 
         PropertyGroup pg_id_loaded = vertexInfo.getPropertyGroup("id");
         Assert.assertNotNull(pg_id_loaded);
-        PropertyGroup pg_details_loaded = vertexInfo.getPropertyGroup("firstName"); // Can get by any prop in the group
+        PropertyGroup pg_details_loaded =
+                vertexInfo.getPropertyGroup("firstName"); // Can get by any prop in the group
         Assert.assertNotNull(pg_details_loaded);
 
         // 2. Verify attributes of the "id" property group (pg_id_loaded)
@@ -259,7 +283,8 @@ public class InfoTest {
         Assert.assertEquals(org.apache.graphar.util.FileType.CSV, pg_id_loaded.getFileType());
         Assert.assertEquals("id/", pg_id_loaded.getPrefix());
 
-        // 3. Verify attributes of the "firstName_lastName_gender" property group (pg_details_loaded)
+        // 3. Verify attributes of the "firstName_lastName_gender" property group
+        // (pg_details_loaded)
         Assert.assertNotNull(pg_details_loaded.getProperties());
         Assert.assertEquals(3, pg_details_loaded.getProperties().size());
 
@@ -302,18 +327,23 @@ public class InfoTest {
         // 6. Test equality (equals() and hashCode())
         // Manually create Property and PropertyGroup instances matching TestUtil definitions
         Property id_manual_prop = new Property("id", DataType.INT64, true, false);
-        PropertyGroup pg1_manual = new PropertyGroup(
-                List.of(id_manual_prop), org.apache.graphar.util.FileType.CSV, "id/");
-        PropertyGroup pg2_manual = new PropertyGroup(
-                List.of(id_manual_prop), org.apache.graphar.util.FileType.CSV, "id/"); // Identical to pg1_manual
+        PropertyGroup pg1_manual =
+                new PropertyGroup(
+                        List.of(id_manual_prop), org.apache.graphar.util.FileType.CSV, "id/");
+        PropertyGroup pg2_manual =
+                new PropertyGroup(
+                        List.of(id_manual_prop),
+                        org.apache.graphar.util.FileType.CSV,
+                        "id/"); // Identical to pg1_manual
 
         Property firstName_manual_prop = new Property("firstName", DataType.STRING, false, false);
         Property lastName_manual_prop = new Property("lastName", DataType.STRING, false, false);
         Property gender_manual_prop = new Property("gender", DataType.STRING, false, true);
-        PropertyGroup pg_details_manual = new PropertyGroup(
-                List.of(firstName_manual_prop, lastName_manual_prop, gender_manual_prop),
-                org.apache.graphar.util.FileType.CSV,
-                "firstName_lastName_gender/");
+        PropertyGroup pg_details_manual =
+                new PropertyGroup(
+                        List.of(firstName_manual_prop, lastName_manual_prop, gender_manual_prop),
+                        org.apache.graphar.util.FileType.CSV,
+                        "firstName_lastName_gender/");
 
         // Test equals and hashCode basic contracts
         Assert.assertEquals(pg1_manual, pg2_manual);
@@ -325,45 +355,61 @@ public class InfoTest {
         Assert.assertEquals(pg_details_manual, pg_details_loaded);
         Assert.assertEquals(pg_details_manual.hashCode(), pg_details_loaded.hashCode());
 
-
         // Test inequality for different PropertyGroups
         Assert.assertNotEquals(pg1_manual, pg_details_manual);
 
         // Test inequality if a property within a list differs
-        Property id_manual_prop_changed_nullability = new Property("id", DataType.INT64, true, true); // nullable changed
-        PropertyGroup pg_id_prop_changed = new PropertyGroup(
-            List.of(id_manual_prop_changed_nullability), org.apache.graphar.util.FileType.CSV, "id/");
+        Property id_manual_prop_changed_nullability =
+                new Property("id", DataType.INT64, true, true); // nullable changed
+        PropertyGroup pg_id_prop_changed =
+                new PropertyGroup(
+                        List.of(id_manual_prop_changed_nullability),
+                        org.apache.graphar.util.FileType.CSV,
+                        "id/");
         Assert.assertNotEquals(pg1_manual, pg_id_prop_changed);
 
         // Test inequality if file type differs
-        PropertyGroup pg_filetype_changed = new PropertyGroup(
-                List.of(id_manual_prop), org.apache.graphar.util.FileType.ORC, "id/");
+        PropertyGroup pg_filetype_changed =
+                new PropertyGroup(
+                        List.of(id_manual_prop), org.apache.graphar.util.FileType.ORC, "id/");
         Assert.assertNotEquals(pg1_manual, pg_filetype_changed);
-        
+
         // Test inequality if prefix differs
-        PropertyGroup pg_prefix_changed = new PropertyGroup(
-                List.of(id_manual_prop), org.apache.graphar.util.FileType.CSV, "id_changed/");
+        PropertyGroup pg_prefix_changed =
+                new PropertyGroup(
+                        List.of(id_manual_prop),
+                        org.apache.graphar.util.FileType.CSV,
+                        "id_changed/");
         Assert.assertNotEquals(pg1_manual, pg_prefix_changed);
 
-        // Test inequality if property list order differs (if PropertyGroup.equals considers order, which it should for list equality)
+        // Test inequality if property list order differs (if PropertyGroup.equals considers order,
+        // which it should for list equality)
         // For a single property group, order doesn't make sense to test this way.
-        // For a group with multiple properties, if PropertyGroup's cachedPropertyList.equals(that.cachedPropertyList) is used, order matters.
+        // For a group with multiple properties, if PropertyGroup's
+        // cachedPropertyList.equals(that.cachedPropertyList) is used, order matters.
         Property p1 = new Property("p1", DataType.INT32, false, false);
         Property p2 = new Property("p2", DataType.STRING, false, false);
-        PropertyGroup pg_multi1 = new PropertyGroup(List.of(p1, p2), org.apache.graphar.util.FileType.CSV, "multi/");
-        PropertyGroup pg_multi2 = new PropertyGroup(List.of(p2, p1), org.apache.graphar.util.FileType.CSV, "multi/"); // Same properties, different order
+        PropertyGroup pg_multi1 =
+                new PropertyGroup(List.of(p1, p2), org.apache.graphar.util.FileType.CSV, "multi/");
+        PropertyGroup pg_multi2 =
+                new PropertyGroup(
+                        List.of(p2, p1),
+                        org.apache.graphar.util.FileType.CSV,
+                        "multi/"); // Same properties, different order
         Assert.assertNotEquals(pg_multi1, pg_multi2); // Because List.equals is order-sensitive
     }
 
     @Test
     public void testAdjacentList() throws IOException {
         // 1. Obtain AdjacentList instances from loaded EdgeInfo
-        String edgeYamlPath = TestUtil.getTestData() + "/ldbc_sample/csv/person_knows_person.edge.yml";
+        String edgeYamlPath =
+                TestUtil.getTestData() + "/ldbc_sample/csv/person_knows_person.edge.yml";
         EdgeInfo edgeInfo = EdgeInfo.loadEdgeInfo(edgeYamlPath);
 
         AdjacentList adjList_obs_loaded = edgeInfo.getAdjacentList(AdjListType.ORDERED_BY_SOURCE);
         Assert.assertNotNull(adjList_obs_loaded);
-        AdjacentList adjList_obd_loaded = edgeInfo.getAdjacentList(AdjListType.ORDERED_BY_DESTINATION);
+        AdjacentList adjList_obd_loaded =
+                edgeInfo.getAdjacentList(AdjListType.ORDERED_BY_DESTINATION);
         Assert.assertNotNull(adjList_obd_loaded);
 
         // 2. Verify attributes of the "ORDERED_BY_SOURCE" AdjacentList
@@ -378,12 +424,21 @@ public class InfoTest {
 
         // 4. Test equality (equals() and hashCode())
         // Manually create AdjacentList instances
-        AdjacentList al_obs_manual1 = new AdjacentList(
-                AdjListType.ORDERED_BY_SOURCE, org.apache.graphar.util.FileType.CSV, "ordered_by_source/");
-        AdjacentList al_obs_manual2 = new AdjacentList(
-                AdjListType.ORDERED_BY_SOURCE, org.apache.graphar.util.FileType.CSV, "ordered_by_source/");
-        AdjacentList al_obd_manual = new AdjacentList(
-                AdjListType.ORDERED_BY_DESTINATION, org.apache.graphar.util.FileType.CSV, "ordered_by_dest/");
+        AdjacentList al_obs_manual1 =
+                new AdjacentList(
+                        AdjListType.ORDERED_BY_SOURCE,
+                        org.apache.graphar.util.FileType.CSV,
+                        "ordered_by_source/");
+        AdjacentList al_obs_manual2 =
+                new AdjacentList(
+                        AdjListType.ORDERED_BY_SOURCE,
+                        org.apache.graphar.util.FileType.CSV,
+                        "ordered_by_source/");
+        AdjacentList al_obd_manual =
+                new AdjacentList(
+                        AdjListType.ORDERED_BY_DESTINATION,
+                        org.apache.graphar.util.FileType.CSV,
+                        "ordered_by_dest/");
 
         // Test equals and hashCode basic contracts
         Assert.assertEquals(al_obs_manual1, al_obs_manual2);
@@ -399,18 +454,27 @@ public class InfoTest {
         Assert.assertNotEquals(al_obs_manual1, al_obd_manual);
 
         // Test inequality with different AdjListType
-        AdjacentList al_ubs_manual = new AdjacentList(
-                AdjListType.UNORDERED_BY_SOURCE, org.apache.graphar.util.FileType.CSV, "ordered_by_source/");
+        AdjacentList al_ubs_manual =
+                new AdjacentList(
+                        AdjListType.UNORDERED_BY_SOURCE,
+                        org.apache.graphar.util.FileType.CSV,
+                        "ordered_by_source/");
         Assert.assertNotEquals(al_obs_manual1, al_ubs_manual);
 
         // Test inequality with different FileType
-        AdjacentList al_obs_orc_manual = new AdjacentList(
-                AdjListType.ORDERED_BY_SOURCE, org.apache.graphar.util.FileType.ORC, "ordered_by_source/");
+        AdjacentList al_obs_orc_manual =
+                new AdjacentList(
+                        AdjListType.ORDERED_BY_SOURCE,
+                        org.apache.graphar.util.FileType.ORC,
+                        "ordered_by_source/");
         Assert.assertNotEquals(al_obs_manual1, al_obs_orc_manual);
 
         // Test inequality with different prefix
-        AdjacentList al_obs_prefix_manual = new AdjacentList(
-                AdjListType.ORDERED_BY_SOURCE, org.apache.graphar.util.FileType.CSV, "prefix_changed/");
+        AdjacentList al_obs_prefix_manual =
+                new AdjacentList(
+                        AdjListType.ORDERED_BY_SOURCE,
+                        org.apache.graphar.util.FileType.CSV,
+                        "prefix_changed/");
         Assert.assertNotEquals(al_obs_manual1, al_obs_prefix_manual);
     }
 
@@ -425,7 +489,8 @@ public class InfoTest {
         Property idPropLoaded = pg_id.getProperty("id");
         Assert.assertNotNull(idPropLoaded);
 
-        PropertyGroup pg_details = vertexInfo.getPropertyGroup("firstName"); // or "lastName", "gender"
+        PropertyGroup pg_details =
+                vertexInfo.getPropertyGroup("firstName"); // or "lastName", "gender"
         Assert.assertNotNull(pg_details);
         Property firstNamePropLoaded = pg_details.getProperty("firstName");
         Assert.assertNotNull(firstNamePropLoaded);
@@ -445,7 +510,8 @@ public class InfoTest {
         // 4. Test equality (equals() and hashCode())
         // Create Property objects programmatically
         Property p1_manual = new Property("id", DataType.INT64, true, false);
-        Property p2_manual = new Property("id", DataType.INT64, true, false); // Identical to p1_manual
+        Property p2_manual =
+                new Property("id", DataType.INT64, true, false); // Identical to p1_manual
 
         // Assert p1_manual.equals(p2_manual) is true and hashCodes are equal
         Assert.assertEquals(p1_manual, p2_manual);
@@ -462,7 +528,6 @@ public class InfoTest {
         // Compare loaded firstName with manually created firstName
         Assert.assertEquals(p3_manual_firstName, firstNamePropLoaded);
         Assert.assertEquals(p3_manual_firstName.hashCode(), firstNamePropLoaded.hashCode());
-
 
         // Modify attributes and assert inequality
         Property p_name_changed = new Property("id_changed", DataType.INT64, true, false);
