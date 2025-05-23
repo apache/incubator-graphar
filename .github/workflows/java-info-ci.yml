@@ -1,0 +1,69 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: GraphAr Java Info CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'maven-projects/info/**'
+      - '.github/workflows/java-info-ci.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'maven-projects/info/**'
+      - '.github/workflows/java-info-ci.yml'
+
+concurrency:
+  group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }} # Same condition as java.yml
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true # Keep this, as GAR_TEST_DATA might be in a submodule or the C++ parts might be needed indirectly
+
+      - name: Install dependencies
+        run: |
+          # Using the same dependency installation as java.yml for now
+          wget -c https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb             -P /tmp/
+          sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
+          sudo apt-get update -y
+          sudo apt install -y libarrow-dev=14.0.1-1                             libarrow-dataset-dev=14.0.1-1                             libarrow-acero-dev=14.0.1-1                             libparquet-dev=14.0.1-1
+          sudo apt-get install libcurl4-openssl-dev -y
+          sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
+
+      - name: Code Format Check
+        working-directory: maven-projects/info
+        run: |
+          export JAVA_HOME=${JAVA_HOME_11_X64} # Using Java 11
+          mvn --no-transfer-progress spotless:check
+
+      - name: Run java-info tests
+        working-directory: maven-projects/info # Adjusted working directory
+        run: |
+          export JAVA_HOME=${JAVA_HOME_11_X64} # Using Java 11
+          export LLVM11_HOME=/usr/lib/llvm-11 # Keep if any native code might be involved indirectly
+          export GAR_TEST_DATA=$GITHUB_WORKSPACE/testing/ # Standard way to reference repo root
+          mvn --no-transfer-progress clean test
