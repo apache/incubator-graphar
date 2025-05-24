@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.graphar.info; 
+package org.apache.graphar.info;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -32,13 +32,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-import org.apache.graphar.info.AdjList;
-import org.apache.graphar.info.EdgeInfo;
-import org.apache.graphar.info.Property;
-import org.apache.graphar.info.PropertyGroup;
 import org.apache.graphar.types.AdjListType;
-import org.apache.graphar.types.DataType; 
-import org.apache.graphar.types.FileType; 
+import org.apache.graphar.types.DataType;
+import org.apache.graphar.types.FileType;
 import org.apache.graphar.util.GrapharStaticFunctions;
 import org.apache.graphar.util.YamlUtil;
 import org.junit.jupiter.api.BeforeAll;
@@ -53,8 +49,8 @@ public class EdgeInfoTest {
         String basePath =
                 Paths.get(
                                 System.getProperty("user.dir"),
-                                "..", 
-                                "info", 
+                                "..",
+                                "info",
                                 "src",
                                 "test",
                                 "resources",
@@ -82,17 +78,16 @@ public class EdgeInfoTest {
         assertTrue(teachesEdgeInfo.isDirected());
         assertEquals("lecturer_teaches_student", teachesEdgeInfo.getConcatKey());
 
-
         List<AdjList> adjLists = teachesEdgeInfo.getAdjLists();
         assertNotNull(adjLists);
         assertEquals(2, adjLists.size());
         assertTrue(teachesEdgeInfo.hasAdjList(AdjListType.ordered_by_source));
         assertTrue(teachesEdgeInfo.hasAdjList(AdjListType.ordered_by_dest));
         assertFalse(teachesEdgeInfo.hasAdjList(AdjListType.unordered_by_source));
-        
+
         AdjList adjListObs = teachesEdgeInfo.getAdjList(AdjListType.ordered_by_source);
         assertNotNull(adjListObs);
-        assertEquals(FileType.PARQUET, adjListObs.getFileType()); 
+        assertEquals(FileType.PARQUET, adjListObs.getFileType());
         assertEquals(AdjListType.ordered_by_source, adjListObs.getAdjListType());
         assertEquals("adj_src_ordered/", adjListObs.getPrefix());
 
@@ -102,49 +97,52 @@ public class EdgeInfoTest {
 
         PropertyGroup pg1 = teachesEdgeInfo.getPropertyGroup("course_id");
         assertNotNull(pg1);
-        Property courseIdProp = pg1.getProperties().stream()
-                .filter(p -> p.getName().equals("course_id"))
-                .findFirst()
-                .orElse(null);
+        Property courseIdProp =
+                pg1.getProperties().stream()
+                        .filter(p -> p.getName().equals("course_id"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(courseIdProp);
         assertEquals("course_id", courseIdProp.getName());
-        assertEquals(DataType.Type.STRING, courseIdProp.getDataType().getType()); 
-        assertFalse(courseIdProp.isPrimary()); 
-        assertFalse(courseIdProp.isNullable()); 
+        assertEquals(DataType.Type.STRING, courseIdProp.getDataType().getType());
+        assertFalse(courseIdProp.isPrimary());
+        assertFalse(courseIdProp.isNullable());
         assertEquals(DataType.Type.STRING, teachesEdgeInfo.getPropertyType("course_id").getType());
         assertFalse(teachesEdgeInfo.isPrimaryKey("course_id"));
         assertFalse(teachesEdgeInfo.isNullableKey("course_id"));
 
-        Property courseYearProp = pg1.getProperties().stream()
-                .filter(p -> p.getName().equals("course_year"))
-                .findFirst()
-                .orElse(null);
+        Property courseYearProp =
+                pg1.getProperties().stream()
+                        .filter(p -> p.getName().equals("course_year"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(courseYearProp);
         assertEquals("course_year", courseYearProp.getName());
-        assertEquals(DataType.Type.INT32, courseYearProp.getDataType().getType()); 
-        assertFalse(courseYearProp.isPrimary()); 
-        assertFalse(courseYearProp.isNullable()); 
+        assertEquals(DataType.Type.INT32, courseYearProp.getDataType().getType());
+        assertFalse(courseYearProp.isPrimary());
+        assertFalse(courseYearProp.isNullable());
         assertEquals(DataType.Type.INT32, teachesEdgeInfo.getPropertyType("course_year").getType());
         assertFalse(teachesEdgeInfo.isPrimaryKey("course_year"));
         assertFalse(teachesEdgeInfo.isNullableKey("course_year"));
 
         PropertyGroup pg2 = teachesEdgeInfo.getPropertyGroup("semester");
         assertNotNull(pg2);
-        Property semesterProp = pg2.getProperties().stream()
-                .filter(p -> p.getName().equals("semester"))
-                .findFirst()
-                .orElse(null);
+        Property semesterProp =
+                pg2.getProperties().stream()
+                        .filter(p -> p.getName().equals("semester"))
+                        .findFirst()
+                        .orElse(null);
         assertNotNull(semesterProp);
         assertEquals("semester", semesterProp.getName());
-        assertEquals(DataType.Type.STRING, semesterProp.getDataType().getType()); 
-        assertFalse(semesterProp.isPrimary()); 
-        assertTrue(semesterProp.isNullable()); 
+        assertEquals(DataType.Type.STRING, semesterProp.getDataType().getType());
+        assertFalse(semesterProp.isPrimary());
+        assertTrue(semesterProp.isNullable());
         assertEquals(DataType.Type.STRING, teachesEdgeInfo.getPropertyType("semester").getType());
         assertFalse(teachesEdgeInfo.isPrimaryKey("semester"));
         assertTrue(teachesEdgeInfo.isNullableKey("semester"));
 
         AdjListType adjType = AdjListType.ordered_by_source;
-        assertNotNull(teachesEdgeInfo.getAdjListPathPrefix(adjType)); 
+        assertNotNull(teachesEdgeInfo.getAdjListPathPrefix(adjType));
         assertNotNull(teachesEdgeInfo.getAdjListFilePath(0, 0, adjType));
         assertNotNull(teachesEdgeInfo.getOffsetPathPrefix(adjType));
         assertNotNull(teachesEdgeInfo.getAdjListOffsetFilePath(0, adjType));
@@ -152,7 +150,6 @@ public class EdgeInfoTest {
         assertNotNull(teachesEdgeInfo.getVerticesNumFilePath(adjType));
         assertNotNull(teachesEdgeInfo.getPropertyGroupPathPrefix(pg1, adjType));
         assertNotNull(teachesEdgeInfo.getPropertyFilePath(pg1, adjType, 0, 0));
-
 
         String dumpString = teachesEdgeInfo.dump();
         JsonNode dumpedNode = null;

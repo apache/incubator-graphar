@@ -48,7 +48,10 @@ public class LocalYamlGraphLoader implements GraphLoader {
 
     @Override
     public GraphInfo load(String graphYamlPath) throws IOException {
-        final Path path = FileSystems.getDefault().getPath(graphYamlPath).toAbsolutePath(); // Ensure path is absolute for reliable parent
+        final Path path =
+                FileSystems.getDefault()
+                        .getPath(graphYamlPath)
+                        .toAbsolutePath(); // Ensure path is absolute for reliable parent
         // load graph itself
         final BufferedReader reader = Files.newBufferedReader(path);
         final Yaml yamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
@@ -68,8 +71,9 @@ public class LocalYamlGraphLoader implements GraphLoader {
             Path resolvedYamlPrefixPath = baseDir.resolve(yamlPrefix).normalize();
             effectiveGraphPrefix = ensureTrailingSlash(resolvedYamlPrefixPath.toString());
         }
-        
-        // load vertices - paths for vertex/edge YAMLs should be relative to the graph.yml's directory (baseDir)
+
+        // load vertices - paths for vertex/edge YAMLs should be relative to the graph.yml's
+        // directory (baseDir)
         // The ABSOLUTE_PREFIX used for loading vertex/edge YAMLs should be baseDir.
         String vertexEdgeYamlBaseDir = ensureTrailingSlash(baseDir.toString());
         List<VertexInfo> vertexInfos = new ArrayList<>(graphYaml.getVertices().size());

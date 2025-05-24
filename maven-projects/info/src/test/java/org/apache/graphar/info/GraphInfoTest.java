@@ -22,22 +22,18 @@ package org.apache.graphar.info;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail; 
+import static org.junit.jupiter.api.Assertions.fail;
 
-import com.fasterxml.jackson.databind.JsonNode; 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
-import org.apache.graphar.info.GraphInfo; 
-import org.apache.graphar.info.VertexInfo; 
-import org.apache.graphar.info.EdgeInfo;   
-import org.apache.graphar.util.GrapharStaticFunctions; 
-import org.apache.graphar.util.YamlUtil; 
-import org.junit.jupiter.api.BeforeAll; 
-import org.junit.jupiter.api.Test; 
-
+import org.apache.graphar.util.GrapharStaticFunctions;
+import org.apache.graphar.util.YamlUtil;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class GraphInfoTest {
     private static GraphInfo graphInfo;
@@ -48,7 +44,7 @@ public class GraphInfoTest {
         String basePath =
                 Paths.get(
                                 System.getProperty("user.dir"),
-                                "..", 
+                                "..",
                                 "info",
                                 "src",
                                 "test",
@@ -57,7 +53,7 @@ public class GraphInfoTest {
                         .normalize()
                         .toString();
         String graphInfoPath = Paths.get(basePath, "graph.info.yml").toString();
-        graphInfo = GrapharStaticFunctions.INSTANCE.loadGraphInfo(graphInfoPath); 
+        graphInfo = GrapharStaticFunctions.INSTANCE.loadGraphInfo(graphInfoPath);
         graphInfoRootNode = YamlUtil.INSTANCE.loadTree(new FileInputStream(graphInfoPath));
     }
 
@@ -65,21 +61,22 @@ public class GraphInfoTest {
     public void testLoadGraphInfo() {
         assertNotNull(graphInfo);
         assertEquals("academic_graph", graphInfo.getName());
-        assertNotNull(graphInfo.getVersion()); 
+        assertNotNull(graphInfo.getVersion());
         assertEquals("gar/v1", graphInfo.getVersion().toString());
         assertEquals("gar_test_data/", graphInfo.getPrefix());
 
-        List<VertexInfo> vertexInfos = graphInfo.getVertexInfos(); 
+        List<VertexInfo> vertexInfos = graphInfo.getVertexInfos();
         assertNotNull(vertexInfos);
         assertEquals(2, vertexInfos.size());
         assertTrue(vertexInfos.stream().anyMatch(vi -> "student".equals(vi.getType())));
         assertTrue(vertexInfos.stream().anyMatch(vi -> "lecturer".equals(vi.getType())));
 
-        List<EdgeInfo> edgeInfos = graphInfo.getEdgeInfos(); 
+        List<EdgeInfo> edgeInfos = graphInfo.getEdgeInfos();
         assertNotNull(edgeInfos);
         assertEquals(1, edgeInfos.size());
-        assertTrue(edgeInfos.stream().anyMatch(ei -> "lecturer_teaches_student".equals(ei.getConcatKey())));
-
+        assertTrue(
+                edgeInfos.stream()
+                        .anyMatch(ei -> "lecturer_teaches_student".equals(ei.getConcatKey())));
 
         Map<String, String> extraInfo = graphInfo.getExtraInfo();
         assertNotNull(extraInfo);
@@ -93,20 +90,18 @@ public class GraphInfoTest {
 
         EdgeInfo teachesInfo = graphInfo.getEdgeInfo("lecturer", "teaches", "student");
         assertNotNull(teachesInfo);
-        assertEquals("teaches", teachesInfo.getEdgeType()); 
+        assertEquals("teaches", teachesInfo.getEdgeType());
 
         String dumpString = graphInfo.dump();
         JsonNode dumpedNode = null;
         try {
-            dumpedNode = YamlUtil.INSTANCE.loadTree(dumpString); 
+            dumpedNode = YamlUtil.INSTANCE.loadTree(dumpString);
         } catch (IOException e) {
-            fail("Failed to parse dumped string: " + e.getMessage()); 
+            fail("Failed to parse dumped string: " + e.getMessage());
         }
         assertNotNull(dumpedNode);
         assertEquals(graphInfoRootNode.get("name").asText(), dumpedNode.get("name").asText());
-        assertEquals(
-                graphInfoRootNode.get("prefix").asText(), dumpedNode.get("prefix").asText());
-        assertEquals(
-                graphInfoRootNode.get("version").asText(), dumpedNode.get("version").asText());
+        assertEquals(graphInfoRootNode.get("prefix").asText(), dumpedNode.get("prefix").asText());
+        assertEquals(graphInfoRootNode.get("version").asText(), dumpedNode.get("version").asText());
     }
 }

@@ -19,27 +19,24 @@
 
 package org.apache.graphar.info;
 
-import static org.junit.jupiter.api.Assertions.assertEquals; 
-import static org.junit.jupiter.api.Assertions.assertNotNull; 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
-import org.apache.graphar.info.GraphInfo; 
-import org.apache.graphar.info.EdgeInfo;
-import org.apache.graphar.info.VertexInfo;
 import org.apache.graphar.info.loader.GraphLoader;
 import org.apache.graphar.info.loader.LocalYamlGraphLoader;
-import org.junit.jupiter.api.AfterAll; 
-import org.junit.jupiter.api.BeforeAll; 
-import org.junit.jupiter.api.Test; 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 public class GraphLoaderTest {
 
-    @BeforeAll 
+    @BeforeAll
     public static void init() {
-        TestUtil.checkTestData(); 
+        TestUtil.checkTestData();
     }
 
-    @AfterAll 
+    @AfterAll
     public static void clean() {}
 
     @Test
@@ -48,19 +45,19 @@ public class GraphLoaderTest {
         final String GRAPH_PATH = TestUtil.getLdbcSampleGraphPath();
         try {
             final GraphInfo graphInfo = graphLoader.load(GRAPH_PATH);
-            assertNotNull(graphInfo); 
-            assertNotNull(graphInfo.getEdgeInfos()); 
-            assertEquals(1, graphInfo.getEdgeInfos().size()); 
+            assertNotNull(graphInfo);
+            assertNotNull(graphInfo.getEdgeInfos());
+            assertEquals(1, graphInfo.getEdgeInfos().size());
             for (EdgeInfo edgeInfo : graphInfo.getEdgeInfos()) {
-                assertNotNull(edgeInfo.getConcat()); 
+                assertNotNull(edgeInfo.getConcat());
             }
-            assertNotNull(graphInfo.getVertexInfos()); 
-            assertEquals(1, graphInfo.getVertexInfos().size()); 
+            assertNotNull(graphInfo.getVertexInfos());
+            assertEquals(1, graphInfo.getVertexInfos().size());
             for (VertexInfo vertexInfo : graphInfo.getVertexInfos()) {
-                assertNotNull(vertexInfo.getType()); 
+                assertNotNull(vertexInfo.getType());
             }
         } catch (IOException e) {
-            throw new RuntimeException(e); 
+            throw new RuntimeException(e);
         }
     }
 }
