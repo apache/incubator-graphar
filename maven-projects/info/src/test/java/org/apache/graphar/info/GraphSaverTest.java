@@ -19,11 +19,15 @@
 
 package org.apache.graphar.info;
 
+import static org.junit.jupiter.api.Assertions.assertTrue; 
+
 import java.io.File;
+import org.apache.graphar.info.GraphInfo;
+import org.apache.graphar.info.EdgeInfo;
+import org.apache.graphar.info.VertexInfo;
 import org.apache.graphar.info.saver.GraphSaver;
 import org.apache.graphar.info.saver.LocalYamlGraphSaver;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test; 
 
 public class GraphSaverTest {
 
@@ -31,24 +35,24 @@ public class GraphSaverTest {
     public void testSave() {
         final String LDBC_SAMPLE_SAVE_DIR = TestUtil.SAVE_DIR + "/ldbc_sample/";
         final GraphSaver graphSaver = new LocalYamlGraphSaver();
-        final GraphInfo graphInfo = TestUtil.getLdbcSampleDataSet();
+        final GraphInfo graphInfo = TestUtil.getLdbcSampleDataSet(); 
         try {
             graphSaver.save(LDBC_SAMPLE_SAVE_DIR, graphInfo);
-            Assert.assertTrue(
+            assertTrue( 
                     new File(LDBC_SAMPLE_SAVE_DIR + "/" + graphInfo.getName() + ".graph.yaml")
                             .exists());
             for (VertexInfo vertexInfo : graphInfo.getVertexInfos()) {
-                Assert.assertTrue(
+                assertTrue( 
                         new File(LDBC_SAMPLE_SAVE_DIR + "/" + vertexInfo.getType() + ".vertex.yaml")
                                 .exists());
             }
             for (EdgeInfo edgeInfo : graphInfo.getEdgeInfos()) {
-                Assert.assertTrue(
+                assertTrue( 
                         new File(LDBC_SAMPLE_SAVE_DIR + "/" + edgeInfo.getConcat() + ".edge.yaml")
                                 .exists());
             }
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) { 
+            throw new RuntimeException(e); 
         }
     }
 }

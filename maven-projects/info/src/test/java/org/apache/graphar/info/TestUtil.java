@@ -20,10 +20,17 @@
 package org.apache.graphar.info;
 
 import java.util.List;
-import org.apache.graphar.proto.AdjListType;
-import org.apache.graphar.proto.DataType;
-import org.apache.graphar.proto.FileType;
-import org.junit.Assume;
+import org.apache.graphar.info.AdjacentList; 
+import org.apache.graphar.info.EdgeInfo;   
+import org.apache.graphar.info.GraphInfo;  
+import org.apache.graphar.info.Property;   
+import org.apache.graphar.info.PropertyGroup; 
+import org.apache.graphar.info.VertexInfo; 
+import org.apache.graphar.types.AdjListType; 
+import org.apache.graphar.types.DataType;   
+import org.apache.graphar.types.FileType;   
+
+import org.junit.jupiter.api.Assumptions; 
 
 public class TestUtil {
     private static String GAR_TEST_DATA = null;
@@ -37,116 +44,65 @@ public class TestUtil {
     }
 
     public static String getLdbcSampleGraphPath() {
+        if (getTestData() == null) return null; 
         return getTestData() + "/" + LDBC_SAMPLE_GRAPH_PATH;
     }
 
     public static GraphInfo getLdbcSampleDataSet() {
-        // create vertex info of yaml:
-        // type: person
-        // chunk_size: 100
-        // prefix: vertex/person/
-        // property_groups:
-        //  - properties:
-        //      - name: id
-        //        data_type: int64
-        //        is_primary: true
-        //        is_nullable: false
-        //    prefix: id/
-        //    file_type: csv
-        //  - properties:
-        //      - name: firstName
-        //        data_type: string
-        //        is_primary: false
-        //      - name: lastName
-        //        data_type: string
-        //        is_primary: false
-        //      - name: gender
-        //        data_type: string
-        //        is_primary: false
-        //        is_nullable: true
-        //    prefix: firstName_lastName_gender/
-        //    file_type: csv
-        // version: gar/v1
-
         Property id = new Property("id", DataType.INT64, true, false);
         Property firstName = new Property("firstName", DataType.STRING, false, false);
         Property lastName = new Property("lastName", DataType.STRING, false, false);
         Property gender = new Property("gender", DataType.STRING, false, true);
-        PropertyGroup pg1 = new PropertyGroup(List.of(id), FileType.CSV, "id/");
-        PropertyGroup pg2 =
+        Property creationDate = new Property("creationDate", DataType.STRING, false, false);
+
+        PropertyGroup personPg1 = new PropertyGroup(List.of(id), FileType.CSV, "id/");
+        PropertyGroup personPg2 =
                 new PropertyGroup(
                         List.of(firstName, lastName, gender),
                         FileType.CSV,
-                        "firstName_lastName_gender/"); // Match the actual prefix in YAML
+                        "firstName_lastName_gender/");
+        
         VertexInfo person =
                 new VertexInfo(
                         "person",
                         100,
-                        List.of(pg1, pg2),
-                        "vertex/person/",
-                        "gar/v1"); // Added version
+                        List.of(personPg1, personPg2),
+                        "vertex/person/", 
+                        "gar/v1");
 
-        // create edge info of yaml:
-        // src_type: person
-        // edge_type: knows
-        // dst_type: person
-        // chunk_size: 1024
-        // src_chunk_size: 100
-        // dst_chunk_size: 100
-        // directed: false
-        // prefix: edge/person_knows_person/
-        // adj_lists:
-        //  - ordered: true
-        //    aligned_by: src
-        //    prefix: ordered_by_source/
-        //    file_type: csv
-        //  - ordered: true
-        //    aligned_by: dst
-        //    prefix: ordered_by_dest/
-        //    file_type: csv
-        // property_groups:
-        //  - prefix: creationDate/
-        //    file_type: csv
-        //    properties:
-        //      - name: creationDate
-        //        data_type: string
-        //        is_primary: false
-        // version: gar/v1
         AdjacentList orderedBySource =
-                new AdjacentList(AdjListType.ORDERED_BY_SOURCE, FileType.CSV, "ordered_by_source/");
+                new AdjacentList(AdjListType.ordered_by_source, FileType.CSV, "ordered_by_source/"); 
         AdjacentList orderedByDest =
                 new AdjacentList(
-                        AdjListType.ORDERED_BY_DESTINATION, FileType.CSV, "ordered_by_dest/");
-        Property creationDate = new Property("creationDate", DataType.STRING, false, false);
-        PropertyGroup pg3 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
+                        AdjListType.ordered_by_dest, FileType.CSV, "ordered_by_dest/"); 
+
+        PropertyGroup knowsPg1 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
+        
         EdgeInfo knows =
                 new EdgeInfo(
-                        "person",
-                        "knows",
-                        "person",
-                        100, // srcChunkSize
-                        1024, // edgeChunkSize (was original chunkSize)
-                        100, // dstChunkSize
-                        false,
-                        "edge/person_knows_person/",
+                        "person", 
+                        "knows",  
+                        "person", 
+                        100,      
+                        1024,     
+                        100,      
+                        false,    
+                        "edge/person_knows_person/", 
                         List.of(orderedBySource, orderedByDest),
-                        List.of(pg3),
-                        "gar/v1"); // Added version
+                        List.of(knowsPg1),
+                        "gar/v1");
 
-        // create graph info of yaml:
-        // name: ldbc_sample
-        // vertices:
-        //  - person.vertex.yml
-        // edges:
-        //  - person_knows_person.edge.yml
-        // version: gar/v1
-        return new GraphInfo("ldbc_sample", List.of(person), List.of(knows), "");
+        return new GraphInfo(
+                "ldbc_sample", 
+                List.of(person), 
+                List.of(knows), 
+                "ldbc_sample/csv/"); 
     }
 
     public static void checkTestData() {
         if (GAR_TEST_DATA == null) {
             GAR_TEST_DATA = System.getenv("GAR_TEST_DATA");
         }
-        Assume.assumeTrue("GAR_TEST_DATA is not set", GAR_TEST_DATA != null);
+        Assumptions.assumeTrue(GAR_TEST_DATA != null, "GAR_TEST_DATA is not set"); 
     }
 }
