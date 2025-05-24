@@ -75,8 +75,8 @@ public class EdgeYaml {
                 src_type,
                 edge_type,
                 dst_type,
-                chunk_size,
-                src_chunk_size,
+                src_chunk_size, // Swapped with chunk_size
+                chunk_size, // Swapped with src_chunk_size (this is the edge's own chunk size)
                 dst_chunk_size,
                 directed,
                 prefix,
@@ -85,7 +85,8 @@ public class EdgeYaml {
                         .collect(Collectors.toUnmodifiableList()),
                 property_groups.stream()
                         .map(PropertyGroupYaml::toPropertyGroup)
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList()),
+                version); // Pass the version from EdgeYaml
     }
 
     public String getSrc_type() {

@@ -1,0 +1,13 @@
+name: "academic_graph"
+prefix: "gar_test_data/"
+version: "gar/v1"
+vertices:
+  - "student.vertex.yml"
+  - "lecturer.vertex.yml"
+edges:
+  - "teaches.edge.yml"
+extra_info:
+  - key: "description"
+    value: "A simple academic graph for testing."
+  - key: "creation_date"
+    value: "2023-10-27"

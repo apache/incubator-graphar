@@ -19,11 +19,12 @@
 
 package org.apache.graphar.info;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.File;
 import org.apache.graphar.info.saver.GraphSaver;
 import org.apache.graphar.info.saver.LocalYamlGraphSaver;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GraphSaverTest {
 
@@ -34,16 +35,16 @@ public class GraphSaverTest {
         final GraphInfo graphInfo = TestUtil.getLdbcSampleDataSet();
         try {
             graphSaver.save(LDBC_SAMPLE_SAVE_DIR, graphInfo);
-            Assert.assertTrue(
+            assertTrue(
                     new File(LDBC_SAMPLE_SAVE_DIR + "/" + graphInfo.getName() + ".graph.yaml")
                             .exists());
             for (VertexInfo vertexInfo : graphInfo.getVertexInfos()) {
-                Assert.assertTrue(
+                assertTrue(
                         new File(LDBC_SAMPLE_SAVE_DIR + "/" + vertexInfo.getType() + ".vertex.yaml")
                                 .exists());
             }
             for (EdgeInfo edgeInfo : graphInfo.getEdgeInfos()) {
-                Assert.assertTrue(
+                assertTrue(
                         new File(LDBC_SAMPLE_SAVE_DIR + "/" + edgeInfo.getConcat() + ".edge.yaml")
                                 .exists());
             }

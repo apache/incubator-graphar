@@ -123,6 +123,42 @@ public class PropertyGroup implements Iterable<Property> {
     org.apache.graphar.proto.PropertyGroup getProto() {
         return protoPropertyGroup;
     }
+
+    public Property getProperty(String name) {
+        return cachedPropertyMap.get(name);
+    }
+
+    public boolean hasProperty(String name) {
+        return cachedPropertyMap.containsKey(name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PropertyGroup that = (PropertyGroup) o;
+        // Compare prefix, fileType, and the list of properties
+        if (!protoPropertyGroup.getPrefix().equals(that.protoPropertyGroup.getPrefix())) {
+            return false;
+        }
+        if (protoPropertyGroup.getFileType() != that.protoPropertyGroup.getFileType()) {
+            return false;
+        }
+        // Compare lists of properties. Order matters for equality here.
+        return cachedPropertyList.equals(that.cachedPropertyList);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = protoPropertyGroup.getPrefix().hashCode();
+        result = 31 * result + protoPropertyGroup.getFileType().hashCode();
+        result = 31 * result + cachedPropertyList.hashCode();
+        return result;
+    }
 }
 
 /**
