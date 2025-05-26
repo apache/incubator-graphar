@@ -27,13 +27,12 @@
     <parent>
         <groupId>org.apache.graphar</groupId>
         <artifactId>graphar-root</artifactId>
-        <version>${graphar.version}</version>
+        <version>0.12.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>spark</artifactId>
     <packaging>pom</packaging>
-    <version>${graphar.version}</version>
 
     <properties>
         <scala.version>2.12.15</scala.version>

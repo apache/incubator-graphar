@@ -28,13 +28,12 @@
     <parent>
         <groupId>org.apache.graphar</groupId>
         <artifactId>graphar-root</artifactId>
-        <version>${graphar.version}</version>
+        <version>0.12.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>graphar-info</artifactId>
     <packaging>jar</packaging>
-    <version>${graphar.version}</version>
 
     <name>graphar-info</name>
 
