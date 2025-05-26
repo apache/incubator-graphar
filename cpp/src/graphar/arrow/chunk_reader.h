@@ -26,6 +26,7 @@
 
 #include "graphar/fwd.h"
 #include "graphar/reader_util.h"
+#include "graphar/status.h"
 
 // forward declaration
 namespace arrow {
@@ -52,6 +53,19 @@ class VertexPropertyArrowChunkReader {
       const std::shared_ptr<VertexInfo>& vertex_info,
       const std::shared_ptr<PropertyGroup>& property_group,
       const std::string& prefix, const util::FilterOptions& options = {});
+  /**
+   * @brief Initialize the VertexPropertyArrowChunkReader.
+   *
+   * @param vertex_info The vertex info that describes the vertex type.
+   * @param property_group The property group that describes the property group.
+   * @param property_names Only these properties will be read.
+   * @param prefix The absolute prefix.
+   */
+  VertexPropertyArrowChunkReader(
+      const std::shared_ptr<VertexInfo>& vertex_info,
+      const std::shared_ptr<PropertyGroup>& property_group,
+      const std::vector<std::string>& property_names, const std::string& prefix,
+      const util::FilterOptions& options = {});
 
   VertexPropertyArrowChunkReader() : vertex_info_(nullptr), prefix_("") {}
 
@@ -127,6 +141,21 @@ class VertexPropertyArrowChunkReader {
       const std::string& prefix, const util::FilterOptions& options = {});
 
   /**
+   * @brief Create a VertexPropertyArrowChunkReader instance from vertex info.
+   *
+   * @param vertex_info The vertex info.
+   * @param property_group The property group of the vertex property.
+   * @param property_names is not empty, only these properties will be read.
+   * @param prefix The absolute prefix of the graph.
+   * @param options The filter options, default is empty.
+   */
+  static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
+      const std::shared_ptr<VertexInfo>& vertex_info,
+      const std::shared_ptr<PropertyGroup>& property_group,
+      const std::vector<std::string>& property_names, const std::string& prefix,
+      const util::FilterOptions& options = {});
+
+  /**
    * @brief Create a VertexPropertyArrowChunkReader instance from graph info and
    * property group.
    *
@@ -187,6 +216,7 @@ class VertexPropertyArrowChunkReader {
  private:
   std::shared_ptr<VertexInfo> vertex_info_;
   std::shared_ptr<PropertyGroup> property_group_;
+  std::vector<std::string> property_names_;
   std::string prefix_;
   std::vector<std::string> labels_;
   IdType chunk_index_;
