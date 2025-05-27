@@ -50,7 +50,7 @@ jobs:
           submodules: false
           fetch-depth: 0
 
-      - uses: bufbuild/buf-setup-action@v4
+      - uses: bufbuild/buf-setup-action@v1
         with:
           version: "1.32.0"
 
