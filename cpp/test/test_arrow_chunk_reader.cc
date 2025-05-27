@@ -166,16 +166,20 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
         util::FilterOptions options;
         options.filter = filter;
         options.columns = expected_cols;
+        auto pg = graph_info->GetVertexInfo(src_type)->GetPropertyGroup(
+            filter_property);
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-            graph_info, src_type, filter_property, options);
+            graph_info, src_type, pg, options);
         REQUIRE(maybe_reader.status().ok());
         walkReader(maybe_reader.value());
       }
 
       SECTION("pushdown by function Filter() & Select()") {
         std::cout << "Vertex property pushdown by Filter() & Select():\n";
-        auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-            graph_info, src_type, filter_property);
+        auto pg = graph_info->GetVertexInfo(src_type)->GetPropertyGroup(
+            filter_property);
+        auto maybe_reader =
+            VertexPropertyArrowChunkReader::Make(graph_info, src_type, pg);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
         reader->Filter(filter);

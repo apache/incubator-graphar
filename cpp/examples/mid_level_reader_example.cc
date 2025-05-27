@@ -29,6 +29,8 @@ void vertex_property_chunk_reader(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {
   // create reader
   std::string type = "person", property_name = "gender";
+  auto propety_group =
+      graph_info->GetVertexInfo(type)->GetPropertyGroup(property_name);
   auto maybe_reader = graphar::VertexPropertyArrowChunkReader::Make(
       graph_info, type, property_name);
   ASSERT(maybe_reader.status().ok());
@@ -72,7 +74,7 @@ void vertex_property_chunk_reader(
                                 graphar::_Literal("female"));
   std::vector<std::string> expected_cols{"firstName", "lastName"};
   auto maybe_filter_reader = graphar::VertexPropertyArrowChunkReader::Make(
-      graph_info, type, property_name);
+      graph_info, type, propety_group);
   ASSERT(maybe_filter_reader.status().ok());
   auto filter_reader = maybe_filter_reader.value();
   filter_reader->Filter(filter);
