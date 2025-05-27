@@ -39,7 +39,7 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
