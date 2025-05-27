@@ -44,9 +44,8 @@ jobs:
   ubuntu:
     name: Ubuntu 22.04 CLI
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && !github.event.pull_request.draft }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
           submodules: true
 
@@ -95,7 +94,7 @@ jobs:
           - architecture: ARM64
             macos-version: "14"
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
           submodules: true
 
