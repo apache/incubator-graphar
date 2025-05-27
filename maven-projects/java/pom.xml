@@ -28,7 +28,7 @@
     <parent>
         <groupId>org.apache.graphar</groupId>
         <artifactId>graphar-root</artifactId>
-        <version>0.12.0-SNAPSHOT</version>
+        <version>${graphar.version}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
