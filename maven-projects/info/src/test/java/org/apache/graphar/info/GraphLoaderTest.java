@@ -20,6 +20,7 @@
 package org.apache.graphar.info;
 
 import java.io.IOException;
+
 import org.apache.graphar.info.loader.GraphLoader;
 import org.apache.graphar.info.loader.LocalYamlGraphLoader;
 import org.junit.AfterClass;
@@ -35,7 +36,8 @@ public class GraphLoaderTest {
     }
 
     @AfterClass
-    public static void clean() {}
+    public static void clean() {
+    }
 
     @Test
     public void testLoad() {
