@@ -23,9 +23,12 @@
 
 #include "./util.h"
 #include "graphar/api/arrow_reader.h"
+#include "graphar/fwd.h"
 
 #include <catch2/catch_test_macros.hpp>
+#include <ostream>
 #include <string>
+#include <vector>
 namespace graphar {
 
 TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
@@ -34,6 +37,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       test_data_dir + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
   std::string src_type = "person", edge_type = "knows", dst_type = "person";
   std::string vertex_property_name = "id";
+  std::vector<std::string> vertex_property_names = {"firstName", "gender"};
   std::string edge_property_name = "creationDate";
   auto maybe_graph_info = GraphInfo::Load(path);
   REQUIRE(maybe_graph_info.status().ok());
@@ -90,59 +94,6 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(table->num_columns() == v_pg->GetProperties().size() + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
-      REQUIRE(reader->GetChunkNum() == 10);
-      REQUIRE(reader->next_chunk().IsIndexError());
-
-      REQUIRE(reader->seek(1024).IsIndexError());
-    }
-
-    SECTION("VertexPropertyArrowChunkReader through propertyName") {
-      std::string vertex_property_name = "firstName";
-      auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-          graph_info, src_type, vertex_property_name);
-      REQUIRE(maybe_reader.status().ok());
-      auto reader = maybe_reader.value();
-      REQUIRE(reader->GetChunkNum() == 10);
-
-      auto result = reader->GetChunk();
-      REQUIRE(!result.has_error());
-      auto table = result.value();
-      REQUIRE(table->num_rows() == 100);
-      std::cout << table->num_columns() << std::endl;
-      std::cout << v_pg->GetProperties().size() << std::endl;
-      REQUIRE(table->num_columns() == v_pg->GetProperties().size() + 1);
-      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
-              nullptr);
-      REQUIRE(table->GetColumnByName(vertex_property_name) != nullptr);
-
-      // seek
-      REQUIRE(reader->seek(100).ok());
-      result = reader->GetChunk();
-      REQUIRE(!result.has_error());
-      table = result.value();
-      REQUIRE(table->num_rows() == 100);
-      REQUIRE(table->num_columns() == 2);
-      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
-              nullptr);
-      REQUIRE(table->GetColumnByName(vertex_property_name) != nullptr);
-      REQUIRE(reader->next_chunk().ok());
-      result = reader->GetChunk();
-      REQUIRE(!result.has_error());
-      table = result.value();
-      REQUIRE(table->num_rows() == 100);
-      REQUIRE(table->num_columns() == 2);
-      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
-              nullptr);
-      REQUIRE(table->GetColumnByName(vertex_property_name) != nullptr);
-      REQUIRE(reader->seek(900).ok());
-      result = reader->GetChunk();
-      REQUIRE(!result.has_error());
-      table = result.value();
-      REQUIRE(table->num_rows() == 3);
-      REQUIRE(table->num_columns() == 2);
-      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
-              nullptr);
-      REQUIRE(table->GetColumnByName(vertex_property_name) != nullptr);
       REQUIRE(reader->GetChunkNum() == 10);
       REQUIRE(reader->next_chunk().IsIndexError());
 
@@ -280,25 +231,6 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
         REQUIRE(result.error().IsInvalid());
         std::cerr << result.error().message() << std::endl;
       }
-
-      SECTION("pushdown column not in read columns") {
-        // TODO is expected_col not in read columns should be an error
-        std::string specific_col = "lastName";
-        std::cout
-            << "The intersection of expected_col and specific_col is null:\n";
-        std::vector<std::string> expected_cols = {"firstName"};
-        util::FilterOptions options;
-        options.columns = expected_cols;
-        auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-            graph_info, src_type, specific_col, options);
-        REQUIRE(maybe_reader.status().ok());
-        auto reader = maybe_reader.value();
-        auto result = reader->GetChunk();
-        REQUIRE(result.status().ok());
-        auto table = result.value();
-        REQUIRE(table->num_columns() == 0);
-        std::cerr << result.error().message() << std::endl;
-      }
     }
 
     SECTION("Make from graph info and property group") {
@@ -315,6 +247,176 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(maybe_reader.status().ok());
       auto reader = maybe_reader.value();
       REQUIRE(reader->GetChunkNum() == 10);
+    }
+  }
+
+  SECTION("VertexPropertyArrowChunkReader through propertyNames") {
+    auto maybe_reader = VertexPropertyArrowChunkReader::Make(
+        graph_info, src_type, vertex_property_names, SelectType::PROPERTIES);
+    REQUIRE(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    REQUIRE(reader->GetChunkNum() == 10);
+
+    SECTION("Basics") {
+      auto result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      auto table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      std::cout << table->num_columns() << std::endl;
+      std::cout << vertex_property_names.size() << std::endl;
+      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      for (auto pn : vertex_property_names) {
+        REQUIRE(table->GetColumnByName(pn) != nullptr);
+      }
+      // seek
+      REQUIRE(reader->seek(100).ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      for (auto pn : vertex_property_names) {
+        REQUIRE(table->GetColumnByName(pn) != nullptr);
+      }
+      REQUIRE(reader->next_chunk().ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      for (auto pn : vertex_property_names) {
+        REQUIRE(table->GetColumnByName(pn) != nullptr);
+      }
+      REQUIRE(reader->seek(900).ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 3);
+      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      for (auto pn : vertex_property_names) {
+        REQUIRE(table->GetColumnByName(pn) != nullptr);
+      }
+      REQUIRE(reader->GetChunkNum() == 10);
+      REQUIRE(reader->next_chunk().IsIndexError());
+
+      REQUIRE(reader->seek(1024).IsIndexError());
+    }
+
+    SECTION("VertexPropertyArrowChunkReader through propertyName") {
+      std::string vertex_property_name = "firstName";
+      auto maybe_reader = VertexPropertyArrowChunkReader::Make(
+          graph_info, src_type, vertex_property_name);
+      REQUIRE(maybe_reader.status().ok());
+      auto reader = maybe_reader.value();
+      REQUIRE(reader->GetChunkNum() == 10);
+
+      auto result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      auto table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      std::cout << table->num_columns() << std::endl;
+      REQUIRE(table->num_columns() == 2);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      REQUIRE(table->GetColumnByName(vertex_property_name) != nullptr);
+
+      // seek
+      REQUIRE(reader->seek(100).ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      REQUIRE(table->num_columns() == 2);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      REQUIRE(table->GetColumnByName(vertex_property_name) != nullptr);
+      REQUIRE(reader->next_chunk().ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      REQUIRE(table->num_columns() == 2);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      REQUIRE(table->GetColumnByName(vertex_property_name) != nullptr);
+      REQUIRE(reader->seek(900).ok());
+      result = reader->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 3);
+      REQUIRE(table->num_columns() == 2);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      REQUIRE(table->GetColumnByName(vertex_property_name) != nullptr);
+      REQUIRE(reader->GetChunkNum() == 10);
+      REQUIRE(reader->next_chunk().IsIndexError());
+
+      REQUIRE(reader->seek(1024).IsIndexError());
+    }
+
+    SECTION("properties don't in this same propertyGroup") {
+      std::cout << "properties don't in this same propertyGroup:\n";
+
+      std::vector<std::string> specific_col = {"id", "gender"};
+      auto maybe_reader = VertexPropertyArrowChunkReader::Make(
+          graph_info, src_type, specific_col, SelectType::PROPERTIES);
+      REQUIRE(maybe_reader.error().IsInvalid());
+      std::cerr << maybe_reader.error().message() << std::endl;
+    }
+
+    SECTION("PropertyPushDown") {
+      std::string filter_property = "gender";
+      auto filter = _Equal(_Property(filter_property), _Literal("female"));
+      std::vector<std::string> expected_cols;
+      expected_cols.push_back("firstName");
+      expected_cols.push_back("lastName");
+
+      SECTION("pushdown column not all in read columns") {
+        // TODO is expected_col not in read columns should be an error
+        std::vector<std::string> specific_col = {"firstName"};
+        std::cout
+            << "The intersection of expected_col and specific_col is null:\n";
+        std::vector<std::string> expected_cols = {"firstName", "gender"};
+        util::FilterOptions options;
+        options.columns = expected_cols;
+        auto maybe_reader = VertexPropertyArrowChunkReader::Make(
+            graph_info, src_type, specific_col, SelectType::PROPERTIES,
+            options);
+        REQUIRE(maybe_reader.status().ok());
+        auto reader = maybe_reader.value();
+        auto result = reader->GetChunk();
+        REQUIRE(result.status().ok());
+        auto table = result.value();
+        REQUIRE(table->num_columns() == 1);
+      }
+
+      SECTION("pushdown column not in read columns") {
+        // TODO is expected_col not in read columns should be an error
+        std::vector<std::string> specific_col = {"lastName", "gender"};
+        std::cout
+            << "The intersection of expected_col and specific_col is null:\n";
+        std::vector<std::string> expected_cols = {"firstName"};
+        util::FilterOptions options;
+        options.columns = expected_cols;
+        auto maybe_reader = VertexPropertyArrowChunkReader::Make(
+            graph_info, src_type, specific_col, SelectType::PROPERTIES,
+            options);
+        REQUIRE(maybe_reader.status().ok());
+        auto reader = maybe_reader.value();
+        auto result = reader->GetChunk();
+        REQUIRE(result.status().ok());
+        auto table = result.value();
+        REQUIRE(table->num_columns() == 0);
+        std::cerr << result.error().message() << std::endl;
+      }
     }
   }
 
