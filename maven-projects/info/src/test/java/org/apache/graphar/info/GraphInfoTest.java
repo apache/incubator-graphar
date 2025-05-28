@@ -20,7 +20,6 @@
 package org.apache.graphar.info;
 
 import java.io.IOException;
-
 import org.apache.graphar.info.loader.GraphLoader;
 import org.apache.graphar.info.loader.LocalYamlGraphLoader;
 import org.apache.graphar.proto.AdjListType;
@@ -52,8 +51,7 @@ public class GraphInfoTest {
     }
 
     @AfterClass
-    public static void clean() {
-    }
+    public static void clean() {}
 
     @Test
     public void testGraphInfoBasics() {
@@ -149,15 +147,16 @@ public class GraphInfoTest {
         Assert.assertEquals("person_knows_person", knowsEdgeInfo.getConcat());
         Assert.assertEquals("edge/person_knows_person/", knowsEdgeInfo.getPrefix());
         Assert.assertEquals(
-                "edge/person_knows_person//person_knows_person.edge.yaml", knowsEdgeInfo.getEdgePath());
-
+                "edge/person_knows_person//person_knows_person.edge.yaml",
+                knowsEdgeInfo.getEdgePath());
     }
 
     @Test
     public void testKnowsEdgeAdjacencyLists() {
         Assert.assertEquals(2, knowsEdgeInfo.getAdjacentLists().size());
-        //test ordered by source adjacency list
-        AdjacentList adjOrderBySource = knowsEdgeInfo.getAdjacentList(AdjListType.ORDERED_BY_SOURCE);
+        // test ordered by source adjacency list
+        AdjacentList adjOrderBySource =
+                knowsEdgeInfo.getAdjacentList(AdjListType.ORDERED_BY_SOURCE);
         Assert.assertEquals(FileType.CSV, adjOrderBySource.getFileType());
         Assert.assertEquals(AdjListType.ORDERED_BY_SOURCE, adjOrderBySource.getType());
         Assert.assertEquals("ordered_by_source/", adjOrderBySource.getPrefix());
@@ -189,7 +188,7 @@ public class GraphInfoTest {
                 "edge/person_knows_person//ordered_by_source//adj_list/offset/chunk4",
                 knowsEdgeInfo.getOffsetChunkPath(AdjListType.ORDERED_BY_SOURCE, 4));
 
-        //test ordered by destination adjacency list
+        // test ordered by destination adjacency list
         AdjacentList adjOrderByDestination =
                 knowsEdgeInfo.getAdjacentList(AdjListType.ORDERED_BY_DESTINATION);
         Assert.assertEquals(FileType.CSV, adjOrderByDestination.getFileType());
@@ -240,7 +239,7 @@ public class GraphInfoTest {
         Assert.assertEquals(
                 "edge/person_knows_person//creationDate//chunk4",
                 knowsEdgeInfo.getPropertyGroupChunkPath(propertyGroup, 4));
-        //edge properties in group 1
+        // edge properties in group 1
         Assert.assertNotNull(propertyGroup.getPropertyList());
         Assert.assertEquals(1, propertyGroup.getPropertyList().size());
         Property property = propertyGroup.getPropertyList().get(0);
