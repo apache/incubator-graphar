@@ -163,7 +163,6 @@ width="650" alt="edge logical table2" />
     </tbody>
 </table>
 
-
 ### 存储效率
 
 <img src="docs/images/benchmark_storage.png" class="align-center" width="700" alt="storage consumption"/>
@@ -174,15 +173,11 @@ width="650" alt="edge logical table2" />
 
 结果表明，GraphAr 在存储方面具有显著优势：平均仅需 “plain + offset” 所需存储空间的 **27.3%**，这主要得益于 delta 编码的应用。
 
----
-
 ### I/O 速度
 
 <img src="docs/images/benchmark_IO_time.png" class="align-center" width="700" alt="I/O time"/>
 
 图 (a) 显示 GraphAr 明显优于基线方法（CSV），平均性能提升达 **4.9 倍**。图 (b) 中，“Imm”（不可变）和 “Mut”（可变）是 GraphScope 的本地内存存储形式。尽管 GraphAr 的查询时间略高于内存存储方式，这是由于固有的 I/O 开销所致，但它仍显著优于先加载再执行查询的方式，在两个变体下分别提升了 **2.4 倍** 和 **2.5 倍**。这表明 GraphAr 是处理低频查询的有效选择。
-
----
 
 ### 标签过滤（Label Filtering）
 
