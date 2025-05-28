@@ -230,11 +230,13 @@ VertexPropertyArrowChunkReader::GetChunk() {
       temp_filter_options.columns = std::ref(property_names_);
     } else {
       if (!property_names_.empty()) {
-        auto columns = temp_filter_options.columns->get();
-        std::set_intersection(columns.begin(), columns.end(),
-                              property_names_.begin(), property_names_.end(),
-                              std::back_inserter(intersection_columns));
-        temp_filter_options.columns = intersection_columns;
+        for (const auto& col : filter_options_.columns.value().get()) {
+          if (std::find(property_names_.begin(), property_names_.end(), col) ==
+              property_names_.end()) {
+            return Status::Invalid("Column ", col,
+                                   " is not in select properties.");
+          }
+        }
       }
     }
 

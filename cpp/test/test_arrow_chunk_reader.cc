@@ -365,9 +365,9 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
     SECTION("properties don't in this same propertyGroup") {
       std::cout << "properties don't in this same propertyGroup:\n";
 
-      std::vector<std::string> specific_col = {"id", "gender"};
+      std::vector<std::string> select_col = {"id", "gender"};
       auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-          graph_info, src_type, specific_col, SelectType::PROPERTIES);
+          graph_info, src_type, select_col, SelectType::PROPERTIES);
       REQUIRE(maybe_reader.error().IsInvalid());
       std::cerr << maybe_reader.error().message() << std::endl;
     }
@@ -380,41 +380,36 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       expected_cols.push_back("lastName");
 
       SECTION("pushdown column not all in read columns") {
-        // TODO is expected_col not in read columns should be an error
-        std::vector<std::string> specific_col = {"firstName"};
+        std::vector<std::string> select_col = {"firstName"};
         std::cout
-            << "The intersection of expected_col and specific_col is null:\n";
+            << "pushdown column not all in read columns:\n";
         std::vector<std::string> expected_cols = {"firstName", "gender"};
         util::FilterOptions options;
         options.columns = expected_cols;
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-            graph_info, src_type, specific_col, SelectType::PROPERTIES,
+            graph_info, src_type, select_col, SelectType::PROPERTIES,
             options);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
         auto result = reader->GetChunk();
-        REQUIRE(result.status().ok());
-        auto table = result.value();
-        REQUIRE(table->num_columns() == 1);
+        REQUIRE(result.error().IsInvalid());
+        std::cerr << result.error().message() << std::endl;
       }
 
       SECTION("pushdown column not in read columns") {
-        // TODO is expected_col not in read columns should be an error
-        std::vector<std::string> specific_col = {"lastName", "gender"};
+        std::vector<std::string> select_col = {"lastName", "gender"};
         std::cout
-            << "The intersection of expected_col and specific_col is null:\n";
+            << "pushdown column not in read columns:\n";
         std::vector<std::string> expected_cols = {"firstName"};
         util::FilterOptions options;
         options.columns = expected_cols;
         auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-            graph_info, src_type, specific_col, SelectType::PROPERTIES,
+            graph_info, src_type, select_col, SelectType::PROPERTIES,
             options);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
         auto result = reader->GetChunk();
-        REQUIRE(result.status().ok());
-        auto table = result.value();
-        REQUIRE(table->num_columns() == 0);
+        REQUIRE(result.error().IsInvalid());
         std::cerr << result.error().message() << std::endl;
       }
     }
