@@ -183,6 +183,21 @@ class VertexPropertyArrowChunkReader {
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
       const std::string& property_name,
       const util::FilterOptions& options = {});
+  /**
+   * @brief Create a VertexPropertyArrowChunkReader instance from vertex info
+   * for labels.
+   *
+   * @param vertex_info The vertex info.
+   * @param labels The name of labels you want to read.
+   * @param select_type The select type, properties or labels.
+   * @param prefix The absolute prefix of the graph.
+   * @param options The filter options, default is empty.
+   */
+
+  static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+      const std::vector<std::string>& property_names_or_labels,
+      const SelectType select_type, const util::FilterOptions& options = {});
 
   /**
    * @brief Create a VertexPropertyArrowChunkReader instance from vertex info
@@ -200,6 +215,22 @@ class VertexPropertyArrowChunkReader {
 
   /**
    * @brief Create a VertexPropertyArrowChunkReader instance from graph info
+   * for properties.
+   *
+   * @param graph_info The graph info.
+   * @param type The vertex type.
+   * @param property_names The name of properties you want to read.
+   * @param prefix The absolute prefix of the graph.
+   * @param options The filter options, default is empty.
+   */
+  static Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
+  MakeForProperties(const std::shared_ptr<GraphInfo>& graph_info,
+                    const std::string& type,
+                    const std::vector<std::string>& property_names,
+                    const util::FilterOptions& options = {});
+
+  /**
+   * @brief Create a VertexPropertyArrowChunkReader instance from graph info
    * for labels.
    *
    * @param graph_info The graph info.
@@ -208,7 +239,7 @@ class VertexPropertyArrowChunkReader {
    * @param prefix The absolute prefix of the graph.
    * @param options The filter options, default is empty.
    */
-  static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> Make(
+  static Result<std::shared_ptr<VertexPropertyArrowChunkReader>> MakeForLabels(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
       const std::vector<std::string>& labels,
       const util::FilterOptions& options = {});

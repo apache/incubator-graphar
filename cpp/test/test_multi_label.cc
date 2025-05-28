@@ -24,6 +24,7 @@
 #include "arrow/csv/api.h"
 #include "arrow/filesystem/api.h"
 #include "arrow/io/api.h"
+#include "graphar/fwd.h"
 #include "parquet/arrow/writer.h"
 
 #include "./util.h"
@@ -85,8 +86,8 @@ TEST_CASE_METHOD(GlobalFixture, "test_multi_label_builder") {
   REQUIRE(writer->WriteVerticesNum(table->num_rows()).ok());
 
   // read label chunk as arrow table
-  auto maybe_reader =
-      VertexPropertyArrowChunkReader::Make(graph_info, "organisation", labels);
+  auto maybe_reader = VertexPropertyArrowChunkReader::Make(
+      graph_info, "organisation", labels, SelectType::LABELS);
   assert(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
   assert(reader->seek(0).ok());

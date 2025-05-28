@@ -352,6 +352,74 @@ VertexPropertyArrowChunkReader::Make(
 
 Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
 VertexPropertyArrowChunkReader::Make(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+    const std::vector<std::string>& property_names_or_labels,
+    const SelectType select_type, const util::FilterOptions& options) {
+  switch (select_type) {
+  case SelectType::LABELS:
+    return MakeForLabels(graph_info, type, property_names_or_labels, options);
+  case SelectType::PROPERTIES:
+    return MakeForProperties(graph_info, type, property_names_or_labels,
+                             options);
+  }
+}
+
+Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
+VertexPropertyArrowChunkReader::MakeForProperties(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+    const std::vector<std::string>& property_names,
+    const util::FilterOptions& options) {
+  auto vertex_info = graph_info->GetVertexInfo(type);
+  if (!vertex_info) {
+    return Status::KeyError("The vertex type ", type,
+                            " doesn't exist in graph ", graph_info->GetName(),
+                            ".");
+  }
+  if (property_names.empty()) {
+    return Status::Invalid("The property names cannot be empty.");
+  }
+  bool hasIndexCol = false;
+  std::vector<std::string> property_names_mutable = property_names;
+  if (property_names_mutable[property_names_mutable.size() - 1] ==
+      graphar::GeneralParams::kVertexIndexCol) {
+    hasIndexCol = true;
+    std::iter_swap(property_names_mutable.begin(),
+                   property_names_mutable.end() - 1);
+  }
+  auto property_group = vertex_info->GetPropertyGroup(
+      property_names_mutable[property_names_mutable.size() - 1]);
+  if (!property_group) {
+    return Status::KeyError(
+        "The property ",
+        property_names_mutable[property_names_mutable.size() - 1],
+        " doesn't exist in vertex type ", type, ".");
+  }
+  for (int i = 0; i < property_names_mutable.size() - 1; i++) {
+    if (property_names_mutable[i] == graphar::GeneralParams::kVertexIndexCol) {
+      hasIndexCol = true;
+    }
+    auto pg = vertex_info->GetPropertyGroup(property_names_mutable[i]);
+    if (!pg) {
+      return Status::KeyError("The property ", property_names_mutable[i],
+                              " doesn't exist in vertex type ", type, ".");
+    }
+    if (pg != property_group) {
+      return Status::Invalid(
+          "The properties ", property_names_mutable[i], " and ",
+          property_names_mutable[property_names_mutable.size() - 1],
+          " are not in the same property group, please use Make with "
+          "property_group instead.");
+    }
+  }
+  if (!hasIndexCol) {
+    property_names_mutable.insert(property_names_mutable.begin(),
+                                  graphar::GeneralParams::kVertexIndexCol);
+  }
+  return Make(vertex_info, property_group, property_names_mutable,
+              graph_info->GetPrefix(), options);
+}
+Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
+VertexPropertyArrowChunkReader::Make(
     const std::shared_ptr<VertexInfo>& vertex_info,
     const std::vector<std::string>& labels, const std::string& prefix,
     const util::FilterOptions& options) {
@@ -360,7 +428,7 @@ VertexPropertyArrowChunkReader::Make(
 }
 
 Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
-VertexPropertyArrowChunkReader::Make(
+VertexPropertyArrowChunkReader::MakeForLabels(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
     const std::vector<std::string>& labels,
     const util::FilterOptions& options) {
