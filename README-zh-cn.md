@@ -112,6 +112,87 @@ width="650" alt="edge logical table1" />
 <img src="docs/images/edge_physical_table2.png" class="align-center"
 width="650" alt="edge logical table2" />
 
+## 基准测试（Benchmark）
+
+我们的实验在阿里云 r6.6xlarge 实例上进行，该实例配备了 24 核 Intel(R) Xeon(R) Platinum 8269CY CPU（主频 2.50GHz）、192GB 内存，运行 64 位 Ubuntu 20.04 LTS 系统。数据存储在一块容量为 200GB 的 PL0 ESSD 上，最大 I/O 吞吐量为 180MB/s。我们在其他平台和类 S3 存储上的附加测试也得到了相似的结果。
+
+### 数据集
+
+我们使用了来自 [Graph500](https://graph500.org/) 和 [LDBC](https://doi.org/10.1145/2723372.2742786) 的大规模图数据集，包含数亿个顶点。其他实验中涉及的数据集可在论文 [GraphAr: An Efficient Storage Scheme for Graph Data in Data Lakes](https://arxiv.org/abs/2312.09577) 中查阅。
+
+<table>
+    <thead>
+        <tr>
+            <th>Abbr.</th>
+            <th>Graph</th>
+            <th>|V|</th>
+            <th>|E|</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>G8</td>
+            <td>Graph500-28</td>
+            <td>268M</td>
+            <td>4.29B</td>
+        </tr>
+        <tr>
+            <td>G9</td>
+            <td>Graph500-29</td>
+            <td>537M</td>
+            <td>8.59B</td>
+        </tr>
+        <tr>
+            <td>SF30</td>
+            <td>SNB Interactive SF-30</td>
+            <td>99.4M</td>
+            <td>655M</td>
+        </tr>
+        <tr>
+            <td>SF100</td>
+            <td>SNB Interactive SF-100</td>
+            <td>318M</td>
+            <td>2.15B</td>
+        </tr>
+        <tr>
+            <td>SF300</td>
+            <td>SNB Interactive SF-300</td>
+            <td>908M</td>
+            <td>6.29B</td>
+        </tr>
+    </tbody>
+</table>
+
+### 存储效率
+
+<img src="docs/images/benchmark_storage.png" class="align-center" width="700" alt="storage consumption"/>
+
+我们对比了两种基线方法：
+1. **“plain”**：对源节点和目标节点列使用普通编码；
+2. **“plain + offset”**：在 “plain” 方法基础上，对边排序并添加偏移列以标记每个顶点起始边的位置。
+
+结果表明，GraphAr 在存储方面具有显著优势：平均仅需 “plain + offset” 所需存储空间的 **27.3%**，这主要得益于 delta 编码的应用。
+
+### I/O 速度
+
+<img src="docs/images/benchmark_IO_time.png" class="align-center" width="700" alt="I/O time"/>
+
+图 (a) 显示 GraphAr 明显优于基线方法（CSV），平均性能提升达 **4.9 倍**。图 (b) 中，“Imm”（不可变）和 “Mut”（可变）是 GraphScope 的本地内存存储形式。尽管 GraphAr 的查询时间略高于内存存储方式，这是由于固有的 I/O 开销所致，但它仍显著优于先加载再执行查询的方式，在两个变体下分别提升了 **2.4 倍** 和 **2.5 倍**。这表明 GraphAr 是处理低频查询的有效选择。
+
+### 标签过滤（Label Filtering）
+
+<img src="docs/images/benchmark_label_simple_filter.png" class="align-center" width="700" alt="Simple condition filtering"/>
+
+**简单条件下的标签过滤性能**
+
+对于每个图，我们分别将每个标签作为目标标签进行过滤实验。GraphAr 持续优于所有基线方法。平均来看，相比 “string” 方法，性能提升了 **14.8 倍**；相比 “binary (plain)” 方法，性能提升了 **8.9 倍**；相比 “binary (RLE)” 方法，性能提升了 **7.4 倍**。
+
+<img src="docs/images/benchmark_label_complex_filter.png" class="align-center" width="700" alt="Complex condition filtering"/>
+
+**复杂条件下的标签过滤性能**
+
+在每个图中，我们通过 AND 或 OR 组合两个标签作为过滤条件。“基于合并解码”的方法表现最佳，其中 “binary (RLE) + merge” 相比 “binary (RLE)” 方法最高提升了 **60.5 倍**。
+
 ## 开发库
 
 GraphAr 提供了一组用于读取、写入和转换文件的库。目前，以下库已经可用，并计划扩展对其他编程语言的支持。
