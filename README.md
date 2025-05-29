@@ -205,7 +205,7 @@ Additional tests on other platforms and S3-like storage yield similar
 results.
 
 ### dataset 
-Here we show statistics of datasets with hundreds of millions of vertices from [Graph500](Graph500.org) and [LDBC](https://doi.org/10.1145/2723372.2742786). Other datasets involved in the experiment can be found in  [paper](https://arxiv.org/abs/2312.09577).
+Here we show statistics of datasets with hundreds of millions of vertices from [Graph500](https://graph500.org/) and [LDBC](https://doi.org/10.1145/2723372.2742786). Other datasets involved in the experiment can be found in  [paper](https://arxiv.org/abs/2312.09577).
 
 <table>
     <thead>
