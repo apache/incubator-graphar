@@ -19,6 +19,13 @@
 
 package org.apache.graphar.info.loader;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -29,17 +36,8 @@ import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-
 public class LocalYamlGraphLoader implements GraphLoader {
-    public LocalYamlGraphLoader() {
-    }
+    public LocalYamlGraphLoader() {}
 
     @Override
     public GraphInfo load(String graphYamlPath) throws IOException {
