@@ -39,7 +39,7 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
@@ -47,12 +47,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - mvn-profile: "datasources-32"
-            spark: "spark-3.2.4"
-            spark-hadoop: "spark-3.2.4-bin-hadoop3.2"
-          - mvn-profile: "datasources-33"
-            spark: "spark-3.3.4"
-            spark-hadoop: "spark-3.3.4-bin-hadoop3"
+          # spark 3.2 and 3.3 are no longer supported
           - mvn-profile: "datasources-34"
             spark: "spark-3.4.3"
             spark-hadoop: "spark-3.4.3-bin-hadoop3"
