@@ -57,7 +57,7 @@ public class GraphInfoTest {
     public void testGraphInfoBasics() {
         Assert.assertNotNull(graphInfo);
         Assert.assertEquals("ldbc_sample", graphInfo.getName());
-        Assert.assertEquals("", graphInfo.getPrefix()); // This shouldn't be an empty string
+        Assert.assertEquals("", graphInfo.getPrefix());
         Assert.assertNotNull(graphInfo.getEdgeInfos());
         Assert.assertEquals(1, graphInfo.getEdgeInfos().size());
         Assert.assertNotNull(graphInfo.getVertexInfos());
@@ -72,7 +72,7 @@ public class GraphInfoTest {
         Assert.assertEquals("vertex/person/", personVertexInfo.getPrefix());
         Assert.assertEquals(
                 "vertex/person//vertex_count",
-                personVertexInfo.getVerticesNumFilePath()); // one more '/'
+                personVertexInfo.getVerticesNumFilePath()); // TODO remove extra '/'  issue#698
         Assert.assertEquals("vertex/person//person.vertex.yaml", personVertexInfo.getVertexPath());
         Assert.assertNotNull(personVertexInfo.getPropertyGroups());
         Assert.assertEquals(2, personVertexInfo.getPropertyGroups().size());
