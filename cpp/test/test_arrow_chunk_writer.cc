@@ -19,13 +19,14 @@
 
 #include <fstream>
 #include <iostream>
+#include <ostream>
 #include <sstream>
 #include <string>
 
+#include "arrow/api.h"
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
 #endif
-#include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/filesystem/api.h"
 #include "arrow/io/api.h"
@@ -154,6 +155,95 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
             table2->GetColumnByName("gender")->ToString());
   }
 #endif
+  SECTION("TestVertexPropertyWriterWithOption") {
+    // csv file
+    auto optionsBuilder = WriterOptions::Builder(FileType::CSV);
+    optionsBuilder.set_include_header(true);
+    optionsBuilder.set_delimiter('|');
+    auto maybe_writer = VertexPropertyWriter::Make(vertex_info, "/tmp/option/",
+                                                   optionsBuilder.Build());
+    REQUIRE(!maybe_writer.has_error());
+    auto writer = maybe_writer.value();
+    REQUIRE(writer->WriteTable(table, 0).ok());
+    // read csv file
+    auto parse_options = arrow::csv::ParseOptions::Defaults();
+    parse_options.delimiter = '|';
+    std::shared_ptr<arrow::io::InputStream> chunk0_input =
+        fs->OpenInputStream(
+              "/tmp/option/vertex/person/firstName_lastName_gender/chunk0")
+            .ValueOrDie();
+    auto read_options = arrow::csv::ReadOptions::Defaults();
+    auto csv_reader =
+        arrow::csv::TableReader::Make(arrow::io::default_io_context(),
+                                      chunk0_input, read_options, parse_options,
+                                      arrow::csv::ConvertOptions::Defaults())
+            .ValueOrDie();
+    auto maybe_table = csv_reader->Read();
+    REQUIRE(maybe_table.ok());
+    std::shared_ptr<arrow::Table> csv_table = *maybe_table;
+    REQUIRE(csv_table->num_rows() == vertex_info->GetChunkSize());
+    REQUIRE(csv_table->num_columns() ==
+            vertex_info->GetPropertyGroup("firstName")->GetProperties().size() +
+                1);
+    // type parquet
+    optionsBuilder = WriterOptions::Builder(FileType::PARQUET);
+    optionsBuilder.set_compression(arrow::Compression::type::UNCOMPRESSED);
+    writer->setWriterOptions(optionsBuilder.Build());
+    REQUIRE(writer->WriteTable(table, 0).ok());
+    // read parquet file
+    std::string parquet_file =
+        "/tmp/option/vertex/person/firstName_lastName_gender/chunk0";
+    auto parquet_fs =
+        arrow::fs::FileSystemFromUriOrPath(parquet_file).ValueOrDie();
+    std::shared_ptr<arrow::io::RandomAccessFile> parquet_input =
+        parquet_fs->OpenInputFile(parquet_file).ValueOrDie();
+    std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
+    auto st = parquet::arrow::OpenFile(
+        parquet_input, arrow::default_memory_pool(), &parquet_reader);
+    REQUIRE(st.ok());
+    // 读取parquet文件为Arrow表
+    std::shared_ptr<arrow::Table> parquet_table;
+    st = parquet_reader->ReadTable(&parquet_table);
+    REQUIRE(st.ok());
+    auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
+    auto row_group_meta = parquet_metadata->RowGroup(0);
+    auto col_meta = row_group_meta->ColumnChunk(0);
+    REQUIRE(col_meta->compression() == parquet::Compression::UNCOMPRESSED);
+    REQUIRE(parquet_table->num_rows() == vertex_info->GetChunkSize());
+    REQUIRE(parquet_table->num_columns() ==
+            vertex_info->GetPropertyGroup("firstName")->GetProperties().size() +
+                1);
+
+// TODO type orc
+#ifdef ARROW_ORC
+    optionsBuilder = WriterOptions::Builder(FileType::ORC);
+    optionsBuilder.set_compression(arrow::Compression::type::UNCOMPRESSED);
+    writer->setWriterOptions(optionsBuilder.Build());
+    REQUIRE(writer->WriteTable(table, 0).ok());
+    auto fs1 = arrow::fs::FileSystemFromUriOrPath(
+                   "/tmp/option/vertex/person/firstName_lastName_gender/chunk0")
+                   .ValueOrDie();
+    std::shared_ptr<arrow::io::RandomAccessFile> input1 =
+        fs1->OpenInputFile(
+               "/tmp/option/vertex/person/firstName_lastName_gender/chunk0")
+            .ValueOrDie();
+    arrow::MemoryPool* pool = arrow::default_memory_pool();
+    std::unique_ptr<arrow::adapters::orc::ORCFileReader> reader =
+        arrow::adapters::orc::ORCFileReader::Open(input1, pool).ValueOrDie();
+
+    // Read entire file as a single Arrow table
+    maybe_table = reader->Read();
+    std::shared_ptr<arrow::Table> table1 = maybe_table.ValueOrDie();
+    parquet_metadata = parquet_reader->parquet_reader()->metadata();
+    row_group_meta = parquet_metadata->RowGroup(0);
+    col_meta = row_group_meta->ColumnChunk(0);
+    REQUIRE(col_meta->compression() == parquet::Compression::UNCOMPRESSED);
+    REQUIRE(parquet_table->num_rows() == vertex_info->GetChunkSize());
+    REQUIRE(parquet_table->num_columns() ==
+            vertex_info->GetPropertyGroup("firstName")->GetProperties().size() +
+                1);
+#endif
+  }
 
   SECTION("TestEdgeChunkWriter") {
     arrow::Status st;

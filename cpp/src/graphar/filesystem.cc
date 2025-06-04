@@ -180,8 +180,8 @@ Result<T> FileSystem::ReadFileToValue(const std::string& path) const noexcept {
 }
 
 template <>
-Result<std::string> FileSystem::ReadFileToValue(const std::string& path) const
-    noexcept {
+Result<std::string> FileSystem::ReadFileToValue(
+    const std::string& path) const noexcept {
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto access_file,
                                        arrow_fs_->OpenInputFile(path));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto bytes, access_file->GetSize());
@@ -214,9 +214,10 @@ Status FileSystem::WriteValueToFile(const std::string& value,
   return Status::OK();
 }
 
-Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
-                                    FileType file_type,
-                                    const std::string& path) const noexcept {
+Status FileSystem::WriteTableToFile(
+    const std::shared_ptr<arrow::Table>& table, FileType file_type,
+    const std::string& path,
+    const std::shared_ptr<WriterOptions>& options) const noexcept {
   // try to create the directory, oss filesystem may not support this, ignore
   ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto output_stream,
@@ -224,8 +225,16 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
   switch (file_type) {
   case FileType::CSV: {
     auto write_options = arrow::csv::WriteOptions::Defaults();
-    write_options.include_header = true;
-    write_options.quoting_style = arrow::csv::QuotingStyle::Needed;
+    if (options) {
+      write_options.include_header = options->include_header;
+      write_options.delimiter = options->delimiter;
+    } else {
+      write_options.include_header = true;
+      write_options.quoting_style = arrow::csv::QuotingStyle::Needed;
+    }
+    // std::cout << write_options.include_header << " " <<
+    // options->include_header
+    //           << std::endl;
     GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
         auto writer, arrow::csv::MakeCSVWriter(output_stream.get(),
                                                table->schema(), write_options));
@@ -237,7 +246,12 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
     auto schema = table->schema();
     auto column_num = schema->num_fields();
     parquet::WriterProperties::Builder builder;
-    builder.compression(arrow::Compression::type::ZSTD);  // enable compression
+    if (options) {
+      builder.compression(options->compression);
+    } else {
+      builder.compression(
+          arrow::Compression::type::ZSTD);  // enable compression
+    }
     RETURN_NOT_ARROW_OK(parquet::arrow::WriteTable(
         *table, arrow::default_memory_pool(), output_stream, 64 * 1024 * 1024,
         builder.build(), parquet::default_arrow_writer_properties()));
@@ -263,8 +277,8 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
 }
 
 Status FileSystem::WriteLabelTableToFile(
-    const std::shared_ptr<arrow::Table>& table, const std::string& path) const
-    noexcept {
+    const std::shared_ptr<arrow::Table>& table,
+    const std::string& path) const noexcept {
   // try to create the directory, oss filesystem may not support this, ignore
   ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto output_stream,
@@ -362,7 +376,6 @@ Status FinalizeS3() {
 template Result<IdType> FileSystem::ReadFileToValue<IdType>(
     const std::string&) const noexcept;
 /// template specialization for std::string
-template Status FileSystem::WriteValueToFile<IdType>(const IdType&,
-                                                     const std::string&) const
-    noexcept;
+template Status FileSystem::WriteValueToFile<IdType>(
+    const IdType&, const std::string&) const noexcept;
 }  // namespace graphar

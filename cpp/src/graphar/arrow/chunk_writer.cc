@@ -17,11 +17,14 @@
  * under the License.
  */
 
+#include <cassert>
+#include <memory>
 #include <unordered_map>
 #include <utility>
 
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
+#include "graphar/writer_util.h"
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
 #include "arrow/acero/exec_plan.h"
 #else
@@ -101,10 +104,12 @@ Result<std::shared_ptr<arrow::Table>> ExecutePlanAndCollectAsTable(
 
 VertexPropertyWriter::VertexPropertyWriter(
     const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+    const std::shared_ptr<WriterOptions>& options,
     const ValidateLevel& validate_level)
     : vertex_info_(vertex_info),
       prefix_(prefix),
-      validate_level_(validate_level) {
+      validate_level_(validate_level),
+      options_(options) {
   if (validate_level_ == ValidateLevel::default_validate) {
     throw std::runtime_error(
         "default_validate is not allowed to be set as the global validate "
@@ -212,7 +217,8 @@ Status VertexPropertyWriter::WriteChunk(
     ValidateLevel validate_level) const {
   GAR_RETURN_NOT_OK(
       validate(input_table, property_group, chunk_index, validate_level));
-  auto file_type = property_group->GetFileType();
+  auto file_type =
+      options_ ? options_->file_type : property_group->GetFileType();
   auto schema = input_table->schema();
   int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
   if (indice == -1) {
@@ -237,7 +243,7 @@ Status VertexPropertyWriter::WriteChunk(
   GAR_ASSIGN_OR_RAISE(auto suffix,
                       vertex_info_->GetFilePath(property_group, chunk_index));
   std::string path = prefix_ + suffix;
-  return fs_->WriteTableToFile(in_table, file_type, path);
+  return fs_->WriteTableToFile(in_table, file_type, path, options_);
 }
 
 Status VertexPropertyWriter::WriteChunk(
@@ -413,19 +419,21 @@ Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::GetLabelTable(
 
 Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
     const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+    const std::shared_ptr<WriterOptions>& options,
     const ValidateLevel& validate_level) {
-  return std::make_shared<VertexPropertyWriter>(vertex_info, prefix,
+  return std::make_shared<VertexPropertyWriter>(vertex_info, prefix, options,
                                                 validate_level);
 }
 
 Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+    const std::shared_ptr<WriterOptions>& options,
     const ValidateLevel& validate_level) {
   auto vertex_info = graph_info->GetVertexInfo(type);
   if (!vertex_info) {
     return Status::KeyError("The vertex ", type, " doesn't exist.");
   }
-  return Make(vertex_info, graph_info->GetPrefix(), validate_level);
+  return Make(vertex_info, graph_info->GetPrefix(), options, validate_level);
 }
 
 Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::AddIndexColumn(

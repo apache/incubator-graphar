@@ -68,6 +68,7 @@ class VertexPropertyWriter {
    */
   explicit VertexPropertyWriter(
       const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+      const std::shared_ptr<WriterOptions>& options = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   /**
@@ -214,9 +215,11 @@ class VertexPropertyWriter {
    * @param prefix The absolute prefix.
    * @param validate_level The global validate level for the writer, default is
    * no_validate.
+   * @param options Options for writing the table, such as compression.
    */
   static Result<std::shared_ptr<VertexPropertyWriter>> Make(
       const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+      const std::shared_ptr<WriterOptions>& options = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   /**
@@ -226,10 +229,16 @@ class VertexPropertyWriter {
    * @param type The vertex type.
    * @param validate_level The global validate level for the writer, default is
    * no_validate.
+   * @param options Options for writing the table, such as compression.
    */
   static Result<std::shared_ptr<VertexPropertyWriter>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+      const std::shared_ptr<WriterOptions>& options = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
+
+  void setWriterOptions(const std::shared_ptr<WriterOptions>& options) {
+    options_ = options;
+  }
 
   Result<std::shared_ptr<arrow::Table>> AddIndexColumn(
       const std::shared_ptr<arrow::Table>& table, IdType chunk_index,
@@ -274,6 +283,7 @@ class VertexPropertyWriter {
   std::string prefix_;
   std::shared_ptr<FileSystem> fs_;
   ValidateLevel validate_level_;
+  std::shared_ptr<WriterOptions> options_;
 };
 
 /**

@@ -30,6 +30,7 @@
 #include "graphar/util.h"
 
 #include "graphar/reader_util.h"
+#include "graphar/writer_util.h"
 
 // forward declarations
 namespace arrow {
@@ -100,19 +101,21 @@ class FileSystem {
    * @return A Status indicating OK if successful, or an error if unsuccessful.
    */
   template <typename T>
-  Status WriteValueToFile(const T& value, const std::string& path) const
-      noexcept;
+  Status WriteValueToFile(const T& value,
+                          const std::string& path) const noexcept;
 
   /**
    * @brief Write a table to a file with a specific type.
    * @param input_table The table to write.
    * @param file_type The type of the output file.
    * @param path The path of the output file.
+   * @param options Options for writing the table, such as compression.
    * @return A Status indicating OK if successful, or an error if unsuccessful.
    */
-  Status WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
-                          FileType file_type, const std::string& path) const
-      noexcept;
+  Status WriteTableToFile(
+      const std::shared_ptr<arrow::Table>& table, FileType file_type,
+      const std::string& path,
+      const std::shared_ptr<WriterOptions>& options = nullptr) const noexcept;
 
   /**
    * @brief Write a label table to a file with parquet type.
