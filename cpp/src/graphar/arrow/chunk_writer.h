@@ -324,6 +324,7 @@ class EdgeChunkWriter {
   explicit EdgeChunkWriter(
       const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
       AdjListType adj_list_type,
+      const std::shared_ptr<WriterOptions>& options = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   /**
@@ -597,6 +598,7 @@ class EdgeChunkWriter {
   static Result<std::shared_ptr<EdgeChunkWriter>> Make(
       const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
       AdjListType adj_list_type,
+      const std::shared_ptr<WriterOptions>& options = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   /**
@@ -614,6 +616,7 @@ class EdgeChunkWriter {
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
       const std::string& edge_type, const std::string& dst_type,
       AdjListType adj_list_type,
+      const std::shared_ptr<WriterOptions>& options = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
  private:
@@ -724,6 +727,7 @@ class EdgeChunkWriter {
   std::string prefix_;
   std::shared_ptr<FileSystem> fs_;
   ValidateLevel validate_level_;
+  std::shared_ptr<WriterOptions> options_;
 };
 
 }  // namespace graphar

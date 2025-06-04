@@ -260,7 +260,12 @@ Status FileSystem::WriteTableToFile(
 #ifdef ARROW_ORC
   case FileType::ORC: {
     auto writer_options = arrow::adapters::orc::WriteOptions();
-    writer_options.compression = arrow::Compression::type::ZSTD;
+    if (options) {
+      writer_options.compression = options->compression;
+    } else {
+      writer_options.compression =
+          arrow::Compression::type::ZSTD;  // enable compression
+    }
     GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
         auto writer, arrow::adapters::orc::ORCFileWriter::Open(
                          output_stream.get(), writer_options));

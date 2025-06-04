@@ -201,7 +201,6 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     auto st = parquet::arrow::OpenFile(
         parquet_input, arrow::default_memory_pool(), &parquet_reader);
     REQUIRE(st.ok());
-    // 读取parquet文件为Arrow表
     std::shared_ptr<arrow::Table> parquet_table;
     st = parquet_reader->ReadTable(&parquet_table);
     REQUIRE(st.ok());
@@ -213,8 +212,6 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     REQUIRE(parquet_table->num_columns() ==
             vertex_info->GetPropertyGroup("firstName")->GetProperties().size() +
                 1);
-
-// TODO type orc
 #ifdef ARROW_ORC
     optionsBuilder = WriterOptions::Builder(FileType::ORC);
     optionsBuilder.set_compression(arrow::Compression::type::UNCOMPRESSED);
@@ -244,37 +241,38 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
                 1);
 #endif
   }
+}
+TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
+  arrow::Status st;
+  arrow::MemoryPool* pool = arrow::default_memory_pool();
+  std::string path = test_data_dir +
+                     "/ldbc_sample/parquet/edge/person_knows_person/"
+                     "unordered_by_source/adj_list/part0/chunk0";
+  auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
+  std::shared_ptr<arrow::io::RandomAccessFile> input =
+      fs->OpenInputFile(path).ValueOrDie();
+  std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
+  st = parquet::arrow::OpenFile(input, pool, &arrow_reader);
+  // Read entire file as a single Arrow table
+  std::shared_ptr<arrow::Table> maybe_table;
+  st = arrow_reader->ReadTable(&maybe_table);
+  REQUIRE(st.ok());
 
-  SECTION("TestEdgeChunkWriter") {
-    arrow::Status st;
-    arrow::MemoryPool* pool = arrow::default_memory_pool();
-    std::string path = test_data_dir +
-                       "/ldbc_sample/parquet/edge/person_knows_person/"
-                       "unordered_by_source/adj_list/part0/chunk0";
-    auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
-    std::shared_ptr<arrow::io::RandomAccessFile> input =
-        fs->OpenInputFile(path).ValueOrDie();
-    std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
-    st = parquet::arrow::OpenFile(input, pool, &arrow_reader);
-    // Read entire file as a single Arrow table
-    std::shared_ptr<arrow::Table> maybe_table;
-    st = arrow_reader->ReadTable(&maybe_table);
-    REQUIRE(st.ok());
+  std::shared_ptr<arrow::Table> table =
+      maybe_table
+          ->RenameColumns(
+              {GeneralParams::kSrcIndexCol, GeneralParams::kDstIndexCol})
+          .ValueOrDie();
+  std::cout << table->schema()->ToString() << std::endl;
+  std::cout << table->num_rows() << ' ' << table->num_columns() << std::endl;
+  // Construct the writer
+  std::string edge_meta_file =
+      test_data_dir + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
+  auto edge_meta = Yaml::LoadFile(edge_meta_file).value();
+  auto edge_info = EdgeInfo::Load(edge_meta).value();
+  auto adj_list_type = AdjListType::ordered_by_source;
 
-    std::shared_ptr<arrow::Table> table =
-        maybe_table
-            ->RenameColumns(
-                {GeneralParams::kSrcIndexCol, GeneralParams::kDstIndexCol})
-            .ValueOrDie();
-    std::cout << table->schema()->ToString() << std::endl;
-    std::cout << table->num_rows() << ' ' << table->num_columns() << std::endl;
-
-    // Construct the writer
-    std::string edge_meta_file =
-        test_data_dir + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
-    auto edge_meta = Yaml::LoadFile(edge_meta_file).value();
-    auto edge_info = EdgeInfo::Load(edge_meta).value();
-    auto adj_list_type = AdjListType::ordered_by_source;
+  SECTION("TestEdgeChunkWriterWithoutOption") {
     auto maybe_writer =
         EdgeChunkWriter::Make(edge_info, "/tmp/", adj_list_type);
     REQUIRE(!maybe_writer.has_error());
@@ -341,6 +339,101 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     REQUIRE(writer->WriteAdjListChunk(tmp_table, 0, 0).IsInvalid());
     // Invalid data type
     REQUIRE(writer->WritePropertyChunk(tmp_table, pg2, 0, 0).IsTypeError());
+  }
+  SECTION("TestEdgeChunkWriterWithOption") {
+    auto optionsBuilder = WriterOptions::Builder(FileType::CSV);
+    optionsBuilder.set_include_header(true);
+    optionsBuilder.set_delimiter('|');
+    auto maybe_writer = EdgeChunkWriter::Make(
+        edge_info, "/tmp/option/", adj_list_type, optionsBuilder.Build());
+    REQUIRE(!maybe_writer.has_error());
+    auto writer = maybe_writer.value();
+
+    // Valid: Write adj list with options
+    REQUIRE(writer->SortAndWriteAdjListTable(table, 0, 0).ok());
+    // Valid: Write edge count
+    REQUIRE(writer->WriteEdgesNum(0, table->num_rows()).ok());
+    // Valid: Write vertex count
+    REQUIRE(writer->WriteVerticesNum(903).ok());
+
+    // Read back CSV file and check delimiter/header
+    auto parse_options = arrow::csv::ParseOptions::Defaults();
+    parse_options.delimiter = '|';
+    auto read_options = arrow::csv::ReadOptions::Defaults();
+    std::shared_ptr<arrow::io::InputStream> chunk0_input =
+        fs->OpenInputStream(
+              "/tmp/option/edge/person_knows_person/ordered_by_source/adj_list/"
+              "part0/chunk0")
+            .ValueOrDie();
+    auto csv_reader =
+        arrow::csv::TableReader::Make(arrow::io::default_io_context(),
+                                      chunk0_input, read_options, parse_options,
+                                      arrow::csv::ConvertOptions::Defaults())
+            .ValueOrDie();
+    auto maybe_table2 = csv_reader->Read();
+    REQUIRE(maybe_table2.ok());
+    std::shared_ptr<arrow::Table> csv_table = *maybe_table2;
+    REQUIRE(csv_table->num_rows() ==
+            std::min(edge_info->GetChunkSize(), table->num_rows()));
+    REQUIRE(csv_table->num_columns() == table->num_columns());
+
+    // Parquet option
+    optionsBuilder = WriterOptions::Builder(FileType::PARQUET);
+    optionsBuilder.set_compression(arrow::Compression::type::UNCOMPRESSED);
+    auto maybe_parquet_writer = EdgeChunkWriter::Make(
+        edge_info, "/tmp/option/", adj_list_type, optionsBuilder.Build());
+    REQUIRE(!maybe_parquet_writer.has_error());
+    auto parquet_writer = maybe_parquet_writer.value();
+    REQUIRE(parquet_writer->SortAndWriteAdjListTable(table, 0, 0).ok());
+    std::string parquet_file =
+        "/tmp/option/edge/person_knows_person/ordered_by_source/adj_list/part0/"
+        "chunk0";
+    auto parquet_fs =
+        arrow::fs::FileSystemFromUriOrPath(parquet_file).ValueOrDie();
+    std::shared_ptr<arrow::io::RandomAccessFile> parquet_input =
+        parquet_fs->OpenInputFile(parquet_file).ValueOrDie();
+    std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
+    auto st = parquet::arrow::OpenFile(
+        parquet_input, arrow::default_memory_pool(), &parquet_reader);
+    REQUIRE(st.ok());
+    std::shared_ptr<arrow::Table> parquet_table;
+    st = parquet_reader->ReadTable(&parquet_table);
+    REQUIRE(st.ok());
+    auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
+    auto row_group_meta = parquet_metadata->RowGroup(0);
+    auto col_meta = row_group_meta->ColumnChunk(0);
+    REQUIRE(col_meta->compression() == parquet::Compression::UNCOMPRESSED);
+    REQUIRE(parquet_table->num_rows() == table->num_rows());
+    REQUIRE(parquet_table->num_columns() == table->num_columns());
+
+#ifdef ARROW_ORC
+    // ORC option
+    optionsBuilder = WriterOptions::Builder(FileType::ORC);
+    optionsBuilder.set_compression(arrow::Compression::type::UNCOMPRESSED);
+    auto maybe_orc_writer = EdgeChunkWriter::Make(
+        edge_info, "/tmp/option/", adj_list_type, optionsBuilder.Build());
+    REQUIRE(!maybe_orc_writer.has_error());
+    auto orc_writer = maybe_orc_writer.value();
+    REQUIRE(orc_writer->SortAndWriteAdjListTable(table, 0, 0).ok());
+    auto orc_fs = arrow::fs::FileSystemFromUriOrPath(
+                      "/tmp/option/edge/person_knows_person/ordered_by_source/"
+                      "adj_list/part0/chunk0")
+                      .ValueOrDie();
+    std::shared_ptr<arrow::io::RandomAccessFile> orc_input =
+        orc_fs
+            ->OpenInputFile(
+                "/tmp/option/edge/person_knows_person/ordered_by_source/"
+                "adj_list/part0/chunk0")
+            .ValueOrDie();
+    arrow::MemoryPool* pool = arrow::default_memory_pool();
+    std::unique_ptr<arrow::adapters::orc::ORCFileReader> orc_reader =
+        arrow::adapters::orc::ORCFileReader::Open(orc_input, pool).ValueOrDie();
+    auto maybe_orc_table = orc_reader->Read();
+    REQUIRE(maybe_orc_table.ok());
+    std::shared_ptr<arrow::Table> orc_table = *maybe_orc_table;
+    REQUIRE(orc_table->num_rows() == table->num_rows());
+    REQUIRE(orc_table->num_columns() == table->num_columns());
+#endif
   }
 }
 }  // namespace graphar
