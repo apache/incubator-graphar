@@ -101,8 +101,8 @@ class FileSystem {
    * @return A Status indicating OK if successful, or an error if unsuccessful.
    */
   template <typename T>
-  Status WriteValueToFile(const T& value,
-                          const std::string& path) const noexcept;
+  Status WriteValueToFile(const T& value, const std::string& path) const
+      noexcept;
 
   /**
    * @brief Write a table to a file with a specific type.

@@ -455,7 +455,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     REQUIRE(parquet_table->num_rows() ==
             std::min(table->num_rows(), edge_info_parquet->GetChunkSize()));
     REQUIRE(parquet_metadata->num_row_groups() ==
-            parquet_table->num_rows() / 10+1);
+            parquet_table->num_rows() / 10 + 1);
     REQUIRE(parquet_table->num_columns() ==
             static_cast<int>(table->num_columns()));
 
