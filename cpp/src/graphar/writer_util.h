@@ -30,6 +30,33 @@
 namespace graphar {
 class WriterOptions {
  public:
+  WriterOptions(const WriterOptions& other)
+      : csvOption(other.csvOption),
+        parquetOption(other.parquetOption),
+        orcOption(other.orcOption) {}
+
+  WriterOptions(WriterOptions&& other) noexcept
+      : csvOption(std::move(other.csvOption)),
+        parquetOption(std::move(other.parquetOption)),
+        orcOption(std::move(other.orcOption)) {}
+
+  WriterOptions& operator=(const WriterOptions& other) {
+    if (this != &other) {
+      csvOption = other.csvOption;
+      parquetOption = other.parquetOption;
+      orcOption = other.orcOption;
+    }
+    return *this;
+  }
+
+  WriterOptions& operator=(WriterOptions&& other) noexcept {
+    if (this != &other) {
+      csvOption = std::move(other.csvOption);
+      parquetOption = std::move(other.parquetOption);
+      orcOption = std::move(other.orcOption);
+    }
+    return *this;
+  }
   class CSVOption {
    public:
     bool include_header = true;
@@ -231,6 +258,35 @@ class WriterOptions {
     friend WriterOptions;
 
    public:
+    Builder() = default;
+    Builder(const Builder& other)
+        : csvBuilder(other.csvBuilder),
+          parquetBuilder(other.parquetBuilder),
+          orcBuilder(other.orcBuilder) {}
+
+    Builder(Builder&& other) noexcept
+        : csvBuilder(std::move(other.csvBuilder)),
+          parquetBuilder(std::move(other.parquetBuilder)),
+          orcBuilder(std::move(other.orcBuilder)) {}
+
+    Builder& operator=(const Builder& other) {
+      if (this != &other) {
+        csvBuilder = other.csvBuilder;
+        parquetBuilder = other.parquetBuilder;
+        orcBuilder = other.orcBuilder;
+      }
+      return *this;
+    }
+
+    Builder& operator=(Builder&& other) noexcept {
+      if (this != &other) {
+        csvBuilder = std::move(other.csvBuilder);
+        parquetBuilder = std::move(other.parquetBuilder);
+        orcBuilder = std::move(other.orcBuilder);
+      }
+      return *this;
+    }
+
     std::shared_ptr<CSVBuilder> getCsvOptionBuilder();
     std::shared_ptr<ParquetBuilder> getParquetOptionBuilder();
     std::shared_ptr<OrcBuilder> getOrcOptionBuilder();
