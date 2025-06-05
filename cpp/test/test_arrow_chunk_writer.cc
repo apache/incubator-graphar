@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <parquet/types.h>
 #include <fstream>
 #include <iostream>
 #include <ostream>
@@ -24,6 +25,7 @@
 #include <string>
 
 #include "arrow/api.h"
+#include "graphar/label.h"
 #include "graphar/writer_util.h"
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
@@ -164,9 +166,9 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     auto vertex_meta_csv = Yaml::LoadFile(vertex_meta_file_csv).value();
     auto vertex_info_csv = VertexInfo::Load(vertex_meta_csv).value();
     auto optionsBuilder = WriterOptions::Builder();
-    auto CsvOptionsBuilder = optionsBuilder.getCsvOptionBuilder();
-    CsvOptionsBuilder->include_header(true);
-    CsvOptionsBuilder->delimiter('|');
+    auto csvOptionsBuilder = optionsBuilder.getCsvOptionBuilder();
+    csvOptionsBuilder->include_header(true);
+    csvOptionsBuilder->delimiter('|');
     auto maybe_writer = VertexPropertyWriter::Make(
         vertex_info_csv, "/tmp/option/", optionsBuilder.Build());
     REQUIRE(!maybe_writer.has_error());
@@ -199,6 +201,13 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     auto options_parquet_Builder = optionsBuilder.getParquetOptionBuilder();
     options_parquet_Builder->compression(
         arrow::Compression::type::UNCOMPRESSED);
+    options_parquet_Builder->enable_statistics(false);
+    parquet::SortingColumn sc;
+    sc.column_idx = 1;
+    std::vector<::parquet::SortingColumn> columns = {sc};
+    options_parquet_Builder->sorting_columns(columns);
+    options_parquet_Builder->enable_store_decimal_as_integer(true);
+    options_parquet_Builder->max_row_group_length(10);
     maybe_writer = VertexPropertyWriter::Make(
         vertex_info_parquet, "/tmp/option/", optionsBuilder.Build());
     REQUIRE(!maybe_writer.has_error());
@@ -222,8 +231,13 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
     auto row_group_meta = parquet_metadata->RowGroup(0);
     auto col_meta = row_group_meta->ColumnChunk(0);
+    REQUIRE(row_group_meta->sorting_columns().size() == 1);
+    REQUIRE(row_group_meta->sorting_columns()[0].column_idx == 1);
     REQUIRE(col_meta->compression() == parquet::Compression::UNCOMPRESSED);
+    REQUIRE(!col_meta->statistics());
     REQUIRE(parquet_table->num_rows() == vertex_info_parquet->GetChunkSize());
+    REQUIRE(parquet_metadata->num_row_groups() ==
+            parquet_table->num_rows() / 10);
     REQUIRE(parquet_table->num_columns() ==
             static_cast<int>(vertex_info_parquet->GetPropertyGroup("firstName")
                                  ->GetProperties()
@@ -234,14 +248,13 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
         test_data_dir + "/ldbc_sample/orc/" + "person.vertex.yml";
     auto vertex_meta_orc = Yaml::LoadFile(vertex_meta_file_orc).value();
     auto vertex_info_orc = VertexInfo::Load(vertex_meta_orc).value();
-    WriterOptions::Builder optionsBilder;
-    auto optionsOrcBuilder = optionsBilder.getOrcOptionBuilder();
-    optionsOrcBuilder->compression(arrow::Compression::type::UNCOMPRESSED);
+    optionsBuilder = WriterOptions::Builder();
+    auto optionsOrcBuilder = optionsBuilder.getOrcOptionBuilder();
+    optionsOrcBuilder->compression(arrow::Compression::type::ZSTD);
     maybe_writer = VertexPropertyWriter::Make(vertex_info_orc, "/tmp/option/",
                                               optionsBuilder.Build());
     REQUIRE(!maybe_writer.has_error());
     writer = maybe_writer.value();
-    writer->setWriterOptions(optionsBilder.Build());
     REQUIRE(writer->WriteTable(table, 0).ok());
     auto fs1 = arrow::fs::FileSystemFromUriOrPath(
                    "/tmp/option/vertex/person/firstName_lastName_gender/chunk0")
@@ -253,16 +266,12 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     arrow::MemoryPool* pool = arrow::default_memory_pool();
     std::unique_ptr<arrow::adapters::orc::ORCFileReader> reader =
         arrow::adapters::orc::ORCFileReader::Open(input1, pool).ValueOrDie();
-
     // Read entire file as a single Arrow table
     maybe_table = reader->Read();
     std::shared_ptr<arrow::Table> table1 = maybe_table.ValueOrDie();
-    parquet_metadata = parquet_reader->parquet_reader()->metadata();
-    row_group_meta = parquet_metadata->RowGroup(0);
-    col_meta = row_group_meta->ColumnChunk(0);
-    REQUIRE(col_meta->compression() == parquet::Compression::UNCOMPRESSED);
-    REQUIRE(parquet_table->num_rows() == vertex_info_parquet->GetChunkSize());
-    REQUIRE(parquet_table->num_columns() ==
+    REQUIRE(reader->GetCompression() == parquet::Compression::ZSTD);
+    REQUIRE(table1->num_rows() == vertex_info_parquet->GetChunkSize());
+    REQUIRE(table1->num_columns() ==
             static_cast<int>(vertex_info_parquet->GetPropertyGroup("firstName")
                                  ->GetProperties()
                                  .size()) +
@@ -415,6 +424,9 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     optionsBilder = WriterOptions::Builder();
     auto optionsBuilderParquet = optionsBilder.getParquetOptionBuilder();
     optionsBuilderParquet->compression(arrow::Compression::type::UNCOMPRESSED);
+    optionsBuilderParquet->enable_statistics(false);
+    optionsBuilderParquet->enable_store_decimal_as_integer(true);
+    optionsBuilderParquet->max_row_group_length(10);
     auto maybe_parquet_writer =
         EdgeChunkWriter::Make(edge_info_parquet, "/tmp/option/", adj_list_type,
                               optionsBilder.Build());
@@ -439,7 +451,11 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     auto row_group_meta = parquet_metadata->RowGroup(0);
     auto col_meta = row_group_meta->ColumnChunk(0);
     REQUIRE(col_meta->compression() == parquet::Compression::UNCOMPRESSED);
-    REQUIRE(parquet_table->num_rows() == table->num_rows());
+    REQUIRE(!col_meta->statistics());
+    REQUIRE(parquet_table->num_rows() ==
+            std::min(table->num_rows(), edge_info_parquet->GetChunkSize()));
+    REQUIRE(parquet_metadata->num_row_groups() ==
+            parquet_table->num_rows() / 10+1);
     REQUIRE(parquet_table->num_columns() ==
             static_cast<int>(table->num_columns()));
 
@@ -451,7 +467,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     auto edge_info_orc = EdgeInfo::Load(edge_meta_orc).value();
     optionsBilder = WriterOptions::Builder();
     auto optionsBuilderOrc = optionsBilder.getOrcOptionBuilder();
-    optionsBuilderOrc->compression(arrow::Compression::type::UNCOMPRESSED);
+    optionsBuilderOrc->compression(arrow::Compression::type::ZSTD);
     auto maybe_orc_writer = EdgeChunkWriter::Make(
         edge_info_orc, "/tmp/option/", adj_list_type, optionsBilder.Build());
     REQUIRE(!maybe_orc_writer.has_error());
@@ -473,6 +489,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     auto maybe_orc_table = orc_reader->Read();
     REQUIRE(maybe_orc_table.ok());
     std::shared_ptr<arrow::Table> orc_table = *maybe_orc_table;
+    REQUIRE(orc_reader->GetCompression() == parquet::Compression::ZSTD);
     REQUIRE(orc_table->num_rows() == table->num_rows());
     REQUIRE(orc_table->num_columns() == table->num_columns());
 #endif

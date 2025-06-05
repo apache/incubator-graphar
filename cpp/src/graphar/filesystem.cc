@@ -227,8 +227,6 @@ Status FileSystem::WriteTableToFile(
   switch (file_type) {
   case FileType::CSV: {
     auto write_options = arrow::csv::WriteOptions::Defaults();
-    write_options.include_header = true;
-    write_options.quoting_style = arrow::csv::QuotingStyle::Needed;
     buildCsvWriteOptionsWithWriterOptions(write_options, options);
     GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
         auto writer, arrow::csv::MakeCSVWriter(output_stream.get(),
@@ -385,8 +383,8 @@ void buildParquetWriteOptionsWithWriterOptions(
   if (!parquetOption) {
     return;
   }
-  if (parquetOption->enable_dictionary) {
-    writer_porpertices_builder.enable_dictionary();
+  if (!parquetOption->enable_dictionary) {
+    writer_porpertices_builder.disable_dictionary();
   }
   writer_porpertices_builder.dictionary_pagesize_limit(
       parquetOption->dictionary_pagesize_limit);
@@ -415,11 +413,13 @@ void buildParquetWriteOptionsWithWriterOptions(
   if (parquetOption->encryption_properties) {
     writer_porpertices_builder.encryption(parquetOption->encryption_properties);
   }
-  if (parquetOption->enable_statistics) {
-    writer_porpertices_builder.enable_statistics();
+  if (!parquetOption->enable_statistics) {
+    writer_porpertices_builder.disable_statistics();
   }
   for (const auto& path_st : parquetOption->column_statistics) {
-    writer_porpertices_builder.enable_statistics(path_st.first);
+    if (!path_st.second) {
+      writer_porpertices_builder.disable_statistics(path_st.first);
+    }
   }
   if (!parquetOption->sorting_columns.empty()) {
     writer_porpertices_builder.set_sorting_columns(
@@ -432,10 +432,12 @@ void buildParquetWriteOptionsWithWriterOptions(
     writer_porpertices_builder.enable_write_page_index();
   }
   for (const auto& column_pi : parquetOption->column_write_page_index) {
-    writer_porpertices_builder.enable_write_page_index(column_pi.first);
+    if (column_pi.second) {
+      writer_porpertices_builder.enable_write_page_index(column_pi.first);
+    }
   }
-  if (parquetOption->compliant_nested_types) {
-    arrow_writer_porpertices_builder.enable_compliant_nested_types();
+  if (!parquetOption->compliant_nested_types) {
+    arrow_writer_porpertices_builder.disable_compliant_nested_types();
   }
   arrow_writer_porpertices_builder.set_use_threads(parquetOption->use_threads);
   if (parquetOption->enable_deprecated_int96_timestamps) {
