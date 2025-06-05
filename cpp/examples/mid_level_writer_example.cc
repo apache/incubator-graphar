@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <arrow/util/type_fwd.h>
 #include <iostream>
 
 #include "arrow/api.h"
@@ -111,10 +112,10 @@ void vertex_property_writer(
   auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
   ASSERT(vertex_info->GetType() == "person");
 
-  graphar::WriterOptions::Builder builder(graphar::FileType::CSV);
-  builder.set_include_header(true);
+  auto builder = graphar::WriterOptions::Builder::createParquetBuilder();
+  builder->compression(arrow::Compression::ZSTD);
   auto maybe_writer = graphar::VertexPropertyWriter::Make(vertex_info, "/tmp/",
-                                                          builder.Build());
+                                                          builder->Build());
   ASSERT(maybe_writer.status().ok());
   auto writer = maybe_writer.value();
 

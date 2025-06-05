@@ -217,8 +217,7 @@ Status VertexPropertyWriter::WriteChunk(
     ValidateLevel validate_level) const {
   GAR_RETURN_NOT_OK(
       validate(input_table, property_group, chunk_index, validate_level));
-  auto file_type =
-      options_ ? options_->file_type : property_group->GetFileType();
+  auto file_type = property_group->GetFileType();
   auto schema = input_table->schema();
   int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
   if (indice == -1) {
@@ -714,9 +713,7 @@ Status EdgeChunkWriter::WriteOffsetChunk(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     ValidateLevel validate_level) const {
   GAR_RETURN_NOT_OK(validate(input_table, vertex_chunk_index, validate_level));
-  auto file_type =
-      options_ ? options_->file_type
-               : edge_info_->GetAdjacentList(adj_list_type_)->GetFileType();
+  auto file_type = edge_info_->GetAdjacentList(adj_list_type_)->GetFileType();
   auto schema = input_table->schema();
   int index = schema->GetFieldIndex(GeneralParams::kOffsetCol);
   if (index == -1) {
@@ -735,9 +732,7 @@ Status EdgeChunkWriter::WriteAdjListChunk(
     IdType chunk_index, ValidateLevel validate_level) const {
   GAR_RETURN_NOT_OK(
       validate(input_table, vertex_chunk_index, chunk_index, validate_level));
-  auto file_type =
-      options_ ? options_->file_type
-               : edge_info_->GetAdjacentList(adj_list_type_)->GetFileType();
+  auto file_type = edge_info_->GetAdjacentList(adj_list_type_)->GetFileType();
   std::vector<int> indices;
   indices.clear();
   auto schema = input_table->schema();
@@ -771,8 +766,7 @@ Status EdgeChunkWriter::WritePropertyChunk(
     ValidateLevel validate_level) const {
   GAR_RETURN_NOT_OK(validate(input_table, property_group, vertex_chunk_index,
                              chunk_index, validate_level));
-  auto file_type =
-      options_ ? options_->file_type : property_group->GetFileType();
+  auto file_type = property_group->GetFileType();
 
   std::vector<int> indices;
   indices.clear();

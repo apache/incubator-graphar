@@ -20,69 +20,282 @@
 #pragma once
 
 #include "graphar/fwd.h"
-#include "graphar/macros.h"
 
+#include <arrow/adapters/orc/options.h>
+#include <arrow/csv/options.h>
 #include <arrow/util/compression.h>
+#include <parquet/arrow/writer.h>
+#include <parquet/properties.h>
+#include <parquet/types.h>
+#include <cstdint>
+#include <memory>
 namespace graphar {
 class WriterOptions {
  public:
+  class CSVOption {
+   public:
+    bool include_header = true;
+    int32_t batch_size = 1024;
+    char delimiter = ',';
+    std::string null_string;
+    arrow::io::IOContext io_context;
+    std::string eol = "\n";
+    arrow::csv::QuotingStyle quoting_style = arrow::csv::QuotingStyle::Needed;
+  };
+  class ParquetOption {
+   public:
+    // WriterProperties::Builder options
+    bool enable_dictionary = true;
+    int64_t dictionary_pagesize_limit = 1024 * 1024;  // 1MB
+    int64_t write_batch_size = 1024;
+    int64_t max_row_group_length = 1024 * 1024;  // 1Mi rows
+    int64_t data_pagesize = 1024 * 1024;         // 1MB
+    ::parquet::ParquetDataPageVersion data_page_version =
+        ::parquet::ParquetDataPageVersion::V1;
+    ::parquet::ParquetVersion::type version =
+        ::parquet::ParquetVersion::PARQUET_2_6;
+    ::parquet::Encoding::type encoding = ::parquet::Encoding::PLAIN;
+    std::unordered_map<std::string, ::parquet::Encoding::type> column_encoding;
+    arrow::Compression::type compression = arrow::Compression::UNCOMPRESSED;
+    std::unordered_map<std::string, arrow::Compression::type>
+        column_compression;
+    int compression_level = std::numeric_limits<int>::min();
+    std::unordered_map<std::string, int> column_compression_level;
+    size_t max_statistics_size = 4096;  // 4KB
+    std::unordered_map<std::string, size_t> column_max_statistics_size;
+    std::shared_ptr<::parquet::FileEncryptionProperties> encryption_properties;
+    bool enable_statistics = true;
+    std::unordered_map<std::string, bool> column_statistics;
+    std::vector<::parquet::SortingColumn> sorting_columns;
+    bool enable_store_decimal_as_integer = false;
+    bool enable_write_page_index = false;
+    std::unordered_map<std::string, bool> column_write_page_index;
+    bool compliant_nested_types = true;
+    bool use_threads = false;
+    bool enable_deprecated_int96_timestamps = false;
+    ::arrow::TimeUnit::type coerce_timestamps = ::arrow::TimeUnit::MICRO;
+    bool allow_truncated_timestamps = false;
+    bool store_schema = false;
+    ::arrow::internal::Executor* executor = nullptr;
+  };
+  class ORCOption {
+   public:
+    int64_t batch_size = 1024;
+    arrow::adapters::orc::FileVersion file_version =
+        arrow::adapters::orc::FileVersion(0, 12);
+    int64_t stripe_size = 64 * 1024 * 1024;
+    arrow::Compression::type compression = arrow::Compression::UNCOMPRESSED;
+    int64_t compression_block_size = 64 * 1024;
+    arrow::adapters::orc::CompressionStrategy compression_strategy =
+        arrow::adapters::orc::CompressionStrategy::kSpeed;
+    int64_t row_index_stride = 10000;
+    double padding_tolerance = 0.0;
+    double dictionary_key_size_threshold = 0.0;
+    std::vector<int64_t> bloom_filter_columns;
+    double bloom_filter_fpp = 0.05;
+  };
+  // Forward declaration of CSVBuilder
+  class CSVBuilder;
+  class ParquetBuilder;
+  class OrcBuilder;
   class Builder {
    public:
     FileType file_type;
-    bool include_header = true;
-    char delimiter = ',';
-    arrow::Compression::type compression;
-    int compression_level = 0;
-
-    Builder(FileType file_type) : file_type(file_type) {}
-
-    void set_include_header(bool value) {
-      if (file_type != FileType::CSV) {
-        throw Status::Invalid("include_header can only be set for CSV files");
-      }
-      include_header = value;
+    static std::shared_ptr<CSVBuilder> createCsvBuilder() {
+      return std::make_shared<CSVBuilder>();
     }
-    void set_delimiter(char delimiter) {
-      if (file_type != FileType::CSV) {
-        throw Status::Invalid("delimiter can only be set for CSV files");
-      }
-      if (delimiter == '\0') {
-        throw Status::Invalid("delimiter cannot be null character");
-      }
-      this->delimiter = delimiter;
+    static std::shared_ptr<ParquetBuilder> createParquetBuilder() {
+      return std::make_shared<ParquetBuilder>();
     }
-    void set_compression(arrow::Compression::type type) {
-      if (file_type != FileType::PARQUET && file_type != FileType::ORC) {
-        throw Status::Invalid(
-            "compression can only be set for PARQUET or ORC files");
-      }
-      compression = type;
+    static std::shared_ptr<OrcBuilder> createOrcBuilder() {
+      return std::make_shared<OrcBuilder>();
     }
-    void set_compression_level(int level) {
-      if (file_type != FileType::PARQUET && file_type != FileType::ORC) {
-        throw Status::Invalid(
-            "compression_level can only be set for PARQUET or ORC files");
+    static std::shared_ptr<Builder> Create(FileType file_type) {
+      switch (file_type) {
+      case FileType::CSV:
+        return std::make_shared<CSVBuilder>();
+      case FileType::PARQUET:
+        return std::make_shared<ParquetBuilder>();
+      case FileType::ORC:
+        return std::make_shared<OrcBuilder>();
+      default:
+        return nullptr;
       }
-      compression_level = level;
     }
     std::shared_ptr<WriterOptions> Build() {
       return std::make_shared<WriterOptions>(this);
     }
+    virtual ~Builder() = default;
+  };
+  class CSVBuilder : public Builder {
+    friend WriterOptions;
+    std::shared_ptr<CSVOption> option;
+
+   public:
+    CSVBuilder() {
+      file_type = FileType::CSV;
+      option = std::make_shared<CSVOption>();
+    }
+    void include_header(bool header) { option->include_header = header; }
+    void batch_size(int32_t bs) { option->batch_size = bs; }
+    void delimiter(char d) { option->delimiter = d; }
+    void null_string(const std::string& ns) { option->null_string = ns; }
+    void io_context(const arrow::io::IOContext& ctx) {
+      option->io_context = ctx;
+    }
+    void eol(const std::string& e) { option->eol = e; }
+    void quoting_style(arrow::csv::QuotingStyle qs) {
+      option->quoting_style = qs;
+    }
+  };
+  class ParquetBuilder : public Builder {
+    friend WriterOptions;
+    std::shared_ptr<ParquetOption> option;
+
+   public:
+    ParquetBuilder() {
+      file_type = FileType::PARQUET;
+      option = std::make_shared<ParquetOption>();
+    }
+    void enable_dictionary(bool enable) { option->enable_dictionary = enable; }
+    void dictionary_pagesize_limit(int64_t limit) {
+      option->dictionary_pagesize_limit = limit;
+    }
+    void write_batch_size(int64_t batch_size) {
+      option->write_batch_size = batch_size;
+    }
+    void max_row_group_length(int64_t length) {
+      option->max_row_group_length = length;
+    }
+    void data_pagesize(int64_t pagesize) { option->data_pagesize = pagesize; }
+    void data_page_version(::parquet::ParquetDataPageVersion version) {
+      option->data_page_version = version;
+    }
+    void version(::parquet::ParquetVersion::type ver) { option->version = ver; }
+    void encoding(::parquet::Encoding::type enc) { option->encoding = enc; }
+    void column_encoding(
+        const std::unordered_map<std::string, ::parquet::Encoding::type>&
+            encodings) {
+      option->column_encoding = encodings;
+    }
+    void compression(arrow::Compression::type comp) {
+      option->compression = comp;
+    }
+    void column_compression(
+        const std::unordered_map<std::string, arrow::Compression::type>&
+            compressions) {
+      option->column_compression = compressions;
+    }
+    void compression_level(int level) { option->compression_level = level; }
+    void column_compression_level(
+        const std::unordered_map<std::string, int>& levels) {
+      option->column_compression_level = levels;
+    }
+    void max_statistics_size(size_t size) {
+      option->max_statistics_size = size;
+    }
+    void column_max_statistics_size(
+        const std::unordered_map<std::string, size_t>& sizes) {
+      option->column_max_statistics_size = sizes;
+    }
+    void encryption_properties(
+        const std::shared_ptr<::parquet::FileEncryptionProperties>& props) {
+      option->encryption_properties = props;
+    }
+    void enable_statistics(bool enable) { option->enable_statistics = enable; }
+    void column_statistics(const std::unordered_map<std::string, bool>& stats) {
+      option->column_statistics = stats;
+    }
+    void sorting_columns(const std::vector<::parquet::SortingColumn>& columns) {
+      option->sorting_columns = columns;
+    }
+    void enable_store_decimal_as_integer(bool enable) {
+      option->enable_store_decimal_as_integer = enable;
+    }
+    void enable_write_page_index(bool enable) {
+      option->enable_write_page_index = enable;
+    }
+    void column_write_page_index(
+        const std::unordered_map<std::string, bool>& indices) {
+      option->column_write_page_index = indices;
+    }
+    void compliant_nested_types(bool compliant) {
+      option->compliant_nested_types = compliant;
+    }
+    void use_threads(bool use) { option->use_threads = use; }
+    void enable_deprecated_int96_timestamps(bool enable) {
+      option->enable_deprecated_int96_timestamps = enable;
+    }
+    void coerce_timestamps(::arrow::TimeUnit::type unit) {
+      option->coerce_timestamps = unit;
+    }
+    void allow_truncated_timestamps(bool allow) {
+      option->allow_truncated_timestamps = allow;
+    }
+    void store_schema(bool store) { option->store_schema = store; }
+    void executor(::arrow::internal::Executor* exec) {
+      option->executor = exec;
+    }
+  };
+  class OrcBuilder : public Builder {
+    friend WriterOptions;
+    std::shared_ptr<ORCOption> option;
+
+   public:
+    OrcBuilder() {
+      file_type = FileType::ORC;
+      option = std::make_shared<ORCOption>();
+    }
+    void batch_size(int64_t bs) { option->batch_size = bs; }
+    void file_version(arrow::adapters::orc::FileVersion fv) {
+      option->file_version = fv;
+    }
+    void stripe_size(int64_t ss) { option->stripe_size = ss; }
+    void compression(arrow::Compression::type comp) {
+      option->compression = comp;
+    }
+    void compression_block_size(int64_t cbs) {
+      option->compression_block_size = cbs;
+    }
+    void compression_strategy(arrow::adapters::orc::CompressionStrategy cs) {
+      option->compression_strategy = cs;
+    }
+    void row_index_stride(int64_t ris) { option->row_index_stride = ris; }
+    void padding_tolerance(double pt) { option->padding_tolerance = pt; }
+    void dictionary_key_size_threshold(double dkst) {
+      option->dictionary_key_size_threshold = dkst;
+    }
+    void bloom_filter_columns(const int64_t bfc) {
+      option->bloom_filter_columns.push_back(bfc);
+    }
+    void bloom_filter_fpp(double bffpp) { option->bloom_filter_fpp = bffpp; }
   };
 
  public:
-  FileType file_type;
-  bool include_header;
-  char delimiter;
-  arrow::Compression::type compression;
-  int compression_level = 0;
-
-  explicit WriterOptions(const class Builder* builder)
-      : file_type(builder->file_type),
-        include_header(builder->include_header),
-        delimiter(builder->delimiter),
-        compression(builder->compression),
-        compression_level(builder->compression_level) {}
+  WriterOptions(Builder* builder) {
+    switch (builder->file_type) {
+    case FileType::CSV: {
+      auto csvBuilder = dynamic_cast<CSVBuilder*>(builder);
+      this->csvOption = csvBuilder->option;
+      break;
+    }
+    case FileType::PARQUET: {
+      auto parquetBuilder = dynamic_cast<ParquetBuilder*>(builder);
+      this->parquetOption = parquetBuilder->option;
+      break;
+    }
+    case FileType::ORC: {
+      auto orcBuilder = dynamic_cast<OrcBuilder*>(builder);
+      this->orcOption = orcBuilder->option;
+      break;
+    }
+    default:
+      break;
+    }
+  }
+  std::shared_ptr<CSVOption> csvOption;
+  std::shared_ptr<ParquetOption> parquetOption;
+  std::shared_ptr<ORCOption> orcOption;
 };
 
 /**
