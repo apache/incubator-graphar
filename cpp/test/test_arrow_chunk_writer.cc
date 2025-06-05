@@ -24,6 +24,7 @@
 #include <string>
 
 #include "arrow/api.h"
+#include "graphar/writer_util.h"
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
 #endif
@@ -162,11 +163,12 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
         test_data_dir + "/ldbc_sample/csv/" + "person.vertex.yml";
     auto vertex_meta_csv = Yaml::LoadFile(vertex_meta_file_csv).value();
     auto vertex_info_csv = VertexInfo::Load(vertex_meta_csv).value();
-    auto optionsBuilder = WriterOptions::Builder::createCsvBuilder();
-    optionsBuilder->include_header(true);
-    optionsBuilder->delimiter('|');
+    auto optionsBuilder = WriterOptions::Builder();
+    auto CsvOptionsBuilder = optionsBuilder.getCsvOptionBuilder();
+    CsvOptionsBuilder->include_header(true);
+    CsvOptionsBuilder->delimiter('|');
     auto maybe_writer = VertexPropertyWriter::Make(
-        vertex_info_csv, "/tmp/option/", optionsBuilder->Build());
+        vertex_info_csv, "/tmp/option/", optionsBuilder.Build());
     REQUIRE(!maybe_writer.has_error());
     auto writer = maybe_writer.value();
     REQUIRE(writer->WriteTable(table, 0).ok());
@@ -187,20 +189,21 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     REQUIRE(maybe_table.ok());
     std::shared_ptr<arrow::Table> csv_table = *maybe_table;
     REQUIRE(csv_table->num_rows() == vertex_info_csv->GetChunkSize());
-    REQUIRE(
-        csv_table->num_columns() ==
-        vertex_info_csv->GetPropertyGroup("firstName")->GetProperties().size() +
-            1);
+    REQUIRE(csv_table->num_columns() ==
+            static_cast<int>(vertex_info_csv->GetPropertyGroup("firstName")
+                                 ->GetProperties()
+                                 .size()) +
+                1);
     // type parquet
-    auto options_parquet_Builder =
-        WriterOptions::Builder::createParquetBuilder();
+    optionsBuilder = WriterOptions::Builder();
+    auto options_parquet_Builder = optionsBuilder.getParquetOptionBuilder();
     options_parquet_Builder->compression(
         arrow::Compression::type::UNCOMPRESSED);
     maybe_writer = VertexPropertyWriter::Make(
-        vertex_info_parquet, "/tmp/option/", optionsBuilder->Build());
+        vertex_info_parquet, "/tmp/option/", optionsBuilder.Build());
     REQUIRE(!maybe_writer.has_error());
     writer = maybe_writer.value();
-    writer->setWriterOptions(options_parquet_Builder->Build());
+    writer->setWriterOptions(optionsBuilder.Build());
     REQUIRE(writer->WriteTable(table, 0).ok());
     // read parquet file
     std::string parquet_file =
@@ -222,22 +225,23 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     REQUIRE(col_meta->compression() == parquet::Compression::UNCOMPRESSED);
     REQUIRE(parquet_table->num_rows() == vertex_info_parquet->GetChunkSize());
     REQUIRE(parquet_table->num_columns() ==
-            vertex_info_parquet->GetPropertyGroup("firstName")
-                    ->GetProperties()
-                    .size() +
-                1);
+            static_cast<int>(vertex_info_parquet->GetPropertyGroup("firstName")
+                                 ->GetProperties()
+                                 .size() +
+                             1));
 #ifdef ARROW_ORC
     std::string vertex_meta_file_orc =
         test_data_dir + "/ldbc_sample/orc/" + "person.vertex.yml";
     auto vertex_meta_orc = Yaml::LoadFile(vertex_meta_file_orc).value();
     auto vertex_info_orc = VertexInfo::Load(vertex_meta_orc).value();
-    auto optionsOrcBuilder = WriterOptions::Builder::createOrcBuilder();
+    WriterOptions::Builder optionsBilder;
+    auto optionsOrcBuilder = optionsBilder.getOrcOptionBuilder();
     optionsOrcBuilder->compression(arrow::Compression::type::UNCOMPRESSED);
     maybe_writer = VertexPropertyWriter::Make(vertex_info_orc, "/tmp/option/",
-                                              optionsBuilder->Build());
+                                              optionsBuilder.Build());
     REQUIRE(!maybe_writer.has_error());
     writer = maybe_writer.value();
-    writer->setWriterOptions(optionsOrcBuilder->Build());
+    writer->setWriterOptions(optionsBilder.Build());
     REQUIRE(writer->WriteTable(table, 0).ok());
     auto fs1 = arrow::fs::FileSystemFromUriOrPath(
                    "/tmp/option/vertex/person/firstName_lastName_gender/chunk0")
@@ -259,9 +263,9 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     REQUIRE(col_meta->compression() == parquet::Compression::UNCOMPRESSED);
     REQUIRE(parquet_table->num_rows() == vertex_info_parquet->GetChunkSize());
     REQUIRE(parquet_table->num_columns() ==
-            vertex_info_parquet->GetPropertyGroup("firstName")
-                    ->GetProperties()
-                    .size() +
+            static_cast<int>(vertex_info_parquet->GetPropertyGroup("firstName")
+                                 ->GetProperties()
+                                 .size()) +
                 1);
 #endif
   }
@@ -365,11 +369,12 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     REQUIRE(writer->WritePropertyChunk(tmp_table, pg2, 0, 0).IsTypeError());
   }
   SECTION("TestEdgeChunkWriterWithOption") {
-    auto optionsBuilder = WriterOptions::Builder::createCsvBuilder();
-    optionsBuilder->include_header(true);
-    optionsBuilder->delimiter('|');
+    WriterOptions::Builder optionsBilder;
+    auto csvOptionsBuilder = optionsBilder.getCsvOptionBuilder();
+    csvOptionsBuilder->include_header(true);
+    csvOptionsBuilder->delimiter('|');
     auto maybe_writer = EdgeChunkWriter::Make(
-        edge_info_csv, "/tmp/option/", adj_list_type, optionsBuilder->Build());
+        edge_info_csv, "/tmp/option/", adj_list_type, optionsBilder.Build());
     REQUIRE(!maybe_writer.has_error());
     auto writer = maybe_writer.value();
 
@@ -407,11 +412,12 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
                                          "person_knows_person.edge.yml";
     auto edge_meta_parquet = Yaml::LoadFile(edge_meta_file_parquet).value();
     auto edge_info_parquet = EdgeInfo::Load(edge_meta_parquet).value();
-    auto optionsBuilderParquet = WriterOptions::Builder::createParquetBuilder();
+    optionsBilder = WriterOptions::Builder();
+    auto optionsBuilderParquet = optionsBilder.getParquetOptionBuilder();
     optionsBuilderParquet->compression(arrow::Compression::type::UNCOMPRESSED);
     auto maybe_parquet_writer =
         EdgeChunkWriter::Make(edge_info_parquet, "/tmp/option/", adj_list_type,
-                              optionsBuilderParquet->Build());
+                              optionsBilder.Build());
     REQUIRE(!maybe_parquet_writer.has_error());
     auto parquet_writer = maybe_parquet_writer.value();
     REQUIRE(parquet_writer->SortAndWriteAdjListTable(table, 0, 0).ok());
@@ -434,7 +440,8 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     auto col_meta = row_group_meta->ColumnChunk(0);
     REQUIRE(col_meta->compression() == parquet::Compression::UNCOMPRESSED);
     REQUIRE(parquet_table->num_rows() == table->num_rows());
-    REQUIRE(parquet_table->num_columns() == table->num_columns());
+    REQUIRE(parquet_table->num_columns() ==
+            static_cast<int>(table->num_columns()));
 
 #ifdef ARROW_ORC
     // ORC option
@@ -442,11 +449,11 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
         test_data_dir + "/ldbc_sample/orc/" + "person_knows_person.edge.yml";
     auto edge_meta_orc = Yaml::LoadFile(edge_meta_file_orc).value();
     auto edge_info_orc = EdgeInfo::Load(edge_meta_orc).value();
-    auto optionsBuilderOrc = WriterOptions::Builder::createOrcBuilder();
+    optionsBilder = WriterOptions::Builder();
+    auto optionsBuilderOrc = optionsBilder.getOrcOptionBuilder();
     optionsBuilderOrc->compression(arrow::Compression::type::UNCOMPRESSED);
-    auto maybe_orc_writer =
-        EdgeChunkWriter::Make(edge_info_orc, "/tmp/option/", adj_list_type,
-                              optionsBuilderOrc->Build());
+    auto maybe_orc_writer = EdgeChunkWriter::Make(
+        edge_info_orc, "/tmp/option/", adj_list_type, optionsBilder.Build());
     REQUIRE(!maybe_orc_writer.has_error());
     auto orc_writer = maybe_orc_writer.value();
     REQUIRE(orc_writer->SortAndWriteAdjListTable(table, 0, 0).ok());

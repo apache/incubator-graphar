@@ -111,11 +111,11 @@ void vertex_property_writer(
   auto vertex_meta = graphar::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
   ASSERT(vertex_info->GetType() == "person");
-
-  auto builder = graphar::WriterOptions::Builder::createParquetBuilder();
-  builder->compression(arrow::Compression::ZSTD);
+  auto builder = graphar::WriterOptions::Builder();
+  auto parquetBuilder = builder.getParquetOptionBuilder();
+  parquetBuilder->compression(arrow::Compression::ZSTD);
   auto maybe_writer = graphar::VertexPropertyWriter::Make(vertex_info, "/tmp/",
-                                                          builder->Build());
+                                                          builder.Build());
   ASSERT(maybe_writer.status().ok());
   auto writer = maybe_writer.value();
 

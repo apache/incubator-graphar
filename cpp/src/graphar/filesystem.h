@@ -188,4 +188,17 @@ Status InitializeS3();
  */
 Status FinalizeS3();
 
+void buildOrcWriteOptionsWithWriterOptions(
+    arrow::adapters::orc::WriteOptions& writeOptions,
+    const std::shared_ptr<WriterOptions>& options);
+
+void buildCsvWriteOptionsWithWriterOptions(
+    arrow::csv::WriteOptions& writeOptions,
+    const std::shared_ptr<WriterOptions>& options);
+
+void buildParquetWriteOptionsWithWriterOptions(
+    parquet::WriterProperties::Builder& builder,
+    parquet::ArrowWriterProperties::Builder& arrow_writer_porpertices_builder,
+    const std::shared_ptr<WriterOptions>& options);
+
 }  // namespace graphar

@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include "graphar/fwd.h"
-
 #include <arrow/adapters/orc/options.h>
 #include <arrow/csv/options.h>
 #include <arrow/util/compression.h>
@@ -94,48 +92,12 @@ class WriterOptions {
     std::vector<int64_t> bloom_filter_columns;
     double bloom_filter_fpp = 0.05;
   };
-  // Forward declaration of CSVBuilder
-  class CSVBuilder;
-  class ParquetBuilder;
-  class OrcBuilder;
-  class Builder {
-   public:
-    FileType file_type;
-    static std::shared_ptr<CSVBuilder> createCsvBuilder() {
-      return std::make_shared<CSVBuilder>();
-    }
-    static std::shared_ptr<ParquetBuilder> createParquetBuilder() {
-      return std::make_shared<ParquetBuilder>();
-    }
-    static std::shared_ptr<OrcBuilder> createOrcBuilder() {
-      return std::make_shared<OrcBuilder>();
-    }
-    static std::shared_ptr<Builder> Create(FileType file_type) {
-      switch (file_type) {
-      case FileType::CSV:
-        return std::make_shared<CSVBuilder>();
-      case FileType::PARQUET:
-        return std::make_shared<ParquetBuilder>();
-      case FileType::ORC:
-        return std::make_shared<OrcBuilder>();
-      default:
-        return nullptr;
-      }
-    }
-    std::shared_ptr<WriterOptions> Build() {
-      return std::make_shared<WriterOptions>(this);
-    }
-    virtual ~Builder() = default;
-  };
-  class CSVBuilder : public Builder {
+  class CSVBuilder {
     friend WriterOptions;
     std::shared_ptr<CSVOption> option;
 
    public:
-    CSVBuilder() {
-      file_type = FileType::CSV;
-      option = std::make_shared<CSVOption>();
-    }
+    CSVBuilder() { option = std::make_shared<CSVOption>(); }
     void include_header(bool header) { option->include_header = header; }
     void batch_size(int32_t bs) { option->batch_size = bs; }
     void delimiter(char d) { option->delimiter = d; }
@@ -148,15 +110,12 @@ class WriterOptions {
       option->quoting_style = qs;
     }
   };
-  class ParquetBuilder : public Builder {
+  class ParquetBuilder {
     friend WriterOptions;
     std::shared_ptr<ParquetOption> option;
 
    public:
-    ParquetBuilder() {
-      file_type = FileType::PARQUET;
-      option = std::make_shared<ParquetOption>();
-    }
+    ParquetBuilder() { option = std::make_shared<ParquetOption>(); }
     void enable_dictionary(bool enable) { option->enable_dictionary = enable; }
     void dictionary_pagesize_limit(int64_t limit) {
       option->dictionary_pagesize_limit = limit;
@@ -237,15 +196,12 @@ class WriterOptions {
       option->executor = exec;
     }
   };
-  class OrcBuilder : public Builder {
+  class OrcBuilder {
     friend WriterOptions;
     std::shared_ptr<ORCOption> option;
 
    public:
-    OrcBuilder() {
-      file_type = FileType::ORC;
-      option = std::make_shared<ORCOption>();
-    }
+    OrcBuilder() { option = std::make_shared<ORCOption>(); }
     void batch_size(int64_t bs) { option->batch_size = bs; }
     void file_version(arrow::adapters::orc::FileVersion fv) {
       option->file_version = fv;
@@ -271,28 +227,24 @@ class WriterOptions {
     void bloom_filter_fpp(double bffpp) { option->bloom_filter_fpp = bffpp; }
   };
 
+  class Builder {
+    friend WriterOptions;
+
+   public:
+    std::shared_ptr<CSVBuilder> getCsvOptionBuilder();
+    std::shared_ptr<ParquetBuilder> getParquetOptionBuilder();
+    std::shared_ptr<OrcBuilder> getOrcOptionBuilder();
+    std::shared_ptr<WriterOptions> Build();
+    virtual ~Builder() = default;
+
+   private:
+    std::shared_ptr<CSVBuilder> csvBuilder;
+    std::shared_ptr<ParquetBuilder> parquetBuilder;
+    std::shared_ptr<OrcBuilder> orcBuilder;
+  };
+
  public:
-  WriterOptions(Builder* builder) {
-    switch (builder->file_type) {
-    case FileType::CSV: {
-      auto csvBuilder = dynamic_cast<CSVBuilder*>(builder);
-      this->csvOption = csvBuilder->option;
-      break;
-    }
-    case FileType::PARQUET: {
-      auto parquetBuilder = dynamic_cast<ParquetBuilder*>(builder);
-      this->parquetOption = parquetBuilder->option;
-      break;
-    }
-    case FileType::ORC: {
-      auto orcBuilder = dynamic_cast<OrcBuilder*>(builder);
-      this->orcOption = orcBuilder->option;
-      break;
-    }
-    default:
-      break;
-    }
-  }
+  explicit WriterOptions(Builder* builder);
   std::shared_ptr<CSVOption> csvOption;
   std::shared_ptr<ParquetOption> parquetOption;
   std::shared_ptr<ORCOption> orcOption;
