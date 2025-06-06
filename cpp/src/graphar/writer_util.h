@@ -18,21 +18,21 @@
  */
 
 #pragma once
-#include <memory>
-#include <vector>
+#include <cstdint>
 #include <limits>
+#include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
-#include <cstdint>
+#include <vector>
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
 #endif
+#include "arrow/api.h"
+#include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
 #include "arrow/filesystem/api.h"
-#include "arrow/csv/api.h"
 #include "parquet/arrow/writer.h"
-#include "arrow/api.h"
 namespace graphar {
 class WriterOptions {
  public:
