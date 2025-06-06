@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <cstddef>
 #include <unordered_map>
 #include <utility>
 
@@ -431,6 +432,18 @@ Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
     return Status::KeyError("The vertex ", type, " doesn't exist.");
   }
   return Make(vertex_info, graph_info->GetPrefix(), options, validate_level);
+}
+
+Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
+    const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+    const ValidateLevel& validate_level) {
+  return Make(vertex_info, prefix, nullptr, validate_level);
+}
+
+Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+    const ValidateLevel& validate_level) {
+  return Make(graph_info, type, nullptr, validate_level);
 }
 
 Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::AddIndexColumn(
@@ -1020,6 +1033,12 @@ Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
 }
 
 Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
+    const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
+    AdjListType adj_list_type, const ValidateLevel& validate_level) {
+  return Make(edge_info, prefix, adj_list_type, nullptr, validate_level);
+}
+
+Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
     const std::string& edge_type, const std::string& dst_type,
     AdjListType adj_list_type, const std::shared_ptr<WriterOptions>& options,
@@ -1030,6 +1049,14 @@ Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
                             dst_type, " doesn't exist.");
   }
   return Make(edge_info, graph_info->GetPrefix(), adj_list_type, options,
+              validate_level);
+}
+
+Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+    const std::string& edge_type, const std::string& dst_type,
+    AdjListType adj_list_type, const ValidateLevel& validate_level) {
+  return Make(graph_info, src_type, edge_type, dst_type, adj_list_type, nullptr,
               validate_level);
 }
 
