@@ -219,7 +219,7 @@ class VertexPropertyWriter {
    */
   static Result<std::shared_ptr<VertexPropertyWriter>> Make(
       const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
-      const std::shared_ptr<WriterOptions>& options = nullptr,
+      const std::shared_ptr<WriterOptions>& options,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   static Result<std::shared_ptr<VertexPropertyWriter>> Make(
@@ -237,7 +237,7 @@ class VertexPropertyWriter {
    */
   static Result<std::shared_ptr<VertexPropertyWriter>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
-      const std::shared_ptr<WriterOptions>& options = nullptr,
+      const std::shared_ptr<WriterOptions>& options,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   static Result<std::shared_ptr<VertexPropertyWriter>> Make(
@@ -606,7 +606,7 @@ class EdgeChunkWriter {
   static Result<std::shared_ptr<EdgeChunkWriter>> Make(
       const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
       AdjListType adj_list_type,
-      const std::shared_ptr<WriterOptions>& options = nullptr,
+      const std::shared_ptr<WriterOptions>& options,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   static Result<std::shared_ptr<EdgeChunkWriter>> Make(
@@ -629,7 +629,7 @@ class EdgeChunkWriter {
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
       const std::string& edge_type, const std::string& dst_type,
       AdjListType adj_list_type,
-      const std::shared_ptr<WriterOptions>& options = nullptr,
+      const std::shared_ptr<WriterOptions>& options,
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   static Result<std::shared_ptr<EdgeChunkWriter>> Make(

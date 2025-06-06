@@ -399,11 +399,11 @@ Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::GetLabelTable(
   for (const auto& label : labels) {
     arrow::BooleanBuilder builder;
     for (const auto& row : bool_matrix) {
-      builder.Append(row[label_to_index[label]]);
+      RETURN_NOT_ARROW_OK(builder.Append(row[label_to_index[label]]));
     }
 
     std::shared_ptr<arrow::Array> array;
-    builder.Finish(&array);
+    RETURN_NOT_ARROW_OK(builder.Finish(&array));
     fields.push_back(arrow::field(label, arrow::boolean()));
     arrays.push_back(array);
   }
