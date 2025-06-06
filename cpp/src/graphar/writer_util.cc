@@ -18,13 +18,6 @@
  */
 
 #include "graphar/writer_util.h"
-#include <arrow/adapters/orc/options.h>
-#include <arrow/csv/options.h>
-#include <arrow/util/compression.h>
-#include <parquet/arrow/writer.h>
-#include <parquet/properties.h>
-#include <parquet/types.h>
-#include <memory>
 namespace graphar {
 std::shared_ptr<WriterOptions::CSVBuilder>
 WriterOptions::Builder::getCsvOptionBuilder() {
@@ -40,6 +33,7 @@ WriterOptions::Builder::getParquetOptionBuilder() {
   }
   return parquetBuilder;
 }
+#ifdef ARROW_ORC
 std::shared_ptr<WriterOptions::OrcBuilder>
 WriterOptions::Builder::getOrcOptionBuilder() {
   if (!orcBuilder) {
@@ -47,7 +41,7 @@ WriterOptions::Builder::getOrcOptionBuilder() {
   }
   return orcBuilder;
 }
-
+#endif
 std::shared_ptr<WriterOptions> WriterOptions::Builder::Build() {
   return std::make_shared<WriterOptions>(this);
 }
@@ -61,9 +55,11 @@ WriterOptions::WriterOptions(WriterOptions::Builder* builder) {
     auto parquetBuilder = builder->parquetBuilder;
     this->parquetOption = parquetBuilder->option;
   }
+#ifdef ARROW_ORC
   if (builder->orcBuilder) {
     auto orcBuilder = builder->orcBuilder;
     this->orcOption = orcBuilder->option;
   }
+#endif
 }
 }  // namespace graphar

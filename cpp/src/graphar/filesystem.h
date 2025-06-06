@@ -20,7 +20,6 @@
 #pragma once
 
 #include <memory>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -101,8 +100,8 @@ class FileSystem {
    * @return A Status indicating OK if successful, or an error if unsuccessful.
    */
   template <typename T>
-  Status WriteValueToFile(const T& value, const std::string& path) const
-      noexcept;
+  Status WriteValueToFile(const T& value,
+                          const std::string& path) const noexcept;
 
   /**
    * @brief Write a table to a file with a specific type.
@@ -188,17 +187,19 @@ Status InitializeS3();
  */
 Status FinalizeS3();
 
+#ifdef ARROW_ORC
 void buildOrcWriteOptionsWithWriterOptions(
-    arrow::adapters::orc::WriteOptions& writeOptions,
+    std::shared_ptr<arrow::adapters::orc::WriteOptions> writeOptions,
     const std::shared_ptr<WriterOptions>& options);
-
+#endif
 void buildCsvWriteOptionsWithWriterOptions(
-    arrow::csv::WriteOptions& writeOptions,
+    std::shared_ptr<arrow::csv::WriteOptions> writeOptions,
     const std::shared_ptr<WriterOptions>& options);
 
 void buildParquetWriteOptionsWithWriterOptions(
-    parquet::WriterProperties::Builder& builder,
-    parquet::ArrowWriterProperties::Builder& arrow_writer_porpertices_builder,
+    std::shared_ptr<parquet::WriterProperties::Builder> builder,
+    std::shared_ptr<parquet::ArrowWriterProperties::Builder>
+        arrow_writer_porpertices_builder,
     const std::shared_ptr<WriterOptions>& options);
 
 }  // namespace graphar

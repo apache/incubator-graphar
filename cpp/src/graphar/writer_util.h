@@ -18,15 +18,21 @@
  */
 
 #pragma once
-
-#include <arrow/adapters/orc/options.h>
-#include <arrow/csv/options.h>
-#include <arrow/util/compression.h>
-#include <parquet/arrow/writer.h>
-#include <parquet/properties.h>
-#include <parquet/types.h>
-#include <cstdint>
 #include <memory>
+#include <vector>
+#include <limits>
+#include <string>
+#include <unordered_map>
+#include <utility>
+#include <cstdint>
+#ifdef ARROW_ORC
+#include "arrow/adapters/orc/adapter.h"
+#endif
+#include "arrow/dataset/api.h"
+#include "arrow/filesystem/api.h"
+#include "arrow/csv/api.h"
+#include "parquet/arrow/writer.h"
+#include "arrow/api.h"
 namespace graphar {
 class WriterOptions {
  public:
@@ -104,6 +110,7 @@ class WriterOptions {
     ::arrow::internal::Executor* executor = nullptr;
   };
   class ORCOption {
+#ifdef ARROW_ORC
    public:
     int64_t batch_size = 1024;
     arrow::adapters::orc::FileVersion file_version =
@@ -118,6 +125,7 @@ class WriterOptions {
     double dictionary_key_size_threshold = 0.0;
     std::vector<int64_t> bloom_filter_columns;
     double bloom_filter_fpp = 0.05;
+#endif
   };
   class CSVBuilder {
     friend WriterOptions;
@@ -229,6 +237,7 @@ class WriterOptions {
 
    public:
     OrcBuilder() { option = std::make_shared<ORCOption>(); }
+#ifdef ARROW_ORC
     void batch_size(int64_t bs) { option->batch_size = bs; }
     void file_version(arrow::adapters::orc::FileVersion fv) {
       option->file_version = fv;
@@ -252,6 +261,7 @@ class WriterOptions {
       option->bloom_filter_columns.push_back(bfc);
     }
     void bloom_filter_fpp(double bffpp) { option->bloom_filter_fpp = bffpp; }
+#endif
   };
 
   class Builder {
