@@ -37,7 +37,12 @@ find_package(Arrow REQUIRED)
 find_package(ArrowDataset REQUIRED)
 find_package(ArrowAcero REQUIRED)
 find_package(Parquet REQUIRED)
-
+# Check if ORC is enabled.
+if (NOT ${ARROW_ORC})
+    message(WARNING "apache-arrow is built without ORC extension, ORC related functionalities will be disabled.")
+else()
+    add_definitions(-DARROW_ORC) # Add macro, otherwise inconsistent in build phase on ubuntu.
+endif()
 # Add a library using FindPython's tooling (pybind11 also provides a helper like
 # this)
 python_add_library(_core MODULE src/main.cc WITH_SOABI)
