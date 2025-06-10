@@ -17,6 +17,7 @@
  * under the License.
  */
 
+#include <arrow/util/type_fwd.h>
 #include <iostream>
 
 #include "arrow/api.h"
@@ -25,6 +26,8 @@
 
 #include "./config.h"
 #include "graphar/api/arrow_writer.h"
+#include "graphar/fwd.h"
+#include "graphar/writer_util.h"
 
 arrow::Result<std::shared_ptr<arrow::Table>> generate_vertex_table() {
   // property "id"
@@ -108,8 +111,11 @@ void vertex_property_writer(
   auto vertex_meta = graphar::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
   ASSERT(vertex_info->GetType() == "person");
-
-  auto maybe_writer = graphar::VertexPropertyWriter::Make(vertex_info, "/tmp/");
+  auto builder = graphar::WriterOptions::Builder();
+  auto parquetBuilder = builder.getParquetOptionBuilder();
+  parquetBuilder->compression(arrow::Compression::ZSTD);
+  auto maybe_writer = graphar::VertexPropertyWriter::Make(vertex_info, "/tmp/",
+                                                          builder.Build());
   ASSERT(maybe_writer.status().ok());
   auto writer = maybe_writer.value();
 
