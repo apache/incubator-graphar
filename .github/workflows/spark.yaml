@@ -91,6 +91,7 @@ jobs:
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         export SPARK_TESTING=1
+        export MAVEN_OPTS="--add-exports java.base/sun.nio.ch=ALL-UNNAMED"
         echo "Test ${{ matrix.mvn-profile }}"
         mvn test --no-transfer-progress -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
 
