@@ -22,13 +22,13 @@ on:
   # but only for the main branch
   push:
     branches:
-      - main
+      - "**"
     paths:
       - 'maven-projects/java/**'
       - '.github/workflows/java.yml'
   pull_request:
     branches:
-      - main
+      - "**"
     paths:
       - 'maven-projects/java/**'
       - '.github/workflows/java.yml'
@@ -39,13 +39,15 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
-          
+
       - name: Install dependencies
         run: |
           # install the latest arrow deb to test arrow
@@ -54,19 +56,21 @@ jobs:
           sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
           sudo apt-get update -y
           # TODO: ISSUE-241
-          sudo apt install -y libarrow-dev=14.0.1-1 \
-                            libarrow-dataset-dev=14.0.1-1 \
-                            libarrow-acero-dev=14.0.1-1 \
-                            libparquet-dev=14.0.1-1
+          sudo apt install -y libarrow-dev=17.0.0-1 \
+                              libarrow-dataset-dev=17.0.0-1 \
+                              libarrow-acero-dev=17.0.0-1 \
+                              libparquet-dev=17.0.0-1
           sudo apt-get install libcurl4-openssl-dev -y
           sudo apt-get install llvm-11 clang-11 lld-11 libclang-11-dev libz-dev -y
-          
+
+          git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+
       - name: Code Format Check
         working-directory: maven-projects/java
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64}
           mvn --no-transfer-progress spotless:check
-      
+
       - name: Build Java Docs
         working-directory: maven-projects/java
         run: |
@@ -79,5 +83,4 @@ jobs:
           # Temporarily using Java 8, related issue: https://github.com/apache/incubator-graphar/issues/277
           export JAVA_HOME=${JAVA_HOME_8_X64}
           export LLVM11_HOME=/usr/lib/llvm-11
-          export GAR_TEST_DATA=$PWD/../../testing/
           mvn --no-transfer-progress clean test -Dspotless.check.skip=true
