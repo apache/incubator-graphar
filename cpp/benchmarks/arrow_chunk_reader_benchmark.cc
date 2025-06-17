@@ -27,8 +27,10 @@ namespace graphar {
 BENCHMARK_DEFINE_F(BenchmarkFixture, CreateVertexPropertyArrowChunkReader)
 (::benchmark::State& state) {  // NOLINT
   for (auto _ : state) {
-    auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-        graph_info_, "person", "firstName");
+    auto gp =
+        graph_info_->GetVertexInfo("person")->GetPropertyGroup("firstName");
+    auto maybe_reader =
+        VertexPropertyArrowChunkReader::Make(graph_info_, "person", gp);
     if (maybe_reader.has_error()) {
       state.SkipWithError(maybe_reader.status().message().c_str());
       return;
@@ -77,8 +79,9 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, CreateAdjListPropertyArrowChunkReader)
 
 BENCHMARK_DEFINE_F(BenchmarkFixture, VertexPropertyArrowChunkReaderReadChunk)
 (::benchmark::State& state) {  // NOLINT
+  auto gp = graph_info_->GetVertexInfo("person")->GetPropertyGroup("firstName");
   auto maybe_reader =
-      VertexPropertyArrowChunkReader::Make(graph_info_, "person", "firstName");
+      VertexPropertyArrowChunkReader::Make(graph_info_, "person", gp);
   if (maybe_reader.has_error()) {
     state.SkipWithError(maybe_reader.status().message().c_str());
     return;
