@@ -235,7 +235,7 @@ class VertexIter {
     if (is_filtered_) {
       for (auto& reader : readers_) {
         reader.seek(filtered_ids_[cur_offset_]);
-        GAR_ASSIGN_OR_RAISE(auto chunk_table, reader.GetChunk());
+        GAR_ASSIGN_OR_RAISE(auto chunk_table, reader.GetChunkV1());
         column = util::GetArrowColumnByName(chunk_table, property);
         if (column != nullptr) {
           break;
@@ -244,7 +244,7 @@ class VertexIter {
     } else {
       for (auto& reader : readers_) {
         reader.seek(cur_offset_);
-        GAR_ASSIGN_OR_RAISE(auto chunk_table, reader.GetChunk());
+        GAR_ASSIGN_OR_RAISE(auto chunk_table, reader.GetChunkV1());
         column = util::GetArrowColumnByName(chunk_table, property);
         if (column != nullptr) {
           break;

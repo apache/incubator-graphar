@@ -91,13 +91,17 @@ class VertexPropertyArrowChunkReader {
   Status seek(IdType id);
 
   /**
-   * @brief Return the current arrow chunk table of chunk position indicator.
+   * @brief Read the chunk through the scanner.
    */
-  Result<std::shared_ptr<arrow::Table>> GetChunk();
+  Result<std::shared_ptr<arrow::Table>> GetChunkV1();
+  /**
+   * @brief Read the chunk through the reader.
+   */
+  Result<std::shared_ptr<arrow::Table>> GetChunkV2();
   /**
    * @brief Return the current arrow chunk table of chunk position indicator.
    */
-  Result<std::shared_ptr<arrow::Table>> GetChunkV2();
+  Result<std::shared_ptr<arrow::Table>> GetChunk();
   /**
    * @brief Return the current arrow label chunk table of chunk position
    * indicator.

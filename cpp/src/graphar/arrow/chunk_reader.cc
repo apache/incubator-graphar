@@ -264,7 +264,7 @@ VertexPropertyArrowChunkReader::GetChunkV2() {
 }
 
 Result<std::shared_ptr<arrow::Table>>
-VertexPropertyArrowChunkReader::GetChunk() {
+VertexPropertyArrowChunkReader::GetChunkV1() {
   GAR_RETURN_NOT_OK(util::CheckFilterOptions(filter_options_, property_group_));
   auto temp_filter_options = filter_options_;
   std::vector<std::string> intersection_columns;
@@ -298,6 +298,15 @@ VertexPropertyArrowChunkReader::GetChunk() {
   }
   IdType row_offset = seek_id_ - chunk_index_ * vertex_info_->GetChunkSize();
   return chunk_table_->Slice(row_offset);
+}
+
+Result<std::shared_ptr<arrow::Table>>
+VertexPropertyArrowChunkReader::GetChunk() {
+  if (filter_options_.filter != nullptr) {
+    return GetChunkV2();
+  }else {
+    return GetChunkV1();
+  }
 }
 
 Result<std::shared_ptr<arrow::Table>>
