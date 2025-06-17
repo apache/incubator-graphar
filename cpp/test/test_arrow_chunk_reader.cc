@@ -18,17 +18,14 @@
  */
 
 #include <cstdlib>
-
-#include "arrow/api.h"
-
-#include "./util.h"
-#include "graphar/api/arrow_reader.h"
-#include "graphar/fwd.h"
-
-#include <catch2/catch_test_macros.hpp>
 #include <ostream>
 #include <string>
 #include <vector>
+#include "arrow/api.h"
+#include "./util.h"
+#include "graphar/api/arrow_reader.h"
+#include "graphar/fwd.h"
+#include <catch2/catch_test_macros.hpp>
 namespace graphar {
 
 TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
