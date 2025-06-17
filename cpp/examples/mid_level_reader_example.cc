@@ -39,7 +39,7 @@ void vertex_property_chunk_reader(
   auto reader = maybe_reader.value();
 
   // use reader
-  auto result = reader->GetChunkV1();
+  auto result = reader->GetChunk(graphar::GetChunkVersion::V1);
   ASSERT(!result.has_error());
   std::cout << "chunk number: " << reader->GetChunkNum() << std::endl;
   auto table = result.value();
@@ -54,7 +54,7 @@ void vertex_property_chunk_reader(
             << std::endl;
   // seek vertex id
   ASSERT(reader->seek(100).ok());
-  result = reader->GetChunkV1();
+  result = reader->GetChunk(graphar::GetChunkVersion::V1);
   ASSERT(!result.has_error());
   table = result.value();
   index_col = table->GetColumnByName(graphar::GeneralParams::kVertexIndexCol);
@@ -63,7 +63,7 @@ void vertex_property_chunk_reader(
             << index_col->ToString() << " " << std::endl;
   // next chunk
   ASSERT(reader->next_chunk().ok());
-  result = reader->GetChunkV1();
+  result = reader->GetChunk(graphar::GetChunkVersion::V1);
   ASSERT(!result.has_error());
   table = result.value();
   index_col = table->GetColumnByName(graphar::GeneralParams::kVertexIndexCol);
@@ -77,7 +77,7 @@ void vertex_property_chunk_reader(
       graph_info, type, specific_col_name);
   ASSERT(maybe_specific_reader.status().ok());
   auto specific_reader = maybe_specific_reader.value();
-  auto specific_result = specific_reader->GetChunkV1();
+  auto specific_result = specific_reader->GetChunk(graphar::GetChunkVersion::V1);
   ASSERT(!result.has_error());
   auto specific_table = specific_result.value();
   std::cout << "rows number of first specificed vertex property chunk: "
@@ -100,7 +100,7 @@ void vertex_property_chunk_reader(
       graph_info, type, specific_col_name);
   ASSERT(maybe_specific_reader.status().ok());
   specific_reader = maybe_specific_reader.value();
-  specific_result = specific_reader->GetChunkV2();
+  specific_result = specific_reader->GetChunk(graphar::GetChunkVersion::V2);
   ASSERT(!specific_result.has_error());
   specific_table = specific_result.value();
   std::cout << "rows number of first specificed vertex property chunk (V2): "
@@ -125,7 +125,7 @@ void vertex_property_chunk_reader(
       graph_info, type, specific_cols, graphar::SelectType::PROPERTIES);
   ASSERT(maybe_specific_reader.status().ok());
   specific_reader = maybe_specific_reader.value();
-  specific_result = specific_reader->GetChunkV1();
+  specific_result = specific_reader->GetChunk(graphar::GetChunkVersion::V1);
   ASSERT(!result.has_error());
   specific_table = specific_result.value();
   std::cout << "rows number of specificed vertex properties chunk: "
@@ -153,7 +153,7 @@ void vertex_property_chunk_reader(
       graph_info, type, specific_cols, graphar::SelectType::PROPERTIES);
   ASSERT(maybe_specific_reader.status().ok());
   specific_reader = maybe_specific_reader.value();
-  specific_result = specific_reader->GetChunkV2();
+  specific_result = specific_reader->GetChunk(graphar::GetChunkVersion::V2);
   ASSERT(!specific_result.has_error());
   specific_table = specific_result.value();
   std::cout << "rows number of specificed vertex properties chunk (V2): "
@@ -186,7 +186,7 @@ void vertex_property_chunk_reader(
   auto filter_reader = maybe_filter_reader.value();
   filter_reader->Filter(filter);
   filter_reader->Select(expected_cols);
-  auto filter_result = filter_reader->GetChunkV1();
+  auto filter_result = filter_reader->GetChunk(graphar::GetChunkVersion::V1);
   ASSERT(!result.has_error());
   auto filter_table = filter_result.value();
   std::cout << "rows number of first filtered vertex property chunk: "

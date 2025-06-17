@@ -251,9 +251,9 @@ VertexPropertyArrowChunkReader::GetChunkV2() {
       column_indices.push_back(field_index);
     }
     std::string path = prefix_ + chunk_file_path;
-    GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadFileToTableV2(
-                                          path, property_group_->GetFileType(),
-                                          column_indices, filter_options_));
+    GAR_ASSIGN_OR_RAISE(
+        chunk_table_, fs_->ReadFileToTable(path, property_group_->GetFileType(),
+                                           column_indices));
     if (schema_ != nullptr && filter_options_.filter == nullptr) {
       GAR_RETURN_NOT_OK(
           CastTableWithSchema(chunk_table_, schema_, &chunk_table_));
@@ -300,12 +300,21 @@ VertexPropertyArrowChunkReader::GetChunkV1() {
   return chunk_table_->Slice(row_offset);
 }
 
-Result<std::shared_ptr<arrow::Table>>
-VertexPropertyArrowChunkReader::GetChunk() {
-  if (filter_options_.filter != nullptr) {
-    return GetChunkV2();
-  }else {
+Result<std::shared_ptr<arrow::Table>> VertexPropertyArrowChunkReader::GetChunk(
+    GetChunkVersion version) {
+  switch (version) {
+  case GetChunkVersion::V1:
     return GetChunkV1();
+  case GetChunkVersion::V2:
+    return GetChunkV2();
+  case GetChunkVersion::AUTO:
+    if (filter_options_.filter != nullptr) {
+      return GetChunkV2();
+    } else {
+      return GetChunkV1();
+    }
+  default:
+    return Status::Invalid("unsupport GetChunkVersion ", version);
   }
 }
 

@@ -75,6 +75,7 @@ class DataType;
 /** Type of file format */
 enum FileType { CSV = 0, PARQUET = 1, ORC = 2, JSON = 3 };
 enum SelectType { PROPERTIES = 0, LABELS = 1 };
+enum GetChunkVersion { AUTO = 0, V1 = 1, V2 = 2 };
 enum class AdjListType : uint8_t;
 
 template <typename T>

@@ -56,7 +56,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
     REQUIRE(reader->GetChunkNum() == 10);
 
     SECTION("Basics") {
-      auto result = reader->GetChunkV1();
+      auto result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       auto table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -68,7 +68,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
 
       // seek
       REQUIRE(reader->seek(100).ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -76,7 +76,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->next_chunk().ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -84,7 +84,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->seek(900).ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 3);
@@ -98,7 +98,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
     }
 
     SECTION("GetChunkV2") {
-      auto result = reader->GetChunkV2();
+      auto result = reader->GetChunk(graphar::GetChunkVersion::V2);
       REQUIRE(!result.has_error());
       auto table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -110,7 +110,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
 
       // seek
       REQUIRE(reader->seek(100).ok());
-      result = reader->GetChunkV2();
+      result = reader->GetChunk(graphar::GetChunkVersion::V2);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -118,7 +118,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->next_chunk().ok());
-      result = reader->GetChunkV2();
+      result = reader->GetChunk(graphar::GetChunkVersion::V2);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -126,7 +126,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->seek(900).ok());
-      result = reader->GetChunkV2();
+      result = reader->GetChunk(graphar::GetChunkVersion::V2);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 3);
@@ -166,7 +166,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
           VertexPropertyArrowChunkReader::Make(vertex_info, new_pg, prefix);
       REQUIRE(maybe_reader.status().ok());
       auto reader = maybe_reader.value();
-      auto result = reader->GetChunkV1();
+      auto result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       auto table = result.value();
       REQUIRE(table->schema()->GetFieldByName("id")->type()->id() ==
@@ -188,7 +188,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
             std::shared_ptr<arrow::Table> table;
 
             do {
-              auto result = reader->GetChunkV1();
+              auto result = reader->GetChunk(graphar::GetChunkVersion::V1);
               REQUIRE(!result.has_error());
               table = result.value();
               std::cout << "Chunk: " << idx << ",\tNums: " << table->num_rows()
@@ -249,7 +249,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
             graph_info, src_type, filter_pg, options);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
-        auto result = reader->GetChunkV1();
+        auto result = reader->GetChunk(graphar::GetChunkVersion::V1);
         REQUIRE(result.error().IsInvalid());
         std::cerr << result.error().message() << std::endl;
       }
@@ -266,7 +266,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
             graph_info, src_type, filter_pg, options);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
-        auto result = reader->GetChunkV1();
+        auto result = reader->GetChunk(graphar::GetChunkVersion::V1);
         REQUIRE(result.error().IsInvalid());
         std::cerr << result.error().message() << std::endl;
       }
@@ -297,7 +297,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
     REQUIRE(reader->GetChunkNum() == 10);
 
     SECTION("Basics") {
-      auto result = reader->GetChunkV1();
+      auto result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       auto table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -311,7 +311,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       }
       // seek
       REQUIRE(reader->seek(100).ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -322,7 +322,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
         REQUIRE(table->GetColumnByName(pn) != nullptr);
       }
       REQUIRE(reader->next_chunk().ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -333,7 +333,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
         REQUIRE(table->GetColumnByName(pn) != nullptr);
       }
       REQUIRE(reader->seek(900).ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 3);
@@ -357,7 +357,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       auto reader = maybe_reader.value();
       REQUIRE(reader->GetChunkNum() == 10);
 
-      auto result = reader->GetChunkV1();
+      auto result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       auto table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -369,7 +369,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
 
       // seek
       REQUIRE(reader->seek(100).ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -378,7 +378,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
               nullptr);
       REQUIRE(table->GetColumnByName(vertex_property_name) != nullptr);
       REQUIRE(reader->next_chunk().ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -387,7 +387,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
               nullptr);
       REQUIRE(table->GetColumnByName(vertex_property_name) != nullptr);
       REQUIRE(reader->seek(900).ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 3);
@@ -428,7 +428,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
             graph_info, src_type, select_col, SelectType::PROPERTIES, options);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
-        auto result = reader->GetChunkV1();
+        auto result = reader->GetChunk(graphar::GetChunkVersion::V1);
         REQUIRE(result.error().IsInvalid());
         std::cerr << result.error().message() << std::endl;
       }
@@ -443,7 +443,7 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
             graph_info, src_type, select_col, SelectType::PROPERTIES, options);
         REQUIRE(maybe_reader.status().ok());
         auto reader = maybe_reader.value();
-        auto result = reader->GetChunkV1();
+        auto result = reader->GetChunk(graphar::GetChunkVersion::V1);
         REQUIRE(result.error().IsInvalid());
         std::cerr << result.error().message() << std::endl;
       }
@@ -735,7 +735,7 @@ TEST_CASE_METHOD(GlobalFixture, "JSON_TEST") {
     REQUIRE(reader->GetChunkNum() == 10);
 
     SECTION("Basics") {
-      auto result = reader->GetChunkV1();
+      auto result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       auto table = result.value();
       REQUIRE(table->num_rows() == 100);
@@ -744,21 +744,21 @@ TEST_CASE_METHOD(GlobalFixture, "JSON_TEST") {
 
       // seek
       REQUIRE(reader->seek(100).ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->next_chunk().ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->seek(900).ok());
-      result = reader->GetChunkV1();
+      result = reader->GetChunk(graphar::GetChunkVersion::V1);
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 3);

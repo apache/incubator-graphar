@@ -21,6 +21,7 @@
 
 #include "./benchmark_util.h"
 #include "graphar/api/arrow_reader.h"
+#include "graphar/fwd.h"
 
 namespace graphar {
 
@@ -89,7 +90,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, VertexPropertyArrowChunkReaderReadChunk)
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     assert(reader->seek(0).ok());
-    assert(reader->GetChunkV1().status().ok());
+    assert(reader->GetChunk(GetChunkVersion::V1).status().ok());
     assert(reader->next_chunk().ok());
   }
 }
