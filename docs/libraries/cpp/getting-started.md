@@ -351,7 +351,7 @@ You can export label table to disk in parquet format, and read it back into memo
 
   // read parquet chunk as arrow table
   auto maybe_reader =
-      VertexPropertyArrowChunkReader::Make(graph_info, "organisation", labels);
+      VertexPropertyArrowChunkReader::MakeForLabels(graph_info, "organisation", labels, SelectType::LABELS);
   assert(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
   assert(reader->seek(0).ok());

@@ -95,6 +95,10 @@ class VertexPropertyArrowChunkReader {
    */
   Result<std::shared_ptr<arrow::Table>> GetChunk();
   /**
+   * @brief Return the current arrow chunk table of chunk position indicator.
+   */
+  Result<std::shared_ptr<arrow::Table>> GetChunkV2();
+  /**
    * @brief Return the current arrow label chunk table of chunk position
    * indicator.
    */

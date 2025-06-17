@@ -94,6 +94,30 @@ void vertex_property_chunk_reader(
   ASSERT(specific_col != nullptr);
   std::cout << "Internal id column: " << specific_col->ToString() << " "
             << std::endl;
+  // read specific one column V2
+  specific_col_name = "lastName";
+  maybe_specific_reader = graphar::VertexPropertyArrowChunkReader::Make(
+      graph_info, type, specific_col_name);
+  ASSERT(maybe_specific_reader.status().ok());
+  specific_reader = maybe_specific_reader.value();
+  specific_result = specific_reader->GetChunkV2();
+  ASSERT(!specific_result.has_error());
+  specific_table = specific_result.value();
+  std::cout << "rows number of first specificed vertex property chunk (V2): "
+            << specific_table->num_rows() << std::endl;
+  ASSERT(specific_table->num_columns() == 2);
+  std::cout << "schema of first specificed vertex property chunk (V2): "
+            << std::endl
+            << specific_table->schema()->ToString() << std::endl;
+  index_col =
+      specific_table->GetColumnByName(graphar::GeneralParams::kVertexIndexCol);
+  ASSERT(index_col != nullptr);
+  std::cout << "Internal id column: " << index_col->ToString() << " "
+            << std::endl;
+  specific_col = specific_table->GetColumnByName("lastName");
+  ASSERT(specific_col != nullptr);
+  std::cout << "Internal id column: " << specific_col->ToString() << " "
+            << std::endl;
 
   // read specific columns
   std::vector<std::string> specific_cols = {"firstName", "lastName"};
@@ -104,10 +128,39 @@ void vertex_property_chunk_reader(
   specific_result = specific_reader->GetChunk();
   ASSERT(!result.has_error());
   specific_table = specific_result.value();
-  std::cout << "rows number of first specificed vertex properties chunk: "
+  std::cout << "rows number of specificed vertex properties chunk: "
             << specific_table->num_rows() << std::endl;
   ASSERT(specific_table->num_columns() == specific_cols.size() + 1);
-  std::cout << "schema of first specificed vertex properties chunk: " << std::endl
+  std::cout << "schema of specificed vertex properties chunk: " << std::endl
+            << specific_table->schema()->ToString() << std::endl;
+  index_col =
+      specific_table->GetColumnByName(graphar::GeneralParams::kVertexIndexCol);
+  ASSERT(index_col != nullptr);
+  std::cout << "Internal id column: " << index_col->ToString() << " "
+            << std::endl;
+  specific_col = specific_table->GetColumnByName("firstName");
+  ASSERT(specific_col != nullptr);
+  std::cout << "firstName column: " << specific_col->ToString() << " "
+            << std::endl;
+  specific_col = specific_table->GetColumnByName("lastName");
+  ASSERT(specific_col != nullptr);
+  std::cout << "lastName column: " << specific_col->ToString() << " "
+            << std::endl;
+
+  // read specific columns V2
+  specific_cols = {"firstName", "lastName"};
+  maybe_specific_reader = graphar::VertexPropertyArrowChunkReader::Make(
+      graph_info, type, specific_cols, graphar::SelectType::PROPERTIES);
+  ASSERT(maybe_specific_reader.status().ok());
+  specific_reader = maybe_specific_reader.value();
+  specific_result = specific_reader->GetChunkV2();
+  ASSERT(!specific_result.has_error());
+  specific_table = specific_result.value();
+  std::cout << "rows number of specificed vertex properties chunk (V2): "
+            << specific_table->num_rows() << std::endl;
+  ASSERT(specific_table->num_columns() == specific_cols.size() + 1);
+  std::cout << "schema of specificed vertex properties chunk (V2): "
+            << std::endl
             << specific_table->schema()->ToString() << std::endl;
   index_col =
       specific_table->GetColumnByName(graphar::GeneralParams::kVertexIndexCol);
