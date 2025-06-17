@@ -77,7 +77,8 @@ void vertex_property_chunk_reader(
       graph_info, type, specific_col_name);
   ASSERT(maybe_specific_reader.status().ok());
   auto specific_reader = maybe_specific_reader.value();
-  auto specific_result = specific_reader->GetChunk(graphar::GetChunkVersion::V1);
+  auto specific_result =
+      specific_reader->GetChunk(graphar::GetChunkVersion::V1);
   ASSERT(!result.has_error());
   auto specific_table = specific_result.value();
   std::cout << "rows number of first specificed vertex property chunk: "
