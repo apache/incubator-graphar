@@ -33,12 +33,10 @@ import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
 import org.apache.graphar.arrow.ArrowTable;
-import org.apache.graphar.graphinfo.GraphInfo;
 import org.apache.graphar.graphinfo.PropertyGroup;
 import org.apache.graphar.graphinfo.VertexInfo;
 import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
-import org.apache.graphar.util.GrapharStaticFunctions;
 import org.apache.graphar.util.Result;
 import org.apache.graphar.util.Status;
 
@@ -78,21 +76,6 @@ public interface VertexPropertyArrowChunkReader extends CXXPointer {
     @FFITypeAlias(GAR_ID_TYPE)
     long getChunkNum();
 
-    /**
-     * Helper function to Construct VertexPropertyArrowChunkReader.
-     *
-     * @param graphInfo The graph info to describe the graph.
-     * @param label label of the vertex.
-     * @param propertyGroup The property group of the vertex.
-     */
-    static Result<VertexPropertyArrowChunkReader> constructVertexPropertyArrowChunkReader(
-            @CXXReference GraphInfo graphInfo,
-            @CXXReference StdString label,
-            @CXXReference PropertyGroup propertyGroup) {
-        return GrapharStaticFunctions.INSTANCE.constructVertexPropertyArrowChunkReader(
-                graphInfo, label, propertyGroup);
-    }
-
     @FFIFactory
     interface Factory {
         /**
@@ -103,8 +86,8 @@ public interface VertexPropertyArrowChunkReader extends CXXPointer {
          * @param prefix The absolute prefix.
          */
         VertexPropertyArrowChunkReader create(
-                @CXXReference VertexInfo vertexInfo,
-                @CXXReference PropertyGroup propertyGroup,
+                @CXXReference StdSharedPtr<VertexInfo> vertexInfo,
+                @CXXReference StdSharedPtr<PropertyGroup> propertyGroup,
                 @CXXReference StdString prefix);
     }
 }

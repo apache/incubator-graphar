@@ -20,33 +20,17 @@
 package org.apache.graphar.util;
 
 import static org.apache.graphar.util.CppClassName.GAR_INFO_VERSION;
-import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+import static org.apache.graphar.util.CppHeaderName.GAR_VERSION_PARSER_H;
 
-import com.alibaba.fastffi.CXXHead;
-import com.alibaba.fastffi.CXXOperator;
-import com.alibaba.fastffi.CXXPointer;
-import com.alibaba.fastffi.CXXReference;
-import com.alibaba.fastffi.CXXValue;
-import com.alibaba.fastffi.FFIFactory;
-import com.alibaba.fastffi.FFIGen;
-import com.alibaba.fastffi.FFINameAlias;
-import com.alibaba.fastffi.FFITypeAlias;
-import com.alibaba.fastffi.FFITypeFactory;
+import com.alibaba.fastffi.*;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.stdcxx.StdVector;
 
 /** InfoVersion is a class provide version information of info. */
 @FFIGen
-@CXXHead(GAR_GRAPH_INFO_H)
+@CXXHead(GAR_VERSION_PARSER_H)
 @FFITypeAlias(GAR_INFO_VERSION)
 public interface InfoVersion extends CXXPointer {
-    /** Parse version string to InfoVersion. */
-    static Result<InfoVersion> parse(String str) {
-        StdString stdString = StdString.create(str);
-        Result<InfoVersion> res = Static.INSTANCE.Parse(stdString);
-        stdString.delete();
-        return res;
-    }
 
     static InfoVersion create(int version) {
         return factory.create(version);
@@ -111,13 +95,5 @@ public interface InfoVersion extends CXXPointer {
 
         /** Constructor with version and user defined types. */
         InfoVersion create(@CXXReference InfoVersion other);
-    }
-
-    interface Static {
-        InfoVersion.Static INSTANCE = FFITypeFactory.getLibrary(InfoVersion.Static.class);
-
-        /** Parse version string to InfoVersion. */
-        @CXXValue
-        Result<InfoVersion> Parse(@CXXReference StdString str);
     }
 }

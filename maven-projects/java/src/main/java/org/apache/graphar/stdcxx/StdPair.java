@@ -35,7 +35,7 @@ import com.alibaba.fastffi.FFITypeAlias;
 @CXXHead(system = "utility")
 @CXXHead(GAR_GRAPH_H)
 @CXXTemplate(
-        cxx = {"GraphArchive::IdType", "GraphArchive::IdType"},
+        cxx = {"graphar::IdType", "graphar::IdType"},
         java = {"Long", "Long"})
 @CXXTemplate(
         cxx = {"int64_t", "int64_t"},

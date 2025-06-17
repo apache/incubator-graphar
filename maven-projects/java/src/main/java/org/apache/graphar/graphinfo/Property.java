@@ -22,16 +22,8 @@ package org.apache.graphar.graphinfo;
 import static org.apache.graphar.util.CppClassName.GAR_PROPERTY;
 import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
-import com.alibaba.fastffi.CXXHead;
-import com.alibaba.fastffi.CXXPointer;
-import com.alibaba.fastffi.CXXValue;
-import com.alibaba.fastffi.FFIFactory;
-import com.alibaba.fastffi.FFIGen;
-import com.alibaba.fastffi.FFIGetter;
-import com.alibaba.fastffi.FFINameAlias;
-import com.alibaba.fastffi.FFISetter;
-import com.alibaba.fastffi.FFITypeAlias;
-import com.alibaba.fastffi.FFITypeFactory;
+import com.alibaba.fastffi.*;
+import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.types.DataType;
 
@@ -43,34 +35,34 @@ public interface Property extends CXXPointer {
     Factory factory = FFITypeFactory.getFactory(Property.class);
 
     @FFIGetter
-    @FFINameAlias("name")
-    @CXXValue
-    StdString getName();
+    @CXXReference
+    StdString name();
 
     @FFISetter
-    @FFINameAlias("name")
-    void setName(@CXXValue StdString name);
+    void name(@CXXReference StdString name);
 
     @FFIGetter
-    @FFINameAlias("type")
-    @CXXValue
-    DataType getType();
+    @CXXReference
+    StdSharedPtr<DataType> type();
 
     @FFISetter
-    @FFINameAlias("type")
-    void setType(@CXXValue DataType type);
+    void type(@CXXReference StdSharedPtr<DataType> type);
 
     @FFIGetter
-    @FFINameAlias("is_primary")
-    boolean isPrimary();
+    boolean is_primary();
 
     @FFISetter
-    @FFINameAlias("is_primary")
-    void setPrimary(boolean primary);
+    void is_primary(boolean nullable);
+
+    @FFIGetter
+    boolean is_nullable();
+
+    @FFISetter
+    void is_nullable(boolean nullable);
 
     @FFIFactory
     interface Factory {
-        @CXXValue
-        Property create();
+
+        Property create(@CXXReference StdString name);
     }
 }

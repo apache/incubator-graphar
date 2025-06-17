@@ -94,7 +94,8 @@ public interface VertexPropertyWriter extends CXXPointer {
     @FFINameAlias("WriteVerticesNum")
     @CXXValue
     Status writeVerticesNum(
-            @FFITypeAlias(GAR_ID_TYPE) long count, @CXXValue ValidateLevel validateLevel);
+            @CXXReference @FFITypeAlias(GAR_ID_TYPE) long count,
+            @CXXValue ValidateLevel validateLevel);
 
     /**
      * Write the number of vertices into the file.
@@ -104,7 +105,7 @@ public interface VertexPropertyWriter extends CXXPointer {
      */
     @FFINameAlias("WriteVerticesNum")
     @CXXValue
-    Status writeVerticesNum(@FFITypeAlias(GAR_ID_TYPE) long count);
+    Status writeVerticesNum(@CXXReference @FFITypeAlias(GAR_ID_TYPE) long count);
 
     /**
      * Copy a file as a vertex property group chunk.
@@ -120,8 +121,8 @@ public interface VertexPropertyWriter extends CXXPointer {
     @CXXValue
     Status writeChunk(
             @CXXReference StdString fileName,
-            @CXXReference PropertyGroup propertyGroup,
-            @FFITypeAlias(GAR_ID_TYPE) long chunkIndex,
+            @CXXReference StdSharedPtr<PropertyGroup> propertyGroup,
+            @CXXValue @FFITypeAlias(GAR_ID_TYPE) long chunkIndex,
             @CXXValue ValidateLevel validateLevel);
 
     /**
@@ -138,8 +139,8 @@ public interface VertexPropertyWriter extends CXXPointer {
     @CXXValue
     Status writeChunk(
             @CXXReference StdSharedPtr<ArrowTable> inputTable,
-            @CXXReference PropertyGroup propertyGroup,
-            @FFITypeAlias(GAR_ID_TYPE) long chunkIndex,
+            @CXXReference StdSharedPtr<PropertyGroup> propertyGroup,
+            @CXXValue @FFITypeAlias(GAR_ID_TYPE) long chunkIndex,
             @CXXValue ValidateLevel validateLevel);
 
     /**
@@ -155,7 +156,7 @@ public interface VertexPropertyWriter extends CXXPointer {
     @CXXValue
     Status writeChunk(
             @CXXReference StdSharedPtr<ArrowTable> inputTable,
-            @FFITypeAlias(GAR_ID_TYPE) long chunkIndex,
+            @CXXValue @FFITypeAlias(GAR_ID_TYPE) long chunkIndex,
             @CXXValue ValidateLevel validateLevel);
 
     /**
@@ -169,7 +170,7 @@ public interface VertexPropertyWriter extends CXXPointer {
     @CXXValue
     Status writeChunk(
             @CXXReference StdSharedPtr<ArrowTable> inputTable,
-            @FFITypeAlias(GAR_ID_TYPE) long chunkIndex);
+            @CXXValue @FFITypeAlias(GAR_ID_TYPE) long chunkIndex);
 
     /**
      * Write a single property group for multiple vertex chunks to corresponding files.
@@ -185,8 +186,8 @@ public interface VertexPropertyWriter extends CXXPointer {
     @CXXValue
     Status writeTable(
             @CXXReference StdSharedPtr<ArrowTable> inputTable,
-            @CXXReference PropertyGroup propertyGroup,
-            @FFITypeAlias(GAR_ID_TYPE) long startChunkIndex,
+            @CXXReference StdSharedPtr<PropertyGroup> propertyGroup,
+            @CXXValue @FFITypeAlias(GAR_ID_TYPE) long startChunkIndex,
             @CXXValue ValidateLevel validateLevel);
 
     /**
@@ -202,7 +203,7 @@ public interface VertexPropertyWriter extends CXXPointer {
     @CXXValue
     Status writeTable(
             @CXXReference StdSharedPtr<ArrowTable> inputTable,
-            @FFITypeAlias(GAR_ID_TYPE) long startChunkIndex,
+            @CXXValue @FFITypeAlias(GAR_ID_TYPE) long startChunkIndex,
             @CXXValue ValidateLevel validateLevel);
 
     /**
@@ -216,7 +217,7 @@ public interface VertexPropertyWriter extends CXXPointer {
     @CXXValue
     Status writeTable(
             @CXXReference StdSharedPtr<ArrowTable> inputTable,
-            @FFITypeAlias(GAR_ID_TYPE) long startChunkIndex);
+            @CXXValue @FFITypeAlias(GAR_ID_TYPE) long startChunkIndex);
 
     @FFIFactory
     interface Factory {
@@ -225,22 +226,8 @@ public interface VertexPropertyWriter extends CXXPointer {
          *
          * @param vertexInfo The vertex info that describes the vertex type.
          * @param prefix The absolute prefix.
-         * @param validateLevel The global validate level for the writer, with no validate by
-         *     default. It could be ValidateLevel::no_validate, ValidateLevel::weak_validate or
-         *     ValidateLevel::strong_validate, but could not be ValidateLevel::default_validate.
          */
         VertexPropertyWriter create(
-                @CXXReference VertexInfo vertexInfo,
-                @CXXReference StdString prefix,
-                @CXXValue ValidateLevel validateLevel);
-
-        /**
-         * Initialize the VertexPropertyWriter.
-         *
-         * @param vertexInfo The vertex info that describes the vertex type.
-         * @param prefix The absolute prefix.
-         */
-        VertexPropertyWriter create(
-                @CXXReference VertexInfo vertexInfo, @CXXReference StdString prefix);
+                @CXXReference StdSharedPtr<VertexInfo> vertexInfo, @CXXReference StdString prefix);
     }
 }
