@@ -22,13 +22,13 @@ on:
   # but only for the main branch
   push:
     branches:
-      - '**'
+      - main
     paths:
       - 'cpp/**'
       - '.github/workflows/ci.yml'
   pull_request:
     branches:
-      - '**'
+      - main
     paths:
       - 'cpp/**'
       - '.github/workflows/ci.yml'
