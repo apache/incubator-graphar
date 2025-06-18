@@ -266,12 +266,22 @@ Result<std::shared_ptr<arrow::Table>>
 VertexPropertyArrowChunkReader::GetChunkV1() {
   GAR_RETURN_NOT_OK(util::CheckFilterOptions(filter_options_, property_group_));
   if (chunk_table_ == nullptr) {
-    auto temp_filter_options = filter_options_;
-    std::vector<std::string> intersection_columns;
-    if (!temp_filter_options.columns && !property_names_.empty()) {
-      temp_filter_options.columns = std::ref(property_names_);
+    GAR_ASSIGN_OR_RAISE(
+        auto chunk_file_path,
+        vertex_info_->GetFilePath(property_group_, chunk_index_));
+    std::string path = prefix_ + chunk_file_path;
+    if (property_names_.empty()) {
+      GAR_ASSIGN_OR_RAISE(
+          chunk_table_,
+          fs_->ReadFileToTable(path, property_group_->GetFileType(),
+                               filter_options_));
     } else {
-      if (!property_names_.empty()) {
+      util::FilterOptions temp_filter_options;
+      temp_filter_options.filter = filter_options_.filter;
+      std::vector<std::string> intersection_columns;
+      if (!filter_options_.columns) {
+        temp_filter_options.columns = std::ref(property_names_);
+      } else {
         for (const auto& col : filter_options_.columns.value().get()) {
           if (std::find(property_names_.begin(), property_names_.end(), col) ==
               property_names_.end()) {
@@ -279,18 +289,15 @@ VertexPropertyArrowChunkReader::GetChunkV1() {
                                    " is not in select properties.");
           }
         }
+        temp_filter_options.columns = filter_options_.columns;
       }
+      GAR_ASSIGN_OR_RAISE(
+          chunk_table_,
+          fs_->ReadFileToTable(path, property_group_->GetFileType(),
+                               temp_filter_options));
     }
-
-    GAR_ASSIGN_OR_RAISE(
-        auto chunk_file_path,
-        vertex_info_->GetFilePath(property_group_, chunk_index_));
-    std::string path = prefix_ + chunk_file_path;
-    GAR_ASSIGN_OR_RAISE(
-        chunk_table_, fs_->ReadFileToTable(path, property_group_->GetFileType(),
-                                           temp_filter_options));
     // TODO(acezen): filter pushdown doesn't support cast schema now
-    if (schema_ != nullptr && temp_filter_options.filter == nullptr) {
+    if (schema_ != nullptr && filter_options_.filter == nullptr) {
       GAR_RETURN_NOT_OK(
           CastTableWithSchema(chunk_table_, schema_, &chunk_table_));
     }
