@@ -265,9 +265,9 @@ VertexPropertyArrowChunkReader::GetChunkV2() {
 Result<std::shared_ptr<arrow::Table>>
 VertexPropertyArrowChunkReader::GetChunkV1() {
   GAR_RETURN_NOT_OK(util::CheckFilterOptions(filter_options_, property_group_));
-  auto temp_filter_options = filter_options_;
-  std::vector<std::string> intersection_columns;
   if (chunk_table_ == nullptr) {
+    auto temp_filter_options = filter_options_;
+    std::vector<std::string> intersection_columns;
     if (!temp_filter_options.columns && !property_names_.empty()) {
       temp_filter_options.columns = std::ref(property_names_);
     } else {

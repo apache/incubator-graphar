@@ -187,12 +187,30 @@ void vertex_property_chunk_reader(
   auto filter_reader = maybe_filter_reader.value();
   filter_reader->Filter(filter);
   filter_reader->Select(expected_cols);
-  auto filter_result = filter_reader->GetChunk(graphar::GetChunkVersion::V1);
+  auto filter_result = filter_reader->GetChunk();
   ASSERT(!result.has_error());
   auto filter_table = filter_result.value();
   std::cout << "rows number of first filtered vertex property chunk: "
             << filter_table->num_rows() << std::endl;
   std::cout << "schema of first filtered vertex property chunk: " << std::endl
+            << filter_table->schema()->ToString() << std::endl;
+  // reader with filter pushdown && select specific column
+  maybe_filter_reader = graphar::VertexPropertyArrowChunkReader::Make(
+      graph_info, type, {"firstName", "lastName"},
+      graphar::SelectType::PROPERTIES);
+  ASSERT(maybe_filter_reader.status().ok());
+  filter_reader = maybe_filter_reader.value();
+  filter_reader->Filter(filter);
+  filter_reader->Select(expected_cols);
+  filter_result = filter_reader->GetChunk();
+  ASSERT(!result.has_error());
+  filter_table = filter_result.value();
+  std::cout << "rows number of first filtered vertex property chunk (select "
+               "specific column): "
+            << filter_table->num_rows() << std::endl;
+  std::cout << "schema of first filtered vertex property chunk (select "
+               "specific column): "
+            << std::endl
             << filter_table->schema()->ToString() << std::endl;
 }
 
