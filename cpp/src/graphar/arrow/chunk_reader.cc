@@ -18,7 +18,6 @@
  */
 
 #include <algorithm>
-#include <iostream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -309,9 +308,9 @@ Result<std::shared_ptr<arrow::Table>> VertexPropertyArrowChunkReader::GetChunk(
     return GetChunkV2();
   case GetChunkVersion::AUTO:
     if (filter_options_.filter != nullptr) {
-      return GetChunkV2();
-    } else {
       return GetChunkV1();
+    } else {
+      return GetChunkV2();
     }
   default:
     return Status::Invalid("unsupport GetChunkVersion ", version);

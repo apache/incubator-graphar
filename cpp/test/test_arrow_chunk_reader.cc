@@ -21,10 +21,9 @@
 
 #include "arrow/api.h"
 
+#include <catch2/catch_test_macros.hpp>
 #include "./util.h"
 #include "graphar/api/arrow_reader.h"
-
-#include <catch2/catch_test_macros.hpp>
 
 namespace graphar {
 
@@ -137,6 +136,33 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(reader->next_chunk().IsIndexError());
 
       REQUIRE(reader->seek(1024).IsIndexError());
+    }
+    SECTION("Auto select GetChunkVersion") {
+      auto v_pg_name = vertex_info->GetPropertyGroup("firstName");
+      auto maybe_reader_auto_select =
+          VertexPropertyArrowChunkReader::Make(graph_info, src_type, v_pg_name);
+      REQUIRE(maybe_reader_auto_select.status().ok());
+      auto reader_auto_select = maybe_reader_auto_select.value();
+      // VERSION V2
+      auto result = reader_auto_select->GetChunk();
+      REQUIRE(!result.has_error());
+      auto table = result.value();
+      REQUIRE(table->num_rows() == 100);
+      REQUIRE(table->num_columns() == v_pg_name->GetProperties().size() + 1);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
+      // VERSION V1
+      auto filter = graphar::_Equal(graphar::_Property("gender"),
+                                    graphar::_Literal("female"));
+      reader_auto_select->Filter(filter);
+      reader_auto_select->next_chunk();
+      result = reader_auto_select->GetChunk();
+      REQUIRE(!result.has_error());
+      table = result.value();
+      REQUIRE(table->num_rows() == 48);
+      REQUIRE(table->num_columns() == v_pg_name->GetProperties().size() + 1);
+      REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
+              nullptr);
     }
 
     SECTION("CastDataType") {
