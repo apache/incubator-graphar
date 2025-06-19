@@ -23,6 +23,7 @@
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
+#include "parquet/arrow/reader.h"
 #if defined(ARROW_VERSION) && ARROW_VERSION <= 12000000
 #include "arrow/dataset/file_json.h"
 #endif
@@ -104,6 +105,34 @@ std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
   default:
     return nullptr;
   }
+}
+
+Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
+    const std::string& path, FileType file_type,
+    const std::vector<int>& column_indices) const noexcept {
+  parquet::arrow::FileReaderBuilder builder;
+  auto open_file_status = builder.OpenFile(path);
+  if (!open_file_status.ok()) {
+    return Status::Invalid("Failed to open file: ", path, " - ",
+                           open_file_status.ToString());
+  }
+  builder.memory_pool(arrow::default_memory_pool());
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto reader, builder.Build());
+  std::shared_ptr<arrow::Table> table;
+  if (column_indices.empty()) {
+    arrow::Status read_status = reader->ReadTable(&table);
+    if (!read_status.ok()) {
+      return Status::Invalid("Failed to read table from file: ", path, " - ",
+                             read_status.ToString());
+    }
+  } else {
+    arrow::Status read_status = reader->ReadTable(column_indices, &table);
+    if (!read_status.ok()) {
+      return Status::Invalid("Failed to read table from file: ", path, " - ",
+                             read_status.ToString());
+    }
+  }
+  return table;
 }
 
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(

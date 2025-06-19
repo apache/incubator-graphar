@@ -17,13 +17,17 @@
  * under the License.
  */
 
+#include <algorithm>
+#include <string>
 #include <utility>
+#include <vector>
 
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
 
 #include "graphar/arrow/chunk_reader.h"
 #include "graphar/filesystem.h"
+#include "graphar/fwd.h"
 #include "graphar/general_params.h"
 #include "graphar/graph_info.h"
 #include "graphar/reader_util.h"
@@ -106,15 +110,21 @@ Status CastTableWithSchema(const std::shared_ptr<arrow::Table>& table,
   if (table->schema()->Equals(*schema)) {
     *out_table = table;
   }
+  std::vector<std::shared_ptr<arrow::Field>> fields;
   std::vector<std::shared_ptr<arrow::ChunkedArray>> columns;
   for (int64_t i = 0; i < table->num_columns(); ++i) {
     auto column = table->column(i);
-    if (table->field(i)->type()->Equals(schema->field(i)->type())) {
+    auto table_field = table->field(i);
+    auto field_name = table_field->name();
+
+    auto schema_field = schema->GetFieldByName(field_name);
+    if (table_field->type()->Equals(schema_field->type())) {
       columns.push_back(column);
+      fields.push_back(table_field);
       continue;
     }
-    auto from_t = table->field(i)->type();
-    auto to_t = schema->field(i)->type();
+    auto from_t = table_field->type();
+    auto to_t = schema_field->type();
     std::vector<std::shared_ptr<arrow::Array>> chunks;
     // process cast for each chunk
     for (int64_t j = 0; j < column->num_chunks(); ++j) {
@@ -129,10 +139,11 @@ Status CastTableWithSchema(const std::shared_ptr<arrow::Table>& table,
         chunks.push_back(out);
       }
     }
+    fields.push_back(arrow::field(field_name, to_t));
     columns.push_back(std::make_shared<arrow::ChunkedArray>(chunks, to_t));
   }
-
-  *out_table = arrow::Table::Make(schema, columns);
+  auto new_schema = std::make_shared<arrow::Schema>(fields);
+  *out_table = arrow::Table::Make(new_schema, columns);
   return Status::OK();
 }
 }  // namespace
@@ -141,8 +152,17 @@ VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
     const std::shared_ptr<VertexInfo>& vertex_info,
     const std::shared_ptr<PropertyGroup>& property_group,
     const std::string& prefix, const util::FilterOptions& options)
+    : VertexPropertyArrowChunkReader(vertex_info, property_group, {}, prefix,
+                                     options) {}
+
+VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
+    const std::shared_ptr<VertexInfo>& vertex_info,
+    const std::shared_ptr<PropertyGroup>& property_group,
+    const std::vector<std::string>& property_names, const std::string& prefix,
+    const util::FilterOptions& options)
     : vertex_info_(std::move(vertex_info)),
       property_group_(std::move(property_group)),
+      property_names_(std::move(property_names)),
       chunk_index_(0),
       seek_id_(0),
       schema_(nullptr),
@@ -201,16 +221,81 @@ Status VertexPropertyArrowChunkReader::seek(IdType id) {
 }
 
 Result<std::shared_ptr<arrow::Table>>
-VertexPropertyArrowChunkReader::GetChunk() {
+VertexPropertyArrowChunkReader::GetChunkV2() {
+  if (chunk_table_ == nullptr) {
+    GAR_ASSIGN_OR_RAISE(
+        auto chunk_file_path,
+        vertex_info_->GetFilePath(property_group_, chunk_index_));
+    std::vector<int> column_indices = {};
+    std::vector<std::string> property_names;
+    if (!filter_options_.columns && !property_names_.empty()) {
+      property_names = property_names_;
+    } else {
+      if (!property_names_.empty()) {
+        for (const auto& col : filter_options_.columns.value().get()) {
+          if (std::find(property_names_.begin(), property_names_.end(), col) ==
+              property_names_.end()) {
+            return Status::Invalid("Column ", col,
+                                   " is not in select properties.");
+          }
+          property_names.push_back(col);
+        }
+      }
+    }
+    for (const auto& col : property_names) {
+      auto field_index = schema_->GetFieldIndex(col);
+      if (field_index == -1) {
+        return Status::Invalid("Column ", col, " is not in select properties.");
+      }
+      column_indices.push_back(field_index);
+    }
+    std::string path = prefix_ + chunk_file_path;
+    GAR_ASSIGN_OR_RAISE(
+        chunk_table_, fs_->ReadFileToTable(path, property_group_->GetFileType(),
+                                           column_indices));
+    if (schema_ != nullptr && filter_options_.filter == nullptr) {
+      GAR_RETURN_NOT_OK(
+          CastTableWithSchema(chunk_table_, schema_, &chunk_table_));
+    }
+  }
+  IdType row_offset = seek_id_ - chunk_index_ * vertex_info_->GetChunkSize();
+  return chunk_table_->Slice(row_offset);
+}
+
+Result<std::shared_ptr<arrow::Table>>
+VertexPropertyArrowChunkReader::GetChunkV1() {
   GAR_RETURN_NOT_OK(util::CheckFilterOptions(filter_options_, property_group_));
   if (chunk_table_ == nullptr) {
     GAR_ASSIGN_OR_RAISE(
         auto chunk_file_path,
         vertex_info_->GetFilePath(property_group_, chunk_index_));
     std::string path = prefix_ + chunk_file_path;
-    GAR_ASSIGN_OR_RAISE(
-        chunk_table_, fs_->ReadFileToTable(path, property_group_->GetFileType(),
-                                           filter_options_));
+    if (property_names_.empty()) {
+      GAR_ASSIGN_OR_RAISE(
+          chunk_table_,
+          fs_->ReadFileToTable(path, property_group_->GetFileType(),
+                               filter_options_));
+    } else {
+      util::FilterOptions temp_filter_options;
+      temp_filter_options.filter = filter_options_.filter;
+      std::vector<std::string> intersection_columns;
+      if (!filter_options_.columns) {
+        temp_filter_options.columns = std::ref(property_names_);
+      } else {
+        for (const auto& col : filter_options_.columns.value().get()) {
+          if (std::find(property_names_.begin(), property_names_.end(), col) ==
+              property_names_.end()) {
+            return Status::Invalid("Column ", col,
+                                   " is not in select properties.");
+          }
+        }
+        temp_filter_options.columns = filter_options_.columns;
+      }
+      GAR_ASSIGN_OR_RAISE(
+          chunk_table_,
+          fs_->ReadFileToTable(path, property_group_->GetFileType(),
+                               temp_filter_options));
+    }
     // TODO(acezen): filter pushdown doesn't support cast schema now
     if (schema_ != nullptr && filter_options_.filter == nullptr) {
       GAR_RETURN_NOT_OK(
@@ -219,6 +304,24 @@ VertexPropertyArrowChunkReader::GetChunk() {
   }
   IdType row_offset = seek_id_ - chunk_index_ * vertex_info_->GetChunkSize();
   return chunk_table_->Slice(row_offset);
+}
+
+Result<std::shared_ptr<arrow::Table>> VertexPropertyArrowChunkReader::GetChunk(
+    GetChunkVersion version) {
+  switch (version) {
+  case GetChunkVersion::V1:
+    return GetChunkV1();
+  case GetChunkVersion::V2:
+    return GetChunkV2();
+  case GetChunkVersion::AUTO:
+    if (filter_options_.filter != nullptr) {
+      return GetChunkV1();
+    } else {
+      return GetChunkV2();
+    }
+  default:
+    return Status::Invalid("unsupport GetChunkVersion ", version);
+  }
 }
 
 Result<std::shared_ptr<arrow::Table>>
@@ -270,6 +373,16 @@ VertexPropertyArrowChunkReader::Make(
 
 Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
 VertexPropertyArrowChunkReader::Make(
+    const std::shared_ptr<VertexInfo>& vertex_info,
+    const std::shared_ptr<PropertyGroup>& property_group,
+    const std::vector<std::string>& property_names, const std::string& prefix,
+    const util::FilterOptions& options) {
+  return std::make_shared<VertexPropertyArrowChunkReader>(
+      vertex_info, property_group, property_names, prefix, options);
+}
+
+Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
+VertexPropertyArrowChunkReader::Make(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
     const std::shared_ptr<PropertyGroup>& property_group,
     const util::FilterOptions& options) {
@@ -297,9 +410,83 @@ VertexPropertyArrowChunkReader::Make(
     return Status::KeyError("The property ", property_name,
                             " doesn't exist in vertex type ", type, ".");
   }
-  return Make(vertex_info, property_group, graph_info->GetPrefix(), options);
+  std::vector<std::string> property_names = {property_name};
+  if (property_name != graphar::GeneralParams::kVertexIndexCol) {
+    property_names.insert(property_names.begin(),
+                          graphar::GeneralParams::kVertexIndexCol);
+  }
+  return Make(vertex_info, property_group, property_names,
+              graph_info->GetPrefix(), options);
 }
 
+Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
+VertexPropertyArrowChunkReader::Make(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+    const std::vector<std::string>& property_names_or_labels,
+    const SelectType select_type, const util::FilterOptions& options) {
+  switch (select_type) {
+  case SelectType::LABELS:
+    return MakeForLabels(graph_info, type, property_names_or_labels, options);
+  case SelectType::PROPERTIES:
+    return MakeForProperties(graph_info, type, property_names_or_labels,
+                             options);
+  }
+}
+
+Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
+VertexPropertyArrowChunkReader::MakeForProperties(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+    const std::vector<std::string>& property_names,
+    const util::FilterOptions& options) {
+  auto vertex_info = graph_info->GetVertexInfo(type);
+  if (!vertex_info) {
+    return Status::KeyError("The vertex type ", type,
+                            " doesn't exist in graph ", graph_info->GetName(),
+                            ".");
+  }
+  if (property_names.empty()) {
+    return Status::Invalid("The property names cannot be empty.");
+  }
+  bool hasIndexCol = false;
+  std::vector<std::string> property_names_mutable = property_names;
+  if (property_names_mutable[property_names_mutable.size() - 1] ==
+      graphar::GeneralParams::kVertexIndexCol) {
+    hasIndexCol = true;
+    std::iter_swap(property_names_mutable.begin(),
+                   property_names_mutable.end() - 1);
+  }
+  auto property_group = vertex_info->GetPropertyGroup(
+      property_names_mutable[property_names_mutable.size() - 1]);
+  if (!property_group) {
+    return Status::KeyError(
+        "The property ",
+        property_names_mutable[property_names_mutable.size() - 1],
+        " doesn't exist in vertex type ", type, ".");
+  }
+  for (int i = 0; i < property_names_mutable.size() - 1; i++) {
+    if (property_names_mutable[i] == graphar::GeneralParams::kVertexIndexCol) {
+      hasIndexCol = true;
+    }
+    auto pg = vertex_info->GetPropertyGroup(property_names_mutable[i]);
+    if (!pg) {
+      return Status::KeyError("The property ", property_names_mutable[i],
+                              " doesn't exist in vertex type ", type, ".");
+    }
+    if (pg != property_group) {
+      return Status::Invalid(
+          "The properties ", property_names_mutable[i], " and ",
+          property_names_mutable[property_names_mutable.size() - 1],
+          " are not in the same property group, please use Make with "
+          "property_group instead.");
+    }
+  }
+  if (!hasIndexCol) {
+    property_names_mutable.insert(property_names_mutable.begin(),
+                                  graphar::GeneralParams::kVertexIndexCol);
+  }
+  return Make(vertex_info, property_group, property_names_mutable,
+              graph_info->GetPrefix(), options);
+}
 Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
 VertexPropertyArrowChunkReader::Make(
     const std::shared_ptr<VertexInfo>& vertex_info,
@@ -310,7 +497,7 @@ VertexPropertyArrowChunkReader::Make(
 }
 
 Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
-VertexPropertyArrowChunkReader::Make(
+VertexPropertyArrowChunkReader::MakeForLabels(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
     const std::vector<std::string>& labels,
     const util::FilterOptions& options) {
