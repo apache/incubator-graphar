@@ -161,36 +161,36 @@ public class EdgeInfo {
 
     public String getPropertyGroupPrefix(PropertyGroup propertyGroup) {
         checkPropertyGroupExist(propertyGroup);
-        return getPrefix() + "/" + propertyGroup.getPrefix();
+        return getPrefix() + propertyGroup.getPrefix();
     }
 
     public String getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
         // PropertyGroup will be checked in getPropertyGroupPrefix
-        return getPropertyGroupPrefix(propertyGroup) + "/chunk" + chunkIndex;
+        return getPropertyGroupPrefix(propertyGroup) + "chunk" + chunkIndex;
     }
 
     public String getAdjacentListPrefix(AdjListType adjListType) {
-        return getPrefix() + "/" + getAdjacentList(adjListType).getPrefix() + "/adj_list";
+        return getPrefix() + getAdjacentList(adjListType).getPrefix() + "adj_list/";
     }
 
     public String getAdjacentListChunkPath(AdjListType adjListType, long vertexChunkIndex) {
-        return getAdjacentListPrefix(adjListType) + "/chunk" + vertexChunkIndex;
+        return getAdjacentListPrefix(adjListType) + "chunk" + vertexChunkIndex;
     }
 
     public String getOffsetPrefix(AdjListType adjListType) {
-        return getAdjacentListPrefix(adjListType) + "/offset";
+        return getAdjacentListPrefix(adjListType) + "offset/";
     }
 
     public String getOffsetChunkPath(AdjListType adjListType, long vertexChunkIndex) {
-        return getOffsetPrefix(adjListType) + "/chunk" + vertexChunkIndex;
+        return getOffsetPrefix(adjListType) + "chunk" + vertexChunkIndex;
     }
 
     public String getVerticesNumFilePath(AdjListType adjListType) {
-        return getAdjacentListPrefix(adjListType) + "/vertex_count";
+        return getAdjacentListPrefix(adjListType) + "vertex_count";
     }
 
     public String getEdgesNumFilePath(AdjListType adjListType, long vertexChunkIndex) {
-        return getAdjacentListPrefix(adjListType) + "/edge_count" + vertexChunkIndex;
+        return getAdjacentListPrefix(adjListType) + "edge_count" + vertexChunkIndex;
     }
 
     public DataType getPropertyType(String propertyName) {
@@ -248,7 +248,7 @@ public class EdgeInfo {
     }
 
     public String getEdgePath() {
-        return getPrefix() + "/" + getConcat() + ".edge.yaml";
+        return getPrefix() + getConcat() + ".edge.yaml";
     }
 
     public Map<AdjListType, AdjacentList> getAdjacentLists() {
