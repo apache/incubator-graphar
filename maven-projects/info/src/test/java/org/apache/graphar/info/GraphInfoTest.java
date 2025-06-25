@@ -25,6 +25,7 @@ import org.apache.graphar.info.loader.LocalYamlGraphLoader;
 import org.apache.graphar.proto.AdjListType;
 import org.apache.graphar.proto.DataType;
 import org.apache.graphar.proto.FileType;
+import org.apache.graphar.util.PathUtil;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -35,12 +36,13 @@ public class GraphInfoTest {
     private static GraphInfo graphInfo;
     private static VertexInfo personVertexInfo;
     private static EdgeInfo knowsEdgeInfo;
+    private static String GRAPH_PATH;
 
     @BeforeClass
     public static void setUp() {
         TestUtil.checkTestData();
+        GRAPH_PATH = TestUtil.getLdbcSampleGraphPath();
         final GraphLoader graphLoader = new LocalYamlGraphLoader();
-        final String GRAPH_PATH = TestUtil.getLdbcSampleGraphPath();
         try {
             graphInfo = graphLoader.load(GRAPH_PATH);
         } catch (IOException e) {
@@ -57,7 +59,7 @@ public class GraphInfoTest {
     public void testGraphInfoBasics() {
         Assert.assertNotNull(graphInfo);
         Assert.assertEquals("ldbc_sample", graphInfo.getName());
-        Assert.assertEquals("", graphInfo.getPrefix());
+        Assert.assertEquals(PathUtil.pathToDirectory(GRAPH_PATH), graphInfo.getPrefix());
         Assert.assertNotNull(graphInfo.getEdgeInfos());
         Assert.assertEquals(1, graphInfo.getEdgeInfos().size());
         Assert.assertNotNull(graphInfo.getVertexInfos());
