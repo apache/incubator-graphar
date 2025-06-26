@@ -129,14 +129,37 @@ public class GraphInfo {
                         && !e.getEdgeLabel().equals(edgeInfo.getEdgeLabel())))
                 .collect(Collectors.toList());
 
+
+        List<VertexInfo> newCachedVertexInfoList = newEdgeInfos.stream()
+                // flatMap is used because for each edge, we might generate a stream of multiple vertices
+                .flatMap(e -> {
+                    Stream<VertexInfo> vertexStream = Stream.empty(); // Start with an empty stream
+                    if (e.getSrcLabel().equals("")) {
+                        // If srcLabel is empty, filter vertices where dstLabel doesn't match
+                        vertexStream = Stream.concat(vertexStream,
+                                cachedVertexInfoList.stream()
+                                        .filter(vertex -> !e.getDstLabel().equals(vertex.getType())));
+                    }
+                    if (e.getDstLabel().equals("")) {
+                        // If dstLabel is empty, filter vertices where srcLabel doesn't match
+                        vertexStream = Stream.concat(vertexStream,
+                                cachedVertexInfoList.stream()
+                                        .filter(vertex -> !e.getSrcLabel().equals(vertex.getType())));
+                    }
+                    return vertexStream; // Return the combined stream of vertices for this edge
+                })
+                .distinct()
+                .collect(Collectors.toList());
+
         final Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
                 cachedEdgeInfoMap.entrySet().stream()
                         .filter(e -> !e.getConcat().equals(edgeInfo.getConcat()))
                         .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+        // TODO if logic is correct create newCachedVertexInfoMap as well
         return Optional.of(
                 new GraphInfo(
                         newProtoGraphInfo,
-                        cachedVertexInfoList,
+                        newCachedVertexInfoList,
                         newEdgeInfos,
                         cachedVertexInfoMap,
                         newEdgeConcat2EdgeInfo));
