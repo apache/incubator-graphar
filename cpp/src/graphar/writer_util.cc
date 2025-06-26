@@ -38,7 +38,6 @@ arrow::csv::WriteOptions WriterOptions::getCsvOption() const {
 std::shared_ptr<parquet::WriterProperties>
 WriterOptions::getParquetWriterProperties() const {
   parquet::WriterProperties::Builder builder;
-  builder.compression(arrow::Compression::ZSTD);
   if (parquetOption_) {
     builder
         .dictionary_pagesize_limit(parquetOption_->dictionary_pagesize_limit)
@@ -115,6 +114,7 @@ WriterOptions::getArrowWriterProperties() const {
 #ifdef ARROW_ORC
 arrow::adapters::orc::WriteOptions WriterOptions::getOrcOption() const {
   auto writer_options = arrow::adapters::orc::WriteOptions();
+  writer_options.compression = arrow::Compression::ZSTD;
   if (orcOption_) {
     writer_options.batch_size = orcOption_->batch_size;
     writer_options.compression = orcOption_->compression;
