@@ -85,6 +85,32 @@ public class GraphInfo {
         return yaml.dump(graphYaml);
     }
 
+    public Optional<GraphInfo> removeVertex(VertexInfo vertexInfo) {
+        if (vertexInfo == null || hasVertexInfo(vertexInfo.getType())) {
+            return Optional.empty();
+        }
+        final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
+                org.apache.graphar.proto.GraphInfo.newBuilder(protoGraphInfo)
+                        .removeVertices(vertexInfo.getVertexPath())
+                        .build();
+        final List<VertexInfo> newVertexInfoList = Stream.concat(cachedVertexInfoList.stream().filter(v ->
+                !v.getType().equals(vertexInfo.getType())
+                        && !v.getPrefix().equals(vertexInfo.getPrefix())))
+                .collect(Collectors.toList());
+
+        final Map<String, VertexInfo> newVertexInfoMap =
+                cachedVertexInfoMap.entrySet().stream()
+                        .filter(v -> !v.getConcat().equals(vertexInfo.getConcat()))
+                        .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+        return Optional.of(
+                new GraphInfo(
+                        newProtoGraphInfo,
+                        newVertexInfoList,
+                        cachedEdgeInfoList,
+                        newVertexInfoMap,
+                        cachedEdgeInfoMap));
+    }
+
     public Optional<GraphInfo> addVertexAsNew(VertexInfo vertexInfo) {
         if (vertexInfo == null || hasVertexInfo(vertexInfo.getType())) {
             return Optional.empty();

@@ -115,6 +115,9 @@ public class VertexInfo {
         VertexYaml vertexYaml = new VertexYaml(this);
         return yaml.dump(vertexYaml);
     }
+    public String getConcat() {
+        return concat(getType(), getPrefix(), getVertexPath);
+    }
 
     public String getType() {
         return protoVertexInfo.getType();
