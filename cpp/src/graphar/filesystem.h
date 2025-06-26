@@ -80,6 +80,10 @@ class FileSystem {
       const std::string& path, FileType file_type,
       const util::FilterOptions& options = {}) const noexcept;
 
+  Result<std::shared_ptr<arrow::Table>> ReadFileToTable(
+      const std::string& path, FileType file_type,
+      const std::vector<int>& column_indices) const noexcept;
+
   /**
    * @brief Read a file and convert its bytes to a value of type T.
    *
