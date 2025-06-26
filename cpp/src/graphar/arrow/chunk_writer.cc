@@ -109,6 +109,9 @@ VertexPropertyWriter::VertexPropertyWriter(
       prefix_(prefix),
       validate_level_(validate_level),
       options_(options) {
+  if (!options) {
+    options_ = WriterOptions::DefaultWriterOption();
+  }
   if (validate_level_ == ValidateLevel::default_validate) {
     throw std::runtime_error(
         "default_validate is not allowed to be set as the global validate "
@@ -437,13 +440,15 @@ Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
 Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
     const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
     const ValidateLevel& validate_level) {
-  return Make(vertex_info, prefix, nullptr, validate_level);
+  return Make(vertex_info, prefix, WriterOptions::DefaultWriterOption(),
+              validate_level);
 }
 
 Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
     const ValidateLevel& validate_level) {
-  return Make(graph_info, type, nullptr, validate_level);
+  return Make(graph_info, type, WriterOptions::DefaultWriterOption(),
+              validate_level);
 }
 
 Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::AddIndexColumn(
@@ -478,6 +483,9 @@ EdgeChunkWriter::EdgeChunkWriter(const std::shared_ptr<EdgeInfo>& edge_info,
       adj_list_type_(adj_list_type),
       validate_level_(validate_level),
       options_(options) {
+  if (!options) {
+    options_ = WriterOptions::DefaultWriterOption();
+  }
   if (validate_level_ == ValidateLevel::default_validate) {
     throw std::runtime_error(
         "default_validate is not allowed to be set as the global validate "
@@ -1035,7 +1043,8 @@ Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
 Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
     const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
     AdjListType adj_list_type, const ValidateLevel& validate_level) {
-  return Make(edge_info, prefix, adj_list_type, nullptr, validate_level);
+  return Make(edge_info, prefix, adj_list_type,
+              WriterOptions::DefaultWriterOption(), validate_level);
 }
 
 Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
@@ -1056,8 +1065,8 @@ Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
     const std::string& edge_type, const std::string& dst_type,
     AdjListType adj_list_type, const ValidateLevel& validate_level) {
-  return Make(graph_info, src_type, edge_type, dst_type, adj_list_type, nullptr,
-              validate_level);
+  return Make(graph_info, src_type, edge_type, dst_type, adj_list_type,
+              WriterOptions::DefaultWriterOption(), validate_level);
 }
 
 std::string EdgeChunkWriter::getSortColumnName(AdjListType adj_list_type) {

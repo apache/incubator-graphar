@@ -165,12 +165,11 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
         test_data_dir + "/ldbc_sample/csv/" + "person.vertex.yml";
     auto vertex_meta_csv = Yaml::LoadFile(vertex_meta_file_csv).value();
     auto vertex_info_csv = VertexInfo::Load(vertex_meta_csv).value();
-    auto optionsBuilder = WriterOptions::Builder();
-    auto csvOptionsBuilder = optionsBuilder.getCsvOptionBuilder();
-    csvOptionsBuilder->include_header(true);
-    csvOptionsBuilder->delimiter('|');
+    auto csv_options = WriterOptions::CSVOptionBuilder();
+    csv_options.include_header(true);
+    csv_options.delimiter('|');
     auto maybe_writer = VertexPropertyWriter::Make(
-        vertex_info_csv, "/tmp/option/", optionsBuilder.Build());
+        vertex_info_csv, "/tmp/option/", csv_options.build());
     REQUIRE(!maybe_writer.has_error());
     auto writer = maybe_writer.value();
     REQUIRE(writer->WriteTable(table, 0).ok());
@@ -197,22 +196,19 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
                                  .size()) +
                 1);
     // type parquet
-    optionsBuilder = WriterOptions::Builder();
-    auto options_parquet_Builder = optionsBuilder.getParquetOptionBuilder();
-    options_parquet_Builder->compression(
-        arrow::Compression::type::UNCOMPRESSED);
-    options_parquet_Builder->enable_statistics(false);
+    auto options_parquet_Builder = WriterOptions::ParquetOptionBuilder();
+    options_parquet_Builder.compression(arrow::Compression::type::UNCOMPRESSED);
+    options_parquet_Builder.enable_statistics(false);
     parquet::SortingColumn sc;
     sc.column_idx = 1;
     std::vector<::parquet::SortingColumn> columns = {sc};
-    options_parquet_Builder->sorting_columns(columns);
-    options_parquet_Builder->enable_store_decimal_as_integer(true);
-    options_parquet_Builder->max_row_group_length(10);
+    options_parquet_Builder.sorting_columns(columns)
+        .enable_store_decimal_as_integer(true)
+        .max_row_group_length(10);
     maybe_writer = VertexPropertyWriter::Make(
-        vertex_info_parquet, "/tmp/option/", optionsBuilder.Build());
+        vertex_info_parquet, "/tmp/option/", options_parquet_Builder.build());
     REQUIRE(!maybe_writer.has_error());
     writer = maybe_writer.value();
-    writer->setWriterOptions(optionsBuilder.Build());
     REQUIRE(writer->WriteTable(table, 0).ok());
     // read parquet file
     std::string parquet_file =
@@ -248,11 +244,10 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
         test_data_dir + "/ldbc_sample/orc/" + "person.vertex.yml";
     auto vertex_meta_orc = Yaml::LoadFile(vertex_meta_file_orc).value();
     auto vertex_info_orc = VertexInfo::Load(vertex_meta_orc).value();
-    optionsBuilder = WriterOptions::Builder();
-    auto optionsOrcBuilder = optionsBuilder.getOrcOptionBuilder();
-    optionsOrcBuilder->compression(arrow::Compression::type::ZSTD);
+    auto optionsOrcBuilder = WriterOptions::ORCOptionBuilder();
+    optionsOrcBuilder.compression(arrow::Compression::type::ZSTD);
     maybe_writer = VertexPropertyWriter::Make(vertex_info_orc, "/tmp/option/",
-                                              optionsBuilder.Build());
+                                              optionsOrcBuilder.build());
     REQUIRE(!maybe_writer.has_error());
     writer = maybe_writer.value();
     REQUIRE(writer->WriteTable(table, 0).ok());
@@ -378,12 +373,11 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     REQUIRE(writer->WritePropertyChunk(tmp_table, pg2, 0, 0).IsTypeError());
   }
   SECTION("TestEdgeChunkWriterWithOption") {
-    WriterOptions::Builder optionsBilder;
-    auto csvOptionsBuilder = optionsBilder.getCsvOptionBuilder();
-    csvOptionsBuilder->include_header(true);
-    csvOptionsBuilder->delimiter('|');
-    auto maybe_writer = EdgeChunkWriter::Make(
-        edge_info_csv, "/tmp/option/", adj_list_type, optionsBilder.Build());
+    WriterOptions::CSVOptionBuilder csv_options_builder;
+    csv_options_builder.include_header(true).delimiter('|');
+    auto maybe_writer =
+        EdgeChunkWriter::Make(edge_info_csv, "/tmp/option/", adj_list_type,
+                              csv_options_builder.build());
     REQUIRE(!maybe_writer.has_error());
     auto writer = maybe_writer.value();
 
@@ -421,15 +415,14 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
                                          "person_knows_person.edge.yml";
     auto edge_meta_parquet = Yaml::LoadFile(edge_meta_file_parquet).value();
     auto edge_info_parquet = EdgeInfo::Load(edge_meta_parquet).value();
-    optionsBilder = WriterOptions::Builder();
-    auto optionsBuilderParquet = optionsBilder.getParquetOptionBuilder();
-    optionsBuilderParquet->compression(arrow::Compression::type::UNCOMPRESSED);
-    optionsBuilderParquet->enable_statistics(false);
-    optionsBuilderParquet->enable_store_decimal_as_integer(true);
-    optionsBuilderParquet->max_row_group_length(10);
+    auto optionsBuilderParquet = WriterOptions::ParquetOptionBuilder();
+    optionsBuilderParquet.compression(arrow::Compression::type::UNCOMPRESSED);
+    optionsBuilderParquet.enable_statistics(false);
+    optionsBuilderParquet.enable_store_decimal_as_integer(true);
+    optionsBuilderParquet.max_row_group_length(10);
     auto maybe_parquet_writer =
         EdgeChunkWriter::Make(edge_info_parquet, "/tmp/option/", adj_list_type,
-                              optionsBilder.Build());
+                              optionsBuilderParquet.build());
     REQUIRE(!maybe_parquet_writer.has_error());
     auto parquet_writer = maybe_parquet_writer.value();
     REQUIRE(parquet_writer->SortAndWriteAdjListTable(table, 0, 0).ok());
@@ -465,11 +458,11 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
         test_data_dir + "/ldbc_sample/orc/" + "person_knows_person.edge.yml";
     auto edge_meta_orc = Yaml::LoadFile(edge_meta_file_orc).value();
     auto edge_info_orc = EdgeInfo::Load(edge_meta_orc).value();
-    optionsBilder = WriterOptions::Builder();
-    auto optionsBuilderOrc = optionsBilder.getOrcOptionBuilder();
-    optionsBuilderOrc->compression(arrow::Compression::type::ZSTD);
-    auto maybe_orc_writer = EdgeChunkWriter::Make(
-        edge_info_orc, "/tmp/option/", adj_list_type, optionsBilder.Build());
+    auto optionsBuilderOrc = WriterOptions::ORCOptionBuilder();
+    optionsBuilderOrc.compression(arrow::Compression::type::ZSTD);
+    auto maybe_orc_writer =
+        EdgeChunkWriter::Make(edge_info_orc, "/tmp/option/", adj_list_type,
+                              optionsBuilderOrc.build());
     REQUIRE(!maybe_orc_writer.has_error());
     auto orc_writer = maybe_orc_writer.value();
     REQUIRE(orc_writer->SortAndWriteAdjListTable(table, 0, 0).ok());

@@ -111,10 +111,10 @@ class FileSystem {
    * @param options Options for writing the table, such as compression.
    * @return A Status indicating OK if successful, or an error if unsuccessful.
    */
-  Status WriteTableToFile(
-      const std::shared_ptr<arrow::Table>& table, FileType file_type,
-      const std::string& path,
-      const std::shared_ptr<WriterOptions>& options = nullptr) const noexcept;
+  Status WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
+                          FileType file_type, const std::string& path,
+                          const std::shared_ptr<WriterOptions>& options) const
+      noexcept;
 
   /**
    * @brief Write a label table to a file with parquet type.
@@ -186,20 +186,5 @@ Status InitializeS3();
  *
  */
 Status FinalizeS3();
-
-#ifdef ARROW_ORC
-void buildOrcWriteOptionsWithWriterOptions(
-    std::shared_ptr<arrow::adapters::orc::WriteOptions> writeOptions,
-    const std::shared_ptr<WriterOptions>& options);
-#endif
-void buildCsvWriteOptionsWithWriterOptions(
-    std::shared_ptr<arrow::csv::WriteOptions> writeOptions,
-    const std::shared_ptr<WriterOptions>& options);
-
-void buildParquetWriteOptionsWithWriterOptions(
-    std::shared_ptr<parquet::WriterProperties::Builder> builder,
-    std::shared_ptr<parquet::ArrowWriterProperties::Builder>
-        arrow_writer_porpertices_builder,
-    const std::shared_ptr<WriterOptions>& options);
 
 }  // namespace graphar

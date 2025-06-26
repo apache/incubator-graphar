@@ -37,7 +37,7 @@
 
 #include <catch2/catch_test_macros.hpp>
 namespace graphar {
-TEST_CASE_METHOD(GlobalFixture, "test_vertices_builder") {
+TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   std::cout << "Test vertex builder" << std::endl;
 
   // construct vertex builder

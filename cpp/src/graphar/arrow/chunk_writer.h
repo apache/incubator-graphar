@@ -68,7 +68,8 @@ class VertexPropertyWriter {
    */
   explicit VertexPropertyWriter(
       const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
-      const std::shared_ptr<WriterOptions>& options = nullptr,
+      const std::shared_ptr<WriterOptions>& options =
+          WriterOptions::DefaultWriterOption(),
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   /**
@@ -332,7 +333,8 @@ class EdgeChunkWriter {
   explicit EdgeChunkWriter(
       const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
       AdjListType adj_list_type,
-      const std::shared_ptr<WriterOptions>& options = nullptr,
+      const std::shared_ptr<WriterOptions>& options =
+          WriterOptions::DefaultWriterOption(),
       const ValidateLevel& validate_level = ValidateLevel::no_validate);
 
   /**

@@ -226,40 +226,27 @@ Status FileSystem::WriteTableToFile(
                                        arrow_fs_->OpenOutputStream(path));
   switch (file_type) {
   case FileType::CSV: {
-    auto write_options = std::make_shared<arrow::csv::WriteOptions>();
-    buildCsvWriteOptionsWithWriterOptions(write_options, options);
     GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
-        auto writer, arrow::csv::MakeCSVWriter(
-                         output_stream.get(), table->schema(), *write_options));
+        auto writer,
+        arrow::csv::MakeCSVWriter(output_stream.get(), table->schema(),
+                                  options->getCsvOption()));
     RETURN_NOT_ARROW_OK(writer->WriteTable(*table));
     RETURN_NOT_ARROW_OK(writer->Close());
     break;
   }
   case FileType::PARQUET: {
     auto schema = table->schema();
-    auto column_num = schema->num_fields();
-    auto writer_porpertices_builder =
-        std::make_shared<parquet::WriterProperties::Builder>();
-    writer_porpertices_builder->compression(
-        arrow::Compression::type::ZSTD);  // default = ZSTD
-    auto arrow_writer_porpertices_builder =
-        std::make_shared<parquet::ArrowWriterProperties::Builder>();
-    buildParquetWriteOptionsWithWriterOptions(
-        writer_porpertices_builder, arrow_writer_porpertices_builder, options);
     RETURN_NOT_ARROW_OK(parquet::arrow::WriteTable(
         *table, arrow::default_memory_pool(), output_stream, 64 * 1024 * 1024,
-        writer_porpertices_builder->build(),
-        arrow_writer_porpertices_builder->build()));
+        options->getParquetWriterProperties(),
+        options->getArrowWriterProperties()));
     break;
   }
 #ifdef ARROW_ORC
   case FileType::ORC: {
-    auto writer_options =
-        std::make_shared<arrow::adapters::orc::WriteOptions>();
-    buildOrcWriteOptionsWithWriterOptions(writer_options, options);
     GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
         auto writer, arrow::adapters::orc::ORCFileWriter::Open(
-                         output_stream.get(), *writer_options));
+                         output_stream.get(), options->getOrcOption()));
     RETURN_NOT_ARROW_OK(writer->Write(*table));
     RETURN_NOT_ARROW_OK(writer->Close());
     break;
@@ -375,129 +362,4 @@ template Result<IdType> FileSystem::ReadFileToValue<IdType>(
 template Status FileSystem::WriteValueToFile<IdType>(const IdType&,
                                                      const std::string&) const
     noexcept;
-
-void buildParquetWriteOptionsWithWriterOptions(
-    std::shared_ptr<parquet::WriterProperties::Builder>
-        writer_porpertices_builder,
-    std::shared_ptr<parquet::ArrowWriterProperties::Builder>
-        arrow_writer_porpertices_builder,
-    const std::shared_ptr<WriterOptions>& options) {
-  if (!options) {
-    return;
-  }
-  auto parquetOption = options->parquetOption;
-  if (!parquetOption) {
-    return;
-  }
-  if (!parquetOption->enable_dictionary) {
-    writer_porpertices_builder->disable_dictionary();
-  }
-  writer_porpertices_builder->dictionary_pagesize_limit(
-      parquetOption->dictionary_pagesize_limit);
-  writer_porpertices_builder->write_batch_size(parquetOption->write_batch_size);
-  writer_porpertices_builder->max_row_group_length(
-      parquetOption->max_row_group_length);
-  writer_porpertices_builder->data_pagesize(parquetOption->data_pagesize);
-  writer_porpertices_builder->data_page_version(
-      parquetOption->data_page_version);
-  writer_porpertices_builder->version(parquetOption->version);
-  writer_porpertices_builder->encoding(parquetOption->encoding);
-  for (const auto& kv : parquetOption->column_encoding) {
-    writer_porpertices_builder->encoding(kv.first, kv.second);
-  }
-  writer_porpertices_builder->compression(parquetOption->compression);
-  for (const auto& kv : parquetOption->column_compression) {
-    writer_porpertices_builder->compression(kv.first, kv.second);
-  }
-  writer_porpertices_builder->compression_level(
-      parquetOption->compression_level);
-  for (const auto& kv : parquetOption->column_compression_level) {
-    writer_porpertices_builder->compression_level(kv.first, kv.second);
-  }
-  writer_porpertices_builder->max_statistics_size(
-      parquetOption->max_statistics_size);
-  if (parquetOption->encryption_properties) {
-    writer_porpertices_builder->encryption(
-        parquetOption->encryption_properties);
-  }
-  if (!parquetOption->enable_statistics) {
-    writer_porpertices_builder->disable_statistics();
-  }
-  for (const auto& path_st : parquetOption->column_statistics) {
-    if (!path_st.second) {
-      writer_porpertices_builder->disable_statistics(path_st.first);
-    }
-  }
-  if (!parquetOption->sorting_columns.empty()) {
-    writer_porpertices_builder->set_sorting_columns(
-        parquetOption->sorting_columns);
-  }
-  if (parquetOption->enable_store_decimal_as_integer) {
-    writer_porpertices_builder->enable_store_decimal_as_integer();
-  }
-  if (parquetOption->enable_write_page_index) {
-    writer_porpertices_builder->enable_write_page_index();
-  }
-  for (const auto& column_pi : parquetOption->column_write_page_index) {
-    if (column_pi.second) {
-      writer_porpertices_builder->enable_write_page_index(column_pi.first);
-    }
-  }
-  if (!parquetOption->compliant_nested_types) {
-    arrow_writer_porpertices_builder->disable_compliant_nested_types();
-  }
-  arrow_writer_porpertices_builder->set_use_threads(parquetOption->use_threads);
-  if (parquetOption->enable_deprecated_int96_timestamps) {
-    arrow_writer_porpertices_builder->enable_deprecated_int96_timestamps();
-  }
-  arrow_writer_porpertices_builder->coerce_timestamps(
-      parquetOption->coerce_timestamps);
-  if (parquetOption->allow_truncated_timestamps) {
-    arrow_writer_porpertices_builder->allow_truncated_timestamps();
-  }
-  if (parquetOption->store_schema) {
-    arrow_writer_porpertices_builder->store_schema();
-  }
-  if (parquetOption->executor) {
-    arrow_writer_porpertices_builder->set_executor(parquetOption->executor);
-  }
-}
-
-void buildCsvWriteOptionsWithWriterOptions(
-    std::shared_ptr<arrow::csv::WriteOptions> writeOptions,
-    const std::shared_ptr<WriterOptions>& options) {
-  if (!options) {
-    return;
-  }
-  auto csvOption = options->csvOption;
-  if (csvOption) {
-    writeOptions->include_header = csvOption->include_header;
-    writeOptions->batch_size = csvOption->batch_size;
-    writeOptions->delimiter = csvOption->delimiter;
-    writeOptions->null_string = csvOption->null_string;
-    writeOptions->io_context = csvOption->io_context;
-    writeOptions->eol = csvOption->eol;
-    writeOptions->quoting_style = csvOption->quoting_style;
-  }
-}
-
-#ifdef ARROW_ORC
-void buildOrcWriteOptionsWithWriterOptions(
-    std::shared_ptr<arrow::adapters::orc::WriteOptions> write_options,
-    const std::shared_ptr<WriterOptions>& options) {
-  if (!options) {
-    return;
-  }
-  auto orcOption = options->orcOption;
-  if (!orcOption) {
-    return;
-  }
-  write_options->batch_size = orcOption->batch_size;
-  write_options->compression = orcOption->compression;
-  write_options->stripe_size = orcOption->stripe_size;
-  write_options->file_version = orcOption->file_version;
-  write_options->bloom_filter_columns = orcOption->bloom_filter_columns;
-  write_options->bloom_filter_fpp = orcOption->bloom_filter_fpp;
-}
-#endif
 }  // namespace graphar
