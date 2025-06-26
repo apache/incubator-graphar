@@ -131,7 +131,7 @@ public class GraphInfo {
 
         final Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
                 cachedEdgeInfoMap.entrySet().stream()
-                        .filter(e -> !e.getKey().equals(edgeInfo.getConcat()))
+                        .filter(e -> !e.getConcat().equals(edgeInfo.getConcat()))
                         .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
         return Optional.of(
                 new GraphInfo(
