@@ -212,10 +212,7 @@ public class GraphInfo {
     public String getPrefix() {
         return protoGraphInfo.getPrefix();
     }
-
-    public String getVersion() {
-        return protoGraphInfo.getVersion();
-    }
+    
 
     private void checkVertexExist(String label) {
         if (!hasVertexInfo(label)) {
