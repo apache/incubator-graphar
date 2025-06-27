@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.graphar.proto.DataType;
 import org.apache.graphar.proto.FileType;
 import org.apache.graphar.util.GeneralParams;
@@ -77,9 +78,9 @@ public class PropertyGroup implements Iterable<Property> {
         }
         List<Property> newPropertyList =
                 Stream.concat(
-                                protoPropertyGroup.getPropertiesList().stream()
-                                        .map(Property::ofProto),
-                                Stream.of(property))
+                        protoPropertyGroup.getPropertiesList().stream()
+                                .map(Property::ofProto),
+                        Stream.of(property))
                         .collect(Collectors.toUnmodifiableList());
         return Optional.of(
                 new PropertyGroup(
@@ -189,8 +190,8 @@ class PropertyGroups {
         }
         Map<String, Property> newProperties =
                 Stream.concat(
-                                properties.values().stream(),
-                                propertyGroup.getCachedPropertyMap().values().stream())
+                        properties.values().stream(),
+                        propertyGroup.getCachedPropertyMap().values().stream())
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Property::getName, Function.identity()));
@@ -219,6 +220,24 @@ class PropertyGroups {
     boolean isPrimaryKey(String propertyName) {
         checkPropertyExist(propertyName);
         return properties.get(propertyName).isPrimary();
+    }
+
+    Map<String, Property> getPropertiesByDataType(DataType type) {
+        return properties.entrySet().stream()
+                .filter(prop -> type == prop.getValue().getDataType()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    Map<String, Property> getNonNullableProperties() {
+        return properties.entrySet().stream()
+                .filter(prop -> !prop.getValue().getIsNullable()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    Map<String, Property> getPrimaryProperties() {
+        return properties.entrySet().stream()
+                .filter(prop -> prop.getValue().getIsPrimaryKey()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     boolean isNullableKey(String propertyName) {
