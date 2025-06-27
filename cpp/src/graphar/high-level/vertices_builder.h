@@ -242,6 +242,7 @@ class VerticesBuilder {
    */
   Status Dump() {
     // construct the writer
+    // TODO(yangxk) Allow users to use custom options instead of nullptr
     VertexPropertyWriter writer(vertex_info_, prefix_, nullptr,
                                 validate_level_);
     IdType start_chunk_index =

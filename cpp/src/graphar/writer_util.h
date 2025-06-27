@@ -36,9 +36,24 @@
 #include "parquet/arrow/writer.h"
 
 namespace graphar {
-
+/**
+ * @class WriterOptions
+ * @brief Provides configuration options for different file format writers (CSV,
+ * Parquet, ORC) in GraphAr. A WriterOptions instance can simultaneously contain
+ * options for all three formats (CSV, Parquet, ORC). The actual file format
+ * used for writing is determined by the FileType specified in the graph_Info.
+ *
+ * The configuration parameters and their default values are aligned with those
+ * in Arrow.
+ */
 class WriterOptions {
  private:
+  /**
+   * @class CSVOption
+   * @brief Configuration options for CSV Writer.
+   * The complete list of supported parameters can be found in:
+   * https://arrow.apache.org/docs/cpp/api/formats.html#csv-writer
+   */
   class CSVOption {
    public:
     arrow::io::IOContext io_context;
@@ -49,7 +64,13 @@ class WriterOptions {
     int32_t batch_size = 1024;
     arrow::csv::QuotingStyle quoting_style = arrow::csv::QuotingStyle::Needed;
   };
-
+  /**
+   * @class ParquetOption
+   * @brief Configuration options for Parquet Writer.
+   * This class includes parameters from both `WriterProperties` and
+   * `ArrowWriterProperties`. The complete list of supported parameters can be
+   * found in: https://arrow.apache.org/docs/cpp/api/formats.html#parquet-writer
+   */
   class ParquetOption {
    public:
     std::shared_ptr<::parquet::FileEncryptionProperties> encryption_properties;
@@ -85,7 +106,12 @@ class WriterOptions {
     bool allow_truncated_timestamps = false;
     bool store_schema = false;
   };
-
+  /**
+   * @class ORCOption
+   * @brief Configuration options for ORC Writer.
+   * The complete list of supported parameters can be found in:
+   * https://arrow.apache.org/docs/cpp/api/formats.html#_CPPv4N5arrow8adapters3orc12WriteOptionsE
+   */
   class ORCOption {
 #ifdef ARROW_ORC
    public:
