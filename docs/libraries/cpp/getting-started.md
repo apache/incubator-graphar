@@ -341,9 +341,11 @@ When you have the data ready, you can read the file into `arrow::Table` by using
 ```
 You can export label table to disk in parquet format, and read it back into memory in the following way.
 ``` cpp
+  auto options_parquet_builder = WriterOptions::ParquetOptionBuilder();
+  options_parquet_builder.compression(arrow::Compression::type::UNCOMPRESSED);
   // write arrow table as parquet chunk
   auto maybe_writer =
-      VertexPropertyWriter::Make(vertex_info, test_data_dir + "/ldbc/parquet/");
+      VertexPropertyWriter::Make(vertex_info, test_data_dir + "/ldbc/parquet/", options_parquet_builder.build());
   REQUIRE(!maybe_writer.has_error());
   auto writer = maybe_writer.value();
   REQUIRE(writer->WriteTable(table, 0).ok());

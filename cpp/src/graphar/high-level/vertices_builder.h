@@ -20,6 +20,7 @@
 #pragma once
 
 #include <any>
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -241,7 +242,9 @@ class VerticesBuilder {
    */
   Status Dump() {
     // construct the writer
-    VertexPropertyWriter writer(vertex_info_, prefix_, validate_level_);
+    // TODO(yangxk) Allow users to use custom options instead of nullptr
+    VertexPropertyWriter writer(vertex_info_, prefix_, nullptr,
+                                validate_level_);
     IdType start_chunk_index =
         start_vertex_index_ / vertex_info_->GetChunkSize();
     // convert to table

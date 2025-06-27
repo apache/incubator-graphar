@@ -17,15 +17,19 @@
  * under the License.
  */
 
+#include <parquet/types.h>
 #include <fstream>
 #include <iostream>
+#include <ostream>
 #include <sstream>
 #include <string>
 
+#include "arrow/api.h"
+#include "graphar/label.h"
+#include "graphar/writer_util.h"
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
 #endif
-#include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/filesystem/api.h"
 #include "arrow/io/api.h"
@@ -67,11 +71,11 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
   std::cout << table->num_rows() << ' ' << table->num_columns() << std::endl;
 
   // Construct the writer
-  std::string vertex_meta_file =
+  std::string vertex_meta_file_parquet =
       test_data_dir + "/ldbc_sample/parquet/" + "person.vertex.yml";
-  auto vertex_meta = Yaml::LoadFile(vertex_meta_file).value();
-  auto vertex_info = VertexInfo::Load(vertex_meta).value();
-  auto maybe_writer = VertexPropertyWriter::Make(vertex_info, "/tmp/");
+  auto vertex_meta_parquet = Yaml::LoadFile(vertex_meta_file_parquet).value();
+  auto vertex_info_parquet = VertexInfo::Load(vertex_meta_parquet).value();
+  auto maybe_writer = VertexPropertyWriter::Make(vertex_info_parquet, "/tmp/");
   REQUIRE(!maybe_writer.has_error());
   auto writer = maybe_writer.value();
 
@@ -98,7 +102,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
   // Out of range
   REQUIRE(writer->WriteChunk(table, 0).IsInvalid());
   // Invalid chunk id
-  auto chunk = table->Slice(0, vertex_info->GetChunkSize());
+  auto chunk = table->Slice(0, vertex_info_parquet->GetChunkSize());
   REQUIRE(writer->WriteChunk(chunk, -1).IsIndexError());
   // Invalid property group
   Property p1("invalid_property", int32(), false);
@@ -108,10 +112,10 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
   std::shared_ptr<arrow::Table> tmp_table =
       table->RenameColumns({"original_id", "firstName", "lastName", "id"})
           .ValueOrDie();
-  auto pg2 = vertex_info->GetPropertyGroup("firstName");
+  auto pg2 = vertex_info_parquet->GetPropertyGroup("firstName");
   REQUIRE(writer->WriteTable(tmp_table, pg2, 0).IsInvalid());
   // Invalid data type
-  auto pg3 = vertex_info->GetPropertyGroup("id");
+  auto pg3 = vertex_info_parquet->GetPropertyGroup("id");
   REQUIRE(writer->WriteTable(tmp_table, pg3, 0).IsTypeError());
 
 #ifdef ARROW_ORC
@@ -154,39 +158,155 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
             table2->GetColumnByName("gender")->ToString());
   }
 #endif
-
-  SECTION("TestEdgeChunkWriter") {
-    arrow::Status st;
-    arrow::MemoryPool* pool = arrow::default_memory_pool();
-    std::string path = test_data_dir +
-                       "/ldbc_sample/parquet/edge/person_knows_person/"
-                       "unordered_by_source/adj_list/part0/chunk0";
-    auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
-    std::shared_ptr<arrow::io::RandomAccessFile> input =
-        fs->OpenInputFile(path).ValueOrDie();
-    std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
-    st = parquet::arrow::OpenFile(input, pool, &arrow_reader);
-    // Read entire file as a single Arrow table
-    std::shared_ptr<arrow::Table> maybe_table;
-    st = arrow_reader->ReadTable(&maybe_table);
-    REQUIRE(st.ok());
-
-    std::shared_ptr<arrow::Table> table =
-        maybe_table
-            ->RenameColumns(
-                {GeneralParams::kSrcIndexCol, GeneralParams::kDstIndexCol})
-            .ValueOrDie();
-    std::cout << table->schema()->ToString() << std::endl;
-    std::cout << table->num_rows() << ' ' << table->num_columns() << std::endl;
-
+  SECTION("TestVertexPropertyWriterWithOption") {
+    // csv file
     // Construct the writer
-    std::string edge_meta_file =
-        test_data_dir + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
-    auto edge_meta = Yaml::LoadFile(edge_meta_file).value();
-    auto edge_info = EdgeInfo::Load(edge_meta).value();
-    auto adj_list_type = AdjListType::ordered_by_source;
+    std::string vertex_meta_file_csv =
+        test_data_dir + "/ldbc_sample/csv/" + "person.vertex.yml";
+    auto vertex_meta_csv = Yaml::LoadFile(vertex_meta_file_csv).value();
+    auto vertex_info_csv = VertexInfo::Load(vertex_meta_csv).value();
+    auto csv_options = WriterOptions::CSVOptionBuilder();
+    csv_options.include_header(true);
+    csv_options.delimiter('|');
+    auto maybe_writer = VertexPropertyWriter::Make(
+        vertex_info_csv, "/tmp/option/", csv_options.build());
+    REQUIRE(!maybe_writer.has_error());
+    auto writer = maybe_writer.value();
+    REQUIRE(writer->WriteTable(table, 0).ok());
+    // read csv file
+    auto parse_options = arrow::csv::ParseOptions::Defaults();
+    parse_options.delimiter = '|';
+    std::shared_ptr<arrow::io::InputStream> chunk0_input =
+        fs->OpenInputStream(
+              "/tmp/option/vertex/person/firstName_lastName_gender/chunk0")
+            .ValueOrDie();
+    auto read_options = arrow::csv::ReadOptions::Defaults();
+    auto csv_reader =
+        arrow::csv::TableReader::Make(arrow::io::default_io_context(),
+                                      chunk0_input, read_options, parse_options,
+                                      arrow::csv::ConvertOptions::Defaults())
+            .ValueOrDie();
+    auto maybe_table = csv_reader->Read();
+    REQUIRE(maybe_table.ok());
+    std::shared_ptr<arrow::Table> csv_table = *maybe_table;
+    REQUIRE(csv_table->num_rows() == vertex_info_csv->GetChunkSize());
+    REQUIRE(csv_table->num_columns() ==
+            static_cast<int>(vertex_info_csv->GetPropertyGroup("firstName")
+                                 ->GetProperties()
+                                 .size()) +
+                1);
+    // type parquet
+    auto options_parquet_Builder = WriterOptions::ParquetOptionBuilder();
+    options_parquet_Builder.compression(arrow::Compression::type::UNCOMPRESSED);
+    options_parquet_Builder.enable_statistics(false);
+    parquet::SortingColumn sc;
+    sc.column_idx = 1;
+    std::vector<::parquet::SortingColumn> columns = {sc};
+    options_parquet_Builder.sorting_columns(columns)
+        .enable_store_decimal_as_integer(true)
+        .max_row_group_length(10);
+    maybe_writer = VertexPropertyWriter::Make(
+        vertex_info_parquet, "/tmp/option/", options_parquet_Builder.build());
+    REQUIRE(!maybe_writer.has_error());
+    writer = maybe_writer.value();
+    REQUIRE(writer->WriteTable(table, 0).ok());
+    // read parquet file
+    std::string parquet_file =
+        "/tmp/option/vertex/person/firstName_lastName_gender/chunk0";
+    auto parquet_fs =
+        arrow::fs::FileSystemFromUriOrPath(parquet_file).ValueOrDie();
+    std::shared_ptr<arrow::io::RandomAccessFile> parquet_input =
+        parquet_fs->OpenInputFile(parquet_file).ValueOrDie();
+    std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
+    auto st = parquet::arrow::OpenFile(
+        parquet_input, arrow::default_memory_pool(), &parquet_reader);
+    REQUIRE(st.ok());
+    std::shared_ptr<arrow::Table> parquet_table;
+    st = parquet_reader->ReadTable(&parquet_table);
+    REQUIRE(st.ok());
+    auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
+    auto row_group_meta = parquet_metadata->RowGroup(0);
+    auto col_meta = row_group_meta->ColumnChunk(0);
+    REQUIRE(row_group_meta->sorting_columns().size() == 1);
+    REQUIRE(row_group_meta->sorting_columns()[0].column_idx == 1);
+    REQUIRE(col_meta->compression() == parquet::Compression::UNCOMPRESSED);
+    REQUIRE(!col_meta->statistics());
+    REQUIRE(parquet_table->num_rows() == vertex_info_parquet->GetChunkSize());
+    REQUIRE(parquet_metadata->num_row_groups() ==
+            parquet_table->num_rows() / 10);
+    REQUIRE(parquet_table->num_columns() ==
+            static_cast<int>(vertex_info_parquet->GetPropertyGroup("firstName")
+                                 ->GetProperties()
+                                 .size() +
+                             1));
+#ifdef ARROW_ORC
+    std::string vertex_meta_file_orc =
+        test_data_dir + "/ldbc_sample/orc/" + "person.vertex.yml";
+    auto vertex_meta_orc = Yaml::LoadFile(vertex_meta_file_orc).value();
+    auto vertex_info_orc = VertexInfo::Load(vertex_meta_orc).value();
+    auto optionsOrcBuilder = WriterOptions::ORCOptionBuilder();
+    optionsOrcBuilder.compression(arrow::Compression::type::ZSTD);
+    maybe_writer = VertexPropertyWriter::Make(vertex_info_orc, "/tmp/option/",
+                                              optionsOrcBuilder.build());
+    REQUIRE(!maybe_writer.has_error());
+    writer = maybe_writer.value();
+    REQUIRE(writer->WriteTable(table, 0).ok());
+    auto fs1 = arrow::fs::FileSystemFromUriOrPath(
+                   "/tmp/option/vertex/person/firstName_lastName_gender/chunk0")
+                   .ValueOrDie();
+    std::shared_ptr<arrow::io::RandomAccessFile> input1 =
+        fs1->OpenInputFile(
+               "/tmp/option/vertex/person/firstName_lastName_gender/chunk0")
+            .ValueOrDie();
+    arrow::MemoryPool* pool = arrow::default_memory_pool();
+    std::unique_ptr<arrow::adapters::orc::ORCFileReader> reader =
+        arrow::adapters::orc::ORCFileReader::Open(input1, pool).ValueOrDie();
+    // Read entire file as a single Arrow table
+    maybe_table = reader->Read();
+    std::shared_ptr<arrow::Table> table1 = maybe_table.ValueOrDie();
+    REQUIRE(reader->GetCompression() == parquet::Compression::ZSTD);
+    REQUIRE(table1->num_rows() == vertex_info_parquet->GetChunkSize());
+    REQUIRE(table1->num_columns() ==
+            static_cast<int>(vertex_info_parquet->GetPropertyGroup("firstName")
+                                 ->GetProperties()
+                                 .size()) +
+                1);
+#endif
+  }
+}
+TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
+  arrow::Status st;
+  arrow::MemoryPool* pool = arrow::default_memory_pool();
+  std::string path = test_data_dir +
+                     "/ldbc_sample/parquet/edge/person_knows_person/"
+                     "unordered_by_source/adj_list/part0/chunk0";
+  auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
+  std::shared_ptr<arrow::io::RandomAccessFile> input =
+      fs->OpenInputFile(path).ValueOrDie();
+  std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
+  st = parquet::arrow::OpenFile(input, pool, &arrow_reader);
+  // Read entire file as a single Arrow table
+  std::shared_ptr<arrow::Table> maybe_table;
+  st = arrow_reader->ReadTable(&maybe_table);
+  REQUIRE(st.ok());
+
+  std::shared_ptr<arrow::Table> table =
+      maybe_table
+          ->RenameColumns(
+              {GeneralParams::kSrcIndexCol, GeneralParams::kDstIndexCol})
+          .ValueOrDie();
+  std::cout << table->schema()->ToString() << std::endl;
+  std::cout << table->num_rows() << ' ' << table->num_columns() << std::endl;
+  // Construct the writer
+  std::string edge_meta_file_csv =
+      test_data_dir + "/ldbc_sample/csv/" + "person_knows_person.edge.yml";
+  auto edge_meta_csv = Yaml::LoadFile(edge_meta_file_csv).value();
+  auto edge_info_csv = EdgeInfo::Load(edge_meta_csv).value();
+  auto adj_list_type = AdjListType::ordered_by_source;
+
+  SECTION("TestEdgeChunkWriterWithoutOption") {
     auto maybe_writer =
-        EdgeChunkWriter::Make(edge_info, "/tmp/", adj_list_type);
+        EdgeChunkWriter::Make(edge_info_csv, "/tmp/", adj_list_type);
     REQUIRE(!maybe_writer.has_error());
     auto writer = maybe_writer.value();
 
@@ -236,14 +356,14 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     // Invalid adj list type
     auto invalid_adj_list_type = AdjListType::unordered_by_dest;
     auto maybe_writer2 =
-        EdgeChunkWriter::Make(edge_info, "/tmp/", invalid_adj_list_type);
+        EdgeChunkWriter::Make(edge_info_csv, "/tmp/", invalid_adj_list_type);
     REQUIRE(maybe_writer2.has_error());
     // Invalid property group
     Property p1("invalid_property", int32(), false);
     auto pg1 = CreatePropertyGroup({p1}, FileType::CSV);
     REQUIRE(writer->WritePropertyChunk(table, pg1, 0, 0).IsKeyError());
     // Property not found in table
-    auto pg2 = edge_info->GetPropertyGroup("creationDate");
+    auto pg2 = edge_info_csv->GetPropertyGroup("creationDate");
     REQUIRE(writer->WritePropertyChunk(table, pg2, 0, 0).IsInvalid());
     // Required columns not found
     std::shared_ptr<arrow::Table> tmp_table =
@@ -251,6 +371,121 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     REQUIRE(writer->WriteAdjListChunk(tmp_table, 0, 0).IsInvalid());
     // Invalid data type
     REQUIRE(writer->WritePropertyChunk(tmp_table, pg2, 0, 0).IsTypeError());
+  }
+  SECTION("TestEdgeChunkWriterWithOption") {
+    WriterOptions::CSVOptionBuilder csv_options_builder;
+    csv_options_builder.include_header(true).delimiter('|');
+    auto maybe_writer =
+        EdgeChunkWriter::Make(edge_info_csv, "/tmp/option/", adj_list_type,
+                              csv_options_builder.build());
+    REQUIRE(!maybe_writer.has_error());
+    auto writer = maybe_writer.value();
+
+    // Valid: Write adj list with options
+    REQUIRE(writer->SortAndWriteAdjListTable(table, 0, 0).ok());
+    // Valid: Write edge count
+    REQUIRE(writer->WriteEdgesNum(0, table->num_rows()).ok());
+    // Valid: Write vertex count
+    REQUIRE(writer->WriteVerticesNum(903).ok());
+
+    // Read back CSV file and check delimiter/header
+    auto parse_options = arrow::csv::ParseOptions::Defaults();
+    parse_options.delimiter = '|';
+    auto read_options = arrow::csv::ReadOptions::Defaults();
+    std::shared_ptr<arrow::io::InputStream> chunk0_input =
+        fs->OpenInputStream(
+              "/tmp/option/edge/person_knows_person/ordered_by_source/adj_list/"
+              "part0/chunk0")
+            .ValueOrDie();
+    auto csv_reader =
+        arrow::csv::TableReader::Make(arrow::io::default_io_context(),
+                                      chunk0_input, read_options, parse_options,
+                                      arrow::csv::ConvertOptions::Defaults())
+            .ValueOrDie();
+    auto maybe_table2 = csv_reader->Read();
+    REQUIRE(maybe_table2.ok());
+    std::shared_ptr<arrow::Table> csv_table = *maybe_table2;
+    REQUIRE(csv_table->num_rows() ==
+            std::min(edge_info_csv->GetChunkSize(), table->num_rows()));
+    REQUIRE(csv_table->num_columns() == table->num_columns());
+
+    // Parquet option
+    std::string edge_meta_file_parquet = test_data_dir +
+                                         "/ldbc_sample/parquet/" +
+                                         "person_knows_person.edge.yml";
+    auto edge_meta_parquet = Yaml::LoadFile(edge_meta_file_parquet).value();
+    auto edge_info_parquet = EdgeInfo::Load(edge_meta_parquet).value();
+    auto optionsBuilderParquet = WriterOptions::ParquetOptionBuilder();
+    optionsBuilderParquet.compression(arrow::Compression::type::UNCOMPRESSED);
+    optionsBuilderParquet.enable_statistics(false);
+    optionsBuilderParquet.enable_store_decimal_as_integer(true);
+    optionsBuilderParquet.max_row_group_length(10);
+    auto maybe_parquet_writer =
+        EdgeChunkWriter::Make(edge_info_parquet, "/tmp/option/", adj_list_type,
+                              optionsBuilderParquet.build());
+    REQUIRE(!maybe_parquet_writer.has_error());
+    auto parquet_writer = maybe_parquet_writer.value();
+    REQUIRE(parquet_writer->SortAndWriteAdjListTable(table, 0, 0).ok());
+    std::string parquet_file =
+        "/tmp/option/edge/person_knows_person/ordered_by_source/adj_list/part0/"
+        "chunk0";
+    auto parquet_fs =
+        arrow::fs::FileSystemFromUriOrPath(parquet_file).ValueOrDie();
+    std::shared_ptr<arrow::io::RandomAccessFile> parquet_input =
+        parquet_fs->OpenInputFile(parquet_file).ValueOrDie();
+    std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
+    auto st = parquet::arrow::OpenFile(
+        parquet_input, arrow::default_memory_pool(), &parquet_reader);
+    REQUIRE(st.ok());
+    std::shared_ptr<arrow::Table> parquet_table;
+    st = parquet_reader->ReadTable(&parquet_table);
+    REQUIRE(st.ok());
+    auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
+    auto row_group_meta = parquet_metadata->RowGroup(0);
+    auto col_meta = row_group_meta->ColumnChunk(0);
+    REQUIRE(col_meta->compression() == parquet::Compression::UNCOMPRESSED);
+    REQUIRE(!col_meta->statistics());
+    REQUIRE(parquet_table->num_rows() ==
+            std::min(table->num_rows(), edge_info_parquet->GetChunkSize()));
+    REQUIRE(parquet_metadata->num_row_groups() ==
+            parquet_table->num_rows() / 10 + 1);
+    REQUIRE(parquet_table->num_columns() ==
+            static_cast<int>(table->num_columns()));
+
+#ifdef ARROW_ORC
+    // ORC option
+    std::string edge_meta_file_orc =
+        test_data_dir + "/ldbc_sample/orc/" + "person_knows_person.edge.yml";
+    auto edge_meta_orc = Yaml::LoadFile(edge_meta_file_orc).value();
+    auto edge_info_orc = EdgeInfo::Load(edge_meta_orc).value();
+    auto optionsBuilderOrc = WriterOptions::ORCOptionBuilder();
+    optionsBuilderOrc.compression(arrow::Compression::type::ZSTD);
+    auto maybe_orc_writer =
+        EdgeChunkWriter::Make(edge_info_orc, "/tmp/option/", adj_list_type,
+                              optionsBuilderOrc.build());
+    REQUIRE(!maybe_orc_writer.has_error());
+    auto orc_writer = maybe_orc_writer.value();
+    REQUIRE(orc_writer->SortAndWriteAdjListTable(table, 0, 0).ok());
+    auto orc_fs = arrow::fs::FileSystemFromUriOrPath(
+                      "/tmp/option/edge/person_knows_person/ordered_by_source/"
+                      "adj_list/part0/chunk0")
+                      .ValueOrDie();
+    std::shared_ptr<arrow::io::RandomAccessFile> orc_input =
+        orc_fs
+            ->OpenInputFile(
+                "/tmp/option/edge/person_knows_person/ordered_by_source/"
+                "adj_list/part0/chunk0")
+            .ValueOrDie();
+    arrow::MemoryPool* pool = arrow::default_memory_pool();
+    std::unique_ptr<arrow::adapters::orc::ORCFileReader> orc_reader =
+        arrow::adapters::orc::ORCFileReader::Open(orc_input, pool).ValueOrDie();
+    auto maybe_orc_table = orc_reader->Read();
+    REQUIRE(maybe_orc_table.ok());
+    std::shared_ptr<arrow::Table> orc_table = *maybe_orc_table;
+    REQUIRE(orc_reader->GetCompression() == parquet::Compression::ZSTD);
+    REQUIRE(orc_table->num_rows() == table->num_rows());
+    REQUIRE(orc_table->num_columns() == table->num_columns());
+#endif
   }
 }
 }  // namespace graphar

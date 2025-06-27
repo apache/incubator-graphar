@@ -20,7 +20,6 @@
 #pragma once
 
 #include <memory>
-#include <optional>
 #include <string>
 #include <vector>
 
@@ -30,6 +29,7 @@
 #include "graphar/util.h"
 
 #include "graphar/reader_util.h"
+#include "graphar/writer_util.h"
 
 // forward declarations
 namespace arrow {
@@ -112,10 +112,12 @@ class FileSystem {
    * @param input_table The table to write.
    * @param file_type The type of the output file.
    * @param path The path of the output file.
+   * @param options Options for writing the table, such as compression.
    * @return A Status indicating OK if successful, or an error if unsuccessful.
    */
   Status WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
-                          FileType file_type, const std::string& path) const
+                          FileType file_type, const std::string& path,
+                          const std::shared_ptr<WriterOptions>& options) const
       noexcept;
 
   /**
