@@ -18,10 +18,12 @@
  */
 
 package org.apache.graphar.info;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
+import org.apache.graphar.types.FileType;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -31,21 +33,25 @@ import java.net.URI;
 public static class FileReader {
 
     //TODO API to read data files based on type (CSV, Parquet, ..)
-    public static long getFileCount(VertexInfo vertexInfo,PropertyGroup propertyGroup) {
+    public static long getFileCount(VertexInfo vertexInfo, PropertyGroup propertyGroup) {
         // TODO check equality test for type
-        String type = propertyGroup.getFileType().toString();
+        FileType type = propertyGroup.getFileType();
         numberOfParts = vertexInfo.getChunkSize()
         chunkBasePath = vertexInfo.getPropertyGroupPrefix() + "/part";
         totalRowCount = 0;
 
         for (int i : numberOfParts) {
             chunkPath = chunkBasePath + Integer.toString(i);
-            if (type == "CSV") {
+            switch (type):
+            case CSV {
                 long currentChunkEntryCount = FileReaderUtils.countCsvFileRows(chunkPath);
+                break;
             }
-            elif(type == "Parquet") {
+            case PARQUET {
                 long currentChunkEntryCount = FileReaderUtils.countParquetFileRows(chunkPath);
+                break;
             }
+            // TODO ORC...
             totalRowCount = totalRowCount + currentChunkEntryCount;
         }
         return totalRowCount;
