@@ -22,13 +22,13 @@ on:
   # but only for the main branch
   push:
     branches:
-      - main
+      - '**'
     paths:
       - 'maven-projects/java/**'
       - '.github/workflows/java.yml'
   pull_request:
     branches:
-      - main
+      - '**'
     paths:
       - 'maven-projects/java/**'
       - '.github/workflows/java.yml'

@@ -22,7 +22,12 @@ package org.apache.graphar.graphinfo;
 import static org.apache.graphar.util.CppClassName.GAR_PROPERTY;
 import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
-import com.alibaba.fastffi.*;
+import com.alibaba.fastffi.CXXHead;
+import com.alibaba.fastffi.CXXPointer;
+import com.alibaba.fastffi.CXXReference;
+import com.alibaba.fastffi.FFIGen;
+import com.alibaba.fastffi.FFITypeAlias;
+import com.alibaba.fastffi.FFITypeFactory;
 import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.types.DataType;

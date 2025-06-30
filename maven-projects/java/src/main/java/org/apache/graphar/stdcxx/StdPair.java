@@ -19,6 +19,7 @@
 
 package org.apache.graphar.stdcxx;
 
+import static org.apache.graphar.util.CppClassName.GAR_ID_TYPE;
 import static org.apache.graphar.util.CppClassName.STD_PAIR;
 import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_H;
 
@@ -35,7 +36,7 @@ import com.alibaba.fastffi.FFITypeAlias;
 @CXXHead(system = "utility")
 @CXXHead(GAR_GRAPH_H)
 @CXXTemplate(
-        cxx = {"graphar::IdType", "graphar::IdType"},
+        cxx = {GAR_ID_TYPE, GAR_ID_TYPE},
         java = {"Long", "Long"})
 @CXXTemplate(
         cxx = {"int64_t", "int64_t"},

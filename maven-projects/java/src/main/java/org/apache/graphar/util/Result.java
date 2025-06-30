@@ -19,7 +19,26 @@
 
 package org.apache.graphar.util;
 
-import static org.apache.graphar.util.CppClassName.*;
+import static org.apache.graphar.util.CppClassName.GAR_ADJ_LIST_ARROW_CHUNK_READER;
+import static org.apache.graphar.util.CppClassName.GAR_ADJ_LIST_CHUNK_INFO_READER;
+import static org.apache.graphar.util.CppClassName.GAR_ADJ_LIST_OFFSET_ARROW_CHUNK_READER;
+import static org.apache.graphar.util.CppClassName.GAR_ADJ_LIST_PROPERTY_ARROW_CHUNK_READER;
+import static org.apache.graphar.util.CppClassName.GAR_ADJ_LIST_PROPERTY_CHUNK_INFO_READER;
+import static org.apache.graphar.util.CppClassName.GAR_DATA_TYPE;
+import static org.apache.graphar.util.CppClassName.GAR_EDGES_COLLECTION;
+import static org.apache.graphar.util.CppClassName.GAR_EDGE_INFO;
+import static org.apache.graphar.util.CppClassName.GAR_GRAPH_INFO;
+import static org.apache.graphar.util.CppClassName.GAR_ID_TYPE;
+import static org.apache.graphar.util.CppClassName.GAR_INFO_VERSION;
+import static org.apache.graphar.util.CppClassName.GAR_PROPERTY_GROUP;
+import static org.apache.graphar.util.CppClassName.GAR_RESULT;
+import static org.apache.graphar.util.CppClassName.GAR_VERTEX_INFO;
+import static org.apache.graphar.util.CppClassName.GAR_VERTEX_PROPERTY_ARROW_CHUNK_READER;
+import static org.apache.graphar.util.CppClassName.GAR_VERTEX_PROPERTY_CHUNK_INFO_READER;
+import static org.apache.graphar.util.CppClassName.GAR_VERTICES_COLLECTION;
+import static org.apache.graphar.util.CppClassName.STD_PAIR;
+import static org.apache.graphar.util.CppClassName.STD_SHARED_PTR;
+import static org.apache.graphar.util.CppClassName.STD_STRING;
 import static org.apache.graphar.util.CppHeaderName.GAR_ARROW_CHUNK_READER_H;
 import static org.apache.graphar.util.CppHeaderName.GAR_CHUNK_INFO_READER_H;
 import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_H;

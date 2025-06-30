@@ -22,7 +22,14 @@ package org.apache.graphar.graphinfo;
 import static org.apache.graphar.util.CppClassName.GAR_ADJACENT_LIST;
 import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
-import com.alibaba.fastffi.*;
+import com.alibaba.fastffi.CXXHead;
+import com.alibaba.fastffi.CXXPointer;
+import com.alibaba.fastffi.CXXReference;
+import com.alibaba.fastffi.CXXValue;
+import com.alibaba.fastffi.FFIConst;
+import com.alibaba.fastffi.FFIGen;
+import com.alibaba.fastffi.FFINameAlias;
+import com.alibaba.fastffi.FFITypeAlias;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.types.AdjListType;
 import org.apache.graphar.types.FileType;
@@ -30,7 +37,7 @@ import org.apache.graphar.types.FileType;
 @FFIGen
 @FFITypeAlias(GAR_ADJACENT_LIST)
 @CXXHead(GAR_GRAPH_INFO_H)
-public interface AdjacentList extends FFIPointer {
+public interface AdjacentList extends CXXPointer {
 
     @FFINameAlias("GetType")
     @CXXValue

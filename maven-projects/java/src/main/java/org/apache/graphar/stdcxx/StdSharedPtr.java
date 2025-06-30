@@ -19,7 +19,16 @@
 
 package org.apache.graphar.stdcxx;
 
-import static org.apache.graphar.util.CppClassName.*;
+import static org.apache.graphar.util.CppClassName.ARROW_ARRAY;
+import static org.apache.graphar.util.CppClassName.ARROW_TABLE;
+import static org.apache.graphar.util.CppClassName.GAR_DATA_TYPE;
+import static org.apache.graphar.util.CppClassName.GAR_EDGE_INFO;
+import static org.apache.graphar.util.CppClassName.GAR_GRAPH_INFO;
+import static org.apache.graphar.util.CppClassName.GAR_INFO_VERSION;
+import static org.apache.graphar.util.CppClassName.GAR_PROPERTY;
+import static org.apache.graphar.util.CppClassName.GAR_PROPERTY_GROUP;
+import static org.apache.graphar.util.CppClassName.GAR_UTIL_INDEX_CONVERTER;
+import static org.apache.graphar.util.CppClassName.GAR_VERTEX_INFO;
 import static org.apache.graphar.util.CppHeaderName.ARROW_API_H;
 import static org.apache.graphar.util.CppHeaderName.GAR_UTIL_UTIL_H;
 
