@@ -23,12 +23,12 @@ import static org.apache.graphar.util.CppClassName.GAR_INFO_VERSION;
 import static org.apache.graphar.util.CppHeaderName.GAR_VERSION_PARSER_H;
 
 import com.alibaba.fastffi.CXXHead;
+import com.alibaba.fastffi.CXXOperator;
 import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
-import com.alibaba.fastffi.FFIFactory;
 import com.alibaba.fastffi.CXXValue;
+import com.alibaba.fastffi.FFIFactory;
 import com.alibaba.fastffi.FFIGen;
-import com.alibaba.fastffi.CXXOperator;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
