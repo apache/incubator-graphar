@@ -183,8 +183,8 @@ public class GraphInfo {
         return protoGraphInfo.getPrefix();
     }
 
-    public String getVersion() {
-        return protoGraphInfo.getVersion();
+    public VertexInfo getVersion() {
+        return VersionParser.getVersion(protoGraphInfo.getVersion());
     }
 
     private void checkVertexExist(String label) {

@@ -22,8 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class VersionParser {
-    private final String versionStr;
-    public static VersionInfo getVersion() {
+    public static VersionInfo getVersion(String versionStr) {
         try {
 
             int parsedVersion = parserVersionImpl(versionStr);
@@ -38,7 +37,7 @@ public class VersionParser {
         }
     }
 
-    public int parserVersionImpl() {
+    public int parserVersionImpl(String versionStr) {
 
         if (versionStr == null || versionStr.isEmpty()) {
             throw new RuntimeException("Invalid version string: input cannot be null or empty.");
@@ -71,7 +70,7 @@ public class VersionParser {
         }
     }
 
-    public List<String> parseUserDefineTypesImpl() {
+    public List<String> parseUserDefineTypesImpl(String versionStr) {
         List<String> userDefineTypes = new ArrayList<>();
 
         final Pattern userDefineTypesRegex = Pattern.compile("gar/v\\d+ *\\((.*)\\).*");

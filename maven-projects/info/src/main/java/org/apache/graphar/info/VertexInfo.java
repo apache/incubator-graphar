@@ -137,8 +137,9 @@ public class VertexInfo {
         return getPrefix() + "/" + getType() + ".vertex.yaml";
     }
 
-    public String getVersion() {
-        return protoVertexInfo.getVersion();
+    public VertexInfo getVersion() {
+        return VersionParser.getVersion(protoVertexInfo.getVersion());
+
     }
 
     private void checkPropertyGroupExist(PropertyGroup propertyGroup) {
