@@ -22,6 +22,7 @@ package org.apache.graphar.info;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
 import org.apache.graphar.proto.DataType;
@@ -134,6 +135,10 @@ public class VertexInfo {
 
     public String getVertexPath() {
         return getPrefix() + "/" + getType() + ".vertex.yaml";
+    }
+
+    public String getVersion() {
+        return protoVertexInfo.getVersion();
     }
 
     private void checkPropertyGroupExist(PropertyGroup propertyGroup) {
