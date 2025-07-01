@@ -18,18 +18,29 @@
  */
 
 package org.apache.graphar.info;
-
+// based on https://github.com/apache/incubator-graphar/blob/main/cpp/src/graphar/chunk_info_reader.cc
 public class ChunkInfoReader {
     private final VertexInfo cachedVertexInfo;
     private final PropertyGroup cachedPropertyGroup;
 
-    public long chunkExists(long internalId) {
-        chunkIdx = internalId / cachedVertexInfo.getChunkSize();
-        chunkCount = FileReader.getFileCount(cachedVertexInfo, cachedPropertyGroup);
-        if (chunkIdx < chunkCount) {
-            return true;
+    public static String getChunk(long, index, VertexInfo vertexInfo) {
+        long chunkIndex = chunkExists(index);
+        String chunkBasePath = vertexInfo.getPropertyGroupPrefix() + "/chunk";
+        return chunkBasePath + String.valueOf(chunkIndex);
+
+    }
+
+    public long chunkExists(long index) {
+        int chunkSize = vertexInfo.getChunkSize()
+        int totalCount = Integer.valueOf(vertexInfo.getVerticesNumFilePath());
+        int chunksCount = totalCount / chunkSize;
+        long chunkIndex = index / chunksCount;
+
+        if (chunkIndex < chunkCount) {
+            return chunkIndex;
         }
-        return false;
+        throw new IndexOutOfBoundsException("Chunk Index out of Range " + Integer.valueOf(index));
+
     }
 
     public String getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
