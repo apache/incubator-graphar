@@ -27,7 +27,7 @@ public class VersionParser {
 
             int parsedVersion = parserVersionImpl(versionStr);
 
-            List<String> parsedTypes = parseUserDefineTypesImpl(versionStr);
+            List<String> parsedTypes = parseUserDefineTypes(versionStr);
 
             return new VersionInfo(parsedVersion, parsedTypes);
         } catch (RuntimeException e) {
@@ -70,7 +70,7 @@ public class VersionParser {
         }
     }
 
-    public List<String> parseUserDefineTypesImpl(String versionStr) {
+    public List<String> parseUserDefineTypes(String versionStr) {
         List<String> userDefineTypes = new ArrayList<>();
 
         final Pattern userDefineTypesRegex = Pattern.compile("gar/v\\d+ *\\((.*)\\).*");

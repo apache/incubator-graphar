@@ -22,7 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class VersionInfo {
-    int Object parsedVersion;
+    private int parsedVersion;
     private List<String> parsedUserDefinedTypes;
 
 
