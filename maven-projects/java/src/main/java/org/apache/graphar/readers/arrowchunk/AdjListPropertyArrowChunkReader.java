@@ -34,12 +34,10 @@ import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
 import org.apache.graphar.arrow.ArrowTable;
 import org.apache.graphar.graphinfo.EdgeInfo;
-import org.apache.graphar.graphinfo.GraphInfo;
 import org.apache.graphar.graphinfo.PropertyGroup;
 import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.types.AdjListType;
-import org.apache.graphar.util.GrapharStaticFunctions;
 import org.apache.graphar.util.Result;
 import org.apache.graphar.util.Status;
 
@@ -115,27 +113,6 @@ public interface AdjListPropertyArrowChunkReader extends CXXPointer {
     @CXXValue
     Status seekChunkIndex(@FFITypeAlias(GAR_ID_TYPE) long vertexChunkIndex);
 
-    /**
-     * Helper function to Construct AdjListPropertyArrowChunkReader.
-     *
-     * @param graphInfo The graph info to describe the graph.
-     * @param srcLabel label of source vertex.
-     * @param edgeLabel label of edge.
-     * @param dstLabel label of destination vertex.
-     * @param propertyGroup The property group of the edge.
-     * @param adjListType The adj list type for the edges.
-     */
-    static Result<AdjListPropertyArrowChunkReader> constructAdjListPropertyArrowChunkReader(
-            @CXXReference GraphInfo graphInfo,
-            @CXXReference StdString srcLabel,
-            @CXXReference StdString edgeLabel,
-            @CXXReference StdString dstLabel,
-            @CXXReference PropertyGroup propertyGroup,
-            @CXXValue AdjListType adjListType) {
-        return GrapharStaticFunctions.INSTANCE.constructAdjListPropertyArrowChunkReader(
-                graphInfo, srcLabel, edgeLabel, dstLabel, propertyGroup, adjListType);
-    }
-
     @FFIFactory
     interface Factory {
         /**
@@ -147,8 +124,8 @@ public interface AdjListPropertyArrowChunkReader extends CXXPointer {
          * @param prefix The absolute prefix.
          */
         AdjListPropertyArrowChunkReader create(
-                @CXXReference EdgeInfo edgeInfo,
-                @CXXReference PropertyGroup propertyGroup,
+                @CXXReference StdSharedPtr<EdgeInfo> edgeInfo,
+                @CXXReference StdSharedPtr<PropertyGroup> propertyGroup,
                 @CXXValue AdjListType adjListType,
                 @CXXReference StdString prefix);
 

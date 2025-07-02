@@ -29,7 +29,7 @@ file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/target/generated-sources/annotati
 # remove auto-generated JNI code for specific method cause we have handwriting JNI code for it
 list(REMOVE_ITEM SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/target/generated-sources/annotations/jni_org_apache_graphar_arrow_ArrowTable_Static_cxx_0x58c7409.cc")
 
-set(LIBNAME "gar-jni")
+set(LIBNAME "graphar-jni")
 
 set(JAVA_AWT_LIBRARY NotNeeded)
 set(JAVA_AWT_INCLUDE_PATH NotNeeded)
@@ -47,12 +47,12 @@ add_library(${LIBNAME} SHARED ${SOURCES})
 if(${BUILD_GAR_CPP})
     include(graphar-cpp)
     build_graphar_cpp()
-    target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} gar_shared)
+    target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} graphar)
     # include graphar-cpp headers
     target_include_directories(${LIBNAME} SYSTEM BEFORE PRIVATE ${GAR_INCLUDE_DIR})
 else()
-    find_package(gar REQUIRED)
-    target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} gar)
+    find_package(graphar REQUIRED)
+    target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} graphar)
 endif()
 target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} Arrow::arrow_shared)
 

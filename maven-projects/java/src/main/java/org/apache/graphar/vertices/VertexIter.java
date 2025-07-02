@@ -35,6 +35,7 @@ import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFISkip;
 import com.alibaba.fastffi.FFITypeAlias;
 import org.apache.graphar.graphinfo.VertexInfo;
+import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.util.Result;
 
@@ -95,7 +96,7 @@ public interface VertexIter extends CXXPointer {
          * @param offset The current offset of the readers.
          */
         VertexIter create(
-                @CXXReference VertexInfo vertexInfo,
+                @CXXReference StdSharedPtr<VertexInfo> vertexInfo,
                 @CXXReference StdString prefix,
                 @FFITypeAlias(GAR_ID_TYPE) long offset);
     }

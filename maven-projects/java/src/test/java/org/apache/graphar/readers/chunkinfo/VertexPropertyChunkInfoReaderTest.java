@@ -21,8 +21,11 @@ package org.apache.graphar.readers.chunkinfo;
 
 import static org.apache.graphar.graphinfo.GraphInfoTest.root;
 
+import com.alibaba.fastffi.CXXReference;
 import org.apache.graphar.graphinfo.GraphInfo;
 import org.apache.graphar.graphinfo.PropertyGroup;
+import org.apache.graphar.graphinfo.VertexInfo;
+import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.util.GrapharStaticFunctions;
 import org.apache.graphar.util.Result;
@@ -34,24 +37,30 @@ public class VertexPropertyChunkInfoReaderTest {
     public void test1() {
         // read file and construct graph info
         String path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-        Result<GraphInfo> maybeGraphInfo = GraphInfo.load(path);
+        Result<StdSharedPtr<GraphInfo>> maybeGraphInfo = GraphInfo.load(path);
         Assert.assertTrue(maybeGraphInfo.status().ok());
-        GraphInfo graphInfo = maybeGraphInfo.value();
-        Assert.assertEquals(1, graphInfo.getVertexInfos().size());
-        Assert.assertEquals(1, graphInfo.getEdgeInfos().size());
+        StdSharedPtr<GraphInfo> graphInfo = maybeGraphInfo.value();
+        Assert.assertEquals(1, graphInfo.get().getVertexInfos().size());
+        Assert.assertEquals(1, graphInfo.get().getEdgeInfos().size());
 
         // construct vertex property info reader
         StdString label = StdString.create("person");
         StdString propertyName = StdString.create("id");
-        Assert.assertTrue(graphInfo.getVertexInfo(label).status().ok());
-        Result<PropertyGroup> maybeGroup = graphInfo.getVertexPropertyGroup(label, propertyName);
-        Assert.assertFalse(maybeGroup.hasError());
-        PropertyGroup group = maybeGroup.value();
-        Result<VertexPropertyChunkInfoReader> maybeReader =
+        StdSharedPtr<@CXXReference VertexInfo> vertexInfoStdSharedPtr =
+                graphInfo.get().getVertexInfo(label);
+        Assert.assertNotNull(vertexInfoStdSharedPtr.get());
+        StdSharedPtr<PropertyGroup> groupStdSharedPtr =
+                vertexInfoStdSharedPtr.get().getPropertyGroup(propertyName);
+        Assert.assertNotNull(groupStdSharedPtr.get());
+        PropertyGroup group = groupStdSharedPtr.get();
+        StdSharedPtr<PropertyGroup> groupPtr =
+                GrapharStaticFunctions.INSTANCE.createPropertyGroup(
+                        group.getProperties(), group.getFileType(), group.getPrefix());
+        Result<StdSharedPtr<VertexPropertyChunkInfoReader>> maybeReader =
                 GrapharStaticFunctions.INSTANCE.constructVertexPropertyChunkInfoReader(
-                        graphInfo, label, group);
+                        graphInfo, label, groupPtr);
         Assert.assertFalse(maybeReader.hasError());
-        VertexPropertyChunkInfoReader reader = maybeReader.value();
+        VertexPropertyChunkInfoReader reader = maybeReader.value().get();
 
         // get chunk file path & validate
         Result<StdString> maybeChunkPath = reader.getChunk();

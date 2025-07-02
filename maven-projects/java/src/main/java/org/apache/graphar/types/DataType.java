@@ -20,7 +20,7 @@
 package org.apache.graphar.types;
 
 import static org.apache.graphar.util.CppClassName.GAR_DATA_TYPE;
-import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+import static org.apache.graphar.util.CppHeaderName.GAR_DATA_TYPE_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;
@@ -35,7 +35,7 @@ import org.apache.graphar.stdcxx.StdString;
 
 @FFIGen
 @FFITypeAlias(GAR_DATA_TYPE)
-@CXXHead(GAR_GRAPH_INFO_H)
+@CXXHead(GAR_DATA_TYPE_H)
 public interface DataType extends CXXPointer {
     Factory factory = FFITypeFactory.getFactory(DataType.class);
 

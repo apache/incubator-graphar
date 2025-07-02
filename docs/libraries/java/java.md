@@ -109,12 +109,12 @@ example code.
 ```java
 // read graph yaml and construct information
 String path = ...; // the path to the yaml file
-Result<GraphInfo> graphInfoResult = GraphInfo.load(path);
+Result<StdSharedPtr<GraphInfo>> graphInfoResult = GraphInfo.load(path);
 if (!graphInfoResult.hasError()) {
-    GraphInfo graphInfo = graphInfoResult.value();
+    GraphInfo graphInfo = graphInfoResult.value().get();
     // use information classes
-    StdMap<StdString, VertexInfo> vertexInfos = graphInfo.getVertexInfos();
-    StdMap<StdString, EdgeInfo> edgeInfos = graphInfo.getEdgeInfos();
+    StdVector<StdSharedPtr<@CXXReference VertexInfo>> vertexInfos = graphInfo.getVertexInfos();
+    StdVector<StdSharedPtr<@CXXReference EdgeInfo>> edgeInfos = graphInfo.getEdgeInfos();
 }
 ```
 
@@ -167,7 +167,7 @@ try (BufferAllocator allocator = new RootAllocator();
 String path = ...; // file to be wrote
 StdString edgeMetaFile = StdString.create(path);
 StdSharedPtr<Yaml> edgeMeta = Yaml.loadFile(edgeMetaFile).value();
-EdgeInfo edgeInfo = EdgeInfo.load(edgeMeta).value();
+StdSharedPtr<EdgeInfo> edgeInfo = EdgeInfo.load(edgeMeta).value();
 EdgeChunkWriter writer = EdgeChunkWriter.factory.create(
                         edgeInfo, StdString.create("/tmp/"), AdjListType.ordered_by_source);
 
@@ -191,22 +191,23 @@ code.
 
 ```java
 // construct vertex chunk reader
-GraphInfo graphInfo = ...; // load graph meta info
+graphInfo = ...; // load graph meta info
 StdString label = StdString.create("person");
 StdString propertyName = StdString.create("id");
-if (graphInfo.getVertexInfo(label).hasError()) {
-    // throw Exception or do other things
-}
-PropertyGroup group = graphInfo.getVertexPropertyGroup(label, propertyName).value();
-Result<VertexPropertyArrowChunkReader> maybeReader =
-                GrapharStaticFunctions.INSTANCE.constructVertexPropertyArrowChunkReader(
-                        graphInfo, label, group);
+        if (graphInfo.get().getVertexInfo(label).get() == null) {
+        // throw Exception or do other things
+        }
+StdSharedPtr<PropertyGroup> group =
+        graphInfo.get().getVertexInfo(label).get().getPropertyGroup(propertyName);
+
+Result<StdSharedPtr<VertexPropertyArrowChunkReader>> maybeReader =
+        GrapharStaticFunctions.INSTANCE.constructVertexPropertyArrowChunkReader(
+                graphInfo, label, group);
 // check reader's status if needed
-VertexPropertyArrowChunkReader reader = maybeReader.value();
-Result<StdSharedPtr<ArrowTable>> result = reader.getChunk();
+StdSharedPtr<VertexPropertyArrowChunkReader> reader = maybeReader.value();
+Result<StdSharedPtr<ArrowTable>> result = reader.get().getChunk();
 // check table's status if needed
 StdSharedPtr<ArrowTable> table = result.value();
-StdPair<Long, Long> range = reader.getRange().value();
 ```
 
 See [test for

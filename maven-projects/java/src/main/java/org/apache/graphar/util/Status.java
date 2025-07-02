@@ -20,7 +20,7 @@
 package org.apache.graphar.util;
 
 import static org.apache.graphar.util.CppClassName.GAR_STATUS;
-import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
+import static org.apache.graphar.util.CppHeaderName.GAR_UTIL_STATUS_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
@@ -33,7 +33,7 @@ import org.apache.graphar.stdcxx.StdString;
 
 @FFIGen
 @FFITypeAlias(GAR_STATUS)
-@CXXHead(GAR_GRAPH_INFO_H)
+@CXXHead(GAR_UTIL_STATUS_H)
 public interface Status extends CXXPointer {
     /** Return true if the status indicates success. */
     boolean ok();

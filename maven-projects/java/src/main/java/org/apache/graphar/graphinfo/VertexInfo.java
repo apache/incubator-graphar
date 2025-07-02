@@ -28,7 +28,6 @@ import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
 import com.alibaba.fastffi.CXXValue;
 import com.alibaba.fastffi.FFIConst;
-import com.alibaba.fastffi.FFIFactory;
 import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFILibrary;
 import com.alibaba.fastffi.FFINameAlias;
@@ -37,7 +36,6 @@ import com.alibaba.fastffi.FFITypeFactory;
 import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.stdcxx.StdVector;
-import org.apache.graphar.types.DataType;
 import org.apache.graphar.util.InfoVersion;
 import org.apache.graphar.util.Result;
 import org.apache.graphar.util.Status;
@@ -48,9 +46,6 @@ import org.apache.graphar.util.Yaml;
 @FFITypeAlias(GAR_VERTEX_INFO)
 @CXXHead(GAR_GRAPH_INFO_H)
 public interface VertexInfo extends CXXPointer {
-
-    Factory factory = FFITypeFactory.getFactory(VertexInfo.class);
-
     /**
      * Adds a property group to the vertex info.
      *
@@ -59,7 +54,8 @@ public interface VertexInfo extends CXXPointer {
      */
     @FFINameAlias("AddPropertyGroup")
     @CXXValue
-    Status addPropertyGroup(@CXXReference PropertyGroup propertyGroup);
+    Result<StdSharedPtr<VertexInfo>> addPropertyGroup(
+            @CXXValue StdSharedPtr<PropertyGroup> propertyGroup);
 
     /**
      * Get the label of the vertex.
@@ -84,7 +80,8 @@ public interface VertexInfo extends CXXPointer {
      * @return The path prefix of the vertex.
      */
     @FFINameAlias("GetPrefix")
-    @CXXValue
+    @CXXReference
+    @FFIConst
     StdString getPrefix();
 
     /**
@@ -92,10 +89,10 @@ public interface VertexInfo extends CXXPointer {
      *
      * @return The version info of the vertex.
      */
-    @FFINameAlias("GetVersion")
+    @FFINameAlias("version")
     @FFIConst
     @CXXReference
-    InfoVersion getVersion();
+    StdSharedPtr<InfoVersion> getVersion();
 
     /**
      * Get the property groups of the vertex.
@@ -105,7 +102,7 @@ public interface VertexInfo extends CXXPointer {
     @FFINameAlias("GetPropertyGroups")
     @FFIConst
     @CXXReference
-    StdVector<PropertyGroup> getPropertyGroups();
+    StdVector<StdSharedPtr<PropertyGroup>> getPropertyGroups();
 
     /**
      * Get the property group that contains the specified property.
@@ -116,18 +113,7 @@ public interface VertexInfo extends CXXPointer {
      */
     @FFINameAlias("GetPropertyGroup")
     @CXXValue
-    Result<@CXXReference PropertyGroup> getPropertyGroup(@CXXReference StdString propertyName);
-
-    /**
-     * Get the data type of the specified property.
-     *
-     * @param propertyName The name of the property.
-     * @return A Result object containing the data type of the property, or a KeyError Status object
-     *     if the property is not found.
-     */
-    @FFINameAlias("GetPropertyType")
-    @CXXValue
-    Result<DataType> getPropertyType(@CXXReference StdString propertyName);
+    StdSharedPtr<PropertyGroup> getPropertyGroup(@CXXReference StdString propertyName);
 
     /**
      * Get whether the vertex info contains the specified property.
@@ -135,8 +121,8 @@ public interface VertexInfo extends CXXPointer {
      * @param propertyName The name of the property.
      * @return True if the property exists in the vertex info, False otherwise.
      */
-    @FFINameAlias("ContainProperty")
-    boolean containProperty(@CXXReference StdString propertyName);
+    @FFINameAlias("HasProperty")
+    boolean hasProperty(@CXXReference StdString propertyName);
 
     /**
      * Saves the vertex info to a YAML file.
@@ -166,8 +152,7 @@ public interface VertexInfo extends CXXPointer {
      */
     @FFINameAlias("IsPrimaryKey")
     @CXXValue
-    @FFITypeAlias("GraphArchive::Result<bool>")
-    Result<Boolean> isPrimaryKey(@CXXReference StdString propertyName);
+    boolean isPrimaryKey(@CXXReference StdString propertyName);
 
     /**
      * Returns whether the vertex info contains the specified property group.
@@ -175,19 +160,8 @@ public interface VertexInfo extends CXXPointer {
      * @param propertyGroup The PropertyGroup object to check for.
      * @return True if the property group exists in the vertex info, False otherwise.
      */
-    @FFINameAlias("ContainPropertyGroup")
-    boolean containPropertyGroup(@CXXReference PropertyGroup propertyGroup);
-
-    /**
-     * Returns a new VertexInfo object with the specified property group added to it.
-     *
-     * @param propertyGroup The PropertyGroup object to add.
-     * @return A Result object containing the new VertexInfo object, or a Status object indicating
-     *     an error.
-     */
-    @FFINameAlias("Extend")
-    @CXXValue
-    Result<VertexInfo> extend(@CXXReference PropertyGroup propertyGroup);
+    @FFINameAlias("HasPropertyGroup")
+    boolean hasPropertyGroup(@CXXReference StdSharedPtr<PropertyGroup> propertyGroup);
 
     /**
      * Get the file path for the specified property group and chunk index.
@@ -200,7 +174,7 @@ public interface VertexInfo extends CXXPointer {
     @FFINameAlias("GetFilePath")
     @CXXValue
     Result<StdString> getFilePath(
-            @CXXReference PropertyGroup propertyGroup,
+            @CXXValue StdSharedPtr<PropertyGroup> propertyGroup,
             @CXXValue @FFITypeAlias(GAR_ID_TYPE) long chunkIndex);
 
     /**
@@ -212,7 +186,7 @@ public interface VertexInfo extends CXXPointer {
      */
     @FFINameAlias("GetPathPrefix")
     @CXXValue
-    Result<StdString> getPathPrefix(@CXXReference PropertyGroup propertyGroup);
+    Result<StdString> getPathPrefix(@CXXValue StdSharedPtr<PropertyGroup> propertyGroup);
 
     /**
      * Get the file path for the number of vertices.
@@ -238,40 +212,8 @@ public interface VertexInfo extends CXXPointer {
      * @return A Result object containing the VertexInfo object, or a Status object indicating an
      *     error.
      */
-    static Result<VertexInfo> load(StdSharedPtr<Yaml> yaml) {
+    static Result<StdSharedPtr<VertexInfo>> load(StdSharedPtr<Yaml> yaml) {
         return Static.INSTANCE.Load(yaml);
-    }
-
-    @FFIFactory
-    interface Factory {
-        /**
-         * Construct a VertexInfo object with the given metadata information.
-         *
-         * @param label The label of the vertex.
-         * @param chunkSize The number of vertices in each vertex chunk.
-         * @param version The version of the vertex info.
-         * @param prefix The prefix of the vertex info.
-         */
-        VertexInfo create(
-                @CXXReference StdString label,
-                @FFITypeAlias(GAR_ID_TYPE) long chunkSize,
-                @CXXReference InfoVersion version,
-                @CXXReference StdString prefix);
-
-        /**
-         * Construct a VertexInfo object with the given metadata information.
-         *
-         * @param label The label of the vertex.
-         * @param chunkSize The number of vertices in each vertex chunk.
-         * @param version The version of the vertex info.
-         */
-        VertexInfo create(
-                @CXXReference StdString label,
-                @FFITypeAlias(GAR_ID_TYPE) long chunkSize,
-                @CXXReference InfoVersion version);
-
-        /** Copy constructor. */
-        VertexInfo create(@CXXReference VertexInfo other);
     }
 
     @FFIGen
@@ -281,6 +223,6 @@ public interface VertexInfo extends CXXPointer {
         Static INSTANCE = FFITypeFactory.getLibrary(VertexInfo.Static.class);
 
         @CXXValue
-        Result<VertexInfo> Load(@CXXValue StdSharedPtr<Yaml> yaml);
+        Result<StdSharedPtr<VertexInfo>> Load(@CXXValue StdSharedPtr<Yaml> yaml);
     }
 }

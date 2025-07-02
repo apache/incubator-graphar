@@ -28,11 +28,9 @@ import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
 import com.alibaba.fastffi.CXXValue;
 import com.alibaba.fastffi.FFIConst;
-import com.alibaba.fastffi.FFIFactory;
 import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
-import com.alibaba.fastffi.FFITypeFactory;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.stdcxx.StdVector;
 import org.apache.graphar.types.FileType;
@@ -49,12 +47,26 @@ import org.apache.graphar.types.FileType;
 @CXXHead(GAR_GRAPH_INFO_H)
 public interface PropertyGroup extends CXXPointer {
 
-    Factory factory = FFITypeFactory.getFactory(PropertyGroup.class);
+    default boolean hasProperty(String property_name) {
+        StdString StdPropertyName = StdString.create(property_name);
+        boolean b = hasProperty(StdPropertyName);
+        StdPropertyName.delete();
+        return b;
+    }
 
     @FFINameAlias("GetProperties")
     @FFIConst
     @CXXReference
     StdVector<Property> getProperties();
+
+    @FFINameAlias("HasProperty")
+    @FFIConst
+    boolean hasProperty(@CXXReference StdString property_name);
+
+    @FFINameAlias("IsValidated")
+    @FFIConst
+    @CXXReference
+    boolean isValidated();
 
     /**
      * Get the file type of property group chunk file.
@@ -72,36 +84,9 @@ public interface PropertyGroup extends CXXPointer {
      */
     @FFINameAlias("GetPrefix")
     @CXXReference
+    @FFIConst
     StdString getPrefix();
 
     @CXXOperator("==")
     boolean eq(@CXXReference PropertyGroup other);
-
-    @FFIFactory
-    interface Factory {
-        /**
-         * Initialize the PropertyGroup with a list of properties, file type, and optional prefix.
-         *
-         * @param properties Property list of group
-         * @param fileType File type of property group chunk file
-         * @param prefix prefix of property group chunk file. The default prefix is the
-         *     concatenation of property names with '_' as separator
-         */
-        @CXXValue
-        PropertyGroup create(
-                @CXXValue StdVector<Property> properties,
-                @CXXValue FileType fileType,
-                @CXXReference StdString prefix);
-
-        /**
-         * Initialize the PropertyGroup with a list of properties, file type, and optional prefix.
-         *
-         * @param properties Property list of group
-         * @param fileType File type of property group chunk file
-         */
-        @CXXValue
-        PropertyGroup create(@CXXValue StdVector<Property> properties, @CXXValue FileType fileType);
-
-        PropertyGroup create();
-    }
 }
