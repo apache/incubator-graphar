@@ -113,20 +113,21 @@ public class GraphInfo {
                         cachedEdgeInfoMap));
     }
 
-    public Optional<GraphInfo> removeEdge(EdgeInfo edgeInfo) {
+    public Optional<GraphInfo> removeEdgeAsNew(String srcLabel, String edgeLabel, String dstLabel) {
         if (edgeInfo == null
                 || hasEdgeInfo(
-                edgeInfo.getSrcLabel(), edgeInfo.getEdgeLabel(), edgeInfo.getDstLabel())) {
+                srcLabel, edgeLabel, dstLabel)) {
             return Optional.empty();
         }
+        String edgePath = getPrefix() + "/" + EdgeInfo.concat(srcLabel, edgeLabel, dstLabel) + ".edge.yaml";
         final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
                 org.apache.graphar.proto.GraphInfo.newBuilder(protoGraphInfo)
-                        .removeEdges(edgeInfo.getEdgePath())
+                        .removeEdges(edgePath)
                         .build();
         final List<EdgeInfo> newEdgeInfos = Stream.concat(cachedEdgeInfoList.stream().filter(e ->
-                !e.getSrcLabel().equals(edgeInfo.getSrcLabel())
-                        && !e.getDstLabel().equals(edgeInfo.getDstLabel())
-                        && !e.getEdgeLabel().equals(edgeInfo.getEdgeLabel())))
+                !e.getSrcLabel().equals(srcLabel)
+                        && !e.getDstLabel().equals(dstLabel)
+                        && !e.getEdgeLabel().equals(edgeLabel)))
                 .collect(Collectors.toList());
 
 
