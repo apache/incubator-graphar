@@ -294,12 +294,20 @@ class VerticesBuilder {
    */
   static Result<std::shared_ptr<VerticesBuilder>> Make(
       const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+      std::shared_ptr<WriterOptions> writer_options,
       IdType start_vertex_index = 0,
-      std::shared_ptr<WriterOptions> writer_options = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
     return std::make_shared<VerticesBuilder>(vertex_info, prefix,
                                              start_vertex_index, writer_options,
                                              validate_level);
+  }
+
+  static Result<std::shared_ptr<VerticesBuilder>> Make(
+      const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+      IdType start_vertex_index = 0,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    return std::make_shared<VerticesBuilder>(
+        vertex_info, prefix, start_vertex_index, nullptr, validate_level);
   }
 
   /**
@@ -315,8 +323,8 @@ class VerticesBuilder {
    */
   static Result<std::shared_ptr<VerticesBuilder>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+      std::shared_ptr<WriterOptions> writer_options,
       IdType start_vertex_index = 0,
-      std::shared_ptr<WriterOptions> writer_options = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
     const auto vertex_info = graph_info->GetVertexInfo(type);
     if (!vertex_info) {
@@ -324,8 +332,22 @@ class VerticesBuilder {
                               " doesn't exist in graph ", graph_info->GetName(),
                               ".");
     }
-    return Make(vertex_info, graph_info->GetPrefix(), start_vertex_index,
-                writer_options, validate_level);
+    return Make(vertex_info, graph_info->GetPrefix(), writer_options,
+                start_vertex_index, validate_level);
+  }
+
+  static Result<std::shared_ptr<VerticesBuilder>> Make(
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+      IdType start_vertex_index = 0,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    const auto vertex_info = graph_info->GetVertexInfo(type);
+    if (!vertex_info) {
+      return Status::KeyError("The vertex type ", type,
+                              " doesn't exist in graph ", graph_info->GetName(),
+                              ".");
+    }
+    return Make(vertex_info, graph_info->GetPrefix(), nullptr,
+                start_vertex_index, validate_level);
   }
 
  private:
