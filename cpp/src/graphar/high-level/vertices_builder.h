@@ -376,7 +376,7 @@ class VerticesBuilder {
   IdType start_vertex_index_;
   IdType num_vertices_;
   bool is_saved_;
-  std::shared_ptr<WriterOptions> writer_options_ = nullptr;
+  std::shared_ptr<WriterOptions> writer_options_;
   ValidateLevel validate_level_;
 };
 
