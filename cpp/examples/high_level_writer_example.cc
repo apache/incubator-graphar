@@ -83,6 +83,10 @@ void edges_builder() {
   graphar::builder::EdgesBuilder builder(
       edge_info, "/tmp/", graphar::AdjListType::ordered_by_dest, vertex_count);
 
+  graphar::WriterOptions::ParquetOptionBuilder parquetOptionBuilder;
+  parquetOptionBuilder.compression(arrow::Compression::ZSTD);
+  builder.SetWriterOptions(parquetOptionBuilder.build());
+
   // set validate level
   builder.SetValidateLevel(graphar::ValidateLevel::strong_validate);
 
