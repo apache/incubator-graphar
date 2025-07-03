@@ -86,10 +86,6 @@ void edges_builder() {
   // set validate level
   builder.SetValidateLevel(graphar::ValidateLevel::strong_validate);
 
-  graphar::WriterOptions::ParquetOptionBuilder parquetOptionBuilder;
-  parquetOptionBuilder.compression(arrow::Compression::ZSTD);
-  builder.SetWriterOptions(parquetOptionBuilder.build());
-
   // prepare edge data
   int edge_count = 4;
   std::vector<std::string> property_names = {"creationDate"};
