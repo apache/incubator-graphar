@@ -179,8 +179,9 @@ class WriterOptions {
       return *this;
     }
     std::shared_ptr<WriterOptions> build() {
-      writerOptions_ =
-          writerOptions_ ? writerOptions_ : std::make_shared<WriterOptions>();
+      if (!writerOptions_) {
+        writerOptions_ = std::make_shared<WriterOptions>();
+      }
       writerOptions_->setCsvOption(option_);
       return writerOptions_;
     }
@@ -327,8 +328,9 @@ class WriterOptions {
       return *this;
     }
     std::shared_ptr<WriterOptions> build() {
-      writerOptions_ =
-          writerOptions_ ? writerOptions_ : std::make_shared<WriterOptions>();
+      if (!writerOptions_) {
+        writerOptions_ = std::make_shared<WriterOptions>();
+      }
       writerOptions_->setParquetOption(option_);
       return writerOptions_;
     }
@@ -394,8 +396,9 @@ class WriterOptions {
     }
 #endif
     std::shared_ptr<WriterOptions> build() {
-      writerOptions_ =
-          writerOptions_ ? writerOptions_ : std::make_shared<WriterOptions>();
+      if (!writerOptions_) {
+        writerOptions_ = std::make_shared<WriterOptions>();
+      }
       writerOptions_->setOrcOption(option_);
       return writerOptions_;
     }
