@@ -30,6 +30,7 @@
 #include "graphar/arrow/chunk_writer.h"
 #include "graphar/graph_info.h"
 #include "graphar/result.h"
+#include "graphar/writer_util.h"
 
 // forward declaration
 namespace arrow {
@@ -136,6 +137,8 @@ class VerticesBuilder {
    * @param vertex_info The vertex info that describes the vertex type.
    * @param prefix The absolute prefix.
    * @param start_vertex_index The start index of the vertices collection.
+   * @param writerOptions The writerOptions provides configuration options for
+   * different file format writers.
    * @param validate_level The global validate level for the writer, with no
    * validate by default. It could be ValidateLevel::no_validate,
    * ValidateLevel::weak_validate or ValidateLevel::strong_validate, but could
@@ -144,10 +147,12 @@ class VerticesBuilder {
   explicit VerticesBuilder(
       const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
       IdType start_vertex_index = 0,
+      std::shared_ptr<WriterOptions> writerOptions = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate)
       : vertex_info_(std::move(vertex_info)),
         prefix_(prefix),
         start_vertex_index_(start_vertex_index),
+        writer_options_(writerOptions),
         validate_level_(validate_level) {
     if (validate_level_ == ValidateLevel::default_validate) {
       throw std::runtime_error(
@@ -158,7 +163,6 @@ class VerticesBuilder {
     num_vertices_ = 0;
     is_saved_ = false;
   }
-
   /**
    * @brief Clear the vertices in this VerciesBuilder.
    */
@@ -166,6 +170,26 @@ class VerticesBuilder {
     vertices_.clear();
     num_vertices_ = 0;
     is_saved_ = false;
+  }
+
+  /**
+   * @brief Set the writerOptions.
+   *
+   * @return The writerOptions provides configuration options for different file
+   * format writers.
+   */
+  inline void SetWriterOptions(std::shared_ptr<WriterOptions> writer_options) {
+    this->writer_options_ = writer_options;
+  }
+
+  /**
+   * @brief Set the writerOptions.
+   *
+   * @param writerOptions The writerOptions provides configuration options for
+   * different file format writers.
+   */
+  inline std::shared_ptr<WriterOptions> GetWriterOptions() {
+    return this->writer_options_;
   }
 
   /**
@@ -242,8 +266,7 @@ class VerticesBuilder {
    */
   Status Dump() {
     // construct the writer
-    // TODO(yangxk) Allow users to use custom options instead of nullptr
-    VertexPropertyWriter writer(vertex_info_, prefix_, nullptr,
+    VertexPropertyWriter writer(vertex_info_, prefix_, writer_options_,
                                 validate_level_);
     IdType start_chunk_index =
         start_vertex_index_ / vertex_info_->GetChunkSize();
@@ -264,15 +287,19 @@ class VerticesBuilder {
    * @param vertex_info The vertex info that describes the vertex type.
    * @param prefix The absolute prefix.
    * @param start_vertex_index The start index of the vertices collection.
+   * @param writerOptions The writerOptions provides configuration options for
+   * different file format writers.
    * @param validate_level The global validate level for the builder, default is
    * no_validate.
    */
   static Result<std::shared_ptr<VerticesBuilder>> Make(
       const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
       IdType start_vertex_index = 0,
+      std::shared_ptr<WriterOptions> writer_options = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
-    return std::make_shared<VerticesBuilder>(
-        vertex_info, prefix, start_vertex_index, validate_level);
+    return std::make_shared<VerticesBuilder>(vertex_info, prefix,
+                                             start_vertex_index, writer_options,
+                                             validate_level);
   }
 
   /**
@@ -281,12 +308,15 @@ class VerticesBuilder {
    * @param graph_info The graph info that describes the graph.
    * @param type The type of the vertex.
    * @param start_vertex_index The start index of the vertices collection.
+   * @param writerOptions The writerOptions provides configuration options for
+   * different file format writers.
    * @param validate_level The global validate level for the builder, default is
    * no_validate.
    */
   static Result<std::shared_ptr<VerticesBuilder>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
       IdType start_vertex_index = 0,
+      std::shared_ptr<WriterOptions> writer_options = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
     const auto vertex_info = graph_info->GetVertexInfo(type);
     if (!vertex_info) {
@@ -295,7 +325,7 @@ class VerticesBuilder {
                               ".");
     }
     return Make(vertex_info, graph_info->GetPrefix(), start_vertex_index,
-                validate_level);
+                writer_options, validate_level);
   }
 
  private:
@@ -346,6 +376,7 @@ class VerticesBuilder {
   IdType start_vertex_index_;
   IdType num_vertices_;
   bool is_saved_;
+  std::shared_ptr<WriterOptions> writer_options_ = nullptr;
   ValidateLevel validate_level_;
 };
 
