@@ -45,6 +45,16 @@ namespace graphar {
  *
  * The configuration parameters and their default values are aligned with those
  * in Arrow.
+ *
+ * CSVOptionBuilder, ParquetOptionBuilder, and ORCOptionBuilder are used to
+ * construct format-specific options for CSV, Parquet, and ORC, respectively.
+ * An existing WriterOptions instance can be passed to a builder’s constructor
+ * to incrementally add or combine options across different formats.
+ * Example:
+ * CSVOptionBuilder csvBuilder;
+ * auto wopt = csvBuilder.build();
+ * ParquetOptionBuilder parquetBuilder(wopt);
+ * wopt = parquetBuilder.build();
  */
 class WriterOptions {
  private:
@@ -138,7 +148,8 @@ class WriterOptions {
     CSVOptionBuilder() : option_(std::make_shared<CSVOption>()) {}
     explicit CSVOptionBuilder(std::shared_ptr<WriterOptions> wopt)
         : writerOptions_(wopt),
-          option_(wopt ? wopt->csvOption_ : std::make_shared<CSVOption>()) {}
+          option_(wopt && wopt->csvOption_ ? wopt->csvOption_
+                                           : std::make_shared<CSVOption>()) {}
     CSVOptionBuilder& include_header(bool header) {
       option_->include_header = header;
       return *this;
@@ -168,9 +179,11 @@ class WriterOptions {
       return *this;
     }
     std::shared_ptr<WriterOptions> build() {
-      return writerOptions_
-                 ? writerOptions_
-                 : std::make_shared<WriterOptions>(option_, nullptr, nullptr);
+      if (!writerOptions_) {
+        writerOptions_ = std::make_shared<WriterOptions>();
+      }
+      writerOptions_->setCsvOption(option_);
+      return writerOptions_;
     }
 
    private:
@@ -184,8 +197,9 @@ class WriterOptions {
     ParquetOptionBuilder() : option_(std::make_shared<ParquetOption>()) {}
     explicit ParquetOptionBuilder(std::shared_ptr<WriterOptions> wopt)
         : writerOptions_(wopt),
-          option_(wopt ? wopt->parquetOption_
-                       : std::make_shared<ParquetOption>()) {}
+          option_(wopt && wopt->parquetOption_
+                      ? wopt->parquetOption_
+                      : std::make_shared<ParquetOption>()) {}
     ParquetOptionBuilder& enable_dictionary(bool enable) {
       option_->enable_dictionary = enable;
       return *this;
@@ -314,9 +328,11 @@ class WriterOptions {
       return *this;
     }
     std::shared_ptr<WriterOptions> build() {
-      return writerOptions_
-                 ? writerOptions_
-                 : std::make_shared<WriterOptions>(nullptr, option_, nullptr);
+      if (!writerOptions_) {
+        writerOptions_ = std::make_shared<WriterOptions>();
+      }
+      writerOptions_->setParquetOption(option_);
+      return writerOptions_;
     }
 
    private:
@@ -330,7 +346,8 @@ class WriterOptions {
     ORCOptionBuilder() : option_(std::make_shared<ORCOption>()) {}
     explicit ORCOptionBuilder(std::shared_ptr<WriterOptions> wopt)
         : writerOptions_(wopt),
-          option_(wopt ? wopt->orcOption_ : std::make_shared<ORCOption>()) {}
+          option_(wopt && wopt->orcOption_ ? wopt->orcOption_
+                                           : std::make_shared<ORCOption>()) {}
 #ifdef ARROW_ORC
     ORCOptionBuilder& batch_size(int64_t bs) {
       option_->batch_size = bs;
@@ -379,9 +396,11 @@ class WriterOptions {
     }
 #endif
     std::shared_ptr<WriterOptions> build() {
-      return writerOptions_
-                 ? writerOptions_
-                 : std::make_shared<WriterOptions>(nullptr, nullptr, option_);
+      if (!writerOptions_) {
+        writerOptions_ = std::make_shared<WriterOptions>();
+      }
+      writerOptions_->setOrcOption(option_);
+      return writerOptions_;
     }
 
    private:
@@ -396,6 +415,15 @@ class WriterOptions {
       : csvOption_(csv), parquetOption_(parquet), orcOption_(orc) {}
   static std::shared_ptr<WriterOptions> DefaultWriterOption() {
     return std::make_shared<WriterOptions>();
+  }
+  void setCsvOption(std::shared_ptr<CSVOption> csv_option) {
+    csvOption_ = csv_option;
+  }
+  void setParquetOption(std::shared_ptr<ParquetOption> parquet_option) {
+    parquetOption_ = parquet_option;
+  }
+  void setOrcOption(std::shared_ptr<ORCOption> orc_option) {
+    orcOption_ = orc_option;
   }
   arrow::csv::WriteOptions getCsvOption() const;
   std::shared_ptr<parquet::WriterProperties> getParquetWriterProperties() const;

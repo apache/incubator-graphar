@@ -28,7 +28,7 @@ namespace graphar::builder {
 
 Status EdgesBuilder::Dump() {
   // construct the writer
-  EdgeChunkWriter writer(edge_info_, prefix_, adj_list_type_, nullptr,
+  EdgeChunkWriter writer(edge_info_, prefix_, adj_list_type_, writer_options_,
                          validate_level_);
   // construct empty edge collections for vertex chunks without edges
   IdType num_vertex_chunks =

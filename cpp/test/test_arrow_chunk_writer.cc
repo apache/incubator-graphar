@@ -166,10 +166,11 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     auto vertex_meta_csv = Yaml::LoadFile(vertex_meta_file_csv).value();
     auto vertex_info_csv = VertexInfo::Load(vertex_meta_csv).value();
     auto csv_options = WriterOptions::CSVOptionBuilder();
+    auto wopt = csv_options.build();
     csv_options.include_header(true);
     csv_options.delimiter('|');
-    auto maybe_writer = VertexPropertyWriter::Make(
-        vertex_info_csv, "/tmp/option/", csv_options.build());
+    auto maybe_writer =
+        VertexPropertyWriter::Make(vertex_info_csv, "/tmp/option/", wopt);
     REQUIRE(!maybe_writer.has_error());
     auto writer = maybe_writer.value();
     REQUIRE(writer->WriteTable(table, 0).ok());
@@ -196,7 +197,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
                                  .size()) +
                 1);
     // type parquet
-    auto options_parquet_Builder = WriterOptions::ParquetOptionBuilder();
+    auto options_parquet_Builder = WriterOptions::ParquetOptionBuilder(wopt);
     options_parquet_Builder.compression(arrow::Compression::type::UNCOMPRESSED);
     options_parquet_Builder.enable_statistics(false);
     parquet::SortingColumn sc;
@@ -205,8 +206,9 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     options_parquet_Builder.sorting_columns(columns)
         .enable_store_decimal_as_integer(true)
         .max_row_group_length(10);
-    maybe_writer = VertexPropertyWriter::Make(
-        vertex_info_parquet, "/tmp/option/", options_parquet_Builder.build());
+    wopt = options_parquet_Builder.build();
+    maybe_writer =
+        VertexPropertyWriter::Make(vertex_info_parquet, "/tmp/option/", wopt);
     REQUIRE(!maybe_writer.has_error());
     writer = maybe_writer.value();
     REQUIRE(writer->WriteTable(table, 0).ok());
@@ -244,10 +246,11 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
         test_data_dir + "/ldbc_sample/orc/" + "person.vertex.yml";
     auto vertex_meta_orc = Yaml::LoadFile(vertex_meta_file_orc).value();
     auto vertex_info_orc = VertexInfo::Load(vertex_meta_orc).value();
-    auto optionsOrcBuilder = WriterOptions::ORCOptionBuilder();
+    auto optionsOrcBuilder = WriterOptions::ORCOptionBuilder(wopt);
     optionsOrcBuilder.compression(arrow::Compression::type::ZSTD);
-    maybe_writer = VertexPropertyWriter::Make(vertex_info_orc, "/tmp/option/",
-                                              optionsOrcBuilder.build());
+    wopt = optionsOrcBuilder.build();
+    maybe_writer =
+        VertexPropertyWriter::Make(vertex_info_orc, "/tmp/option/", wopt);
     REQUIRE(!maybe_writer.has_error());
     writer = maybe_writer.value();
     REQUIRE(writer->WriteTable(table, 0).ok());
