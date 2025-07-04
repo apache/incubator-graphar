@@ -183,7 +183,7 @@ public class GraphInfo {
         return protoGraphInfo.getPrefix();
     }
 
-    public VertexInfo getVersion() {
+    public VersionInfo getVersion() {
         return VersionParser.getVersion(protoGraphInfo.getVersion());
     }
 

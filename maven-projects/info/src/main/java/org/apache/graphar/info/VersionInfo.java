@@ -22,8 +22,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class VersionInfo {
-    private int parsedVersion;
-    private List<String> parsedUserDefinedTypes;
+    public int parsedVersion;
+    public List<String> parsedUserDefinedTypes;
 
 
     public VersionInfo(int parsedVersion, List<String> parsedUserDefinedTypes) {
@@ -37,7 +37,7 @@ public class VersionInfo {
     }
 
 
-    public List<String> getParsedTypes() {
-        return parsedTypes;
+    public List<String> getParsedUserDefinedTypes() {
+        return parsedUserDefinedTypes;
     }
 }

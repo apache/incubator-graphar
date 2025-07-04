@@ -137,7 +137,7 @@ public class VertexInfo {
         return getPrefix() + "/" + getType() + ".vertex.yaml";
     }
 
-    public VertexInfo getVersion() {
+    public VersionInfo getVersion() {
         return VersionParser.getVersion(protoVertexInfo.getVersion());
 
     }
