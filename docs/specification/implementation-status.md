@@ -198,9 +198,9 @@ Supported operations in Graph Info:
 |-------------------|-------|--------|-------|------------|
 | create            | ✓     | ✓      | ✓     | ✓          |
 | add vertex        | ✓     | ✓      | ✓     | ✓          |
-| remove vertex     |       |        |       |            |
+| remove vertex     |       | ✓      |       |            |
 | add edge          | ✓     | ✓      | ✓     | ✓          |
-| remove edge       |       |        |       |            |
+| remove edge       |       | ✓      |       |            |
 | get name          | ✓     | ✓      | ✓     | ✓          |
 | get vertex        | ✓     | ✓      | ✓     | ✓          |
 | get edge          | ✓     | ✓      | ✓     | ✓          |
