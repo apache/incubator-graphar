@@ -19,30 +19,33 @@
 
 package org.apache.graphar.reader
 
-import org.apache.graphar.util.{IndexGenerator, DataFrameConcat}
-import org.apache.graphar.{VertexInfo, PropertyGroup, GeneralParams}
+import org.apache.graphar.util.{DataFrameConcat, IndexGenerator}
+import org.apache.graphar.{GeneralParams, PropertyGroup, VertexInfo}
 import org.apache.graphar.util.FileSystem
-
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.{col, struct, udf}
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.types._
+
+import scala.collection.convert.ImplicitConversions.`list asScalaBuffer`
+import scala.collection.mutable.ListBuffer
 
 /**
  * Reader for vertex chunks.
  *
  * @constructor
- *   create a new vertex reader with vertex info.
+ * create a new vertex reader with vertex info.
  * @param prefix
- *   the absolute prefix.
+ * the absolute prefix.
  * @param vertexInfo
- *   the vertex info that describes the vertex type.
+ * the vertex info that describes the vertex type.
  * @param spark
- *   spark session for the reader to read chunks as Spark DataFrame.
+ * spark session for the reader to read chunks as Spark DataFrame.
  */
 class VertexReader(
-    prefix: String,
-    vertexInfo: VertexInfo,
-    spark: SparkSession
-) {
+                    prefix: String,
+                    vertexInfo: VertexInfo,
+                    spark: SparkSession
+                  ) {
 
   /** Load the total number of vertices for this vertex type. */
   def readVerticesNumber(): Long = {
@@ -56,17 +59,17 @@ class VertexReader(
    * Load a single vertex property chunk as a DataFrame.
    *
    * @param propertyGroup
-   *   property group.
+   * property group.
    * @param chunk_index
-   *   index of vertex chunk.
+   * index of vertex chunk.
    * @return
-   *   vertex property chunk DataFrame. Raise IllegalArgumentException if the
-   *   property group not contained.
+   * vertex property chunk DataFrame. Raise IllegalArgumentException if the
+   * property group not contained.
    */
   def readVertexPropertyChunk(
-      propertyGroup: PropertyGroup,
-      chunk_index: Long
-  ): DataFrame = {
+                               propertyGroup: PropertyGroup,
+                               chunk_index: Long
+                             ): DataFrame = {
     if (!vertexInfo.containPropertyGroup(propertyGroup)) {
       throw new IllegalArgumentException(
         "property group not contained in vertex info."
@@ -86,14 +89,14 @@ class VertexReader(
    * Load all chunks for a property group as a DataFrame.
    *
    * @param propertyGroup
-   *   property group.
+   * property group.
    * @return
-   *   DataFrame that contains all chunks of property group. Raise
-   *   IllegalArgumentException if the property group not contained.
+   * DataFrame that contains all chunks of property group. Raise
+   * IllegalArgumentException if the property group not contained.
    */
   def readVertexPropertyGroup(
-      propertyGroup: PropertyGroup
-  ): DataFrame = {
+                               propertyGroup: PropertyGroup
+                             ): DataFrame = {
     if (!vertexInfo.containPropertyGroup(propertyGroup)) {
       throw new IllegalArgumentException(
         "property group not contained in vertex info."
@@ -113,14 +116,14 @@ class VertexReader(
    * Load the chunks for multiple property groups as a DataFrame.
    *
    * @param propertyGroups
-   *   list of property groups.
+   * list of property groups.
    * @return
-   *   DataFrame that contains all chunks of property group. Raise
-   *   IllegalArgumentException if the property group not contained.
+   * DataFrame that contains all chunks of property group. Raise
+   * IllegalArgumentException if the property group not contained.
    */
   def readMultipleVertexPropertyGroups(
-      propertyGroups: java.util.ArrayList[PropertyGroup]
-  ): DataFrame = {
+                                        propertyGroups: java.util.ArrayList[PropertyGroup]
+                                      ): DataFrame = {
     val len: Int = propertyGroups.size
     if (len == 0) {
       return spark.emptyDataFrame
@@ -148,10 +151,38 @@ class VertexReader(
    * Load the chunks for all property groups as a DataFrame.
    *
    * @return
-   *   DataFrame that contains all property group chunks of vertex.
+   * DataFrame that contains all property group chunks of vertex.
    */
   def readAllVertexPropertyGroups(): DataFrame = {
     val property_groups = vertexInfo.getProperty_groups()
     return readMultipleVertexPropertyGroups(property_groups)
+  }
+
+  def readVertexLabels(): DataFrame = {
+    if (vertexInfo.labels.size() > 0) {
+      val labels_list = vertexInfo.labels.toSeq
+      val parquet_read_path = prefix + vertexInfo.prefix + "/labels"
+      val rdd = spark.read
+        .option("fileFormat", "parquet")
+        .option("header", "true")
+        .format("org.apache.graphar.datasources.GarDataSource")
+        .load(parquet_read_path)
+        .rdd.map { row =>
+          val labelsBuffer = ListBuffer[String]()
+          for ((colName, index) <- labels_list.zipWithIndex) {
+            if (row.getBoolean(index)) {
+              labelsBuffer += colName
+            }
+          }
+          Row.apply(labelsBuffer.toSeq)
+        }
+        //TODO(yangxk) read the vertexIndexCol from the file.
+        .zipWithIndex().map { case (row, idx) => Row.fromSeq(row.toSeq :+ idx) }
+      val schema_array = Array(StructField(GeneralParams.kLabelCol, ArrayType(StringType)), StructField(GeneralParams.vertexIndexCol, LongType))
+      val schema = StructType(schema_array)
+      spark.createDataFrame(rdd, schema)
+    } else {
+      return spark.emptyDataFrame
+    }
   }
 }
