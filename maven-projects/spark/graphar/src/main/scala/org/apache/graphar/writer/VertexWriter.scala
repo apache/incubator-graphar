@@ -19,14 +19,14 @@
 
 package org.apache.graphar.writer
 
-import org.apache.graphar.util.{FileSystem, ChunkPartitioner, IndexGenerator}
-import org.apache.graphar.{GeneralParams, VertexInfo, PropertyGroup}
-
+import org.apache.graphar.util.{ChunkPartitioner, FileSystem, IndexGenerator}
+import org.apache.graphar.{GeneralParams, PropertyGroup, VertexInfo}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types.{LongType, StructField}
 
+import scala.collection.convert.ImplicitConversions.`collection AsScalaIterable`
 import scala.collection.mutable.ArrayBuffer
 
 /** Helper object for VertexWriter class. */
@@ -155,6 +155,44 @@ class VertexWriter(
       val property_group = it.next()
       writeVertexProperties(property_group)
     }
+  }
+
+  def writeVertexLabels(): Unit = {
+    if (vertexInfo.labels.isEmpty) {
+      throw new IllegalArgumentException(
+        "vertex does not have labels."
+      )
+    }
+
+    // write out the chunks
+    val output_prefix = prefix + vertexInfo.prefix + "/labels"
+    val labels_list = vertexInfo.labels.toSeq
+    val label_num = labels_list.length
+    val labels_list_rdd =
+      chunks.select(col(GeneralParams.kLabelCol)).rdd.map { row =>
+        val labels = row.getSeq(0)
+        val bools = new Array[Boolean](label_num)
+        var i = 0
+        while (i < label_num) {
+          bools(i) = labels.contains(labels_list(i))
+          i += 1
+        }
+        Row.fromSeq(bools)
+      }
+    val schema = StructType(
+      labels_list.map(label =>
+        StructField(label, BooleanType, nullable = false)
+      )
+    )
+    val labelDf = spark.createDataFrame(labels_list_rdd, schema)
+    labelDf.show()
+    FileSystem.writeDataFrame(
+      labelDf,
+      "parquet",
+      output_prefix,
+      None,
+      None
+    )
   }
 
   override def finalize(): Unit = {

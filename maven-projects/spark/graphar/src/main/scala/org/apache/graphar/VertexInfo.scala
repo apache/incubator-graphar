@@ -38,7 +38,6 @@ class VertexInfo() {
   @BeanProperty var labels = new java.util.ArrayList[String]()
   @BeanProperty var version: String = ""
 
-
   /**
    * Check if the vertex info contains the property group.
    *
@@ -290,7 +289,7 @@ class VertexInfo() {
     val data = new java.util.HashMap[String, Object]()
     data.put("type", `type`)
     val labels_num = labels.size()
-    if(labels_num > 0) {
+    if (labels_num > 0) {
       data.put("labels", labels)
     }
     data.put("chunk_size", new java.lang.Long(chunk_size))

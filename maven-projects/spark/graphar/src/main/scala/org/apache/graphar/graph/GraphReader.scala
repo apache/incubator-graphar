@@ -66,18 +66,18 @@ object GraphReader {
    * @return
    *   The map of (vertex type -> DataFrame)
    */
-   def readVertexWithLabels(
-                               prefix: String,
-                               vertexInfo: VertexInfo,
-                               spark: SparkSession
-                             ): DataFrame = {
-        val reader = new VertexReader(prefix, vertexInfo, spark)
-        val frame = reader.readAllVertexPropertyGroups()
-        val label_frame = reader.readVertexLabels()
-        if(label_frame.isEmpty){
-          return frame
-        }
-        frame.join(label_frame,GeneralParams.vertexIndexCol,"left")
+  def readVertexWithLabels(
+      prefix: String,
+      vertexInfo: VertexInfo,
+      spark: SparkSession
+  ): DataFrame = {
+    val reader = new VertexReader(prefix, vertexInfo, spark)
+    val frame = reader.readAllVertexPropertyGroups()
+    val label_frame = reader.readVertexLabels()
+    if (label_frame.isEmpty) {
+      return frame
+    }
+    frame.join(label_frame, GeneralParams.vertexIndexCol, "left")
   }
 
   /**
