@@ -185,7 +185,6 @@ class VertexWriter(
       )
     )
     val labelDf = spark.createDataFrame(labels_list_rdd, schema)
-    labelDf.show()
     FileSystem.writeDataFrame(
       labelDf,
       "parquet",

@@ -47,8 +47,7 @@ object GraphReader {
   ): Map[String, DataFrame] = {
     val vertex_dataframes: Map[String, DataFrame] = vertexInfos.map {
       case (vertex_type, vertexInfo) => {
-        val reader = new VertexReader(prefix, vertexInfo, spark)
-        (vertex_type, reader.readAllVertexPropertyGroups())
+        (vertex_type, readVertexWithLabels(prefix, vertexInfo, spark))
       }
     }
     return vertex_dataframes
@@ -73,6 +72,9 @@ object GraphReader {
   ): DataFrame = {
     val reader = new VertexReader(prefix, vertexInfo, spark)
     val frame = reader.readAllVertexPropertyGroups()
+    if (vertexInfo.labels.isEmpty) {
+      return frame
+    }
     val label_frame = reader.readVertexLabels()
     if (label_frame.isEmpty) {
       return frame
