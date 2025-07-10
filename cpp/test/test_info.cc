@@ -25,6 +25,8 @@
 #include "./util.h"
 
 #include "graphar/api/info.h"
+#include "graphar/fwd.h"
+#include "graphar/status.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -75,9 +77,9 @@ TEST_CASE_METHOD(GlobalFixture, "Property") {
 
 TEST_CASE_METHOD(GlobalFixture, "PropertyGroup") {
   Property p0("p0", int32(), true);
-  Property p1("p1", int32(), false);
-  Property p2("p2", string(), false);
-  Property p3("p3", float32(), false);
+  Property p1("p1", int32(), false, true, Cardinality::SINGLE);
+  Property p2("p2", string(), false, true, Cardinality::LIST);
+  Property p3("p3", float32(), false, true, Cardinality::SET);
   Property p4("p4", float64(), false);
 
   PropertyGroup pg0({p0, p1}, FileType::CSV, "p0_and_p1/");
@@ -94,6 +96,11 @@ TEST_CASE_METHOD(GlobalFixture, "PropertyGroup") {
     REQUIRE(p.type->ToTypeName() == int32()->ToTypeName());
     REQUIRE(p.is_primary == true);
     REQUIRE(p.is_nullable == false);
+    // cardinality
+    REQUIRE(p0.cardinality == Cardinality::SINGLE);
+    REQUIRE(p1.cardinality == Cardinality::SINGLE);
+    REQUIRE(p2.cardinality == Cardinality::LIST);
+    REQUIRE(p3.cardinality == Cardinality::SET);
   }
 
   SECTION("FileType") {
@@ -180,8 +187,10 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
   int chunk_size = 100;
   auto version = std::make_shared<InfoVersion>(1);
   auto pg = CreatePropertyGroup(
-      {Property("p0", int32(), true), Property("p1", string(), false)},
-      FileType::CSV, "p0_p1/");
+      {Property("p0", int32(), true),
+       Property("p1", string(), false, true, Cardinality::LIST),
+       Property("p2", string(), false, true, Cardinality::SET)},
+      FileType::PARQUET, "p0_p1/");
   auto vertex_info =
       CreateVertexInfo(type, chunk_size, {pg}, {}, "test_vertex", version);
 
@@ -206,6 +215,12 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
     REQUIRE(vertex_info->IsPrimaryKey("p1") == false);
     REQUIRE(vertex_info->IsNullableKey("p0") == false);
     REQUIRE(vertex_info->IsNullableKey("p1") == true);
+    REQUIRE(vertex_info->GetPropertyCardinality("p0").value() ==
+            Cardinality::SINGLE);
+    REQUIRE(vertex_info->GetPropertyCardinality("p1").value() ==
+            Cardinality::LIST);
+    REQUIRE(vertex_info->GetPropertyCardinality("p2").value() ==
+            Cardinality::SET);
     REQUIRE(vertex_info->HasProperty("not_exist") == false);
     REQUIRE(vertex_info->IsPrimaryKey("not_exist") == false);
     REQUIRE(vertex_info->HasPropertyGroup(nullptr) == false);
@@ -221,10 +236,16 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
 
   SECTION("IsValidate") {
     REQUIRE(vertex_info->IsValidated() == true);
-    auto invalid_pg =
-        CreatePropertyGroup({Property("p0", nullptr, true)}, FileType::CSV);
+    auto invalid_pg = CreatePropertyGroup(
+        {Property("p0", list(string()), true, false, Cardinality::SET)},
+        FileType::CSV);
     auto invalid_vertex_info0 = CreateVertexInfo(type, chunk_size, {invalid_pg},
                                                  {}, "test_vertex/", version);
+    REQUIRE(invalid_vertex_info0->IsValidated() == false);
+    invalid_pg =
+        CreatePropertyGroup({Property("p0", nullptr, true)}, FileType::CSV);
+    invalid_vertex_info0 = CreateVertexInfo(type, chunk_size, {invalid_pg}, {},
+                                            "test_vertex/", version);
     REQUIRE(invalid_vertex_info0->IsValidated() == false);
     VertexInfo invalid_vertex_info1("", chunk_size, {pg}, {}, "test_vertex/",
                                     version);
@@ -252,17 +273,23 @@ TEST_CASE_METHOD(GlobalFixture, "VertexInfo") {
     std::string expected = R"(chunk_size: 100
 prefix: test_vertex
 property_groups: 
-  - file_type: csv
+  - file_type: parquet
     prefix: p0_p1/
     properties: 
       - data_type: int32
         is_nullable: false
         is_primary: true
         name: p0
-      - data_type: string
+      - cardinality: list
+        data_type: string
         is_nullable: true
         is_primary: false
         name: p1
+      - cardinality: set
+        data_type: string
+        is_nullable: true
+        is_primary: false
+        name: p2
 type: test_vertex
 version: gar/v1
 )";
@@ -280,22 +307,23 @@ version: gar/v1
   }
 
   SECTION("AddPropertyGroup") {
-    auto pg2 = CreatePropertyGroup({Property("p2", int32(), false)},
-                                   FileType::CSV, "p2/");
-    auto maybe_extend_info = vertex_info->AddPropertyGroup(pg2);
+    auto pg3 = CreatePropertyGroup({Property("p3", int32(), false)},
+                                   FileType::CSV, "p3/");
+    auto maybe_extend_info = vertex_info->AddPropertyGroup(pg3);
     REQUIRE(maybe_extend_info.status().ok());
     auto extend_info = maybe_extend_info.value();
     REQUIRE(extend_info->PropertyGroupNum() == 2);
     REQUIRE(extend_info->HasProperty("p2") == true);
-    REQUIRE(extend_info->HasPropertyGroup(pg2) == true);
+    REQUIRE(extend_info->HasPropertyGroup(pg3) == true);
     REQUIRE(extend_info->GetPropertyGroups().size() == 2);
-    REQUIRE(*(extend_info->GetPropertyGroups()[1]) == *pg2);
-    REQUIRE(extend_info->GetPropertyType("p2").value()->ToTypeName() ==
+    REQUIRE(*(extend_info->GetPropertyGroups()[1]) == *pg3);
+    REQUIRE(extend_info->GetPropertyType("p3").value()->ToTypeName() ==
             int32()->ToTypeName());
-    REQUIRE(extend_info->IsPrimaryKey("p2") == false);
-    REQUIRE(extend_info->IsNullableKey("p2") == true);
-    auto extend_info2 = extend_info->AddPropertyGroup(pg2);
-    REQUIRE(!extend_info2.status().ok());
+    REQUIRE(extend_info->IsPrimaryKey("p3") == false);
+    REQUIRE(extend_info->IsNullableKey("p3") == true);
+    REQUIRE(extend_info->GetPropertyCardinality("p3") == Cardinality::SINGLE);
+    auto extend_info3 = extend_info->AddPropertyGroup(pg3);
+    REQUIRE(!extend_info3.status().ok());
   }
 }
 
@@ -384,6 +412,15 @@ TEST_CASE_METHOD(GlobalFixture, "EdgeInfo") {
     auto invalid_pg =
         CreatePropertyGroup({Property("p0", nullptr, true)}, FileType::CSV);
     auto invalid_edge_info0 =
+        CreateEdgeInfo(src_type, edge_type, dst_type, chunk_size,
+                       src_chunk_size, dst_chunk_size, directed, {adj_list},
+                       {invalid_pg}, "test_edge/", version);
+    REQUIRE(invalid_edge_info0->IsValidated() == false);
+    // edgeInfo does not support list/set cardinality
+    invalid_pg = CreatePropertyGroup(
+        {Property("p_cardinality", string(), false, true, Cardinality::LIST)},
+        FileType::PARQUET);
+    auto cardinality_invalid_edge_info0 =
         CreateEdgeInfo(src_type, edge_type, dst_type, chunk_size,
                        src_chunk_size, dst_chunk_size, directed, {adj_list},
                        {invalid_pg}, "test_edge/", version);
@@ -692,6 +729,13 @@ property_groups:
         is_nullable: false
     file_type: parquet
   - properties:
+      - name: phoneNumber
+        data_type: string
+        is_primary: false
+        is_nullable: true
+        cardinality: list
+    file_type: parquet
+  - properties:
       - name: firstName
         data_type: string
         is_primary: false
@@ -750,6 +794,10 @@ extra_info:
     REQUIRE(vertex_info->GetChunkSize() == 100);
     REQUIRE(vertex_info->GetPrefix() == "vertex/person/");
     REQUIRE(vertex_info->version()->ToString() == "gar/v1");
+    REQUIRE(vertex_info->GetPropertyCardinality("id").value() ==
+            Cardinality::SINGLE);
+    REQUIRE(vertex_info->GetPropertyCardinality("phoneNumber").value() ==
+            Cardinality::LIST);
   }
 
   SECTION("EdgeInfo::Load") {
@@ -759,6 +807,36 @@ extra_info:
     REQUIRE(edge_info->GetSrcType() == "person");
     REQUIRE(edge_info->GetEdgeType() == "knows");
     REQUIRE(edge_info->GetDstType() == "person");
+  }
+
+  edge_info_yaml = R"(src_type: person
+edge_type: knows
+dst_type: person
+chunk_size: 1024
+src_chunk_size: 100
+dst_chunk_size: 100
+directed: false
+prefix: edge/person_knows_person/
+adj_lists:
+  - ordered: false
+    aligned_by: src
+    file_type: parquet
+property_groups:
+  - file_type: parquet
+    properties:
+      - name: creationDate
+        data_type: string
+        is_primary: false
+        is_nullable: true
+        cardinality: list
+version: gar/v1
+)";
+
+  SECTION("EdgeInfo::Load with cardinality") {
+    auto maybe_edge_info = EdgeInfo::Load(edge_info_yaml);
+    REQUIRE(maybe_edge_info.has_error());
+    REQUIRE(maybe_edge_info.status().code() == StatusCode::kYamlError);
+    std::cout << maybe_edge_info.status().message() << std::endl;
   }
 
   SECTION("GraphInfo::Load") {

@@ -72,6 +72,8 @@ class FileSystem;
 using IdType = int64_t;
 enum class Type;
 class DataType;
+/** Defines how multiple values are handled for a given property key */
+enum Cardinality { SINGLE, LIST, SET };
 /** Type of file format */
 enum FileType { CSV = 0, PARQUET = 1, ORC = 2, JSON = 3 };
 enum SelectType { PROPERTIES = 0, LABELS = 1 };

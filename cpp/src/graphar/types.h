@@ -242,4 +242,31 @@ static inline const char* FileTypeToString(FileType file_type) {
   return file_type2string.at(file_type);
 }
 
+static inline Cardinality StringToCardinality(const std::string& str) {
+  static const std::map<std::string, Cardinality> str2cardinality{
+      {"single", Cardinality::SINGLE},
+      {"list", Cardinality::LIST},
+      {"set", Cardinality::SET},
+  };
+  try {
+    return str2cardinality.at(str.c_str());
+  } catch (const std::exception& e) {
+    throw std::runtime_error("KeyError: " + str);
+  }
+}
+
+static inline const char* CardinalityToString(Cardinality cardinality) {
+  static const std::map<Cardinality, const char*> cardinality2string{
+      {Cardinality::SINGLE, "single"},
+      {Cardinality::LIST, "list"},
+      {Cardinality::SET, "set"},
+  };
+  try {
+    return cardinality2string.at(cardinality);
+  } catch (const std::exception& e) {
+    throw std::runtime_error("KeyError: " +
+                             std::to_string(static_cast<int>(cardinality)));
+  }
+}
+
 }  // namespace graphar
