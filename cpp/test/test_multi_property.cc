@@ -21,6 +21,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <ostream>
 #include <string>
 #include <unordered_map>
 #include "arrow/api.h"
@@ -62,10 +63,10 @@ std::shared_ptr<arrow::Table> read_csv_to_table(const std::string& filename) {
 
 namespace graphar {
 TEST_CASE_METHOD(GlobalFixture, "read from csv file") {
-  int expected_row = 100;
   // read labels csv file as arrow table
   auto person_table = read_csv_to_table(test_data_dir + "/ldbc/person_0_0.csv");
-  std::string person_table_message = person_table->ToString();
+  srand(time(NULL));
+  int expected_row = rand() % person_table->num_rows();
   auto person_schema = person_table->schema();
   arrow::MemoryPool* pool = arrow::default_memory_pool();
   auto value_builder = std::make_shared<arrow::StringBuilder>();
@@ -96,23 +97,20 @@ TEST_CASE_METHOD(GlobalFixture, "read from csv file") {
   builder.Finish(&array);
   auto person_emails_chunked_array = std::make_shared<arrow::ChunkedArray>(
       std::vector<std::shared_ptr<arrow::Array>>{array});
-  person_table =
-      person_table->RemoveColumn(person_schema->GetFieldIndex("emails"))
-          .ValueOrDie();
-  person_schema =
-      person_schema->RemoveField(person_schema->GetFieldIndex("emails"))
-          .ValueOrDie();
+  int emailFieldIndex = person_schema->GetFieldIndex("emails");
+  person_table = person_table->RemoveColumn(emailFieldIndex).ValueOrDie();
+  person_schema = person_schema->RemoveField(emailFieldIndex).ValueOrDie();
   person_schema =
       person_schema
           ->AddField(person_schema->num_fields(),
-                     arrow::field("email_list", arrow::list(arrow::utf8())))
+                     arrow::field("emails", arrow::list(arrow::utf8())))
           .ValueOrDie();
   person_table = person_table
                      ->AddColumn(person_table->num_columns(),
                                  person_schema->fields().back(),
                                  person_emails_chunked_array)
                      .ValueOrDie();
-  auto index = person_schema->GetFieldIndex("email_list");
+  auto index = person_schema->GetFieldIndex("emails");
   auto emails_col = person_table->column(index)->chunk(0);
   auto result = std::static_pointer_cast<arrow::ListArray>(
       emails_col->View(arrow::list(arrow::utf8())).ValueOrDie());
@@ -125,6 +123,42 @@ TEST_CASE_METHOD(GlobalFixture, "read from csv file") {
     if (i < end - 1)
       emails += ";";
   }
+  std::cout << "random row: " << expected_row << std::endl;
+  ASSERT(expected_emails == emails);
+  // write to parquet file
+  std::string path = test_data_dir + "/ldbc/parquet/" + "ldbc.graph.yml";
+  auto graph_info = graphar::GraphInfo::Load(path).value();
+  auto vertex_info = graph_info->GetVertexInfo("person");
+  auto maybe_writer =
+      VertexPropertyWriter::Make(vertex_info, test_data_dir + "/ldbc/parquet/");
+  REQUIRE(!maybe_writer.has_error());
+  auto writer = maybe_writer.value();
+  REQUIRE(writer->WriteTable(person_table, 0).ok());
+  REQUIRE(writer->WriteVerticesNum(person_table->num_rows()).ok());
+
+  auto maybe_reader = VertexPropertyArrowChunkReader::Make(
+      graph_info, "person", {"emails"}, SelectType::PROPERTIES);
+  assert(maybe_reader.status().ok());
+  auto reader = maybe_reader.value();
+  assert(reader->seek(expected_row).ok());
+  auto table_result = reader->GetChunk();
+  ASSERT(table_result.status().ok());
+  auto table = table_result.value();
+  index = table->schema()->GetFieldIndex("emails");
+  emails_col = table->column(index)->chunk(0);
+  result = std::static_pointer_cast<arrow::ListArray>(
+      emails_col->View(arrow::list(arrow::large_utf8())).ValueOrDie());
+  expected_row = expected_row % vertex_info->GetChunkSize();
+  auto email_result =
+      std::static_pointer_cast<arrow::LargeStringArray>(result->value_slice(0));
+  emails = "";
+  end = email_result->length();
+  for (int64_t i = 0; i < end; ++i) {
+    emails += email_result->GetString(i);
+    if (i < end - 1)
+      emails += ";";
+  }
+  std::cout << emails << std::endl;
   ASSERT(expected_emails == emails);
 }
 }  // namespace graphar

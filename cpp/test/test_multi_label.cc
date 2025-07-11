@@ -24,7 +24,6 @@
 #include "arrow/csv/api.h"
 #include "arrow/filesystem/api.h"
 #include "arrow/io/api.h"
-#include "graphar/arrow/chunk_reader.h"
 #include "graphar/fwd.h"
 #include "parquet/arrow/writer.h"
 
