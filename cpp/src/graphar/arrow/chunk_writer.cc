@@ -321,17 +321,6 @@ Status VertexPropertyWriter::WriteTable(
   return Status::OK();
 }
 
-// Helper function to split a string by a delimiter
-std::vector<std::string> SplitString(const std::string& str, char delimiter) {
-  std::vector<std::string> tokens;
-  std::string token;
-  std::istringstream tokenStream(str);
-  while (std::getline(tokenStream, token, delimiter)) {
-    tokens.push_back(token);
-  }
-  return tokens;
-}
-
 Status VertexPropertyWriter::WriteLabelTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType start_chunk_index,
     FileType file_type, ValidateLevel validate_level) const {
@@ -379,6 +368,7 @@ Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::GetLabelTable(
     auto label_column = std::static_pointer_cast<arrow::StringArray>(chunk);
 
     // Populate the matrix based on :LABEL column values
+    //TODO(@yangxk):  store array in the label_column, split the string when reading file
     for (int64_t row = 0; row < label_column->length(); ++row) {
       if (label_column->IsValid(row)) {
         std::string labels_string = label_column->GetString(row);

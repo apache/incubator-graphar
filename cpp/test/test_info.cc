@@ -729,7 +729,7 @@ property_groups:
         is_nullable: false
     file_type: parquet
   - properties:
-      - name: phoneNumber
+      - name: email
         data_type: string
         is_primary: false
         is_nullable: true
@@ -796,7 +796,7 @@ extra_info:
     REQUIRE(vertex_info->version()->ToString() == "gar/v1");
     REQUIRE(vertex_info->GetPropertyCardinality("id").value() ==
             Cardinality::SINGLE);
-    REQUIRE(vertex_info->GetPropertyCardinality("phoneNumber").value() ==
+    REQUIRE(vertex_info->GetPropertyCardinality("email").value() ==
             Cardinality::LIST);
   }
 
