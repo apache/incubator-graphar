@@ -24,6 +24,7 @@
 
 #include "./config.h"
 #include "graphar/api/high_level_writer.h"
+#include "graphar/writer_util.h"
 
 void vertices_builder() {
   // construct vertices builder
@@ -33,6 +34,10 @@ void vertices_builder() {
   auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
   graphar::IdType start_index = 0;
   graphar::builder::VerticesBuilder builder(vertex_info, "/tmp/", start_index);
+
+  graphar::WriterOptions::ParquetOptionBuilder parquetOptionBuilder;
+  parquetOptionBuilder.compression(arrow::Compression::ZSTD);
+  builder.SetWriterOptions(parquetOptionBuilder.build());
 
   // set validate level
   builder.SetValidateLevel(graphar::ValidateLevel::strong_validate);
@@ -77,6 +82,10 @@ void edges_builder() {
   auto vertex_count = 3;
   graphar::builder::EdgesBuilder builder(
       edge_info, "/tmp/", graphar::AdjListType::ordered_by_dest, vertex_count);
+
+  graphar::WriterOptions::ParquetOptionBuilder parquetOptionBuilder;
+  parquetOptionBuilder.compression(arrow::Compression::ZSTD);
+  builder.SetWriterOptions(parquetOptionBuilder.build());
 
   // set validate level
   builder.SetValidateLevel(graphar::ValidateLevel::strong_validate);
