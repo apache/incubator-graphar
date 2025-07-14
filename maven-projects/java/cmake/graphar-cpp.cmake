@@ -56,7 +56,7 @@ function(build_graphar_cpp)
     set(GAR_SHARED_LIBRARY_DIR "${GAR_PREFIX}/lib")
 
     set(GAR_SHARED_LIB_FILENAME
-            "${CMAKE_SHARED_LIBRARY_PREFIX}gar${CMAKE_SHARED_LIBRARY_SUFFIX}")
+            "${CMAKE_SHARED_LIBRARY_PREFIX}graphar${CMAKE_SHARED_LIBRARY_SUFFIX}")
     set(GAR_SHARED_LIB "${GAR_SHARED_LIBRARY_DIR}/${GAR_SHARED_LIB_FILENAME}" CACHE INTERNAL "graphar cpp lib")
 
     set(GAR_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/graphar_ep-build")
@@ -65,7 +65,7 @@ function(build_graphar_cpp)
     set(GAR_INCLUDE_DIR "${GAR_PREFIX}/include" CACHE INTERNAL "graphar cpp include directory")
     set(GAR_BUILD_BYPRODUCTS "${GAR_SHARED_LIB}")
 
-    set(GAR_VERSION_TO_BUILD "v0.10.0")
+    set(GAR_VERSION_TO_BUILD "v0.12.0")
 
     include(ExternalProject)
     ExternalProject_Add(graphar_ep
@@ -78,7 +78,7 @@ function(build_graphar_cpp)
             CMAKE_ARGS "${GAR_CMAKE_ARGS}"
             BUILD_BYPRODUCTS "${GAR_BUILD_BYPRODUCTS}")
 
-    set(GAR_LIBRARY_TARGET gar_shared)
+    set(GAR_LIBRARY_TARGET graphar)
 
     file(MAKE_DIRECTORY "${GAR_INCLUDE_DIR}")
     add_library(${GAR_LIBRARY_TARGET} SHARED IMPORTED)

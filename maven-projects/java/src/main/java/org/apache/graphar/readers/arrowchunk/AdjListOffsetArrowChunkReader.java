@@ -34,11 +34,9 @@ import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
 import org.apache.graphar.arrow.ArrowArray;
 import org.apache.graphar.graphinfo.EdgeInfo;
-import org.apache.graphar.graphinfo.GraphInfo;
 import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.types.AdjListType;
-import org.apache.graphar.util.GrapharStaticFunctions;
 import org.apache.graphar.util.Result;
 import org.apache.graphar.util.Status;
 
@@ -77,25 +75,6 @@ public interface AdjListOffsetArrowChunkReader extends CXXPointer {
     @FFITypeAlias(GAR_ID_TYPE)
     long getChunkIndex();
 
-    /**
-     * Helper function to Construct AdjListOffsetArrowChunkReader.
-     *
-     * @param graphInfo The graph info to describe the graph.
-     * @param srcLabel label of source vertex.
-     * @param edgeLabel label of edge.
-     * @param dstLabel label of destination vertex.
-     * @param adjListType The adj list type for the edges.
-     */
-    static Result<AdjListOffsetArrowChunkReader> constructAdjListOffsetArrowChunkReader(
-            @CXXReference GraphInfo graphInfo,
-            @CXXReference StdString srcLabel,
-            @CXXReference StdString edgeLabel,
-            @CXXReference StdString dstLabel,
-            @CXXValue AdjListType adjListType) {
-        return GrapharStaticFunctions.INSTANCE.constructAdjListOffsetArrowChunkReader(
-                graphInfo, srcLabel, edgeLabel, dstLabel, adjListType);
-    }
-
     @FFIFactory
     interface Factory {
         /**
@@ -107,7 +86,7 @@ public interface AdjListOffsetArrowChunkReader extends CXXPointer {
          * @param prefix The absolute prefix.
          */
         AdjListOffsetArrowChunkReader create(
-                @CXXReference EdgeInfo edgeInfo,
+                @CXXReference StdSharedPtr<EdgeInfo> edgeInfo,
                 @CXXValue AdjListType adjListType,
                 @CXXReference StdString prefix);
     }

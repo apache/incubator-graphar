@@ -27,7 +27,7 @@ import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXPointer;
 import com.alibaba.fastffi.CXXReference;
 import com.alibaba.fastffi.CXXValue;
-import com.alibaba.fastffi.FFIFactory;
+import com.alibaba.fastffi.FFIConst;
 import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFILibrary;
 import com.alibaba.fastffi.FFINameAlias;
@@ -38,7 +38,6 @@ import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.stdcxx.StdVector;
 import org.apache.graphar.types.AdjListType;
 import org.apache.graphar.types.DataType;
-import org.apache.graphar.types.FileType;
 import org.apache.graphar.util.InfoVersion;
 import org.apache.graphar.util.Result;
 import org.apache.graphar.util.Status;
@@ -50,50 +49,15 @@ import org.apache.graphar.util.Yaml;
 @CXXHead(GAR_GRAPH_INFO_H)
 public interface EdgeInfo extends CXXPointer {
 
-    Factory factory = FFITypeFactory.getFactory(EdgeInfo.class);
-
-    /**
-     * Add an adjacency list information to the edge info. The adjacency list information indicating
-     * the adjacency list stored with CSR, CSC, or COO format.
-     *
-     * @param adjListType The type of the adjacency list to add.
-     * @param fileType The file type of the adjacency list topology and offset chunk file.
-     * @param prefix The prefix of the adjacency list topology chunk (optional, default is empty).
-     * @return A Status object indicating success or an error if the adjacency list type has already
-     *     been added.
-     */
-    @FFINameAlias("AddAdjList")
+    @FFINameAlias("AddAdjacentList")
     @CXXValue
-    Status addAdjList(
-            @CXXValue AdjListType adjListType,
-            @CXXValue FileType fileType,
-            @CXXReference StdString prefix);
+    Result<StdSharedPtr<EdgeInfo>> addAdjacentList(@CXXValue StdSharedPtr<AdjacentList> adjList);
 
-    /**
-     * Add an adjacency list information to the edge info. The adjacency list information indicating
-     * the adjacency list stored with CSR, CSC, or COO format.
-     *
-     * @param adjListType The type of the adjacency list to add.
-     * @param fileType The file type of the adjacency list topology and offset chunk file.
-     * @return A Status object indicating success or an error if the adjacency list type has already
-     *     been added.
-     */
-    @FFINameAlias("AddAdjList")
-    @CXXValue
-    Status addAdjList(@CXXValue AdjListType adjListType, @CXXValue FileType fileType);
-
-    /**
-     * Add a property group to edge info for the given adjacency list type.
-     *
-     * @param propertyGroup Property group to add.
-     * @param adjListType Adjacency list type to add property group to.
-     * @return A Status object indicating success or an error if adj_list_type is not supported by
-     *     edge info or if the property group is already added to the adjacency list type.
-     */
+    /** Add a property group to edge info for the given adjacency list type. */
     @FFINameAlias("AddPropertyGroup")
     @CXXValue
-    Status addPropertyGroup(
-            @CXXReference PropertyGroup propertyGroup, @CXXValue AdjListType adjListType);
+    Result<StdSharedPtr<EdgeInfo>> addPropertyGroup(
+            @CXXValue StdSharedPtr<PropertyGroup> propertyGroup);
 
     /**
      * Get the label of the source vertex.
@@ -155,7 +119,8 @@ public interface EdgeInfo extends CXXPointer {
      * @return The path prefix of the edge.
      */
     @FFINameAlias("GetPrefix")
-    @CXXValue
+    @FFIConst
+    @CXXReference
     StdString getPrefix();
 
     /**
@@ -171,9 +136,9 @@ public interface EdgeInfo extends CXXPointer {
      *
      * @return The version info of the edge.
      */
-    @FFINameAlias("GetVersion")
+    @FFINameAlias("version")
     @CXXReference
-    InfoVersion getVersion();
+    StdSharedPtr<InfoVersion> getVersion();
 
     /**
      * Return whether the edge info contains the adjacency list information.
@@ -181,20 +146,18 @@ public interface EdgeInfo extends CXXPointer {
      * @param adjListType The adjacency list type.
      * @return True if the edge info contains the adjacency list information, false otherwise.
      */
-    @FFINameAlias("ContainAdjList")
-    boolean containAdjList(@CXXValue AdjListType adjListType);
+    @FFINameAlias("HasAdjacentListType")
+    boolean hasAdjacentListType(@CXXValue AdjListType adjListType);
 
     /**
      * Returns whether the edge info contains the given property group for the specified adjacency
      * list type.
      *
      * @param propertyGroup Property group to check.
-     * @param adjListType Adjacency list type the property group belongs to.
      * @return True if the edge info contains the property group, false otherwise.
      */
-    @FFINameAlias("ContainPropertyGroup")
-    boolean containPropertyGroup(
-            @CXXReference PropertyGroup propertyGroup, @CXXValue AdjListType adjListType);
+    @FFINameAlias("HasPropertyGroup")
+    boolean hasPropertyGroup(@CXXReference StdSharedPtr<PropertyGroup> propertyGroup);
 
     /**
      * Returns whether the edge info contains the given property for any adjacency list type.
@@ -202,48 +165,28 @@ public interface EdgeInfo extends CXXPointer {
      * @param property Property name to check.
      * @return True if the edge info contains the property, false otherwise.
      */
-    @FFINameAlias("ContainProperty")
-    boolean containProperty(@CXXReference StdString property);
+    @FFINameAlias("HasProperty")
+    boolean hasPropertyGroup(@CXXReference StdString property);
 
-    /**
-     * Get the file type of the adjacency list topology and offset chunk file for the given
-     * adjacency list type.
-     *
-     * @param adjListType The adjacency list type.
-     * @return A Result object containing the file type, or a Status object indicating an KeyError
-     *     if the adjacency list type is not found in the edge info.
-     */
-    @FFINameAlias("GetFileType")
+    @FFINameAlias("GetAdjacentList")
     @CXXValue
-    Result<FileType> getFileType(@CXXValue AdjListType adjListType);
+    StdSharedPtr<AdjacentList> getAdjacentList(@CXXValue AdjListType adjListType);
 
-    /**
-     * Get the property groups for the given adjacency list type.
-     *
-     * @param adjListType Adjacency list type.
-     * @return A Result object containing reference to the property groups for the given adjacency
-     *     list type, or a Status object indicating an KeyError if the adjacency list type is not
-     *     found in the edge info.
-     */
+    /** Get the property groups. */
     @FFINameAlias("GetPropertyGroups")
-    @CXXValue
-    @FFITypeAlias("GraphArchive::Result<const std::vector<GraphArchive::PropertyGroup>>")
-    Result<@CXXReference StdVector<PropertyGroup>> getPropertyGroups(
-            @CXXValue AdjListType adjListType);
+    @FFIConst
+    @CXXReference
+    StdVector<StdSharedPtr<PropertyGroup>> getPropertyGroups();
 
     /**
-     * Get the property group containing the given property and for the specified adjacency list
-     * type.
+     * Get the property group containing the given property.
      *
      * @param property Property name.
-     * @param adjListType Adjacency list type.
-     * @return A Result object containing reference to the property group, or a Status object
-     *     indicating an KeyError if the adjacency list type is not found in the edge info.
+     * @return Property group may be nullptr if the property is not found.
      */
     @FFINameAlias("GetPropertyGroup")
     @CXXValue
-    Result<@CXXReference PropertyGroup> getPropertyGroup(
-            @CXXReference StdString property, @CXXValue AdjListType adjListType);
+    StdSharedPtr<PropertyGroup> getPropertyGroup(@CXXReference StdString property);
 
     /**
      * Get the file path for the number of vertices.
@@ -327,7 +270,7 @@ public interface EdgeInfo extends CXXPointer {
     @FFINameAlias("GetPropertyFilePath")
     @CXXValue
     Result<StdString> getPropertyFilePath(
-            @CXXReference PropertyGroup propertyGroup,
+            @CXXReference StdSharedPtr<PropertyGroup> propertyGroup,
             @CXXValue AdjListType adjListType,
             @FFINameAlias(GAR_ID_TYPE) long vertexChunkIndex,
             @FFITypeAlias(GAR_ID_TYPE) long edgeChunkIndex);
@@ -342,7 +285,8 @@ public interface EdgeInfo extends CXXPointer {
     @FFINameAlias("GetPropertyGroupPathPrefix")
     @CXXValue
     Result<StdString> getPropertyGroupPathPrefix(
-            @CXXReference PropertyGroup propertyGroup, @CXXValue AdjListType adjListType);
+            @CXXReference StdSharedPtr<PropertyGroup> propertyGroup,
+            @CXXValue AdjListType adjListType);
 
     /**
      * Get the data type of the specified property.
@@ -353,7 +297,7 @@ public interface EdgeInfo extends CXXPointer {
      */
     @FFINameAlias("GetPropertyType")
     @CXXValue
-    Result<DataType> getPropertyType(@CXXReference StdString propertyName);
+    Result<StdSharedPtr<DataType>> getPropertyType(@CXXReference StdString propertyName);
 
     /**
      * Returns whether the specified property is a primary key.
@@ -364,8 +308,7 @@ public interface EdgeInfo extends CXXPointer {
      */
     @FFINameAlias("IsPrimaryKey")
     @CXXValue
-    @FFITypeAlias("GraphArchive::Result<bool>")
-    Result<Boolean> isPrimaryKey(@CXXReference StdString propertyName);
+    boolean isPrimaryKey(@CXXReference StdString propertyName);
 
     /**
      * Saves the edge info to a YAML file.
@@ -387,50 +330,6 @@ public interface EdgeInfo extends CXXPointer {
     Result<StdString> dump();
 
     /**
-     * Returns a new EdgeInfo object with the specified adjacency list type added to with given
-     * metadata.
-     *
-     * @param adjListType The type of the adjacency list to add.
-     * @param fileType The file type of the adjacency list topology and offset chunk file.
-     * @param prefix The prefix of the adjacency list topology chunk.
-     * @return A Result object containing the new EdgeInfo object, or a Status object indicating an
-     *     error.
-     */
-    @FFINameAlias("ExtendAdjList")
-    @CXXValue
-    Result<EdgeInfo> extendAdjList(
-            @CXXValue AdjListType adjListType,
-            @CXXValue FileType fileType,
-            @CXXReference StdString prefix);
-
-    /**
-     * Returns a new EdgeInfo object with the specified adjacency list type added to with given
-     * metadata.
-     *
-     * @param adjListType The type of the adjacency list to add.
-     * @param fileType The file type of the adjacency list topology and offset chunk file.
-     * @return A Result object containing the new EdgeInfo object, or a Status object indicating an
-     *     error.
-     */
-    @FFINameAlias("ExtendAdjList")
-    @CXXValue
-    Result<EdgeInfo> extendAdjList(@CXXValue AdjListType adjListType, @CXXValue FileType fileType);
-
-    /**
-     * Returns a new EdgeInfo object with the specified property group added to given adjacency list
-     * type.
-     *
-     * @param propertyGroup The PropertyGroup object to add.
-     * @param adjListType The adjacency list type to add the property group to.
-     * @return A Result object containing the new EdgeInfo object, or a Status object indicating an
-     *     error.
-     */
-    @FFINameAlias("ExtendPropertyGroup")
-    @CXXValue
-    Result<EdgeInfo> extendPropertyGroup(
-            @CXXReference PropertyGroup propertyGroup, @CXXValue AdjListType adjListType);
-
-    /**
      * Returns whether the edge info is validated.
      *
      * @return True if the edge info is valid, False otherwise.
@@ -438,61 +337,8 @@ public interface EdgeInfo extends CXXPointer {
     @FFINameAlias("IsValidated")
     boolean isValidated();
 
-    static Result<EdgeInfo> load(StdSharedPtr<Yaml> yaml) {
+    static Result<StdSharedPtr<EdgeInfo>> load(StdSharedPtr<Yaml> yaml) {
         return Static.INSTANCE.Load(yaml);
-    }
-
-    @FFIFactory
-    interface Factory {
-        EdgeInfo create();
-
-        /**
-         * Construct an EdgeInfo object with the given metadata information.
-         *
-         * @param srcLabel The label of the source vertex.
-         * @param edgeLabel The label of the edge.
-         * @param dstLabel The label of the destination vertex.
-         * @param chunkSize The number of edges in each edge chunk.
-         * @param srcChunkSize The number of source vertices in each vertex chunk.
-         * @param dstChunkSize The number of destination vertices in each vertex chunk.
-         * @param directed Whether the edge is directed.
-         * @param version The version of the edge info.
-         * @param prefix The path prefix of the edge info.
-         */
-        EdgeInfo create(
-                @CXXReference StdString srcLabel,
-                @CXXReference StdString edgeLabel,
-                @CXXReference StdString dstLabel,
-                long chunkSize,
-                long srcChunkSize,
-                long dstChunkSize,
-                boolean directed,
-                @CXXReference InfoVersion version,
-                @CXXReference StdString prefix);
-
-        /**
-         * Construct an EdgeInfo object with the given metadata information.
-         *
-         * @param srcLabel The label of the source vertex.
-         * @param edgeLabel The label of the edge.
-         * @param dstLabel The label of the destination vertex.
-         * @param chunkSize The number of edges in each edge chunk.
-         * @param srcChunkSize The number of source vertices in each vertex chunk.
-         * @param dstChunkSize The number of destination vertices in each vertex chunk.
-         * @param directed Whether the edge is directed.
-         * @param version The version of the edge info.
-         */
-        EdgeInfo create(
-                @CXXReference StdString srcLabel,
-                @CXXReference StdString edgeLabel,
-                @CXXReference StdString dstLabel,
-                long chunkSize,
-                long srcChunkSize,
-                long dstChunkSize,
-                boolean directed,
-                @CXXReference InfoVersion version);
-
-        EdgeInfo create(@CXXReference EdgeInfo other);
     }
 
     @FFIGen
@@ -502,6 +348,6 @@ public interface EdgeInfo extends CXXPointer {
         Static INSTANCE = FFITypeFactory.getLibrary(EdgeInfo.Static.class);
 
         @CXXValue
-        Result<EdgeInfo> Load(@CXXValue StdSharedPtr<Yaml> yaml);
+        Result<StdSharedPtr<EdgeInfo>> Load(@CXXValue StdSharedPtr<Yaml> yaml);
     }
 }

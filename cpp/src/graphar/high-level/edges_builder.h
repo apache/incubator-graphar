@@ -158,6 +158,8 @@ class EdgesBuilder {
    * @param prefix The absolute prefix.
    * @param adj_list_type The adj list type of the edges.
    * @param num_vertices The total number of vertices for source or destination.
+   * @param writerOptions The writerOptions provides configuration options for
+   * different file format writers.
    * @param validate_level The global validate level for the writer, with no
    * validate by default. It could be ValidateLevel::no_validate,
    * ValidateLevel::weak_validate or ValidateLevel::strong_validate, but could
@@ -166,11 +168,13 @@ class EdgesBuilder {
   explicit EdgesBuilder(
       const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
       AdjListType adj_list_type, IdType num_vertices,
+      std::shared_ptr<WriterOptions> writerOptions = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate)
       : edge_info_(std::move(edge_info)),
         prefix_(prefix),
         adj_list_type_(adj_list_type),
         num_vertices_(num_vertices),
+        writer_options_(writerOptions),
         validate_level_(validate_level) {
     if (validate_level_ == ValidateLevel::default_validate) {
       throw std::runtime_error(
@@ -208,6 +212,25 @@ class EdgesBuilder {
       return;
     }
     validate_level_ = validate_level;
+  }
+
+  /**
+   * @brief Set the writerOptions.
+   *
+   * @return The writerOptions provides configuration options for different file
+   * format writers.
+   */
+  inline void SetWriterOptions(std::shared_ptr<WriterOptions> writer_options) {
+    this->writer_options_ = writer_options;
+  }
+  /**
+   * @brief Set the writerOptions.
+   *
+   * @param writerOptions The writerOptions provides configuration options for
+   * different file format writers.
+   */
+  inline std::shared_ptr<WriterOptions> GetWriterOptions() {
+    return this->writer_options_;
   }
 
   /**
@@ -279,9 +302,26 @@ class EdgesBuilder {
    * @param prefix The absolute prefix.
    * @param adj_list_type The adj list type of the edges.
    * @param num_vertices The total number of vertices for source or destination.
+   * @param writerOptions The writerOptions provides configuration options for
+   * different file format writers.
    * @param validate_level The global validate level for the builder, default is
    * no_validate.
    */
+  static Result<std::shared_ptr<EdgesBuilder>> Make(
+      const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
+      AdjListType adj_list_type, IdType num_vertices,
+      std::shared_ptr<WriterOptions> writer_options,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    if (!edge_info->HasAdjacentListType(adj_list_type)) {
+      return Status::KeyError(
+          "The adjacent list type ", AdjListTypeToString(adj_list_type),
+          " doesn't exist in edge ", edge_info->GetEdgeType(), ".");
+    }
+    return std::make_shared<EdgesBuilder>(edge_info, prefix, adj_list_type,
+                                          num_vertices, writer_options,
+                                          validate_level);
+  }
+
   static Result<std::shared_ptr<EdgesBuilder>> Make(
       const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
       AdjListType adj_list_type, IdType num_vertices,
@@ -292,7 +332,8 @@ class EdgesBuilder {
           " doesn't exist in edge ", edge_info->GetEdgeType(), ".");
     }
     return std::make_shared<EdgesBuilder>(edge_info, prefix, adj_list_type,
-                                          num_vertices, validate_level);
+                                          num_vertices, nullptr,
+                                          validate_level);
   }
 
   /**
@@ -311,6 +352,7 @@ class EdgesBuilder {
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
       const std::string& edge_type, const std::string& dst_type,
       const AdjListType& adj_list_type, IdType num_vertices,
+      std::shared_ptr<WriterOptions> writer_options,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
     auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
     if (!edge_info) {
@@ -318,7 +360,21 @@ class EdgesBuilder {
                               dst_type, " doesn't exist.");
     }
     return Make(edge_info, graph_info->GetPrefix(), adj_list_type, num_vertices,
-                validate_level);
+                writer_options, validate_level);
+  }
+
+  static Result<std::shared_ptr<EdgesBuilder>> Make(
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+      const std::string& edge_type, const std::string& dst_type,
+      const AdjListType& adj_list_type, IdType num_vertices,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
+    if (!edge_info) {
+      return Status::KeyError("The edge ", src_type, " ", edge_type, " ",
+                              dst_type, " doesn't exist.");
+    }
+    return Make(edge_info, graph_info->GetPrefix(), adj_list_type, num_vertices,
+                nullptr, validate_level);
   }
 
  private:
@@ -421,6 +477,7 @@ class EdgesBuilder {
   IdType num_vertices_;
   IdType num_edges_;
   bool is_saved_;
+  std::shared_ptr<WriterOptions> writer_options_;
   ValidateLevel validate_level_;
 };
 

@@ -33,6 +33,7 @@ import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
 import org.apache.graphar.graphinfo.EdgeInfo;
+import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.types.AdjListType;
 import org.apache.graphar.types.ValidateLevel;
@@ -134,7 +135,7 @@ public interface EdgesBuilder extends CXXPointer {
          *     ValidateLevel::strong_validate, but could not be ValidateLevel::default_validate.
          */
         EdgesBuilder create(
-                @CXXValue EdgeInfo edgeInfo,
+                @CXXValue StdSharedPtr<EdgeInfo> edgeInfo,
                 @CXXReference StdString prefix,
                 @CXXValue AdjListType adjListType,
                 @FFITypeAlias(GAR_ID_TYPE) long numVertices,
@@ -149,7 +150,7 @@ public interface EdgesBuilder extends CXXPointer {
          * @param numVertices The total number of vertices for source or destination.
          */
         EdgesBuilder create(
-                @CXXValue EdgeInfo edgeInfo,
+                @CXXValue StdSharedPtr<EdgeInfo> edgeInfo,
                 @CXXReference StdString prefix,
                 @CXXValue AdjListType adjListType,
                 @FFITypeAlias(GAR_ID_TYPE) long numVertices);

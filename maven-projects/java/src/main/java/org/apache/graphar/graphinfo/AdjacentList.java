@@ -17,36 +17,43 @@
  * under the License.
  */
 
-package org.apache.graphar.stdcxx;
+package org.apache.graphar.graphinfo;
 
-import static org.apache.graphar.util.CppClassName.GAR_ID_TYPE;
-import static org.apache.graphar.util.CppClassName.STD_PAIR;
-import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_H;
+import static org.apache.graphar.util.CppClassName.GAR_ADJACENT_LIST;
+import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
-import com.alibaba.fastffi.CXXTemplate;
+import com.alibaba.fastffi.CXXPointer;
+import com.alibaba.fastffi.CXXReference;
+import com.alibaba.fastffi.CXXValue;
+import com.alibaba.fastffi.FFIConst;
 import com.alibaba.fastffi.FFIGen;
-import com.alibaba.fastffi.FFIGetter;
 import com.alibaba.fastffi.FFINameAlias;
-import com.alibaba.fastffi.FFIPointer;
 import com.alibaba.fastffi.FFITypeAlias;
+import org.apache.graphar.stdcxx.StdString;
+import org.apache.graphar.types.AdjListType;
+import org.apache.graphar.types.FileType;
 
 @FFIGen
-@FFITypeAlias(STD_PAIR)
-@CXXHead(system = "utility")
-@CXXHead(GAR_GRAPH_H)
-@CXXTemplate(
-        cxx = {GAR_ID_TYPE, GAR_ID_TYPE},
-        java = {"Long", "Long"})
-@CXXTemplate(
-        cxx = {"int64_t", "int64_t"},
-        java = {"Long", "Long"})
-public interface StdPair<T1, T2> extends FFIPointer {
-    @FFINameAlias("first")
-    @FFIGetter
-    T1 getFirst();
+@FFITypeAlias(GAR_ADJACENT_LIST)
+@CXXHead(GAR_GRAPH_INFO_H)
+public interface AdjacentList extends CXXPointer {
 
-    @FFINameAlias("second")
-    @FFIGetter
-    T2 getSecond();
+    @FFINameAlias("GetType")
+    @CXXValue
+    @FFIConst
+    AdjListType getType();
+
+    @FFINameAlias("GetFileType")
+    @CXXValue
+    @FFIConst
+    FileType getFileType();
+
+    @FFINameAlias("GetPrefix")
+    @FFIConst
+    @CXXReference
+    StdString getPrefix();
+
+    @FFINameAlias("IsValidated")
+    boolean isValidated();
 }
