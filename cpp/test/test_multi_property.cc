@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 #include <arrow/compute/api.h>
 #include <cstddef>
 #include <iostream>
