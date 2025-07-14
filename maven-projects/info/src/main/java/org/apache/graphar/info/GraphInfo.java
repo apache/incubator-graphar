@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.util.GeneralParams;
 import org.yaml.snakeyaml.Yaml;
@@ -98,8 +99,8 @@ public class GraphInfo {
                         .collect(Collectors.toList());
         final Map<String, VertexInfo> newVertexInfoMap =
                 Stream.concat(
-                                cachedVertexInfoMap.entrySet().stream(),
-                                Stream.of(Map.entry(vertexInfo.getType(), vertexInfo)))
+                        cachedVertexInfoMap.entrySet().stream(),
+                        Stream.of(Map.entry(vertexInfo.getType(), vertexInfo)))
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));
@@ -112,10 +113,63 @@ public class GraphInfo {
                         cachedEdgeInfoMap));
     }
 
+    public Optional<GraphInfo> removeEdgeAsNew(String srcLabel, String edgeLabel, String dstLabel) {
+        if (edgeInfo == null
+                || hasEdgeInfo(
+                srcLabel, edgeLabel, dstLabel)) {
+            return Optional.empty();
+        }
+        String edgePath = getPrefix() + "/" + EdgeInfo.concat(srcLabel, edgeLabel, dstLabel) + ".edge.yaml";
+        final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
+                org.apache.graphar.proto.GraphInfo.newBuilder(protoGraphInfo)
+                        .removeEdges(edgePath)
+                        .build();
+        final List<EdgeInfo> newEdgeInfos = Stream.concat(cachedEdgeInfoList.stream().filter(e ->
+                !e.getSrcLabel().equals(srcLabel)
+                        && !e.getDstLabel().equals(dstLabel)
+                        && !e.getEdgeLabel().equals(edgeLabel)))
+                .collect(Collectors.toList());
+
+
+        List<VertexInfo> newCachedVertexInfoList = newEdgeInfos.stream()
+                // flatMap is used because for each edge, we might generate a stream of multiple vertices
+                .flatMap(e -> {
+                    Stream<VertexInfo> vertexStream = Stream.empty(); // Start with an empty stream
+                    if (e.getSrcLabel().equals("")) {
+                        // If srcLabel is empty, filter vertices where dstLabel doesn't match
+                        vertexStream = Stream.concat(vertexStream,
+                                cachedVertexInfoList.stream()
+                                        .filter(vertex -> !e.getDstLabel().equals(vertex.getType())));
+                    }
+                    if (e.getDstLabel().equals("")) {
+                        // If dstLabel is empty, filter vertices where srcLabel doesn't match
+                        vertexStream = Stream.concat(vertexStream,
+                                cachedVertexInfoList.stream()
+                                        .filter(vertex -> !e.getSrcLabel().equals(vertex.getType())));
+                    }
+                    return vertexStream; // Return the combined stream of vertices for this edge
+                })
+                .distinct()
+                .collect(Collectors.toList());
+
+        final Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
+                cachedEdgeInfoMap.entrySet().stream()
+                        .filter(e -> !e.getConcat().equals(edgeInfo.getConcat()))
+                        .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+        // TODO if logic is correct create newCachedVertexInfoMap as well
+        return Optional.of(
+                new GraphInfo(
+                        newProtoGraphInfo,
+                        newCachedVertexInfoList,
+                        newEdgeInfos,
+                        cachedVertexInfoMap,
+                        newEdgeConcat2EdgeInfo));
+    }
+
     public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
         if (edgeInfo == null
                 || hasEdgeInfo(
-                        edgeInfo.getSrcLabel(), edgeInfo.getEdgeLabel(), edgeInfo.getDstLabel())) {
+                edgeInfo.getSrcLabel(), edgeInfo.getEdgeLabel(), edgeInfo.getDstLabel())) {
             return Optional.empty();
         }
         final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
@@ -127,8 +181,8 @@ public class GraphInfo {
                         .collect(Collectors.toList());
         final Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
                 Stream.concat(
-                                cachedEdgeInfoMap.entrySet().stream(),
-                                Stream.of(Map.entry(edgeInfo.getConcat(), edgeInfo)))
+                        cachedEdgeInfoMap.entrySet().stream(),
+                        Stream.of(Map.entry(edgeInfo.getConcat(), edgeInfo)))
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));
@@ -182,6 +236,7 @@ public class GraphInfo {
     public String getPrefix() {
         return protoGraphInfo.getPrefix();
     }
+    
 
     private void checkVertexExist(String label) {
         if (!hasVertexInfo(label)) {
