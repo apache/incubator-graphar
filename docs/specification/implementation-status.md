@@ -117,6 +117,8 @@ Vertex features:
 | tag               |       |       |       |            |
 | chunk based       | ✓     | ✓     | ✓     | ✓          |
 | property group    | ✓     | ✓     | ✓     | ✓          |
+| multi-label       | ✓     |       | ✓     |            |
+| multi-property    | ✓     |       |       |            |
 
 :::note
 

@@ -37,16 +37,20 @@ class Property {
   std::shared_ptr<DataType> type;  // property data type
   bool is_primary;                 // primary key tag
   bool is_nullable;                // nullable tag for non-primary key
+  Cardinality
+      cardinality;  // cardinality of the property, only use in vertex info
 
   Property() = default;
 
   explicit Property(const std::string& name,
                     const std::shared_ptr<DataType>& type = nullptr,
-                    bool is_primary = false, bool is_nullable = true)
+                    bool is_primary = false, bool is_nullable = true,
+                    Cardinality cardinality = Cardinality::SINGLE)
       : name(name),
         type(type),
         is_primary(is_primary),
-        is_nullable(!is_primary && is_nullable) {}
+        is_nullable(!is_primary && is_nullable),
+        cardinality(cardinality) {}
 };
 
 bool operator==(const Property& lhs, const Property& rhs);
@@ -276,6 +280,8 @@ class VertexInfo {
   Result<std::shared_ptr<DataType>> GetPropertyType(
       const std::string& property_name) const;
 
+  Result<Cardinality> GetPropertyCardinality(
+      const std::string& property_name) const;
   /**
    * Get whether the vertex info contains the specified property.
    *

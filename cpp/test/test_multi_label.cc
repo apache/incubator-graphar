@@ -17,19 +17,19 @@
  * under the License.
  */
 
-#include <fstream>
+#include <arrow/compute/api.h>
+#include <cstddef>
 #include <iostream>
-#include <unordered_map>
+#include <memory>
+#include <ostream>
+#include <string>
 #include "arrow/api.h"
-#include "arrow/csv/api.h"
-#include "arrow/filesystem/api.h"
-#include "arrow/io/api.h"
-#include "graphar/fwd.h"
+#include "graphar/arrow/chunk_reader.h"
+#include "graphar/arrow/chunk_writer.h"
+#include "graphar/graph_info.h"
 #include "parquet/arrow/writer.h"
 
 #include "./util.h"
-#include "graphar/api/arrow_reader.h"
-#include "graphar/api/high_level_writer.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -79,7 +79,7 @@ TEST_CASE_METHOD(GlobalFixture, "test_multi_label_builder") {
 
   // write arrow table as parquet chunk
   auto maybe_writer =
-      VertexPropertyWriter::Make(vertex_info, test_data_dir + "/ldbc/parquet/");
+      VertexPropertyWriter::Make(vertex_info, "/tmp/ldbc/parquet/");
   REQUIRE(!maybe_writer.has_error());
   auto writer = maybe_writer.value();
   REQUIRE(writer->WriteTable(table, 0).ok());
@@ -87,7 +87,7 @@ TEST_CASE_METHOD(GlobalFixture, "test_multi_label_builder") {
 
   // read label chunk as arrow table
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-      graph_info, "organisation", labels, SelectType::LABELS);
+      vertex_info, labels, "/tmp/ldbc/parquet/");
   assert(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
   assert(reader->seek(0).ok());

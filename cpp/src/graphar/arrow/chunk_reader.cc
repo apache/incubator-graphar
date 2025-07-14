@@ -49,8 +49,11 @@ Result<std::shared_ptr<arrow::Schema>> PropertyGroupToSchema(
         GeneralParams::kVertexIndexCol, arrow::int64()));
   }
   for (const auto& prop : pg->GetProperties()) {
-    fields.push_back(std::make_shared<arrow::Field>(
-        prop.name, DataType::DataTypeToArrowDataType(prop.type)));
+    auto dataType = DataType::DataTypeToArrowDataType(prop.type);
+    if (prop.cardinality != Cardinality::SINGLE) {
+      dataType = arrow::list(dataType);
+    }
+    fields.push_back(std::make_shared<arrow::Field>(prop.name, dataType));
   }
   return arrow::schema(fields);
 }
