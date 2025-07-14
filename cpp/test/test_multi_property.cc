@@ -18,24 +18,19 @@
  */
 #include <arrow/compute/api.h>
 #include <cstddef>
-#include <fstream>
 #include <iostream>
 #include <memory>
 #include <ostream>
 #include <string>
-#include <unordered_map>
 #include "arrow/api.h"
-#include "arrow/csv/api.h"
-#include "arrow/filesystem/api.h"
-#include "arrow/io/api.h"
 #include "examples/config.h"
-#include "graphar/fwd.h"
-#include "graphar/status.h"
+#include "graphar/arrow/chunk_reader.h"
+#include "graphar/arrow/chunk_writer.h"
+#include "graphar/graph_info.h"
+#include "graphar/types.h"
 #include "parquet/arrow/writer.h"
 
 #include "./util.h"
-#include "graphar/api/arrow_reader.h"
-#include "graphar/api/high_level_writer.h"
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -65,8 +60,8 @@ namespace graphar {
 TEST_CASE_METHOD(GlobalFixture, "read from csv file") {
   // read labels csv file as arrow table
   auto person_table = read_csv_to_table(test_data_dir + "/ldbc/person_0_0.csv");
-  srand(time(NULL));
-  int expected_row = rand() % person_table->num_rows();
+  auto seed = static_cast<unsigned int>(time(NULL));
+  int expected_row = rand_r(&seed) % person_table->num_rows();
   auto person_schema = person_table->schema();
   arrow::MemoryPool* pool = arrow::default_memory_pool();
   auto value_builder = std::make_shared<arrow::StringBuilder>();
@@ -130,14 +125,15 @@ TEST_CASE_METHOD(GlobalFixture, "read from csv file") {
   auto graph_info = graphar::GraphInfo::Load(path).value();
   auto vertex_info = graph_info->GetVertexInfo("person");
   auto maybe_writer =
-      VertexPropertyWriter::Make(vertex_info, test_data_dir + "/ldbc/parquet/");
+      VertexPropertyWriter::Make(vertex_info, "/tmp/ldbc/parquet/");
   REQUIRE(!maybe_writer.has_error());
   auto writer = maybe_writer.value();
   REQUIRE(writer->WriteTable(person_table, 0).ok());
   REQUIRE(writer->WriteVerticesNum(person_table->num_rows()).ok());
 
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(
-      graph_info, "person", {"emails"}, SelectType::PROPERTIES);
+      vertex_info, vertex_info->GetPropertyGroup("emails"),
+      "/tmp/ldbc/parquet/");
   assert(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
   assert(reader->seek(expected_row).ok());

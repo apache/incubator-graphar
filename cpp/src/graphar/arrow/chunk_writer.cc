@@ -368,7 +368,8 @@ Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::GetLabelTable(
     auto label_column = std::static_pointer_cast<arrow::StringArray>(chunk);
 
     // Populate the matrix based on :LABEL column values
-    //TODO(@yangxk):  store array in the label_column, split the string when reading file
+    // TODO(@yangxk):  store array in the label_column, split the string when
+    // reading file
     for (int64_t row = 0; row < label_column->length(); ++row) {
       if (label_column->IsValid(row)) {
         std::string labels_string = label_column->GetString(row);

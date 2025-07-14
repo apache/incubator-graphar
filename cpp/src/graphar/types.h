@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "graphar/fwd.h"
 #include "graphar/macros.h"
@@ -270,7 +271,8 @@ static inline const char* CardinalityToString(Cardinality cardinality) {
 }
 
 // Helper function to split a string by a delimiter
-inline std::vector<std::string> SplitString(const std::string& str, char delimiter) {
+inline std::vector<std::string> SplitString(const std::string& str,
+                                            char delimiter) {
   std::vector<std::string> tokens;
   std::string token;
   std::istringstream tokenStream(str);
