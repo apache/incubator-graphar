@@ -165,6 +165,7 @@ jobs:
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
+        ./label_filter_benchmark
 
     - name: Use Static Arrow
       working-directory: "cpp"
