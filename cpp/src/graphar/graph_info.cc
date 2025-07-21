@@ -20,6 +20,7 @@
 #include <unordered_set>
 #include <utility>
 
+#include "graphar/status.h"
 #include "mini-yaml/yaml/Yaml.hpp"
 
 #include "graphar/filesystem.h"
@@ -86,7 +87,8 @@ std::string BuildPath(const std::vector<std::string>& paths) {
 bool operator==(const Property& lhs, const Property& rhs) {
   return (lhs.name == rhs.name) && (lhs.type == rhs.type) &&
          (lhs.is_primary == rhs.is_primary) &&
-         (lhs.is_nullable == rhs.is_nullable);
+         (lhs.is_nullable == rhs.is_nullable) &&
+         (lhs.cardinality == rhs.cardinality);
 }
 
 PropertyGroup::PropertyGroup(const std::vector<Property>& properties,
@@ -136,6 +138,11 @@ bool PropertyGroup::IsValidated() const {
     // TODO(@acezen): support list type in csv file
     if (p.type->id() == Type::LIST && file_type_ == FileType::CSV) {
       // list type is not supported in csv file
+      return false;
+    }
+    // TODO(@yangxk): support cardinality in csv file
+    if (p.cardinality != Cardinality::SINGLE && file_type_ == FileType::CSV) {
+      // list cardinality is not supported in csv file
       return false;
     }
   }
@@ -212,6 +219,7 @@ class VertexInfo::Impl {
         property_name_to_primary_.emplace(p.name, p.is_primary);
         property_name_to_nullable_.emplace(p.name, p.is_nullable);
         property_name_to_type_.emplace(p.name, p.type);
+        property_name_to_cardinality_.emplace(p.name, p.cardinality);
       }
     }
   }
@@ -251,6 +259,7 @@ class VertexInfo::Impl {
   std::unordered_map<std::string, bool> property_name_to_nullable_;
   std::unordered_map<std::string, std::shared_ptr<DataType>>
       property_name_to_type_;
+  std::unordered_map<std::string, Cardinality> property_name_to_cardinality_;
 };
 
 VertexInfo::VertexInfo(const std::string& type, IdType chunk_size,
@@ -363,6 +372,15 @@ Result<std::shared_ptr<DataType>> VertexInfo::GetPropertyType(
   return it->second;
 }
 
+Result<Cardinality> VertexInfo::GetPropertyCardinality(
+    const std::string& property_name) const {
+  auto it = impl_->property_name_to_cardinality_.find(property_name);
+  if (it == impl_->property_name_to_cardinality_.end()) {
+    return Status::Invalid("property name not found: ", property_name);
+  }
+  return it->second;
+}
+
 Result<std::shared_ptr<VertexInfo>> VertexInfo::AddPropertyGroup(
     std::shared_ptr<PropertyGroup> property_group) const {
   if (property_group == nullptr) {
@@ -440,8 +458,13 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::Load(
         bool is_primary = p_node["is_primary"].As<bool>();
         bool is_nullable =
             p_node["is_nullable"].IsNone() || p_node["is_nullable"].As<bool>();
+        Cardinality cardinality = Cardinality::SINGLE;
+        if (!p_node["cardinality"].IsNone()) {
+          cardinality =
+              StringToCardinality(p_node["cardinality"].As<std::string>());
+        }
         property_vec.emplace_back(property_name, property_type, is_primary,
-                                  is_nullable);
+                                  is_nullable, cardinality);
       }
       property_groups.push_back(
           std::make_shared<PropertyGroup>(property_vec, file_type, pg_prefix));
@@ -485,6 +508,9 @@ Result<std::string> VertexInfo::Dump() const noexcept {
         p_node["data_type"] = p.type->ToTypeName();
         p_node["is_primary"] = p.is_primary ? "true" : "false";
         p_node["is_nullable"] = p.is_nullable ? "true" : "false";
+        if (p.cardinality != Cardinality::SINGLE) {
+          p_node["cardinality"] = CardinalityToString(p.cardinality);
+        }
         pg_node["properties"].PushBack();
         pg_node["properties"][pg_node["properties"].Size() - 1] = p_node;
       }
@@ -574,6 +600,13 @@ class EdgeInfo::Impl {
       }
       // check if property name is unique in all property groups
       for (const auto& p : pg->GetProperties()) {
+        if (p.cardinality != Cardinality::SINGLE) {
+          // edge property only supports single cardinality
+          std::cout
+              << "Edge property only supports single cardinality, but got: "
+              << CardinalityToString(p.cardinality) << std::endl;
+          return false;
+        }
         if (check_property_unique_set.find(p.name) !=
             check_property_unique_set.end()) {
           return false;
@@ -910,6 +943,12 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::Load(std::shared_ptr<Yaml> yaml) {
         auto property_name = p_node["name"].As<std::string>();
         auto property_type =
             DataType::TypeNameToDataType(p_node["data_type"].As<std::string>());
+        if (!p_node["cardinality"].IsNone() &&
+            StringToCardinality(p_node["cardinality"].As<std::string>()) !=
+                Cardinality::SINGLE) {
+          return Status::YamlError(
+              "Unsupported set cardinality for edge property.");
+        }
         bool is_primary = p_node["is_primary"].As<bool>();
         bool is_nullable =
             p_node["is_nullable"].IsNone() || p_node["is_nullable"].As<bool>();
