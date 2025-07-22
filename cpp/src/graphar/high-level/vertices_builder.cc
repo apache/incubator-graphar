@@ -19,6 +19,7 @@
 
 #include "graphar/high-level/vertices_builder.h"
 #include <any>
+#include <iterator>
 #include <vector>
 #include "graphar/convert_to_arrow_type.h"
 #include "graphar/fwd.h"
@@ -252,8 +253,15 @@ Result<std::shared_ptr<arrow::Table>> VerticesBuilder::convertToTable() {
   for (auto& property_group : property_groups) {
     for (auto& property : property_group->GetProperties()) {
       // add a column to schema
-      schema_vector.push_back(arrow::field(
-          property.name, DataType::DataTypeToArrowDataType(property.type)));
+      if (vertex_info_->GetPropertyCardinality(property.name).value() !=
+          Cardinality::SINGLE) {
+        schema_vector.push_back(arrow::field(
+            property.name,
+            arrow::list(DataType::DataTypeToArrowDataType(property.type))));
+      } else {
+        schema_vector.push_back(arrow::field(
+            property.name, DataType::DataTypeToArrowDataType(property.type)));
+      }
       // add a column to data
       std::shared_ptr<arrow::Array> array;
       appendToArray(property.type, property.name, array);

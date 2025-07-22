@@ -40,7 +40,7 @@ void vertices_builder() {
   builder.SetWriterOptions(parquetOptionBuilder.build());
 
   // set validate level
-  builder.SetValidateLevel(graphar::ValidateLevel::strong_validate);
+  builder.SetValidateLevel(graphar::ValidateLevel::weak_validate);
 
   // prepare vertex data
   int vertex_count = 3;
@@ -63,10 +63,10 @@ void vertices_builder() {
     v.AddProperty(property_names[1], firstName[i]);
     v.AddProperty(property_names[2], lastName[i]);
     v.AddProperty(property_names[3], gender[i]);
-    // for (const auto& email : emails[i]) {
-    //   v.AddProperty(graphar::Cardinality::LIST, property_names[4],
-    //                 email);  // Multi-property
-    // }
+    for (const auto& email : emails[i]) {
+      v.AddProperty(graphar::Cardinality::LIST, property_names[4],
+                    email);  // Multi-property
+    }
     ASSERT(builder.AddVertex(v).ok());
   }
 
