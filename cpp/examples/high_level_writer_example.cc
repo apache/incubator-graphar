@@ -40,7 +40,7 @@ void vertices_builder() {
   builder.SetWriterOptions(parquetOptionBuilder.build());
 
   // set validate level
-  builder.SetValidateLevel(graphar::ValidateLevel::weak_validate);
+  builder.SetValidateLevel(graphar::ValidateLevel::strong_validate);
 
   // prepare vertex data
   int vertex_count = 3;

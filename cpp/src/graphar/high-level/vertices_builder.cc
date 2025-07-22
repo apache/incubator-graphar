@@ -150,6 +150,8 @@ Status VerticesBuilder::tryToAppend(
   if (cardinality != Cardinality::SINGLE) {
     arrow::ListBuilder list_builder(pool, builder);
     for (auto& v : vertices_) {
+      GAR_RETURN_NOT_OK(
+          v.ValidateMultiProperty<CType>(property_name, cardinality));
       RETURN_NOT_ARROW_OK(list_builder.Append());
       if (v.Empty() || !v.ContainProperty(property_name)) {
         RETURN_NOT_ARROW_OK(builder->AppendNull());
@@ -264,7 +266,7 @@ Result<std::shared_ptr<arrow::Table>> VerticesBuilder::convertToTable() {
       }
       // add a column to data
       std::shared_ptr<arrow::Array> array;
-      appendToArray(property.type, property.name, array);
+      GAR_RETURN_NOT_OK(appendToArray(property.type, property.name, array));
       arrays.push_back(array);
     }
   }

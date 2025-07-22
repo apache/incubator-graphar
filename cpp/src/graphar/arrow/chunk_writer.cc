@@ -23,6 +23,7 @@
 
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
+#include "graphar/fwd.h"
 #include "graphar/writer_util.h"
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
 #include "arrow/acero/exec_plan.h"
@@ -193,10 +194,15 @@ Status VertexPropertyWriter::validate(
                                " does not exist in the input table.");
       }
       auto field = schema->field(indice);
-      if (DataType::ArrowDataTypeToDataType(field->type()) != property.type) {
+      auto schema_data_type = DataType::DataTypeToArrowDataType(property.type);
+      if (property.cardinality != Cardinality::SINGLE) {
+        schema_data_type = arrow::list(schema_data_type);
+      }
+      if (!field->type()->Equals(schema_data_type)) {
         return Status::TypeError(
             "The data type of property: ", property.name, " is ",
-            property.type->ToTypeName(), ", but got ",
+            DataType::ArrowDataTypeToDataType(schema_data_type)->ToTypeName(),
+            ", but got ",
             DataType::ArrowDataTypeToDataType(field->type())->ToTypeName(),
             ".");
       }

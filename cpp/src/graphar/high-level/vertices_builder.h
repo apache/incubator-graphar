@@ -149,21 +149,21 @@ class Vertex {
             cardinalities_.at(property) != Cardinality::SINGLE);
   }
 
+  template <typename T>
   Status ValidateMultiProperty(const std::string& property,
                                const Cardinality cardinality) const {
     if (cardinality == Cardinality::SET) {
-      if (IsMultiProperty(property) &&
-          cardinalities_.at(property) != Cardinality::SET) {
-        // auto vec =
-        //     std::any_cast<std::vector<std::any>>(properties_.at(property));
-        // std::unordered_set<std::any> seen;
-        // for (const auto& item : vec) {
-        //   if (!seen.insert(item).second) {
-        //     return Status::KeyError(
-        //         "Duplicate values exist in set type multi-property: ",
-        //         property);
-        //   }
-        // }
+      if (IsMultiProperty(property)) {
+        auto vec =
+            std::any_cast<std::vector<std::any>>(properties_.at(property));
+        std::unordered_set<T> seen;
+        for (const auto& item : vec) {
+          if (!seen.insert(std::any_cast<T>(item)).second) {
+            return Status::KeyError(
+                "Duplicate values exist in set type multi-property key: ",
+                property," value: ",std::any_cast<T>(item));
+          }
+        }
       }
     }
     return Status::OK();
