@@ -18,8 +18,13 @@
  */
 
 #include "graphar/high-level/vertices_builder.h"
+#include <any>
+#include <vector>
 #include "graphar/convert_to_arrow_type.h"
+#include "graphar/fwd.h"
 #include "graphar/graph_info.h"
+#include "graphar/label.h"
+#include "graphar/status.h"
 
 namespace graphar::builder {
 
@@ -118,7 +123,10 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
       default:
         return Status::TypeError("Unsupported property type.");
       }
-      if (invalid_type) {
+      if (invalid_type &&
+          Cardinality::SINGLE ==
+              vertex_info_->GetPropertyCardinality(property.first).value()) {
+        // TODO validate multi property type
         return Status::TypeError(
             "Invalid data type for property ", property.first + ", defined as ",
             type->ToTypeName(), ", but got ", property.second.type().name());
@@ -134,16 +142,41 @@ Status VerticesBuilder::tryToAppend(
     std::shared_ptr<arrow::Array>& array) {  // NOLINT
   using CType = typename TypeToArrowType<type>::CType;
   arrow::MemoryPool* pool = arrow::default_memory_pool();
-  typename TypeToArrowType<type>::BuilderType builder(pool);
-  for (auto& v : vertices_) {
-    if (v.Empty() || !v.ContainProperty(property_name)) {
-      RETURN_NOT_ARROW_OK(builder.AppendNull());
-    } else {
-      RETURN_NOT_ARROW_OK(
-          builder.Append(std::any_cast<CType>(v.GetProperty(property_name))));
+  auto builder =
+      std::make_shared<typename TypeToArrowType<type>::BuilderType>(pool);
+  auto cardinality =
+      vertex_info_->GetPropertyCardinality(property_name).value();
+  if (cardinality != Cardinality::SINGLE) {
+    arrow::ListBuilder list_builder(pool, builder);
+    for (auto& v : vertices_) {
+      RETURN_NOT_ARROW_OK(list_builder.Append());
+      if (v.Empty() || !v.ContainProperty(property_name)) {
+        RETURN_NOT_ARROW_OK(builder->AppendNull());
+      } else {
+        if (!v.IsMultiProperty(property_name)) {
+          RETURN_NOT_ARROW_OK(builder->Append(
+              std::any_cast<CType>(v.GetProperty(property_name))));
+        } else {
+          auto property_value_list = std::any_cast<std::vector<std::any>>(
+              v.GetProperty(property_name));
+          for (auto& value : property_value_list) {
+            RETURN_NOT_ARROW_OK(builder->Append(std::any_cast<CType>(value)));
+          }
+        }
+      }
     }
+    array = list_builder.Finish().ValueOrDie();
+  } else {
+    for (auto& v : vertices_) {
+      if (v.Empty() || !v.ContainProperty(property_name)) {
+        RETURN_NOT_ARROW_OK(builder->AppendNull());
+      } else {
+        RETURN_NOT_ARROW_OK(builder->Append(
+            std::any_cast<CType>(v.GetProperty(property_name))));
+      }
+    }
+    array = builder->Finish().ValueOrDie();
   }
-  array = builder.Finish().ValueOrDie();
   return Status::OK();
 }
 

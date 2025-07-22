@@ -21,15 +21,19 @@
 
 #include <any>
 #include <cstddef>
+#include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
+#include "examples/config.h"
 #include "graphar/arrow/chunk_writer.h"
+#include "graphar/fwd.h"
 #include "graphar/graph_info.h"
 #include "graphar/result.h"
+#include "graphar/status.h"
 #include "graphar/writer_util.h"
 
 // forward declaration
@@ -88,6 +92,28 @@ class Vertex {
     properties_[name] = val;
   }
 
+  inline void AddProperty(const Cardinality cardinality,
+                          const std::string& name, const std::any& val) {
+    if (cardinality == Cardinality::SINGLE) {
+      cardinalities_[name] = Cardinality::SINGLE;
+      AddProperty(name, val);
+      return;
+    }
+    empty_ = false;
+    if (cardinalities_.find(name) != cardinalities_.end()) {
+      ASSERT(cardinalities_[name] == cardinality);
+      auto property_value_list =
+          std::any_cast<std::vector<std::any>>(properties_[name]);
+      property_value_list.push_back(val);
+      properties_[name] = property_value_list;
+    } else {
+      auto property_value_list = std::vector<std::any>();
+      property_value_list.push_back(val);
+      properties_[name] = property_value_list;
+    }
+    cardinalities_[name] = cardinality;
+  }
+
   /**
    * @brief Get a property of the vertex.
    *
@@ -118,10 +144,36 @@ class Vertex {
     return (properties_.find(property) != properties_.end());
   }
 
+  inline bool IsMultiProperty(const std::string& property) const {
+    return (cardinalities_.find(property) != cardinalities_.end() &&
+            cardinalities_.at(property) != Cardinality::SINGLE);
+  }
+
+  Status ValidateMultiProperty(const std::string& property,
+                               const Cardinality cardinality) const {
+    if (cardinality == Cardinality::SET) {
+      if (IsMultiProperty(property) &&
+          cardinalities_.at(property) != Cardinality::SET) {
+        // auto vec =
+        //     std::any_cast<std::vector<std::any>>(properties_.at(property));
+        // std::unordered_set<std::any> seen;
+        // for (const auto& item : vec) {
+        //   if (!seen.insert(item).second) {
+        //     return Status::KeyError(
+        //         "Duplicate values exist in set type multi-property: ",
+        //         property);
+        //   }
+        // }
+      }
+    }
+    return Status::OK();
+  }
+
  private:
   IdType id_;
   bool empty_;
   std::unordered_map<std::string, std::any> properties_;
+  std::unordered_map<std::string, Cardinality> cardinalities_;
 };
 
 /**
