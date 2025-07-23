@@ -58,10 +58,10 @@ jobs:
             -P /tmp/
         sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
         sudo apt-get update -y
-        sudo apt install -y libarrow-dev \
-                            libarrow-dataset-dev \
-                            libarrow-acero-dev \
-                            libparquet-dev
+        sudo apt install -y libarrow-dev=17.0.0-1 \
+                            libarrow-dataset-dev=17.0.0-1 \
+                            libarrow-acero-dev=17.0.0-1 \
+                            libparquet-dev=17.0.0-1
         sudo apt-get install -y ccache libcurl4-openssl-dev
 
     - name: Install GraphAr CLI and Run Tests
