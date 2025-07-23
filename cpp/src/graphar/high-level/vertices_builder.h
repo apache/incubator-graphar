@@ -20,16 +20,21 @@
 #pragma once
 
 #include <any>
+#include <cassert>
 #include <cstddef>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
 #include "graphar/arrow/chunk_writer.h"
+#include "graphar/fwd.h"
 #include "graphar/graph_info.h"
 #include "graphar/result.h"
+#include "graphar/status.h"
+#include "graphar/types.h"
 #include "graphar/writer_util.h"
 
 // forward declaration
@@ -88,6 +93,28 @@ class Vertex {
     properties_[name] = val;
   }
 
+  inline void AddProperty(const Cardinality cardinality,
+                          const std::string& name, const std::any& val) {
+    if (cardinality == Cardinality::SINGLE) {
+      cardinalities_[name] = Cardinality::SINGLE;
+      AddProperty(name, val);
+      return;
+    }
+    empty_ = false;
+    if (cardinalities_.find(name) != cardinalities_.end()) {
+      assert(cardinalities_[name] == cardinality);
+      auto property_value_list =
+          std::any_cast<std::vector<std::any>>(properties_[name]);
+      property_value_list.push_back(val);
+      properties_[name] = property_value_list;
+    } else {
+      auto property_value_list = std::vector<std::any>();
+      property_value_list.push_back(val);
+      properties_[name] = property_value_list;
+    }
+    cardinalities_[name] = cardinality;
+  }
+
   /**
    * @brief Get a property of the vertex.
    *
@@ -118,10 +145,75 @@ class Vertex {
     return (properties_.find(property) != properties_.end());
   }
 
+  inline bool IsMultiProperty(const std::string& property) const {
+    return (cardinalities_.find(property) != cardinalities_.end() &&
+            cardinalities_.at(property) != Cardinality::SINGLE);
+  }
+
+  template <typename T>
+  Status ValidatePropertyType(const std::string& property,
+                              const Cardinality cardinality) const {
+    if (cardinality == Cardinality::SINGLE && IsMultiProperty(property)) {
+      return Status::TypeError(
+          "Invalid data cardinality for property ", property,
+          ", defined as SINGLE but got ",
+          cardinalities_.at(property) == Cardinality::LIST ? "LIST" : "SET");
+    }
+    if (IsMultiProperty(property) &&
+        (cardinality == Cardinality::SET ||
+         cardinalities_.at(property) == Cardinality::SET)) {
+      GAR_RETURN_NOT_OK(ValidateMultiPropertySet<T>(property));
+    }
+    if (IsMultiProperty(property)) {
+      auto value_list =
+          std::any_cast<std::vector<std::any>>(properties_.at(property));
+      for (auto value : value_list) {
+        auto& value_type = value.type();
+        if (value_type != typeid(T)) {
+          return Status::TypeError("Invalid data type for property ", property,
+                                   ", defined as ", typeid(T).name(),
+                                   ", but got ", value_type.name());
+        }
+      }
+    } else {
+      auto& value_type = properties_.at(property).type();
+      if (value_type != typeid(T)) {
+        return Status::TypeError("Invalid data type for property ", property,
+                                 ", defined as ", typeid(T).name(),
+                                 ", but got ", value_type.name());
+      }
+    }
+    return Status::OK();
+  }
+
+  template <typename T>
+  Status ValidateMultiProperty(const std::string& property) const {
+    if (IsMultiProperty(property) &&
+        cardinalities_.at(property) == Cardinality::SET) {
+      GAR_RETURN_NOT_OK(ValidateMultiPropertySet<T>(property));
+    }
+    return Status::OK();
+  }
+
+  template <typename T>
+  Status ValidateMultiPropertySet(const std::string& property) const {
+    auto vec = std::any_cast<std::vector<std::any>>(properties_.at(property));
+    std::unordered_set<T> seen;
+    for (const auto& item : vec) {
+      if (!seen.insert(std::any_cast<T>(item)).second) {
+        return Status::KeyError(
+            "Duplicate values exist in set type multi-property key: ", property,
+            " value: ", std::any_cast<T>(item));
+      }
+    }
+    return Status::OK();
+  }
+
  private:
   IdType id_;
   bool empty_;
   std::unordered_map<std::string, std::any> properties_;
+  std::unordered_map<std::string, Cardinality> cardinalities_;
 };
 
 /**
