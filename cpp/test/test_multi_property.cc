@@ -28,6 +28,7 @@
 #include "examples/config.h"
 #include "graphar/arrow/chunk_reader.h"
 #include "graphar/arrow/chunk_writer.h"
+#include "graphar/fwd.h"
 #include "graphar/graph_info.h"
 #include "graphar/types.h"
 #include "parquet/arrow/writer.h"
@@ -191,10 +192,10 @@ TEST_CASE_METHOD(GlobalFixture, "TestMultiProperty high level builder") {
         v.AddProperty(graphar::Cardinality::SET, "emails",
                       email);  // Multi-property
       }
-      ASSERT(!builder.AddVertex(v).ok());
+      ASSERT(builder.AddVertex(v).IsKeyError());
     }
   }
-  SECTION("add single values to set property") {
+  SECTION("test add single values to set property") {
     graphar::builder::VerticesBuilder builder(
         vertex_info, "/tmp/", start_index, nullptr,
         graphar::ValidateLevel::strong_validate);
@@ -206,6 +207,41 @@ TEST_CASE_METHOD(GlobalFixture, "TestMultiProperty high level builder") {
       graphar::builder::Vertex v;
       v.AddProperty("emails", emails[i]);
       ASSERT(builder.AddVertex(v).ok());
+    }
+  }
+  SECTION("test add multi values to single property") {
+    auto single_email =
+        CreatePropertyGroup({Property("single_email", string(), false)},
+                            FileType::PARQUET, "single_email/");
+    auto test_vertex_info = vertex_info->AddPropertyGroup(single_email).value();
+    graphar::builder::VerticesBuilder builder(
+        test_vertex_info, "/tmp/", start_index, nullptr,
+        graphar::ValidateLevel::strong_validate);
+    for (int i = 0; i < vertex_count; i++) {
+      graphar::builder::Vertex v;
+      v.AddProperty(graphar::Cardinality::LIST, "single_email", emails[i]);
+      ASSERT(builder.AddVertex(v).IsTypeError());
+    }
+  }
+  SECTION("test add multi values to set property") {
+    auto set_email = CreatePropertyGroup(
+        {Property("set_email", string(), false, true, Cardinality::SET)},
+        FileType::PARQUET, "set_email/");
+    auto test_vertex_info = vertex_info->AddPropertyGroup(set_email).value();
+    graphar::builder::VerticesBuilder builder(
+        test_vertex_info, "/tmp/", start_index, nullptr,
+        graphar::ValidateLevel::strong_validate);
+    int vertex_count = 1;
+    std::vector<std::vector<std::string>> emails = {
+        {"john@example.com", "john@example.com"}};
+    // add vertices
+    for (int i = 0; i < vertex_count; i++) {
+      graphar::builder::Vertex v;
+      for (const auto& email : emails[i]) {
+        v.AddProperty(graphar::Cardinality::LIST, "set_email",
+                      email);  // Multi-property
+      }
+      ASSERT(builder.AddVertex(v).IsKeyError());
     }
   }
   SECTION("test write to file") {

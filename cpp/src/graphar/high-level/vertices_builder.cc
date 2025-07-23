@@ -128,7 +128,6 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
       if (invalid_type &&
           Cardinality::SINGLE ==
               vertex_info_->GetPropertyCardinality(property.first).value()) {
-        // TODO(yangxk) validate multi property type
         return Status::TypeError(
             "Invalid data type for property ", property.first + ", defined as ",
             type->ToTypeName(), ", but got ", property.second.type().name());
