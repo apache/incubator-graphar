@@ -109,17 +109,18 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
         break;
       case Type::DATE:
         // date is stored as int32_t
-        GAR_RETURN_NOT_OK(
-            v.ValidatePropertyType<typename TypeToArrowType<Type::DATE>::CType::c_type>(
-                property.first,
-                vertex_info_->GetPropertyCardinality(property.first).value()));
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::DATE>::CType::c_type>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::TIMESTAMP:
         // timestamp is stored as int64_t
-        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
-                          typename TypeToArrowType<Type::TIMESTAMP>::CType::c_type>(
-            property.first,
-            vertex_info_->GetPropertyCardinality(property.first).value()));
+        GAR_RETURN_NOT_OK(
+            v.ValidatePropertyType<
+                typename TypeToArrowType<Type::TIMESTAMP>::CType::c_type>(
+                property.first,
+                vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       default:
         return Status::TypeError("Unsupported property type.");

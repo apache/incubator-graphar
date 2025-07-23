@@ -24,12 +24,16 @@
 #include <ostream>
 #include <string>
 #include "arrow/api.h"
+#include "arrow/filesystem/api.h"
 #include "examples/config.h"
 #include "graphar/arrow/chunk_reader.h"
 #include "graphar/arrow/chunk_writer.h"
 #include "graphar/graph_info.h"
 #include "graphar/types.h"
 #include "parquet/arrow/writer.h"
+
+#include "graphar/api/high_level_writer.h"
+#include "graphar/writer_util.h"
 
 #include "./util.h"
 
@@ -58,7 +62,7 @@ std::shared_ptr<arrow::Table> read_csv_to_table(const std::string& filename) {
 }
 
 namespace graphar {
-TEST_CASE_METHOD(GlobalFixture, "read from csv file") {
+TEST_CASE_METHOD(GlobalFixture, "read multi-properties from csv file") {
   // read labels csv file as arrow table
   auto person_table = read_csv_to_table(test_data_dir + "/ldbc/person_0_0.csv");
   auto seed = static_cast<unsigned int>(time(NULL));
@@ -157,5 +161,93 @@ TEST_CASE_METHOD(GlobalFixture, "read from csv file") {
   }
   std::cout << emails << std::endl;
   ASSERT(expected_emails == emails);
+}
+TEST_CASE_METHOD(GlobalFixture, "TestMultiProperty high level builder") {
+  int vertex_count = 3;
+  std::vector<std::string> property_names = {"id", "emails"};
+  std::vector<int64_t> id = {0, 1, 2};
+  std::vector<std::vector<std::string>> emails = {
+      {"john@example.com", "john.work@example.com"},
+      {"jane@example.com"},
+      {"alice@example.com", "alice123@example.com",
+       "a.wonderland@example.com"}};
+  std::string vertex_meta_file =
+      GetTestingResourceRoot() + "/ldbc/parquet/" + "person.vertex.yml";
+  auto vertex_meta = graphar::Yaml::LoadFile(vertex_meta_file).value();
+  auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
+  graphar::IdType start_index = 0;
+  SECTION("add sample values to set property") {
+    graphar::builder::VerticesBuilder builder(
+        vertex_info, "/tmp/", start_index, nullptr,
+        graphar::ValidateLevel::strong_validate);
+    // prepare vertex data
+    int vertex_count = 1;
+    std::vector<std::vector<std::string>> emails = {
+        {"john@example.com", "john@example.com"}};
+    // add vertices
+    for (int i = 0; i < vertex_count; i++) {
+      graphar::builder::Vertex v;
+      for (const auto& email : emails[i]) {
+        v.AddProperty(graphar::Cardinality::SET, "emails",
+                      email);  // Multi-property
+      }
+      ASSERT(!builder.AddVertex(v).ok());
+    }
+  }
+  SECTION("add single values to set property") {
+    graphar::builder::VerticesBuilder builder(
+        vertex_info, "/tmp/", start_index, nullptr,
+        graphar::ValidateLevel::strong_validate);
+    // prepare vertex data
+    int vertex_count = 3;
+    std::vector<std::string> emails = {"john@example.com", "jane@example.com",
+                                       "alice@example.com"};
+    for (int i = 0; i < vertex_count; i++) {
+      graphar::builder::Vertex v;
+      v.AddProperty("emails", emails[i]);
+      ASSERT(builder.AddVertex(v).ok());
+    }
+  }
+  SECTION("test write to file") {
+    graphar::builder::VerticesBuilder builder(
+        vertex_info, "/tmp/", start_index, nullptr,
+        graphar::ValidateLevel::strong_validate);
+    // prepare vertex data
+    // add vertices
+    for (int i = 0; i < vertex_count; i++) {
+      graphar::builder::Vertex v;
+      v.AddProperty(property_names[0], id[i]);
+      for (const auto& email : emails[i]) {
+        v.AddProperty(graphar::Cardinality::SET, property_names[1], email);
+      }
+      ASSERT(builder.AddVertex(v).ok());
+    }
+    auto st = builder.Dump();
+    std::cout << st.message() << std::endl;
+    ASSERT(st.ok());
+  }
+  SECTION("test read from file") {
+    // read from file
+    auto maybe_reader = graphar::VertexPropertyArrowChunkReader::Make(
+        vertex_info, vertex_info->GetPropertyGroup(property_names[1]), "/tmp/");
+    assert(maybe_reader.status().ok());
+    auto reader = maybe_reader.value();
+    assert(reader->seek(0).ok());
+    auto table_result = reader->GetChunk();
+    ASSERT(table_result.status().ok());
+    auto table = table_result.value();
+    auto index = table->schema()->GetFieldIndex(property_names[1]);
+    auto emails_col = table->column(index)->chunk(0);
+    auto result = std::static_pointer_cast<arrow::ListArray>(
+        emails_col->View(arrow::list(arrow::large_utf8())).ValueOrDie());
+    ASSERT(result->length() == 3);
+    for (int i = 0; i < result->length(); i++) {
+      auto email_result = std::static_pointer_cast<arrow::LargeStringArray>(
+          result->value_slice(i));
+      for (int j = 0; j < email_result->length(); j++) {
+        ASSERT(emails[i][j] == email_result->GetString(j));
+      }
+    }
+  }
 }
 }  // namespace graphar

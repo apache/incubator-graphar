@@ -25,6 +25,7 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
@@ -159,8 +160,9 @@ class Vertex {
           ", defined as SINGLE but got ",
           cardinalities_.at(property) == Cardinality::LIST ? "LIST" : "SET");
     }
-    if (cardinality == Cardinality::SET && IsMultiProperty(property)) {
-      // TODO 如果插入的时候是单利，但是需要一个set/list看看是否可以执行成功
+    if (IsMultiProperty(property) &&
+        (cardinality == Cardinality::SET ||
+         cardinalities_.at(property) == Cardinality::SET)) {
       GAR_RETURN_NOT_OK(ValidateMultiPropertySet<T>(property));
     }
     if (IsMultiProperty(property)) {

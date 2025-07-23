@@ -198,7 +198,8 @@ Status VertexPropertyWriter::validate(
       if (property.cardinality != Cardinality::SINGLE) {
         schema_data_type = arrow::list(schema_data_type);
       }
-      if (!field->type()->Equals(schema_data_type)) {
+      if (!DataType::ArrowDataTypeToDataType(field->type())
+               ->Equals(DataType::ArrowDataTypeToDataType(schema_data_type))) {
         return Status::TypeError(
             "The data type of property: ", property.name, " is ",
             DataType::ArrowDataTypeToDataType(schema_data_type)->ToTypeName(),
