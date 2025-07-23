@@ -72,54 +72,54 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
       bool invalid_type = false;
       switch (type->id()) {
       case Type::BOOL:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::BOOL>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(
+            v.ValidatePropertyType<typename TypeToArrowType<Type::BOOL>::CType>(
+                property.first,
+                vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::INT32:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::INT32>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::INT32>::CType>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::INT64:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::INT64>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::INT64>::CType>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::FLOAT:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::FLOAT>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::FLOAT>::CType>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::DOUBLE:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::DOUBLE>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::DOUBLE>::CType>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::STRING:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::STRING>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::STRING>::CType>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::DATE:
         // date is stored as int32_t
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::DATE>::CType::c_type)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(
+            v.ValidatePropertyType<typename TypeToArrowType<Type::DATE>::CType::c_type>(
+                property.first,
+                vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::TIMESTAMP:
         // timestamp is stored as int64_t
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::TIMESTAMP>::CType::c_type)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::TIMESTAMP>::CType::c_type>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       default:
         return Status::TypeError("Unsupported property type.");
@@ -127,7 +127,7 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
       if (invalid_type &&
           Cardinality::SINGLE ==
               vertex_info_->GetPropertyCardinality(property.first).value()) {
-        // TODO validate multi property type
+        // TODO(yangxk) validate multi property type
         return Status::TypeError(
             "Invalid data type for property ", property.first + ", defined as ",
             type->ToTypeName(), ", but got ", property.second.type().name());
@@ -150,8 +150,6 @@ Status VerticesBuilder::tryToAppend(
   if (cardinality != Cardinality::SINGLE) {
     arrow::ListBuilder list_builder(pool, builder);
     for (auto& v : vertices_) {
-      GAR_RETURN_NOT_OK(
-          v.ValidateMultiProperty<CType>(property_name, cardinality));
       RETURN_NOT_ARROW_OK(list_builder.Append());
       if (v.Empty() || !v.ContainProperty(property_name)) {
         RETURN_NOT_ARROW_OK(builder->AppendNull());

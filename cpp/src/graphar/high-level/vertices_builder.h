@@ -34,6 +34,7 @@
 #include "graphar/graph_info.h"
 #include "graphar/result.h"
 #include "graphar/status.h"
+#include "graphar/types.h"
 #include "graphar/writer_util.h"
 
 // forward declaration
@@ -150,20 +151,58 @@ class Vertex {
   }
 
   template <typename T>
-  Status ValidateMultiProperty(const std::string& property,
-                               const Cardinality cardinality) const {
-    if (cardinality == Cardinality::SET) {
-      if (IsMultiProperty(property)) {
-        auto vec =
-            std::any_cast<std::vector<std::any>>(properties_.at(property));
-        std::unordered_set<T> seen;
-        for (const auto& item : vec) {
-          if (!seen.insert(std::any_cast<T>(item)).second) {
-            return Status::KeyError(
-                "Duplicate values exist in set type multi-property key: ",
-                property," value: ",std::any_cast<T>(item));
-          }
+  Status ValidatePropertyType(const std::string& property,
+                              const Cardinality cardinality) const {
+    if (cardinality == Cardinality::SINGLE && IsMultiProperty(property)) {
+      return Status::TypeError(
+          "Invalid data cardinality for property ", property,
+          ", defined as SINGLE but got ",
+          cardinalities_.at(property) == Cardinality::LIST ? "LIST" : "SET");
+    }
+    if (cardinality == Cardinality::SET && IsMultiProperty(property)) {
+      // TODO 如果插入的时候是单利，但是需要一个set/list看看是否可以执行成功
+      GAR_RETURN_NOT_OK(ValidateMultiPropertySet<T>(property));
+    }
+    if (IsMultiProperty(property)) {
+      auto value_list =
+          std::any_cast<std::vector<std::any>>(properties_.at(property));
+      for (auto value : value_list) {
+        auto& value_type = value.type();
+        if (value_type != typeid(T)) {
+          return Status::TypeError("Invalid data type for property ", property,
+                                   ", defined as ", typeid(T).name(),
+                                   ", but got ", value_type.name());
         }
+      }
+    } else {
+      auto& value_type = properties_.at(property).type();
+      if (value_type != typeid(T)) {
+        return Status::TypeError("Invalid data type for property ", property,
+                                 ", defined as ", typeid(T).name(),
+                                 ", but got ", value_type.name());
+      }
+    }
+    return Status::OK();
+  }
+
+  template <typename T>
+  Status ValidateMultiProperty(const std::string& property) const {
+    if (IsMultiProperty(property) &&
+        cardinalities_.at(property) == Cardinality::SET) {
+      GAR_RETURN_NOT_OK(ValidateMultiPropertySet<T>(property));
+    }
+    return Status::OK();
+  }
+
+  template <typename T>
+  Status ValidateMultiPropertySet(const std::string& property) const {
+    auto vec = std::any_cast<std::vector<std::any>>(properties_.at(property));
+    std::unordered_set<T> seen;
+    for (const auto& item : vec) {
+      if (!seen.insert(std::any_cast<T>(item)).second) {
+        return Status::KeyError(
+            "Duplicate values exist in set type multi-property key: ", property,
+            " value: ", std::any_cast<T>(item));
       }
     }
     return Status::OK();
