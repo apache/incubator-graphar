@@ -20,8 +20,8 @@
 #pragma once
 
 #include <any>
+#include <cassert>
 #include <cstddef>
-#include <iostream>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -29,7 +29,6 @@
 #include <utility>
 #include <vector>
 
-#include "examples/config.h"
 #include "graphar/arrow/chunk_writer.h"
 #include "graphar/fwd.h"
 #include "graphar/graph_info.h"
@@ -103,7 +102,7 @@ class Vertex {
     }
     empty_ = false;
     if (cardinalities_.find(name) != cardinalities_.end()) {
-      ASSERT(cardinalities_[name] == cardinality);
+      assert(cardinalities_[name] == cardinality);
       auto property_value_list =
           std::any_cast<std::vector<std::any>>(properties_[name]);
       property_value_list.push_back(val);
