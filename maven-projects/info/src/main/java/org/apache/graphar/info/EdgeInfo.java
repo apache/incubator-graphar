@@ -251,6 +251,11 @@ public class EdgeInfo {
         return getPrefix() + getConcat() + ".edge.yaml";
     }
 
+    public VersionInfo getVersion() {
+        return VersionParser.getVersion(protoEdgeInfo.getVersion());
+
+    }
+
     public Map<AdjListType, AdjacentList> getAdjacentLists() {
         return cachedAdjacentLists;
     }
