@@ -16,26 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class VersionInfo {
     public int parsedVersion;
     public List<String> parsedUserDefinedTypes;
-
 
     public VersionInfo(int parsedVersion, List<String> parsedUserDefinedTypes) {
         this.parsedVersion = parsedVersion;
         this.parsedUserDefinedTypes = parsedUserDefinedTypes;
     }
 
-
     public int getParsedVersion() {
         return parsedVersion;
     }
-
 
     public List<String> getParsedUserDefinedTypes() {
         return parsedUserDefinedTypes;

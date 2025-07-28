@@ -58,8 +58,7 @@ public class VersionParser {
             } catch (NumberFormatException e) {
 
                 throw new RuntimeException(
-                        "Invalid version string: Could not parse version number from "
-                                + versionStr,
+                        "Invalid version string: Could not parse version number from " + versionStr,
                         e);
             }
         } else {

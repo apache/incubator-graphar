@@ -253,7 +253,6 @@ public class EdgeInfo {
 
     public VersionInfo getVersion() {
         return VersionParser.getVersion(protoEdgeInfo.getVersion());
-
     }
 
     public Map<AdjListType, AdjacentList> getAdjacentLists() {

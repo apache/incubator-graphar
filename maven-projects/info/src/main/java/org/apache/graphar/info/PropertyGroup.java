@@ -27,7 +27,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.graphar.proto.DataType;
 import org.apache.graphar.proto.FileType;
 import org.apache.graphar.util.GeneralParams;
@@ -78,9 +77,9 @@ public class PropertyGroup implements Iterable<Property> {
         }
         List<Property> newPropertyList =
                 Stream.concat(
-                        protoPropertyGroup.getPropertiesList().stream()
-                                .map(Property::ofProto),
-                        Stream.of(property))
+                                protoPropertyGroup.getPropertiesList().stream()
+                                        .map(Property::ofProto),
+                                Stream.of(property))
                         .collect(Collectors.toUnmodifiableList());
         return Optional.of(
                 new PropertyGroup(
@@ -190,8 +189,8 @@ class PropertyGroups {
         }
         Map<String, Property> newProperties =
                 Stream.concat(
-                        properties.values().stream(),
-                        propertyGroup.getCachedPropertyMap().values().stream())
+                                properties.values().stream(),
+                                propertyGroup.getCachedPropertyMap().values().stream())
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Property::getName, Function.identity()));
