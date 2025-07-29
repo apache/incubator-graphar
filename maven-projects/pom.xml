@@ -72,7 +72,7 @@
         </scm>-->
     <properties>
         <graphar.version>0.12.0-SNAPSHOT</graphar.version>
-        <spotless-maven-plugin.version>2.20.0</spotless-maven-plugin.version>
+        <spotless-maven-plugin.version>2.46.1</spotless-maven-plugin.version> <!--2.20.0-->
     </properties>
     <modules>
         <module>java</module>

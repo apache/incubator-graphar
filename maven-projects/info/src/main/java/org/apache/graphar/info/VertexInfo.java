@@ -100,7 +100,10 @@ public class VertexInfo {
         checkPropertyGroupExist(propertyGroup);
         return getPrefix() + "/" + propertyGroup.getPrefix();
     }
-
+    public String getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
+        // PropertyGroup will be checked in getPropertyGroupPrefix
+        return getPropertyGroupPrefix(propertyGroup) + "chunk" + chunkIndex;
+    }
 
     public String getVerticesNumFilePath() {
         return getPrefix() + "/vertex_count";

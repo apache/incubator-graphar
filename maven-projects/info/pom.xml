@@ -94,7 +94,7 @@
                 <configuration>
                     <java>
                         <googleJavaFormat>
-                            <version>1.7</version>
+                            <version>1.28.0</version> <!--1.7-->
                             <style>AOSP</style>
                         </googleJavaFormat>
                     </java>
