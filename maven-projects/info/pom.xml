@@ -39,8 +39,8 @@
     <name>graphar-info</name>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source><!--11-->
-        <maven.compiler.target>17</maven.compiler.target><!--11-->
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <protobuf-maven-plugin.version>2.3.0</protobuf-maven-plugin.version>
         <protobuf.version>4.27.1</protobuf.version>
