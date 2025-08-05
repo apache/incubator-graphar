@@ -100,8 +100,17 @@ class DataType {
   inline DataType& operator=(const DataType& other) = default;
 
   bool Equals(const DataType& other) const {
-    return id_ == other.id_ &&
-           user_defined_type_name_ == other.user_defined_type_name_;
+    if (id_ != other.id_ ||
+        user_defined_type_name_ != other.user_defined_type_name_) {
+      return false;
+    }
+    if (child_ == nullptr && other.child_ == nullptr) {
+      return true;
+    }
+    if (child_ != nullptr && other.child_ != nullptr) {
+      return child_->Equals(other.child_);
+    }
+    return false;
   }
 
   bool Equals(const std::shared_ptr<DataType>& other) const {
