@@ -17,7 +17,6 @@
 
 brew "cmake"
 brew "google-benchmark"
-brew "https://github.com/Homebrew/homebrew-core/blob/aeedb3fd9d26579140d3e59eab5e61db4bba1699/Formula/a/apache-arrow.rb"
 brew "boost"
 brew "doxygen"
 brew "git"
