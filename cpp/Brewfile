@@ -17,7 +17,6 @@
 
 brew "cmake"
 brew "google-benchmark"
-brew "apache-arrow"
 brew "boost"
 brew "doxygen"
 brew "git"
