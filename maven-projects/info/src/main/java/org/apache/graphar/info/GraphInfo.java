@@ -183,8 +183,9 @@ public class GraphInfo {
         return protoGraphInfo.getPrefix();
     }
 
+    // TODO test protoGraphInfo why is not returning the version from the graph yaml file?
     public VersionInfo getVersion() {
-        return VersionParser.getVersion(protoGraphInfo.getVersion());
+        return VersionParser.getVersion(protoGraphInfo.getVersion() == null ? "gar/v1" : protoGraphInfo.getVersion());
     }
 
     private void checkVertexExist(String label) {
