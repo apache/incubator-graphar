@@ -136,6 +136,10 @@ public class VertexInfo {
         return getPrefix() + getType() + ".vertex.yaml";
     }
 
+    public VersionInfo getVersion() {
+        return VersionParser.getVersion(protoVertexInfo.getVersion());
+    }
+
     private void checkPropertyGroupExist(PropertyGroup propertyGroup) {
         if (propertyGroup == null) {
             throw new IllegalArgumentException("Property group is null");
