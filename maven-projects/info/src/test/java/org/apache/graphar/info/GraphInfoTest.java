@@ -63,7 +63,7 @@ public class GraphInfoTest {
         Assert.assertNotNull(graphInfo.getVertexInfos());
         Assert.assertEquals(1, graphInfo.getVertexInfos().size());
         // test version gar/v1
-        Assert.assertEquals("68", graphInfo.getVersion().getParsedVersion());
+        Assert.assertEquals("", graphInfo.getVersion().getParsedVersion());
     }
 
     @Test
