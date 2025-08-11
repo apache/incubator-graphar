@@ -21,7 +21,9 @@ package org.apache.graphar.info.yaml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.graphar.info.VersionInfo;
 import org.apache.graphar.info.VertexInfo;
 
 public class VertexYaml {
@@ -47,6 +49,11 @@ public class VertexYaml {
                         .map(PropertyGroupYaml::new)
                         .collect(Collectors.toList());
         this.prefix = vertexInfo.getPrefix();
+        this.version =
+                Optional.of(vertexInfo)
+                        .map(VertexInfo::getVersion)
+                        .map(VersionInfo::toString)
+                        .orElse(null);
     }
 
     public VertexInfo toVertexInfo() {
@@ -56,7 +63,8 @@ public class VertexYaml {
                 property_groups.stream()
                         .map(PropertyGroupYaml::toPropertyGroup)
                         .collect(Collectors.toList()),
-                prefix);
+                prefix,
+                version);
     }
 
     public String getType() {

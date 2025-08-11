@@ -21,9 +21,15 @@ package org.apache.graphar.info.yaml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.GraphInfo;
+import org.apache.graphar.info.VersionInfo;
 import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.introspector.Property;
+import org.yaml.snakeyaml.nodes.NodeTuple;
+import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.representer.Representer;
 
 public class GraphYaml {
     private String name;
@@ -32,6 +38,7 @@ public class GraphYaml {
     private List<String> edges;
     private String version;
     private static final DumperOptions dumperOption;
+    private static Representer representer;
 
     static {
         dumperOption = new DumperOptions();
@@ -39,6 +46,26 @@ public class GraphYaml {
         dumperOption.setIndent(4);
         dumperOption.setIndicatorIndent(2);
         dumperOption.setPrettyFlow(true);
+        representer =
+                new Representer(dumperOption) {
+                    @Override
+                    protected NodeTuple representJavaBeanProperty(
+                            Object javaBean,
+                            Property property,
+                            Object propertyValue,
+                            Tag customTag) {
+                        // if value of property is null, ignore it.
+                        if (propertyValue == null) {
+                            return null;
+                        } else {
+                            return super.representJavaBeanProperty(
+                                    javaBean, property, propertyValue, customTag);
+                        }
+                    }
+                };
+        representer.addClassTag(GraphYaml.class, Tag.MAP);
+        representer.addClassTag(VertexYaml.class, Tag.MAP);
+        representer.addClassTag(EdgeYaml.class, Tag.MAP);
     }
 
     public GraphYaml() {
@@ -52,6 +79,11 @@ public class GraphYaml {
     public GraphYaml(GraphInfo graphInfo) {
         this.name = graphInfo.getName();
         this.prefix = graphInfo.getPrefix();
+        this.version =
+                Optional.of(graphInfo)
+                        .map(GraphInfo::getVersion)
+                        .map(VersionInfo::toString)
+                        .orElse(null);
         this.vertices =
                 graphInfo.getVertexInfos().stream()
                         .map(vertexInfo -> vertexInfo.getType() + ".vertex.yaml")
@@ -64,6 +96,10 @@ public class GraphYaml {
 
     public static DumperOptions getDumperOptions() {
         return dumperOption;
+    }
+
+    public static Representer getRepresenter() {
+        return representer;
     }
 
     public String getName() {

@@ -37,7 +37,11 @@ public class GraphInfo {
     private final Map<String, EdgeInfo> cachedEdgeInfoMap;
 
     public GraphInfo(
-            String name, List<VertexInfo> vertexInfos, List<EdgeInfo> edgeInfos, String prefix) {
+            String name,
+            List<VertexInfo> vertexInfos,
+            List<EdgeInfo> edgeInfos,
+            String prefix,
+            String version) {
         this.cachedVertexInfoList = List.copyOf(vertexInfos);
         this.cachedEdgeInfoList = List.copyOf(edgeInfos);
         this.cachedVertexInfoMap =
@@ -62,6 +66,7 @@ public class GraphInfo {
                                         .map(EdgeInfo::getEdgePath)
                                         .collect(Collectors.toList()))
                         .setPrefix(prefix)
+                        .setVersion(version)
                         .build();
     }
 
@@ -80,7 +85,7 @@ public class GraphInfo {
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         GraphYaml graphYaml = new GraphYaml(this);
         return yaml.dump(graphYaml);
     }
@@ -181,6 +186,10 @@ public class GraphInfo {
 
     public String getPrefix() {
         return protoGraphInfo.getPrefix();
+    }
+
+    public VersionInfo getVersion() {
+        return VersionParser.getVersion(protoGraphInfo.getVersion());
     }
 
     private void checkVertexExist(String label) {

@@ -46,6 +46,7 @@ public class EdgeInfo {
             long dstChunkSize,
             boolean directed,
             String prefix,
+            String version,
             List<AdjacentList> adjacentListsAsList,
             List<PropertyGroup> propertyGroupsAsList) {
         this.cachedAdjacentLists =
@@ -64,6 +65,7 @@ public class EdgeInfo {
                         .setDestinationVertexType(dstLabel)
                         .setIsDirected(directed)
                         .setPrefix(prefix)
+                        .setVersion(version)
                         .addAllAdjacentList(
                                 adjacentListsAsList.stream()
                                         .map(AdjacentList::getProto)
@@ -206,7 +208,7 @@ public class EdgeInfo {
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         EdgeYaml edgeYaml = new EdgeYaml(this);
         return yaml.dump(edgeYaml);
     }
@@ -249,6 +251,10 @@ public class EdgeInfo {
 
     public String getEdgePath() {
         return getPrefix() + getConcat() + ".edge.yaml";
+    }
+
+    public VersionInfo getVersion() {
+        return VersionParser.getVersion(protoEdgeInfo.getVersion());
     }
 
     public Map<AdjListType, AdjacentList> getAdjacentLists() {
