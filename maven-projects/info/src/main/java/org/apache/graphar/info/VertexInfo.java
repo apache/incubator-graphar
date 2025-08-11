@@ -104,16 +104,16 @@ public class VertexInfo {
 
     public String getPropertyGroupPrefix(PropertyGroup propertyGroup) {
         checkPropertyGroupExist(propertyGroup);
-        return getPrefix() + "/" + propertyGroup.getPrefix();
+        return getPrefix() + propertyGroup.getPrefix();
     }
 
     public String getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
         // PropertyGroup will be checked in getPropertyGroupPrefix
-        return getPropertyGroupPrefix(propertyGroup) + "/chunk" + chunkIndex;
+        return getPropertyGroupPrefix(propertyGroup) + "chunk" + chunkIndex;
     }
 
     public String getVerticesNumFilePath() {
-        return getPrefix() + "/vertex_count";
+        return getPrefix() + "vertex_count";
     }
 
     public String dump() {
@@ -139,7 +139,7 @@ public class VertexInfo {
     }
 
     public String getVertexPath() {
-        return getPrefix() + "/" + getType() + ".vertex.yaml";
+        return getPrefix() + getType() + ".vertex.yaml";
     }
 
     public VersionInfo getVersion() {

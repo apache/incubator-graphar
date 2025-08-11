@@ -32,6 +32,7 @@ import org.apache.graphar.info.VertexInfo;
 import org.apache.graphar.info.yaml.EdgeYaml;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
+import org.apache.graphar.util.PathUtil;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -47,6 +48,11 @@ public class LocalYamlGraphLoader implements GraphLoader {
         final Yaml yamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
         final GraphYaml graphYaml = yamlLoader.load(reader);
         reader.close();
+        String defaultPrefix = PathUtil.pathToDirectory(graphYamlPath);
+        String prefix = defaultPrefix;
+        if (graphYaml.getPrefix() != null && !graphYaml.getPrefix().isEmpty()) {
+            prefix = graphYaml.getPrefix();
+        }
 
         // load vertices
         final String ABSOLUTE_PREFIX = path.getParent().toString();
@@ -63,8 +69,7 @@ public class LocalYamlGraphLoader implements GraphLoader {
                 graphYaml.getName(),
                 vertexInfos,
                 edgeInfos,
-                graphYaml.getPrefix(),
-                graphYaml.getVersion());
+                prefix,graphYaml.getVersion());
     }
 
     private VertexInfo loadVertex(String path) throws IOException {

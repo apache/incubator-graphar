@@ -33,6 +33,7 @@ import com.alibaba.fastffi.FFINameAlias;
 import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
 import org.apache.graphar.graphinfo.VertexInfo;
+import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.types.ValidateLevel;
 import org.apache.graphar.util.Status;
@@ -148,7 +149,7 @@ public interface VerticesBuilder extends CXXPointer {
          *     ValidateLevel::strong_validate, but could not be ValidateLevel::default_validate.
          */
         VerticesBuilder create(
-                @CXXReference VertexInfo vertexInfo,
+                @CXXReference StdSharedPtr<VertexInfo> vertexInfo,
                 @CXXReference StdString prefix,
                 @FFITypeAlias(GAR_ID_TYPE) long startVertexIndex,
                 @CXXValue ValidateLevel validateLevel);
@@ -159,7 +160,8 @@ public interface VerticesBuilder extends CXXPointer {
          * @param vertexInfo The vertex info that describes the vertex type.
          * @param prefix The absolute prefix.
          */
-        VerticesBuilder create(@CXXReference VertexInfo vertexInfo, @CXXReference StdString prefix);
+        VerticesBuilder create(
+                @CXXReference StdSharedPtr<VertexInfo> vertexInfo, @CXXReference StdString prefix);
 
         /**
          * Initialize the VerciesBuilder.
@@ -169,7 +171,7 @@ public interface VerticesBuilder extends CXXPointer {
          * @param startVertexIndex The start index of the vertices' collection.
          */
         VerticesBuilder create(
-                @CXXReference VertexInfo vertexInfo,
+                @CXXReference StdSharedPtr<VertexInfo> vertexInfo,
                 @CXXReference StdString prefix,
                 @FFITypeAlias(GAR_ID_TYPE) long startVertexIndex);
     }

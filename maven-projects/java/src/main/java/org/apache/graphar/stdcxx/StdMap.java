@@ -19,15 +19,11 @@
 
 package org.apache.graphar.stdcxx;
 
-import static org.apache.graphar.util.CppClassName.GAR_EDGE_INFO;
-import static org.apache.graphar.util.CppClassName.GAR_VERTEX_INFO;
-import static org.apache.graphar.util.CppClassName.STD_STRING;
 import static org.apache.graphar.util.CppHeaderName.GAR_GRAPH_INFO_H;
 
 import com.alibaba.fastffi.CXXHead;
 import com.alibaba.fastffi.CXXOperator;
 import com.alibaba.fastffi.CXXReference;
-import com.alibaba.fastffi.CXXTemplate;
 import com.alibaba.fastffi.FFIFactory;
 import com.alibaba.fastffi.FFIGen;
 import com.alibaba.fastffi.FFIPointer;
@@ -37,12 +33,6 @@ import com.alibaba.fastffi.FFITypeAlias;
 @CXXHead(system = {"map"})
 @CXXHead(GAR_GRAPH_INFO_H)
 @FFITypeAlias("std::map")
-@CXXTemplate(
-        cxx = {STD_STRING, GAR_EDGE_INFO},
-        java = {"org.apache.graphar.stdcxx.StdString", "org.apache.graphar.graphinfo.EdgeInfo"})
-@CXXTemplate(
-        cxx = {STD_STRING, GAR_VERTEX_INFO},
-        java = {"org.apache.graphar.stdcxx.StdString", "org.apache.graphar.graphinfo.VertexInfo"})
 public interface StdMap<K, V> extends FFIPointer {
 
     @CXXOperator("[]")

@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "graphar/fwd.h"
 #include "graphar/macros.h"
@@ -99,8 +100,17 @@ class DataType {
   inline DataType& operator=(const DataType& other) = default;
 
   bool Equals(const DataType& other) const {
-    return id_ == other.id_ &&
-           user_defined_type_name_ == other.user_defined_type_name_;
+    if (id_ != other.id_ ||
+        user_defined_type_name_ != other.user_defined_type_name_) {
+      return false;
+    }
+    if (child_ == nullptr && other.child_ == nullptr) {
+      return true;
+    }
+    if (child_ != nullptr && other.child_ != nullptr) {
+      return child_->Equals(other.child_);
+    }
+    return false;
   }
 
   bool Equals(const std::shared_ptr<DataType>& other) const {
@@ -242,4 +252,42 @@ static inline const char* FileTypeToString(FileType file_type) {
   return file_type2string.at(file_type);
 }
 
+static inline Cardinality StringToCardinality(const std::string& str) {
+  static const std::map<std::string, Cardinality> str2cardinality{
+      {"single", Cardinality::SINGLE},
+      {"list", Cardinality::LIST},
+      {"set", Cardinality::SET},
+  };
+  try {
+    return str2cardinality.at(str.c_str());
+  } catch (const std::exception& e) {
+    throw std::runtime_error("KeyError: " + str);
+  }
+}
+
+static inline const char* CardinalityToString(Cardinality cardinality) {
+  static const std::map<Cardinality, const char*> cardinality2string{
+      {Cardinality::SINGLE, "single"},
+      {Cardinality::LIST, "list"},
+      {Cardinality::SET, "set"},
+  };
+  try {
+    return cardinality2string.at(cardinality);
+  } catch (const std::exception& e) {
+    throw std::runtime_error("KeyError: " +
+                             std::to_string(static_cast<int>(cardinality)));
+  }
+}
+
+// Helper function to split a string by a delimiter
+inline std::vector<std::string> SplitString(const std::string& str,
+                                            char delimiter) {
+  std::vector<std::string> tokens;
+  std::string token;
+  std::istringstream tokenStream(str);
+  while (std::getline(tokenStream, token, delimiter)) {
+    tokens.push_back(token);
+  }
+  return tokens;
+}
 }  // namespace graphar

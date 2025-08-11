@@ -39,7 +39,7 @@ concurrency:
 
 jobs:
   test:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
@@ -47,12 +47,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - mvn-profile: "datasources-32"
-            spark: "spark-3.2.4"
-            spark-hadoop: "spark-3.2.4-bin-hadoop3.2"
-          - mvn-profile: "datasources-33"
-            spark: "spark-3.3.4"
-            spark-hadoop: "spark-3.3.4-bin-hadoop3"
+          # spark 3.2 and 3.3 are no longer supported
           - mvn-profile: "datasources-34"
             spark: "spark-3.4.3"
             spark-hadoop: "spark-3.4.3-bin-hadoop3"
@@ -96,6 +91,11 @@ jobs:
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         export SPARK_TESTING=1
+        export JDK_JAVA_OPTIONS="--add-opens=java.base/sun.nio.ch=ALL-UNNAMED  \
+        --add-opens=java.base/java.lang=ALL-UNNAMED                           \
+        --add-opens=java.base/java.nio=ALL-UNNAMED                            \
+        --add-opens=java.base/java.lang.invoke=ALL-UNNAMED                    \
+        --add-opens=java.base/java.util=ALL-UNNAMED"
         echo "Test ${{ matrix.mvn-profile }}"
         mvn test --no-transfer-progress -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
 

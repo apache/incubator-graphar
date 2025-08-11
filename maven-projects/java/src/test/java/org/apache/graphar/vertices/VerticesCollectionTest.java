@@ -34,9 +34,9 @@ public class VerticesCollectionTest {
     public void test1() {
         // read file and construct graph info
         String path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-        Result<GraphInfo> maybeGraphInfo = GraphInfo.load(path);
+        Result<StdSharedPtr<GraphInfo>> maybeGraphInfo = GraphInfo.load(path);
         Assert.assertTrue(maybeGraphInfo.status().ok());
-        GraphInfo graphInfo = maybeGraphInfo.value();
+        StdSharedPtr<GraphInfo> graphInfo = maybeGraphInfo.value();
 
         // construct vertices collection
         StdString label = StdString.create("person");

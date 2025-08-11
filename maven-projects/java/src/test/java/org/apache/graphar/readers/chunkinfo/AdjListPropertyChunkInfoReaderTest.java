@@ -21,8 +21,12 @@ package org.apache.graphar.readers.chunkinfo;
 
 import static org.apache.graphar.graphinfo.GraphInfoTest.root;
 
+import com.alibaba.fastffi.CXXReference;
+import java.io.FileNotFoundException;
+import org.apache.graphar.graphinfo.EdgeInfo;
 import org.apache.graphar.graphinfo.GraphInfo;
 import org.apache.graphar.graphinfo.PropertyGroup;
+import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.types.AdjListType;
 import org.apache.graphar.util.GrapharStaticFunctions;
@@ -32,32 +36,35 @@ import org.junit.Test;
 
 public class AdjListPropertyChunkInfoReaderTest {
     @Test
-    public void test1() {
+    public void test1() throws FileNotFoundException {
         String path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-        Result<GraphInfo> maybeGraphInfo = GraphInfo.load(path);
+        Result<StdSharedPtr<GraphInfo>> maybeGraphInfo = GraphInfo.load(path);
         Assert.assertTrue(maybeGraphInfo.status().ok());
-        GraphInfo graphInfo = maybeGraphInfo.value();
+        StdSharedPtr<GraphInfo> graphInfo = maybeGraphInfo.value();
 
         StdString srcLabel = StdString.create("person");
         StdString edgeLabel = StdString.create("knows");
         StdString dstLabel = StdString.create("person");
         StdString propertyName = StdString.create("creationDate");
 
-        Result<PropertyGroup> maybeGroup =
-                graphInfo.getEdgePropertyGroup(
-                        srcLabel, edgeLabel, dstLabel, propertyName, AdjListType.ordered_by_source);
-        Assert.assertTrue(maybeGroup.status().ok());
-        PropertyGroup group = maybeGroup.value();
-        Result<AdjListPropertyChunkInfoReader> maybePropertyReader =
+        StdSharedPtr<@CXXReference EdgeInfo> edgeInfo =
+                graphInfo.get().getEdgeInfo(srcLabel, edgeLabel, dstLabel);
+        StdSharedPtr<PropertyGroup> propertyGroup = edgeInfo.get().getPropertyGroup(propertyName);
+        PropertyGroup group = propertyGroup.get();
+        Assert.assertNotNull(group);
+        StdSharedPtr<PropertyGroup> groupPtr =
+                GrapharStaticFunctions.INSTANCE.createPropertyGroup(
+                        group.getProperties(), group.getFileType(), group.getPrefix());
+        Result<StdSharedPtr<AdjListPropertyChunkInfoReader>> maybePropertyReader =
                 GrapharStaticFunctions.INSTANCE.constructAdjListPropertyChunkInfoReader(
                         graphInfo,
                         srcLabel,
                         edgeLabel,
                         dstLabel,
-                        group,
+                        groupPtr,
                         AdjListType.ordered_by_source);
         Assert.assertTrue(maybePropertyReader.status().ok());
-        AdjListPropertyChunkInfoReader reader = maybePropertyReader.value();
+        AdjListPropertyChunkInfoReader reader = maybePropertyReader.value().get();
 
         // get chunk file path & validate
         Result<StdString> maybeChunkPath = reader.getChunk();
@@ -113,21 +120,20 @@ public class AdjListPropertyChunkInfoReaderTest {
         Assert.assertTrue(reader.seekDst(100).isInvalid());
 
         // test reader to read ordered by dest
-        maybeGroup =
-                graphInfo.getEdgePropertyGroup(
-                        srcLabel, edgeLabel, dstLabel, propertyName, AdjListType.ordered_by_dest);
-        Assert.assertTrue(maybeGroup.status().ok());
+        edgeInfo = graphInfo.get().getEdgeInfo(srcLabel, edgeLabel, dstLabel);
+        propertyGroup = edgeInfo.get().getPropertyGroup(propertyName);
+        Assert.assertNotNull(propertyGroup.get());
         graphInfo = maybeGraphInfo.value();
-        Result<AdjListPropertyChunkInfoReader> maybeDstReader =
+        Result<StdSharedPtr<AdjListPropertyChunkInfoReader>> maybeDstReader =
                 GrapharStaticFunctions.INSTANCE.constructAdjListPropertyChunkInfoReader(
                         graphInfo,
                         srcLabel,
                         edgeLabel,
                         dstLabel,
-                        group,
+                        groupPtr,
                         AdjListType.ordered_by_dest);
         Assert.assertTrue(maybeDstReader.status().ok());
-        AdjListPropertyChunkInfoReader dstReader = maybeDstReader.value();
+        AdjListPropertyChunkInfoReader dstReader = maybeDstReader.value().get();
         Assert.assertTrue(dstReader.seekDst(100).ok());
         maybeChunkPath = dstReader.getChunk();
         Assert.assertTrue(maybeChunkPath.status().ok());

@@ -18,8 +18,14 @@
  */
 
 #include "graphar/high-level/vertices_builder.h"
+#include <any>
+#include <iterator>
+#include <vector>
 #include "graphar/convert_to_arrow_type.h"
+#include "graphar/fwd.h"
 #include "graphar/graph_info.h"
+#include "graphar/label.h"
+#include "graphar/status.h"
 
 namespace graphar::builder {
 
@@ -66,59 +72,62 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
       bool invalid_type = false;
       switch (type->id()) {
       case Type::BOOL:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::BOOL>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(
+            v.ValidatePropertyType<typename TypeToArrowType<Type::BOOL>::CType>(
+                property.first,
+                vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::INT32:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::INT32>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::INT32>::CType>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::INT64:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::INT64>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::INT64>::CType>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::FLOAT:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::FLOAT>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::FLOAT>::CType>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::DOUBLE:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::DOUBLE>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::DOUBLE>::CType>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::STRING:
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::STRING>::CType)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::STRING>::CType>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::DATE:
         // date is stored as int32_t
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::DATE>::CType::c_type)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(v.ValidatePropertyType<
+                          typename TypeToArrowType<Type::DATE>::CType::c_type>(
+            property.first,
+            vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       case Type::TIMESTAMP:
         // timestamp is stored as int64_t
-        if (property.second.type() !=
-            typeid(typename TypeToArrowType<Type::TIMESTAMP>::CType::c_type)) {
-          invalid_type = true;
-        }
+        GAR_RETURN_NOT_OK(
+            v.ValidatePropertyType<
+                typename TypeToArrowType<Type::TIMESTAMP>::CType::c_type>(
+                property.first,
+                vertex_info_->GetPropertyCardinality(property.first).value()));
         break;
       default:
         return Status::TypeError("Unsupported property type.");
       }
-      if (invalid_type) {
+      if (invalid_type &&
+          Cardinality::SINGLE ==
+              vertex_info_->GetPropertyCardinality(property.first).value()) {
         return Status::TypeError(
             "Invalid data type for property ", property.first + ", defined as ",
             type->ToTypeName(), ", but got ", property.second.type().name());
@@ -134,16 +143,41 @@ Status VerticesBuilder::tryToAppend(
     std::shared_ptr<arrow::Array>& array) {  // NOLINT
   using CType = typename TypeToArrowType<type>::CType;
   arrow::MemoryPool* pool = arrow::default_memory_pool();
-  typename TypeToArrowType<type>::BuilderType builder(pool);
-  for (auto& v : vertices_) {
-    if (v.Empty() || !v.ContainProperty(property_name)) {
-      RETURN_NOT_ARROW_OK(builder.AppendNull());
-    } else {
-      RETURN_NOT_ARROW_OK(
-          builder.Append(std::any_cast<CType>(v.GetProperty(property_name))));
+  auto builder =
+      std::make_shared<typename TypeToArrowType<type>::BuilderType>(pool);
+  auto cardinality =
+      vertex_info_->GetPropertyCardinality(property_name).value();
+  if (cardinality != Cardinality::SINGLE) {
+    arrow::ListBuilder list_builder(pool, builder);
+    for (auto& v : vertices_) {
+      RETURN_NOT_ARROW_OK(list_builder.Append());
+      if (v.Empty() || !v.ContainProperty(property_name)) {
+        RETURN_NOT_ARROW_OK(builder->AppendNull());
+      } else {
+        if (!v.IsMultiProperty(property_name)) {
+          RETURN_NOT_ARROW_OK(builder->Append(
+              std::any_cast<CType>(v.GetProperty(property_name))));
+        } else {
+          auto property_value_list = std::any_cast<std::vector<std::any>>(
+              v.GetProperty(property_name));
+          for (auto& value : property_value_list) {
+            RETURN_NOT_ARROW_OK(builder->Append(std::any_cast<CType>(value)));
+          }
+        }
+      }
     }
+    array = list_builder.Finish().ValueOrDie();
+  } else {
+    for (auto& v : vertices_) {
+      if (v.Empty() || !v.ContainProperty(property_name)) {
+        RETURN_NOT_ARROW_OK(builder->AppendNull());
+      } else {
+        RETURN_NOT_ARROW_OK(builder->Append(
+            std::any_cast<CType>(v.GetProperty(property_name))));
+      }
+    }
+    array = builder->Finish().ValueOrDie();
   }
-  array = builder.Finish().ValueOrDie();
   return Status::OK();
 }
 
@@ -219,11 +253,18 @@ Result<std::shared_ptr<arrow::Table>> VerticesBuilder::convertToTable() {
   for (auto& property_group : property_groups) {
     for (auto& property : property_group->GetProperties()) {
       // add a column to schema
-      schema_vector.push_back(arrow::field(
-          property.name, DataType::DataTypeToArrowDataType(property.type)));
+      if (vertex_info_->GetPropertyCardinality(property.name).value() !=
+          Cardinality::SINGLE) {
+        schema_vector.push_back(arrow::field(
+            property.name,
+            arrow::list(DataType::DataTypeToArrowDataType(property.type))));
+      } else {
+        schema_vector.push_back(arrow::field(
+            property.name, DataType::DataTypeToArrowDataType(property.type)));
+      }
       // add a column to data
       std::shared_ptr<arrow::Array> array;
-      appendToArray(property.type, property.name, array);
+      GAR_RETURN_NOT_OK(appendToArray(property.type, property.name, array));
       arrays.push_back(array);
     }
   }
