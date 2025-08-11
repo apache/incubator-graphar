@@ -26,49 +26,37 @@ import java.util.regex.Pattern;
 
 public class VersionParser {
     public static VersionInfo getVersion(String versionStr) {
-        if (versionStr == "" || versionStr == null) {
-            return new VersionInfo("", new ArrayList<>());
+        if (versionStr == null || versionStr.isEmpty()) {
+            return null;
         }
         try {
-
             int parsedVersion = parserVersionImpl(versionStr);
-
             List<String> parsedTypes = parseUserDefineTypes(versionStr);
-
             return new VersionInfo(parsedVersion, parsedTypes);
         } catch (RuntimeException e) {
-
             throw new RuntimeException(
                     "Invalid version string: '" + versionStr + "'. Details: " + e.getMessage(), e);
         }
     }
 
     public static int parserVersionImpl(String versionStr) {
-
         if (versionStr == null || versionStr.isEmpty()) {
             throw new RuntimeException("Invalid version string: input cannot be null or empty.");
         }
-
         final Pattern versionRegex = Pattern.compile("gar/v(\\d+).*");
-
         final Matcher match = versionRegex.matcher(versionStr);
-
         if (match.matches()) {
-
             if (match.groupCount() != 1) {
                 throw new RuntimeException("Invalid version string: " + versionStr);
             }
-
             try {
                 return Integer.parseInt(match.group(1));
             } catch (NumberFormatException e) {
-
                 throw new RuntimeException(
                         "Invalid version string: Could not parse version number from " + versionStr,
                         e);
             }
         } else {
-
             throw new RuntimeException(
                     "Invalid version string: Does not match 'gar/v(\\d+).*' format for "
                             + versionStr);

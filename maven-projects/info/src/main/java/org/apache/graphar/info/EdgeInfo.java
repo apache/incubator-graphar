@@ -46,6 +46,7 @@ public class EdgeInfo {
             long dstChunkSize,
             boolean directed,
             String prefix,
+            String version,
             List<AdjacentList> adjacentListsAsList,
             List<PropertyGroup> propertyGroupsAsList) {
         this.cachedAdjacentLists =
@@ -64,6 +65,7 @@ public class EdgeInfo {
                         .setDestinationVertexType(dstLabel)
                         .setIsDirected(directed)
                         .setPrefix(prefix)
+                        .setVersion(version)
                         .addAllAdjacentList(
                                 adjacentListsAsList.stream()
                                         .map(AdjacentList::getProto)

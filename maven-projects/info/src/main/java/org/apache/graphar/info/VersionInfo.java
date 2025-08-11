@@ -25,7 +25,7 @@ public class VersionInfo {
     public int parsedVersion;
     public List<String> parsedUserDefinedTypes;
 
-    public VersionInfo(int parsedVersion, List<String> parsedUserDefinedTypes) {
+    public VersionInfo(Integer parsedVersion, List<String> parsedUserDefinedTypes) {
         this.parsedVersion = parsedVersion;
         this.parsedUserDefinedTypes = parsedUserDefinedTypes;
     }

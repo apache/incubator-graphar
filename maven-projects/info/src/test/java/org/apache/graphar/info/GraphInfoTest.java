@@ -63,7 +63,7 @@ public class GraphInfoTest {
         Assert.assertNotNull(graphInfo.getVertexInfos());
         Assert.assertEquals(1, graphInfo.getVertexInfos().size());
         // test version gar/v1
-        Assert.assertEquals("", graphInfo.getVersion().getParsedVersion());
+        Assert.assertEquals(1, graphInfo.getVersion().getParsedVersion());
     }
 
     @Test
@@ -78,6 +78,7 @@ public class GraphInfoTest {
         Assert.assertEquals("vertex/person//person.vertex.yaml", personVertexInfo.getVertexPath());
         Assert.assertNotNull(personVertexInfo.getPropertyGroups());
         Assert.assertEquals(2, personVertexInfo.getPropertyGroups().size());
+        Assert.assertEquals(1, personVertexInfo.getVersion().getParsedVersion());
     }
 
     @Test
@@ -151,6 +152,7 @@ public class GraphInfoTest {
         Assert.assertEquals(
                 "edge/person_knows_person//person_knows_person.edge.yaml",
                 knowsEdgeInfo.getEdgePath());
+        Assert.assertEquals(1, knowsEdgeInfo.getVersion().getParsedVersion());
     }
 
     @Test

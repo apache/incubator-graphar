@@ -32,7 +32,11 @@ public class VertexInfo {
     private final PropertyGroups cachedPropertyGroups;
 
     public VertexInfo(
-            String type, long chunkSize, List<PropertyGroup> propertyGroups, String prefix) {
+            String type,
+            long chunkSize,
+            List<PropertyGroup> propertyGroups,
+            String prefix,
+            String version) {
         this.cachedPropertyGroups = new PropertyGroups(propertyGroups);
         this.protoVertexInfo =
                 org.apache.graphar.proto.VertexInfo.newBuilder()
@@ -43,6 +47,7 @@ public class VertexInfo {
                                         .map(PropertyGroup::getProto)
                                         .collect(Collectors.toList()))
                         .setPrefix(prefix)
+                        .setVersion(version)
                         .build();
     }
 
@@ -69,7 +74,8 @@ public class VertexInfo {
                                         protoVertexInfo.getType(),
                                         protoVertexInfo.getChunkSize(),
                                         newPropertyGroups.getPropertyGroupList(),
-                                        protoVertexInfo.getPrefix()));
+                                        protoVertexInfo.getPrefix(),
+                                        protoVertexInfo.getVersion()));
     }
 
     public int propertyGroupNum() {

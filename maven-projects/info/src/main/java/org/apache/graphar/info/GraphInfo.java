@@ -37,7 +37,11 @@ public class GraphInfo {
     private final Map<String, EdgeInfo> cachedEdgeInfoMap;
 
     public GraphInfo(
-            String name, List<VertexInfo> vertexInfos, List<EdgeInfo> edgeInfos, String prefix) {
+            String name,
+            List<VertexInfo> vertexInfos,
+            List<EdgeInfo> edgeInfos,
+            String prefix,
+            String version) {
         this.cachedVertexInfoList = List.copyOf(vertexInfos);
         this.cachedEdgeInfoList = List.copyOf(edgeInfos);
         this.cachedVertexInfoMap =
@@ -62,6 +66,7 @@ public class GraphInfo {
                                         .map(EdgeInfo::getEdgePath)
                                         .collect(Collectors.toList()))
                         .setPrefix(prefix)
+                        .setVersion(version)
                         .build();
     }
 
@@ -184,6 +189,9 @@ public class GraphInfo {
     }
 
     public VersionInfo getVersion() {
+        System.out.println("====================");
+        System.out.println(protoGraphInfo.getVersion());
+        System.out.println("====================");
         return VersionParser.getVersion(protoGraphInfo.getVersion());
     }
 

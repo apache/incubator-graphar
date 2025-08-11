@@ -76,7 +76,8 @@ public class TestUtil {
         PropertyGroup pg2 =
                 new PropertyGroup(
                         List.of(firstName, lastName, gender), FileType.CSV, "firstName_lastName");
-        VertexInfo person = new VertexInfo("person", 100, List.of(pg1, pg2), "vertex/person/");
+        VertexInfo person =
+                new VertexInfo("person", 100, List.of(pg1, pg2), "vertex/person/", "gar/v1");
 
         // create edge info of yaml:
         // src_type: person
@@ -121,6 +122,7 @@ public class TestUtil {
                         100,
                         false,
                         "edge/person_knows_person/",
+                        "gar/v1",
                         List.of(orderedBySource, orderedByDest),
                         List.of(pg3));
 
@@ -131,7 +133,7 @@ public class TestUtil {
         // edges:
         //  - person_knows_person.edge.yml
         // version: gar/v1
-        return new GraphInfo("ldbc_sample", List.of(person), List.of(knows), "");
+        return new GraphInfo("ldbc_sample", List.of(person), List.of(knows), "", "");
     }
 
     public static void checkTestData() {

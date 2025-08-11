@@ -80,6 +80,7 @@ public class EdgeYaml {
                 dst_chunk_size,
                 directed,
                 prefix,
+                version,
                 adj_lists.stream()
                         .map(AdjacentListYaml::toAdjacentList)
                         .collect(Collectors.toUnmodifiableList()),

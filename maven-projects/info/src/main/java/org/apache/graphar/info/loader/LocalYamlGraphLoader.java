@@ -59,7 +59,12 @@ public class LocalYamlGraphLoader implements GraphLoader {
         for (String edgeYamlName : graphYaml.getEdges()) {
             edgeInfos.add(loadEdge(ABSOLUTE_PREFIX + "/" + edgeYamlName));
         }
-        return new GraphInfo(graphYaml.getName(), vertexInfos, edgeInfos, graphYaml.getPrefix());
+        return new GraphInfo(
+                graphYaml.getName(),
+                vertexInfos,
+                edgeInfos,
+                graphYaml.getPrefix(),
+                graphYaml.getVersion());
     }
 
     private VertexInfo loadVertex(String path) throws IOException {
