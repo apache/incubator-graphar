@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 public class VersionParser {
     public static VersionInfo getVersion(String versionStr) {
         if (versionStr == "" || versionStr == null) {
-            return null /*new VersionInfo(0, new ArrayList<>())*/;
+            return new VersionInfo(0, new ArrayList<>());
         }
         try {
 
