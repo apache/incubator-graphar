@@ -66,10 +66,7 @@ public class LocalYamlGraphLoader implements GraphLoader {
             edgeInfos.add(loadEdge(ABSOLUTE_PREFIX + "/" + edgeYamlName));
         }
         return new GraphInfo(
-                graphYaml.getName(),
-                vertexInfos,
-                edgeInfos,
-                prefix,graphYaml.getVersion());
+                graphYaml.getName(), vertexInfos, edgeInfos, prefix, graphYaml.getVersion());
     }
 
     private VertexInfo loadVertex(String path) throws IOException {
