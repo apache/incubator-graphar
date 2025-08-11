@@ -85,7 +85,7 @@ public class GraphInfo {
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         GraphYaml graphYaml = new GraphYaml(this);
         return yaml.dump(graphYaml);
     }
@@ -189,9 +189,6 @@ public class GraphInfo {
     }
 
     public VersionInfo getVersion() {
-        System.out.println("====================");
-        System.out.println(protoGraphInfo.getVersion());
-        System.out.println("====================");
         return VersionParser.getVersion(protoGraphInfo.getVersion());
     }
 

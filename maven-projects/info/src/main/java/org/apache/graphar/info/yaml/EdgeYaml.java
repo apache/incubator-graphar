@@ -21,8 +21,10 @@ package org.apache.graphar.info.yaml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.EdgeInfo;
+import org.apache.graphar.info.VersionInfo;
 
 public class EdgeYaml {
     private String src_type;
@@ -60,6 +62,11 @@ public class EdgeYaml {
         this.dst_chunk_size = edgeInfo.getDstChunkSize();
         this.directed = edgeInfo.isDirected();
         this.prefix = edgeInfo.getPrefix();
+        this.version =
+                Optional.of(edgeInfo)
+                        .map(EdgeInfo::getVersion)
+                        .map(VersionInfo::toString)
+                        .orElse(null);
         this.adj_lists =
                 edgeInfo.getAdjacentLists().values().stream()
                         .map(AdjacentListYaml::new)

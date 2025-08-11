@@ -133,7 +133,7 @@ public class TestUtil {
         // edges:
         //  - person_knows_person.edge.yml
         // version: gar/v1
-        return new GraphInfo("ldbc_sample", List.of(person), List.of(knows), "", "");
+        return new GraphInfo("ldbc_sample", List.of(person), List.of(knows), "", "gar/v1");
     }
 
     public static void checkTestData() {

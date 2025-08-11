@@ -20,6 +20,8 @@
 package org.apache.graphar.info;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.graphar.info.loader.GraphLoader;
 import org.apache.graphar.info.loader.LocalYamlGraphLoader;
 import org.apache.graphar.proto.AdjListType;
@@ -65,7 +67,7 @@ public class GraphInfoTest {
         Assert.assertNotNull(graphInfo.getVertexInfos());
         Assert.assertEquals(1, graphInfo.getVertexInfos().size());
         // test version gar/v1
-        Assert.assertEquals(1, graphInfo.getVersion().getParsedVersion());
+        Assert.assertEquals(1, graphInfo.getVersion().getVersion());
     }
 
     @Test
@@ -79,7 +81,7 @@ public class GraphInfoTest {
         Assert.assertEquals("vertex/person/person.vertex.yaml", personVertexInfo.getVertexPath());
         Assert.assertNotNull(personVertexInfo.getPropertyGroups());
         Assert.assertEquals(2, personVertexInfo.getPropertyGroups().size());
-        Assert.assertEquals(1, personVertexInfo.getVersion().getParsedVersion());
+        Assert.assertEquals(1, personVertexInfo.getVersion().getVersion());
     }
 
     @Test
@@ -153,7 +155,7 @@ public class GraphInfoTest {
         Assert.assertEquals(
                 "edge/person_knows_person/person_knows_person.edge.yaml",
                 knowsEdgeInfo.getEdgePath());
-        Assert.assertEquals(1, knowsEdgeInfo.getVersion().getParsedVersion());
+        Assert.assertEquals(1, knowsEdgeInfo.getVersion().getVersion());
     }
 
     @Test
@@ -253,5 +255,34 @@ public class GraphInfoTest {
         Assert.assertEquals(DataType.STRING, property.getDataType());
         Assert.assertFalse(property.isPrimary());
         Assert.assertTrue(property.isNullable());
+    }
+
+    @Test
+    public void testVersionParser() {
+        // parser
+        VersionInfo versionInfo = VersionParser.getVersion("gar/v1");
+        Assert.assertEquals(1, versionInfo.getVersion());
+        Assert.assertTrue(versionInfo.getUserDefinedTypes().isEmpty());
+        Assert.assertTrue((versionInfo.checkType("int32")));
+        Assert.assertFalse((versionInfo.checkType("date32")));
+
+        versionInfo = VersionParser.getVersion("gar/v1 (t1,t2)");
+        Assert.assertEquals(1, versionInfo.getVersion());
+        Assert.assertEquals(List.of("t1", "t2"), versionInfo.getUserDefinedTypes());
+        Assert.assertTrue(versionInfo.checkType("t1"));
+        Assert.assertTrue(versionInfo.checkType("t2"));
+        Assert.assertTrue((versionInfo.checkType("int32")));
+        Assert.assertFalse((versionInfo.checkType("date32")));
+
+        // dump
+        versionInfo = new VersionInfo(1, new ArrayList<>());
+        Assert.assertEquals(1, versionInfo.getVersion());
+        Assert.assertTrue(versionInfo.getUserDefinedTypes().isEmpty());
+        Assert.assertEquals("gar/v1", versionInfo.toString());
+
+        versionInfo = new VersionInfo(2, List.of("t1", "t2"));
+        Assert.assertEquals(2, versionInfo.getVersion());
+        Assert.assertEquals(List.of("t1", "t2"), versionInfo.getUserDefinedTypes());
+        Assert.assertEquals("gar/v2 (t1,t2)", versionInfo.toString());
     }
 }

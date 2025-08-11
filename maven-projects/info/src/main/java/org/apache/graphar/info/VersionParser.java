@@ -30,77 +30,62 @@ public class VersionParser {
             return null;
         }
         try {
-
-            int parsedVersion = parserVersionImpl(versionStr);
-
+            int parsedVersion = parserVersion(versionStr);
             List<String> parsedTypes = parseUserDefineTypes(versionStr);
-
             return new VersionInfo(parsedVersion, parsedTypes);
         } catch (RuntimeException e) {
-
             throw new RuntimeException(
                     "Invalid version string: '" + versionStr + "'. Details: " + e.getMessage(), e);
         }
     }
 
-    public static int parserVersionImpl(String versionStr) {
-
+    private static int parserVersion(String versionStr) {
         if (versionStr == null || versionStr.isEmpty()) {
             throw new RuntimeException("Invalid version string: input cannot be null or empty.");
         }
 
         final Pattern versionRegex = Pattern.compile("gar/v(\\d+).*");
-
         final Matcher match = versionRegex.matcher(versionStr);
 
         if (match.matches()) {
-
             if (match.groupCount() != 1) {
                 throw new RuntimeException("Invalid version string: " + versionStr);
             }
-
             try {
                 return Integer.parseInt(match.group(1));
             } catch (NumberFormatException e) {
-
                 throw new RuntimeException(
                         "Invalid version string: Could not parse version number from " + versionStr,
                         e);
             }
         } else {
-
             throw new RuntimeException(
                     "Invalid version string: Does not match 'gar/v(\\d+).*' format for "
                             + versionStr);
         }
     }
 
-    public static List<String> parseUserDefineTypes(String versionStr) {
-        List<String> userDefineTypes = new ArrayList<>();
+    private static List<String> parseUserDefineTypes(String versionStr) {
 
+        List<String> userDefineTypes = new ArrayList<>();
         final Pattern userDefineTypesRegex = Pattern.compile("gar/v\\d+ *\\((.*)\\).*");
         final Matcher match = userDefineTypesRegex.matcher(versionStr);
 
         if (match.matches()) {
-
             if (match.groupCount() != 1) {
                 throw new RuntimeException("Invalid version string: " + versionStr);
             }
 
             String typesStr = match.group(1);
-
             String[] typesArray = typesStr.split(",", -1);
 
             for (String type : typesArray) {
-
                 String trimmedType = type.trim();
-
                 if (!trimmedType.isEmpty()) {
                     userDefineTypes.add(trimmedType);
                 }
             }
         }
-
         return userDefineTypes;
     }
 }

@@ -20,21 +20,53 @@
 package org.apache.graphar.info;
 
 import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 
 public class VersionInfo {
-    public int parsedVersion;
-    public List<String> parsedUserDefinedTypes;
+    private int version;
+    private List<String> userDefinedTypes;
+    private final Map<Integer, List<String>> version2types =
+            Map.of(1, List.of("bool", "int32", "int64", "float", "double", "string"));
 
-    public VersionInfo(Integer parsedVersion, List<String> parsedUserDefinedTypes) {
-        this.parsedVersion = parsedVersion;
-        this.parsedUserDefinedTypes = parsedUserDefinedTypes;
+    public VersionInfo(Integer version, List<String> userDefinedTypes) {
+        this.version = version;
+        this.userDefinedTypes = userDefinedTypes;
     }
 
-    public int getParsedVersion() {
-        return parsedVersion;
+    public int getVersion() {
+        return version;
     }
 
-    public List<String> getParsedUserDefinedTypes() {
-        return parsedUserDefinedTypes;
+    public List<String> getUserDefinedTypes() {
+        return userDefinedTypes;
+    }
+
+    /** Dump version to string. */
+    public String toString() {
+        StringBuilder str = new StringBuilder("gar/v").append(version);
+
+        if (userDefinedTypes != null && !userDefinedTypes.isEmpty()) {
+            str.append(" (");
+            // 使用 StringJoiner 更优雅地拼接带分隔符的字符串
+            StringJoiner sj = new StringJoiner(",");
+            for (String type : userDefinedTypes) {
+                sj.add(type);
+            }
+            str.append(sj.toString()).append(")");
+        }
+        return str.toString();
+    }
+
+    /** Check if type is supported by version. */
+    public boolean checkType(final String typeStr) {
+        if (version2types == null || !version2types.containsKey(version)) {
+            return false;
+        }
+        List<String> types = version2types.get(version);
+        if (types.contains(typeStr)) {
+            return true;
+        }
+        return userDefinedTypes != null && userDefinedTypes.contains(typeStr);
     }
 }

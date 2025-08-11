@@ -117,7 +117,7 @@ public class VertexInfo {
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         VertexYaml vertexYaml = new VertexYaml(this);
         return yaml.dump(vertexYaml);
     }

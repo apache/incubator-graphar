@@ -208,7 +208,7 @@ public class EdgeInfo {
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         EdgeYaml edgeYaml = new EdgeYaml(this);
         return yaml.dump(edgeYaml);
     }
