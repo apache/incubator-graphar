@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.EdgeYaml;
@@ -64,7 +63,18 @@ public class EdgeInfo {
             String version,
             List<AdjacentList> adjacentListsAsList,
             List<PropertyGroup> propertyGroupsAsList) {
-        this(srcType, edgeType, dstType, chunkSize, srcChunkSize, dstChunkSize, directed, prefix, VersionParser.getVersion(version), adjacentListsAsList, propertyGroupsAsList);
+        this(
+                srcType,
+                edgeType,
+                dstType,
+                chunkSize,
+                srcChunkSize,
+                dstChunkSize,
+                directed,
+                prefix,
+                VersionParser.getVersion(version),
+                adjacentListsAsList,
+                propertyGroupsAsList);
     }
 
     public EdgeInfo(
@@ -123,7 +133,16 @@ public class EdgeInfo {
             String version,
             Map<AdjListType, AdjacentList> adjacentLists,
             PropertyGroups propertyGroups) {
-        this(edgeTriplet, chunkSize, srcChunkSize, dstChunkSize, directed, prefix, VersionParser.getVersion(version), adjacentLists, propertyGroups);
+        this(
+                edgeTriplet,
+                chunkSize,
+                srcChunkSize,
+                dstChunkSize,
+                directed,
+                prefix,
+                VersionParser.getVersion(version),
+                adjacentLists,
+                propertyGroups);
     }
 
     private EdgeInfo(

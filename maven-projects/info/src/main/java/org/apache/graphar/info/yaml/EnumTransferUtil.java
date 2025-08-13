@@ -23,15 +23,12 @@ import org.apache.graphar.info.type.AdjListType;
 
 public class EnumTransferUtil {
 
-
     public static AdjListType orderedAndAlignedBy2AdjListType(boolean ordered, String alignedBy) {
         switch (alignedBy) {
             case "src":
                 return ordered ? AdjListType.ordered_by_source : AdjListType.unordered_by_source;
             case "dst":
-                return ordered
-                        ? AdjListType.ordered_by_dest
-                        : AdjListType.unordered_by_dest;
+                return ordered ? AdjListType.ordered_by_dest : AdjListType.unordered_by_dest;
             default:
                 throw new IllegalArgumentException("Invalid alignedBy: " + alignedBy);
         }

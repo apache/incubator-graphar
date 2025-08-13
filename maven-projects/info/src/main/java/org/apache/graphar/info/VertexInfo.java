@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
@@ -104,7 +103,8 @@ public class VertexInfo {
                 .map(PropertyGroups::getPropertyGroupList)
                 .map(
                         newPropertyGroups ->
-                                new VertexInfo(type, chunkSize, newPropertyGroups, prefix, version));
+                                new VertexInfo(
+                                        type, chunkSize, newPropertyGroups, prefix, version));
     }
 
     public int propertyGroupNum() {
@@ -194,7 +194,6 @@ public class VertexInfo {
     public String getVertexPath() {
         return getPrefix() + getType() + ".vertex.yaml";
     }
-
 
     private void checkPropertyGroupExist(PropertyGroup propertyGroup) {
         if (propertyGroup == null) {

@@ -50,6 +50,7 @@ public class PropertyYaml {
                 is_primary,
                 is_nullable.orElseGet(() -> !is_primary));
     }
+
     public String getName() {
         return name;
     }
