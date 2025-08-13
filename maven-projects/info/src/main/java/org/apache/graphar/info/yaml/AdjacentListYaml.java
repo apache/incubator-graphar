@@ -45,7 +45,7 @@ public class AdjacentListYaml {
 
     public AdjacentList toAdjacentList() {
         return new AdjacentList(
-                AdjListType.fromOrderedAndAlignedBy(ordered,aligned_by),
+                AdjListType.fromOrderedAndAlignedBy(ordered, aligned_by),
                 FileType.fromString(file_type),
                 prefix);
     }
