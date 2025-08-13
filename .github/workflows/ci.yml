@@ -208,7 +208,6 @@ jobs:
     - name: Install dependencies
       run: |
         brew bundle --file=cpp/Brewfile
-        sudo chown -R $(whoami) /usr/local/Cellar /usr/local/Homebrew
         git clone https://github.com/Homebrew/homebrew-core.git --depth 1 
         pushd homebrew-core
         git fetch origin 6f33d6974fe77a38a3efbd44a89ead14a5562589
