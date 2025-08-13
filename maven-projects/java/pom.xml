@@ -80,7 +80,7 @@
             <artifactId>llvm4jni</artifactId>
             <version>${fastffi.revision}</version>
             <classifier>${os.detected.classifier}</classifier>
-            <scope>provided</scope>
+            <scope>provided</scope>  
         </dependency>
 
         <dependency>
