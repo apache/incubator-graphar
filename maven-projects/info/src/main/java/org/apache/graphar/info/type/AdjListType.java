@@ -17,23 +17,34 @@
  * under the License.
  */
 
-package org.apache.graphar.info.yaml;
+package org.apache.graphar.info.type;
 
-import org.apache.graphar.info.type.AdjListType;
+public enum AdjListType {
+    /** collection of edges by source, but unordered, can represent COO format */
+    unordered_by_source,
+    /** collection of edges by destination, but unordered, can represent COO */
+    unordered_by_dest,
+    /** collection of edges by source, ordered by source, can represent CSR format */
+    ordered_by_source,
+    /** collection of edges by destination, ordered by destination, can represent CSC format */
+    ordered_by_dest;
 
-public class EnumTransferUtil {
-
-
-    public static AdjListType orderedAndAlignedBy2AdjListType(boolean ordered, String alignedBy) {
+    public static AdjListType fromOrderedAndAlignedBy(boolean ordered, String alignedBy) {
         switch (alignedBy) {
             case "src":
-                return ordered ? AdjListType.ordered_by_source : AdjListType.unordered_by_source;
+                return ordered ? ordered_by_source : unordered_by_source;
             case "dst":
-                return ordered
-                        ? AdjListType.ordered_by_dest
-                        : AdjListType.unordered_by_dest;
+                return ordered ? ordered_by_dest : unordered_by_dest;
             default:
                 throw new IllegalArgumentException("Invalid alignedBy: " + alignedBy);
         }
+    }
+
+    public boolean isOrdered() {
+        return this == ordered_by_source || this == ordered_by_dest;
+    }
+
+    public String getAlignedBy() {
+        return this == ordered_by_source || this == unordered_by_source ? "src" : "dst";
     }
 }

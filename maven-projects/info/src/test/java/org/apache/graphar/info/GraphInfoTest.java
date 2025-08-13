@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 import org.apache.graphar.info.loader.GraphLoader;
 import org.apache.graphar.info.loader.LocalYamlGraphLoader;
-import org.apache.graphar.proto.AdjListType;
-import org.apache.graphar.proto.DataType;
-import org.apache.graphar.proto.FileType;
+import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.DataType;
+import org.apache.graphar.info.type.FileType;
 import org.apache.graphar.util.PathUtil;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -143,11 +143,11 @@ public class GraphInfoTest {
 
     @Test
     public void testKnowEdgeInfoBasic() {
-        Assert.assertEquals("knows", knowsEdgeInfo.getEdgeLabel());
+        Assert.assertEquals("knows", knowsEdgeInfo.getEdgeType());
         Assert.assertEquals(1024, knowsEdgeInfo.getChunkSize());
-        Assert.assertEquals("person", knowsEdgeInfo.getSrcLabel());
+        Assert.assertEquals("person", knowsEdgeInfo.getSrcType());
         Assert.assertEquals(100, knowsEdgeInfo.getSrcChunkSize());
-        Assert.assertEquals("person", knowsEdgeInfo.getDstLabel());
+        Assert.assertEquals("person", knowsEdgeInfo.getDstType());
         Assert.assertEquals(100, knowsEdgeInfo.getDstChunkSize());
         Assert.assertFalse(knowsEdgeInfo.isDirected());
         Assert.assertEquals("person_knows_person", knowsEdgeInfo.getConcat());
@@ -163,71 +163,71 @@ public class GraphInfoTest {
         Assert.assertEquals(2, knowsEdgeInfo.getAdjacentLists().size());
         // test ordered by source adjacency list
         AdjacentList adjOrderBySource =
-                knowsEdgeInfo.getAdjacentList(AdjListType.ORDERED_BY_SOURCE);
+                knowsEdgeInfo.getAdjacentList(AdjListType.ordered_by_source);
         Assert.assertEquals(FileType.CSV, adjOrderBySource.getFileType());
-        Assert.assertEquals(AdjListType.ORDERED_BY_SOURCE, adjOrderBySource.getType());
+        Assert.assertEquals(AdjListType.ordered_by_source, adjOrderBySource.getType());
         Assert.assertEquals("ordered_by_source/", adjOrderBySource.getPrefix());
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_source/adj_list/vertex_count",
-                knowsEdgeInfo.getVerticesNumFilePath(AdjListType.ORDERED_BY_SOURCE));
+                knowsEdgeInfo.getVerticesNumFilePath(AdjListType.ordered_by_source));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_source/adj_list/edge_count0",
-                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ORDERED_BY_SOURCE, 0));
+                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ordered_by_source, 0));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_source/adj_list/edge_count4",
-                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ORDERED_BY_SOURCE, 4));
+                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ordered_by_source, 4));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_source/adj_list/",
-                knowsEdgeInfo.getAdjacentListPrefix(AdjListType.ORDERED_BY_SOURCE));
+                knowsEdgeInfo.getAdjacentListPrefix(AdjListType.ordered_by_source));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_source/adj_list/chunk0",
-                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ORDERED_BY_SOURCE, 0));
+                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ordered_by_source, 0));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_source/adj_list/chunk4",
-                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ORDERED_BY_SOURCE, 4));
+                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ordered_by_source, 4));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_source/adj_list/offset/",
-                knowsEdgeInfo.getOffsetPrefix(AdjListType.ORDERED_BY_SOURCE));
+                knowsEdgeInfo.getOffsetPrefix(AdjListType.ordered_by_source));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_source/adj_list/offset/chunk0",
-                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ORDERED_BY_SOURCE, 0));
+                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ordered_by_source, 0));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_source/adj_list/offset/chunk4",
-                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ORDERED_BY_SOURCE, 4));
+                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ordered_by_source, 4));
 
         // test ordered by destination adjacency list
         AdjacentList adjOrderByDestination =
-                knowsEdgeInfo.getAdjacentList(AdjListType.ORDERED_BY_DESTINATION);
+                knowsEdgeInfo.getAdjacentList(AdjListType.ordered_by_dest);
         Assert.assertEquals(FileType.CSV, adjOrderByDestination.getFileType());
-        Assert.assertEquals(AdjListType.ORDERED_BY_DESTINATION, adjOrderByDestination.getType());
+        Assert.assertEquals(AdjListType.ordered_by_dest, adjOrderByDestination.getType());
         Assert.assertEquals("ordered_by_dest/", adjOrderByDestination.getPrefix());
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_dest/adj_list/vertex_count",
-                knowsEdgeInfo.getVerticesNumFilePath(AdjListType.ORDERED_BY_DESTINATION));
+                knowsEdgeInfo.getVerticesNumFilePath(AdjListType.ordered_by_dest));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_dest/adj_list/edge_count0",
-                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ORDERED_BY_DESTINATION, 0));
+                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ordered_by_dest, 0));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_dest/adj_list/edge_count4",
-                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ORDERED_BY_DESTINATION, 4));
+                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ordered_by_dest, 4));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_dest/adj_list/",
-                knowsEdgeInfo.getAdjacentListPrefix(AdjListType.ORDERED_BY_DESTINATION));
+                knowsEdgeInfo.getAdjacentListPrefix(AdjListType.ordered_by_dest));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_dest/adj_list/chunk0",
-                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ORDERED_BY_DESTINATION, 0));
+                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ordered_by_dest, 0));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_dest/adj_list/chunk4",
-                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ORDERED_BY_DESTINATION, 4));
+                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ordered_by_dest, 4));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_dest/adj_list/offset/",
-                knowsEdgeInfo.getOffsetPrefix(AdjListType.ORDERED_BY_DESTINATION));
+                knowsEdgeInfo.getOffsetPrefix(AdjListType.ordered_by_dest));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_dest/adj_list/offset/chunk0",
-                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ORDERED_BY_DESTINATION, 0));
+                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ordered_by_dest, 0));
         Assert.assertEquals(
                 "edge/person_knows_person/ordered_by_dest/adj_list/offset/chunk4",
-                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ORDERED_BY_DESTINATION, 4));
+                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ordered_by_dest, 4));
     }
 
     @Test

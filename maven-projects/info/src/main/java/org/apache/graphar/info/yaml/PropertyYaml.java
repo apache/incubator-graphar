@@ -21,6 +21,7 @@ package org.apache.graphar.info.yaml;
 
 import java.util.Optional;
 import org.apache.graphar.info.Property;
+import org.apache.graphar.info.type.DataType;
 
 public class PropertyYaml {
     private String name;
@@ -37,7 +38,7 @@ public class PropertyYaml {
 
     public PropertyYaml(Property property) {
         this.name = property.getName();
-        this.data_type = EnumTransferUtil.dataType2String(property.getDataType());
+        this.data_type = property.getDataType().toString();
         this.is_primary = property.isPrimary();
         this.is_nullable = Optional.of(property.isNullable());
     }
@@ -45,11 +46,10 @@ public class PropertyYaml {
     Property toProperty() {
         return new Property(
                 name,
-                EnumTransferUtil.string2DataType(data_type),
+                DataType.fromString(data_type),
                 is_primary,
                 is_nullable.orElseGet(() -> !is_primary));
     }
-
     public String getName() {
         return name;
     }

@@ -19,42 +19,38 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.proto.AdjListType;
-import org.apache.graphar.proto.FileType;
+import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.FileType;
+import org.apache.graphar.info.yaml.AdjacentListYaml;
 
 public class AdjacentList {
-    private final org.apache.graphar.proto.AdjacentList protoAdjacentList;
+    private final AdjListType type;
+    private final FileType fileType;
+    private final String prefix;
 
     public AdjacentList(AdjListType type, FileType fileType, String prefix) {
-        protoAdjacentList =
-                org.apache.graphar.proto.AdjacentList.newBuilder()
-                        .setType(type)
-                        .setFileType(fileType)
-                        .setPrefix(prefix)
-                        .build();
+        this.type = type;
+        this.fileType = fileType;
+        this.prefix = prefix;
     }
 
-    private AdjacentList(org.apache.graphar.proto.AdjacentList protoAdjacentList) {
-        this.protoAdjacentList = protoAdjacentList;
-    }
-
-    public static AdjacentList ofProto(org.apache.graphar.proto.AdjacentList protoAdjacentList) {
-        return new AdjacentList(protoAdjacentList);
+    AdjacentList(AdjacentListYaml yamlParser) {
+        this.type =
+                AdjListType.fromOrderedAndAlignedBy(
+                        yamlParser.isOrdered(), yamlParser.isAligned_by());
+        this.fileType = FileType.valueOf(yamlParser.getFile_type());
+        this.prefix = yamlParser.getPrefix();
     }
 
     public AdjListType getType() {
-        return protoAdjacentList.getType();
+        return type;
     }
 
     public FileType getFileType() {
-        return protoAdjacentList.getFileType();
+        return fileType;
     }
 
     public String getPrefix() {
-        return protoAdjacentList.getPrefix();
-    }
-
-    org.apache.graphar.proto.AdjacentList getProto() {
-        return protoAdjacentList;
+        return prefix;
     }
 }
