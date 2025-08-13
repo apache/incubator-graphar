@@ -187,6 +187,14 @@ public class EdgeInfo {
         return new EdgeInfo(edgeInfoYaml);
     }
 
+    public static String concat(String srcLabel, String edgeLabel, String dstLabel) {
+        return srcLabel
+                + GeneralParams.regularSeparator
+                + edgeLabel
+                + GeneralParams.regularSeparator
+                + dstLabel;
+    }
+
     public Optional<EdgeInfo> addAdjacentListAsNew(AdjacentList adjacentList) {
         if (adjacentList == null || adjacentLists.containsKey(adjacentList.getType())) {
             return Optional.empty();
@@ -418,11 +426,7 @@ public class EdgeInfo {
         }
 
         public String getConcat() {
-            return srcType
-                    + GeneralParams.regularSeparator
-                    + edgeType
-                    + GeneralParams.regularSeparator
-                    + dstType;
+            return EdgeInfo.concat(srcType, edgeType, dstType);
         }
 
         @Override

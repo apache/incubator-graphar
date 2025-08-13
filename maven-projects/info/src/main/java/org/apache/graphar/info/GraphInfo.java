@@ -28,7 +28,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.graphar.info.yaml.GraphYaml;
-import org.apache.graphar.util.GeneralParams;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -219,7 +218,7 @@ public class GraphInfo {
     }
 
     public boolean hasEdgeInfo(String srcType, String edgeType, String dstType) {
-        return edgeConcat2EdgeInfo.containsKey(srcType + dstType + edgeType);
+        return edgeConcat2EdgeInfo.containsKey(EdgeInfo.concat(srcType, dstType, edgeType));
     }
 
     public VertexInfo getVertexInfo(String type) {
@@ -229,7 +228,7 @@ public class GraphInfo {
 
     public EdgeInfo getEdgeInfo(String srcType, String edgeType, String dstType) {
         checkEdgeExist(srcType, edgeType, dstType);
-        return edgeConcat2EdgeInfo.get(srcType + edgeType + dstType);
+        return edgeConcat2EdgeInfo.get(EdgeInfo.concat(srcType, dstType, edgeType));
     }
 
     public int getVertexInfoNum() {
@@ -288,13 +287,8 @@ public class GraphInfo {
     private void checkEdgeExist(String srcType, String dstType, String edgeType) {
         if (!hasEdgeInfo(srcType, dstType, edgeType)) {
             throw new IllegalArgumentException(
-                    "Edge type"
-                            + srcType
-                            + GeneralParams.regularSeparator
-                            + GeneralParams.regularSeparator
-                            + edgeType
-                            + GeneralParams.regularSeparator
-                            + dstType
+                    "Edge type "
+                            + EdgeInfo.concat(srcType, dstType, edgeType)
                             + " not exist in graph "
                             + getName());
         }

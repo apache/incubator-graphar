@@ -58,7 +58,7 @@ public class AdjacentListYaml {
         this.ordered = ordered;
     }
 
-    public String isAligned_by() {
+    public String getAligned_by() {
         return aligned_by;
     }
 

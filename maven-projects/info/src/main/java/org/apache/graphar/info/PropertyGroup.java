@@ -59,7 +59,7 @@ public class PropertyGroup implements Iterable<Property> {
     }
 
     public Optional<PropertyGroup> addPropertyAsNew(Property property) {
-        if (property == null || !propertyMap.containsKey(property.getName())) {
+        if (property == null || propertyMap.containsKey(property.getName())) {
             return Optional.empty();
         }
         List<Property> newPropertyMap =

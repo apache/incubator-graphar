@@ -37,8 +37,8 @@ public class AdjacentList {
     AdjacentList(AdjacentListYaml yamlParser) {
         this.type =
                 AdjListType.fromOrderedAndAlignedBy(
-                        yamlParser.isOrdered(), yamlParser.isAligned_by());
-        this.fileType = FileType.valueOf(yamlParser.getFile_type());
+                        yamlParser.isOrdered(), yamlParser.getAligned_by());
+        this.fileType = FileType.fromString(yamlParser.getFile_type());
         this.prefix = yamlParser.getPrefix();
     }
 
