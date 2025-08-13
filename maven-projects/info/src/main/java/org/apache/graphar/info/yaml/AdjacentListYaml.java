@@ -20,6 +20,7 @@
 package org.apache.graphar.info.yaml;
 
 import org.apache.graphar.info.AdjacentList;
+import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.FileType;
 
 public class AdjacentListYaml {
@@ -44,7 +45,7 @@ public class AdjacentListYaml {
 
     public AdjacentList toAdjacentList() {
         return new AdjacentList(
-                EnumTransferUtil.orderedAndAlignedBy2AdjListType(ordered, aligned_by),
+                AdjListType.fromOrderedAndAlignedBy(ordered,aligned_by),
                 FileType.fromString(file_type),
                 prefix);
     }
