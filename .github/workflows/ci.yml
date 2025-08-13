@@ -205,10 +205,6 @@ jobs:
       with:
           submodules: true
 
-    - name: Setup Debug Session
-      uses: mxschmitt/action-tmate@v3
-      timeout-minutes: 15
-
     - name: Install dependencies
       run: |
         brew bundle --file=cpp/Brewfile
