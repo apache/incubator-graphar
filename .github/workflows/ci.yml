@@ -212,7 +212,7 @@ jobs:
         pushd homebrew-core
         git fetch origin aeedb3fd9d26579140d3e59eab5e61db4bba1699
         git checkout aeedb3fd9d26579140d3e59eab5e61db4bba1699
-        brew install ./Formula/a/apache-arrow.rb
+        brew install --prefix=/opt/homebrew ./Formula/a/apache-arrow.rb
         popd
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
     
