@@ -415,9 +415,6 @@ else()
         message(FATAL_ERROR "parquet is required, please install it and retry")
     endif()
 
-    find_package(Protobuf REQUIRED)
-    include_directories(${PROTOBUF_INCLUDE_DIRS})
-
     build_graphar()
 endif()
 
