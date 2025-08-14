@@ -50,13 +50,13 @@ public class EdgeYaml {
         this.prefix = "";
         this.adj_lists = new ArrayList<>();
         this.property_groups = new ArrayList<>();
-        this.version = "v1";
+        this.version = "";
     }
 
     public EdgeYaml(EdgeInfo edgeInfo) {
-        this.src_type = edgeInfo.getSrcLabel();
-        this.edge_type = edgeInfo.getSrcLabel();
-        this.dst_type = edgeInfo.getDstLabel();
+        this.src_type = edgeInfo.getSrcType();
+        this.edge_type = edgeInfo.getEdgeType();
+        this.dst_type = edgeInfo.getDstType();
         this.chunk_size = edgeInfo.getChunkSize();
         this.src_chunk_size = edgeInfo.getSrcChunkSize();
         this.dst_chunk_size = edgeInfo.getDstChunkSize();

@@ -92,6 +92,11 @@ public class GraphYaml {
                 graphInfo.getEdgeInfos().stream()
                         .map(edgeInfo -> edgeInfo.getConcat() + ".edge.yaml")
                         .collect(Collectors.toList());
+        this.version =
+                Optional.of(graphInfo)
+                        .map(GraphInfo::getVersion)
+                        .map(VersionInfo::toString)
+                        .orElse(null);
     }
 
     public static DumperOptions getDumperOptions() {

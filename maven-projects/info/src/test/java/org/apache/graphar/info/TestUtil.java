@@ -20,9 +20,9 @@
 package org.apache.graphar.info;
 
 import java.util.List;
-import org.apache.graphar.proto.AdjListType;
-import org.apache.graphar.proto.DataType;
-import org.apache.graphar.proto.FileType;
+import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.DataType;
+import org.apache.graphar.info.type.FileType;
 import org.junit.Assume;
 
 public class TestUtil {
@@ -106,10 +106,9 @@ public class TestUtil {
         //        is_primary: false
         // version: gar/v1
         AdjacentList orderedBySource =
-                new AdjacentList(AdjListType.ORDERED_BY_SOURCE, FileType.CSV, "ordered_by_source/");
+                new AdjacentList(AdjListType.ordered_by_source, FileType.CSV, "ordered_by_source/");
         AdjacentList orderedByDest =
-                new AdjacentList(
-                        AdjListType.ORDERED_BY_DESTINATION, FileType.CSV, "ordered_by_dest/");
+                new AdjacentList(AdjListType.ordered_by_dest, FileType.CSV, "ordered_by_dest/");
         Property creationDate = new Property("creationDate", DataType.STRING, false, false);
         PropertyGroup pg3 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
         EdgeInfo knows =
