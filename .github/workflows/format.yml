@@ -42,7 +42,6 @@ concurrency:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
     steps:
       - uses: actions/checkout@v4
         with:

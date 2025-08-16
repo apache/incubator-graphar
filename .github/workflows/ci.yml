@@ -42,11 +42,10 @@ jobs:
     # TODO use ubuntu-latest
     name: Ubuntu 22.04 C++
     runs-on: ubuntu-22.04
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && !github.event.pull_request.draft }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
           submodules: true
 
