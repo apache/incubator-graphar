@@ -552,7 +552,7 @@ class EdgeIter {
 
   /** Construct and return the edge of the current offset. */
   Edge operator*() {
-    // Ensure all readers are synchronized with current vertex chunk and offset
+    // Ensure readers are synchronized with current vertex chunk and offset
     adj_list_reader_.seek_chunk_index(vertex_chunk_index_);
     adj_list_reader_.seek(cur_offset_);
     for (auto& reader : property_readers_) {
@@ -573,7 +573,7 @@ class EdgeIter {
   Result<T> property(const std::string& property) noexcept {
     std::shared_ptr<arrow::ChunkedArray> column(nullptr);
     for (auto& reader : property_readers_) {
-      // Ensure reader is synchronized with current vertex chunk before seeking
+      // Synchronize reader with current vertex chunk before seeking
       reader.seek_chunk_index(vertex_chunk_index_);
       reader.seek(cur_offset_);
       GAR_ASSIGN_OR_RAISE(auto chunk_table, reader.GetChunk());
@@ -626,13 +626,13 @@ class EdgeIter {
         for (auto& reader : property_readers_) {
           auto reader_st = reader.next_chunk();
           if (!reader_st.ok()) {
-            // If property reader fails to advance, ensure it's at least
-            // synchronized with the current vertex chunk
+            // If property reader fails to advance, ensure it's synchronized
+            // with the current vertex chunk
             reader.seek_chunk_index(vertex_chunk_index_);
           }
         }
       } else {
-        // Even if adjacency list reader fails, ensure property readers
+        // Even if adjacency reader fails, ensure property readers
         // are synchronized to avoid stale state
         for (auto& reader : property_readers_) {
           reader.seek_chunk_index(vertex_chunk_index_);
