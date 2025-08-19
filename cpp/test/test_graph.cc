@@ -190,6 +190,107 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
         EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
                               AdjListType::unordered_by_dest);
     REQUIRE(expect4.status().IsInvalid());
+
+    // EdgeIter synchronization tests - prevent regression of property misalignment bug
+    // These tests ensure property readers stay synchronized with iterator state
+    INFO("Testing EdgeIter synchronization to prevent property misalignment");
+    
+    // Test 1: Sequential vs segmented iteration consistency
+    // Original bug: segmented iteration could return different results than sequential
+    std::vector<std::string> reference_dates;
+    std::vector<IdType> reference_sources;
+    auto it_ref = edges2->begin();
+    const size_t SYNC_TEST_SIZE = std::min(static_cast<size_t>(50), edges2->size());
+    
+    // Collect reference data with sequential iteration
+    for (size_t i = 0; i < SYNC_TEST_SIZE && it_ref != edges2->end(); ++i, ++it_ref) {
+      reference_dates.push_back(it_ref.property<std::string>("creationDate").value());
+      reference_sources.push_back(it_ref.source());
+    }
+    
+    // Verify segmented iteration returns same results
+    for (size_t target_pos = 0; target_pos < SYNC_TEST_SIZE; ++target_pos) {
+      auto it_seg = edges2->begin();
+      for (size_t pos = 0; pos < target_pos && it_seg != edges2->end(); ++pos, ++it_seg) {}
+      
+      if (it_seg != edges2->end()) {
+        REQUIRE(it_seg.property<std::string>("creationDate").value() == reference_dates[target_pos]);
+        REQUIRE(it_seg.source() == reference_sources[target_pos]);
+      }
+    }
+    
+    // Test 2: Multiple property access consistency
+    // Original bug: repeated property() calls could return different values
+    auto it_multi = edges2->begin();
+    for (int i = 0; i < 20 && it_multi != edges2->end(); ++i, ++it_multi) {
+      auto date1 = it_multi.property<std::string>("creationDate").value();
+      auto date2 = it_multi.property<std::string>("creationDate").value();
+      auto date3 = it_multi.property<std::string>("creationDate").value();
+      
+      REQUIRE(date1 == date2);
+      REQUIRE(date2 == date3);
+    }
+    
+    // Test 3: Iterator property vs Edge property consistency
+    // Original bug: it.property() and (*it).property() could diverge
+    auto it_consistency = edges2->begin();
+    for (int i = 0; i < 20 && it_consistency != edges2->end(); ++i, ++it_consistency) {
+      auto iter_date = it_consistency.property<std::string>("creationDate").value();
+      auto edge = *it_consistency;
+      auto edge_date = edge.property<std::string>("creationDate").value();
+      
+      REQUIRE(iter_date == edge_date);
+      REQUIRE(it_consistency.source() == edge.source());
+      REQUIRE(it_consistency.destination() == edge.destination());
+    }
+    
+    // Test 4: Multiple iterator independence
+    // Original bug: shared property readers could cause cross-contamination
+    auto it1 = edges2->begin();
+    auto it2 = edges2->begin();
+    
+    // Advance iterators to different positions
+    for (int i = 0; i < 5 && it1 != edges2->end(); ++i, ++it1) {}
+    for (int i = 0; i < 15 && it2 != edges2->end(); ++i, ++it2) {}
+    
+    if (it1 != edges2->end() && it2 != edges2->end()) {
+      auto date1_before = it1.property<std::string>("creationDate").value();
+      
+      // Access it2's properties (this could affect it1 if readers are shared)
+      volatile auto temp_date2 = it2.property<std::string>("creationDate").value();
+      volatile auto temp_src2 = it2.source();
+      (void)temp_date2; (void)temp_src2;
+      
+      // Verify it1's state hasn't changed
+      auto date1_after = it1.property<std::string>("creationDate").value();
+      REQUIRE(date1_before == date1_after);
+    }
+    
+    // Test 5: Chunk boundary behavior
+    // Original bug: crossing chunk boundaries could cause sync issues
+    auto it_boundary = edges2->begin();
+    std::string last_date;
+    size_t boundary_count = 0;
+    const size_t MAX_BOUNDARY_TEST = std::min(static_cast<size_t>(100), edges2->size());
+    
+    while (it_boundary != edges2->end() && boundary_count < MAX_BOUNDARY_TEST) {
+      // Each position should have consistent property access
+      auto current_date = it_boundary.property<std::string>("creationDate").value();
+      auto repeat_date = it_boundary.property<std::string>("creationDate").value();
+      
+      REQUIRE(current_date == repeat_date);
+      
+      // Verify edge object consistency
+      auto edge = *it_boundary;
+      auto edge_date = edge.property<std::string>("creationDate").value();
+      REQUIRE(current_date == edge_date);
+      
+      last_date = current_date;
+      ++it_boundary;
+      ++boundary_count;
+    }
+    
+    REQUIRE(boundary_count > 0); // Ensure we actually tested something
   }
 
   SECTION("ValidateProperty") {
