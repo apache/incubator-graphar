@@ -224,8 +224,9 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
 
   SECTION("EdgeIterator") {
     std::string src_type = "person", edge_type = "knows", dst_type = "person";
-    auto expect = EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
-                                       AdjListType::ordered_by_source);
+    auto expect =
+        EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
+                              AdjListType::ordered_by_source);
     REQUIRE(!expect.has_error());
     auto edges = expect.value();
 
@@ -233,7 +234,7 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
     auto begin = edges->begin();
     auto end = edges->end();
     size_t count = 0;
-    
+
     // Iterate through first 2000 edges
     for (auto it = begin; it != end; ++it) {
       if (count >= 2000) {

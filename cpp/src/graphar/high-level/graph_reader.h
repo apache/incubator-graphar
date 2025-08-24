@@ -609,7 +609,8 @@ class EdgeIter {
       GAR_ASSIGN_OR_RAISE_ERROR(num_row_of_chunk_,
                                 adj_list_reader_.GetRowNumOfChunk());
       ++global_chunk_index_;
-      // The reader also need to be updated at the boundaries of chunks of size chunk_size.
+      // The reader also need to be updated at the boundaries of chunks of size
+      // chunk_size.
       for (auto& reader : property_readers_) {
         reader.next_chunk();
       }
