@@ -26,6 +26,7 @@
 
 #include "arrow/api.h"
 #include "graphar/label.h"
+#include "graphar/util.h"
 #include "graphar/writer_util.h"
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
@@ -140,11 +141,8 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     std::shared_ptr<arrow::Table> table1 = maybe_table.ValueOrDie();
 
     // Open Parquet file reader
-    auto fs2 = arrow::fs::FileSystemFromUriOrPath(path2).ValueOrDie();
-    std::shared_ptr<arrow::io::RandomAccessFile> input2 =
-        fs2->OpenInputFile(path2).ValueOrDie();
     std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
-    st = parquet::arrow::OpenFile(input2, pool, &arrow_reader);
+    st = graphar::util::OpenParquetArrowReader(path2, pool, arrow_reader);
 
     // Read entire file as a single Arrow table
     std::shared_ptr<arrow::Table> table2;
@@ -215,13 +213,9 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     // read parquet file
     std::string parquet_file =
         "/tmp/option/vertex/person/firstName_lastName_gender/chunk0";
-    auto parquet_fs =
-        arrow::fs::FileSystemFromUriOrPath(parquet_file).ValueOrDie();
-    std::shared_ptr<arrow::io::RandomAccessFile> parquet_input =
-        parquet_fs->OpenInputFile(parquet_file).ValueOrDie();
     std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
-    auto st = parquet::arrow::OpenFile(
-        parquet_input, arrow::default_memory_pool(), &parquet_reader);
+    auto st = graphar::util::OpenParquetArrowReader(
+        parquet_file, arrow::default_memory_pool(), parquet_reader);
     REQUIRE(st.ok());
     std::shared_ptr<arrow::Table> parquet_table;
     st = parquet_reader->ReadTable(&parquet_table);
@@ -283,11 +277,8 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
   std::string path = test_data_dir +
                      "/ldbc_sample/parquet/edge/person_knows_person/"
                      "unordered_by_source/adj_list/part0/chunk0";
-  auto fs = arrow::fs::FileSystemFromUriOrPath(path).ValueOrDie();
-  std::shared_ptr<arrow::io::RandomAccessFile> input =
-      fs->OpenInputFile(path).ValueOrDie();
   std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
-  st = parquet::arrow::OpenFile(input, pool, &arrow_reader);
+  st = graphar::util::OpenParquetArrowReader(path, pool, arrow_reader);
   // Read entire file as a single Arrow table
   std::shared_ptr<arrow::Table> maybe_table;
   st = arrow_reader->ReadTable(&maybe_table);
@@ -326,6 +317,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     // Write number of vertices
     REQUIRE(writer->WriteVerticesNum(903).ok());
 
+    auto fs = arrow::fs::FileSystemFromUriOrPath("/tmp/edge/").ValueOrDie();
     // Check the number of edges
     std::shared_ptr<arrow::io::InputStream> input2 =
         fs->OpenInputStream(
@@ -395,6 +387,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     auto parse_options = arrow::csv::ParseOptions::Defaults();
     parse_options.delimiter = '|';
     auto read_options = arrow::csv::ReadOptions::Defaults();
+    auto fs = arrow::fs::FileSystemFromUriOrPath("/tmp/option/").ValueOrDie();
     std::shared_ptr<arrow::io::InputStream> chunk0_input =
         fs->OpenInputStream(
               "/tmp/option/edge/person_knows_person/ordered_by_source/adj_list/"
@@ -432,13 +425,9 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     std::string parquet_file =
         "/tmp/option/edge/person_knows_person/ordered_by_source/adj_list/part0/"
         "chunk0";
-    auto parquet_fs =
-        arrow::fs::FileSystemFromUriOrPath(parquet_file).ValueOrDie();
-    std::shared_ptr<arrow::io::RandomAccessFile> parquet_input =
-        parquet_fs->OpenInputFile(parquet_file).ValueOrDie();
     std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
-    auto st = parquet::arrow::OpenFile(
-        parquet_input, arrow::default_memory_pool(), &parquet_reader);
+    auto st = graphar::util::OpenParquetArrowReader(
+        parquet_file, arrow::default_memory_pool(), parquet_reader);
     REQUIRE(st.ok());
     std::shared_ptr<arrow::Table> parquet_table;
     st = parquet_reader->ReadTable(&parquet_table);

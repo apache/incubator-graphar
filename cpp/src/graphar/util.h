@@ -26,7 +26,16 @@
 #include <vector>
 
 #include "graphar/result.h"
+#include "graphar/status.h"
 
+#include "arrow/api.h"
+#include "arrow/csv/api.h"
+#include "arrow/filesystem/api.h"
+#include "arrow/io/api.h"
+#include "arrow/stl.h"
+#include "arrow/util/uri.h"
+#include "parquet/arrow/reader.h"
+#include "parquet/arrow/writer.h"
 #define REGULAR_SEPARATOR "_"
 
 // forward declarations
@@ -249,5 +258,18 @@ template <>
 struct ValueGetter<std::string> {
   static std::string Value(const void* data, int64_t offset);
 };
+
+static inline arrow::Status OpenParquetArrowReader(
+    const std::string& file_path, arrow::MemoryPool* pool,
+    std::unique_ptr<parquet::arrow::FileReader>& parquet_reader) {
+  std::shared_ptr<arrow::io::RandomAccessFile> input;
+  ARROW_ASSIGN_OR_RAISE(input, arrow::io::ReadableFile::Open(file_path));
+#if defined(ARROW_VERSION) && ARROW_VERSION <= 20000000
+  ARROW_RETURN_NOT_OK(parquet::arrow::OpenFile(input, pool, &parquet_reader));
+#else
+  ARROW_ASSIGN_OR_RAISE(parquet_reader, parquet::arrow::OpenFile(input, pool));
+#endif
+  return arrow::Status::OK();
+}
 
 }  // namespace graphar::util

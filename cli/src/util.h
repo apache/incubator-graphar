@@ -76,14 +76,10 @@ std::shared_ptr<arrow::Table> SelectColumns(
 std::shared_ptr<arrow::Table> GetDataFromParquetFile(
     const std::string& path, const std::vector<std::string>& column_names) {
   // Open the Parquet file
-  auto infile =
-      arrow::io::ReadableFile::Open(path, arrow::default_memory_pool())
-          .ValueOrDie();
-
   // Create a Parquet FileReader
   std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
-  auto status = parquet::arrow::OpenFile(infile, arrow::default_memory_pool(),
-                                         &parquet_reader);
+  auto status = graphar::util::OpenParquetArrowReader(
+      path, arrow::default_memory_pool(), parquet_reader);
   if (!status.ok()) {
     throw std::runtime_error("Failed to create Parquet FileReader: " +
                              status.ToString());
