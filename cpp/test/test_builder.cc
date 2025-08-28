@@ -134,7 +134,7 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   auto parquet_file = "/tmp/vertex/person/id/chunk0";
   std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
   REQUIRE(graphar::util::OpenParquetArrowReader(
-              parquet_file, arrow::default_memory_pool(), parquet_reader)
+              parquet_file, arrow::default_memory_pool(), &parquet_reader)
               .ok());
   std::shared_ptr<arrow::Table> parquet_table;
   REQUIRE(parquet_reader->ReadTable(&parquet_table).ok());
@@ -236,8 +236,9 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
   auto parquet_file =
       "/tmp/edge/person_knows_person/ordered_by_dest/creationDate/part0/chunk0";
   std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
-  REQUIRE(graphar::util::OpenParquetArrowReader(parquet_file, arrow::default_memory_pool(),
-                                     parquet_reader).ok());
+  REQUIRE(graphar::util::OpenParquetArrowReader(
+              parquet_file, arrow::default_memory_pool(), &parquet_reader)
+              .ok());
   std::shared_ptr<arrow::Table> parquet_table;
   REQUIRE(parquet_reader->ReadTable(&parquet_table).ok());
   auto parquet_metadata = parquet_reader->parquet_reader()->metadata();

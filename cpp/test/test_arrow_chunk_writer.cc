@@ -142,7 +142,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
 
     // Open Parquet file reader
     std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
-    st = graphar::util::OpenParquetArrowReader(path2, pool, arrow_reader);
+    st = graphar::util::OpenParquetArrowReader(path2, pool, &arrow_reader);
 
     // Read entire file as a single Arrow table
     std::shared_ptr<arrow::Table> table2;
@@ -215,7 +215,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
         "/tmp/option/vertex/person/firstName_lastName_gender/chunk0";
     std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
     auto st = graphar::util::OpenParquetArrowReader(
-        parquet_file, arrow::default_memory_pool(), parquet_reader);
+        parquet_file, arrow::default_memory_pool(), &parquet_reader);
     REQUIRE(st.ok());
     std::shared_ptr<arrow::Table> parquet_table;
     st = parquet_reader->ReadTable(&parquet_table);
@@ -278,7 +278,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
                      "/ldbc_sample/parquet/edge/person_knows_person/"
                      "unordered_by_source/adj_list/part0/chunk0";
   std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
-  st = graphar::util::OpenParquetArrowReader(path, pool, arrow_reader);
+  st = graphar::util::OpenParquetArrowReader(path, pool, &arrow_reader);
   // Read entire file as a single Arrow table
   std::shared_ptr<arrow::Table> maybe_table;
   st = arrow_reader->ReadTable(&maybe_table);
@@ -427,7 +427,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
         "chunk0";
     std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
     auto st = graphar::util::OpenParquetArrowReader(
-        parquet_file, arrow::default_memory_pool(), parquet_reader);
+        parquet_file, arrow::default_memory_pool(), &parquet_reader);
     REQUIRE(st.ok());
     std::shared_ptr<arrow::Table> parquet_table;
     st = parquet_reader->ReadTable(&parquet_table);

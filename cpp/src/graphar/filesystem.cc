@@ -23,9 +23,9 @@
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
 #endif
+#include <arrow/compute/api.h>
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
-#include <arrow/compute/api.h>
 #include "arrow/dataset/api.h"
 #include "parquet/arrow/reader.h"
 #if defined(ARROW_VERSION) && ARROW_VERSION <= 12000000

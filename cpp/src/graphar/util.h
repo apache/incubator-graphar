@@ -261,13 +261,14 @@ struct ValueGetter<std::string> {
 
 static inline arrow::Status OpenParquetArrowReader(
     const std::string& file_path, arrow::MemoryPool* pool,
-    std::unique_ptr<parquet::arrow::FileReader>& parquet_reader) {
+    std::unique_ptr<parquet::arrow::FileReader>* parquet_reader) {
   std::shared_ptr<arrow::io::RandomAccessFile> input;
   ARROW_ASSIGN_OR_RAISE(input, arrow::io::ReadableFile::Open(file_path));
 #if defined(ARROW_VERSION) && ARROW_VERSION <= 20000000
-  ARROW_RETURN_NOT_OK(parquet::arrow::OpenFile(input, pool, &parquet_reader));
+  ARROW_RETURN_NOT_OK(parquet::arrow::OpenFile(input, pool, parquet_reader));
 #else
-  ARROW_ASSIGN_OR_RAISE(parquet_reader, parquet::arrow::OpenFile(input, pool));
+  ARROW_ASSIGN_OR_RAISE(auto reader, parquet::arrow::OpenFile(input, pool));
+  *parquet_reader = std::move(reader);
 #endif
   return arrow::Status::OK();
 }

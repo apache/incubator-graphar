@@ -79,7 +79,7 @@ std::shared_ptr<arrow::Table> GetDataFromParquetFile(
   // Create a Parquet FileReader
   std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
   auto status = graphar::util::OpenParquetArrowReader(
-      path, arrow::default_memory_pool(), parquet_reader);
+      path, arrow::default_memory_pool(), &parquet_reader);
   if (!status.ok()) {
     throw std::runtime_error("Failed to create Parquet FileReader: " +
                              status.ToString());

@@ -17,11 +17,11 @@
  * under the License.
  */
 
+#include <arrow/acero/api.h>
 #include <cstddef>
 #include <iostream>
 #include <unordered_map>
 #include <utility>
-#include <arrow/acero/api.h>
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
 #include "graphar/fwd.h"
