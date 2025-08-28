@@ -208,12 +208,6 @@ jobs:
     - name: Install dependencies
       run: |
         brew bundle --file=cpp/Brewfile
-        git clone https://github.com/Homebrew/homebrew-core.git --depth 1 
-        pushd homebrew-core
-        git fetch origin b76848f98196f6dd9d3c4e6f71d030da84d22ce8
-        git checkout b76848f98196f6dd9d3c4e6f71d030da84d22ce8
-        brew install ./Formula/a/apache-arrow.rb
-        popd
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
     
     - name: Build GraphAr

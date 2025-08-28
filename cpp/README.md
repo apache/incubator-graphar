@@ -56,14 +56,6 @@ On macOS, you can use [Homebrew](https://brew.sh) to install the required packag
 ```bash
 brew update && brew bundle --file=cpp/Brewfile
 ```
-and run the following command to install the Arrow 20.0.0_1 C++ libraries:
-```bash
-git clone https://github.com/Homebrew/homebrew-core.git --depth 1 
-cd homebrew-core
-git fetch origin b76848f98196f6dd9d3c4e6f71d030da84d22ce8
-git checkout b76848f98196f6dd9d3c4e6f71d030da84d22ce8
-brew install ./Formula/a/apache-arrow.rb
-```
 
 > [!NOTE]
 > Currently, the Arrow C++ library has [disabled ARROW_ORC](https://github.com/Homebrew/homebrew-core/blob/4588359b7248b07379094de5310ee7ff89afa17e/Formula/a/apache-arrow.rb#L53) in the brew formula, so you need to build and install the Arrow C++ library manually (with `-DARROW_ORC=True`).
