@@ -18,9 +18,10 @@
  */
 
 #include <cstddef>
+#include <iostream>
 #include <unordered_map>
 #include <utility>
-
+#include <arrow/acero/api.h>
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
 #include "graphar/fwd.h"
@@ -1005,6 +1006,9 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::getOffsetTable(
 Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::sortTable(
     const std::shared_ptr<arrow::Table>& input_table,
     const std::string& column_name) {
+#if ARROW_VERSION >= 21000000
+  RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+#endif
   auto exec_context = arrow::compute::default_exec_context();
   auto plan = arrow_acero_namespace::ExecPlan::Make(exec_context).ValueOrDie();
   auto table_source_options =
