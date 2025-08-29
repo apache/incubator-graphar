@@ -17,11 +17,13 @@
  * under the License.
  */
 
+#include <iostream>
 #include <memory>
 #include "graphar/writer_util.h"
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
 #endif
+#include <arrow/compute/api.h>
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
@@ -147,7 +149,9 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
                         arrow::dataset::FileSystemFactoryOptions()));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto dataset, factory->Finish());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
-
+#if ARROW_VERSION >= 21000000
+  RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+#endif
   // Apply the row filter and select the specified columns
   if (options.filter) {
     GAR_ASSIGN_OR_RAISE(auto filter, options.filter->Evaluate());

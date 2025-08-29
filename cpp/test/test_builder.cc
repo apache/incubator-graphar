@@ -30,6 +30,7 @@
 #include "arrow/io/api.h"
 #include "arrow/stl.h"
 #include "arrow/util/uri.h"
+#include "graphar/util.h"
 #include "parquet/arrow/reader.h"
 #include "parquet/arrow/writer.h"
 
@@ -131,13 +132,9 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   REQUIRE((*ptr) == start_index + builder->GetNum());
   // check parquet file compression
   auto parquet_file = "/tmp/vertex/person/id/chunk0";
-  auto parquet_fs =
-      arrow::fs::FileSystemFromUriOrPath(parquet_file).ValueOrDie();
-  std::shared_ptr<arrow::io::RandomAccessFile> parquet_input =
-      parquet_fs->OpenInputFile(parquet_file).ValueOrDie();
   std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
-  REQUIRE(parquet::arrow::OpenFile(parquet_input, arrow::default_memory_pool(),
-                                   &parquet_reader)
+  REQUIRE(graphar::util::OpenParquetArrowReader(
+              parquet_file, arrow::default_memory_pool(), &parquet_reader)
               .ok());
   std::shared_ptr<arrow::Table> parquet_table;
   REQUIRE(parquet_reader->ReadTable(&parquet_table).ok());
@@ -238,13 +235,9 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
   // check parquet file compression
   auto parquet_file =
       "/tmp/edge/person_knows_person/ordered_by_dest/creationDate/part0/chunk0";
-  auto parquet_fs =
-      arrow::fs::FileSystemFromUriOrPath(parquet_file).ValueOrDie();
-  std::shared_ptr<arrow::io::RandomAccessFile> parquet_input =
-      parquet_fs->OpenInputFile(parquet_file).ValueOrDie();
   std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
-  REQUIRE(parquet::arrow::OpenFile(parquet_input, arrow::default_memory_pool(),
-                                   &parquet_reader)
+  REQUIRE(graphar::util::OpenParquetArrowReader(
+              parquet_file, arrow::default_memory_pool(), &parquet_reader)
               .ok());
   std::shared_ptr<arrow::Table> parquet_table;
   REQUIRE(parquet_reader->ReadTable(&parquet_table).ok());
