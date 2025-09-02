@@ -19,54 +19,64 @@
 
 package org.apache.graphar.info;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Comparator;
 import org.apache.graphar.info.saver.GraphSaver;
 import org.apache.graphar.info.saver.LocalYamlGraphSaver;
-import org.junit.Assert;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
-public class GraphSaverTest {
+public class GraphSaverTest extends BaseFileSystemTest {
+
+    private String testSaveDirectory;
+    private GraphSaver graphSaver;
+    private GraphInfo testGraphInfo;
+
+    @Before
+    public void setUp() {
+        verifyTestPrerequisites();
+        testSaveDirectory = createCleanTestDirectory("ldbc_sample");
+        graphSaver = new LocalYamlGraphSaver();
+        testGraphInfo = TestDataFactory.createSampleGraphInfo();
+    }
+
+    @After
+    public void tearDown() {
+        // Clean up test directory after each test
+        cleanupDirectory(testSaveDirectory);
+    }
 
     @Test
     public void testSave() {
-        final String LDBC_SAMPLE_SAVE_DIR = TestUtil.SAVE_DIR + "/ldbc_sample/";
-
-        // Clean up any existing test files
         try {
-            Path saveDir = Paths.get(LDBC_SAMPLE_SAVE_DIR);
-            if (Files.exists(saveDir)) {
-                Files.walk(saveDir)
-                        .sorted(Comparator.reverseOrder())
-                        .map(Path::toFile)
-                        .forEach(File::delete);
-            }
+            graphSaver.save(testSaveDirectory, testGraphInfo);
+            TestVerificationUtils.verifyGraphInfoFilesSaved(testSaveDirectory, testGraphInfo);
         } catch (Exception e) {
-            // Ignore cleanup errors
+            throw new RuntimeException("Failed to save graph info", e);
         }
+    }
 
-        final GraphSaver graphSaver = new LocalYamlGraphSaver();
-        final GraphInfo graphInfo = TestUtil.getLdbcSampleDataSet();
+    @Test
+    public void testSaveMinimalGraph() {
+        GraphInfo minimalGraph = TestDataFactory.createMinimalGraphInfo();
         try {
-            graphSaver.save(LDBC_SAMPLE_SAVE_DIR, graphInfo);
-            Assert.assertTrue(
-                    new File(LDBC_SAMPLE_SAVE_DIR + "/" + graphInfo.getName() + ".graph.yaml")
-                            .exists());
-            for (VertexInfo vertexInfo : graphInfo.getVertexInfos()) {
-                Assert.assertTrue(
-                        new File(LDBC_SAMPLE_SAVE_DIR + "/" + vertexInfo.getType() + ".vertex.yaml")
-                                .exists());
-            }
-            for (EdgeInfo edgeInfo : graphInfo.getEdgeInfos()) {
-                Assert.assertTrue(
-                        new File(LDBC_SAMPLE_SAVE_DIR + "/" + edgeInfo.getConcat() + ".edge.yaml")
-                                .exists());
-            }
+            graphSaver.save(testSaveDirectory, minimalGraph);
+            TestVerificationUtils.verifyGraphFileExists(testSaveDirectory, minimalGraph);
+            TestVerificationUtils.verifyVertexFilesExist(testSaveDirectory, minimalGraph);
+            // No edge files expected for minimal graph
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to save minimal graph info", e);
+        }
+    }
+
+    @Test
+    public void testSaveDirectoryCreation() {
+        String nestedDir = testSaveDirectory + "/nested/deep/directory";
+        try {
+            graphSaver.save(nestedDir, testGraphInfo);
+            TestVerificationUtils.verifyDirectoryHasFiles(nestedDir);
+            TestVerificationUtils.verifyGraphInfoFilesSaved(nestedDir, testGraphInfo);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save to nested directory", e);
         }
     }
 }

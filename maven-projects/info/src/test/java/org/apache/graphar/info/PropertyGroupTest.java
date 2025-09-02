@@ -26,47 +26,67 @@ import java.util.Optional;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class PropertyGroupTest {
 
+    private Property idProperty;
+    private Property nameProperty;
+    private Property testProperty;
+    private PropertyGroup basicGroup;
+    private PropertyGroup singlePropertyGroup;
+    private PropertyGroup emptyGroup;
+
+    @Before
+    public void setUp() {
+        idProperty = TestDataFactory.createIdProperty();
+        nameProperty = TestDataFactory.createProperty("name", DataType.STRING, false, true);
+        testProperty = TestDataFactory.createProperty("test", DataType.STRING, false, true);
+
+        basicGroup =
+                TestDataFactory.createPropertyGroup(
+                        Arrays.asList(idProperty, nameProperty), FileType.CSV, "test/");
+        singlePropertyGroup =
+                TestDataFactory.createPropertyGroup(
+                        Arrays.asList(testProperty), FileType.PARQUET, "single/");
+        emptyGroup = TestDataFactory.createPropertyGroup(new ArrayList<>(), FileType.CSV, "empty/");
+    }
+
     @Test
     public void testPropertyGroupBasicConstruction() {
-        Property id = new Property("id", DataType.INT32, true, false);
-        Property name = new Property("name", DataType.STRING, false, true);
-        List<Property> properties = Arrays.asList(id, name);
-
-        PropertyGroup pg = new PropertyGroup(properties, FileType.CSV, "test/");
-
-        Assert.assertEquals(2, pg.size());
-        Assert.assertEquals(FileType.CSV, pg.getFileType());
-        Assert.assertEquals("test/", pg.getPrefix());
-        Assert.assertEquals(properties, pg.getPropertyList());
+        Assert.assertEquals(2, basicGroup.size());
+        Assert.assertEquals(FileType.CSV, basicGroup.getFileType());
+        Assert.assertEquals("test/", basicGroup.getPrefix());
+        Assert.assertEquals(Arrays.asList(idProperty, nameProperty), basicGroup.getPropertyList());
     }
 
     @Test
     public void testPropertyGroupWithAllFileTypes() {
-        Property prop = new Property("test", DataType.STRING, false, true);
-        List<Property> properties = Arrays.asList(prop);
+        List<Property> properties = Arrays.asList(testProperty);
 
-        PropertyGroup csvGroup = new PropertyGroup(properties, FileType.CSV, "csv/");
+        PropertyGroup csvGroup =
+                TestDataFactory.createPropertyGroup(properties, FileType.CSV, "csv/");
         Assert.assertEquals(FileType.CSV, csvGroup.getFileType());
 
-        PropertyGroup parquetGroup = new PropertyGroup(properties, FileType.PARQUET, "parquet/");
+        PropertyGroup parquetGroup =
+                TestDataFactory.createPropertyGroup(properties, FileType.PARQUET, "parquet/");
         Assert.assertEquals(FileType.PARQUET, parquetGroup.getFileType());
 
-        PropertyGroup orcGroup = new PropertyGroup(properties, FileType.ORC, "orc/");
+        PropertyGroup orcGroup =
+                TestDataFactory.createPropertyGroup(properties, FileType.ORC, "orc/");
         Assert.assertEquals(FileType.ORC, orcGroup.getFileType());
     }
 
     @Test
     public void testPropertyGroupIteration() {
-        Property prop1 = new Property("prop1", DataType.INT32, false, false);
-        Property prop2 = new Property("prop2", DataType.STRING, false, true);
-        Property prop3 = new Property("prop3", DataType.DOUBLE, false, true);
+        Property prop1 = TestDataFactory.createProperty("prop1", DataType.INT32, false, false);
+        Property prop2 = TestDataFactory.createProperty("prop2", DataType.STRING, false, true);
+        Property prop3 = TestDataFactory.createProperty("prop3", DataType.DOUBLE, false, true);
         List<Property> properties = Arrays.asList(prop1, prop2, prop3);
 
-        PropertyGroup pg = new PropertyGroup(properties, FileType.PARQUET, "test/");
+        PropertyGroup pg =
+                TestDataFactory.createPropertyGroup(properties, FileType.PARQUET, "test/");
 
         int count = 0;
         for (Property prop : pg) {
@@ -78,12 +98,14 @@ public class PropertyGroupTest {
 
     @Test
     public void testPropertyGroupToString() {
-        Property id = new Property("id", DataType.INT64, true, false);
-        Property firstName = new Property("firstName", DataType.STRING, false, true);
-        Property lastName = new Property("lastName", DataType.STRING, false, true);
+        Property id = TestDataFactory.createProperty("id", DataType.INT64, true, false);
+        Property firstName =
+                TestDataFactory.createProperty("firstName", DataType.STRING, false, true);
+        Property lastName =
+                TestDataFactory.createProperty("lastName", DataType.STRING, false, true);
         List<Property> properties = Arrays.asList(id, firstName, lastName);
 
-        PropertyGroup pg = new PropertyGroup(properties, FileType.CSV, "names/");
+        PropertyGroup pg = TestDataFactory.createPropertyGroup(properties, FileType.CSV, "names/");
 
         String result = pg.toString();
         Assert.assertTrue(result.contains("id"));
@@ -95,34 +117,24 @@ public class PropertyGroupTest {
 
     @Test
     public void testPropertyGroupWithSingleProperty() {
-        Property singleProp = new Property("single", DataType.BOOL, false, false);
-        List<Property> properties = Arrays.asList(singleProp);
-
-        PropertyGroup pg = new PropertyGroup(properties, FileType.PARQUET, "single/");
-
-        Assert.assertEquals(1, pg.size());
-        Assert.assertEquals("single", pg.toString());
-        Assert.assertEquals(singleProp, pg.getPropertyList().get(0));
+        Assert.assertEquals(1, singlePropertyGroup.size());
+        Assert.assertEquals("test", singlePropertyGroup.toString());
+        Assert.assertEquals(testProperty, singlePropertyGroup.getPropertyList().get(0));
     }
 
     @Test
     public void testPropertyGroupWithEmptyList() {
-        List<Property> emptyProperties = new ArrayList<>();
-
-        PropertyGroup pg = new PropertyGroup(emptyProperties, FileType.CSV, "empty/");
-
-        Assert.assertEquals(0, pg.size());
-        Assert.assertTrue(pg.getPropertyList().isEmpty());
-        Assert.assertTrue(pg.getPropertyMap().isEmpty());
-        Assert.assertEquals("", pg.toString());
+        Assert.assertEquals(0, emptyGroup.size());
+        Assert.assertTrue(emptyGroup.getPropertyList().isEmpty());
+        Assert.assertTrue(emptyGroup.getPropertyMap().isEmpty());
+        Assert.assertEquals("", emptyGroup.toString());
     }
 
     @Test
     public void testPropertyGroupWithNullPrefix() {
-        Property prop = new Property("test", DataType.STRING, false, true);
-        List<Property> properties = Arrays.asList(prop);
-
-        PropertyGroup pg = new PropertyGroup(properties, FileType.CSV, null);
+        PropertyGroup pg =
+                TestDataFactory.createPropertyGroup(
+                        Arrays.asList(testProperty), FileType.CSV, null);
 
         Assert.assertEquals(1, pg.size());
         Assert.assertNull(pg.getPrefix());
@@ -130,10 +142,8 @@ public class PropertyGroupTest {
 
     @Test
     public void testPropertyGroupWithEmptyPrefix() {
-        Property prop = new Property("test", DataType.STRING, false, true);
-        List<Property> properties = Arrays.asList(prop);
-
-        PropertyGroup pg = new PropertyGroup(properties, FileType.CSV, "");
+        PropertyGroup pg =
+                TestDataFactory.createPropertyGroup(Arrays.asList(testProperty), FileType.CSV, "");
 
         Assert.assertEquals(1, pg.size());
         Assert.assertEquals("", pg.getPrefix());
@@ -141,12 +151,14 @@ public class PropertyGroupTest {
 
     @Test
     public void testPropertyGroupAddProperty() {
-        Property existingProp = new Property("existing", DataType.INT32, false, false);
-        List<Property> properties = Arrays.asList(existingProp);
-        PropertyGroup pg = new PropertyGroup(properties, FileType.CSV, "test/");
+        Property existingProp =
+                TestDataFactory.createProperty("existing", DataType.INT32, false, false);
+        PropertyGroup pg =
+                TestDataFactory.createPropertyGroup(
+                        Arrays.asList(existingProp), FileType.CSV, "test/");
 
         // Add a new property
-        Property newProp = new Property("new", DataType.STRING, false, true);
+        Property newProp = TestDataFactory.createProperty("new", DataType.STRING, false, true);
         Optional<PropertyGroup> result = pg.addPropertyAsNew(newProp);
 
         Assert.assertTrue(result.isPresent());
@@ -158,12 +170,12 @@ public class PropertyGroupTest {
 
     @Test
     public void testPropertyGroupAddDuplicateProperty() {
-        Property prop1 = new Property("test", DataType.INT32, false, false);
-        List<Property> properties = Arrays.asList(prop1);
-        PropertyGroup pg = new PropertyGroup(properties, FileType.CSV, "test/");
+        Property prop1 = TestDataFactory.createProperty("test", DataType.INT32, false, false);
+        PropertyGroup pg =
+                TestDataFactory.createPropertyGroup(Arrays.asList(prop1), FileType.CSV, "test/");
 
         // Try to add property with same name
-        Property prop2 = new Property("test", DataType.STRING, false, true);
+        Property prop2 = TestDataFactory.createProperty("test", DataType.STRING, false, true);
         Optional<PropertyGroup> result = pg.addPropertyAsNew(prop2);
 
         Assert.assertFalse(result.isPresent());
@@ -171,9 +183,11 @@ public class PropertyGroupTest {
 
     @Test
     public void testPropertyGroupAddNullProperty() {
-        Property existingProp = new Property("existing", DataType.INT32, false, false);
-        List<Property> properties = Arrays.asList(existingProp);
-        PropertyGroup pg = new PropertyGroup(properties, FileType.CSV, "test/");
+        Property existingProp =
+                TestDataFactory.createProperty("existing", DataType.INT32, false, false);
+        PropertyGroup pg =
+                TestDataFactory.createPropertyGroup(
+                        Arrays.asList(existingProp), FileType.CSV, "test/");
 
         Optional<PropertyGroup> result = pg.addPropertyAsNew(null);
 
@@ -182,12 +196,13 @@ public class PropertyGroupTest {
 
     @Test
     public void testPropertyGroupPropertyMap() {
-        Property id = new Property("id", DataType.INT64, true, false);
-        Property name = new Property("name", DataType.STRING, false, true);
-        Property age = new Property("age", DataType.INT32, false, true);
+        Property id = TestDataFactory.createProperty("id", DataType.INT64, true, false);
+        Property name = TestDataFactory.createProperty("name", DataType.STRING, false, true);
+        Property age = TestDataFactory.createProperty("age", DataType.INT32, false, true);
         List<Property> properties = Arrays.asList(id, name, age);
 
-        PropertyGroup pg = new PropertyGroup(properties, FileType.PARQUET, "person/");
+        PropertyGroup pg =
+                TestDataFactory.createPropertyGroup(properties, FileType.PARQUET, "person/");
 
         Assert.assertEquals(3, pg.getPropertyMap().size());
         Assert.assertEquals(id, pg.getPropertyMap().get("id"));
@@ -198,27 +213,33 @@ public class PropertyGroupTest {
 
     @Test
     public void testPropertyGroupImmutability() {
-        Property originalProp = new Property("test", DataType.STRING, false, true);
+        Property originalProp =
+                TestDataFactory.createProperty("test", DataType.STRING, false, true);
         List<Property> originalProperties = new ArrayList<>(Arrays.asList(originalProp));
 
-        PropertyGroup pg = new PropertyGroup(originalProperties, FileType.CSV, "test/");
+        PropertyGroup pg =
+                TestDataFactory.createPropertyGroup(originalProperties, FileType.CSV, "test/");
 
         // Modify original list - should not affect PropertyGroup
-        originalProperties.add(new Property("new", DataType.INT32, false, false));
+        originalProperties.add(TestDataFactory.createProperty("new", DataType.INT32, false, false));
 
         Assert.assertEquals(1, pg.size()); // Should still be 1
         Assert.assertEquals(1, pg.getPropertyList().size());
 
         // Try to modify returned lists - should throw exception or be unmodifiable
         try {
-            pg.getPropertyList().add(new Property("another", DataType.BOOL, false, false));
+            pg.getPropertyList()
+                    .add(TestDataFactory.createProperty("another", DataType.BOOL, false, false));
             Assert.fail("Should not be able to modify property list");
         } catch (UnsupportedOperationException expected) {
             // This is expected behavior
         }
 
         try {
-            pg.getPropertyMap().put("test2", new Property("test2", DataType.FLOAT, false, false));
+            pg.getPropertyMap()
+                    .put(
+                            "test2",
+                            TestDataFactory.createProperty("test2", DataType.FLOAT, false, false));
             Assert.fail("Should not be able to modify property map");
         } catch (UnsupportedOperationException expected) {
             // This is expected behavior
@@ -227,12 +248,13 @@ public class PropertyGroupTest {
 
     @Test
     public void testPropertyGroupWithComplexDataTypes() {
-        Property listProp = new Property("items", DataType.LIST, false, true);
-        Property boolProp = new Property("flag", DataType.BOOL, false, false);
-        Property doubleProp = new Property("score", DataType.DOUBLE, false, true);
+        Property listProp = TestDataFactory.createProperty("items", DataType.LIST, false, true);
+        Property boolProp = TestDataFactory.createProperty("flag", DataType.BOOL, false, false);
+        Property doubleProp = TestDataFactory.createProperty("score", DataType.DOUBLE, false, true);
         List<Property> properties = Arrays.asList(listProp, boolProp, doubleProp);
 
-        PropertyGroup pg = new PropertyGroup(properties, FileType.PARQUET, "complex/");
+        PropertyGroup pg =
+                TestDataFactory.createPropertyGroup(properties, FileType.PARQUET, "complex/");
 
         Assert.assertEquals(3, pg.size());
         Assert.assertEquals(DataType.LIST, pg.getPropertyMap().get("items").getDataType());
