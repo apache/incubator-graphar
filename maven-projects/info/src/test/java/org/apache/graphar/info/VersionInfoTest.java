@@ -31,7 +31,7 @@ public class VersionInfoTest {
     @Test
     public void testVersionInfoBasicConstruction() {
         VersionInfo versionInfo = new VersionInfo(1, null);
-        
+
         Assert.assertEquals(1, versionInfo.getVersion());
         Assert.assertNull(versionInfo.getUserDefinedTypes());
         Assert.assertEquals("gar/v1", versionInfo.toString());
@@ -41,7 +41,7 @@ public class VersionInfoTest {
     public void testVersionInfoWithEmptyUserDefinedTypes() {
         List<String> emptyTypes = Collections.emptyList();
         VersionInfo versionInfo = new VersionInfo(1, emptyTypes);
-        
+
         Assert.assertEquals(1, versionInfo.getVersion());
         Assert.assertEquals(emptyTypes, versionInfo.getUserDefinedTypes());
         Assert.assertEquals("gar/v1", versionInfo.toString());
@@ -51,7 +51,7 @@ public class VersionInfoTest {
     public void testVersionInfoWithUserDefinedTypes() {
         List<String> userTypes = Arrays.asList("customType1", "customType2");
         VersionInfo versionInfo = new VersionInfo(1, userTypes);
-        
+
         Assert.assertEquals(1, versionInfo.getVersion());
         Assert.assertEquals(userTypes, versionInfo.getUserDefinedTypes());
         Assert.assertEquals("gar/v1 (customType1,customType2)", versionInfo.toString());
@@ -61,7 +61,7 @@ public class VersionInfoTest {
     public void testVersionInfoWithSingleUserDefinedType() {
         List<String> userTypes = Arrays.asList("singleType");
         VersionInfo versionInfo = new VersionInfo(1, userTypes);
-        
+
         Assert.assertEquals(1, versionInfo.getVersion());
         Assert.assertEquals(userTypes, versionInfo.getUserDefinedTypes());
         Assert.assertEquals("gar/v1 (singleType)", versionInfo.toString());
@@ -70,7 +70,7 @@ public class VersionInfoTest {
     @Test
     public void testVersionInfoCheckTypeBuiltInTypes() {
         VersionInfo versionInfo = new VersionInfo(1, null);
-        
+
         // Test built-in types for version 1
         Assert.assertTrue(versionInfo.checkType("bool"));
         Assert.assertTrue(versionInfo.checkType("int32"));
@@ -83,7 +83,7 @@ public class VersionInfoTest {
     @Test
     public void testVersionInfoCheckTypeNonExistentTypes() {
         VersionInfo versionInfo = new VersionInfo(1, null);
-        
+
         // Test non-existent types
         Assert.assertFalse(versionInfo.checkType("date32"));
         Assert.assertFalse(versionInfo.checkType("timestamp"));
@@ -96,15 +96,15 @@ public class VersionInfoTest {
     public void testVersionInfoCheckTypeWithUserDefinedTypes() {
         List<String> userTypes = Arrays.asList("customType1", "customType2");
         VersionInfo versionInfo = new VersionInfo(1, userTypes);
-        
+
         // Test built-in types still work
         Assert.assertTrue(versionInfo.checkType("int32"));
         Assert.assertTrue(versionInfo.checkType("string"));
-        
+
         // Test user-defined types
         Assert.assertTrue(versionInfo.checkType("customType1"));
         Assert.assertTrue(versionInfo.checkType("customType2"));
-        
+
         // Test non-existent types
         Assert.assertFalse(versionInfo.checkType("nonExistentType"));
         Assert.assertFalse(versionInfo.checkType("date32"));
@@ -113,7 +113,7 @@ public class VersionInfoTest {
     @Test
     public void testVersionInfoCheckTypeWithNullType() {
         VersionInfo versionInfo = new VersionInfo(1, null);
-        
+
         // The current implementation doesn't handle null gracefully, so this will throw NPE
         try {
             versionInfo.checkType(null);
@@ -126,7 +126,7 @@ public class VersionInfoTest {
     @Test
     public void testVersionInfoCheckTypeWithUnsupportedVersion() {
         VersionInfo versionInfo = new VersionInfo(999, null);
-        
+
         // Unsupported version should not support any types
         Assert.assertFalse(versionInfo.checkType("int32"));
         Assert.assertFalse(versionInfo.checkType("string"));
@@ -137,12 +137,12 @@ public class VersionInfoTest {
     public void testVersionInfoCheckTypeWithUnsupportedVersionButUserTypes() {
         List<String> userTypes = Arrays.asList("customType");
         VersionInfo versionInfo = new VersionInfo(999, userTypes);
-        
+
         // Unsupported version should not support built-in types
         Assert.assertFalse(versionInfo.checkType("int32"));
         Assert.assertFalse(versionInfo.checkType("string"));
-        
-        // Current implementation: unsupported version returns false for all types, 
+
+        // Current implementation: unsupported version returns false for all types,
         // including user-defined types, due to early return in checkType()
         Assert.assertFalse(versionInfo.checkType("customType"));
     }
@@ -151,7 +151,7 @@ public class VersionInfoTest {
     public void testVersionInfoToStringWithMultipleTypes() {
         List<String> userTypes = Arrays.asList("type1", "type2", "type3", "type4");
         VersionInfo versionInfo = new VersionInfo(1, userTypes);
-        
+
         String expected = "gar/v1 (type1,type2,type3,type4)";
         Assert.assertEquals(expected, versionInfo.toString());
     }
@@ -161,7 +161,7 @@ public class VersionInfoTest {
         VersionInfo version1 = new VersionInfo(1, null);
         VersionInfo version2 = new VersionInfo(2, null);
         VersionInfo version10 = new VersionInfo(10, null);
-        
+
         Assert.assertEquals("gar/v1", version1.toString());
         Assert.assertEquals("gar/v2", version2.toString());
         Assert.assertEquals("gar/v10", version10.toString());
@@ -169,9 +169,10 @@ public class VersionInfoTest {
 
     @Test
     public void testVersionInfoToStringWithSpecialCharactersInTypes() {
-        List<String> userTypes = Arrays.asList("type-with-dash", "type_with_underscore", "type.with.dots");
+        List<String> userTypes =
+                Arrays.asList("type-with-dash", "type_with_underscore", "type.with.dots");
         VersionInfo versionInfo = new VersionInfo(1, userTypes);
-        
+
         String expected = "gar/v1 (type-with-dash,type_with_underscore,type.with.dots)";
         Assert.assertEquals(expected, versionInfo.toString());
     }
@@ -180,17 +181,17 @@ public class VersionInfoTest {
     public void testVersionInfoImmutability() {
         List<String> originalTypes = new ArrayList<>(Arrays.asList("type1", "type2"));
         VersionInfo versionInfo = new VersionInfo(1, originalTypes);
-        
+
         // Get the user defined types
         List<String> returnedTypes = versionInfo.getUserDefinedTypes();
-        
+
         // The returned list should be the same as the original
         Assert.assertEquals(originalTypes, returnedTypes);
-        
+
         // Try to modify the original list
         originalTypes.add("type3");
-        
-        // Current implementation: VersionInfo is not truly immutable, 
+
+        // Current implementation: VersionInfo is not truly immutable,
         // it stores a reference to the original list
         Assert.assertEquals(3, versionInfo.getUserDefinedTypes().size());
         Assert.assertTrue(versionInfo.checkType("type1"));
@@ -201,10 +202,10 @@ public class VersionInfoTest {
     @Test
     public void testVersionInfoWithZeroVersion() {
         VersionInfo versionInfo = new VersionInfo(0, null);
-        
+
         Assert.assertEquals(0, versionInfo.getVersion());
         Assert.assertEquals("gar/v0", versionInfo.toString());
-        
+
         // Version 0 should not support any built-in types
         Assert.assertFalse(versionInfo.checkType("int32"));
         Assert.assertFalse(versionInfo.checkType("string"));
@@ -213,10 +214,10 @@ public class VersionInfoTest {
     @Test
     public void testVersionInfoWithNegativeVersion() {
         VersionInfo versionInfo = new VersionInfo(-1, null);
-        
+
         Assert.assertEquals(-1, versionInfo.getVersion());
         Assert.assertEquals("gar/v-1", versionInfo.toString());
-        
+
         // Negative version should not support any built-in types
         Assert.assertFalse(versionInfo.checkType("int32"));
         Assert.assertFalse(versionInfo.checkType("string"));
@@ -226,7 +227,7 @@ public class VersionInfoTest {
     public void testVersionInfoCaseSensitivity() {
         List<String> userTypes = Arrays.asList("MyType", "mytype", "MYTYPE");
         VersionInfo versionInfo = new VersionInfo(1, userTypes);
-        
+
         // Should be case sensitive
         Assert.assertTrue(versionInfo.checkType("MyType"));
         Assert.assertTrue(versionInfo.checkType("mytype"));
@@ -238,7 +239,7 @@ public class VersionInfoTest {
     @Test
     public void testVersionInfoBuiltInTypeCaseSensitivity() {
         VersionInfo versionInfo = new VersionInfo(1, null);
-        
+
         // Built-in types should be case sensitive
         Assert.assertTrue(versionInfo.checkType("int32"));
         Assert.assertTrue(versionInfo.checkType("string"));

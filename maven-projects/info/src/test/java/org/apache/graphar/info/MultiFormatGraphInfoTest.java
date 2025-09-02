@@ -36,9 +36,10 @@ public class MultiFormatGraphInfoTest {
         List<VertexInfo> emptyVertices = new ArrayList<>();
         List<EdgeInfo> emptyEdges = new ArrayList<>();
         String version = "gar/v1";
-        
-        GraphInfo graphInfo = new GraphInfo("emptyGraph", emptyVertices, emptyEdges, "test/", version);
-        
+
+        GraphInfo graphInfo =
+                new GraphInfo("emptyGraph", emptyVertices, emptyEdges, "test/", version);
+
         Assert.assertEquals("emptyGraph", graphInfo.getName());
         Assert.assertEquals(0, graphInfo.getVertexInfos().size());
         Assert.assertEquals(0, graphInfo.getEdgeInfos().size());
@@ -51,9 +52,9 @@ public class MultiFormatGraphInfoTest {
         List<VertexInfo> vertices = new ArrayList<>();
         List<EdgeInfo> edges = new ArrayList<>();
         String version = "gar/v1";
-        
+
         GraphInfo graphInfo = new GraphInfo("testGraph", vertices, edges, null, version);
-        
+
         Assert.assertEquals("testGraph", graphInfo.getName());
         Assert.assertNull(graphInfo.getPrefix());
     }
@@ -63,9 +64,10 @@ public class MultiFormatGraphInfoTest {
         PropertyGroup emptyPg = new PropertyGroup(Collections.emptyList(), FileType.CSV, "empty/");
         List<PropertyGroup> propertyGroups = Arrays.asList(emptyPg);
         String version = "gar/v1";
-        
-        VertexInfo vertexInfo = new VertexInfo("testVertex", 100, propertyGroups, "vertex/", version);
-        
+
+        VertexInfo vertexInfo =
+                new VertexInfo("testVertex", 100, propertyGroups, "vertex/", version);
+
         Assert.assertEquals("testVertex", vertexInfo.getType());
         Assert.assertEquals(100, vertexInfo.getChunkSize());
         Assert.assertEquals(1, vertexInfo.getPropertyGroups().size());
@@ -78,9 +80,9 @@ public class MultiFormatGraphInfoTest {
         PropertyGroup pg = new PropertyGroup(Arrays.asList(prop), FileType.CSV, "test/");
         List<PropertyGroup> propertyGroups = Arrays.asList(pg);
         String version = "gar/v1";
-        
+
         VertexInfo vertexInfo = new VertexInfo("testVertex", 0, propertyGroups, "vertex/", version);
-        
+
         Assert.assertEquals("testVertex", vertexInfo.getType());
         Assert.assertEquals(0, vertexInfo.getChunkSize());
     }
@@ -91,9 +93,10 @@ public class MultiFormatGraphInfoTest {
         PropertyGroup pg = new PropertyGroup(Arrays.asList(prop), FileType.CSV, "test/");
         List<PropertyGroup> propertyGroups = Arrays.asList(pg);
         String version = "gar/v1";
-        
-        VertexInfo vertexInfo = new VertexInfo("testVertex", -100, propertyGroups, "vertex/", version);
-        
+
+        VertexInfo vertexInfo =
+                new VertexInfo("testVertex", -100, propertyGroups, "vertex/", version);
+
         Assert.assertEquals("testVertex", vertexInfo.getType());
         Assert.assertEquals(-100, vertexInfo.getChunkSize());
     }
@@ -103,10 +106,21 @@ public class MultiFormatGraphInfoTest {
         List<AdjacentList> emptyAdjLists = new ArrayList<>();
         List<PropertyGroup> emptyPropertyGroups = new ArrayList<>();
         String version = "gar/v1";
-        
-        EdgeInfo edgeInfo = new EdgeInfo("srcType", "edgeType", "dstType", 50, 100, 200, true, 
-                                       "edge/", version, emptyAdjLists, emptyPropertyGroups);
-        
+
+        EdgeInfo edgeInfo =
+                new EdgeInfo(
+                        "srcType",
+                        "edgeType",
+                        "dstType",
+                        50,
+                        100,
+                        200,
+                        true,
+                        "edge/",
+                        version,
+                        emptyAdjLists,
+                        emptyPropertyGroups);
+
         Assert.assertEquals("srcType", edgeInfo.getSrcType());
         Assert.assertEquals("edgeType", edgeInfo.getEdgeType());
         Assert.assertEquals("dstType", edgeInfo.getDstType());
@@ -117,14 +131,26 @@ public class MultiFormatGraphInfoTest {
 
     @Test
     public void testEdgeInfoWithZeroChunkSize() {
-        AdjacentList adjList = new AdjacentList(AdjListType.unordered_by_source, FileType.CSV, "adj/");
+        AdjacentList adjList =
+                new AdjacentList(AdjListType.unordered_by_source, FileType.CSV, "adj/");
         List<AdjacentList> adjLists = Arrays.asList(adjList);
         List<PropertyGroup> emptyPropertyGroups = new ArrayList<>();
         String version = "gar/v1";
-        
-        EdgeInfo edgeInfo = new EdgeInfo("srcType", "edgeType", "dstType", 0, 100, 200, true, 
-                                       "edge/", version, adjLists, emptyPropertyGroups);
-        
+
+        EdgeInfo edgeInfo =
+                new EdgeInfo(
+                        "srcType",
+                        "edgeType",
+                        "dstType",
+                        0,
+                        100,
+                        200,
+                        true,
+                        "edge/",
+                        version,
+                        adjLists,
+                        emptyPropertyGroups);
+
         Assert.assertEquals(0, edgeInfo.getChunkSize());
     }
 
@@ -137,13 +163,19 @@ public class MultiFormatGraphInfoTest {
         Property doubleProp = new Property("precision", DataType.DOUBLE, false, true);
         Property stringProp = new Property("name", DataType.STRING, false, true);
         Property listProp = new Property("tags", DataType.LIST, false, true);
-        
-        List<Property> mixedProps = Arrays.asList(
-            boolProp, int32Prop, int64Prop, floatProp, doubleProp, stringProp, listProp
-        );
-        
+
+        List<Property> mixedProps =
+                Arrays.asList(
+                        boolProp,
+                        int32Prop,
+                        int64Prop,
+                        floatProp,
+                        doubleProp,
+                        stringProp,
+                        listProp);
+
         PropertyGroup pg = new PropertyGroup(mixedProps, FileType.PARQUET, "mixed/");
-        
+
         Assert.assertEquals(7, pg.size());
         Assert.assertEquals(DataType.BOOL, pg.getPropertyMap().get("isActive").getDataType());
         Assert.assertEquals(DataType.INT32, pg.getPropertyMap().get("count").getDataType());
@@ -158,12 +190,12 @@ public class MultiFormatGraphInfoTest {
     public void testPropertyGroupWithDifferentFileFormats() {
         Property prop = new Property("test", DataType.STRING, false, true);
         List<Property> properties = Arrays.asList(prop);
-        
+
         // Test all file formats
         PropertyGroup csvPg = new PropertyGroup(properties, FileType.CSV, "csv/");
         PropertyGroup parquetPg = new PropertyGroup(properties, FileType.PARQUET, "parquet/");
         PropertyGroup orcPg = new PropertyGroup(properties, FileType.ORC, "orc/");
-        
+
         Assert.assertEquals(FileType.CSV, csvPg.getFileType());
         Assert.assertEquals(FileType.PARQUET, parquetPg.getFileType());
         Assert.assertEquals(FileType.ORC, orcPg.getFileType());
@@ -176,9 +208,9 @@ public class MultiFormatGraphInfoTest {
             AdjListType.unordered_by_source, AdjListType.unordered_by_dest,
             AdjListType.ordered_by_source, AdjListType.ordered_by_dest
         };
-        
+
         FileType[] fileTypes = {FileType.CSV, FileType.PARQUET, FileType.ORC};
-        
+
         for (AdjListType adjType : adjTypes) {
             for (FileType fileType : fileTypes) {
                 AdjacentList adjList = new AdjacentList(adjType, fileType, "test/");
@@ -191,26 +223,41 @@ public class MultiFormatGraphInfoTest {
 
     @Test
     public void testVersionInfoWithExtensiveUserDefinedTypes() {
-        List<String> manyTypes = Arrays.asList(
-            "type1", "type2", "type3", "type4", "type5", "type6", "type7", "type8", "type9", "type10",
-            "customDate", "customTime", "customGeometry", "customJSON", "customXML",
-            "user-defined-1", "user_defined_2", "user.defined.3"
-        );
-        
+        List<String> manyTypes =
+                Arrays.asList(
+                        "type1",
+                        "type2",
+                        "type3",
+                        "type4",
+                        "type5",
+                        "type6",
+                        "type7",
+                        "type8",
+                        "type9",
+                        "type10",
+                        "customDate",
+                        "customTime",
+                        "customGeometry",
+                        "customJSON",
+                        "customXML",
+                        "user-defined-1",
+                        "user_defined_2",
+                        "user.defined.3");
+
         VersionInfo versionInfo = new VersionInfo(1, manyTypes);
-        
+
         Assert.assertEquals(1, versionInfo.getVersion());
         Assert.assertEquals(manyTypes, versionInfo.getUserDefinedTypes());
-        
+
         // Test all user-defined types are supported
         for (String type : manyTypes) {
             Assert.assertTrue("Type " + type + " should be supported", versionInfo.checkType(type));
         }
-        
+
         // Built-in types should still work
         Assert.assertTrue(versionInfo.checkType("int32"));
         Assert.assertTrue(versionInfo.checkType("string"));
-        
+
         // Non-existent types should not work
         Assert.assertFalse(versionInfo.checkType("nonExistentType"));
     }
@@ -219,23 +266,27 @@ public class MultiFormatGraphInfoTest {
     public void testPropertyWithExtremeValues() {
         // Test properties with edge case names
         Property emptyNameProp = new Property("", DataType.STRING, false, true);
-        Property longNameProp = new Property("verylongpropertynamethatgoesonyesitdoes", DataType.INT32, false, false);
-        Property specialCharsProp = new Property("prop-with_special.chars", DataType.DOUBLE, true, false);
-        
+        Property longNameProp =
+                new Property(
+                        "verylongpropertynamethatgoesonyesitdoes", DataType.INT32, false, false);
+        Property specialCharsProp =
+                new Property("prop-with_special.chars", DataType.DOUBLE, true, false);
+
         Assert.assertEquals("", emptyNameProp.getName());
         Assert.assertEquals("verylongpropertynamethatgoesonyesitdoes", longNameProp.getName());
         Assert.assertEquals("prop-with_special.chars", specialCharsProp.getName());
-        
+
         // Test all combinations of primary/nullable flags
         Property primaryNullable = new Property("test1", DataType.INT32, true, true);
         Property primaryNotNullable = new Property("test2", DataType.INT32, true, false);
         Property notPrimaryNullable = new Property("test3", DataType.INT32, false, true);
         Property notPrimaryNotNullable = new Property("test4", DataType.INT32, false, false);
-        
+
         Assert.assertTrue(primaryNullable.isPrimary() && primaryNullable.isNullable());
         Assert.assertTrue(primaryNotNullable.isPrimary() && !primaryNotNullable.isNullable());
         Assert.assertTrue(!notPrimaryNullable.isPrimary() && notPrimaryNullable.isNullable());
-        Assert.assertTrue(!notPrimaryNotNullable.isPrimary() && !notPrimaryNotNullable.isNullable());
+        Assert.assertTrue(
+                !notPrimaryNotNullable.isPrimary() && !notPrimaryNotNullable.isNullable());
     }
 
     @Test
@@ -244,27 +295,44 @@ public class MultiFormatGraphInfoTest {
         List<VertexInfo> vertices = new ArrayList<>();
         List<EdgeInfo> edges = new ArrayList<>();
         String version = "gar/v1";
-        
+
         // Create 10 vertex types
         for (int i = 0; i < 10; i++) {
             Property prop = new Property("id" + i, DataType.INT64, true, false);
-            PropertyGroup pg = new PropertyGroup(Arrays.asList(prop), FileType.PARQUET, "vertex" + i + "/");
-            VertexInfo vertex = new VertexInfo("vertex" + i, 1000, Arrays.asList(pg), "vertex" + i + "/", version);
+            PropertyGroup pg =
+                    new PropertyGroup(Arrays.asList(prop), FileType.PARQUET, "vertex" + i + "/");
+            VertexInfo vertex =
+                    new VertexInfo(
+                            "vertex" + i, 1000, Arrays.asList(pg), "vertex" + i + "/", version);
             vertices.add(vertex);
         }
-        
+
         // Create edges between vertex types
         for (int i = 0; i < 5; i++) {
-            AdjacentList adjList = new AdjacentList(AdjListType.ordered_by_source, FileType.PARQUET, "edge" + i + "/");
+            AdjacentList adjList =
+                    new AdjacentList(
+                            AdjListType.ordered_by_source, FileType.PARQUET, "edge" + i + "/");
             Property edgeProp = new Property("weight", DataType.DOUBLE, false, true);
-            PropertyGroup edgePg = new PropertyGroup(Arrays.asList(edgeProp), FileType.PARQUET, "edge" + i + "/");
-            EdgeInfo edge = new EdgeInfo("vertex" + i, "edge" + i, "vertex" + (i + 1), 500, 1000, 1000, true,
-                                       "edge" + i + "/", version, Arrays.asList(adjList), Arrays.asList(edgePg));
+            PropertyGroup edgePg =
+                    new PropertyGroup(Arrays.asList(edgeProp), FileType.PARQUET, "edge" + i + "/");
+            EdgeInfo edge =
+                    new EdgeInfo(
+                            "vertex" + i,
+                            "edge" + i,
+                            "vertex" + (i + 1),
+                            500,
+                            1000,
+                            1000,
+                            true,
+                            "edge" + i + "/",
+                            version,
+                            Arrays.asList(adjList),
+                            Arrays.asList(edgePg));
             edges.add(edge);
         }
-        
+
         GraphInfo graphInfo = new GraphInfo("largeGraph", vertices, edges, "large/", version);
-        
+
         Assert.assertEquals("largeGraph", graphInfo.getName());
         Assert.assertEquals(10, graphInfo.getVertexInfos().size());
         Assert.assertEquals(5, graphInfo.getEdgeInfos().size());

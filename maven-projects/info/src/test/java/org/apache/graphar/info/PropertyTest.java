@@ -28,7 +28,7 @@ public class PropertyTest {
     @Test
     public void testPropertyBasicConstruction() {
         Property prop = new Property("id", DataType.INT32, true, false);
-        
+
         Assert.assertEquals("id", prop.getName());
         Assert.assertEquals(DataType.INT32, prop.getDataType());
         Assert.assertTrue(prop.isPrimary());
@@ -38,7 +38,7 @@ public class PropertyTest {
     @Test
     public void testPropertyWithStringType() {
         Property prop = new Property("name", DataType.STRING, false, true);
-        
+
         Assert.assertEquals("name", prop.getName());
         Assert.assertEquals(DataType.STRING, prop.getDataType());
         Assert.assertFalse(prop.isPrimary());
@@ -122,7 +122,7 @@ public class PropertyTest {
         // Note: Property class doesn't override equals(), so this tests object identity
         Assert.assertNotEquals(prop1, prop2); // Different objects
         Assert.assertNotEquals(prop1, prop3); // Different properties
-        
+
         // Same object reference
         Property sameRef = prop1;
         Assert.assertEquals(prop1, sameRef);
@@ -131,13 +131,13 @@ public class PropertyTest {
     @Test
     public void testPropertyImmutability() {
         Property prop = new Property("test", DataType.INT32, true, false);
-        
+
         // Properties should be immutable (final fields)
         Assert.assertEquals("test", prop.getName());
         Assert.assertEquals(DataType.INT32, prop.getDataType());
         Assert.assertTrue(prop.isPrimary());
         Assert.assertFalse(prop.isNullable());
-        
+
         // These values should not change after construction
         Assert.assertEquals("test", prop.getName());
         Assert.assertEquals(DataType.INT32, prop.getDataType());

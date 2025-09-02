@@ -34,20 +34,20 @@ public class GraphSaverTest {
     @Test
     public void testSave() {
         final String LDBC_SAMPLE_SAVE_DIR = TestUtil.SAVE_DIR + "/ldbc_sample/";
-        
+
         // Clean up any existing test files
         try {
             Path saveDir = Paths.get(LDBC_SAMPLE_SAVE_DIR);
             if (Files.exists(saveDir)) {
                 Files.walk(saveDir)
-                    .sorted(Comparator.reverseOrder())
-                    .map(Path::toFile)
-                    .forEach(File::delete);
+                        .sorted(Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(File::delete);
             }
         } catch (Exception e) {
             // Ignore cleanup errors
         }
-        
+
         final GraphSaver graphSaver = new LocalYamlGraphSaver();
         final GraphInfo graphInfo = TestUtil.getLdbcSampleDataSet();
         try {
