@@ -20,6 +20,10 @@
 package org.apache.graphar.info;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Comparator;
 import org.apache.graphar.info.saver.GraphSaver;
 import org.apache.graphar.info.saver.LocalYamlGraphSaver;
 import org.junit.Assert;
@@ -30,6 +34,20 @@ public class GraphSaverTest {
     @Test
     public void testSave() {
         final String LDBC_SAMPLE_SAVE_DIR = TestUtil.SAVE_DIR + "/ldbc_sample/";
+        
+        // Clean up any existing test files
+        try {
+            Path saveDir = Paths.get(LDBC_SAMPLE_SAVE_DIR);
+            if (Files.exists(saveDir)) {
+                Files.walk(saveDir)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+            }
+        } catch (Exception e) {
+            // Ignore cleanup errors
+        }
+        
         final GraphSaver graphSaver = new LocalYamlGraphSaver();
         final GraphInfo graphInfo = TestUtil.getLdbcSampleDataSet();
         try {
