@@ -111,19 +111,18 @@ public class TestUtil {
                 new AdjacentList(AdjListType.ordered_by_dest, FileType.CSV, "ordered_by_dest/");
         Property creationDate = new Property("creationDate", DataType.STRING, false, false);
         PropertyGroup pg3 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
-        EdgeInfo knows =
-                new EdgeInfo(
-                        "person",
-                        "knows",
-                        "person",
-                        1024,
-                        100,
-                        100,
-                        false,
-                        "edge/person_knows_person/",
-                        "gar/v1",
-                        List.of(orderedBySource, orderedByDest),
-                        List.of(pg3));
+
+        EdgeInfo knows = new EdgeInfo.EdgeInfoBuilder()
+                .edgeTriplet("person", "knows", "person")
+                .chunkSize(1024)
+                .srcChunkSize(100)
+                .dstChunkSize(100)
+                .directed(false)
+                .prefix("edge/person_knows_person/")
+                .version("gar/v1")
+                .adjacentLists(List.of(orderedBySource, orderedByDest))
+                .propertyGroups(List.of(pg3))
+                .build();
 
         // create graph info of yaml:
         // name: ldbc_sample

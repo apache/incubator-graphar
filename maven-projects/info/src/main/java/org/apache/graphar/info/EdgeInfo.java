@@ -26,6 +26,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.EdgeYaml;
@@ -50,6 +52,106 @@ public class EdgeInfo {
     private final Map<AdjListType, AdjacentList> adjacentLists;
     private final PropertyGroups propertyGroups;
     private final VersionInfo version;
+
+    public static final class EdgeInfoBuilder{
+        private EdgeTriplet edgeTriplet;
+        private long chunkSize;
+        private long srcChunkSize;
+        private long dstChunkSize;
+        private boolean directed;
+        private String prefix;
+        private Map<AdjListType, AdjacentList> adjacentLists;
+        private PropertyGroups propertyGroups;
+        private VersionInfo version;
+
+
+        public EdgeInfoBuilder edgeTriplet( String srcType, String edgeType, String dstType){
+            this.edgeTriplet = new EdgeTriplet(srcType,edgeType,dstType);
+            return this;
+        }
+
+        private EdgeInfoBuilder edgeTriplet(EdgeTriplet edgeTriplet){
+            this.edgeTriplet = edgeTriplet;
+            return this;
+        }
+
+
+        public EdgeInfoBuilder chunkSize(long chunkSize){
+            this.chunkSize = chunkSize;
+            return this;
+        }
+
+        public EdgeInfoBuilder srcChunkSize(long srcChunkSize){
+            this.srcChunkSize = srcChunkSize;
+            return this;
+        }
+
+        public EdgeInfoBuilder dstChunkSize(long dstChunkSize){
+            this.dstChunkSize = dstChunkSize;
+            return this;
+        }
+
+        public EdgeInfoBuilder directed(boolean directed){
+            this.directed = directed;
+            return this;
+        }
+
+        public EdgeInfoBuilder prefix(String prefix){
+            this.prefix = prefix;
+            return this;
+        }
+
+
+        public EdgeInfoBuilder adjacentLists(List<AdjacentList> adjacentListsAsList){
+            this.adjacentLists = adjacentListsAsList.stream().collect(
+                    Collectors.toUnmodifiableMap(AdjacentList::getType, Function.identity()));
+            return this;
+        }
+
+        private EdgeInfoBuilder adjecentLists(Map<AdjListType, AdjacentList> adjacentLists){
+            this.adjacentLists = adjacentLists;
+            return this;
+        }
+
+        public EdgeInfoBuilder propertyGroups(List<PropertyGroup> propertyGroups){
+            this.propertyGroups = new PropertyGroups(propertyGroups);
+            return this;
+        }
+
+        private EdgeInfoBuilder propertyGroups(PropertyGroups propertyGroups){
+            this.propertyGroups = propertyGroups;
+            return this;
+        }
+
+
+        public EdgeInfoBuilder version(String version){
+            this.version = VersionParser.getVersion(version);
+            return this;
+        }
+
+        public EdgeInfoBuilder version(VersionInfo version){
+            this.version = version;
+            return this;
+        }
+
+        public EdgeInfo build(){
+            return new EdgeInfo(this);
+        }
+
+    }
+
+    private EdgeInfo(EdgeInfoBuilder builder) {
+        this.edgeTriplet = builder.edgeTriplet;
+        this.chunkSize = builder.chunkSize;
+        this.srcChunkSize = builder.srcChunkSize;
+        this.dstChunkSize = builder.dstChunkSize;
+        this.directed = builder.directed;
+        this.prefix = builder.prefix;
+        this.adjacentLists = builder.adjacentLists;
+        this.propertyGroups = builder.propertyGroups;
+        this.version = builder.version;
+    }
+
 
     public EdgeInfo(
             String srcType,
