@@ -63,6 +63,9 @@ public class EdgeInfo {
         private List<AdjacentList> adjacentListsAsListTemp;
         private List<PropertyGroup> propertyGroupsAsListTemp;
 
+        private String srcType;
+        private String edgeType;
+        private String dstType;
 
         public static EdgeInfoBuilder builder() {
             return new EdgeInfoBuilder();
@@ -71,6 +74,19 @@ public class EdgeInfo {
         private EdgeInfoBuilder() {}
 
 
+        public EdgeInfoBuilder srcType(String srcType) {
+            this.srcType = srcType;
+            return this;
+        }
+
+        public EdgeInfoBuilder edgeType(String edgeType) {
+            this.edgeType = edgeType;
+            return this;
+        }
+        public EdgeInfoBuilder dstType(String dstType) {
+            this.dstType = dstType;
+            return this;
+        }
 
         public EdgeInfoBuilder edgeTriplet(String srcType, String edgeType, String dstType) {
             this.edgeTriplet = new EdgeTriplet(srcType, edgeType, dstType);
@@ -160,7 +176,8 @@ public class EdgeInfo {
             if(adjacentLists == null)
                 adjacentLists = new HashMap<>();
 
-            adjacentLists.putAll(
+            if(adjacentListsAsListTemp != null)
+                adjacentLists.putAll(
                     adjacentListsAsListTemp.stream()
                             .collect(
                                     Collectors.toUnmodifiableMap(
@@ -168,13 +185,20 @@ public class EdgeInfo {
 
             if(propertyGroups == null)
                 propertyGroups = new PropertyGroups(propertyGroupsAsListTemp);
-            else
-                propertyGroups = propertyGroupsAsListTemp.stream()
+            else {
+                if(propertyGroupsAsListTemp != null)
+                    propertyGroups = propertyGroupsAsListTemp.stream()
                         .map(propertyGroups::addPropertyGroupAsNew)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
-                        .reduce((first, second)->second)
+                        .reduce((first, second) -> second)
                         .orElse(new PropertyGroups(new ArrayList<>()));
+                else
+                    propertyGroups = new PropertyGroups(new ArrayList<>());
+            }
+
+            if(edgeTriplet == null && srcType != null && edgeType != null && dstType != null)
+                edgeTriplet = new EdgeTriplet(srcType, edgeType, dstType);
 
 
             return new EdgeInfo(this);
