@@ -21,10 +21,8 @@ package org.apache.graphar.info.saver;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -32,17 +30,21 @@ import org.apache.graphar.util.PathUtil;
 
 public class GraphSaver {
     public static void save(String path, GraphInfo graphInfo) throws IOException {
-        save(path, graphInfo, (filePath, yamlString) -> {
-            Path outputPath = Path.of(filePath);
-            Files.createDirectories(outputPath.getParent());
-            Files.createFile(outputPath);
-            final BufferedWriter writer = Files.newBufferedWriter(outputPath);
-            writer.write(yamlString);
-            writer.close();
-        });
+        save(
+                path,
+                graphInfo,
+                (filePath, yamlString) -> {
+                    Path outputPath = Path.of(filePath);
+                    Files.createDirectories(outputPath.getParent());
+                    Files.createFile(outputPath);
+                    final BufferedWriter writer = Files.newBufferedWriter(outputPath);
+                    writer.write(yamlString);
+                    writer.close();
+                });
     }
 
-    public static void save(String path, GraphInfo graphInfo, YamlSaver yamlSaver) throws IOException {
+    public static void save(String path, GraphInfo graphInfo, YamlSaver yamlSaver)
+            throws IOException {
         saveGraph(path, graphInfo, yamlSaver);
         for (VertexInfo vertexInfo : graphInfo.getVertexInfos()) {
             saveVertex(path, vertexInfo, yamlSaver);
@@ -52,15 +54,22 @@ public class GraphSaver {
         }
     }
 
-    private static void saveGraph(String path, GraphInfo graphInfo, YamlSaver yamlSaver) throws IOException {
-        yamlSaver.saveYaml(PathUtil.resolvePath(path, graphInfo.getName() + ".graph.yaml"), graphInfo.dump());
+    private static void saveGraph(String path, GraphInfo graphInfo, YamlSaver yamlSaver)
+            throws IOException {
+        yamlSaver.saveYaml(
+                PathUtil.resolvePath(path, graphInfo.getName() + ".graph.yaml"), graphInfo.dump());
     }
 
-    private static void saveVertex(String path, VertexInfo vertexInfo, YamlSaver yamlSaver) throws IOException {
-        yamlSaver.saveYaml(PathUtil.resolvePath(path, vertexInfo.getType() + ".vertex.yaml"), vertexInfo.dump());
+    private static void saveVertex(String path, VertexInfo vertexInfo, YamlSaver yamlSaver)
+            throws IOException {
+        yamlSaver.saveYaml(
+                PathUtil.resolvePath(path, vertexInfo.getType() + ".vertex.yaml"),
+                vertexInfo.dump());
     }
 
-    private static void saveEdge(String path, EdgeInfo edgeInfo, YamlSaver yamlSaver) throws IOException {
-        yamlSaver.saveYaml(PathUtil.resolvePath(path, edgeInfo.getConcat() + ".edge.yaml"), edgeInfo.dump());
+    private static void saveEdge(String path, EdgeInfo edgeInfo, YamlSaver yamlSaver)
+            throws IOException {
+        yamlSaver.saveYaml(
+                PathUtil.resolvePath(path, edgeInfo.getConcat() + ".edge.yaml"), edgeInfo.dump());
     }
 }

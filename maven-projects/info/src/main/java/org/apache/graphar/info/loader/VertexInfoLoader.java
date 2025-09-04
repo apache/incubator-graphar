@@ -19,15 +19,16 @@
 
 package org.apache.graphar.info.loader;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.stream.Collectors;
 import org.apache.graphar.info.VertexInfo;
+import org.apache.graphar.info.yaml.PropertyGroupYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 
 public class VertexInfoLoader {
     public static VertexInfo load(String edgeYamlPath) throws IOException {
@@ -38,6 +39,14 @@ public class VertexInfoLoader {
         String yaml = yamlReader.readYaml(edgeYamlPath);
         Yaml edgeYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
         VertexYaml edgeYaml = edgeYamlLoader.load(yaml);
-        return edgeYaml.toVertexInfo();
+
+        return new VertexInfo(
+                edgeYaml.getType(),
+                edgeYaml.getChunk_size(),
+                edgeYaml.getProperty_groups().stream()
+                        .map(PropertyGroupYaml::toPropertyGroup)
+                        .collect(Collectors.toList()),
+                edgeYaml.getPrefix(),
+                edgeYaml.getVersion());
     }
 }

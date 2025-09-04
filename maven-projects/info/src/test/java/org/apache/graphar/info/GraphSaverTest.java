@@ -36,7 +36,8 @@ public class GraphSaverTest {
                     new File(LDBC_SAMPLE_SAVE_DIR + "/" + graphInfo.getName() + ".graph.yaml")
                             .exists());
             for (VertexInfo vertexInfo : graphInfo.getVertexInfos()) {
-                System.out.println(LDBC_SAMPLE_SAVE_DIR + "/" + vertexInfo.getType() + ".vertex.yaml");
+                System.out.println(
+                        LDBC_SAMPLE_SAVE_DIR + "/" + vertexInfo.getType() + ".vertex.yaml");
                 Assert.assertTrue(
                         new File(LDBC_SAMPLE_SAVE_DIR + "/" + vertexInfo.getType() + ".vertex.yaml")
                                 .exists());

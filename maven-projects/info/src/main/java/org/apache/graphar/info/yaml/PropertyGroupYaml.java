@@ -45,7 +45,7 @@ public class PropertyGroupYaml {
         this.prefix = propertyGroup.getPrefix();
     }
 
-    PropertyGroup toPropertyGroup() {
+    public PropertyGroup toPropertyGroup() {
         return new PropertyGroup(
                 properties.stream().map(PropertyYaml::toProperty).collect(Collectors.toList()),
                 FileType.fromString(file_type),

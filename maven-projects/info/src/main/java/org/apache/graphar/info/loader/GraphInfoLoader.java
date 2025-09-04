@@ -19,14 +19,12 @@
 
 package org.apache.graphar.info.loader;
 
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -39,7 +37,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 public class GraphInfoLoader {
 
     public static GraphInfo load(String graphYamlPath) throws IOException {
-        //default method is read from local file system
+        // default method is read from local file system
         return load(graphYamlPath, (path -> Files.readString(Path.of(path))));
     }
 
@@ -49,7 +47,7 @@ public class GraphInfoLoader {
         String yaml = yamlReader.readYaml(graphYamlPath);
         Yaml GraphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
         GraphYaml graphYaml = GraphYamlLoader.load(yaml);
-        //init prefix default value
+        // init prefix default value
         String prefix = PathUtil.pathToDirectory(graphYamlPath);
         if (graphYaml.getPrefix() != null && !graphYaml.getPrefix().isEmpty()) {
             prefix = graphYaml.getPrefix();

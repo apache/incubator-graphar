@@ -77,25 +77,6 @@ public class EdgeYaml {
                         .collect(Collectors.toList());
     }
 
-    public EdgeInfo toEdgeInfo() {
-        return new EdgeInfo(
-                src_type,
-                edge_type,
-                dst_type,
-                chunk_size,
-                src_chunk_size,
-                dst_chunk_size,
-                directed,
-                prefix,
-                version,
-                adj_lists.stream()
-                        .map(AdjacentListYaml::toAdjacentList)
-                        .collect(Collectors.toUnmodifiableList()),
-                property_groups.stream()
-                        .map(PropertyGroupYaml::toPropertyGroup)
-                        .collect(Collectors.toList()));
-    }
-
     public String getSrc_type() {
         return src_type;
     }

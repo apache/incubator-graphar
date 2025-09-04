@@ -25,9 +25,7 @@ import java.util.stream.Collectors;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
-import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 public class VertexInfo {
     private final String type;

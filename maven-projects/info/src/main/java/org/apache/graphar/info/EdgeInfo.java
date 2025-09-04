@@ -30,9 +30,7 @@ import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.EdgeYaml;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.util.GeneralParams;
-import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 public class EdgeInfo {
     private final EdgeTriplet edgeTriplet;

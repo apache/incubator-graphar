@@ -19,15 +19,17 @@
 
 package org.apache.graphar.info.loader;
 
-import org.apache.graphar.info.EdgeInfo;
-import org.apache.graphar.info.yaml.EdgeYaml;
-import org.yaml.snakeyaml.LoaderOptions;
-import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Collectors;
+import org.apache.graphar.info.EdgeInfo;
+import org.apache.graphar.info.yaml.AdjacentListYaml;
+import org.apache.graphar.info.yaml.EdgeYaml;
+import org.apache.graphar.info.yaml.PropertyGroupYaml;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 public class EdgeInfoLoader {
     public static EdgeInfo load(String edgeYamlPath) throws IOException {
@@ -38,6 +40,21 @@ public class EdgeInfoLoader {
         String yaml = yamlReader.readYaml(edgeYamlPath);
         Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
         EdgeYaml edgeYaml = edgeYamlLoader.load(yaml);
-        return edgeYaml.toEdgeInfo();
+        return new EdgeInfo(
+                edgeYaml.getSrc_type(),
+                edgeYaml.getEdge_type(),
+                edgeYaml.getDst_type(),
+                edgeYaml.getChunk_size(),
+                edgeYaml.getSrc_chunk_size(),
+                edgeYaml.getDst_chunk_size(),
+                edgeYaml.isDirected(),
+                edgeYaml.getPrefix(),
+                edgeYaml.getVersion(),
+                edgeYaml.getAdj_lists().stream()
+                        .map(AdjacentListYaml::toAdjacentList)
+                        .collect(Collectors.toUnmodifiableList()),
+                edgeYaml.getProperty_groups().stream()
+                        .map(PropertyGroupYaml::toPropertyGroup)
+                        .collect(Collectors.toList()));
     }
 }

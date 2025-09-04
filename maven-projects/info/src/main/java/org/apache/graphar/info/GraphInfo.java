@@ -19,19 +19,14 @@
 
 package org.apache.graphar.info;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.graphar.info.yaml.GraphYaml;
-import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 public class GraphInfo {
     private final String name;
@@ -134,7 +129,7 @@ public class GraphInfo {
     public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
         if (edgeInfo == null
                 || hasEdgeInfo(
-                edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
+                        edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
             return Optional.empty();
         }
         List<EdgeInfo> newEdgeInfos =
