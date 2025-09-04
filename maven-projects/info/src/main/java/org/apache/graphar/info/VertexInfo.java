@@ -19,18 +19,12 @@
 
 package org.apache.graphar.info;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -73,28 +67,6 @@ public class VertexInfo {
                         .collect(Collectors.toUnmodifiableList()),
                 parser.getPrefix(),
                 parser.getVersion());
-    }
-
-    public static VertexInfo load(String vertexInfoPath) throws IOException {
-        return load(vertexInfoPath, new Configuration());
-    }
-
-    public static VertexInfo load(String vertexInfoPath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        return load(vertexInfoPath, FileSystem.get(conf));
-    }
-
-    public static VertexInfo load(String vertexInfoPath, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataInputStream inputStream = fileSystem.open(new Path(vertexInfoPath));
-        Yaml vertexInfoYamlLoader =
-                new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
-        VertexYaml vertexInfoYaml = vertexInfoYamlLoader.load(inputStream);
-        return new VertexInfo(vertexInfoYaml);
     }
 
     public Optional<VertexInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
@@ -143,26 +115,6 @@ public class VertexInfo {
 
     public String getVerticesNumFilePath() {
         return getPrefix() + "vertex_count";
-    }
-
-    public void save(String filePath) throws IOException {
-        save(filePath, new Configuration());
-    }
-
-    public void save(String filePath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        save(filePath, FileSystem.get(conf));
-    }
-
-    public void save(String fileName, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
-        outputStream.writeBytes(dump());
-        outputStream.close();
     }
 
     public String dump() {

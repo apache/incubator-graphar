@@ -27,12 +27,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.graphar.info.yaml.GraphYaml;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -67,15 +63,6 @@ public class GraphInfo {
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         EdgeInfo::getConcat, Function.identity()));
-    }
-
-    private GraphInfo(GraphYaml graphYaml, Configuration conf) throws IOException {
-        this(
-                graphYaml.getName(),
-                vertexFileNames2VertexInfos(graphYaml.getVertices(), conf),
-                edgeFileNames2EdgeInfos(graphYaml.getEdges(), conf),
-                graphYaml.getPrefix(),
-                graphYaml.getVersion());
     }
 
     private GraphInfo(
@@ -113,49 +100,6 @@ public class GraphInfo {
         this.edgeConcat2EdgeInfo = edgeConcat2EdgeInfo;
     }
 
-    public static GraphInfo load(String graphPath) throws IOException {
-        return load(graphPath, new Configuration());
-    }
-
-    public static GraphInfo load(String graphPath, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        return load(graphPath, fileSystem.getConf());
-    }
-
-    public static GraphInfo load(String graphPath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        Path path = new Path(graphPath);
-        FileSystem fileSystem = path.getFileSystem(conf);
-        FSDataInputStream inputStream = fileSystem.open(path);
-        Yaml graphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
-        GraphYaml graphYaml = graphYamlLoader.load(inputStream);
-        return new GraphInfo(graphYaml, conf);
-    }
-
-    public void save(String filePath) throws IOException {
-        save(filePath, new Configuration());
-    }
-
-    public void save(String filePath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        save(filePath, FileSystem.get(conf));
-    }
-
-    public void save(String fileName, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
-        outputStream.writeBytes(dump());
-        outputStream.close();
-    }
-
     public String dump() {
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         GraphYaml graphYaml = new GraphYaml(this);
@@ -190,7 +134,7 @@ public class GraphInfo {
     public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
         if (edgeInfo == null
                 || hasEdgeInfo(
-                        edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
+                edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
             return Optional.empty();
         }
         List<EdgeInfo> newEdgeInfos =
@@ -257,24 +201,6 @@ public class GraphInfo {
 
     public VersionInfo getVersion() {
         return version;
-    }
-
-    private static List<VertexInfo> vertexFileNames2VertexInfos(
-            List<String> vertexFileNames, Configuration conf) throws IOException {
-        ArrayList<VertexInfo> tempVertices = new ArrayList<>(vertexFileNames.size());
-        for (String vertexFileName : vertexFileNames) {
-            tempVertices.add(VertexInfo.load(vertexFileName, conf));
-        }
-        return List.copyOf(tempVertices);
-    }
-
-    private static List<EdgeInfo> edgeFileNames2EdgeInfos(
-            List<String> edgeFileNames, Configuration conf) throws IOException {
-        ArrayList<EdgeInfo> tempEdges = new ArrayList<>(edgeFileNames.size());
-        for (String edgeFileName : edgeFileNames) {
-            tempEdges.add(EdgeInfo.load(edgeFileName, conf));
-        }
-        return List.copyOf(tempEdges);
     }
 
     private void checkVertexExist(String type) {

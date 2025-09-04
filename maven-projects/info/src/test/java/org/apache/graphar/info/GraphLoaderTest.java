@@ -20,8 +20,7 @@
 package org.apache.graphar.info;
 
 import java.io.IOException;
-import org.apache.graphar.info.loader.GraphLoader;
-import org.apache.graphar.info.loader.LocalYamlGraphLoader;
+import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -39,10 +38,9 @@ public class GraphLoaderTest {
 
     @Test
     public void testLoad() {
-        final GraphLoader graphLoader = new LocalYamlGraphLoader();
         final String GRAPH_PATH = TestUtil.getLdbcSampleGraphPath();
         try {
-            final GraphInfo graphInfo = graphLoader.load(GRAPH_PATH);
+            final GraphInfo graphInfo = GraphInfoLoader.load(GRAPH_PATH);
             Assert.assertNotNull(graphInfo);
             Assert.assertNotNull(graphInfo.getEdgeInfos());
             Assert.assertEquals(1, graphInfo.getEdgeInfos().size());

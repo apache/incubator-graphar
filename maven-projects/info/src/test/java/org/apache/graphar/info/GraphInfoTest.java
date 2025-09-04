@@ -20,10 +20,12 @@
 package org.apache.graphar.info;
 
 import java.io.IOException;
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.graphar.info.loader.GraphLoader;
-import org.apache.graphar.info.loader.LocalYamlGraphLoader;
+import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
@@ -44,9 +46,8 @@ public class GraphInfoTest {
     public static void setUp() {
         TestUtil.checkTestData();
         GRAPH_PATH = TestUtil.getLdbcSampleGraphPath();
-        final GraphLoader graphLoader = new LocalYamlGraphLoader();
         try {
-            graphInfo = graphLoader.load(GRAPH_PATH);
+            graphInfo = GraphInfoLoader.load(GRAPH_PATH);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

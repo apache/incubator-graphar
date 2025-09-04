@@ -19,7 +19,6 @@
 
 package org.apache.graphar.info;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,11 +30,6 @@ import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.EdgeYaml;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.util.GeneralParams;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -166,27 +160,6 @@ public class EdgeInfo {
         this.version = version;
     }
 
-    public static EdgeInfo load(String edgeInfoPath) throws IOException {
-        return load(edgeInfoPath, new Configuration());
-    }
-
-    public static EdgeInfo load(String edgeInfoPath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        return load(edgeInfoPath, FileSystem.get(conf));
-    }
-
-    public static EdgeInfo load(String edgeInfoPath, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataInputStream inputStream = fileSystem.open(new Path(edgeInfoPath));
-        Yaml edgeInfoYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
-        EdgeYaml edgeInfoYaml = edgeInfoYamlLoader.load(inputStream);
-        return new EdgeInfo(edgeInfoYaml);
-    }
-
     public static String concat(String srcLabel, String edgeLabel, String dstLabel) {
         return srcLabel
                 + GeneralParams.regularSeparator
@@ -308,26 +281,6 @@ public class EdgeInfo {
 
     public boolean isNullableKey(String propertyName) {
         return propertyGroups.isNullableKey(propertyName);
-    }
-
-    public void save(String filePath) throws IOException {
-        save(filePath, new Configuration());
-    }
-
-    public void save(String filePath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        save(filePath, FileSystem.get(conf));
-    }
-
-    public void save(String fileName, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
-        outputStream.writeBytes(dump());
-        outputStream.close();
     }
 
     public String dump() {

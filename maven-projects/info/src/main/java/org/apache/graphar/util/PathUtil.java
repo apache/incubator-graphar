@@ -20,8 +20,22 @@
 package org.apache.graphar.util;
 
 public class PathUtil {
+
+    public static String resolvePath(String basePath, String subPath) {
+        if (subPath == null || subPath.isEmpty()) {
+            return basePath;
+        }
+        if (subPath.contains("://")) {
+            return subPath;
+        }
+        if (!basePath.contains("://") && subPath.startsWith("/")) {
+            return subPath;
+        }
+        return pathToDirectory(basePath) + subPath;
+    }
+
     public static String pathToDirectory(String path) {
-        if (path.startsWith("s3://")) {
+        if (path.startsWith("s3://") || path.startsWith("oss://")) {
             int t = path.indexOf('?');
             if (t != -1) {
                 String prefix = path.substring(0, t);
