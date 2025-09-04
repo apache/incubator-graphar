@@ -113,7 +113,7 @@ public class TestUtil {
         PropertyGroup pg3 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
 
         EdgeInfo knows =
-                new EdgeInfo.EdgeInfoBuilder()
+                EdgeInfo.EdgeInfoBuilder.builder()
                         .edgeTriplet("person", "knows", "person")
                         .chunkSize(1024)
                         .srcChunkSize(100)

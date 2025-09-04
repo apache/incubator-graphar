@@ -62,6 +62,12 @@ public class EdgeInfo {
         private PropertyGroups propertyGroups;
         private VersionInfo version;
 
+        public static EdgeInfoBuilder builder() {
+            return new EdgeInfoBuilder();
+        }
+
+        private EdgeInfoBuilder() {}
+
         public EdgeInfoBuilder edgeTriplet(String srcType, String edgeType, String dstType) {
             this.edgeTriplet = new EdgeTriplet(srcType, edgeType, dstType);
             return this;
