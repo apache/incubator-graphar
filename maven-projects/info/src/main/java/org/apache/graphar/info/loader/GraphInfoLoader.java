@@ -39,6 +39,7 @@ import org.yaml.snakeyaml.constructor.Constructor;
 public class GraphInfoLoader {
 
     public static GraphInfo load(String graphYamlPath) throws IOException {
+        //default method is read from local file system
         return load(graphYamlPath, (path -> Files.readString(Path.of(path))));
     }
 
@@ -46,7 +47,6 @@ public class GraphInfoLoader {
         final Path path = FileSystems.getDefault().getPath(graphYamlPath);
         // load graph itself
         String yaml = yamlReader.readYaml(graphYamlPath);
-        DataInputStream dataInputStream;
         Yaml GraphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
         GraphYaml graphYaml = GraphYamlLoader.load(yaml);
         //init prefix default value
