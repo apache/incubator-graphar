@@ -20,33 +20,40 @@
 package org.apache.graphar.info.loader;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.stream.Collectors;
+import java.io.InputStream;
+import org.apache.graphar.info.EdgeInfo;
+import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
-import org.apache.graphar.info.yaml.PropertyGroupYaml;
+import org.apache.graphar.info.yaml.EdgeYaml;
+import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-public class VertexInfoLoader {
-    public static VertexInfo load(String edgeYamlPath) throws IOException {
-        return load(edgeYamlPath, (path -> Files.readString(Path.of(path))));
+public abstract class StreamGraphInfoLoader extends BaseGraphInfoLoader {
+
+    public abstract InputStream readYaml(String path) throws IOException;
+
+    public GraphInfo loadGraphInfo(String graphYamlPath) throws IOException {
+        // load graph itself
+        InputStream yaml = readYaml(graphYamlPath);
+        Yaml GraphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
+        GraphYaml graphYaml = GraphYamlLoader.load(yaml);
+        return buildGraphInfoFromGraphYaml(graphYamlPath, graphYaml);
     }
 
-    public static VertexInfo load(String edgeYamlPath, YamlReader yamlReader) throws IOException {
-        String yaml = yamlReader.readYaml(edgeYamlPath);
+    public VertexInfo loadVertexInfo(String vertexYamlPath) throws IOException {
+        InputStream yaml = readYaml(vertexYamlPath);
         Yaml edgeYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
         VertexYaml edgeYaml = edgeYamlLoader.load(yaml);
+        return buildVertexInfoFromGraphYaml(edgeYaml);
+    }
 
-        return new VertexInfo(
-                edgeYaml.getType(),
-                edgeYaml.getChunk_size(),
-                edgeYaml.getProperty_groups().stream()
-                        .map(PropertyGroupYaml::toPropertyGroup)
-                        .collect(Collectors.toList()),
-                edgeYaml.getPrefix(),
-                edgeYaml.getVersion());
+    public EdgeInfo loadEdgeInfo(String edgeYamlPath) throws IOException {
+        InputStream yaml = readYaml(edgeYamlPath);
+        Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
+        EdgeYaml edgeYaml = edgeYamlLoader.load(yaml);
+        return buildEdgeInfoFromGraphYaml(edgeYaml);
     }
 }

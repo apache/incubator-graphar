@@ -39,8 +39,9 @@ public class GraphLoaderTest {
     @Test
     public void testLoad() {
         final String GRAPH_PATH = TestUtil.getLdbcSampleGraphPath();
+        GraphInfoLoader loader = new LocalFileSystemStringStreamLoader();
         try {
-            final GraphInfo graphInfo = GraphInfoLoader.load(GRAPH_PATH);
+            final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH);
             Assert.assertNotNull(graphInfo);
             Assert.assertNotNull(graphInfo.getEdgeInfos());
             Assert.assertEquals(1, graphInfo.getEdgeInfos().size());

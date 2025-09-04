@@ -43,8 +43,9 @@ public class GraphInfoTest {
     public static void setUp() {
         TestUtil.checkTestData();
         GRAPH_PATH = TestUtil.getLdbcSampleGraphPath();
+        GraphInfoLoader loader = new LocalFileSystemStringStreamLoader();
         try {
-            graphInfo = GraphInfoLoader.load(GRAPH_PATH);
+            graphInfo = loader.loadGraphInfo(GRAPH_PATH);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
