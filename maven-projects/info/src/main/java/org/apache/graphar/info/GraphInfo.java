@@ -204,6 +204,10 @@ public class GraphInfo {
         return baseUri.toString();
     }
 
+    public URI getBaseUri() {
+        return baseUri;
+    }
+
     public VersionInfo getVersion() {
         return version;
     }

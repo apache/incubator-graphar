@@ -99,18 +99,18 @@ public class VertexInfo {
         return propertyGroups.hasPropertyGroup(propertyGroup);
     }
 
-    public String getPropertyGroupPrefix(PropertyGroup propertyGroup) {
+    public URI getPropertyGroupPrefix(PropertyGroup propertyGroup) {
         checkPropertyGroupExist(propertyGroup);
-        return getPrefix() + propertyGroup.getPrefix();
+        return getBaseUri().resolve(propertyGroup.getBaseUri());
     }
 
-    public String getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
+    public URI getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
         // PropertyGroup will be checked in getPropertyGroupPrefix
-        return getPropertyGroupPrefix(propertyGroup) + "chunk" + chunkIndex;
+        return getPropertyGroupPrefix(propertyGroup).resolve("chunk" + chunkIndex);
     }
 
-    public String getVerticesNumFilePath() {
-        return getPrefix() + "vertex_count";
+    public URI getVerticesNumFilePath() {
+        return getBaseUri().resolve("vertex_count");
     }
 
     public String dump() {
@@ -135,12 +135,12 @@ public class VertexInfo {
         return baseUri.toString();
     }
 
-    public VersionInfo getVersion() {
-        return version;
+    public URI getBaseUri() {
+        return baseUri;
     }
 
-    public String getVertexPath() {
-        return getPrefix() + getType() + ".vertex.yaml";
+    public VersionInfo getVersion() {
+        return version;
     }
 
     private void checkPropertyGroupExist(PropertyGroup propertyGroup) {

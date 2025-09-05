@@ -19,6 +19,7 @@
 
 package org.apache.graphar.info;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,16 +30,19 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
-import org.apache.graphar.info.yaml.PropertyGroupYaml;
 import org.apache.graphar.util.GeneralParams;
 
 public class PropertyGroup implements Iterable<Property> {
     private final List<Property> propertyList;
     private final Map<String, Property> propertyMap;
     private final FileType fileType;
-    private final String prefix;
+    private final URI baseUri;
 
     public PropertyGroup(List<Property> propertyMap, FileType fileType, String prefix) {
+        this(propertyMap, fileType, URI.create(prefix));
+    }
+
+    public PropertyGroup(List<Property> propertyMap, FileType fileType, URI baseUri) {
         this.propertyList = List.copyOf(propertyMap);
         this.propertyMap =
                 propertyMap.stream()
@@ -46,16 +50,7 @@ public class PropertyGroup implements Iterable<Property> {
                                 Collectors.toUnmodifiableMap(
                                         Property::getName, Function.identity()));
         this.fileType = fileType;
-        this.prefix = prefix;
-    }
-
-    PropertyGroup(PropertyGroupYaml yamlParser) {
-        this(
-                yamlParser.getProperties().stream()
-                        .map(Property::new)
-                        .collect(Collectors.toUnmodifiableList()),
-                FileType.fromString(yamlParser.getFile_type()),
-                yamlParser.getPrefix());
+        this.baseUri = baseUri;
     }
 
     public Optional<PropertyGroup> addPropertyAsNew(Property property) {
@@ -65,7 +60,7 @@ public class PropertyGroup implements Iterable<Property> {
         List<Property> newPropertyMap =
                 Stream.concat(propertyMap.values().stream(), Stream.of(property))
                         .collect(Collectors.toUnmodifiableList());
-        return Optional.of(new PropertyGroup(newPropertyMap, fileType, prefix));
+        return Optional.of(new PropertyGroup(newPropertyMap, fileType, baseUri));
     }
 
     @Override
@@ -97,7 +92,11 @@ public class PropertyGroup implements Iterable<Property> {
     }
 
     public String getPrefix() {
-        return prefix;
+        return baseUri.toString();
+    }
+
+    public URI getBaseUri() {
+        return baseUri;
     }
 }
 

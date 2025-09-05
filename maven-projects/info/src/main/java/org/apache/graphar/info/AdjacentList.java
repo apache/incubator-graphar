@@ -19,27 +19,23 @@
 
 package org.apache.graphar.info;
 
+import java.net.URI;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.FileType;
-import org.apache.graphar.info.yaml.AdjacentListYaml;
 
 public class AdjacentList {
     private final AdjListType type;
     private final FileType fileType;
-    private final String prefix;
+    private final URI baseUri;
 
-    public AdjacentList(AdjListType type, FileType fileType, String prefix) {
+    public AdjacentList(AdjListType type, FileType fileType, URI baseUri) {
         this.type = type;
         this.fileType = fileType;
-        this.prefix = prefix;
+        this.baseUri = baseUri;
     }
 
-    AdjacentList(AdjacentListYaml yamlParser) {
-        this.type =
-                AdjListType.fromOrderedAndAlignedBy(
-                        yamlParser.isOrdered(), yamlParser.getAligned_by());
-        this.fileType = FileType.fromString(yamlParser.getFile_type());
-        this.prefix = yamlParser.getPrefix();
+    public AdjacentList(AdjListType type, FileType fileType, String prefix) {
+        this(type, fileType, URI.create(prefix));
     }
 
     public AdjListType getType() {
@@ -51,6 +47,10 @@ public class AdjacentList {
     }
 
     public String getPrefix() {
-        return prefix;
+        return baseUri.toString();
+    }
+
+    public URI getBaseUri() {
+        return baseUri;
     }
 }
