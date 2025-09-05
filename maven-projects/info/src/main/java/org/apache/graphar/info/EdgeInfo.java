@@ -19,11 +19,6 @@
 
 package org.apache.graphar.info;
 
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.EdgeYaml;
@@ -37,6 +32,15 @@ import org.apache.hadoop.fs.Path;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EdgeInfo {
     private final EdgeTriplet edgeTriplet;
@@ -48,6 +52,10 @@ public class EdgeInfo {
     private final Map<AdjListType, AdjacentList> adjacentLists;
     private final PropertyGroups propertyGroups;
     private final VersionInfo version;
+
+    public static EdgeInfoBuilder builder(){
+        return new EdgeInfoBuilder();
+    }
 
     public static final class EdgeInfoBuilder {
         private EdgeTriplet edgeTriplet;
@@ -67,9 +75,6 @@ public class EdgeInfo {
         private String edgeType;
         private String dstType;
 
-        public static EdgeInfoBuilder builder() {
-            return new EdgeInfoBuilder();
-        }
 
         private EdgeInfoBuilder() {}
 
@@ -125,15 +130,17 @@ public class EdgeInfo {
         }
 
         public EdgeInfoBuilder addAdjacentList(AdjacentList adjacentList) {
-            if(adjacentListsAsListTemp == null)
+            if(adjacentListsAsListTemp == null){
                 adjacentListsAsListTemp = new ArrayList<>();
+                }
             adjacentListsAsListTemp.add(adjacentList);
             return this;
         }
 
         public EdgeInfoBuilder adjacentLists(List<AdjacentList> adjacentListsAsList) {
-            if(adjacentListsAsListTemp == null)
+            if(adjacentListsAsListTemp == null) {
                 adjacentListsAsListTemp = new ArrayList<>();
+            }
             this.adjacentListsAsListTemp.addAll(adjacentListsAsList);
             return this;
         }
@@ -150,14 +157,14 @@ public class EdgeInfo {
             return this;
         }
 
-        public EdgeInfoBuilder propertyGroups(List<PropertyGroup> propertyGroups) {
+        public EdgeInfoBuilder addPropertyGroups(List<PropertyGroup> propertyGroups) {
             if(propertyGroupsAsListTemp == null)
                 propertyGroupsAsListTemp = new ArrayList<>();
             propertyGroupsAsListTemp.addAll(propertyGroups);
             return this;
         }
 
-        private EdgeInfoBuilder propertyGroups(PropertyGroups propertyGroups) {
+        private EdgeInfoBuilder addPropertyGroups(PropertyGroups propertyGroups) {
             this.propertyGroups = propertyGroups;
             return this;
         }
@@ -173,32 +180,39 @@ public class EdgeInfo {
         }
 
         public EdgeInfo build() {
-            if(adjacentLists == null)
+            if(adjacentLists == null) {
                 adjacentLists = new HashMap<>();
-
-            if(adjacentListsAsListTemp != null)
-                adjacentLists.putAll(
-                    adjacentListsAsListTemp.stream()
-                            .collect(
-                                    Collectors.toUnmodifiableMap(
-                                            AdjacentList::getType, Function.identity())));
-
-            if(propertyGroups == null)
-                propertyGroups = new PropertyGroups(propertyGroupsAsListTemp);
-            else {
-                if(propertyGroupsAsListTemp != null)
-                    propertyGroups = propertyGroupsAsListTemp.stream()
-                        .map(propertyGroups::addPropertyGroupAsNew)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .reduce((first, second) -> second)
-                        .orElse(new PropertyGroups(new ArrayList<>()));
-                else
-                    propertyGroups = new PropertyGroups(new ArrayList<>());
             }
 
-            if(edgeTriplet == null && srcType != null && edgeType != null && dstType != null)
+            if(adjacentListsAsListTemp != null) {
+                adjacentLists.putAll(
+                        adjacentListsAsListTemp.stream()
+                                .collect(
+                                        Collectors.toUnmodifiableMap(
+                                                AdjacentList::getType, Function.identity())));
+            }
+
+            if(propertyGroups == null) {
+                propertyGroups = new PropertyGroups(propertyGroupsAsListTemp);
+            }
+            else {
+                if(propertyGroupsAsListTemp != null) {
+                    propertyGroups = propertyGroupsAsListTemp.stream()
+                            .map(propertyGroups::addPropertyGroupAsNew)
+                            .filter(Optional::isPresent)
+                            .map(Optional::get)
+                            .reduce((first, second) -> second)
+                            .orElse(new PropertyGroups(new ArrayList<>()));
+                }
+                else {
+                    propertyGroups = new PropertyGroups(new ArrayList<>());
+                }
+            }
+
+            if(edgeTriplet == null && srcType != null && edgeType != null && dstType != null) {
                 edgeTriplet = new EdgeTriplet(srcType, edgeType, dstType);
+            }
+
 
 
             return new EdgeInfo(this);
