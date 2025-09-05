@@ -20,9 +20,11 @@
 package org.apache.graphar.info.loader;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -35,15 +37,15 @@ import org.apache.graphar.util.PathUtil;
 
 public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
 
-    public abstract GraphInfo loadGraphInfo(String graphYamlPath) throws IOException;
+    public abstract GraphInfo loadGraphInfo(URI graphYamlUri) throws IOException;
 
-    public abstract VertexInfo loadVertexInfo(String graphYamlPath) throws IOException;
+    public abstract VertexInfo loadVertexInfo(URI vertexYamlUri) throws IOException;
 
-    public abstract EdgeInfo loadEdgeInfo(String edgeYamlPath) throws IOException;
+    public abstract EdgeInfo loadEdgeInfo(URI edgeYamlUri) throws IOException;
 
-    public GraphInfo buildGraphInfoFromGraphYaml(String basePath, GraphYaml graphYaml)
+    public GraphInfo buildGraphInfoFromGraphYaml(URI baseUri, GraphYaml graphYaml)
             throws IOException {
-        String prefix = PathUtil.pathToDirectory(basePath);
+        String prefix = PathUtil.pathToDirectory(baseUri.getPath());
         if (graphYaml.getPrefix() != null && !graphYaml.getPrefix().isEmpty()) {
             prefix = graphYaml.getPrefix();
         }
@@ -51,14 +53,14 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
         // load vertices
         List<VertexInfo> vertexInfos = new ArrayList<>(graphYaml.getVertices().size());
         for (String vertexYamlPath : graphYaml.getVertices()) {
-            String vertexInfoPath = PathUtil.resolvePath(basePath, vertexYamlPath);
-            vertexInfos.add(loadVertexInfo(vertexInfoPath));
+            URI vertexInfoUri = baseUri.resolve(vertexYamlPath);
+            vertexInfos.add(loadVertexInfo(vertexInfoUri));
         }
         // load edges
         List<EdgeInfo> edgeInfos = new ArrayList<>(graphYaml.getEdges().size());
         for (String edgeYamlPath : graphYaml.getEdges()) {
-            String EdgeInfoPath = PathUtil.resolvePath(basePath, edgeYamlPath);
-            edgeInfos.add(loadEdgeInfo(EdgeInfoPath));
+            URI edgeInfoUri = baseUri.resolve(edgeYamlPath);
+            edgeInfos.add(loadEdgeInfo(edgeInfoUri));
         }
         return new GraphInfo(
                 graphYaml.getName(), vertexInfos, edgeInfos, prefix, graphYaml.getVersion());

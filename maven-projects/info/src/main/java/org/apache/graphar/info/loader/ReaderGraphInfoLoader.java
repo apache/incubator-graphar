@@ -21,6 +21,8 @@ package org.apache.graphar.info.loader;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.net.URI;
+
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -33,24 +35,27 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 public abstract class ReaderGraphInfoLoader extends BaseGraphInfoLoader {
 
-    public abstract Reader readYaml(String path) throws IOException;
+    public abstract Reader readYaml(URI uri) throws IOException;
 
-    public GraphInfo loadGraphInfo(String graphYamlPath) throws IOException {
-        Reader yaml = readYaml(graphYamlPath);
+    @Override
+    public GraphInfo loadGraphInfo(URI graphYamlUri) throws IOException {
+        Reader yaml = readYaml(graphYamlUri);
         Yaml GraphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
         GraphYaml graphYaml = GraphYamlLoader.load(yaml);
-        return buildGraphInfoFromGraphYaml(graphYamlPath, graphYaml);
+        return buildGraphInfoFromGraphYaml(graphYamlUri, graphYaml);
     }
 
-    public VertexInfo loadVertexInfo(String vertexYamlPath) throws IOException {
-        Reader yaml = readYaml(vertexYamlPath);
+    @Override
+    public VertexInfo loadVertexInfo(URI vertexYamlUri) throws IOException {
+        Reader yaml = readYaml(vertexYamlUri);
         Yaml vertexYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
         VertexYaml vertexYaml = vertexYamlLoader.load(yaml);
         return buildVertexInfoFromGraphYaml(vertexYaml);
     }
 
-    public EdgeInfo loadEdgeInfo(String edgeYamlPath) throws IOException {
-        Reader yaml = readYaml(edgeYamlPath);
+    @Override
+    public EdgeInfo loadEdgeInfo(URI edgeYamlUri) throws IOException {
+        Reader yaml = readYaml(edgeYamlUri);
         Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
         EdgeYaml edgeYaml = edgeYamlLoader.load(yaml);
         return buildEdgeInfoFromGraphYaml(edgeYaml);

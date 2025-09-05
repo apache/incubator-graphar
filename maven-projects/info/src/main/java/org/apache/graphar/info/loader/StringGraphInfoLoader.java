@@ -20,6 +20,8 @@
 package org.apache.graphar.info.loader;
 
 import java.io.IOException;
+import java.net.URI;
+
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -32,24 +34,27 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 public abstract class StringGraphInfoLoader extends BaseGraphInfoLoader {
 
-    public abstract String readYaml(String path) throws IOException;
+    public abstract String readYaml(URI uri) throws IOException;
 
-    public GraphInfo loadGraphInfo(String graphYamlPath) throws IOException {
-        String yaml = readYaml(graphYamlPath);
+    @Override
+    public GraphInfo loadGraphInfo(URI graphYamlUri) throws IOException {
+        String yaml = readYaml(graphYamlUri);
         Yaml GraphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
         GraphYaml graphYaml = GraphYamlLoader.load(yaml);
-        return buildGraphInfoFromGraphYaml(graphYamlPath, graphYaml);
+        return buildGraphInfoFromGraphYaml(graphYamlUri, graphYaml);
     }
 
-    public VertexInfo loadVertexInfo(String vertexYamlPath) throws IOException {
-        String yaml = readYaml(vertexYamlPath);
+    @Override
+    public VertexInfo loadVertexInfo(URI vertexYamlUri) throws IOException {
+        String yaml = readYaml(vertexYamlUri);
         Yaml vertexYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
         VertexYaml vertexYaml = vertexYamlLoader.load(yaml);
         return buildVertexInfoFromGraphYaml(vertexYaml);
     }
 
-    public EdgeInfo loadEdgeInfo(String edgeYamlPath) throws IOException {
-        String yaml = readYaml(edgeYamlPath);
+    @Override
+    public EdgeInfo loadEdgeInfo(URI edgeYamlUri) throws IOException {
+        String yaml = readYaml(edgeYamlUri);
         Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
         EdgeYaml edgeYaml = edgeYamlLoader.load(yaml);
         return buildEdgeInfoFromGraphYaml(edgeYaml);

@@ -21,6 +21,8 @@ package org.apache.graphar.info.loader;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -33,25 +35,28 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 public abstract class StreamGraphInfoLoader extends BaseGraphInfoLoader {
 
-    public abstract InputStream readYaml(String path) throws IOException;
+    public abstract InputStream readYaml(URI uri) throws IOException;
 
-    public GraphInfo loadGraphInfo(String graphYamlPath) throws IOException {
+    @Override
+    public GraphInfo loadGraphInfo(URI graphYamluri) throws IOException {
         // load graph itself
-        InputStream yaml = readYaml(graphYamlPath);
+        InputStream yaml = readYaml(graphYamluri);
         Yaml GraphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
         GraphYaml graphYaml = GraphYamlLoader.load(yaml);
-        return buildGraphInfoFromGraphYaml(graphYamlPath, graphYaml);
+        return buildGraphInfoFromGraphYaml(graphYamluri, graphYaml);
     }
 
-    public VertexInfo loadVertexInfo(String vertexYamlPath) throws IOException {
-        InputStream yaml = readYaml(vertexYamlPath);
+    @Override
+    public VertexInfo loadVertexInfo(URI vertexYamlUri) throws IOException {
+        InputStream yaml = readYaml(vertexYamlUri);
         Yaml edgeYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
         VertexYaml edgeYaml = edgeYamlLoader.load(yaml);
         return buildVertexInfoFromGraphYaml(edgeYaml);
     }
 
-    public EdgeInfo loadEdgeInfo(String edgeYamlPath) throws IOException {
-        InputStream yaml = readYaml(edgeYamlPath);
+    @Override
+    public EdgeInfo loadEdgeInfo(URI edgeYamlUri) throws IOException {
+        InputStream yaml = readYaml(edgeYamlUri);
         Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
         EdgeYaml edgeYaml = edgeYamlLoader.load(yaml);
         return buildEdgeInfoFromGraphYaml(edgeYaml);

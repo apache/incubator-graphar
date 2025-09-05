@@ -20,15 +20,17 @@
 package org.apache.graphar.info.loader;
 
 import java.io.IOException;
+import java.net.URI;
+
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
 
 public interface GraphInfoLoader {
 
-    GraphInfo loadGraphInfo(String graphYamlPath) throws IOException;
+    GraphInfo loadGraphInfo(URI graphYamlUri) throws IOException;
 
-    VertexInfo loadVertexInfo(String graphYamlPath) throws IOException;
+    VertexInfo loadVertexInfo(URI vertexYamlUri) throws IOException;
 
-    EdgeInfo loadEdgeInfo(String edgeYamlPath) throws IOException;
+    EdgeInfo loadEdgeInfo(URI edgeYamlUri) throws IOException;
 }

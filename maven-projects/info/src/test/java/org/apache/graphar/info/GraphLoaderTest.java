@@ -20,6 +20,8 @@
 package org.apache.graphar.info;
 
 import java.io.IOException;
+import java.nio.file.Path;
+
 import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -41,7 +43,7 @@ public class GraphLoaderTest {
         final String GRAPH_PATH = TestUtil.getLdbcSampleGraphPath();
         GraphInfoLoader loader = new LocalFileSystemStringStreamLoader();
         try {
-            final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH);
+            final GraphInfo graphInfo = loader.loadGraphInfo(Path.of(GRAPH_PATH).toUri());
             Assert.assertNotNull(graphInfo);
             Assert.assertNotNull(graphInfo.getEdgeInfos());
             Assert.assertEquals(1, graphInfo.getEdgeInfos().size());
