@@ -22,7 +22,6 @@ package org.apache.graphar.info.loader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;

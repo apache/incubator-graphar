@@ -20,11 +20,9 @@
 package org.apache.graphar.info;
 
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
@@ -57,8 +55,7 @@ public class GraphInfoTest {
     }
 
     @AfterClass
-    public static void clean() {
-    }
+    public static void clean() {}
 
     @Test
     public void test() {
@@ -69,7 +66,8 @@ public class GraphInfoTest {
     public void testGraphInfoBasics() {
         Assert.assertNotNull(graphInfo);
         Assert.assertEquals("ldbc_sample", graphInfo.getName());
-        Assert.assertEquals(Path.of(GRAPH_PATH).getParent().toString()+"/", graphInfo.getPrefix());
+        Assert.assertEquals(
+                Path.of(GRAPH_PATH).getParent().toString() + "/", graphInfo.getPrefix());
         Assert.assertNotNull(graphInfo.getEdgeInfos());
         Assert.assertEquals(1, graphInfo.getEdgeInfos().size());
         Assert.assertNotNull(graphInfo.getVertexInfos());

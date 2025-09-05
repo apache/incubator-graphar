@@ -21,7 +21,6 @@ package org.apache.graphar.info;
 
 import java.io.IOException;
 import java.nio.file.Path;
-
 import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.junit.AfterClass;
 import org.junit.Assert;
