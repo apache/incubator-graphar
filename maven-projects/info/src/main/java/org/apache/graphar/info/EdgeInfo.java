@@ -213,6 +213,18 @@ public class EdgeInfo {
                 edgeTriplet = new EdgeTriplet(srcType, edgeType, dstType);
             }
 
+            if(edgeTriplet == null) {
+                throw new IllegalArgumentException("Edge triplet is null");
+            }
+
+            if(propertyGroups.getProperties().isEmpty()) {
+                throw new IllegalArgumentException("PropertyGroups is empty");
+            }
+
+            if(adjacentListsAsListTemp.isEmpty()) {
+                throw new IllegalArgumentException("AdjacentLists is empty");
+            }
+
 
 
             return new EdgeInfo(this);
