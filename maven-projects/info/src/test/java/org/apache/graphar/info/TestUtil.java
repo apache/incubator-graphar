@@ -113,7 +113,7 @@ public class TestUtil {
         PropertyGroup pg3 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
 
         EdgeInfo knows =
-                EdgeInfo.EdgeInfoBuilder.builder()
+                EdgeInfo.builder()
                         .edgeTriplet("person", "knows", "person")
                         .chunkSize(1024)
                         .srcChunkSize(100)
@@ -122,7 +122,7 @@ public class TestUtil {
                         .prefix("edge/person_knows_person/")
                         .version("gar/v1")
                         .adjacentLists(List.of(orderedBySource, orderedByDest))
-                        .propertyGroups(List.of(pg3))
+                        .addPropertyGroups(List.of(pg3))
                         .build();
 
         // create graph info of yaml:
