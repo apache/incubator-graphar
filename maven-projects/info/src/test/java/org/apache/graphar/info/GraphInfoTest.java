@@ -58,11 +58,6 @@ public class GraphInfoTest {
     public static void clean() {}
 
     @Test
-    public void test() {
-        System.out.println(PathUtil.resolvePath("s3:///tmp/graphar", "ldbc"));
-    }
-
-    @Test
     public void testGraphInfoBasics() {
         Assert.assertNotNull(graphInfo);
         Assert.assertEquals("ldbc_sample", graphInfo.getName());

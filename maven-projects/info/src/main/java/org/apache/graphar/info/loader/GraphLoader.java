@@ -17,11 +17,12 @@
  * under the License.
  */
 
-package org.apache.graphar.info.saver;
+package org.apache.graphar.info.loader;
 
 import java.io.IOException;
+import org.apache.graphar.info.GraphInfo;
 
 @FunctionalInterface
-public interface YamlSaver {
-    void saveYaml(String path, String yaml) throws IOException;
+public interface GraphLoader {
+    public GraphInfo load(String graphYamlPath) throws IOException;
 }
