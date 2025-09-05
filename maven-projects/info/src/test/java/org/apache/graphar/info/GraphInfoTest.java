@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.graphar.info.loader.GraphInfoLoader;
+import org.apache.graphar.info.loader.impl.LocalFileSystemStreamGraphInfoLoader;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
@@ -43,7 +44,7 @@ public class GraphInfoTest {
     public static void setUp() {
         TestUtil.checkTestData();
         GRAPH_PATH_URI = TestUtil.getLdbcSampleGraphURI();
-        GraphInfoLoader loader = new LocalFileSystemStringStreamLoader();
+        GraphInfoLoader loader = new LocalFileSystemStreamGraphInfoLoader();
         try {
             graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
         } catch (IOException e) {

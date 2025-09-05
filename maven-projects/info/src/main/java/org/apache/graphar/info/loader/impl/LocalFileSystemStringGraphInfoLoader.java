@@ -17,21 +17,25 @@
  * under the License.
  */
 
-package org.apache.graphar.info;
+package org.apache.graphar.info.loader.impl;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import org.apache.graphar.info.loader.StreamGraphInfoLoader;
+import org.apache.graphar.info.loader.StringGraphInfoLoader;
 
-public class LocalFileSystemStringStreamLoader extends StreamGraphInfoLoader {
+public class LocalFileSystemStringGraphInfoLoader extends StringGraphInfoLoader {
     @Override
-    public InputStream readYaml(URI uri) throws IOException {
+    public String readYaml(URI uri) throws IOException {
         if (uri.getScheme() != null && !"file".equals(uri.getScheme())) {
-            throw new RuntimeException("Only file:// scheme is supported in Local File System");
+            throw new IllegalArgumentException(
+                    "Only file:// scheme is supported in Local File System");
         }
         String path = uri.getPath();
-        return new FileInputStream(path);
+        try (FileInputStream fis = new FileInputStream(path)) {
+            byte[] data = new byte[fis.available()];
+            fis.read(data);
+            return new String(data);
+        }
     }
 }
