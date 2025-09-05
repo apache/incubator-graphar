@@ -19,12 +19,14 @@
 
 package org.apache.graphar.info;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.yaml.snakeyaml.Yaml;
 
@@ -32,7 +34,7 @@ public class GraphInfo {
     private final String name;
     private final List<VertexInfo> vertexInfos;
     private final List<EdgeInfo> edgeInfos;
-    private final String prefix;
+    private final URI baseUri;
     private final Map<String, VertexInfo> vertexType2VertexInfo;
     private final Map<String, EdgeInfo> edgeConcat2EdgeInfo;
     private final VersionInfo version;
@@ -43,10 +45,19 @@ public class GraphInfo {
             List<EdgeInfo> edgeInfos,
             String prefix,
             String version) {
+        this(name, vertexInfos, edgeInfos, URI.create(prefix), version);
+    }
+
+    public GraphInfo(
+            String name,
+            List<VertexInfo> vertexInfos,
+            List<EdgeInfo> edgeInfos,
+            URI baseUri,
+            String version) {
         this.name = name;
         this.vertexInfos = List.copyOf(vertexInfos);
         this.edgeInfos = List.copyOf(edgeInfos);
-        this.prefix = prefix;
+        this.baseUri = baseUri;
         this.version = VersionParser.getVersion(version);
         this.vertexType2VertexInfo =
                 vertexInfos.stream()
@@ -64,7 +75,7 @@ public class GraphInfo {
             String name,
             List<VertexInfo> vertexInfos,
             List<EdgeInfo> edgeInfos,
-            String prefix,
+            URI baseUri,
             String version,
             Map<String, VertexInfo> vertexType2VertexInfo,
             Map<String, EdgeInfo> edgeConcat2EdgeInfo) {
@@ -72,7 +83,7 @@ public class GraphInfo {
                 name,
                 vertexInfos,
                 edgeInfos,
-                prefix,
+                baseUri,
                 VersionParser.getVersion(version),
                 vertexType2VertexInfo,
                 edgeConcat2EdgeInfo);
@@ -82,14 +93,14 @@ public class GraphInfo {
             String name,
             List<VertexInfo> vertexInfos,
             List<EdgeInfo> edgeInfos,
-            String prefix,
+            URI baseUri,
             VersionInfo version,
             Map<String, VertexInfo> vertexType2VertexInfo,
             Map<String, EdgeInfo> edgeConcat2EdgeInfo) {
         this.name = name;
         this.vertexInfos = vertexInfos;
         this.edgeInfos = edgeInfos;
-        this.prefix = prefix;
+        this.baseUri = baseUri;
         this.version = version;
         this.vertexType2VertexInfo = vertexType2VertexInfo;
         this.edgeConcat2EdgeInfo = edgeConcat2EdgeInfo;
@@ -120,7 +131,7 @@ public class GraphInfo {
                         name,
                         newVertexInfos,
                         edgeInfos,
-                        prefix,
+                        baseUri,
                         version,
                         newVertexType2VertexInfo,
                         edgeConcat2EdgeInfo));
@@ -129,7 +140,7 @@ public class GraphInfo {
     public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
         if (edgeInfo == null
                 || hasEdgeInfo(
-                        edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
+                edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
             return Optional.empty();
         }
         List<EdgeInfo> newEdgeInfos =
@@ -146,7 +157,7 @@ public class GraphInfo {
                         name,
                         vertexInfos,
                         newEdgeInfos,
-                        prefix,
+                        baseUri,
                         version,
                         vertexType2VertexInfo,
                         newEdgeConcat2EdgeInfo));
@@ -191,7 +202,7 @@ public class GraphInfo {
     }
 
     public String getPrefix() {
-        return prefix;
+        return baseUri.toString();
     }
 
     public VersionInfo getVersion() {

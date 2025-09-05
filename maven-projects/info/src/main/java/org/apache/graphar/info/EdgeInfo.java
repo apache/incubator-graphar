@@ -19,12 +19,14 @@
 
 package org.apache.graphar.info;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.EdgeYaml;
@@ -38,10 +40,36 @@ public class EdgeInfo {
     private final long srcChunkSize;
     private final long dstChunkSize;
     private final boolean directed;
-    private final String prefix;
+    private final URI baseUri;
     private final Map<AdjListType, AdjacentList> adjacentLists;
     private final PropertyGroups propertyGroups;
     private final VersionInfo version;
+
+    public EdgeInfo(
+            String srcType,
+            String edgeType,
+            String dstType,
+            long chunkSize,
+            long srcChunkSize,
+            long dstChunkSize,
+            boolean directed,
+            URI baseUri,
+            String version,
+            List<AdjacentList> adjacentListsAsList,
+            List<PropertyGroup> propertyGroupsAsList) {
+        this(
+                srcType,
+                edgeType,
+                dstType,
+                chunkSize,
+                srcChunkSize,
+                dstChunkSize,
+                directed,
+                baseUri,
+                VersionParser.getVersion(version),
+                adjacentListsAsList,
+                propertyGroupsAsList);
+    }
 
     public EdgeInfo(
             String srcType,
@@ -63,8 +91,8 @@ public class EdgeInfo {
                 srcChunkSize,
                 dstChunkSize,
                 directed,
-                prefix,
-                VersionParser.getVersion(version),
+                URI.create(prefix),
+                version,
                 adjacentListsAsList,
                 propertyGroupsAsList);
     }
@@ -77,7 +105,7 @@ public class EdgeInfo {
             long srcChunkSize,
             long dstChunkSize,
             boolean directed,
-            String prefix,
+            URI baseUri,
             VersionInfo version,
             List<AdjacentList> adjacentListsAsList,
             List<PropertyGroup> propertyGroupsAsList) {
@@ -86,7 +114,7 @@ public class EdgeInfo {
         this.srcChunkSize = srcChunkSize;
         this.dstChunkSize = dstChunkSize;
         this.directed = directed;
-        this.prefix = prefix;
+        this.baseUri = baseUri;
         this.adjacentLists =
                 adjacentListsAsList.stream()
                         .collect(
@@ -96,32 +124,13 @@ public class EdgeInfo {
         this.version = version;
     }
 
-    private EdgeInfo(EdgeYaml yamlParser) {
-        this(
-                yamlParser.getSrc_type(),
-                yamlParser.getEdge_type(),
-                yamlParser.getDst_type(),
-                yamlParser.getChunk_size(),
-                yamlParser.getSrc_chunk_size(),
-                yamlParser.getDst_chunk_size(),
-                yamlParser.isDirected(),
-                yamlParser.getPrefix(),
-                yamlParser.getVersion(),
-                yamlParser.getAdj_lists().stream()
-                        .map(AdjacentList::new)
-                        .collect(Collectors.toUnmodifiableList()),
-                yamlParser.getProperty_groups().stream()
-                        .map(PropertyGroup::new)
-                        .collect(Collectors.toUnmodifiableList()));
-    }
-
     private EdgeInfo(
             EdgeTriplet edgeTriplet,
             long chunkSize,
             long srcChunkSize,
             long dstChunkSize,
             boolean directed,
-            String prefix,
+            URI baseUri,
             String version,
             Map<AdjListType, AdjacentList> adjacentLists,
             PropertyGroups propertyGroups) {
@@ -131,7 +140,7 @@ public class EdgeInfo {
                 srcChunkSize,
                 dstChunkSize,
                 directed,
-                prefix,
+                baseUri,
                 VersionParser.getVersion(version),
                 adjacentLists,
                 propertyGroups);
@@ -143,7 +152,7 @@ public class EdgeInfo {
             long srcChunkSize,
             long dstChunkSize,
             boolean directed,
-            String prefix,
+            URI baseUri,
             VersionInfo version,
             Map<AdjListType, AdjacentList> adjacentLists,
             PropertyGroups propertyGroups) {
@@ -152,7 +161,7 @@ public class EdgeInfo {
         this.srcChunkSize = srcChunkSize;
         this.dstChunkSize = dstChunkSize;
         this.directed = directed;
-        this.prefix = prefix;
+        this.baseUri = baseUri;
         this.adjacentLists = adjacentLists;
         this.propertyGroups = propertyGroups;
         this.version = version;
@@ -184,7 +193,7 @@ public class EdgeInfo {
                         srcChunkSize,
                         dstChunkSize,
                         directed,
-                        prefix,
+                        baseUri,
                         version,
                         newAdjacentLists,
                         propertyGroups));
@@ -201,7 +210,7 @@ public class EdgeInfo {
                                         srcChunkSize,
                                         dstChunkSize,
                                         directed,
-                                        prefix,
+                                        baseUri,
                                         version,
                                         adjacentLists,
                                         newPropertyGroups));
@@ -320,7 +329,7 @@ public class EdgeInfo {
     }
 
     public String getPrefix() {
-        return prefix;
+        return baseUri.toString();
     }
 
     public String getEdgePath() {

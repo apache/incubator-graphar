@@ -19,7 +19,9 @@
 
 package org.apache.graphar.info;
 
+import java.net.URI;
 import java.util.List;
+
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
@@ -38,6 +40,10 @@ public class TestUtil {
 
     public static String getLdbcSampleGraphPath() {
         return getTestData() + "/" + LDBC_SAMPLE_GRAPH_PATH;
+    }
+
+    public static URI getLdbcSampleGraphURI() {
+        return URI.create(getLdbcSampleGraphPath());
     }
 
     public static GraphInfo getLdbcSampleDataSet() {

@@ -20,14 +20,14 @@
 package org.apache.graphar.info;
 
 import java.io.IOException;
-import java.nio.file.Path;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
-import org.apache.graphar.util.PathUtil;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -38,15 +38,15 @@ public class GraphInfoTest {
     private static GraphInfo graphInfo;
     private static VertexInfo personVertexInfo;
     private static EdgeInfo knowsEdgeInfo;
-    private static String GRAPH_PATH;
+    private static URI GRAPH_PATH_URI;
 
     @BeforeClass
     public static void setUp() {
         TestUtil.checkTestData();
-        GRAPH_PATH = TestUtil.getLdbcSampleGraphPath();
+        GRAPH_PATH_URI = TestUtil.getLdbcSampleGraphURI();
         GraphInfoLoader loader = new LocalFileSystemStringStreamLoader();
         try {
-            graphInfo = loader.loadGraphInfo(Path.of(GRAPH_PATH).toUri());
+            graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -67,7 +67,7 @@ public class GraphInfoTest {
         Assert.assertNotNull(graphInfo);
         Assert.assertEquals("ldbc_sample", graphInfo.getName());
         Assert.assertEquals(
-                Path.of(GRAPH_PATH).getParent().toString() + "/", graphInfo.getPrefix());
+                GRAPH_PATH_URI.toString(), graphInfo.getPrefix());
         Assert.assertNotNull(graphInfo.getEdgeInfos());
         Assert.assertEquals(1, graphInfo.getEdgeInfos().size());
         Assert.assertNotNull(graphInfo.getVertexInfos());

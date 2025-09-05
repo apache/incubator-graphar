@@ -19,9 +19,11 @@
 
 package org.apache.graphar.info;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
@@ -31,7 +33,7 @@ public class VertexInfo {
     private final String type;
     private final long chunkSize;
     private final PropertyGroups propertyGroups;
-    private final String prefix;
+    private final URI baseUri;
     private final VersionInfo version;
 
     public VertexInfo(
@@ -40,31 +42,29 @@ public class VertexInfo {
             List<PropertyGroup> propertyGroups,
             String prefix,
             String version) {
-        this(type, chunkSize, propertyGroups, prefix, VersionParser.getVersion(version));
+        this(type, chunkSize, propertyGroups, URI.create(prefix), version);
     }
 
     public VertexInfo(
             String type,
             long chunkSize,
             List<PropertyGroup> propertyGroups,
-            String prefix,
+            URI baseUri,
+            String version) {
+        this(type, chunkSize, propertyGroups, baseUri, VersionParser.getVersion(version));
+    }
+
+    public VertexInfo(
+            String type,
+            long chunkSize,
+            List<PropertyGroup> propertyGroups,
+            URI baseUri,
             VersionInfo version) {
         this.type = type;
         this.chunkSize = chunkSize;
         this.propertyGroups = new PropertyGroups(propertyGroups);
-        this.prefix = prefix;
+        this.baseUri = baseUri;
         this.version = version;
-    }
-
-    private VertexInfo(VertexYaml parser) {
-        this(
-                parser.getType(),
-                parser.getChunk_size(),
-                parser.getProperty_groups().stream()
-                        .map(PropertyGroup::new)
-                        .collect(Collectors.toUnmodifiableList()),
-                parser.getPrefix(),
-                parser.getVersion());
     }
 
     public Optional<VertexInfo> addPropertyGroupAsNew(PropertyGroup propertyGroup) {
@@ -74,7 +74,7 @@ public class VertexInfo {
                 .map(
                         newPropertyGroups ->
                                 new VertexInfo(
-                                        type, chunkSize, newPropertyGroups, prefix, version));
+                                        type, chunkSize, newPropertyGroups, baseUri, version));
     }
 
     public int propertyGroupNum() {
@@ -134,7 +134,7 @@ public class VertexInfo {
     }
 
     public String getPrefix() {
-        return prefix;
+        return baseUri.toString();
     }
 
     public VersionInfo getVersion() {
