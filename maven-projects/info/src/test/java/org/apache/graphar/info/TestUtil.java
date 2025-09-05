@@ -40,6 +40,13 @@ public class TestUtil {
         return getTestData() + "/" + LDBC_SAMPLE_GRAPH_PATH;
     }
 
+    public static AdjacentList orderedBySource =
+            new AdjacentList(AdjListType.ordered_by_source, FileType.CSV, "ordered_by_source/");
+    public static AdjacentList orderedByDest =
+            new AdjacentList(AdjListType.ordered_by_dest, FileType.CSV, "ordered_by_dest/");
+    public static Property creationDate = new Property("creationDate", DataType.STRING, false, false);
+    public static PropertyGroup pg3 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
+
     public static GraphInfo getLdbcSampleDataSet() {
         // create vertex info of yaml:
         // type: person
@@ -105,12 +112,7 @@ public class TestUtil {
         //        data_type: string
         //        is_primary: false
         // version: gar/v1
-        AdjacentList orderedBySource =
-                new AdjacentList(AdjListType.ordered_by_source, FileType.CSV, "ordered_by_source/");
-        AdjacentList orderedByDest =
-                new AdjacentList(AdjListType.ordered_by_dest, FileType.CSV, "ordered_by_dest/");
-        Property creationDate = new Property("creationDate", DataType.STRING, false, false);
-        PropertyGroup pg3 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
+
 
         EdgeInfo knows =
                 EdgeInfo.builder()

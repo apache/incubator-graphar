@@ -192,21 +192,17 @@ public class EdgeInfo {
                                                 AdjacentList::getType, Function.identity())));
             }
 
-            if(propertyGroups == null) {
+            if(propertyGroups == null && propertyGroupsAsListTemp != null) {
                 propertyGroups = new PropertyGroups(propertyGroupsAsListTemp);
             }
-            else {
-                if(propertyGroupsAsListTemp != null) {
+            else if(propertyGroupsAsListTemp != null) {
                     propertyGroups = propertyGroupsAsListTemp.stream()
                             .map(propertyGroups::addPropertyGroupAsNew)
                             .filter(Optional::isPresent)
                             .map(Optional::get)
                             .reduce((first, second) -> second)
                             .orElse(new PropertyGroups(new ArrayList<>()));
-                }
-                else {
-                    propertyGroups = new PropertyGroups(new ArrayList<>());
-                }
+
             }
 
             if(edgeTriplet == null && srcType != null && edgeType != null && dstType != null) {
@@ -217,11 +213,11 @@ public class EdgeInfo {
                 throw new IllegalArgumentException("Edge triplet is null");
             }
 
-            if(propertyGroups.getProperties().isEmpty()) {
+            if(propertyGroups == null) {
                 throw new IllegalArgumentException("PropertyGroups is empty");
             }
 
-            if(adjacentListsAsListTemp.isEmpty()) {
+            if(adjacentLists.isEmpty()) {
                 throw new IllegalArgumentException("AdjacentLists is empty");
             }
 
