@@ -19,19 +19,12 @@
 
 package org.apache.graphar.util;
 
+import java.nio.file.Path;
+
 public class PathUtil {
 
     public static String resolvePath(String basePath, String subPath) {
-        if (subPath == null || subPath.isEmpty()) {
-            return basePath;
-        }
-        if (subPath.contains("://")) {
-            return subPath;
-        }
-        if (!basePath.contains("://") && subPath.startsWith("/")) {
-            return subPath;
-        }
-        return pathToDirectory(basePath) + subPath;
+        return Path.of(basePath).resolve(subPath).toString();
     }
 
     public static String pathToDirectory(String path) {

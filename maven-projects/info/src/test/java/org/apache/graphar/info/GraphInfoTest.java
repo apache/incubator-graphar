@@ -62,9 +62,7 @@ public class GraphInfoTest {
 
     @Test
     public void test() {
-        Path path = Path.of("/tmp/graphar/ldbc/graph.yaml");
-        URI uri = path.toUri();
-        System.out.println(uri.toString());
+        System.out.println(PathUtil.resolvePath("s3:///tmp/graphar", "ldbc"));
     }
 
     @Test
