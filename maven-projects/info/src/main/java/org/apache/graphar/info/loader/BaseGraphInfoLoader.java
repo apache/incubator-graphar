@@ -24,7 +24,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -63,7 +62,11 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
             edgeInfos.add(loadEdgeInfo(edgeInfoUri));
         }
         return new GraphInfo(
-                graphYaml.getName(), vertexInfos, edgeInfos, defaultBaseUri, graphYaml.getVersion());
+                graphYaml.getName(),
+                vertexInfos,
+                edgeInfos,
+                defaultBaseUri,
+                graphYaml.getVersion());
     }
 
     public VertexInfo buildVertexInfoFromGraphYaml(VertexYaml vertexYaml) {

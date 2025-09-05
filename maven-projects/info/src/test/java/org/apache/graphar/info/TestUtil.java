@@ -21,7 +21,6 @@ package org.apache.graphar.info;
 
 import java.net.URI;
 import java.util.List;
-
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;

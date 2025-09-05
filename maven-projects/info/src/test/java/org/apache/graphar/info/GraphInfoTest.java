@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
@@ -61,8 +60,7 @@ public class GraphInfoTest {
     public void testGraphInfoBasics() {
         Assert.assertNotNull(graphInfo);
         Assert.assertEquals("ldbc_sample", graphInfo.getName());
-        Assert.assertEquals(
-                GRAPH_PATH_URI.resolve(".").toString(), graphInfo.getPrefix());
+        Assert.assertEquals(GRAPH_PATH_URI.resolve(".").toString(), graphInfo.getPrefix());
         Assert.assertNotNull(graphInfo.getEdgeInfos());
         Assert.assertEquals(1, graphInfo.getEdgeInfos().size());
         Assert.assertNotNull(graphInfo.getVertexInfos());
