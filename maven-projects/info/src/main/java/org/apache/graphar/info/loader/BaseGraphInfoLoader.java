@@ -45,7 +45,7 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
     public GraphInfo buildGraphInfoFromGraphYaml(URI baseUri, GraphYaml graphYaml)
             throws IOException {
 
-        URI defaultBaseUri = baseUri;
+        URI defaultBaseUri = baseUri.resolve(".");
         if (graphYaml.getPrefix() != null && !graphYaml.getPrefix().isEmpty()) {
             defaultBaseUri = baseUri.resolve(graphYaml.getPrefix());
         }

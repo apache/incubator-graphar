@@ -62,7 +62,7 @@ public class GraphInfoTest {
         Assert.assertNotNull(graphInfo);
         Assert.assertEquals("ldbc_sample", graphInfo.getName());
         Assert.assertEquals(
-                GRAPH_PATH_URI.toString(), graphInfo.getPrefix());
+                GRAPH_PATH_URI.resolve(".").toString(), graphInfo.getPrefix());
         Assert.assertNotNull(graphInfo.getEdgeInfos());
         Assert.assertEquals(1, graphInfo.getEdgeInfos().size());
         Assert.assertNotNull(graphInfo.getVertexInfos());
