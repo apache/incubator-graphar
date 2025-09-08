@@ -19,6 +19,15 @@
 
 package org.apache.graphar.info;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.EdgeYaml;
@@ -32,15 +41,6 @@ import org.apache.hadoop.fs.Path;
 import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class EdgeInfo {
     private final EdgeTriplet edgeTriplet;
@@ -53,7 +53,7 @@ public class EdgeInfo {
     private final PropertyGroups propertyGroups;
     private final VersionInfo version;
 
-    public static EdgeInfoBuilder builder(){
+    public static EdgeInfoBuilder builder() {
         return new EdgeInfoBuilder();
     }
 
@@ -75,9 +75,7 @@ public class EdgeInfo {
         private String edgeType;
         private String dstType;
 
-
         private EdgeInfoBuilder() {}
-
 
         public EdgeInfoBuilder srcType(String srcType) {
             this.srcType = srcType;
@@ -88,6 +86,7 @@ public class EdgeInfo {
             this.edgeType = edgeType;
             return this;
         }
+
         public EdgeInfoBuilder dstType(String dstType) {
             this.dstType = dstType;
             return this;
@@ -97,7 +96,6 @@ public class EdgeInfo {
             this.edgeTriplet = new EdgeTriplet(srcType, edgeType, dstType);
             return this;
         }
-
 
         public EdgeInfoBuilder edgeTriplet(EdgeTriplet edgeTriplet) {
             this.edgeTriplet = edgeTriplet;
@@ -130,15 +128,15 @@ public class EdgeInfo {
         }
 
         public EdgeInfoBuilder addAdjacentList(AdjacentList adjacentList) {
-            if(adjacentListsAsListTemp == null){
+            if (adjacentListsAsListTemp == null) {
                 adjacentListsAsListTemp = new ArrayList<>();
-                }
+            }
             adjacentListsAsListTemp.add(adjacentList);
             return this;
         }
 
         public EdgeInfoBuilder adjacentLists(List<AdjacentList> adjacentListsAsList) {
-            if(adjacentListsAsListTemp == null) {
+            if (adjacentListsAsListTemp == null) {
                 adjacentListsAsListTemp = new ArrayList<>();
             }
             this.adjacentListsAsListTemp.addAll(adjacentListsAsList);
@@ -151,15 +149,13 @@ public class EdgeInfo {
         }
 
         public EdgeInfoBuilder addPropertyGroup(PropertyGroup propertyGroup) {
-            if(propertyGroupsAsListTemp == null)
-                propertyGroupsAsListTemp = new ArrayList<>();
+            if (propertyGroupsAsListTemp == null) propertyGroupsAsListTemp = new ArrayList<>();
             propertyGroupsAsListTemp.add(propertyGroup);
             return this;
         }
 
         public EdgeInfoBuilder addPropertyGroups(List<PropertyGroup> propertyGroups) {
-            if(propertyGroupsAsListTemp == null)
-                propertyGroupsAsListTemp = new ArrayList<>();
+            if (propertyGroupsAsListTemp == null) propertyGroupsAsListTemp = new ArrayList<>();
             propertyGroupsAsListTemp.addAll(propertyGroups);
             return this;
         }
@@ -180,11 +176,11 @@ public class EdgeInfo {
         }
 
         public EdgeInfo build() {
-            if(adjacentLists == null) {
+            if (adjacentLists == null) {
                 adjacentLists = new HashMap<>();
             }
 
-            if(adjacentListsAsListTemp != null) {
+            if (adjacentListsAsListTemp != null) {
                 adjacentLists.putAll(
                         adjacentListsAsListTemp.stream()
                                 .collect(
@@ -192,36 +188,33 @@ public class EdgeInfo {
                                                 AdjacentList::getType, Function.identity())));
             }
 
-            if(propertyGroups == null && propertyGroupsAsListTemp != null) {
+            if (propertyGroups == null && propertyGroupsAsListTemp != null) {
                 propertyGroups = new PropertyGroups(propertyGroupsAsListTemp);
+            } else if (propertyGroupsAsListTemp != null) {
+                propertyGroups =
+                        propertyGroupsAsListTemp.stream()
+                                .map(propertyGroups::addPropertyGroupAsNew)
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .reduce((first, second) -> second)
+                                .orElse(new PropertyGroups(new ArrayList<>()));
             }
-            else if(propertyGroupsAsListTemp != null) {
-                    propertyGroups = propertyGroupsAsListTemp.stream()
-                            .map(propertyGroups::addPropertyGroupAsNew)
-                            .filter(Optional::isPresent)
-                            .map(Optional::get)
-                            .reduce((first, second) -> second)
-                            .orElse(new PropertyGroups(new ArrayList<>()));
 
-            }
-
-            if(edgeTriplet == null && srcType != null && edgeType != null && dstType != null) {
+            if (edgeTriplet == null && srcType != null && edgeType != null && dstType != null) {
                 edgeTriplet = new EdgeTriplet(srcType, edgeType, dstType);
             }
 
-            if(edgeTriplet == null) {
+            if (edgeTriplet == null) {
                 throw new IllegalArgumentException("Edge triplet is null");
             }
 
-            if(propertyGroups == null) {
+            if (propertyGroups == null) {
                 throw new IllegalArgumentException("PropertyGroups is empty");
             }
 
-            if(adjacentLists.isEmpty()) {
+            if (adjacentLists.isEmpty()) {
                 throw new IllegalArgumentException("AdjacentLists is empty");
             }
-
-
 
             return new EdgeInfo(this);
         }

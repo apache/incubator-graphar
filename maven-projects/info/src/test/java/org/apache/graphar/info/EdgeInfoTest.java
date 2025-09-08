@@ -19,27 +19,25 @@
 
 package org.apache.graphar.info;
 
+import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-
-import java.util.List;
-
 public class EdgeInfoTest {
 
-    private EdgeInfo.EdgeInfoBuilder e = EdgeInfo.builder()
-            .srcType("person")
-            .edgeType("knows")
-            .chunkSize(1024)
-            .srcChunkSize(100)
-            .dstChunkSize(100)
-            .directed(false)
-            .prefix("edge/person_knows_person/")
-            .version("gar/v1");
-
+    private EdgeInfo.EdgeInfoBuilder e =
+            EdgeInfo.builder()
+                    .srcType("person")
+                    .edgeType("knows")
+                    .chunkSize(1024)
+                    .srcChunkSize(100)
+                    .dstChunkSize(100)
+                    .directed(false)
+                    .prefix("edge/person_knows_person/")
+                    .version("gar/v1");
 
     @Test
-    public void erroneousTripletEdgeBuilderTest(){
+    public void erroneousTripletEdgeBuilderTest() {
         try {
             e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
                     .addPropertyGroups(List.of(TestUtil.pg3))
@@ -50,18 +48,16 @@ public class EdgeInfoTest {
     }
 
     @Test
-    public void emptyAdjacentListEdgeBuilderTest(){
+    public void emptyAdjacentListEdgeBuilderTest() {
         try {
-            e.dstType("person")
-                    .addPropertyGroups(List.of(TestUtil.pg3))
-                    .build();
+            e.dstType("person").addPropertyGroups(List.of(TestUtil.pg3)).build();
         } catch (IllegalArgumentException e) {
             System.err.println(e.getMessage());
         }
     }
 
     @Test
-    public void emptyPropertyGroupsEdgeBuilderTest(){
+    public void emptyPropertyGroupsEdgeBuilderTest() {
         try {
             e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
                     .dstType("person")
@@ -72,31 +68,30 @@ public class EdgeInfoTest {
     }
 
     @Test
-    public void addMethodsTest(){
+    public void addMethodsTest() {
 
-        EdgeInfo edgeInfo = e.addPropertyGroup(TestUtil.pg3)
-                .addAdjacentList(TestUtil.orderedBySource)
-                .addAdjacentList(TestUtil.orderedByDest)
-                .dstType("person")
-                .build();
+        EdgeInfo edgeInfo =
+                e.addPropertyGroup(TestUtil.pg3)
+                        .addAdjacentList(TestUtil.orderedBySource)
+                        .addAdjacentList(TestUtil.orderedByDest)
+                        .dstType("person")
+                        .build();
 
         Assert.assertEquals(2, edgeInfo.getAdjacentLists().size());
-        Assert.assertEquals(1,edgeInfo.getPropertyGroups().size());
+        Assert.assertEquals(1, edgeInfo.getPropertyGroups().size());
     }
 
     @Test
-    public void appendMethodsTest(){
-        EdgeInfo edgeInfo = e.propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
-                .adjacentLists(List.of(TestUtil.orderedBySource))
-                .addAdjacentList(TestUtil.orderedByDest)
-                .addPropertyGroups(List.of(TestUtil.pg2))
-                .dstType("person")
-                .build();
+    public void appendMethodsTest() {
+        EdgeInfo edgeInfo =
+                e.propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                        .adjacentLists(List.of(TestUtil.orderedBySource))
+                        .addAdjacentList(TestUtil.orderedByDest)
+                        .addPropertyGroups(List.of(TestUtil.pg2))
+                        .dstType("person")
+                        .build();
 
         Assert.assertEquals(2, edgeInfo.getAdjacentLists().size());
-        Assert.assertEquals(2,edgeInfo.getPropertyGroups().size());
+        Assert.assertEquals(2, edgeInfo.getPropertyGroups().size());
     }
-
-
-
 }

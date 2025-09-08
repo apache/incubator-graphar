@@ -44,11 +44,14 @@ public class TestUtil {
             new AdjacentList(AdjListType.ordered_by_source, FileType.CSV, "ordered_by_source/");
     public static final AdjacentList orderedByDest =
             new AdjacentList(AdjListType.ordered_by_dest, FileType.CSV, "ordered_by_dest/");
-    public static final Property creationDate = new Property("creationDate", DataType.STRING, false, false);
-    public static final PropertyGroup pg3 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
+    public static final Property creationDate =
+            new Property("creationDate", DataType.STRING, false, false);
+    public static final PropertyGroup pg3 =
+            new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
 
     public static final Property id = new Property("id", DataType.INT64, true, false);
-    public static final Property firstName = new Property("firstName", DataType.STRING, false, false);
+    public static final Property firstName =
+            new Property("firstName", DataType.STRING, false, false);
     public static final Property lastName = new Property("lastName", DataType.STRING, false, false);
     public static final Property gender = new Property("gender", DataType.STRING, false, true);
     public static final PropertyGroup pg1 = new PropertyGroup(List.of(id), FileType.CSV, "id/");
@@ -86,8 +89,6 @@ public class TestUtil {
         //    file_type: csv
         // version: gar/v1
 
-
-
         // create edge info of yaml:
         // src_type: person
         // edge_type: knows
@@ -114,7 +115,6 @@ public class TestUtil {
         //        data_type: string
         //        is_primary: false
         // version: gar/v1
-
 
         EdgeInfo knows =
                 EdgeInfo.builder()
