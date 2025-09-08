@@ -34,7 +34,7 @@ public class VersionInfo {
             throw new IllegalArgumentException("Version must be a supported positive integer: " + version);
         }
         this.version = version;
-        this.userDefinedTypes = userDefinedTypes;
+        this.userDefinedTypes = List.copyOf(userDefinedTypes);
     }
 
     public int getVersion() {
