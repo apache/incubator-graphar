@@ -31,7 +31,7 @@ public class TestUtil {
 
     static final String SAVE_DIR = "/tmp/graphar/test/";
 
-    private static String LDBC_SAMPLE_GRAPH_PATH = "/ldbc_sample/csv/ldbc_sample.graph.yml";
+    private static final String LDBC_SAMPLE_GRAPH_PATH = "/ldbc_sample/csv/ldbc_sample.graph.yml";
 
     public static String getTestData() {
         return GAR_TEST_DATA;
@@ -44,6 +44,27 @@ public class TestUtil {
     public static URI getLdbcSampleGraphURI() {
         return URI.create(getLdbcSampleGraphPath());
     }
+
+    public static final AdjacentList orderedBySource =
+            new AdjacentList(AdjListType.ordered_by_source, FileType.CSV, "ordered_by_source/");
+    public static final AdjacentList orderedByDest =
+            new AdjacentList(AdjListType.ordered_by_dest, FileType.CSV, "ordered_by_dest/");
+    public static final Property creationDate =
+            new Property("creationDate", DataType.STRING, false, false);
+    public static final PropertyGroup pg3 =
+            new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
+
+    public static final Property id = new Property("id", DataType.INT64, true, false);
+    public static final Property firstName =
+            new Property("firstName", DataType.STRING, false, false);
+    public static final Property lastName = new Property("lastName", DataType.STRING, false, false);
+    public static final Property gender = new Property("gender", DataType.STRING, false, true);
+    public static final PropertyGroup pg1 = new PropertyGroup(List.of(id), FileType.CSV, "id/");
+    public static final PropertyGroup pg2 =
+            new PropertyGroup(
+                    List.of(firstName, lastName, gender), FileType.CSV, "firstName_lastName");
+    public static final VertexInfo person =
+            new VertexInfo("person", 100, List.of(pg1, pg2), "vertex/person/", "gar/v1");
 
     public static GraphInfo getLdbcSampleDataSet() {
         // create vertex info of yaml:
@@ -73,17 +94,6 @@ public class TestUtil {
         //    file_type: csv
         // version: gar/v1
 
-        Property id = new Property("id", DataType.INT64, true, false);
-        Property firstName = new Property("firstName", DataType.STRING, false, false);
-        Property lastName = new Property("lastName", DataType.STRING, false, false);
-        Property gender = new Property("gender", DataType.STRING, false, true);
-        PropertyGroup pg1 = new PropertyGroup(List.of(id), FileType.CSV, "id/");
-        PropertyGroup pg2 =
-                new PropertyGroup(
-                        List.of(firstName, lastName, gender), FileType.CSV, "firstName_lastName");
-        VertexInfo person =
-                new VertexInfo("person", 100, List.of(pg1, pg2), "vertex/person/", "gar/v1");
-
         // create edge info of yaml:
         // src_type: person
         // edge_type: knows
@@ -110,25 +120,19 @@ public class TestUtil {
         //        data_type: string
         //        is_primary: false
         // version: gar/v1
-        AdjacentList orderedBySource =
-                new AdjacentList(AdjListType.ordered_by_source, FileType.CSV, "ordered_by_source/");
-        AdjacentList orderedByDest =
-                new AdjacentList(AdjListType.ordered_by_dest, FileType.CSV, "ordered_by_dest/");
-        Property creationDate = new Property("creationDate", DataType.STRING, false, false);
-        PropertyGroup pg3 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
+
         EdgeInfo knows =
-                new EdgeInfo(
-                        "person",
-                        "knows",
-                        "person",
-                        1024,
-                        100,
-                        100,
-                        false,
-                        "edge/person_knows_person/",
-                        "gar/v1",
-                        List.of(orderedBySource, orderedByDest),
-                        List.of(pg3));
+                EdgeInfo.builder()
+                        .edgeTriplet("person", "knows", "person")
+                        .chunkSize(1024)
+                        .srcChunkSize(100)
+                        .dstChunkSize(100)
+                        .directed(false)
+                        .baseUri(URI.create("edge/person_knows_person/"))
+                        .version("gar/v1")
+                        .adjacentLists(List.of(orderedBySource, orderedByDest))
+                        .addPropertyGroups(List.of(pg3))
+                        .build();
 
         // create graph info of yaml:
         // name: ldbc_sample
