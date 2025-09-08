@@ -99,7 +99,7 @@ public class EdgeInfo {
         }
 
 
-        private EdgeInfoBuilder edgeTriplet(EdgeTriplet edgeTriplet) {
+        public EdgeInfoBuilder edgeTriplet(EdgeTriplet edgeTriplet) {
             this.edgeTriplet = edgeTriplet;
             return this;
         }
@@ -145,7 +145,7 @@ public class EdgeInfo {
             return this;
         }
 
-        private EdgeInfoBuilder adjacentLists(Map<AdjListType, AdjacentList> adjacentLists) {
+        public EdgeInfoBuilder adjacentLists(Map<AdjListType, AdjacentList> adjacentLists) {
             this.adjacentLists = adjacentLists;
             return this;
         }
@@ -164,7 +164,7 @@ public class EdgeInfo {
             return this;
         }
 
-        private EdgeInfoBuilder addPropertyGroups(PropertyGroups propertyGroups) {
+        public EdgeInfoBuilder propertyGroups(PropertyGroups propertyGroups) {
             this.propertyGroups = propertyGroups;
             return this;
         }
