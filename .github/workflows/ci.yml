@@ -153,6 +153,7 @@ jobs:
       working-directory: "cpp/build"
       run: |
         lcov --capture --directory . --output-file coverage.info
+        lcov --extract coverage.info '*/src/graphar/*' --output-file coverage.info
         lcov --remove coverage.info '/usr/*' --output-file coverage.info
         lcov --list coverage.info
 
