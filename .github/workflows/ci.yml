@@ -148,7 +148,14 @@ jobs:
       run: |
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
-      
+
+    - name: Benchmark
+      working-directory: "cpp/build"
+      run: |
+        ./graph_info_benchmark
+        ./arrow_chunk_reader_benchmark
+        ./label_filter_benchmark
+
     - name: Generate coverage info
       working-directory: "cpp/build"
       run: |
@@ -158,16 +165,9 @@ jobs:
         lcov --list coverage.info
 
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v4.0.1
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-    
-    - name: Benchmark
-      working-directory: "cpp/build"
-      run: |
-        ./graph_info_benchmark
-        ./arrow_chunk_reader_benchmark
-        ./label_filter_benchmark
 
     - name: Use Static Arrow
       working-directory: "cpp"
@@ -185,7 +185,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: ubuntu-libgraphar.a
-        path: cpp/build-static/libgraphar.a  
+        path: cpp/build-static/libgraphar.a
 
   macos:
     name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
@@ -210,7 +210,7 @@ jobs:
       run: |
         brew bundle --file=cpp/Brewfile
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
-    
+
     - name: Build GraphAr
       working-directory: "cpp"
       run: |
@@ -243,4 +243,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: macos-${{ matrix.macos-version }}-libgraphar.a
-        path: cpp/build-static/libgraphar.a  
+        path: cpp/build-static/libgraphar.a
