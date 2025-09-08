@@ -20,6 +20,8 @@
 package org.apache.graphar.info;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,6 +52,185 @@ public class EdgeInfo {
     private final Map<AdjListType, AdjacentList> adjacentLists;
     private final PropertyGroups propertyGroups;
     private final VersionInfo version;
+
+    public static EdgeInfoBuilder builder() {
+        return new EdgeInfoBuilder();
+    }
+
+    public static final class EdgeInfoBuilder {
+        private EdgeTriplet edgeTriplet;
+        private long chunkSize;
+        private long srcChunkSize;
+        private long dstChunkSize;
+        private boolean directed;
+        private String prefix;
+        private Map<AdjListType, AdjacentList> adjacentLists;
+        private PropertyGroups propertyGroups;
+        private VersionInfo version;
+
+        private List<AdjacentList> adjacentListsAsListTemp;
+        private List<PropertyGroup> propertyGroupsAsListTemp;
+
+        private String srcType;
+        private String edgeType;
+        private String dstType;
+
+        private EdgeInfoBuilder() {}
+
+        public EdgeInfoBuilder srcType(String srcType) {
+            this.srcType = srcType;
+            return this;
+        }
+
+        public EdgeInfoBuilder edgeType(String edgeType) {
+            this.edgeType = edgeType;
+            return this;
+        }
+
+        public EdgeInfoBuilder dstType(String dstType) {
+            this.dstType = dstType;
+            return this;
+        }
+
+        public EdgeInfoBuilder edgeTriplet(String srcType, String edgeType, String dstType) {
+            this.edgeTriplet = new EdgeTriplet(srcType, edgeType, dstType);
+            return this;
+        }
+
+        public EdgeInfoBuilder edgeTriplet(EdgeTriplet edgeTriplet) {
+            this.edgeTriplet = edgeTriplet;
+            return this;
+        }
+
+        public EdgeInfoBuilder chunkSize(long chunkSize) {
+            this.chunkSize = chunkSize;
+            return this;
+        }
+
+        public EdgeInfoBuilder srcChunkSize(long srcChunkSize) {
+            this.srcChunkSize = srcChunkSize;
+            return this;
+        }
+
+        public EdgeInfoBuilder dstChunkSize(long dstChunkSize) {
+            this.dstChunkSize = dstChunkSize;
+            return this;
+        }
+
+        public EdgeInfoBuilder directed(boolean directed) {
+            this.directed = directed;
+            return this;
+        }
+
+        public EdgeInfoBuilder prefix(String prefix) {
+            this.prefix = prefix;
+            return this;
+        }
+
+        public EdgeInfoBuilder addAdjacentList(AdjacentList adjacentList) {
+            if (adjacentListsAsListTemp == null) {
+                adjacentListsAsListTemp = new ArrayList<>();
+            }
+            adjacentListsAsListTemp.add(adjacentList);
+            return this;
+        }
+
+        public EdgeInfoBuilder adjacentLists(List<AdjacentList> adjacentListsAsList) {
+            if (adjacentListsAsListTemp == null) {
+                adjacentListsAsListTemp = new ArrayList<>();
+            }
+            this.adjacentListsAsListTemp.addAll(adjacentListsAsList);
+            return this;
+        }
+
+        public EdgeInfoBuilder adjacentLists(Map<AdjListType, AdjacentList> adjacentLists) {
+            this.adjacentLists = adjacentLists;
+            return this;
+        }
+
+        public EdgeInfoBuilder addPropertyGroup(PropertyGroup propertyGroup) {
+            if (propertyGroupsAsListTemp == null) propertyGroupsAsListTemp = new ArrayList<>();
+            propertyGroupsAsListTemp.add(propertyGroup);
+            return this;
+        }
+
+        public EdgeInfoBuilder addPropertyGroups(List<PropertyGroup> propertyGroups) {
+            if (propertyGroupsAsListTemp == null) propertyGroupsAsListTemp = new ArrayList<>();
+            propertyGroupsAsListTemp.addAll(propertyGroups);
+            return this;
+        }
+
+        public EdgeInfoBuilder propertyGroups(PropertyGroups propertyGroups) {
+            this.propertyGroups = propertyGroups;
+            return this;
+        }
+
+        public EdgeInfoBuilder version(String version) {
+            this.version = VersionParser.getVersion(version);
+            return this;
+        }
+
+        public EdgeInfoBuilder version(VersionInfo version) {
+            this.version = version;
+            return this;
+        }
+
+        public EdgeInfo build() {
+            if (adjacentLists == null) {
+                adjacentLists = new HashMap<>();
+            }
+
+            if (adjacentListsAsListTemp != null) {
+                adjacentLists.putAll(
+                        adjacentListsAsListTemp.stream()
+                                .collect(
+                                        Collectors.toUnmodifiableMap(
+                                                AdjacentList::getType, Function.identity())));
+            }
+
+            if (propertyGroups == null && propertyGroupsAsListTemp != null) {
+                propertyGroups = new PropertyGroups(propertyGroupsAsListTemp);
+            } else if (propertyGroupsAsListTemp != null) {
+                propertyGroups =
+                        propertyGroupsAsListTemp.stream()
+                                .map(propertyGroups::addPropertyGroupAsNew)
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .reduce((first, second) -> second)
+                                .orElse(new PropertyGroups(new ArrayList<>()));
+            }
+
+            if (edgeTriplet == null && srcType != null && edgeType != null && dstType != null) {
+                edgeTriplet = new EdgeTriplet(srcType, edgeType, dstType);
+            }
+
+            if (edgeTriplet == null) {
+                throw new IllegalArgumentException("Edge triplet is null");
+            }
+
+            if (propertyGroups == null) {
+                throw new IllegalArgumentException("PropertyGroups is empty");
+            }
+
+            if (adjacentLists.isEmpty()) {
+                throw new IllegalArgumentException("AdjacentLists is empty");
+            }
+
+            return new EdgeInfo(this);
+        }
+    }
+
+    private EdgeInfo(EdgeInfoBuilder builder) {
+        this.edgeTriplet = builder.edgeTriplet;
+        this.chunkSize = builder.chunkSize;
+        this.srcChunkSize = builder.srcChunkSize;
+        this.dstChunkSize = builder.dstChunkSize;
+        this.directed = builder.directed;
+        this.prefix = builder.prefix;
+        this.adjacentLists = builder.adjacentLists;
+        this.propertyGroups = builder.propertyGroups;
+        this.version = builder.version;
+    }
 
     public EdgeInfo(
             String srcType,
