@@ -150,7 +150,7 @@ public class EdgeInfo {
             return this;
         }
 
-        public EdgeInfoBuilder addPropertyGroups(PropertyGroup propertyGroup) {
+        public EdgeInfoBuilder addPropertyGroup(PropertyGroup propertyGroup) {
             if(propertyGroupsAsListTemp == null)
                 propertyGroupsAsListTemp = new ArrayList<>();
             propertyGroupsAsListTemp.add(propertyGroup);

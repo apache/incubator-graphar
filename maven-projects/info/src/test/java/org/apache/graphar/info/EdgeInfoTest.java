@@ -19,9 +19,10 @@
 
 package org.apache.graphar.info;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 public class EdgeInfoTest {
@@ -69,4 +70,33 @@ public class EdgeInfoTest {
             System.err.println(e.getMessage());
         }
     }
+
+    @Test
+    public void addMethodsTest(){
+
+        EdgeInfo edgeInfo = e.addPropertyGroup(TestUtil.pg3)
+                .addAdjacentList(TestUtil.orderedBySource)
+                .addAdjacentList(TestUtil.orderedByDest)
+                .dstType("person")
+                .build();
+
+        Assert.assertEquals(2, edgeInfo.getAdjacentLists().size());
+        Assert.assertEquals(1,edgeInfo.getPropertyGroups().size());
+    }
+
+    @Test
+    public void appendMethodsTest(){
+        EdgeInfo edgeInfo = e.propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                .adjacentLists(List.of(TestUtil.orderedBySource))
+                .addAdjacentList(TestUtil.orderedByDest)
+                .addPropertyGroups(List.of(TestUtil.pg2))
+                .dstType("person")
+                .build();
+
+        Assert.assertEquals(2, edgeInfo.getAdjacentLists().size());
+        Assert.assertEquals(2,edgeInfo.getPropertyGroups().size());
+    }
+
+
+
 }

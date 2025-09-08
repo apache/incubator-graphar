@@ -40,12 +40,23 @@ public class TestUtil {
         return getTestData() + "/" + LDBC_SAMPLE_GRAPH_PATH;
     }
 
-    public static AdjacentList orderedBySource =
+    public static final AdjacentList orderedBySource =
             new AdjacentList(AdjListType.ordered_by_source, FileType.CSV, "ordered_by_source/");
-    public static AdjacentList orderedByDest =
+    public static final AdjacentList orderedByDest =
             new AdjacentList(AdjListType.ordered_by_dest, FileType.CSV, "ordered_by_dest/");
-    public static Property creationDate = new Property("creationDate", DataType.STRING, false, false);
-    public static PropertyGroup pg3 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
+    public static final Property creationDate = new Property("creationDate", DataType.STRING, false, false);
+    public static final PropertyGroup pg3 = new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
+
+    public static final Property id = new Property("id", DataType.INT64, true, false);
+    public static final Property firstName = new Property("firstName", DataType.STRING, false, false);
+    public static final Property lastName = new Property("lastName", DataType.STRING, false, false);
+    public static final Property gender = new Property("gender", DataType.STRING, false, true);
+    public static final PropertyGroup pg1 = new PropertyGroup(List.of(id), FileType.CSV, "id/");
+    public static final PropertyGroup pg2 =
+            new PropertyGroup(
+                    List.of(firstName, lastName, gender), FileType.CSV, "firstName_lastName");
+    public static final VertexInfo person =
+            new VertexInfo("person", 100, List.of(pg1, pg2), "vertex/person/", "gar/v1");
 
     public static GraphInfo getLdbcSampleDataSet() {
         // create vertex info of yaml:
@@ -75,16 +86,7 @@ public class TestUtil {
         //    file_type: csv
         // version: gar/v1
 
-        Property id = new Property("id", DataType.INT64, true, false);
-        Property firstName = new Property("firstName", DataType.STRING, false, false);
-        Property lastName = new Property("lastName", DataType.STRING, false, false);
-        Property gender = new Property("gender", DataType.STRING, false, true);
-        PropertyGroup pg1 = new PropertyGroup(List.of(id), FileType.CSV, "id/");
-        PropertyGroup pg2 =
-                new PropertyGroup(
-                        List.of(firstName, lastName, gender), FileType.CSV, "firstName_lastName");
-        VertexInfo person =
-                new VertexInfo("person", 100, List.of(pg1, pg2), "vertex/person/", "gar/v1");
+
 
         // create edge info of yaml:
         // src_type: person
