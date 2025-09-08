@@ -19,6 +19,7 @@
 
 package org.apache.graphar.info;
 
+import java.net.URI;
 import java.util.List;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
@@ -38,6 +39,10 @@ public class TestUtil {
 
     public static String getLdbcSampleGraphPath() {
         return getTestData() + "/" + LDBC_SAMPLE_GRAPH_PATH;
+    }
+
+    public static URI getLdbcSampleGraphURI() {
+        return URI.create(getLdbcSampleGraphPath());
     }
 
     public static final AdjacentList orderedBySource =
@@ -123,7 +128,7 @@ public class TestUtil {
                         .srcChunkSize(100)
                         .dstChunkSize(100)
                         .directed(false)
-                        .prefix("edge/person_knows_person/")
+                        .baseUri(URI.create("edge/person_knows_person/"))
                         .version("gar/v1")
                         .adjacentLists(List.of(orderedBySource, orderedByDest))
                         .addPropertyGroups(List.of(pg3))
@@ -144,5 +149,117 @@ public class TestUtil {
             GAR_TEST_DATA = System.getenv("GAR_TEST_DATA");
         }
         Assume.assumeTrue("GAR_TEST_DATA is not set", GAR_TEST_DATA != null);
+    }
+
+    public static String getBaseGraphInfoYaml() {
+        return "type: person\n"
+                + "chunk_size: 100\n"
+                + "prefix: vertex/person/\n"
+                + "property_groups:\n"
+                + "  - properties:\n"
+                + "      - name: id\n"
+                + "        data_type: int64\n"
+                + "        is_primary: true\n"
+                + "        is_nullable: false\n"
+                + "    prefix: id/\n"
+                + "    file_type: csv\n"
+                + "  - properties:\n"
+                + "      - name: firstName\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "      - name: lastName\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "      - name: gender\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "        is_nullable: true\n"
+                + "    prefix: /tmp/vertex/person/firstName_lastName_gender/\n"
+                + "    file_type: csv\n"
+                + "version: gar/v1\n";
+    }
+
+    public static String getS3GraphInfoYaml() {
+        return "type: person\n"
+                + "chunk_size: 100\n"
+                + "prefix: s3://graphar/vertex/person/\n"
+                + "property_groups:\n"
+                + "  - properties:\n"
+                + "      - name: id\n"
+                + "        data_type: int64\n"
+                + "        is_primary: true\n"
+                + "        is_nullable: false\n"
+                + "    prefix: id/\n"
+                + "    file_type: csv\n"
+                + "  - properties:\n"
+                + "      - name: firstName\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "      - name: lastName\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "      - name: gender\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "        is_nullable: true\n"
+                + "    prefix: s3://tmp/vertex/person/firstName_lastName_gender/\n"
+                + "    file_type: csv\n"
+                + "version: gar/v1\n";
+    }
+
+    public static String getHdfsGraphInfoYaml() {
+        return "type: person\n"
+                + "chunk_size: 100\n"
+                + "prefix: hdfs://graphar/vertex/person/\n"
+                + "property_groups:\n"
+                + "  - properties:\n"
+                + "      - name: id\n"
+                + "        data_type: int64\n"
+                + "        is_primary: true\n"
+                + "        is_nullable: false\n"
+                + "    prefix: id/\n"
+                + "    file_type: csv\n"
+                + "  - properties:\n"
+                + "      - name: firstName\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "      - name: lastName\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "      - name: gender\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "        is_nullable: true\n"
+                + "    prefix: hdfs://tmp/vertex/person/firstName_lastName_gender/\n"
+                + "    file_type: csv\n"
+                + "version: gar/v1\n";
+    }
+
+    public static String getFileGraphInfoYaml() {
+        return "type: person\n"
+                + "chunk_size: 100\n"
+                + "prefix: file:///graphar/vertex/person/\n"
+                + "property_groups:\n"
+                + "  - properties:\n"
+                + "      - name: id\n"
+                + "        data_type: int64\n"
+                + "        is_primary: true\n"
+                + "        is_nullable: false\n"
+                + "    prefix: id/\n"
+                + "    file_type: csv\n"
+                + "  - properties:\n"
+                + "      - name: firstName\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "      - name: lastName\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "      - name: gender\n"
+                + "        data_type: string\n"
+                + "        is_primary: false\n"
+                + "        is_nullable: true\n"
+                + "    prefix: file:///tmp/vertex/person/firstName_lastName_gender/\n"
+                + "    file_type: csv\n"
+                + "version: gar/v1\n";
     }
 }

@@ -17,40 +17,25 @@
  * under the License.
  */
 
-package org.apache.graphar.info;
+package org.apache.graphar.info.loader.impl;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
-import org.apache.graphar.info.type.AdjListType;
-import org.apache.graphar.info.type.FileType;
+import org.apache.graphar.info.loader.StringGraphInfoLoader;
 
-public class AdjacentList {
-    private final AdjListType type;
-    private final FileType fileType;
-    private final URI baseUri;
-
-    public AdjacentList(AdjListType type, FileType fileType, URI baseUri) {
-        this.type = type;
-        this.fileType = fileType;
-        this.baseUri = baseUri;
-    }
-
-    public AdjacentList(AdjListType type, FileType fileType, String prefix) {
-        this(type, fileType, URI.create(prefix));
-    }
-
-    public AdjListType getType() {
-        return type;
-    }
-
-    public FileType getFileType() {
-        return fileType;
-    }
-
-    public String getPrefix() {
-        return baseUri.toString();
-    }
-
-    public URI getBaseUri() {
-        return baseUri;
+public class LocalFileSystemStringGraphInfoLoader extends StringGraphInfoLoader {
+    @Override
+    public String readYaml(URI uri) throws IOException {
+        if (uri.getScheme() != null && !"file".equals(uri.getScheme())) {
+            throw new IllegalArgumentException(
+                    "Only file:// scheme is supported in Local File System");
+        }
+        String path = uri.getPath();
+        try (FileInputStream fis = new FileInputStream(path)) {
+            byte[] data = new byte[fis.available()];
+            fis.read(data);
+            return new String(data);
+        }
     }
 }

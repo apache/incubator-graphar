@@ -17,40 +17,19 @@
  * under the License.
  */
 
-package org.apache.graphar.info;
+package org.apache.graphar.info.loader;
 
+import java.io.IOException;
 import java.net.URI;
-import org.apache.graphar.info.type.AdjListType;
-import org.apache.graphar.info.type.FileType;
+import org.apache.graphar.info.EdgeInfo;
+import org.apache.graphar.info.GraphInfo;
+import org.apache.graphar.info.VertexInfo;
 
-public class AdjacentList {
-    private final AdjListType type;
-    private final FileType fileType;
-    private final URI baseUri;
+public interface GraphInfoLoader {
 
-    public AdjacentList(AdjListType type, FileType fileType, URI baseUri) {
-        this.type = type;
-        this.fileType = fileType;
-        this.baseUri = baseUri;
-    }
+    GraphInfo loadGraphInfo(URI graphYamlUri) throws IOException;
 
-    public AdjacentList(AdjListType type, FileType fileType, String prefix) {
-        this(type, fileType, URI.create(prefix));
-    }
+    VertexInfo loadVertexInfo(URI vertexYamlUri) throws IOException;
 
-    public AdjListType getType() {
-        return type;
-    }
-
-    public FileType getFileType() {
-        return fileType;
-    }
-
-    public String getPrefix() {
-        return baseUri.toString();
-    }
-
-    public URI getBaseUri() {
-        return baseUri;
-    }
+    EdgeInfo loadEdgeInfo(URI edgeYamlUri) throws IOException;
 }

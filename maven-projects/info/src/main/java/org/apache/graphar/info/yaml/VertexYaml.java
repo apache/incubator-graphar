@@ -56,17 +56,6 @@ public class VertexYaml {
                         .orElse(null);
     }
 
-    public VertexInfo toVertexInfo() {
-        return new VertexInfo(
-                type,
-                chunk_size,
-                property_groups.stream()
-                        .map(PropertyGroupYaml::toPropertyGroup)
-                        .collect(Collectors.toList()),
-                prefix,
-                version);
-    }
-
     public String getType() {
         return type;
     }

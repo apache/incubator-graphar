@@ -19,7 +19,7 @@
 
 package org.apache.graphar.info;
 
-import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,14 +33,7 @@ import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.EdgeYaml;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.util.GeneralParams;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
-import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
-import org.yaml.snakeyaml.constructor.Constructor;
 
 public class EdgeInfo {
     private final EdgeTriplet edgeTriplet;
@@ -48,7 +41,7 @@ public class EdgeInfo {
     private final long srcChunkSize;
     private final long dstChunkSize;
     private final boolean directed;
-    private final String prefix;
+    private final URI baseUri;
     private final Map<AdjListType, AdjacentList> adjacentLists;
     private final PropertyGroups propertyGroups;
     private final VersionInfo version;
@@ -63,6 +56,7 @@ public class EdgeInfo {
         private long srcChunkSize;
         private long dstChunkSize;
         private boolean directed;
+        private URI baseUri;
         private String prefix;
         private Map<AdjListType, AdjacentList> adjacentLists;
         private PropertyGroups propertyGroups;
@@ -119,6 +113,11 @@ public class EdgeInfo {
 
         public EdgeInfoBuilder directed(boolean directed) {
             this.directed = directed;
+            return this;
+        }
+
+        public EdgeInfoBuilder baseUri(URI baseUri) {
+            this.baseUri = baseUri;
             return this;
         }
 
@@ -216,6 +215,22 @@ public class EdgeInfo {
                 throw new IllegalArgumentException("AdjacentLists is empty");
             }
 
+            if (baseUri == null && prefix == null) {
+                throw new IllegalArgumentException("baseUri and prefix cannot be both null");
+            }
+
+            if (baseUri != null && prefix != null && !URI.create(prefix).equals(baseUri)) {
+                throw new IllegalArgumentException(
+                        "baseUri and prefix conflict: baseUri="
+                                + baseUri.toString()
+                                + " prefix="
+                                + prefix);
+            }
+
+            if (baseUri == null) {
+                baseUri = URI.create(prefix);
+            }
+
             return new EdgeInfo(this);
         }
     }
@@ -226,10 +241,36 @@ public class EdgeInfo {
         this.srcChunkSize = builder.srcChunkSize;
         this.dstChunkSize = builder.dstChunkSize;
         this.directed = builder.directed;
-        this.prefix = builder.prefix;
+        this.baseUri = builder.baseUri;
         this.adjacentLists = builder.adjacentLists;
         this.propertyGroups = builder.propertyGroups;
         this.version = builder.version;
+    }
+
+    public EdgeInfo(
+            String srcType,
+            String edgeType,
+            String dstType,
+            long chunkSize,
+            long srcChunkSize,
+            long dstChunkSize,
+            boolean directed,
+            URI baseUri,
+            String version,
+            List<AdjacentList> adjacentListsAsList,
+            List<PropertyGroup> propertyGroupsAsList) {
+        this(
+                srcType,
+                edgeType,
+                dstType,
+                chunkSize,
+                srcChunkSize,
+                dstChunkSize,
+                directed,
+                baseUri,
+                VersionParser.getVersion(version),
+                adjacentListsAsList,
+                propertyGroupsAsList);
     }
 
     public EdgeInfo(
@@ -252,8 +293,8 @@ public class EdgeInfo {
                 srcChunkSize,
                 dstChunkSize,
                 directed,
-                prefix,
-                VersionParser.getVersion(version),
+                URI.create(prefix),
+                version,
                 adjacentListsAsList,
                 propertyGroupsAsList);
     }
@@ -266,7 +307,7 @@ public class EdgeInfo {
             long srcChunkSize,
             long dstChunkSize,
             boolean directed,
-            String prefix,
+            URI baseUri,
             VersionInfo version,
             List<AdjacentList> adjacentListsAsList,
             List<PropertyGroup> propertyGroupsAsList) {
@@ -275,7 +316,7 @@ public class EdgeInfo {
         this.srcChunkSize = srcChunkSize;
         this.dstChunkSize = dstChunkSize;
         this.directed = directed;
-        this.prefix = prefix;
+        this.baseUri = baseUri;
         this.adjacentLists =
                 adjacentListsAsList.stream()
                         .collect(
@@ -285,32 +326,13 @@ public class EdgeInfo {
         this.version = version;
     }
 
-    private EdgeInfo(EdgeYaml yamlParser) {
-        this(
-                yamlParser.getSrc_type(),
-                yamlParser.getEdge_type(),
-                yamlParser.getDst_type(),
-                yamlParser.getChunk_size(),
-                yamlParser.getSrc_chunk_size(),
-                yamlParser.getDst_chunk_size(),
-                yamlParser.isDirected(),
-                yamlParser.getPrefix(),
-                yamlParser.getVersion(),
-                yamlParser.getAdj_lists().stream()
-                        .map(AdjacentList::new)
-                        .collect(Collectors.toUnmodifiableList()),
-                yamlParser.getProperty_groups().stream()
-                        .map(PropertyGroup::new)
-                        .collect(Collectors.toUnmodifiableList()));
-    }
-
     private EdgeInfo(
             EdgeTriplet edgeTriplet,
             long chunkSize,
             long srcChunkSize,
             long dstChunkSize,
             boolean directed,
-            String prefix,
+            URI baseUri,
             String version,
             Map<AdjListType, AdjacentList> adjacentLists,
             PropertyGroups propertyGroups) {
@@ -320,7 +342,7 @@ public class EdgeInfo {
                 srcChunkSize,
                 dstChunkSize,
                 directed,
-                prefix,
+                baseUri,
                 VersionParser.getVersion(version),
                 adjacentLists,
                 propertyGroups);
@@ -332,7 +354,7 @@ public class EdgeInfo {
             long srcChunkSize,
             long dstChunkSize,
             boolean directed,
-            String prefix,
+            URI baseUri,
             VersionInfo version,
             Map<AdjListType, AdjacentList> adjacentLists,
             PropertyGroups propertyGroups) {
@@ -341,31 +363,10 @@ public class EdgeInfo {
         this.srcChunkSize = srcChunkSize;
         this.dstChunkSize = dstChunkSize;
         this.directed = directed;
-        this.prefix = prefix;
+        this.baseUri = baseUri;
         this.adjacentLists = adjacentLists;
         this.propertyGroups = propertyGroups;
         this.version = version;
-    }
-
-    public static EdgeInfo load(String edgeInfoPath) throws IOException {
-        return load(edgeInfoPath, new Configuration());
-    }
-
-    public static EdgeInfo load(String edgeInfoPath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        return load(edgeInfoPath, FileSystem.get(conf));
-    }
-
-    public static EdgeInfo load(String edgeInfoPath, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataInputStream inputStream = fileSystem.open(new Path(edgeInfoPath));
-        Yaml edgeInfoYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
-        EdgeYaml edgeInfoYaml = edgeInfoYamlLoader.load(inputStream);
-        return new EdgeInfo(edgeInfoYaml);
     }
 
     public static String concat(String srcLabel, String edgeLabel, String dstLabel) {
@@ -394,7 +395,7 @@ public class EdgeInfo {
                         srcChunkSize,
                         dstChunkSize,
                         directed,
-                        prefix,
+                        baseUri,
                         version,
                         newAdjacentLists,
                         propertyGroups));
@@ -411,7 +412,7 @@ public class EdgeInfo {
                                         srcChunkSize,
                                         dstChunkSize,
                                         directed,
-                                        prefix,
+                                        baseUri,
                                         version,
                                         adjacentLists,
                                         newPropertyGroups));
@@ -445,38 +446,38 @@ public class EdgeInfo {
         return propertyGroups.getPropertyGroup(property);
     }
 
-    public String getPropertyGroupPrefix(PropertyGroup propertyGroup) {
+    public URI getPropertyGroupPrefix(PropertyGroup propertyGroup) {
         checkPropertyGroupExist(propertyGroup);
-        return getPrefix() + propertyGroup.getPrefix();
+        return getBaseUri().resolve(propertyGroup.getBaseUri());
     }
 
-    public String getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
+    public URI getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
         // PropertyGroup will be checked in getPropertyGroupPrefix
-        return getPropertyGroupPrefix(propertyGroup) + "chunk" + chunkIndex;
+        return getPropertyGroupPrefix(propertyGroup).resolve("chunk" + chunkIndex);
     }
 
-    public String getAdjacentListPrefix(AdjListType adjListType) {
-        return getPrefix() + getAdjacentList(adjListType).getPrefix() + "adj_list/";
+    public URI getAdjacentListPrefix(AdjListType adjListType) {
+        return getBaseUri().resolve(getAdjacentList(adjListType).getBaseUri()).resolve("adj_list/");
     }
 
-    public String getAdjacentListChunkPath(AdjListType adjListType, long vertexChunkIndex) {
-        return getAdjacentListPrefix(adjListType) + "chunk" + vertexChunkIndex;
+    public URI getAdjacentListChunkPath(AdjListType adjListType, long vertexChunkIndex) {
+        return getAdjacentListPrefix(adjListType).resolve("chunk" + vertexChunkIndex);
     }
 
-    public String getOffsetPrefix(AdjListType adjListType) {
-        return getAdjacentListPrefix(adjListType) + "offset/";
+    public URI getOffsetPrefix(AdjListType adjListType) {
+        return getAdjacentListPrefix(adjListType).resolve("offset/");
     }
 
-    public String getOffsetChunkPath(AdjListType adjListType, long vertexChunkIndex) {
-        return getOffsetPrefix(adjListType) + "chunk" + vertexChunkIndex;
+    public URI getOffsetChunkPath(AdjListType adjListType, long vertexChunkIndex) {
+        return getOffsetPrefix(adjListType).resolve("chunk" + vertexChunkIndex);
     }
 
-    public String getVerticesNumFilePath(AdjListType adjListType) {
-        return getAdjacentListPrefix(adjListType) + "vertex_count";
+    public URI getVerticesNumFilePath(AdjListType adjListType) {
+        return getAdjacentListPrefix(adjListType).resolve("vertex_count");
     }
 
-    public String getEdgesNumFilePath(AdjListType adjListType, long vertexChunkIndex) {
-        return getAdjacentListPrefix(adjListType) + "edge_count" + vertexChunkIndex;
+    public URI getEdgesNumFilePath(AdjListType adjListType, long vertexChunkIndex) {
+        return getAdjacentListPrefix(adjListType).resolve("edge_count" + vertexChunkIndex);
     }
 
     public DataType getPropertyType(String propertyName) {
@@ -489,26 +490,6 @@ public class EdgeInfo {
 
     public boolean isNullableKey(String propertyName) {
         return propertyGroups.isNullableKey(propertyName);
-    }
-
-    public void save(String filePath) throws IOException {
-        save(filePath, new Configuration());
-    }
-
-    public void save(String filePath, Configuration conf) throws IOException {
-        if (conf == null) {
-            throw new IllegalArgumentException("Configuration is null");
-        }
-        save(filePath, FileSystem.get(conf));
-    }
-
-    public void save(String fileName, FileSystem fileSystem) throws IOException {
-        if (fileSystem == null) {
-            throw new IllegalArgumentException("FileSystem is null");
-        }
-        FSDataOutputStream outputStream = fileSystem.create(new Path(fileName));
-        outputStream.writeBytes(dump());
-        outputStream.close();
     }
 
     public String dump() {
@@ -550,11 +531,11 @@ public class EdgeInfo {
     }
 
     public String getPrefix() {
-        return prefix;
+        return baseUri.toString();
     }
 
-    public String getEdgePath() {
-        return getPrefix() + getConcat() + ".edge.yaml";
+    public URI getBaseUri() {
+        return baseUri;
     }
 
     public VersionInfo getVersion() {
