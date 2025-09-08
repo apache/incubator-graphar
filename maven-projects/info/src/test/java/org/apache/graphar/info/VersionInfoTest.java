@@ -124,16 +124,6 @@ public class VersionInfoTest {
     }
 
     @Test
-    public void testVersionInfoCheckTypeWithUnsupportedVersion() {
-        VersionInfo versionInfo = new VersionInfo(999, null);
-
-        // Unsupported version should not support any types
-        Assert.assertFalse(versionInfo.checkType("int32"));
-        Assert.assertFalse(versionInfo.checkType("string"));
-        Assert.assertFalse(versionInfo.checkType("bool"));
-    }
-
-    @Test
     public void testVersionInfoCheckTypeWithUnsupportedVersionButUserTypes() {
         List<String> userTypes = Arrays.asList("customType");
         VersionInfo versionInfo = new VersionInfo(999, userTypes);

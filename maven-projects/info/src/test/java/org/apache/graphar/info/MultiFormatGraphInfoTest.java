@@ -87,18 +87,14 @@ public class MultiFormatGraphInfoTest {
         Assert.assertEquals(0, vertexInfo.getChunkSize());
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testVertexInfoWithNegativeChunkSize() {
         Property prop = new Property("id", DataType.INT32, true, false);
         PropertyGroup pg = new PropertyGroup(Arrays.asList(prop), FileType.CSV, "test/");
         List<PropertyGroup> propertyGroups = Arrays.asList(pg);
         String version = "gar/v1";
 
-        VertexInfo vertexInfo =
-                new VertexInfo("testVertex", -100, propertyGroups, "vertex/", version);
-
-        Assert.assertEquals("testVertex", vertexInfo.getType());
-        Assert.assertEquals(-100, vertexInfo.getChunkSize());
+        new VertexInfo("testVertex", -100, propertyGroups, "vertex/", version);
     }
 
     @Test

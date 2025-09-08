@@ -58,6 +58,9 @@ public class VertexInfo {
             List<PropertyGroup> propertyGroups,
             URI baseUri,
             VersionInfo version) {
+        if (chunkSize < 0) {
+            throw new IllegalArgumentException("Chunk size cannot be negative: " + chunkSize);
+        }
         this.type = type;
         this.chunkSize = chunkSize;
         this.propertyGroups = new PropertyGroups(propertyGroups);

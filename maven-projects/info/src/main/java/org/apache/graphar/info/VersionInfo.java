@@ -29,7 +29,10 @@ public class VersionInfo {
     private final Map<Integer, List<String>> version2types =
             Map.of(1, List.of("bool", "int32", "int64", "float", "double", "string"));
 
-    public VersionInfo(Integer version, List<String> userDefinedTypes) {
+    public VersionInfo(int version, List<String> userDefinedTypes) {
+        if (version <= 0) {
+            throw new IllegalArgumentException("Version must be a supported positive integer: " + version);
+        }
         this.version = version;
         this.userDefinedTypes = userDefinedTypes;
     }
