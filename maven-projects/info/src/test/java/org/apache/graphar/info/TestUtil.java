@@ -30,7 +30,7 @@ public class TestUtil {
 
     static final String SAVE_DIR = "/tmp/graphar/test/";
 
-    private static String LDBC_SAMPLE_GRAPH_PATH = "/ldbc_sample/csv/ldbc_sample.graph.yml";
+    private static final String LDBC_SAMPLE_GRAPH_PATH = "/ldbc_sample/csv/ldbc_sample.graph.yml";
 
     public static String getTestData() {
         return GAR_TEST_DATA;
