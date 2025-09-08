@@ -1,0 +1,6 @@
+# .codecov.yml
+ignore:
+  - "cpp/benchmarks/**"
+  - "cpp/examples/**"
+  - "cpp/thirdparty/**"
+  - "cpp/test/**"
