@@ -20,7 +20,6 @@
 package org.apache.graphar.info;
 
 import java.net.URI;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +57,7 @@ public class EdgeInfo {
         private long dstChunkSize;
         private boolean directed;
         private URI baseUri;
+        private String prefix;
         private Map<AdjListType, AdjacentList> adjacentLists;
         private PropertyGroups propertyGroups;
         private VersionInfo version;
@@ -116,8 +116,13 @@ public class EdgeInfo {
             return this;
         }
 
-        public EdgeInfoBuilder baseUri(URI baseUri){
+        public EdgeInfoBuilder baseUri(URI baseUri) {
             this.baseUri = baseUri;
+            return this;
+        }
+
+        public EdgeInfoBuilder prefix(String prefix) {
+            this.prefix = prefix;
             return this;
         }
 
@@ -208,6 +213,22 @@ public class EdgeInfo {
 
             if (adjacentLists.isEmpty()) {
                 throw new IllegalArgumentException("AdjacentLists is empty");
+            }
+
+            if (baseUri == null && prefix == null) {
+                throw new IllegalArgumentException("baseUri and prefix cannot be both null");
+            }
+
+            if (baseUri != null && prefix != null && !URI.create(prefix).equals(baseUri)) {
+                throw new IllegalArgumentException(
+                        "baseUri and prefix conflict: baseUri="
+                                + baseUri.toString()
+                                + " prefix="
+                                + prefix);
+            }
+
+            if (baseUri == null) {
+                baseUri = URI.create(prefix);
             }
 
             return new EdgeInfo(this);
