@@ -22,8 +22,12 @@ flags:
   spark:
     paths:
       - "maven-projects/spark/"
+  pyspark:
+    paths:
       - "pyspark"
-
+  java-info:
+    paths:
+      - "maven-projects/info/"
 coverage:
   status:
     project:
@@ -31,6 +35,8 @@ coverage:
         flags:
           - cpp
           - spark
+          - pyspark
+          - java-info
 
 ignore:
   - "cpp/benchmarks/**"
