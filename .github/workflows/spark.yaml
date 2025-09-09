@@ -108,6 +108,7 @@ jobs:
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
+        flag: cpp
         files: "./maven-projects/spark/graphar/target/site/jacoco/jacoco.xml"
         token: ${{ secrets.CODECOV_TOKEN }}
 
