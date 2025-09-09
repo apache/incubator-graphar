@@ -14,9 +14,27 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+flags:
+  cpp:
+    paths:
+      - "cpp/"
+  spark:
+    paths:
+      - "maven-projects/spark/"
+      - "pyspark"
+
+coverage:
+  status:
+    project:
+      default:
+        flags:
+          - cpp
+          - spark
 
 ignore:
   - "cpp/benchmarks/**"
   - "cpp/examples/**"
   - "cpp/thirdparty/**"
   - "cpp/test/**"
+  - "maven-projects/spark/graphar/src/main/scala/org/apache/graphar/importer/**"
+  - "maven-projects/spark/graphar/src/main/scala/org/apache/graphar/example/**"
