@@ -33,7 +33,7 @@ public class VersionInfoTest {
         VersionInfo versionInfo = new VersionInfo(1, null);
 
         Assert.assertEquals(1, versionInfo.getVersion());
-        Assert.assertNull(versionInfo.getUserDefinedTypes());
+        Assert.assertTrue(versionInfo.getUserDefinedTypes().isEmpty());
         Assert.assertEquals("gar/v1", versionInfo.toString());
     }
 
@@ -168,49 +168,25 @@ public class VersionInfoTest {
     }
 
     @Test
-    public void testVersionInfoImmutability() {
-        List<String> originalTypes = new ArrayList<>(Arrays.asList("type1", "type2"));
-        VersionInfo versionInfo = new VersionInfo(1, originalTypes);
-
-        // Get the user defined types
-        List<String> returnedTypes = versionInfo.getUserDefinedTypes();
-
-        // The returned list should be the same as the original
-        Assert.assertEquals(originalTypes, returnedTypes);
-
-        // Try to modify the original list
-        originalTypes.add("type3");
-
-        // Current implementation: VersionInfo is not truly immutable,
-        // it stores a reference to the original list
-        Assert.assertEquals(3, versionInfo.getUserDefinedTypes().size());
-        Assert.assertTrue(versionInfo.checkType("type1"));
-        Assert.assertTrue(versionInfo.checkType("type2"));
-        Assert.assertTrue(versionInfo.checkType("type3"));
-    }
-
-    @Test
     public void testVersionInfoWithZeroVersion() {
-        VersionInfo versionInfo = new VersionInfo(0, null);
-
-        Assert.assertEquals(0, versionInfo.getVersion());
-        Assert.assertEquals("gar/v0", versionInfo.toString());
-
-        // Version 0 should not support any built-in types
-        Assert.assertFalse(versionInfo.checkType("int32"));
-        Assert.assertFalse(versionInfo.checkType("string"));
+        try {
+            new VersionInfo(0, null);
+            Assert.fail("Expected IllegalArgumentException for zero version");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue("Error message should mention version", 
+                e.getMessage().contains("Version must be a supported positive integer"));
+        }
     }
 
     @Test
     public void testVersionInfoWithNegativeVersion() {
-        VersionInfo versionInfo = new VersionInfo(-1, null);
-
-        Assert.assertEquals(-1, versionInfo.getVersion());
-        Assert.assertEquals("gar/v-1", versionInfo.toString());
-
-        // Negative version should not support any built-in types
-        Assert.assertFalse(versionInfo.checkType("int32"));
-        Assert.assertFalse(versionInfo.checkType("string"));
+        try {
+            new VersionInfo(-1, null);
+            Assert.fail("Expected IllegalArgumentException for negative version");
+        } catch (IllegalArgumentException e) {
+            Assert.assertTrue("Error message should mention version", 
+                e.getMessage().contains("Version must be a supported positive integer"));
+        }
     }
 
     @Test
