@@ -73,7 +73,7 @@ jobs:
         working-directory: maven-projects/info
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64}
-          mvn jacoco:report --no-transfer-progress -P ${{ matrix.mvn-profile }}
+          mvn jacoco:report --no-transfer-progress
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
