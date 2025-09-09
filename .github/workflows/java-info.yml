@@ -68,3 +68,16 @@ jobs:
         run: |
           export JAVA_HOME=${JAVA_HOME_11_X64}
           mvn --no-transfer-progress clean test -Dspotless.check.skip=true
+
+      - name: Generate JaCoCo Coverage Report
+        working-directory: maven-projects/info
+        run: |
+          export JAVA_HOME=${JAVA_HOME_11_X64}
+          mvn jacoco:report --no-transfer-progress
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          flag: java-info
+          files: "./maven-projects/info/target/site/jacoco/jacoco.xml"
+          token: ${{ secrets.CODECOV_TOKEN }}

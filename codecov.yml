@@ -15,8 +15,33 @@
 # specific language governing permissions and limitations
 # under the License.
 
+flags:
+  cpp:
+    paths:
+      - "cpp/"
+  spark:
+    paths:
+      - "maven-projects/spark/"
+  pyspark:
+    paths:
+      - "pyspark"
+  java-info:
+    paths:
+      - "maven-projects/info/"
+coverage:
+  status:
+    project:
+      default:
+        flags:
+          - cpp
+          - spark
+          - pyspark
+          - java-info
+
 ignore:
   - "cpp/benchmarks/**"
   - "cpp/examples/**"
   - "cpp/thirdparty/**"
   - "cpp/test/**"
+  - "maven-projects/spark/graphar/src/main/scala/org/apache/graphar/importer/**"
+  - "maven-projects/spark/graphar/src/main/scala/org/apache/graphar/example/**"
