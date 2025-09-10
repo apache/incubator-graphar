@@ -93,7 +93,7 @@ public class AdjacentListTest {
     @Test
     public void testAdjacentListWithNullPrefix() {
         AdjacentList adjList =
-                new AdjacentList(AdjListType.unordered_by_source, FileType.CSV, null);
+                new AdjacentList(AdjListType.unordered_by_source, FileType.CSV, (String) null);
 
         Assert.assertEquals(AdjListType.unordered_by_source, adjList.getType());
         Assert.assertEquals(FileType.CSV, adjList.getFileType());

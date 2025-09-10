@@ -39,7 +39,7 @@ public class PropertyGroup implements Iterable<Property> {
     private final URI baseUri;
 
     public PropertyGroup(List<Property> propertyMap, FileType fileType, String prefix) {
-        this(propertyMap, fileType, URI.create(prefix));
+        this(propertyMap, fileType, prefix == null ? null : URI.create(prefix));
     }
 
     public PropertyGroup(List<Property> propertyMap, FileType fileType, URI baseUri) {
@@ -92,7 +92,7 @@ public class PropertyGroup implements Iterable<Property> {
     }
 
     public String getPrefix() {
-        return baseUri.toString();
+        return baseUri == null ? null : baseUri.toString();
     }
 
     public URI getBaseUri() {

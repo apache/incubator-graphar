@@ -53,7 +53,7 @@ public class MultiFormatGraphInfoTest {
         List<EdgeInfo> edges = new ArrayList<>();
         String version = "gar/v1";
 
-        GraphInfo graphInfo = new GraphInfo("testGraph", vertices, edges, null, version);
+        GraphInfo graphInfo = new GraphInfo("testGraph", vertices, edges, (String) null, version);
 
         Assert.assertEquals("testGraph", graphInfo.getName());
         Assert.assertNull(graphInfo.getPrefix());

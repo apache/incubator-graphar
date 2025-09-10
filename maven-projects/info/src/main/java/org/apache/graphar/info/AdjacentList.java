@@ -35,7 +35,7 @@ public class AdjacentList {
     }
 
     public AdjacentList(AdjListType type, FileType fileType, String prefix) {
-        this(type, fileType, URI.create(prefix));
+        this(type, fileType, prefix == null ? null : URI.create(prefix));
     }
 
     public AdjListType getType() {
@@ -47,7 +47,7 @@ public class AdjacentList {
     }
 
     public String getPrefix() {
-        return baseUri.toString();
+        return baseUri == null ? null : baseUri.toString();
     }
 
     public URI getBaseUri() {
