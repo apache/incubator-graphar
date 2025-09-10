@@ -31,7 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class GraphInfoLoaderTest {
-
+    
     @BeforeClass
     public static void init() {
         TestUtil.checkTestData();
@@ -41,39 +41,27 @@ public class GraphInfoLoaderTest {
     public static void clean() {}
 
     @Test
-    public void testStringLoader() {
+    public void testStringLoader() throws IOException {
         final URI GRAPH_PATH_URI = TestUtil.getLdbcSampleGraphURI();
         GraphInfoLoader loader = new LocalFileSystemStringGraphInfoLoader();
-        try {
-            final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
-            testGraphInfo(graphInfo);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
+        testGraphInfo(graphInfo);
     }
 
     @Test
-    public void testStreamLoader() {
+    public void testStreamLoader() throws IOException {
         final URI GRAPH_PATH_URI = TestUtil.getLdbcSampleGraphURI();
         GraphInfoLoader loader = new LocalFileSystemStreamGraphInfoLoader();
-        try {
-            final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
-            testGraphInfo(graphInfo);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
+        testGraphInfo(graphInfo);
     }
 
     @Test
-    public void testReaderLoader() {
+    public void testReaderLoader() throws IOException {
         final URI GRAPH_PATH_URI = TestUtil.getLdbcSampleGraphURI();
         GraphInfoLoader loader = new LocalFileSystemReaderGraphInfoLoader();
-        try {
-            final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
-            testGraphInfo(graphInfo);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
+        testGraphInfo(graphInfo);
     }
 
     private void testGraphInfo(GraphInfo graphInfo) {

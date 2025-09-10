@@ -98,6 +98,8 @@ public abstract class BaseFileSystemTest {
     /** Verifies that test prerequisites are met. */
     protected void verifyTestPrerequisites() {
         TestUtil.checkTestData();
+        // Note: BaseFileSystemTest doesn't require external test data for basic operations
+        // Individual tests that need external data should check TestUtil.getTestData() != null
     }
 
     /**
