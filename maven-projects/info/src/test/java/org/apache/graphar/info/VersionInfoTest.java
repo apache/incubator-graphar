@@ -19,7 +19,6 @@
 
 package org.apache.graphar.info;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -173,8 +172,9 @@ public class VersionInfoTest {
             new VersionInfo(0, null);
             Assert.fail("Expected IllegalArgumentException for zero version");
         } catch (IllegalArgumentException e) {
-            Assert.assertTrue("Error message should mention version", 
-                e.getMessage().contains("Version must be a supported positive integer"));
+            Assert.assertTrue(
+                    "Error message should mention version",
+                    e.getMessage().contains("Version must be a supported positive integer"));
         }
     }
 
@@ -184,8 +184,9 @@ public class VersionInfoTest {
             new VersionInfo(-1, null);
             Assert.fail("Expected IllegalArgumentException for negative version");
         } catch (IllegalArgumentException e) {
-            Assert.assertTrue("Error message should mention version", 
-                e.getMessage().contains("Version must be a supported positive integer"));
+            Assert.assertTrue(
+                    "Error message should mention version",
+                    e.getMessage().contains("Version must be a supported positive integer"));
         }
     }
 

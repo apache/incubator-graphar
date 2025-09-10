@@ -148,27 +148,28 @@ public class TestUtil {
         if (GAR_TEST_DATA == null) {
             // 1. First try system property (convenient for Maven command line)
             GAR_TEST_DATA = System.getProperty("gar.test.data");
-            
+
             // 2. Then try environment variable (backward compatibility)
             if (GAR_TEST_DATA == null) {
                 GAR_TEST_DATA = System.getenv("GAR_TEST_DATA");
             }
-            
+
             // 3. Auto-detect common locations
             if (GAR_TEST_DATA == null) {
                 String[] possiblePaths = {
-                    "../../testing",                    // from info module
-                    "../testing",                       // from maven-projects
-                    "testing",                          // from project root
-                    "graphar-testing",                  // common CI naming
-                    "../incubator-graphar-testing"      // sibling directory
+                    "../../testing", // from info module
+                    "../testing", // from maven-projects
+                    "testing", // from project root
+                    "graphar-testing", // common CI naming
+                    "../incubator-graphar-testing" // sibling directory
                 };
-                
+
                 for (String path : possiblePaths) {
                     java.io.File testDir = new java.io.File(path).getAbsoluteFile();
                     if (testDir.exists() && testDir.isDirectory()) {
                         // Verify expected test data exists
-                        java.io.File sampleGraph = new java.io.File(testDir, "ldbc_sample/csv/ldbc_sample.graph.yml");
+                        java.io.File sampleGraph =
+                                new java.io.File(testDir, "ldbc_sample/csv/ldbc_sample.graph.yml");
                         if (sampleGraph.exists()) {
                             GAR_TEST_DATA = testDir.getAbsolutePath();
                             System.out.println("Found test data at: " + GAR_TEST_DATA);
@@ -178,31 +179,32 @@ public class TestUtil {
                 }
             }
         }
-        
+
         // Verify test data directory
         boolean dataExists = false;
         if (GAR_TEST_DATA != null) {
             java.io.File testDir = new java.io.File(GAR_TEST_DATA);
-            java.io.File sampleGraph = new java.io.File(testDir, "ldbc_sample/csv/ldbc_sample.graph.yml");
+            java.io.File sampleGraph =
+                    new java.io.File(testDir, "ldbc_sample/csv/ldbc_sample.graph.yml");
             dataExists = testDir.exists() && sampleGraph.exists();
         }
-        
+
         // Friendly error message
         Assume.assumeTrue(
-            "GraphAr test data not found. To run tests, please:\n" +
-            "\n" +
-            "Option 1: Clone test data repository\n" +
-            "  git clone https://github.com/apache/incubator-graphar-testing.git testing\n" +
-            "\n" +
-            "Option 2: Set test data path\n" +
-            "  mvn test -Dgar.test.data=/path/to/testing\n" +
-            "  OR\n" +
-            "  export GAR_TEST_DATA=/path/to/testing\n" +
-            "\n" +
-            "Searched locations: testing/, ../testing/, ../../testing/\n" +
-            "Current GAR_TEST_DATA: " + GAR_TEST_DATA,
-            dataExists
-        );
+                "GraphAr test data not found. To run tests, please:\n"
+                        + "\n"
+                        + "Option 1: Clone test data repository\n"
+                        + "  git clone https://github.com/apache/incubator-graphar-testing.git testing\n"
+                        + "\n"
+                        + "Option 2: Set test data path\n"
+                        + "  mvn test -Dgar.test.data=/path/to/testing\n"
+                        + "  OR\n"
+                        + "  export GAR_TEST_DATA=/path/to/testing\n"
+                        + "\n"
+                        + "Searched locations: testing/, ../testing/, ../../testing/\n"
+                        + "Current GAR_TEST_DATA: "
+                        + GAR_TEST_DATA,
+                dataExists);
     }
 
     public static String getBaseGraphInfoYaml() {
