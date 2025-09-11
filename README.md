@@ -417,10 +417,10 @@ See [GraphAr Spark
 Library](./maven-projects/spark)
 for details about the Scala with Spark library.
 
-### The Java-FFI Library
+### The Java (FFI) Library
 
 > [!WARNING] 
-> The Java-FFI library is no longer being updated. The final version depends on C++ library v0.12.0.
+> The Java (FFI) library is no longer being updated. The final version depends on C++ library v0.12.0.
 
 The GraphAr Java library was created with bindings to the C++ library
 (currently at version v0.12.0), utilizing
@@ -432,12 +432,11 @@ details about the building of the Java library.
 > [!NOTE]
 > The Java library is under development.
 
-The Java library is composed of different modules:
+Unlike java-FFI, the Java library will be implemented by pure java, which will contain different modules:
+
 - **[java-info](./maven-projects/info)**: Responsible for parsing graphInfo (schema) from YAML files
 - **java-io-xxx**: Responsible for reading graph data from different storage formats (to be implemented)
 - **java-api-xxx**: Provides high level API for graph operations (to be implemented)
-
-This module is part of the pure Java implementation of GraphAr, which is currently under development.
 
 ### The Python with PySpark Library
 

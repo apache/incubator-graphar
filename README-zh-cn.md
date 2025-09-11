@@ -205,12 +205,23 @@ GraphAr 提供了一组用于读取、写入和转换文件的库。目前，以
 
 有关 Scala 与 Spark 库的详细信息，请参阅 [GraphAr Spark库](./maven-projects/spark)。
 
+### Java (FFI) 库
+
+
+> [!WARNING]
+> Java (FFI) 库已不再更新，最后版本依赖于 C++ 库 v0.12.0。
+
+GraphAr Java 库是通过绑定到 C++ 库（当前版本为v0.12.0）创建的，使用 [Alibaba-FastFFI](https://github.com/alibaba/fastFFI) 进行实现。有关 Java 库构建的详细信息，请参阅 [GraphAr Java库](./maven-projects/java)。
+
+
 ### Java 库
+> [!NOTE]
+> Java 库正在开发中.
 
-> [!NOTE] 
-> Java 库正在开发中。
-
-GraphAr Java 库是通过绑定到 C++ 库（当前版本为v0.10.0）创建的，使用 [Alibaba-FastFFI](https://github.com/alibaba/fastFFI) 进行实现。有关 Java 库构建的详细信息，请参阅 [GraphAr Java库](./maven-projects/java)。
+java 库将由纯java开发，他将会包括下面的模块：
+- **[Java-Info](./maven-projects/info)**：负责从yaml文件中解析Graphinfo（schema）
+- **Java-io-XXX**：负责从不同存储格式读取图形数据（待实现）
+- **Java-Api-XXX**：为图形操作提供高级API（待实现）
 
 ### Python（PySpark）库
 
