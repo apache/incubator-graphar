@@ -25,7 +25,6 @@ import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
-import org.junit.Assume;
 
 public class TestUtil {
     private static String GAR_TEST_DATA = null;
@@ -68,28 +67,32 @@ public class TestUtil {
     public static final PropertyGroup pg1 = new PropertyGroup(List.of(id), FileType.CSV, "id/");
     public static final PropertyGroup pg2 =
             new PropertyGroup(
-                    List.of(firstName, lastName, gender), FileType.CSV, "firstName_lastName_gender/");
+                    List.of(firstName, lastName, gender),
+                    FileType.CSV,
+                    "firstName_lastName_gender/");
     public static final VertexInfo person =
             new VertexInfo("person", 100, List.of(pg1, pg2), "vertex/person/", "gar/v1");
 
     /**
-     * Gets the real LDBC sample GraphInfo by loading it from test data files.
-     * This replaces the old mock data approach with real file-based data loading.
+     * Gets the real LDBC sample GraphInfo by loading it from test data files. This replaces the old
+     * mock data approach with real file-based data loading.
      */
     public static GraphInfo getLdbcSampleDataSet() {
         checkTestData();
         try {
-            GraphInfoLoader loader = new org.apache.graphar.info.loader.impl.LocalFileSystemStreamGraphInfoLoader();
+            GraphInfoLoader loader =
+                    new org.apache.graphar.info.loader.impl.LocalFileSystemStreamGraphInfoLoader();
             return loader.loadGraphInfo(getLdbcSampleGraphURI());
         } catch (Exception e) {
-            throw new RuntimeException("Failed to load real LDBC sample data: " + e.getMessage(), e);
+            throw new RuntimeException(
+                    "Failed to load real LDBC sample data: " + e.getMessage(), e);
         }
     }
 
     public static void checkTestData() {
         // Always try to find test data freshly to avoid stale cached values
         String testDataPath = null;
-        
+
         // 1. First try environment variable GAR_TEST_DATA
         testDataPath = System.getenv("GAR_TEST_DATA");
 
@@ -130,11 +133,12 @@ public class TestUtil {
         }
 
         if (!dataExists) {
-            throw new RuntimeException("GAR_TEST_DATA not found or invalid. " +
-                    "Please set GAR_TEST_DATA environment variable to point to the testing directory " +
-                    "or ensure the testing directory exists with ldbc_sample/csv/ldbc_sample.graph.yml");
+            throw new RuntimeException(
+                    "GAR_TEST_DATA not found or invalid. "
+                            + "Please set GAR_TEST_DATA environment variable to point to the testing directory "
+                            + "or ensure the testing directory exists with ldbc_sample/csv/ldbc_sample.graph.yml");
         }
-        
+
         // Only set the static variable after successful validation
         GAR_TEST_DATA = testDataPath;
     }

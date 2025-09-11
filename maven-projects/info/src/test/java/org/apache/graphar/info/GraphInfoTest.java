@@ -43,16 +43,18 @@ public class GraphInfoTest {
     @BeforeClass
     public static void setUp() {
         TestUtil.checkTestData();
-        
+
         // Always use real test data - fail if not available
         GRAPH_PATH_URI = TestUtil.getLdbcSampleGraphURI();
         GraphInfoLoader loader = new LocalFileSystemStreamGraphInfoLoader();
         try {
             graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load real test data from " + GRAPH_PATH_URI + ": " + e.getMessage(), e);
+            throw new RuntimeException(
+                    "Failed to load real test data from " + GRAPH_PATH_URI + ": " + e.getMessage(),
+                    e);
         }
-        
+
         personVertexInfo = graphInfo.getVertexInfos().get(0);
         knowsEdgeInfo = graphInfo.getEdgeInfos().get(0);
     }
@@ -74,11 +76,11 @@ public class GraphInfoTest {
     public void testGraphInfoBasics() {
         Assert.assertNotNull(graphInfo);
         Assert.assertEquals("ldbc_sample", graphInfo.getName());
-        
+
         // For real test data
         Assert.assertEquals(GRAPH_PATH_URI.resolve(".").toString(), graphInfo.getPrefix());
         Assert.assertEquals(GRAPH_PATH_URI.resolve("."), graphInfo.getBaseUri());
-        
+
         Assert.assertNotNull(graphInfo.getEdgeInfos());
         Assert.assertEquals(1, graphInfo.getEdgeInfos().size());
         Assert.assertNotNull(graphInfo.getVertexInfos());

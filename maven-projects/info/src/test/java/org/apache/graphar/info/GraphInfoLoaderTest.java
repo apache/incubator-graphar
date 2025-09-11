@@ -31,7 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class GraphInfoLoaderTest {
-    
+
     @BeforeClass
     public static void init() {
         TestUtil.checkTestData();
