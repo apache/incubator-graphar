@@ -90,59 +90,57 @@ public class TestUtil {
         }
     }
 
-    public static void checkTestData() {
-        // Always try to find test data freshly to avoid stale cached values
-        String testDataPath = null;
+   public static void checkTestData() {
+    // Always try to find test data freshly to avoid stale cached values
+    String testDataPath = null;
 
-        // 1. First try environment variable GAR_TEST_DATA
-        testDataPath = System.getenv("GAR_TEST_DATA");
+    // Try environment variable GAR_TEST_DATA or system property
+    testDataPath = System.getenv("GAR_TEST_DATA");
+    if (testDataPath == null || testDataPath.isEmpty()) {
+        testDataPath = System.getProperty("gar.test.data");
+    }
 
-        // 2. Try system property (for custom paths)
-        if (testDataPath == null) {
-            testDataPath = System.getProperty("gar.test.data");
-        }
+    // Default to project root testing directory if nothing is set
+    if (testDataPath == null || testDataPath.isEmpty()) {
+        String[] possiblePaths = {
+            "../../testing", // from info module to project root
+            "../testing",    // from maven-projects to project root
+            "testing"        // from project root
+        };
 
-        // 3. Default to project root testing directory
-        if (testDataPath == null) {
-            String[] possiblePaths = {
-                "../../testing", // from info module to project root
-                "../testing", // from maven-projects to project root
-                "testing" // from project root
-            };
-
-            for (String path : possiblePaths) {
-                java.io.File testDir = new java.io.File(path).getAbsoluteFile();
-                if (testDir.exists() && testDir.isDirectory()) {
-                    // Verify expected test data exists
-                    java.io.File sampleGraph =
-                            new java.io.File(testDir, "ldbc_sample/csv/ldbc_sample.graph.yml");
-                    if (sampleGraph.exists()) {
-                        testDataPath = testDir.getAbsolutePath();
-                        break;
-                    }
+        for (String path : possiblePaths) {
+            java.io.File testDir = new java.io.File(path).getAbsoluteFile();
+            if (testDir.exists() && testDir.isDirectory()) {
+                // Verify expected test data exists
+                java.io.File sampleGraph =
+                        new java.io.File(testDir, "ldbc_sample/csv/ldbc_sample.graph.yml");
+                if (sampleGraph.exists()) {
+                    testDataPath = testDir.getAbsolutePath();
+                    break;
                 }
             }
         }
-
-        // Verify test data directory
-        boolean dataExists = false;
-        if (testDataPath != null) {
-            java.io.File testDir = new java.io.File(testDataPath);
-            java.io.File sampleGraph =
-                    new java.io.File(testDir, "ldbc_sample/csv/ldbc_sample.graph.yml");
-            dataExists = testDir.exists() && sampleGraph.exists();
-        }
-
-        if (!dataExists) {
-            throw new RuntimeException(
-                    "GAR_TEST_DATA not found or invalid. "
-                            + "Please set GAR_TEST_DATA environment variable to point to the testing directory "
-                            + "or ensure the testing directory exists with ldbc_sample/csv/ldbc_sample.graph.yml");
-        }
-
-        // Only set the static variable after successful validation
-        GAR_TEST_DATA = testDataPath;
     }
+
+    // Verify test data directory
+    boolean dataExists = false;
+    if (testDataPath != null) {
+        java.io.File testDir = new java.io.File(testDataPath);
+        java.io.File sampleGraph =
+                new java.io.File(testDir, "ldbc_sample/csv/ldbc_sample.graph.yml");
+        dataExists = testDir.exists() && sampleGraph.exists();
+    }
+
+    if (!dataExists) {
+        throw new RuntimeException(
+                "GAR_TEST_DATA not found or invalid. "
+                        + "Please set GAR_TEST_DATA environment variable to point to the testing directory "
+                        + "or ensure the testing directory exists with ldbc_sample/csv/ldbc_sample.graph.yml");
+    }
+
+    // Only set the static variable after successful validation
+    GAR_TEST_DATA = testDataPath;
+}
 
     public static String getBaseGraphInfoYaml() {
         return "type: person\n"
