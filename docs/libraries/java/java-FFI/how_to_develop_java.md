@@ -75,7 +75,7 @@ More about usage of CMake, please refer to
 ## Building GraphAr Java
 
 Please refer to
-[GraphAr Java Library user guide](java.md).
+[GraphAr Java Library user guide](getting-started).
 
 ## How To Test
 
