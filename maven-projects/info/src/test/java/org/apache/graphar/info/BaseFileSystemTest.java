@@ -38,13 +38,15 @@ public abstract class BaseFileSystemTest {
     @BeforeClass
     public static void setUpClass() {
         TestUtil.checkTestData();
+        // Clean up from previous test runs before starting new tests
+        cleanupTestOutputDirectory();
         ensureTestOutputDirectoryExists();
     }
 
     @AfterClass
     public static void tearDownClass() {
-        // Optionally clean up test directories after all tests
-        // cleanupTestOutputDirectory();
+        // Keep test output for debugging - cleanup will happen before next test run
+        System.out.println("Test output preserved in: " + TEST_OUTPUT_DIR);
     }
 
     /** Ensures the test output directory exists. */
@@ -59,8 +61,8 @@ public abstract class BaseFileSystemTest {
     }
 
     /**
-     * Cleans up a specific test directory. Use this in @Before or @After methods for test-specific
-     * cleanup.
+     * Cleans up a specific test directory. Use this in @Before methods for test-specific
+     * pre-cleanup, or when you need to reset a directory during test execution.
      */
     protected void cleanupDirectory(String directoryPath) {
         try {
@@ -81,11 +83,30 @@ public abstract class BaseFileSystemTest {
         }
     }
 
-    /** Creates a test-specific subdirectory and ensures it's clean. */
+    /** 
+     * Creates a test-specific subdirectory and ensures it's clean.
+     * This method will clean existing content before creating the directory.
+     */
     protected String createCleanTestDirectory(String subdirectoryName) {
         String testDir = TEST_OUTPUT_DIR + "/" + subdirectoryName;
         cleanupDirectory(testDir);
 
+        try {
+            Files.createDirectories(Paths.get(testDir));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create test directory: " + testDir, e);
+        }
+
+        return testDir;
+    }
+
+    /**
+     * Creates a test-specific subdirectory without cleaning existing content.
+     * Use this when you want to preserve existing files in the directory.
+     */
+    protected String ensureTestDirectory(String subdirectoryName) {
+        String testDir = TEST_OUTPUT_DIR + "/" + subdirectoryName;
+        
         try {
             Files.createDirectories(Paths.get(testDir));
         } catch (Exception e) {
@@ -103,13 +124,14 @@ public abstract class BaseFileSystemTest {
     }
 
     /**
-     * Cleans up the entire test output directory. Use with caution - this removes all test output
-     * files.
+     * Cleans up the entire test output directory. 
+     * Called automatically before test runs to ensure clean state.
      */
     private static void cleanupTestOutputDirectory() {
         try {
             Path testDir = Paths.get(TEST_OUTPUT_DIR);
             if (Files.exists(testDir)) {
+                System.out.println("Cleaning up previous test output from: " + testDir);
                 Files.walk(testDir)
                         .sorted(Comparator.reverseOrder())
                         .map(Path::toFile)

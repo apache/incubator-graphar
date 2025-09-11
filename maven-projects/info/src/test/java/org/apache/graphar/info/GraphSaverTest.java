@@ -41,8 +41,8 @@ public class GraphSaverTest extends BaseFileSystemTest {
 
     @After
     public void tearDown() {
-        // Clean up test directory after each test
-        cleanupDirectory(testSaveDirectory);
+        // Test data will be preserved for debugging - cleanup happens before next test run
+        System.out.println("Test data saved in: " + testSaveDirectory);
     }
 
     @Test
