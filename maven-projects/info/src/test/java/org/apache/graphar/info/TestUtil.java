@@ -21,20 +21,26 @@ package org.apache.graphar.info;
 
 import java.net.URI;
 import java.util.List;
+import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
-import org.junit.Assume;
 
 public class TestUtil {
     private static String GAR_TEST_DATA = null;
 
-    static final String SAVE_DIR = "/tmp/graphar/test/";
+    static final String SAVE_DIR =
+            System.getProperty("test.output.dir", "target/test-output") + "/";
 
     private static final String LDBC_SAMPLE_GRAPH_PATH = "/ldbc_sample/csv/ldbc_sample.graph.yml";
 
     public static String getTestData() {
         return GAR_TEST_DATA;
+    }
+
+    public static boolean hasTestData() {
+        checkTestData();
+        return GAR_TEST_DATA != null && new java.io.File(GAR_TEST_DATA).exists();
     }
 
     public static String getLdbcSampleGraphPath() {
@@ -50,105 +56,92 @@ public class TestUtil {
     public static final AdjacentList orderedByDest =
             new AdjacentList(AdjListType.ordered_by_dest, FileType.CSV, "ordered_by_dest/");
     public static final Property creationDate =
-            new Property("creationDate", DataType.STRING, false, false);
+            new Property("creationDate", DataType.STRING, false, true);
     public static final PropertyGroup pg3 =
             new PropertyGroup(List.of(creationDate), FileType.CSV, "creationDate/");
 
     public static final Property id = new Property("id", DataType.INT64, true, false);
     public static final Property firstName =
-            new Property("firstName", DataType.STRING, false, false);
-    public static final Property lastName = new Property("lastName", DataType.STRING, false, false);
+            new Property("firstName", DataType.STRING, false, true);
+    public static final Property lastName = new Property("lastName", DataType.STRING, false, true);
     public static final Property gender = new Property("gender", DataType.STRING, false, true);
     public static final PropertyGroup pg1 = new PropertyGroup(List.of(id), FileType.CSV, "id/");
     public static final PropertyGroup pg2 =
             new PropertyGroup(
-                    List.of(firstName, lastName, gender), FileType.CSV, "firstName_lastName");
+                    List.of(firstName, lastName, gender),
+                    FileType.CSV,
+                    "firstName_lastName_gender/");
     public static final VertexInfo person =
             new VertexInfo("person", 100, List.of(pg1, pg2), "vertex/person/", "gar/v1");
 
+    /**
+     * Gets the real LDBC sample GraphInfo by loading it from test data files. This replaces the old
+     * mock data approach with real file-based data loading.
+     */
     public static GraphInfo getLdbcSampleDataSet() {
-        // create vertex info of yaml:
-        // type: person
-        // chunk_size: 100
-        // prefix: vertex/person/
-        // property_groups:
-        //  - properties:
-        //      - name: id
-        //        data_type: int64
-        //        is_primary: true
-        //        is_nullable: false
-        //    prefix: id/
-        //    file_type: csv
-        //  - properties:
-        //      - name: firstName
-        //        data_type: string
-        //        is_primary: false
-        //      - name: lastName
-        //        data_type: string
-        //        is_primary: false
-        //      - name: gender
-        //        data_type: string
-        //        is_primary: false
-        //        is_nullable: true
-        //    prefix: firstName_lastName_gender/
-        //    file_type: csv
-        // version: gar/v1
-
-        // create edge info of yaml:
-        // src_type: person
-        // edge_type: knows
-        // dst_type: person
-        // chunk_size: 1024
-        // src_chunk_size: 100
-        // dst_chunk_size: 100
-        // directed: false
-        // prefix: edge/person_knows_person/
-        // adj_lists:
-        //  - ordered: true
-        //    aligned_by: src
-        //    prefix: ordered_by_source/
-        //    file_type: csv
-        //  - ordered: true
-        //    aligned_by: dst
-        //    prefix: ordered_by_dest/
-        //    file_type: csv
-        // property_groups:
-        //  - prefix: creationDate/
-        //    file_type: csv
-        //    properties:
-        //      - name: creationDate
-        //        data_type: string
-        //        is_primary: false
-        // version: gar/v1
-
-        EdgeInfo knows =
-                EdgeInfo.builder()
-                        .edgeTriplet("person", "knows", "person")
-                        .chunkSize(1024)
-                        .srcChunkSize(100)
-                        .dstChunkSize(100)
-                        .directed(false)
-                        .baseUri(URI.create("edge/person_knows_person/"))
-                        .version("gar/v1")
-                        .adjacentLists(List.of(orderedBySource, orderedByDest))
-                        .addPropertyGroups(List.of(pg3))
-                        .build();
-
-        // create graph info of yaml:
-        // name: ldbc_sample
-        // vertices:
-        //  - person.vertex.yml
-        // edges:
-        //  - person_knows_person.edge.yml
-        // version: gar/v1
-        return new GraphInfo("ldbc_sample", List.of(person), List.of(knows), "", "gar/v1");
+        checkTestData();
+        try {
+            GraphInfoLoader loader =
+                    new org.apache.graphar.info.loader.impl.LocalFileSystemStreamGraphInfoLoader();
+            return loader.loadGraphInfo(getLdbcSampleGraphURI());
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Failed to load real LDBC sample data: " + e.getMessage(), e);
+        }
     }
 
     public static void checkTestData() {
-        if (GAR_TEST_DATA == null) {
-            GAR_TEST_DATA = System.getenv("GAR_TEST_DATA");
+        // Always try to find test data freshly to avoid stale cached values
+        String testDataPath = null;
+
+        // 1. First try environment variable GAR_TEST_DATA
+        testDataPath = System.getenv("GAR_TEST_DATA");
+
+        // 2. Try system property (for custom paths)
+        if (testDataPath == null) {
+            testDataPath = System.getProperty("gar.test.data");
         }
-        Assume.assumeTrue("GAR_TEST_DATA is not set", GAR_TEST_DATA != null);
+
+        // 3. Default to project root testing directory
+        if (testDataPath == null) {
+            String[] possiblePaths = {
+                "../../testing", // from info module to project root
+                "../testing", // from maven-projects to project root
+                "testing" // from project root
+            };
+
+            for (String path : possiblePaths) {
+                java.io.File testDir = new java.io.File(path).getAbsoluteFile();
+                if (testDir.exists() && testDir.isDirectory()) {
+                    // Verify expected test data exists
+                    java.io.File sampleGraph =
+                            new java.io.File(testDir, "ldbc_sample/csv/ldbc_sample.graph.yml");
+                    if (sampleGraph.exists()) {
+                        testDataPath = testDir.getAbsolutePath();
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Verify test data directory
+        boolean dataExists = false;
+        if (testDataPath != null) {
+            java.io.File testDir = new java.io.File(testDataPath);
+            java.io.File sampleGraph =
+                    new java.io.File(testDir, "ldbc_sample/csv/ldbc_sample.graph.yml");
+            dataExists = testDir.exists() && sampleGraph.exists();
+        }
+
+        if (!dataExists) {
+            throw new RuntimeException(
+                    "GAR_TEST_DATA not found or invalid. "
+                            + "Please set GAR_TEST_DATA environment variable to point to the testing directory "
+                            + "or ensure the testing directory exists with ldbc_sample/csv/ldbc_sample.graph.yml");
+        }
+
+        // Only set the static variable after successful validation
+        GAR_TEST_DATA = testDataPath;
     }
 
     public static String getBaseGraphInfoYaml() {

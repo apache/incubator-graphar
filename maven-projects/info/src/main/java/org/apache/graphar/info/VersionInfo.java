@@ -24,14 +24,21 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 public class VersionInfo {
-    private int version;
-    private List<String> userDefinedTypes;
-    private final Map<Integer, List<String>> version2types =
+    private final int version;
+    private final List<String> userDefinedTypes;
+    private static final Map<Integer, List<String>> version2types =
             Map.of(1, List.of("bool", "int32", "int64", "float", "double", "string"));
 
-    public VersionInfo(Integer version, List<String> userDefinedTypes) {
+    public VersionInfo(int version, List<String> userDefinedTypes) {
+        if (version <= 0) {
+            throw new IllegalArgumentException(
+                    "Version must be a supported positive integer: " + version);
+        }
         this.version = version;
-        this.userDefinedTypes = userDefinedTypes;
+        this.userDefinedTypes =
+                userDefinedTypes == null || userDefinedTypes.isEmpty()
+                        ? new java.util.ArrayList<>()
+                        : List.copyOf(userDefinedTypes);
     }
 
     public int getVersion() {

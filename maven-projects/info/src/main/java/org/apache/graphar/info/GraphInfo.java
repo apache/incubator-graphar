@@ -44,7 +44,7 @@ public class GraphInfo {
             List<EdgeInfo> edgeInfos,
             String prefix,
             String version) {
-        this(name, vertexInfos, edgeInfos, URI.create(prefix), version);
+        this(name, vertexInfos, edgeInfos, prefix == null ? null : URI.create(prefix), version);
     }
 
     public GraphInfo(
@@ -201,7 +201,7 @@ public class GraphInfo {
     }
 
     public String getPrefix() {
-        return baseUri.toString();
+        return baseUri == null ? null : baseUri.toString();
     }
 
     public URI getBaseUri() {
