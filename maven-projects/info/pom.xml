@@ -103,6 +103,15 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.8</version>
+                <configuration>
+                    <excludes>
+                        <exclude>java/**</exclude>
+                        <exclude>javax/**</exclude>
+                        <exclude>sun/**</exclude>
+                        <exclude>com/sun/**</exclude>
+                        <exclude>org/yaml/snakeyaml/**</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
