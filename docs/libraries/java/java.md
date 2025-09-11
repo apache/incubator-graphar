@@ -1,7 +1,7 @@
 ---
 id: java
 title: Java Library
-sidebar_position: 1
+sidebar_position: 2
 ---
 
 # Java Library

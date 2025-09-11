@@ -1,7 +1,7 @@
 ---
-id: java
-title: Java Library
-sidebar_position: 2
+id: getting-started
+title: Getting Started with java FFI Module
+sidebar_position: 1
 ---
 
 ## Overview

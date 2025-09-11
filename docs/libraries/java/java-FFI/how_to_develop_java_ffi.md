@@ -1,7 +1,7 @@
 ---
-id: how_to_develop_java
-title: How to Develop Java Library
-sidebar_position: 1
+id: how_to_develop_java_ffi
+title: How to Develop Java FFI Library
+sidebar_position: 2
 ---
 
 ## Introduction
