@@ -83,9 +83,9 @@ public abstract class BaseFileSystemTest {
         }
     }
 
-    /** 
-     * Creates a test-specific subdirectory and ensures it's clean.
-     * This method will clean existing content before creating the directory.
+    /**
+     * Creates a test-specific subdirectory and ensures it's clean. This method will clean existing
+     * content before creating the directory.
      */
     protected String createCleanTestDirectory(String subdirectoryName) {
         String testDir = TEST_OUTPUT_DIR + "/" + subdirectoryName;
@@ -101,12 +101,12 @@ public abstract class BaseFileSystemTest {
     }
 
     /**
-     * Creates a test-specific subdirectory without cleaning existing content.
-     * Use this when you want to preserve existing files in the directory.
+     * Creates a test-specific subdirectory without cleaning existing content. Use this when you
+     * want to preserve existing files in the directory.
      */
     protected String ensureTestDirectory(String subdirectoryName) {
         String testDir = TEST_OUTPUT_DIR + "/" + subdirectoryName;
-        
+
         try {
             Files.createDirectories(Paths.get(testDir));
         } catch (Exception e) {
@@ -124,8 +124,8 @@ public abstract class BaseFileSystemTest {
     }
 
     /**
-     * Cleans up the entire test output directory. 
-     * Called automatically before test runs to ensure clean state.
+     * Cleans up the entire test output directory. Called automatically before test runs to ensure
+     * clean state.
      */
     private static void cleanupTestOutputDirectory() {
         try {

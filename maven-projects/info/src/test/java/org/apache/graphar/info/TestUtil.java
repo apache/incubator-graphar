@@ -29,7 +29,8 @@ import org.apache.graphar.info.type.FileType;
 public class TestUtil {
     private static String GAR_TEST_DATA = null;
 
-    static final String SAVE_DIR = System.getProperty("test.output.dir", "target/test-output") + "/";
+    static final String SAVE_DIR =
+            System.getProperty("test.output.dir", "target/test-output") + "/";
 
     private static final String LDBC_SAMPLE_GRAPH_PATH = "/ldbc_sample/csv/ldbc_sample.graph.yml";
 
