@@ -17,15 +17,19 @@
 
 flags:
   cpp:
+    carryforward: true
     paths:
       - "cpp/"
   spark:
+    carryforward: true
     paths:
       - "maven-projects/spark/"
   pyspark:
+    carryforward: true
     paths:
       - "pyspark/"
   java-info:
+    carryforward: true
     paths:
       - "maven-projects/info/"
 coverage:
