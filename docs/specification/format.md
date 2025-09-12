@@ -147,6 +147,9 @@ Take the "person knows person" edges to illustrate. Suppose the vertex chunk siz
 ## Information files
 
 GraphAr uses two kinds of files to store a graph: a group of Yaml files to describe metadata information; and data files to store actual data for vertices and edges.  
+
+### Graph Information File
+
 A graph information file which named "\<name\>.graph.yml" describes the meta information for a graph whose name is \<name\>. The content of this file includes:
 
 - the graph name;
@@ -155,6 +158,22 @@ A graph information file which named "\<name\>.graph.yml" describes the meta inf
 - the version of GraphAr.
 - extra information for the graph, could be used for user defined information.
 
+**An example of the graph information file is shown as follows**:
+
+```yaml
+name: ldbc_sample
+prefix: ./
+vertices:
+  - person.vertex.yml
+edges:
+  - person_knows_person.edge.yml
+version: gar/v1
+```
+
+In this example, it defines an example graph named "ldbc_sample", which includes one type of vertices ("person") and one type of edges ("person knows person").
+
+### Vertex Information File
+
 A vertex information file which named "\<label\>.vertex.yml" defines a single group of vertices with the same vertex label \<label\>, and all vertices in this group have the same schema. The file defines:
 
 - the vertex label;
@@ -162,6 +181,36 @@ A vertex information file which named "\<label\>.vertex.yml" defines a single gr
 - the relative path for vertex data files;
 - the property groups attached: each property group has its own file type and the prefix for the path of its data files, it also lists all properties in this group, with every property containing its own name, data type, flagging of whether it is the primary key or not and flagging of whether it is nullable or not for non-primary key properties;
 - the version of GraphAr.
+
+**An example of the vertex information file is shown as follows**:
+
+```yaml
+type: person
+chunk_size: 100
+prefix: vertex/person/
+property_groups:
+  - properties:
+      - name: id
+        data_type: int64
+        is_primary: true
+    file_type: parquet
+  - properties:
+      - name: firstName
+        data_type: string
+        is_primary: false
+      - name: lastName
+        data_type: string
+        is_primary: false
+      - name: gender
+        data_type: string
+        is_primary: false
+    file_type: parquet
+version: gar/v1
+```
+
+In this example, the "person" vertices have two property groups. The first group contains only one property (named "id") and the second group contains three properties ("firstName", "lastName" and "gender").
+
+### Edge Information File
 
 An edge information file which named "\<source label\>_\<edge label\>_\<destination label\>.edge.yml" defines a single group of edges with specific label for source vertex, destination vertex and the edge. It describes the meta information for these edges, includes:
 
@@ -173,13 +222,43 @@ An edge information file which named "\<source label\>_\<edge label\>_\<destinat
 - the property groups attached to the edge for all adjLists;
 - the version of GraphAr.
 
+An example of the edge information file is shown as follows:
+
+```yaml
+src_type: person
+edge_type: knows
+dst_type: person
+chunk_size: 1024
+src_chunk_size: 100
+dst_chunk_size: 100
+directed: false
+prefix: edge/person_knows_person/
+adj_lists:
+  - ordered: false
+    aligned_by: src
+    file_type: parquet
+  - ordered: true
+    aligned_by: src
+    file_type: parquet
+  - ordered: true
+    aligned_by: dst
+    file_type: parquet
+property_groups:
+  - file_type: parquet
+    properties:
+      - name: creationDate
+        data_type: string
+        is_primary: false
+version: gar/v1
+```
+
 :::note
 
 Please note that GraphAr supports the storage of multiple types of adjLists for a given group of edges, e.g., a group of edges could be accessed in both CSR and CSC way when two copies (one is **ordered_by_source** and the other is **ordered_by_dest**) of the relevant data are present in GraphAr.
 
 :::
 
-See also [Gar Information Files](https://graphar.apache.org/docs/libraries/cpp/getting-started#gar-information-files) for an example.
+For usage examples, please refer to [Information in C++](https://graphar.apache.org/docs/libraries/cpp/getting-started/#construct-information) and [Information in Java](https://graphar.apache.org/docs/libraries/java/info/getting-started).
 
 ## Data files
 

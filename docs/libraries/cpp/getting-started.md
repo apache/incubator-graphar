@@ -290,6 +290,7 @@ id|:LABEL|name|url
 ...
 1575|university|Paktia_University|http://dbpedia.org/resource/Paktia_University
 ```
+
 At the beginning, we need to add label information into the `yml` file of  vertex. For this example, it should be as follows.
 
 ```yml
@@ -318,6 +319,7 @@ property_groups:
 version: gar/v1
 
 ```
+
 When you have the data ready, you can read the file into `arrow::Table` by using arrow I/O function.
 
 ``` cpp
@@ -339,7 +341,9 @@ When you have the data ready, you can read the file into `arrow::Table` by using
     std::shared_ptr<arrow::Table> table;
     table = reader->Read().ValueOrDie();
 ```
+
 You can export label table to disk in parquet format, and read it back into memory in the following way.
+
 ``` cpp
   auto options_parquet_builder = WriterOptions::ParquetOptionBuilder();
   options_parquet_builder.compression(arrow::Compression::type::UNCOMPRESSED);
@@ -360,11 +364,10 @@ You can export label table to disk in parquet format, and read it back into memo
   assert(reader->GetLabelChunk().status().ok());
   assert(reader->next_chunk().ok());
 ```
+
 ### Using Label Filtering Functions
 
 By calling the `graphar::VerticesCollection::verticesWithLabel` or `graphar::VerticesCollection::verticesWithMultipleLabels` API, we can specify a certain type of vertices on a certain graph, then filter out all vertices that match one or more labels. Here we introduce several examples of using label filtering.
-
-
 
 ```cpp
   graph_info = ...
@@ -403,8 +406,8 @@ By calling the `graphar::VerticesCollection::verticesWithLabel` or `graphar::Ver
 
  
 ```
-Notice that, if the first two queries are executed successively, the result is equivalent to the third query.
 
+Notice that, if the first two queries are executed successively, the result is equivalent to the third query.
 
 ### Working with Cloud Storage (S3, OSS)
 

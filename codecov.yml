@@ -24,7 +24,7 @@ flags:
       - "maven-projects/spark/"
   pyspark:
     paths:
-      - "pyspark"
+      - "pyspark/"
   java-info:
     paths:
       - "maven-projects/info/"

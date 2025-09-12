@@ -1,7 +1,7 @@
 ---
-id: how_to_develop_java
-title: How to Develop Java Library
-sidebar_position: 1
+id: how_to_develop_java_ffi
+title: How to Develop Java FFI Library
+sidebar_position: 2
 ---
 
 ## Introduction
@@ -75,7 +75,7 @@ More about usage of CMake, please refer to
 ## Building GraphAr Java
 
 Please refer to
-[GraphAr Java Library user guide](java.md).
+[GraphAr Java Library user guide](getting-started).
 
 ## How To Test
 
