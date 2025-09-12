@@ -4,7 +4,7 @@ The **graphar-info** module is part of the pure Java implementation of GraphAr.
 
 ## Key Features
 
-The **java-info** module offers a lightweight yet powerful solution for **GraphAr metadata management**. It is responsible for:
+The **java-info** module offers a lightweight, zero-dependencies yet powerful solution for **GraphAr metadata management**. It is responsible for:
 
 * **Loading & Saving Metadata**: Read and write GraphAr metadata files in YAML format.
 * **Schema Parsing**: Extract graph schema definitions (e.g., vertex/edge types, properties).
@@ -25,11 +25,9 @@ mvn clean install
 
 ## Usage
 
-### Load graph Info
-
-#### Load GraphInfo from local file system
-
 Here's a simple example of how to use the graphar-info module:
+
+For more usage examples and detailed information, please refer to [Getting Started with Info Module](https://graphar.apache.org/docs/libraries/java/info/getting-started).
 
 ```java
 import org.apache.graphar.info.GraphInfo;
@@ -55,55 +53,6 @@ EdgeInfo knowsEdge = edges.get(0);
 String edgeType = knowsEdge.getEdgeType();
 boolean isDirected = knowsEdge.isDirected();
 ```
-
-#### Custom YAML Loader Implementation
-
-The java-info module requires users to implement their own YAML reading interface, because we typically face data lakes where data may be stored anywhere (local file or HDFS or S3 or OSS...). Users can implement one or more of StringGraphInfoLoader, ReaderGraphInfoLoader, or StreamGraphInfoLoader (a local file system implementation is already provided).
-
-Here's an example of how to implement a custom YAML loader by extending the StringGraphInfoLoader abstract class:
-
-```java
-import org.apache.graphar.info.loader.StringGraphInfoLoader;
-import java.io.IOException;
-import java.net.URI;
-
-public class MyStringGraphInfoLoader extends StringGraphInfoLoader {
-    @Override
-    public String readYaml(URI uri) throws IOException {
-        // Implement your custom logic to read YAML from any source
-        // This example shows reading from a database, but it could be HTTP, S3, HDFS, etc.
-        
-        // Example: Read from a database based on URI path
-        String path = uri.getPath();
-        // Query database for YAML content
-        return readYamlFromDatabase(path);
-    }
-    
-    private String readYamlFromDatabase(String path) throws IOException {
-        // Your database access logic here
-        // This is just a placeholder implementation
-        // In a real implementation, you would connect to your database
-        // and retrieve the YAML content based on the path
-        
-        // For example:
-        // Connection conn = DriverManager.getConnection(dbUrl, username, password);
-        // PreparedStatement stmt = conn.prepareStatement("SELECT yaml_content FROM graphs WHERE id = ?");
-        // stmt.setString(1, path);
-        // ResultSet rs = stmt.executeQuery();
-        // if (rs.next()) {
-        //     return rs.getString("yaml_content");
-        // }
-        
-        // Placeholder return
-        return "name: example\ntype: graph\nversion: v1";
-    }
-}
-
-// Usage of the custom loader
-MyStringGraphInfoLoader customLoader = new MyStringGraphInfoLoader();
-GraphInfo graphInfo = customLoader.loadGraphInfo(URI.create("db://mydatabase/graphs/graph1/graph.yml"));
-```
-
 ## Dependencies
 
 The graphar-info module has minimal dependencies:
