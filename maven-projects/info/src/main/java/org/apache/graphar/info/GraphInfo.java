@@ -111,6 +111,42 @@ public class GraphInfo {
         return yaml.dump(graphYaml);
     }
 
+    public Optional<GraphInfo> removeVertex(VertexInfo vertexInfo) {
+
+        if (vertexInfo == null || hasVertexInfo(vertexInfo.getType())) {
+            return Optional.empty();
+        }
+        final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
+                org.apache.graphar.proto.GraphInfo.newBuilder(protoGraphInfo)
+                        .removeVertices(vertexInfo.getVertexPath())
+                        .build();
+
+        List<EdgeInfo> newCachedEdgeInfoList = cachedEdgeInfoList.stream()
+                .filter(currEdge ->
+                        !currEdge.getSrcLabel().equals(vertexInfo.getType()) &&
+                                !currEdge.getDstLabel().equals(vertexInfo.getType())
+                )
+                .collect(Collectors.toList());
+
+
+        final List<VertexInfo> newVertexInfoList = Stream.concat(cachedVertexInfoList.stream().filter(v ->
+                !v.getType().equals(vertexInfo.getType())
+                        && !v.getPrefix().equals(vertexInfo.getPrefix())))
+                .collect(Collectors.toList());
+
+        final Map<String, VertexInfo> newVertexInfoMap =
+                cachedVertexInfoMap.entrySet().stream()
+                        .filter(v -> !v.getConcat().equals(vertexInfo.getConcat()))
+                        .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+        return Optional.of(
+                new GraphInfo(
+                        newProtoGraphInfo,
+                        newVertexInfoList,
+                        newCachedEdgeInfoList,
+                        newVertexInfoMap,
+                        cachedEdgeInfoMap));
+    }
+
     public Optional<GraphInfo> addVertexAsNew(VertexInfo vertexInfo) {
         if (vertexInfo == null || hasVertexInfo(vertexInfo.getType())) {
             return Optional.empty();
@@ -134,6 +170,36 @@ public class GraphInfo {
                         version,
                         newVertexType2VertexInfo,
                         edgeConcat2EdgeInfo));
+    }
+
+    public Optional<GraphInfo> removeEdge(EdgeInfo edgeInfo) {
+        if (edgeInfo == null
+                || hasEdgeInfo(
+                edgeInfo.getSrcLabel(), edgeInfo.getEdgeLabel(), edgeInfo.getDstLabel())) {
+            return Optional.empty();
+        }
+        final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
+                org.apache.graphar.proto.GraphInfo.newBuilder(protoGraphInfo)
+                        .removeEdges(edgeInfo.getEdgePath())
+                        .build();
+        final List<EdgeInfo> newEdgeInfos = Stream.concat(cachedEdgeInfoList.stream().filter(e ->
+                !e.getSrcLabel().equals(edgeInfo.getSrcLabel())
+                        && !e.getDstLabel().equals(edgeInfo.getDstLabel())
+                        && !e.getEdgeLabel().equals(edgeInfo.getEdgeLabel())))
+                .collect(Collectors.toList());
+
+        final Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
+                cachedEdgeInfoMap.entrySet().stream()
+                        .filter(e -> !e.getKey().equals(edgeInfo.getConcat()))
+                        .filter(e -> !e.getConcat().equals(edgeInfo.getConcat()))
+                        .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+        return Optional.of(
+                new GraphInfo(
+                        newProtoGraphInfo,
+                        cachedVertexInfoList,
+                        newEdgeInfos,
+                        cachedVertexInfoMap,
+                        newEdgeConcat2EdgeInfo));
     }
 
     public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
