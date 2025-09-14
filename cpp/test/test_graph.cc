@@ -298,5 +298,50 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
     REQUIRE(count == edges->size());
     std::cout << "Total edge_count=" << count << std::endl;
   }
+
+  SECTION("DateType") {
+    std::string src_type = "person", edge_type = "knows", dst_type = "person";
+    auto expect =
+        EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
+                              AdjListType::ordered_by_source);
+    REQUIRE(!expect.has_error());
+    auto edges = expect.value();
+
+    // Expected values for the first ten creationDate-date entries
+    int32_t expected_dates[10] = {
+        14820, 15442, 14909, 15182, 15141, 15058, 15155, 15135, 15364, 15455
+    };
+    size_t count = 0;
+    for (auto it = edges->begin(); it != edges->end() && count < 10; ++it, ++count) {
+      auto date_val = it.property<int32_t>("creationDate-date");
+      REQUIRE(date_val.has_value());
+      REQUIRE(date_val.value() == expected_dates[count]);
+    }
+    REQUIRE(count == 10);
+    std::cout << "DateType edge_count=" << count << std::endl;
+  }
+
+  SECTION("TimestampType") {
+    std::string src_type = "person", edge_type = "knows", dst_type = "person";
+    auto expect =
+        EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
+                              AdjListType::ordered_by_source);
+    REQUIRE(!expect.has_error());
+    auto edges = expect.value();
+
+    // Expected values for the first ten creationDate-timestamp entries
+    int64_t expected_timestamps[10] = {
+        1280503193298LL, 1334239018931LL, 1288146786288LL, 1311781394869LL, 1308223719623LL,
+        1301064563134LL, 1309416320777LL, 1307728039432LL, 1327492287348LL, 1335389465259LL
+    };
+    size_t count = 0;
+    for (auto it = edges->begin(); it != edges->end() && count < 10; ++it, ++count) {
+      auto ts_val = it.property<int64_t>("creationDate-timestamp");
+      REQUIRE(ts_val.has_value());
+      REQUIRE(ts_val.value() == expected_timestamps[count]);
+    }
+    REQUIRE(count == 10);
+    std::cout << "TimestampType edge_count=" << count << std::endl;
+  }
 }
 }  // namespace graphar
