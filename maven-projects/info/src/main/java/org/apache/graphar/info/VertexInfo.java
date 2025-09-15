@@ -34,6 +34,80 @@ public class VertexInfo {
     private final URI baseUri;
     private final VersionInfo version;
 
+    public static VertexInfoBuilder builder() {
+        return new VertexInfoBuilder();
+    }
+
+    public static class VertexInfoBuilder{
+        private String type;
+        private long chunkSize;
+        private PropertyGroups propertyGroups;
+        private URI baseUri;
+        private VersionInfo version;
+
+        private VertexInfoBuilder(){}
+
+        public VertexInfoBuilder type(String type){
+            this.type = type;
+            return this;
+        }
+
+        public VertexInfoBuilder chunkSize(long chunkSize){
+            this.chunkSize = chunkSize;
+            return this;
+        }
+
+        public VertexInfoBuilder propertyGroups(PropertyGroups propertyGroups){
+            this.propertyGroups = propertyGroups;
+            return this;
+        }
+
+        public VertexInfoBuilder baseUri(URI baseUri){
+            if(this.baseUri == null) {
+                this.baseUri = baseUri;
+            }
+            return this;
+        }
+
+        public VertexInfoBuilder baseUri(String baseUri){
+            if(this.baseUri == null) {
+                this.baseUri = URI.create(baseUri);
+            }
+            return this;
+        }
+
+        public VertexInfoBuilder version(VersionInfo version){
+            if(this.version == null) {
+                this.version = version;
+            }
+            return this;
+        }
+
+        public VertexInfoBuilder version(String version){
+            if(this.version == null) {
+                this.version = VersionParser.getVersion(version);
+            }
+            return this;
+        }
+
+        public VertexInfo build(){
+            if (chunkSize < 0) {
+                throw new IllegalArgumentException("Chunk size cannot be negative: " + chunkSize);
+            }
+            return  new VertexInfo(this);
+        }
+
+
+    }
+
+    private VertexInfo(VertexInfoBuilder builder){
+        this.type = builder.type;
+        this.chunkSize = builder.chunkSize;
+        this.propertyGroups = builder.propertyGroups;
+        this.baseUri = builder.baseUri;
+        this.version = builder.version;
+    }
+
     public VertexInfo(
             String type,
             long chunkSize,
