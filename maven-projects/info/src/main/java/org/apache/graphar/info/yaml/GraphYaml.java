@@ -95,7 +95,7 @@ public class GraphYaml {
                                 vertexInfo -> {
                                     URI storeUri = graphInfo.getStoreUri(vertexInfo);
                                     if (graphInfoUri != null) {
-                                        storeUri = graphInfoUri.relativize(storeUri);
+                                        storeUri = graphInfoUri.resolve(".").relativize(storeUri);
                                     }
                                     return storeUri.toString();
                                 })
@@ -106,7 +106,7 @@ public class GraphYaml {
                                 edgeInfo -> {
                                     URI storeUri = graphInfo.getStoreUri(edgeInfo);
                                     if (graphInfoUri != null) {
-                                        storeUri = graphInfoUri.relativize(storeUri);
+                                        storeUri = graphInfoUri.resolve(".").relativize(storeUri);
                                     }
                                     return storeUri.toString();
                                 })

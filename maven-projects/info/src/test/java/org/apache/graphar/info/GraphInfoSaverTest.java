@@ -21,6 +21,7 @@ package org.apache.graphar.info;
 
 import java.net.URI;
 import java.nio.file.FileSystems;
+import org.apache.graphar.info.loader.impl.LocalFileSystemStringGraphInfoLoader;
 import org.apache.graphar.info.saver.GraphInfoSaver;
 import org.apache.graphar.info.saver.impl.LocalYamlGraphInfoSaver;
 import org.junit.After;
@@ -58,6 +59,10 @@ public class GraphInfoSaverTest extends BaseFileSystemTest {
                                     + ".graph.yaml");
             graphInfoSaver.save(graphInfoUri, testGraphInfo);
             TestVerificationUtils.verifyGraphInfoFilesSaved(testSaveDirectory, testGraphInfo);
+            LocalFileSystemStringGraphInfoLoader graphInfoLoader =
+                    new LocalFileSystemStringGraphInfoLoader();
+            GraphInfo graphInfo = graphInfoLoader.loadGraphInfo(graphInfoUri);
+            TestVerificationUtils.equalsGraphInfo(testGraphInfo, graphInfo);
         } catch (Exception e) {
             throw new RuntimeException("Failed to save graph info", e);
         }
@@ -71,14 +76,56 @@ public class GraphInfoSaverTest extends BaseFileSystemTest {
                     URI.create(
                             testSaveDirectory
                                     + FileSystems.getDefault().getSeparator()
-                                    + testGraphInfo.getName()
+                                    + minimalGraph.getName()
                                     + ".graph.yaml");
             graphInfoSaver.save(graphInfoUri, minimalGraph);
             TestVerificationUtils.verifyGraphFileExists(testSaveDirectory, minimalGraph);
             TestVerificationUtils.verifyVertexFilesExist(testSaveDirectory, minimalGraph);
+            LocalFileSystemStringGraphInfoLoader graphInfoLoader =
+                    new LocalFileSystemStringGraphInfoLoader();
+            GraphInfo graphInfo = graphInfoLoader.loadGraphInfo(graphInfoUri);
+            TestVerificationUtils.equalsGraphInfo(minimalGraph, graphInfo);
             // No edge files expected for minimal graph
         } catch (Exception e) {
             throw new RuntimeException("Failed to save minimal graph info", e);
+        }
+    }
+
+    @Test
+    public void testSaveGraph2DiffPath() {
+        for (VertexInfo vertexInfo : testGraphInfo.getVertexInfos()) {
+            testGraphInfo.setStoreUri(
+                    vertexInfo,
+                    URI.create(testSaveDirectory + "/test_vertices/")
+                            .resolve(testGraphInfo.getStoreUri(vertexInfo)));
+        }
+
+        for (EdgeInfo edgeInfo : testGraphInfo.getEdgeInfos()) {
+            testGraphInfo.setStoreUri(
+                    edgeInfo,
+                    URI.create(testSaveDirectory + "/test_edges/")
+                            .resolve(testGraphInfo.getStoreUri(edgeInfo)));
+        }
+        try {
+            URI graphInfoUri =
+                    URI.create(
+                            testSaveDirectory
+                                    + FileSystems.getDefault().getSeparator()
+                                    + testGraphInfo.getName()
+                                    + ".graph.yaml");
+            graphInfoSaver.save(graphInfoUri, testGraphInfo);
+            TestVerificationUtils.verifyGraphFileExists(testSaveDirectory, testGraphInfo);
+            TestVerificationUtils.verifyVertexFilesExist(
+                    testSaveDirectory + "/test_vertices", testGraphInfo);
+            TestVerificationUtils.verifyEdgeFilesExist(
+                    testSaveDirectory + "/test_edges", testGraphInfo);
+            // No edge files expected for minimal graph
+            LocalFileSystemStringGraphInfoLoader graphInfoLoader =
+                    new LocalFileSystemStringGraphInfoLoader();
+            GraphInfo graphInfo = graphInfoLoader.loadGraphInfo(graphInfoUri);
+            TestVerificationUtils.equalsGraphInfo(testGraphInfo, graphInfo);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to save test graph info", e);
         }
     }
 

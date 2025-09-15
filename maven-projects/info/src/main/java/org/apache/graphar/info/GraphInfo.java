@@ -35,7 +35,7 @@ public class GraphInfo {
     private final Map<String, VertexInfo> vertexType2VertexInfo;
     private final Map<String, EdgeInfo> edgeConcat2EdgeInfo;
     private final VersionInfo version;
-    private final Map<String, URI> types2Prefix;
+    private final Map<String, URI> types2StoreUri;
 
     public GraphInfo(
             String name,
@@ -49,8 +49,8 @@ public class GraphInfo {
                 new ArrayList<>(edgeInfos.values()),
                 uri,
                 version);
-        vertexInfos.forEach((key, value) -> types2Prefix.put(value.getType() + ".vertex", key));
-        edgeInfos.forEach((key, value) -> types2Prefix.put(value.getConcat() + ".edge", key));
+        vertexInfos.forEach((key, value) -> types2StoreUri.put(value.getType() + ".vertex", key));
+        edgeInfos.forEach((key, value) -> types2StoreUri.put(value.getConcat() + ".edge", key));
     }
 
     public GraphInfo(
@@ -83,7 +83,7 @@ public class GraphInfo {
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         EdgeInfo::getConcat, Function.identity()));
-        this.types2Prefix = new HashMap<>();
+        this.types2StoreUri = new HashMap<>();
     }
 
     private GraphInfo(
@@ -119,7 +119,7 @@ public class GraphInfo {
         this.version = version;
         this.vertexType2VertexInfo = vertexType2VertexInfo;
         this.edgeConcat2EdgeInfo = edgeConcat2EdgeInfo;
-        this.types2Prefix = new HashMap<>();
+        this.types2StoreUri = new HashMap<>();
     }
 
     public String dump(URI baseUri) {
@@ -235,32 +235,32 @@ public class GraphInfo {
         return version;
     }
 
-    public void setStoreUri(VertexInfo vertexInfo, URI prefix) {
-        this.types2Prefix.put(vertexInfo.getType() + ".vertex", prefix);
+    public void setStoreUri(VertexInfo vertexInfo, URI storeUri) {
+        this.types2StoreUri.put(vertexInfo.getType() + ".vertex", storeUri);
     }
 
-    public void setStoreUri(EdgeInfo edgeInfo, URI prefix) {
-        this.types2Prefix.put(edgeInfo.getConcat() + ".vertex", prefix);
+    public void setStoreUri(EdgeInfo edgeInfo, URI storeUri) {
+        this.types2StoreUri.put(edgeInfo.getConcat() + ".edge", storeUri);
     }
 
     public URI getStoreUri(VertexInfo vertexInfo) {
         String type = vertexInfo.getType() + ".vertex";
-        if (types2Prefix.containsKey(type)) {
-            return types2Prefix.get(type);
+        if (types2StoreUri.containsKey(type)) {
+            return types2StoreUri.get(type);
         }
         return URI.create(type + ".yaml");
     }
 
     public URI getStoreUri(EdgeInfo edgeInfo) {
         String type = edgeInfo.getConcat() + ".edge";
-        if (types2Prefix.containsKey(type)) {
-            return types2Prefix.get(type);
+        if (types2StoreUri.containsKey(type)) {
+            return types2StoreUri.get(type);
         }
         return URI.create(type + ".yaml");
     }
 
     public Map<String, URI> getTypes2Uri() {
-        return types2Prefix;
+        return types2StoreUri;
     }
 
     private void checkVertexExist(String type) {
