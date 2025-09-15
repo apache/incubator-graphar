@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VersionInfo;
 import org.yaml.snakeyaml.DumperOptions;
@@ -92,23 +91,25 @@ public class GraphYaml {
                         .orElse(null);
         this.vertices =
                 graphInfo.getVertexInfos().stream()
-                        .map(vertexInfo -> {
-                            URI storeUri = graphInfo.getStoreUri(vertexInfo);
-                            if (graphInfoUri != null) {
-                                storeUri = graphInfoUri.relativize(storeUri);
-                            }
-                            return storeUri.toString();
-                        })
+                        .map(
+                                vertexInfo -> {
+                                    URI storeUri = graphInfo.getStoreUri(vertexInfo);
+                                    if (graphInfoUri != null) {
+                                        storeUri = graphInfoUri.relativize(storeUri);
+                                    }
+                                    return storeUri.toString();
+                                })
                         .collect(Collectors.toList());
         this.edges =
                 graphInfo.getEdgeInfos().stream()
-                        .map(edgeInfo -> {
-                            URI storeUri = graphInfo.getStoreUri(edgeInfo);
-                            if (graphInfoUri != null) {
-                                storeUri = graphInfoUri.relativize(storeUri);
-                            }
-                            return storeUri.toString();
-                        })
+                        .map(
+                                edgeInfo -> {
+                                    URI storeUri = graphInfo.getStoreUri(edgeInfo);
+                                    if (graphInfoUri != null) {
+                                        storeUri = graphInfoUri.relativize(storeUri);
+                                    }
+                                    return storeUri.toString();
+                                })
                         .collect(Collectors.toList());
         this.version =
                 Optional.of(graphInfo)

@@ -19,14 +19,12 @@
 
 package org.apache.graphar.info.saver.impl;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -62,7 +60,6 @@ public class LocalYamlGraphInfoSaver implements GraphInfoSaver {
         Writer vertexWriter = writeYaml(vertexInfoUri);
         vertexWriter.write(vertexInfo.dump());
         vertexWriter.close();
-
     }
 
     @Override

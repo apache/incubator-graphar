@@ -19,14 +19,13 @@
 
 package org.apache.graphar.info;
 
+import java.net.URI;
+import java.nio.file.FileSystems;
 import org.apache.graphar.info.saver.GraphInfoSaver;
 import org.apache.graphar.info.saver.impl.LocalYamlGraphInfoSaver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.net.URI;
-import java.nio.file.FileSystems;
 
 public class GraphInfoSaverTest extends BaseFileSystemTest {
 
@@ -51,7 +50,12 @@ public class GraphInfoSaverTest extends BaseFileSystemTest {
     @Test
     public void testSave() {
         try {
-            URI graphInfoUri = URI.create(testSaveDirectory + FileSystems.getDefault().getSeparator() + testGraphInfo.getName() + ".graph.yaml");
+            URI graphInfoUri =
+                    URI.create(
+                            testSaveDirectory
+                                    + FileSystems.getDefault().getSeparator()
+                                    + testGraphInfo.getName()
+                                    + ".graph.yaml");
             graphInfoSaver.save(graphInfoUri, testGraphInfo);
             TestVerificationUtils.verifyGraphInfoFilesSaved(testSaveDirectory, testGraphInfo);
         } catch (Exception e) {
@@ -63,7 +67,12 @@ public class GraphInfoSaverTest extends BaseFileSystemTest {
     public void testSaveMinimalGraph() {
         GraphInfo minimalGraph = TestDataFactory.createMinimalGraphInfo();
         try {
-            URI graphInfoUri = URI.create(testSaveDirectory + FileSystems.getDefault().getSeparator() + testGraphInfo.getName() + ".graph.yaml");
+            URI graphInfoUri =
+                    URI.create(
+                            testSaveDirectory
+                                    + FileSystems.getDefault().getSeparator()
+                                    + testGraphInfo.getName()
+                                    + ".graph.yaml");
             graphInfoSaver.save(graphInfoUri, minimalGraph);
             TestVerificationUtils.verifyGraphFileExists(testSaveDirectory, minimalGraph);
             TestVerificationUtils.verifyVertexFilesExist(testSaveDirectory, minimalGraph);
@@ -77,7 +86,12 @@ public class GraphInfoSaverTest extends BaseFileSystemTest {
     public void testSaveDirectoryCreation() {
         String nestedDir = testSaveDirectory + "/nested/deep/directory";
         try {
-            URI graphInfoUri = URI.create(nestedDir + FileSystems.getDefault().getSeparator() + testGraphInfo.getName() + ".graph.yaml");
+            URI graphInfoUri =
+                    URI.create(
+                            nestedDir
+                                    + FileSystems.getDefault().getSeparator()
+                                    + testGraphInfo.getName()
+                                    + ".graph.yaml");
             graphInfoSaver.save(graphInfoUri, testGraphInfo);
             TestVerificationUtils.verifyDirectoryHasFiles(nestedDir);
             TestVerificationUtils.verifyGraphInfoFilesSaved(nestedDir, testGraphInfo);

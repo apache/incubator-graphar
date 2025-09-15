@@ -24,7 +24,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.yaml.snakeyaml.Yaml;
 
@@ -44,7 +43,12 @@ public class GraphInfo {
             Map<URI, EdgeInfo> edgeInfos,
             URI uri,
             String version) {
-        this(name, new ArrayList<>(vertexInfos.values()), new ArrayList<>(edgeInfos.values()), uri, version);
+        this(
+                name,
+                new ArrayList<>(vertexInfos.values()),
+                new ArrayList<>(edgeInfos.values()),
+                uri,
+                version);
         vertexInfos.forEach((key, value) -> types2Prefix.put(value.getType() + ".vertex", key));
         edgeInfos.forEach((key, value) -> types2Prefix.put(value.getConcat() + ".edge", key));
     }
@@ -158,7 +162,7 @@ public class GraphInfo {
     public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
         if (edgeInfo == null
                 || hasEdgeInfo(
-                edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
+                        edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
             return Optional.empty();
         }
         List<EdgeInfo> newEdgeInfos =
