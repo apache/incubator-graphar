@@ -23,7 +23,7 @@ import java.net.URI;
 import java.nio.file.FileSystems;
 import org.apache.graphar.info.loader.impl.LocalFileSystemStringGraphInfoLoader;
 import org.apache.graphar.info.saver.GraphInfoSaver;
-import org.apache.graphar.info.saver.impl.LocalYamlGraphInfoSaver;
+import org.apache.graphar.info.saver.impl.LocalFileSystemYamlGraphSaver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class GraphInfoSaverTest extends BaseFileSystemTest {
     public void setUp() {
         verifyTestPrerequisites();
         testSaveDirectory = createCleanTestDirectory("ldbc_sample");
-        graphInfoSaver = new LocalYamlGraphInfoSaver();
+        graphInfoSaver = new LocalFileSystemYamlGraphSaver();
         testGraphInfo = TestDataFactory.createSampleGraphInfo();
     }
 

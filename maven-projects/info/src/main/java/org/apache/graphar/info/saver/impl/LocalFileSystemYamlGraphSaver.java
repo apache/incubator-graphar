@@ -27,7 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.apache.graphar.info.saver.BaseGraphInfoSaver;
 
-public class LocalYamlGraphInfoSaver extends BaseGraphInfoSaver {
+public class LocalFileSystemYamlGraphSaver extends BaseGraphInfoSaver {
 
     public Writer writeYaml(URI uri) throws IOException {
         Path outputPath = FileSystems.getDefault().getPath(uri.toString());

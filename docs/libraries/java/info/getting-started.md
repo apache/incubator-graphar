@@ -96,6 +96,37 @@ MyStringGraphInfoLoader customLoader = new MyStringGraphInfoLoader();
 GraphInfo graphInfo = customLoader.loadGraphInfo(URI.create("db://mydatabase/graphs/graph1/graph.yml"));
 ```
 
+### Save Graph Info
+
+The java-info module also provides functionality to save graph metadata to YAML files using the `GraphSaver` interface. Here's an example of how to use it:
+
+```java
+import org.apache.graphar.info.GraphInfo;
+import org.apache.graphar.info.saver.GraphSaver;
+import org.apache.graphar.info.saver.LocalYamlGraphSaver;
+
+// Create or obtain a GraphInfo object
+GraphInfo graphInfo = createOrLoadGraphInfo(); // your method to create or load GraphInfo
+
+// Create a GraphSaver instance
+GraphSaver graphSaver = new LocalFileSystemYamlGraphSaver();
+
+// Save the graph info to a directory
+String savePath = "/path/to/save/directory";
+try {
+    graphSaver.save(savePath, graphInfo);
+    System.out.println("Graph info saved successfully to " + savePath);
+} catch (IOException e) {
+    System.err.println("Failed to save graph info: " + e.getMessage());
+    e.printStackTrace();
+}
+```
+
+This will save the graph metadata as a set of YAML files:
+- One main graph YAML file (e.g., `graph-name.graph.yaml`)
+- One YAML file for each vertex type (e.g., `person.vertex.yaml`)
+- One YAML file for each edge type (e.g., `person_knows_person.edge.yaml`)
+
 ### Building
 
 To build the graphar-info module, you need:
