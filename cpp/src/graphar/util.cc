@@ -89,6 +89,12 @@ Result<const void*> GetArrowArrayData(
   } else if (array->type()->Equals(arrow::boolean())) {
     return reinterpret_cast<const void*>(
         std::dynamic_pointer_cast<arrow::BooleanArray>(array).get());
+  } else if (array->type()->Equals(arrow::date32())) {
+    return reinterpret_cast<const void*>(
+        std::dynamic_pointer_cast<arrow::Date32Array>(array)->raw_values());
+  } else if (array->type()->Equals(arrow::timestamp(arrow::TimeUnit::MILLI))) {
+    return reinterpret_cast<const void*>(
+        std::dynamic_pointer_cast<arrow::TimestampArray>(array)->raw_values());
   } else {
     return Status::TypeError("Array type - ", array->type()->ToString(),
                              " is not supported yet...");
