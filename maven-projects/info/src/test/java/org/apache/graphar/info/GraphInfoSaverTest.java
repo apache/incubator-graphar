@@ -19,23 +19,26 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.info.saver.GraphSaver;
-import org.apache.graphar.info.saver.LocalYamlGraphSaver;
+import org.apache.graphar.info.saver.GraphInfoSaver;
+import org.apache.graphar.info.saver.impl.LocalYamlGraphInfoSaver;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class GraphSaverTest extends BaseFileSystemTest {
+import java.net.URI;
+import java.nio.file.FileSystems;
+
+public class GraphInfoSaverTest extends BaseFileSystemTest {
 
     private String testSaveDirectory;
-    private GraphSaver graphSaver;
+    private GraphInfoSaver graphInfoSaver;
     private GraphInfo testGraphInfo;
 
     @Before
     public void setUp() {
         verifyTestPrerequisites();
         testSaveDirectory = createCleanTestDirectory("ldbc_sample");
-        graphSaver = new LocalYamlGraphSaver();
+        graphInfoSaver = new LocalYamlGraphInfoSaver();
         testGraphInfo = TestDataFactory.createSampleGraphInfo();
     }
 
@@ -48,7 +51,8 @@ public class GraphSaverTest extends BaseFileSystemTest {
     @Test
     public void testSave() {
         try {
-            graphSaver.save(testSaveDirectory, testGraphInfo);
+            URI graphInfoUri = URI.create(testSaveDirectory + FileSystems.getDefault().getSeparator() + testGraphInfo.getName() + ".graph.yaml");
+            graphInfoSaver.save(graphInfoUri, testGraphInfo);
             TestVerificationUtils.verifyGraphInfoFilesSaved(testSaveDirectory, testGraphInfo);
         } catch (Exception e) {
             throw new RuntimeException("Failed to save graph info", e);
@@ -59,7 +63,8 @@ public class GraphSaverTest extends BaseFileSystemTest {
     public void testSaveMinimalGraph() {
         GraphInfo minimalGraph = TestDataFactory.createMinimalGraphInfo();
         try {
-            graphSaver.save(testSaveDirectory, minimalGraph);
+            URI graphInfoUri = URI.create(testSaveDirectory + FileSystems.getDefault().getSeparator() + testGraphInfo.getName() + ".graph.yaml");
+            graphInfoSaver.save(graphInfoUri, minimalGraph);
             TestVerificationUtils.verifyGraphFileExists(testSaveDirectory, minimalGraph);
             TestVerificationUtils.verifyVertexFilesExist(testSaveDirectory, minimalGraph);
             // No edge files expected for minimal graph
@@ -72,7 +77,8 @@ public class GraphSaverTest extends BaseFileSystemTest {
     public void testSaveDirectoryCreation() {
         String nestedDir = testSaveDirectory + "/nested/deep/directory";
         try {
-            graphSaver.save(nestedDir, testGraphInfo);
+            URI graphInfoUri = URI.create(nestedDir + FileSystems.getDefault().getSeparator() + testGraphInfo.getName() + ".graph.yaml");
+            graphInfoSaver.save(graphInfoUri, testGraphInfo);
             TestVerificationUtils.verifyDirectoryHasFiles(nestedDir);
             TestVerificationUtils.verifyGraphInfoFilesSaved(nestedDir, testGraphInfo);
         } catch (Exception e) {

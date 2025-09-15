@@ -23,7 +23,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
+
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VertexInfo;
@@ -50,16 +53,16 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
         }
 
         // load vertices
-        List<VertexInfo> vertexInfos = new ArrayList<>(graphYaml.getVertices().size());
+        Map<URI, VertexInfo> vertexInfos = new TreeMap<>();
         for (String vertexYamlPath : graphYaml.getVertices()) {
             URI vertexInfoUri = baseUri.resolve(vertexYamlPath);
-            vertexInfos.add(loadVertexInfo(vertexInfoUri));
+            vertexInfos.put(vertexInfoUri, loadVertexInfo(vertexInfoUri));
         }
         // load edges
-        List<EdgeInfo> edgeInfos = new ArrayList<>(graphYaml.getEdges().size());
+        Map<URI, EdgeInfo> edgeInfos = new TreeMap<>();
         for (String edgeYamlPath : graphYaml.getEdges()) {
             URI edgeInfoUri = baseUri.resolve(edgeYamlPath);
-            edgeInfos.add(loadEdgeInfo(edgeInfoUri));
+            edgeInfos.put(edgeInfoUri, loadEdgeInfo(edgeInfoUri));
         }
         return new GraphInfo(
                 graphYaml.getName(),

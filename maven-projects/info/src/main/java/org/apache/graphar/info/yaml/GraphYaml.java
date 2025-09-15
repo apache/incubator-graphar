@@ -19,10 +19,12 @@
 
 package org.apache.graphar.info.yaml;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import org.apache.graphar.info.GraphInfo;
 import org.apache.graphar.info.VersionInfo;
 import org.yaml.snakeyaml.DumperOptions;
@@ -77,6 +79,10 @@ public class GraphYaml {
     }
 
     public GraphYaml(GraphInfo graphInfo) {
+        this(null, graphInfo);
+    }
+
+    public GraphYaml(URI graphInfoUri, GraphInfo graphInfo) {
         this.name = graphInfo.getName();
         this.prefix = graphInfo.getPrefix();
         this.version =
@@ -86,11 +92,23 @@ public class GraphYaml {
                         .orElse(null);
         this.vertices =
                 graphInfo.getVertexInfos().stream()
-                        .map(vertexInfo -> vertexInfo.getType() + ".vertex.yaml")
+                        .map(vertexInfo -> {
+                            URI storeUri = graphInfo.getStoreUri(vertexInfo);
+                            if (graphInfoUri != null) {
+                                storeUri = graphInfoUri.relativize(storeUri);
+                            }
+                            return storeUri.toString();
+                        })
                         .collect(Collectors.toList());
         this.edges =
                 graphInfo.getEdgeInfos().stream()
-                        .map(edgeInfo -> edgeInfo.getConcat() + ".edge.yaml")
+                        .map(edgeInfo -> {
+                            URI storeUri = graphInfo.getStoreUri(edgeInfo);
+                            if (graphInfoUri != null) {
+                                storeUri = graphInfoUri.relativize(storeUri);
+                            }
+                            return storeUri.toString();
+                        })
                         .collect(Collectors.toList());
         this.version =
                 Optional.of(graphInfo)
