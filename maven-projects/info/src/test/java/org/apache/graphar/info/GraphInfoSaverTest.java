@@ -21,12 +21,21 @@ package org.apache.graphar.info;
 
 import java.net.URI;
 import java.nio.file.FileSystems;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.graphar.info.loader.impl.LocalFileSystemStringGraphInfoLoader;
 import org.apache.graphar.info.saver.GraphInfoSaver;
 import org.apache.graphar.info.saver.impl.LocalFileSystemYamlGraphSaver;
+import org.apache.graphar.info.yaml.EdgeYaml;
+import org.apache.graphar.info.yaml.GraphYaml;
+import org.apache.graphar.info.yaml.VertexYaml;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.Constructor;
 
 public class GraphInfoSaverTest extends BaseFileSystemTest {
 
@@ -46,6 +55,39 @@ public class GraphInfoSaverTest extends BaseFileSystemTest {
     public void tearDown() {
         // Test data will be preserved for debugging - cleanup happens before next test run
         System.out.println("Test data saved in: " + testSaveDirectory);
+    }
+
+    @Test
+    public void testDump() {
+        List<VertexInfo> vertexInfos = new ArrayList<>();
+        for (VertexInfo vertexInfo : testGraphInfo.getVertexInfos()) {
+            String vertexYamlString = vertexInfo.dump();
+            Yaml vertexYamlLoader =
+                    new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
+            VertexYaml vertexYaml = vertexYamlLoader.load(vertexYamlString);
+            VertexInfo vertexInfoFromYaml = TestUtil.buildVertexInfoFromYaml(vertexYaml);
+            vertexInfos.add(vertexInfoFromYaml);
+        }
+        List<EdgeInfo> edgeInfos = new ArrayList<>();
+        for (EdgeInfo edgeInfo : testGraphInfo.getEdgeInfos()) {
+            String edgeYamlString = edgeInfo.dump();
+            Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
+            EdgeYaml EdgeYaml = edgeYamlLoader.load(edgeYamlString);
+            EdgeInfo EdgeInfoFromYaml = TestUtil.buildEdgeInfoFromYaml(EdgeYaml);
+            edgeInfos.add(EdgeInfoFromYaml);
+        }
+        String testGraphInfoString = testGraphInfo.dump();
+        Yaml GraphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
+        GraphYaml graphYaml = GraphYamlLoader.load(testGraphInfoString);
+        GraphInfo graphInfoFromYaml =
+                new GraphInfo(
+                        graphYaml.getName(),
+                        vertexInfos,
+                        edgeInfos,
+                        graphYaml.getPrefix(),
+                        graphYaml.getVersion());
+        System.out.println(testGraphInfoString);
+        Assert.assertTrue(TestVerificationUtils.equalsGraphInfo(testGraphInfo, graphInfoFromYaml));
     }
 
     @Test

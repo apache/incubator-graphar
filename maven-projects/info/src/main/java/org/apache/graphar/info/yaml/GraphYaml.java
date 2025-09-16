@@ -81,7 +81,7 @@ public class GraphYaml {
         this(null, graphInfo);
     }
 
-    public GraphYaml(URI graphInfoUri, GraphInfo graphInfo) {
+    public GraphYaml(URI graphInfoStoreUri, GraphInfo graphInfo) {
         this.name = graphInfo.getName();
         this.prefix = graphInfo.getPrefix();
         this.version =
@@ -94,8 +94,9 @@ public class GraphYaml {
                         .map(
                                 vertexInfo -> {
                                     URI storeUri = graphInfo.getStoreUri(vertexInfo);
-                                    if (graphInfoUri != null) {
-                                        storeUri = graphInfoUri.resolve(".").relativize(storeUri);
+                                    if (graphInfoStoreUri != null) {
+                                        storeUri =
+                                                graphInfoStoreUri.resolve(".").relativize(storeUri);
                                     }
                                     return storeUri.toString();
                                 })
@@ -105,8 +106,9 @@ public class GraphYaml {
                         .map(
                                 edgeInfo -> {
                                     URI storeUri = graphInfo.getStoreUri(edgeInfo);
-                                    if (graphInfoUri != null) {
-                                        storeUri = graphInfoUri.resolve(".").relativize(storeUri);
+                                    if (graphInfoStoreUri != null) {
+                                        storeUri =
+                                                graphInfoStoreUri.resolve(".").relativize(storeUri);
                                     }
                                     return storeUri.toString();
                                 })

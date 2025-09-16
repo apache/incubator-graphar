@@ -41,7 +41,7 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
 
     public abstract EdgeInfo loadEdgeInfo(URI edgeYamlUri) throws IOException;
 
-    public GraphInfo buildGraphInfoFromGraphYaml(URI baseUri, GraphYaml graphYaml)
+    protected GraphInfo buildGraphInfoFromGraphYaml(URI baseUri, GraphYaml graphYaml)
             throws IOException {
 
         URI defaultBaseUri = baseUri.resolve(".");
@@ -69,7 +69,7 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
                 graphYaml.getVersion());
     }
 
-    public VertexInfo buildVertexInfoFromGraphYaml(VertexYaml vertexYaml) {
+    protected VertexInfo buildVertexInfoFromVertexYaml(VertexYaml vertexYaml) {
         return new VertexInfo(
                 vertexYaml.getType(),
                 vertexYaml.getChunk_size(),
@@ -80,7 +80,7 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
                 vertexYaml.getVersion());
     }
 
-    public EdgeInfo buildEdgeInfoFromGraphYaml(EdgeYaml edgeYaml) {
+    protected EdgeInfo buildEdgeInfoFromEdgeYaml(EdgeYaml edgeYaml) {
         return new EdgeInfo(
                 edgeYaml.getSrc_type(),
                 edgeYaml.getEdge_type(),

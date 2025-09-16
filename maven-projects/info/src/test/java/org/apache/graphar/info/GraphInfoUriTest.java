@@ -20,8 +20,6 @@
 package org.apache.graphar.info;
 
 import java.net.URI;
-import org.apache.graphar.info.loader.BaseGraphInfoLoader;
-import org.apache.graphar.info.loader.impl.LocalFileSystemStringGraphInfoLoader;
 import org.apache.graphar.info.yaml.VertexYaml;
 import org.junit.Assert;
 import org.junit.Test;
@@ -35,8 +33,7 @@ public class GraphInfoUriTest {
     public void testBaseGraphInfo() {
         Yaml vertexYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
         VertexYaml vertexYaml = vertexYamlLoader.load(TestUtil.getBaseGraphInfoYaml());
-        BaseGraphInfoLoader baseGraphInfoLoader = new LocalFileSystemStringGraphInfoLoader();
-        VertexInfo vertexInfo = baseGraphInfoLoader.buildVertexInfoFromGraphYaml(vertexYaml);
+        VertexInfo vertexInfo = TestUtil.buildVertexInfoFromYaml(vertexYaml);
         Assert.assertEquals(URI.create("vertex/person/"), vertexInfo.getBaseUri());
         // absolute paths
         Assert.assertEquals(
@@ -52,8 +49,7 @@ public class GraphInfoUriTest {
     public void testS3GraphInfo() {
         Yaml vertexYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
         VertexYaml vertexYaml = vertexYamlLoader.load(TestUtil.getS3GraphInfoYaml());
-        BaseGraphInfoLoader baseGraphInfoLoader = new LocalFileSystemStringGraphInfoLoader();
-        VertexInfo vertexInfo = baseGraphInfoLoader.buildVertexInfoFromGraphYaml(vertexYaml);
+        VertexInfo vertexInfo = TestUtil.buildVertexInfoFromYaml(vertexYaml);
         Assert.assertEquals(URI.create("s3://graphar/vertex/person/"), vertexInfo.getBaseUri());
         // absolute paths
         Assert.assertEquals(
@@ -69,8 +65,7 @@ public class GraphInfoUriTest {
     public void testHdfsGraphInfo() {
         Yaml vertexYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
         VertexYaml vertexYaml = vertexYamlLoader.load(TestUtil.getHdfsGraphInfoYaml());
-        BaseGraphInfoLoader baseGraphInfoLoader = new LocalFileSystemStringGraphInfoLoader();
-        VertexInfo vertexInfo = baseGraphInfoLoader.buildVertexInfoFromGraphYaml(vertexYaml);
+        VertexInfo vertexInfo = TestUtil.buildVertexInfoFromYaml(vertexYaml);
         Assert.assertEquals(URI.create("hdfs://graphar/vertex/person/"), vertexInfo.getBaseUri());
         // absolute paths
         Assert.assertEquals(
@@ -86,8 +81,7 @@ public class GraphInfoUriTest {
     public void testFileGraphInfo() {
         Yaml vertexYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
         VertexYaml vertexYaml = vertexYamlLoader.load(TestUtil.getFileGraphInfoYaml());
-        BaseGraphInfoLoader baseGraphInfoLoader = new LocalFileSystemStringGraphInfoLoader();
-        VertexInfo vertexInfo = baseGraphInfoLoader.buildVertexInfoFromGraphYaml(vertexYaml);
+        VertexInfo vertexInfo = TestUtil.buildVertexInfoFromYaml(vertexYaml);
         Assert.assertEquals(URI.create("file:///graphar/vertex/person/"), vertexInfo.getBaseUri());
         // absolute paths
         Assert.assertEquals(

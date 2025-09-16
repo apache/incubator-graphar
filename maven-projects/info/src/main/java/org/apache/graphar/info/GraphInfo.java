@@ -122,9 +122,9 @@ public class GraphInfo {
         this.types2StoreUri = new HashMap<>();
     }
 
-    public String dump(URI baseUri) {
+    public String dump(URI storeUri) {
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
-        GraphYaml graphYaml = new GraphYaml(baseUri, this);
+        GraphYaml graphYaml = new GraphYaml(storeUri, this);
         return yaml.dump(graphYaml);
     }
 
