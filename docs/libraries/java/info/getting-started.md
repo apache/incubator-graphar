@@ -102,19 +102,20 @@ The java-info module also provides functionality to save graph metadata to YAML 
 
 ```java
 import org.apache.graphar.info.GraphInfo;
-import org.apache.graphar.info.saver.GraphSaver;
-import org.apache.graphar.info.saver.LocalYamlGraphSaver;
+import org.apache.graphar.info.saver.GraphInfoSaver;
+import org.apache.graphar.info.saver.impl.LocalFileSystemYamlGraphSaver;
+import java.net.URI;
 
 // Create or obtain a GraphInfo object
 GraphInfo graphInfo = createOrLoadGraphInfo(); // your method to create or load GraphInfo
 
 // Create a GraphSaver instance
-GraphSaver graphSaver = new LocalFileSystemYamlGraphSaver();
+GraphInfoSaver graphSaver = new LocalFileSystemYamlGraphSaver();
 
 // Save the graph info to a directory
 String savePath = "/path/to/save/directory";
 try {
-    graphSaver.save(savePath, graphInfo);
+    graphSaver.save(URI.create(savePath), graphInfo);
     System.out.println("Graph info saved successfully to " + savePath);
 } catch (IOException e) {
     System.err.println("Failed to save graph info: " + e.getMessage());
@@ -126,6 +127,34 @@ This will save the graph metadata as a set of YAML files:
 - One main graph YAML file (e.g., `graph-name.graph.yaml`)
 - One YAML file for each vertex type (e.g., `person.vertex.yaml`)
 - One YAML file for each edge type (e.g., `person_knows_person.edge.yaml`)
+
+Alternatively, you can use the dump method to convert graph info to a string and store it anywhere:
+
+```java
+import org.apache.graphar.info.GraphInfo;
+import org.apache.graphar.info.EdgeInfo;
+import org.apache.graphar.info.VertexInfo;
+import java.net.URI;
+
+// Create or obtain a GraphInfo object
+GraphInfo graphInfo = createOrLoadGraphInfo(); // your method to create or load GraphInfo
+
+// Set custom storage URIs for vertex and edge info files
+for (VertexInfo vertexInfo : graphInfo.getVertexInfos()) {
+    graphInfo.setStoreUri(vertexInfo, URI.create("db://path/vertex/" + vertexInfo.getType() + ".vertex.yaml"));
+}
+
+for (EdgeInfo edgeInfo : graphInfo.getEdgeInfos()) {
+    graphInfo.setStoreUri(edgeInfo, URI.create("db://path/edge/" + edgeInfo.getConcat() + ".edge.yaml"));
+}
+
+// Convert graph info to YAML string
+String graphYamlString = graphInfo.dump();
+
+// Now you can store the YAML string anywhere you want
+// For example, save to a database, send over network, etc.
+saveYamlStringToDatabase(graphYamlString);
+```
 
 ### Building
 

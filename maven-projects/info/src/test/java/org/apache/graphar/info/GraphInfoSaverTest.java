@@ -86,7 +86,6 @@ public class GraphInfoSaverTest extends BaseFileSystemTest {
                         edgeInfos,
                         graphYaml.getPrefix(),
                         graphYaml.getVersion());
-        System.out.println(testGraphInfoString);
         Assert.assertTrue(TestVerificationUtils.equalsGraphInfo(testGraphInfo, graphInfoFromYaml));
     }
 
