@@ -22,9 +22,11 @@ package org.apache.graphar.info;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -574,6 +576,56 @@ public class EdgeInfo {
                             + " does not exist in the edge "
                             + getConcat());
         }
+    }
+
+    public boolean isValidated() {
+        // Check if source type, edge type, or destination type is empty
+        if (getSrcType() == null
+                || getSrcType().isEmpty()
+                || getEdgeType() == null
+                || getEdgeType().isEmpty()
+                || getDstType() == null
+                || getDstType().isEmpty()) {
+            return false;
+        }
+
+        // Check if chunk sizes are positive
+        if (chunkSize <= 0 || srcChunkSize <= 0 || dstChunkSize <= 0) {
+            return false;
+        }
+
+        // Check if prefix is null or empty
+        if (baseUri == null || baseUri.toString().isEmpty()) {
+            return false;
+        }
+
+        // Check if adjacent lists are empty
+        if (adjacentLists.isEmpty()) {
+            return false;
+        }
+
+        // Check if all adjacent lists are valid
+        for (AdjacentList adjacentList : adjacentLists.values()) {
+            if (adjacentList == null || !adjacentList.isValidated()) {
+                return false;
+            }
+        }
+
+        // Check if all property groups are valid and property names are unique
+        Set<String> propertyNameSet = new HashSet<>();
+        for (PropertyGroup pg : propertyGroups.getPropertyGroupList()) {
+            if (pg == null || !pg.isValidated()) {
+                return false;
+            }
+
+            for (Property p : pg.getPropertyList()) {
+                if (propertyNameSet.contains(p.getName())) {
+                    return false;
+                }
+                propertyNameSet.add(p.getName());
+            }
+        }
+        return true;
     }
 
     private static class EdgeTriplet {

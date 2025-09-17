@@ -212,6 +212,35 @@ public class GraphInfo {
         return version;
     }
 
+    public boolean isValidated() {
+        // Check if name is not empty and base URI is not null
+        if (name == null || name.isEmpty() || baseUri == null) {
+            return false;
+        }
+
+        // Check if all vertex infos are valid
+        for (VertexInfo vertexInfo : vertexInfos) {
+            if (vertexInfo == null || !vertexInfo.isValidated()) {
+                return false;
+            }
+        }
+
+        // Check if all edge infos are valid
+        for (EdgeInfo edgeInfo : edgeInfos) {
+            if (edgeInfo == null || !edgeInfo.isValidated()) {
+                return false;
+            }
+        }
+
+        // Check if vertex/edge infos size matches vertex/edge type to index map size
+        if (vertexInfos.size() != vertexType2VertexInfo.size()
+                || edgeInfos.size() != edgeConcat2EdgeInfo.size()) {
+            return false;
+        }
+
+        return true;
+    }
+
     private void checkVertexExist(String type) {
         if (!hasVertexInfo(type)) {
             throw new IllegalArgumentException(

@@ -53,4 +53,36 @@ public class AdjacentList {
     public URI getBaseUri() {
         return baseUri;
     }
+
+    public boolean isValidated() {
+        // Check if type is valid
+        if (type == null) {
+            return false;
+        }
+
+        // Check if type is one of the valid AdjListType values
+        if (type != AdjListType.unordered_by_source
+                && type != AdjListType.ordered_by_source
+                && type != AdjListType.unordered_by_dest
+                && type != AdjListType.ordered_by_dest) {
+            return false;
+        }
+
+        // Check if file type is valid
+        if (fileType == null) {
+            return false;
+        }
+
+        // Check if file type is one of the valid FileType values
+        if (fileType != FileType.CSV && fileType != FileType.PARQUET && fileType != FileType.ORC) {
+            return false;
+        }
+
+        // Check if base URI is not null
+        if (baseUri == null) {
+            return false;
+        }
+
+        return true;
+    }
 }

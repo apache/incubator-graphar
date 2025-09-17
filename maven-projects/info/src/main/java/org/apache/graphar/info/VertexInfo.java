@@ -20,8 +20,10 @@
 package org.apache.graphar.info;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
@@ -135,7 +137,7 @@ public class VertexInfo {
     }
 
     public String getPrefix() {
-        return baseUri.toString();
+        return baseUri == null ? null : baseUri.toString();
     }
 
     public URI getBaseUri() {
@@ -157,5 +159,28 @@ public class VertexInfo {
                             + " does not exist in the vertex "
                             + getType());
         }
+    }
+
+    public boolean isValidated() {
+        // Check if type and baseUri is not empty and chunkSize is positive
+        if (type == null || type.isEmpty() || chunkSize <= 0 || baseUri == null) {
+            return false;
+        }
+        // Check if property groups are valid
+        Set<String> propertyNameSet = new HashSet<>();
+        for (PropertyGroup pg : propertyGroups.getPropertyGroupList()) {
+            // Check if property group is not null and not empty
+            if (pg == null || !pg.isValidated()) {
+                return false;
+            }
+            for (Property p : pg.getPropertyList()) {
+                if (propertyNameSet.contains(p.getName())) {
+                    return false;
+                }
+                propertyNameSet.add(p.getName());
+            }
+        }
+
+        return true;
     }
 }
