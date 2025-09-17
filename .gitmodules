@@ -1,3 +1,6 @@
 [submodule "testing"]
 	path = testing
 	url = https://github.com/apache/incubator-graphar-testing.git
+[submodule "maven-projects/spark/ldbc-snb-datagen"]
+	path = maven-projects/spark/ldbc-snb-datagen
+	url = https://github.com/ldbc/ldbc_snb_datagen_spark.git
