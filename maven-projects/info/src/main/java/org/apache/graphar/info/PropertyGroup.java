@@ -106,12 +106,10 @@ public class PropertyGroup implements Iterable<Property> {
         }
 
         // Check if file type is valid
-        if (fileType == null) {
-            return false;
-        }
-
-        // Check if file type is one of the valid FileType values
-        if (fileType != FileType.CSV && fileType != FileType.PARQUET && fileType != FileType.ORC) {
+        if (fileType == null
+                || fileType != FileType.CSV
+                        && fileType != FileType.PARQUET
+                        && fileType != FileType.ORC) {
             return false;
         }
 
@@ -123,12 +121,9 @@ public class PropertyGroup implements Iterable<Property> {
         // Check if all properties are valid and have unique names
         Map<String, Boolean> propertyNameSet = new HashMap<>();
         for (Property property : propertyList) {
-            // Check if property is not null and is valid
-            if (property == null) {
-                return false;
-            }
-
-            if (property.getName() == null
+            // Check if property name is not empty and data type is not null
+            if (property == null
+                    || property.getName() == null
                     || property.getName().isEmpty()
                     || property.getDataType() == null) {
                 return false;
@@ -138,9 +133,8 @@ public class PropertyGroup implements Iterable<Property> {
             String propertyName = property.getName();
             if (propertyNameSet.containsKey(propertyName)) {
                 return false;
-            } else {
-                propertyNameSet.put(propertyName, true);
             }
+            propertyNameSet.put(propertyName, true);
 
             // TODO: support list type in csv file
             if (property.getDataType() == DataType.LIST && fileType == FileType.CSV) {

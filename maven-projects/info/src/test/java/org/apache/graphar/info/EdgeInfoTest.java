@@ -20,7 +20,10 @@
 package org.apache.graphar.info;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.FileType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -101,61 +104,163 @@ public class EdgeInfoTest {
     }
 
     @Test
-    public void erroneousTripletEdgeBuilderTest() {
-        try {
-            e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
-                    .addPropertyGroups(List.of(TestUtil.pg3))
-                    .build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("Edge triplet is null", e.getMessage());
-        }
-    }
-
-    @Test
-    public void emptyAdjacentListEdgeBuilderTest() {
-        try {
-            e.dstType("person").addPropertyGroups(List.of(TestUtil.pg3)).build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("AdjacentLists is empty", e.getMessage());
-        }
-    }
-
-    @Test
-    public void emptyPropertyGroupsEdgeBuilderTest() {
-        try {
-            e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
-                    .dstType("person")
-                    .build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("PropertyGroups is empty", e.getMessage());
-        }
-    }
-
-    @Test
-    public void addMethodsTest() {
-
+    public void testIsValidated() {
+        // Test valid edge info
         EdgeInfo edgeInfo =
-                e.addPropertyGroup(TestUtil.pg3)
-                        .addAdjacentList(TestUtil.orderedBySource)
-                        .addAdjacentList(TestUtil.orderedByDest)
-                        .dstType("person")
-                        .build();
-
-        Assert.assertEquals(2, edgeInfo.getAdjacentLists().size());
-        Assert.assertEquals(1, edgeInfo.getPropertyGroups().size());
-    }
-
-    @Test
-    public void appendMethodsTest() {
-        EdgeInfo edgeInfo =
-                e.propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
-                        .adjacentLists(List.of(TestUtil.orderedBySource))
-                        .addAdjacentList(TestUtil.orderedByDest)
-                        .addPropertyGroups(List.of(TestUtil.pg2))
-                        .dstType("person")
-                        .build();
-
-        Assert.assertEquals(2, edgeInfo.getAdjacentLists().size());
-        Assert.assertEquals(2, edgeInfo.getPropertyGroups().size());
+                new EdgeInfo(
+                        "",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(edgeInfo.isValidated());
+        edgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "",
+                        "person",
+                        1024,
+                        100,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(edgeInfo.isValidated());
+        edgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "",
+                        1024,
+                        100,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(edgeInfo.isValidated());
+        edgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        0,
+                        100,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(edgeInfo.isValidated());
+        edgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        -1,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(edgeInfo.isValidated());
+        edgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        0,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(edgeInfo.isValidated());
+        edgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        100,
+                        false,
+                        URI.create(""),
+                        "gar/v1",
+                        List.of(),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(edgeInfo.isValidated());
+        edgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        1000,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(edgeInfo.isValidated());
+        edgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        1000,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(
+                                new AdjacentList(
+                                        AdjListType.ordered_by_source, FileType.PARQUET, "")),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(edgeInfo.isValidated());
+        edgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        1000,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(new PropertyGroup(new ArrayList<>(), FileType.PARQUET, "")));
+        Assert.assertFalse(edgeInfo.isValidated());
+        edgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        1000,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg1));
+        Assert.assertTrue(edgeInfo.isValidated());
     }
 }

@@ -22,6 +22,7 @@ package org.apache.graphar.info;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.loader.impl.LocalFileSystemStreamGraphInfoLoader;
@@ -306,5 +307,67 @@ public class GraphInfoTest {
         Assert.assertEquals(2, versionInfo.getVersion());
         Assert.assertEquals(List.of("t1", "t2"), versionInfo.getUserDefinedTypes());
         Assert.assertEquals("gar/v2 (t1,t2)", versionInfo.toString());
+    }
+
+    @Test
+    public void testIsValidated() {
+        // Test valid graph info from real test data
+        Assert.assertTrue(graphInfo.isValidated());
+
+        // Test invalid graph info with empty name
+        GraphInfo emptyNameGraphInfo =
+                new GraphInfo(
+                        "",
+                        graphInfo.getVertexInfos(),
+                        graphInfo.getEdgeInfos(),
+                        graphInfo.getBaseUri(),
+                        graphInfo.getVersion().toString());
+        Assert.assertFalse(emptyNameGraphInfo.isValidated());
+
+        // Test invalid graph info with null base URI
+        GraphInfo nullBaseUriGraphInfo =
+                new GraphInfo(
+                        "test",
+                        graphInfo.getVertexInfos(),
+                        graphInfo.getEdgeInfos(),
+                        (URI) null,
+                        graphInfo.getVersion().toString());
+        Assert.assertFalse(nullBaseUriGraphInfo.isValidated());
+
+        // Test invalid graph info with invalid vertex info
+        VertexInfo invalidVertexInfo =
+                new VertexInfo("", 100, Arrays.asList(TestUtil.pg1), "vertex/person/", "gar/v1");
+        GraphInfo invalidVertexGraphInfo =
+                new GraphInfo(
+                        "test",
+                        Arrays.asList(invalidVertexInfo),
+                        graphInfo.getEdgeInfos(),
+                        graphInfo.getBaseUri(),
+                        graphInfo.getVersion().toString());
+        Assert.assertFalse(invalidVertexGraphInfo.isValidated());
+
+        // Test invalid graph info with invalid edge info
+        EdgeInfo invalidEdgeInfo =
+                EdgeInfo.builder()
+                        .srcType("")
+                        .edgeType("knows")
+                        .dstType("person")
+                        .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                        .adjacentLists(List.of(TestUtil.orderedBySource))
+                        .chunkSize(1024)
+                        .srcChunkSize(100)
+                        .dstChunkSize(100)
+                        .directed(false)
+                        .prefix("edge/person_knows_person/")
+                        .version("gar/v1")
+                        .build();
+        GraphInfo invalidEdgeGraphInfo =
+                new GraphInfo(
+                        "test",
+                        graphInfo.getVertexInfos(),
+                        Arrays.asList(invalidEdgeInfo),
+                        graphInfo.getBaseUri(),
+                        graphInfo.getVersion().toString());
+        Assert.assertFalse(invalidEdgeGraphInfo.isValidated());
     }
 }
