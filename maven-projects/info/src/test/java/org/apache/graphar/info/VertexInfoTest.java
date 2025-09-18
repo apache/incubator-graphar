@@ -41,34 +41,6 @@ public class VertexInfoTest {
     }
 
     @Test
-    public void testUriAndPrefixConflict() {
-        try {
-            VertexInfo vertexInfo =
-                    new VertexInfo(
-                            "person",
-                            100,
-                            Arrays.asList(TestUtil.pg1),
-                            URI.create("/person/"),
-                            "gar/v1");
-            // This should not throw an exception as we're not using builder pattern
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("baseUri and prefix cannot be both null", e.getMessage());
-        }
-    }
-
-    @Test
-    public void testMissingUriAndPrefix() {
-        try {
-            VertexInfo vertexInfo =
-                    new VertexInfo(
-                            "person", 100, Arrays.asList(TestUtil.pg1), (URI) null, "gar/v1");
-            System.out.println(vertexInfo.dump());
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("baseUri and prefix cannot be both null", e.getMessage());
-        }
-    }
-
-    @Test
     public void testIsValidated() {
         // Test valid vertex info
         VertexInfo validVertexInfo =

@@ -61,46 +61,49 @@ public class EdgeInfoTest {
 
     @Test
     public void testUriAndPrefixConflict() {
-        try {
-            EdgeInfo.builder()
-                    .srcType("person")
-                    .edgeType("knows")
-                    .dstType("person")
-                    .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
-                    .adjacentLists(List.of(TestUtil.orderedBySource))
-                    .chunkSize(1024)
-                    .srcChunkSize(100)
-                    .dstChunkSize(100)
-                    .directed(false)
-                    .prefix("edge/person_knows_person/")
-                    .baseUri(URI.create("/person_knows_person/"))
-                    .version("gar/v1")
-                    .build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals(
-                    "baseUri and prefix conflict: baseUri=/person_knows_person/ prefix=edge/person_knows_person/",
-                    e.getMessage());
-        }
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () ->
+                                EdgeInfo.builder()
+                                        .srcType("person")
+                                        .edgeType("knows")
+                                        .dstType("person")
+                                        .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                                        .adjacentLists(List.of(TestUtil.orderedBySource))
+                                        .chunkSize(1024)
+                                        .srcChunkSize(100)
+                                        .dstChunkSize(100)
+                                        .directed(false)
+                                        .prefix("edge/person_knows_person/")
+                                        .baseUri(URI.create("/person_knows_person/"))
+                                        .version("gar/v1")
+                                        .build());
+        Assert.assertEquals(
+                "baseUri and prefix conflict: baseUri=/person_knows_person/ prefix=edge/person_knows_person/",
+                illegalArgumentException.getMessage());
     }
 
     @Test
     public void testMissingUriAndPrefix() {
-        try {
-            EdgeInfo.builder()
-                    .srcType("person")
-                    .edgeType("knows")
-                    .dstType("person")
-                    .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
-                    .adjacentLists(List.of(TestUtil.orderedBySource))
-                    .chunkSize(1024)
-                    .srcChunkSize(100)
-                    .dstChunkSize(100)
-                    .directed(false)
-                    .version("gar/v1")
-                    .build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("baseUri and prefix cannot be both null", e.getMessage());
-        }
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () ->
+                                EdgeInfo.builder()
+                                        .srcType("person")
+                                        .edgeType("knows")
+                                        .dstType("person")
+                                        .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                                        .adjacentLists(List.of(TestUtil.orderedBySource))
+                                        .chunkSize(1024)
+                                        .srcChunkSize(100)
+                                        .dstChunkSize(100)
+                                        .directed(false)
+                                        .version("gar/v1")
+                                        .build());
+        Assert.assertEquals(
+                "baseUri and prefix cannot be both null", illegalArgumentException.getMessage());
     }
 
     @Test

@@ -167,7 +167,7 @@ public class GraphInfo {
     }
 
     public boolean hasEdgeInfo(String srcType, String edgeType, String dstType) {
-        return edgeConcat2EdgeInfo.containsKey(EdgeInfo.concat(srcType, dstType, edgeType));
+        return edgeConcat2EdgeInfo.containsKey(EdgeInfo.concat(srcType, edgeType, dstType));
     }
 
     public VertexInfo getVertexInfo(String type) {
@@ -177,7 +177,7 @@ public class GraphInfo {
 
     public EdgeInfo getEdgeInfo(String srcType, String edgeType, String dstType) {
         checkEdgeExist(srcType, edgeType, dstType);
-        return edgeConcat2EdgeInfo.get(EdgeInfo.concat(srcType, dstType, edgeType));
+        return edgeConcat2EdgeInfo.get(EdgeInfo.concat(srcType, edgeType, dstType));
     }
 
     public int getVertexInfoNum() {

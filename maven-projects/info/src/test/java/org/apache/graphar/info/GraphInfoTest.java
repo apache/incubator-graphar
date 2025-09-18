@@ -40,6 +40,12 @@ public class GraphInfoTest {
     private static VertexInfo personVertexInfo;
     private static EdgeInfo knowsEdgeInfo;
     private static URI GRAPH_PATH_URI;
+    // test not exist property group
+    private static final PropertyGroup notExistPg =
+            new PropertyGroup(
+                    List.of(new Property("not_exist", DataType.INT64, true, false)),
+                    FileType.CSV,
+                    "not_exist/");
 
     @BeforeClass
     public static void setUp() {
@@ -82,14 +88,24 @@ public class GraphInfoTest {
 
         Assert.assertNotNull(graphInfo.getEdgeInfos());
         Assert.assertEquals(1, graphInfo.getEdgeInfos().size());
+        Assert.assertEquals(1, graphInfo.getEdgeInfoNum());
         Assert.assertNotNull(graphInfo.getVertexInfos());
         Assert.assertEquals(1, graphInfo.getVertexInfos().size());
+        Assert.assertEquals(1, graphInfo.getVertexInfoNum());
         Assert.assertEquals(personVertexInfo, graphInfo.getVertexInfo("person"));
         IllegalArgumentException illegalArgumentException =
                 Assert.assertThrows(
                         IllegalArgumentException.class, () -> graphInfo.getVertexInfo("not_exist"));
         Assert.assertEquals(
                 "Vertex type not_exist not exist in graph ldbc_sample",
+                illegalArgumentException.getMessage());
+        Assert.assertEquals(knowsEdgeInfo, graphInfo.getEdgeInfo("person", "knows", "person"));
+        illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () -> graphInfo.getEdgeInfo("person", "not_knows", "person"));
+        Assert.assertEquals(
+                "Edge type person_not_knows_person not exist in graph ldbc_sample",
                 illegalArgumentException.getMessage());
         // test version gar/v1
         Assert.assertEquals(1, graphInfo.getVersion().getVersion());
@@ -110,6 +126,7 @@ public class GraphInfoTest {
     @Test
     public void testPersonVertexPropertyGroup() {
         // group1 id
+        Assert.assertEquals(2, personVertexInfo.getPropertyGroupNum());
         PropertyGroup idPropertyGroup = personVertexInfo.getPropertyGroups().get(0);
         Assert.assertEquals("id/", idPropertyGroup.getPrefix());
         Assert.assertEquals(URI.create("id/"), idPropertyGroup.getBaseUri());
@@ -123,12 +140,6 @@ public class GraphInfoTest {
         Assert.assertEquals(
                 URI.create("vertex/person/id/chunk4"),
                 personVertexInfo.getPropertyGroupChunkUri(idPropertyGroup, 4));
-        // test not exist property group
-        PropertyGroup notExistPg =
-                new PropertyGroup(
-                        List.of(new Property("not_exist", DataType.INT64, true, false)),
-                        FileType.CSV,
-                        "not_exist/");
         IllegalArgumentException illegalArgumentException =
                 Assert.assertThrows(
                         IllegalArgumentException.class,
@@ -139,6 +150,13 @@ public class GraphInfoTest {
                         + " does not exist in the vertex "
                         + personVertexInfo.getType(),
                 illegalArgumentException.getMessage());
+        Assert.assertEquals(idPropertyGroup, personVertexInfo.getPropertyGroup("id"));
+        illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () -> personVertexInfo.getPropertyGroup("not_exist"));
+        Assert.assertEquals(
+                "Property not_exist does not exist", illegalArgumentException.getMessage());
         Assert.assertNotNull(idPropertyGroup.getPropertyList());
         Assert.assertEquals(1, idPropertyGroup.getPropertyList().size());
         Property idProperty = idPropertyGroup.getPropertyList().get(0);
@@ -280,6 +298,23 @@ public class GraphInfoTest {
         Assert.assertEquals(1, knowsEdgeInfo.getPropertyGroupNum());
         // edge properties group 1
         PropertyGroup propertyGroup = knowsEdgeInfo.getPropertyGroups().get(0);
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () -> personVertexInfo.getPropertyGroupUri(notExistPg));
+        Assert.assertEquals(
+                "Property group "
+                        + notExistPg
+                        + " does not exist in the vertex "
+                        + personVertexInfo.getType(),
+                illegalArgumentException.getMessage());
+        Assert.assertEquals(propertyGroup, knowsEdgeInfo.getPropertyGroup("creationDate"));
+        illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () -> personVertexInfo.getPropertyGroup("not_exist"));
+        Assert.assertEquals(
+                "Property not_exist does not exist", illegalArgumentException.getMessage());
         Assert.assertEquals("creationDate/", propertyGroup.getPrefix());
         Assert.assertEquals(URI.create("creationDate/"), propertyGroup.getBaseUri());
         Assert.assertEquals(FileType.CSV, propertyGroup.getFileType());

@@ -221,16 +221,6 @@ class PropertyGroups {
         return properties.get(propertyName).getDataType();
     }
 
-    boolean isPrimaryKey(String propertyName) {
-        checkPropertyExist(propertyName);
-        return properties.get(propertyName).isPrimary();
-    }
-
-    boolean isNullableKey(String propertyName) {
-        checkPropertyExist(propertyName);
-        return properties.get(propertyName).isNullable();
-    }
-
     List<PropertyGroup> getPropertyGroupList() {
         return propertyGroupList;
     }
@@ -253,8 +243,7 @@ class PropertyGroups {
             throw new IllegalArgumentException("Property name is null");
         }
         if (!hasProperty(propertyName)) {
-            throw new IllegalArgumentException(
-                    "Property " + propertyName + " does not exist in the property group " + this);
+            throw new IllegalArgumentException("Property " + propertyName + " does not exist");
         }
     }
 }
