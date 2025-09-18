@@ -157,6 +157,11 @@ public class GraphInfoTest {
                         () -> personVertexInfo.getPropertyGroup("not_exist"));
         Assert.assertEquals(
                 "Property not_exist does not exist", illegalArgumentException.getMessage());
+        illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () -> personVertexInfo.getPropertyGroup(null));
+        Assert.assertEquals("Property name is null", illegalArgumentException.getMessage());
         Assert.assertNotNull(idPropertyGroup.getPropertyList());
         Assert.assertEquals(1, idPropertyGroup.getPropertyList().size());
         Property idProperty = idPropertyGroup.getPropertyList().get(0);
@@ -301,20 +306,24 @@ public class GraphInfoTest {
         IllegalArgumentException illegalArgumentException =
                 Assert.assertThrows(
                         IllegalArgumentException.class,
-                        () -> personVertexInfo.getPropertyGroupUri(notExistPg));
+                        () -> knowsEdgeInfo.getPropertyGroupUri(notExistPg));
         Assert.assertEquals(
                 "Property group "
                         + notExistPg
-                        + " does not exist in the vertex "
-                        + personVertexInfo.getType(),
+                        + " does not exist in the edge "
+                        + knowsEdgeInfo.getConcat(),
                 illegalArgumentException.getMessage());
         Assert.assertEquals(propertyGroup, knowsEdgeInfo.getPropertyGroup("creationDate"));
         illegalArgumentException =
                 Assert.assertThrows(
                         IllegalArgumentException.class,
-                        () -> personVertexInfo.getPropertyGroup("not_exist"));
+                        () -> knowsEdgeInfo.getPropertyGroup("not_exist"));
         Assert.assertEquals(
                 "Property not_exist does not exist", illegalArgumentException.getMessage());
+        illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class, () -> knowsEdgeInfo.getPropertyGroup(null));
+        Assert.assertEquals("Property name is null", illegalArgumentException.getMessage());
         Assert.assertEquals("creationDate/", propertyGroup.getPrefix());
         Assert.assertEquals(URI.create("creationDate/"), propertyGroup.getBaseUri());
         Assert.assertEquals(FileType.CSV, propertyGroup.getFileType());

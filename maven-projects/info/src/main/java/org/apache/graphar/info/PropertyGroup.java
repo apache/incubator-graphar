@@ -216,26 +216,13 @@ class PropertyGroups {
         return propertyGroupList.size();
     }
 
-    DataType getPropertyType(String propertyName) {
-        checkPropertyExist(propertyName);
-        return properties.get(propertyName).getDataType();
-    }
-
     List<PropertyGroup> getPropertyGroupList() {
         return propertyGroupList;
-    }
-
-    Map<String, PropertyGroup> getPropertyGroupMap() {
-        return propertyGroupMap;
     }
 
     PropertyGroup getPropertyGroup(String propertyName) {
         checkPropertyExist(propertyName);
         return propertyGroupMap.get(propertyName);
-    }
-
-    Map<String, Property> getProperties() {
-        return properties;
     }
 
     private void checkPropertyExist(String propertyName) {
