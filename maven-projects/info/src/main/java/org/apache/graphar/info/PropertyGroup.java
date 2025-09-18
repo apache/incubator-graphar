@@ -216,6 +216,21 @@ class PropertyGroups {
         return propertyGroupList.size();
     }
 
+    DataType getPropertyType(String propertyName) {
+        checkPropertyExist(propertyName);
+        return properties.get(propertyName).getDataType();
+    }
+
+    boolean isPrimaryKey(String propertyName) {
+        checkPropertyExist(propertyName);
+        return properties.get(propertyName).isPrimary();
+    }
+
+    boolean isNullableKey(String propertyName) {
+        checkPropertyExist(propertyName);
+        return properties.get(propertyName).isNullable();
+    }
+
     List<PropertyGroup> getPropertyGroupList() {
         return propertyGroupList;
     }

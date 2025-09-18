@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
 import org.yaml.snakeyaml.Yaml;
@@ -83,8 +84,20 @@ public class VertexInfo {
         return propertyGroups.getPropertyGroupNum();
     }
 
+    public DataType getPropertyType(String propertyName) {
+        return propertyGroups.getPropertyType(propertyName);
+    }
+
     public boolean hasProperty(String propertyName) {
         return propertyGroups.hasProperty(propertyName);
+    }
+
+    public boolean isPrimaryKey(String propertyName) {
+        return propertyGroups.isPrimaryKey(propertyName);
+    }
+
+    public boolean isNullableKey(String propertyName) {
+        return propertyGroups.isNullableKey(propertyName);
     }
 
     public boolean hasPropertyGroup(PropertyGroup propertyGroup) {

@@ -31,6 +31,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.EdgeYaml;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.util.GeneralParams;
@@ -425,6 +426,18 @@ public class EdgeInfo {
 
     public boolean hasProperty(String propertyName) {
         return propertyGroups.hasProperty(propertyName);
+    }
+
+    public DataType getPropertyType(String propertyName) {
+        return propertyGroups.getPropertyType(propertyName);
+    }
+
+    public boolean isPrimaryKey(String propertyName) {
+        return propertyGroups.isPrimaryKey(propertyName);
+    }
+
+    public boolean isNullableKey(String propertyName) {
+        return propertyGroups.isNullableKey(propertyName);
     }
 
     public boolean hasPropertyGroup(PropertyGroup propertyGroup) {

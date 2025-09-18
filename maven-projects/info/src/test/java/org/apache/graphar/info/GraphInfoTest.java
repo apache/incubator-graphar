@@ -168,8 +168,11 @@ public class GraphInfoTest {
         Assert.assertTrue(personVertexInfo.hasProperty("id"));
         Assert.assertEquals("id", idProperty.getName());
         Assert.assertEquals(DataType.INT64, idProperty.getDataType());
+        Assert.assertEquals(DataType.INT64, personVertexInfo.getPropertyType("id"));
         Assert.assertTrue(idProperty.isPrimary());
+        Assert.assertTrue(personVertexInfo.isPrimaryKey("id"));
         Assert.assertFalse(idProperty.isNullable());
+        Assert.assertFalse(personVertexInfo.isNullableKey("id"));
         // group2 firstName_lastName_gender
         PropertyGroup firstName_lastName_gender = personVertexInfo.getPropertyGroups().get(1);
         Assert.assertEquals("firstName_lastName_gender/", firstName_lastName_gender.getPrefix());
@@ -227,6 +230,10 @@ public class GraphInfoTest {
     @Test
     public void testKnowsEdgeAdjacencyLists() {
         Assert.assertEquals(2, knowsEdgeInfo.getAdjacentLists().size());
+        Assert.assertTrue(knowsEdgeInfo.hasAdjListType(AdjListType.ordered_by_source));
+        Assert.assertTrue(knowsEdgeInfo.hasAdjListType(AdjListType.ordered_by_dest));
+        Assert.assertFalse(knowsEdgeInfo.hasAdjListType(AdjListType.unordered_by_source));
+        Assert.assertFalse(knowsEdgeInfo.hasAdjListType(AdjListType.unordered_by_dest));
         // test ordered by source adjacency list
         AdjacentList adjOrderBySource =
                 knowsEdgeInfo.getAdjacentList(AdjListType.ordered_by_source);
@@ -343,8 +350,11 @@ public class GraphInfoTest {
         Assert.assertTrue(knowsEdgeInfo.hasProperty("creationDate"));
         Assert.assertEquals("creationDate", property.getName());
         Assert.assertEquals(DataType.STRING, property.getDataType());
+        Assert.assertEquals(DataType.STRING, knowsEdgeInfo.getPropertyType("creationDate"));
         Assert.assertFalse(property.isPrimary());
+        Assert.assertFalse(knowsEdgeInfo.isPrimaryKey("creationDate"));
         Assert.assertTrue(property.isNullable());
+        Assert.assertTrue(knowsEdgeInfo.isNullableKey("creationDate"));
     }
 
     @Test
