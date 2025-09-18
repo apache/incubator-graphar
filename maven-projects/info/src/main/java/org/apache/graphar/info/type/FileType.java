@@ -38,7 +38,6 @@ public enum FileType {
     }
 
     public static FileType fromString(String fileType) {
-        System.out.println(fileType);
         if (fileType == null) {
             return null;
         }

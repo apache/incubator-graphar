@@ -25,14 +25,21 @@ import java.net.URI;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import org.apache.graphar.info.saver.BaseGraphInfoSaver;
 
 public class LocalFileSystemYamlGraphSaver extends BaseGraphInfoSaver {
 
     public Writer writeYaml(URI uri) throws IOException {
         Path outputPath = FileSystems.getDefault().getPath(uri.toString());
-        Files.createDirectories(outputPath.getParent());
-        Files.createFile(outputPath);
-        return Files.newBufferedWriter(outputPath);
+        Path parentDir = outputPath.getParent();
+        if (parentDir != null) {
+            Files.createDirectories(parentDir);
+        }
+        return Files.newBufferedWriter(
+                outputPath,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.WRITE);
     }
 }
