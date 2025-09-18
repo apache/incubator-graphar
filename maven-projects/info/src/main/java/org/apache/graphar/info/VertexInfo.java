@@ -69,19 +69,19 @@ public class VertexInfo {
         }
 
         public VertexInfoBuilder baseUri(String baseUri) {
-                this.baseUri = URI.create(baseUri);
+            this.baseUri = URI.create(baseUri);
 
             return this;
         }
 
         public VertexInfoBuilder version(VersionInfo version) {
-                this.version = version;
+            this.version = version;
 
             return this;
         }
 
         public VertexInfoBuilder version(String version) {
-                this.version = VersionParser.getVersion(version);
+            this.version = VersionParser.getVersion(version);
 
             return this;
         }
@@ -90,7 +90,7 @@ public class VertexInfo {
             if (chunkSize < 0) {
                 throw new IllegalArgumentException("Chunk size cannot be negative: " + chunkSize);
             }
-            if(baseUri == null) {
+            if (baseUri == null) {
                 throw new IllegalArgumentException("Base URI cannot be null");
             }
             return new VertexInfo(this);

@@ -48,17 +48,18 @@ public class VertexInfoTest {
     }
 
     @Test
-    public void URInullTest(){
-        VertexInfo b2 = VertexInfo.builder()
-                .type("test")
-                .chunkSize(24)
-                .version("gar/v1")
-                .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
-                .build();
+    public void URInullTest() {
+        VertexInfo b2 =
+                VertexInfo.builder()
+                        .type("test")
+                        .chunkSize(24)
+                        .version("gar/v1")
+                        .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                        .build();
     }
 
     @Test
-    public void invalidChunkSizeTest(){
+    public void invalidChunkSizeTest() {
         b.chunkSize(-1);
         b.build();
     }
