@@ -448,38 +448,38 @@ public class EdgeInfo {
         return propertyGroups.getPropertyGroup(property);
     }
 
-    public URI getPropertyGroupPrefix(PropertyGroup propertyGroup) {
+    public URI getPropertyGroupUri(PropertyGroup propertyGroup) {
         checkPropertyGroupExist(propertyGroup);
         return getBaseUri().resolve(propertyGroup.getBaseUri());
     }
 
-    public URI getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
+    public URI getPropertyGroupChunkUri(PropertyGroup propertyGroup, long chunkIndex) {
         // PropertyGroup will be checked in getPropertyGroupPrefix
-        return getPropertyGroupPrefix(propertyGroup).resolve("chunk" + chunkIndex);
+        return getPropertyGroupUri(propertyGroup).resolve("chunk" + chunkIndex);
     }
 
-    public URI getAdjacentListPrefix(AdjListType adjListType) {
+    public URI getAdjacentListUri(AdjListType adjListType) {
         return getBaseUri().resolve(getAdjacentList(adjListType).getBaseUri()).resolve("adj_list/");
     }
 
-    public URI getAdjacentListChunkPath(AdjListType adjListType, long vertexChunkIndex) {
-        return getAdjacentListPrefix(adjListType).resolve("chunk" + vertexChunkIndex);
+    public URI getAdjacentListChunkUri(AdjListType adjListType, long vertexChunkIndex) {
+        return getAdjacentListUri(adjListType).resolve("chunk" + vertexChunkIndex);
     }
 
-    public URI getOffsetPrefix(AdjListType adjListType) {
-        return getAdjacentListPrefix(adjListType).resolve("offset/");
+    public URI getOffsetUri(AdjListType adjListType) {
+        return getAdjacentListUri(adjListType).resolve("offset/");
     }
 
-    public URI getOffsetChunkPath(AdjListType adjListType, long vertexChunkIndex) {
-        return getOffsetPrefix(adjListType).resolve("chunk" + vertexChunkIndex);
+    public URI getOffsetChunkUri(AdjListType adjListType, long vertexChunkIndex) {
+        return getOffsetUri(adjListType).resolve("chunk" + vertexChunkIndex);
     }
 
-    public URI getVerticesNumFilePath(AdjListType adjListType) {
-        return getAdjacentListPrefix(adjListType).resolve("vertex_count");
+    public URI getVerticesNumFileUri(AdjListType adjListType) {
+        return getAdjacentListUri(adjListType).resolve("vertex_count");
     }
 
-    public URI getEdgesNumFilePath(AdjListType adjListType, long vertexChunkIndex) {
-        return getAdjacentListPrefix(adjListType).resolve("edge_count" + vertexChunkIndex);
+    public URI getEdgesNumFileUri(AdjListType adjListType, long vertexChunkIndex) {
+        return getAdjacentListUri(adjListType).resolve("edge_count" + vertexChunkIndex);
     }
 
     public DataType getPropertyType(String propertyName) {

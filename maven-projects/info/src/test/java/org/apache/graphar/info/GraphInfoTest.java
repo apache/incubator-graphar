@@ -68,9 +68,7 @@ public class GraphInfoTest {
         System.out.println(
                 graphInfo
                         .getBaseUri()
-                        .resolve(
-                                knowsEdgeInfo.getAdjacentListPrefix(
-                                        AdjListType.ordered_by_source)));
+                        .resolve(knowsEdgeInfo.getAdjacentListUri(AdjListType.ordered_by_source)));
     }
 
     @Test
@@ -111,13 +109,13 @@ public class GraphInfoTest {
         Assert.assertEquals(FileType.CSV, idPropertyGroup.getFileType());
         Assert.assertEquals(
                 URI.create("vertex/person/id/"),
-                personVertexInfo.getPropertyGroupPrefix(idPropertyGroup));
+                personVertexInfo.getPropertyGroupUri(idPropertyGroup));
         Assert.assertEquals(
                 URI.create("vertex/person/id/chunk0"),
-                personVertexInfo.getPropertyGroupChunkPath(idPropertyGroup, 0));
+                personVertexInfo.getPropertyGroupChunkUri(idPropertyGroup, 0));
         Assert.assertEquals(
                 URI.create("vertex/person/id/chunk4"),
-                personVertexInfo.getPropertyGroupChunkPath(idPropertyGroup, 4));
+                personVertexInfo.getPropertyGroupChunkUri(idPropertyGroup, 4));
         Assert.assertNotNull(idPropertyGroup.getPropertyList());
         Assert.assertEquals(1, idPropertyGroup.getPropertyList().size());
         Property idProperty = idPropertyGroup.getPropertyList().get(0);
@@ -134,13 +132,13 @@ public class GraphInfoTest {
         Assert.assertEquals(FileType.CSV, firstName_lastName_gender.getFileType());
         Assert.assertEquals(
                 URI.create("vertex/person/firstName_lastName_gender/"),
-                personVertexInfo.getPropertyGroupPrefix(firstName_lastName_gender));
+                personVertexInfo.getPropertyGroupUri(firstName_lastName_gender));
         Assert.assertEquals(
                 URI.create("vertex/person/firstName_lastName_gender/chunk0"),
-                personVertexInfo.getPropertyGroupChunkPath(firstName_lastName_gender, 0));
+                personVertexInfo.getPropertyGroupChunkUri(firstName_lastName_gender, 0));
         Assert.assertEquals(
                 URI.create("vertex/person/firstName_lastName_gender/chunk4"),
-                personVertexInfo.getPropertyGroupChunkPath(firstName_lastName_gender, 4));
+                personVertexInfo.getPropertyGroupChunkUri(firstName_lastName_gender, 4));
         Assert.assertNotNull(firstName_lastName_gender.getPropertyList());
         Assert.assertEquals(3, firstName_lastName_gender.getPropertyList().size());
         Property firstNameProperty = firstName_lastName_gender.getPropertyList().get(0);
@@ -190,31 +188,31 @@ public class GraphInfoTest {
         Assert.assertEquals(URI.create("ordered_by_source/"), adjOrderBySource.getBaseUri());
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_source/adj_list/vertex_count"),
-                knowsEdgeInfo.getVerticesNumFilePath(AdjListType.ordered_by_source));
+                knowsEdgeInfo.getVerticesNumFileUri(AdjListType.ordered_by_source));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_source/adj_list/edge_count0"),
-                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ordered_by_source, 0));
+                knowsEdgeInfo.getEdgesNumFileUri(AdjListType.ordered_by_source, 0));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_source/adj_list/edge_count4"),
-                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ordered_by_source, 4));
+                knowsEdgeInfo.getEdgesNumFileUri(AdjListType.ordered_by_source, 4));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_source/adj_list/"),
-                knowsEdgeInfo.getAdjacentListPrefix(AdjListType.ordered_by_source));
+                knowsEdgeInfo.getAdjacentListUri(AdjListType.ordered_by_source));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_source/adj_list/chunk0"),
-                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ordered_by_source, 0));
+                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_source, 0));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_source/adj_list/chunk4"),
-                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ordered_by_source, 4));
+                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_source, 4));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_source/adj_list/offset/"),
-                knowsEdgeInfo.getOffsetPrefix(AdjListType.ordered_by_source));
+                knowsEdgeInfo.getOffsetUri(AdjListType.ordered_by_source));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_source/adj_list/offset/chunk0"),
-                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ordered_by_source, 0));
+                knowsEdgeInfo.getOffsetChunkUri(AdjListType.ordered_by_source, 0));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_source/adj_list/offset/chunk4"),
-                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ordered_by_source, 4));
+                knowsEdgeInfo.getOffsetChunkUri(AdjListType.ordered_by_source, 4));
 
         // test ordered by destination adjacency list
         AdjacentList adjOrderByDestination =
@@ -225,31 +223,31 @@ public class GraphInfoTest {
         Assert.assertEquals(URI.create("ordered_by_dest/"), adjOrderByDestination.getBaseUri());
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_dest/adj_list/vertex_count"),
-                knowsEdgeInfo.getVerticesNumFilePath(AdjListType.ordered_by_dest));
+                knowsEdgeInfo.getVerticesNumFileUri(AdjListType.ordered_by_dest));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_dest/adj_list/edge_count0"),
-                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ordered_by_dest, 0));
+                knowsEdgeInfo.getEdgesNumFileUri(AdjListType.ordered_by_dest, 0));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_dest/adj_list/edge_count4"),
-                knowsEdgeInfo.getEdgesNumFilePath(AdjListType.ordered_by_dest, 4));
+                knowsEdgeInfo.getEdgesNumFileUri(AdjListType.ordered_by_dest, 4));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_dest/adj_list/"),
-                knowsEdgeInfo.getAdjacentListPrefix(AdjListType.ordered_by_dest));
+                knowsEdgeInfo.getAdjacentListUri(AdjListType.ordered_by_dest));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_dest/adj_list/chunk0"),
-                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ordered_by_dest, 0));
+                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_dest, 0));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_dest/adj_list/chunk4"),
-                knowsEdgeInfo.getAdjacentListChunkPath(AdjListType.ordered_by_dest, 4));
+                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_dest, 4));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_dest/adj_list/offset/"),
-                knowsEdgeInfo.getOffsetPrefix(AdjListType.ordered_by_dest));
+                knowsEdgeInfo.getOffsetUri(AdjListType.ordered_by_dest));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_dest/adj_list/offset/chunk0"),
-                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ordered_by_dest, 0));
+                knowsEdgeInfo.getOffsetChunkUri(AdjListType.ordered_by_dest, 0));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_dest/adj_list/offset/chunk4"),
-                knowsEdgeInfo.getOffsetChunkPath(AdjListType.ordered_by_dest, 4));
+                knowsEdgeInfo.getOffsetChunkUri(AdjListType.ordered_by_dest, 4));
     }
 
     @Test
@@ -262,13 +260,13 @@ public class GraphInfoTest {
         Assert.assertEquals(FileType.CSV, propertyGroup.getFileType());
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/creationDate/"),
-                knowsEdgeInfo.getPropertyGroupPrefix(propertyGroup));
+                knowsEdgeInfo.getPropertyGroupUri(propertyGroup));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/creationDate/chunk0"),
-                knowsEdgeInfo.getPropertyGroupChunkPath(propertyGroup, 0));
+                knowsEdgeInfo.getPropertyGroupChunkUri(propertyGroup, 0));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/creationDate/chunk4"),
-                knowsEdgeInfo.getPropertyGroupChunkPath(propertyGroup, 4));
+                knowsEdgeInfo.getPropertyGroupChunkUri(propertyGroup, 4));
         // edge properties in group 1
         Assert.assertNotNull(propertyGroup.getPropertyList());
         Assert.assertEquals(1, propertyGroup.getPropertyList().size());

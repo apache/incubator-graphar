@@ -51,8 +51,8 @@ public class VertexInfoTest {
                             URI.create("/person/"),
                             "gar/v1");
             // This should not throw an exception as we're not using builder pattern
-        } catch (Exception e) {
-            // This test is not applicable in Java as we don't have the same conflict checking
+        } catch (IllegalArgumentException e) {
+            Assert.assertEquals("baseUri and prefix cannot be both null", e.getMessage());
         }
     }
 
@@ -62,8 +62,9 @@ public class VertexInfoTest {
             VertexInfo vertexInfo =
                     new VertexInfo(
                             "person", 100, Arrays.asList(TestUtil.pg1), (URI) null, "gar/v1");
-        } catch (Exception e) {
-            // This test is not applicable in Java as we don't have the same null checking
+            System.out.println(vertexInfo.dump());
+        } catch (IllegalArgumentException e) {
+            Assert.assertEquals("baseUri and prefix cannot be both null", e.getMessage());
         }
     }
 

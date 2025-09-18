@@ -104,17 +104,17 @@ public class VertexInfo {
         return propertyGroups.hasPropertyGroup(propertyGroup);
     }
 
-    public URI getPropertyGroupPrefix(PropertyGroup propertyGroup) {
+    public URI getPropertyGroupUri(PropertyGroup propertyGroup) {
         checkPropertyGroupExist(propertyGroup);
         return getBaseUri().resolve(propertyGroup.getBaseUri());
     }
 
-    public URI getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
+    public URI getPropertyGroupChunkUri(PropertyGroup propertyGroup, long chunkIndex) {
         // PropertyGroup will be checked in getPropertyGroupPrefix
-        return getPropertyGroupPrefix(propertyGroup).resolve("chunk" + chunkIndex);
+        return getPropertyGroupUri(propertyGroup).resolve("chunk" + chunkIndex);
     }
 
-    public URI getVerticesNumFilePath() {
+    public URI getVerticesNumFileUri() {
         return getBaseUri().resolve("vertex_count");
     }
 
