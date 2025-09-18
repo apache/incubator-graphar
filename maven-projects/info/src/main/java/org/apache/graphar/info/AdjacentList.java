@@ -56,19 +56,12 @@ public class AdjacentList {
 
     public boolean isValidated() {
         // Check if type is valid
-        if (type == null
-                || type != AdjListType.unordered_by_source
-                        && type != AdjListType.ordered_by_source
-                        && type != AdjListType.unordered_by_dest
-                        && type != AdjListType.ordered_by_dest) {
+        if (type == null) {
             return false;
         }
 
         // Check if file type is valid
-        if (fileType == null
-                || fileType != FileType.CSV
-                        && fileType != FileType.PARQUET
-                        && fileType != FileType.ORC) {
+        if (fileType == null) {
             return false;
         }
 

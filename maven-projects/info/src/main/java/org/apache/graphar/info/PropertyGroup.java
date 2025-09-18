@@ -106,10 +106,7 @@ public class PropertyGroup implements Iterable<Property> {
         }
 
         // Check if file type is valid
-        if (fileType == null
-                || fileType != FileType.CSV
-                        && fileType != FileType.PARQUET
-                        && fileType != FileType.ORC) {
+        if (fileType == null) {
             return false;
         }
 

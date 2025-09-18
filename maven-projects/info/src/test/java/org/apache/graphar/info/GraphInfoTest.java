@@ -84,6 +84,13 @@ public class GraphInfoTest {
         Assert.assertEquals(1, graphInfo.getEdgeInfos().size());
         Assert.assertNotNull(graphInfo.getVertexInfos());
         Assert.assertEquals(1, graphInfo.getVertexInfos().size());
+        Assert.assertEquals(personVertexInfo, graphInfo.getVertexInfo("person"));
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class, () -> graphInfo.getVertexInfo("not_exist"));
+        Assert.assertEquals(
+                "Vertex type not_exist not exist in graph ldbc_sample",
+                illegalArgumentException.getMessage());
         // test version gar/v1
         Assert.assertEquals(1, graphInfo.getVersion().getVersion());
     }
@@ -116,6 +123,22 @@ public class GraphInfoTest {
         Assert.assertEquals(
                 URI.create("vertex/person/id/chunk4"),
                 personVertexInfo.getPropertyGroupChunkUri(idPropertyGroup, 4));
+        // test not exist property group
+        PropertyGroup notExistPg =
+                new PropertyGroup(
+                        List.of(new Property("not_exist", DataType.INT64, true, false)),
+                        FileType.CSV,
+                        "not_exist/");
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () -> personVertexInfo.getPropertyGroupUri(notExistPg));
+        Assert.assertEquals(
+                "Property group "
+                        + notExistPg
+                        + " does not exist in the vertex "
+                        + personVertexInfo.getType(),
+                illegalArgumentException.getMessage());
         Assert.assertNotNull(idPropertyGroup.getPropertyList());
         Assert.assertEquals(1, idPropertyGroup.getPropertyList().size());
         Property idProperty = idPropertyGroup.getPropertyList().get(0);
@@ -139,6 +162,8 @@ public class GraphInfoTest {
         Assert.assertEquals(
                 URI.create("vertex/person/firstName_lastName_gender/chunk4"),
                 personVertexInfo.getPropertyGroupChunkUri(firstName_lastName_gender, 4));
+        Assert.assertEquals(
+                URI.create("vertex/person/vertex_count"), personVertexInfo.getVerticesNumFileUri());
         Assert.assertNotNull(firstName_lastName_gender.getPropertyList());
         Assert.assertEquals(3, firstName_lastName_gender.getPropertyList().size());
         Property firstNameProperty = firstName_lastName_gender.getPropertyList().get(0);
