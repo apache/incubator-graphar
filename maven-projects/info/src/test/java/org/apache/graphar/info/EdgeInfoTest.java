@@ -107,10 +107,84 @@ public class EdgeInfoTest {
     }
 
     @Test
+    public void erroneousTripletEdgeBuilderTest() {
+        try {
+            e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
+                    .addPropertyGroups(List.of(TestUtil.pg3))
+                    .build();
+        } catch (IllegalArgumentException e) {
+            Assert.assertEquals("Edge triplet is null", e.getMessage());
+        }
+    }
+
+    @Test
+    public void emptyAdjacentListEdgeBuilderTest() {
+        try {
+            e.dstType("person").addPropertyGroups(List.of(TestUtil.pg3)).build();
+        } catch (IllegalArgumentException e) {
+            Assert.assertEquals("AdjacentLists is empty", e.getMessage());
+        }
+    }
+
+    @Test
+    public void emptyPropertyGroupsEdgeBuilderTest() {
+        try {
+            e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
+                    .dstType("person")
+                    .build();
+        } catch (IllegalArgumentException e) {
+            Assert.assertEquals("PropertyGroups is empty", e.getMessage());
+        }
+    }
+
+    @Test
+    public void addMethodsTest() {
+
+        EdgeInfo edgeInfo =
+                e.addPropertyGroup(TestUtil.pg3)
+                        .addAdjacentList(TestUtil.orderedBySource)
+                        .addAdjacentList(TestUtil.orderedByDest)
+                        .dstType("person")
+                        .build();
+
+        Assert.assertEquals(2, edgeInfo.getAdjacentLists().size());
+        Assert.assertEquals(1, edgeInfo.getPropertyGroups().size());
+    }
+
+    @Test
+    public void appendMethodsTest() {
+        EdgeInfo edgeInfo =
+                e.propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                        .adjacentLists(List.of(TestUtil.orderedBySource))
+                        .addAdjacentList(TestUtil.orderedByDest)
+                        .addPropertyGroups(List.of(TestUtil.pg2))
+                        .dstType("person")
+                        .build();
+
+        Assert.assertEquals(2, edgeInfo.getAdjacentLists().size());
+        Assert.assertEquals(2, edgeInfo.getPropertyGroups().size());
+    }
+
+    @Test
     public void testIsValidated() {
         // Test valid edge info
         EdgeInfo edgeInfo =
                 new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        1000,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg1));
+        Assert.assertTrue(edgeInfo.isValidated());
+
+        EdgeInfo srcTypeEmptyEdgeInfo =
+                new EdgeInfo(
                         "",
                         "knows",
                         "person",
@@ -122,8 +196,9 @@ public class EdgeInfoTest {
                         "gar/v1",
                         List.of(TestUtil.orderedBySource),
                         List.of(TestUtil.pg3));
-        Assert.assertFalse(edgeInfo.isValidated());
-        edgeInfo =
+        Assert.assertFalse(srcTypeEmptyEdgeInfo.isValidated());
+
+        EdgeInfo edgeTypeEmptyEdgeInfo =
                 new EdgeInfo(
                         "person",
                         "",
@@ -136,8 +211,9 @@ public class EdgeInfoTest {
                         "gar/v1",
                         List.of(TestUtil.orderedBySource),
                         List.of(TestUtil.pg3));
-        Assert.assertFalse(edgeInfo.isValidated());
-        edgeInfo =
+        Assert.assertFalse(edgeTypeEmptyEdgeInfo.isValidated());
+
+        EdgeInfo dstTypeEmptyEdgeInfo =
                 new EdgeInfo(
                         "person",
                         "knows",
@@ -150,8 +226,9 @@ public class EdgeInfoTest {
                         "gar/v1",
                         List.of(TestUtil.orderedBySource),
                         List.of(TestUtil.pg3));
-        Assert.assertFalse(edgeInfo.isValidated());
-        edgeInfo =
+        Assert.assertFalse(dstTypeEmptyEdgeInfo.isValidated());
+
+        EdgeInfo chunkSizeIllegalEdgeInfo =
                 new EdgeInfo(
                         "person",
                         "knows",
@@ -164,8 +241,9 @@ public class EdgeInfoTest {
                         "gar/v1",
                         List.of(TestUtil.orderedBySource),
                         List.of(TestUtil.pg3));
-        Assert.assertFalse(edgeInfo.isValidated());
-        edgeInfo =
+        Assert.assertFalse(chunkSizeIllegalEdgeInfo.isValidated());
+
+        EdgeInfo srcChunkSizeIllegalEdgeInfo =
                 new EdgeInfo(
                         "person",
                         "knows",
@@ -178,8 +256,9 @@ public class EdgeInfoTest {
                         "gar/v1",
                         List.of(TestUtil.orderedBySource),
                         List.of(TestUtil.pg3));
-        Assert.assertFalse(edgeInfo.isValidated());
-        edgeInfo =
+        Assert.assertFalse(srcChunkSizeIllegalEdgeInfo.isValidated());
+
+        EdgeInfo dstChunkSizeIllegalEdgeInfo =
                 new EdgeInfo(
                         "person",
                         "knows",
@@ -192,8 +271,9 @@ public class EdgeInfoTest {
                         "gar/v1",
                         List.of(TestUtil.orderedBySource),
                         List.of(TestUtil.pg3));
-        Assert.assertFalse(edgeInfo.isValidated());
-        edgeInfo =
+        Assert.assertFalse(dstChunkSizeIllegalEdgeInfo.isValidated());
+
+        EdgeInfo adjListEmptyEdgeInfo =
                 new EdgeInfo(
                         "person",
                         "knows",
@@ -206,8 +286,9 @@ public class EdgeInfoTest {
                         "gar/v1",
                         List.of(),
                         List.of(TestUtil.pg3));
-        Assert.assertFalse(edgeInfo.isValidated());
-        edgeInfo =
+        Assert.assertFalse(adjListEmptyEdgeInfo.isValidated());
+
+        EdgeInfo pgEmptyEdgeInfo =
                 new EdgeInfo(
                         "person",
                         "knows",
@@ -220,8 +301,9 @@ public class EdgeInfoTest {
                         "gar/v1",
                         List.of(),
                         List.of(TestUtil.pg3));
-        Assert.assertFalse(edgeInfo.isValidated());
-        edgeInfo =
+        Assert.assertFalse(pgEmptyEdgeInfo.isValidated());
+
+        EdgeInfo adjListPrefixEmptyEdgeInfo =
                 new EdgeInfo(
                         "person",
                         "knows",
@@ -236,8 +318,9 @@ public class EdgeInfoTest {
                                 new AdjacentList(
                                         AdjListType.ordered_by_source, FileType.PARQUET, "")),
                         List.of(TestUtil.pg3));
-        Assert.assertFalse(edgeInfo.isValidated());
-        edgeInfo =
+        Assert.assertFalse(adjListPrefixEmptyEdgeInfo.isValidated());
+
+        EdgeInfo pgPrefixEmptyEdgeInfo =
                 new EdgeInfo(
                         "person",
                         "knows",
@@ -250,20 +333,6 @@ public class EdgeInfoTest {
                         "gar/v1",
                         List.of(TestUtil.orderedBySource),
                         List.of(new PropertyGroup(new ArrayList<>(), FileType.PARQUET, "")));
-        Assert.assertFalse(edgeInfo.isValidated());
-        edgeInfo =
-                new EdgeInfo(
-                        "person",
-                        "knows",
-                        "person",
-                        1024,
-                        100,
-                        1000,
-                        false,
-                        URI.create("edge/person_knows_person/"),
-                        "gar/v1",
-                        List.of(TestUtil.orderedBySource),
-                        List.of(TestUtil.pg1));
-        Assert.assertTrue(edgeInfo.isValidated());
+        Assert.assertFalse(pgPrefixEmptyEdgeInfo.isValidated());
     }
 }
