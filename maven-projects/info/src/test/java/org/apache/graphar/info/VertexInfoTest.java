@@ -47,7 +47,7 @@ public class VertexInfoTest {
         Assert.assertEquals(new URI("world"), v.getBaseUri());
     }
 
-    @Test
+    @Test(expected=RuntimeException.class)
     public void URInullTest() {
         VertexInfo b2 =
                 VertexInfo.builder()
@@ -58,7 +58,7 @@ public class VertexInfoTest {
                         .build();
     }
 
-    @Test
+    @Test(expected=RuntimeException.class)
     public void invalidChunkSizeTest() {
         b.chunkSize(-1);
         b.build();
