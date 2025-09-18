@@ -44,6 +44,22 @@ public class VertexInfoTest {
     public void testVertexInfoBuilderDoubleDeclaration() throws URISyntaxException {
         VertexInfo v = b.baseUri(new URI("world")).build();
 
-        Assert.assertEquals(new URI("test"), v.getBaseUri());
+        Assert.assertEquals(new URI("world"), v.getBaseUri());
+    }
+
+    @Test
+    public void URInullTest(){
+        VertexInfo b2 = VertexInfo.builder()
+                .type("test")
+                .chunkSize(24)
+                .version("gar/v1")
+                .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                .build();
+    }
+
+    @Test
+    public void invalidChunkSizeTest(){
+        b.chunkSize(-1);
+        b.build();
     }
 }

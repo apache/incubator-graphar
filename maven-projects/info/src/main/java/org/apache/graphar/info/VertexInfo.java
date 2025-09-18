@@ -63,36 +63,35 @@ public class VertexInfo {
         }
 
         public VertexInfoBuilder baseUri(URI baseUri) {
-            if (this.baseUri == null) {
-                this.baseUri = baseUri;
-            }
+            this.baseUri = baseUri;
+
             return this;
         }
 
         public VertexInfoBuilder baseUri(String baseUri) {
-            if (this.baseUri == null) {
                 this.baseUri = URI.create(baseUri);
-            }
+
             return this;
         }
 
         public VertexInfoBuilder version(VersionInfo version) {
-            if (this.version == null) {
                 this.version = version;
-            }
+
             return this;
         }
 
         public VertexInfoBuilder version(String version) {
-            if (this.version == null) {
                 this.version = VersionParser.getVersion(version);
-            }
+
             return this;
         }
 
         public VertexInfo build() {
             if (chunkSize < 0) {
                 throw new IllegalArgumentException("Chunk size cannot be negative: " + chunkSize);
+            }
+            if(baseUri == null) {
+                throw new IllegalArgumentException("Base URI cannot be null");
             }
             return new VertexInfo(this);
         }

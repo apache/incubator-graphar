@@ -38,6 +38,7 @@ public class GraphInfo {
     private final Map<String, EdgeInfo> edgeConcat2EdgeInfo;
     private final VersionInfo version;
 
+
     public GraphInfo(
             String name,
             List<VertexInfo> vertexInfos,
