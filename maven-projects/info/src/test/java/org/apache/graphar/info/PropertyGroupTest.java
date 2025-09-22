@@ -261,4 +261,56 @@ public class PropertyGroupTest {
         Assert.assertEquals(DataType.BOOL, pg.getPropertyMap().get("flag").getDataType());
         Assert.assertEquals(DataType.DOUBLE, pg.getPropertyMap().get("score").getDataType());
     }
+
+    @Test
+    public void testIsValidated() {
+        // Test valid property group
+        Assert.assertTrue(basicGroup.isValidated());
+        Assert.assertTrue(singlePropertyGroup.isValidated());
+
+        // Test invalid property group with null prefix
+        PropertyGroup nullPrefixGroup =
+                TestDataFactory.createPropertyGroup(
+                        Arrays.asList(idProperty, nameProperty), FileType.CSV, null);
+        Assert.assertFalse(nullPrefixGroup.isValidated());
+
+        // Test invalid property group with empty prefix
+        PropertyGroup emptyPrefixGroup =
+                TestDataFactory.createPropertyGroup(
+                        Arrays.asList(idProperty, nameProperty), FileType.CSV, "");
+        Assert.assertFalse(emptyPrefixGroup.isValidated());
+
+        // Test invalid property group with null file type
+        PropertyGroup nullFileTypeGroup =
+                new PropertyGroup(Arrays.asList(idProperty, nameProperty), null, "test/");
+        Assert.assertFalse(nullFileTypeGroup.isValidated());
+
+        // Test invalid property group with invalid file type values
+        // This test is not applicable in Java as FileType is an enum and cannot have invalid values
+
+        // Test invalid property group with empty property list
+        Assert.assertFalse(emptyGroup.isValidated());
+
+        // Test invalid property group with property having empty name
+        Property emptyNameProperty =
+                TestDataFactory.createProperty("", DataType.STRING, false, true);
+        PropertyGroup groupWithEmptyNameProperty =
+                new PropertyGroup(
+                        Arrays.asList(idProperty, emptyNameProperty), FileType.CSV, "test/");
+        Assert.assertFalse(groupWithEmptyNameProperty.isValidated());
+
+        // Test invalid property group with property having null data type
+        Property nullDataTypeProperty = new Property("nullType", null, false, true);
+        PropertyGroup groupWithNullDataTypeProperty =
+                new PropertyGroup(
+                        Arrays.asList(idProperty, nullDataTypeProperty), FileType.CSV, "test/");
+        Assert.assertFalse(groupWithNullDataTypeProperty.isValidated());
+
+        // Test invalid property group with CSV file type and LIST data type
+        Property listProperty =
+                TestDataFactory.createProperty("listProp", DataType.LIST, false, true);
+        PropertyGroup csvWithListGroup =
+                new PropertyGroup(Arrays.asList(listProperty), FileType.CSV, "test/");
+        Assert.assertFalse(csvWithListGroup.isValidated());
+    }
 }

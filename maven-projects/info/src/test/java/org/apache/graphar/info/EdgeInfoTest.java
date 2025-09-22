@@ -20,7 +20,10 @@
 package org.apache.graphar.info;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.FileType;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -58,46 +61,49 @@ public class EdgeInfoTest {
 
     @Test
     public void testUriAndPrefixConflict() {
-        try {
-            EdgeInfo.builder()
-                    .srcType("person")
-                    .edgeType("knows")
-                    .dstType("person")
-                    .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
-                    .adjacentLists(List.of(TestUtil.orderedBySource))
-                    .chunkSize(1024)
-                    .srcChunkSize(100)
-                    .dstChunkSize(100)
-                    .directed(false)
-                    .prefix("edge/person_knows_person/")
-                    .baseUri(URI.create("/person_knows_person/"))
-                    .version("gar/v1")
-                    .build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals(
-                    "baseUri and prefix conflict: baseUri=/person_knows_person/ prefix=edge/person_knows_person/",
-                    e.getMessage());
-        }
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () ->
+                                EdgeInfo.builder()
+                                        .srcType("person")
+                                        .edgeType("knows")
+                                        .dstType("person")
+                                        .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                                        .adjacentLists(List.of(TestUtil.orderedBySource))
+                                        .chunkSize(1024)
+                                        .srcChunkSize(100)
+                                        .dstChunkSize(100)
+                                        .directed(false)
+                                        .prefix("edge/person_knows_person/")
+                                        .baseUri(URI.create("/person_knows_person/"))
+                                        .version("gar/v1")
+                                        .build());
+        Assert.assertEquals(
+                "baseUri and prefix conflict: baseUri=/person_knows_person/ prefix=edge/person_knows_person/",
+                illegalArgumentException.getMessage());
     }
 
     @Test
     public void testMissingUriAndPrefix() {
-        try {
-            EdgeInfo.builder()
-                    .srcType("person")
-                    .edgeType("knows")
-                    .dstType("person")
-                    .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
-                    .adjacentLists(List.of(TestUtil.orderedBySource))
-                    .chunkSize(1024)
-                    .srcChunkSize(100)
-                    .dstChunkSize(100)
-                    .directed(false)
-                    .version("gar/v1")
-                    .build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("baseUri and prefix cannot be both null", e.getMessage());
-        }
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class,
+                        () ->
+                                EdgeInfo.builder()
+                                        .srcType("person")
+                                        .edgeType("knows")
+                                        .dstType("person")
+                                        .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                                        .adjacentLists(List.of(TestUtil.orderedBySource))
+                                        .chunkSize(1024)
+                                        .srcChunkSize(100)
+                                        .dstChunkSize(100)
+                                        .directed(false)
+                                        .version("gar/v1")
+                                        .build());
+        Assert.assertEquals(
+                "baseUri and prefix cannot be both null", illegalArgumentException.getMessage());
     }
 
     @Test
@@ -157,5 +163,176 @@ public class EdgeInfoTest {
 
         Assert.assertEquals(2, edgeInfo.getAdjacentLists().size());
         Assert.assertEquals(2, edgeInfo.getPropertyGroups().size());
+    }
+
+    @Test
+    public void testIsValidated() {
+        // Test valid edge info
+        EdgeInfo edgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        1000,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg1));
+        Assert.assertTrue(edgeInfo.isValidated());
+
+        EdgeInfo srcTypeEmptyEdgeInfo =
+                new EdgeInfo(
+                        "",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(srcTypeEmptyEdgeInfo.isValidated());
+
+        EdgeInfo edgeTypeEmptyEdgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "",
+                        "person",
+                        1024,
+                        100,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(edgeTypeEmptyEdgeInfo.isValidated());
+
+        EdgeInfo dstTypeEmptyEdgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "",
+                        1024,
+                        100,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(dstTypeEmptyEdgeInfo.isValidated());
+
+        EdgeInfo chunkSizeIllegalEdgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        0,
+                        100,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(chunkSizeIllegalEdgeInfo.isValidated());
+
+        EdgeInfo srcChunkSizeIllegalEdgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        -1,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(srcChunkSizeIllegalEdgeInfo.isValidated());
+
+        EdgeInfo dstChunkSizeIllegalEdgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        0,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(dstChunkSizeIllegalEdgeInfo.isValidated());
+
+        EdgeInfo adjListEmptyEdgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        100,
+                        false,
+                        URI.create(""),
+                        "gar/v1",
+                        List.of(),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(adjListEmptyEdgeInfo.isValidated());
+
+        EdgeInfo pgEmptyEdgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        1000,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(pgEmptyEdgeInfo.isValidated());
+
+        EdgeInfo adjListPrefixEmptyEdgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        1000,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(
+                                new AdjacentList(
+                                        AdjListType.ordered_by_source, FileType.PARQUET, "")),
+                        List.of(TestUtil.pg3));
+        Assert.assertFalse(adjListPrefixEmptyEdgeInfo.isValidated());
+
+        EdgeInfo pgPrefixEmptyEdgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        1000,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(new PropertyGroup(new ArrayList<>(), FileType.PARQUET, "")));
+        Assert.assertFalse(pgPrefixEmptyEdgeInfo.isValidated());
     }
 }

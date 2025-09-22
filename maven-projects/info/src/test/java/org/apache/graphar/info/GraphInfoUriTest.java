@@ -38,11 +38,11 @@ public class GraphInfoUriTest {
         // absolute paths
         Assert.assertEquals(
                 URI.create("vertex/person/id/"),
-                vertexInfo.getPropertyGroupPrefix(vertexInfo.getPropertyGroups().get(0)));
+                vertexInfo.getPropertyGroupUri(vertexInfo.getPropertyGroups().get(0)));
         // relative paths
         Assert.assertEquals(
                 URI.create("/tmp/vertex/person/firstName_lastName_gender/chunk0"),
-                vertexInfo.getPropertyGroupChunkPath(vertexInfo.getPropertyGroups().get(1), 0));
+                vertexInfo.getPropertyGroupChunkUri(vertexInfo.getPropertyGroups().get(1), 0));
     }
 
     @Test
@@ -54,11 +54,11 @@ public class GraphInfoUriTest {
         // absolute paths
         Assert.assertEquals(
                 URI.create("s3://graphar/vertex/person/id/"),
-                vertexInfo.getPropertyGroupPrefix(vertexInfo.getPropertyGroups().get(0)));
+                vertexInfo.getPropertyGroupUri(vertexInfo.getPropertyGroups().get(0)));
         // relative paths
         Assert.assertEquals(
                 URI.create("s3://tmp/vertex/person/firstName_lastName_gender/chunk0"),
-                vertexInfo.getPropertyGroupChunkPath(vertexInfo.getPropertyGroups().get(1), 0));
+                vertexInfo.getPropertyGroupChunkUri(vertexInfo.getPropertyGroups().get(1), 0));
     }
 
     @Test
@@ -70,11 +70,11 @@ public class GraphInfoUriTest {
         // absolute paths
         Assert.assertEquals(
                 URI.create("hdfs://graphar/vertex/person/id/"),
-                vertexInfo.getPropertyGroupPrefix(vertexInfo.getPropertyGroups().get(0)));
+                vertexInfo.getPropertyGroupUri(vertexInfo.getPropertyGroups().get(0)));
         // relative paths
         Assert.assertEquals(
                 URI.create("hdfs://tmp/vertex/person/firstName_lastName_gender/chunk0"),
-                vertexInfo.getPropertyGroupChunkPath(vertexInfo.getPropertyGroups().get(1), 0));
+                vertexInfo.getPropertyGroupChunkUri(vertexInfo.getPropertyGroups().get(1), 0));
     }
 
     @Test
@@ -86,10 +86,10 @@ public class GraphInfoUriTest {
         // absolute paths
         Assert.assertEquals(
                 URI.create("file:///graphar/vertex/person/id/"),
-                vertexInfo.getPropertyGroupPrefix(vertexInfo.getPropertyGroups().get(0)));
+                vertexInfo.getPropertyGroupUri(vertexInfo.getPropertyGroups().get(0)));
         // relative paths
         Assert.assertEquals(
                 URI.create("file:///tmp/vertex/person/firstName_lastName_gender/chunk0"),
-                vertexInfo.getPropertyGroupChunkPath(vertexInfo.getPropertyGroups().get(1), 0));
+                vertexInfo.getPropertyGroupChunkUri(vertexInfo.getPropertyGroups().get(1), 0));
     }
 }
