@@ -88,7 +88,7 @@ public abstract class BaseFileSystemTest {
      * content before creating the directory.
      */
     protected String createCleanTestDirectory(String subdirectoryName) {
-        String testDir = TEST_OUTPUT_DIR + "/" + subdirectoryName;
+        String testDir = TEST_OUTPUT_DIR + subdirectoryName;
         cleanupDirectory(testDir);
 
         try {

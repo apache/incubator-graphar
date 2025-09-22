@@ -19,6 +19,7 @@
 
 package org.apache.graphar.info.yaml;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -77,6 +78,10 @@ public class GraphYaml {
     }
 
     public GraphYaml(GraphInfo graphInfo) {
+        this(null, graphInfo);
+    }
+
+    public GraphYaml(URI graphInfoStoreUri, GraphInfo graphInfo) {
         this.name = graphInfo.getName();
         this.prefix = graphInfo.getPrefix();
         this.version =
@@ -86,11 +91,27 @@ public class GraphYaml {
                         .orElse(null);
         this.vertices =
                 graphInfo.getVertexInfos().stream()
-                        .map(vertexInfo -> vertexInfo.getType() + ".vertex.yaml")
+                        .map(
+                                vertexInfo -> {
+                                    URI storeUri = graphInfo.getStoreUri(vertexInfo);
+                                    if (graphInfoStoreUri != null) {
+                                        storeUri =
+                                                graphInfoStoreUri.resolve(".").relativize(storeUri);
+                                    }
+                                    return storeUri.toString();
+                                })
                         .collect(Collectors.toList());
         this.edges =
                 graphInfo.getEdgeInfos().stream()
-                        .map(edgeInfo -> edgeInfo.getConcat() + ".edge.yaml")
+                        .map(
+                                edgeInfo -> {
+                                    URI storeUri = graphInfo.getStoreUri(edgeInfo);
+                                    if (graphInfoStoreUri != null) {
+                                        storeUri =
+                                                graphInfoStoreUri.resolve(".").relativize(storeUri);
+                                    }
+                                    return storeUri.toString();
+                                })
                         .collect(Collectors.toList());
         this.version =
                 Optional.of(graphInfo)

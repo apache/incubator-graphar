@@ -17,12 +17,29 @@
  * under the License.
  */
 
-package org.apache.graphar.info.loader;
+package org.apache.graphar.info.saver.impl;
 
 import java.io.IOException;
-import org.apache.graphar.info.GraphInfo;
+import java.io.Writer;
+import java.net.URI;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import org.apache.graphar.info.saver.BaseGraphInfoSaver;
 
-@FunctionalInterface
-public interface GraphLoader {
-    public GraphInfo load(String graphYamlPath) throws IOException;
+public class LocalFileSystemYamlGraphSaver extends BaseGraphInfoSaver {
+
+    public Writer writeYaml(URI uri) throws IOException {
+        Path outputPath = FileSystems.getDefault().getPath(uri.toString());
+        Path parentDir = outputPath.getParent();
+        if (parentDir != null) {
+            Files.createDirectories(parentDir);
+        }
+        return Files.newBufferedWriter(
+                outputPath,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING,
+                StandardOpenOption.WRITE);
+    }
 }

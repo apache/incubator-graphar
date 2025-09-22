@@ -21,10 +21,15 @@ package org.apache.graphar.info;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
+import org.apache.graphar.info.yaml.AdjacentListYaml;
+import org.apache.graphar.info.yaml.EdgeYaml;
+import org.apache.graphar.info.yaml.PropertyGroupYaml;
+import org.apache.graphar.info.yaml.VertexYaml;
 
 public class TestUtil {
     private static String GAR_TEST_DATA = null;
@@ -49,6 +54,36 @@ public class TestUtil {
 
     public static URI getLdbcSampleGraphURI() {
         return URI.create(getLdbcSampleGraphPath());
+    }
+
+    public static VertexInfo buildVertexInfoFromYaml(VertexYaml vertexYaml) {
+        return new VertexInfo(
+                vertexYaml.getType(),
+                vertexYaml.getChunk_size(),
+                vertexYaml.getProperty_groups().stream()
+                        .map(PropertyGroupYaml::toPropertyGroup)
+                        .collect(Collectors.toList()),
+                vertexYaml.getPrefix(),
+                vertexYaml.getVersion());
+    }
+
+    public static EdgeInfo buildEdgeInfoFromYaml(EdgeYaml edgeYaml) {
+        return new EdgeInfo(
+                edgeYaml.getSrc_type(),
+                edgeYaml.getEdge_type(),
+                edgeYaml.getDst_type(),
+                edgeYaml.getChunk_size(),
+                edgeYaml.getSrc_chunk_size(),
+                edgeYaml.getDst_chunk_size(),
+                edgeYaml.isDirected(),
+                edgeYaml.getPrefix(),
+                edgeYaml.getVersion(),
+                edgeYaml.getAdj_lists().stream()
+                        .map(AdjacentListYaml::toAdjacentList)
+                        .collect(Collectors.toUnmodifiableList()),
+                edgeYaml.getProperty_groups().stream()
+                        .map(PropertyGroupYaml::toPropertyGroup)
+                        .collect(Collectors.toList()));
     }
 
     public static final AdjacentList orderedBySource =

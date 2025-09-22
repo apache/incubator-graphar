@@ -49,7 +49,7 @@ public abstract class ReaderGraphInfoLoader extends BaseGraphInfoLoader {
         Reader yaml = readYaml(vertexYamlUri);
         Yaml vertexYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
         VertexYaml vertexYaml = vertexYamlLoader.load(yaml);
-        return buildVertexInfoFromGraphYaml(vertexYaml);
+        return buildVertexInfoFromVertexYaml(vertexYaml);
     }
 
     @Override
@@ -57,6 +57,6 @@ public abstract class ReaderGraphInfoLoader extends BaseGraphInfoLoader {
         Reader yaml = readYaml(edgeYamlUri);
         Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
         EdgeYaml edgeYaml = edgeYamlLoader.load(yaml);
-        return buildEdgeInfoFromGraphYaml(edgeYaml);
+        return buildEdgeInfoFromEdgeYaml(edgeYaml);
     }
 }

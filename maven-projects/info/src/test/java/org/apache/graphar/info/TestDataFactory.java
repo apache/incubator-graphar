@@ -38,7 +38,11 @@ public class TestDataFactory {
         VertexInfo personVertex = createPersonVertexInfo();
         EdgeInfo knowsEdge = createKnowsEdgeInfo();
         return new GraphInfo(
-                "ldbc_sample", List.of(personVertex), List.of(knowsEdge), "", "gar/v1");
+                "ldbc_sample",
+                List.of(personVertex),
+                List.of(knowsEdge),
+                "file:///test_path",
+                "gar/v1");
     }
 
     /** Creates a person vertex info for testing. */
@@ -48,11 +52,11 @@ public class TestDataFactory {
         Property lastName = createProperty("lastName", DataType.STRING, false, false);
         Property gender = createProperty("gender", DataType.STRING, false, true);
 
-        PropertyGroup idGroup = createPropertyGroup(List.of(id), FileType.CSV, "id/");
+        PropertyGroup idGroup = createPropertyGroup(List.of(id), FileType.PARQUET, "id/");
         PropertyGroup nameGroup =
                 createPropertyGroup(
                         List.of(firstName, lastName, gender),
-                        FileType.CSV,
+                        FileType.ORC,
                         "firstName_lastName_gender/");
 
         return new VertexInfo(
@@ -113,6 +117,6 @@ public class TestDataFactory {
         Property id = createIdProperty();
         PropertyGroup idGroup = createPropertyGroup(List.of(id), FileType.CSV, "id/");
         VertexInfo vertex = new VertexInfo("test", 100, List.of(idGroup), "vertex/test/", "gar/v1");
-        return new GraphInfo("test_graph", List.of(vertex), List.of(), "", "gar/v1");
+        return new GraphInfo("test_graph", List.of(vertex), List.of(), "/tmp", "gar/v1");
     }
 }
