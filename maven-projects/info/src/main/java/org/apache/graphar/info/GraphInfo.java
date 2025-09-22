@@ -167,7 +167,7 @@ public class GraphInfo {
     }
 
     public boolean hasEdgeInfo(String srcType, String edgeType, String dstType) {
-        return edgeConcat2EdgeInfo.containsKey(EdgeInfo.concat(srcType, dstType, edgeType));
+        return edgeConcat2EdgeInfo.containsKey(EdgeInfo.concat(srcType, edgeType, dstType));
     }
 
     public VertexInfo getVertexInfo(String type) {
@@ -177,7 +177,7 @@ public class GraphInfo {
 
     public EdgeInfo getEdgeInfo(String srcType, String edgeType, String dstType) {
         checkEdgeExist(srcType, edgeType, dstType);
-        return edgeConcat2EdgeInfo.get(EdgeInfo.concat(srcType, dstType, edgeType));
+        return edgeConcat2EdgeInfo.get(EdgeInfo.concat(srcType, edgeType, dstType));
     }
 
     public int getVertexInfoNum() {
@@ -210,6 +210,35 @@ public class GraphInfo {
 
     public VersionInfo getVersion() {
         return version;
+    }
+
+    public boolean isValidated() {
+        // Check if name is not empty and base URI is not null
+        if (name == null || name.isEmpty() || baseUri == null) {
+            return false;
+        }
+
+        // Check if all vertex infos are valid
+        for (VertexInfo vertexInfo : vertexInfos) {
+            if (vertexInfo == null || !vertexInfo.isValidated()) {
+                return false;
+            }
+        }
+
+        // Check if all edge infos are valid
+        for (EdgeInfo edgeInfo : edgeInfos) {
+            if (edgeInfo == null || !edgeInfo.isValidated()) {
+                return false;
+            }
+        }
+
+        // Check if vertex/edge infos size matches vertex/edge type to index map size
+        if (vertexInfos.size() != vertexType2VertexInfo.size()
+                || edgeInfos.size() != edgeConcat2EdgeInfo.size()) {
+            return false;
+        }
+
+        return true;
     }
 
     private void checkVertexExist(String type) {

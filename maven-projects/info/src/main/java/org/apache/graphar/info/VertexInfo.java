@@ -20,8 +20,10 @@
 package org.apache.graphar.info;
 
 import java.net.URI;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
@@ -78,7 +80,7 @@ public class VertexInfo {
                                         type, chunkSize, newPropertyGroups, baseUri, version));
     }
 
-    public int propertyGroupNum() {
+    public int getPropertyGroupNum() {
         return propertyGroups.getPropertyGroupNum();
     }
 
@@ -102,17 +104,21 @@ public class VertexInfo {
         return propertyGroups.hasPropertyGroup(propertyGroup);
     }
 
-    public URI getPropertyGroupPrefix(PropertyGroup propertyGroup) {
+    public PropertyGroup getPropertyGroup(String property) {
+        return propertyGroups.getPropertyGroup(property);
+    }
+
+    public URI getPropertyGroupUri(PropertyGroup propertyGroup) {
         checkPropertyGroupExist(propertyGroup);
         return getBaseUri().resolve(propertyGroup.getBaseUri());
     }
 
-    public URI getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
+    public URI getPropertyGroupChunkUri(PropertyGroup propertyGroup, long chunkIndex) {
         // PropertyGroup will be checked in getPropertyGroupPrefix
-        return getPropertyGroupPrefix(propertyGroup).resolve("chunk" + chunkIndex);
+        return getPropertyGroupUri(propertyGroup).resolve("chunk" + chunkIndex);
     }
 
-    public URI getVerticesNumFilePath() {
+    public URI getVerticesNumFileUri() {
         return getBaseUri().resolve("vertex_count");
     }
 
@@ -135,7 +141,7 @@ public class VertexInfo {
     }
 
     public String getPrefix() {
-        return baseUri.toString();
+        return baseUri == null ? null : baseUri.toString();
     }
 
     public URI getBaseUri() {
@@ -157,5 +163,28 @@ public class VertexInfo {
                             + " does not exist in the vertex "
                             + getType());
         }
+    }
+
+    public boolean isValidated() {
+        // Check if type and baseUri is not empty and chunkSize is positive
+        if (type == null || type.isEmpty() || chunkSize <= 0 || baseUri == null) {
+            return false;
+        }
+        // Check if property groups are valid
+        Set<String> propertyNameSet = new HashSet<>();
+        for (PropertyGroup pg : propertyGroups.getPropertyGroupList()) {
+            // Check if property group is not null and not empty
+            if (pg == null || !pg.isValidated()) {
+                return false;
+            }
+            for (Property p : pg.getPropertyList()) {
+                if (propertyNameSet.contains(p.getName())) {
+                    return false;
+                }
+                propertyNameSet.add(p.getName());
+            }
+        }
+
+        return true;
     }
 }

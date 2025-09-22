@@ -22,9 +22,11 @@ package org.apache.graphar.info;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -426,6 +428,18 @@ public class EdgeInfo {
         return propertyGroups.hasProperty(propertyName);
     }
 
+    public DataType getPropertyType(String propertyName) {
+        return propertyGroups.getPropertyType(propertyName);
+    }
+
+    public boolean isPrimaryKey(String propertyName) {
+        return propertyGroups.isPrimaryKey(propertyName);
+    }
+
+    public boolean isNullableKey(String propertyName) {
+        return propertyGroups.isNullableKey(propertyName);
+    }
+
     public boolean hasPropertyGroup(PropertyGroup propertyGroup) {
         return propertyGroups.hasPropertyGroup(propertyGroup);
     }
@@ -446,50 +460,38 @@ public class EdgeInfo {
         return propertyGroups.getPropertyGroup(property);
     }
 
-    public URI getPropertyGroupPrefix(PropertyGroup propertyGroup) {
+    public URI getPropertyGroupUri(PropertyGroup propertyGroup) {
         checkPropertyGroupExist(propertyGroup);
         return getBaseUri().resolve(propertyGroup.getBaseUri());
     }
 
-    public URI getPropertyGroupChunkPath(PropertyGroup propertyGroup, long chunkIndex) {
+    public URI getPropertyGroupChunkUri(PropertyGroup propertyGroup, long chunkIndex) {
         // PropertyGroup will be checked in getPropertyGroupPrefix
-        return getPropertyGroupPrefix(propertyGroup).resolve("chunk" + chunkIndex);
+        return getPropertyGroupUri(propertyGroup).resolve("chunk" + chunkIndex);
     }
 
-    public URI getAdjacentListPrefix(AdjListType adjListType) {
+    public URI getAdjacentListUri(AdjListType adjListType) {
         return getBaseUri().resolve(getAdjacentList(adjListType).getBaseUri()).resolve("adj_list/");
     }
 
-    public URI getAdjacentListChunkPath(AdjListType adjListType, long vertexChunkIndex) {
-        return getAdjacentListPrefix(adjListType).resolve("chunk" + vertexChunkIndex);
+    public URI getAdjacentListChunkUri(AdjListType adjListType, long vertexChunkIndex) {
+        return getAdjacentListUri(adjListType).resolve("chunk" + vertexChunkIndex);
     }
 
-    public URI getOffsetPrefix(AdjListType adjListType) {
-        return getAdjacentListPrefix(adjListType).resolve("offset/");
+    public URI getOffsetUri(AdjListType adjListType) {
+        return getAdjacentListUri(adjListType).resolve("offset/");
     }
 
-    public URI getOffsetChunkPath(AdjListType adjListType, long vertexChunkIndex) {
-        return getOffsetPrefix(adjListType).resolve("chunk" + vertexChunkIndex);
+    public URI getOffsetChunkUri(AdjListType adjListType, long vertexChunkIndex) {
+        return getOffsetUri(adjListType).resolve("chunk" + vertexChunkIndex);
     }
 
-    public URI getVerticesNumFilePath(AdjListType adjListType) {
-        return getAdjacentListPrefix(adjListType).resolve("vertex_count");
+    public URI getVerticesNumFileUri(AdjListType adjListType) {
+        return getAdjacentListUri(adjListType).resolve("vertex_count");
     }
 
-    public URI getEdgesNumFilePath(AdjListType adjListType, long vertexChunkIndex) {
-        return getAdjacentListPrefix(adjListType).resolve("edge_count" + vertexChunkIndex);
-    }
-
-    public DataType getPropertyType(String propertyName) {
-        return propertyGroups.getPropertyType(propertyName);
-    }
-
-    public boolean isPrimaryKey(String propertyName) {
-        return propertyGroups.isPrimaryKey(propertyName);
-    }
-
-    public boolean isNullableKey(String propertyName) {
-        return propertyGroups.isNullableKey(propertyName);
+    public URI getEdgesNumFileUri(AdjListType adjListType, long vertexChunkIndex) {
+        return getAdjacentListUri(adjListType).resolve("edge_count" + vertexChunkIndex);
     }
 
     public String dump() {
@@ -574,6 +576,56 @@ public class EdgeInfo {
                             + " does not exist in the edge "
                             + getConcat());
         }
+    }
+
+    public boolean isValidated() {
+        // Check if source type, edge type, or destination type is empty
+        if (getSrcType() == null
+                || getSrcType().isEmpty()
+                || getEdgeType() == null
+                || getEdgeType().isEmpty()
+                || getDstType() == null
+                || getDstType().isEmpty()) {
+            return false;
+        }
+
+        // Check if chunk sizes are positive
+        if (chunkSize <= 0 || srcChunkSize <= 0 || dstChunkSize <= 0) {
+            return false;
+        }
+
+        // Check if prefix is null or empty
+        if (baseUri == null || baseUri.toString().isEmpty()) {
+            return false;
+        }
+
+        // Check if adjacent lists are empty
+        if (adjacentLists.isEmpty()) {
+            return false;
+        }
+
+        // Check if all adjacent lists are valid
+        for (AdjacentList adjacentList : adjacentLists.values()) {
+            if (adjacentList == null || !adjacentList.isValidated()) {
+                return false;
+            }
+        }
+
+        // Check if all property groups are valid and property names are unique
+        Set<String> propertyNameSet = new HashSet<>();
+        for (PropertyGroup pg : propertyGroups.getPropertyGroupList()) {
+            if (pg == null || !pg.isValidated()) {
+                return false;
+            }
+
+            for (Property p : pg.getPropertyList()) {
+                if (propertyNameSet.contains(p.getName())) {
+                    return false;
+                }
+                propertyNameSet.add(p.getName());
+            }
+        }
+        return true;
     }
 
     private static class EdgeTriplet {
