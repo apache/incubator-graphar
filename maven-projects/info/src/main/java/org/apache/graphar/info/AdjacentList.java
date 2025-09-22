@@ -53,4 +53,23 @@ public class AdjacentList {
     public URI getBaseUri() {
         return baseUri;
     }
+
+    public boolean isValidated() {
+        // Check if type is valid
+        if (type == null) {
+            return false;
+        }
+
+        // Check if file type is valid
+        if (fileType == null) {
+            return false;
+        }
+
+        // Check if base URI is not null
+        if (baseUri == null || baseUri.toString().isEmpty()) {
+            return false;
+        }
+
+        return true;
+    }
 }
