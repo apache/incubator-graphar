@@ -136,6 +136,41 @@ public class GraphInfo {
                         edgeConcat2EdgeInfo));
     }
 
+	public Optional<GraphInfo> removeVertex(VertexInfo vertexInfo) {
+
+		if (vertexInfo == null || !hasVertexInfo(vertexInfo.getType())) {
+		  return Optional.empty();
+		}
+		List<EdgeInfo> newCachedEdgeInfoList =
+			edgeInfos.stream()
+				.filter(
+					currEdge ->
+						!currEdge.getSrcType().equals(vertexInfo.getType())
+							&& !currEdge.getDstType().equals(vertexInfo.getType()))
+				.collect(Collectors.toList());
+
+		final List<VertexInfo> newVertexInfoList =
+			vertexInfos.stream()
+				.filter(
+					v ->
+						!v.getType().equals(vertexInfo.getType())
+							&& !v.getPrefix().equals(vertexInfo.getPrefix()))
+				.collect(Collectors.toList());
+
+		final Map<String, VertexInfo> newVertexInfoMap =
+			vertexType2VertexInfo.entrySet().stream()
+				.filter(v -> !v.getValue().getType().equals(vertexInfo.getType()))
+				.collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+		return Optional.of(
+			new GraphInfo(
+				name,
+				newVertexInfoList,
+				newCachedEdgeInfoList,
+				baseUri,
+				version,
+				newVertexInfoMap,
+				edgeConcat2EdgeInfo));
+    }
     public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
         if (edgeInfo == null
                 || hasEdgeInfo(
@@ -160,6 +195,36 @@ public class GraphInfo {
                         version,
                         vertexType2VertexInfo,
                         newEdgeConcat2EdgeInfo));
+    }
+	
+	public Optional<GraphInfo> removeEdge(EdgeInfo edgeInfo) {
+		if (edgeInfo == null
+			|| hasEdgeInfo(edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
+		  return Optional.empty();
+		}
+		final List<EdgeInfo> newEdgeInfos =
+			edgeInfos.stream()
+				.filter(
+					e ->
+						!(e.getSrcType().equals(edgeInfo.getSrcType())
+							&& e.getDstType().equals(edgeInfo.getDstType())
+							&& e.getEdgeType().equals(edgeInfo.getEdgeType())))
+				.collect(Collectors.toList());
+
+		final Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
+			edgeConcat2EdgeInfo.entrySet().stream()
+				.filter(e -> !e.getKey().equals(edgeInfo.getConcat()))
+				.filter(e -> !e.getValue().getConcat().equals(edgeInfo.getConcat()))
+				.collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+		return Optional.of(
+			new GraphInfo(
+				name,
+				vertexInfos,
+				newEdgeInfos,
+				baseUri,
+				version,
+				vertexType2VertexInfo,
+				newEdgeConcat2EdgeInfo));
     }
 
     public boolean hasVertexInfo(String type) {
