@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.apache.graphar.info.builder.ElementGenericAbstractBuilder;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
@@ -35,6 +36,48 @@ public class VertexInfo {
     private final PropertyGroups propertyGroups;
     private final URI baseUri;
     private final VersionInfo version;
+
+    public static VertexInfoBuilder builder() {
+        return new VertexInfoBuilder();
+    }
+
+    public static class VertexInfoBuilder
+            extends ElementGenericAbstractBuilder<VertexInfo, VertexInfoBuilder> {
+        private String type;
+        private long chunkSize;
+
+        private VertexInfoBuilder() {
+            super(VertexInfo.class, VertexInfoBuilder.class);
+        }
+
+        public VertexInfoBuilder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public VertexInfoBuilder chunkSize(long chunkSize) {
+            this.chunkSize = chunkSize;
+            return this;
+        }
+
+        @Override
+        protected void check() {
+            if (chunkSize < 0) {
+                throw new IllegalArgumentException("Chunk size cannot be negative: " + chunkSize);
+            }
+            if (baseUri == null) {
+                throw new IllegalArgumentException("Base URI cannot be null");
+            }
+        }
+    }
+
+    public VertexInfo(VertexInfoBuilder builder) {
+        this.type = builder.type;
+        this.chunkSize = builder.chunkSize;
+        this.propertyGroups = builder.propertyGroups;
+        this.baseUri = builder.baseUri;
+        this.version = builder.version;
+    }
 
     public VertexInfo(
             String type,
