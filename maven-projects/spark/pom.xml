@@ -91,6 +91,7 @@
             <modules>
                 <module>graphar</module>
                 <module>datasources-35</module>
+                <module>snb-graphar-bridge</module>
             </modules>
             <activation>
                 <activeByDefault>true</activeByDefault>
