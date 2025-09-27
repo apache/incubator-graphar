@@ -150,7 +150,7 @@ static inline bool IsValid(bool* state, int column_number) {
 }
 
 Result<std::vector<IdType>> VerticesCollection::filter(
-    std::vector<std::string> filter_labels,
+    const std::vector<std::string>& filter_labels,
     std::vector<IdType>* new_valid_chunk) {
   std::vector<int> indices;
   const int TOT_ROWS_NUM = vertex_num_;
@@ -214,7 +214,7 @@ Result<std::vector<IdType>> VerticesCollection::filter(
 }
 
 Result<std::vector<IdType>> VerticesCollection::filter_by_acero(
-    std::vector<std::string> filter_labels) const {
+    const std::vector<std::string>& filter_labels) const {
   std::vector<int> indices;
   const int TOT_ROWS_NUM = vertex_num_;
   const int CHUNK_SIZE = vertex_info_->GetChunkSize();
@@ -265,7 +265,8 @@ Result<std::vector<IdType>> VerticesCollection::filter_by_acero(
 }
 
 Result<std::vector<IdType>> VerticesCollection::filter(
-    std::string property_name, std::shared_ptr<Expression> filter_expression,
+    const std::string& property_name,
+    std::shared_ptr<Expression> filter_expression,
     std::vector<IdType>* new_valid_chunk) {
   std::vector<int> indices;
   const int TOT_ROWS_NUM = vertex_num_;
