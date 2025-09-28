@@ -19,6 +19,7 @@
 
 package org.apache.graphar.info;
 
+import java.io.Writer;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
@@ -120,6 +121,12 @@ public class VertexInfo {
 
     public URI getVerticesNumFileUri() {
         return getBaseUri().resolve("vertex_count");
+    }
+
+    public void dump(Writer output) {
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
+        VertexYaml vertexYaml = new VertexYaml(this);
+        yaml.dump(vertexYaml, output);
     }
 
     public String dump() {
