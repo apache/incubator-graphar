@@ -90,6 +90,26 @@ public class GraphInfoSaverTest extends BaseFileSystemTest {
     }
 
     @Test
+    public void testDumpWithBaseUri() {
+        GraphInfo dumpTestGraphInfo = TestDataFactory.createSampleGraphInfo();
+        dumpTestGraphInfo.setStoreUri(
+                dumpTestGraphInfo.getVertexInfos().get(0),
+                URI.create("/tmp/verticesInfos/personInfo.vertex.yaml"));
+        String dumpTestGraphInfoString = dumpTestGraphInfo.dump(URI.create("/tmp/GraphInfos/"));
+        Yaml GraphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
+        GraphYaml graphYaml = GraphYamlLoader.load(dumpTestGraphInfoString);
+        Assert.assertEquals(
+                "/tmp/verticesInfos/personInfo.vertex.yaml", graphYaml.getVertices().get(0));
+        dumpTestGraphInfo.setStoreUri(
+                dumpTestGraphInfo.getVertexInfos().get(0),
+                URI.create("/tmp/verticesInfos/personInfo.vertex.yaml"));
+        dumpTestGraphInfoString = dumpTestGraphInfo.dump(URI.create("/tmp/verticesInfos/"));
+        GraphYamlLoader = new Yaml(new Constructor(GraphYaml.class, new LoaderOptions()));
+        graphYaml = GraphYamlLoader.load(dumpTestGraphInfoString);
+        Assert.assertEquals("personInfo.vertex.yaml", graphYaml.getVertices().get(0));
+    }
+
+    @Test
     public void testSave() {
         try {
             URI graphInfoUri =

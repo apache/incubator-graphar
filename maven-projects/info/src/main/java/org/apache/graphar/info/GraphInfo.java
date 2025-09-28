@@ -19,6 +19,7 @@
 
 package org.apache.graphar.info;
 
+import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -124,6 +125,12 @@ public class GraphInfo {
         this.vertexType2VertexInfo = vertexType2VertexInfo;
         this.edgeConcat2EdgeInfo = edgeConcat2EdgeInfo;
         this.types2StoreUri = new HashMap<>();
+    }
+
+    public void dump(URI storeUri, Writer output) {
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
+        GraphYaml graphYaml = new GraphYaml(storeUri, this);
+        yaml.dump(graphYaml, output);
     }
 
     public String dump(URI storeUri) {

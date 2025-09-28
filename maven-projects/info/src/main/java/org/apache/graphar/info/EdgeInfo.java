@@ -19,6 +19,7 @@
 
 package org.apache.graphar.info;
 
+import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -492,6 +493,12 @@ public class EdgeInfo {
 
     public URI getEdgesNumFileUri(AdjListType adjListType, long vertexChunkIndex) {
         return getAdjacentListUri(adjListType).resolve("edge_count" + vertexChunkIndex);
+    }
+
+    public void dump(Writer output) {
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
+        EdgeYaml edgeYaml = new EdgeYaml(this);
+        yaml.dump(edgeYaml, output);
     }
 
     public String dump() {

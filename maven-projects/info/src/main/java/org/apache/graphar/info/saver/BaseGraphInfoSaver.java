@@ -33,7 +33,7 @@ public abstract class BaseGraphInfoSaver implements GraphInfoSaver {
     @Override
     public void save(URI graphInfoUri, GraphInfo graphInfo) throws IOException {
         Writer writer = writeYaml(graphInfoUri);
-        writer.write(graphInfo.dump(graphInfoUri));
+        graphInfo.dump(graphInfoUri, writer);
         writer.close();
 
         for (VertexInfo vertexInfo : graphInfo.getVertexInfos()) {
@@ -49,14 +49,14 @@ public abstract class BaseGraphInfoSaver implements GraphInfoSaver {
     @Override
     public void save(URI vertexInfoUri, VertexInfo vertexInfo) throws IOException {
         Writer vertexWriter = writeYaml(vertexInfoUri);
-        vertexWriter.write(vertexInfo.dump());
+        vertexInfo.dump(vertexWriter);
         vertexWriter.close();
     }
 
     @Override
     public void save(URI edgeInfoUri, EdgeInfo edgeInfo) throws IOException {
         Writer edgeWriter = writeYaml(edgeInfoUri);
-        edgeWriter.write(edgeInfo.dump());
+        edgeInfo.dump(edgeWriter);
         edgeWriter.close();
     }
 }
