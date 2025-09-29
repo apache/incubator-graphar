@@ -430,10 +430,6 @@ public class EdgeInfo {
         return propertyGroups.hasProperty(propertyName);
     }
 
-    public Cardinality getCardinality(String propertyName) {
-        return propertyGroups.getCardinality(propertyName);
-    }
-
     public DataType getPropertyType(String propertyName) {
         return propertyGroups.getPropertyType(propertyName);
     }

@@ -358,7 +358,6 @@ public class GraphInfoTest {
         Assert.assertEquals(DataType.STRING, property.getDataType());
         Assert.assertEquals(DataType.STRING, knowsEdgeInfo.getPropertyType("creationDate"));
         Assert.assertEquals(Cardinality.SINGLE, property.getCardinality());
-        Assert.assertEquals(Cardinality.SINGLE, knowsEdgeInfo.getCardinality("creationDate"));
         Assert.assertFalse(property.isPrimary());
         Assert.assertFalse(knowsEdgeInfo.isPrimaryKey("creationDate"));
         Assert.assertTrue(property.isNullable());
