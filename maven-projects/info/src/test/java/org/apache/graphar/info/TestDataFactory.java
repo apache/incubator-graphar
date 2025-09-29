@@ -21,6 +21,7 @@ package org.apache.graphar.info;
 
 import java.util.List;
 import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.Cardinality;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
 
@@ -98,6 +99,16 @@ public class TestDataFactory {
     public static Property createProperty(
             String name, DataType dataType, boolean isPrimary, boolean isNullable) {
         return new Property(name, dataType, isPrimary, isNullable);
+    }
+
+    /** Creates a property with given parameters including cardinality. */
+    public static Property createProperty(
+            String name,
+            DataType dataType,
+            Cardinality cardinality,
+            boolean isPrimary,
+            boolean isNullable) {
+        return new Property(name, dataType, cardinality, isPrimary, isNullable);
     }
 
     /** Creates a property group with given parameters. */

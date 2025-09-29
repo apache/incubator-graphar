@@ -30,6 +30,7 @@ public class VertexYaml {
     private String type;
     private long chunk_size;
     private List<PropertyGroupYaml> property_groups;
+    private List<String> labels;
     private String prefix;
     private String version;
 
@@ -37,6 +38,7 @@ public class VertexYaml {
         this.type = "";
         this.chunk_size = 0;
         this.property_groups = new ArrayList<>();
+        this.labels = null;
         this.prefix = "";
         this.version = "";
     }
@@ -78,6 +80,17 @@ public class VertexYaml {
 
     public void setProperty_groups(List<PropertyGroupYaml> property_groups) {
         this.property_groups = property_groups;
+    }
+
+    public List<String> getLabels() {
+        if (labels == null) {
+            return null;
+        }
+        return labels.isEmpty() ? null : labels;
+    }
+
+    public void setLabels(List<String> labels) {
+        this.labels = labels;
     }
 
     public String getPrefix() {
