@@ -21,6 +21,7 @@ package org.apache.graphar.info;
 
 import java.io.Writer;
 import java.net.URI;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -34,6 +35,7 @@ public class VertexInfo {
     private final String type;
     private final long chunkSize;
     private final PropertyGroups propertyGroups;
+    private final List<String> labels;
     private final URI baseUri;
     private final VersionInfo version;
 
@@ -43,7 +45,17 @@ public class VertexInfo {
             List<PropertyGroup> propertyGroups,
             String prefix,
             String version) {
-        this(type, chunkSize, propertyGroups, URI.create(prefix), version);
+        this(type, chunkSize, propertyGroups, Collections.emptyList(), URI.create(prefix), version);
+    }
+
+    public VertexInfo(
+            String type,
+            long chunkSize,
+            List<PropertyGroup> propertyGroups,
+            List<String> labels,
+            String prefix,
+            String version) {
+        this(type, chunkSize, propertyGroups, labels, URI.create(prefix), version);
     }
 
     public VertexInfo(
@@ -52,13 +64,24 @@ public class VertexInfo {
             List<PropertyGroup> propertyGroups,
             URI baseUri,
             String version) {
-        this(type, chunkSize, propertyGroups, baseUri, VersionParser.getVersion(version));
+        this(type, chunkSize, propertyGroups, Collections.emptyList(), baseUri, version);
     }
 
     public VertexInfo(
             String type,
             long chunkSize,
             List<PropertyGroup> propertyGroups,
+            List<String> labels,
+            URI baseUri,
+            String version) {
+        this(type, chunkSize, propertyGroups, labels, baseUri, VersionParser.getVersion(version));
+    }
+
+    public VertexInfo(
+            String type,
+            long chunkSize,
+            List<PropertyGroup> propertyGroups,
+            List<String> labels,
             URI baseUri,
             VersionInfo version) {
         if (chunkSize < 0) {
@@ -67,6 +90,7 @@ public class VertexInfo {
         this.type = type;
         this.chunkSize = chunkSize;
         this.propertyGroups = new PropertyGroups(propertyGroups);
+        this.labels = labels == null ? Collections.emptyList() : List.copyOf(labels);
         this.baseUri = baseUri;
         this.version = version;
     }
@@ -78,7 +102,12 @@ public class VertexInfo {
                 .map(
                         newPropertyGroups ->
                                 new VertexInfo(
-                                        type, chunkSize, newPropertyGroups, baseUri, version));
+                                        type,
+                                        chunkSize,
+                                        newPropertyGroups,
+                                        labels,
+                                        baseUri,
+                                        version));
     }
 
     public int getPropertyGroupNum() {
@@ -141,6 +170,10 @@ public class VertexInfo {
 
     public long getChunkSize() {
         return chunkSize;
+    }
+
+    public List<String> getLabels() {
+        return labels;
     }
 
     public List<PropertyGroup> getPropertyGroups() {
