@@ -19,48 +19,35 @@
 
 package org.apache.graphar.datasources.ldbc.model
 
-/**
- * Validation result sealed trait
- */
+/** 验证结果密封特质 */
 sealed trait ValidationResult {
-  def isSuccess: Boolean
-  def getErrors: List[String]
+  def isSuccess: Boolean  // 是否验证成功
+  def getErrors: List[String]  // 错误信息列表
 }
 
-/**
- * Success validation result
- */
+/** 验证成功结果 */
 case object ValidationSuccess extends ValidationResult {
   override def isSuccess: Boolean = true
   override def getErrors: List[String] = List.empty
 }
 
-/**
- * Failure validation result
- *
- * @param errors List of error messages
- */
+/** 验证失败结果 */
 case class ValidationFailure(errors: List[String]) extends ValidationResult {
   override def isSuccess: Boolean = false
   override def getErrors: List[String] = errors
 }
 
-/**
- * ValidationResult companion object
- */
+/** 验证结果伴生对象 */
 object ValidationResult {
-  def success(): ValidationResult = ValidationSuccess
+  def success(): ValidationResult = ValidationSuccess  // 创建成功结果
 
-  def failure(error: String): ValidationResult = ValidationFailure(List(error))
+  def failure(error: String): ValidationResult = ValidationFailure(List(error))  // 创建单错误失败结果
 
-  def failure(errors: List[String]): ValidationResult = ValidationFailure(errors)
+  def failure(errors: List[String]): ValidationResult = ValidationFailure(errors)  // 创建多错误失败结果
 
+  // 合并多个验证结果
   def combine(results: ValidationResult*): ValidationResult = {
-    val failures = results.collect { case ValidationFailure(errors) => errors }.flatten.toList
-    if (failures.nonEmpty) {
-      ValidationFailure(failures)
-    } else {
-      ValidationSuccess
-    }
+    val allErrors = results.collect { case ValidationFailure(errors) => errors }.flatten.toList
+    if (allErrors.nonEmpty) ValidationFailure(allErrors) else ValidationSuccess
   }
 }
