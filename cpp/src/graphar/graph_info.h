@@ -208,6 +208,16 @@ class VertexInfo {
       std::shared_ptr<PropertyGroup> property_group) const;
 
   /**
+   * @brief Removes a property group from the VertexInfo instance and returns a new
+   * VertexInfo.
+   * @param property_group The property group to remove.
+   * @return A Status object indicating the success or failure of the
+   * operation. Returns InvalidOperation if the property group is not contained.
+   */
+  Result<std::shared_ptr<VertexInfo>> RemovePropertyGroup(
+      std::shared_ptr<PropertyGroup> property_group) const;
+      
+  /**
    * Get the type of the vertex.
    *
    * @return The type of the vertex.
@@ -435,11 +445,31 @@ class EdgeInfo {
       std::shared_ptr<AdjacentList> adj_list) const;
 
   /**
+   * @brief Removes an adjacency list from the EdgeInfo instance and returns a new
+   * EdgeInfo.
+   * @param adj_list The adjacency list to remove.
+   * @return A Status object indicating the success or failure of the
+   * operation. Returns InvalidOperation if the adjacency list is not contained.
+   */
+  Result<std::shared_ptr<EdgeInfo>> RemoveAdjacentList(
+      std::shared_ptr<AdjacentList> adj_list) const;
+  
+  /**
    * Add a property group to edge info and returns a new EdgeInfo.
    *
    * @param property_group Property group to add.
    */
   Result<std::shared_ptr<EdgeInfo>> AddPropertyGroup(
+      std::shared_ptr<PropertyGroup> property_group) const;
+
+  /**
+   * @brief Removes a property group from the EdgeInfo instance and returns a new
+   * EdgeInfo.
+   * @param property_group The property group to remove.
+   * @return A Status object indicating the success or failure of the
+   * operation. Returns InvalidOperation if the property group is not contained.
+   */
+  Result<std::shared_ptr<EdgeInfo>> RemovePropertyGroup(
       std::shared_ptr<PropertyGroup> property_group) const;
 
   /**
@@ -755,6 +785,16 @@ class GraphInfo {
       std::shared_ptr<VertexInfo> vertex_info) const;
 
   /**
+   * @brief Removes a vertex info from the GraphInfo instance and returns a new
+   * GraphInfo.
+   * @param vertex_info The vertex info to remove.
+   * @return A Status object indicating the success or failure of the
+   * operation. Returns InvalidOperation if the vertex info is not contained.
+   */
+  Result<std::shared_ptr<GraphInfo>> RemoveVertex(
+      std::shared_ptr<VertexInfo> vertex_info) const;
+  
+  /**
    * @brief Adds an edge info to the GraphInfo instance and returns a new
    * GraphInfo.
    * @param edge_info The edge info to add.
@@ -765,6 +805,16 @@ class GraphInfo {
   Result<std::shared_ptr<GraphInfo>> AddEdge(
       std::shared_ptr<EdgeInfo> edge_info) const;
 
+  /**
+   * @brief Removes an edge info from the GraphInfo instance and returns a new
+   * GraphInfo.
+   * @param edge_info The edge info to remove.
+   * @return A Status object indicating the success or failure of the
+   * operation. Returns InvalidOperation if the edge info is not contained.
+   */
+  Result<std::shared_ptr<GraphInfo>> RemoveEdge(
+      std::shared_ptr<EdgeInfo> edge_info) const;
+  
   /**
    * @brief Get the name of the graph.
    * @return The name of the graph.

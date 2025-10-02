@@ -71,6 +71,21 @@ std::vector<T> AddVectorElement(const std::vector<T>& values, T new_element) {
   return out;
 }
 
+template <typename T>
+std::vector<T> RemoveVectorElement(const std::vector<T>& values, size_t index) {
+  if (index >= values.size()) {
+    return values;
+  }
+  std::vector<T> out;
+  out.reserve(values.size()-1);
+  for (size_t i = 0; i < values.size(); ++i) {
+    if (i != index) {
+      out.push_back(values[i]);
+    }
+  }
+  return out;
+}
+
 std::string BuildPath(const std::vector<std::string>& paths) {
   std::string path;
   for (const auto& p : paths) {
@@ -397,6 +412,27 @@ Result<std::shared_ptr<VertexInfo>> VertexInfo::AddPropertyGroup(
       AddVectorElement(impl_->property_groups_, property_group), impl_->labels_,
       impl_->prefix_, impl_->version_);
 }
+
+Result<std::shared_ptr<VertexInfo>> VertexInfo::RemovePropertyGroup(
+    std::shared_ptr<PropertyGroup> property_group) const {
+  if (property_group == nullptr) {
+    return Status::Invalid("property group is nullptr");
+  }
+  int idx=-1;
+  for (size_t i=0;i<impl_->property_groups_.size();i++){
+    if(*(impl_->property_groups_[i])==*property_group){
+      idx=i;
+      break;
+    }
+    }
+  if(idx==-1){
+    return Status::Invalid("property group not found");
+  }
+  return std::make_shared<VertexInfo>(
+      impl_->type_, impl_->chunk_size_,
+      RemoveVectorElement(impl_->property_groups_, static_cast<size_t>(idx)), impl_->labels_,
+      impl_->prefix_, impl_->version_);
+  }
 
 bool VertexInfo::IsValidated() const { return impl_->is_validated(); }
 
@@ -845,6 +881,28 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddAdjacentList(
       impl_->property_groups_, impl_->prefix_, impl_->version_);
 }
 
+Result<std::shared_ptr<EdgeInfo>> EdgeInfo::RemoveAdjacentList(
+    std::shared_ptr<AdjacentList> adj_list) const {
+       if(adj_list==nullptr){
+        return Status::Invalid("adj list is nullptr");
+       }
+       int idx=-1;
+       for (size_t i=0;i<impl_->adjacent_lists_.size();i++){
+        if(impl_->adjacent_lists_[i]->GetType()==adj_list->GetType()){
+          idx=i;
+          break;
+        }
+       }
+       if(idx==-1){
+        return Status::Invalid("adj list not found");
+       }
+       return std::make_shared<EdgeInfo>(
+        impl_->src_type_, impl_->edge_type_, impl_->dst_type_, impl_->chunk_size_,
+        impl_->src_chunk_size_, impl_->dst_chunk_size_, impl_->directed_,
+        RemoveVectorElement(impl_->adjacent_lists_, static_cast<size_t>(idx)),
+        impl_->property_groups_, impl_->prefix_, impl_->version_);
+      }
+
 Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddPropertyGroup(
     std::shared_ptr<PropertyGroup> property_group) const {
   if (property_group == nullptr) {
@@ -863,6 +921,28 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddPropertyGroup(
       AddVectorElement(impl_->property_groups_, property_group), impl_->prefix_,
       impl_->version_);
 }
+
+Result<std::shared_ptr<EdgeInfo>> EdgeInfo::RemovePropertyGroup(
+  std::shared_ptr<PropertyGroup> property_group) const {
+    if(property_group==nullptr){
+      return Status::Invalid("property group is nullptr");
+    }
+    int idx=-1;
+    for (size_t i=0;i<impl_->property_groups_.size();i++){
+      if(*(impl_->property_groups_[i])==*property_group){
+        idx=i;
+      }
+    }
+    if(idx==-1){
+      return Status::Invalid("property group not found");
+    }
+    return std::make_shared<EdgeInfo>(
+      impl_->src_type_, impl_->edge_type_, impl_->dst_type_, impl_->chunk_size_,
+      impl_->src_chunk_size_, impl_->dst_chunk_size_, impl_->directed_,
+      impl_->adjacent_lists_, 
+      RemoveVectorElement(impl_->property_groups_, static_cast<size_t>(idx)), impl_->prefix_, 
+      impl_->version_);
+    }
 
 bool EdgeInfo::IsValidated() const { return impl_->is_validated(); }
 
@@ -1278,6 +1358,20 @@ Result<std::shared_ptr<GraphInfo>> GraphInfo::AddVertex(
       impl_->edge_infos_, impl_->labels_, impl_->prefix_, impl_->version_);
 }
 
+Result<std::shared_ptr<GraphInfo>> GraphInfo::RemoveVertex(
+    std::shared_ptr<VertexInfo> vertex_info) const {
+  if (vertex_info == nullptr) {
+    return Status::Invalid("vertex info is nullptr");
+  }
+  int idx = GetVertexInfoIndex(vertex_info->GetType());
+  if (idx == -1) {
+    return Status::Invalid("vertex info not found");
+  }
+  return std::make_shared<GraphInfo>(
+      impl_->name_, RemoveVectorElement(impl_->vertex_infos_, static_cast<size_t>(idx)),
+      impl_->edge_infos_, impl_->labels_, impl_->prefix_, impl_->version_, impl_->extra_info_);
+}
+
 Result<std::shared_ptr<GraphInfo>> GraphInfo::AddEdge(
     std::shared_ptr<EdgeInfo> edge_info) const {
   if (edge_info == nullptr) {
@@ -1292,6 +1386,22 @@ Result<std::shared_ptr<GraphInfo>> GraphInfo::AddEdge(
       AddVectorElement(impl_->edge_infos_, edge_info), impl_->labels_,
       impl_->prefix_, impl_->version_);
 }
+
+Result<std::shared_ptr<GraphInfo>> GraphInfo::RemoveEdge(
+    std::shared_ptr<EdgeInfo> edge_info) const {
+  if (edge_info == nullptr) {
+    return Status::Invalid("edge info is nullptr");
+  }
+  int idx=GetEdgeInfoIndex(edge_info->GetSrcType(), edge_info->GetEdgeType(),
+  edge_info->GetDstType());
+  if(idx==-1){
+    return Status::Invalid("edge info not found");
+  }
+  return std::make_shared<GraphInfo>(
+      impl_->name_, impl_->vertex_infos_, 
+      RemoveVectorElement(impl_->edge_infos_, static_cast<size_t>(idx)), impl_->labels_, 
+      impl_->prefix_, impl_->version_, impl_->extra_info_);
+  }
 
 std::shared_ptr<GraphInfo> CreateGraphInfo(
     const std::string& name, const VertexInfoVector& vertex_infos,
