@@ -82,7 +82,7 @@ Supported operations in Property:
 |-------------------|-------|--------|-------|------------|
 | create            | ✓     | ✓      | ✓     | ✓          |
 | add property      | ✓     | ✓      | ✓     | ✓          |
-| remove property   |       |        |       |            |
+| remove property   | ✓     |        |       |            |
 | get properties    | ✓     | ✓      | ✓     | ✓          |
 | check property    | ✓     | ✓      |       |            |
 | get file type     | ✓     | ✓      | ✓     | ✓          |
@@ -133,7 +133,7 @@ Supported operations in Vertex Info:
 |-------------------|-------|--------|-------|------------|
 | create            | ✓     | ✓      | ✓     | ✓          |
 | add group         | ✓     | ✓      | ✓     | ✓          |
-| remove group      |       |        |       |            |
+| remove group      | ✓     |        |       |            |
 | get label         | ✓     | ✓      | ✓     | ✓          |
 | get chunk size    | ✓     | ✓      | ✓     | ✓          |
 | get groups        | ✓     | ✓      | ✓     | ✓          |
@@ -161,9 +161,9 @@ Supported operations in Edge Info:
 |-------------------|-------|--------|-------|------------|
 | create            | ✓     | ✓      | ✓     | ✓          |
 | add group         | ✓     | ✓      | ✓     | ✓          |
-| remove group      |       |        |       |            |
+| remove group      | ✓     |        |       |            |
 | add adj list      | ✓     | ✓      | ✓     | ✓          |
-| remove adj list   |       |        |       |            |
+| remove adj list   | ✓     |        |       |            |
 | get label         | ✓     | ✓      | ✓     | ✓          |
 | get source label  | ✓     | ✓      | ✓     | ✓          |
 | get dest label    | ✓     | ✓      | ✓     | ✓          |
@@ -200,9 +200,9 @@ Supported operations in Graph Info:
 |-------------------|-------|--------|-------|------------|
 | create            | ✓     | ✓      | ✓     | ✓          |
 | add vertex        | ✓     | ✓      | ✓     | ✓          |
-| remove vertex     |       |        |       |            |
+| remove vertex     | ✓     |        |       |            |
 | add edge          | ✓     | ✓      | ✓     | ✓          |
-| remove edge       |       |        |       |            |
+| remove edge       | ✓     |        |       |            |
 | get name          | ✓     | ✓      | ✓     | ✓          |
 | get vertex        | ✓     | ✓      | ✓     | ✓          |
 | get edge          | ✓     | ✓      | ✓     | ✓          |
