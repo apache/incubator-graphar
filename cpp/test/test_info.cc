@@ -582,7 +582,7 @@ version: gar/v1
     REQUIRE(!extend_info2.status().ok());
   }
 
-  SECTION("RemovePropertyGroup"){
+  SECTION("RemovePropertyGroup") {
     auto pg2 = CreatePropertyGroup({Property("p2", int32(), false)},
                                    FileType::CSV, "p2/");
     auto maybe_extend_info = edge_info->AddPropertyGroup(pg2);
@@ -756,7 +756,7 @@ vertices:
     REQUIRE(remove_info->GetVertexInfoByIndex(1) == nullptr);
     auto remove_info2 = remove_info->RemoveVertex(vertex_info2);
     REQUIRE(!remove_info2.status().ok());
-    }
+  }
 
   SECTION("AddEdge") {
     auto edge_info2 =
@@ -781,7 +781,7 @@ vertices:
     REQUIRE(!extend_info2.status().ok());
   }
 
-  SECTION("RemoveEdge"){
+  SECTION("RemoveEdge") {
     auto edge_info2 =
         CreateEdgeInfo("person", "knows2", "person", 1024, 100, 100, true,
                        {CreateAdjacentList(AdjListType::ordered_by_source,
@@ -795,11 +795,9 @@ vertices:
     auto remove_info = maybe_remove_info.value();
     REQUIRE(remove_info->EdgeInfoNum() == 1);
     REQUIRE(remove_info->GetEdgeInfoByIndex(1) == nullptr);
-    REQUIRE(
-      remove_info->GetEdgeInfo("person", "knows2", "person") ==
-      nullptr);
-      REQUIRE(remove_info->GetEdgeInfos().size() == 1);
-      auto remove_info2 = remove_info->RemoveEdge(edge_info2);
+    REQUIRE(remove_info->GetEdgeInfo("person", "knows2", "person") == nullptr);
+    REQUIRE(remove_info->GetEdgeInfos().size() == 1);
+    auto remove_info2 = remove_info->RemoveEdge(edge_info2);
     REQUIRE(!remove_info2.status().ok());
   }
 }
