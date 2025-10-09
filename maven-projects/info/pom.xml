@@ -94,7 +94,7 @@
                     <java>
                         <!--<includes>
                             <include>
-                                maven-projects/info/src/test/java/org/apache/graphar/info/GraphInfoTest.java
+                                src/test/java/org/apache/graphar/info/GraphInfoTest.java
                             </include>
                         </includes>-->
                         <googleJavaFormat>
