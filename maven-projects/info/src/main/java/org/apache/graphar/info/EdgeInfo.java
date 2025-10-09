@@ -32,6 +32,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.Cardinality;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.EdgeYaml;
 import org.apache.graphar.info.yaml.GraphYaml;
@@ -496,12 +497,14 @@ public class EdgeInfo {
     }
 
     public void dump(Writer output) {
+        isValidated();
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         EdgeYaml edgeYaml = new EdgeYaml(this);
         yaml.dump(edgeYaml, output);
     }
 
     public String dump() {
+        isValidated();
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         EdgeYaml edgeYaml = new EdgeYaml(this);
         return yaml.dump(edgeYaml);
@@ -626,6 +629,10 @@ public class EdgeInfo {
             }
 
             for (Property p : pg.getPropertyList()) {
+                if (p.getCardinality() != Cardinality.SINGLE) {
+                    // edge property only supports single cardinality
+                    return false;
+                }
                 if (propertyNameSet.contains(p.getName())) {
                     return false;
                 }
