@@ -20,7 +20,9 @@
 package org.apache.graphar.info;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.List;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
 import org.junit.Assert;
@@ -28,7 +30,19 @@ import org.junit.Test;
 
 public class VertexInfoTest {
 
+    private VertexInfo.VertexInfoBuilder b =
+            VertexInfo.builder()
+                    .baseUri("test")
+                    .type("test")
+                    .chunkSize(24)
+                    .version("gar/v1")
+                    .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)));
+
     @Test
+    public void testVertexInfoBasicBuilder() {
+        VertexInfo v = b.build();
+    }
+
     public void testBuildWithPrefix() {
         try {
             VertexInfo vertexInfo =
@@ -38,6 +52,47 @@ public class VertexInfoTest {
         } catch (Exception e) {
             Assert.fail("Should not throw exception: " + e.getMessage());
         }
+    }
+
+    @Test
+    public void testVertexInfoBuilderDoubleDeclaration() throws URISyntaxException {
+        VertexInfo v = b.baseUri(new URI("world")).build();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void URInullTest() {
+        VertexInfo b2 =
+                VertexInfo.builder()
+                        .type("test")
+                        .chunkSize(24)
+                        .version("gar/v1")
+                        .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                        .build();
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void invalidChunkSizeTest() {
+        b.chunkSize(-1);
+        b.build();
+    }
+
+    @Test
+    public void propertyGroupAppendTest() {
+        b.addPropertyGroup(TestUtil.pg1);
+        VertexInfo v = b.build();
+        Assert.assertEquals(List.of(TestUtil.pg3, TestUtil.pg1), v.getPropertyGroups());
+        // Test invalid vertex info with invalid property group
+        Property invalidProperty = new Property("", DataType.STRING, false, true);
+        PropertyGroup invalidPropertyGroup =
+                new PropertyGroup(Arrays.asList(invalidProperty), FileType.CSV, "invalid/");
+        VertexInfo invalidPropertyGroupVertexInfo =
+                new VertexInfo(
+                        "person",
+                        100,
+                        Arrays.asList(invalidPropertyGroup),
+                        "vertex/person/",
+                        "gar/v1");
+        Assert.assertFalse(invalidPropertyGroupVertexInfo.isValidated());
     }
 
     @Test
