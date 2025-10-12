@@ -59,21 +59,15 @@ public class VertexInfoTest {
     }
 
     @Test
-    public void propertyGroupAppendTest(){
-        VertexInfo v = b
-                .addPropertyGroup(TestUtil.pg2)
-                .build();
+    public void propertyGroupAppendTest() {
+        VertexInfo v = b.addPropertyGroup(TestUtil.pg2).build();
 
         Assert.assertEquals(2, v.getPropertyGroups().size());
-
     }
 
     @Test
-    public void propertyGroupAddOnlyTest(){
-        VertexInfo v = b
-                .propertyGroups(null)
-                .addPropertyGroup(TestUtil.pg2)
-                .build();
+    public void propertyGroupAddOnlyTest() {
+        VertexInfo v = b.propertyGroups(null).addPropertyGroup(TestUtil.pg2).build();
 
         Assert.assertEquals(1, v.getPropertyGroups().size());
     }

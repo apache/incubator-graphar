@@ -59,7 +59,6 @@ public class VertexInfo {
             return this;
         }
 
-
         public VertexInfoBuilder baseUri(URI baseUri) {
             this.baseUri = baseUri;
 
