@@ -21,8 +21,8 @@ package org.apache.graphar.info;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
 import org.junit.Assert;
