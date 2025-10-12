@@ -79,6 +79,8 @@ public class VertexInfoTest {
     public void invalidChunkSizeTest() {
         b.chunkSize(-1);
         b.build();
+    }
+
     @Test
     public void testBuildWithPrefix() {
         try {
