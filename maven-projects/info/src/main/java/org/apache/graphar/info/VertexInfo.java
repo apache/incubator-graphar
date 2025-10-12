@@ -20,6 +20,7 @@
 package org.apache.graphar.info;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.apache.graphar.info.type.DataType;
@@ -44,6 +45,7 @@ public class VertexInfo {
         private PropertyGroups propertyGroups;
         private URI baseUri;
         private VersionInfo version;
+        private List<PropertyGroup> propertyGroupsAsListTemp;
 
         private VertexInfoBuilder() {}
 
@@ -57,10 +59,6 @@ public class VertexInfo {
             return this;
         }
 
-        public VertexInfoBuilder propertyGroups(PropertyGroups propertyGroups) {
-            this.propertyGroups = propertyGroups;
-            return this;
-        }
 
         public VertexInfoBuilder baseUri(URI baseUri) {
             this.baseUri = baseUri;
@@ -86,7 +84,36 @@ public class VertexInfo {
             return this;
         }
 
+        public VertexInfoBuilder addPropertyGroup(PropertyGroup propertyGroup) {
+            if (propertyGroupsAsListTemp == null) propertyGroupsAsListTemp = new ArrayList<>();
+            propertyGroupsAsListTemp.add(propertyGroup);
+            return this;
+        }
+
+        public VertexInfoBuilder addPropertyGroups(List<PropertyGroup> propertyGroups) {
+            if (propertyGroupsAsListTemp == null) propertyGroupsAsListTemp = new ArrayList<>();
+            propertyGroupsAsListTemp.addAll(propertyGroups);
+            return this;
+        }
+
+        public VertexInfoBuilder propertyGroups(PropertyGroups propertyGroups) {
+            this.propertyGroups = propertyGroups;
+            return this;
+        }
+
         public VertexInfo build() {
+            if (propertyGroups == null && propertyGroupsAsListTemp != null) {
+                propertyGroups = new PropertyGroups(propertyGroupsAsListTemp);
+            } else if (propertyGroupsAsListTemp != null) {
+                propertyGroups =
+                        propertyGroupsAsListTemp.stream()
+                                .map(propertyGroups::addPropertyGroupAsNew)
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .reduce((first, second) -> second)
+                                .orElse(new PropertyGroups(new ArrayList<>()));
+            }
+
             if (chunkSize < 0) {
                 throw new IllegalArgumentException("Chunk size cannot be negative: " + chunkSize);
             }
