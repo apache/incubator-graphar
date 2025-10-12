@@ -49,13 +49,33 @@ public class VertexInfoTest {
 
     @Test(expected = RuntimeException.class)
     public void URInullTest() {
-        VertexInfo b2 =
+        VertexInfo v =
                 VertexInfo.builder()
                         .type("test")
                         .chunkSize(24)
                         .version("gar/v1")
                         .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
                         .build();
+    }
+
+    @Test
+    public void propertyGroupAppendTest(){
+        VertexInfo v = b
+                .addPropertyGroup(TestUtil.pg2)
+                .build();
+
+        Assert.assertEquals(2, v.getPropertyGroups().size());
+
+    }
+
+    @Test
+    public void propertyGroupAddOnlyTest(){
+        VertexInfo v = b
+                .propertyGroups(null)
+                .addPropertyGroup(TestUtil.pg2)
+                .build();
+
+        Assert.assertEquals(1, v.getPropertyGroups().size());
     }
 
     @Test(expected = RuntimeException.class)
