@@ -205,4 +205,62 @@ public class AdjacentListTest {
         Assert.assertEquals(fileType, adjList.getFileType());
         Assert.assertEquals(prefix, adjList.getPrefix());
     }
+
+    @Test
+    public void testIsValidated() {
+        // Test valid adjacent lists
+        AdjacentList validList =
+                new AdjacentList(AdjListType.unordered_by_source, FileType.CSV, "adj_list/");
+        Assert.assertTrue(validList.isValidated());
+
+        // Test invalid adjacent list with null type
+        AdjacentList nullTypeList = new AdjacentList(null, FileType.CSV, "adj_list/");
+        Assert.assertFalse(nullTypeList.isValidated());
+
+        // Test invalid adjacent list with invalid type values
+        // This test is not needed in Java as AdjListType is an enum
+
+        // Test invalid adjacent list with null file type
+        AdjacentList nullFileTypeList =
+                new AdjacentList(AdjListType.unordered_by_source, null, "adj_list/");
+        Assert.assertFalse(nullFileTypeList.isValidated());
+
+        // Test invalid adjacent list with invalid file type values
+        // This test is not needed in Java as FileType is an enum
+
+        // Test invalid adjacent list with null prefix
+        AdjacentList nullPrefixList =
+                new AdjacentList(AdjListType.unordered_by_source, FileType.CSV, (String) null);
+        Assert.assertFalse(nullPrefixList.isValidated());
+
+        // Test all valid AdjListType values
+        AdjacentList unorderedBySourceList =
+                new AdjacentList(AdjListType.unordered_by_source, FileType.CSV, "unordered_src/");
+        Assert.assertTrue(unorderedBySourceList.isValidated());
+
+        AdjacentList unorderedByDestList =
+                new AdjacentList(AdjListType.unordered_by_dest, FileType.CSV, "unordered_dst/");
+        Assert.assertTrue(unorderedByDestList.isValidated());
+
+        AdjacentList orderedBySourceList =
+                new AdjacentList(AdjListType.ordered_by_source, FileType.CSV, "ordered_src/");
+        Assert.assertTrue(orderedBySourceList.isValidated());
+
+        AdjacentList orderedByDestList =
+                new AdjacentList(AdjListType.ordered_by_dest, FileType.CSV, "ordered_dst/");
+        Assert.assertTrue(orderedByDestList.isValidated());
+
+        // Test all valid FileType values
+        AdjacentList csvList =
+                new AdjacentList(AdjListType.unordered_by_source, FileType.CSV, "csv/");
+        Assert.assertTrue(csvList.isValidated());
+
+        AdjacentList parquetList =
+                new AdjacentList(AdjListType.unordered_by_source, FileType.PARQUET, "parquet/");
+        Assert.assertTrue(parquetList.isValidated());
+
+        AdjacentList orcList =
+                new AdjacentList(AdjListType.unordered_by_source, FileType.ORC, "orc/");
+        Assert.assertTrue(orcList.isValidated());
+    }
 }

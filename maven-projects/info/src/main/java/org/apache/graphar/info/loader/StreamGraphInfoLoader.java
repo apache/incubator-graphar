@@ -48,9 +48,9 @@ public abstract class StreamGraphInfoLoader extends BaseGraphInfoLoader {
     @Override
     public VertexInfo loadVertexInfo(URI vertexYamlUri) throws IOException {
         InputStream yaml = readYaml(vertexYamlUri);
-        Yaml edgeYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
-        VertexYaml edgeYaml = edgeYamlLoader.load(yaml);
-        return buildVertexInfoFromGraphYaml(edgeYaml);
+        Yaml vertexYamlLoader = new Yaml(new Constructor(VertexYaml.class, new LoaderOptions()));
+        VertexYaml vertexYaml = vertexYamlLoader.load(yaml);
+        return buildVertexInfoFromVertexYaml(vertexYaml);
     }
 
     @Override
@@ -58,6 +58,6 @@ public abstract class StreamGraphInfoLoader extends BaseGraphInfoLoader {
         InputStream yaml = readYaml(edgeYamlUri);
         Yaml edgeYamlLoader = new Yaml(new Constructor(EdgeYaml.class, new LoaderOptions()));
         EdgeYaml edgeYaml = edgeYamlLoader.load(yaml);
-        return buildEdgeInfoFromGraphYaml(edgeYaml);
+        return buildEdgeInfoFromEdgeYaml(edgeYaml);
     }
 }

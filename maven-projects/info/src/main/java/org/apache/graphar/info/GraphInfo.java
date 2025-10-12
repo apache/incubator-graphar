@@ -19,7 +19,10 @@
 
 package org.apache.graphar.info;
 
+import java.io.Writer;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +40,23 @@ public class GraphInfo {
     private final Map<String, VertexInfo> vertexType2VertexInfo;
     private final Map<String, EdgeInfo> edgeConcat2EdgeInfo;
     private final VersionInfo version;
+    private final Map<String, URI> types2StoreUri;
+
+    public GraphInfo(
+            String name,
+            Map<URI, VertexInfo> vertexInfos,
+            Map<URI, EdgeInfo> edgeInfos,
+            URI uri,
+            String version) {
+        this(
+                name,
+                new ArrayList<>(vertexInfos.values()),
+                new ArrayList<>(edgeInfos.values()),
+                uri,
+                version);
+        vertexInfos.forEach((key, value) -> types2StoreUri.put(value.getType() + ".vertex", key));
+        edgeInfos.forEach((key, value) -> types2StoreUri.put(value.getConcat() + ".edge", key));
+    }
 
     public GraphInfo(
             String name,
@@ -68,6 +88,7 @@ public class GraphInfo {
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         EdgeInfo::getConcat, Function.identity()));
+        this.types2StoreUri = new HashMap<>();
     }
 
     private GraphInfo(
@@ -103,6 +124,19 @@ public class GraphInfo {
         this.version = version;
         this.vertexType2VertexInfo = vertexType2VertexInfo;
         this.edgeConcat2EdgeInfo = edgeConcat2EdgeInfo;
+        this.types2StoreUri = new HashMap<>();
+    }
+
+    public void dump(URI storeUri, Writer output) {
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
+        GraphYaml graphYaml = new GraphYaml(storeUri, this);
+        yaml.dump(graphYaml, output);
+    }
+
+    public String dump(URI storeUri) {
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
+        GraphYaml graphYaml = new GraphYaml(storeUri, this);
+        return yaml.dump(graphYaml);
     }
 
     public String dump() {
@@ -167,7 +201,7 @@ public class GraphInfo {
     }
 
     public boolean hasEdgeInfo(String srcType, String edgeType, String dstType) {
-        return edgeConcat2EdgeInfo.containsKey(EdgeInfo.concat(srcType, dstType, edgeType));
+        return edgeConcat2EdgeInfo.containsKey(EdgeInfo.concat(srcType, edgeType, dstType));
     }
 
     public VertexInfo getVertexInfo(String type) {
@@ -177,7 +211,7 @@ public class GraphInfo {
 
     public EdgeInfo getEdgeInfo(String srcType, String edgeType, String dstType) {
         checkEdgeExist(srcType, edgeType, dstType);
-        return edgeConcat2EdgeInfo.get(EdgeInfo.concat(srcType, dstType, edgeType));
+        return edgeConcat2EdgeInfo.get(EdgeInfo.concat(srcType, edgeType, dstType));
     }
 
     public int getVertexInfoNum() {
@@ -210,6 +244,63 @@ public class GraphInfo {
 
     public VersionInfo getVersion() {
         return version;
+    }
+
+    public void setStoreUri(VertexInfo vertexInfo, URI storeUri) {
+        this.types2StoreUri.put(vertexInfo.getType() + ".vertex", storeUri);
+    }
+
+    public void setStoreUri(EdgeInfo edgeInfo, URI storeUri) {
+        this.types2StoreUri.put(edgeInfo.getConcat() + ".edge", storeUri);
+    }
+
+    public URI getStoreUri(VertexInfo vertexInfo) {
+        String type = vertexInfo.getType() + ".vertex";
+        if (types2StoreUri.containsKey(type)) {
+            return types2StoreUri.get(type);
+        }
+        return URI.create(type + ".yaml");
+    }
+
+    public URI getStoreUri(EdgeInfo edgeInfo) {
+        String type = edgeInfo.getConcat() + ".edge";
+        if (types2StoreUri.containsKey(type)) {
+            return types2StoreUri.get(type);
+        }
+        return URI.create(type + ".yaml");
+    }
+
+    public Map<String, URI> getTypes2Uri() {
+        return types2StoreUri;
+    }
+
+    public boolean isValidated() {
+        // Check if name is not empty and base URI is not null
+        if (name == null || name.isEmpty() || baseUri == null) {
+            return false;
+        }
+
+        // Check if all vertex infos are valid
+        for (VertexInfo vertexInfo : vertexInfos) {
+            if (vertexInfo == null || !vertexInfo.isValidated()) {
+                return false;
+            }
+        }
+
+        // Check if all edge infos are valid
+        for (EdgeInfo edgeInfo : edgeInfos) {
+            if (edgeInfo == null || !edgeInfo.isValidated()) {
+                return false;
+            }
+        }
+
+        // Check if vertex/edge infos size matches vertex/edge type to index map size
+        if (vertexInfos.size() != vertexType2VertexInfo.size()
+                || edgeInfos.size() != edgeConcat2EdgeInfo.size()) {
+            return false;
+        }
+
+        return true;
     }
 
     private void checkVertexExist(String type) {
