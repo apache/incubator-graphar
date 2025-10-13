@@ -88,10 +88,10 @@ TEST_CASE_METHOD(GlobalFixture, "test_multi_label_builder") {
   // read label chunk as arrow table
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(
       vertex_info, labels, "/tmp/ldbc/parquet/");
-  assert(maybe_reader.status().ok());
+  REQUIRE(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
-  assert(reader->seek(0).ok());
-  assert(reader->GetLabelChunk().status().ok());
-  assert(reader->next_chunk().ok());
+  REQUIRE(reader->seek(0).ok());
+  REQUIRE(reader->GetLabelChunk().status().ok());
+  REQUIRE(reader->next_chunk().ok());
 }
 }  // namespace graphar
