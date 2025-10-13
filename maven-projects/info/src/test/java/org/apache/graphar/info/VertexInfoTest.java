@@ -77,13 +77,12 @@ public class VertexInfoTest {
 
     @Test
     public void invalidChunkSizeTest() {
-        try{
+        try {
             b.chunkSize(-1);
             b.build();
             Assert.assertThrows(IllegalArgumentException.class, () -> b.chunkSize(-1));
         } catch (IllegalArgumentException ignored) {
         }
-
     }
 
     @Test
