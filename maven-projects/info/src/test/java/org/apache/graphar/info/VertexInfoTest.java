@@ -75,10 +75,15 @@ public class VertexInfoTest {
         Assert.assertEquals(1, v.getPropertyGroups().size());
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     public void invalidChunkSizeTest() {
-        b.chunkSize(-1);
-        b.build();
+        try{
+            b.chunkSize(-1);
+            b.build();
+            Assert.assertThrows(IllegalArgumentException.class, () -> b.chunkSize(-1));
+        } catch (IllegalArgumentException ignored) {
+        }
+
     }
 
     @Test

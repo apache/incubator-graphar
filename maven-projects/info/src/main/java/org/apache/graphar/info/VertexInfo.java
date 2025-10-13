@@ -87,13 +87,14 @@ public class VertexInfo {
         }
 
         public VertexInfoBuilder addPropertyGroup(PropertyGroup propertyGroup) {
-            if (propertyGroupsAsListTemp == null) propertyGroupsAsListTemp = new ArrayList<>();
+            if (propertyGroupsAsListTemp == null)
+            {propertyGroupsAsListTemp = new ArrayList<>();}
             propertyGroupsAsListTemp.add(propertyGroup);
             return this;
         }
 
         public VertexInfoBuilder addPropertyGroups(List<PropertyGroup> propertyGroups) {
-            if (propertyGroupsAsListTemp == null) propertyGroupsAsListTemp = new ArrayList<>();
+            if (propertyGroupsAsListTemp == null) {propertyGroupsAsListTemp = new ArrayList<>();}
             propertyGroupsAsListTemp.addAll(propertyGroups);
             return this;
         }
