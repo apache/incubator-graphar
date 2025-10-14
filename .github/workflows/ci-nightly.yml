@@ -18,6 +18,21 @@
 name: GraphAr C++ CI Nightly
 
 on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+    paths:
+      - 'cpp/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'cpp/**'
+      - '.github/workflows/ci.yml'
+
   workflow_dispatch:
   schedule:
     # The notifications for scheduled workflows are sent to the user who
