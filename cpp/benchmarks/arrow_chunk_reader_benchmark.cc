@@ -20,6 +20,7 @@
 #include "benchmark/benchmark.h"
 
 #include "./benchmark_util.h"
+#include "examples/config.h"
 #include "graphar/api/arrow_reader.h"
 #include "graphar/fwd.h"
 
@@ -88,9 +89,9 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListArrowChunkReaderReadChunk)
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk().status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk().status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 
@@ -104,9 +105,9 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListOffsetArrowChunkReaderReadChunk)
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk().status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk().status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 
@@ -121,9 +122,9 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListPropertyArrowChunkReaderReadChunk)
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk().status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk().status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 
@@ -140,9 +141,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 // select one columns and internal ID column
@@ -158,9 +159,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 
@@ -177,9 +178,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 
@@ -196,9 +197,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 // select one columns and internal ID column
@@ -214,9 +215,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 
@@ -233,9 +234,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 
@@ -253,9 +254,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 // select one columns and internal ID column
@@ -271,9 +272,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 
@@ -291,9 +292,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 
@@ -311,9 +312,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 // select one columns and internal ID column
@@ -329,9 +330,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 
@@ -349,9 +350,9 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    assert(reader->seek(0).ok());
-    assert(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    assert(reader->next_chunk().ok());
+    ASSERT(reader->seek(0).ok());
+    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
+    ASSERT(reader->next_chunk().ok());
   }
 }
 
