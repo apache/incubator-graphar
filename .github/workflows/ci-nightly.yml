@@ -57,20 +57,43 @@ jobs:
 
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
-    - name: CMake
+    - name: CMake-debug
       run: |
-        mkdir build
-        pushd build
+        mkdir build-debug
+        pushd build-debug
         cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
         popd
 
-    - name: Build GraphAr
+    - name: Build GraphAr-debug
       run: |
-        pushd build
+        pushd build-debug
         make -j$(nproc)
         make graphar-ccache-stats
         popd
-    - name: Test
+        
+    - name: Test-debug
       run: |
-        cd build
+        pushd build-debug
         ctest --output-on-failure
+        popd
+
+
+    - name: CMake-release
+      run: |
+        mkdir build-release
+        pushd build-release
+        cmake ../cpp -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
+        popd
+
+    - name: Build GraphAr-release
+      run: |
+        pushd build-release
+        make -j$(nproc)
+        make graphar-ccache-stats
+        popd
+
+    - name: Test-release
+      run: |
+        pushd build-release
+        ctest --output-on-failure
+        popd
