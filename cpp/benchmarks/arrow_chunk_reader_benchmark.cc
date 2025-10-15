@@ -20,7 +20,6 @@
 #include "benchmark/benchmark.h"
 
 #include "./benchmark_util.h"
-#include "examples/config.h"
 #include "graphar/api/arrow_reader.h"
 #include "graphar/fwd.h"
 
@@ -89,9 +88,12 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListArrowChunkReaderReadChunk)
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk().status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk();
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 
@@ -105,9 +107,12 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListOffsetArrowChunkReaderReadChunk)
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk().status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk();
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 
@@ -122,9 +127,12 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListPropertyArrowChunkReaderReadChunk)
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk().status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk();
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 
@@ -141,9 +149,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V1);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 // select one columns and internal ID column
@@ -159,9 +170,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V1);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 
@@ -178,9 +192,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V1);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 
@@ -197,9 +214,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V2);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 // select one columns and internal ID column
@@ -215,9 +235,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V2);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 
@@ -234,9 +257,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V2);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 
@@ -254,9 +280,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V1);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 // select one columns and internal ID column
@@ -272,9 +301,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V1);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 
@@ -292,9 +324,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V1).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V1);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 
@@ -312,9 +347,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V2);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 // select one columns and internal ID column
@@ -330,9 +368,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V2);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 
@@ -350,9 +391,12 @@ BENCHMARK_DEFINE_F(
   }
   auto reader = maybe_reader.value();
   for (auto _ : state) {
-    ASSERT(reader->seek(0).ok());
-    ASSERT(reader->GetChunk(GetChunkVersion::V2).status().ok());
-    ASSERT(reader->next_chunk().ok());
+    auto st = reader->seek(0);
+    SKIP_WITH_ERROR_STATUS(state, st);
+    auto chunk_result = reader->GetChunk(GetChunkVersion::V2);
+    SKIP_WITH_ERROR_STATUS(state, chunk_result.status());
+    auto next_result = reader->next_chunk();
+    SKIP_WITH_ERROR_STATUS(state, next_result);
   }
 }
 
@@ -362,7 +406,6 @@ BENCHMARK_REGISTER_F(BenchmarkFixture, CreateAdjListOffsetArrowChunkReader);
 BENCHMARK_REGISTER_F(BenchmarkFixture,
                      AdjListPropertyArrowChunkReaderReadChunk);
 BENCHMARK_REGISTER_F(BenchmarkFixture, AdjListArrowChunkReaderReadChunk);
-BENCHMARK_REGISTER_F(BenchmarkFixture, AdjListOffsetArrowChunkReaderReadChunk);
 BENCHMARK_REGISTER_F(BenchmarkFixture, AdjListOffsetArrowChunkReaderReadChunk);
 BENCHMARK_REGISTER_F(
     BenchmarkFixture,
