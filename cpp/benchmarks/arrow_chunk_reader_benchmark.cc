@@ -32,10 +32,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, CreateVertexPropertyArrowChunkReader)
         graph_info_->GetVertexInfo("person")->GetPropertyGroup("firstName");
     auto maybe_reader =
         VertexPropertyArrowChunkReader::Make(graph_info_, "person", gp);
-    if (maybe_reader.has_error()) {
-      state.SkipWithError(maybe_reader.status().message().c_str());
-      return;
-    }
+    SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   }
 }
 
@@ -45,10 +42,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, CreateAdjListArrowChunkReader)
     auto maybe_reader =
         AdjListArrowChunkReader::Make(graph_info_, "person", "knows", "person",
                                       AdjListType::ordered_by_source);
-    if (maybe_reader.has_error()) {
-      state.SkipWithError(maybe_reader.status().message().c_str());
-      return;
-    }
+    SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   }
 }
 
@@ -58,10 +52,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, CreateAdjListOffsetArrowChunkReader)
     auto maybe_reader = AdjListOffsetArrowChunkReader::Make(
         graph_info_, "person", "knows", "person",
         AdjListType::ordered_by_source);
-    if (maybe_reader.has_error()) {
-      state.SkipWithError(maybe_reader.status().message().c_str());
-      return;
-    }
+    SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   }
 }
 
@@ -71,10 +62,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, CreateAdjListPropertyArrowChunkReader)
     auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
         graph_info_, "person", "knows", "person", "creationDate",
         AdjListType::ordered_by_source);
-    if (maybe_reader.has_error()) {
-      state.SkipWithError(maybe_reader.status().message().c_str());
-      return;
-    }
+    SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   }
 }
 
@@ -82,10 +70,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListArrowChunkReaderReadChunk)
 (::benchmark::State& state) {  // NOLINT
   auto maybe_reader = AdjListArrowChunkReader::Make(
       graph_info_, "person", "knows", "person", AdjListType::ordered_by_source);
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -101,10 +86,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListOffsetArrowChunkReaderReadChunk)
 (::benchmark::State& state) {  // NOLINT
   auto maybe_reader = AdjListOffsetArrowChunkReader::Make(
       graph_info_, "person", "knows", "person", AdjListType::ordered_by_source);
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -121,10 +103,7 @@ BENCHMARK_DEFINE_F(BenchmarkFixture, AdjListPropertyArrowChunkReaderReadChunk)
   auto maybe_reader = AdjListPropertyArrowChunkReader::Make(
       graph_info_, "person", "knows", "person", "creationDate",
       AdjListType::ordered_by_source);
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -143,10 +122,7 @@ BENCHMARK_DEFINE_F(
   auto gp = graph_info_->GetVertexInfo("person")->GetPropertyGroup("firstName");
   auto maybe_reader =
       VertexPropertyArrowChunkReader::Make(graph_info_, "person", gp);
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -164,10 +140,7 @@ BENCHMARK_DEFINE_F(
 (::benchmark::State& state) {  // NOLINT
   auto maybe_reader =
       VertexPropertyArrowChunkReader::Make(graph_info_, "person", "firstName");
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -186,10 +159,7 @@ BENCHMARK_DEFINE_F(
 (::benchmark::State& state) {  // NOLINT
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(
       graph_info_, "person", {"firstName", "lastName"}, SelectType::PROPERTIES);
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -208,10 +178,7 @@ BENCHMARK_DEFINE_F(
   auto gp = graph_info_->GetVertexInfo("person")->GetPropertyGroup("firstName");
   auto maybe_reader =
       VertexPropertyArrowChunkReader::Make(graph_info_, "person", gp);
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -229,10 +196,7 @@ BENCHMARK_DEFINE_F(
 (::benchmark::State& state) {  // NOLINT
   auto maybe_reader =
       VertexPropertyArrowChunkReader::Make(graph_info_, "person", "firstName");
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -251,10 +215,7 @@ BENCHMARK_DEFINE_F(
 (::benchmark::State& state) {  // NOLINT
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(
       graph_info_, "person", {"firstName", "lastName"}, SelectType::PROPERTIES);
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -274,10 +235,7 @@ BENCHMARK_DEFINE_F(
       second_graph_info_->GetVertexInfo("organisation")->GetPropertyGroup("id");
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(second_graph_info_,
                                                            "organisation", gp);
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -295,10 +253,7 @@ BENCHMARK_DEFINE_F(
 (::benchmark::State& state) {  // NOLINT
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(
       second_graph_info_, "organisation", "id");
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -318,10 +273,7 @@ BENCHMARK_DEFINE_F(
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(
       second_graph_info_, "organisation", {"id", "name"},
       SelectType::PROPERTIES);
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -341,10 +293,7 @@ BENCHMARK_DEFINE_F(
       second_graph_info_->GetVertexInfo("organisation")->GetPropertyGroup("id");
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(second_graph_info_,
                                                            "organisation", gp);
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -362,10 +311,7 @@ BENCHMARK_DEFINE_F(
 (::benchmark::State& state) {  // NOLINT
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(
       second_graph_info_, "organisation", "id");
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
@@ -385,10 +331,7 @@ BENCHMARK_DEFINE_F(
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(
       second_graph_info_, "organisation", {"id", "name"},
       SelectType::PROPERTIES);
-  if (maybe_reader.has_error()) {
-    state.SkipWithError(maybe_reader.status().message().c_str());
-    return;
-  }
+  SKIP_WITH_ERROR_STATUS(state, maybe_reader.status());
   auto reader = maybe_reader.value();
   for (auto _ : state) {
     auto st = reader->seek(0);
