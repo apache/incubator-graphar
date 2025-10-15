@@ -102,7 +102,9 @@ class Vertex {
     }
     empty_ = false;
     if (cardinalities_.find(name) != cardinalities_.end()) {
-      assert(cardinalities_[name] == cardinality);
+      if (cardinalities_[name] != cardinality) {
+        throw std::runtime_error("Cardinality mismatch for property: " + name);
+      }
       auto property_value_list =
           std::any_cast<std::vector<std::any>>(properties_[name]);
       property_value_list.push_back(val);
