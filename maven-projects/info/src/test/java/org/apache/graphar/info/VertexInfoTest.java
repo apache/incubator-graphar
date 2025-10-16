@@ -45,7 +45,8 @@ public class VertexInfoTest {
 
     @Test
     public void testVertexInfoBuilderDoubleDeclaration() throws URISyntaxException {
-        VertexInfo.VertexInfoBuilder doubleDefinitionBuilder = defaultBuilder.baseUri(new URI("world"));
+        VertexInfo.VertexInfoBuilder doubleDefinitionBuilder =
+                defaultBuilder.baseUri(new URI("world"));
         VertexInfo v = doubleDefinitionBuilder.build();
 
         Assert.assertEquals(new URI("world"), v.getBaseUri());
@@ -64,7 +65,8 @@ public class VertexInfoTest {
 
     @Test
     public void propertyGroupAppendTest() {
-        VertexInfo.VertexInfoBuilder propertyGroupAppendBuilder = defaultBuilder.addPropertyGroup(TestUtil.pg2);
+        VertexInfo.VertexInfoBuilder propertyGroupAppendBuilder =
+                defaultBuilder.addPropertyGroup(TestUtil.pg2);
         VertexInfo v = propertyGroupAppendBuilder.build();
 
         Assert.assertEquals(2, v.getPropertyGroups().size());
@@ -72,8 +74,9 @@ public class VertexInfoTest {
 
     @Test
     public void propertyGroupAddOnlyTest() {
-        VertexInfo.VertexInfoBuilder propertyGroupAddOnlyBuilder = defaultBuilder.propertyGroups(null).addPropertyGroup(TestUtil.pg2);
-        VertexInfo v =  propertyGroupAddOnlyBuilder.build();
+        VertexInfo.VertexInfoBuilder propertyGroupAddOnlyBuilder =
+                defaultBuilder.propertyGroups(null).addPropertyGroup(TestUtil.pg2);
+        VertexInfo v = propertyGroupAddOnlyBuilder.build();
 
         Assert.assertEquals(1, v.getPropertyGroups().size());
     }
@@ -82,11 +85,9 @@ public class VertexInfoTest {
     public void invalidChunkSizeTest() {
         VertexInfo.VertexInfoBuilder invalidChunkSizeBuilder = defaultBuilder.chunkSize(-1);
         IllegalArgumentException illegalArgumentException =
-                Assert.assertThrows(
-                        IllegalArgumentException.class, invalidChunkSizeBuilder::build);
-                Assert.assertEquals(
-                "Chunk size cannot be negative: -1",
-                illegalArgumentException.getMessage());
+                Assert.assertThrows(IllegalArgumentException.class, invalidChunkSizeBuilder::build);
+        Assert.assertEquals(
+                "Chunk size cannot be negative: -1", illegalArgumentException.getMessage());
     }
 
     @Test
