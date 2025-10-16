@@ -81,11 +81,12 @@ public class VertexInfoTest {
     @Test
     public void invalidChunkSizeTest() {
         VertexInfo.VertexInfoBuilder invalidChunkSizeBuilder = defaultBuilder.chunkSize(-1);
-        try {
-            invalidChunkSizeBuilder.build();
-            Assert.assertThrows(IllegalArgumentException.class, () -> invalidChunkSizeBuilder.chunkSize(-1));
-        } catch (IllegalArgumentException ignored) {
-        }
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class, invalidChunkSizeBuilder::build);
+                Assert.assertEquals(
+                "Chunk size cannot be negative: -1",
+                illegalArgumentException.getMessage());
     }
 
     @Test
