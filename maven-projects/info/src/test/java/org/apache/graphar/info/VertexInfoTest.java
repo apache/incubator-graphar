@@ -30,7 +30,7 @@ import org.junit.Test;
 
 public class VertexInfoTest {
 
-    private VertexInfo.VertexInfoBuilder b =
+    private VertexInfo.VertexInfoBuilder defaultBuilder =
             VertexInfo.builder()
                     .baseUri("test")
                     .type("test")
@@ -40,12 +40,13 @@ public class VertexInfoTest {
 
     @Test
     public void testVertexInfoBasicBuilder() {
-        VertexInfo v = b.build();
+        VertexInfo v = defaultBuilder.build();
     }
 
     @Test
     public void testVertexInfoBuilderDoubleDeclaration() throws URISyntaxException {
-        VertexInfo v = b.baseUri(new URI("world")).build();
+        VertexInfo.VertexInfoBuilder doubleDefinitionBuilder = defaultBuilder.baseUri(new URI("world"));
+        VertexInfo v = doubleDefinitionBuilder.build();
 
         Assert.assertEquals(new URI("world"), v.getBaseUri());
     }
@@ -63,24 +64,26 @@ public class VertexInfoTest {
 
     @Test
     public void propertyGroupAppendTest() {
-        VertexInfo v = b.addPropertyGroup(TestUtil.pg2).build();
+        VertexInfo.VertexInfoBuilder propertyGroupAppendBuilder = defaultBuilder.addPropertyGroup(TestUtil.pg2);
+        VertexInfo v = propertyGroupAppendBuilder.build();
 
         Assert.assertEquals(2, v.getPropertyGroups().size());
     }
 
     @Test
     public void propertyGroupAddOnlyTest() {
-        VertexInfo v = b.propertyGroups(null).addPropertyGroup(TestUtil.pg2).build();
+        VertexInfo.VertexInfoBuilder propertyGroupAddOnlyBuilder = defaultBuilder.propertyGroups(null).addPropertyGroup(TestUtil.pg2);
+        VertexInfo v =  propertyGroupAddOnlyBuilder.build();
 
         Assert.assertEquals(1, v.getPropertyGroups().size());
     }
 
     @Test
     public void invalidChunkSizeTest() {
+        VertexInfo.VertexInfoBuilder invalidChunkSizeBuilder = defaultBuilder.chunkSize(-1);
         try {
-            b.chunkSize(-1);
-            b.build();
-            Assert.assertThrows(IllegalArgumentException.class, () -> b.chunkSize(-1));
+            invalidChunkSizeBuilder.build();
+            Assert.assertThrows(IllegalArgumentException.class, () -> invalidChunkSizeBuilder.chunkSize(-1));
         } catch (IllegalArgumentException ignored) {
         }
     }
