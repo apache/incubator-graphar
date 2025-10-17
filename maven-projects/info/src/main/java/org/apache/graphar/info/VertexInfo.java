@@ -50,9 +50,11 @@ public class VertexInfo {
         private PropertyGroups propertyGroups;
         private URI baseUri;
         private VersionInfo version;
+        private List<String> labels;
         private List<PropertyGroup> propertyGroupsAsListTemp;
 
-        private VertexInfoBuilder() {}
+        private VertexInfoBuilder() {
+        }
 
         public VertexInfoBuilder type(String type) {
             this.type = type;
@@ -88,6 +90,19 @@ public class VertexInfo {
             return this;
         }
 
+        public VertexInfoBuilder labels(List<String> labels) {
+            this.labels = labels;
+            return this;
+        }
+
+        public VertexInfoBuilder addLabel(String label) {
+            if (labels == null) {
+                labels = new ArrayList<>();
+            }
+            labels.add(label);
+            return this;
+        }
+
         public VertexInfoBuilder addPropertyGroup(PropertyGroup propertyGroup) {
             if (propertyGroupsAsListTemp == null) {
                 propertyGroupsAsListTemp = new ArrayList<>();
@@ -110,16 +125,23 @@ public class VertexInfo {
         }
 
         public VertexInfo build() {
+            if (type == null || type.isEmpty()) {
+                throw new IllegalArgumentException("Type cannot be null or empty");
+            }
+
+            if (labels == null) {
+                labels = Collections.emptyList();
+            }
+
             if (propertyGroups == null && propertyGroupsAsListTemp != null) {
                 propertyGroups = new PropertyGroups(propertyGroupsAsListTemp);
             } else if (propertyGroupsAsListTemp != null) {
-                propertyGroups =
-                        propertyGroupsAsListTemp.stream()
-                                .map(propertyGroups::addPropertyGroupAsNew)
-                                .filter(Optional::isPresent)
-                                .map(Optional::get)
-                                .reduce((first, second) -> second)
-                                .orElse(new PropertyGroups(new ArrayList<>()));
+                propertyGroups = propertyGroupsAsListTemp.stream()
+                        .map(propertyGroups::addPropertyGroupAsNew)
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .reduce((first, second) -> second)
+                        .orElse(new PropertyGroups(new ArrayList<>()));
             }
 
             if (chunkSize < 0) {
@@ -128,6 +150,7 @@ public class VertexInfo {
             if (baseUri == null) {
                 throw new IllegalArgumentException("Base URI cannot be null");
             }
+
             return new VertexInfo(this);
         }
     }
@@ -135,6 +158,7 @@ public class VertexInfo {
     private VertexInfo(VertexInfoBuilder builder) {
         this.type = builder.type;
         this.chunkSize = builder.chunkSize;
+        this.labels = builder.labels;
         this.propertyGroups = builder.propertyGroups;
         this.baseUri = builder.baseUri;
         this.version = builder.version;
@@ -201,14 +225,13 @@ public class VertexInfo {
                 .addPropertyGroupAsNew(propertyGroup)
                 .map(PropertyGroups::getPropertyGroupList)
                 .map(
-                        newPropertyGroups ->
-                                new VertexInfo(
-                                        type,
-                                        chunkSize,
-                                        newPropertyGroups,
-                                        labels,
-                                        baseUri,
-                                        version));
+                        newPropertyGroups -> new VertexInfo(
+                                type,
+                                chunkSize,
+                                newPropertyGroups,
+                                labels,
+                                baseUri,
+                                version));
     }
 
     public int getPropertyGroupNum() {
