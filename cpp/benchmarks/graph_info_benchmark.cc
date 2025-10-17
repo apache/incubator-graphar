@@ -28,10 +28,7 @@ static void CreateGraphInfo(::benchmark::State& state,  // NOLINT
                             const std::string& path) {
   for (auto _ : state) {
     auto maybe_graph_info = GraphInfo::Load(path);
-    if (maybe_graph_info.has_error()) {
-      state.SkipWithError(maybe_graph_info.status().message().c_str());
-      return;
-    }
+    SKIP_WITH_ERROR_STATUS(state, maybe_graph_info.status());
   }
 }
 

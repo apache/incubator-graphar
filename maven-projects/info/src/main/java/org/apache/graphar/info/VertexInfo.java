@@ -21,6 +21,7 @@ package org.apache.graphar.info;
 
 import java.io.Writer;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -38,6 +39,106 @@ public class VertexInfo {
     private final List<String> labels;
     private final URI baseUri;
     private final VersionInfo version;
+
+    public static VertexInfoBuilder builder() {
+        return new VertexInfoBuilder();
+    }
+
+    public static class VertexInfoBuilder {
+        private String type;
+        private long chunkSize;
+        private PropertyGroups propertyGroups;
+        private URI baseUri;
+        private VersionInfo version;
+        private List<PropertyGroup> propertyGroupsAsListTemp;
+
+        private VertexInfoBuilder() {}
+
+        public VertexInfoBuilder type(String type) {
+            this.type = type;
+            return this;
+        }
+
+        public VertexInfoBuilder chunkSize(long chunkSize) {
+            this.chunkSize = chunkSize;
+            return this;
+        }
+
+        public VertexInfoBuilder baseUri(URI baseUri) {
+            this.baseUri = baseUri;
+
+            return this;
+        }
+
+        public VertexInfoBuilder baseUri(String baseUri) {
+            this.baseUri = URI.create(baseUri);
+
+            return this;
+        }
+
+        public VertexInfoBuilder version(VersionInfo version) {
+            this.version = version;
+
+            return this;
+        }
+
+        public VertexInfoBuilder version(String version) {
+            this.version = VersionParser.getVersion(version);
+
+            return this;
+        }
+
+        public VertexInfoBuilder addPropertyGroup(PropertyGroup propertyGroup) {
+            if (propertyGroupsAsListTemp == null) {
+                propertyGroupsAsListTemp = new ArrayList<>();
+            }
+            propertyGroupsAsListTemp.add(propertyGroup);
+            return this;
+        }
+
+        public VertexInfoBuilder addPropertyGroups(List<PropertyGroup> propertyGroups) {
+            if (propertyGroupsAsListTemp == null) {
+                propertyGroupsAsListTemp = new ArrayList<>();
+            }
+            propertyGroupsAsListTemp.addAll(propertyGroups);
+            return this;
+        }
+
+        public VertexInfoBuilder propertyGroups(PropertyGroups propertyGroups) {
+            this.propertyGroups = propertyGroups;
+            return this;
+        }
+
+        public VertexInfo build() {
+            if (propertyGroups == null && propertyGroupsAsListTemp != null) {
+                propertyGroups = new PropertyGroups(propertyGroupsAsListTemp);
+            } else if (propertyGroupsAsListTemp != null) {
+                propertyGroups =
+                        propertyGroupsAsListTemp.stream()
+                                .map(propertyGroups::addPropertyGroupAsNew)
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .reduce((first, second) -> second)
+                                .orElse(new PropertyGroups(new ArrayList<>()));
+            }
+
+            if (chunkSize < 0) {
+                throw new IllegalArgumentException("Chunk size cannot be negative: " + chunkSize);
+            }
+            if (baseUri == null) {
+                throw new IllegalArgumentException("Base URI cannot be null");
+            }
+            return new VertexInfo(this);
+        }
+    }
+
+    private VertexInfo(VertexInfoBuilder builder) {
+        this.type = builder.type;
+        this.chunkSize = builder.chunkSize;
+        this.propertyGroups = builder.propertyGroups;
+        this.baseUri = builder.baseUri;
+        this.version = builder.version;
+    }
 
     public VertexInfo(
             String type,
