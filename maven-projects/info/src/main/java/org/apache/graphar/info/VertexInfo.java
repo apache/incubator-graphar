@@ -53,8 +53,7 @@ public class VertexInfo {
         private List<String> labels;
         private List<PropertyGroup> propertyGroupsAsListTemp;
 
-        private VertexInfoBuilder() {
-        }
+        private VertexInfoBuilder() {}
 
         public VertexInfoBuilder type(String type) {
             this.type = type;
@@ -136,12 +135,13 @@ public class VertexInfo {
             if (propertyGroups == null && propertyGroupsAsListTemp != null) {
                 propertyGroups = new PropertyGroups(propertyGroupsAsListTemp);
             } else if (propertyGroupsAsListTemp != null) {
-                propertyGroups = propertyGroupsAsListTemp.stream()
-                        .map(propertyGroups::addPropertyGroupAsNew)
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .reduce((first, second) -> second)
-                        .orElse(new PropertyGroups(new ArrayList<>()));
+                propertyGroups =
+                        propertyGroupsAsListTemp.stream()
+                                .map(propertyGroups::addPropertyGroupAsNew)
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .reduce((first, second) -> second)
+                                .orElse(new PropertyGroups(new ArrayList<>()));
             }
 
             if (chunkSize < 0) {
@@ -225,13 +225,14 @@ public class VertexInfo {
                 .addPropertyGroupAsNew(propertyGroup)
                 .map(PropertyGroups::getPropertyGroupList)
                 .map(
-                        newPropertyGroups -> new VertexInfo(
-                                type,
-                                chunkSize,
-                                newPropertyGroups,
-                                labels,
-                                baseUri,
-                                version));
+                        newPropertyGroups ->
+                                new VertexInfo(
+                                        type,
+                                        chunkSize,
+                                        newPropertyGroups,
+                                        labels,
+                                        baseUri,
+                                        version));
     }
 
     public int getPropertyGroupNum() {
