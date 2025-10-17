@@ -189,19 +189,14 @@ jobs:
         path: cpp/build-static/libgraphar.a
 
   macos:
-    name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} C++
-    runs-on: macos-${{ matrix.macos-version }}
+    name: macos latest C++
+    runs-on: macos-latest
     if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - architecture: ARM64
-            macos-version: "14"
-          - architecture: AMD64
-            macos-version: "15"
+
     steps:
     - uses: actions/checkout@v3
       with:
