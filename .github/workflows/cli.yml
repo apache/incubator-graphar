@@ -82,18 +82,13 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
 
   macos:
-    name: ${{ matrix.architecture }} macOS ${{ matrix.macos-version }} CLI
-    runs-on: macos-${{ matrix.macos-version }}
+    name: macos latest CLI
+    runs-on: macos-latest
     # TODO: Remove this when the macos issue is fixed
     if: false   
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - architecture: AMD64
-            macos-version: "12"
-          - architecture: ARM64
-            macos-version: "14"
+
     steps:
     - uses: actions/checkout@v3
       with:
