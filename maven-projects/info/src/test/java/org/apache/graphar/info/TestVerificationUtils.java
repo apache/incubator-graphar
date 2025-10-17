@@ -234,6 +234,8 @@ public class TestVerificationUtils {
             return false;
         }
 
+        Assert.assertEquals("VertexInfo labels mismatch", expected.getLabels(), actual.getLabels());
+
         Assert.assertEquals("VertexInfo type mismatch", expected.getType(), actual.getType());
         Assert.assertEquals(
                 "VertexInfo chunk size mismatch", expected.getChunkSize(), actual.getChunkSize());
