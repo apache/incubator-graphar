@@ -170,6 +170,24 @@ jobs:
         flags: cpp
         token: ${{ secrets.CODECOV_TOKEN }}
 
+    - name: test release build type
+      working-directory: "cpp"
+      run: |
+        mkdir build-release
+        pushd build-release
+        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        make -j$(nproc)
+        export ASAN_OPTIONS=detect_leaks=0
+        ctest --output-on-failure
+        popd
+
+    - name: Benchmark-release
+      working-directory: "cpp/build-release"
+      run: |
+        ./graph_info_benchmark
+        ./arrow_chunk_reader_benchmark
+        ./label_filter_benchmark
+
     - name: Use Static Arrow
       working-directory: "cpp"
       run: |
@@ -221,6 +239,24 @@ jobs:
       run: |
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
+
+    - name: test release build type
+      working-directory: "cpp"
+      run: |
+        mkdir build-release
+        pushd build-release
+        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        make -j$(nproc)
+        export ASAN_OPTIONS=detect_leaks=0
+        ctest --output-on-failure
+        popd
+
+    - name: Benchmark-release
+      working-directory: "cpp/build-release"
+      run: |
+        ./graph_info_benchmark
+        ./arrow_chunk_reader_benchmark
+        ./label_filter_benchmark
 
     - name: Use Static Arrow
       working-directory: "cpp"
