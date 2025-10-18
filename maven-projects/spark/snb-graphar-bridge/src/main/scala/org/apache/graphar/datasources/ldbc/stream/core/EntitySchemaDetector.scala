@@ -24,22 +24,22 @@ import org.apache.spark.sql.types._
 import org.slf4j.{Logger, LoggerFactory}
 
 /**
- * 实体模式检测器
+ * Entity Schema Detector
  *
- * 负责根据LDBC输出的header信息识别实体类型，并建立字段映射关系。
- * 支持基于字段特征的智能识别和精确的模式匹配。
+ * Responsible for identifying entity types based on LDBC output header information and establishing field mapping relationships.
+ * Supports intelligent recognition based on field characteristics and precise schema matching.
  */
 object EntitySchemaDetector {
 
   private val logger: Logger = LoggerFactory.getLogger(this.getClass)
 
   /**
-   * 实体模式定义
+   * Entity schema definition
    */
   case class EntitySchema(
     entityType: LdbcEntityType,
-    fieldMapping: Map[String, Int], // 字段名 -> 索引位置
-    dataTypes: Map[String, DataType], // 字段名 -> 数据类型
+    fieldMapping: Map[String, Int], // Field name -> index position
+    dataTypes: Map[String, DataType], // Field name -> data type
     isValidSchema: Boolean = true
   ) {
     def getFieldIndex(fieldName: String): Option[Int] = fieldMapping.get(fieldName)
@@ -48,7 +48,7 @@ object EntitySchemaDetector {
   }
 
   /**
-   * 字段特征模式定义
+   * Field pattern definition
    */
   private case class FieldPattern(
     requiredFields: Set[String],
@@ -58,10 +58,10 @@ object EntitySchemaDetector {
   )
 
   /**
-   * 预定义的实体识别模式
+   * Predefined entity recognition patterns
    */
   private val entityPatterns: Map[LdbcEntityType, FieldPattern] = Map(
-    // 顶点实体模式
+    // Vertex entity patterns
     PersonVertex -> FieldPattern(
       requiredFields = Set("id", "firstName", "lastName", "gender", "birthday", "creationDate"),
       optionalFields = Set("locationIP", "browserUsed", "place", "languages", "emails"),
@@ -90,7 +90,7 @@ object EntitySchemaDetector {
       uniqueIdentifiers = Set("CommentId", "comment.id", "Message.id")
     ),
 
-    // 边实体模式
+    // Edge entity patterns
     KnowsEdge -> FieldPattern(
       requiredFields = Set("Person1Id", "Person2Id", "creationDate"),
       optionalFields = Set("weight"),
@@ -136,47 +136,47 @@ object EntitySchemaDetector {
   )
 
   /**
-   * 检测实体模式
+   * Detect entity schema
    */
   def detectSchema(header: Array[String]): EntitySchema = {
-    logger.debug(s"检测实体模式，header: ${header.mkString(", ")}")
+    logger.debug(s"Detecting entity schema, header: ${header.mkString(", ")}")
 
-    // 创建字段映射
+    // Create field mapping
     val fieldMapping = header.zipWithIndex.toMap
 
-    // 尝试匹配各种实体模式
+    // Try to match various entity patterns
     val detectedEntityType = detectEntityType(header, fieldMapping)
 
     detectedEntityType match {
       case Some(entityType) =>
         val dataTypes = buildDataTypeMapping(header, entityType)
         val schema = EntitySchema(entityType, fieldMapping, dataTypes, isValidSchema = true)
-        logger.info(s"成功检测到实体类型: ${entityType.name}")
+        logger.info(s"Successfully detected entity type: ${entityType.name}")
         schema
 
       case None =>
-        logger.warn(s"无法识别实体类型，header: ${header.mkString(", ")}")
-        // 返回一个默认的schema，尝试作为通用实体处理
+        logger.warn(s"Unable to recognize entity type, header: ${header.mkString(", ")}")
+        // Return a default schema, attempt to handle as generic entity
         val dataTypes = buildDefaultDataTypeMapping(header)
         EntitySchema(PersonVertex, fieldMapping, dataTypes, isValidSchema = false)
     }
   }
 
   /**
-   * 检测实体类型
+   * Detect entity type
    */
   private def detectEntityType(header: Array[String], fieldMapping: Map[String, Int]): Option[LdbcEntityType] = {
     val headerFields = header.toSet
 
-    // 按优先级尝试匹配各种模式
+    // Try to match various patterns by priority
     val matchScores = entityPatterns.map { case (entityType, pattern) =>
       val score = calculateMatchScore(headerFields, fieldMapping.size, pattern)
       (entityType, score)
     }
 
-    // 找到最佳匹配
+    // Find the best match
     val bestMatch = matchScores.maxBy(_._2)
-    if (bestMatch._2 > 0.6) { // 匹配度阈值
+    if (bestMatch._2 > 0.6) { // Match score threshold
       Some(bestMatch._1)
     } else {
       None
@@ -184,12 +184,12 @@ object EntitySchemaDetector {
   }
 
   /**
-   * 计算匹配分数
+   * Calculate match score
    */
   private def calculateMatchScore(headerFields: Set[String], fieldCount: Int, pattern: FieldPattern): Double = {
     var score = 0.0
 
-    // 1. 必需字段匹配度
+    // 1. Required field match score
     val requiredMatches = pattern.requiredFields.count(field =>
       headerFields.exists(_.toLowerCase.contains(field.toLowerCase)))
     val requiredScore = if (pattern.requiredFields.nonEmpty) {
@@ -198,7 +198,7 @@ object EntitySchemaDetector {
 
     score += requiredScore * 0.6
 
-    // 2. 字段数量匹配度
+    // 2. Field count match score
     val fieldCountScore = pattern.fieldCount match {
       case Some(expectedCount) =>
         if (fieldCount == expectedCount) 1.0
@@ -209,7 +209,7 @@ object EntitySchemaDetector {
 
     score += fieldCountScore * 0.2
 
-    // 3. 唯一标识符匹配度
+    // 3. Unique identifier match score
     val identifierMatches = pattern.uniqueIdentifiers.count(identifier =>
       headerFields.exists(_.toLowerCase.contains(identifier.toLowerCase)))
     val identifierScore = if (pattern.uniqueIdentifiers.nonEmpty) {
@@ -218,16 +218,16 @@ object EntitySchemaDetector {
 
     score += identifierScore * 0.2
 
-    logger.debug(s"匹配分数计算: required=$requiredScore, fieldCount=$fieldCountScore, identifier=$identifierScore, total=$score")
+    logger.debug(s"Match score calculation: required=$requiredScore, fieldCount=$fieldCountScore, identifier=$identifierScore, total=$score")
 
     score
   }
 
   /**
-   * 基于LDBC raw.scala的精确字段类型映射表
+   * Precise field type mapping table based on LDBC raw.scala
    */
   private val LDBC_FIELD_TYPE_MAPPING = Map(
-    // Person fields - 基于 raw.Person
+    // Person fields - based on raw.Person
     "id" -> LongType,
     "firstName" -> StringType,
     "lastName" -> StringType,
@@ -239,19 +239,19 @@ object EntitySchemaDetector {
     "language" -> StringType,
     "email" -> StringType,
 
-    // Forum fields - 基于 raw.Forum，添加驼峰命名支持
-    "title" -> StringType,  // 明确指定为StringType
+    // Forum fields - based on raw.Forum, with camelCase support
+    "title" -> StringType,  // Explicitly specified as StringType
     "creationDate" -> TimestampType,
-    "creationdate" -> TimestampType,  // 小写版本
+    "creationdate" -> TimestampType,  // Lowercase version
     "deletionDate" -> TimestampType,
-    "deletiondate" -> TimestampType,  // 小写版本
+    "deletiondate" -> TimestampType,  // Lowercase version
     "explicitlyDeleted" -> BooleanType,
     "ModeratorPersonId" -> LongType,
-    "moderatorPersonId" -> LongType,  // 驼峰版本
-    "moderatorpersonid" -> LongType,  // 小写版本
+    "moderatorPersonId" -> LongType,  // camelCase version
+    "moderatorpersonid" -> LongType,  // Lowercase version
 
-    // Post fields - 基于 raw.Post
-    "content" -> StringType,  // 明确指定为StringType
+    // Post fields - based on raw.Post
+    "content" -> StringType,  // Explicitly specified as StringType
     "imageFile" -> StringType,
     "length" -> IntegerType,
     "CreatorPersonId" -> LongType,
@@ -260,13 +260,13 @@ object EntitySchemaDetector {
     "containerForumId" -> LongType,
     "LocationCountryId" -> LongType,
 
-    // Comment fields - 基于 raw.Comment
+    // Comment fields - based on raw.Comment
     "ParentPostId" -> LongType,
     "parentPostId" -> LongType,
     "ParentCommentId" -> LongType,
     "parentCommentId" -> LongType,
 
-    // 通用ID字段
+    // Generic ID fields
     "PersonId" -> LongType,
     "personId" -> LongType,
     "ForumId" -> LongType,
@@ -280,66 +280,66 @@ object EntitySchemaDetector {
   )
 
   /**
-   * 基于字段名推断数据类型
+   * Infer data type based on field name
    */
   private def inferDataType(fieldName: String): Option[DataType] = {
     val normalizedFieldName = fieldName.toLowerCase.replaceAll("[^a-z0-9]", "")
-    logger.info(s"字段类型推断: 原始字段='$fieldName', 规范化字段='$normalizedFieldName'")
+    logger.info(s"Field type inference: original field='$fieldName', normalized field='$normalizedFieldName'")
 
-    // 首先查找精确映射
+    // First look for exact mapping
     LDBC_FIELD_TYPE_MAPPING.get(normalizedFieldName) match {
       case Some(dataType) =>
-        logger.info(s"字段 '$fieldName' 使用精确类型映射: $dataType")
+        logger.info(s"Field '$fieldName' using exact type mapping: $dataType")
         Some(dataType)
       case None => {
-        logger.info(s"字段 '$fieldName' 未找到精确映射，使用后备推断逻辑")
-        // 后备推断逻辑
+        logger.info(s"Field '$fieldName' exact mapping not found, using fallback inference logic")
+        // Fallback inference logic
         val inferredType = if (normalizedFieldName.endsWith("id") || normalizedFieldName.contains("id")) {
-          logger.info(s"字段 '$fieldName' 包含'id'，推断为LongType")
+          logger.info(s"Field '$fieldName' contains 'id', inferred as LongType")
           Some(LongType)
         } else if (normalizedFieldName.contains("date") && !normalizedFieldName.contains("birthday")) {
-          logger.info(s"字段 '$fieldName' 包含'date'但非'birthday'，推断为TimestampType")
+          logger.info(s"Field '$fieldName' contains 'date' but not 'birthday', inferred as TimestampType")
           Some(TimestampType)
         } else if (normalizedFieldName.contains("birthday") || normalizedFieldName.contains("birth")) {
-          logger.info(s"字段 '$fieldName' 包含'birthday'，推断为DateType")
+          logger.info(s"Field '$fieldName' contains 'birthday', inferred as DateType")
           Some(DateType)
         } else if (normalizedFieldName.contains("weight") || normalizedFieldName.contains("score")) {
-          logger.info(s"字段 '$fieldName' 包含'weight'或'score'，推断为FloatType")
+          logger.info(s"Field '$fieldName' contains 'weight' or 'score', inferred as FloatType")
           Some(FloatType)
         } else if (normalizedFieldName.contains("count") || normalizedFieldName.contains("size") || normalizedFieldName.contains("length")) {
-          logger.info(s"字段 '$fieldName' 包含计数相关词汇，推断为IntegerType")
+          logger.info(s"Field '$fieldName' contains count-related words, inferred as IntegerType")
           Some(IntegerType)
         } else if (normalizedFieldName == "title" || normalizedFieldName.contains("name") ||
                    normalizedFieldName.contains("content") || normalizedFieldName.contains("file") ||
                    normalizedFieldName.contains("ip") || normalizedFieldName.contains("browser") ||
                    normalizedFieldName.contains("language") || normalizedFieldName.contains("gender")) {
-          // 明确指定这些字段为String类型，避免被误判为其他类型
-          logger.info(s"字段 '$fieldName' 匹配字符串模式，推断为StringType")
+          // Explicitly specify these fields as String type to avoid misclassification
+          logger.info(s"Field '$fieldName' matches string pattern, inferred as StringType")
           Some(StringType)
         } else {
-          logger.info(s"字段 '$fieldName' 无法匹配任何模式，默认推断为StringType")
+          logger.info(s"Field '$fieldName' unable to match any pattern, default inferred as StringType")
           Some(StringType)
         }
 
-        logger.info(s"字段 '$fieldName' 最终推断类型: $inferredType")
+        logger.info(s"Field '$fieldName' final inferred type: $inferredType")
         inferredType
       }
     }
   }
 
   /**
-   * 构建数据类型映射 - 基于LDBC统一映射表
+   * Build data type mapping - based on LDBC unified mapping table
    */
   private def buildDataTypeMapping(header: Array[String], entityType: LdbcEntityType): Map[String, DataType] = {
     header.map { fieldName =>
       val dataType = detectFieldType(fieldName, "").getOrElse(StringType)
-      logger.info(s"构建类型映射: $fieldName -> $dataType")
+      logger.info(s"Building type mapping: $fieldName -> $dataType")
       fieldName -> dataType
     }.toMap
   }
 
   /**
-   * 构建默认数据类型映射 - 用于未识别实体类型的情况
+   * Build default data type mapping - for unrecognized entity types
    */
   private def buildDefaultDataTypeMapping(header: Array[String]): Map[String, DataType] = {
     header.map { fieldName =>
@@ -349,31 +349,31 @@ object EntitySchemaDetector {
   }
 
   /**
-   * 验证记录是否符合模式
+   * Validate if record conforms to schema
    */
   def validateRecord(record: Array[String], schema: EntitySchema): Boolean = {
     if (!schema.isValidSchema) {
-      return true // 对于无效模式，不进行验证
+      return true // For invalid schema, no validation
     }
 
-    // 检查字段数量
+    // Check field count
     if (record.length != schema.fieldMapping.size) {
-      logger.warn(s"记录字段数量不匹配: expected=${schema.fieldMapping.size}, actual=${record.length}")
+      logger.warn(s"Record field count mismatch: expected=${schema.fieldMapping.size}, actual=${record.length}")
       return false
     }
 
-    // 可以添加更多的数据类型验证
+    // Can add more data type validation
     true
   }
 
   /**
-   * 获取实体的主键字段
+   * Get primary key field of entity
    */
   def getPrimaryKeyField(entityType: LdbcEntityType): String = {
     entityType match {
       case _: VertexEntityType => "id"
       case edge: EdgeEntityType =>
-        // 对于边，通常是源顶点和目标顶点的组合
+        // For edges, typically the combination of source and destination vertices
         edge match {
           case KnowsEdge => "Person1Id"
           case HasCreatorEdge => "MessageId"
@@ -389,21 +389,21 @@ object EntitySchemaDetector {
   def detectFieldType(fieldName: String, sampleValue: String): Option[DataType] = {
     val normalizedFieldName = fieldName.toLowerCase
 
-    // 首先检查精确映射
+    // First check exact mapping
     LDBC_FIELD_TYPE_MAPPING.get(fieldName) match {
       case Some(dataType) => Some(dataType)
       case None =>
-        // 检查小写映射
+        // Check lowercase mapping
         LDBC_FIELD_TYPE_MAPPING.get(normalizedFieldName) match {
           case Some(dataType) => Some(dataType)
           case None =>
-            // 改进的后备推断逻辑
+            // Improved fallback inference logic
             if (fieldName == "title" || fieldName == "content") {
-              // 明确指定title和content为String类型
+              // Explicitly specify title and content as String type
               Some(StringType)
             } else if (normalizedFieldName.endsWith("id") || normalizedFieldName.contains("id")) {
               if (normalizedFieldName.contains("tag")) {
-                Some(IntegerType)  // TagId通常是Integer
+                Some(IntegerType)  // TagId is typically Integer
               } else {
                 Some(LongType)
               }
@@ -412,14 +412,14 @@ object EntitySchemaDetector {
             } else if (normalizedFieldName.contains("deleted")) {
               Some(BooleanType)
             } else {
-              // 默认为String类型
+              // Default to String type
               Some(StringType)
             }
         }
     }
   }
   /**
-   * 获取实体的外键字段
+   * Get foreign key fields of entity
    */
   def getForeignKeyFields(entityType: LdbcEntityType): List[String] = {
     entityType match {

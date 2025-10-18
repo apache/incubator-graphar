@@ -26,26 +26,26 @@ import org.apache.spark.sql.SparkSession
 import scala.util.Try
 
 /**
- * LDBC桥接器统一接口
+ * Unified interface for LDBC bridge
  *
- * 遵循GraphAr生态系统的设计模式，提供统一的API接口：
- * 1. 标准化的write方法签名（与GraphWriter一致）
- * 2. 统一的配置参数验证
- * 3. 一致的错误处理和返回类型
- * 4. 专注于流式处理模式
+ * Follows GraphAr ecosystem design patterns, providing a unified API interface:
+ * 1. Standardized write method signature (consistent with GraphWriter)
+ * 2. Unified configuration parameter validation
+ * 3. Consistent error handling and return types
+ * 4. Focus on streaming processing mode
  */
 trait LdbcBridgeInterface {
 
   /**
-   * 统一的写入方法（遵循GraphAr GraphWriter模式）
+   * Unified write method (following GraphAr GraphWriter pattern)
    *
-   * @param path 输出路径
-   * @param spark SparkSession实例
-   * @param name 图名称
-   * @param vertex_chunk_size 顶点分块大小
-   * @param edge_chunk_size 边分块大小
-   * @param file_type 文件类型 (csv|parquet|orc)
-   * @return 转换结果
+   * @param path Output path
+   * @param spark SparkSession instance
+   * @param name Graph name
+   * @param vertex_chunk_size Vertex chunk size
+   * @param edge_chunk_size Edge chunk size
+   * @param file_type File type (csv|parquet|orc)
+   * @return Conversion result
    */
   def write(
     path: String,
@@ -57,36 +57,51 @@ trait LdbcBridgeInterface {
   ): Try[ConversionResult]
 
   /**
-   * 验证配置参数（统一的验证逻辑）
+   * Validate configuration parameters (unified validation logic)
+   *
+   * @param mode Processing mode
+   * @param outputPath Output path for GraphAr files
+   * @param vertexChunkSize Chunk size for vertex data
+   * @param edgeChunkSize Chunk size for edge data
+   * @param fileType File format (csv, parquet, or orc)
+   * @return ValidationResult indicating whether configuration is valid
    */
   def validateConfiguration(
     mode: String,
-    outputPath: String,
-    vertexChunkSize: Long,
-    edgeChunkSize: Long,
-    fileType: String
+    output_path: String,
+    vertex_chunk_size: Long,
+    edge_chunk_size: Long,
+    file_type: String
   ): ValidationResult
 
   /**
-   * 获取支持的处理模式
+   * Get supported processing modes
+   *
+   * @return List of supported processing mode names
    */
   def getSupportedModes(): List[String]
 
   /**
-   * 获取桥接器类型标识
+   * Get bridge type identifier
+   *
+   * @return String identifier for this bridge type (e.g., "streaming")
    */
   def getBridgeType(): String
 }
 
 /**
- * 流式桥接器接口扩展
+ * Streaming bridge interface extension
  *
- * 为流式处理提供额外的配置和控制方法
+ * Provides additional configuration and control methods for streaming processing
  */
 trait StreamingBridgeInterface extends LdbcBridgeInterface {
 
   /**
-   * 流式处理专用写入方法
+   * Streaming processing dedicated write method
+   *
+   * @param config Streaming configuration parameters
+   * @param spark Implicit SparkSession for distributed processing
+   * @return Try wrapping StreamingConversionResult with conversion statistics
    */
   def writeStreaming(
     config: StreamingConfiguration
@@ -94,54 +109,63 @@ trait StreamingBridgeInterface extends LdbcBridgeInterface {
 }
 
 /**
- * 流式配置
+ * Streaming configuration
  */
 case class StreamingConfiguration(
-  ldbcConfigPath: String,
-  outputPath: String,
-  scaleFactor: String = "0.003",
-  graphName: String = "ldbc_social_network_streaming",
-  vertexChunkSize: Long = 1024L,
-  edgeChunkSize: Long = 1024L,
-  fileType: String = "parquet"
+  ldbc_config_path: String,
+  output_path: String,
+  scale_factor: String = "0.003",
+  graph_name: String = "ldbc_social_network_streaming",
+  vertex_chunk_size: Long = 1024L,
+  edge_chunk_size: Long = 1024L,
+  file_type: String = "parquet"
 ) extends BridgeConfiguration
 
 
 /**
- * 统一配置基类
+ * Unified configuration base class
  */
 trait BridgeConfiguration {
-  def outputPath: String
-  def graphName: String
-  def vertexChunkSize: Long
-  def edgeChunkSize: Long
-  def fileType: String
+  /** Output path for GraphAr files */
+  def output_path: String
+
+  /** Graph name used in metadata */
+  def graph_name: String
+
+  /** Vertex chunk size for data partitioning */
+  def vertex_chunk_size: Long
+
+  /** Edge chunk size for data partitioning */
+  def edge_chunk_size: Long
+
+  /** File format (csv, parquet, or orc) */
+  def file_type: String
 
   /**
-   * 验证配置有效性
+   * Validate configuration validity
    */
   def validate(): ValidationResult = {
     val errors = scala.collection.mutable.ListBuffer[String]()
 
-    if (outputPath.trim.isEmpty) {
+    if (output_path.trim.isEmpty) {
       errors += "Output path cannot be empty"
     }
 
-    if (graphName.trim.isEmpty) {
+    if (graph_name.trim.isEmpty) {
       errors += "Graph name cannot be empty"
     }
 
-    if (vertexChunkSize <= 0) {
-      errors += s"Vertex chunk size must be positive, got: $vertexChunkSize"
+    if (vertex_chunk_size <= 0) {
+      errors += s"Vertex chunk size must be positive, got: $vertex_chunk_size"
     }
 
-    if (edgeChunkSize <= 0) {
-      errors += s"Edge chunk size must be positive, got: $edgeChunkSize"
+    if (edge_chunk_size <= 0) {
+      errors += s"Edge chunk size must be positive, got: $edge_chunk_size"
     }
 
     val supportedFileTypes = Set("csv", "parquet", "orc")
-    if (!supportedFileTypes.contains(fileType.toLowerCase)) {
-      errors += s"Unsupported file type: $fileType. Supported types: ${supportedFileTypes.mkString(", ")}"
+    if (!supportedFileTypes.contains(file_type.toLowerCase)) {
+      errors += s"Unsupported file type: $file_type. Supported types: ${supportedFileTypes.mkString(", ")}"
     }
 
     if (errors.isEmpty) {
@@ -153,7 +177,7 @@ trait BridgeConfiguration {
 }
 
 /**
- * 使配置实现统一验证
+ * Enable configuration to implement unified validation
  */
 object BridgeConfiguration {
   implicit class ConfigurationOps(config: BridgeConfiguration) {
@@ -162,12 +186,16 @@ object BridgeConfiguration {
 }
 
 /**
- * 桥接器工厂
+ * Bridge factory
  */
 object LdbcBridgeFactory {
 
   /**
-   * 创建适当的桥接器实例
+   * Create appropriate bridge instance
+   *
+   * @param bridgeType Type of bridge to create (e.g., "streaming")
+   * @return Instance of requested bridge type
+   * @throws IllegalArgumentException if bridge type is not supported
    */
   def createBridge(bridgeType: String): LdbcBridgeInterface = {
     bridgeType.toLowerCase match {
@@ -177,7 +205,9 @@ object LdbcBridgeFactory {
   }
 
   /**
-   * 获取所有支持的桥接器类型
+   * Get all supported bridge types
+   *
+   * @return List of bridge type identifiers that can be created
    */
   def getSupportedBridgeTypes(): List[String] = {
     List("streaming")

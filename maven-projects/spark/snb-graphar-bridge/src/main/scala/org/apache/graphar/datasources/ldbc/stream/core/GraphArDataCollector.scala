@@ -28,48 +28,48 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.collection.mutable
 
 /**
- * GraphAr数据收集器
+ * GraphAr Data Collector
  *
- * 统一收集静态数据（RDD来源）和流式数据（chunk来源）的元信息
- * 为后续的策略选择和输出处理提供数据基础
+ * Unified collection of metadata from static data (RDD source) and streaming data (chunk source)
+ * Provides data foundation for subsequent strategy selection and output processing
  */
 class GraphArDataCollector(
-  outputPath: String,
-  graphName: String,
+  output_path: String,
+  graph_name: String,
   val idManager: UnifiedIdManager
 )(implicit spark: SparkSession) extends Serializable {
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[GraphArDataCollector])
 
-  // 静态数据收集（RDD来源）
+  // Static data collection (RDD source)
   private val staticDataFrames = mutable.Map[String, DataFrame]()
   private val staticEdgeFrames = mutable.Map[(String, String, String), DataFrame]()
   private val staticSchemas = mutable.Map[String, StructType]()
 
-  // 流式数据元信息收集（chunk来源）
+  // Streaming data metadata collection (chunk source)
   private val streamingEntityInfo = mutable.Map[String, StreamingEntityInfo]()
   private val streamingSchemas = mutable.Map[String, StructType]()
 
-  // 收集统计信息
+  // Collection statistics
   private var staticVertexCount = 0L
   private var staticEdgeCount = 0L
   private var streamingVertexCount = 0L
   private var streamingEdgeCount = 0L
 
-  logger.info(s"GraphArDataCollector初始化: outputPath=$outputPath, graphName=$graphName")
+  logger.info(s"GraphArDataCollector initialized: output_path=$output_path, graph_name=$graph_name")
 
   /**
-   * 添加静态顶点数据
+   * Add static vertex data
    */
   def addStaticVertexData(entityType: String, df: DataFrame): Unit = {
-    logger.info(s"收集静态顶点数据: $entityType")
+    logger.info(s"Collecting static vertex data: $entityType")
 
-    // 确保ID已分配
+    // Ensure IDs are assigned
     val dfWithIds = if (df.columns.contains("_graphArVertexIndex")) {
-      logger.debug(s"实体 $entityType 已包含_graphArVertexIndex列")
+      logger.debug(s"Entity $entityType already contains _graphArVertexIndex column")
       df
     } else {
-      logger.debug(s"为实体 $entityType 分配顶点ID")
+      logger.debug(s"Assigning vertex IDs to entity $entityType")
       idManager.assignVertexIds(df, entityType)
     }
 
@@ -78,26 +78,26 @@ class GraphArDataCollector(
     staticSchemas(entityType) = dfWithIds.schema
     staticVertexCount += recordCount
 
-    logger.info(s"静态顶点数据收集完成: $entityType, 记录数: $recordCount")
+    logger.info(s"Static vertex data collection completed: $entityType, record count: $recordCount")
   }
 
   /**
-   * 添加静态边数据
+   * Add static edge data
    */
   def addStaticEdgeData(relation: (String, String, String), df: DataFrame): Unit = {
     val (srcType, edgeType, dstType) = relation
-    logger.info(s"收集静态边数据: ${srcType}_${edgeType}_${dstType}")
+    logger.info(s"Collecting static edge data: ${srcType}_${edgeType}_${dstType}")
 
     val recordCount = df.count()
     staticEdgeFrames(relation) = df
     staticSchemas(s"${srcType}_${edgeType}_${dstType}") = df.schema
     staticEdgeCount += recordCount
 
-    logger.info(s"静态边数据收集完成: ${srcType}_${edgeType}_${dstType}, 记录数: $recordCount")
+    logger.info(s"Static edge data collection completed: ${srcType}_${edgeType}_${dstType}, record count: $recordCount")
   }
 
   /**
-   * 记录流式实体信息
+   * Record streaming entity information
    */
   def recordStreamingEntity(
     entityType: String,
@@ -106,7 +106,7 @@ class GraphArDataCollector(
     schema: StructType,
     offsetMapping: Map[String, Map[Long, OffsetInfo]]
   ): Unit = {
-    logger.info(s"记录流式实体信息: $entityType, chunks: $chunkCount, rows: $totalRows")
+    logger.info(s"Recording streaming entity info: $entityType, chunks: $chunkCount, rows: $totalRows")
 
     streamingEntityInfo(entityType) = StreamingEntityInfo(
       entityType = entityType,
@@ -124,36 +124,36 @@ class GraphArDataCollector(
       streamingEdgeCount += totalRows
     }
 
-    logger.info(s"流式实体信息记录完成: $entityType")
+    logger.info(s"Streaming entity info recording completed: $entityType")
   }
 
   /**
-   * 获取静态DataFrame集合
+   * Get static DataFrame collection
    */
   def getStaticDataFrames(): Map[String, DataFrame] = staticDataFrames.toMap
 
   /**
-   * 获取静态边DataFrame集合
+   * Get static edge DataFrame collection
    */
   def getStaticEdgeFrames(): Map[(String, String, String), DataFrame] = staticEdgeFrames.toMap
 
   /**
-   * 获取流式实体信息集合
+   * Get streaming entity information collection
    */
   def getStreamingEntityInfo(): Map[String, StreamingEntityInfo] = streamingEntityInfo.toMap
 
   /**
-   * 获取所有静态Schema
+   * Get all static schemas
    */
   def getStaticSchemas(): Map[String, StructType] = staticSchemas.toMap
 
   /**
-   * 获取所有流式Schema
+   * Get all streaming schemas
    */
   def getStreamingSchemas(): Map[String, StructType] = streamingSchemas.toMap
 
   /**
-   * 获取收集统计信息
+   * Get collection statistics
    */
   def getCollectionStatistics(): DataCollectionStatistics = {
     val totalStaticEntities = staticDataFrames.size + staticEdgeFrames.size
@@ -183,18 +183,18 @@ class GraphArDataCollector(
   }
 
   /**
-   * 生成数据概览报告
+   * Generate data overview report
    */
   def generateDataOverview(): DataOverviewReport = {
     val statistics = getCollectionStatistics()
     val idUsageStats = idManager.generateUsageStatistics()
 
-    // 分析Schema兼容性
+    // Analyze schema compatibility
     val schemaCompatibility = analyzeSchemaCompatibility()
 
     DataOverviewReport(
-      graphName = graphName,
-      outputPath = outputPath,
+      graphName = graph_name,
+      outputPath = output_path,
       collectionStats = statistics,
       idUsageStats = idUsageStats,
       schemaCompatibility = schemaCompatibility,
@@ -203,13 +203,13 @@ class GraphArDataCollector(
   }
 
   /**
-   * 分析Schema兼容性
+   * Analyze schema compatibility
    */
   private def analyzeSchemaCompatibility(): SchemaCompatibilityReport = {
     val conflicts = mutable.ListBuffer[SchemaConflict]()
     val compatibleEntities = mutable.ListBuffer[String]()
 
-    // 检查静态和流式数据的Schema冲突
+    // Check schema conflicts between static and streaming data
     val commonEntities = staticSchemas.keySet.intersect(streamingSchemas.keySet)
 
     commonEntities.foreach { entityType =>
@@ -234,7 +234,7 @@ class GraphArDataCollector(
   }
 
   /**
-   * 检测两个Schema之间的冲突
+   * Detect conflicts between two schemas
    */
   private def detectSchemaConflicts(
     entityType: String,
@@ -270,7 +270,7 @@ class GraphArDataCollector(
             streamingType = "MISSING",
             conflictType = "missing_field"
           )
-        case _ => // 兼容
+        case _ => // Compatible
       }
     }
 
@@ -278,35 +278,35 @@ class GraphArDataCollector(
   }
 
   /**
-   * 生成处理建议
+   * Generate processing recommendations
    */
   private def generateRecommendations(stats: DataCollectionStatistics): List[String] = {
     val recommendations = mutable.ListBuffer[String]()
 
-    // 基于数据规模的建议
+    // Recommendations based on data scale
     if (stats.totalVertices > 10000000) {
-      recommendations += "数据规模较大(>1000万顶点)，建议使用混合格式输出以优化性能"
+      recommendations += "Large data scale (>10M vertices), recommend using hybrid format output to optimize performance"
     } else if (stats.totalVertices < 1000000) {
-      recommendations += "数据规模适中(<100万顶点)，建议使用完全标准化输出确保兼容性"
+      recommendations += "Moderate data scale (<1M vertices), recommend using fully standardized output for compatibility"
     }
 
-    // 基于流式数据比例的建议
+    // Recommendations based on streaming data ratio
     if (stats.streamingRatio > 0.8) {
-      recommendations += s"流式数据占比较高(${(stats.streamingRatio * 100).toInt}%)，建议保持chunk格式以维持性能优势"
+      recommendations += s"High streaming data ratio (${(stats.streamingRatio * 100).toInt}%), recommend maintaining chunk format for performance advantages"
     } else if (stats.streamingRatio < 0.2) {
-      recommendations += s"静态数据占主导(${((1 - stats.streamingRatio) * 100).toInt}%)，建议使用标准GraphWriter处理"
+      recommendations += s"Static data dominates (${((1 - stats.streamingRatio) * 100).toInt}%), recommend using standard GraphWriter"
     }
 
-    // 基于实体类型数量的建议
+    // Recommendations based on entity type count
     if (stats.allEntityTypes.length > 15) {
-      recommendations += "实体类型较多，建议启用智能Schema合并以处理复杂度"
+      recommendations += "Many entity types, recommend enabling intelligent schema merging to handle complexity"
     }
 
     recommendations.toList
   }
 
   /**
-   * 判断是否为顶点实体
+   * Check if entity is a vertex entity
    */
   def isVertexEntity(entityType: String): Boolean = {
     val vertexEntities = Set("Person", "Organisation", "Place", "Tag", "TagClass", "Forum", "Post", "Comment", "Photo")
@@ -314,17 +314,17 @@ class GraphArDataCollector(
   }
 
   /**
-   * 获取总实体数量
+   * Get total entity count
    */
   def getTotalEntityCount(): Int = {
     staticDataFrames.size + staticEdgeFrames.size + streamingEntityInfo.size
   }
 
   /**
-   * 清理收集的数据（用于内存管理）
+   * Clean up collected data (for memory management)
    */
   def cleanup(): Unit = {
-    logger.info("清理GraphArDataCollector缓存数据")
+    logger.info("Cleaning up GraphArDataCollector cached data")
 
     staticDataFrames.clear()
     staticEdgeFrames.clear()
@@ -337,12 +337,12 @@ class GraphArDataCollector(
     streamingVertexCount = 0L
     streamingEdgeCount = 0L
 
-    logger.info("GraphArDataCollector清理完成")
+    logger.info("GraphArDataCollector cleanup completed")
   }
 }
 
 /**
- * 流式实体信息
+ * Streaming entity information
  */
 case class StreamingEntityInfo(
   entityType: String,
@@ -353,7 +353,7 @@ case class StreamingEntityInfo(
 )
 
 /**
- * 数据收集统计信息
+ * Data collection statistics
  */
 case class DataCollectionStatistics(
   totalEntities: Int,
@@ -372,7 +372,7 @@ case class DataCollectionStatistics(
 )
 
 /**
- * Schema冲突信息
+ * Schema conflict information
  */
 case class SchemaConflict(
   entityType: String,
@@ -381,11 +381,11 @@ case class SchemaConflict(
   streamingType: String,
   conflictType: String
 ) {
-  def description: String = s"实体 $entityType 字段 $fieldName: $conflictType (static=$staticType, streaming=$streamingType)"
+  def description: String = s"Entity $entityType field $fieldName: $conflictType (static=$staticType, streaming=$streamingType)"
 }
 
 /**
- * Schema兼容性报告
+ * Schema compatibility report
  */
 case class SchemaCompatibilityReport(
   totalEntitiesChecked: Int,
@@ -396,7 +396,7 @@ case class SchemaCompatibilityReport(
 )
 
 /**
- * 数据概览报告
+ * Data overview report
  */
 case class DataOverviewReport(
   graphName: String,

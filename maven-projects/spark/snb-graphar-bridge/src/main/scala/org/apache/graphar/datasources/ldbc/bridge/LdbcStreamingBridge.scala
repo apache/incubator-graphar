@@ -29,19 +29,19 @@ import org.slf4j.{Logger, LoggerFactory}
 import scala.util.Try
 
 /**
- * LDBC流式桥接器（专用于流式处理）
+ * LDBC streaming bridge (dedicated to streaming processing)
  *
- * 提供完整的LDBC流式处理功能：
- * 1. 支持流式处理模式，处理完整的LDBC数据集
- * 2. 标准化的配置和验证
- * 3. GraphAr格式输出
+ * Provides complete LDBC streaming processing functionality:
+ * 1. Supports streaming processing mode for complete LDBC dataset
+ * 2. Standardized configuration and validation
+ * 3. GraphAr format output
  */
 class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[LdbcStreamingBridge])
 
   /**
-   * 统一的写入方法（遵循GraphAr GraphWriter接口）
+   * Unified write method (following GraphAr GraphWriter interface)
    */
   override def write(
     path: String,
@@ -54,61 +54,61 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
     logger.info(s"LdbcStreamingBridge.write() called with path=$path, name=$name")
     logger.info("Using streaming mode for all write operations")
 
-    // 转换为流式配置并调用流式处理
+    // Convert to streaming configuration and call streaming processing
     val streamingConfig = StreamingConfiguration(
-      ldbcConfigPath = "ldbc_config.properties",
-      outputPath = path,
-      scaleFactor = "0.1", // 默认规模因子
-      graphName = name,
-      vertexChunkSize = vertex_chunk_size,
-      edgeChunkSize = edge_chunk_size,
-      fileType = file_type
+      ldbc_config_path = "ldbc_config.properties",
+      output_path = path,
+      scale_factor = "0.1", // Default scale factor
+      graph_name = name,
+      vertex_chunk_size = vertex_chunk_size,
+      edge_chunk_size = edge_chunk_size,
+      file_type = file_type
     )
 
     writeStreaming(streamingConfig)(spark).map(_.asInstanceOf[ConversionResult])
   }
 
   /**
-   * 流式处理专用写入方法（使用新的流式架构）
+   * Streaming processing dedicated write method (using new streaming architecture)
    */
   override def writeStreaming(
     config: StreamingConfiguration
   )(implicit spark: SparkSession): Try[StreamingConversionResult] = Try {
 
     logger.info("=== STREAMING MODE (FULL IMPLEMENTATION) ===")
-    logger.info("使用GraphArActivityOutputStream进行真正的流式处理")
-    logger.info("支持完整的LDBC实体：Person, Forum, Post, Comment, 以及所有关系")
+    logger.info("Using GraphArActivityOutputStream for true streaming processing")
+    logger.info("Supporting complete LDBC entities: Person, Forum, Post, Comment, and all relationships")
 
     val startTime = System.currentTimeMillis()
 
-    // 创建流式集成器
+    // Create streaming integrator
     val streamingIntegrator = new LdbcStreamingIntegrator(
-      outputPath = config.outputPath,
-      graphName = config.graphName,
-      vertexChunkSize = config.vertexChunkSize,
-      edgeChunkSize = config.edgeChunkSize,
-      fileType = config.fileType
+      output_path = config.output_path,
+      graph_name = config.graph_name,
+      vertex_chunk_size = config.vertex_chunk_size,
+      edge_chunk_size = config.edge_chunk_size,
+      file_type = config.file_type
     )
 
     try {
-      // 创建LDBC配置
+      // Create LDBC configuration
       val ldbcConfig = createLdbcConfiguration(config)
 
-      // 执行流式转换
+      // Execute streaming conversion
       val conversionResult = streamingIntegrator.executeStreamingConversion(ldbcConfig)
 
       conversionResult match {
         case scala.util.Success(result) =>
-          logger.info(s"✓ 流式转换完成: ${result.processingDurationMs}ms")
-          logger.info(s"✓ 支持的实体类型: ${streamingIntegrator.getSupportedEntityTypes().mkString(", ")}")
-          logger.info(s"✓ 处理的实体: ${result.integrationStatistics.processedEntities.mkString(", ")}")
-          logger.info(s"✓ 总记录数: ${result.integrationStatistics.totalRecords}")
-          logger.info("✓ 流式转换完成，真实LDBC数据生成成功")
+          logger.info(s"✓ Streaming conversion completed: ${result.processingDurationMs}ms")
+          logger.info(s"✓ Supported entity types: ${streamingIntegrator.getSupportedEntityTypes().mkString(", ")}")
+          logger.info(s"✓ Processed entities: ${result.integrationStatistics.processedEntities.mkString(", ")}")
+          logger.info(s"✓ Total records: ${result.integrationStatistics.totalRecords}")
+          logger.info("✓ Streaming conversion completed, real LDBC data generation successful")
           result
 
         case scala.util.Failure(exception) =>
-          logger.error("✗ 流式转换失败", exception)
-          throw exception // 直接抛出异常，不降级
+          logger.error("✗ Streaming conversion failed", exception)
+          throw exception // Directly throw exception, no fallback
       }
 
     } finally {
@@ -117,14 +117,14 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
   }
 
   /**
-   * 创建LDBC配置
+   * Create LDBC configuration
    */
   private def createLdbcConfiguration(config: StreamingConfiguration): GeneratorConfiguration = {
     val ldbcConfig = new GeneratorConfiguration(new java.util.HashMap[String, String]())
 
-    // *** 基于params_default.ini的完整LDBC配置 ***
+    // *** Complete LDBC configuration based on params_default.ini ***
 
-    // 基础概率参数
+    // Basic probability parameters
     ldbcConfig.map.put("generator.baseProbCorrelated", "0.95")
     ldbcConfig.map.put("generator.blockSize", "10000")
     ldbcConfig.map.put("generator.degreeDistribution", "Facebook")
@@ -137,7 +137,7 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
     ldbcConfig.map.put("generator.knowsGenerator", "Distance")
     ldbcConfig.map.put("generator.limitProCorrelated", "0.2")
 
-    // 内容大小参数
+    // Content size parameters
     ldbcConfig.map.put("generator.maxCommentSize", "185")
     ldbcConfig.map.put("generator.maxCompanies", "3")
     ldbcConfig.map.put("generator.maxEmails", "5")
@@ -159,14 +159,14 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
     ldbcConfig.map.put("generator.maxNumTagsPerPerson", "80")
     ldbcConfig.map.put("generator.maxTextSize", "250")
 
-    // 最小值参数
+    // Minimum value parameters
     ldbcConfig.map.put("generator.minCommentSize", "75")
     ldbcConfig.map.put("generator.minLargeCommentSize", "700")
     ldbcConfig.map.put("generator.minLargePostSize", "700")
     ldbcConfig.map.put("generator.minNumTagsPerPerson", "1")
     ldbcConfig.map.put("generator.minTextSize", "85")
 
-    // 概率参数
+    // Probability parameters
     ldbcConfig.map.put("generator.missingRatio", "0.2")
     ldbcConfig.map.put("generator.person.similarity", "GeoDistance")
     ldbcConfig.map.put("generator.probAnotherBrowser", "0.01")
@@ -184,30 +184,30 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
     ldbcConfig.map.put("generator.probPopularPlaces", "0.9")
     ldbcConfig.map.put("generator.probRandomPerLevel", "0.005")
     ldbcConfig.map.put("generator.probSecondLang", "0.2")
-    ldbcConfig.map.put("generator.probTopUniv", "0.9") // *** 这是缺失的关键参数 ***
+    ldbcConfig.map.put("generator.probTopUniv", "0.9") // *** This is the missing critical parameter ***
     ldbcConfig.map.put("generator.probUnCorrelatedCompany", "0.05")
     ldbcConfig.map.put("generator.probUnCorrelatedOrganisation", "0.005")
 
-    // 比例参数
+    // Ratio parameters
     ldbcConfig.map.put("generator.ratioLargeComment", "0.001")
     ldbcConfig.map.put("generator.ratioLargePost", "0.001")
     ldbcConfig.map.put("generator.ratioReduceText", "0.8")
 
-    // 核心参数（使用传入的规模因子）
-    ldbcConfig.map.put("generator.scaleFactor", config.scaleFactor)
+    // Core parameters (using passed scale factor)
+    ldbcConfig.map.put("generator.scaleFactor", config.scale_factor)
     ldbcConfig.map.put("generator.numPersons", "10000")
     ldbcConfig.map.put("generator.numYears", "3")
     ldbcConfig.map.put("generator.startYear", "2010")
-    ldbcConfig.map.put("generator.outputDir", config.outputPath)
+    ldbcConfig.map.put("generator.outputDir", config.output_path)
     ldbcConfig.map.put("generator.tagCountryCorrProb", "0.5")
     ldbcConfig.map.put("hadoop.numThreads", "1")
 
-    // LDBC前缀参数（保持向后兼容）
-    ldbcConfig.map.put("ldbc.snb.datagen.generator.scaleFactor", config.scaleFactor)
+    // LDBC prefix parameters (maintaining backward compatibility)
+    ldbcConfig.map.put("ldbc.snb.datagen.generator.scaleFactor", config.scale_factor)
     ldbcConfig.map.put("ldbc.snb.datagen.generator.mode", "streaming")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.numThreads", "4")
 
-    // 启用所有动态实体生成
+    // Enable all dynamic entity generation
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enableDynamicEntities", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enableForum", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enablePost", "true")
@@ -215,65 +215,65 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enableLike", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enablePhoto", "true")
 
-    // 启用静态实体生成（新增）
+    // Enable static entity generation (newly added)
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enableStaticEntities", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enablePlace", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enableTag", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enableTagClass", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enableOrganisation", "true")
 
-    // 静态数据字典配置
+    // Static data dictionary configuration
     ldbcConfig.map.put("ldbc.snb.datagen.dictionary.loadPlaces", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.dictionary.loadTags", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.dictionary.loadCompanies", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.dictionary.loadUniversities", "true")
 
-    // 确保静态实体完整性
+    // Ensure static entity integrity
     ldbcConfig.map.put("ldbc.snb.datagen.staticdata.includeHierarchy", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.staticdata.includeRelations", "true")
 
-    // 序列化器配置
-    ldbcConfig.map.put("serializer.outputDir", config.outputPath)
+    // Serializer configuration
+    ldbcConfig.map.put("serializer.outputDir", config.output_path)
     ldbcConfig.map.put("serializer.format", "graphar_streaming")
     ldbcConfig.map.put("serializer.compressed", "false")
 
-    logger.info(s"LDBC完整配置创建完成，规模因子: ${config.scaleFactor}")
-    logger.info("✓ 启用动态实体: Forum, Post, Comment, Like, Photo")
-    logger.info("✓ 启用静态实体: Place, Tag, TagClass, Organisation")
-    logger.debug(s"关键参数: generator.probTopUniv=0.9, generator.baseProbCorrelated=0.95")
-    logger.debug(s"数据生成时间范围: 2010-2013")
+    logger.info(s"LDBC complete configuration created, scale factor: ${config.scale_factor}")
+    logger.info("✓ Enabled dynamic entities: Forum, Post, Comment, Like, Photo")
+    logger.info("✓ Enabled static entities: Place, Tag, TagClass, Organisation")
+    logger.debug(s"Key parameters: generator.probTopUniv=0.9, generator.baseProbCorrelated=0.95")
+    logger.debug(s"Data generation time range: 2010-2013")
     ldbcConfig
   }
 
 
   /**
-   * 验证配置参数
+   * Validate configuration parameters
    */
   def validateConfiguration(
-                             mode: String,
-                             outputPath: String,
-                             vertexChunkSize: Long,
-                             edgeChunkSize: Long
-                           ): ValidationResult = {
+    mode: String,
+    output_path: String,
+    vertex_chunk_size: Long,
+    edge_chunk_size: Long
+  ): ValidationResult = {
     val errors = scala.collection.mutable.ListBuffer[String]()
 
-    // 验证处理模式
+    // Validate processing mode
     if (!getSupportedModes().contains(mode)) {
       errors += s"Unsupported processing mode: $mode. Supported modes: ${getSupportedModes().mkString(", ")}"
     }
 
-    // 验证输出路径
-    if (outputPath.trim.isEmpty) {
+    // Validate output path
+    if (output_path.trim.isEmpty) {
       errors += "Output path cannot be empty"
     }
 
-    // 验证块大小
-    if (vertexChunkSize <= 0) {
-      errors += s"Vertex chunk size must be positive, got: $vertexChunkSize"
+    // Validate chunk sizes
+    if (vertex_chunk_size <= 0) {
+      errors += s"Vertex chunk size must be positive, got: $vertex_chunk_size"
     }
 
-    if (edgeChunkSize <= 0) {
-      errors += s"Edge chunk size must be positive, got: $edgeChunkSize"
+    if (edge_chunk_size <= 0) {
+      errors += s"Edge chunk size must be positive, got: $edge_chunk_size"
     }
 
     if (errors.isEmpty) {
@@ -284,19 +284,19 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
   }
 
   /**
-   * 获取桥接器类型标识
+   * Get bridge type identifier
    */
   override def getBridgeType(): String = "streaming"
 
   /**
-   * 验证配置参数
+   * Validate configuration parameters
    */
   override def validateConfiguration(
     mode: String,
-    outputPath: String,
-    vertexChunkSize: Long,
-    edgeChunkSize: Long,
-    fileType: String
+    output_path: String,
+    vertex_chunk_size: Long,
+    edge_chunk_size: Long,
+    file_type: String
   ): ValidationResult = {
     val errors = scala.collection.mutable.ListBuffer[String]()
 
@@ -304,21 +304,21 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
       errors += s"Unsupported mode: $mode. Supported: ${getSupportedModes().mkString(", ")}"
     }
 
-    if (outputPath.trim.isEmpty) {
+    if (output_path.trim.isEmpty) {
       errors += "Output path cannot be empty"
     }
 
-    if (vertexChunkSize <= 0) {
-      errors += s"Vertex chunk size must be positive: $vertexChunkSize"
+    if (vertex_chunk_size <= 0) {
+      errors += s"Vertex chunk size must be positive: $vertex_chunk_size"
     }
 
-    if (edgeChunkSize <= 0) {
-      errors += s"Edge chunk size must be positive: $edgeChunkSize"
+    if (edge_chunk_size <= 0) {
+      errors += s"Edge chunk size must be positive: $edge_chunk_size"
     }
 
     val supportedTypes = Set("csv", "parquet", "orc")
-    if (!supportedTypes.contains(fileType.toLowerCase)) {
-      errors += s"Unsupported file type: $fileType. Supported: ${supportedTypes.mkString(", ")}"
+    if (!supportedTypes.contains(file_type.toLowerCase)) {
+      errors += s"Unsupported file type: $file_type. Supported: ${supportedTypes.mkString(", ")}"
     }
 
     if (errors.isEmpty) {
@@ -329,27 +329,29 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
   }
 
   /**
-   * 获取支持的处理模式
+   * Get supported processing modes
    */
   override def getSupportedModes(): List[String] = {
     List("streaming")
   }
 
   /**
-   * 获取处理能力摘要
+   * Get processing capability summary
+   *
+   * @return ProcessingCapability containing all supported entities and relationships
    */
   def getCapabilitySummary(): ProcessingCapability = {
     ProcessingCapability(
-      batchModeEntities = List(), // 不再支持批处理模式
+      batchModeEntities = List(), // No longer supports batch processing mode
       streamingModeEntities = List(
-        // 动态顶点实体
+        // Dynamic vertex entities
         "Person", "Forum", "Post", "Comment",
-        // 静态顶点实体
+        // Static vertex entities
         "Place", "Tag", "TagClass", "Organisation",
-        // 动态边关系
+        // Dynamic edge relationships
         "knows", "hasInterest", "workAt", "studyAt", "isLocatedIn",
         "hasCreator", "containerOf", "replyOf", "likes", "hasModerator", "hasMember",
-        // 静态边关系
+        // Static edge relationships
         "Place_isPartOf_Place", "Tag_hasType_TagClass", "TagClass_isSubclassOf_TagClass", "Organisation_isLocatedIn_Place"
       ),
       hybridModeSupported = false,
@@ -359,7 +361,12 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
 }
 
 /**
- * 处理能力摘要
+ * Processing capability summary
+ *
+ * @param batchModeEntities Entity types supported in batch mode
+ * @param streamingModeEntities Entity types supported in streaming mode
+ * @param hybridModeSupported Whether hybrid processing mode is supported
+ * @param autoModeSupported Whether auto mode selection is supported
  */
 case class ProcessingCapability(
   batchModeEntities: List[String],
@@ -367,27 +374,36 @@ case class ProcessingCapability(
   hybridModeSupported: Boolean,
   autoModeSupported: Boolean
 ) {
+  /**
+   * Calculate streaming mode entity coverage percentage
+   *
+   * @return Coverage percentage against LDBC SNB standard (22 total entities)
+   */
   def coveragePercentage: Double = {
-    // LDBC SNB标准总共22个实体和关系类型（完整覆盖目标）
+    // LDBC SNB standard total of 22 entities and relationship types (complete coverage target)
     val totalEntities = 22
     streamingModeEntities.length.toDouble / totalEntities * 100
   }
 }
 
 /**
- * 便捷构造器
+ * Convenience constructor
  */
 object LdbcStreamingBridge {
 
   /**
-   * 创建默认配置的流式桥接器
+   * Create streaming bridge with default configuration
+   *
+   * @return New LdbcStreamingBridge instance with default settings
    */
   def createDefault(): LdbcStreamingBridge = {
     new LdbcStreamingBridge()
   }
 
   /**
-   * 创建自定义配置的流式桥接器
+   * Create streaming bridge with custom configuration
+   *
+   * @return New LdbcStreamingBridge instance
    */
   def create(): LdbcStreamingBridge = {
     new LdbcStreamingBridge()

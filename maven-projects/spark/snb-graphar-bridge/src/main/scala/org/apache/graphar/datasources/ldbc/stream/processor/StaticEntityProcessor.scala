@@ -30,15 +30,15 @@ import scala.collection.JavaConverters._
 import scala.util.Try
 
 /**
- * 静态实体处理器
+ * Static Entity Processor
  *
- * 负责从LDBC Dictionaries生成静态实体的DataFrame，
- * 包括Organisation、Place、Tag、TagClass等。
+ * Responsible for generating static entity DataFrames from LDBC Dictionaries,
+ * including Organisation, Place, Tag, TagClass, etc.
  *
- * 设计理由：
- * 1. 复用LDBC Dictionaries接口获取静态数据
- * 2. 返回DataFrame与GraphWriter兼容
- * 3. 使用UnifiedIdManager确保ID空间协调
+ * Design rationale:
+ * 1. Reuse LDBC Dictionaries interface to obtain static data
+ * 2. Return DataFrame compatible with GraphWriter
+ * 3. Use UnifiedIdManager to ensure ID space coordination
  */
 class StaticEntityProcessor(
   idManager: UnifiedIdManager
@@ -62,31 +62,34 @@ class StaticEntityProcessor(
       DatagenParams.readConf(config)
       Dictionaries.loadDictionaries()  // No parameters needed
 
-      logger.info("LDBC Dictionaries初始化成功")
+      logger.info("LDBC Dictionaries initialized successfully")
     } catch {
       case e: Exception =>
-        logger.error("LDBC Dictionaries初始化失败", e)
+        logger.error("LDBC Dictionaries initialization failed", e)
         throw e
     }
   }
 
   /**
-   * 生成所有静态实体的DataFrame
+   * Generate DataFrames for all static entities
+   *
+   * @return Map of entity type name to DataFrame
+   * @throws RuntimeException if LDBC Dictionaries cannot be initialized
    */
   def generateAllStaticEntities(): Map[String, DataFrame] = {
-    logger.info("开始生成所有静态实体数据")
+    logger.info("Starting to generate all static entity data")
 
     // Always try to initialize LDBC dictionaries for real data
     val dictionariesAvailable = Try {
       if (!validateDictionaries()) {
-        logger.info("正在初始化LDBC字典...")
+        logger.info("Initializing LDBC dictionaries...")
         initializeDictionaries()
       }
       validateDictionaries()
     }.getOrElse(false)
 
     if (!dictionariesAvailable) {
-      logger.error("无法初始化LDBC字典，无法继续生成真实数据")
+      logger.error("Cannot initialize LDBC dictionaries, unable to continue generating real data")
       throw new RuntimeException("LDBC Dictionaries initialization failed - cannot generate real data")
     }
 
@@ -101,9 +104,9 @@ class StaticEntityProcessor(
     entities.foreach { case (entityType, df) =>
       val count = df.count()
       if (count > 0) {
-        logger.info(s"生成静态实体 $entityType: $count 条记录")
+        logger.info(s"Generated static entity $entityType: $count records")
       } else {
-        logger.warn(s"静态实体 $entityType 为空")
+        logger.warn(s"Static entity $entityType is empty")
       }
     }
 
@@ -111,18 +114,18 @@ class StaticEntityProcessor(
   }
 
   /**
-   * 生成Organisation DataFrame
-   * 包含Company和University两种类型
+   * Generate Organisation DataFrame
+   * Contains both Company and University types
    */
   private def generateOrganisationDF(): DataFrame = {
     import spark.implicits._
 
-    logger.info("生成Organisation实体数据")
+    logger.info("Generating Organisation entity data")
 
-    // 处理公司数据
+    // Process company data
     val companies = if (Dictionaries.companies != null && Dictionaries.companies.getCompanies != null) {
       val companyIds = Dictionaries.companies.getCompanies.iterator().asScala.toList
-      logger.info(s"发现 ${companyIds.size} 个公司")
+      logger.info(s"Found ${companyIds.size} companies")
 
       companyIds.map { companyId =>
         val name = Option(Dictionaries.companies.getCompanyName(companyId)).getOrElse(s"Company_$companyId")
@@ -137,21 +140,21 @@ class StaticEntityProcessor(
         )
       }
     } else {
-      logger.warn("Companies字典未初始化或为空")
+      logger.warn("Companies dictionary not initialized or empty")
       List.empty[Row]
     }
 
-    // 处理大学数据
+    // Process university data
     val universities = if (Dictionaries.universities != null && Dictionaries.universities.getUniversities != null) {
       val universityIds = Dictionaries.universities.getUniversities.iterator().asScala.toList
-      logger.info(s"发现 ${universityIds.size} 个大学")
+      logger.info(s"Found ${universityIds.size} universities")
 
       universityIds.map { universityId =>
         val name = Option(Dictionaries.universities.getUniversityName(universityId)).getOrElse(s"University_$universityId")
         val cityId = Dictionaries.universities.getUniversityCity(universityId)
 
         Row(
-          universityId.toLong, // ✅ 使用原始 universityId（依赖 type 字段区分）
+          universityId.toLong, // ✓ Use original universityId (distinguished by type field)
           "University",
           name,
           DBP.getUrl(name),
@@ -159,15 +162,15 @@ class StaticEntityProcessor(
         )
       }
     } else {
-      logger.warn("Universities字典未初始化或为空")
+      logger.warn("Universities dictionary not initialized or empty")
       List.empty[Row]
     }
 
-    // 合并数据
+    // Merge data
     val allOrganisations = companies ++ universities
 
     if (allOrganisations.isEmpty) {
-      logger.error("没有找到任何Organisation数据，LDBC字典可能未正确初始化")
+      logger.error("No Organisation data found, LDBC dictionaries may not be properly initialized")
       throw new RuntimeException("No Organisation data found - LDBC Dictionaries may not be properly initialized")
     }
 
@@ -177,20 +180,20 @@ class StaticEntityProcessor(
   }
 
   /**
-   * 生成Place DataFrame
+   * Generate Place DataFrame
    */
   private def generatePlaceDF(): DataFrame = {
     import spark.implicits._
 
-    logger.info("生成Place实体数据")
+    logger.info("Generating Place entity data")
 
     if (Dictionaries.places == null || Dictionaries.places.getPlaces == null) {
-      logger.error("Places字典未初始化")
+      logger.error("Places dictionary not initialized")
       throw new RuntimeException("Places dictionary not initialized - cannot generate Place data")
     }
 
     val placeIds = Dictionaries.places.getPlaces.iterator().asScala.toList
-    logger.info(s"发现 ${placeIds.size} 个地点")
+    logger.info(s"Found ${placeIds.size} places")
 
     val places = placeIds.flatMap { placeId =>
       Try {
@@ -229,20 +232,20 @@ class StaticEntityProcessor(
   }
 
   /**
-   * 生成Tag DataFrame
+   * Generate Tag DataFrame
    */
   private def generateTagDF(): DataFrame = {
     import spark.implicits._
 
-    logger.info("生成Tag实体数据")
+    logger.info("Generating Tag entity data")
 
     if (Dictionaries.tags == null || Dictionaries.tags.getTags == null) {
-      logger.error("Tags字典未初始化")
+      logger.error("Tags dictionary not initialized")
       throw new RuntimeException("Tags dictionary not initialized - cannot generate Tag data")
     }
 
     val tagIds = Dictionaries.tags.getTags.iterator().asScala.toList
-    logger.info(s"发现 ${tagIds.size} 个标签")
+    logger.info(s"Found ${tagIds.size} tags")
 
     val tags = tagIds.map { tagId =>
       val name = Option(Dictionaries.tags.getName(tagId)).getOrElse(s"Tag_$tagId")
@@ -266,59 +269,54 @@ class StaticEntityProcessor(
   }
 
   /**
-   * 生成TagClass DataFrame
+   * Generate TagClass DataFrame
    */
   private def generateTagClassDF(): DataFrame = {
     import spark.implicits._
 
-    logger.info("生成TagClass实体数据")
+    logger.info("Generating TagClass entity data (using real LDBC data only)")
 
-    // TagClass通常通过Tag关系推断，LDBC可能没有独立的tagClasses字典
-    // 创建基本的标签分类数据
+    // Only use LDBC TagDictionary API to get real TagClass data, no simulated data
     val tagClasses = if (Dictionaries.tags != null) {
-      // 从tags中提取tagClass信息
-      val tagClassIds = Try {
+      // Extract tagClass IDs from tags (explicit type annotation ensures type safety)
+      val tagClassIds: List[Int] = Try {
         val tags = Dictionaries.tags.getTags
         if (tags != null) {
           tags.iterator().asScala.map { tagId =>
-            Dictionaries.tags.getTagClass(tagId)
+            Dictionaries.tags.getTagClass(tagId).asInstanceOf[Int]
           }.toSet.toList
-        } else List.empty[Int]
-      }.getOrElse(List.empty[Int])
+        } else {
+          logger.warn("Dictionaries.tags.getTags returned null, cannot get TagClass data")
+          List.empty[Int]
+        }
+      }.getOrElse {
+        logger.warn("Failed to extract TagClass IDs")
+        List.empty[Int]
+      }
 
-      logger.info(s"从Tags中发现 ${tagClassIds.size} 个标签分类")
+      logger.info(s"Found ${tagClassIds.size} tag classes from Tags")
 
       if (tagClassIds.nonEmpty) {
         tagClassIds.map { tagClassId =>
+          // Use LDBC API to get real TagClass data
+          val className = Dictionaries.tags.getClassName(tagClassId)
+          val classLabel = Dictionaries.tags.getClassLabel(tagClassId)
+          val parentId = Dictionaries.tags.getClassParent(tagClassId)
+
           Row(
             tagClassId,
-            s"TagClass_$tagClassId",
-            s"http://dbpedia.org/resource/TagClass_$tagClassId",
-            if (tagClassId.asInstanceOf[Int] > 5) 1 else null // 创建一些层次关系
+            className,  // Real TagClass name
+            s"http://dbpedia.org/resource/$classLabel",  // URL based on real label
+            if (parentId == -1) null else parentId  // Real parent relationship
           )
         }
       } else {
-        // 创建基本分类
-        (1 to 10).map { i =>
-          Row(
-            i,
-            s"TagClass_$i",
-            s"http://dbpedia.org/resource/TagClass_$i",
-            if (i > 5) 1 else null
-          )
-        }
+        logger.warn("Failed to get any TagClass data, will return empty DataFrame")
+        List.empty[Row]
       }
     } else {
-      logger.warn("Tags字典未初始化，创建基本分类")
-      // 创建基本的标签分类
-      (1 to 10).map { i =>
-        Row(
-          i,
-          s"TagClass_$i",
-          s"http://dbpedia.org/resource/TagClass_$i",
-          if (i > 5) 1 else null // 创建一些层次关系
-        )
-      }
+      logger.error("Tags dictionary not initialized, cannot generate TagClass data, returning empty DataFrame")
+      List.empty[Row]
     }
 
     if (tagClasses.isEmpty) {
@@ -331,7 +329,7 @@ class StaticEntityProcessor(
   }
 
   /**
-   * 验证LDBC字典是否已初始化
+   * Validate whether LDBC dictionaries are initialized
    */
   private def validateDictionaries(): Boolean = {
     val checks = Map(
@@ -339,18 +337,18 @@ class StaticEntityProcessor(
       "universities" -> (Dictionaries.universities != null),
       "places" -> (Dictionaries.places != null),
       "tags" -> (Dictionaries.tags != null)
-      // tagClasses 不是独立的字典，从tags推断
+      // tagClasses is not an independent dictionary, inferred from tags
     )
 
     checks.foreach { case (dict, initialized) =>
-      logger.info(s"字典 $dict 状态: ${if (initialized) "已初始化" else "未初始化"}")
+      logger.info(s"Dictionary $dict status: ${if (initialized) "initialized" else "not initialized"}")
     }
 
-    // 只要有部分字典初始化就继续
+    // Continue as long as some dictionaries are initialized
     checks.values.exists(identity)
   }
 
-  // Schema定义
+  // Schema definitions
   private def organisationSchema(): StructType = StructType(Array(
     StructField("id", LongType, nullable = false),
     StructField("type", StringType, nullable = false),
@@ -381,7 +379,7 @@ class StaticEntityProcessor(
     StructField("isSubclassOf", IntegerType, nullable = true)
   ))
 
-  // 创建空DataFrame的辅助方法
+  // Helper methods to create empty DataFrames
   private def createEmptyOrganisationDF(): DataFrame = {
     spark.createDataFrame(spark.sparkContext.emptyRDD[Row], organisationSchema())
   }
@@ -396,5 +394,122 @@ class StaticEntityProcessor(
 
   private def createEmptyTagClassDF(): DataFrame = {
     spark.createDataFrame(spark.sparkContext.emptyRDD[Row], tagClassSchema())
+  }
+
+  // ========== Edge generation methods (ExplodeEdges logic) ==========
+
+  /**
+   * Generate Organisation_isLocatedIn_Place edges
+   * Extracted from Organisation.locationId column
+   *
+   * @param organisationDF DataFrame containing Organisation vertices
+   * @return DataFrame with src/dst columns representing edge relationships
+   */
+  def generateOrgIsLocatedInPlace(organisationDF: DataFrame): DataFrame = {
+    import spark.implicits._
+
+    logger.info("Generating Organisation_isLocatedIn_Place edges")
+
+    organisationDF
+      .filter(col("locationId").isNotNull)
+      .select(
+        col("id").as("src"),
+        col("locationId").as("dst")
+      )
+  }
+
+  /**
+   * Generate Place_isPartOf_Place edges
+   * Extracted from Place.isPartOf column (geographic hierarchy relationship)
+   *
+   * @param placeDF DataFrame containing Place vertices
+   * @return DataFrame with src/dst columns representing hierarchical relationships
+   */
+  def generatePlaceIsPartOfPlace(placeDF: DataFrame): DataFrame = {
+    import spark.implicits._
+
+    logger.info("Generating Place_isPartOf_Place edges")
+
+    placeDF
+      .filter(col("isPartOf").isNotNull)
+      .select(
+        col("id").as("src"),
+        col("isPartOf").as("dst")
+      )
+  }
+
+  /**
+   * Generate Tag_hasType_TagClass edges
+   * Extracted from Tag.hasType column
+   *
+   * @param tagDF DataFrame containing Tag vertices
+   * @return DataFrame with src/dst columns linking Tags to TagClasses
+   */
+  def generateTagHasTypeTagClass(tagDF: DataFrame): DataFrame = {
+    import spark.implicits._
+
+    logger.info("Generating Tag_hasType_TagClass edges")
+
+    tagDF
+      .filter(col("hasType").isNotNull)
+      .select(
+        col("id").as("src"),
+        col("hasType").cast(LongType).as("dst")  // Ensure type consistency
+      )
+  }
+
+  /**
+   * Generate TagClass_isSubclassOf_TagClass edges
+   * Extracted from TagClass.isSubclassOf column
+   *
+   * @param tagClassDF DataFrame containing TagClass vertices
+   * @return DataFrame with src/dst columns representing TagClass hierarchy
+   */
+  def generateTagClassIsSubclassOf(tagClassDF: DataFrame): DataFrame = {
+    import spark.implicits._
+
+    logger.info("Generating TagClass_isSubclassOf_TagClass edges")
+
+    tagClassDF
+      .filter(col("isSubclassOf").isNotNull)
+      .select(
+        col("id").cast(LongType).as("src"),  // Ensure type consistency
+        col("isSubclassOf").cast(LongType).as("dst")
+      )
+  }
+
+  /**
+   * Generate all static edge relationships
+   *
+   * Generates vertices first, then extracts all edge types from vertex attributes.
+   *
+   * @return Map of edge type name to DataFrame with src/dst columns
+   */
+  def generateAllStaticEdges(): Map[String, DataFrame] = {
+    logger.info("Starting to generate all static edge relationships")
+
+    // First generate vertex data (needed to extract edges)
+    val vertices = generateAllStaticEntities()
+
+    val organisationDF = vertices("Organisation")
+    val placeDF = vertices("Place")
+    val tagDF = vertices("Tag")
+    val tagClassDF = vertices("TagClass")
+
+    // Generate 5 types of edges
+    val edges = Map(
+      "Organisation_isLocatedIn_Place" -> generateOrgIsLocatedInPlace(organisationDF),
+      "Place_isPartOf_Place" -> generatePlaceIsPartOfPlace(placeDF),
+      "Tag_hasType_TagClass" -> generateTagHasTypeTagClass(tagDF),
+      "TagClass_isSubclassOf_TagClass" -> generateTagClassIsSubclassOf(tagClassDF)
+    )
+
+    // Record count for each edge type
+    edges.foreach { case (edgeType, df) =>
+      val count = df.count()
+      logger.info(s"Generated static edge $edgeType: $count records")
+    }
+
+    edges
   }
 }

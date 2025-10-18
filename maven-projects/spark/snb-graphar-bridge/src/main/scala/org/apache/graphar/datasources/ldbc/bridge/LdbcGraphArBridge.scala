@@ -34,19 +34,19 @@ import java.io.File
 import java.nio.file.{Files, Paths}
 
 /**
- * LDBC到GraphAr主控制器
+ * Main controller for LDBC to GraphAr conversion
  *
- * 实现双轨制处理架构：
- * 1. 静态数据（Person等）通过RDD生成器处理
- * 2. 动态数据通过流式架构处理
- * 3. 智能选择输出策略并生成标准GraphAr格式
+ * Implements a dual-track processing architecture:
+ * 1. Static data (Person, etc.) processed via RDD-based batch processing
+ * 2. Dynamic data processed via streaming architecture
+ * 3. Intelligently selects output strategy and generates standard GraphAr format
  */
 class LdbcGraphArBridge extends LdbcBridgeInterface {
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[LdbcGraphArBridge])
 
   /**
-   * 统一的写入方法（遵循GraphAr GraphWriter模式）
+   * Unified write method (following GraphAr GraphWriter pattern)
    */
   override def write(
     path: String,
@@ -57,22 +57,22 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
     file_type: String
   ): Try[ConversionResult] = {
 
-    logger.info(s"开始LDBC到GraphAr转换: path=$path, name=$name, vertex_chunk_size=$vertex_chunk_size, edge_chunk_size=$edge_chunk_size, file_type=$file_type")
+    logger.info(s"Starting LDBC to GraphAr conversion: path=$path, name=$name, vertex_chunk_size=$vertex_chunk_size, edge_chunk_size=$edge_chunk_size, file_type=$file_type")
 
     Try {
       implicit val sparkSession: SparkSession = spark
 
-      // 1. 参数验证
+      // 1. Parameter validation
       val validation = validateConfiguration("dual_track", path, vertex_chunk_size, edge_chunk_size, file_type)
       if (!validation.isSuccess) {
-        throw new IllegalArgumentException(s"配置验证失败: ${validation.getErrors.mkString(", ")}")
+        throw new IllegalArgumentException(s"Configuration validation failed: ${validation.getErrors.mkString(", ")}")
       }
 
-      // 2. 初始化增强组件
+      // 2. Initialize enhanced components
       val systemResources = SystemResourceInfo.current()
       val scaleFactor = getScaleFactor(spark)
 
-      logger.info(s"初始化增强组件: scaleFactor=$scaleFactor")
+      logger.info(s"Initializing enhanced components: scaleFactor=$scaleFactor")
 
       val idManager = new UnifiedIdManager(scaleFactor)
       idManager.initialize()
@@ -80,15 +80,15 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
       val dataCollector = new GraphArDataCollector(path, name, idManager)
       val strategySelector = new EnhancedOutputStrategySelector()
 
-      // 3. 创建临时目录
+      // 3. Create temporary directories
       val tempDir = createTempDirectories(path)
 
       try {
-        // 4. 第一轨：处理静态数据
+        // 4. First track: Process static entities
         val staticResult = processStaticEntities(dataCollector, tempDir.staticPath)
-        logger.info(s"静态数据处理完成: $staticResult")
+        logger.info(s"Static data processing completed: $staticResult")
 
-        // 5. 第二轨：处理动态流数据
+        // 5. Second track: Process dynamic streaming data
         val streamingResult = processStreamingEntities(
           dataCollector,
           tempDir.streamingPath,
@@ -97,13 +97,13 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
           edge_chunk_size,
           file_type
         )
-        logger.info(s"流式数据处理完成: $streamingResult")
+        logger.info(s"Streaming data processing completed: $streamingResult")
 
-        // 6. 智能策略选择
+        // 6. Intelligent strategy selection
         val strategyDecision = strategySelector.selectStrategyFromCollector(dataCollector, systemResources)
-        logger.info(s"选择策略: ${strategyDecision}")
+        logger.info(s"Selected strategy: ${strategyDecision}")
 
-        // 7. 基于策略的统一输出
+        // 7. Unified output based on selected strategy
         val finalResult = executeSelectedStrategy(
           path,
           tempDir,
@@ -115,9 +115,9 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
           file_type
         )
 
-        // 8. 生成处理报告
+        // 8. Generate processing report
         val processingReport = generateProcessingReport(dataCollector, strategyDecision, finalResult)
-        logger.info(s"处理报告: $processingReport")
+        logger.info(s"Processing report: $processingReport")
 
         ConversionResult(
           personCount = dataCollector.getTotalEntityCount().toLong,
@@ -128,61 +128,61 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
           locationCount = 0L,
           outputPath = path,
           conversionTime = System.currentTimeMillis(),
-          warnings = List(s"策略=${strategyDecision.strategy}, 置信度=${(strategyDecision.confidence * 100).toInt}%")
+          warnings = List(s"Strategy=${strategyDecision.strategy}, Confidence=${(strategyDecision.confidence * 100).toInt}%")
         )
 
       } finally {
-        // 清理临时目录
+        // Cleanup temporary directories
         cleanupTempDirectories(tempDir)
 
-        // 清理数据收集器
+        // Cleanup data collector
         dataCollector.cleanup()
       }
 
     }.recoverWith {
       case e: Exception =>
-        logger.error("LDBC到GraphAr转换失败", e)
+        logger.error("LDBC to GraphAr conversion failed", e)
         Try(ConversionResult(
           personCount = 0L,
           knowsCount = 0L,
           outputPath = path,
-          warnings = List(s"转换失败: ${e.getMessage}")
+          warnings = List(s"Conversion failed: ${e.getMessage}")
         ))
     }
   }
 
   /**
-   * 验证配置参数
+   * Validate configuration parameters
    */
   override def validateConfiguration(
     mode: String,
-    outputPath: String,
-    vertexChunkSize: Long,
-    edgeChunkSize: Long,
-    fileType: String
+    output_path: String,
+    vertex_chunk_size: Long,
+    edge_chunk_size: Long,
+    file_type: String
   ): ValidationResult = {
 
     val errors = scala.collection.mutable.ListBuffer[String]()
 
-    if (outputPath.trim.isEmpty) {
-      errors += "输出路径不能为空"
+    if (output_path.trim.isEmpty) {
+      errors += "Output path cannot be empty"
     }
 
-    if (vertexChunkSize <= 0) {
-      errors += s"顶点分块大小必须为正数: $vertexChunkSize"
+    if (vertex_chunk_size <= 0) {
+      errors += s"Vertex chunk size must be positive: $vertex_chunk_size"
     }
 
-    if (edgeChunkSize <= 0) {
-      errors += s"边分块大小必须为正数: $edgeChunkSize"
+    if (edge_chunk_size <= 0) {
+      errors += s"Edge chunk size must be positive: $edge_chunk_size"
     }
 
     val supportedFileTypes = Set("csv", "parquet", "orc")
-    if (!supportedFileTypes.contains(fileType.toLowerCase)) {
-      errors += s"不支持的文件类型: $fileType. 支持的类型: ${supportedFileTypes.mkString(", ")}"
+    if (!supportedFileTypes.contains(file_type.toLowerCase)) {
+      errors += s"Unsupported file type: $file_type. Supported types: ${supportedFileTypes.mkString(", ")}"
     }
 
     if (!Set("dual_track", "static", "streaming").contains(mode)) {
-      errors += s"不支持的处理模式: $mode"
+      errors += s"Unsupported processing mode: $mode"
     }
 
     if (errors.isEmpty) {
@@ -193,34 +193,33 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
   }
 
   /**
-   * 获取支持的处理模式
+   * Get supported processing modes
    */
   override def getSupportedModes(): List[String] = {
     List("dual_track", "static", "streaming")
   }
 
   /**
-   * 获取桥接器类型标识
+   * Get bridge type identifier
    */
   override def getBridgeType(): String = "ldbc_enhanced_dual_track"
 
   /**
-   * 处理静态实体数据
+   * Process static entity data
    */
   private def processStaticEntities(
     dataCollector: GraphArDataCollector,
     tempStaticPath: String
   )(implicit spark: SparkSession): StaticProcessingResult = {
 
-    logger.info("开始处理静态实体数据")
+    logger.info("Starting to process static entity data")
 
     try {
-      // 使用PersonRDDProcessor处理Person及其关系
+      // Use PersonRDDProcessor to process Person and its relationships
       val personProcessor = new PersonRDDProcessor(dataCollector.idManager)
       val personResult = personProcessor.processAndCollect(dataCollector).get
 
-      // TODO: 处理其他静态实体（Organisation, Place, Tag等）
-      // 目前先处理Person作为示例
+      // Process other static entities (Organisation, Place, Tag, etc.)
       processOtherStaticEntities(dataCollector, dataCollector.idManager)
 
       StaticProcessingResult(
@@ -228,12 +227,12 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
         processedEntities = List("Person", "Organisation", "Place", "Tag", "TagClass"),
         personResult = Some(personResult),
         totalVertices = personResult.personCount,
-        totalEdges = personResult.knowsCount + personResult.hasInterestCount + personResult.studyAtCount + personResult.workAtCount
+        totalEdges = personResult.knowsCount + personResult.hasInterestCount + personResult.studyAtCount + personResult.workAtCount + personResult.isLocatedInCount
       )
 
     } catch {
       case e: Exception =>
-        logger.error("静态实体处理失败", e)
+        logger.error("Static entity processing failed", e)
         StaticProcessingResult(
           success = false,
           processedEntities = List.empty,
@@ -246,70 +245,83 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
   }
 
   /**
-   * 处理流式实体数据
+   * Process streaming entity data
    */
   private def processStreamingEntities(
     dataCollector: GraphArDataCollector,
     tempStreamingPath: String,
-    graphName: String,
-    vertexChunkSize: Long,
-    edgeChunkSize: Long,
-    fileType: String
+    graph_name: String,
+    vertex_chunk_size: Long,
+    edge_chunk_size: Long,
+    file_type: String
   )(implicit spark: SparkSession): StreamingProcessingResult = {
 
-    logger.info("开始处理流式实体数据")
+    logger.info("Starting to process streaming entity data")
 
     try {
-      // 使用现有的流式组件
+      // Use existing streaming components
       val streamingWriter = new StreamingGraphArWriter(
-        outputPath = tempStreamingPath,
-        graphName = graphName,
-        vertexChunkSize = vertexChunkSize,
-        edgeChunkSize = edgeChunkSize,
-        fileType = fileType
+        output_path = tempStreamingPath,
+        graph_name = graph_name,
+        vertex_chunk_size = vertex_chunk_size,
+        edge_chunk_size = edge_chunk_size,
+        file_type = file_type
       )
 
       val activityOutputStream = new GraphArActivityOutputStream(
-        outputPath = tempStreamingPath,
-        graphName = graphName,
-        fileType = fileType
+        output_path = tempStreamingPath,
+        graph_name = graph_name,
+        file_type = file_type
       )
 
-      // TODO: 替换为真实的LDBC动态数据生成
-      // ldbcDatagen.generateActivityData(activityOutputStream)
-
-      // 模拟流式数据处理
+      // Call real LDBC dynamic data generation
       simulateStreamingDataProcessing(activityOutputStream)
 
       activityOutputStream.close()
 
-      // 收集流式处理结果
-      val streamingStats = streamingWriter.getWriteStatistics()
-      streamingStats.foreach { case (entityName, stats) =>
-        val offsetMappings = streamingWriter.getOffsetMappings()
+      // Scan temporary directory to collect dynamic entity information
+      logger.info("Scanning temporary streaming directory to collect dynamic entity information")
+      val streamingEntities = discoverStreamingEntities(tempStreamingPath, file_type)
 
-        // 推断Schema（实际实现中应该从chunk文件读取）
-        val schema = inferSchemaFromEntity(entityName)
+      logger.info(s"Found ${streamingEntities.size} dynamic entity types: ${streamingEntities.keys.mkString(", ")}")
 
-        dataCollector.recordStreamingEntity(
-          entityType = entityName,
-          chunkCount = stats.totalChunks,
-          totalRows = stats.totalRows,
-          schema = schema,
-          offsetMapping = offsetMappings.getOrElse(entityName, Map.empty)
-        )
+      streamingEntities.foreach { case (entityType, (entityPath, isVertex)) =>
+        try {
+          // Read entity data
+          val entityDF = file_type.toLowerCase match {
+            case "parquet" => spark.read.parquet(entityPath)
+            case "csv" => spark.read.option("header", "true").csv(entityPath)
+            case "orc" => spark.read.orc(entityPath)
+            case _ => spark.read.parquet(entityPath)
+          }
+
+          val rowCount = entityDF.count()
+          logger.info(s"Reading dynamic entity $entityType: $rowCount records, path: $entityPath")
+
+          // Add to data collector
+          if (isVertex) {
+            dataCollector.addStaticVertexData(entityType, entityDF)
+          } else {
+            // Parse edge relationship
+            val relation = parseEdgeRelationFromPath(entityType)
+            dataCollector.addStaticEdgeData(relation, entityDF)
+          }
+        } catch {
+          case e: Exception =>
+            logger.error(s"Failed to read dynamic entity $entityType", e)
+        }
       }
 
       StreamingProcessingResult(
         success = true,
-        processedEntities = streamingStats.keys.toList,
-        totalChunks = streamingStats.values.map(_.totalChunks).sum,
-        totalRows = streamingStats.values.map(_.totalRows).sum
+        processedEntities = streamingEntities.keys.toList,
+        totalChunks = 0,
+        totalRows = streamingEntities.size
       )
 
     } catch {
       case e: Exception =>
-        logger.error("流式实体处理失败", e)
+        logger.error("Streaming entity processing failed", e)
         StreamingProcessingResult(
           success = false,
           processedEntities = List.empty,
@@ -321,92 +333,92 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
   }
 
   /**
-   * 执行选择的输出策略
+   * Execute selected output strategy
    */
   private def executeSelectedStrategy(
-    outputPath: String,
+    output_path: String,
     tempDir: TempDirectoryInfo,
     dataCollector: GraphArDataCollector,
     strategyDecision: StrategyDecision,
-    graphName: String,
-    vertexChunkSize: Long,
-    edgeChunkSize: Long,
-    fileType: String
+    graph_name: String,
+    vertex_chunk_size: Long,
+    edge_chunk_size: Long,
+    file_type: String
   )(implicit spark: SparkSession): OutputExecutionResult = {
 
-    logger.info(s"执行输出策略: ${strategyDecision.strategy}")
+    logger.info(s"Executing output strategy: ${strategyDecision.strategy}")
 
     strategyDecision.strategy match {
       case OutputStrategy.COMPLETE_STANDARD =>
-        executeCompleteStandardStrategy(outputPath, tempDir, dataCollector, graphName, vertexChunkSize, edgeChunkSize, fileType)
+        executeCompleteStandardStrategy(output_path, tempDir, dataCollector, graph_name, vertex_chunk_size, edge_chunk_size, file_type)
 
       case OutputStrategy.HYBRID_DOCUMENTED =>
-        executeHybridDocumentedStrategy(outputPath, tempDir, dataCollector, graphName, vertexChunkSize, edgeChunkSize, fileType)
+        executeHybridDocumentedStrategy(output_path, tempDir, dataCollector, graph_name, vertex_chunk_size, edge_chunk_size, file_type)
     }
   }
 
   /**
-   * 执行完全标准化策略
+   * Execute complete standard strategy
    */
   private def executeCompleteStandardStrategy(
-    outputPath: String,
+    output_path: String,
     tempDir: TempDirectoryInfo,
     dataCollector: GraphArDataCollector,
-    graphName: String,
-    vertexChunkSize: Long,
-    edgeChunkSize: Long,
-    fileType: String
+    graph_name: String,
+    vertex_chunk_size: Long,
+    edge_chunk_size: Long,
+    file_type: String
   )(implicit spark: SparkSession): OutputExecutionResult = {
 
-    logger.info("执行完全标准化策略")
+    logger.info("Executing complete standard strategy")
 
     try {
       val graphWriter = new GraphWriter()
 
-      // 1. 添加所有静态数据到GraphWriter
+      // 1. Add all static data to GraphWriter
       val staticDataFrames = dataCollector.getStaticDataFrames()
-      logger.info(s"获取到静态DataFrame数量: ${staticDataFrames.size}")
+      logger.info(s"Retrieved static DataFrame count: ${staticDataFrames.size}")
 
       staticDataFrames.foreach { case (entityType, df) =>
         val rowCount = df.count()
-        logger.info(s"添加静态顶点数据到GraphWriter: $entityType, 记录数: $rowCount")
+        logger.info(s"Adding static vertex data to GraphWriter: $entityType, record count: $rowCount")
 
-        // 移除UnifiedIdManager添加的内部列，让GraphWriter自己管理顶点索引
+        // Remove internal columns added by UnifiedIdManager, let GraphWriter manage vertex indices
         val cleanDF = df.drop("_graphArVertexIndex", "_entityType", "_idSpaceCategory")
         graphWriter.PutVertexData(entityType, cleanDF)
       }
 
       val staticEdgeFrames = dataCollector.getStaticEdgeFrames()
-      logger.info(s"获取到静态边DataFrame数量: ${staticEdgeFrames.size}")
+      logger.info(s"Retrieved static edge DataFrame count: ${staticEdgeFrames.size}")
 
       staticEdgeFrames.foreach { case (relation, df) =>
         val rowCount = df.count()
-        logger.info(s"添加静态边数据到GraphWriter: ${relation._1}_${relation._2}_${relation._3}, 记录数: $rowCount")
+        logger.info(s"Adding static edge data to GraphWriter: ${relation._1}_${relation._2}_${relation._3}, record count: $rowCount")
         graphWriter.PutEdgeData(relation, df)
       }
 
-      // 2. 转换流式chunk数据为DataFrame并添加到GraphWriter
+      // 2. Convert streaming chunk data to DataFrame and add to GraphWriter
       val streamingEntityInfo = dataCollector.getStreamingEntityInfo()
-      logger.info(s"获取到流式实体数量: ${streamingEntityInfo.size}")
+      logger.info(s"Retrieved streaming entity count: ${streamingEntityInfo.size}")
 
       streamingEntityInfo.foreach { case (entityType, info) =>
-        logger.info(s"处理流式实体: $entityType, chunks: ${info.chunkCount}, rows: ${info.totalRows}")
-        val mergedDF = convertChunksToDataFrame(tempDir.streamingPath, entityType, info, fileType)
+        logger.info(s"Processing streaming entity: $entityType, chunks: ${info.chunkCount}, rows: ${info.totalRows}")
+        val mergedDF = convertChunksToDataFrame(tempDir.streamingPath, entityType, info, file_type)
 
         if (isVertexEntity(entityType)) {
           graphWriter.PutVertexData(entityType, mergedDF)
-          logger.info(s"添加流式顶点数据到GraphWriter: $entityType")
+          logger.info(s"Adding streaming vertex data to GraphWriter: $entityType")
         } else {
           val relation = parseEdgeRelation(entityType)
           graphWriter.PutEdgeData(relation, mergedDF)
-          logger.info(s"添加流式边数据到GraphWriter: ${relation._1}_${relation._2}_${relation._3}")
+          logger.info(s"Adding streaming edge data to GraphWriter: ${relation._1}_${relation._2}_${relation._3}")
         }
       }
 
-      // 3. 一次性生成完全标准的GraphAr输出
-      logger.info(s"开始调用GraphWriter写入: outputPath=$outputPath, graphName=$graphName")
-      graphWriter.write(outputPath, spark, graphName, vertexChunkSize, edgeChunkSize, fileType)
-      logger.info("GraphWriter写入完成")
+      // 3. Generate complete standard GraphAr output in one shot
+      logger.info(s"Starting GraphWriter write: output_path=$output_path, graph_name=$graph_name")
+      graphWriter.write(output_path, spark, graph_name, vertex_chunk_size, edge_chunk_size, file_type)
+      logger.info("GraphWriter write completed")
 
       OutputExecutionResult(
         success = true,
@@ -417,7 +429,7 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
 
     } catch {
       case e: Exception =>
-        logger.error("完全标准化策略执行失败", e)
+        logger.error("Complete standard strategy execution failed", e)
         OutputExecutionResult(
           success = false,
           strategy = OutputStrategy.COMPLETE_STANDARD,
@@ -429,22 +441,22 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
   }
 
   /**
-   * 执行混合文档化策略
+   * Execute hybrid documented strategy
    */
   private def executeHybridDocumentedStrategy(
-    outputPath: String,
+    output_path: String,
     tempDir: TempDirectoryInfo,
     dataCollector: GraphArDataCollector,
-    graphName: String,
-    vertexChunkSize: Long,
-    edgeChunkSize: Long,
-    fileType: String
+    graph_name: String,
+    vertex_chunk_size: Long,
+    edge_chunk_size: Long,
+    file_type: String
   )(implicit spark: SparkSession): OutputExecutionResult = {
 
-    logger.info("执行混合文档化策略")
+    logger.info("Executing hybrid documented strategy")
 
     try {
-      // 1. 处理静态数据部分
+      // 1. Process static data part
       val staticGraphWriter = new GraphWriter()
 
       dataCollector.getStaticDataFrames().foreach { case (entityType, df) =>
@@ -455,15 +467,15 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
         staticGraphWriter.PutEdgeData(relation, df)
       }
 
-      // 写入静态部分到临时目录
-      val tempStaticOutputPath = s"$outputPath/.temp_static_final"
-      staticGraphWriter.write(tempStaticOutputPath, spark, s"${graphName}_static", vertexChunkSize, edgeChunkSize, fileType)
+      // Write static part to temporary directory
+      val tempStaticOutputPath = s"$output_path/.temp_static_final"
+      staticGraphWriter.write(tempStaticOutputPath, spark, s"${graph_name}_static", vertex_chunk_size, edge_chunk_size, file_type)
 
-      // 2. 移动和合并目录结构
-      mergeDirectoryStructures(tempStaticOutputPath, tempDir.streamingPath, outputPath)
+      // 2. Merge directory structures
+      mergeDirectoryStructures(tempStaticOutputPath, tempDir.streamingPath, output_path)
 
-      // 3. 生成统一的标准YAML元数据
-      generateHybridStandardYamls(outputPath, dataCollector, graphName, vertexChunkSize, edgeChunkSize, fileType)
+      // 3. Generate unified standard YAML metadata
+      generateHybridStandardYamls(output_path, dataCollector, graph_name, vertex_chunk_size, edge_chunk_size, file_type)
 
       OutputExecutionResult(
         success = true,
@@ -474,7 +486,7 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
 
     } catch {
       case e: Exception =>
-        logger.error("混合文档化策略执行失败", e)
+        logger.error("Hybrid documented strategy execution failed", e)
         OutputExecutionResult(
           success = false,
           strategy = OutputStrategy.HYBRID_DOCUMENTED,
@@ -485,12 +497,12 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
     }
   }
 
-  // 辅助方法实现
+  // Helper method implementations
   private def getScaleFactor(spark: SparkSession): Double = {
-    // 从Spark配置或系统属性中获取scale factor
+    // Get scale factor from Spark configuration or system properties
     spark.conf.getOption("ldbc.scale.factor")
       .map(_.toDouble)
-      .getOrElse(0.003) // 默认scale factor
+      .getOrElse(0.003) // Default scale factor
   }
 
   private def createTempDirectories(basePath: String): TempDirectoryInfo = {
@@ -516,7 +528,7 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
       }
     } catch {
       case e: Exception =>
-        logger.warn("清理临时目录失败", e)
+        logger.warn("Failed to cleanup temporary directories", e)
     }
   }
 
@@ -535,101 +547,241 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
     }
   }
 
-  // TODO: 实现其他辅助方法
-  private def processOtherStaticEntities(dataCollector: GraphArDataCollector, idManager: UnifiedIdManager)(implicit spark: SparkSession): Unit = {
-    logger.info("处理其他静态实体")
+  /**
+   * Scan temporary streaming directory to discover generated dynamic entities
+   * Returns Map[EntityType, (Path, IsVertex)]
+   */
+  private def discoverStreamingEntities(tempStreamingPath: String, file_type: String): Map[String, (String, Boolean)] = {
+    import java.nio.file.{Files, Paths}
+    import scala.collection.JavaConverters._
+
+    val result = scala.collection.mutable.Map[String, (String, Boolean)]()
 
     try {
-      // 创建静态实体处理器
-      val staticProcessor = new StaticEntityProcessor(idManager)(spark)
-
-      // 生成所有静态实体
-      val staticEntities = staticProcessor.generateAllStaticEntities()
-
-      if (staticEntities.isEmpty) {
-        logger.warn("未能生成任何静态实体，可能是LDBC字典未初始化")
-        return
-      }
-
-      // 添加到数据收集器
-      staticEntities.foreach { case (entityType, df) =>
-        val recordCount = df.count()
-        if (recordCount > 0) {
-          logger.info(s"添加静态实体 $entityType: $recordCount 条记录")
-          dataCollector.addStaticVertexData(entityType, df)
-        } else {
-          logger.warn(s"静态实体 $entityType 为空，跳过")
+      // Check vertex directory
+      val vertexDir = Paths.get(tempStreamingPath, "vertex")
+      if (Files.exists(vertexDir) && Files.isDirectory(vertexDir)) {
+        Files.list(vertexDir).iterator().asScala.foreach { vertexPath =>
+          if (Files.isDirectory(vertexPath)) {
+            val entityType = vertexPath.getFileName.toString
+            result(entityType) = (vertexPath.toString, true) // true indicates vertex
+          }
         }
       }
 
-      logger.info("静态实体处理完成")
+      // Check edge directory
+      val edgeDir = Paths.get(tempStreamingPath, "edge")
+      if (Files.exists(edgeDir) && Files.isDirectory(edgeDir)) {
+        Files.list(edgeDir).iterator().asScala.foreach { edgePath =>
+          if (Files.isDirectory(edgePath)) {
+            val entityType = edgePath.getFileName.toString
+            result(entityType) = (edgePath.toString, false) // false indicates edge
+          }
+        }
+      }
+
+      // Check entities in root directory (like Photo)
+      val rootDir = Paths.get(tempStreamingPath)
+      if (Files.exists(rootDir) && Files.isDirectory(rootDir)) {
+        Files.list(rootDir).iterator().asScala.foreach { entityPath =>
+          val fileName = entityPath.getFileName.toString
+          if (Files.isDirectory(entityPath) && !fileName.startsWith(".") && fileName != "vertex" && fileName != "edge") {
+            // Determine whether it's a vertex or edge (by name pattern)
+            val isVertex = !fileName.contains("_")
+            result(fileName) = (entityPath.toString, isVertex)
+          }
+        }
+      }
+    } catch {
+      case e: Exception =>
+        logger.error("Failed to scan streaming directory", e)
+    }
+
+    result.toMap
+  }
+
+  /**
+   * Parse edge relationship from path name
+   */
+  private def parseEdgeRelationFromPath(pathName: String): (String, String, String) = {
+    val parts = pathName.split("_")
+    if (parts.length >= 3) {
+      val src = parts(0)
+      val dst = parts.last
+      val edge = parts.slice(1, parts.length - 1).mkString("_")
+      (src, edge, dst)
+    } else {
+      logger.warn(s"Failed to parse edge relation: $pathName, using default value")
+      ("Unknown", pathName, "Unknown")
+    }
+  }
+
+  private def processOtherStaticEntities(dataCollector: GraphArDataCollector, idManager: UnifiedIdManager)(implicit spark: SparkSession): Unit = {
+    logger.info("Processing other static entities")
+
+    try {
+      // Create static entity processor
+      val staticProcessor = new StaticEntityProcessor(idManager)(spark)
+
+      // Generate all static entities
+      val staticEntities = staticProcessor.generateAllStaticEntities()
+
+      if (staticEntities.isEmpty) {
+        logger.warn("Failed to generate any static entities, LDBC dictionaries may not be initialized")
+        return
+      }
+
+      // Add vertices to data collector
+      staticEntities.foreach { case (entityType, df) =>
+        val recordCount = df.count()
+        if (recordCount > 0) {
+          logger.info(s"Adding static entity $entityType: $recordCount records")
+          dataCollector.addStaticVertexData(entityType, df)
+        } else {
+          logger.warn(s"Static entity $entityType is empty, skipping")
+        }
+      }
+
+      // Generate and add static edge data
+      logger.info("Starting to generate static edge data")
+      val staticEdges = staticProcessor.generateAllStaticEdges()
+
+      staticEdges.foreach { case (edgeKey, df) =>
+        val recordCount = df.count()
+        if (recordCount > 0) {
+          // Parse edge relation tuple: Organisation_isLocatedIn_Place -> (Organisation, isLocatedIn, Place)
+          val parts = edgeKey.split("_")
+          val relation = if (parts.length >= 3) {
+            val src = parts(0)
+            val dst = parts.last
+            val edge = parts.slice(1, parts.length - 1).mkString("_")
+            (src, edge, dst)
+          } else {
+            logger.error(s"Failed to parse edge relation: $edgeKey")
+            ("Unknown", "Unknown", "Unknown")
+          }
+
+          logger.info(s"Adding static edge data ${relation._1}_${relation._2}_${relation._3}: $recordCount records")
+          dataCollector.addStaticEdgeData(relation, df)
+        } else {
+          logger.warn(s"Static edge $edgeKey is empty, skipping")
+        }
+      }
+
+      logger.info("Static entity and edge processing completed")
 
     } catch {
       case e: Exception =>
-        logger.error("处理静态实体时发生错误", e)
-        // 继续处理，不中断整个流程
-        logger.warn("静态实体处理失败，但继续执行后续步骤")
+        logger.error("Error occurred while processing static entities", e)
+        // Continue processing, don't interrupt the entire workflow
+        logger.warn("Static entity processing failed, but continuing with subsequent steps")
     }
   }
 
   private def simulateStreamingDataProcessing(outputStream: GraphArActivityOutputStream)(implicit spark: SparkSession): Unit = {
-    logger.info("开始处理动态数据流")
+    logger.info("Starting to process dynamic data stream (real LDBC Activity generation)")
 
     try {
-      // 导入LDBC需要的类
+      // Import LDBC required classes
       import ldbc.snb.datagen.generator.DatagenParams
-      import ldbc.snb.datagen.generator.generators.SparkPersonGenerator
+      import ldbc.snb.datagen.generator.generators.{SparkPersonGenerator, PersonActivityGenerator}
+      import scala.collection.JavaConverters._
 
-      // 创建LDBC配置
+      // Create LDBC configuration
       val ldbcConfig = createLdbcConfiguration()
       DatagenParams.readConf(ldbcConfig)
 
-      logger.info(s"开始生成LDBC动态数据，scaleFactor=${getScaleFactor(spark)}")
+      logger.info(s"Starting to generate LDBC dynamic data, scaleFactor=${getScaleFactor(spark)}")
 
-      // 1. 首先生成Person数据（动态数据的基础）
+      // 1. Generate Person data (foundation of dynamic data)
       val personRDD = SparkPersonGenerator(ldbcConfig)(spark)
       val personCount = personRDD.count()
-      logger.info(s"Person RDD生成完成: $personCount 个Person")
+      logger.info(s"Person RDD generation completed: $personCount Persons")
 
-      // 2. 简化的动态数据处理 - 当前仅处理少量Person数据
-      personRDD.take(Math.min(10, personCount.toInt)).foreach { person =>
+      // 2. Group Persons by block (following LDBC PersonSorter logic)
+      val blockSize = DatagenParams.blockSize
+      val personsByBlock = personRDD
+        .map { person => (person.getAccountId / blockSize, person) }
+        .groupByKey()
+        .collect()
+
+      logger.info(s"Person data has been grouped into ${personsByBlock.length} blocks")
+
+      // 3. Generate Activity data for each block
+      val activityGenerator = new PersonActivityGenerator()
+      var totalActivitiesProcessed = 0
+
+      personsByBlock.foreach { case (blockId, persons) =>
+        val personList = persons.toList.sortBy(_.getAccountId).asJava
+        logger.info(s"Processing Block $blockId, containing ${personList.size()} Persons")
+
         try {
-          logger.debug(s"处理Person ${person.getAccountId()} 的动态数据")
-          // TODO: 实现真实的动态数据流处理
+          // Use public API generateActivityForBlock() to generate entire block's Activity data
+          val activityStream = activityGenerator.generateActivityForBlock(blockId.toInt, personList)
+
+          // Process each GenActivity in the stream
+          activityStream.forEach { genActivity =>
+            try {
+              // Use GraphArActivityOutputStream to process generated Activity
+              outputStream.processLdbcActivity(genActivity)
+              totalActivitiesProcessed += 1
+
+              if (totalActivitiesProcessed % 10 == 0) {
+                logger.info(s"Processed $totalActivitiesProcessed Person Activity data")
+              }
+
+            } catch {
+              case e: Exception =>
+                logger.warn(s"Failed to process GenActivity data: ${e.getMessage}")
+                logger.debug("Exception details:", e)
+            }
+          }
+
+          logger.info(s"Block $blockId Activity data processing completed, containing ${personList.size()} Persons")
+
         } catch {
           case e: Exception =>
-            logger.warn(s"Person ${person.getAccountId()} 动态数据生成失败: ${e.getMessage}")
+            logger.error(s"Block $blockId Activity data generation failed", e)
         }
       }
 
-      logger.info("LDBC动态数据生成处理完成")
+      logger.info("=" * 60)
+      logger.info("LDBC dynamic data generation processing completed")
+      logger.info(s"Total processed $personCount Persons")
+      logger.info(s"Total processed $totalActivitiesProcessed Activities (including Wall/Group/Album)")
+      logger.info("Forum/Post/Comment/Like counts refer to output file statistics")
+      logger.info("=" * 60)
 
     } catch {
       case e: Exception =>
-        logger.error("LDBC动态数据生成失败", e)
-        logger.info("继续使用空的流式数据处理")
+        logger.error("LDBC dynamic data generation failed", e)
+        logger.error("Exception stack trace:", e)
+        throw e // Rethrow exception for outer layer to handle
     }
   }
 
   /**
-   * 创建LDBC配置
+   * Create LDBC configuration
    */
   private def createLdbcConfiguration()(implicit spark: SparkSession): ldbc.snb.datagen.util.GeneratorConfiguration = {
     import ldbc.snb.datagen.util.{GeneratorConfiguration, ConfigParser}
     import scala.collection.JavaConverters._
 
-    // 从Spark配置中获取scale factor，如果没有则使用默认值
+    // Get scale factor from Spark configuration, use default if not available
     val scaleFactor = getScaleFactor(spark)
 
-    // 使用LdbcConfigUtils创建完整配置
-    val config = org.apache.graphar.datasources.ldbc.util.LdbcConfigUtils.createFastTestConfig(scaleFactor.toString)
+    // Convert double to integer string for LDBC (e.g., 1.0 -> "1", 0.003 -> "0.003")
+    val scaleFactorString = if (scaleFactor == scaleFactor.toInt) scaleFactor.toInt.toString else scaleFactor.toString
 
-    logger.info(s"LDBC配置创建: scaleFactor=$scaleFactor")
+    // Use LdbcConfigUtils to create complete configuration
+    val config = org.apache.graphar.datasources.ldbc.util.LdbcConfigUtils.createFastTestConfig(scaleFactorString)
+
+    logger.info(s"LDBC configuration created: scaleFactor=$scaleFactor, scaleFactorString=$scaleFactorString")
     config
   }
 
   private def inferSchemaFromEntity(entityName: String): org.apache.spark.sql.types.StructType = {
-    // 根据实体名称推断基本Schema
+    // Infer basic Schema based on entity name
     import org.apache.spark.sql.types._
 
     entityName match {
@@ -654,10 +806,10 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
     basePath: String,
     entityType: String,
     info: org.apache.graphar.datasources.ldbc.stream.core.StreamingEntityInfo,
-    fileType: String
+    file_type: String
   )(implicit spark: SparkSession): org.apache.spark.sql.DataFrame = {
-    // 实现chunk到DataFrame的转换
-    // 这里返回一个模拟的空DataFrame
+    // Implement chunk to DataFrame conversion
+    // For now, return a simulated empty DataFrame
     spark.createDataFrame(spark.sparkContext.emptyRDD[org.apache.spark.sql.Row], info.schema)
   }
 
@@ -667,26 +819,26 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
   }
 
   private def parseEdgeRelation(entityType: String): (String, String, String) = {
-    // 简化的边关系解析
+    // Simplified edge relation parsing
     entityType match {
       case "likes" => ("Person", "likes", "Post")
       case _ => ("Unknown", entityType, "Unknown")
     }
   }
 
-  private def mergeDirectoryStructures(staticPath: String, streamingPath: String, outputPath: String): Unit = {
-    logger.info("合并目录结构（简化实现）")
+  private def mergeDirectoryStructures(staticPath: String, streamingPath: String, output_path: String): Unit = {
+    logger.info("Merging directory structures (simplified implementation)")
   }
 
   private def generateHybridStandardYamls(
-    outputPath: String,
+    output_path: String,
     dataCollector: GraphArDataCollector,
-    graphName: String,
-    vertexChunkSize: Long,
-    edgeChunkSize: Long,
-    fileType: String
+    graph_name: String,
+    vertex_chunk_size: Long,
+    edge_chunk_size: Long,
+    file_type: String
   ): Unit = {
-    logger.info("生成混合格式标准YAML（简化实现）")
+    logger.info("Generating hybrid format standard YAML (simplified implementation)")
   }
 
   private def generateProcessingReport(
@@ -710,7 +862,7 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
   }
 }
 
-// 数据类定义
+// Data class definitions
 case class TempDirectoryInfo(
   basePath: String,
   staticPath: String,

@@ -31,20 +31,30 @@ import scala.util.Try
 import scala.collection.JavaConverters._
 import ldbc.snb.datagen.generator.dictionary.Dictionaries
 
-/** PersonRDDProcessor伴生对象 - 提供静态工具方法 */
+/** PersonRDDProcessor companion object - provides static utility methods */
 object PersonRDDProcessor {
-  // 语言列表转字符串（避免序列化问题）
+  /**
+   * Convert language list to string (avoid serialization issues)
+   *
+   * @param languages Java list of language IDs
+   * @return Semicolon-separated string of language IDs
+   */
   def getLanguages(languages: java.util.List[Integer]): String = {
     if (languages != null) languages.asScala.map(_.toString).mkString(";") else ""
   }
 
-  // 邮箱列表转字符串（避免序列化问题）
+  /**
+   * Convert email list to string (avoid serialization issues)
+   *
+   * @param emails Java list of email addresses
+   * @return Semicolon-separated string of emails
+   */
   def getEmails(emails: java.util.List[String]): String = {
     if (emails != null) emails.asScala.mkString(";") else ""
   }
 }
 
-/** 基于RDD的Person处理器，处理静态Person实体及关系 */
+/** RDD-based Person processor, processing static Person entities and relationships */
 class PersonRDDProcessor(
                           idManager: UnifiedIdManager,
                           config: Map[String, String] = Map.empty
@@ -52,13 +62,13 @@ class PersonRDDProcessor(
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[PersonRDDProcessor])
 
-  // Person DataFrame标准Schema
+  // Person DataFrame standard Schema
   private val personSchema = StructType(Array(
     StructField("id", LongType, nullable = false),
     StructField("firstName", StringType, nullable = true),
     StructField("lastName", StringType, nullable = true),
     StructField("gender", StringType, nullable = true),
-    StructField("birthday", StringType, nullable = true), // 用String避免DateType问题
+    StructField("birthday", StringType, nullable = true), // Use String to avoid DateType issues
     StructField("creationDate", TimestampType, nullable = false),
     StructField("locationIP", StringType, nullable = true),
     StructField("browserUsed", StringType, nullable = true),
@@ -67,12 +77,12 @@ class PersonRDDProcessor(
     StructField("emails", StringType, nullable = true)
   ))
 
-  // 处理统计信息
+  // Processing statistics
   private val processingStats = mutable.Map[String, Long]()
 
-  // 缓存Person RDD，避免重复生成
+  // Cached Person RDD to avoid repeated generation
   private lazy val cachedPersonRDD = {
-    logger.info("生成并缓存Person RDD（含knows关系）")
+    logger.info("Generating and caching Person RDD (with knows relationships)")
     val ldbcConfig = createLdbcConfiguration()
 
     import ldbc.snb.datagen.generator.generators._
@@ -82,12 +92,12 @@ class PersonRDDProcessor(
     DatagenParams.readConf(ldbcConfig)
     Dictionaries.loadDictionaries()
 
-    // 步骤1: 生成Person对象
-    logger.info("步骤1: 生成Person对象")
+    // Step 1: Generate Person objects
+    logger.info("Step 1: Generating Person objects")
     val personRDD = SparkPersonGenerator(ldbcConfig)(spark)
 
-    // 步骤2: 生成3种knows关系（45%大学 + 45%兴趣 + 10%随机）
-    logger.info("步骤2: 生成knows关系（45%大学 + 45%兴趣 + 10%随机）")
+    // Step 2: Generate 3 types of knows relationships (45% university + 45% interest + 10% random)
+    logger.info("Step 2: Generating knows relationships (45% university + 45% interest + 10% random)")
     val percentages = Seq(0.45f, 0.45f, 0.1f)
     val knowsGeneratorClassName = DatagenParams.getKnowsGenerator
 
@@ -95,107 +105,131 @@ class PersonRDDProcessor(
     val interestRanker = SparkRanker.create(_.byInterest)
     val randomRanker = SparkRanker.create(_.byRandomId)
 
-    logger.info("  - 生成基于大学的knows关系")
+    logger.info("  - Generating university-based knows relationships")
     val uniKnows = SparkKnowsGenerator(personRDD, uniRanker, ldbcConfig, percentages, 0, knowsGeneratorClassName)
-    logger.info("  - 生成基于兴趣的knows关系")
+    logger.info("  - Generating interest-based knows relationships")
     val interestKnows = SparkKnowsGenerator(personRDD, interestRanker, ldbcConfig, percentages, 1, knowsGeneratorClassName)
-    logger.info("  - 生成随机knows关系")
+    logger.info("  - Generating random knows relationships")
     val randomKnows = SparkKnowsGenerator(personRDD, randomRanker, ldbcConfig, percentages, 2, knowsGeneratorClassName)
 
-    // 步骤3: 合并所有knows关系
-    logger.info("步骤3: 合并所有knows关系")
+    // Step 3: Merge all knows relationships
+    logger.info("Step 3: Merging all knows relationships")
     val personRDDWithKnows = SparkKnowsMerger(uniKnows, interestKnows, randomKnows)
 
     import org.apache.spark.storage.StorageLevel
     val cached = personRDDWithKnows.persist(StorageLevel.MEMORY_AND_DISK_SER)
 
-    logger.info(s"Person RDD（含knows关系）缓存完成，存储级别: MEMORY_AND_DISK_SER")
+    logger.info(s"Person RDD (with knows relationships) caching completed, storage level: MEMORY_AND_DISK_SER")
     cached
   }
 
-  logger.info("PersonRDDProcessor初始化")
+  logger.info("PersonRDDProcessor initialized")
 
-  /** 处理Person实体数据 */
+  /**
+   * Process Person entity data
+   *
+   * @return Try wrapping DataFrame with Person entity data including assigned IDs
+   */
   def processPersonFromRDD(): Try[DataFrame] = {
     Try {
-      logger.info("处理Person RDD数据")
+      logger.info("Processing Person RDD data")
       val personDF = generatePersonDataFrame()
       val personWithIds = idManager.assignVertexIds(personDF, "Person")
 
       val recordCount = personWithIds.count()
       processingStats("person_count") = recordCount
-      logger.info(s"Person处理完成: 记录数=$recordCount")
+      logger.info(s"Person processing completed: record count=$recordCount")
 
       personWithIds
     }.recover {
       case e: Exception =>
-        logger.error("Person处理失败", e)
+        logger.error("Person processing failed", e)
         throw e
     }
   }
 
-  /** 处理Person相关关系数据 */
+  /**
+   * Process Person relationship data
+   *
+   * Processes all Person-related relationships including knows, hasInterest, studyAt, workAt, and isLocatedIn.
+   *
+   * @return Try wrapping Map of relationship type to DataFrame
+   */
   def processPersonRelationsFromRDD(): Try[Map[String, DataFrame]] = {
     Try {
-      logger.info("处理Person关系数据")
+      logger.info("Processing Person relationship data")
       val relations = mutable.Map[String, DataFrame]()
 
-      // 处理knows关系
+      // Process knows relationships
       val knowsDF = processKnowsRelation()
       relations("knows") = knowsDF
       processingStats("knows_count") = knowsDF.count()
 
-      // 处理hasInterest关系
+      // Process hasInterest relationships
       val hasInterestDF = processHasInterestRelation()
       relations("hasInterest") = hasInterestDF
       processingStats("hasInterest_count") = hasInterestDF.count()
 
-      // 处理studyAt关系
+      // Process studyAt relationships
       val studyAtDF = processStudyAtRelation()
       relations("studyAt") = studyAtDF
       processingStats("studyAt_count") = studyAtDF.count()
 
-      // 处理workAt关系
+      // Process workAt relationships
       val workAtDF = processWorkAtRelation()
       relations("workAt") = workAtDF
       processingStats("workAt_count") = workAtDF.count()
 
-      logger.info(s"Person关系处理完成: knows=${processingStats("knows_count")}, " +
+      // Process Person_isLocatedIn_Place relationships
+      val isLocatedInDF = processPersonIsLocatedInPlace()
+      relations("isLocatedIn") = isLocatedInDF
+      processingStats("isLocatedIn_count") = isLocatedInDF.count()
+
+      logger.info(s"Person relationship processing completed: knows=${processingStats("knows_count")}, " +
         s"hasInterest=${processingStats("hasInterest_count")}, " +
         s"studyAt=${processingStats("studyAt_count")}, " +
-        s"workAt=${processingStats("workAt_count")}")
+        s"workAt=${processingStats("workAt_count")}, " +
+        s"isLocatedIn=${processingStats("isLocatedIn_count")}")
 
       relations.toMap
     }.recover {
       case e: Exception =>
-        logger.error("Person关系处理失败", e)
+        logger.error("Person relationship processing failed", e)
         throw e
     }
   }
 
-  /** 处理Person数据并添加到数据收集器 */
+  /**
+   * Process Person data and add to data collector
+   *
+   * Processes both Person entities and all related relationships, then adds them to the data collector.
+   *
+   * @param dataCollector GraphArDataCollector to store processed data
+   * @return Try wrapping PersonProcessingResult with statistics
+   */
   def processAndCollect(dataCollector: GraphArDataCollector): Try[PersonProcessingResult] = {
     Try {
-      logger.info("处理Person数据并收集到GraphArDataCollector")
+      logger.info("Processing Person data and collecting to GraphArDataCollector")
 
-      // 处理Person实体
+      // Process Person entities
       val personDF = processPersonFromRDD().get
-      logger.info(s"Person添加到DataCollector，记录数: ${personDF.count()}")
+      logger.info(s"Person added to DataCollector, record count: ${personDF.count()}")
       dataCollector.addStaticVertexData("Person", personDF)
 
-      // 处理Person关系
+      // Process Person relationships
       val relations = processPersonRelationsFromRDD().get
-      logger.info(s"处理Person关系，类型数: ${relations.size}")
+      logger.info(s"Processing Person relationships, types count: ${relations.size}")
 
       relations.foreach { case (relationType, df) =>
         val count = df.count()
-        logger.info(s"处理关系 $relationType，记录数: $count")
+        logger.info(s"Processing relationship $relationType, record count: $count")
         relationType match {
           case "knows" => dataCollector.addStaticEdgeData(("Person", "knows", "Person"), df)
           case "hasInterest" => dataCollector.addStaticEdgeData(("Person", "hasInterest", "Tag"), df)
           case "studyAt" => dataCollector.addStaticEdgeData(("Person", "studyAt", "Organisation"), df)
           case "workAt" => dataCollector.addStaticEdgeData(("Person", "workAt", "Organisation"), df)
-          case _ => logger.warn(s"未知关系类型: $relationType")
+          case "isLocatedIn" => dataCollector.addStaticEdgeData(("Person", "isLocatedIn", "Place"), df)
+          case _ => logger.warn(s"Unknown relationship type: $relationType")
         }
       }
 
@@ -205,21 +239,22 @@ class PersonRDDProcessor(
         hasInterestCount = processingStats("hasInterest_count"),
         studyAtCount = processingStats("studyAt_count"),
         workAtCount = processingStats("workAt_count"),
+        isLocatedInCount = processingStats.getOrElse("isLocatedIn_count", 0L),
         success = true
       )
 
-      logger.info(s"Person处理和收集完成: $result")
+      logger.info(s"Person processing and collection completed: $result")
       result
     }.recover {
       case e: Exception =>
-        logger.error("Person处理和收集失败", e)
+        logger.error("Person processing and collection failed", e)
         PersonProcessingResult(0, 0, 0, 0, 0, success = false, error = Some(e.getMessage))
     }
   }
 
-  /** 从缓存RDD生成Person DataFrame */
+  /** Generate Person DataFrame from cached RDD */
   private def generatePersonDataFrame(): DataFrame = {
-    logger.info("从缓存RDD生成Person DataFrame")
+    logger.info("Generating Person DataFrame from cached RDD")
     import scala.collection.JavaConverters._
     val personDF = spark.createDataFrame(cachedPersonRDD.map { person =>
       org.apache.spark.sql.Row(
@@ -237,25 +272,27 @@ class PersonRDDProcessor(
       )
     }, personSchema)
 
-    logger.info("Person DataFrame生成成功")
+    logger.info("Person DataFrame generated successfully")
     personDF
   }
 
-  /** 创建LDBC配置 */
+  /** Create LDBC configuration */
   private def createLdbcConfiguration(): ldbc.snb.datagen.util.GeneratorConfiguration = {
     import ldbc.snb.datagen.util.{GeneratorConfiguration, ConfigParser}
     import scala.collection.JavaConverters._
 
     val scaleFactor = spark.conf.getOption("ldbc.scale.factor").map(_.toDouble).getOrElse(0.003)
-    val config = org.apache.graphar.datasources.ldbc.util.LdbcConfigUtils.createFastTestConfig(scaleFactor.toString)
+    // Convert double to integer string for LDBC (e.g., 1.0 -> "1", 0.003 -> "0.003")
+    val scaleFactorString = if (scaleFactor == scaleFactor.toInt) scaleFactor.toInt.toString else scaleFactor.toString
+    val config = org.apache.graphar.datasources.ldbc.util.LdbcConfigUtils.createFastTestConfig(scaleFactorString)
 
-    logger.info(s"LDBC配置创建: scaleFactor=$scaleFactor")
+    logger.info(s"LDBC configuration created: scaleFactor=$scaleFactor, scaleFactorString=$scaleFactorString")
     config
   }
 
-  /** 处理knows关系（使用LDBC的Person.getKnows()） */
+  /** Process knows relationships (using LDBC Person.getKnows()) */
   private def processKnowsRelation(): DataFrame = {
-    logger.info("生成knows关系数据")
+    logger.info("Generating knows relationship data")
     val knowsSchema = StructType(Array(
       StructField("src", LongType, nullable = false),
       StructField("dst", LongType, nullable = false),
@@ -277,13 +314,13 @@ class PersonRDDProcessor(
     }
 
     val knowsDF = spark.createDataFrame(knowsRows, knowsSchema).coalesce(1)
-    logger.info(s"生成knows关系 ${knowsDF.count()} 条")
+    logger.info(s"Generated knows relationships: ${knowsDF.count()} records")
     knowsDF
   }
 
-  /** 处理hasInterest关系（使用LDBC的Person.getInterests()） */
+  /** Process hasInterest relationships (using LDBC Person.getInterests()) */
   private def processHasInterestRelation(): DataFrame = {
-    logger.info("生成hasInterest关系数据")
+    logger.info("Generating hasInterest relationship data")
     val hasInterestSchema = StructType(Array(
       StructField("src", LongType, nullable = false),
       StructField("dst", LongType, nullable = false),
@@ -303,13 +340,13 @@ class PersonRDDProcessor(
     }
 
     val hasInterestDF = spark.createDataFrame(hasInterestRows, hasInterestSchema).coalesce(1)
-    logger.info(s"生成hasInterest关系 ${hasInterestDF.count()} 条")
+    logger.info(s"Generated hasInterest relationships: ${hasInterestDF.count()} records")
     hasInterestDF
   }
 
-  /** 处理studyAt关系（使用LDBC官方解码逻辑） */
+  /** Process studyAt relationships (using LDBC official decoding logic) */
   private def processStudyAtRelation(): DataFrame = {
-    logger.info("生成studyAt关系数据")
+    logger.info("Generating studyAt relationship data")
     val studyAtSchema = StructType(Array(
       StructField("src", LongType, nullable = false),
       StructField("dst", LongType, nullable = false),
@@ -328,13 +365,13 @@ class PersonRDDProcessor(
     }
 
     val studyAtDF = spark.createDataFrame(studyAtRows, studyAtSchema).coalesce(1)
-    logger.info(s"生成studyAt关系 ${studyAtDF.count()} 条")
+    logger.info(s"Generated studyAt relationships: ${studyAtDF.count()} records")
     studyAtDF
   }
 
-  /** 处理workAt关系（使用LDBC的Person.getCompanies()） */
+  /** Process workAt relationships (using LDBC Person.getCompanies()) */
   private def processWorkAtRelation(): DataFrame = {
-    logger.info("生成workAt关系数据")
+    logger.info("Generating workAt relationship data")
     val workAtSchema = StructType(Array(
       StructField("src", LongType, nullable = false),
       StructField("dst", LongType, nullable = false),
@@ -354,37 +391,67 @@ class PersonRDDProcessor(
     }
 
     val workAtDF = spark.createDataFrame(workAtRows, workAtSchema).coalesce(1)
-    logger.info(s"生成workAt关系 ${workAtDF.count()} 条")
+    logger.info(s"Generated workAt relationships: ${workAtDF.count()} records")
     workAtDF
   }
 
-  /** 获取处理统计信息 */
+  /** Process Person_isLocatedIn_Place relationships (using Person.getCityId()) */
+  private def processPersonIsLocatedInPlace(): DataFrame = {
+    logger.info("Generating Person_isLocatedIn_Place relationship data")
+    val isLocatedInSchema = StructType(Array(
+      StructField("src", LongType, nullable = false),
+      StructField("dst", LongType, nullable = false)
+    ))
+
+    val isLocatedInRows = cachedPersonRDD.map { person =>
+      val personId = person.getAccountId().toLong
+      val cityId = person.getCityId().toLong
+      org.apache.spark.sql.Row(personId, cityId)
+    }
+
+    val isLocatedInDF = spark.createDataFrame(isLocatedInRows, isLocatedInSchema).coalesce(1)
+    logger.info(s"Generated Person_isLocatedIn_Place relationships: ${isLocatedInDF.count()} records")
+    isLocatedInDF
+  }
+
+  /**
+   * Get processing statistics
+   *
+   * @return Map of metric name to count
+   */
   def getProcessingStatistics(): Map[String, Long] = processingStats.toMap
 
-  /** 验证Person数据完整性 */
+  /**
+   * Validate Person data integrity
+   *
+   * Validates required fields, ID uniqueness, and NULL value constraints.
+   *
+   * @param personDF DataFrame containing Person data to validate
+   * @return ValidationResult indicating success or listing validation errors
+   */
   def validatePersonData(personDF: DataFrame): org.apache.graphar.datasources.ldbc.model.ValidationResult = {
     try {
       val validationErrors = mutable.ListBuffer[String]()
       val requiredFields = Set("id", "firstName", "lastName", "creationDate")
       val actualFields = personDF.columns.toSet
 
-      // 检查必需字段
+      // Check required fields
       requiredFields.foreach { field =>
-        if (!actualFields.contains(field)) validationErrors += s"缺少字段: $field"
+        if (!actualFields.contains(field)) validationErrors += s"Missing field: $field"
       }
 
-      // 检查ID唯一性
+      // Check ID uniqueness
       val totalCount = personDF.count()
       val uniqueIdCount = personDF.select("id").distinct().count()
       if (totalCount != uniqueIdCount) {
-        validationErrors += s"ID不唯一: 总数=$totalCount, 唯一数=$uniqueIdCount"
+        validationErrors += s"ID not unique: total=$totalCount, unique=$uniqueIdCount"
       }
 
-      // 检查NULL值
+      // Check NULL values
       requiredFields.foreach { field =>
         if (actualFields.contains(field)) {
           val nullCount = personDF.filter(col(field).isNull).count()
-          if (nullCount > 0) validationErrors += s"字段 $field 有 $nullCount 个NULL值"
+          if (nullCount > 0) validationErrors += s"Field $field has $nullCount NULL values"
         }
       }
 
@@ -392,19 +459,20 @@ class PersonRDDProcessor(
       else ValidationFailure(validationErrors.toList)
     } catch {
       case e: Exception =>
-        logger.error("数据验证失败", e)
-        ValidationFailure(List(s"验证出错: ${e.getMessage}"))
+        logger.error("Data validation failed", e)
+        ValidationFailure(List(s"Validation error: ${e.getMessage}"))
     }
   }
 }
 
-/** Person处理结果封装 */
+/** Person processing result wrapper */
 case class PersonProcessingResult(
                                    personCount: Long,
                                    knowsCount: Long,
                                    hasInterestCount: Long,
                                    studyAtCount: Long,
                                    workAtCount: Long,
+                                   isLocatedInCount: Long = 0L,
                                    success: Boolean,
                                    error: Option[String] = None
                                  )

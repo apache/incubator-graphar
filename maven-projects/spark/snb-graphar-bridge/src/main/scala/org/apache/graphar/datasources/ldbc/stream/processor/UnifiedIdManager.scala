@@ -27,49 +27,52 @@ import java.util.concurrent.atomic.AtomicLong
 import scala.collection.mutable
 
 /**
- * 统一ID管理器
+ * Unified ID Manager
  *
- * 解决静态数据（RDD生成）和流式数据的顶点ID空间冲突问题
- * 基于LDBC scale factor预分配ID空间，确保全局ID一致性
+ * Solves vertex ID space conflict between static data (RDD-generated) and streaming data
+ * Pre-allocates ID space based on LDBC scale factor to ensure global ID consistency
  */
 class UnifiedIdManager(scaleFactor: Double, config: Map[String, String] = Map.empty) {
 
   private val logger: Logger = LoggerFactory.getLogger(classOf[UnifiedIdManager])
 
-  // 基于LDBC scale factor计算的实体数量预估
+  // Entity count estimates based on LDBC scale factor
   private val entityCountEstimates = calculateEntityCounts(scaleFactor)
 
-  // ID空间分配表：实体类型 -> ID空间信息
+  // ID space allocation table: entity type -> ID space info
   private val idSpaceAllocation = mutable.Map[String, IdSpaceInfo]()
 
-  // 全局ID计数器（原子操作保证线程安全）
+  // Global ID counter (atomic operations ensure thread safety)
   private val globalIdCounter = new AtomicLong(0)
 
-  // 初始化标志
+  // Initialization flag
   @volatile private var initialized = false
 
-  logger.info(s"UnifiedIdManager初始化: scaleFactor=$scaleFactor")
+  logger.info(s"UnifiedIdManager initialized: scaleFactor=$scaleFactor")
 
   /**
-   * 初始化ID空间分配
+   * Initialize ID space allocation
+   *
+   * Pre-allocates ID space for all entity types based on scale factor.
+   * This method is thread-safe and idempotent.
    */
   def initialize(): Unit = {
     if (initialized) {
-      logger.warn("UnifiedIdManager已经初始化，跳过重复初始化")
+      logger.warn("UnifiedIdManager already initialized, skipping duplicate initialization")
       return
     }
 
     synchronized {
       if (!initialized) {
-        logger.info("开始初始化ID空间分配")
+        logger.info("Starting ID space allocation initialization")
 
         var currentOffset = 0L
 
-        // 静态实体ID空间分配（预留足够空间）
+        // Static entity ID space allocation (reserve sufficient space)
         val staticEntities = List("Person", "Organisation", "Place", "Tag", "TagClass")
         staticEntities.foreach { entityType =>
           val estimatedCount = entityCountEstimates.getOrElse(entityType, 1000L)
-          val reservedSpace = (estimatedCount * 1.2).toLong // 预留20%空间
+          val reservedSpace = (estimatedCount * 1.2).toLong // Reserve 20% extra space
 
           idSpaceAllocation(entityType) = IdSpaceInfo(
             entityType = entityType,
@@ -79,15 +82,15 @@ class UnifiedIdManager(scaleFactor: Double, config: Map[String, String] = Map.em
             entityCategory = "static"
           )
 
-          logger.info(s"静态实体 $entityType ID空间: [$currentOffset, ${currentOffset + reservedSpace - 1}], 估算数量: $estimatedCount")
+          logger.info(s"Static entity $entityType ID space: [$currentOffset, ${currentOffset + reservedSpace - 1}], estimated count: $estimatedCount")
           currentOffset += reservedSpace
         }
 
-        // 动态实体ID空间分配
+        // Dynamic entity ID space allocation
         val dynamicEntities = List("Forum", "Post", "Comment", "Photo")
         dynamicEntities.foreach { entityType =>
           val estimatedCount = entityCountEstimates.getOrElse(entityType, 10000L)
-          val reservedSpace = (estimatedCount * 1.5).toLong // 动态数据预留更多空间
+          val reservedSpace = (estimatedCount * 1.5).toLong // Reserve more space for dynamic data
 
           idSpaceAllocation(entityType) = IdSpaceInfo(
             entityType = entityType,
@@ -97,69 +100,85 @@ class UnifiedIdManager(scaleFactor: Double, config: Map[String, String] = Map.em
             entityCategory = "dynamic"
           )
 
-          logger.info(s"动态实体 $entityType ID空间: [$currentOffset, ${currentOffset + reservedSpace - 1}], 估算数量: $estimatedCount")
+          logger.info(s"Dynamic entity $entityType ID space: [$currentOffset, ${currentOffset + reservedSpace - 1}], estimated count: $estimatedCount")
           currentOffset += reservedSpace
         }
 
         globalIdCounter.set(currentOffset)
         initialized = true
 
-        logger.info(s"ID空间初始化完成，总预分配空间: $currentOffset")
+        logger.info(s"ID space initialization completed, total pre-allocated space: $currentOffset")
       }
     }
   }
 
   /**
-   * 为指定实体类型分配ID范围
+   * Allocate ID range for specified entity type
+   *
+   * @param entityType Entity type requesting ID allocation
+   * @param requestedCount Number of IDs to allocate
+   * @return IdRange containing start, end, and count of allocated IDs
+   * @throws IllegalStateException if manager is not initialized
    */
   def allocateIdRange(entityType: String, requestedCount: Long): IdRange = {
     if (!initialized) {
-      throw new IllegalStateException("UnifiedIdManager未初始化，请先调用initialize()方法")
+      throw new IllegalStateException("UnifiedIdManager not initialized, please call initialize() first")
     }
 
     val spaceInfo = idSpaceAllocation.getOrElseUpdate(entityType, {
-      logger.warn(s"实体类型 $entityType 未在预分配空间中，动态创建ID空间")
+      logger.warn(s"Entity type $entityType not in pre-allocated space, dynamically creating ID space")
       expandIdSpace(entityType, requestedCount)
     })
 
     val startId = spaceInfo.currentPosition.getAndAdd(requestedCount)
     val endId = startId + requestedCount - 1
 
-    // 检查是否超出预分配空间
+    // Check if exceeding pre-allocated space
     if (endId > spaceInfo.endId) {
-      logger.warn(s"实体 $entityType ID空间不足 (请求: $requestedCount, 剩余: ${spaceInfo.endId - startId + 1})，自动扩展")
+      logger.warn(s"Entity $entityType ID space insufficient (requested: $requestedCount, remaining: ${spaceInfo.endId - startId + 1}), auto-expanding")
       expandIdSpace(entityType, requestedCount * 2)
     }
 
-    logger.debug(s"为实体 $entityType 分配ID范围: [$startId, $endId], 数量: $requestedCount")
+    logger.debug(s"Allocated ID range for entity $entityType: [$startId, $endId], count: $requestedCount")
 
     IdRange(startId, endId, requestedCount)
   }
 
   /**
-   * 为DataFrame分配顶点ID
+   * Assign vertex IDs to DataFrame
+   *
+   * Allocates a continuous ID range for the DataFrame and adds _graphArVertexIndex column.
+   *
+   * @param df DataFrame to assign IDs to
+   * @param entityType Entity type for ID space allocation
+   * @return DataFrame with added _graphArVertexIndex, _entityType, and _idSpaceCategory columns
    */
   def assignVertexIds(df: DataFrame, entityType: String): DataFrame = {
     val rowCount = df.count()
     val idRange = allocateIdRange(entityType, rowCount)
 
-    logger.info(s"为实体 $entityType 分配顶点ID: 记录数=$rowCount, ID范围=[${idRange.startId}, ${idRange.endId}]")
+    logger.info(s"Assigned vertex IDs for entity $entityType: record count=$rowCount, ID range=[${idRange.startId}, ${idRange.endId}]")
 
-    // 为DataFrame添加连续的_graphArVertexIndex列
+    // Add continuous _graphArVertexIndex column to DataFrame
     df.withColumn("_graphArVertexIndex", monotonically_increasing_id() + idRange.startId)
       .withColumn("_entityType", lit(entityType))
       .withColumn("_idSpaceCategory", lit(getEntityCategory(entityType)))
   }
 
   /**
-   * 获取ID空间使用报告
+   * Get ID space usage report
+   *
+   * @return Map of entity type to IdSpaceInfo showing current ID allocation state
    */
   def getIdSpaceReport(): Map[String, IdSpaceInfo] = {
     idSpaceAllocation.toMap
   }
 
   /**
-   * 获取实体的ID空间类别
+   * Get ID space category for entity
+   *
+   * @param entityType Entity type to query
+   * @return Category string ("static", "dynamic", "expanded", or "unknown")
    */
   def getEntityCategory(entityType: String): String = {
     idSpaceAllocation.get(entityType) match {
@@ -169,12 +188,14 @@ class UnifiedIdManager(scaleFactor: Double, config: Map[String, String] = Map.em
   }
 
   /**
-   * 检查ID管理器是否已初始化
+   * Check if ID manager is initialized
+   *
+   * @return true if initialize() has been called successfully
    */
   def isInitialized: Boolean = initialized
 
   /**
-   * 动态扩展ID空间
+   * Dynamically expand ID space
    */
   private def expandIdSpace(entityType: String, additionalSpace: Long): IdSpaceInfo = {
     val currentGlobalOffset = globalIdCounter.getAndAdd(additionalSpace)
@@ -187,15 +208,15 @@ class UnifiedIdManager(scaleFactor: Double, config: Map[String, String] = Map.em
       entityCategory = "expanded"
     )
 
-    logger.info(s"扩展实体 $entityType ID空间: [$currentGlobalOffset, ${currentGlobalOffset + additionalSpace - 1}]")
+    logger.info(s"Expanded entity $entityType ID space: [$currentGlobalOffset, ${currentGlobalOffset + additionalSpace - 1}]")
     expandedInfo
   }
 
   /**
-   * 基于LDBC scale factor计算各实体类型的预估数量
+   * Calculate estimated entity counts based on LDBC scale factor
    */
   private def calculateEntityCounts(scaleFactor: Double): Map[String, Long] = {
-    // 基于LDBC SNB规范的实体数量计算公式
+    // Entity count calculation formulas based on LDBC SNB specification
     val basePersonCount = (1000 * scaleFactor).toLong
 
     Map(
@@ -212,7 +233,9 @@ class UnifiedIdManager(scaleFactor: Double, config: Map[String, String] = Map.em
   }
 
   /**
-   * 生成ID空间使用统计
+   * Generate ID space usage statistics
+   *
+   * @return IdSpaceUsageStatistics containing detailed usage information for all entity types
    */
   def generateUsageStatistics(): IdSpaceUsageStatistics = {
     val entityStats: List[EntityIdUsage] = idSpaceAllocation.map { case (entityType, spaceInfo) =>
@@ -244,7 +267,7 @@ class UnifiedIdManager(scaleFactor: Double, config: Map[String, String] = Map.em
 }
 
 /**
- * ID空间信息
+ * ID space information
  */
 case class IdSpaceInfo(
   entityType: String,
@@ -255,12 +278,12 @@ case class IdSpaceInfo(
 )
 
 /**
- * ID范围
+ * ID range
  */
 case class IdRange(startId: Long, endId: Long, count: Long)
 
 /**
- * 实体ID使用情况
+ * Entity ID usage information
  */
 case class EntityIdUsage(
   entityType: String,
@@ -273,7 +296,7 @@ case class EntityIdUsage(
 )
 
 /**
- * ID空间使用统计
+ * ID space usage statistics
  */
 case class IdSpaceUsageStatistics(
   totalAllocatedIds: Long,
