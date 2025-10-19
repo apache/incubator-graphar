@@ -20,9 +20,15 @@
 package org.apache.graphar.info.saver;
 
 import java.io.IOException;
+import java.net.URI;
+import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
+import org.apache.graphar.info.VertexInfo;
 
-@FunctionalInterface
-public interface GraphSaver {
-    void save(String path, GraphInfo graphInfo) throws IOException;
+public interface GraphInfoSaver {
+    void save(URI graphInfoUri, GraphInfo graphInfo) throws IOException;
+
+    void save(URI vertexInfoUri, VertexInfo vertexInfo) throws IOException;
+
+    void save(URI edgeInfoUri, EdgeInfo edgeInfo) throws IOException;
 }

@@ -23,3 +23,28 @@ repos:
         args:
         - '--verbose'
 
+  - repo: local
+    hooks:
+      - id: spotless-java-info
+        name: Spotless java-info
+        entry: bash -c 'cd maven-projects/info && mvn spotless:apply'
+        language: system
+        files: ^maven-projects/info/
+        pass_filenames: false
+        require_serial: true
+
+      - id: spotless-java-ffi
+        name: Spotless java-ffi
+        entry: bash -c 'cd maven-projects/java && mvn spotless:apply'
+        language: system
+        files: ^maven-projects/java/
+        pass_filenames: false
+        require_serial: true
+
+      - id: spotless-spark
+        name: Spotless spark
+        entry: bash -c 'cd maven-projects/spark && mvn spotless:apply'
+        language: system
+        files: ^maven-projects/spark/
+        pass_filenames: false
+        require_serial: true

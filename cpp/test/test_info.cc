@@ -325,6 +325,22 @@ version: gar/v1
     auto extend_info3 = extend_info->AddPropertyGroup(pg3);
     REQUIRE(!extend_info3.status().ok());
   }
+
+  SECTION("RemovePropertyGroup") {
+    auto pg3 = CreatePropertyGroup({Property("p3", int32(), false)},
+                                   FileType::CSV, "p3/");
+    auto maybe_extend_info = vertex_info->AddPropertyGroup(pg3);
+    REQUIRE(maybe_extend_info.status().ok());
+    auto extend_info = maybe_extend_info.value();
+    REQUIRE(extend_info->PropertyGroupNum() == 2);
+    auto maybe_removed_info = extend_info->RemovePropertyGroup(pg3);
+    REQUIRE(maybe_removed_info.status().ok());
+    auto removed_info = maybe_removed_info.value();
+    REQUIRE(removed_info->PropertyGroupNum() == 1);
+    REQUIRE(removed_info->HasPropertyGroup(pg3) == false);
+    auto maybe_removed_again = removed_info->RemovePropertyGroup(pg3);
+    REQUIRE(!maybe_removed_again.status().ok());
+  }
 }
 
 TEST_CASE_METHOD(GlobalFixture, "EdgeInfo") {
@@ -533,6 +549,21 @@ version: gar/v1
     REQUIRE(!extend_info2.status().ok());
   }
 
+  SECTION("RemoveAdjacentList") {
+    auto adj_list2 = CreateAdjacentList(AdjListType::ordered_by_dest,
+                                        FileType::CSV, "ordered_by_dest/");
+    auto maybe_extend_info = edge_info->AddAdjacentList(adj_list2);
+    REQUIRE(maybe_extend_info.status().ok());
+    auto extend_info = maybe_extend_info.value();
+    auto maybe_remove_info = extend_info->RemoveAdjacentList(adj_list2);
+    REQUIRE(maybe_remove_info.status().ok());
+    auto remove_info = maybe_remove_info.value();
+    REQUIRE(remove_info->HasAdjacentListType(AdjListType::ordered_by_dest) ==
+            false);
+    auto remove_info2 = remove_info->RemoveAdjacentList(adj_list2);
+    REQUIRE(!remove_info2.status().ok());
+  }
+
   SECTION("AddPropertyGroup") {
     auto pg2 = CreatePropertyGroup({Property("p2", int32(), false)},
                                    FileType::CSV, "p2/");
@@ -549,6 +580,23 @@ version: gar/v1
     REQUIRE(extend_info->IsPrimaryKey("p2") == false);
     auto extend_info2 = extend_info->AddPropertyGroup(pg2);
     REQUIRE(!extend_info2.status().ok());
+  }
+
+  SECTION("RemovePropertyGroup") {
+    auto pg2 = CreatePropertyGroup({Property("p2", int32(), false)},
+                                   FileType::CSV, "p2/");
+    auto maybe_extend_info = edge_info->AddPropertyGroup(pg2);
+    REQUIRE(maybe_extend_info.status().ok());
+    auto extend_info = maybe_extend_info.value();
+    auto maybe_remove_info = extend_info->RemovePropertyGroup(pg2);
+    REQUIRE(maybe_remove_info.status().ok());
+    auto remove_info = maybe_remove_info.value();
+    REQUIRE(remove_info->PropertyGroupNum() == 1);
+    REQUIRE(remove_info->HasProperty("p2") == false);
+    REQUIRE(remove_info->HasPropertyGroup(pg2) == false);
+    REQUIRE(remove_info->GetPropertyGroups().size() == 1);
+    auto remove_info2 = remove_info->RemovePropertyGroup(pg2);
+    REQUIRE(!remove_info2.status().ok());
   }
 }
 
@@ -693,6 +741,23 @@ vertices:
     REQUIRE(!extend_info2.status().ok());
   }
 
+  SECTION("RemoveVertex") {
+    auto vertex_info2 = CreateVertexInfo("test_vertex2", 100, {pg}, {},
+                                         "test_vertex2/", version);
+    auto maybe_extend_info = graph_info->AddVertex(vertex_info2);
+    REQUIRE(maybe_extend_info.status().ok());
+    auto extend_info = maybe_extend_info.value();
+    auto maybe_remove_info = extend_info->RemoveVertex(vertex_info2);
+    REQUIRE(maybe_remove_info.status().ok());
+    auto remove_info = maybe_remove_info.value();
+    REQUIRE(remove_info->GetVertexInfos().size() == 1);
+    REQUIRE(remove_info->GetVertexInfoByIndex(1) == nullptr);
+    REQUIRE(remove_info->GetVertexInfo("test_vertex2") == nullptr);
+    REQUIRE(remove_info->GetVertexInfoByIndex(1) == nullptr);
+    auto remove_info2 = remove_info->RemoveVertex(vertex_info2);
+    REQUIRE(!remove_info2.status().ok());
+  }
+
   SECTION("AddEdge") {
     auto edge_info2 =
         CreateEdgeInfo("person", "knows2", "person", 1024, 100, 100, true,
@@ -714,6 +779,26 @@ vertices:
     REQUIRE(extend_info->GetEdgeInfos()[1]->GetEdgeType() == "knows2");
     auto extend_info2 = extend_info->AddEdge(edge_info2);
     REQUIRE(!extend_info2.status().ok());
+  }
+
+  SECTION("RemoveEdge") {
+    auto edge_info2 =
+        CreateEdgeInfo("person", "knows2", "person", 1024, 100, 100, true,
+                       {CreateAdjacentList(AdjListType::ordered_by_source,
+                                           FileType::CSV, "adj_list/")},
+                       {pg}, "test_edge/", version);
+    auto maybe_extend_info = graph_info->AddEdge(edge_info2);
+    REQUIRE(maybe_extend_info.status().ok());
+    auto extend_info = maybe_extend_info.value();
+    auto maybe_remove_info = extend_info->RemoveEdge(edge_info2);
+    REQUIRE(maybe_remove_info.status().ok());
+    auto remove_info = maybe_remove_info.value();
+    REQUIRE(remove_info->EdgeInfoNum() == 1);
+    REQUIRE(remove_info->GetEdgeInfoByIndex(1) == nullptr);
+    REQUIRE(remove_info->GetEdgeInfo("person", "knows2", "person") == nullptr);
+    REQUIRE(remove_info->GetEdgeInfos().size() == 1);
+    auto remove_info2 = remove_info->RemoveEdge(edge_info2);
+    REQUIRE(!remove_info2.status().ok());
   }
 }
 

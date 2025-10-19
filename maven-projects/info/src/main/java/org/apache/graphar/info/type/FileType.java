@@ -24,6 +24,19 @@ public enum FileType {
     PARQUET,
     ORC;
 
+    public String toString() {
+        switch (this) {
+            case CSV:
+                return "csv";
+            case PARQUET:
+                return "parquet";
+            case ORC:
+                return "orc";
+            default:
+                throw new IllegalArgumentException("Unknown file type: " + this);
+        }
+    }
+
     public static FileType fromString(String fileType) {
         if (fileType == null) {
             return null;

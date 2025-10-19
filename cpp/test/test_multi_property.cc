@@ -25,7 +25,6 @@
 #include <string>
 #include "arrow/api.h"
 #include "arrow/filesystem/api.h"
-#include "examples/config.h"
 #include "graphar/arrow/chunk_reader.h"
 #include "graphar/arrow/chunk_writer.h"
 #include "graphar/fwd.h"
@@ -84,12 +83,12 @@ TEST_CASE_METHOD(GlobalFixture, "read multi-properties from csv file") {
     auto email_column = std::static_pointer_cast<arrow::StringArray>(chunk);
     for (int64_t row = 0; row < email_column->length(); ++row) {
       auto result = builder.Append();
-      ASSERT(result.ok());
+      REQUIRE(result.ok());
       if (email_column->IsValid(row)) {
         std::string emails_string = email_column->GetString(row);
         auto row_emails = SplitString(emails_string, ';');
         for (const auto& email : row_emails) {
-          ASSERT(value_builder->Append(email).ok());
+          REQUIRE(value_builder->Append(email).ok());
         }
       }
     }
@@ -125,7 +124,7 @@ TEST_CASE_METHOD(GlobalFixture, "read multi-properties from csv file") {
       emails += ";";
   }
   std::cout << "random row: " << expected_row << std::endl;
-  ASSERT(expected_emails == emails);
+  REQUIRE(expected_emails == emails);
   // write to parquet file
   std::string path = test_data_dir + "/ldbc/parquet/" + "ldbc.graph.yml";
   auto graph_info = graphar::GraphInfo::Load(path).value();
@@ -140,17 +139,16 @@ TEST_CASE_METHOD(GlobalFixture, "read multi-properties from csv file") {
   auto maybe_reader = VertexPropertyArrowChunkReader::Make(
       vertex_info, vertex_info->GetPropertyGroup("emails"),
       "/tmp/ldbc/parquet/");
-  assert(maybe_reader.status().ok());
+  REQUIRE(maybe_reader.status().ok());
   auto reader = maybe_reader.value();
-  assert(reader->seek(expected_row).ok());
+  REQUIRE(reader->seek(expected_row).ok());
   auto table_result = reader->GetChunk();
-  ASSERT(table_result.status().ok());
+  REQUIRE(table_result.status().ok());
   auto table = table_result.value();
   index = table->schema()->GetFieldIndex("emails");
   emails_col = table->column(index)->chunk(0);
   result = std::static_pointer_cast<arrow::ListArray>(
       emails_col->View(arrow::list(arrow::large_utf8())).ValueOrDie());
-  expected_row = expected_row % vertex_info->GetChunkSize();
   auto email_result =
       std::static_pointer_cast<arrow::LargeStringArray>(result->value_slice(0));
   emails = "";
@@ -161,7 +159,7 @@ TEST_CASE_METHOD(GlobalFixture, "read multi-properties from csv file") {
       emails += ";";
   }
   std::cout << emails << std::endl;
-  ASSERT(expected_emails == emails);
+  REQUIRE(expected_emails == emails);
 }
 TEST_CASE_METHOD(GlobalFixture, "TestMultiProperty high level builder") {
   int vertex_count = 3;
@@ -173,7 +171,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestMultiProperty high level builder") {
       {"alice@example.com", "alice123@example.com",
        "a.wonderland@example.com"}};
   std::string vertex_meta_file =
-      GetTestingResourceRoot() + "/ldbc/parquet/" + "person.vertex.yml";
+      test_data_dir + "/ldbc/parquet/" + "person.vertex.yml";
   auto vertex_meta = graphar::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
   graphar::IdType start_index = 0;
@@ -192,7 +190,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestMultiProperty high level builder") {
         v.AddProperty(graphar::Cardinality::SET, "emails",
                       email);  // Multi-property
       }
-      ASSERT(builder.AddVertex(v).IsKeyError());
+      REQUIRE(builder.AddVertex(v).IsKeyError());
     }
   }
   SECTION("test add single values to set property") {
@@ -206,7 +204,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestMultiProperty high level builder") {
     for (int i = 0; i < vertex_count; i++) {
       graphar::builder::Vertex v;
       v.AddProperty("emails", emails[i]);
-      ASSERT(builder.AddVertex(v).ok());
+      REQUIRE(builder.AddVertex(v).ok());
     }
   }
   SECTION("test add multi values to single property") {
@@ -220,7 +218,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestMultiProperty high level builder") {
     for (int i = 0; i < vertex_count; i++) {
       graphar::builder::Vertex v;
       v.AddProperty(graphar::Cardinality::LIST, "single_email", emails[i]);
-      ASSERT(builder.AddVertex(v).IsTypeError());
+      REQUIRE(builder.AddVertex(v).IsTypeError());
     }
   }
   SECTION("test add multi values to set property") {
@@ -241,7 +239,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestMultiProperty high level builder") {
         v.AddProperty(graphar::Cardinality::LIST, "set_email",
                       email);  // Multi-property
       }
-      ASSERT(builder.AddVertex(v).IsKeyError());
+      REQUIRE(builder.AddVertex(v).IsKeyError());
     }
   }
   SECTION("test write to file") {
@@ -256,32 +254,32 @@ TEST_CASE_METHOD(GlobalFixture, "TestMultiProperty high level builder") {
       for (const auto& email : emails[i]) {
         v.AddProperty(graphar::Cardinality::SET, property_names[1], email);
       }
-      ASSERT(builder.AddVertex(v).ok());
+      REQUIRE(builder.AddVertex(v).ok());
     }
     auto st = builder.Dump();
     std::cout << st.message() << std::endl;
-    ASSERT(st.ok());
+    REQUIRE(st.ok());
   }
   SECTION("test read from file") {
     // read from file
     auto maybe_reader = graphar::VertexPropertyArrowChunkReader::Make(
         vertex_info, vertex_info->GetPropertyGroup(property_names[1]), "/tmp/");
-    assert(maybe_reader.status().ok());
+    REQUIRE(maybe_reader.status().ok());
     auto reader = maybe_reader.value();
-    assert(reader->seek(0).ok());
+    REQUIRE(reader->seek(0).ok());
     auto table_result = reader->GetChunk();
-    ASSERT(table_result.status().ok());
+    REQUIRE(table_result.status().ok());
     auto table = table_result.value();
     auto index = table->schema()->GetFieldIndex(property_names[1]);
     auto emails_col = table->column(index)->chunk(0);
     auto result = std::static_pointer_cast<arrow::ListArray>(
         emails_col->View(arrow::list(arrow::large_utf8())).ValueOrDie());
-    ASSERT(result->length() == 3);
+    REQUIRE(result->length() == 3);
     for (int i = 0; i < result->length(); i++) {
       auto email_result = std::static_pointer_cast<arrow::LargeStringArray>(
           result->value_slice(i));
       for (int j = 0; j < email_result->length(); j++) {
-        ASSERT(emails[i][j] == email_result->GetString(j));
+        REQUIRE(emails[i][j] == email_result->GetString(j));
       }
     }
   }
