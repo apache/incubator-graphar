@@ -37,9 +37,9 @@ int main()
     }
 
     // Copy explain
-    // auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample_timestamp/parquet/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
-    auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample/parquet/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
-    // auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample/json/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person\")");
+    // auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"xxx/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
+    auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
+    // auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"xxx/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person\")");
     if (!copyExplainResult->isSuccess())
     {
         std::cerr << copyExplainResult->getErrorMessage() << std::endl;
@@ -54,9 +54,9 @@ int main()
     }
 
     // Load data.
-    auto copyResult = connection->query("COPY Person FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample/parquet/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
-    // auto copyResult = connection->query("COPY Person FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample_timestamp/parquet/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
-    // auto copyResult = connection->query("COPY Person FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample/json/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person\")");
+    auto copyResult = connection->query("COPY Person FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
+    // auto copyResult = connection->query("COPY Person FROM \"xxx/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
+    // auto copyResult = connection->query("COPY Person FROM \"xxx/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person\")");
     if (!copyResult->isSuccess())
     {
         std::cerr << copyResult->getErrorMessage() << std::endl;
@@ -83,9 +83,9 @@ int main()
     connection->query("CREATE REL TABLE KNOWS(FROM Person TO Person, creationDate TIMESTAMP)");
 
     // Copy edge explain
-    auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample_timestamp/parquet/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
-    // auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample/parquet/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
-    // auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample/json/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person_Knows_Person\")");
+    auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"xxx/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
+    // auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
+    // auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"xxx/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person_Knows_Person\")");
     if (!copyEdgeExplainResult->isSuccess())
     {
         std::cerr << copyEdgeExplainResult->getErrorMessage() << std::endl;
@@ -93,9 +93,9 @@ int main()
         return -1;
     }
 
-    auto copyEdgeResult = connection->query("COPY KNOWS FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample_timestamp/parquet/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
-    // auto copyEdgeResult = connection->query("COPY KNOWS FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample/parquet/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
-    // auto copyEdgeResult = connection->query("COPY KNOWS FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample/json/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person_Knows_Person\")");
+    auto copyEdgeResult = connection->query("COPY KNOWS FROM \"xxx/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
+    // auto copyEdgeResult = connection->query("COPY KNOWS FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
+    // auto copyEdgeResult = connection->query("COPY KNOWS FROM \"xxx/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person_Knows_Person\")");
     if (!copyEdgeResult->isSuccess())
     {
         std::cerr << copyEdgeResult->getErrorMessage() << std::endl;

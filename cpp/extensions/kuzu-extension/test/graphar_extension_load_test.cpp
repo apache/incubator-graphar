@@ -19,7 +19,7 @@ int main()
     auto connection = make_unique<Connection>(database.get());
 
     // auto loadResult = connection->query("LOAD graphar;");
-    auto result = connection->query("LOAD EXTENSION \"/home/gary/.kuzu/extension/0.10.0/linux_amd64/graphar/libgraphar.kuzu_extension\";");
+    auto result = connection->query("LOAD EXTENSION \"xxx/libgraphar.kuzu_extension\";");
     if (!result->isSuccess())
     {
         std::cerr << result->getErrorMessage() << std::endl;
@@ -28,8 +28,8 @@ int main()
     }
 
     // Load explain
-    auto loadExplainResult = connection->query("EXPLAIN LOAD FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample/parquet/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person\") RETURN *");
-    // auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample/json/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person\")");
+    auto loadExplainResult = connection->query("EXPLAIN LOAD FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person\") RETURN *");
+    // auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"xxx/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person\")");
     if (!loadExplainResult->isSuccess())
     {
         std::cerr << loadExplainResult->getErrorMessage() << std::endl;
@@ -44,7 +44,7 @@ int main()
     }
 
     // Load data.
-    auto loadResult = connection->query("LOAD FROM \"/home/gary/incubator-graphar/cpp/build-debug/testing/ldbc_sample/parquet/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person\") RETURN *");
+    auto loadResult = connection->query("LOAD FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person\") RETURN *");
     if (!loadResult->isSuccess())
     {
         std::cerr << loadResult->getErrorMessage() << std::endl;

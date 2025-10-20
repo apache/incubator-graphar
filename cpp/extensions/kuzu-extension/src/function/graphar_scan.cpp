@@ -1,7 +1,5 @@
 #include "function/graphar_scan.h"
 
-#include <iostream>
-
 namespace kuzu {
 namespace graphar_extension {
 
@@ -18,32 +16,34 @@ GrapharScanSharedState::GrapharScanSharedState(
       maybe_edges_collection{std::move(maybeEdgesCollection)},
       maybe_from_vertices_collection{std::move(maybeFromVerticesCollection)},
       maybe_to_vertices_collection{std::move(maybeToVerticesCollection)} {
-        if (!is_edge) {
-            collection_count = maybe_vertices_collection.value()->size();
-        } else {
-            collection_count = maybe_edges_collection.value()->size();
-        }
-        KU_ASSERT(collection_count != 0);
-        batch_size = max_threads % collection_count == 0 ?
-            std::max<size_t>(1, collection_count / max_threads) : std::max<size_t>(1, collection_count / max_threads + 1);
-        batch_size = batch_size > DEFAULT_VECTOR_CAPACITY ? DEFAULT_VECTOR_CAPACITY : batch_size;
-        next_index.store(0);
+    if (!is_edge) {
+        collection_count = maybe_vertices_collection.value()->size();
+    } else {
+        collection_count = maybe_edges_collection.value()->size();
+    }
+    KU_ASSERT(collection_count != 0);
+    batch_size = max_threads % collection_count == 0 ?
+                     std::max<size_t>(1, collection_count / max_threads) :
+                     std::max<size_t>(1, collection_count / max_threads + 1);
+    batch_size = batch_size > DEFAULT_VECTOR_CAPACITY ? DEFAULT_VECTOR_CAPACITY : batch_size;
+    next_index.store(0);
 
-        // If it is edge, pre-compute the starting point of each batch's EdgeIter in the init stage.
-        if (is_edge && maybe_edges_collection.has_value()) {
-            auto edges = maybe_edges_collection.value();
-            size_t num_batches = (collection_count + batch_size - 1) / batch_size;
-            edge_batch_iters.reserve(num_batches);
+    // If it is edge, pre-compute the starting point of each batch's EdgeIter in the init stage.
+    if (is_edge && maybe_edges_collection.has_value()) {
+        auto edges = maybe_edges_collection.value();
+        size_t num_batches = (collection_count + batch_size - 1) / batch_size;
+        edge_batch_iters.reserve(num_batches);
 
-            // Single sequential scan: Walk from begin() to end(), and push_back a copy at the first index of each batch.
-            auto iter = edges->begin();
-            for (size_t idx = 0; idx < collection_count; ++idx) {
-                if (idx % batch_size == 0) {
-                    edge_batch_iters.emplace_back(iter); // copy constructor
-                }
-                ++iter;
+        // Single sequential scan: Walk from begin() to end(), and push_back a copy at the first
+        // index of each batch.
+        auto iter = edges->begin();
+        for (size_t idx = 0; idx < collection_count; ++idx) {
+            if (idx % batch_size == 0) {
+                edge_batch_iters.emplace_back(iter); // copy constructor
             }
+            ++iter;
         }
+    }
 }
 
 std::unique_ptr<TableFuncSharedState> initGrapharScanSharedState(
@@ -51,46 +51,40 @@ std::unique_ptr<TableFuncSharedState> initGrapharScanSharedState(
     auto grapharScanBindData = input.bindData->constPtrCast<GrapharScanBindData>();
     graphar::Result<std::shared_ptr<graphar::VerticesCollection>> maybe_vertices_collection = {};
     graphar::Result<std::shared_ptr<graphar::EdgesCollection>> maybe_edges_collection = {};
-    graphar::Result<std::shared_ptr<graphar::VerticesCollection>> maybe_from_vertices_collection = {};
+    graphar::Result<std::shared_ptr<graphar::VerticesCollection>> maybe_from_vertices_collection =
+        {};
     graphar::Result<std::shared_ptr<graphar::VerticesCollection>> maybe_to_vertices_collection = {};
 
     if (!grapharScanBindData->is_edge) {
-        maybe_vertices_collection = graphar::VerticesCollection::Make(grapharScanBindData->graph_info, grapharScanBindData->table_name);
+        maybe_vertices_collection = graphar::VerticesCollection::Make(
+            grapharScanBindData->graph_info, grapharScanBindData->table_name);
     } else {
         // parse table_name into src.edge.dst
         std::string src, edge, dst;
-        auto tryParse = [&](const std::string &tn) {
-            std::vector<char> seps = {'.', ':', '_'};
-            for (char sep : seps) {
-                std::vector<std::string> parts;
-                size_t start = 0;
-                for (size_t i = 0; i <= tn.size(); ++i) {
-                    if (i == tn.size() || tn[i] == sep) {
-                        parts.push_back(tn.substr(start, i - start));
-                        start = i + 1;
-                    }
-                }
-                if (parts.size() == 3) {
-                    src = parts[0]; edge = parts[1]; dst = parts[2];
-                    return true;
-                }
-            }
-            return false;
-        };
-        if (tryParse(grapharScanBindData->table_name)) {
-            maybe_edges_collection = graphar::EdgesCollection::Make(grapharScanBindData->graph_info, src, edge, dst, graphar::AdjListType::ordered_by_source);
-            maybe_from_vertices_collection = graphar::VerticesCollection::Make(grapharScanBindData->graph_info, src);
-            maybe_to_vertices_collection = graphar::VerticesCollection::Make(grapharScanBindData->graph_info, dst);
+        if (!tryParseEdgeTableName(grapharScanBindData->table_name, src, edge, dst)) {
+            throw BinderException("Edge table name " + grapharScanBindData->table_name +
+                                  " is invalid. It should be in the format of "
+                                  "<source>_<edge>_<destination>.");
         }
+
+        maybe_edges_collection = graphar::EdgesCollection::Make(grapharScanBindData->graph_info,
+            src, edge, dst, graphar::AdjListType::ordered_by_source);
+        maybe_from_vertices_collection =
+            graphar::VerticesCollection::Make(grapharScanBindData->graph_info, src);
+        maybe_to_vertices_collection =
+            graphar::VerticesCollection::Make(grapharScanBindData->graph_info, dst);
     }
-    return std::make_unique<graphar_extension::GrapharScanSharedState>(std::move(maybe_vertices_collection), std::move(maybe_edges_collection), 
-                                                                       std::move(maybe_from_vertices_collection), std::move(maybe_to_vertices_collection),
-                                                                       grapharScanBindData->max_threads, grapharScanBindData->is_edge);
+    return std::make_unique<graphar_extension::GrapharScanSharedState>(
+        std::move(maybe_vertices_collection), std::move(maybe_edges_collection),
+        std::move(maybe_from_vertices_collection), std::move(maybe_to_vertices_collection),
+        grapharScanBindData->max_threads, grapharScanBindData->is_edge);
 }
 
 offset_t tableFunc(const TableFuncInput& input, TableFuncOutput& output) {
-    auto grapharSharedState = input.sharedState->ptrCast<graphar_extension::GrapharScanSharedState>();
-    auto grapharScanBindData = input.bindData->constPtrCast<graphar_extension::GrapharScanBindData>();
+    auto grapharSharedState =
+        input.sharedState->ptrCast<graphar_extension::GrapharScanSharedState>();
+    auto grapharScanBindData =
+        input.bindData->constPtrCast<graphar_extension::GrapharScanBindData>();
 
     if (!grapharScanBindData->is_edge) {
         auto& column_setters = grapharScanBindData->vertex_column_setters;
@@ -99,7 +93,8 @@ offset_t tableFunc(const TableFuncInput& input, TableFuncOutput& output) {
         size_t batch_size = grapharSharedState->batch_size;
 
         // Reserve a batch of indices atomically
-        size_t start = grapharSharedState->next_index.fetch_add(batch_size, std::memory_order_relaxed);
+        size_t start =
+            grapharSharedState->next_index.fetch_add(batch_size, std::memory_order_relaxed);
         if (start >= vertices_count) {
             // no more rows
             output.dataChunk.state->getSelVectorUnsafe().setSelSize(0);
@@ -111,14 +106,15 @@ offset_t tableFunc(const TableFuncInput& input, TableFuncOutput& output) {
         // create a local iterator for this index (each worker/thread has its own local iterator)
         auto it = vertices->begin() + start;
         for (size_t idx = start; idx < end; ++idx) {
-            // Complete all column writes using the setter generated in the bind stage (without switch)
+            // Complete all column writes using the setter generated in the bind stage (without
+            // switch)
             for (size_t ci = 0; ci < column_setters.size(); ++ci) {
                 column_setters[ci](it, output, count);
             }
             ++it;
             count++;
         }
-        
+
         output.dataChunk.state->getSelVectorUnsafe().setSelSize(count);
         return output.dataChunk.state->getSelVector().getSelSize();
     } else {
@@ -129,7 +125,8 @@ offset_t tableFunc(const TableFuncInput& input, TableFuncOutput& output) {
         size_t batch_size = grapharSharedState->batch_size;
 
         // Reserve a batch of indices atomically
-        size_t start = grapharSharedState->next_index.fetch_add(batch_size, std::memory_order_relaxed);
+        size_t start =
+            grapharSharedState->next_index.fetch_add(batch_size, std::memory_order_relaxed);
         if (start >= edges_count) {
             // no more rows
             output.dataChunk.state->getSelVectorUnsafe().setSelSize(0);
@@ -137,20 +134,24 @@ offset_t tableFunc(const TableFuncInput& input, TableFuncOutput& output) {
         }
         size_t end = std::min(start + batch_size, edges_count);
 
-        // Use the pre-computed batch start iter in SharedState to avoid advancing from the beginning each time.
+        // Use the pre-computed batch start iter in SharedState to avoid advancing from the
+        // beginning each time.
         size_t batch_id = start / batch_size;
         KU_ASSERT(batch_id < grapharSharedState->edge_batch_iters.size());
 
-        idx_t count = 0; 
+        idx_t count = 0;
         auto from_vertices = grapharSharedState->maybe_from_vertices_collection.value();
         auto to_vertices = grapharSharedState->maybe_to_vertices_collection.value();
 
         auto it = grapharSharedState->edge_batch_iters[batch_id];
         for (size_t idx = start; idx < end; ++idx) {
             for (size_t ci = 0; ci < column_setters.size(); ++ci) {
-                if (column_names[ci] == "from") {
+                if (StringUtils::caseInsensitiveEquals(column_names[ci], FROM_COL_NAME) ||
+                    StringUtils::caseInsensitiveEquals(column_names[ci], INTERNAL_FROM_COL_NAME)) {
                     column_setters[ci](it, output, count, from_vertices); // from setter
-                } else if (column_names[ci] == "to") {
+                } else if (StringUtils::caseInsensitiveEquals(column_names[ci], TO_COL_NAME) ||
+                           StringUtils::caseInsensitiveEquals(column_names[ci],
+                               INTERNAL_TO_COL_NAME)) {
                     column_setters[ci](it, output, count, to_vertices); // to setter
                 } else {
                     column_setters[ci](it, output, count, nullptr); // other setter
