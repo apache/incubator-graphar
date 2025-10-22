@@ -1,4 +1,3 @@
-#include "common/exception/not_implemented.h"
 #include "function/graphar_scan.h"
 
 namespace kuzu {

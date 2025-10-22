@@ -8,6 +8,7 @@
 #include "common/copy_constructors.h"
 #include "common/exception/binder.h"
 #include "common/exception/runtime.h"
+#include "common/exception/not_implemented.h"
 #include "common/string_utils.h"
 #include "common/types/types.h"
 #include "function/table/bind_data.h"

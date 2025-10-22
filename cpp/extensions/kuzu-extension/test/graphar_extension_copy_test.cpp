@@ -19,7 +19,7 @@ int main()
     auto connection = make_unique<Connection>(database.get());
 
     // auto loadResult = connection->query("LOAD graphar;");
-    auto loadResult = connection->query("LOAD EXTENSION \"/home/gary/.kuzu/extension/0.10.0/linux_amd64/graphar/libgraphar.kuzu_extension\";");
+    auto loadResult = connection->query("LOAD EXTENSION \"xxx/libgraphar.kuzu_extension\";");
     if (!loadResult->isSuccess())
     {
         std::cerr << loadResult->getErrorMessage() << std::endl;

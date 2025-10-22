@@ -1,7 +1,5 @@
 #include "function/graphar_metadata.h"
 
-#include <iostream>
-
 using namespace kuzu::function;
 using namespace kuzu::common;
 
@@ -70,60 +68,69 @@ METADATA_TYPE_DEDUCED:
     // Wanted metadata of the graph
     switch (metadata_type) {
     case GrapharMetadataType::GRAPH: {
-        column_names.push_back("graph_name");
-        column_types.push_back(LogicalType::STRING());
-        column_names.push_back("vertex_type_num");
-        column_types.push_back(LogicalType::INT32());
-        column_names.push_back("edge_types_num");
-        column_types.push_back(LogicalType::INT32());
-        column_names.push_back("vertex_types");
-        column_types.push_back(LogicalType::LIST(LogicalType::STRING()));
-        column_names.push_back("edge_types");
-        column_types.push_back(LogicalType::LIST(LogicalType::STRING()));
-        column_names.push_back("prefix");
-        column_types.push_back(LogicalType::STRING());
-        column_names.push_back("version");
-        column_types.push_back(LogicalType::STRING());
+        column_names = {
+            "graph_name",
+            "vertex_type_num",
+            "edge_types_num",
+            "vertex_types",
+            "edge_types",
+            "prefix",
+            "version"
+        };
+        column_types.reserve(GRAPH_METADATA_COLUMN_NUM);
+        column_types.emplace_back(LogicalType::STRING());
+        column_types.emplace_back(LogicalType::INT32());
+        column_types.emplace_back(LogicalType::INT32());
+        column_types.emplace_back(LogicalType::LIST(LogicalType::STRING()));
+        column_types.emplace_back(LogicalType::LIST(LogicalType::STRING()));
+        column_types.emplace_back(LogicalType::STRING());
+        column_types.emplace_back(LogicalType::STRING());
         break;
     }
     case GrapharMetadataType::VERTEX: {
-        column_names.push_back("vertex_type");
-        column_types.push_back(LogicalType::STRING());
-        column_names.push_back("vertex_count");
-        column_types.push_back(LogicalType::INT64());
-        column_names.push_back("property_names|types|is_primary");
-        column_types.push_back(LogicalType::LIST(LogicalType::STRING()));
-        column_names.push_back("chunk_size");
-        column_types.push_back(LogicalType::INT64());
-        column_names.push_back("prefix");
-        column_types.push_back(LogicalType::STRING());
-        column_names.push_back("version");
-        column_types.push_back(LogicalType::STRING());
+        column_names = {
+            "vertex_type",
+            "vertex_count",
+            "property_names|types|is_primary",
+            "chunk_size",
+            "prefix",
+            "version"
+        };
+        column_types.reserve(VERTEX_METADATA_COLUMN_NUM);
+        column_types.emplace_back(LogicalType::STRING());
+        column_types.emplace_back(LogicalType::INT64());
+        column_types.emplace_back(LogicalType::LIST(LogicalType::STRING()));
+        column_types.emplace_back(LogicalType::INT64());
+        column_types.emplace_back(LogicalType::STRING());
+        column_types.emplace_back(LogicalType::STRING());
         break;
     }
     case GrapharMetadataType::EDGE: {
-        column_names.push_back("edge_type");
-        column_types.push_back(LogicalType::STRING());
-        column_names.push_back("src_type");
-        column_types.push_back(LogicalType::STRING());
-        column_names.push_back("dst_type");
-        column_types.push_back(LogicalType::STRING());
-        column_names.push_back("directed");
-        column_types.push_back(LogicalType::BOOL());
-        column_names.push_back("edge_count");
-        column_types.push_back(LogicalType::INT64());
-        column_names.push_back("property_names|types|is_primary");
-        column_types.push_back(LogicalType::LIST(LogicalType::STRING()));
-        column_names.push_back("chunk_size");
-        column_types.push_back(LogicalType::INT64());
-        column_names.push_back("src_chunk_size");
-        column_types.push_back(LogicalType::INT64());
-        column_names.push_back("dst_chunk_size");
-        column_types.push_back(LogicalType::INT64());
-        column_names.push_back("prefix");
-        column_types.push_back(LogicalType::STRING());
-        column_names.push_back("version");
-        column_types.push_back(LogicalType::STRING());
+        column_names = {
+            "edge_type",
+            "src_type",
+            "dst_type",
+            "directed",
+            "edge_count",
+            "property_names|types|is_primary",
+            "chunk_size",
+            "src_chunk_size",
+            "dst_chunk_size",
+            "prefix",
+            "version"
+        };
+        column_types.reserve(EDGE_METADATA_COLUMN_NUM);
+        column_types.emplace_back(LogicalType::STRING());
+        column_types.emplace_back(LogicalType::STRING());
+        column_types.emplace_back(LogicalType::STRING());
+        column_types.emplace_back(LogicalType::BOOL());
+        column_types.emplace_back(LogicalType::INT64());
+        column_types.emplace_back(LogicalType::LIST(LogicalType::STRING()));
+        column_types.emplace_back(LogicalType::INT64());
+        column_types.emplace_back(LogicalType::INT64());
+        column_types.emplace_back(LogicalType::INT64());
+        column_types.emplace_back(LogicalType::STRING());
+        column_types.emplace_back(LogicalType::STRING());
         break;
     }
     default:
@@ -157,6 +164,28 @@ offset_t metadataTableFunc(const TableFuncInput& input, TableFuncOutput& output)
         return output.dataChunk.state->getSelVector().getSelSize();
     }
     sharedState->finished = true;
+
+    // Helper: Flatten property groups into a vector of "name|type|is_primary" strings.
+    // The return value is a string vector that the caller writes into the data vector of the ListVector in order.
+    auto collectPropertyStrings = [](const std::vector<std::shared_ptr<graphar::PropertyGroup>>& property_groups) {
+        std::vector<std::string> out;
+        // Calculate the total number of properties and pre-allocate.
+        size_t total = 0;
+        for (const auto& group : property_groups) {
+            const auto& properties = group->GetProperties();
+            total += properties.size();
+        }
+        out.reserve(total);
+        for (const auto& group : property_groups) {
+            const auto& properties = group->GetProperties();
+            for (const auto& property : properties) {
+                out.emplace_back(property.name + METADATA_SEPARATOR +
+                                 property.type->ToTypeName() + METADATA_SEPARATOR +
+                                 (property.is_primary ? "true" : "false"));
+            }
+        }
+        return out;
+    };
 
     // we come here only once.
     switch (metadata_type) {
@@ -271,23 +300,16 @@ offset_t metadataTableFunc(const TableFuncInput& input, TableFuncOutput& output)
         auto property_names_data_vec = ListVector::getDataVector(&property_names_vec);
         property_names_data_vec->resetAuxiliaryBuffer();
         const auto property_groups = vertex_info->GetPropertyGroups();
-        size_t num_properties = property_groups.size();
-        for (const auto& group : property_groups) {
-            const auto& properties = group->GetProperties();
-            num_properties += properties.size();
-        }
+        auto property_strings = collectPropertyStrings(property_groups);
+        size_t num_properties = property_strings.size();
+
         auto propertyResultList = ListVector::addList(&property_names_vec, num_properties);
         property_names_vec.setValue<list_entry_t>(0, propertyResultList);
-        for (const auto& group : property_groups) {
-            const auto& properties = group->GetProperties();
-            for (const auto& property : properties) {
-                std::string property_str = property.name + METADATA_SEPARATOR +
-                                           property.type->ToTypeName() + METADATA_SEPARATOR +
-                                           (property.is_primary ? "true" : "false");
-                StringVector::addString(property_names_data_vec, propertyResultList.offset,
-                    property_str);
-                propertyResultList.offset++;
-            }
+
+        // Write data vector in sequence at once
+        for (size_t i = 0; i < num_properties; ++i) {
+            StringVector::addString(property_names_data_vec, propertyResultList.offset + i,
+                property_strings[i]);
         }
 
         // chunk_size
@@ -339,23 +361,15 @@ offset_t metadataTableFunc(const TableFuncInput& input, TableFuncOutput& output)
         auto property_names_data_vec = ListVector::getDataVector(&property_names_vec);
         property_names_data_vec->resetAuxiliaryBuffer();
         const auto property_groups = edge_info->GetPropertyGroups();
-        size_t num_properties = property_groups.size();
-        for (const auto& group : property_groups) {
-            const auto& properties = group->GetProperties();
-            num_properties += properties.size();
-        }
+        auto property_strings = collectPropertyStrings(property_groups);
+        size_t num_properties = property_strings.size();
+
         auto propertyResultList = ListVector::addList(&property_names_vec, num_properties);
         property_names_vec.setValue<list_entry_t>(0, propertyResultList);
-        for (const auto& group : property_groups) {
-            const auto& properties = group->GetProperties();
-            for (const auto& property : properties) {
-                std::string property_str = property.name + METADATA_SEPARATOR +
-                                           property.type->ToTypeName() + METADATA_SEPARATOR +
-                                           (property.is_primary ? "true" : "false");
-                StringVector::addString(property_names_data_vec, propertyResultList.offset,
-                    property_str);
-                propertyResultList.offset++;
-            }
+
+        for (size_t i = 0; i < num_properties; ++i) {
+            StringVector::addString(property_names_data_vec, propertyResultList.offset + i,
+                property_strings[i]);
         }
 
         // chunk_size
