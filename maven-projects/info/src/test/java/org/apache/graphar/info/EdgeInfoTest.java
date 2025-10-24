@@ -28,17 +28,17 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class EdgeInfoTest {
-
-    private final EdgeInfo.EdgeInfoBuilder e =
-            EdgeInfo.builder()
-                    .srcType("person")
-                    .edgeType("knows")
-                    .chunkSize(1024)
-                    .srcChunkSize(100)
-                    .dstChunkSize(100)
-                    .directed(false)
-                    .baseUri(URI.create("edge/person_knows_person/"))
-                    .version("gar/v1");
+    private EdgeInfo.EdgeInfoBuilder createBaseEdgeInfoBuilder() {
+        return EdgeInfo.builder()
+                .srcType("person")
+                .edgeType("knows")
+                .chunkSize(1024)
+                .srcChunkSize(100)
+                .dstChunkSize(100)
+                .directed(false)
+                .baseUri(URI.create("edge/person_knows_person/"))
+                .version("gar/v1");
+    }
 
     @Test
     public void testBuildWithPrefix() {
@@ -108,40 +108,43 @@ public class EdgeInfoTest {
 
     @Test
     public void erroneousTripletEdgeBuilderTest() {
-        try {
-            e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
-                    .addPropertyGroups(List.of(TestUtil.pg3))
-                    .build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("Edge triplet is null", e.getMessage());
-        }
+        EdgeInfo.EdgeInfoBuilder edgeInfoBuilder =
+                createBaseEdgeInfoBuilder()
+                        .adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
+                        .addPropertyGroups(List.of(TestUtil.pg3));
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(IllegalArgumentException.class, edgeInfoBuilder::build);
+        Assert.assertEquals("Edge triplet is null", illegalArgumentException.getMessage());
     }
 
     @Test
     public void emptyAdjacentListEdgeBuilderTest() {
-        try {
-            e.dstType("person").addPropertyGroups(List.of(TestUtil.pg3)).build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("AdjacentLists is empty", e.getMessage());
-        }
+        EdgeInfo.EdgeInfoBuilder edgeInfoBuilder =
+                createBaseEdgeInfoBuilder()
+                        .dstType("person")
+                        .addPropertyGroups(List.of(TestUtil.pg3));
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(IllegalArgumentException.class, edgeInfoBuilder::build);
+        Assert.assertEquals("AdjacentLists is empty", illegalArgumentException.getMessage());
     }
 
     @Test
     public void emptyPropertyGroupsEdgeBuilderTest() {
-        try {
-            e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
-                    .dstType("person")
-                    .build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("PropertyGroups is empty", e.getMessage());
-        }
+        EdgeInfo.EdgeInfoBuilder edgeInfoBuilder =
+                createBaseEdgeInfoBuilder()
+                        .dstType("person")
+                        .adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest));
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(IllegalArgumentException.class, edgeInfoBuilder::build);
+        Assert.assertEquals("PropertyGroups is empty", illegalArgumentException.getMessage());
     }
 
     @Test
     public void addMethodsTest() {
 
         EdgeInfo edgeInfo =
-                e.addPropertyGroup(TestUtil.pg3)
+                createBaseEdgeInfoBuilder()
+                        .addPropertyGroup(TestUtil.pg3)
                         .addAdjacentList(TestUtil.orderedBySource)
                         .addAdjacentList(TestUtil.orderedByDest)
                         .dstType("person")
@@ -154,7 +157,8 @@ public class EdgeInfoTest {
     @Test
     public void appendMethodsTest() {
         EdgeInfo edgeInfo =
-                e.propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                createBaseEdgeInfoBuilder()
+                        .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
                         .adjacentLists(List.of(TestUtil.orderedBySource))
                         .addAdjacentList(TestUtil.orderedByDest)
                         .addPropertyGroups(List.of(TestUtil.pg2))

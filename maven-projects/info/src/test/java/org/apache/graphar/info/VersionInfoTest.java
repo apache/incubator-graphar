@@ -114,12 +114,9 @@ public class VersionInfoTest {
         VersionInfo versionInfo = new VersionInfo(1, null);
 
         // The current implementation doesn't handle null gracefully, so this will throw NPE
-        try {
-            versionInfo.checkType(null);
-            Assert.fail("Expected NullPointerException");
-        } catch (NullPointerException expected) {
-            // This is the current behavior - null parameter causes NPE
-        }
+        NullPointerException nullPointerException =
+                Assert.assertThrows(NullPointerException.class, () -> versionInfo.checkType(null));
+        // This is the current behavior - null parameter causes NPE
     }
 
     @Test
@@ -127,13 +124,10 @@ public class VersionInfoTest {
         List<String> userTypes = Arrays.asList("customType");
         VersionInfo versionInfo = new VersionInfo(999, userTypes);
 
-        // Unsupported version should not support built-in types
         Assert.assertFalse(versionInfo.checkType("int32"));
         Assert.assertFalse(versionInfo.checkType("string"));
 
-        // Current implementation: unsupported version returns false for all types,
-        // including user-defined types, due to early return in checkType()
-        Assert.assertFalse(versionInfo.checkType("customType"));
+        Assert.assertTrue(versionInfo.checkType("customType"));
     }
 
     @Test
@@ -168,26 +162,25 @@ public class VersionInfoTest {
 
     @Test
     public void testVersionInfoWithZeroVersion() {
-        try {
-            new VersionInfo(0, null);
-            Assert.fail("Expected IllegalArgumentException for zero version");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(
-                    "Error message should mention version",
-                    e.getMessage().contains("Version must be a supported positive integer"));
-        }
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(IllegalArgumentException.class, () -> new VersionInfo(0, null));
+        Assert.assertTrue(
+                "Error message should mention version",
+                illegalArgumentException
+                        .getMessage()
+                        .contains("Version must be a supported positive integer"));
     }
 
     @Test
     public void testVersionInfoWithNegativeVersion() {
-        try {
-            new VersionInfo(-1, null);
-            Assert.fail("Expected IllegalArgumentException for negative version");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(
-                    "Error message should mention version",
-                    e.getMessage().contains("Version must be a supported positive integer"));
-        }
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class, () -> new VersionInfo(-1, null));
+        Assert.assertTrue(
+                "Error message should mention version",
+                illegalArgumentException
+                        .getMessage()
+                        .contains("Version must be a supported positive integer"));
     }
 
     @Test
