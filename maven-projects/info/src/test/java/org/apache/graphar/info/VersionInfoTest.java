@@ -124,14 +124,10 @@ public class VersionInfoTest {
         List<String> userTypes = Arrays.asList("customType");
         VersionInfo versionInfo = new VersionInfo(999, userTypes);
 
-        System.out.println(versionInfo.toString());
-        // Unsupported version should not support built-in types
         Assert.assertFalse(versionInfo.checkType("int32"));
         Assert.assertFalse(versionInfo.checkType("string"));
 
-        // Current implementation: unsupported version returns false for all types,
-        // including user-defined types, due to early return in checkType()
-        Assert.assertFalse(versionInfo.checkType("customType"));
+        Assert.assertTrue(versionInfo.checkType("customType"));
     }
 
     @Test
