@@ -131,6 +131,36 @@ public class VersionInfoTest {
     }
 
     @Test
+    public void testVersionInfoToStringWithMultipleTypes() {
+        List<String> userTypes = Arrays.asList("type1", "type2", "type3", "type4");
+        VersionInfo versionInfo = new VersionInfo(1, userTypes);
+
+        String expected = "gar/v1 (type1,type2,type3,type4)";
+        Assert.assertEquals(expected, versionInfo.toString());
+    }
+
+    @Test
+    public void testVersionInfoToStringWithDifferentVersions() {
+        VersionInfo version1 = new VersionInfo(1, null);
+        VersionInfo version2 = new VersionInfo(2, null);
+        VersionInfo version10 = new VersionInfo(10, null);
+
+        Assert.assertEquals("gar/v1", version1.toString());
+        Assert.assertEquals("gar/v2", version2.toString());
+        Assert.assertEquals("gar/v10", version10.toString());
+    }
+
+    @Test
+    public void testVersionInfoToStringWithSpecialCharactersInTypes() {
+        List<String> userTypes =
+                Arrays.asList("type-with-dash", "type_with_underscore", "type.with.dots");
+        VersionInfo versionInfo = new VersionInfo(1, userTypes);
+
+        String expected = "gar/v1 (type-with-dash,type_with_underscore,type.with.dots)";
+        Assert.assertEquals(expected, versionInfo.toString());
+    }
+
+    @Test
     public void testVersionInfoWithZeroVersion() {
         IllegalArgumentException illegalArgumentException =
                 Assert.assertThrows(IllegalArgumentException.class, () -> new VersionInfo(0, null));
