@@ -108,33 +108,30 @@ public class EdgeInfoTest {
 
     @Test
     public void erroneousTripletEdgeBuilderTest() {
-        try {
-            e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
-                    .addPropertyGroups(List.of(TestUtil.pg3))
-                    .build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("Edge triplet is null", e.getMessage());
-        }
+        EdgeInfo.EdgeInfoBuilder edgeInfoBuilder =
+                e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
+                        .addPropertyGroups(List.of(TestUtil.pg3));
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(IllegalArgumentException.class, edgeInfoBuilder::build);
+        Assert.assertEquals("Edge triplet is null", illegalArgumentException.getMessage());
     }
 
     @Test
     public void emptyAdjacentListEdgeBuilderTest() {
-        try {
-            e.dstType("person").addPropertyGroups(List.of(TestUtil.pg3)).build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("AdjacentLists is empty", e.getMessage());
-        }
+        EdgeInfo.EdgeInfoBuilder edgeInfoBuilder =
+                e.dstType("person").addPropertyGroups(List.of(TestUtil.pg3));
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(IllegalArgumentException.class, edgeInfoBuilder::build);
+        Assert.assertEquals("AdjacentLists is empty", illegalArgumentException.getMessage());
     }
 
     @Test
     public void emptyPropertyGroupsEdgeBuilderTest() {
-        try {
-            e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest))
-                    .dstType("person")
-                    .build();
-        } catch (IllegalArgumentException e) {
-            Assert.assertEquals("PropertyGroups is empty", e.getMessage());
-        }
+        EdgeInfo.EdgeInfoBuilder edgeInfoBuilder =
+                e.adjacentLists(List.of(TestUtil.orderedBySource, TestUtil.orderedByDest));
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(IllegalArgumentException.class, edgeInfoBuilder::build);
+        Assert.assertEquals("PropertyGroups is empty", illegalArgumentException.getMessage());
     }
 
     @Test

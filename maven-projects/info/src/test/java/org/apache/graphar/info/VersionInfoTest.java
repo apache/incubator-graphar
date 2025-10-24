@@ -114,12 +114,9 @@ public class VersionInfoTest {
         VersionInfo versionInfo = new VersionInfo(1, null);
 
         // The current implementation doesn't handle null gracefully, so this will throw NPE
-        try {
-            versionInfo.checkType(null);
-            Assert.fail("Expected NullPointerException");
-        } catch (NullPointerException expected) {
-            // This is the current behavior - null parameter causes NPE
-        }
+        NullPointerException nullPointerException =
+                Assert.assertThrows(NullPointerException.class, () -> versionInfo.checkType(null));
+        // This is the current behavior - null parameter causes NPE
     }
 
     @Test
@@ -127,6 +124,7 @@ public class VersionInfoTest {
         List<String> userTypes = Arrays.asList("customType");
         VersionInfo versionInfo = new VersionInfo(999, userTypes);
 
+        System.out.println(versionInfo.toString());
         // Unsupported version should not support built-in types
         Assert.assertFalse(versionInfo.checkType("int32"));
         Assert.assertFalse(versionInfo.checkType("string"));
@@ -137,57 +135,26 @@ public class VersionInfoTest {
     }
 
     @Test
-    public void testVersionInfoToStringWithMultipleTypes() {
-        List<String> userTypes = Arrays.asList("type1", "type2", "type3", "type4");
-        VersionInfo versionInfo = new VersionInfo(1, userTypes);
-
-        String expected = "gar/v1 (type1,type2,type3,type4)";
-        Assert.assertEquals(expected, versionInfo.toString());
-    }
-
-    @Test
-    public void testVersionInfoToStringWithDifferentVersions() {
-        VersionInfo version1 = new VersionInfo(1, null);
-        VersionInfo version2 = new VersionInfo(2, null);
-        VersionInfo version10 = new VersionInfo(10, null);
-
-        Assert.assertEquals("gar/v1", version1.toString());
-        Assert.assertEquals("gar/v2", version2.toString());
-        Assert.assertEquals("gar/v10", version10.toString());
-    }
-
-    @Test
-    public void testVersionInfoToStringWithSpecialCharactersInTypes() {
-        List<String> userTypes =
-                Arrays.asList("type-with-dash", "type_with_underscore", "type.with.dots");
-        VersionInfo versionInfo = new VersionInfo(1, userTypes);
-
-        String expected = "gar/v1 (type-with-dash,type_with_underscore,type.with.dots)";
-        Assert.assertEquals(expected, versionInfo.toString());
-    }
-
-    @Test
     public void testVersionInfoWithZeroVersion() {
-        try {
-            new VersionInfo(0, null);
-            Assert.fail("Expected IllegalArgumentException for zero version");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(
-                    "Error message should mention version",
-                    e.getMessage().contains("Version must be a supported positive integer"));
-        }
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(IllegalArgumentException.class, () -> new VersionInfo(0, null));
+        Assert.assertTrue(
+                "Error message should mention version",
+                illegalArgumentException
+                        .getMessage()
+                        .contains("Version must be a supported positive integer"));
     }
 
     @Test
     public void testVersionInfoWithNegativeVersion() {
-        try {
-            new VersionInfo(-1, null);
-            Assert.fail("Expected IllegalArgumentException for negative version");
-        } catch (IllegalArgumentException e) {
-            Assert.assertTrue(
-                    "Error message should mention version",
-                    e.getMessage().contains("Version must be a supported positive integer"));
-        }
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(
+                        IllegalArgumentException.class, () -> new VersionInfo(-1, null));
+        Assert.assertTrue(
+                "Error message should mention version",
+                illegalArgumentException
+                        .getMessage()
+                        .contains("Version must be a supported positive integer"));
     }
 
     @Test

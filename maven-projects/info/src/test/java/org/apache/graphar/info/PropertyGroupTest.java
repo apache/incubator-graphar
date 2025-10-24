@@ -227,23 +227,24 @@ public class PropertyGroupTest {
         Assert.assertEquals(1, pg.getPropertyList().size());
 
         // Try to modify returned lists - should throw exception or be unmodifiable
-        try {
-            pg.getPropertyList()
-                    .add(TestDataFactory.createProperty("another", DataType.BOOL, false, false));
-            Assert.fail("Should not be able to modify property list");
-        } catch (UnsupportedOperationException expected) {
-            // This is expected behavior
-        }
+        UnsupportedOperationException unsupportedOperationException1 =
+                Assert.assertThrows(
+                        UnsupportedOperationException.class,
+                        () ->
+                                pg.getPropertyList()
+                                        .add(
+                                                TestDataFactory.createProperty(
+                                                        "another", DataType.BOOL, false, false)));
 
-        try {
-            pg.getPropertyMap()
-                    .put(
-                            "test2",
-                            TestDataFactory.createProperty("test2", DataType.FLOAT, false, false));
-            Assert.fail("Should not be able to modify property map");
-        } catch (UnsupportedOperationException expected) {
-            // This is expected behavior
-        }
+        UnsupportedOperationException unsupportedOperationException2 =
+                Assert.assertThrows(
+                        UnsupportedOperationException.class,
+                        () ->
+                                pg.getPropertyMap()
+                                        .put(
+                                                "test2",
+                                                TestDataFactory.createProperty(
+                                                        "test2", DataType.FLOAT, false, false)));
     }
 
     @Test
