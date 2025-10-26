@@ -42,11 +42,17 @@ class LdbcGraphArBridgeTest extends LdbcTestBase {
       file_type = "parquet"
     )
 
-    assert(result.isSuccess, s"Conversion should succeed, but failed with: ${result.failed.map(_.getMessage).getOrElse("Unknown error")}")
+    assert(
+      result.isSuccess,
+      s"Conversion should succeed, but failed with: ${result.failed.map(_.getMessage).getOrElse("Unknown error")}"
+    )
 
     // Verify graph metadata file exists
     val graphYmlPath = Paths.get(outputPath, "test_graph.graph.yml")
     assert(Files.exists(graphYmlPath), "Graph YAML metadata file should exist")
-    assert(Files.size(graphYmlPath) > 0, "Graph YAML metadata should not be empty")
+    assert(
+      Files.size(graphYmlPath) > 0,
+      "Graph YAML metadata should not be empty"
+    )
   }
 }

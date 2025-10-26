@@ -28,9 +28,9 @@ import org.apache.graphar.graph.GraphReader
  * Data integrity validator for GraphAr output.
  *
  * Validates:
- * - Edge reference integrity (no dangling edges)
- * - ID mapping consistency (university/company ID ranges)
- * - GraphAr index column correctness
+ *   - Edge reference integrity (no dangling edges)
+ *   - ID mapping consistency (university/company ID ranges)
+ *   - GraphAr index column correctness
  */
 class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
 
@@ -43,36 +43,46 @@ class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
       "ldbc_test.graph.yml",
       "graph.yml"
     )
-    possibleNames.map(name => s"$graphArPath/$name")
+    possibleNames
+      .map(name => s"$graphArPath/$name")
       .find(path => new java.io.File(path).exists())
-      .getOrElse(throw new IllegalArgumentException(
-        s"No graph metadata file found in $graphArPath. Tried: ${possibleNames.mkString(", ")}"
-      ))
+      .getOrElse(
+        throw new IllegalArgumentException(
+          s"No graph metadata file found in $graphArPath. Tried: ${possibleNames.mkString(", ")}"
+        )
+      )
   }
 
   private val graphInfo = GraphInfo.loadGraphInfo(graphInfoPath, spark)
 
   // Load all vertices and edges using GraphReader
-  private val (vertexDataframes, edgeDataframes) = GraphReader.read(graphInfoPath, spark)
+  private val (vertexDataframes, edgeDataframes) =
+    GraphReader.read(graphInfoPath, spark)
 
   /**
-   * Validate edge reference integrity: edge indices are within valid vertex index range.
+   * Validate edge reference integrity: edge indices are within valid vertex
+   * index range.
    *
    * GraphAr uses index-based storage format. Edge DataFrames only contain:
-   * - _graphArSrcIndex: index of source vertex (0-based)
-   * - _graphArDstIndex: index of destination vertex (0-based)
+   *   - _graphArSrcIndex: index of source vertex (0-based)
+   *   - _graphArDstIndex: index of destination vertex (0-based)
    *
-   * This validates that all edge indices reference valid vertex indices in range [0, vertexCount).
+   * This validates that all edge indices reference valid vertex indices in
+   * range [0, vertexCount).
    *
-   * @param srcVertexType Source vertex type (e.g., "Person")
-   * @param edgeName Edge name (e.g., "knows")
-   * @param dstVertexType Destination vertex type (e.g., "Person")
-   * @return ValidationReport with results
+   * @param srcVertexType
+   *   Source vertex type (e.g., "Person")
+   * @param edgeName
+   *   Edge name (e.g., "knows")
+   * @param dstVertexType
+   *   Destination vertex type (e.g., "Person")
+   * @return
+   *   ValidationReport with results
    */
   def validateEdgeReferenceIntegrity(
-    srcVertexType: String,
-    edgeName: String,
-    dstVertexType: String
+      srcVertexType: String,
+      edgeName: String,
+      dstVertexType: String
   ): ValidationReport = {
     try {
       // Get vertex counts (max valid index = count - 1)
@@ -84,10 +94,11 @@ class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
 
       // Get edge DataFrame
       val edgeKey = (srcVertexType, edgeName, dstVertexType)
-      val edgeDFOpt: Option[DataFrame] = edgeDataframes.get(edgeKey).map { adjListMap =>
-        // Get the first adj_list type (usually "ordered_by_source")
-        adjListMap.head._2.select("_graphArSrcIndex", "_graphArDstIndex")
-      }
+      val edgeDFOpt: Option[DataFrame] =
+        edgeDataframes.get(edgeKey).map { adjListMap =>
+          // Get the first adj_list type (usually "ordered_by_source")
+          adjListMap.head._2.select("_graphArSrcIndex", "_graphArDstIndex")
+        }
 
       // Check if edge type exists
       if (edgeDFOpt.isEmpty) {
@@ -106,12 +117,16 @@ class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
 
       // Validate source index range: [0, maxSrcIndex]
       val invalidSrcCount = edgeDF
-        .filter(col("_graphArSrcIndex") < 0 || col("_graphArSrcIndex") > maxSrcIndex)
+        .filter(
+          col("_graphArSrcIndex") < 0 || col("_graphArSrcIndex") > maxSrcIndex
+        )
         .count()
 
       // Validate destination index range: [0, maxDstIndex]
       val invalidDstCount = edgeDF
-        .filter(col("_graphArDstIndex") < 0 || col("_graphArDstIndex") > maxDstIndex)
+        .filter(
+          col("_graphArDstIndex") < 0 || col("_graphArDstIndex") > maxDstIndex
+        )
         .count()
 
       ValidationReport(
@@ -121,8 +136,10 @@ class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
         invalidDstReferences = invalidDstCount,
         passed = (invalidSrcCount == 0 && invalidDstCount == 0),
         errorMessage = if (invalidSrcCount > 0 || invalidDstCount > 0) {
-          Some(s"Found $invalidSrcCount invalid src indices (valid range: [0, $maxSrcIndex]), " +
-               s"$invalidDstCount invalid dst indices (valid range: [0, $maxDstIndex])")
+          Some(
+            s"Found $invalidSrcCount invalid src indices (valid range: [0, $maxSrcIndex]), " +
+              s"$invalidDstCount invalid dst indices (valid range: [0, $maxDstIndex])"
+          )
         } else None
       )
     } catch {
@@ -141,16 +158,19 @@ class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
   /**
    * Validate Organisation ID mapping consistency.
    *
-   * LDBC standard: Company and University IDs are in continuous range, distinguished by type field.
-   * - Companies: typically [0, N)
-   * - Universities: typically [N, M), following companies
-   * - No ID offset is applied (verified against LDBC SNB Datagen official implementation)
+   * LDBC standard: Company and University IDs are in continuous range,
+   * distinguished by type field.
+   *   - Companies: typically [0, N)
+   *   - Universities: typically [N, M), following companies
+   *   - No ID offset is applied (verified against LDBC SNB Datagen official
+   *     implementation)
    *
    * This validation checks:
-   * 1. No duplicate IDs between companies and universities
-   * 2. Type field is correctly set
+   *   1. No duplicate IDs between companies and universities 2. Type field is
+   *      correctly set
    *
-   * @return ValidationReport with results
+   * @return
+   *   ValidationReport with results
    */
   def validateOrganisationIdMapping(): ValidationReport = {
     try {
@@ -168,7 +188,9 @@ class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
       val duplicateIds = totalOrgs - totalDistinctIds
 
       // Check that type field is set correctly (should only be Company or University)
-      val invalidTypes = organisations.filter($"type" =!= "Company" && $"type" =!= "University").count()
+      val invalidTypes = organisations
+        .filter($"type" =!= "Company" && $"type" =!= "University")
+        .count()
 
       ValidationReport(
         edgeName = "Organisation_ID_Mapping",
@@ -177,10 +199,14 @@ class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
         invalidDstReferences = invalidTypes,
         passed = (duplicateIds == 0 && invalidTypes == 0),
         errorMessage = if (duplicateIds > 0 || invalidTypes > 0) {
-          Some(s"Found $duplicateIds duplicate IDs, $invalidTypes invalid type values. " +
-               s"Total: $totalOrgs orgs ($companyCount companies, $universityCount universities)")
+          Some(
+            s"Found $duplicateIds duplicate IDs, $invalidTypes invalid type values. " +
+              s"Total: $totalOrgs orgs ($companyCount companies, $universityCount universities)"
+          )
         } else {
-          Some(s"✓ LDBC standard: $companyCount companies + $universityCount universities with unique continuous IDs")
+          Some(
+            s"✓ LDBC standard: $companyCount companies + $universityCount universities with unique continuous IDs"
+          )
         }
       )
     } catch {
@@ -199,8 +225,10 @@ class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
   /**
    * Validate GraphAr index column exists and is a 0-based sequence.
    *
-   * @param vertexType Vertex type to validate (e.g., "Person")
-   * @return ValidationReport with results
+   * @param vertexType
+   *   Vertex type to validate (e.g., "Person")
+   * @return
+   *   ValidationReport with results
    */
   def validateIndexColumns(vertexType: String): ValidationReport = {
     try {
@@ -214,18 +242,21 @@ class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
           invalidSrcReferences = 1,
           invalidDstReferences = 0,
           passed = false,
-          errorMessage = Some(s"Missing _graphArVertexIndex column in $vertexType")
+          errorMessage =
+            Some(s"Missing _graphArVertexIndex column in $vertexType")
         )
       }
 
       val vertexCount = vertices.count()
 
       // Check if indices form a 0-based sequence
-      val indices = vertices.select("_graphArVertexIndex")
+      val indices = vertices
+        .select("_graphArVertexIndex")
         .distinct()
         .orderBy("_graphArVertexIndex")
 
-      val expectedIndices = spark.range(0, vertexCount).toDF("_graphArVertexIndex")
+      val expectedIndices =
+        spark.range(0, vertexCount).toDF("_graphArVertexIndex")
 
       // Find mismatches
       val mismatch = indices.except(expectedIndices).count()
@@ -256,10 +287,11 @@ class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
   /**
    * Run all validation checks and return reports
    *
-   * Executes comprehensive validation including edge reference integrity,
-   * ID mapping consistency, and index column correctness for all entity types.
+   * Executes comprehensive validation including edge reference integrity, ID
+   * mapping consistency, and index column correctness for all entity types.
    *
-   * @return Sequence of validation reports for all checks
+   * @return
+   *   Sequence of validation reports for all checks
    */
   def validateAll(): Seq[ValidationReport] = {
     Seq(
@@ -290,25 +322,33 @@ class DataIntegrityValidator(graphArPath: String, spark: SparkSession) {
 /**
  * Validation report case class.
  *
- * @param edgeName Name of the validation check
- * @param totalEdges Total number of records checked
- * @param invalidSrcReferences Number of invalid source references found
- * @param invalidDstReferences Number of invalid destination references found
- * @param passed Whether the validation passed
- * @param errorMessage Optional error message if validation failed
+ * @param edgeName
+ *   Name of the validation check
+ * @param totalEdges
+ *   Total number of records checked
+ * @param invalidSrcReferences
+ *   Number of invalid source references found
+ * @param invalidDstReferences
+ *   Number of invalid destination references found
+ * @param passed
+ *   Whether the validation passed
+ * @param errorMessage
+ *   Optional error message if validation failed
  */
 case class ValidationReport(
-  edgeName: String,
-  totalEdges: Long,
-  invalidSrcReferences: Long,
-  invalidDstReferences: Long,
-  passed: Boolean,
-  errorMessage: Option[String] = None
+    edgeName: String,
+    totalEdges: Long,
+    invalidSrcReferences: Long,
+    invalidDstReferences: Long,
+    passed: Boolean,
+    errorMessage: Option[String] = None
 ) {
+
   /**
    * Convert validation report to Markdown table row format.
    *
-   * @return Markdown formatted string
+   * @return
+   *   Markdown formatted string
    */
   def toMarkdown: String = {
     val status = if (passed) "✓ through" else "❌ Failure"

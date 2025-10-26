@@ -26,19 +26,21 @@ import org.slf4j.{Logger, LoggerFactory}
 /**
  * Validation runner for GraphAr output.
  *
- * This program validates the integrity of GraphAr output files generated
- * from LDBC SNB data, checking:
- * - Edge reference integrity (no dangling edges)
- * - ID mapping consistency (university/company ID ranges)
- * - GraphAr index column correctness
+ * This program validates the integrity of GraphAr output files generated from
+ * LDBC SNB data, checking:
+ *   - Edge reference integrity (no dangling edges)
+ *   - ID mapping consistency (university/company ID ranges)
+ *   - GraphAr index column correctness
  *
- * Usage:
- *   mvn exec:java -Dexec.mainClass="org.apache.graphar.datasources.ldbc.examples.ValidateGraphArOutput" \
- *     -Dexec.args="/tmp/graphar_output"
+ * Usage: mvn exec:java
+ * -Dexec.mainClass="org.apache.graphar.datasources.ldbc.examples.ValidateGraphArOutput"
+ * \
+ * -Dexec.args="/tmp/graphar_output"
  */
 object ValidateGraphArOutput {
 
-  private val logger: Logger = LoggerFactory.getLogger(ValidateGraphArOutput.getClass)
+  private val logger: Logger =
+    LoggerFactory.getLogger(ValidateGraphArOutput.getClass)
 
   def main(args: Array[String]): Unit = {
     if (args.length < 1) {
@@ -52,7 +54,8 @@ object ValidateGraphArOutput {
     logger.info("")
 
     // Create Spark session
-    val spark = SparkSession.builder()
+    val spark = SparkSession
+      .builder()
       .appName("GraphAr Data Integrity Validation")
       .master("local[*]")
       .config("spark.driver.memory", "4g")
@@ -72,8 +75,12 @@ object ValidateGraphArOutput {
       logger.info("")
       logger.info(s"GraphAr output path: $graphArPath")
       logger.info("")
-      logger.info("| Validation Check | Total Records | Invalid Src | Invalid Dst | Status |")
-      logger.info("|------------------|---------------|-------------|-------------|--------|")
+      logger.info(
+        "| Validation Check | Total Records | Invalid Src | Invalid Dst | Status |"
+      )
+      logger.info(
+        "|------------------|---------------|-------------|-------------|--------|"
+      )
 
       // Run all validation checks
       val reports = validator.validateAll()
@@ -112,7 +119,9 @@ object ValidateGraphArOutput {
           report.errorMessage.foreach(msg => logger.info(s"  Error: $msg"))
         }
         logger.info("")
-        logger.info("Recommendation: Please check the data generation process, fix the issues above and re-validate.")
+        logger.info(
+          "Recommendation: Please check the data generation process, fix the issues above and re-validate."
+        )
         logger.info("")
         System.exit(1)
       }

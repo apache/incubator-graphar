@@ -20,68 +20,81 @@
 package org.apache.graphar.datasources.ldbc.util
 
 import ldbc.snb.datagen.util.{ConfigParser, GeneratorConfiguration}
+
 /** LDBCConfiguretoolClass */
 object LdbcConfigUtils {
 
- /** Create simplified complexity optimized LDBC configuration */
- def createOptimizedConfig(scaleFactor: String): GeneratorConfiguration = {
- val configMap = new java.util.HashMap[String, String]()
+  /** Create simplified complexity optimized LDBC configuration */
+  def createOptimizedConfig(scaleFactor: String): GeneratorConfiguration = {
+    val configMap = new java.util.HashMap[String, String]()
 
- // LoaddefaultParameter
- val defaultParams = getClass.getResourceAsStream("/params_default.ini")
- if (defaultParams!= null) {
- configMap.putAll(ConfigParser.readConfig(defaultParams))
- defaultParams.close()
- }
+    // LoaddefaultParameter
+    val defaultParams = getClass.getResourceAsStream("/params_default.ini")
+    if (defaultParams != null) {
+      configMap.putAll(ConfigParser.readConfig(defaultParams))
+      defaultParams.close()
+    }
 
- // Load scale factor configuration
- configMap.putAll(ConfigParser.scaleFactorConf(scaleFactor))
- 
- // Optimize configuration to speed up processing
- configMap.put("generator.numYears", "1") // Reduce data years to 1 year
- configMap.put("generator.maxNumFriends", "20") // Limit maximum friend count
- configMap.put("generator.maxNumComments", "10") // Reduce comment count
- configMap.put("generator.maxNumPostPerMonth", "10") // Reduce post count
- configMap.put("generator.maxNumLike", "100") // Reduce like count
- configMap.put("generator.blockSize", "1000") // Reasonable chunk size
- configMap.put("hadoop.numThreads", "4") // Use multiple threads
+    // Load scale factor configuration
+    configMap.putAll(ConfigParser.scaleFactorConf(scaleFactor))
 
- new GeneratorConfiguration(configMap)
- }
+    // Optimize configuration to speed up processing
+    configMap.put("generator.numYears", "1") // Reduce data years to 1 year
+    configMap.put("generator.maxNumFriends", "20") // Limit maximum friend count
+    configMap.put("generator.maxNumComments", "10") // Reduce comment count
+    configMap.put("generator.maxNumPostPerMonth", "10") // Reduce post count
+    configMap.put("generator.maxNumLike", "100") // Reduce like count
+    configMap.put("generator.blockSize", "1000") // Reasonable chunk size
+    configMap.put("hadoop.numThreads", "4") // Use multiple threads
 
- /** Create production environment configuration, generate realistic LDBC data (including posts, comments, likes, etc) */
- def createFastTestConfig(scaleFactor: String): GeneratorConfiguration = {
- val configMap = new java.util.HashMap[String, String]()
+    new GeneratorConfiguration(configMap)
+  }
 
- // LoaddefaultParameter
- val defaultParams = getClass.getResourceAsStream("/params_default.ini")
- if (defaultParams!= null) {
- configMap.putAll(ConfigParser.readConfig(defaultParams))
- defaultParams.close()
- }
+  /**
+   * Create production environment configuration, generate realistic LDBC data
+   * (including posts, comments, likes, etc)
+   */
+  def createFastTestConfig(scaleFactor: String): GeneratorConfiguration = {
+    val configMap = new java.util.HashMap[String, String]()
 
- // Load scale factor configuration (use passed scale factor parameter)
- configMap.putAll(ConfigParser.scaleFactorConf(scaleFactor))
+    // LoaddefaultParameter
+    val defaultParams = getClass.getResourceAsStream("/params_default.ini")
+    if (defaultParams != null) {
+      configMap.putAll(ConfigParser.readConfig(defaultParams))
+      defaultParams.close()
+    }
 
- // Realistic LDBC data generation configuration
- configMap.put("generator.numYears", "3") // 3 years of realistic data
- configMap.put("generator.maxNumFriends", "50") // Realistic friend count
- configMap.put("generator.maxNumComments", "100") // Enable comment generation
- configMap.put("generator.maxNumPostPerMonth", "20") // Enable post generation
- configMap.put("generator.maxNumLike", "100") // Enable like generation
- configMap.put("generator.blockSize", "1000") // Reasonable chunk size
- configMap.put("hadoop.numThreads", "4") // Multi-threading improves performance
+    // Load scale factor configuration (use passed scale factor parameter)
+    configMap.putAll(ConfigParser.scaleFactorConf(scaleFactor))
 
- new GeneratorConfiguration(configMap)
- }
+    // Realistic LDBC data generation configuration
+    configMap.put("generator.numYears", "3") // 3 years of realistic data
+    configMap.put("generator.maxNumFriends", "50") // Realistic friend count
+    configMap.put(
+      "generator.maxNumComments",
+      "100"
+    ) // Enable comment generation
+    configMap.put(
+      "generator.maxNumPostPerMonth",
+      "20"
+    ) // Enable post generation
+    configMap.put("generator.maxNumLike", "100") // Enable like generation
+    configMap.put("generator.blockSize", "1000") // Reasonable chunk size
+    configMap.put(
+      "hadoop.numThreads",
+      "4"
+    ) // Multi-threading improves performance
 
- /** Validate LDBC configuration validity */
- def validateConfig(config: GeneratorConfiguration): Boolean = {
- try {
- val numPersons = config.get("generator.numPersons")
- numPersons!= null && numPersons.toInt > 0
- } catch {
- case _: Exception => false
- }
- }
+    new GeneratorConfiguration(configMap)
+  }
+
+  /** Validate LDBC configuration validity */
+  def validateConfig(config: GeneratorConfiguration): Boolean = {
+    try {
+      val numPersons = config.get("generator.numPersons")
+      numPersons != null && numPersons.toInt > 0
+    } catch {
+      case _: Exception => false
+    }
+  }
 }

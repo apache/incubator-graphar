@@ -19,10 +19,24 @@
 
 package org.apache.graphar.datasources.ldbc.bridge
 
-import org.apache.graphar.datasources.ldbc.model.{ConversionResult, ValidationResult, ValidationSuccess, ValidationFailure}
+import org.apache.graphar.datasources.ldbc.model.{
+  ConversionResult,
+  ValidationResult,
+  ValidationSuccess,
+  ValidationFailure
+}
 import org.apache.graphar.datasources.ldbc.stream.core.GraphArDataCollector
-import org.apache.graphar.datasources.ldbc.stream.processor.{UnifiedIdManager, PersonRDDProcessor, StaticEntityProcessor}
-import org.apache.graphar.datasources.ldbc.stream.strategy.{EnhancedOutputStrategySelector, OutputStrategy, SystemResourceInfo, StrategyDecision}
+import org.apache.graphar.datasources.ldbc.stream.processor.{
+  UnifiedIdManager,
+  PersonRDDProcessor,
+  StaticEntityProcessor
+}
+import org.apache.graphar.datasources.ldbc.stream.strategy.{
+  EnhancedOutputStrategySelector,
+  OutputStrategy,
+  SystemResourceInfo,
+  StrategyDecision
+}
 import org.apache.graphar.datasources.ldbc.stream.writer.StreamingGraphArWriter
 import org.apache.graphar.datasources.ldbc.stream.output.GraphArActivityOutputStream
 import org.apache.graphar.graph.GraphWriter
@@ -37,35 +51,46 @@ import java.nio.file.{Files, Paths}
  * Main controller for LDBC to GraphAr conversion
  *
  * Implements a dual-track processing architecture:
- * 1. Static data (Person, etc.) processed via RDD-based batch processing
- * 2. Dynamic data processed via streaming architecture
- * 3. Intelligently selects output strategy and generates standard GraphAr format
+ *   1. Static data (Person, etc.) processed via RDD-based batch processing 2.
+ *      Dynamic data processed via streaming architecture 3. Intelligently
+ *      selects output strategy and generates standard GraphAr format
  */
 class LdbcGraphArBridge extends LdbcBridgeInterface {
 
-  private val logger: Logger = LoggerFactory.getLogger(classOf[LdbcGraphArBridge])
+  private val logger: Logger =
+    LoggerFactory.getLogger(classOf[LdbcGraphArBridge])
 
   /**
    * Unified write method (following GraphAr GraphWriter pattern)
    */
   override def write(
-    path: String,
-    spark: SparkSession,
-    name: String,
-    vertex_chunk_size: Long,
-    edge_chunk_size: Long,
-    file_type: String
+      path: String,
+      spark: SparkSession,
+      name: String,
+      vertex_chunk_size: Long,
+      edge_chunk_size: Long,
+      file_type: String
   ): Try[ConversionResult] = {
 
-    logger.info(s"Starting LDBC to GraphAr conversion: path=$path, name=$name, vertex_chunk_size=$vertex_chunk_size, edge_chunk_size=$edge_chunk_size, file_type=$file_type")
+    logger.info(
+      s"Starting LDBC to GraphAr conversion: path=$path, name=$name, vertex_chunk_size=$vertex_chunk_size, edge_chunk_size=$edge_chunk_size, file_type=$file_type"
+    )
 
     Try {
       implicit val sparkSession: SparkSession = spark
 
       // 1. Parameter validation
-      val validation = validateConfiguration("dual_track", path, vertex_chunk_size, edge_chunk_size, file_type)
+      val validation = validateConfiguration(
+        "dual_track",
+        path,
+        vertex_chunk_size,
+        edge_chunk_size,
+        file_type
+      )
       if (!validation.isSuccess) {
-        throw new IllegalArgumentException(s"Configuration validation failed: ${validation.getErrors.mkString(", ")}")
+        throw new IllegalArgumentException(
+          s"Configuration validation failed: ${validation.getErrors.mkString(", ")}"
+        )
       }
 
       // 2. Initialize enhanced components
@@ -85,7 +110,8 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
 
       try {
         // 4. First track: Process static entities
-        val staticResult = processStaticEntities(dataCollector, tempDir.staticPath)
+        val staticResult =
+          processStaticEntities(dataCollector, tempDir.staticPath)
         logger.info(s"Static data processing completed: $staticResult")
 
         // 5. Second track: Process dynamic streaming data
@@ -100,7 +126,10 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
         logger.info(s"Streaming data processing completed: $streamingResult")
 
         // 6. Intelligent strategy selection
-        val strategyDecision = strategySelector.selectStrategyFromCollector(dataCollector, systemResources)
+        val strategyDecision = strategySelector.selectStrategyFromCollector(
+          dataCollector,
+          systemResources
+        )
         logger.info(s"Selected strategy: ${strategyDecision}")
 
         // 7. Unified output based on selected strategy
@@ -116,7 +145,8 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
         )
 
         // 8. Generate processing report
-        val processingReport = generateProcessingReport(dataCollector, strategyDecision, finalResult)
+        val processingReport =
+          generateProcessingReport(dataCollector, strategyDecision, finalResult)
         logger.info(s"Processing report: $processingReport")
 
         ConversionResult(
@@ -128,7 +158,9 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
           locationCount = 0L,
           outputPath = path,
           conversionTime = System.currentTimeMillis(),
-          warnings = List(s"Strategy=${strategyDecision.strategy}, Confidence=${(strategyDecision.confidence * 100).toInt}%")
+          warnings = List(
+            s"Strategy=${strategyDecision.strategy}, Confidence=${(strategyDecision.confidence * 100).toInt}%"
+          )
         )
 
       } finally {
@@ -139,15 +171,16 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
         dataCollector.cleanup()
       }
 
-    }.recoverWith {
-      case e: Exception =>
-        logger.error("LDBC to GraphAr conversion failed", e)
-        Try(ConversionResult(
+    }.recoverWith { case e: Exception =>
+      logger.error("LDBC to GraphAr conversion failed", e)
+      Try(
+        ConversionResult(
           personCount = 0L,
           knowsCount = 0L,
           outputPath = path,
           warnings = List(s"Conversion failed: ${e.getMessage}")
-        ))
+        )
+      )
     }
   }
 
@@ -155,11 +188,11 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
    * Validate configuration parameters
    */
   override def validateConfiguration(
-    mode: String,
-    output_path: String,
-    vertex_chunk_size: Long,
-    edge_chunk_size: Long,
-    file_type: String
+      mode: String,
+      output_path: String,
+      vertex_chunk_size: Long,
+      edge_chunk_size: Long,
+      file_type: String
   ): ValidationResult = {
 
     val errors = scala.collection.mutable.ListBuffer[String]()
@@ -208,8 +241,8 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
    * Process static entity data
    */
   private def processStaticEntities(
-    dataCollector: GraphArDataCollector,
-    tempStaticPath: String
+      dataCollector: GraphArDataCollector,
+      tempStaticPath: String
   )(implicit spark: SparkSession): StaticProcessingResult = {
 
     logger.info("Starting to process static entity data")
@@ -224,10 +257,12 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
 
       StaticProcessingResult(
         success = true,
-        processedEntities = List("Person", "Organisation", "Place", "Tag", "TagClass"),
+        processedEntities =
+          List("Person", "Organisation", "Place", "Tag", "TagClass"),
         personResult = Some(personResult),
         totalVertices = personResult.personCount,
-        totalEdges = personResult.knowsCount + personResult.hasInterestCount + personResult.studyAtCount + personResult.workAtCount + personResult.isLocatedInCount
+        totalEdges =
+          personResult.knowsCount + personResult.hasInterestCount + personResult.studyAtCount + personResult.workAtCount + personResult.isLocatedInCount
       )
 
     } catch {
@@ -248,12 +283,12 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
    * Process streaming entity data
    */
   private def processStreamingEntities(
-    dataCollector: GraphArDataCollector,
-    tempStreamingPath: String,
-    graph_name: String,
-    vertex_chunk_size: Long,
-    edge_chunk_size: Long,
-    file_type: String
+      dataCollector: GraphArDataCollector,
+      tempStreamingPath: String,
+      graph_name: String,
+      vertex_chunk_size: Long,
+      edge_chunk_size: Long,
+      file_type: String
   )(implicit spark: SparkSession): StreamingProcessingResult = {
 
     logger.info("Starting to process streaming entity data")
@@ -280,10 +315,15 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
       activityOutputStream.close()
 
       // Scan temporary directory to collect dynamic entity information
-      logger.info("Scanning temporary streaming directory to collect dynamic entity information")
-      val streamingEntities = discoverStreamingEntities(tempStreamingPath, file_type)
+      logger.info(
+        "Scanning temporary streaming directory to collect dynamic entity information"
+      )
+      val streamingEntities =
+        discoverStreamingEntities(tempStreamingPath, file_type)
 
-      logger.info(s"Found ${streamingEntities.size} dynamic entity types: ${streamingEntities.keys.mkString(", ")}")
+      logger.info(
+        s"Found ${streamingEntities.size} dynamic entity types: ${streamingEntities.keys.mkString(", ")}"
+      )
 
       streamingEntities.foreach { case (entityType, (entityPath, isVertex)) =>
         try {
@@ -292,11 +332,13 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
             case "parquet" => spark.read.parquet(entityPath)
             case "csv" => spark.read.option("header", "true").csv(entityPath)
             case "orc" => spark.read.orc(entityPath)
-            case _ => spark.read.parquet(entityPath)
+            case _     => spark.read.parquet(entityPath)
           }
 
           val rowCount = entityDF.count()
-          logger.info(s"Reading dynamic entity $entityType: $rowCount records, path: $entityPath")
+          logger.info(
+            s"Reading dynamic entity $entityType: $rowCount records, path: $entityPath"
+          )
 
           // Add to data collector
           if (isVertex) {
@@ -336,24 +378,40 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
    * Execute selected output strategy
    */
   private def executeSelectedStrategy(
-    output_path: String,
-    tempDir: TempDirectoryInfo,
-    dataCollector: GraphArDataCollector,
-    strategyDecision: StrategyDecision,
-    graph_name: String,
-    vertex_chunk_size: Long,
-    edge_chunk_size: Long,
-    file_type: String
+      output_path: String,
+      tempDir: TempDirectoryInfo,
+      dataCollector: GraphArDataCollector,
+      strategyDecision: StrategyDecision,
+      graph_name: String,
+      vertex_chunk_size: Long,
+      edge_chunk_size: Long,
+      file_type: String
   )(implicit spark: SparkSession): OutputExecutionResult = {
 
     logger.info(s"Executing output strategy: ${strategyDecision.strategy}")
 
     strategyDecision.strategy match {
       case OutputStrategy.COMPLETE_STANDARD =>
-        executeCompleteStandardStrategy(output_path, tempDir, dataCollector, graph_name, vertex_chunk_size, edge_chunk_size, file_type)
+        executeCompleteStandardStrategy(
+          output_path,
+          tempDir,
+          dataCollector,
+          graph_name,
+          vertex_chunk_size,
+          edge_chunk_size,
+          file_type
+        )
 
       case OutputStrategy.HYBRID_DOCUMENTED =>
-        executeHybridDocumentedStrategy(output_path, tempDir, dataCollector, graph_name, vertex_chunk_size, edge_chunk_size, file_type)
+        executeHybridDocumentedStrategy(
+          output_path,
+          tempDir,
+          dataCollector,
+          graph_name,
+          vertex_chunk_size,
+          edge_chunk_size,
+          file_type
+        )
     }
   }
 
@@ -361,13 +419,13 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
    * Execute complete standard strategy
    */
   private def executeCompleteStandardStrategy(
-    output_path: String,
-    tempDir: TempDirectoryInfo,
-    dataCollector: GraphArDataCollector,
-    graph_name: String,
-    vertex_chunk_size: Long,
-    edge_chunk_size: Long,
-    file_type: String
+      output_path: String,
+      tempDir: TempDirectoryInfo,
+      dataCollector: GraphArDataCollector,
+      graph_name: String,
+      vertex_chunk_size: Long,
+      edge_chunk_size: Long,
+      file_type: String
   )(implicit spark: SparkSession): OutputExecutionResult = {
 
     logger.info("Executing complete standard strategy")
@@ -381,43 +439,72 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
 
       staticDataFrames.foreach { case (entityType, df) =>
         val rowCount = df.count()
-        logger.info(s"Adding static vertex data to GraphWriter: $entityType, record count: $rowCount")
+        logger.info(
+          s"Adding static vertex data to GraphWriter: $entityType, record count: $rowCount"
+        )
 
         // Remove internal columns added by UnifiedIdManager, let GraphWriter manage vertex indices
-        val cleanDF = df.drop("_graphArVertexIndex", "_entityType", "_idSpaceCategory")
+        val cleanDF =
+          df.drop("_graphArVertexIndex", "_entityType", "_idSpaceCategory")
         graphWriter.PutVertexData(entityType, cleanDF)
       }
 
       val staticEdgeFrames = dataCollector.getStaticEdgeFrames()
-      logger.info(s"Retrieved static edge DataFrame count: ${staticEdgeFrames.size}")
+      logger.info(
+        s"Retrieved static edge DataFrame count: ${staticEdgeFrames.size}"
+      )
 
       staticEdgeFrames.foreach { case (relation, df) =>
         val rowCount = df.count()
-        logger.info(s"Adding static edge data to GraphWriter: ${relation._1}_${relation._2}_${relation._3}, record count: $rowCount")
+        logger.info(
+          s"Adding static edge data to GraphWriter: ${relation._1}_${relation._2}_${relation._3}, record count: $rowCount"
+        )
         graphWriter.PutEdgeData(relation, df)
       }
 
       // 2. Convert streaming chunk data to DataFrame and add to GraphWriter
       val streamingEntityInfo = dataCollector.getStreamingEntityInfo()
-      logger.info(s"Retrieved streaming entity count: ${streamingEntityInfo.size}")
+      logger.info(
+        s"Retrieved streaming entity count: ${streamingEntityInfo.size}"
+      )
 
       streamingEntityInfo.foreach { case (entityType, info) =>
-        logger.info(s"Processing streaming entity: $entityType, chunks: ${info.chunkCount}, rows: ${info.totalRows}")
-        val mergedDF = convertChunksToDataFrame(tempDir.streamingPath, entityType, info, file_type)
+        logger.info(
+          s"Processing streaming entity: $entityType, chunks: ${info.chunkCount}, rows: ${info.totalRows}"
+        )
+        val mergedDF = convertChunksToDataFrame(
+          tempDir.streamingPath,
+          entityType,
+          info,
+          file_type
+        )
 
         if (isVertexEntity(entityType)) {
           graphWriter.PutVertexData(entityType, mergedDF)
-          logger.info(s"Adding streaming vertex data to GraphWriter: $entityType")
+          logger.info(
+            s"Adding streaming vertex data to GraphWriter: $entityType"
+          )
         } else {
           val relation = parseEdgeRelation(entityType)
           graphWriter.PutEdgeData(relation, mergedDF)
-          logger.info(s"Adding streaming edge data to GraphWriter: ${relation._1}_${relation._2}_${relation._3}")
+          logger.info(
+            s"Adding streaming edge data to GraphWriter: ${relation._1}_${relation._2}_${relation._3}"
+          )
         }
       }
 
       // 3. Generate complete standard GraphAr output in one shot
-      logger.info(s"Starting GraphWriter write: output_path=$output_path, graph_name=$graph_name")
-      graphWriter.write(output_path, spark, graph_name, vertex_chunk_size, edge_chunk_size, file_type)
+      logger.info(
+        s"Starting GraphWriter write: output_path=$output_path, graph_name=$graph_name"
+      )
+      graphWriter.write(
+        output_path,
+        spark,
+        graph_name,
+        vertex_chunk_size,
+        edge_chunk_size,
+        file_type
+      )
       logger.info("GraphWriter write completed")
 
       OutputExecutionResult(
@@ -444,13 +531,13 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
    * Execute hybrid documented strategy
    */
   private def executeHybridDocumentedStrategy(
-    output_path: String,
-    tempDir: TempDirectoryInfo,
-    dataCollector: GraphArDataCollector,
-    graph_name: String,
-    vertex_chunk_size: Long,
-    edge_chunk_size: Long,
-    file_type: String
+      output_path: String,
+      tempDir: TempDirectoryInfo,
+      dataCollector: GraphArDataCollector,
+      graph_name: String,
+      vertex_chunk_size: Long,
+      edge_chunk_size: Long,
+      file_type: String
   )(implicit spark: SparkSession): OutputExecutionResult = {
 
     logger.info("Executing hybrid documented strategy")
@@ -469,13 +556,31 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
 
       // Write static part to temporary directory
       val tempStaticOutputPath = s"$output_path/.temp_static_final"
-      staticGraphWriter.write(tempStaticOutputPath, spark, s"${graph_name}_static", vertex_chunk_size, edge_chunk_size, file_type)
+      staticGraphWriter.write(
+        tempStaticOutputPath,
+        spark,
+        s"${graph_name}_static",
+        vertex_chunk_size,
+        edge_chunk_size,
+        file_type
+      )
 
       // 2. Merge directory structures
-      mergeDirectoryStructures(tempStaticOutputPath, tempDir.streamingPath, output_path)
+      mergeDirectoryStructures(
+        tempStaticOutputPath,
+        tempDir.streamingPath,
+        output_path
+      )
 
       // 3. Generate unified standard YAML metadata
-      generateHybridStandardYamls(output_path, dataCollector, graph_name, vertex_chunk_size, edge_chunk_size, file_type)
+      generateHybridStandardYamls(
+        output_path,
+        dataCollector,
+        graph_name,
+        vertex_chunk_size,
+        edge_chunk_size,
+        file_type
+      )
 
       OutputExecutionResult(
         success = true,
@@ -500,7 +605,8 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
   // Helper method implementations
   private def getScaleFactor(spark: SparkSession): Double = {
     // Get scale factor from Spark configuration or system properties
-    spark.conf.getOption("ldbc.scale.factor")
+    spark.conf
+      .getOption("ldbc.scale.factor")
       .map(_.toDouble)
       .getOrElse(0.003) // Default scale factor
   }
@@ -551,7 +657,10 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
    * Scan temporary streaming directory to discover generated dynamic entities
    * Returns Map[EntityType, (Path, IsVertex)]
    */
-  private def discoverStreamingEntities(tempStreamingPath: String, file_type: String): Map[String, (String, Boolean)] = {
+  private def discoverStreamingEntities(
+      tempStreamingPath: String,
+      file_type: String
+  ): Map[String, (String, Boolean)] = {
     import java.nio.file.{Files, Paths}
     import scala.collection.JavaConverters._
 
@@ -564,7 +673,8 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
         Files.list(vertexDir).iterator().asScala.foreach { vertexPath =>
           if (Files.isDirectory(vertexPath)) {
             val entityType = vertexPath.getFileName.toString
-            result(entityType) = (vertexPath.toString, true) // true indicates vertex
+            result(entityType) =
+              (vertexPath.toString, true) // true indicates vertex
           }
         }
       }
@@ -575,7 +685,8 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
         Files.list(edgeDir).iterator().asScala.foreach { edgePath =>
           if (Files.isDirectory(edgePath)) {
             val entityType = edgePath.getFileName.toString
-            result(entityType) = (edgePath.toString, false) // false indicates edge
+            result(entityType) =
+              (edgePath.toString, false) // false indicates edge
           }
         }
       }
@@ -585,7 +696,10 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
       if (Files.exists(rootDir) && Files.isDirectory(rootDir)) {
         Files.list(rootDir).iterator().asScala.foreach { entityPath =>
           val fileName = entityPath.getFileName.toString
-          if (Files.isDirectory(entityPath) && !fileName.startsWith(".") && fileName != "vertex" && fileName != "edge") {
+          if (
+            Files.isDirectory(entityPath) && !fileName
+              .startsWith(".") && fileName != "vertex" && fileName != "edge"
+          ) {
             // Determine whether it's a vertex or edge (by name pattern)
             val isVertex = !fileName.contains("_")
             result(fileName) = (entityPath.toString, isVertex)
@@ -603,7 +717,9 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
   /**
    * Parse edge relationship from path name
    */
-  private def parseEdgeRelationFromPath(pathName: String): (String, String, String) = {
+  private def parseEdgeRelationFromPath(
+      pathName: String
+  ): (String, String, String) = {
     val parts = pathName.split("_")
     if (parts.length >= 3) {
       val src = parts(0)
@@ -611,12 +727,17 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
       val edge = parts.slice(1, parts.length - 1).mkString("_")
       (src, edge, dst)
     } else {
-      logger.warn(s"Failed to parse edge relation: $pathName, using default value")
+      logger.warn(
+        s"Failed to parse edge relation: $pathName, using default value"
+      )
       ("Unknown", pathName, "Unknown")
     }
   }
 
-  private def processOtherStaticEntities(dataCollector: GraphArDataCollector, idManager: UnifiedIdManager)(implicit spark: SparkSession): Unit = {
+  private def processOtherStaticEntities(
+      dataCollector: GraphArDataCollector,
+      idManager: UnifiedIdManager
+  )(implicit spark: SparkSession): Unit = {
     logger.info("Processing other static entities")
 
     try {
@@ -627,7 +748,9 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
       val staticEntities = staticProcessor.generateAllStaticEntities()
 
       if (staticEntities.isEmpty) {
-        logger.warn("Failed to generate any static entities, LDBC dictionaries may not be initialized")
+        logger.warn(
+          "Failed to generate any static entities, LDBC dictionaries may not be initialized"
+        )
         return
       }
 
@@ -661,7 +784,9 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
             ("Unknown", "Unknown", "Unknown")
           }
 
-          logger.info(s"Adding static edge data ${relation._1}_${relation._2}_${relation._3}: $recordCount records")
+          logger.info(
+            s"Adding static edge data ${relation._1}_${relation._2}_${relation._3}: $recordCount records"
+          )
           dataCollector.addStaticEdgeData(relation, df)
         } else {
           logger.warn(s"Static edge $edgeKey is empty, skipping")
@@ -674,24 +799,35 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
       case e: Exception =>
         logger.error("Error occurred while processing static entities", e)
         // Continue processing, don't interrupt the entire workflow
-        logger.warn("Static entity processing failed, but continuing with subsequent steps")
+        logger.warn(
+          "Static entity processing failed, but continuing with subsequent steps"
+        )
     }
   }
 
-  private def simulateStreamingDataProcessing(outputStream: GraphArActivityOutputStream)(implicit spark: SparkSession): Unit = {
-    logger.info("Starting to process dynamic data stream (real LDBC Activity generation)")
+  private def simulateStreamingDataProcessing(
+      outputStream: GraphArActivityOutputStream
+  )(implicit spark: SparkSession): Unit = {
+    logger.info(
+      "Starting to process dynamic data stream (real LDBC Activity generation)"
+    )
 
     try {
       // Import LDBC required classes
       import ldbc.snb.datagen.generator.DatagenParams
-      import ldbc.snb.datagen.generator.generators.{SparkPersonGenerator, PersonActivityGenerator}
+      import ldbc.snb.datagen.generator.generators.{
+        SparkPersonGenerator,
+        PersonActivityGenerator
+      }
       import scala.collection.JavaConverters._
 
       // Create LDBC configuration
       val ldbcConfig = createLdbcConfiguration()
       DatagenParams.readConf(ldbcConfig)
 
-      logger.info(s"Starting to generate LDBC dynamic data, scaleFactor=${getScaleFactor(spark)}")
+      logger.info(
+        s"Starting to generate LDBC dynamic data, scaleFactor=${getScaleFactor(spark)}"
+      )
 
       // 1. Generate Person data (foundation of dynamic data)
       val personRDD = SparkPersonGenerator(ldbcConfig)(spark)
@@ -705,7 +841,9 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
         .groupByKey()
         .collect()
 
-      logger.info(s"Person data has been grouped into ${personsByBlock.length} blocks")
+      logger.info(
+        s"Person data has been grouped into ${personsByBlock.length} blocks"
+      )
 
       // 3. Generate Activity data for each block
       val activityGenerator = new PersonActivityGenerator()
@@ -713,11 +851,16 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
 
       personsByBlock.foreach { case (blockId, persons) =>
         val personList = persons.toList.sortBy(_.getAccountId).asJava
-        logger.info(s"Processing Block $blockId, containing ${personList.size()} Persons")
+        logger.info(
+          s"Processing Block $blockId, containing ${personList.size()} Persons"
+        )
 
         try {
           // Use public API generateActivityForBlock() to generate entire block's Activity data
-          val activityStream = activityGenerator.generateActivityForBlock(blockId.toInt, personList)
+          val activityStream = activityGenerator.generateActivityForBlock(
+            blockId.toInt,
+            personList
+          )
 
           // Process each GenActivity in the stream
           activityStream.forEach { genActivity =>
@@ -727,17 +870,23 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
               totalActivitiesProcessed += 1
 
               if (totalActivitiesProcessed % 10 == 0) {
-                logger.info(s"Processed $totalActivitiesProcessed Person Activity data")
+                logger.info(
+                  s"Processed $totalActivitiesProcessed Person Activity data"
+                )
               }
 
             } catch {
               case e: Exception =>
-                logger.warn(s"Failed to process GenActivity data: ${e.getMessage}")
+                logger.warn(
+                  s"Failed to process GenActivity data: ${e.getMessage}"
+                )
                 logger.debug("Exception details:", e)
             }
           }
 
-          logger.info(s"Block $blockId Activity data processing completed, containing ${personList.size()} Persons")
+          logger.info(
+            s"Block $blockId Activity data processing completed, containing ${personList.size()} Persons"
+          )
 
         } catch {
           case e: Exception =>
@@ -748,8 +897,12 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
       logger.info("=" * 60)
       logger.info("LDBC dynamic data generation processing completed")
       logger.info(s"Total processed $personCount Persons")
-      logger.info(s"Total processed $totalActivitiesProcessed Activities (including Wall/Group/Album)")
-      logger.info("Forum/Post/Comment/Like counts refer to output file statistics")
+      logger.info(
+        s"Total processed $totalActivitiesProcessed Activities (including Wall/Group/Album)"
+      )
+      logger.info(
+        "Forum/Post/Comment/Like counts refer to output file statistics"
+      )
       logger.info("=" * 60)
 
     } catch {
@@ -763,7 +916,9 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
   /**
    * Create LDBC configuration
    */
-  private def createLdbcConfiguration()(implicit spark: SparkSession): ldbc.snb.datagen.util.GeneratorConfiguration = {
+  private def createLdbcConfiguration()(implicit
+      spark: SparkSession
+  ): ldbc.snb.datagen.util.GeneratorConfiguration = {
     import ldbc.snb.datagen.util.{GeneratorConfiguration, ConfigParser}
     import scala.collection.JavaConverters._
 
@@ -771,80 +926,117 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
     val scaleFactor = getScaleFactor(spark)
 
     // Convert double to integer string for LDBC (e.g., 1.0 -> "1", 0.003 -> "0.003")
-    val scaleFactorString = if (scaleFactor == scaleFactor.toInt) scaleFactor.toInt.toString else scaleFactor.toString
+    val scaleFactorString =
+      if (scaleFactor == scaleFactor.toInt) scaleFactor.toInt.toString
+      else scaleFactor.toString
 
     // Use LdbcConfigUtils to create complete configuration
-    val config = org.apache.graphar.datasources.ldbc.util.LdbcConfigUtils.createFastTestConfig(scaleFactorString)
+    val config = org.apache.graphar.datasources.ldbc.util.LdbcConfigUtils
+      .createFastTestConfig(scaleFactorString)
 
-    logger.info(s"LDBC configuration created: scaleFactor=$scaleFactor, scaleFactorString=$scaleFactorString")
+    logger.info(
+      s"LDBC configuration created: scaleFactor=$scaleFactor, scaleFactorString=$scaleFactorString"
+    )
     config
   }
 
-  private def inferSchemaFromEntity(entityName: String): org.apache.spark.sql.types.StructType = {
+  private def inferSchemaFromEntity(
+      entityName: String
+  ): org.apache.spark.sql.types.StructType = {
     // Infer basic Schema based on entity name
     import org.apache.spark.sql.types._
 
     entityName match {
-      case "Forum" => StructType(Array(
-        StructField("id", LongType, false),
-        StructField("title", StringType, true),
-        StructField("creationDate", TimestampType, false)
-      ))
-      case "Post" => StructType(Array(
-        StructField("id", LongType, false),
-        StructField("content", StringType, true),
-        StructField("creationDate", TimestampType, false)
-      ))
-      case _ => StructType(Array(
-        StructField("id", LongType, false),
-        StructField("creationDate", TimestampType, false)
-      ))
+      case "Forum" =>
+        StructType(
+          Array(
+            StructField("id", LongType, false),
+            StructField("title", StringType, true),
+            StructField("creationDate", TimestampType, false)
+          )
+        )
+      case "Post" =>
+        StructType(
+          Array(
+            StructField("id", LongType, false),
+            StructField("content", StringType, true),
+            StructField("creationDate", TimestampType, false)
+          )
+        )
+      case _ =>
+        StructType(
+          Array(
+            StructField("id", LongType, false),
+            StructField("creationDate", TimestampType, false)
+          )
+        )
     }
   }
 
   private def convertChunksToDataFrame(
-    basePath: String,
-    entityType: String,
-    info: org.apache.graphar.datasources.ldbc.stream.core.StreamingEntityInfo,
-    file_type: String
+      basePath: String,
+      entityType: String,
+      info: org.apache.graphar.datasources.ldbc.stream.core.StreamingEntityInfo,
+      file_type: String
   )(implicit spark: SparkSession): org.apache.spark.sql.DataFrame = {
     // Implement chunk to DataFrame conversion
     // For now, return a simulated empty DataFrame
-    spark.createDataFrame(spark.sparkContext.emptyRDD[org.apache.spark.sql.Row], info.schema)
+    spark.createDataFrame(
+      spark.sparkContext.emptyRDD[org.apache.spark.sql.Row],
+      info.schema
+    )
   }
 
   private def isVertexEntity(entityType: String): Boolean = {
-    val vertexEntities = Set("Person", "Organisation", "Place", "Tag", "TagClass", "Forum", "Post", "Comment", "Photo")
+    val vertexEntities = Set(
+      "Person",
+      "Organisation",
+      "Place",
+      "Tag",
+      "TagClass",
+      "Forum",
+      "Post",
+      "Comment",
+      "Photo"
+    )
     vertexEntities.contains(entityType)
   }
 
-  private def parseEdgeRelation(entityType: String): (String, String, String) = {
+  private def parseEdgeRelation(
+      entityType: String
+  ): (String, String, String) = {
     // Simplified edge relation parsing
     entityType match {
       case "likes" => ("Person", "likes", "Post")
-      case _ => ("Unknown", entityType, "Unknown")
+      case _       => ("Unknown", entityType, "Unknown")
     }
   }
 
-  private def mergeDirectoryStructures(staticPath: String, streamingPath: String, output_path: String): Unit = {
+  private def mergeDirectoryStructures(
+      staticPath: String,
+      streamingPath: String,
+      output_path: String
+  ): Unit = {
     logger.info("Merging directory structures (simplified implementation)")
   }
 
   private def generateHybridStandardYamls(
-    output_path: String,
-    dataCollector: GraphArDataCollector,
-    graph_name: String,
-    vertex_chunk_size: Long,
-    edge_chunk_size: Long,
-    file_type: String
+      output_path: String,
+      dataCollector: GraphArDataCollector,
+      graph_name: String,
+      vertex_chunk_size: Long,
+      edge_chunk_size: Long,
+      file_type: String
   ): Unit = {
-    logger.info("Generating hybrid format standard YAML (simplified implementation)")
+    logger.info(
+      "Generating hybrid format standard YAML (simplified implementation)"
+    )
   }
 
   private def generateProcessingReport(
-    dataCollector: GraphArDataCollector,
-    strategyDecision: StrategyDecision,
-    executionResult: OutputExecutionResult
+      dataCollector: GraphArDataCollector,
+      strategyDecision: StrategyDecision,
+      executionResult: OutputExecutionResult
   ): ProcessingReport = {
     val collectionStats = dataCollector.getCollectionStatistics()
     val idUsageStats = dataCollector.idManager.generateUsageStatistics()
@@ -864,43 +1056,45 @@ class LdbcGraphArBridge extends LdbcBridgeInterface {
 
 // Data class definitions
 case class TempDirectoryInfo(
-  basePath: String,
-  staticPath: String,
-  streamingPath: String
+    basePath: String,
+    staticPath: String,
+    streamingPath: String
 )
 
 case class StaticProcessingResult(
-  success: Boolean,
-  processedEntities: List[String],
-  personResult: Option[org.apache.graphar.datasources.ldbc.stream.processor.PersonProcessingResult],
-  totalVertices: Long,
-  totalEdges: Long,
-  error: Option[String] = None
+    success: Boolean,
+    processedEntities: List[String],
+    personResult: Option[
+      org.apache.graphar.datasources.ldbc.stream.processor.PersonProcessingResult
+    ],
+    totalVertices: Long,
+    totalEdges: Long,
+    error: Option[String] = None
 )
 
 case class StreamingProcessingResult(
-  success: Boolean,
-  processedEntities: List[String],
-  totalChunks: Long,
-  totalRows: Long,
-  error: Option[String] = None
+    success: Boolean,
+    processedEntities: List[String],
+    totalChunks: Long,
+    totalRows: Long,
+    error: Option[String] = None
 )
 
 case class OutputExecutionResult(
-  success: Boolean,
-  strategy: OutputStrategy.Value,
-  outputFormat: String,
-  totalEntities: Int,
-  error: Option[String] = None
+    success: Boolean,
+    strategy: OutputStrategy.Value,
+    outputFormat: String,
+    totalEntities: Int,
+    error: Option[String] = None
 )
 
 case class ProcessingReport(
-  strategy: String,
-  confidence: Double,
-  totalEntities: Int,
-  totalVertices: Long,
-  totalEdges: Long,
-  success: Boolean,
-  outputFormat: String,
-  idUtilization: Double
+    strategy: String,
+    confidence: Double,
+    totalEntities: Int,
+    totalVertices: Long,
+    totalEdges: Long,
+    success: Boolean,
+    outputFormat: String,
+    idUtilization: Double
 )

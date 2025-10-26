@@ -30,20 +30,24 @@ import scala.collection.mutable
 /**
  * GraphAr Data Collector
  *
- * Unified collection of metadata from static data (RDD source) and streaming data (chunk source)
- * Provides data foundation for subsequent strategy selection and output processing
+ * Unified collection of metadata from static data (RDD source) and streaming
+ * data (chunk source) Provides data foundation for subsequent strategy
+ * selection and output processing
  */
 class GraphArDataCollector(
-  output_path: String,
-  graph_name: String,
-  val idManager: UnifiedIdManager
-)(implicit spark: SparkSession) extends Serializable {
+    output_path: String,
+    graph_name: String,
+    val idManager: UnifiedIdManager
+)(implicit spark: SparkSession)
+    extends Serializable {
 
-  private val logger: Logger = LoggerFactory.getLogger(classOf[GraphArDataCollector])
+  private val logger: Logger =
+    LoggerFactory.getLogger(classOf[GraphArDataCollector])
 
   // Static data collection (RDD source)
   private val staticDataFrames = mutable.Map[String, DataFrame]()
-  private val staticEdgeFrames = mutable.Map[(String, String, String), DataFrame]()
+  private val staticEdgeFrames =
+    mutable.Map[(String, String, String), DataFrame]()
   private val staticSchemas = mutable.Map[String, StructType]()
 
   // Streaming data metadata collection (chunk source)
@@ -56,7 +60,9 @@ class GraphArDataCollector(
   private var streamingVertexCount = 0L
   private var streamingEdgeCount = 0L
 
-  logger.info(s"GraphArDataCollector initialized: output_path=$output_path, graph_name=$graph_name")
+  logger.info(
+    s"GraphArDataCollector initialized: output_path=$output_path, graph_name=$graph_name"
+  )
 
   /**
    * Add static vertex data
@@ -66,7 +72,9 @@ class GraphArDataCollector(
 
     // Ensure IDs are assigned
     val dfWithIds = if (df.columns.contains("_graphArVertexIndex")) {
-      logger.debug(s"Entity $entityType already contains _graphArVertexIndex column")
+      logger.debug(
+        s"Entity $entityType already contains _graphArVertexIndex column"
+      )
       df
     } else {
       logger.debug(s"Assigning vertex IDs to entity $entityType")
@@ -78,35 +86,46 @@ class GraphArDataCollector(
     staticSchemas(entityType) = dfWithIds.schema
     staticVertexCount += recordCount
 
-    logger.info(s"Static vertex data collection completed: $entityType, record count: $recordCount")
+    logger.info(
+      s"Static vertex data collection completed: $entityType, record count: $recordCount"
+    )
   }
 
   /**
    * Add static edge data
    */
-  def addStaticEdgeData(relation: (String, String, String), df: DataFrame): Unit = {
+  def addStaticEdgeData(
+      relation: (String, String, String),
+      df: DataFrame
+  ): Unit = {
     val (srcType, edgeType, dstType) = relation
-    logger.info(s"Collecting static edge data: ${srcType}_${edgeType}_${dstType}")
+    logger.info(
+      s"Collecting static edge data: ${srcType}_${edgeType}_${dstType}"
+    )
 
     val recordCount = df.count()
     staticEdgeFrames(relation) = df
     staticSchemas(s"${srcType}_${edgeType}_${dstType}") = df.schema
     staticEdgeCount += recordCount
 
-    logger.info(s"Static edge data collection completed: ${srcType}_${edgeType}_${dstType}, record count: $recordCount")
+    logger.info(
+      s"Static edge data collection completed: ${srcType}_${edgeType}_${dstType}, record count: $recordCount"
+    )
   }
 
   /**
    * Record streaming entity information
    */
   def recordStreamingEntity(
-    entityType: String,
-    chunkCount: Long,
-    totalRows: Long,
-    schema: StructType,
-    offsetMapping: Map[String, Map[Long, OffsetInfo]]
+      entityType: String,
+      chunkCount: Long,
+      totalRows: Long,
+      schema: StructType,
+      offsetMapping: Map[String, Map[Long, OffsetInfo]]
   ): Unit = {
-    logger.info(s"Recording streaming entity info: $entityType, chunks: $chunkCount, rows: $totalRows")
+    logger.info(
+      s"Recording streaming entity info: $entityType, chunks: $chunkCount, rows: $totalRows"
+    )
 
     streamingEntityInfo(entityType) = StreamingEntityInfo(
       entityType = entityType,
@@ -135,12 +154,14 @@ class GraphArDataCollector(
   /**
    * Get static edge DataFrame collection
    */
-  def getStaticEdgeFrames(): Map[(String, String, String), DataFrame] = staticEdgeFrames.toMap
+  def getStaticEdgeFrames(): Map[(String, String, String), DataFrame] =
+    staticEdgeFrames.toMap
 
   /**
    * Get streaming entity information collection
    */
-  def getStreamingEntityInfo(): Map[String, StreamingEntityInfo] = streamingEntityInfo.toMap
+  def getStreamingEntityInfo(): Map[String, StreamingEntityInfo] =
+    streamingEntityInfo.toMap
 
   /**
    * Get all static schemas
@@ -216,7 +237,8 @@ class GraphArDataCollector(
       val staticSchema = staticSchemas(entityType)
       val streamingSchema = streamingSchemas(entityType)
 
-      val entityConflicts = detectSchemaConflicts(entityType, staticSchema, streamingSchema)
+      val entityConflicts =
+        detectSchemaConflicts(entityType, staticSchema, streamingSchema)
       if (entityConflicts.nonEmpty) {
         conflicts ++= entityConflicts
       } else {
@@ -237,16 +259,17 @@ class GraphArDataCollector(
    * Detect conflicts between two schemas
    */
   private def detectSchemaConflicts(
-    entityType: String,
-    staticSchema: StructType,
-    streamingSchema: StructType
+      entityType: String,
+      staticSchema: StructType,
+      streamingSchema: StructType
   ): List[SchemaConflict] = {
 
     val conflicts = mutable.ListBuffer[SchemaConflict]()
 
     staticSchema.fields.foreach { staticField =>
       streamingSchema.fields.find(_.name == staticField.name) match {
-        case Some(streamingField) if staticField.dataType != streamingField.dataType =>
+        case Some(streamingField)
+            if staticField.dataType != streamingField.dataType =>
           conflicts += SchemaConflict(
             entityType = entityType,
             fieldName = staticField.name,
@@ -254,7 +277,8 @@ class GraphArDataCollector(
             streamingType = streamingField.dataType.typeName,
             conflictType = "type_mismatch"
           )
-        case Some(streamingField) if staticField.nullable != streamingField.nullable =>
+        case Some(streamingField)
+            if staticField.nullable != streamingField.nullable =>
           conflicts += SchemaConflict(
             entityType = entityType,
             fieldName = staticField.name,
@@ -280,7 +304,9 @@ class GraphArDataCollector(
   /**
    * Generate processing recommendations
    */
-  private def generateRecommendations(stats: DataCollectionStatistics): List[String] = {
+  private def generateRecommendations(
+      stats: DataCollectionStatistics
+  ): List[String] = {
     val recommendations = mutable.ListBuffer[String]()
 
     // Recommendations based on data scale
@@ -309,7 +335,17 @@ class GraphArDataCollector(
    * Check if entity is a vertex entity
    */
   def isVertexEntity(entityType: String): Boolean = {
-    val vertexEntities = Set("Person", "Organisation", "Place", "Tag", "TagClass", "Forum", "Post", "Comment", "Photo")
+    val vertexEntities = Set(
+      "Person",
+      "Organisation",
+      "Place",
+      "Tag",
+      "TagClass",
+      "Forum",
+      "Post",
+      "Comment",
+      "Photo"
+    )
     vertexEntities.contains(entityType)
   }
 
@@ -345,64 +381,65 @@ class GraphArDataCollector(
  * Streaming entity information
  */
 case class StreamingEntityInfo(
-  entityType: String,
-  chunkCount: Long,
-  totalRows: Long,
-  schema: StructType,
-  offsetMapping: Map[String, Map[Long, OffsetInfo]]
+    entityType: String,
+    chunkCount: Long,
+    totalRows: Long,
+    schema: StructType,
+    offsetMapping: Map[String, Map[Long, OffsetInfo]]
 )
 
 /**
  * Data collection statistics
  */
 case class DataCollectionStatistics(
-  totalEntities: Int,
-  staticEntities: Int,
-  streamingEntities: Int,
-  totalVertices: Long,
-  totalEdges: Long,
-  staticVertices: Long,
-  streamingVertices: Long,
-  staticEdges: Long,
-  streamingEdges: Long,
-  staticEntityTypes: List[String],
-  streamingEntityTypes: List[String],
-  allEntityTypes: List[String],
-  streamingRatio: Double
+    totalEntities: Int,
+    staticEntities: Int,
+    streamingEntities: Int,
+    totalVertices: Long,
+    totalEdges: Long,
+    staticVertices: Long,
+    streamingVertices: Long,
+    staticEdges: Long,
+    streamingEdges: Long,
+    staticEntityTypes: List[String],
+    streamingEntityTypes: List[String],
+    allEntityTypes: List[String],
+    streamingRatio: Double
 )
 
 /**
  * Schema conflict information
  */
 case class SchemaConflict(
-  entityType: String,
-  fieldName: String,
-  staticType: String,
-  streamingType: String,
-  conflictType: String
+    entityType: String,
+    fieldName: String,
+    staticType: String,
+    streamingType: String,
+    conflictType: String
 ) {
-  def description: String = s"Entity $entityType field $fieldName: $conflictType (static=$staticType, streaming=$streamingType)"
+  def description: String =
+    s"Entity $entityType field $fieldName: $conflictType (static=$staticType, streaming=$streamingType)"
 }
 
 /**
  * Schema compatibility report
  */
 case class SchemaCompatibilityReport(
-  totalEntitiesChecked: Int,
-  conflictCount: Int,
-  compatibleEntities: List[String],
-  conflicts: List[SchemaConflict],
-  isFullyCompatible: Boolean
+    totalEntitiesChecked: Int,
+    conflictCount: Int,
+    compatibleEntities: List[String],
+    conflicts: List[SchemaConflict],
+    isFullyCompatible: Boolean
 )
 
 /**
  * Data overview report
  */
 case class DataOverviewReport(
-  graphName: String,
-  outputPath: String,
-  collectionStats: DataCollectionStatistics,
-  idUsageStats: org.apache.graphar.datasources.ldbc.stream.processor.IdSpaceUsageStatistics,
-  schemaCompatibility: SchemaCompatibilityReport,
-  recommendations: List[String]
+    graphName: String,
+    outputPath: String,
+    collectionStats: DataCollectionStatistics,
+    idUsageStats: org.apache.graphar.datasources.ldbc.stream.processor.IdSpaceUsageStatistics,
+    schemaCompatibility: SchemaCompatibilityReport,
+    recommendations: List[String]
 )

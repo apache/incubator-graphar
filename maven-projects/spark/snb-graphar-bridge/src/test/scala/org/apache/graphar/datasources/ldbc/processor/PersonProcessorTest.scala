@@ -44,6 +44,9 @@ class PersonProcessorTest extends LdbcTestBase {
     val personRDD = SparkPersonGenerator(config)(spark)
     val count = personRDD.count()
 
-    assert(count == 50, s"SF0.003 should generate 50 persons according to LDBC specification, but got $count")
+    assert(
+      count == 50,
+      s"SF0.003 should generate 50 persons according to LDBC specification, but got $count"
+    )
   }
 }

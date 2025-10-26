@@ -37,8 +37,14 @@ class OutputValidationTest extends LdbcTestBase {
     bridge.write(outputPath, spark, "ldbc_test", 256, 256, "parquet")
 
     // Verify basic directory structure
-    assert(Files.exists(Paths.get(outputPath, "vertex")), "vertex directory should exist")
-    assert(Files.exists(Paths.get(outputPath, "edge")), "edge directory should exist")
+    assert(
+      Files.exists(Paths.get(outputPath, "vertex")),
+      "vertex directory should exist"
+    )
+    assert(
+      Files.exists(Paths.get(outputPath, "edge")),
+      "edge directory should exist"
+    )
 
     // Verify graph metadata
     val graphYmlPath = Paths.get(outputPath, "ldbc_test.graph.yml")
@@ -47,6 +53,9 @@ class OutputValidationTest extends LdbcTestBase {
 
     // Verify Person vertex directory exists (core entity)
     val personVertexPath = Paths.get(outputPath, "vertex", "Person")
-    assert(Files.exists(personVertexPath), "Person vertex directory should exist")
+    assert(
+      Files.exists(personVertexPath),
+      "Person vertex directory should exist"
+    )
   }
 }

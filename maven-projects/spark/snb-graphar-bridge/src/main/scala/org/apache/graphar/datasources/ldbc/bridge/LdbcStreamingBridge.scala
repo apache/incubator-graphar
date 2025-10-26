@@ -20,7 +20,11 @@
 package org.apache.graphar.datasources.ldbc.bridge
 
 import ldbc.snb.datagen.util.GeneratorConfiguration
-import org.apache.graphar.datasources.ldbc.model.{ConversionResult, StreamingConversionResult, ValidationResult}
+import org.apache.graphar.datasources.ldbc.model.{
+  ConversionResult,
+  StreamingConversionResult,
+  ValidationResult
+}
 import org.apache.graphar.datasources.ldbc.stream.core.{LdbcStreamingIntegrator}
 import org.apache.graphar.datasources.ldbc.stream.model.IntegrationStatistics
 import org.apache.spark.sql.SparkSession
@@ -32,26 +36,28 @@ import scala.util.Try
  * LDBC streaming bridge (dedicated to streaming processing)
  *
  * Provides complete LDBC streaming processing functionality:
- * 1. Supports streaming processing mode for complete LDBC dataset
- * 2. Standardized configuration and validation
- * 3. GraphAr format output
+ *   1. Supports streaming processing mode for complete LDBC dataset 2.
+ *      Standardized configuration and validation 3. GraphAr format output
  */
 class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
 
-  private val logger: Logger = LoggerFactory.getLogger(classOf[LdbcStreamingBridge])
+  private val logger: Logger =
+    LoggerFactory.getLogger(classOf[LdbcStreamingBridge])
 
   /**
    * Unified write method (following GraphAr GraphWriter interface)
    */
   override def write(
-    path: String,
-    spark: SparkSession,
-    name: String,
-    vertex_chunk_size: Long,
-    edge_chunk_size: Long,
-    file_type: String
+      path: String,
+      spark: SparkSession,
+      name: String,
+      vertex_chunk_size: Long,
+      edge_chunk_size: Long,
+      file_type: String
   ): Try[ConversionResult] = {
-    logger.info(s"LdbcStreamingBridge.write() called with path=$path, name=$name")
+    logger.info(
+      s"LdbcStreamingBridge.write() called with path=$path, name=$name"
+    )
     logger.info("Using streaming mode for all write operations")
 
     // Convert to streaming configuration and call streaming processing
@@ -69,15 +75,20 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
   }
 
   /**
-   * Streaming processing dedicated write method (using new streaming architecture)
+   * Streaming processing dedicated write method (using new streaming
+   * architecture)
    */
   override def writeStreaming(
-    config: StreamingConfiguration
+      config: StreamingConfiguration
   )(implicit spark: SparkSession): Try[StreamingConversionResult] = Try {
 
     logger.info("=== STREAMING MODE (FULL IMPLEMENTATION) ===")
-    logger.info("Using GraphArActivityOutputStream for true streaming processing")
-    logger.info("Supporting complete LDBC entities: Person, Forum, Post, Comment, and all relationships")
+    logger.info(
+      "Using GraphArActivityOutputStream for true streaming processing"
+    )
+    logger.info(
+      "Supporting complete LDBC entities: Person, Forum, Post, Comment, and all relationships"
+    )
 
     val startTime = System.currentTimeMillis()
 
@@ -95,15 +106,26 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
       val ldbcConfig = createLdbcConfiguration(config)
 
       // Execute streaming conversion
-      val conversionResult = streamingIntegrator.executeStreamingConversion(ldbcConfig)
+      val conversionResult =
+        streamingIntegrator.executeStreamingConversion(ldbcConfig)
 
       conversionResult match {
         case scala.util.Success(result) =>
-          logger.info(s"✓ Streaming conversion completed: ${result.processingDurationMs}ms")
-          logger.info(s"✓ Supported entity types: ${streamingIntegrator.getSupportedEntityTypes().mkString(", ")}")
-          logger.info(s"✓ Processed entities: ${result.integrationStatistics.processedEntities.mkString(", ")}")
-          logger.info(s"✓ Total records: ${result.integrationStatistics.totalRecords}")
-          logger.info("✓ Streaming conversion completed, real LDBC data generation successful")
+          logger.info(
+            s"✓ Streaming conversion completed: ${result.processingDurationMs}ms"
+          )
+          logger.info(
+            s"✓ Supported entity types: ${streamingIntegrator.getSupportedEntityTypes().mkString(", ")}"
+          )
+          logger.info(
+            s"✓ Processed entities: ${result.integrationStatistics.processedEntities.mkString(", ")}"
+          )
+          logger.info(
+            s"✓ Total records: ${result.integrationStatistics.totalRecords}"
+          )
+          logger.info(
+            "✓ Streaming conversion completed, real LDBC data generation successful"
+          )
           result
 
         case scala.util.Failure(exception) =>
@@ -119,8 +141,12 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
   /**
    * Create LDBC configuration
    */
-  private def createLdbcConfiguration(config: StreamingConfiguration): GeneratorConfiguration = {
-    val ldbcConfig = new GeneratorConfiguration(new java.util.HashMap[String, String]())
+  private def createLdbcConfiguration(
+      config: StreamingConfiguration
+  ): GeneratorConfiguration = {
+    val ldbcConfig = new GeneratorConfiguration(
+      new java.util.HashMap[String, String]()
+    )
 
     // *** Complete LDBC configuration based on params_default.ini ***
 
@@ -184,7 +210,10 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
     ldbcConfig.map.put("generator.probPopularPlaces", "0.9")
     ldbcConfig.map.put("generator.probRandomPerLevel", "0.005")
     ldbcConfig.map.put("generator.probSecondLang", "0.2")
-    ldbcConfig.map.put("generator.probTopUniv", "0.9") // *** This is the missing critical parameter ***
+    ldbcConfig.map.put(
+      "generator.probTopUniv",
+      "0.9"
+    ) // *** This is the missing critical parameter ***
     ldbcConfig.map.put("generator.probUnCorrelatedCompany", "0.05")
     ldbcConfig.map.put("generator.probUnCorrelatedOrganisation", "0.005")
 
@@ -203,12 +232,18 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
     ldbcConfig.map.put("hadoop.numThreads", "1")
 
     // LDBC prefix parameters (maintaining backward compatibility)
-    ldbcConfig.map.put("ldbc.snb.datagen.generator.scaleFactor", config.scale_factor)
+    ldbcConfig.map.put(
+      "ldbc.snb.datagen.generator.scaleFactor",
+      config.scale_factor
+    )
     ldbcConfig.map.put("ldbc.snb.datagen.generator.mode", "streaming")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.numThreads", "4")
 
     // Enable all dynamic entity generation
-    ldbcConfig.map.put("ldbc.snb.datagen.generator.enableDynamicEntities", "true")
+    ldbcConfig.map.put(
+      "ldbc.snb.datagen.generator.enableDynamicEntities",
+      "true"
+    )
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enableForum", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enablePost", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enableComment", "true")
@@ -216,7 +251,10 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enablePhoto", "true")
 
     // Enable static entity generation (newly added)
-    ldbcConfig.map.put("ldbc.snb.datagen.generator.enableStaticEntities", "true")
+    ldbcConfig.map.put(
+      "ldbc.snb.datagen.generator.enableStaticEntities",
+      "true"
+    )
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enablePlace", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enableTag", "true")
     ldbcConfig.map.put("ldbc.snb.datagen.generator.enableTagClass", "true")
@@ -237,23 +275,26 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
     ldbcConfig.map.put("serializer.format", "graphar_streaming")
     ldbcConfig.map.put("serializer.compressed", "false")
 
-    logger.info(s"LDBC complete configuration created, scale factor: ${config.scale_factor}")
+    logger.info(
+      s"LDBC complete configuration created, scale factor: ${config.scale_factor}"
+    )
     logger.info("✓ Enabled dynamic entities: Forum, Post, Comment, Like, Photo")
     logger.info("✓ Enabled static entities: Place, Tag, TagClass, Organisation")
-    logger.debug(s"Key parameters: generator.probTopUniv=0.9, generator.baseProbCorrelated=0.95")
+    logger.debug(
+      s"Key parameters: generator.probTopUniv=0.9, generator.baseProbCorrelated=0.95"
+    )
     logger.debug(s"Data generation time range: 2010-2013")
     ldbcConfig
   }
-
 
   /**
    * Validate configuration parameters
    */
   def validateConfiguration(
-    mode: String,
-    output_path: String,
-    vertex_chunk_size: Long,
-    edge_chunk_size: Long
+      mode: String,
+      output_path: String,
+      vertex_chunk_size: Long,
+      edge_chunk_size: Long
   ): ValidationResult = {
     val errors = scala.collection.mutable.ListBuffer[String]()
 
@@ -292,11 +333,11 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
    * Validate configuration parameters
    */
   override def validateConfiguration(
-    mode: String,
-    output_path: String,
-    vertex_chunk_size: Long,
-    edge_chunk_size: Long,
-    file_type: String
+      mode: String,
+      output_path: String,
+      vertex_chunk_size: Long,
+      edge_chunk_size: Long,
+      file_type: String
   ): ValidationResult = {
     val errors = scala.collection.mutable.ListBuffer[String]()
 
@@ -338,21 +379,40 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
   /**
    * Get processing capability summary
    *
-   * @return ProcessingCapability containing all supported entities and relationships
+   * @return
+   *   ProcessingCapability containing all supported entities and relationships
    */
   def getCapabilitySummary(): ProcessingCapability = {
     ProcessingCapability(
       batchModeEntities = List(), // No longer supports batch processing mode
       streamingModeEntities = List(
         // Dynamic vertex entities
-        "Person", "Forum", "Post", "Comment",
+        "Person",
+        "Forum",
+        "Post",
+        "Comment",
         // Static vertex entities
-        "Place", "Tag", "TagClass", "Organisation",
+        "Place",
+        "Tag",
+        "TagClass",
+        "Organisation",
         // Dynamic edge relationships
-        "knows", "hasInterest", "workAt", "studyAt", "isLocatedIn",
-        "hasCreator", "containerOf", "replyOf", "likes", "hasModerator", "hasMember",
+        "knows",
+        "hasInterest",
+        "workAt",
+        "studyAt",
+        "isLocatedIn",
+        "hasCreator",
+        "containerOf",
+        "replyOf",
+        "likes",
+        "hasModerator",
+        "hasMember",
         // Static edge relationships
-        "Place_isPartOf_Place", "Tag_hasType_TagClass", "TagClass_isSubclassOf_TagClass", "Organisation_isLocatedIn_Place"
+        "Place_isPartOf_Place",
+        "Tag_hasType_TagClass",
+        "TagClass_isSubclassOf_TagClass",
+        "Organisation_isLocatedIn_Place"
       ),
       hybridModeSupported = false,
       autoModeSupported = false
@@ -363,21 +423,27 @@ class LdbcStreamingBridge extends StreamingBridgeInterface with Serializable {
 /**
  * Processing capability summary
  *
- * @param batchModeEntities Entity types supported in batch mode
- * @param streamingModeEntities Entity types supported in streaming mode
- * @param hybridModeSupported Whether hybrid processing mode is supported
- * @param autoModeSupported Whether auto mode selection is supported
+ * @param batchModeEntities
+ *   Entity types supported in batch mode
+ * @param streamingModeEntities
+ *   Entity types supported in streaming mode
+ * @param hybridModeSupported
+ *   Whether hybrid processing mode is supported
+ * @param autoModeSupported
+ *   Whether auto mode selection is supported
  */
 case class ProcessingCapability(
-  batchModeEntities: List[String],
-  streamingModeEntities: List[String],
-  hybridModeSupported: Boolean,
-  autoModeSupported: Boolean
+    batchModeEntities: List[String],
+    streamingModeEntities: List[String],
+    hybridModeSupported: Boolean,
+    autoModeSupported: Boolean
 ) {
+
   /**
    * Calculate streaming mode entity coverage percentage
    *
-   * @return Coverage percentage against LDBC SNB standard (22 total entities)
+   * @return
+   *   Coverage percentage against LDBC SNB standard (22 total entities)
    */
   def coveragePercentage: Double = {
     // LDBC SNB standard total of 22 entities and relationship types (complete coverage target)
@@ -394,7 +460,8 @@ object LdbcStreamingBridge {
   /**
    * Create streaming bridge with default configuration
    *
-   * @return New LdbcStreamingBridge instance with default settings
+   * @return
+   *   New LdbcStreamingBridge instance with default settings
    */
   def createDefault(): LdbcStreamingBridge = {
     new LdbcStreamingBridge()
@@ -403,7 +470,8 @@ object LdbcStreamingBridge {
   /**
    * Create streaming bridge with custom configuration
    *
-   * @return New LdbcStreamingBridge instance
+   * @return
+   *   New LdbcStreamingBridge instance
    */
   def create(): LdbcStreamingBridge = {
     new LdbcStreamingBridge()

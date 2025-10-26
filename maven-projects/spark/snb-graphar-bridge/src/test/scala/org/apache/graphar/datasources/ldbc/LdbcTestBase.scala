@@ -28,9 +28,9 @@ import java.nio.file.Files
  * Base test class for LDBC to GraphAr bridge tests
  *
  * Provides common test infrastructure including:
- * - Spark session setup with LDBC configuration
- * - Test data directory management
- * - Resource cleanup
+ *   - Spark session setup with LDBC configuration
+ *   - Test data directory management
+ *   - Resource cleanup
  */
 trait LdbcTestBase extends AnyFunSuite with BeforeAndAfterAll {
 
@@ -38,12 +38,13 @@ trait LdbcTestBase extends AnyFunSuite with BeforeAndAfterAll {
   var spark: SparkSession = _
 
   /**
-   * Initialize Spark session before running tests
-   * Configured for local execution with LDBC SF0.003 scale factor
+   * Initialize Spark session before running tests Configured for local
+   * execution with LDBC SF0.003 scale factor
    */
   override def beforeAll(): Unit = {
     super.beforeAll()
-    spark = SparkSession.builder()
+    spark = SparkSession
+      .builder()
       .appName("LDBC GraphAr Bridge Test")
       .master("local[2]")
       .config("ldbc.scale.factor", "0.003")
@@ -67,7 +68,8 @@ trait LdbcTestBase extends AnyFunSuite with BeforeAndAfterAll {
 
   /**
    * Create a temporary directory for test output
-   * @return Absolute path to the temporary directory
+   * @return
+   *   Absolute path to the temporary directory
    */
   def createTempDir(): String = {
     Files.createTempDirectory("graphar_test_").toString

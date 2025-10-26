@@ -25,18 +25,18 @@ import scala.collection.mutable
  * Streaming integration statistics
  */
 case class IntegrationStatistics(
- var generationDurationMs: Long = 0L,
- var completed: Boolean = false,
- var processedEntities: mutable.Set[String] = mutable.Set[String](),
- var totalRecords: Long = 0L,
- var writerStatistics: Option[Map[String, Long]] = None
+    var generationDurationMs: Long = 0L,
+    var completed: Boolean = false,
+    var processedEntities: mutable.Set[String] = mutable.Set[String](),
+    var totalRecords: Long = 0L,
+    var writerStatistics: Option[Map[String, Long]] = None
 )
 
 /**
  * Standard integration statistics (for backward compatibility)
  */
 case class standardIntegrationStatistics(
- generationDurationMs: Long = 0L,
- completed: Boolean = false,
- writerStatistics: Option[Any] = None
+    generationDurationMs: Long = 0L,
+    completed: Boolean = false,
+    writerStatistics: Option[Any] = None
 )

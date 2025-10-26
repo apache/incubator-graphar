@@ -44,7 +44,10 @@ class SchemaValidationTest extends LdbcTestBase {
       file_type = "parquet"
     )
 
-    assert(result.isSuccess, s"Data generation should succeed before validation")
+    assert(
+      result.isSuccess,
+      s"Data generation should succeed before validation"
+    )
 
     // Run comprehensive validation
     val validator = new DataIntegrityValidator(outputPath, spark)
@@ -54,8 +57,12 @@ class SchemaValidationTest extends LdbcTestBase {
     println("\n" + "=" * 80)
     println("GraphAr Data Integrity Validation Report")
     println("=" * 80)
-    println("| Validation Check | Total Records | Invalid Src | Invalid Dst | Status |")
-    println("|-----------------|---------------|-------------|-------------|---------|")
+    println(
+      "| Validation Check | Total Records | Invalid Src | Invalid Dst | Status |"
+    )
+    println(
+      "|-----------------|---------------|-------------|-------------|---------|"
+    )
     reports.foreach(report => println(report.toMarkdown))
     println("=" * 80)
 
@@ -69,7 +76,9 @@ class SchemaValidationTest extends LdbcTestBase {
     if (failures.nonEmpty) {
       println("\nFailed checks:")
       failures.foreach { report =>
-        println(s"  ❌ ${report.edgeName}: ${report.errorMessage.getOrElse("Unknown error")}")
+        println(
+          s"  ❌ ${report.edgeName}: ${report.errorMessage.getOrElse("Unknown error")}"
+        )
       }
     }
     println()

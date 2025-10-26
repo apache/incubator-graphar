@@ -19,25 +19,28 @@
 
 package org.apache.graphar.datasources.ldbc.model
 
-import org.apache.graphar.datasources.ldbc.stream.model.{IntegrationStatistics, standardIntegrationStatistics}
+import org.apache.graphar.datasources.ldbc.stream.model.{
+  IntegrationStatistics,
+  standardIntegrationStatistics
+}
 
 /**
  * streaming conversionresult
  */
 case class StreamingConversionResult(
- processingDurationMs: Long,
- outputPath: String,
- graphName: String,
- integrationStatistics: IntegrationStatistics,
- success: Boolean
+    processingDurationMs: Long,
+    outputPath: String,
+    graphName: String,
+    integrationStatistics: IntegrationStatistics,
+    success: Boolean
 )
 
 /**
  * mixed schemaconversion result
  */
 case class HybridConversionResult(
- batchResult: ConversionResult,
- streamingResult: StreamingConversionResult,
- mergedoutputPath: String,
- success: Boolean
+    batchResult: ConversionResult,
+    streamingResult: StreamingConversionResult,
+    mergedoutputPath: String,
+    success: Boolean
 )
