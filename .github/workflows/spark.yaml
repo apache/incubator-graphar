@@ -60,6 +60,20 @@ jobs:
       with:
           submodules: true
 
+    - name: Install SBT
+      run: |
+        echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | sudo tee /etc/apt/sources.list.d/sbt.list
+        echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt_old.list
+        curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | sudo tee /etc/apt/trusted.gpg.d/sbt.asc
+        sudo apt-get update
+        sudo apt-get install sbt
+
+    - name: Build LDBC SNB Datagen dependency
+      working-directory: maven-projects/spark/ldbc-snb-datagen
+      run: |
+        sbt assembly
+        ls -lh target/ldbc_snb_datagen_2.12_spark3.2-*.jar
+
     - name: Code Format Check
       working-directory: maven-projects/spark
       run: |
@@ -96,6 +110,7 @@ jobs:
         --add-opens=java.base/java.nio=ALL-UNNAMED                            \
         --add-opens=java.base/java.lang.invoke=ALL-UNNAMED                    \
         --add-opens=java.base/java.util=ALL-UNNAMED"
+        export MAVEN_OPTS="-Xmx3g -Xms512m"
         echo "Test ${{ matrix.mvn-profile }}"
         mvn test --no-transfer-progress -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
 
