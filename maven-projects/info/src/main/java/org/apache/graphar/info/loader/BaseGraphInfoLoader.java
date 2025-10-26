@@ -21,8 +21,8 @@ package org.apache.graphar.info.loader;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.EdgeInfo;
 import org.apache.graphar.info.GraphInfo;
@@ -41,7 +41,7 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
 
     public abstract EdgeInfo loadEdgeInfo(URI edgeYamlUri) throws IOException;
 
-    public GraphInfo buildGraphInfoFromGraphYaml(URI baseUri, GraphYaml graphYaml)
+    protected GraphInfo buildGraphInfoFromGraphYaml(URI baseUri, GraphYaml graphYaml)
             throws IOException {
 
         URI defaultBaseUri = baseUri.resolve(".");
@@ -50,16 +50,16 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
         }
 
         // load vertices
-        List<VertexInfo> vertexInfos = new ArrayList<>(graphYaml.getVertices().size());
+        Map<URI, VertexInfo> vertexInfos = new TreeMap<>();
         for (String vertexYamlPath : graphYaml.getVertices()) {
             URI vertexInfoUri = baseUri.resolve(vertexYamlPath);
-            vertexInfos.add(loadVertexInfo(vertexInfoUri));
+            vertexInfos.put(vertexInfoUri, loadVertexInfo(vertexInfoUri));
         }
         // load edges
-        List<EdgeInfo> edgeInfos = new ArrayList<>(graphYaml.getEdges().size());
+        Map<URI, EdgeInfo> edgeInfos = new TreeMap<>();
         for (String edgeYamlPath : graphYaml.getEdges()) {
             URI edgeInfoUri = baseUri.resolve(edgeYamlPath);
-            edgeInfos.add(loadEdgeInfo(edgeInfoUri));
+            edgeInfos.put(edgeInfoUri, loadEdgeInfo(edgeInfoUri));
         }
         return new GraphInfo(
                 graphYaml.getName(),
@@ -69,7 +69,7 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
                 graphYaml.getVersion());
     }
 
-    public VertexInfo buildVertexInfoFromGraphYaml(VertexYaml vertexYaml) {
+    protected VertexInfo buildVertexInfoFromVertexYaml(VertexYaml vertexYaml) {
         return new VertexInfo(
                 vertexYaml.getType(),
                 vertexYaml.getChunk_size(),
@@ -80,7 +80,7 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
                 vertexYaml.getVersion());
     }
 
-    public EdgeInfo buildEdgeInfoFromGraphYaml(EdgeYaml edgeYaml) {
+    protected EdgeInfo buildEdgeInfoFromEdgeYaml(EdgeYaml edgeYaml) {
         return new EdgeInfo(
                 edgeYaml.getSrc_type(),
                 edgeYaml.getEdge_type(),

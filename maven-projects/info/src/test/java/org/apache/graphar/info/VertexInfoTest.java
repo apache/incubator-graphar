@@ -20,13 +20,75 @@
 package org.apache.graphar.info;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.List;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class VertexInfoTest {
+
+    private VertexInfo.VertexInfoBuilder defaultBuilder =
+            VertexInfo.builder()
+                    .baseUri("test")
+                    .type("test")
+                    .chunkSize(24)
+                    .version("gar/v1")
+                    .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)));
+
+    @Test
+    public void testVertexInfoBasicBuilder() {
+        VertexInfo v = defaultBuilder.build();
+    }
+
+    @Test
+    public void testVertexInfoBuilderDoubleDeclaration() throws URISyntaxException {
+        VertexInfo.VertexInfoBuilder doubleDefinitionBuilder =
+                defaultBuilder.baseUri(new URI("world"));
+        VertexInfo v = doubleDefinitionBuilder.build();
+
+        Assert.assertEquals(new URI("world"), v.getBaseUri());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void URInullTest() {
+        VertexInfo v =
+                VertexInfo.builder()
+                        .type("test")
+                        .chunkSize(24)
+                        .version("gar/v1")
+                        .propertyGroups(new PropertyGroups(List.of(TestUtil.pg3)))
+                        .build();
+    }
+
+    @Test
+    public void propertyGroupAppendTest() {
+        VertexInfo.VertexInfoBuilder propertyGroupAppendBuilder =
+                defaultBuilder.addPropertyGroup(TestUtil.pg2);
+        VertexInfo v = propertyGroupAppendBuilder.build();
+
+        Assert.assertEquals(2, v.getPropertyGroups().size());
+    }
+
+    @Test
+    public void propertyGroupAddOnlyTest() {
+        VertexInfo.VertexInfoBuilder propertyGroupAddOnlyBuilder =
+                defaultBuilder.propertyGroups(null).addPropertyGroup(TestUtil.pg2);
+        VertexInfo v = propertyGroupAddOnlyBuilder.build();
+
+        Assert.assertEquals(1, v.getPropertyGroups().size());
+    }
+
+    @Test
+    public void invalidChunkSizeTest() {
+        VertexInfo.VertexInfoBuilder invalidChunkSizeBuilder = defaultBuilder.chunkSize(-1);
+        IllegalArgumentException illegalArgumentException =
+                Assert.assertThrows(IllegalArgumentException.class, invalidChunkSizeBuilder::build);
+        Assert.assertEquals(
+                "Chunk size cannot be negative: -1", illegalArgumentException.getMessage());
+    }
 
     @Test
     public void testBuildWithPrefix() {
