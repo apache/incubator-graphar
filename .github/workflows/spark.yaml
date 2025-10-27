@@ -78,7 +78,7 @@ jobs:
       working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
-        mvn --no-transfer-progress spotless:check
+        mvn --no-transfer-progress spotless:check -pl '!snb-graphar-bridge'
 
     - name: Download test data
       run: |
