@@ -59,6 +59,7 @@ jobs:
     - uses: actions/checkout@v4
       with:
           submodules: true
+          fetch-depth: 0
 
     - name: Install SBT
       run: |
@@ -78,7 +79,11 @@ jobs:
       working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
-        mvn --no-transfer-progress spotless:check
+        if [ "${{ matrix.mvn-profile }}" == "datasources-35" ]; then
+          mvn --no-transfer-progress spotless:check -pl '!snb-graphar-bridge'
+        else
+          mvn --no-transfer-progress spotless:check
+        fi
 
     - name: Download test data
       run: |
@@ -89,7 +94,11 @@ jobs:
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
         echo "Build ${{ matrix.mvn-profile }}"
-        mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
+        if [ "${{ matrix.mvn-profile }}" == "datasources-35" ]; then
+          mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }} -pl '!snb-graphar-bridge'
+        else
+          mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
+        fi
     
     - name: Build Spark Docs
       working-directory: maven-projects/spark
@@ -97,8 +106,13 @@ jobs:
         export JAVA_HOME=${JAVA_HOME_11_X64}
         echo "Build ${{ matrix.mvn-profile }}"
         # FIXME: the install is not necessary, but it is a workaround for the issue
-        mvn install --no-transfer-progress --no-transfer-progress -DskipTests -Dspotless.check.skip=true
-        mvn --no-transfer-progress scala:doc
+        if [ "${{ matrix.mvn-profile }}" == "datasources-35" ]; then
+          mvn install --no-transfer-progress --no-transfer-progress -DskipTests -Dspotless.check.skip=true -pl '!snb-graphar-bridge'
+          mvn --no-transfer-progress scala:doc -pl '!snb-graphar-bridge'
+        else
+          mvn install --no-transfer-progress --no-transfer-progress -DskipTests -Dspotless.check.skip=true
+          mvn --no-transfer-progress scala:doc
+        fi
 
     - name: Run test
       working-directory: maven-projects/spark
@@ -112,13 +126,21 @@ jobs:
         --add-opens=java.base/java.util=ALL-UNNAMED"
         export MAVEN_OPTS="-Xmx3g -Xms512m"
         echo "Test ${{ matrix.mvn-profile }}"
-        mvn test --no-transfer-progress -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
+        if [ "${{ matrix.mvn-profile }}" == "datasources-35" ]; then
+          mvn test --no-transfer-progress -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }} -pl '!snb-graphar-bridge'
+        else
+          mvn test --no-transfer-progress -Dspotless.check.skip=true -P ${{ matrix.mvn-profile }}
+        fi
 
     - name: Generate JaCoCo Coverage Report
       working-directory: maven-projects/spark
       run: |
         export JAVA_HOME=${JAVA_HOME_11_X64}
-        mvn jacoco:report --no-transfer-progress -P ${{ matrix.mvn-profile }}
+        if [ "${{ matrix.mvn-profile }}" == "datasources-35" ]; then
+          mvn jacoco:report --no-transfer-progress -P ${{ matrix.mvn-profile }} -pl '!snb-graphar-bridge'
+        else
+          mvn jacoco:report --no-transfer-progress -P ${{ matrix.mvn-profile }}
+        fi
         
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4

@@ -18,7 +18,7 @@
 .PHONY: install_test
 install_test:
 		export JAVA_HOME=${JAVA_HOME_11_X64}
-		cd ../maven-projects/spark && mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true && cd ../../pyspark 
+		cd ../maven-projects/spark && mvn --no-transfer-progress clean package -DskipTests -Dspotless.check.skip=true -pl '!snb-graphar-bridge' && cd ../../pyspark 
 		export PYSPARK_HADOOP_VERSION=3.3
 		poetry install --with=spark,tests
 
