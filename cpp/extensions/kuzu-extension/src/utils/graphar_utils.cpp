@@ -11,18 +11,18 @@ std::string getFirstToken(const std::string& input) {
     return input.substr(0, pos);
 }
 
-void getYamlNameWithoutGrapharLabel(const std::string& filePath) {
+void getYamlNameWithoutGrapharLabelInPlace(std::string& filePath) {
     const std::string grapharLabel = DEFAULT_GRAPHAR_LABEL;
     if (ends_with(filePath, grapharLabel)) {
-        // remove the trailing ".graphar"
-        const_cast<std::string&>(filePath).erase(filePath.size() - grapharLabel.size());
+        // remove the trailing ".graphar" in-place
+        filePath.erase(filePath.size() - grapharLabel.size());
     }
 }
 
-bool ends_with(const std::string& s, const std::string& suffix) {
-    if (s.size() < suffix.size())
+bool ends_with(const std::string& filePath, const std::string& suffix) {
+    if (filePath.size() < suffix.size())
         return false;
-    return s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0;
+    return filePath.compare(filePath.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
 
 bool parse_is_edge(const std::string& path) {
@@ -39,7 +39,7 @@ bool parse_is_edge(const std::string& path) {
     }
 
     // Convert to uppercase for case-insensitive comparison
-    const std::string up = common::StringUtils::getUpper(filename);
+    const std::string upperFilename = common::StringUtils::getUpper(filename);
 
     // Uppercase suffix constants
     constexpr const char* EDGE_YAML = ".EDGE.YAML";
@@ -47,10 +47,10 @@ bool parse_is_edge(const std::string& path) {
     constexpr const char* VERTEX_YAML = ".VERTEX.YAML";
     constexpr const char* VERTEX_YML = ".VERTEX.YML";
 
-    if (ends_with(up, EDGE_YAML) || ends_with(up, EDGE_YML)) {
+    if (ends_with(upperFilename, EDGE_YAML) || ends_with(upperFilename, EDGE_YML)) {
         return true;
     }
-    if (ends_with(up, VERTEX_YAML) || ends_with(up, VERTEX_YML)) {
+    if (ends_with(upperFilename, VERTEX_YAML) || ends_with(upperFilename, VERTEX_YML)) {
         return false;
     }
 

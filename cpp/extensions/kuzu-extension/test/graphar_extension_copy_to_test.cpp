@@ -3,7 +3,6 @@
 #include "kuzu.hpp"
 
 using namespace kuzu::main;
-using namespace std;
 
 int main()
 {
@@ -13,10 +12,10 @@ int main()
         /*maxNumThreads=*/16,
         /*enableCompression=*/true,
         /*readOnly=*/false);
-    auto database = make_unique<Database>("test", systemConfig);
+    auto database = std::make_unique<Database>("test", systemConfig);
 
     // Connect to the database.
-    auto connection = make_unique<Connection>(database.get());
+    auto connection = std::make_unique<Connection>(database.get());
 
     // auto loadResult = connection->query("LOAD graphar;");
     auto loadResult = connection->query("LOAD EXTENSION \"xxx/libgraphar.kuzu_extension\";");
@@ -35,7 +34,7 @@ int main()
     while (copyExplainResult->hasNext())
     {
         auto row = copyExplainResult->getNext();
-        std::cout << row->getValue(0)->getValue<string>() << std::endl;
+        std::cout << row->getValue(0)->getValue<std::string>() << std::endl;
     }
 
     // Load data.
@@ -56,9 +55,9 @@ int main()
         auto row = result->getNext();
         std::cout << row->getValue(0)->getValue<int64_t>() << " "
                   << row->getValue(1)->getValue<int64_t>() << " "
-                  << row->getValue(2)->getValue<string>() << " "
-                  << row->getValue(3)->getValue<string>() << " "
-                  << row->getValue(4)->getValue<string>() << std::endl;
+                  << row->getValue(2)->getValue<std::string>() << " "
+                  << row->getValue(3)->getValue<std::string>() << " "
+                  << row->getValue(4)->getValue<std::string>() << std::endl;
     }
 
     // export to gar data.
@@ -74,11 +73,11 @@ int main()
     while (exportPlan->hasNext())
     {
         auto row = exportPlan->getNext();
-        std::cout << row->getValue(0)->getValue<string>() << std::endl;
+        std::cout << row->getValue(0)->getValue<std::string>() << std::endl;
     }
 
-    auto exportResult = connection->query("COPY (MATCH (p:Person) RETURN p.id as id, p.firstName as firstName, p.lastName as lastName, p.gender as gender ORDER BY p.internal_id ASC) TO \"xxx/ldbc_sample.graph.yml.graphar\" (table_name=\"person\", target_dir=\"/home/gary/kuzu-cpp-demo/copyToTestSet/\")");
-    // auto exportResult = connection->query("COPY (MATCH (p:Person) RETURN p.id as id, p.firstName as firstName, p.lastName as lastName, p.gender as gender) TO \"xxx/ldbc_sample.graph.yml.graphar\" (table_name=\"person\", target_dir=\"/home/gary/kuzu-cpp-demo/copyToTestSet/\")");
+    auto exportResult = connection->query("COPY (MATCH (p:Person) RETURN p.id as id, p.firstName as firstName, p.lastName as lastName, p.gender as gender ORDER BY p.internal_id ASC) TO \"xxx/ldbc_sample.graph.yml.graphar\" (table_name=\"person\", target_dir=\"xxx/copyToTestSet/\")");
+    // auto exportResult = connection->query("COPY (MATCH (p:Person) RETURN p.id as id, p.firstName as firstName, p.lastName as lastName, p.gender as gender) TO \"xxx/ldbc_sample.graph.yml.graphar\" (table_name=\"person\", target_dir=\"xxx/copyToTestSet/\")");
     if (!exportResult->isSuccess())
     {
         std::cerr << exportResult->getErrorMessage() << std::endl;
@@ -105,13 +104,13 @@ int main()
         auto row = edgeResult->getNext();
         std::cout << row->getValue(0)->getValue<int64_t>() << " "
                   << row->getValue(1)->getValue<int64_t>() << " "
-                  << row->getValue(2)->getValue<string>() << " "
+                  << row->getValue(2)->getValue<std::string>() << " "
                   << row->getValue(3)->getValue<int64_t>() << " "
                   << row->getValue(4)->getValue<int64_t>() << std::endl;
     }
 
     // export edge to gar data.
-    auto exportEdgePlan = connection->query("EXPLAIN COPY (MATCH (a:Person)-[k:KNOWS]->(b:Person) RETURN a.internal_id as from, k.creationDate as creationDate, b.internal_id as to) TO \"xxx/ldbc_sample.graph.yml.graphar\" (table_name=\"person_knows_person\", target_dir=\"/home/gary/kuzu-cpp-demo/copyToTestSet/\")");
+    auto exportEdgePlan = connection->query("EXPLAIN COPY (MATCH (a:Person)-[k:KNOWS]->(b:Person) RETURN a.internal_id as from, k.creationDate as creationDate, b.internal_id as to) TO \"xxx/ldbc_sample.graph.yml.graphar\" (table_name=\"person_knows_person\", target_dir=\"xxx/copyToTestSet/\")");
     if (!exportEdgePlan->isSuccess())
     {
         std::cerr << exportEdgePlan->getErrorMessage() << std::endl;
@@ -122,10 +121,10 @@ int main()
     while (exportEdgePlan->hasNext())
     {
         auto row = exportEdgePlan->getNext();
-        std::cout << row->getValue(0)->getValue<string>() << std::endl;
+        std::cout << row->getValue(0)->getValue<std::string>() << std::endl;
     }
 
-    auto exportEdgeResult = connection->query("COPY (MATCH (a:Person)-[k:KNOWS]->(b:Person) RETURN a.internal_id as from, k.creationDate as creationDate, b.internal_id as to) TO \"xxx/ldbc_sample.graph.yml.graphar\" (table_name=\"person_knows_person\", target_dir=\"/home/gary/kuzu-cpp-demo/copyToTestSet/\")");
+    auto exportEdgeResult = connection->query("COPY (MATCH (a:Person)-[k:KNOWS]->(b:Person) RETURN a.internal_id as from, k.creationDate as creationDate, b.internal_id as to) TO \"xxx/ldbc_sample.graph.yml.graphar\" (table_name=\"person_knows_person\", target_dir=\"xxx/copyToTestSet/\")");
     if (!exportEdgeResult->isSuccess())
     {
         std::cerr << exportEdgeResult->getErrorMessage() << std::endl;

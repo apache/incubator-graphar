@@ -329,8 +329,8 @@ GrapharScanBindData::GrapharScanBindData(binder::expression_vector columns,
     std::vector<std::string> column_names, std::vector<kuzu::common::LogicalType> column_types,
     bool is_edge)
     : ScanFileBindData{std::move(columns), 0 /* numRows */, std::move(fileScanInfo), context},
-      graph_info{std::move(graph_info)},
-      column_info{std::make_shared<KuzuColumnInfo>(column_names)},
+      graph_info{std::move(graph_info)}, column_info{std::make_shared<KuzuColumnInfo>(
+                                             column_names)},
       table_name{std::move(table_name)}, column_names{std::move(column_names)},
       column_types{std::move(column_types)}, is_edge(is_edge) {
     if (!is_edge) {
@@ -466,32 +466,35 @@ std::unique_ptr<TableFuncBindData> bindFunc(main::ClientContext* context,
     auto edge_infos = graph_info->GetEdgeInfos();
 
     // Try vertex first
+    bool found = false;
     for (const auto& v_info : vertex_infos) {
         if (v_info->GetType() == table_name) {
             autoDetectVertexSchema(context, graph_info, table_name, column_types, column_names);
             is_edge = false;
-            goto TAIL;
+            found = true;
+            break;
         }
     }
 
     // Try edge if not vertex
-    for (const auto& e_info : edge_infos) {
-        std::string src_type = e_info->GetSrcType();
-        std::string edge_type = e_info->GetEdgeType();
-        std::string dst_type = e_info->GetDstType();
-        std::string full_edge_name =
-            src_type + REGULAR_SEPARATOR + edge_type + REGULAR_SEPARATOR + dst_type;
-        if (full_edge_name == table_name) {
-            autoDetectEdgeSchema(context, graph_info, table_name, column_types, column_names,
-                edges_from_to_mapping);
-            is_edge = true;
-            goto TAIL;
+    if (!found) {
+        for (const auto& e_info : edge_infos) {
+            std::string src_type = e_info->GetSrcType();
+            std::string edge_type = e_info->GetEdgeType();
+            std::string dst_type = e_info->GetDstType();
+            std::string full_edge_name =
+                src_type + REGULAR_SEPARATOR + edge_type + REGULAR_SEPARATOR + dst_type;
+            if (full_edge_name == table_name) {
+                autoDetectEdgeSchema(context, graph_info, table_name, column_types, column_names,
+                    edges_from_to_mapping);
+                is_edge = true;
+                found = true;
+                break;
+            }
         }
     }
 
-    KU_ASSERT(true);
-
-TAIL:
+    KU_ASSERT(found);
     KU_ASSERT(column_types.size() == column_names.size());
 
     // ignore property type suffixes in column names.

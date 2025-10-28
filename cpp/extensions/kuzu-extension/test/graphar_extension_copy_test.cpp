@@ -3,7 +3,6 @@
 #include "kuzu.hpp"
 
 using namespace kuzu::main;
-using namespace std;
 
 int main()
 {
@@ -13,10 +12,10 @@ int main()
         /*maxNumThreads=*/16,
         /*enableCompression=*/true,
         /*readOnly=*/false);
-    auto database = make_unique<Database>("test", systemConfig);
+    auto database = std::make_unique<Database>("test", systemConfig);
 
     // Connect to the database.
-    auto connection = make_unique<Connection>(database.get());
+    auto connection = std::make_unique<Connection>(database.get());
 
     // auto loadResult = connection->query("LOAD graphar;");
     auto loadResult = connection->query("LOAD EXTENSION \"xxx/libgraphar.kuzu_extension\";");
@@ -37,7 +36,6 @@ int main()
     }
 
     // Copy explain
-    // auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"xxx/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
     auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
     // auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"xxx/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person\")");
     if (!copyExplainResult->isSuccess())
@@ -50,12 +48,11 @@ int main()
     while (copyExplainResult->hasNext())
     {
         auto row = copyExplainResult->getNext();
-        std::cout << row->getValue(0)->getValue<string>() << std::endl;
+        std::cout << row->getValue(0)->getValue<std::string>() << std::endl;
     }
 
     // Load data.
     auto copyResult = connection->query("COPY Person FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
-    // auto copyResult = connection->query("COPY Person FROM \"xxx/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person\")");
     // auto copyResult = connection->query("COPY Person FROM \"xxx/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person\")");
     if (!copyResult->isSuccess())
     {
@@ -73,18 +70,20 @@ int main()
     {
         auto row = result->getNext();
         std::cout << row->getValue(0)->getValue<int64_t>() << " "
-                  << row->getValue(1)->getValue<string>() << " "
-                  << row->getValue(2)->getValue<string>() << " "
-                  << row->getValue(3)->getValue<string>() << std::endl;
+                  << row->getValue(1)->getValue<std::string>() << " "
+                  << row->getValue(2)->getValue<std::string>() << " "
+                  << row->getValue(3)->getValue<std::string>() << std::endl;
     }
 
     /* EDGE */
-    // connection->query("CREATE REL TABLE KNOWS(FROM Person TO Person, creationDate STRING)");
-    connection->query("CREATE REL TABLE KNOWS(FROM Person TO Person, creationDate TIMESTAMP)");
+    connection->query("CREATE REL TABLE KNOWS(FROM Person TO Person, creationDate STRING)");
+    // connection->query("CREATE REL TABLE KNOWS(FROM Person TO Person, creationDate TIMESTAMP)");
+    // connection->query("CREATE REL TABLE KNOWS(FROM Person TO Person, creationDate DATE)");
 
     // Copy edge explain
-    auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"xxx/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
-    // auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
+    // auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"xxx/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows-timestamp_person\")");
+    // auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"xxx/ldbc_sample_date.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows-date_person\")");
+    auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
     // auto copyEdgeExplainResult = connection->query("EXPLAIN COPY KNOWS FROM \"xxx/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person_Knows_Person\")");
     if (!copyEdgeExplainResult->isSuccess())
     {
@@ -93,8 +92,9 @@ int main()
         return -1;
     }
 
-    auto copyEdgeResult = connection->query("COPY KNOWS FROM \"xxx/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
-    // auto copyEdgeResult = connection->query("COPY KNOWS FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
+    // auto copyEdgeResult = connection->query("COPY KNOWS FROM \"xxx/ldbc_sample_timestamp.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows-timestamp_person\")");
+    // auto copyEdgeResult = connection->query("COPY KNOWS FROM \"xxx/ldbc_sample_date.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows-date_person\")");
+    auto copyEdgeResult = connection->query("COPY KNOWS FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person_knows_person\")");
     // auto copyEdgeResult = connection->query("COPY KNOWS FROM \"xxx/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person_Knows_Person\")");
     if (!copyEdgeResult->isSuccess())
     {
@@ -109,8 +109,9 @@ int main()
     {
         auto row = edgeResult->getNext();
         std::cout << row->getValue(0)->getValue<int64_t>() << " "
-                //   << row->getValue(1)->getValue<string>() << " "
-                  << row->getValue(1)->getValue<int64_t>() << " "
+                  << row->getValue(1)->getValue<std::string>() << " "
+                //   << row->getValue(1)->getValue<int64_t>() << " "
+                //   << row->getValue(1)->getValue<int32_t>() << " "
                   << row->getValue(2)->getValue<int64_t>() << std::endl;
     }
 

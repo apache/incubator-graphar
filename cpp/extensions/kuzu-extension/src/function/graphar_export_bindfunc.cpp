@@ -494,7 +494,7 @@ std::unique_ptr<ExportFuncBindData> bindFunc(ExportFuncBindInput& bindInput) {
     }
 
     // convert '.../ldbc_sample.graph.yml.graphar' to '.../ldbc_sample.graph.yml'.
-    getYamlNameWithoutGrapharLabel(bindInput.filePath);
+    getYamlNameWithoutGrapharLabelInPlace(bindInput.filePath);
     return std::make_unique<ExportGrapharBindData>(bindInput.columnNames, bindInput.filePath,
         grapharExportOptions, tableName, targetDir, validateLevel);
 }

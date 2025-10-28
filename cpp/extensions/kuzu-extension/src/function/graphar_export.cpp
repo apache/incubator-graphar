@@ -369,16 +369,17 @@ void ExportGrapharSharedState::init([[maybe_unused]] main::ClientContext& contex
         std::string dst_type = e_info->GetDstType();
         std::string full_edge_name =
             src_type + REGULAR_SEPARATOR + edge_type + REGULAR_SEPARATOR + dst_type;
+
+        // Get src type count
+        auto maybe_from_vertices_collection =
+            graphar::VerticesCollection::Make(graph_info, src_type);
+        KU_ASSERT(!maybe_from_vertices_collection.has_error());
+        int vertexNum = maybe_from_vertices_collection.value()->size();
+
         if (full_edge_name == tableName) {
             edgeInfo = e_info;
-            // edgesBuilder = std::make_shared<builder::EdgesBuilder>(edgeInfo, targetDir,
-            //     AdjListType::ordered_by_source, 903, exportOptions.wopt, validateLevel);
             edgesBuilder = std::make_shared<builder::EdgesBuilder>(edgeInfo, targetDir,
-                AdjListType::ordered_by_source, 903);
-            graphar::WriterOptions::ParquetOptionBuilder parquetOptionBuilder;
-            parquetOptionBuilder.compression(arrow::Compression::ZSTD);
-            edgesBuilder->SetWriterOptions(parquetOptionBuilder.build());
-            edgesBuilder->SetValidateLevel(validateLevel);
+                AdjListType::ordered_by_source, vertexNum, exportOptions.wopt, validateLevel);
             is_edge = true;
             return;
         }

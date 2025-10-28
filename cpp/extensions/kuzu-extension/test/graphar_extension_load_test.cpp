@@ -3,7 +3,6 @@
 #include "kuzu.hpp"
 
 using namespace kuzu::main;
-using namespace std;
 
 int main()
 {
@@ -13,10 +12,10 @@ int main()
         /*maxNumThreads=*/16,
         /*enableCompression=*/true,
         /*readOnly=*/false);
-    auto database = make_unique<Database>("test", systemConfig);
+    auto database = std::make_unique<Database>("test", systemConfig);
 
     // Connect to the database.
-    auto connection = make_unique<Connection>(database.get());
+    auto connection = std::make_unique<Connection>(database.get());
 
     // auto loadResult = connection->query("LOAD graphar;");
     auto result = connection->query("LOAD EXTENSION \"xxx/libgraphar.kuzu_extension\";");
@@ -29,7 +28,6 @@ int main()
 
     // Load explain
     auto loadExplainResult = connection->query("EXPLAIN LOAD FROM \"xxx/ldbc_sample.graph.yml\" (file_format=\"graphar\", table_name=\"person\") RETURN *");
-    // auto copyExplainResult = connection->query("EXPLAIN COPY Person FROM \"xxx/LdbcSample.graph.yml\" (file_format=\"graphar\", table_name=\"Person\")");
     if (!loadExplainResult->isSuccess())
     {
         std::cerr << loadExplainResult->getErrorMessage() << std::endl;
@@ -40,7 +38,7 @@ int main()
     while (loadExplainResult->hasNext())
     {
         auto row = loadExplainResult->getNext();
-        std::cout << row->getValue(0)->getValue<string>() << std::endl;
+        std::cout << row->getValue(0)->getValue<std::string>() << std::endl;
     }
 
     // Load data.
@@ -56,9 +54,10 @@ int main()
     {
         auto row = loadResult->getNext();
         std::cout << row->getValue(0)->getValue<int64_t>() << " "
-                  << row->getValue(1)->getValue<string>() << " "
-                  << row->getValue(2)->getValue<string>() << " "
-                  << row->getValue(3)->getValue<string>() << std::endl;
+                  << row->getValue(1)->getValue<int64_t>() << " "
+                  << row->getValue(2)->getValue<std::string>() << " "
+                  << row->getValue(3)->getValue<std::string>() << " "
+                  << row->getValue(4)->getValue<std::string>() << std::endl;
     }
 
     std::filesystem::remove_all("test");

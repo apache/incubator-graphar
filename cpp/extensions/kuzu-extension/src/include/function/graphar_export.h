@@ -12,6 +12,7 @@
 #include "function/export/export_function.h"
 #include "function/function.h"
 #include "function/table/bind_data.h"
+#include "graphar/api/high_level_reader.h"
 #include "graphar/api/high_level_writer.h"
 #include "graphar/writer_util.h"
 #include "main/client_context.h"

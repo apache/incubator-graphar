@@ -1,31 +1,13 @@
 #include <iostream>
 #include <filesystem>
 #include <memory>
-#include <string>
 #include "kuzu.hpp"
 
-using namespace std;
-using namespace kuzu::main;       // Database, Connection, QueryResult
-using namespace kuzu::common;     // Value, LogicalTypeID
-using namespace kuzu::processor;  // ResultSet, FlatTuple
-
-#include <kuzu.hpp>
-#include <iostream>
-#include <memory>
-
-using namespace std;
-using namespace kuzu;
+using namespace kuzu::main;
 using namespace kuzu::common;
+using namespace kuzu::processor;
 
-#include <kuzu.hpp>
-#include <iostream>
-#include <memory>
-
-using namespace std;
-using namespace kuzu;
-using namespace kuzu::common;
-
-void printRow(const unique_ptr<QueryResult> &result, const shared_ptr<FlatTuple> &row, ostream &os) {
+void printRow(const std::unique_ptr<QueryResult> &result, const std::shared_ptr<FlatTuple> &row, std::ostream &os) {
     auto colNames = result->getColumnNames();
     for (uint32_t i = 0; i < result->getNumColumns(); i++) {
         std::string colName = colNames[i];
@@ -45,29 +27,29 @@ int main() {
         /*maxNumThreads=*/16,
         /*enableCompression=*/true,
         /*readOnly=*/false);
-    auto db = make_unique<Database>("test", cfg);
-    auto conn = make_unique<Connection>(db.get());
+    auto db = std::make_unique<Database>("test", cfg);
+    auto conn = std::make_unique<Connection>(db.get());
 
     auto loadRes = conn->query("LOAD EXTENSION \"xxx/libgraphar.kuzu_extension\";");
     if (!loadRes->isSuccess()) {
-        cerr << "Load extension failed: " << loadRes->getErrorMessage() << endl;
-        filesystem::remove_all("test");
+        std::cerr << "Load extension failed: " << loadRes->getErrorMessage() << std::endl;
+        std::filesystem::remove_all("test");
         return -1;
     }
-    cout << "Extension loaded.\n";
+    std::cout << "Extension loaded.\n";
 
     // === GRAPH metadata ===
     {
         auto result = conn->query("CALL GRAPHAR_METADATA('xxx/modern_graph.graph.yml') RETURN *;");
         if (!result->isSuccess()) {
-            cerr << "GRAPHAR_METADATA error: " << result->getErrorMessage() << endl;
-            filesystem::remove_all("test");
+            std::cerr << "GRAPHAR_METADATA error: " << result->getErrorMessage() << std::endl;
+            std::filesystem::remove_all("test");
             return -1;
         }
-        cout << "[GRAPH Metadata]\n";
+        std::cout << "[GRAPH Metadata]\n";
         while (result->hasNext()) {
             auto row = result->getNext();
-            printRow(result, row, cout);
+            printRow(result, row, std::cout);
         }
     }
 
@@ -75,14 +57,14 @@ int main() {
     {
         auto result = conn->query("CALL GRAPHAR_METADATA('xxx/modern_graph.graph.yml', vertex_type := 'person') RETURN *;");
         if (!result->isSuccess()) {
-            cerr << "VERTEX Metadata error: " << result->getErrorMessage() << endl;
-            filesystem::remove_all("test");
+            std::cerr << "VERTEX Metadata error: " << result->getErrorMessage() << std::endl;
+            std::filesystem::remove_all("test");
             return -1;
         }
-        cout << "[VERTEX Metadata]\n";
+        std::cout << "[VERTEX Metadata]\n";
         while (result->hasNext()) {
             auto row = result->getNext();
-            printRow(result, row, cout);
+            printRow(result, row, std::cout);
         }
     }
 
@@ -90,17 +72,17 @@ int main() {
     {
         auto result = conn->query("CALL GRAPHAR_METADATA('xxx/modern_graph.graph.yml', edge_type := 'person_knows_person') RETURN *;");
         if (!result->isSuccess()) {
-            cerr << "EDGE Metadata error: " << result->getErrorMessage() << endl;
-            filesystem::remove_all("test");
+            std::cerr << "EDGE Metadata error: " << result->getErrorMessage() << std::endl;
+            std::filesystem::remove_all("test");
             return -1;
         }
-        cout << "[EDGE Metadata]\n";
+        std::cout << "[EDGE Metadata]\n";
         while (result->hasNext()) {
             auto row = result->getNext();
-            printRow(result, row, cout);
+            printRow(result, row, std::cout);
         }
     }
 
-    filesystem::remove_all("test");
+    std::filesystem::remove_all("test");
     return 0;
 }

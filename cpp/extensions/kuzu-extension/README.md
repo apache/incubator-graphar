@@ -2,7 +2,7 @@
 
 **API:** C++
 **Status:** first-cut, pragmatic implementation (ingest, export, metadata inspection)
-**Repository branch:** [https://github.com/gary-cloud/kuzu/tree/graphar-extension](https://github.com/gary-cloud/kuzu/tree/graphar-extension)
+**Repository branch:** [https://github.com/apache/incubator-graphar/tree/kuzu-extension](https://github.com/apache/incubator-graphar/tree/kuzu-extension)
 
 ---
 
