@@ -92,14 +92,10 @@ public class VertexInfoTest {
 
     @Test
     public void testBuildWithPrefix() {
-        try {
-            VertexInfo vertexInfo =
-                    new VertexInfo(
-                            "person", 100, Arrays.asList(TestUtil.pg1), "vertex/person/", "gar/v1");
-            Assert.assertEquals(URI.create("vertex/person/"), vertexInfo.getBaseUri());
-        } catch (Exception e) {
-            Assert.fail("Should not throw exception: " + e.getMessage());
-        }
+        VertexInfo vertexInfo =
+                new VertexInfo(
+                        "person", 100, Arrays.asList(TestUtil.pg1), "vertex/person/", "gar/v1");
+        Assert.assertEquals(URI.create("vertex/person/"), vertexInfo.getBaseUri());
     }
 
     @Test
