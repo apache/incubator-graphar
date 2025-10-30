@@ -53,10 +53,13 @@ jobs:
         python-version: '3.10'
 
     - name: Install Poetry
-      working-directory: pyspark
       run: |
-        yes | sudo python3 -m pip install poetry --quiet
-        poetry env use python3
+        curl -sSL https://install.python-poetry.org | python3 -
+        echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+    - name: Configure Poetry Environment
+      working-directory: pyspark
+      run: poetry env use python3
 
     - name: Lint
       working-directory: pyspark
