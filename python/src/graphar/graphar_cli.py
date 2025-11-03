@@ -20,13 +20,8 @@ from pathlib import Path
 from typing import List
 
 import typer
-import yaml
 
 from ._core import (  # type: ignore  # noqa: PGH003
-    check_edge,
-    check_graph,
-    check_vertex,
-    do_import,
     get_edge_count,
     get_edge_types,
     get_vertex_count,
@@ -35,9 +30,9 @@ from ._core import (  # type: ignore  # noqa: PGH003
     show_graph,
     show_vertex,
 )
-from .config import ImportConfig
-from .importer import validate
 from .logging import setup_logging
+
+import graphar.api as api
 
 app = typer.Typer(
     help="GraphAr Cli",
@@ -47,12 +42,12 @@ app = typer.Typer(
 )
 
 setup_logging()
-logger = getLogger(__name__)
+logger = getLogger("graphar_cli")
 
 
 @app.command(
     context_settings={"help_option_names": ["-h", "--help"]},
-    help="Show the metadata~",
+    help="Show the metadata",
     no_args_is_help=True,
 )
 def show(
@@ -109,34 +104,12 @@ def show(
 def check(
     path: str = typer.Option(None, "--path", "-p", help="Path to the GraphAr config file"),
 ):
-    if not Path(path).exists():
-        logger.error("File not found: %s", path)
+    try:
+        result_str = api.check(path)
+    except Exception as e:
+        logger.error(e)
         raise typer.Exit(1)
-    path = Path(path).resolve() if Path(path).is_absolute() else Path(Path.cwd(), path).resolve()
-    path = str(path)
-    vertex_types = get_vertex_types(path)
-    for vertex_type in vertex_types:
-        if not check_vertex(path, vertex_type):
-            logger.error("Vertex type %s is not valid", vertex_type)
-            raise typer.Exit(1)
-    edge_types = get_edge_types(path)
-    for edge_type in edge_types:
-        if edge_type[0] not in vertex_types:
-            logger.error("Source vertex type %s not found in the graph", edge_type[0])
-            raise typer.Exit(1)
-        if edge_type[2] not in vertex_types:
-            logger.error("Destination vertex type %s not found in the graph", edge_type[2])
-            raise typer.Exit(1)
-        if not check_edge(path, edge_type[0], edge_type[1], edge_type[2]):
-            logger.error(
-                "Edge type %s_%s_%s is not valid", edge_type[0], edge_type[1], edge_type[2]
-            )
-            raise typer.Exit(1)
-    if not check_graph(path):
-        logger.error("Graph is not valid")
-        raise typer.Exit(1)
-    logger.info("Graph is valid")
-
+    logger.info(result_str)
 
 @app.command(
     "import",
@@ -147,26 +120,12 @@ def check(
 def import_data(
     config_file: str = typer.Option(None, "--config", "-c", help="Path of the GraphAr config file"),
 ):
-    if not Path(config_file).is_file():
-        logger.error("File not found: %s", config_file)
+    try:
+        result_str = api.import_data(config_file)
+    except Exception as e:
+        logger.error(e)
         raise typer.Exit(1)
-
-    try:
-        with Path(config_file).open(encoding="utf-8") as file:
-            config = yaml.safe_load(file)
-        import_config = ImportConfig(**config)
-        validate(import_config)
-    except Exception as e:
-        logger.error("Invalid config: %s", e)
-        raise typer.Exit(1) from None
-    try:
-        logger.info("Starting import")
-        res = do_import(import_config.model_dump())
-        logger.info(res)
-    except Exception as e:
-        logger.error("Import failed: %s", e)
-        raise typer.Exit(1) from None
-
+    logger.info(result_str)
 
 def main() -> None:
     app()
