@@ -60,7 +60,15 @@ target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cpp/thir
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
 # The install directory is the output (wheel) directory
-set_target_properties(_core PROPERTIES INSTALL_RPATH "@loader_path")
+# Use platform-appropriate rpath so the Python extension can find the
+# packaged libgraphar at runtime inside the wheel.
+if(APPLE)
+  # macOS uses @loader_path to find libraries relative to the module
+  set_target_properties(_core PROPERTIES INSTALL_RPATH "@loader_path")
+else()
+  # On Linux and other Unix, use $ORIGIN (escaped so CMake preserves the $)
+  set_target_properties(_core PROPERTIES INSTALL_RPATH "\$ORIGIN")
+endif()
 
 install(TARGETS graphar DESTINATION graphar)
 install(TARGETS _core DESTINATION graphar)
