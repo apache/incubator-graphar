@@ -15,34 +15,34 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: GraphAr CLI CI
+name: GraphAr Python CI
 
 on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
   push:
     branches:
-      - main
+      - "**"
     paths:
       - 'cpp/**'
-      - 'cli/**'
+      - 'python/**'
       - '.github/workflows/ci.yml'
-      - '.github/workflows/cli.yml'
+      - '.github/workflows/python.yml'
   pull_request:
     branches:
-      - main
+      - "**"
     paths:
       - 'cpp/**'
-      - 'cli/**'
+      - 'python/**'
       - '.github/workflows/ci.yml'
-      - '.github/workflows/cli.yml'
+      - '.github/workflows/python.yml'
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
   ubuntu:
-    name: Ubuntu 22.04 CLI
+    name: Ubuntu 22.04 Python
     runs-on: ubuntu-latest
     if: ${{ !contains(github.event.pull_request.title, 'WIP') && !github.event.pull_request.draft }}
     steps:
@@ -64,8 +64,8 @@ jobs:
                             libparquet-dev=17.0.0-1
         sudo apt-get install -y ccache libcurl4-openssl-dev
 
-    - name: Install GraphAr CLI and Run Tests
-      working-directory: "cli"
+    - name: Install GraphAr Python SDK and Run Tests
+      working-directory: "python"
       run: |
         pip install ./ -v
         graphar --help
@@ -73,7 +73,8 @@ jobs:
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
         graphar import -c ../testing/neo4j/data/import.mini.yml
-# TODO: Add unit tests
+
+        pytest test -v
 
 
     - name: Upload coverage reports to Codecov
@@ -82,7 +83,7 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
 
   macos:
-    name: macos latest CLI
+    name: macos latest Python
     runs-on: macos-latest
     # TODO: Remove this when the macos issue is fixed
     if: false   
@@ -100,7 +101,7 @@ jobs:
         
     
     - name: Build GraphAr And Run Tests
-      working-directory: "cli"
+      working-directory: "python"
       run: |
         pip install ./
         graphar --help
