@@ -94,10 +94,6 @@ jobs:
   macos:
     name: macos latest Python
     runs-on: macos-latest
-    # TODO: Remove this when the macos issue is fixed
-    if: false   
-    strategy:
-      fail-fast: false
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
 
