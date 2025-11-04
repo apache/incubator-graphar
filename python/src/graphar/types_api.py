@@ -17,4 +17,7 @@
 
 from ._core import (  # type: ignore  # noqa: PGH003
     Type,
+    FileType,
+    AdjListType,
+    Cardinality
 )

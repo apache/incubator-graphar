@@ -40,6 +40,25 @@ extern "C" void bind_graph_info(pybind11::module_& m) {
       .def("id", &graphar::DataType::id)
       .def("to_type_name", &graphar::DataType::ToTypeName);
 
+  // Bind InfoVersion
+  py::class_<graphar::InfoVersion, std::shared_ptr<graphar::InfoVersion>>(m, "InfoVersion")
+      .def(py::init<>())
+      .def(py::init<int>(), py::arg("version"))
+      .def(py::init<int, const std::vector<std::string>&>(), 
+           py::arg("version"), py::arg("user_define_types"))
+      .def("get_version", &graphar::InfoVersion::version)
+      .def("get_user_define_types", &graphar::InfoVersion::user_define_types,
+           py::return_value_policy::reference_internal)
+      .def("to_string", &graphar::InfoVersion::ToString)
+      .def("check_type", &graphar::InfoVersion::CheckType)
+      .def_static("parse", [](const std::string& str) {
+               return ThrowOrReturn(graphar::InfoVersion::Parse(str));
+           })
+      .def("__eq__", [](const graphar::InfoVersion& self, const graphar::InfoVersion& other) {
+               return self == other;
+           });
+
+
   // Bind Property
   py::class_<graphar::Property>(m, "Property")
       .def(py::init<>())
@@ -130,10 +149,7 @@ extern "C" void bind_graph_info(pybind11::module_& m) {
       .def("get_vertices_num_file_path", [](const graphar::VertexInfo& self) {
                return ThrowOrReturn(self.GetVerticesNumFilePath());
            })
-      .def("is_validated", &graphar::VertexInfo::IsValidated)
-      .def_static("load", [](const std::string& input) {
-               return ThrowOrReturn(graphar::VertexInfo::Load(input));
-           });
+      .def("is_validated", &graphar::VertexInfo::IsValidated);
 
   // Bind EdgeInfo
   py::class_<graphar::EdgeInfo, std::shared_ptr<graphar::EdgeInfo>>(m, "EdgeInfo")
@@ -225,10 +241,7 @@ extern "C" void bind_graph_info(pybind11::module_& m) {
       .def("dump", [](const graphar::EdgeInfo& self) {
                return ThrowOrReturn(self.Dump());
            })
-      .def("is_validated", &graphar::EdgeInfo::IsValidated)
-      .def_static("load", [](const std::string& input) {
-               return ThrowOrReturn(graphar::EdgeInfo::Load(input));
-           });
+      .def("is_validated", &graphar::EdgeInfo::IsValidated);
 
   // Bind GraphInfo
   py::class_<graphar::GraphInfo, std::shared_ptr<graphar::GraphInfo>>(m, "GraphInfo")
