@@ -21,7 +21,7 @@ from typing import List
 
 import typer
 
-from ._core import (  # type: ignore  # noqa: PGH003
+from ..graphar._core import (  # type: ignore  # noqa: PGH003
     get_edge_count,
     get_edge_types,
     get_vertex_count,
@@ -30,7 +30,7 @@ from ._core import (  # type: ignore  # noqa: PGH003
     show_graph,
     show_vertex,
 )
-from .logging import setup_logging
+from ..graphar.logging import setup_logging
 
 import graphar.command_cli_api as api
 

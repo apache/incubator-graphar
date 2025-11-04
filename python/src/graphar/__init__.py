@@ -17,8 +17,6 @@
 
 from __future__ import annotations
 
-from .command_cli_api import check, import_data
-from .graph_info_api import DataType
-from .types_api import Type
+from .graph_info import GraphInfo, VertexInfo, EdgeInfo, PropertyGroup, Property
 
-__all__ = ["check", "import_data", "Type", "DataType"]
+__all__ = ["GraphInfo", "VertexInfo", "EdgeInfo", "PropertyGroup", "Property"]

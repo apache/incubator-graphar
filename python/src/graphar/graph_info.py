@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from .types_api import Type
+from .types import Type
 
 from ._core import (  # type: ignore  # noqa: PGH003
     DataType,

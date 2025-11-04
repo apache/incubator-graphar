@@ -1,87 +1,94 @@
-# GraphAr Python CLI SDK
+# GraphAr Python SDK
 
-GraphAr python sdk uses [pybind11][] and [scikit-build-core][] to bind C++ code into Python and build command line tools through Python. Command line tools developed using [typer][].
-
-[pybind11]: https://pybind11.readthedocs.io
-[scikit-build-core]: https://scikit-build-core.readthedocs.io
-[typer]: https://typer.tiangolo.com/
-
-## Requirements
-
-- Linux (work fine on Ubuntu 22.04)
-- Cmake >= 3.15
-- Arrow >= 12.0
-- Python >= 3.7
-- pip == latest
-
-
-The best testing environment is `ghcr.io/apache/graphar-dev` Docker environment.
-
-And using Python in conda or venv is a good choice. 
+GraphAr Python SDK provides Python bindings for the GraphAr C++ library, allowing user to work with GraphAr formatted graph data in Python environments. It includes both a high-level API for data manipulation and a command-line interface for common operations.
 
 ## Installation
 
-- Clone this repository
-- `pip install ./python` or set verbose level `pip install -v ./python`
+### Prerequisites
 
-## Usage
+- Python >= 3.7
+- pip (latest version recommended)
+- CMake >= 3.15 (for building from source)
+- Apache Arrow >= 12.0 (for building from source)
+
+### Install from Source
+
+Clone the repository and install the Python package:
 
 ```bash
-graphar --help
-
-# check the metadata, verify whether the vertex edge information and attribute information of the graph are valid
-graphar check -p ../testing/neo4j/MovieGraph.graph.yml
-
-# show the vertex
-graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
-
-# show the edge
-graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
-
-# import graph data by using a config file
-graphar import -c ../testing/neo4j/data/import.mini.yml
+git clone https://github.com/apache/incubator-graphar.git
+cd incubator-graphar
+pip install ./python
 ```
 
-## Import config file
+For verbose output during installation:
 
-The config file supports `yaml` data type. We provide two reference templates for it: full and mini.
+```bash
+pip install -v ./python
+```
 
-The full version of the configuration file contains all configurable fields, and additional fields will be automatically ignored.
+### Using Docker (Recommended)
 
-The mini version of the configuration file is a simplified version of the full configuration file, retaining the same functionality. It shows the essential parts of the configuration information. 
+The easiest way to get started is by using our pre-configured Docker environment:
 
-For the full configuration file, if all fields can be set to their default values, you can simplify it to the mini version. However, it cannot be further reduced beyond the mini version.
+```bash
+docker run -it ghcr.io/apache/graphar-dev
+```
 
-In the full `yaml` config file, we provide brief comments on the fields, which can be used as a reference.
+## Quick Start
 
-**Example**
+### Importing the Package
 
-To import the movie graph data from the `testing` directory, you first need to prepare data files. Supported file types include `csv`, `json`(as well as`jsonline`, but should have the `.json` extension), `parquet`, and `orc` files. Please ensure the correct file extensions are set in advance, or specify the `file_type` field in the source section of the configuration. The `file_type` field will ignore the file extension.
+After installation, you can import the GraphAr Python SDK in your Python scripts:
 
-Next, write a configuration file following the provided sample. Any empty fields in the `graphar` configuration will be filled with default values. In the `import_schema`, empty fields will use the global configuration values from `graphar`. If fields in `import_schema` are not empty, they will override the values from `graphar`.
+```python
+import graphar
+```
 
-A few important notes:
+### Basic Usage
 
-1. The sources list specifies configuration for the data source files. For `csv` files, you can set the `delimiter`. The format of the `json` file should be given in the format of `jsonline`.
+Loading graph information:
 
-2. The columns dictionary maps column names in the data source to node or edge properties. Keys represent column names in the data source, and values represent property names.
+```python
+import graphar
 
-3. Currently, edge properties cannot have the same names as the edge endpoints' properties; doing so will raise an exception.
+# Load graph info from a YAML file
+graph_info = graphar.graph_info.GraphInfo.load("path/to/graph.yaml")
 
-4. The following table lists the default fields, more of which are included in the full configuration.
+# Access vertex information
+vertex_info = graph_info.get_vertex_info("person")
+print(f"Vertex type: {vertex_info.get_type()}")
 
+# Access edge information
+edge_info = graph_info.get_edge_info("person", "knows", "person")
+print(f"Edge type: {edge_info.get_edge_type()}")
+```
 
-| Field                             | Default value        |
-| -----------                       | -----------          |
-|  `graphar.vertex_chunk_size`      | `100`                |
-|  `graphar.edge_chunk_size`        | `1024`               |
-|  `graphar.file_type`              | `parquet`            |
-|  `graphar.adj_list_type`          | `ordered_by_source`  |
-|  `graphar.validate_level`         | `weak`               |
-|  `graphar.version`                | `gar/v1`             |
-|  `property.nullable`              | `true`               |
+## Command-Line Interface
 
+GraphAr Python SDK also provides a command-line interface for common operations such as checking metadata, showing graph information, and importing data.
 
+For detailed information about the CLI functionality, please see [CLI Documentation](src/cli/README.md).
 
+## API Documentation
 
-Wish you a happy use！
+The Python SDK exposes the core GraphAr functionality through several modules:
+
+- `graphar.graph_info`: Main API for working with graph, vertex, and edge information
+
+## Examples
+> [!NOTE]
+> under development.
+
+You can find various examples in the [examples directory](../cpp/examples/) which demonstrate usage of the underlying C++ library. These concepts translate directly to the Python SDK.
+
+## Development
+
+To contribute to the Python SDK, please follow the guidelines in the main [CONTRIBUTING.md](../CONTRIBUTING.md) file.
+
+## License
+
+**GraphAr** is distributed under [Apache License
+2.0](https://github.com/apache/incubator-graphar/blob/main/LICENSE).
+Please note that third-party libraries may not have the same license as
+GraphAr.

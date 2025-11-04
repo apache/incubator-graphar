@@ -19,8 +19,6 @@ import pytest
 import typer
 
 import graphar as gar
-import graphar.graph_info_api as graphInfo
-import graphar.types_api as gar_types
 
 
 @pytest.fixture
@@ -29,7 +27,7 @@ def sample_graph(test_data_root):
 
 @pytest.fixture
 def sample_graph_info(sample_graph):
-  return graphInfo.GraphInfo.load(sample_graph)
+  return gar.graph_info.GraphInfo.load(sample_graph)
 
 @pytest.fixture
 def sample_graph_vertex(sample_graph_info):
@@ -74,7 +72,7 @@ def test_person_vertex_property_groups(sample_graph_vertex):
     id_property_group = sample_graph_vertex.get_property_group_by_index(0)
     assert id_property_group is not None
     assert id_property_group.get_prefix() == "id/"
-    assert id_property_group.get_file_type() == gar_types.FileType.CSV
+    assert id_property_group.get_file_type() == gar.types.FileType.CSV
     
     # Check id property
     assert sample_graph_vertex.has_property("id")
@@ -87,7 +85,7 @@ def test_person_vertex_property_groups(sample_graph_vertex):
     name_property_group = sample_graph_vertex.get_property_group_by_index(1)
     assert name_property_group is not None
     assert name_property_group.get_prefix() == "firstName_lastName_gender/"
-    assert name_property_group.get_file_type() == gar_types.FileType.CSV
+    assert name_property_group.get_file_type() == gar.types.FileType.CSV
     
     # Check name properties
     assert sample_graph_vertex.has_property("firstName")
@@ -117,14 +115,14 @@ def test_knows_edge_info_basics(sample_graph_edge):
 def test_knows_edge_adjacency_lists(sample_graph_edge):
     """Test knows edge adjacency lists."""
     # Check that edge has both ordered_by_source and ordered_by_dest adjacency lists
-    assert sample_graph_edge.has_adjacent_list_type(gar_types.AdjListType.ordered_by_source)
-    assert sample_graph_edge.has_adjacent_list_type(gar_types.AdjListType.ordered_by_dest)
+    assert sample_graph_edge.has_adjacent_list_type(gar.types.AdjListType.ordered_by_source)
+    assert sample_graph_edge.has_adjacent_list_type(gar.types.AdjListType.ordered_by_dest)
     
     # Test ordered_by_source adjacency list
-    adj_by_source = sample_graph_edge.get_adjacent_list(gar_types.AdjListType.ordered_by_source)
+    adj_by_source = sample_graph_edge.get_adjacent_list(gar.types.AdjListType.ordered_by_source)
     assert adj_by_source is not None
-    assert adj_by_source.get_file_type() == gar_types.FileType.CSV
-    assert adj_by_source.get_type() == gar_types.AdjListType.ordered_by_source
+    assert adj_by_source.get_file_type() == gar.types.FileType.CSV
+    assert adj_by_source.get_type() == gar.types.AdjListType.ordered_by_source
     assert adj_by_source.get_prefix() == "ordered_by_source/"
 
 def test_knows_edge_property_groups(sample_graph_edge):
@@ -135,7 +133,7 @@ def test_knows_edge_property_groups(sample_graph_edge):
     property_group = sample_graph_edge.get_property_group_by_index(0)
     assert property_group is not None
     assert property_group.get_prefix() == "creationDate/"
-    assert property_group.get_file_type() == gar_types.FileType.CSV
+    assert property_group.get_file_type() == gar.types.FileType.CSV
     
     # Check creationDate property
     assert sample_graph_edge.has_property("creationDate")

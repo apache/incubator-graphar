@@ -19,7 +19,7 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
-#include "pybind_util.h"
+#include "utils/pybind_util.h"
 
 #include "graphar/graph_info.h"
 #include "graphar/types.h"

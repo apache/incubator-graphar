@@ -27,8 +27,8 @@ from ._core import (  # type: ignore  # noqa: PGH003
     get_edge_types,
     get_vertex_types,
 )
-from .config import ImportConfig
-from .importer import validate
+from .import.config import ImportConfig
+from .import.importer import validate
 def check(path: str):
     if not Path(path).exists():
         raise ValueError(f'File not found: {path}')
