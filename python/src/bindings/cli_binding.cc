@@ -155,7 +155,6 @@ namespace py = pybind11;
 
 // Changed from PYBIND11_MODULE to a regular function
 extern "C" void bind_cli(pybind11::module_& m) {
-
   // CLI-level convenience functions
   m.def("show_graph", &ShowGraph, "Show the graph info");
   m.def("show_vertex", &ShowVertex, "Show the vertex info");

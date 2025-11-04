@@ -26,7 +26,7 @@ extern "C" void bind_cli(pybind11::module_& m);
 
 PYBIND11_MODULE(_core, m) {
   m.doc() = "GraphAr core Python bindings";
-  
+
   bind_types(m);
   bind_graph_info(m);
   bind_cli(m);
