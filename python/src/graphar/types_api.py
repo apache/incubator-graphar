@@ -15,10 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from __future__ import annotations
-
-from .command_cli_api import check, import_data
-from .graph_info_api import DataType
-from .types_api import Type
-
-__all__ = ["check", "import_data", "Type", "DataType"]
+from ._core import (  # type: ignore  # noqa: PGH003
+    Type,
+)

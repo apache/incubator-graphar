@@ -32,7 +32,7 @@ from ._core import (  # type: ignore  # noqa: PGH003
 )
 from .logging import setup_logging
 
-import graphar.api as api
+import graphar.command_cli_api as api
 
 app = typer.Typer(
     help="GraphAr Cli",

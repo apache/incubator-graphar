@@ -15,10 +15,19 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from __future__ import annotations
+import pytest
+import typer
+from pathlib import Path
 
-from .command_cli_api import check, import_data
-from .graph_info_api import DataType
-from .types_api import Type
+import graphar as gar
 
-__all__ = ["check", "import_data", "Type", "DataType"]
+
+@pytest.fixture
+def sample_cfg():
+    return (Path(__file__).parent / "../" /".." / "testing" / "ldbc_sample" / "parquet" / "ldbc_sample.graph.yml").resolve()
+
+def test_data_type_binding():
+    dataType = gar.DataType()
+    print(dataType.id())
+    dataType = gar.DataType(gar.Type.INT64)
+    print(dataType.id())
