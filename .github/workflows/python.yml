@@ -124,7 +124,6 @@ jobs:
         graphar check -p ../testing/neo4j/MovieGraph.graph.yml
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
-        graphar import -c ../testing/neo4j/data/import.mini.yml
 
     - name: Run pytest
       working-directory: "python"
