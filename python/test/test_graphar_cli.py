@@ -24,7 +24,15 @@ import graphar.graphar_cli as cli
 
 @pytest.fixture
 def sample_cfg():
-    return (Path(__file__).parent / "../" /".." / "testing" / "ldbc_sample" / "parquet" / "ldbc_sample.graph.yml").resolve()
+    return (
+        Path(__file__).parent
+        / "../"
+        / ".."
+        / "testing"
+        / "ldbc_sample"
+        / "parquet"
+        / "ldbc_sample.graph.yml"
+    ).resolve()
 
 
 def test_show_file_not_found(tmp_path):

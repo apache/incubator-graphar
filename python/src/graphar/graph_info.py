@@ -17,12 +17,4 @@
 
 from .types import Type
 
-from ._core import (
-    DataType,
-    Property,
-    PropertyGroup,
-    AdjacentList,
-    VertexInfo,
-    EdgeInfo,
-    GraphInfo
-)
+from ._core import DataType, Property, PropertyGroup, AdjacentList, VertexInfo, EdgeInfo, GraphInfo

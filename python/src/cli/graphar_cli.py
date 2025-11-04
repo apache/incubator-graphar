@@ -111,6 +111,7 @@ def check(
         raise typer.Exit(1)
     logger.info(result_str)
 
+
 @app.command(
     "import",
     context_settings={"help_option_names": ["-h", "--help"]},
@@ -126,6 +127,7 @@ def import_data(
         logger.error(e)
         raise typer.Exit(1)
     logger.info(result_str)
+
 
 def main() -> None:
     app()
