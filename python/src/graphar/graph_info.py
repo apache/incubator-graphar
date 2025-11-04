@@ -17,7 +17,7 @@
 
 from .types import Type
 
-from ._core import (  # type: ignore  # noqa: PGH003
+from ._core import (
     DataType,
     Property,
     PropertyGroup,

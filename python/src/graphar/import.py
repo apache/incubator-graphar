@@ -19,7 +19,7 @@ from pathlib import Path
 
 import yaml
 
-from ._core import (  # type: ignore  # noqa: PGH003
+from ._core import (
     check_edge,
     check_graph,
     check_vertex,

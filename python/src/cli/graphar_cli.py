@@ -21,7 +21,7 @@ from typing import List
 
 import typer
 
-from ..graphar._core import (  # type: ignore  # noqa: PGH003
+from ..graphar._core import (
     get_edge_count,
     get_edge_types,
     get_vertex_count,
