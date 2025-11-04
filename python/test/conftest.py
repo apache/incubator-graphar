@@ -15,14 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from .types_api import Type
-
-from ._core import (  # type: ignore  # noqa: PGH003
-    DataType,
-    Property,
-    PropertyGroup,
-    AdjacentList,
-    VertexInfo,
-    EdgeInfo,
-    GraphInfo
-)
+import os
+import pytest
+@pytest.fixture
+def test_data_root():
+    test_data_root = os.environ.get("GAR_TEST_DATA", "../../")
+    return test_data_root

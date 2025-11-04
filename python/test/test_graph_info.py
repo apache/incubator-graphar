@@ -17,17 +17,37 @@
 
 import pytest
 import typer
-from pathlib import Path
 
 import graphar as gar
+import graphar.graph_info_api as graphInfo
 
 
 @pytest.fixture
-def sample_cfg():
-    return (Path(__file__).parent / "../" /".." / "testing" / "ldbc_sample" / "parquet" / "ldbc_sample.graph.yml").resolve()
+def sample_graph(test_data_root):
+  return test_data_root +"/ldbc_sample/parquet/" + "ldbc_sample.graph.yml";
+
+@pytest.fixture
+def sample_graph_vertex(test_data_root):
+  return test_data_root +"/ldbc_sample/parquet/" + "person.vertex.yml";
+
+@pytest.fixture
+def sample_graph_edge(test_data_root):
+  return test_data_root +"/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
 
 def test_data_type_binding():
     dataType = gar.DataType()
     print(dataType.id())
     dataType = gar.DataType(gar.Type.INT64)
     print(dataType.id())
+
+def test_graph_info_load(sample_graph):
+    #load file and print
+    sample_graph = graphInfo.GraphInfo.load(sample_graph)
+    print(sample_graph.dump())
+    pereson_info = sample_graph.get_vertex_info("person")
+    print(pereson_info.dump())
+
+def test_vertex_info_load(sample_graph_vertex):
+    #load file and print
+    person_info = graphInfo.VertexInfo.load(sample_graph_vertex)
+    print(person_info.dump())
