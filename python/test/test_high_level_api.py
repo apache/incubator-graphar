@@ -17,12 +17,11 @@
 
 import pytest
 import tempfile
-import os
 
-from graphar import GraphInfo, VertexInfo, EdgeInfo
+from graphar import GraphInfo
 from graphar.types import AdjListType, ValidateLevel 
 from graphar.high_level import (
-    Vertex, Edge, VertexIter, VerticesCollection, EdgeIter, EdgesCollection, 
+    VerticesCollection, EdgesCollection, 
     BuilderVertex, VerticesBuilder, BuilderEdge, EdgesBuilder
 )
 
@@ -179,11 +178,11 @@ def test_edges_builder(sample_graph_edge):
         assert builder.GetNum() == 0
 
 
-def test_vertex_iter_operations(ldbc_sample_graph_info):
+def test_vertex_iter_operations(sample_graph_info):
     """Test vertex iterator operations."""
     # Construct vertices collection
     type_name = "person"
-    vertices = VerticesCollection.Make(ldbc_sample_graph_info, type_name)
+    vertices = VerticesCollection.Make(sample_graph_info, type_name)
     
     # Test iterator operations
     it = vertices.begin()
@@ -193,7 +192,7 @@ def test_vertex_iter_operations(ldbc_sample_graph_info):
         assert vertex_id >= 0
 
 
-def test_edge_iter_operations(ldbc_sample_graph_info):
+def test_edge_iter_operations(sample_graph_info):
     """Test edge iterator operations."""
     # Construct edges collection
     src_type = "person"
@@ -201,7 +200,7 @@ def test_edge_iter_operations(ldbc_sample_graph_info):
     dst_type = "person"
     adj_list_type = AdjListType.ordered_by_source
     
-    edges = EdgesCollection.Make(ldbc_sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
+    edges = EdgesCollection.Make(sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
     
     # Test iterator operations
     it = edges.begin()
