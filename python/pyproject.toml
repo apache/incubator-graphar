@@ -37,7 +37,7 @@ test = ["pandas ~= 2.0", "typing_extensions ~= 4.0"]
 build-dir = "build"
 
 [project.scripts]
-graphar = "client.graphar_cli:main"
+graphar = "cli.graphar_cli:main"
 
 [tool.ruff]
 src = ["src"]
