@@ -17,7 +17,7 @@
 
 from logging import getLogger
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import typer
 
@@ -34,6 +34,8 @@ from graphar.logging import setup_logging
 
 from graphar.importer import data_import
 
+from . import __version__
+
 app = typer.Typer(
     help="GraphAr Cli",
     no_args_is_help=True,
@@ -43,6 +45,20 @@ app = typer.Typer(
 
 setup_logging()
 logger = getLogger("graphar_cli")
+
+
+@app.callback(invoke_without_command=True)
+def _callback(
+    ctx: typer.Context,
+    version: Optional[bool] = typer.Option(
+        False, "--version", "-v", help="Show GraphAr version and exit", is_eager=True
+    ),
+):
+    """Top-level callback to support global options like --version."""
+    if version:
+        # Print version and exit immediately
+        typer.echo(f"GraphAr CLI Version: {__version__}")
+        raise typer.Exit()
 
 
 @app.command(
