@@ -41,6 +41,7 @@ body:
         - Java
         - Spark
         - PySpark
+        - Python
         - Continuous Integration
         - Developer Tools
         - Documentation
