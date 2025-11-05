@@ -103,7 +103,11 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
         .def("begin", &graphar::VerticesCollection::begin)
         .def("end", &graphar::VerticesCollection::end)
         .def("find", &graphar::VerticesCollection::find)
-        .def("size", &graphar::VerticesCollection::size);
+        .def("size", &graphar::VerticesCollection::size)
+        .def_static("Make", [](const std::shared_ptr<graphar::GraphInfo>& graph_info, const std::string& type) {
+            auto result = graphar::VerticesCollection::Make(graph_info, type);
+            return ThrowOrReturn(result);
+        });
 
     // Bind EdgeIter class
     auto edge_iter = py::class_<graphar::EdgeIter>(m, "EdgeIter");
@@ -139,11 +143,15 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
         .def("end", &graphar::EdgesCollection::end)
         .def("size", &graphar::EdgesCollection::size)
         .def("find_src", &graphar::EdgesCollection::find_src)
-        .def("find_dst", &graphar::EdgesCollection::find_dst);
-
-    // Bind static methods for creating collections
-    m.def("VerticesCollection_Make", &graphar::VerticesCollection::Make);
-    m.def("EdgesCollection_Make", &graphar::EdgesCollection::Make);
+        .def("find_dst", &graphar::EdgesCollection::find_dst)
+        .def_static("Make",  [](const std::shared_ptr<graphar::GraphInfo>& graph_info, 
+                              const std::string& src_type,
+                              const std::string& edge_type,
+                              const std::string& dst_type,
+                              graphar::AdjListType adj_list_type) {
+            auto result = graphar::EdgesCollection::Make(graph_info, src_type, edge_type, dst_type, adj_list_type);
+            return ThrowOrReturn(result);
+        });
 
     // Bind builder::Vertex class
     auto builder_vertex = py::class_<graphar::builder::Vertex>(m, "BuilderVertex");
@@ -215,10 +223,7 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
                                            graphar::IdType start_vertex_index,
                                            const graphar::ValidateLevel& validate_level) {
         auto result = graphar::builder::VerticesBuilder::Make(vertex_info, prefix, writer_options, start_vertex_index, validate_level);
-        if (!result.status().ok()) {
-            throw std::runtime_error(result.status().message());
-        }
-        return result.value();
+        return ThrowOrReturn(result);
     }, py::arg("vertex_info"), py::arg("prefix"), py::arg("writer_options") = nullptr, 
        py::arg("start_vertex_index") = 0, py::arg("validate_level") = graphar::ValidateLevel::no_validate);
 
@@ -228,10 +233,7 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
                                            graphar::IdType start_vertex_index,
                                            const graphar::ValidateLevel& validate_level) {
         auto result = graphar::builder::VerticesBuilder::Make(graph_info, type, writer_options, start_vertex_index, validate_level);
-        if (!result.status().ok()) {
-            throw std::runtime_error(result.status().message());
-        }
-        return result.value();
+        return ThrowOrReturn(result);
     }, py::arg("graph_info"), py::arg("type"), py::arg("writer_options") = nullptr, 
        py::arg("start_vertex_index") = 0, py::arg("validate_level") = graphar::ValidateLevel::no_validate);
 
@@ -292,10 +294,7 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
                                         std::shared_ptr<graphar::WriterOptions> writer_options,
                                         const graphar::ValidateLevel& validate_level) {
         auto result = graphar::builder::EdgesBuilder::Make(edge_info, prefix, adj_list_type, num_vertices, writer_options, validate_level);
-        if (!result.status().ok()) {
-            throw std::runtime_error(result.status().message());
-        }
-        return result.value();
+        return ThrowOrReturn(result);
     }, py::arg("edge_info"), py::arg("prefix"), py::arg("adj_list_type"), py::arg("num_vertices"),
        py::arg("writer_options") = nullptr, py::arg("validate_level") = graphar::ValidateLevel::no_validate);
 
@@ -308,10 +307,7 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
                                         std::shared_ptr<graphar::WriterOptions> writer_options,
                                         const graphar::ValidateLevel& validate_level) {
         auto result = graphar::builder::EdgesBuilder::Make(graph_info, src_type, edge_type, dst_type, adj_list_type, num_vertices, writer_options, validate_level);
-        if (!result.status().ok()) {
-            throw std::runtime_error(result.status().message());
-        }
-        return result.value();
+        return ThrowOrReturn(result);
     }, py::arg("graph_info"), py::arg("src_type"), py::arg("edge_type"), py::arg("dst_type"),
        py::arg("adj_list_type"), py::arg("num_vertices"), py::arg("writer_options") = nullptr,
        py::arg("validate_level") = graphar::ValidateLevel::no_validate);

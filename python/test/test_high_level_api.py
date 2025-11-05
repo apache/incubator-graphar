@@ -19,8 +19,8 @@ import pytest
 import tempfile
 import os
 
-from graphar.graph_info import GraphInfo, VertexInfo, EdgeInfo
-from graphar.types import AdjListType
+from graphar import GraphInfo, VertexInfo, EdgeInfo
+from graphar.types import AdjListType, ValidateLevel 
 from graphar.high_level import (
     Vertex, Edge, VertexIter, VerticesCollection, EdgeIter, EdgesCollection, 
     BuilderVertex, VerticesBuilder, BuilderEdge, EdgesBuilder
@@ -51,9 +51,7 @@ def test_vertices_collection(ldbc_sample_graph_info):
     """Test vertices collection reading functionality."""
     # Construct vertices collection
     type_name = "person"
-    maybe_vertices_collection = VerticesCollection.Make(ldbc_sample_graph_info, type_name)
-    assert maybe_vertices_collection.status().ok()
-    vertices = maybe_vertices_collection.value()
+    vertices = VerticesCollection.Make(ldbc_sample_graph_info, type_name)
     
     # Use vertices collection
     count = 0
@@ -85,9 +83,7 @@ def test_edges_collection(ldbc_sample_graph_info):
     dst_type = "person"
     adj_list_type = AdjListType.ordered_by_source
     
-    expect = EdgesCollection.Make(ldbc_sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
-    assert expect.status().ok()
-    edges = expect.value()
+    edges = EdgesCollection.Make(ldbc_sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
     
     # Use edges collection
     count = 0
@@ -137,13 +133,13 @@ def test_vertices_builder(person_vertex_meta):
             v.AddProperty(property_names[1], firstName_values[i])
             v.AddProperty(property_names[2], lastName_values[i])
             v.AddProperty(property_names[3], gender_values[i])
-            assert builder.AddVertex(v).ok()
+            builder.AddVertex(v)
         
         # Test vertex count
         assert builder.GetNum() == vertex_count
         
         # Dump
-        assert builder.Dump().ok()
+        builder.Dump()
         
         # Clear vertices
         builder.Clear()
@@ -172,13 +168,13 @@ def test_edges_builder(person_knows_person_edge_meta):
         for i in range(edge_count):
             e = BuilderEdge(src_values[i], dst_values[i])
             e.AddProperty("creationDate", creationDate_values[i])
-            assert builder.AddEdge(e).ok()
+            builder.AddEdge(e)
         
         # Test edge count
         assert builder.GetNum() == edge_count
         
         # Dump
-        assert builder.Dump().ok()
+        builder.Dump()
         
         # Clear edges
         builder.Clear()
@@ -189,9 +185,7 @@ def test_vertex_iter_operations(ldbc_sample_graph_info):
     """Test vertex iterator operations."""
     # Construct vertices collection
     type_name = "person"
-    maybe_vertices_collection = VerticesCollection.Make(ldbc_sample_graph_info, type_name)
-    assert maybe_vertices_collection.status().ok()
-    vertices = maybe_vertices_collection.value()
+    vertices = VerticesCollection.Make(ldbc_sample_graph_info, type_name)
     
     # Test iterator operations
     it = vertices.begin()
@@ -209,9 +203,7 @@ def test_edge_iter_operations(ldbc_sample_graph_info):
     dst_type = "person"
     adj_list_type = AdjListType.ordered_by_source
     
-    expect = EdgesCollection.Make(ldbc_sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
-    assert expect.status().ok()
-    edges = expect.value()
+    edges = EdgesCollection.Make(ldbc_sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
     
     # Test iterator operations
     it = edges.begin()
