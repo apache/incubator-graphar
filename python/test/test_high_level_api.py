@@ -19,10 +19,14 @@ import pytest
 import tempfile
 
 from graphar import GraphInfo
-from graphar.types import AdjListType, ValidateLevel 
+from graphar.types import AdjListType, ValidateLevel
 from graphar.high_level import (
-    VerticesCollection, EdgesCollection, 
-    BuilderVertex, VerticesBuilder, BuilderEdge, EdgesBuilder
+    VerticesCollection,
+    EdgesCollection,
+    BuilderVertex,
+    VerticesBuilder,
+    BuilderEdge,
+    EdgesBuilder,
 )
 
 
@@ -64,7 +68,7 @@ def test_vertices_collection(sample_graph_info):
             vertex.property("firstName")
         except Exception:
             pass  # Properties might not exist in all test data=
-    
+
     # Test size
     assert count == vertices.size()
 
@@ -76,9 +80,9 @@ def test_edges_collection(sample_graph_info):
     edge_type = "knows"
     dst_type = "person"
     adj_list_type = AdjListType.ordered_by_source
-    
+
     edges = EdgesCollection.Make(sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
-    
+
     # Use edges collection
     count = 0
     # Iterate through edges collection
@@ -92,7 +96,7 @@ def test_edges_collection(sample_graph_info):
             edge.property("creationDate")
         except Exception:
             pass  # Properties might not exist in all test data
-    
+
     # Test size
     assert count == edges.size()
 
@@ -103,10 +107,10 @@ def test_vertices_builder(sample_graph_vertex):
         # Construct vertices builder
         start_index = 0
         builder = VerticesBuilder.Make(sample_graph_vertex, temp_dir, start_index)
-        
+
         # Set validate level
         builder.SetValidateLevel(ValidateLevel.strong_validate)
-        
+
         # Prepare vertex data
         vertex_count = 3
         property_names = ["id", "firstName", "lastName", "gender"]
@@ -114,7 +118,7 @@ def test_vertices_builder(sample_graph_vertex):
         firstName_values = ["John", "Jane", "Alice"]
         lastName_values = ["Smith", "Doe", "Wonderland"]
         gender_values = ["male", "female", "female"]
-        
+
         # Add vertices
         for i in range(vertex_count):
             v = BuilderVertex()
@@ -123,13 +127,13 @@ def test_vertices_builder(sample_graph_vertex):
             v.AddProperty(property_names[2], lastName_values[i])
             v.AddProperty(property_names[3], gender_values[i])
             builder.AddVertex(v)
-        
+
         # Test vertex count
         assert builder.GetNum() == vertex_count
-        
+
         # Dump
         builder.Dump()
-        
+
         # Clear vertices
         builder.Clear()
         assert builder.GetNum() == 0
@@ -142,28 +146,28 @@ def test_edges_builder(sample_graph_edge):
         vertex_count = 3
         adj_list_type = AdjListType.ordered_by_dest
         builder = EdgesBuilder.Make(sample_graph_edge, temp_dir, adj_list_type, vertex_count)
-        
+
         # Set validate level
         builder.SetValidateLevel(ValidateLevel.strong_validate)
-        
+
         # Prepare edge data
         edge_count = 4
         src_values = [1, 0, 0, 2]
         dst_values = [0, 1, 2, 1]
         creationDate_values = ["2010-01-01", "2011-01-01", "2012-01-01", "2013-01-01"]
-        
+
         # Add edges
         for i in range(edge_count):
             e = BuilderEdge(src_values[i], dst_values[i])
             e.AddProperty("creationDate", creationDate_values[i])
             builder.AddEdge(e)
-        
+
         # Test edge count
         assert builder.GetNum() == edge_count
-        
+
         # Dump
         builder.Dump()
-        
+
         # Clear edges
         builder.Clear()
         assert builder.GetNum() == 0
@@ -174,7 +178,7 @@ def test_vertex_iter_operations(sample_graph_info):
     # Construct vertices collection
     type_name = "person"
     vertices = VerticesCollection.Make(sample_graph_info, type_name)
-    
+
     # Test iterator operations
     it = vertices.begin()
     if it != vertices.end():
@@ -190,9 +194,9 @@ def test_edge_iter_operations(sample_graph_info):
     edge_type = "knows"
     dst_type = "person"
     adj_list_type = AdjListType.ordered_by_source
-    
+
     edges = EdgesCollection.Make(sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
-    
+
     # Test iterator operations
     it = edges.begin()
     if it != edges.end():
