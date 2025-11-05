@@ -19,7 +19,7 @@ from pathlib import Path
 
 import yaml
 
-from ._core import (
+from .._core import (
     check_edge,
     check_graph,
     check_vertex,
@@ -27,8 +27,8 @@ from ._core import (
     get_edge_types,
     get_vertex_types,
 )
-from .import.config import ImportConfig
-from .import.importer import validate
+from .config import ImportConfig
+from .importer import validate
 def check(path: str):
     if not Path(path).exists():
         raise ValueError(f'File not found: {path}')

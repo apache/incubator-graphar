@@ -68,7 +68,7 @@ print(f"Edge type: {edge_info.get_edge_type()}")
 
 GraphAr Python SDK also provides a command-line interface for common operations such as checking metadata, showing graph information, and importing data.
 
-For detailed information about the CLI functionality, please see [CLI Documentation](src/cli/README.md).
+For detailed information about the CLI functionality, please see [CLI Documentation](src/client/README.md).
 
 ## API Documentation
 

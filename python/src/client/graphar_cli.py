@@ -21,7 +21,7 @@ from typing import List
 
 import typer
 
-from ..graphar._core import (
+from graphar._core import (
     get_edge_count,
     get_edge_types,
     get_vertex_count,
@@ -30,9 +30,9 @@ from ..graphar._core import (
     show_graph,
     show_vertex,
 )
-from ..graphar.logging import setup_logging
+from graphar.logging import setup_logging
 
-import graphar.command_cli_api as api
+from graphar.importer import data_import
 
 app = typer.Typer(
     help="GraphAr Cli",
@@ -105,7 +105,7 @@ def check(
     path: str = typer.Option(None, "--path", "-p", help="Path to the GraphAr config file"),
 ):
     try:
-        result_str = api.check(path)
+        result_str = data_import.check(path)
     except Exception as e:
         logger.error(e)
         raise typer.Exit(1)
@@ -122,7 +122,7 @@ def import_data(
     config_file: str = typer.Option(None, "--config", "-c", help="Path of the GraphAr config file"),
 ):
     try:
-        result_str = api.import_data(config_file)
+        result_str = data_import.import_data(config_file)
     except Exception as e:
         logger.error(e)
         raise typer.Exit(1)

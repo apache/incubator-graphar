@@ -15,12 +15,11 @@ dependencies = ["typer ~= 0.1", "pydantic ~= 2.0, < 2.12", "pyyaml ~= 6.0", "pyt
 [project.optional-dependencies]
 test = ["pandas ~= 2.0", "typing_extensions ~= 4.0"]
 
-[project.scripts]
-graphar = "graphar.graphar_cli:main"
-
-
 [tool.scikit-build]
 build-dir = "build"
+
+[project.scripts]
+graphar = "client.graphar_cli:main"
 
 [tool.ruff]
 src = ["src"]

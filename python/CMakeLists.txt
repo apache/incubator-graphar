@@ -73,5 +73,6 @@ else()
   set_target_properties(_core PROPERTIES INSTALL_RPATH "\$ORIGIN")
 endif()
 
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/client/ DESTINATION client)
 install(TARGETS graphar DESTINATION graphar)
 install(TARGETS _core DESTINATION graphar)

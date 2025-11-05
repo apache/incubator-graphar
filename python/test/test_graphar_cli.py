@@ -19,9 +19,7 @@ import pytest
 import typer
 from pathlib import Path
 
-import graphar.graphar_cli as cli
-
-
+from client import graphar_cli as cli
 @pytest.fixture
 def sample_cfg():
     return (
