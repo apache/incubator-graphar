@@ -15,4 +15,4 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from ._core import DataType, Property, PropertyGroup, AdjacentList, VertexInfo, EdgeInfo, GraphInfo
+from ._core import Vertex, Edge, VertexIter, VerticesCollection, EdgeIter, EdgesCollection, BuilderVertex, VerticesBuilder, BuilderEdge, EdgesBuilder

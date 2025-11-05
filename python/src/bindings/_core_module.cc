@@ -20,8 +20,9 @@
 #include <pybind11/pybind11.h>
 
 // Declare binding functions
-extern "C" void bind_graph_info(pybind11::module_& m);
 extern "C" void bind_types(pybind11::module_& m);
+extern "C" void bind_graph_info(pybind11::module_& m);
+extern "C" void bind_high_level_api(pybind11::module_& m);
 extern "C" void bind_cli(pybind11::module_& m);
 
 PYBIND11_MODULE(_core, m) {
@@ -29,5 +30,6 @@ PYBIND11_MODULE(_core, m) {
 
   bind_types(m);
   bind_graph_info(m);
+  bind_high_level_api(m);
   bind_cli(m);
 }

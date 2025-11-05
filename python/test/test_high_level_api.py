@@ -1,0 +1,223 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+import pytest
+import tempfile
+import os
+
+from graphar.graph_info import GraphInfo, VertexInfo, EdgeInfo
+from graphar.types import AdjListType
+from graphar.high_level import (
+    Vertex, Edge, VertexIter, VerticesCollection, EdgeIter, EdgesCollection, 
+    BuilderVertex, VerticesBuilder, BuilderEdge, EdgesBuilder
+)
+
+
+@pytest.fixture
+def ldbc_sample_graph(test_data_root):
+    return test_data_root + "/ldbc_sample/parquet/ldbc_sample.graph.yml"
+
+
+@pytest.fixture
+def ldbc_sample_graph_info(ldbc_sample_graph):
+    return GraphInfo.load(ldbc_sample_graph)
+
+
+@pytest.fixture
+def person_vertex_meta(test_data_root):
+    return test_data_root + "/ldbc/parquet/person.vertex.yml"
+
+
+@pytest.fixture
+def person_knows_person_edge_meta(test_data_root):
+    return test_data_root + "/ldbc_sample/parquet/person_knows_person.edge.yml"
+
+
+def test_vertices_collection(ldbc_sample_graph_info):
+    """Test vertices collection reading functionality."""
+    # Construct vertices collection
+    type_name = "person"
+    maybe_vertices_collection = VerticesCollection.Make(ldbc_sample_graph_info, type_name)
+    assert maybe_vertices_collection.status().ok()
+    vertices = maybe_vertices_collection.value()
+    
+    # Use vertices collection
+    count = 0
+    # Iterate through vertices collection
+    for vertex in vertices:
+        count += 1
+        # Test first 10 vertices
+        if count <= 10:
+            # Access data through vertex
+            assert vertex.id() >= 0
+            # Try to access properties
+            try:
+                vertex.property("id")
+                vertex.property("firstName")
+            except Exception:
+                pass  # Properties might not exist in all test data
+        else:
+            break
+    
+    # Test size
+    assert count == vertices.size()
+
+
+def test_edges_collection(ldbc_sample_graph_info):
+    """Test edges collection reading functionality."""
+    # Construct edges collection
+    src_type = "person"
+    edge_type = "knows"
+    dst_type = "person"
+    adj_list_type = AdjListType.ordered_by_source
+    
+    expect = EdgesCollection.Make(ldbc_sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
+    assert expect.status().ok()
+    edges = expect.value()
+    
+    # Use edges collection
+    count = 0
+    # Iterate through edges collection
+    for edge in edges:
+        count += 1
+        # Test first 10 edges
+        if count <= 10:
+            # Access data through edge
+            assert edge.source() >= 0
+            assert edge.destination() >= 0
+            # Try to access properties
+            try:
+                edge.property("creationDate")
+            except Exception:
+                pass  # Properties might not exist in all test data
+        else:
+            break
+    
+    # Test size
+    assert count == edges.size()
+
+
+def test_vertices_builder(person_vertex_meta):
+    """Test vertices builder functionality."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Construct vertices builder
+        vertex_info = VertexInfo.load(person_vertex_meta)
+        start_index = 0
+        builder = VerticesBuilder(vertex_info, temp_dir, start_index)
+        
+        # Set validate level
+        builder.SetValidateLevel(ValidateLevel.strong_validate)
+        
+        # Prepare vertex data
+        vertex_count = 3
+        property_names = ["id", "firstName", "lastName", "gender"]
+        id_values = [0, 1, 2]
+        firstName_values = ["John", "Jane", "Alice"]
+        lastName_values = ["Smith", "Doe", "Wonderland"]
+        gender_values = ["male", "female", "female"]
+        
+        # Add vertices
+        for i in range(vertex_count):
+            v = BuilderVertex()
+            v.AddProperty(property_names[0], id_values[i])
+            v.AddProperty(property_names[1], firstName_values[i])
+            v.AddProperty(property_names[2], lastName_values[i])
+            v.AddProperty(property_names[3], gender_values[i])
+            assert builder.AddVertex(v).ok()
+        
+        # Test vertex count
+        assert builder.GetNum() == vertex_count
+        
+        # Dump
+        assert builder.Dump().ok()
+        
+        # Clear vertices
+        builder.Clear()
+        assert builder.GetNum() == 0
+
+
+def test_edges_builder(person_knows_person_edge_meta):
+    """Test edges builder functionality."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Construct edges builder
+        edge_info = EdgeInfo.load(person_knows_person_edge_meta)
+        vertex_count = 3
+        adj_list_type = AdjListType.ordered_by_dest
+        builder = EdgesBuilder(edge_info, temp_dir, adj_list_type, vertex_count)
+        
+        # Set validate level
+        builder.SetValidateLevel(ValidateLevel.strong_validate)
+        
+        # Prepare edge data
+        edge_count = 4
+        src_values = [1, 0, 0, 2]
+        dst_values = [0, 1, 2, 1]
+        creationDate_values = ["2010-01-01", "2011-01-01", "2012-01-01", "2013-01-01"]
+        
+        # Add edges
+        for i in range(edge_count):
+            e = BuilderEdge(src_values[i], dst_values[i])
+            e.AddProperty("creationDate", creationDate_values[i])
+            assert builder.AddEdge(e).ok()
+        
+        # Test edge count
+        assert builder.GetNum() == edge_count
+        
+        # Dump
+        assert builder.Dump().ok()
+        
+        # Clear edges
+        builder.Clear()
+        assert builder.GetNum() == 0
+
+
+def test_vertex_iter_operations(ldbc_sample_graph_info):
+    """Test vertex iterator operations."""
+    # Construct vertices collection
+    type_name = "person"
+    maybe_vertices_collection = VerticesCollection.Make(ldbc_sample_graph_info, type_name)
+    assert maybe_vertices_collection.status().ok()
+    vertices = maybe_vertices_collection.value()
+    
+    # Test iterator operations
+    it = vertices.begin()
+    if it != vertices.end():
+        # Test accessing vertex id through iterator
+        vertex_id = it.id()
+        assert vertex_id >= 0
+
+
+def test_edge_iter_operations(ldbc_sample_graph_info):
+    """Test edge iterator operations."""
+    # Construct edges collection
+    src_type = "person"
+    edge_type = "knows"
+    dst_type = "person"
+    adj_list_type = AdjListType.ordered_by_source
+    
+    expect = EdgesCollection.Make(ldbc_sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
+    assert expect.status().ok()
+    edges = expect.value()
+    
+    # Test iterator operations
+    it = edges.begin()
+    if it != edges.end():
+        # Test accessing edge source and destination through iterator
+        source = it.source()
+        destination = it.destination()
+        assert source >= 0
+        assert destination >= 0
