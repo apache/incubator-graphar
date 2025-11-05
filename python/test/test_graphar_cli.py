@@ -20,6 +20,8 @@ import typer
 from pathlib import Path
 
 from client import graphar_cli as cli
+
+
 @pytest.fixture
 def sample_cfg():
     return (

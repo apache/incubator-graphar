@@ -29,30 +29,33 @@ from .._core import (
 )
 from .config import ImportConfig
 from .importer import validate
+
+
 def check(path: str):
     if not Path(path).exists():
-        raise ValueError(f'File not found: {path}')
+        raise ValueError(f"File not found: {path}")
     path = Path(path).resolve() if Path(path).is_absolute() else Path(Path.cwd(), path).resolve()
     path = str(path)
     vertex_types = get_vertex_types(path)
     for vertex_type in vertex_types:
         if not check_vertex(path, vertex_type):
-            raise ValueError(f'Vertex type {vertex_type} is not valid')
+            raise ValueError(f"Vertex type {vertex_type} is not valid")
     edge_types = get_edge_types(path)
     for edge_type in edge_types:
         if edge_type[0] not in vertex_types:
-            raise ValueError(f'Source vertex type {edge_type[0]} not found in the graph')
+            raise ValueError(f"Source vertex type {edge_type[0]} not found in the graph")
         if edge_type[2] not in vertex_types:
-            raise ValueError(f'Destination vertex type {edge_type[2]} not found in the graph')
+            raise ValueError(f"Destination vertex type {edge_type[2]} not found in the graph")
         if not check_edge(path, edge_type[0], edge_type[1], edge_type[2]):
-            raise ValueError(f'Edge type {edge_type[0]}_{edge_type[1]}_{edge_type[2]} is not valid')
+            raise ValueError(f"Edge type {edge_type[0]}_{edge_type[1]}_{edge_type[2]} is not valid")
     if not check_graph(path):
         raise ValueError("Graph is not valid")
     return "Graph is valid"
 
+
 def import_data(config_file: str):
     if not Path(config_file).is_file():
-        raise ValueError(f'File not found: {config_file}')
+        raise ValueError(f"File not found: {config_file}")
 
     try:
         with Path(config_file).open(encoding="utf-8") as file:
@@ -60,9 +63,9 @@ def import_data(config_file: str):
         import_config = ImportConfig(**config)
         validate(import_config)
     except Exception as e:
-        raise ValueError(f'Invalid config: {e}')
+        raise ValueError(f"Invalid config: {e}")
     try:
         res = do_import(import_config.model_dump())
     except Exception as e:
-        raise ValueError(f'Import failed: {e}')
+        raise ValueError(f"Import failed: {e}")
     return res

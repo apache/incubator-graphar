@@ -121,6 +121,7 @@ jobs:
       working-directory: "python"
       run: |
         graphar --help
+        graphar --version
         graphar check -p ../testing/neo4j/MovieGraph.graph.yml
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
