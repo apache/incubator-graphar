@@ -46,35 +46,30 @@ def sample_graph_edge(sample_graph_info):
     return sample_graph_info.get_edge_info("person", "knows", "person")
 
 
-def test_vertices_collection(ldbc_sample_graph_info):
+def test_vertices_collection(sample_graph_info):
     """Test vertices collection reading functionality."""
     # Construct vertices collection
     type_name = "person"
-    vertices = VerticesCollection.Make(ldbc_sample_graph_info, type_name)
-    
+    vertices = VerticesCollection.Make(sample_graph_info, type_name)
     # Use vertices collection
     count = 0
     # Iterate through vertices collection
     for vertex in vertices:
         count += 1
-        # Test first 10 vertices
-        if count <= 10:
-            # Access data through vertex
-            assert vertex.id() >= 0
-            # Try to access properties
-            try:
-                vertex.property("id")
-                vertex.property("firstName")
-            except Exception:
-                pass  # Properties might not exist in all test data
-        else:
-            break
+        # Access data through vertex
+        assert vertex.id() >= 0
+        # Try to access properties
+        try:
+            vertex.property("id")
+            vertex.property("firstName")
+        except Exception:
+            pass  # Properties might not exist in all test data=
     
     # Test size
     assert count == vertices.size()
 
 
-def test_edges_collection(ldbc_sample_graph_info):
+def test_edges_collection(sample_graph_info):
     """Test edges collection reading functionality."""
     # Construct edges collection
     src_type = "person"
@@ -82,25 +77,21 @@ def test_edges_collection(ldbc_sample_graph_info):
     dst_type = "person"
     adj_list_type = AdjListType.ordered_by_source
     
-    edges = EdgesCollection.Make(ldbc_sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
+    edges = EdgesCollection.Make(sample_graph_info, src_type, edge_type, dst_type, adj_list_type)
     
     # Use edges collection
     count = 0
     # Iterate through edges collection
     for edge in edges:
         count += 1
-        # Test first 10 edges
-        if count <= 10:
-            # Access data through edge
-            assert edge.source() >= 0
-            assert edge.destination() >= 0
-            # Try to access properties
-            try:
-                edge.property("creationDate")
-            except Exception:
-                pass  # Properties might not exist in all test data
-        else:
-            break
+        # Access data through edge
+        assert edge.source() >= 0
+        assert edge.destination() >= 0
+        # Try to access properties
+        try:
+            edge.property("creationDate")
+        except Exception:
+            pass  # Properties might not exist in all test data
     
     # Test size
     assert count == edges.size()

@@ -35,7 +35,7 @@ namespace py = pybind11;
 // Changed from PYBIND11_MODULE to a regular function
 extern "C" void bind_high_level_api(pybind11::module_& m) {
     // Bind Vertex class
-    auto vertex = py::class_<graphar::Vertex>(m, "Vertex");
+    auto vertex = py::class_<graphar::Vertex, std::shared_ptr<graphar::Vertex>>(m, "Vertex");
     vertex.def("id", &graphar::Vertex::id)
         .def("property", [](const graphar::Vertex& self, const std::string& property) {
             // We need to handle different property types
@@ -53,7 +53,7 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
         .def("IsValid", &graphar::Vertex::IsValid);
 
     // Bind Edge class
-    auto edge = py::class_<graphar::Edge>(m, "Edge");
+    auto edge = py::class_<graphar::Edge, std::shared_ptr<graphar::Edge>>(m, "Edge");
     edge.def("source", &graphar::Edge::source)
         .def("destination", &graphar::Edge::destination)
         .def("property", [](const graphar::Edge& self, const std::string& property) {
@@ -72,7 +72,7 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
         .def("IsValid", &graphar::Edge::IsValid);
 
     // Bind VertexIter class
-    auto vertex_iter = py::class_<graphar::VertexIter>(m, "VertexIter");
+    auto vertex_iter = py::class_<graphar::VertexIter, std::shared_ptr<graphar::VertexIter>>(m, "VertexIter");
     vertex_iter.def("__iter__", [](graphar::VertexIter& it) -> graphar::VertexIter& { return it; })
         .def("__next__", [](graphar::VertexIter& it) {
             // TODO: Implement proper end checking
@@ -96,7 +96,8 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
         });
 
     // Bind VerticesCollection class
-    auto vertices_collection = py::class_<graphar::VerticesCollection>(m, "VerticesCollection");
+    auto vertices_collection = py::class_<graphar::VerticesCollection,
+                                     std::shared_ptr<graphar::VerticesCollection>>(m, "VerticesCollection");
     vertices_collection.def("__iter__", [](graphar::VerticesCollection& self) {
             return py::make_iterator(self.begin(), self.end());
         }, py::keep_alive<0, 1>()) // Keep collection alive while iterator is used
@@ -110,7 +111,7 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
         });
 
     // Bind EdgeIter class
-    auto edge_iter = py::class_<graphar::EdgeIter>(m, "EdgeIter");
+    auto edge_iter = py::class_<graphar::EdgeIter, std::shared_ptr<graphar::EdgeIter>>(m, "EdgeIter");
     edge_iter.def("__iter__", [](graphar::EdgeIter& it) -> graphar::EdgeIter& { return it; })
         .def("__next__", [](graphar::EdgeIter& it) {
             // TODO: Implement proper end checking
@@ -135,7 +136,8 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
         });
 
     // Bind EdgesCollection class
-    auto edges_collection = py::class_<graphar::EdgesCollection>(m, "EdgesCollection");
+    auto edges_collection = py::class_<graphar::EdgesCollection,
+                                     std::shared_ptr<graphar::EdgesCollection>>(m, "EdgesCollection");
     edges_collection.def("__iter__", [](graphar::EdgesCollection& self) {
             return py::make_iterator(self.begin(), self.end());
         }, py::keep_alive<0, 1>()) // Keep collection alive while iterator is used
@@ -154,7 +156,7 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
         });
 
     // Bind builder::Vertex class
-    auto builder_vertex = py::class_<graphar::builder::Vertex>(m, "BuilderVertex");
+    auto builder_vertex = py::class_<graphar::builder::Vertex, std::shared_ptr<graphar::builder::Vertex>>(m, "BuilderVertex");
     builder_vertex.def(py::init<>())
         .def(py::init<graphar::IdType>())
         .def("GetId", &graphar::builder::Vertex::GetId)
