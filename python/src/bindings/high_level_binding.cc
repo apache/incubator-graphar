@@ -197,24 +197,22 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
     //WRITER
     // Bind WriterOptions class
     //TODO add csv_option_builder parquet_option_builder orc_option_builder
-    auto writer_options = py::class_<graphar::WriterOptions>(m, "WriterOptions");
+    auto writer_options = py::class_<graphar::WriterOptions, std::shared_ptr<graphar::WriterOptions>>(m, "WriterOptions");
     // Bind builder::VerticesBuilder class
-    auto vertices_builder = py::class_<graphar::builder::VerticesBuilder>(m, "VerticesBuilder");
-    vertices_builder.def(py::init<const std::shared_ptr<graphar::VertexInfo>&, const std::string&, graphar::IdType, 
-                          std::shared_ptr<graphar::WriterOptions>, const graphar::ValidateLevel&>(),
-                          py::arg("vertex_info"), py::arg("prefix"), py::arg("start_vertex_index") = 0,
-                          py::arg("writer_options") = nullptr, py::arg("validate_level") = graphar::ValidateLevel::no_validate)
-        .def("Clear", &graphar::builder::VerticesBuilder::Clear)
+    auto vertices_builder = py::class_<graphar::builder::VerticesBuilder, std::shared_ptr<graphar::builder::VerticesBuilder>>(m, "VerticesBuilder");
+    vertices_builder.def("Clear", &graphar::builder::VerticesBuilder::Clear)
         .def("SetWriterOptions", &graphar::builder::VerticesBuilder::SetWriterOptions)
         .def("GetWriterOptions", &graphar::builder::VerticesBuilder::GetWriterOptions)
         .def("SetValidateLevel", &graphar::builder::VerticesBuilder::SetValidateLevel)
         .def("GetValidateLevel", &graphar::builder::VerticesBuilder::GetValidateLevel)
         .def("AddVertex", [](graphar::builder::VerticesBuilder& self, graphar::builder::Vertex& v, 
                              graphar::IdType index, const graphar::ValidateLevel& validate_level) {
-            return self.AddVertex(v, index, validate_level);
+            return CheckStatus(self.AddVertex(v, index, validate_level));
         }, py::arg("v"), py::arg("index") = -1, py::arg("validate_level") = graphar::ValidateLevel::default_validate)
         .def("GetNum", &graphar::builder::VerticesBuilder::GetNum)
-        .def("Dump", &graphar::builder::VerticesBuilder::Dump);
+        .def("Dump", [](graphar::builder::VerticesBuilder& self) {
+            return CheckStatus(self.Dump());
+        });
 
     // Static factory methods for VerticesBuilder
     vertices_builder.def_static("Make", [](const std::shared_ptr<graphar::VertexInfo>& vertex_info, 
@@ -236,9 +234,15 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
         return ThrowOrReturn(result);
     }, py::arg("graph_info"), py::arg("type"), py::arg("writer_options") = nullptr, 
        py::arg("start_vertex_index") = 0, py::arg("validate_level") = graphar::ValidateLevel::no_validate);
+    vertices_builder.def_static("Make", [](const std::shared_ptr<graphar::VertexInfo>& vertex_info, 
+                                           const std::string& prefix,
+                                           graphar::IdType start_vertex_index) {
+        auto result = graphar::builder::VerticesBuilder::Make(vertex_info, prefix, start_vertex_index);
+        return ThrowOrReturn(result);
+    }, py::arg("vertex_info"), py::arg("prefix"), py::arg("start_vertex_index") = 0);
 
     // Bind builder::Edge class
-    auto builder_edge = py::class_<graphar::builder::Edge>(m, "BuilderEdge");
+    auto builder_edge = py::class_<graphar::builder::Edge, std::shared_ptr<graphar::builder::Edge>>(m, "BuilderEdge");
     builder_edge.def(py::init<graphar::IdType, graphar::IdType>())
         .def("Empty", &graphar::builder::Edge::Empty)
         .def("GetSource", &graphar::builder::Edge::GetSource)
@@ -270,21 +274,22 @@ extern "C" void bind_high_level_api(pybind11::module_& m) {
         .def("ContainProperty", &graphar::builder::Edge::ContainProperty);
 
     // Bind builder::EdgesBuilder class
-    auto edges_builder = py::class_<graphar::builder::EdgesBuilder>(m, "EdgesBuilder");
-    edges_builder.def(py::init<const std::shared_ptr<graphar::EdgeInfo>&, const std::string&, 
-                               graphar::AdjListType, graphar::IdType, std::shared_ptr<graphar::WriterOptions>, 
-                               const graphar::ValidateLevel&>(),
-                      py::arg("edge_info"), py::arg("prefix"), py::arg("adj_list_type"), py::arg("num_vertices"),
-                      py::arg("writer_options") = nullptr, py::arg("validate_level") = graphar::ValidateLevel::no_validate)
+    auto edges_builder = py::class_<graphar::builder::EdgesBuilder, std::shared_ptr<graphar::builder::EdgesBuilder>>(m, "EdgesBuilder");
+    edges_builder
         .def("SetValidateLevel", &graphar::builder::EdgesBuilder::SetValidateLevel)
         .def("SetWriterOptions", &graphar::builder::EdgesBuilder::SetWriterOptions)
         .def("GetWriterOptions", &graphar::builder::EdgesBuilder::GetWriterOptions)
         .def("GetValidateLevel", &graphar::builder::EdgesBuilder::GetValidateLevel)
         .def("Clear", &graphar::builder::EdgesBuilder::Clear)
-        .def("AddEdge", &graphar::builder::EdgesBuilder::AddEdge, 
-             py::arg("e"), py::arg("validate_level") = graphar::ValidateLevel::default_validate)
+        .def("AddEdge", [](graphar::builder::EdgesBuilder& self, 
+                           const graphar::builder::Edge& e,
+                           const graphar::ValidateLevel& validate_level) {
+            return CheckStatus(self.AddEdge(e, validate_level));
+        }, py::arg("e"), py::arg("validate_level") = graphar::ValidateLevel::default_validate)
         .def("GetNum", &graphar::builder::EdgesBuilder::GetNum)
-        .def("Dump", &graphar::builder::EdgesBuilder::Dump);
+        .def("Dump", [](graphar::builder::EdgesBuilder& self) {
+            return CheckStatus(self.Dump());
+        });
 
     // Static factory methods for EdgesBuilder
     edges_builder.def_static("Make", [](const std::shared_ptr<graphar::EdgeInfo>& edge_info,

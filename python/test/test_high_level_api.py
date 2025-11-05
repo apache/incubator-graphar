@@ -33,18 +33,18 @@ def ldbc_sample_graph(test_data_root):
 
 
 @pytest.fixture
-def ldbc_sample_graph_info(ldbc_sample_graph):
+def sample_graph_info(ldbc_sample_graph):
     return GraphInfo.load(ldbc_sample_graph)
 
 
 @pytest.fixture
-def person_vertex_meta(test_data_root):
-    return test_data_root + "/ldbc/parquet/person.vertex.yml"
+def sample_graph_vertex(sample_graph_info):
+    return sample_graph_info.get_vertex_info("person")
 
 
 @pytest.fixture
-def person_knows_person_edge_meta(test_data_root):
-    return test_data_root + "/ldbc_sample/parquet/person_knows_person.edge.yml"
+def sample_graph_edge(sample_graph_info):
+    return sample_graph_info.get_edge_info("person", "knows", "person")
 
 
 def test_vertices_collection(ldbc_sample_graph_info):
@@ -107,13 +107,12 @@ def test_edges_collection(ldbc_sample_graph_info):
     assert count == edges.size()
 
 
-def test_vertices_builder(person_vertex_meta):
+def test_vertices_builder(sample_graph_vertex):
     """Test vertices builder functionality."""
     with tempfile.TemporaryDirectory() as temp_dir:
         # Construct vertices builder
-        vertex_info = VertexInfo.load(person_vertex_meta)
         start_index = 0
-        builder = VerticesBuilder(vertex_info, temp_dir, start_index)
+        builder = VerticesBuilder.Make(sample_graph_vertex, temp_dir, start_index)
         
         # Set validate level
         builder.SetValidateLevel(ValidateLevel.strong_validate)
@@ -146,14 +145,13 @@ def test_vertices_builder(person_vertex_meta):
         assert builder.GetNum() == 0
 
 
-def test_edges_builder(person_knows_person_edge_meta):
+def test_edges_builder(sample_graph_edge):
     """Test edges builder functionality."""
     with tempfile.TemporaryDirectory() as temp_dir:
         # Construct edges builder
-        edge_info = EdgeInfo.load(person_knows_person_edge_meta)
         vertex_count = 3
         adj_list_type = AdjListType.ordered_by_dest
-        builder = EdgesBuilder(edge_info, temp_dir, adj_list_type, vertex_count)
+        builder = EdgesBuilder.Make(sample_graph_edge, temp_dir, adj_list_type, vertex_count)
         
         # Set validate level
         builder.SetValidateLevel(ValidateLevel.strong_validate)
