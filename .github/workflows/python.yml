@@ -73,7 +73,7 @@ jobs:
         pip install ./ -v
 
     - name: Build Docs
-      working-directory: pyspark
+      working-directory: python
       run: |
         make install_docs
         make docs
