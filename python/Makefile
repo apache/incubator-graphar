@@ -15,27 +15,10 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from __future__ import annotations
+.PHONY: install_docs
+install_docs:
+		poetry install --with docs
 
-from .graph_info import *
-from .high_level import *
-
-__all__ = [
-    "GraphInfo", 
-    "VertexInfo", 
-    "EdgeInfo", 
-    "PropertyGroup", 
-    "Property",
-    "DataType",
-    "AdjacentList",
-    "Vertex",
-    "Edge",
-    "VertexIter",
-    "VerticesCollection",
-    "EdgeIter",
-    "EdgesCollection",
-    "BuilderVertex",
-    "VerticesBuilder",
-    "BuilderEdge",
-    "EdgesBuilder",
-]
+.PHONY: docs
+docs:
+		poetry run pdoc --output-dir ./docs graphar
