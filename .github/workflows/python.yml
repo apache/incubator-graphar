@@ -15,36 +15,38 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: GraphAr CLI CI
+name: GraphAr Python CI
 
 on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
   push:
     branches:
-      - main
+      - "main"
     paths:
       - 'cpp/**'
-      - 'cli/**'
+      - 'python/**'
       - '.github/workflows/ci.yml'
-      - '.github/workflows/cli.yml'
+      - '.github/workflows/python.yml'
   pull_request:
     branches:
-      - main
+      - "main"
     paths:
       - 'cpp/**'
-      - 'cli/**'
+      - 'python/**'
       - '.github/workflows/ci.yml'
-      - '.github/workflows/cli.yml'
+      - '.github/workflows/python.yml'
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
   ubuntu:
-    name: Ubuntu 22.04 CLI
+    name: Ubuntu 22.04 Python
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && !github.event.pull_request.draft }}
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
+
     steps:
     - uses: actions/checkout@v3
       with:
@@ -63,17 +65,25 @@ jobs:
                             libarrow-acero-dev=17.0.0-1 \
                             libparquet-dev=17.0.0-1
         sudo apt-get install -y ccache libcurl4-openssl-dev
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
-    - name: Install GraphAr CLI and Run Tests
-      working-directory: "cli"
+    - name: Install GraphAr Python SDK
+      working-directory: "python"
       run: |
         pip install ./ -v
+    - name: Run Cli Test
+      working-directory: "python"
+      run: |
         graphar --help
         graphar check -p ../testing/neo4j/MovieGraph.graph.yml
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
         graphar import -c ../testing/neo4j/data/import.mini.yml
-# TODO: Add unit tests
+
+    - name: Run pytest
+      working-directory: "python"
+      run: |
+        pytest test -v
 
 
     - name: Upload coverage reports to Codecov
@@ -82,31 +92,44 @@ jobs:
         token: ${{ secrets.CODECOV_TOKEN }}
 
   macos:
-    name: macos latest CLI
+    name: macos latest Python
     runs-on: macos-latest
-    # TODO: Remove this when the macos issue is fixed
-    if: false   
-    strategy:
-      fail-fast: false
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
 
     steps:
     - uses: actions/checkout@v3
       with:
           submodules: true
 
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+
     - name: Install dependencies
       run: |
         brew bundle --file=cpp/Brewfile
-        
-    
-    - name: Build GraphAr And Run Tests
-      working-directory: "cli"
+
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+
+    - name: Install GraphAr Python SDK
+      working-directory: "python"
       run: |
-        pip install ./
+        pip install ./ -v
+    - name: Run Cli Test
+      working-directory: "python"
+      run: |
         graphar --help
+        graphar --version
         graphar check -p ../testing/neo4j/MovieGraph.graph.yml
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
         graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
-        graphar import -c ../testing/neo4j/data/import.mini.yml
+
+    - name: Run pytest
+      working-directory: "python"
+      run: |
+        pytest test -v
+
       
 # TODO: Add unit tests

@@ -1,6 +1,6 @@
-# GraphAr Cli
+# GraphAr Python CLI
 
-GraphAr Cli uses [pybind11][] and [scikit-build-core][] to bind C++ code into Python and build command line tools through Python. Command line tools developed using [typer][].
+GraphAr python cli uses [pybind11][] and [scikit-build-core][] to bind C++ code into Python and build command line tools through Python. Command line tools developed using [typer][].
 
 [pybind11]: https://pybind11.readthedocs.io
 [scikit-build-core]: https://scikit-build-core.readthedocs.io
@@ -22,7 +22,7 @@ And using Python in conda or venv is a good choice.
 ## Installation
 
 - Clone this repository
-- `pip install ./cli` or set verbose level `pip install -v ./cli`
+- `pip install ./python` or set verbose level `pip install -v ./python`
 
 ## Usage
 

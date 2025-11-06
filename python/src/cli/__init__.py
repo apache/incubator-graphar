@@ -15,10 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from __future__ import annotations
+"""CLI module for GraphAr."""
 
-import graphar_cli as m
+try:
+    from importlib import metadata
+except ImportError:
+    import importlib_metadata as metadata
 
-
-def test_version():
-    assert m.__version__ == "0.0.1"
+try:
+    __version__ = metadata.version("graphar")
+except Exception:
+    __version__ = "unknown"

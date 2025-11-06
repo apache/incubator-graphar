@@ -152,8 +152,10 @@ std::vector<std::vector<std::string>> GetEdgeTypes(const std::string& path) {
 }
 
 namespace py = pybind11;
-PYBIND11_MODULE(_core, m) {
-  m.doc() = "GraphAr Python bindings";
+
+// Changed from PYBIND11_MODULE to a regular function
+extern "C" void bind_cli(pybind11::module_& m) {
+  // CLI-level convenience functions
   m.def("show_graph", &ShowGraph, "Show the graph info");
   m.def("show_vertex", &ShowVertex, "Show the vertex info");
   m.def("show_edge", &ShowEdge, "Show the edge info");
