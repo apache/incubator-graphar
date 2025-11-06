@@ -15,6 +15,4 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from .types import Type
-
 from ._core import DataType, Property, PropertyGroup, AdjacentList, VertexInfo, EdgeInfo, GraphInfo
