@@ -71,6 +71,13 @@ jobs:
       working-directory: "python"
       run: |
         pip install ./ -v
+
+    - name: Build Docs
+      working-directory: pyspark
+      run: |
+        make install_docs
+        make docs
+
     - name: Run Cli Test
       working-directory: "python"
       run: |
