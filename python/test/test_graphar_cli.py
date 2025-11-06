@@ -19,7 +19,7 @@ import pytest
 import typer
 from pathlib import Path
 
-from client import graphar_cli as cli
+from cli import graphar_cli
 
 
 @pytest.fixture
@@ -40,7 +40,7 @@ def test_show_file_not_found(tmp_path):
     # path that does not exist
     missing = tmp_path / "nope.yaml"
     with pytest.raises(typer.Exit):
-        cli.show(path=str(missing))
+        graphar_cli.show(path=str(missing))
 
 
 def test_show_edge_not_all_set(sample_cfg):
@@ -48,7 +48,7 @@ def test_show_edge_not_all_set(sample_cfg):
     cfg = sample_cfg
     # only provide edge_src, missing others
     with pytest.raises(typer.Exit):
-        cli.show(path=str(cfg), edge_src="s")
+        graphar_cli.show(path=str(cfg), edge_src="s")
 
 
 def test_show_graph_default(sample_cfg):
@@ -56,7 +56,7 @@ def test_show_graph_default(sample_cfg):
     cfg = sample_cfg
     # This should run without throwing exceptions
     try:
-        cli.show(path=str(cfg))
+        graphar_cli.show(path=str(cfg))
     except typer.Exit:
         # typer.Exit is expected when the command completes successfully
         pass
@@ -67,7 +67,7 @@ def test_check_success(sample_cfg):
     cfg = sample_cfg
     # This should run without throwing exceptions
     try:
-        cli.check(path=str(cfg))
+        graphar_cli.check(path=str(cfg))
     except typer.Exit:
         # typer.Exit is expected when the command completes successfully
         pass
@@ -77,4 +77,4 @@ def test_import_data_exception():
     """Test import_data command with a non-existent config file."""
     # Using a non-existent config file should raise an exception
     with pytest.raises(typer.Exit):
-        cli.import_data(config_file="non_existent_config.yaml")
+        graphar_cli.import_data(config_file="non_existent_config.yaml")

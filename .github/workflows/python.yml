@@ -22,7 +22,7 @@ on:
   # but only for the main branch
   push:
     branches:
-      - "**"
+      - "main"
     paths:
       - 'cpp/**'
       - 'python/**'
@@ -30,7 +30,7 @@ on:
       - '.github/workflows/python.yml'
   pull_request:
     branches:
-      - "**"
+      - "main"
     paths:
       - 'cpp/**'
       - 'python/**'
