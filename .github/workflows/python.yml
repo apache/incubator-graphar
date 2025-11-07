@@ -80,8 +80,7 @@ jobs:
     - name: Install Poetry
       working-directory: pyspark
       run: |
-        yes | sudo python3 -m pip install poetry --quiet
-        poetry env use python3
+        pip install poetry --quiet
 
     - name: Build Docs
       working-directory: python
