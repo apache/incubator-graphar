@@ -78,7 +78,7 @@ jobs:
         pip install ./ -v
 
     - name: Install Poetry
-      working-directory: pyspark
+      working-directory: python
       run: |
         pip install poetry --quiet
 
