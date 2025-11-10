@@ -55,7 +55,7 @@ jobs:
     - name: Install Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.13'
+        python-version: '3.10'
 
     - name: Install dependencies
       run: |
@@ -82,12 +82,6 @@ jobs:
       run: |
         pip install poetry --quiet
 
-    - name: Build Docs
-      working-directory: python
-      run: |
-        make install_docs
-        make docs
-
     - name: Run Cli Test
       working-directory: "python"
       run: |
@@ -107,6 +101,12 @@ jobs:
       uses: codecov/codecov-action@v4.0.1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Build Docs
+      working-directory: python
+      run: |
+        make install_docs
+        make docs
 
   macos:
     name: macos latest Python
