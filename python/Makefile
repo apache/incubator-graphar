@@ -17,7 +17,7 @@
 
 .PHONY: install_docs
 install_docs:
-		poetry install --with docs
+		poetry run pip install -e .
 
 .PHONY: docs
 docs:
