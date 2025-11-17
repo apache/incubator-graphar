@@ -38,6 +38,7 @@ public class TestUtil {
             System.getProperty("test.output.dir", "target/test-output") + "/";
 
     private static final String LDBC_SAMPLE_GRAPH_PATH = "/ldbc_sample/csv/ldbc_sample.graph.yml";
+    private static final String LDBC_GRAPH_PATH = "/ldbc/parquet/ldbc.graph.yml";
 
     public static String getTestData() {
         return GAR_TEST_DATA;
@@ -54,6 +55,14 @@ public class TestUtil {
 
     public static URI getLdbcSampleGraphURI() {
         return URI.create(getLdbcSampleGraphPath());
+    }
+
+    public static String getLdbcGraphPath() {
+        return getTestData() + "/" + LDBC_GRAPH_PATH;
+    }
+
+    public static URI getLdbcGraphURI() {
+        return URI.create(getLdbcGraphPath());
     }
 
     public static VertexInfo buildVertexInfoFromYaml(VertexYaml vertexYaml) {
