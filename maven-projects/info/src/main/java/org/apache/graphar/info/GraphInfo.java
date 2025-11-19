@@ -128,18 +128,21 @@ public class GraphInfo {
     }
 
     public void dump(URI storeUri, Writer output) {
+        isValidated();
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         GraphYaml graphYaml = new GraphYaml(storeUri, this);
         yaml.dump(graphYaml, output);
     }
 
     public String dump(URI storeUri) {
+        isValidated();
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         GraphYaml graphYaml = new GraphYaml(storeUri, this);
         return yaml.dump(graphYaml);
     }
 
     public String dump() {
+        isValidated();
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         GraphYaml graphYaml = new GraphYaml(this);
         return yaml.dump(graphYaml);
