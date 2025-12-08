@@ -22,6 +22,26 @@ repos:
       - id: gitleaks
         args:
         - '--verbose'
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.0
+    hooks:
+    - id: ruff-check
+      files: ^python/
+      args: [--output-format, github, --fix]
+    - id: ruff-format
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.38.1
+    hooks:
+    - id: typos
+      files: ^python/
+      args: [--force-exclude]
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: v21.1.2
+    hooks:
+    - id: clang-format
+      files: ^python/
+      types_or: [c++]
+      args: [--style=file, --verbose]
 
   - repo: local
     hooks:

@@ -45,8 +45,12 @@ else()
 endif()
 # Add a library using FindPython's tooling (pybind11 also provides a helper like
 # this)
-python_add_library(_core MODULE src/main.cc WITH_SOABI)
-
+python_add_library(_core MODULE src/bindings/types_binding.cc
+                                   src/bindings/cli_binding.cc
+                                   src/bindings/graph_info_binding.cc
+                                   src/bindings/high_level_binding.cc
+                                   src/bindings/_core_module.cc WITH_SOABI)
+                                   
 target_link_libraries(_core PRIVATE pybind11::headers graphar Arrow::arrow_shared
                                     Parquet::parquet_shared
                                     ArrowDataset::arrow_dataset_shared
@@ -60,6 +64,16 @@ target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cpp/thir
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
 # The install directory is the output (wheel) directory
-set_target_properties(_core PROPERTIES INSTALL_RPATH "$ORIGIN")
-install(TARGETS graphar DESTINATION graphar_cli)
-install(TARGETS _core DESTINATION graphar_cli)
+# Use platform-appropriate rpath so the Python extension can find the
+# packaged libgraphar at runtime inside the wheel.
+if(APPLE)
+  # macOS uses @loader_path to find libraries relative to the module
+  set_target_properties(_core PROPERTIES INSTALL_RPATH "@loader_path")
+else()
+  # On Linux and other Unix, use $ORIGIN (escaped so CMake preserves the $)
+  set_target_properties(_core PROPERTIES INSTALL_RPATH "\$ORIGIN")
+endif()
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/cli/ DESTINATION cli)
+install(TARGETS graphar DESTINATION graphar)
+install(TARGETS _core DESTINATION graphar)

@@ -1,0 +1,79 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+[build-system]
+requires = ["scikit-build-core>=0.3.3", "pybind11", "ninja ~= 1.11"]
+build-backend = "scikit_build_core.build"
+
+
+[project]
+name = "graphar"
+version = "0.13.0"
+description = "GraphAr command line tool"
+readme = "README.md"
+authors = [{ name = "GraphAr community", email = "dev@graphar.apache.org" }]
+requires-python = ">=3.9"
+dependencies = ["typer ~= 0.1", "pydantic ~= 2.0, < 2.12", "pyyaml ~= 6.0", "pytest ~= 7.2"]
+
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+pdoc = "*"
+
+[project.optional-dependencies]
+test = ["pandas ~= 2.0", "typing_extensions ~= 4.0"]
+
+[tool.scikit-build]
+build-dir = "build"
+
+[project.scripts]
+graphar = "cli.graphar_cli:main"
+
+[tool.ruff]
+src = ["src"]
+line-length = 100
+
+
+[tool.ruff.lint]
+extend-select = [
+  "B",   # flake8-bugbear
+  "I",   # isort
+  "ARG", # flake8-unused-arguments
+  "C4",  # flake8-comprehensions
+  "EM",  # flake8-errmsg
+  "ICN", # flake8-import-conventions
+  "G",   # flake8-logging-format
+  "PGH", # pygrep-hooks
+  "PIE", # flake8-pie
+  "PL",  # pylint
+  "PT",  # flake8-pytest-style
+  "PTH", # flake8-use-pathlib
+  "RET", # flake8-return
+  "RUF", # Ruff-specific
+  "SIM", # flake8-simplify
+  "T20", # flake8-print
+  "UP",  # pyupgrade
+  "YTT", # flake8-2020
+  "EXE", # flake8-executable
+  "NPY", # NumPy specific rules
+  "PD",  # pandas-vet
+]
+ignore = [
+  "PLR09",   # Too many X
+  "PLR2004", # Magic comparison
+]

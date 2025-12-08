@@ -67,13 +67,13 @@ public class VersionInfo {
 
     /** Check if type is supported by version. */
     public boolean checkType(final String typeStr) {
-        if (version2types == null || !version2types.containsKey(version)) {
-            return false;
-        }
+        // Check built-in types first if version is supported
         List<String> types = version2types.get(version);
-        if (types.contains(typeStr)) {
+        if (types != null && types.contains(typeStr)) {
             return true;
         }
-        return userDefinedTypes != null && userDefinedTypes.contains(typeStr);
+
+        // Check user-defined types
+        return userDefinedTypes.contains(typeStr);
     }
 }

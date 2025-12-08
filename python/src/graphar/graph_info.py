@@ -15,36 +15,4 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Enhancement Request
-description: Request an enhancement to the project
-labels: ["enhancement"]
-assignees: []
-body:
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for taking the time to share your feedback on ways Apache GraphAr (incubating) can be improved!
-  - type: textarea
-    id: description
-    attributes:
-      label: Describe the enhancement requested
-    validations:
-      required: true
-  - type: dropdown
-    id: component
-    attributes:
-      label: Component(s)
-      multiple: true
-      options:
-        - Format
-        - C++
-        - Java
-        - Spark
-        - PySpark
-        - Python
-        - Continuous Integration
-        - Developer Tools
-        - Documentation
-        - Other
-    validations:
-      required: true
+from ._core import DataType, Property, PropertyGroup, AdjacentList, VertexInfo, EdgeInfo, GraphInfo

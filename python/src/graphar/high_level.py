@@ -15,10 +15,15 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from __future__ import annotations
-
-import graphar_cli as m
-
-
-def test_version():
-    assert m.__version__ == "0.0.1"
+from ._core import (
+    Vertex,
+    Edge,
+    VertexIter,
+    VerticesCollection,
+    EdgeIter,
+    EdgesCollection,
+    BuilderVertex,
+    VerticesBuilder,
+    BuilderEdge,
+    EdgesBuilder,
+)
