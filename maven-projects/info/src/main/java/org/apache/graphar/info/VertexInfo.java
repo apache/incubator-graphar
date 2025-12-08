@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import org.apache.graphar.info.type.Cardinality;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.GraphYaml;
 import org.apache.graphar.info.yaml.VertexYaml;
@@ -186,6 +187,10 @@ public class VertexInfo {
         return propertyGroups.getPropertyGroupNum();
     }
 
+    public Cardinality getCardinality(String propertyName) {
+        return propertyGroups.getCardinality(propertyName);
+    }
+
     public DataType getPropertyType(String propertyName) {
         return propertyGroups.getPropertyType(propertyName);
     }
@@ -225,12 +230,18 @@ public class VertexInfo {
     }
 
     public void dump(Writer output) {
+        if (!isValidated()) {
+            throw new IllegalStateException("VertexInfo is not valid and cannot be dumped.");
+        }
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         VertexYaml vertexYaml = new VertexYaml(this);
         yaml.dump(vertexYaml, output);
     }
 
     public String dump() {
+        if (!isValidated()) {
+            throw new IllegalStateException("VertexInfo is not valid and cannot be dumped.");
+        }
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         VertexYaml vertexYaml = new VertexYaml(this);
         return yaml.dump(vertexYaml);

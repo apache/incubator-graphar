@@ -19,27 +19,44 @@
 
 package org.apache.graphar.info;
 
+import org.apache.graphar.info.type.Cardinality;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.yaml.PropertyYaml;
 
 public class Property {
     private final String name;
     private final DataType dataType;
+    private final Cardinality cardinality;
     private final boolean primary;
     private final boolean nullable;
 
     public Property(String name, DataType dataType, boolean primary, boolean nullable) {
+        this(name, dataType, Cardinality.SINGLE, primary, nullable);
+    }
+
+    public Property(
+            String name,
+            DataType dataType,
+            Cardinality cardinality,
+            boolean primary,
+            boolean nullable) {
         this.name = name;
         this.dataType = dataType;
+        this.cardinality = cardinality;
         this.primary = primary;
         this.nullable = nullable;
     }
 
-    Property(PropertyYaml yamlParser) {
+    public Property(PropertyYaml yamlParser) {
         this.name = yamlParser.getName();
         this.dataType = DataType.fromString(yamlParser.getData_type());
         this.primary = yamlParser.getIs_primary();
         this.nullable = yamlParser.getIs_nullable();
+        Cardinality cardinality = Cardinality.SINGLE;
+        if (yamlParser.getCardinality() != null && !yamlParser.getCardinality().isEmpty()) {
+            cardinality = Cardinality.fromString(yamlParser.getCardinality());
+        }
+        this.cardinality = cardinality;
     }
 
     public String getName() {
@@ -56,5 +73,9 @@ public class Property {
 
     public boolean isNullable() {
         return nullable;
+    }
+
+    public Cardinality getCardinality() {
+        return cardinality;
     }
 }
