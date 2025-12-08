@@ -50,6 +50,7 @@ public class VertexYaml {
                 vertexInfo.getPropertyGroups().stream()
                         .map(PropertyGroupYaml::new)
                         .collect(Collectors.toList());
+        this.labels = vertexInfo.getLabels();
         this.prefix = vertexInfo.getPrefix();
         this.version =
                 Optional.of(vertexInfo)
@@ -86,6 +87,9 @@ public class VertexYaml {
         if (labels == null) {
             return null;
         }
+        // Returns the labels list, or null if the list is null or empty. Returning null for empty
+        // lists ensures that the labels field is omitted from YAML output when no labels are
+        // defined.
         return labels.isEmpty() ? null : labels;
     }
 

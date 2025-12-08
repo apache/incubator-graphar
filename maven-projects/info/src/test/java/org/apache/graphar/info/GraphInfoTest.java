@@ -116,6 +116,7 @@ public class GraphInfoTest {
     public void testPersonVertexInfoBasics() {
         VertexInfo personVertexInfo = graphInfo.getVertexInfos().get(0);
         Assert.assertEquals("person", personVertexInfo.getType());
+        Assert.assertTrue(personVertexInfo.getLabels().isEmpty());
         Assert.assertEquals(100, personVertexInfo.getChunkSize());
         Assert.assertEquals("vertex/person/", personVertexInfo.getPrefix());
         Assert.assertEquals(URI.create("vertex/person/"), personVertexInfo.getBaseUri());

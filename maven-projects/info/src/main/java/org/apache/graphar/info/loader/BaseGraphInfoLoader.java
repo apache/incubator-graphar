@@ -76,6 +76,7 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
                 vertexYaml.getProperty_groups().stream()
                         .map(PropertyGroupYaml::toPropertyGroup)
                         .collect(Collectors.toList()),
+                vertexYaml.getLabels(),
                 vertexYaml.getPrefix(),
                 vertexYaml.getVersion());
     }
