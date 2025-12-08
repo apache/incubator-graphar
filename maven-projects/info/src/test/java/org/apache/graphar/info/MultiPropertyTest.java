@@ -188,7 +188,7 @@ public class MultiPropertyTest extends BaseFileSystemTest {
         Property weights =
                 TestDataFactory.createProperty(
                         "weights", DataType.DOUBLE, Cardinality.LIST, false, true);
-        PropertyGroup weights_pg =
+        PropertyGroup weightsPg =
                 TestDataFactory.createPropertyGroup(
                         Arrays.asList(weights), FileType.CSV, "weights/");
         AdjacentList orderedBySource =
@@ -206,7 +206,7 @@ public class MultiPropertyTest extends BaseFileSystemTest {
                         .prefix("edge/person_knows_person/")
                         .version("gar/v1")
                         .addAdjacentList(orderedBySource)
-                        .addPropertyGroups(List.of(weights_pg))
+                        .addPropertyGroups(List.of(weightsPg))
                         .build();
         Assert.assertFalse(knowsEdgeInfo.isValidated());
     }
