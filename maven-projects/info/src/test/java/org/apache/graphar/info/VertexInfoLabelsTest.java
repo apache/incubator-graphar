@@ -94,8 +94,7 @@ public class VertexInfoLabelsTest extends BaseFileSystemTest {
         graphInfoSaver.save(URI.create(testSaveDirectory), vertexInfo);
         // test load
         VertexInfo loadedVertexInfo =
-                graphInfoLoader.loadVertexInfo(
-                        URI.create(testSaveDirectory + "person.vertex.yaml"));
+                graphInfoLoader.loadVertexInfo(URI.create(testSaveDirectory + "person.vertex.yml"));
         Assert.assertTrue(TestVerificationUtils.equalsVertexInfo(vertexInfo, loadedVertexInfo));
     }
 
@@ -128,8 +127,7 @@ public class VertexInfoLabelsTest extends BaseFileSystemTest {
         graphInfoSaver.save(URI.create(testSaveDirectory), vertexInfo);
         // test load
         VertexInfo loadedVertexInfo =
-                graphInfoLoader.loadVertexInfo(
-                        URI.create(testSaveDirectory + "person.vertex.yaml"));
+                graphInfoLoader.loadVertexInfo(URI.create(testSaveDirectory + "person.vertex.yml"));
         Assert.assertTrue(TestVerificationUtils.equalsVertexInfo(vertexInfo, loadedVertexInfo));
     }
 
@@ -158,12 +156,12 @@ public class VertexInfoLabelsTest extends BaseFileSystemTest {
         Assert.assertEquals("vertex/person/", vertexInfo.getPrefix());
 
         // Test validation
-        Assert.assertTrue(vertexInfo.isValidated()); // Test dump
+        Assert.assertTrue(vertexInfo.isValidated());
+        // Test dump
         graphInfoSaver.save(URI.create(testSaveDirectory), vertexInfo);
         // test load
         VertexInfo loadedVertexInfo =
-                graphInfoLoader.loadVertexInfo(
-                        URI.create(testSaveDirectory + "person.vertex.yaml"));
+                graphInfoLoader.loadVertexInfo(URI.create(testSaveDirectory + "person.vertex.yml"));
         Assert.assertTrue(TestVerificationUtils.equalsVertexInfo(vertexInfo, loadedVertexInfo));
     }
 
