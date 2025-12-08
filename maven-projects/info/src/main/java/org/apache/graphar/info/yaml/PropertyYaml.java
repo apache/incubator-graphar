@@ -35,7 +35,7 @@ public class PropertyYaml {
         this.data_type = "";
         this.is_primary = false;
         this.is_nullable = Optional.empty();
-        this.cardinality = "single"; // Default to single
+        this.cardinality = null;
     }
 
     public PropertyYaml(Property property) {
