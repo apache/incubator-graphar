@@ -299,7 +299,7 @@ public class MultiPropertyTest extends BaseFileSystemTest {
                         "gar/v1");
 
         // Check that the generated YAML files contain cardinality information
-        String graphYamlFilePath = testSaveDirectory + "/test_graph.graph.yaml";
+        String graphYamlFilePath = testSaveDirectory + "/test_graph.graph.yml";
 
         // Save GraphInfo to YAML files
         graphInfoSaver.save(URI.create(testSaveDirectory), graphInfo);
