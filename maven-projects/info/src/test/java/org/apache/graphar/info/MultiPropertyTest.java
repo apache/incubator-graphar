@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.loader.impl.LocalFileSystemStringGraphInfoLoader;
 import org.apache.graphar.info.saver.GraphInfoSaver;
@@ -329,32 +328,25 @@ public class MultiPropertyTest extends BaseFileSystemTest {
         Property id = new Property("id", DataType.INT64, true, false);
         PropertyGroup properties = new PropertyGroup(List.of(id), FileType.PARQUET, "id/");
         VertexInfo vertexInfo =
-                new VertexInfo(
-                        "person", 100, List.of(properties), "vertex/person/", "gar/v1");
+                new VertexInfo("person", 100, List.of(properties), "vertex/person/", "gar/v1");
         String dump = vertexInfo.dump();
         Assert.assertFalse(dump.contains("cardinality:"));
 
         id = new Property("id", DataType.INT64, Cardinality.SINGLE, true, false);
         properties = new PropertyGroup(List.of(id), FileType.PARQUET, "id/");
-        vertexInfo =
-                new VertexInfo(
-                        "person", 100, List.of(properties), "vertex/person/", "gar/v1");
+        vertexInfo = new VertexInfo("person", 100, List.of(properties), "vertex/person/", "gar/v1");
         dump = vertexInfo.dump();
         Assert.assertFalse(dump.contains("cardinality:"));
 
         id = new Property("id", DataType.INT64, Cardinality.LIST, true, false);
         properties = new PropertyGroup(List.of(id), FileType.PARQUET, "id/");
-        vertexInfo =
-                new VertexInfo(
-                        "person", 100, List.of(properties), "vertex/person/", "gar/v1");
+        vertexInfo = new VertexInfo("person", 100, List.of(properties), "vertex/person/", "gar/v1");
         dump = vertexInfo.dump();
         Assert.assertTrue(dump.contains("cardinality: list"));
 
         id = new Property("id", DataType.INT64, Cardinality.SET, true, false);
         properties = new PropertyGroup(List.of(id), FileType.PARQUET, "id/");
-        vertexInfo =
-                new VertexInfo(
-                        "person", 100, List.of(properties), "vertex/person/", "gar/v1");
+        vertexInfo = new VertexInfo("person", 100, List.of(properties), "vertex/person/", "gar/v1");
         dump = vertexInfo.dump();
         Assert.assertTrue(dump.contains("cardinality: set"));
     }
