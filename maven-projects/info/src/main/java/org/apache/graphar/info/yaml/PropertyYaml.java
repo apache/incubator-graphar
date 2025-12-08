@@ -20,6 +20,7 @@
 package org.apache.graphar.info.yaml;
 
 import java.util.Optional;
+
 import org.apache.graphar.info.Property;
 import org.apache.graphar.info.type.Cardinality;
 
@@ -35,7 +36,7 @@ public class PropertyYaml {
         this.data_type = "";
         this.is_primary = false;
         this.is_nullable = Optional.empty();
-        this.cardinality = "single"; // Default to single
+        this.cardinality = null;
     }
 
     public PropertyYaml(Property property) {
@@ -43,7 +44,7 @@ public class PropertyYaml {
         this.data_type = property.getDataType().toString();
         this.is_primary = property.isPrimary();
         this.is_nullable = Optional.of(property.isNullable());
-        this.cardinality = property.getCardinality().toString();
+        this.cardinality = property.getCardinality() == Cardinality.SINGLE ? null : property.getCardinality().toString();
     }
 
     Property toProperty() {

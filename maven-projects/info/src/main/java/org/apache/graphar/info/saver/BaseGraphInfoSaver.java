@@ -35,7 +35,7 @@ public abstract class BaseGraphInfoSaver implements GraphInfoSaver {
         // if graphInfoUri is a directory then save to ${graphInfo.name}.graph.yml
         if (graphInfoUri.getPath().endsWith("/")) {
             graphInfoUri =
-                    URI.create(graphInfoUri.toString() + graphInfo.getName() + ".graph.yaml");
+                    URI.create(graphInfoUri.toString() + graphInfo.getName() + ".graph.yml");
         }
         Writer writer = writeYaml(graphInfoUri);
         graphInfo.dump(graphInfoUri, writer);
@@ -56,7 +56,7 @@ public abstract class BaseGraphInfoSaver implements GraphInfoSaver {
         // if vertexInfoUri is a directory then save to ${vertexInfo.type}.vertex.yml
         if (vertexInfoUri.getPath().endsWith("/")) {
             vertexInfoUri =
-                    URI.create(vertexInfoUri.toString() + vertexInfo.getType() + ".vertex.yaml");
+                    URI.create(vertexInfoUri.toString() + vertexInfo.getType() + ".vertex.yml");
         }
         Writer vertexWriter = writeYaml(vertexInfoUri);
         vertexInfo.dump(vertexWriter);
@@ -67,7 +67,7 @@ public abstract class BaseGraphInfoSaver implements GraphInfoSaver {
     public void save(URI edgeInfoUri, EdgeInfo edgeInfo) throws IOException {
         // if edgeInfoUri is a directory then save to ${edgeInfo.getConcat()}.edge.yml
         if (edgeInfoUri.getPath().endsWith("/")) {
-            edgeInfoUri = URI.create(edgeInfoUri.toString() + edgeInfo.getConcat() + ".edge.yaml");
+            edgeInfoUri = URI.create(edgeInfoUri.toString() + edgeInfo.getConcat() + ".edge.yml");
         }
         Writer edgeWriter = writeYaml(edgeInfoUri);
         edgeInfo.dump(edgeWriter);

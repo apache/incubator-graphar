@@ -28,6 +28,7 @@ public enum Cardinality {
     /** Set of values property (no duplicates) */
     SET;
 
+    @Override
     public String toString() {
         switch (this) {
             case SINGLE:

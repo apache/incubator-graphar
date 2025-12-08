@@ -497,14 +497,18 @@ public class EdgeInfo {
     }
 
     public void dump(Writer output) {
-        isValidated();
+        if (!isValidated()) {
+            throw new IllegalStateException("EdgeInfo is not valid and cannot be dumped.");
+        }
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         EdgeYaml edgeYaml = new EdgeYaml(this);
         yaml.dump(edgeYaml, output);
     }
 
     public String dump() {
-        isValidated();
+        if (!isValidated()) {
+            throw new IllegalStateException("EdgeInfo is not valid and cannot be dumped.");
+        }
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         EdgeYaml edgeYaml = new EdgeYaml(this);
         return yaml.dump(edgeYaml);
