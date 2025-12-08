@@ -391,6 +391,10 @@ public class TestVerificationUtils {
                 "Property nullable flag mismatch", expected.isNullable(), actual.isNullable());
         Assert.assertEquals(
                 "Property data type mismatch", expected.getDataType(), actual.getDataType());
+        Assert.assertEquals(
+                "Property cardinality mismatch",
+                expected.getCardinality(),
+                actual.getCardinality());
         return true;
     }
 
