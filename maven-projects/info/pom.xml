@@ -92,11 +92,6 @@
                 <version>${spotless-maven-plugin.version}</version>
                 <configuration>
                     <java>
-                        <!--<includes>
-                            <include>
-                                src/test/java/org/apache/graphar/info/GraphInfoTest.java
-                            </include>
-                        </includes>-->
                         <googleJavaFormat>
                             <version>1.7</version>
                             <style>AOSP</style>
