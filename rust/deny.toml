@@ -1,0 +1,38 @@
+[graph]
+all-features = true
+
+[output]
+feature-depth = 1
+
+[advisories]
+git-fetch-with-cli = true
+unmaintained = "workspace"
+
+[licenses]
+allow = [
+    "MIT",
+    "Apache-2.0",
+    "Zlib",
+    "BSL-1.0",
+    "ISC",
+    "CC0-1.0",
+    "Unicode-3.0",
+]
+confidence-threshold = 0.8
+
+[licenses.private]
+ignore = false
+
+[bans]
+highlight = "all"
+multiple-versions = "warn"
+wildcards = "deny"
+
+[bans.workspace-dependencies]
+duplicates = "deny"
+unused = "deny"
+
+[sources]
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+unknown-git = "deny"
+unknown-registry = "deny"

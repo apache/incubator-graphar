@@ -5,7 +5,7 @@ pub(crate) mod graphar {
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    #[repr(i32)]
+    #[repr(u32)]
     enum Type {
         #[cxx_name = "BOOL"]
         Bool = 0,
