@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.loader.impl.LocalFileSystemStreamGraphInfoLoader;
 import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.Cardinality;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
 import org.junit.AfterClass;
@@ -115,6 +116,7 @@ public class GraphInfoTest {
     public void testPersonVertexInfoBasics() {
         VertexInfo personVertexInfo = graphInfo.getVertexInfos().get(0);
         Assert.assertEquals("person", personVertexInfo.getType());
+        Assert.assertTrue(personVertexInfo.getLabels().isEmpty());
         Assert.assertEquals(100, personVertexInfo.getChunkSize());
         Assert.assertEquals("vertex/person/", personVertexInfo.getPrefix());
         Assert.assertEquals(URI.create("vertex/person/"), personVertexInfo.getBaseUri());
@@ -169,6 +171,8 @@ public class GraphInfoTest {
         Assert.assertEquals("id", idProperty.getName());
         Assert.assertEquals(DataType.INT64, idProperty.getDataType());
         Assert.assertEquals(DataType.INT64, personVertexInfo.getPropertyType("id"));
+        Assert.assertEquals(Cardinality.SINGLE, idProperty.getCardinality());
+        Assert.assertEquals(Cardinality.SINGLE, personVertexInfo.getCardinality("id"));
         Assert.assertTrue(idProperty.isPrimary());
         Assert.assertTrue(personVertexInfo.isPrimaryKey("id"));
         Assert.assertFalse(idProperty.isNullable());
@@ -196,18 +200,21 @@ public class GraphInfoTest {
         Assert.assertTrue(personVertexInfo.hasProperty("firstName"));
         Assert.assertEquals("firstName", firstNameProperty.getName());
         Assert.assertEquals(DataType.STRING, firstNameProperty.getDataType());
+        Assert.assertEquals(Cardinality.SINGLE, firstNameProperty.getCardinality());
         Assert.assertFalse(firstNameProperty.isPrimary());
         Assert.assertTrue(firstNameProperty.isNullable());
         Property lastNameProperty = firstName_lastName_gender.getPropertyList().get(1);
         Assert.assertTrue(personVertexInfo.hasProperty("lastName"));
         Assert.assertEquals("lastName", lastNameProperty.getName());
         Assert.assertEquals(DataType.STRING, lastNameProperty.getDataType());
+        Assert.assertEquals(Cardinality.SINGLE, lastNameProperty.getCardinality());
         Assert.assertFalse(lastNameProperty.isPrimary());
         Assert.assertTrue(lastNameProperty.isNullable());
         Property genderProperty = firstName_lastName_gender.getPropertyList().get(2);
         Assert.assertTrue(personVertexInfo.hasProperty("gender"));
         Assert.assertEquals("gender", genderProperty.getName());
         Assert.assertEquals(DataType.STRING, genderProperty.getDataType());
+        Assert.assertEquals(Cardinality.SINGLE, genderProperty.getCardinality());
         Assert.assertFalse(genderProperty.isPrimary());
         Assert.assertTrue(genderProperty.isNullable());
     }
@@ -351,6 +358,7 @@ public class GraphInfoTest {
         Assert.assertEquals("creationDate", property.getName());
         Assert.assertEquals(DataType.STRING, property.getDataType());
         Assert.assertEquals(DataType.STRING, knowsEdgeInfo.getPropertyType("creationDate"));
+        Assert.assertEquals(Cardinality.SINGLE, property.getCardinality());
         Assert.assertFalse(property.isPrimary());
         Assert.assertFalse(knowsEdgeInfo.isPrimaryKey("creationDate"));
         Assert.assertTrue(property.isNullable());

@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.graphar.info.type.Cardinality;
 import org.apache.graphar.info.type.DataType;
 import org.apache.graphar.info.type.FileType;
 import org.apache.graphar.util.GeneralParams;
@@ -137,6 +138,9 @@ public class PropertyGroup implements Iterable<Property> {
             if (property.getDataType() == DataType.LIST && fileType == FileType.CSV) {
                 return false;
             }
+            if (property.getCardinality() != Cardinality.SINGLE && fileType == FileType.CSV) {
+                return false;
+            }
         }
 
         return true;
@@ -214,6 +218,11 @@ class PropertyGroups {
 
     int getPropertyGroupNum() {
         return propertyGroupList.size();
+    }
+
+    public Cardinality getCardinality(String propertyName) {
+        checkPropertyExist(propertyName);
+        return properties.get(propertyName).getCardinality();
     }
 
     DataType getPropertyType(String propertyName) {

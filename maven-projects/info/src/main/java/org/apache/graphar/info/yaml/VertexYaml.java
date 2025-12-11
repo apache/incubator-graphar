@@ -30,6 +30,7 @@ public class VertexYaml {
     private String type;
     private long chunk_size;
     private List<PropertyGroupYaml> property_groups;
+    private List<String> labels;
     private String prefix;
     private String version;
 
@@ -37,6 +38,7 @@ public class VertexYaml {
         this.type = "";
         this.chunk_size = 0;
         this.property_groups = new ArrayList<>();
+        this.labels = null;
         this.prefix = "";
         this.version = "";
     }
@@ -48,6 +50,7 @@ public class VertexYaml {
                 vertexInfo.getPropertyGroups().stream()
                         .map(PropertyGroupYaml::new)
                         .collect(Collectors.toList());
+        this.labels = vertexInfo.getLabels();
         this.prefix = vertexInfo.getPrefix();
         this.version =
                 Optional.of(vertexInfo)
@@ -78,6 +81,20 @@ public class VertexYaml {
 
     public void setProperty_groups(List<PropertyGroupYaml> property_groups) {
         this.property_groups = property_groups;
+    }
+
+    public List<String> getLabels() {
+        if (labels == null) {
+            return null;
+        }
+        // Returns the labels list, or null if the list is null or empty. Returning null for empty
+        // lists ensures that the labels field is omitted from YAML output when no labels are
+        // defined.
+        return labels.isEmpty() ? null : labels;
+    }
+
+    public void setLabels(List<String> labels) {
+        this.labels = labels;
     }
 
     public String getPrefix() {

@@ -234,6 +234,8 @@ public class TestVerificationUtils {
             return false;
         }
 
+        Assert.assertEquals("VertexInfo labels mismatch", expected.getLabels(), actual.getLabels());
+
         Assert.assertEquals("VertexInfo type mismatch", expected.getType(), actual.getType());
         Assert.assertEquals(
                 "VertexInfo chunk size mismatch", expected.getChunkSize(), actual.getChunkSize());
@@ -389,6 +391,10 @@ public class TestVerificationUtils {
                 "Property nullable flag mismatch", expected.isNullable(), actual.isNullable());
         Assert.assertEquals(
                 "Property data type mismatch", expected.getDataType(), actual.getDataType());
+        Assert.assertEquals(
+                "Property cardinality mismatch",
+                expected.getCardinality(),
+                actual.getCardinality());
         return true;
     }
 

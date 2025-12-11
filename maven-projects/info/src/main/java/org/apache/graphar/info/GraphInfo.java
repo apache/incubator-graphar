@@ -128,18 +128,27 @@ public class GraphInfo {
     }
 
     public void dump(URI storeUri, Writer output) {
+        if (!isValidated()) {
+            throw new IllegalStateException("GraphInfo is not valid and cannot be dumped.");
+        }
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         GraphYaml graphYaml = new GraphYaml(storeUri, this);
         yaml.dump(graphYaml, output);
     }
 
     public String dump(URI storeUri) {
+        if (!isValidated()) {
+            throw new IllegalStateException("GraphInfo is not valid and cannot be dumped.");
+        }
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         GraphYaml graphYaml = new GraphYaml(storeUri, this);
         return yaml.dump(graphYaml);
     }
 
     public String dump() {
+        if (!isValidated()) {
+            throw new IllegalStateException("GraphInfo is not valid and cannot be dumped.");
+        }
         Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         GraphYaml graphYaml = new GraphYaml(this);
         return yaml.dump(graphYaml);
