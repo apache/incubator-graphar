@@ -16,3 +16,8 @@
 // under the License.
 
 #include "graphar_rs.h"
+namespace graphar_rs {
+
+int64_t foo(int64_t x, int64_t y) { return x + y; }
+
+} // namespace graphar_rs

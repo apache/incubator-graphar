@@ -18,114 +18,122 @@
 name: GraphAr Rust CI
 
 on:
-    push:
-        branches:
-            - "main"
-        paths:
-            - "rust/**"
-            - ".github/workflows/rust.yaml"
-    pull_request:
-        branches:
-            - "main"
-        paths:
-            - "rust/**"
-            - ".github/workflows/rust.yaml"
+  push:
+    branches:
+      - "main"
+    paths:
+      - "rust/**"
+      - "cpp/**"
+      - ".github/workflows/rust.yaml"
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - "rust/**"
+      - "cpp/**"
+      - ".github/workflows/rust.yaml"
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
-    RUSTFLAGS: -Dwarnings
-    RUST_BACKTRACE: 1
-    CI: true
+  RUSTFLAGS: -Dwarnings
+  RUST_BACKTRACE: 1
+  CI: true
 
 defaults:
-    run:
-        shell: bash
+  run:
+    shell: bash
 
 jobs:
-    ubuntu:
-        name: Ubuntu latest Rust
-        runs-on: ubuntu-latest
-        # run on draft
-        if: ${{ github.event_name != 'pull_request' || !contains(github.event.pull_request.title, 'WIP') }}
-        env:
-            GAR_TEST_DATA: ${{ github.workspace }}/testing/
-        defaults:
-            run:
-                working-directory: "rust"
-        steps:
-            - uses: actions/checkout@v4
-              with:
-                  submodules: true
+  ubuntu:
+    name: Ubuntu latest Rust
+    runs-on: ubuntu-24.04
+    # run on draft
+    if: ${{ github.event_name != 'pull_request' || !contains(github.event.pull_request.title, 'WIP') }}
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/testing/
+    defaults:
+      run:
+        working-directory: "rust"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
 
-            - uses: actions-rust-lang/setup-rust-toolchain@v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          components: rustfmt, clippy
 
-            - uses: taiki-e/install-action@v2
-              with:
-                  tool: cargo-nextest@0.9.88,taplo-cli@0.9.3,cargo-machete,cargo-llvm-cov
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "rust -> target"
 
-            - name: Install dependencies
-              run: |
-                  wget -c https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
-                    -P /tmp/
-                  sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
-                  sudo apt-get update -y
-                  sudo apt install -y libarrow-dev \
-                                    libarrow-dataset-dev \
-                                    libarrow-acero-dev \
-                                    libparquet-dev
-                  sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen lcov cmake
+      - uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest@0.9.114,taplo-cli@0.10.0,cargo-machete@0.9.1,cargo-llvm-cov@0.6.21
 
-            - name: Spell Check
-              uses: crate-ci/typos@v1.29.4
-              with:
-                  files: rust/
-              timeout-minutes: 10
+      - name: Install dependencies
+        run: |
+          wget -c https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
+            -P /tmp/
+          sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
+          sudo apt-get update -y
+          sudo apt install -y libarrow-dev=22.0.0-1 \
+                            libarrow-dataset-dev=22.0.0-1 \
+                            libarrow-acero-dev=22.0.0-1 \
+                            libparquet-dev=22.0.0-1
+          sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen lcov cmake
 
-            - name: TOML Check
-              run: taplo fmt --check --diff
-              timeout-minutes: 10
+      - name: Spell Check
+        uses: crate-ci/typos@v1.29.4
+        with:
+          files: rust/
+        timeout-minutes: 10
 
-            - name: Clippy Check
-              run: cargo clippy --tests --no-deps
-              timeout-minutes: 10
+      - name: TOML Check
+        run: taplo fmt --check --diff
+        timeout-minutes: 10
 
-            - name: Machete Check
-              run: cargo machete
-              timeout-minutes: 10
+      - name: Rustfmt Check
+        run: cargo fmt --all --check
+        timeout-minutes: 10
 
-            - name: Deny Check
-              uses: EmbarkStudios/cargo-deny-action@v2
-              with:
-                  manifest-path: rust/Cargo.toml
-              timeout-minutes: 10
+      - name: Clippy Check
+        run: cargo clippy --tests --no-deps
+        timeout-minutes: 10
 
-            - uses: Swatinem/rust-cache@v2
-              with:
-                  workspaces: "rust -> target"
+      - name: Machete Check
+        run: cargo machete
+        timeout-minutes: 10
 
-            - name: Build
-              run: cargo build
-              timeout-minutes: 30
+      - name: Deny Check
+        uses: EmbarkStudios/cargo-deny-action@v2
+        with:
+          manifest-path: rust/Cargo.toml
+        timeout-minutes: 10
 
-            - name: Test
-              run: |
-                  cargo nextest run
-                  cargo test --doc
-              timeout-minutes: 30
+      - name: Build
+        run: cargo build
+        timeout-minutes: 30
 
-            - name: Build Docs
-              run: cargo doc --lib --no-deps
-              timeout-minutes: 30
+      - name: Test
+        run: |
+          cargo nextest run
+          cargo test --doc
+        timeout-minutes: 30
 
-            - name: Generate code coverage
-              run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+      - name: Build Docs
+        run: cargo doc --lib --no-deps
+        timeout-minutes: 30
 
-            - name: Upload coverage to Codecov
-              uses: codecov/codecov-action@v5
-              with:
-                  token: ${{ secrets.CODECOV_TOKEN }} # required for private repos or protected branches
-                  files: lcov.info
-                  fail_ci_if_error: true
+      - name: Generate code coverage
+        run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # required for private repos or protected branches
+          files: lcov.info
+          fail_ci_if_error: true

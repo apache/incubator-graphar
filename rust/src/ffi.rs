@@ -17,7 +17,21 @@
 
 #[cxx::bridge(namespace = "graphar")]
 pub(crate) mod graphar {
-    extern "C++" {
+    unsafe extern "C++" {
         include!("graphar_rs.h");
+
+        #[allow(unused)]
+        #[namespace = "graphar_rs"]
+        fn foo(x: i64, y: i64) -> i64;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_foo() {
+        assert_eq!(graphar::foo(1, 2), 3);
     }
 }

@@ -17,5 +17,7 @@
 
 #pragma once
 
-// Placeholder header for future GraphAr Rust bindings.
-namespace graphar_rs {}  // namespace graphar_rs
+#include <cstdint>
+namespace graphar_rs {
+int64_t foo(int64_t x, int64_t y);
+} // namespace graphar_rs
