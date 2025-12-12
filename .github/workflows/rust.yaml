@@ -62,17 +62,34 @@ jobs:
         with:
           submodules: true
 
-      - uses: actions-rust-lang/setup-rust-toolchain@v1
-        with:
-          components: rustfmt, clippy
-
       - uses: Swatinem/rust-cache@v2
         with:
           workspaces: "rust -> target"
 
-      - uses: taiki-e/install-action@v2
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@v2
         with:
-          tool: cargo-nextest@0.9.114,taplo-cli@0.10.0,cargo-machete@0.9.1,cargo-llvm-cov@0.6.21
+          tool: cargo-nextest@0.9.114
+          
+      - name: Install cargo-machete
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-machete@0.9.1,cargo-llvm-cov@0.6.21
+
+      - name: Install taplo-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: taplo-cli@0.10.0
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov@0.6.21
+
+      - name: Install cargo-deny
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny@0.18.9
 
       - name: Install dependencies
         run: |
@@ -109,10 +126,7 @@ jobs:
         timeout-minutes: 10
 
       - name: Deny Check
-        uses: EmbarkStudios/cargo-deny-action@v2
-        with:
-          manifest-path: rust/Cargo.toml
-        timeout-minutes: 10
+        run: cargo deny check
 
       - name: Build
         run: cargo build
