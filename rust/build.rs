@@ -35,6 +35,7 @@ fn build_ffi(bridge_file: &str, out_name: &str, source_file: &str, include_paths
     build.file(source_file);
 
     build.includes(include_paths);
+    // TODO support MSVC
     build.flag("-std=c++17");
     build.flag("-fdiagnostics-color=always");
 
