@@ -203,7 +203,7 @@ public class GraphInfo {
 
     public Optional<GraphInfo> removeEdge(EdgeInfo edgeInfo) {
         if (edgeInfo == null
-                || hasEdgeInfo(
+                || !hasEdgeInfo(
                         edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
             return Optional.empty();
         }

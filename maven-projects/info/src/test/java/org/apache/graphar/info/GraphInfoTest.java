@@ -113,15 +113,39 @@ public class GraphInfoTest {
         // list checks)
         VertexInfo testingVertexInfo =
                 new VertexInfo("", 100, Arrays.asList(TestUtil.pg1), "vertex/person/", "gar/v1");
-        GraphInfo testingGraphInfo =
-                new GraphInfo("graphTest", new ArrayList<>(), new ArrayList<>(), "", "");
+        GraphInfo testingVertexGraphInfo =
+                new GraphInfo("graphVertexTest", new ArrayList<>(), new ArrayList<>(), "", "");
         // add the created vertex on an empty graph
         Assert.assertEquals(
                 1,
-                testingGraphInfo.addVertexAsNew(testingVertexInfo).get().getVertexInfos().size());
+                testingVertexGraphInfo
+                        .addVertexAsNew(testingVertexInfo)
+                        .get()
+                        .getVertexInfos()
+                        .size());
         // remove the newly created vertex and check again the emptied graph
-        Assert.assertEquals(true, testingGraphInfo.removeVertex(testingVertexInfo).isEmpty());
-        // TODO (same tests as vertices for edges)
+        Assert.assertEquals(true, testingVertexGraphInfo.removeVertex(testingVertexInfo).isEmpty());
+        // same tests as vertices for edges
+        GraphInfo testingEdgeGraphInfo =
+                new GraphInfo("graphEdgeTest", new ArrayList<>(), new ArrayList<>(), "", "");
+        EdgeInfo testingEdgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        // add the created edge to an empty graph
+        Assert.assertEquals(
+                1, testingEdgeGraphInfo.addEdgeAsNew(testingEdgeInfo).get().getEdgeInfos().size());
+        // remove the newly created edge and check again the emptied graph
+        Assert.assertEquals(true, testingEdgeGraphInfo.removeEdge(testingEdgeInfo).isEmpty());
     }
 
     @Test
