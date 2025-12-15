@@ -141,14 +141,6 @@ public class GraphInfo {
         if (vertexInfo == null || !hasVertexInfo(vertexInfo.getType())) {
             return Optional.empty();
         }
-        List<EdgeInfo> newCachedEdgeInfoList =
-                edgeInfos.stream()
-                        .filter(
-                                currEdge ->
-                                        !currEdge.getSrcType().equals(vertexInfo.getType())
-                                                && !currEdge.getDstType()
-                                                        .equals(vertexInfo.getType()))
-                        .collect(Collectors.toList());
 
         final List<VertexInfo> newVertexInfoList =
                 vertexInfos.stream()
@@ -168,7 +160,7 @@ public class GraphInfo {
                 new GraphInfo(
                         name,
                         newVertexInfoList,
-                        newCachedEdgeInfoList,
+                        edgeInfos,
                         baseUri,
                         version,
                         newVertexInfoMap,
