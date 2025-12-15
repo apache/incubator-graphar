@@ -36,11 +36,11 @@ RUN wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | 
     && apt-get install -y ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb                                                                        \
     && apt-get update                                                                                                                                                   \
     && apt-get install -y                                                                                                                                               \
-        libarrow-dev                                                                                                                                                    \
-        libarrow-dataset-dev                                                                                                                                            \
-        libarrow-acero-dev                                                                                                                                              \
-        libparquet-dev                                                                                                                                                  \
-        libarrow-compute-dev                                                                                                                                            \
+        libarrow-dev=22.0.0-1                                                                                                                                           \
+        libarrow-dataset-dev=22.0.0-1                                                                                                                                   \
+        libarrow-acero-dev=22.0.0-1                                                                                                                                     \
+        libparquet-dev=22.0.0-1                                                                                                                                         \
+        libarrow-compute-dev=22.0.0-1                                                                                                                                   \
         libboost-graph-dev
 
 RUN apt-get clean -y &&  				            \

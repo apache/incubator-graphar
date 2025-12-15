@@ -30,7 +30,7 @@ fn link_libraries() {
     println!("cargo:rustc-link-lib=graphar");
 }
 
-fn build_ffi(bridge_file: &str, out_name: &str, source_file: &str, include_paths: &Vec<PathBuf>) {
+fn build_ffi(bridge_file: &str, out_name: &str, source_file: &str, include_paths: &[PathBuf]) {
     let mut build = cxx_build::bridge(bridge_file);
     build.file(source_file);
 
