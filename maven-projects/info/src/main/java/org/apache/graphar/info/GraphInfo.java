@@ -144,15 +144,12 @@ public class GraphInfo {
 
         final List<VertexInfo> newVertexInfoList =
                 vertexInfos.stream()
-                        .filter(
-                                v ->
-                                        !v.getType().equals(vertexInfo.getType())
-                                                && !v.getPrefix().equals(vertexInfo.getPrefix()))
+                        .filter(v -> !v.getType().equals(vertexInfo.getType()))
                         .collect(Collectors.toList());
 
         final Map<String, VertexInfo> newVertexInfoMap =
                 vertexType2VertexInfo.entrySet().stream()
-                        .filter(v -> !v.getValue().getType().equals(vertexInfo.getType()))
+                        .filter(v -> !v.getKey().equals(vertexInfo.getType()))
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));
@@ -211,7 +208,6 @@ public class GraphInfo {
         final Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
                 edgeConcat2EdgeInfo.entrySet().stream()
                         .filter(e -> !e.getKey().equals(edgeInfo.getConcat()))
-                        .filter(e -> !e.getValue().getConcat().equals(edgeInfo.getConcat()))
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));

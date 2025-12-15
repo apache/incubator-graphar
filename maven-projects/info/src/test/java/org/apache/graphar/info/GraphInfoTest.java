@@ -110,7 +110,7 @@ public class GraphInfoTest {
                 illegalArgumentException.getMessage());
         // test version gar/v1
         Assert.assertEquals(1, graphInfo.getVersion().getVersion());
-        // basic tests for addVertex and removeVertex (more advanced ones should include adjancency
+        // basic tests for addVertex and removeVertex (more advanced ones should include adjacency
         // list checks)
         VertexInfo testingVertexInfo =
                 new VertexInfo("", 100, Arrays.asList(TestUtil.pg1), "vertex/person/", "gar/v1");
