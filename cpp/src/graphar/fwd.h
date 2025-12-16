@@ -70,7 +70,7 @@ class FileSystem;
 
 /** Type of vertex id or vertex index. */
 using IdType = int64_t;
-enum class Type;
+enum class Type: uint32_t;
 class DataType;
 /** Defines how multiple values are handled for a given property key */
 enum Cardinality { SINGLE, LIST, SET };
