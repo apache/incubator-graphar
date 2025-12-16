@@ -36,7 +36,7 @@ class DataType;
 namespace graphar {
 
 /** @brief Main data type enumeration. */
-enum class Type: uint32_t {
+enum class Type: int32_t {
   /** Boolean */
   BOOL = 0,
 
