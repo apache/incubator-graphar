@@ -110,10 +110,14 @@ public class GraphInfoTest {
                 illegalArgumentException.getMessage());
         // test version gar/v1
         Assert.assertEquals(1, graphInfo.getVersion().getVersion());
-        // basic tests for addVertex and removeVertex (more advanced ones should include adjacency
-        // list checks)
+        // basic tests for addVertex and removeVertex
         VertexInfo testingVertexInfo =
-                new VertexInfo("", 100, Arrays.asList(TestUtil.pg1), "vertex/person/", "gar/v1");
+                new VertexInfo(
+                        "test_vertex",
+                        100,
+                        Arrays.asList(TestUtil.pg1),
+                        "vertex/person/",
+                        "gar/v1");
         GraphInfo testingVertexGraphInfo =
                 new GraphInfo("graphVertexTest", new ArrayList<>(), new ArrayList<>(), "", "");
         // remove unexisting vertex from an empty graph
@@ -154,9 +158,9 @@ public class GraphInfoTest {
         Assert.assertTrue(addEdgeAsNewGraph.isPresent());
         testingEdgeGraphInfo = addEdgeAsNewGraph.get();
         Assert.assertEquals(1, addEdgeAsNewGraph.get().getEdgeInfos().size());
-        // try to add the same Edge again
+        // try to add the same edge again
         Assert.assertTrue(testingEdgeGraphInfo.addEdgeAsNew(testingEdgeInfo).isEmpty());
-        // test remove Edge
+        // test remove edge
         addEdgeAsNewGraph = testingEdgeGraphInfo.removeEdge(testingEdgeInfo);
         Assert.assertTrue(addEdgeAsNewGraph.isPresent());
         Assert.assertEquals(0, addEdgeAsNewGraph.get().getEdgeInfos().size());
