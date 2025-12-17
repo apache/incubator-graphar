@@ -1,0 +1,153 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: GraphAr Rust CI
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "rust/**"
+      - "cpp/**"
+      - ".github/workflows/rust.yaml"
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - "rust/**"
+      - "cpp/**"
+      - ".github/workflows/rust.yaml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  RUSTFLAGS: -Dwarnings
+  RUST_BACKTRACE: 1
+  CI: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  ubuntu:
+    name: Ubuntu latest Rust
+    runs-on: ubuntu-24.04
+    # run on draft
+    if: ${{ github.event_name != 'pull_request' || !contains(github.event.pull_request.title, 'WIP') }}
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/testing/
+    defaults:
+      run:
+        working-directory: "rust"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: "rust -> target"
+
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-nextest@0.9.114
+          
+      - name: Install cargo-machete
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-machete@0.9.1
+
+      - name: Install taplo-cli
+        uses: taiki-e/install-action@v2
+        with:
+          tool: taplo-cli@0.10.0
+
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-llvm-cov@0.6.21
+
+      - name: Install cargo-deny
+        uses: taiki-e/install-action@v2
+        with:
+          tool: cargo-deny@0.18.9
+
+      - name: Install dependencies
+        run: |
+          wget -c https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
+            -P /tmp/
+          sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
+          sudo apt-get update -y
+          sudo apt install -y libarrow-dev=22.0.0-1 \
+                            libarrow-dataset-dev=22.0.0-1 \
+                            libarrow-acero-dev=22.0.0-1 \
+                            libparquet-dev=22.0.0-1
+          sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen lcov cmake
+
+      - name: Spell Check
+        uses: crate-ci/typos@v1.29.4
+        with:
+          files: rust/
+        timeout-minutes: 10
+
+      - name: TOML Check
+        run: taplo fmt --check --diff
+        timeout-minutes: 10
+
+      - name: Rustfmt Check
+        run: cargo fmt --all --check
+        timeout-minutes: 10
+
+      - name: Clippy Check
+        run: cargo clippy --tests --no-deps
+        timeout-minutes: 10
+
+      - name: Machete Check
+        run: cargo machete
+        timeout-minutes: 10
+
+      - name: Deny Check
+        run: cargo deny check
+
+      - name: Build
+        run: cargo build
+        timeout-minutes: 30
+
+      - name: Test
+        run: |
+          cargo nextest run
+          cargo test --doc
+        timeout-minutes: 30
+
+      - name: Build Docs
+        run: cargo doc --lib --no-deps
+        timeout-minutes: 30
+
+      - name: Generate code coverage
+        run: cargo llvm-cov --all-features --workspace --lcov --output-path lcov.info
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # required for private repos or protected branches
+          files: lcov.info
+          fail_ci_if_error: true
