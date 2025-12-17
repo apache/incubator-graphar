@@ -16,6 +16,8 @@
 // under the License.
 
 // Portions adapted from `https://github.com/kuzudb/kuzu/blob/master/tools/rust_api/build.rs` (MIT License).
+
+use std::env;
 use std::path::{Path, PathBuf};
 
 fn link_libraries() {
@@ -29,11 +31,12 @@ fn link_libraries() {
     println!("cargo:rustc-link-lib=graphar");
 }
 
-fn build_ffi(bridge_file: &str, out_name: &str, source_file: &str, include_paths: &Vec<PathBuf>) {
+fn build_ffi(bridge_file: &str, out_name: &str, source_file: &str, include_paths: &[PathBuf]) {
     let mut build = cxx_build::bridge(bridge_file);
     build.file(source_file);
 
     build.includes(include_paths);
+    // TODO support MSVC
     build.flag("-std=c++17");
     build.flag("-fdiagnostics-color=always");
 
@@ -43,10 +46,21 @@ fn build_ffi(bridge_file: &str, out_name: &str, source_file: &str, include_paths
 fn build_graphar() -> Vec<PathBuf> {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("..").join("cpp");
     let mut build = cmake::Config::new(&root);
+
+    // 1. Check if `GRAPHAR_BUILD_TYPE` is set. The value must be `Release`, `Debug` or `RelWithDebInfo`
+    // 2. If not, fallback to `PROFILE` which is set by `cargo`
+    let cmake_build_type =
+        env::var("GRAPHAR_BUILD_TYPE").unwrap_or_else(|_| match env::var("PROFILE").as_deref() {
+            Ok("release") => "Release".to_string(),
+            _ => "Debug".to_string(),
+        });
+
+    println!("cargo:rerun-if-env-changed=GRAPHAR_BUILD_TYPE");
+    println!("cargo:rerun-if-env-changed=PROFILE");
+
     build
         .no_build_target(true)
-        // TODO `cargo build` -> `Debug`
-        .define("CMAKE_BUILD_TYPE", "RelWithDebInfo")
+        .define("CMAKE_BUILD_TYPE", cmake_build_type)
         .define("GRAPHAR_BUILD_STATIC", "on");
     let build_dir = build.build();
 
