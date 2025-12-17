@@ -120,7 +120,7 @@ public class GraphInfoTest {
                         "gar/v1");
         GraphInfo testingVertexGraphInfo =
                 new GraphInfo("graphVertexTest", new ArrayList<>(), new ArrayList<>(), "", "");
-        // remove unexisting vertex from an empty graph
+        // remove non-existent vertex from an empty graph
         Assert.assertTrue(testingVertexGraphInfo.removeVertex(testingVertexInfo).isEmpty());
         // add the created vertex on an empty graph
         Optional<GraphInfo> addVertexAsNewGraph =
@@ -151,7 +151,7 @@ public class GraphInfoTest {
                         "gar/v1",
                         List.of(TestUtil.orderedBySource),
                         List.of(TestUtil.pg3));
-        // remove unexisting edge from an empty graph
+        // remove non-existent edge from an empty graph
         Assert.assertTrue(testingEdgeGraphInfo.removeEdge(testingEdgeInfo).isEmpty());
         // add the created edge on an empty graph
         Optional<GraphInfo> addEdgeAsNewGraph = testingEdgeGraphInfo.addEdgeAsNew(testingEdgeInfo);
