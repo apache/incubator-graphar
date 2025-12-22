@@ -104,10 +104,18 @@ endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall")
 
+# [Modified]: Modern RPATH handling
+# This ensures that when linking dynamically against system libs, the RPATH is correctly set.
+# Also handles the $ORIGIN requirement for relocatable builds.
+set(CMAKE_MACOSX_RPATH ON)
+set(CMAKE_SKIP_BUILD_RPATH OFF)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH OFF)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 if (APPLE)
-  set(CMAKE_MACOSX_RPATH ON)
+  set(CMAKE_INSTALL_RPATH "@loader_path/../lib")
 else ()
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
+  set(CMAKE_INSTALL_RPATH "$ORIGIN/../lib")
 endif ()
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fno-omit-frame-pointer -fsanitize=address")
@@ -212,7 +220,7 @@ function(graphar_create_merged_static_lib output_target)
 
   if(APPLE)
     set(BUNDLE_COMMAND "libtool" "-no_warning_for_no_symbols" "-static" "-o"
-                       ${output_lib_path} ${all_library_paths})
+                        ${output_lib_path} ${all_library_paths})
   elseif(CMAKE_CXX_COMPILER_ID MATCHES "^(Clang|GNU|Intel)$")
     set(ar_script_path ${CMAKE_BINARY_DIR}/${ARG_NAME}.ar)
 
@@ -245,7 +253,7 @@ function(graphar_create_merged_static_lib output_target)
       endif()
     endif()
     set(BUNDLE_COMMAND ${BUNDLE_TOOL} /NOLOGO /OUT:${output_lib_path}
-                       ${all_library_paths})
+                        ${all_library_paths})
   else()
     message(FATAL_ERROR "Unknown bundle scenario!")
   endif()
@@ -277,31 +285,38 @@ macro(build_graphar)
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
 
+    # [Modified]: Logic separated for Static vs Dynamic Arrow
     if(APPLE)
         if(USE_STATIC_ARROW)
+            # Static linking with force load to keep symbols
             target_link_libraries(graphar PRIVATE -Wl,-force_load
                 Arrow::arrow_static
                 Parquet::parquet_static
                 ArrowDataset::arrow_dataset_static
                 ArrowAcero::arrow_acero_static)
         else()
-            target_link_libraries(graphar PRIVATE -Wl,-force_load Arrow::arrow_shared
+            # Dynamic linking: Standard link, RPATH handled globally
+            target_link_libraries(graphar PRIVATE
+                Arrow::arrow_shared
                 Parquet::parquet_shared
                 ArrowDataset::arrow_dataset_shared
                 ArrowAcero::arrow_acero_shared)
         endif()
     else()
         if(USE_STATIC_ARROW)
+            # Static linking with whole-archive
             target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
                 Arrow::arrow_static
                 Parquet::parquet_static
                 ArrowDataset::arrow_dataset_static
                 ArrowAcero::arrow_acero_static -Wl,--no-whole-archive)
         else()
-            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_shared
+             # Dynamic linking: Standard link, no whole-archive needed
+            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL
+                Arrow::arrow_shared
                 Parquet::parquet_shared
                 ArrowDataset::arrow_dataset_shared
-                ArrowAcero::arrow_acero_shared -Wl,--no-whole-archive)
+                ArrowAcero::arrow_acero_shared)
         endif()
     endif()
 endmacro()
@@ -444,7 +459,7 @@ if (BUILD_EXAMPLES)
             else()
                 target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive ${GAR_ARROW_STATIC_LIB}
                     "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive) 
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
             endif()
         else()
             if(APPLE)
@@ -453,15 +468,17 @@ if (BUILD_EXAMPLES)
                         Arrow::arrow_static
                         Parquet::parquet_static)
                 else()
+                    # Dynamic Linking: No force_load
                     target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
                         Parquet::parquet_shared)
                 endif()
             else()
                 if(USE_STATIC_ARROW)
-                    target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive 
-                        Arrow::arrow_static 
+                    target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
+                        Arrow::arrow_static
                         Parquet::parquet_static -Wl,--no-whole-archive)
                 else()
+                    # Dynamic Linking: No whole-archive
                     target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
                         Parquet::parquet_shared)
                 endif()
@@ -527,15 +544,16 @@ if (BUILD_TESTS)
             else()
                 target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
                     "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive) 
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
             endif()
         else()
             if(APPLE)
                 if(USE_STATIC_ARROW)
-                    target_link_libraries(${target} PRIVATE -Wl,-force_load 
+                    target_link_libraries(${target} PRIVATE -Wl,-force_load
                         Arrow::arrow_static
                         Parquet::parquet_static)
                 else()
+                    # Dynamic Linking: No force_load
                     target_link_libraries(${target} PRIVATE Arrow::arrow_shared
                         Parquet::parquet_shared)
                 endif()
@@ -545,6 +563,7 @@ if (BUILD_TESTS)
                         Arrow::arrow_static
                         Parquet::parquet_static -Wl,--no-whole-archive)
                 else()
+                    # Dynamic Linking: No whole-archive
                     target_link_libraries(${target} PRIVATE Arrow::arrow_shared
                         Parquet::parquet_shared)
                 endif()
