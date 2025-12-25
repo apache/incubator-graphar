@@ -16,18 +16,28 @@
 # under the License.
 
 [build-system]
-requires = ["scikit-build-core>=0.3.3", "pybind11", "ninja ~= 1.11"]
+requires = ["scikit-build-core>=0.8.3", "pybind11", "ninja ~= 1.11"]
 build-backend = "scikit_build_core.build"
 
 
 [project]
 name = "graphar"
-version = "0.13.0"
-description = "GraphAr command line tool"
+version = "0.13.0-dev"
+description = "An open source, standard data file format for graph data storage and retrieval."
 readme = "README.md"
 authors = [{ name = "GraphAr community", email = "dev@graphar.apache.org" }]
 requires-python = ">=3.9"
 dependencies = ["typer ~= 0.1", "pydantic ~= 2.0, < 2.12", "pyyaml ~= 6.0", "pytest ~= 7.2"]
+license = {text = "Apache-2.0"}
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
 
 [tool.poetry.group.docs]
 optional = true
@@ -35,11 +45,20 @@ optional = true
 [tool.poetry.group.docs.dependencies]
 pdoc = "*"
 
-[project.optional-dependencies]
-test = ["pandas ~= 2.0", "typing_extensions ~= 4.0"]
-
 [tool.scikit-build]
 build-dir = "build"
+
+[tool.scikit-build.sdist]
+include = [
+  "../cpp/**",
+  "../CMakeLists.txt",
+  "../LICENSE",
+  "../NOTICE",
+]
+
+[project.optional-dependencies]
+test = ["pandas ~= 2.0", "typing_extensions ~= 4.0"]
+docs = ["pdoc"]
 
 [project.scripts]
 graphar = "cli.graphar_cli:main"
