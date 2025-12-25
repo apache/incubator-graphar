@@ -88,6 +88,17 @@ public class PropertyTest {
         Property listProp = TestDataFactory.createProperty("items", DataType.LIST, false, true);
         Assert.assertEquals(DataType.LIST, listProp.getDataType());
         TestVerificationUtils.verifyProperty(listProp, "items", false, true);
+
+        // Newly added data types
+        Property dateProp =
+                TestDataFactory.createProperty("creationDate", DataType.DATE, false, true);
+        Assert.assertEquals(DataType.DATE, dateProp.getDataType());
+        TestVerificationUtils.verifyProperty(dateProp, "creationDate", false, true);
+
+        Property timestampProp =
+                TestDataFactory.createProperty("createdAt", DataType.TIMESTAMP, false, true);
+        Assert.assertEquals(DataType.TIMESTAMP, timestampProp.getDataType());
+        TestVerificationUtils.verifyProperty(timestampProp, "createdAt", false, true);
     }
 
     @Test

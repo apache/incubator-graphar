@@ -39,7 +39,13 @@ public enum DataType {
     STRING,
 
     /** List of same type */
-    LIST;
+    LIST,
+
+    /** Date value */
+    DATE,
+
+    /** Timestamp value */
+    TIMESTAMP;
 
     public static DataType fromString(String s) {
         switch (s) {
@@ -57,6 +63,10 @@ public enum DataType {
                 return STRING;
             case "list":
                 return LIST;
+            case "date":
+                return DATE;
+            case "timestamp":
+                return TIMESTAMP;
             default:
                 throw new IllegalArgumentException("Unknown data type: " + s);
         }
