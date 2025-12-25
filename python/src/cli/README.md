@@ -21,6 +21,15 @@ And using Python in conda or venv is a good choice.
 
 ## Installation
 
+### Install from Pypi
+Install the latest released version from PyPI:
+
+```bash
+pip install -U graphar
+```
+
+### Install from Source
+
 - Clone this repository
 - `pip install ./python` or set verbose level `pip install -v ./python`
 
