@@ -27,8 +27,8 @@ on:
     paths:
       - 'cpp/**'
       - 'python/**'
-      - '.github/workflows/ci.yml'
-      - '.github/workflows/python.yml'
+      - '.github/workflows/python-wheel-workflow.yml'
+      - '.github/scripts/update_version.py'
   pull_request:
     branches:
       - "main"
