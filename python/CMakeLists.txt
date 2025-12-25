@@ -27,7 +27,19 @@ project(
   LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../cpp ${CMAKE_BINARY_DIR}/graphar)
+
+# The Python wheel build (e.g. via cibuildwheel) may run from an isolated copy of
+# the `python/` directory, where `../cpp` doesn't exist. In CI we bundle `cpp/`
+# into the project directory as `_bundled_cpp/`.
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/_bundled_cpp/CMakeLists.txt")
+  set(GRAPHAR_CPP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/_bundled_cpp")
+elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../cpp/CMakeLists.txt")
+  set(GRAPHAR_CPP_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../cpp")
+else()
+  message(FATAL_ERROR "GraphAr C++ sources not found. Expected either '_bundled_cpp/' or '../cpp/'.")
+endif()
+
+add_subdirectory(${GRAPHAR_CPP_SOURCE_DIR} ${CMAKE_BINARY_DIR}/graphar)
 
 # Find the module development requirements (requires FindPython from 3.17 or
 # scikit-build-core's built-in backport)
@@ -37,6 +49,29 @@ find_package(Arrow REQUIRED)
 find_package(ArrowDataset REQUIRED)
 find_package(ArrowAcero REQUIRED)
 find_package(Parquet REQUIRED)
+
+if(APPLE)
+  # cibuildwheel uses delocate to bundle external dylibs into the wheel.
+  # delocate needs to be able to resolve @rpath dependencies (e.g.
+  # @rpath/libarrow.1300.dylib). We add the imported Arrow/Parquet library
+  # directories to LC_RPATH so delocate can find and copy them.
+  set(_graphar_macos_rpaths "")
+
+  foreach(_tgt IN ITEMS Arrow::arrow_shared ArrowDataset::arrow_dataset_shared ArrowAcero::arrow_acero_shared Parquet::parquet_shared)
+    if(TARGET ${_tgt})
+      get_target_property(_loc ${_tgt} IMPORTED_LOCATION_RELEASE)
+      if(NOT _loc)
+        get_target_property(_loc ${_tgt} IMPORTED_LOCATION)
+      endif()
+      if(_loc)
+        get_filename_component(_libdir "${_loc}" DIRECTORY)
+        list(APPEND _graphar_macos_rpaths "${_libdir}")
+      endif()
+    endif()
+  endforeach()
+
+  list(REMOVE_DUPLICATES _graphar_macos_rpaths)
+endif()
 # Check if ORC is enabled.
 if (NOT ${ARROW_ORC})
     message(WARNING "apache-arrow is built without ORC extension, ORC related functionalities will be disabled.")
@@ -57,18 +92,32 @@ target_link_libraries(_core PRIVATE pybind11::headers graphar Arrow::arrow_share
                                     ArrowAcero::arrow_acero_shared
                                     )
 target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cpp/src)
-target_include_directories(_core PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../cpp/thirdparty)
+target_include_directories(_core PRIVATE ${GRAPHAR_CPP_SOURCE_DIR}/src)
+target_include_directories(_core PRIVATE ${GRAPHAR_CPP_SOURCE_DIR}/thirdparty)
 
 # This is passing in the version as a define just as an example
 target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
-# The install directory is the output (wheel) directory
+# The install directory is the output (wheel) directory.
 # Use platform-appropriate rpath so the Python extension can find the
 # packaged libgraphar at runtime inside the wheel.
 if(APPLE)
-  # macOS uses @loader_path to find libraries relative to the module
-  set_target_properties(_core PROPERTIES INSTALL_RPATH "@loader_path")
+  # Keep @loader_path for runtime inside the wheel, and add Arrow/Parquet
+  # library dirs so delocate can resolve @rpath dependencies during repair.
+  set(_core_rpath "@loader_path")
+  if(_graphar_macos_rpaths)
+    list(JOIN _graphar_macos_rpaths ";" _graphar_macos_rpaths_joined)
+    set(_core_rpath "${_core_rpath};${_graphar_macos_rpaths_joined}")
+  endif()
+  set_target_properties(_core PROPERTIES BUILD_WITH_INSTALL_RPATH ON)
+  set_target_properties(_core PROPERTIES INSTALL_RPATH "${_core_rpath}")
+
+  if(TARGET graphar)
+    set_target_properties(graphar PROPERTIES BUILD_WITH_INSTALL_RPATH ON)
+    if(_graphar_macos_rpaths)
+      set_target_properties(graphar PROPERTIES INSTALL_RPATH "${_graphar_macos_rpaths_joined}")
+    endif()
+  endif()
 else()
   # On Linux and other Unix, use $ORIGIN (escaped so CMake preserves the $)
   set_target_properties(_core PROPERTIES INSTALL_RPATH "\$ORIGIN")
