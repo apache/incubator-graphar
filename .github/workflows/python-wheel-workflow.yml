@@ -23,7 +23,7 @@ on:
   # but only for the main branch
   push:
     branches:
-      - "**"
+      - "main"
     paths:
       - 'cpp/**'
       - 'python/**'
@@ -108,7 +108,6 @@ jobs:
 
     env:
       CIBW_PLATFORM: ${{ matrix.os }}
-      # CIBW_BUILD: "cp311-* cp312-* cp313-*"
       CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
       CIBW_SKIP: "*-musllinux_*"
       # Pin arch to the matrix platform
