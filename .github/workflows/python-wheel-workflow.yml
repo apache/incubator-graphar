@@ -39,8 +39,8 @@ on:
     paths:
       - 'cpp/**'
       - 'python/**'
-      - '.github/workflows/ci.yml'
-      - '.github/workflows/python.yml'
+      - '.github/workflows/python-wheel-workflow.yml'
+      - '.github/scripts/update_version.py'
   workflow_dispatch:
     inputs:
       publish_pypi:
@@ -66,7 +66,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install build twine
       - name: update pyproject version
-        if: github.event_name != 'workflow_dispatch' || !inputs.publish_pypi
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.publish_pypi != 'true'
         run: |
           python .github/scripts/update_version.py
       - name: Build sdist
@@ -112,7 +112,7 @@ jobs:
 
     env:
       CIBW_PLATFORM: ${{ matrix.os }}
-      CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
+      CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
       CIBW_SKIP: "*-musllinux_*"
       # Pin arch to the matrix platform
       CIBW_ARCHS: ${{ matrix.platform }}
