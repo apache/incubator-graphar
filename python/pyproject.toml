@@ -16,7 +16,7 @@
 # under the License.
 
 [build-system]
-requires = ["scikit-build-core>=0.8.3", "pybind11"]
+requires = ["scikit-build-core>=0.8.3", "pybind11", "ninja ~= 1.11"]
 build-backend = "scikit_build_core.build"
 
 

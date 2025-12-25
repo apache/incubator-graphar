@@ -39,6 +39,14 @@ else()
   message(FATAL_ERROR "GraphAr C++ sources not found. Expected either '_bundled_cpp/' or '../cpp/'.")
 endif()
 
+# Verify that the expected subdirectories exist before adding the C++ sources.
+if(NOT EXISTS "${GRAPHAR_CPP_SOURCE_DIR}/src")
+  message(FATAL_ERROR "GraphAr C++ sources are missing the 'src' directory under '${GRAPHAR_CPP_SOURCE_DIR}'.")
+endif()
+if(NOT EXISTS "${GRAPHAR_CPP_SOURCE_DIR}/thirdparty")
+  message(FATAL_ERROR "GraphAr C++ sources are missing the 'thirdparty' directory under '${GRAPHAR_CPP_SOURCE_DIR}'.")
+endif()
+
 add_subdirectory(${GRAPHAR_CPP_SOURCE_DIR} ${CMAKE_BINARY_DIR}/graphar)
 
 # Find the module development requirements (requires FindPython from 3.17 or

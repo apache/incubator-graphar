@@ -18,6 +18,10 @@
 
 name: Build Python Wheels
 
+concurrency:
+  group: python-wheel-${{ github.ref }}
+  cancel-in-progress: false
+
 on:
   # Trigger the workflow on push or pull request,
   # but only for the main branch
@@ -50,10 +54,10 @@ jobs:
     name: Build source distribution
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 
@@ -61,7 +65,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install build twine
-      - name: update pyporject version
+      - name: update pyproject version
         if: github.event_name != 'workflow_dispatch' || !inputs.publish_pypi
         run: |
           python .github/scripts/update_version.py
@@ -111,7 +115,7 @@ jobs:
       CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
       CIBW_SKIP: "*-musllinux_*"
       # Pin arch to the matrix platform
-      CIBW_ARCHS: ${{ (matrix.os == 'linux' && matrix.platform) || (matrix.os == 'macos' && matrix.platform) || (matrix.os == 'windows' && 'AMD64') || 'auto' }}
+      CIBW_ARCHS: ${{ matrix.platform }}
       CIBW_MANYLINUX_X86_64_IMAGE: ${{ matrix.os == 'linux' && format('manylinux{0}', matrix.manylinux) || '' }}
       CIBW_MANYLINUX_AARCH64_IMAGE: ${{ matrix.os == 'linux' && format('manylinux{0}', matrix.manylinux) || '' }}
       CIBW_ENVIRONMENT_WINDOWS: DISTUTILS_USE_SDK=1 MSSdk=1
@@ -149,10 +153,10 @@ jobs:
           libcurl-devel re2-devel ccache
     steps:
       - name: Checkout (needed for some tooling)
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.9"
 

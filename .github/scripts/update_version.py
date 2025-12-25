@@ -16,6 +16,7 @@
 # under the License.
 
 import json
+import os
 import re
 import sys
 import urllib.request
@@ -23,6 +24,7 @@ from packaging.version import Version
 
 PACKAGE_NAME = "graphar"
 FILE_PATH = "python/pyproject.toml"
+URL_TIMEOUT_SECONDS = int(os.getenv("GRAPHAR_VERSION_FETCH_TIMEOUT", "10"))
 
 def get_next_version():
     versions = []
@@ -34,11 +36,14 @@ def get_next_version():
     print(f"Fetching versions for {PACKAGE_NAME}...")
     for url in urls:
         try:
-            with urllib.request.urlopen(url, timeout=5) as r:
+            with urllib.request.urlopen(url, timeout=URL_TIMEOUT_SECONDS) as r:
                 data = json.load(r)
                 versions.extend(data.get("releases", {}).keys())
-        except Exception:
-            pass
+        except Exception as e:
+            print(
+                f"Warning: Failed to fetch versions from {url}: {type(e).__name__}: {e}",
+                file=sys.stderr,
+            )
 
     if not versions:
         return "0.0.1.dev1"
@@ -47,7 +52,8 @@ def get_next_version():
     print(f"Latest version found: {latest}")
 
     if latest.is_devrelease:
-        return f"{latest.major}.{latest.minor}.{latest.micro}.dev{latest.dev + 1}"
+        dev_number = latest.dev if latest.dev is not None else 0
+        return f"{latest.major}.{latest.minor}.{latest.micro}.dev{dev_number + 1}"
     else:
         return f"{latest.major}.{latest.minor}.{latest.micro + 1}.dev1"
 
