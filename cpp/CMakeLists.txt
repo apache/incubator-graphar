@@ -111,7 +111,7 @@ else ()
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 endif ()
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fno-omit-frame-pointer ")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fno-omit-frame-pointer")
 if (GRAPHAR_ENABLE_SANITIZER)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
   # Linker flags are required to pull in the ASan runtime.
@@ -121,7 +121,11 @@ endif()
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -g")
 
 message(STATUS "[graphar] will build in type: ${CMAKE_BUILD_TYPE}")
-message(STATUS "[graphar] GRAPHAR_ENABLE_SANITIZER: ${GRAPHAR_ENABLE_SANITIZER}")
+
+string(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_UPPER)
+if (CMAKE_BUILD_TYPE_UPPER STREQUAL "DEBUG")
+  message(STATUS "[graphar] GRAPHAR_ENABLE_SANITIZER: ${GRAPHAR_ENABLE_SANITIZER}")
+endif()
 
 # ------------------------------------------------------------------------------
 # cmake configs
