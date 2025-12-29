@@ -11,6 +11,13 @@ GraphAr Python SDK provides Python bindings for the GraphAr C++ library, allowin
 - CMake >= 3.15 (for building from source)
 - Apache Arrow >= 12.0 (for building from source)
 
+### Install from Pypi
+Install the latest released version from PyPI:
+
+```bash
+pip install -U graphar
+```
+
 ### Install from Source
 
 Clone the repository and install the Python package:

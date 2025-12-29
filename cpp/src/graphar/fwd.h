@@ -70,16 +70,15 @@ class FileSystem;
 
 /** Type of vertex id or vertex index. */
 using IdType = int64_t;
-enum class Type;
 class DataType;
 /** Defines how multiple values are handled for a given property key */
-enum Cardinality { SINGLE, LIST, SET };
+enum Cardinality : int32_t { SINGLE, LIST, SET };
 /** Type of file format */
-enum FileType { CSV = 0, PARQUET = 1, ORC = 2, JSON = 3 };
-enum SelectType { PROPERTIES = 0, LABELS = 1 };
+enum FileType : int32_t { CSV = 0, PARQUET = 1, ORC = 2, JSON = 3 };
+enum SelectType : int32_t { PROPERTIES = 0, LABELS = 1 };
 /** GetChunkVersion: V1 use scanner, V2 use FileReader */
-enum GetChunkVersion { AUTO = 0, V1 = 1, V2 = 2 };
-enum class AdjListType : uint8_t;
+enum GetChunkVersion : int32_t { AUTO = 0, V1 = 1, V2 = 2 };
+enum class AdjListType : int32_t;
 
 template <typename T>
 class Array;
