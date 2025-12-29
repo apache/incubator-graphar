@@ -102,12 +102,17 @@ if(NOT (CMAKE_CXX_COMPILER_LAUNCHER MATCHES "ccache") AND NOT (CMAKE_C_COMPILER_
     endif(ccache_EXECUTABLE)
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall")
+if(MSVC)
+    # Avoid GCC/Clang-specific flags on MSVC.
+    # C++17 is already enforced via CMAKE_CXX_STANDARD/target features.
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall")
+endif()
 
 if (APPLE)
-  set(CMAKE_MACOSX_RPATH ON)
-else ()
-  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
+    set(CMAKE_MACOSX_RPATH ON)
+elseif(UNIX)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
 endif ()
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fno-omit-frame-pointer -fsanitize=address")
@@ -290,6 +295,22 @@ macro(build_graphar)
                 ArrowDataset::arrow_dataset_shared
                 ArrowAcero::arrow_acero_shared)
         endif()
+    elseif(MSVC)
+        # MSVC doesn't support GNU ld-style -Wl flags. For shared libraries we
+        # don't need whole-archive semantics.
+        if(USE_STATIC_ARROW)
+            target_link_libraries(graphar PRIVATE
+                Arrow::arrow_static
+                Parquet::parquet_static
+                ArrowDataset::arrow_dataset_static
+                ArrowAcero::arrow_acero_static)
+        else()
+            target_link_libraries(graphar PRIVATE
+                Arrow::arrow_shared
+                Parquet::parquet_shared
+                ArrowDataset::arrow_dataset_shared
+                ArrowAcero::arrow_acero_shared)
+        endif()
     else()
         if(USE_STATIC_ARROW)
             target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
@@ -350,6 +371,9 @@ macro(build_graphar_with_arrow_bundled)
                 graphar_bundled_dependencies
                 "-framework CoreFoundation"
                 "-framework Security")
+    elseif(MSVC)
+        # MSVC doesn't support GNU ld-style -Wl flags.
+        target_link_libraries(graphar PRIVATE graphar_bundled_dependencies)
     else()
         target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL
                 graphar_bundled_dependencies)

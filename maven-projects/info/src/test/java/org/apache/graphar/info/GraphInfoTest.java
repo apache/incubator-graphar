@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.loader.impl.LocalFileSystemStreamGraphInfoLoader;
 import org.apache.graphar.info.type.AdjListType;
@@ -110,6 +111,60 @@ public class GraphInfoTest {
                 illegalArgumentException.getMessage());
         // test version gar/v1
         Assert.assertEquals(1, graphInfo.getVersion().getVersion());
+        // basic tests for addVertex and removeVertex
+        VertexInfo testingVertexInfo =
+                new VertexInfo(
+                        "test_vertex",
+                        100,
+                        Arrays.asList(TestUtil.pg1),
+                        "vertex/person/",
+                        "gar/v1");
+        GraphInfo testingVertexGraphInfo =
+                new GraphInfo("graphVertexTest", new ArrayList<>(), new ArrayList<>(), "", "");
+        // remove non-existent vertex from an empty graph
+        Assert.assertTrue(testingVertexGraphInfo.removeVertex(testingVertexInfo).isEmpty());
+        // add the created vertex on an empty graph
+        Optional<GraphInfo> addVertexAsNewGraph =
+                testingVertexGraphInfo.addVertexAsNew(testingVertexInfo);
+        Assert.assertTrue(addVertexAsNewGraph.isPresent());
+        testingVertexGraphInfo = addVertexAsNewGraph.get();
+        Assert.assertEquals(1, addVertexAsNewGraph.get().getVertexInfos().size());
+        // try to add the same vertex again
+        Assert.assertTrue(testingVertexGraphInfo.addVertexAsNew(testingVertexInfo).isEmpty());
+        // test remove vertex
+        addVertexAsNewGraph = testingVertexGraphInfo.removeVertex(testingVertexInfo);
+        Assert.assertTrue(addVertexAsNewGraph.isPresent());
+        Assert.assertEquals(0, addVertexAsNewGraph.get().getVertexInfos().size());
+
+        // same tests as vertices for edges
+        GraphInfo testingEdgeGraphInfo =
+                new GraphInfo("graphEdgeTest", new ArrayList<>(), new ArrayList<>(), "", "");
+        EdgeInfo testingEdgeInfo =
+                new EdgeInfo(
+                        "person",
+                        "knows",
+                        "person",
+                        1024,
+                        100,
+                        100,
+                        false,
+                        URI.create("edge/person_knows_person/"),
+                        "gar/v1",
+                        List.of(TestUtil.orderedBySource),
+                        List.of(TestUtil.pg3));
+        // remove non-existent edge from an empty graph
+        Assert.assertTrue(testingEdgeGraphInfo.removeEdge(testingEdgeInfo).isEmpty());
+        // add the created edge on an empty graph
+        Optional<GraphInfo> addEdgeAsNewGraph = testingEdgeGraphInfo.addEdgeAsNew(testingEdgeInfo);
+        Assert.assertTrue(addEdgeAsNewGraph.isPresent());
+        testingEdgeGraphInfo = addEdgeAsNewGraph.get();
+        Assert.assertEquals(1, addEdgeAsNewGraph.get().getEdgeInfos().size());
+        // try to add the same edge again
+        Assert.assertTrue(testingEdgeGraphInfo.addEdgeAsNew(testingEdgeInfo).isEmpty());
+        // test remove edge
+        addEdgeAsNewGraph = testingEdgeGraphInfo.removeEdge(testingEdgeInfo);
+        Assert.assertTrue(addEdgeAsNewGraph.isPresent());
+        Assert.assertEquals(0, addEdgeAsNewGraph.get().getEdgeInfos().size());
     }
 
     @Test
