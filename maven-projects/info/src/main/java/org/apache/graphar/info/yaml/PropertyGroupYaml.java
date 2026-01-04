@@ -49,8 +49,11 @@ public class PropertyGroupYaml {
         String pgPrefix = prefix;
         if (pgPrefix == null || pgPrefix.isEmpty()) {
             StringBuilder prefixBuilder = new StringBuilder();
-            for (PropertyYaml property : properties) {
-                prefixBuilder.append(property.getName()).append("_");
+            for (int i = 0; i < properties.size(); i++) {
+                if (i > 0) {
+                    prefixBuilder.append("_");
+                }
+                prefixBuilder.append(properties.get(i).getName());
             }
             prefixBuilder.append("/");
             pgPrefix = prefixBuilder.toString();

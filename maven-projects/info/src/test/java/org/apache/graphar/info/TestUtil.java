@@ -37,7 +37,10 @@ public class TestUtil {
     static final String SAVE_DIR =
             System.getProperty("test.output.dir", "target/test-output") + "/";
 
-    private static final String LDBC_SAMPLE_GRAPH_PATH = "/ldbc_sample/csv/ldbc_sample.graph.yml";
+    private static final String CSV_LDBC_SAMPLE_GRAPH_PATH =
+            "/ldbc_sample/csv/ldbc_sample.graph.yml";
+    private static final String PARQUET_LDBC_SAMPLE_GRAPH_PATH =
+            "/ldbc_sample/parquet/ldbc_sample.graph.yml";
     private static final String LDBC_GRAPH_PATH = "/ldbc/parquet/ldbc.graph.yml";
 
     public static String getTestData() {
@@ -49,12 +52,20 @@ public class TestUtil {
         return GAR_TEST_DATA != null && new java.io.File(GAR_TEST_DATA).exists();
     }
 
-    public static String getLdbcSampleGraphPath() {
-        return getTestData() + "/" + LDBC_SAMPLE_GRAPH_PATH;
+    public static String getCSVLdbcSampleGraphPath() {
+        return getTestData() + "/" + CSV_LDBC_SAMPLE_GRAPH_PATH;
     }
 
-    public static URI getLdbcSampleGraphURI() {
-        return URI.create(getLdbcSampleGraphPath());
+    public static URI getCSVLdbcSampleGraphURI() {
+        return URI.create(getCSVLdbcSampleGraphPath());
+    }
+
+    public static String getParquetLdbcSampleGraphPath() {
+        return getTestData() + "/" + PARQUET_LDBC_SAMPLE_GRAPH_PATH;
+    }
+
+    public static URI getParquetLdbcSampleGraphURI() {
+        return URI.create(getParquetLdbcSampleGraphPath());
     }
 
     public static String getLdbcGraphPath() {
@@ -127,7 +138,7 @@ public class TestUtil {
         try {
             GraphInfoLoader loader =
                     new org.apache.graphar.info.loader.impl.LocalFileSystemStreamGraphInfoLoader();
-            return loader.loadGraphInfo(getLdbcSampleGraphURI());
+            return loader.loadGraphInfo(getCSVLdbcSampleGraphURI());
         } catch (Exception e) {
             throw new RuntimeException(
                     "Failed to load real LDBC sample data: " + e.getMessage(), e);
