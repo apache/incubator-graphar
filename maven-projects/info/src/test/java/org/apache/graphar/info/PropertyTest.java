@@ -19,6 +19,9 @@
 
 package org.apache.graphar.info;
 
+import java.io.IOException;
+import java.net.URI;
+import org.apache.graphar.info.loader.impl.LocalFileSystemStringGraphInfoLoader;
 import org.apache.graphar.info.type.DataType;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,6 +38,7 @@ public class PropertyTest {
         idProperty = TestDataFactory.createIdProperty();
         nameProperty = TestDataFactory.createProperty("name", DataType.STRING, false, true);
         optionalProperty = TestDataFactory.createProperty("optional", DataType.STRING, false, true);
+        TestUtil.checkTestData();
     }
 
     @Test
@@ -170,5 +174,20 @@ public class PropertyTest {
         // These values should not change after construction
         TestVerificationUtils.verifyProperty(prop, "test", true, false);
         Assert.assertEquals(DataType.INT32, prop.getDataType());
+    }
+
+    @Test
+    public void testLoadPropertyDateTypes() throws IOException {
+        String testDataRoot = TestUtil.getTestData();
+        String timestampEdge =
+                testDataRoot + "/ldbc_sample/parquet/person_knows-timestamp_person.edge.yml";
+        LocalFileSystemStringGraphInfoLoader localFileSystemStringGraphInfoLoader =
+                new LocalFileSystemStringGraphInfoLoader();
+        EdgeInfo edgeInfo =
+                localFileSystemStringGraphInfoLoader.loadEdgeInfo(URI.create(timestampEdge));
+        Assert.assertTrue(edgeInfo.dump().contains("data_type: timestamp"));
+        String dateEdge = testDataRoot + "/ldbc_sample/parquet/person_knows-date_person.edge.yml";
+        edgeInfo = localFileSystemStringGraphInfoLoader.loadEdgeInfo(URI.create(dateEdge));
+        Assert.assertTrue(edgeInfo.dump().contains("data_type: date"));
     }
 }
