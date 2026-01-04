@@ -42,6 +42,7 @@ public class GraphInfoTest {
     private static VertexInfo personVertexInfo;
     private static EdgeInfo knowsEdgeInfo;
     private static URI GRAPH_PATH_URI;
+    private static URI PARUQET_GRAPH_PATH_URI;
     // test not exist property group
     private static final PropertyGroup notExistPg =
             new PropertyGroup(
@@ -54,7 +55,8 @@ public class GraphInfoTest {
         TestUtil.checkTestData();
 
         // Always use real test data - fail if not available
-        GRAPH_PATH_URI = TestUtil.getLdbcSampleGraphURI();
+        GRAPH_PATH_URI = TestUtil.getCSVLdbcSampleGraphURI();
+        PARUQET_GRAPH_PATH_URI = TestUtil.getParquetLdbcSampleGraphURI();
         GraphInfoLoader loader = new LocalFileSystemStreamGraphInfoLoader();
         try {
             graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
@@ -509,5 +511,42 @@ public class GraphInfoTest {
                         graphInfo.getBaseUri(),
                         graphInfo.getVersion().toString());
         Assert.assertFalse(invalidEdgeGraphInfo.isValidated());
+    }
+
+    @Test
+    public void testParquetGraphInfo() {
+        GraphInfoLoader loader = new LocalFileSystemStreamGraphInfoLoader();
+        GraphInfo graphInfo;
+        try {
+            graphInfo = loader.loadGraphInfo(PARUQET_GRAPH_PATH_URI);
+        } catch (IOException e) {
+            throw new RuntimeException(
+                    "Failed to load real test data from "
+                            + PARUQET_GRAPH_PATH_URI
+                            + ": "
+                            + e.getMessage(),
+                    e);
+        }
+        VertexInfo personVertexInfo = graphInfo.getVertexInfos().get(0);
+        EdgeInfo knowsEdgeInfo = graphInfo.getEdgeInfos().get(0);
+        // test vertex property
+        PropertyGroup firstName_lastName_gender = personVertexInfo.getPropertyGroups().get(1);
+        Assert.assertEquals("firstName_lastName_gender/", firstName_lastName_gender.getPrefix());
+        Assert.assertEquals(FileType.PARQUET, firstName_lastName_gender.getFileType());
+        Assert.assertEquals(
+                URI.create("vertex/person/vertex_count"), personVertexInfo.getVerticesNumFileUri());
+        // test edge property
+        PropertyGroup creationDate = knowsEdgeInfo.getPropertyGroups().get(0);
+        Assert.assertEquals("creationDate/", creationDate.getPrefix());
+        Assert.assertEquals(FileType.PARQUET, creationDate.getFileType());
+        // test adjlist
+        AdjacentList adjOrderBySource =
+                knowsEdgeInfo.getAdjacentList(AdjListType.ordered_by_source);
+        Assert.assertEquals(FileType.PARQUET, adjOrderBySource.getFileType());
+        Assert.assertEquals(AdjListType.ordered_by_source, adjOrderBySource.getType());
+        Assert.assertEquals("ordered_by_source/", adjOrderBySource.getPrefix());
+        Assert.assertEquals(
+                URI.create("edge/person_knows_person/ordered_by_source/adj_list/offset/"),
+                knowsEdgeInfo.getOffsetUri(AdjListType.ordered_by_source));
     }
 }

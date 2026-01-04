@@ -44,10 +44,14 @@ public class AdjacentListYaml {
     }
 
     public AdjacentList toAdjacentList() {
+        String adjPrefix = prefix;
+        if (adjPrefix == null || adjPrefix.isEmpty()) {
+            adjPrefix = AdjListType.fromOrderedAndAlignedBy(ordered, aligned_by) + "/";
+        }
         return new AdjacentList(
                 AdjListType.fromOrderedAndAlignedBy(ordered, aligned_by),
                 FileType.fromString(file_type),
-                prefix);
+                adjPrefix);
     }
 
     public boolean isOrdered() {
