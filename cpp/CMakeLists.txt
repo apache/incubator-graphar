@@ -330,7 +330,11 @@ if(BUILD_ARROW_FROM_SOURCE AND GRAPHAR_BUILD_STATIC)
     get_target_property(bundled_lib_path graphar_bundled_dependencies IMPORTED_LOCATION)
     install(FILES ${bundled_lib_path} DESTINATION ${CMAKE_INSTALL_LIBDIR})
 else()
-    target_link_arrow_dependencies(graphar PRIVATE)
+    if(BUILD_ARROW_FROM_SOURCE OR USE_STATIC_ARROW)
+        target_link_arrow_dependencies(graphar PRIVATE)
+    else()
+        target_link_arrow_dependencies(graphar PUBLIC)
+    endif()
 endif()
 
 # ------------------------------------------------------------------------------

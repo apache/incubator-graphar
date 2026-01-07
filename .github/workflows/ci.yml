@@ -238,8 +238,12 @@ jobs:
         cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
         make -j$(nproc)
         export ASAN_OPTIONS=detect_leaks=0
-        ctest --output-on-failure
         popd
+
+    - name: Test
+      working-directory: "cpp/build-static"    
+      run: |
+        ctest --output-on-failure
 
     - name: Upload libgraphar.a artifact
       if: github.event_name == 'push'
@@ -355,8 +359,12 @@ jobs:
         make -j$(nproc)
         export ASAN_OPTIONS=detect_leaks=0
         export ASAN_OPTIONS=detect_container_overflow=0
-        ctest --output-on-failure
         popd
+
+    - name: Test
+      working-directory: "cpp/build-static"    
+      run: |
+        ctest --output-on-failure
 
     - name: Upload libgraphar.a artifact
       if: github.event_name == 'push'
