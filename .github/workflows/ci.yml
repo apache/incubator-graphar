@@ -270,6 +270,17 @@ jobs:
         ctest --output-on-failure
         popd
 
+    - name: Build with Arrow from Source
+      working-directory: "cpp"
+      run: |
+        mkdir build-bundled
+        pushd build-bundled
+        cmake .. -DBUILD_ARROW_FROM_SOURCE=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+        make -j$(nproc)
+        export ASAN_OPTIONS=detect_leaks=0
+        ctest --output-on-failure
+        popd
+
     - name: Upload libgraphar.a artifact
       if: github.event_name == 'push'
       uses: actions/upload-artifact@v4
