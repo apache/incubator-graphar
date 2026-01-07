@@ -89,7 +89,7 @@ function(build_arrow)
                              "-DARROW_BUILD_TESTS=OFF"
                              "-DARROW_BUILD_INTEGRATION=OFF"
                              "-DBoost_SOURCE=BUNDLED"
-                             "-DARROW_ORC=ON"
+                             "-DARROW_ORC=${GRAPHAR_ENABLE_ORC}"
                              "-DARROW_COMPUTE=ON"
                              "-DARROW_ACERO=ON"
                              "-DARROW_DATASET=ON"

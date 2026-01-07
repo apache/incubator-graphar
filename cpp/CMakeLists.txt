@@ -48,6 +48,7 @@ option(BUILD_DOCS_ONLY "Build docs only" OFF)
 option(USE_STATIC_ARROW "Link arrow static library" OFF)
 option(GRAPHAR_BUILD_STATIC "Build GraphAr as static libraries" OFF)
 option(BUILD_ARROW_FROM_SOURCE "Build Arrow from source" OFF)
+option(GRAPHAR_ENABLE_ORC "Enable Arrow ORC support (build-from-source)" OFF)
 
 # Consistency Logic
 if (USE_STATIC_ARROW OR BUILD_ARROW_FROM_SOURCE)
@@ -259,7 +260,9 @@ if (BUILD_ARROW_FROM_SOURCE)
     find_package(CURL REQUIRED)
     include(apache-arrow)
     build_arrow()
-    add_definitions(-DARROW_ORC)
+    if (GRAPHAR_ENABLE_ORC)
+        add_definitions(-DARROW_ORC)
+    endif()
 else()
     # Find System Arrow
     find_package(Arrow QUIET)
