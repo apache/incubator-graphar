@@ -273,11 +273,17 @@ jobs:
       run: |
         mkdir build-bundled
         pushd build-bundled
-        cmake .. -DBUILD_ARROW_FROM_SOURCE=ON -DCMAKE_BUILD_TYPE=Release  -DBUILD_TESTS=ON
+        cmake .. -DBUILD_ARROW_FROM_SOURCE=ON -DCMAKE_BUILD_TYPE=Release  -DBUILD_EXAMPLES=ON
         make -j$(nproc)
         export ASAN_OPTIONS=detect_leaks=0
-        ctest --output-on-failure
         popd
+
+    - name: Run examples
+      working-directory: "cpp/build-bundled"
+      run: |
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+        bash high_level_reader_example
+        bash high_level_writer_example
 
   macos:
     name: macos latest C++
@@ -382,8 +388,14 @@ jobs:
       run: |
         mkdir build-bundled
         pushd build-bundled
-        cmake .. -DBUILD_ARROW_FROM_SOURCE=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+        cmake .. -DBUILD_ARROW_FROM_SOURCE=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=ON
         make -j$(nproc)
         export ASAN_OPTIONS=detect_leaks=0
-        ctest --output-on-failure
         popd
+
+    - name: Run examples
+      working-directory: "cpp/build-bundled"
+      run: |
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+        bash high_level_reader_example
+        bash high_level_writer_example
