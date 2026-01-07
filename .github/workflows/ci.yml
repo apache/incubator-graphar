@@ -282,8 +282,8 @@ jobs:
       working-directory: "cpp/build-bundled"
       run: |
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
-        bash high_level_reader_example
-        bash high_level_writer_example
+        ./high_level_reader_example
+        ./high_level_writer_example
 
   macos:
     name: macos latest C++
@@ -398,5 +398,5 @@ jobs:
       working-directory: "cpp/build-bundled"
       run: |
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
-        bash high_level_reader_example
-        bash high_level_writer_example
+        ./high_level_reader_example
+        ./high_level_writer_example
