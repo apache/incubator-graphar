@@ -45,7 +45,11 @@ impl Display for DataType {
         if self.0.is_null() {
             write!(f, "null")
         } else {
-            write!(f, "{}", ffi::graphar::to_type_name(&self.0))
+            write!(
+                f,
+                "{}",
+                ffi::graphar::to_type_name(self.0.as_ref().unwrap())
+            )
         }
     }
 }
@@ -55,7 +59,11 @@ impl Debug for DataType {
         if self.0.is_null() {
             write!(f, "null")
         } else {
-            write!(f, "{}", ffi::graphar::to_type_name(&self.0))
+            write!(
+                f,
+                "{}",
+                ffi::graphar::to_type_name(self.0.as_ref().unwrap())
+            )
         }
     }
 }
