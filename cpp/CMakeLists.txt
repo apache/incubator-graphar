@@ -296,6 +296,15 @@ endif()
 target_link_libraries(graphar PUBLIC ${PROJECT_NAME}_interface)
 target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
 
+# When building Arrow/Parquet from source, GraphAr's sources (and often its public
+# headers) include Arrow/Parquet headers. Ensure the build tree can find them.
+# Use BUILD_INTERFACE so we don't leak the build directory into installed targets.
+if(BUILD_ARROW_FROM_SOURCE)
+    target_include_directories(graphar SYSTEM BEFORE
+        PUBLIC $<BUILD_INTERFACE:${GAR_ARROW_INCLUDE_DIR}>
+    )
+endif()
+
 # Dependency Linking Logic
 if(BUILD_ARROW_FROM_SOURCE AND GRAPHAR_BUILD_STATIC)
     set(GAR_BUNDLED_DEPS_STATIC_LIBS

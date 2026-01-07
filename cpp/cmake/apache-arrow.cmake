@@ -158,5 +158,12 @@ function(build_arrow)
             IMPORTED_LOCATION ${GAR_ARROW_ACERO_STATIC_LIB})
     endif()
 
+    # Ensure imported targets wait for the ExternalProject build/install step.
     add_dependencies(${GAR_ARROW_LIBRARY_TARGET} arrow_ep)
+    add_dependencies(${GAR_PARQUET_LIBRARY_TARGET} arrow_ep)
+    add_dependencies(${GAR_DATASET_LIBRARY_TARGET} arrow_ep)
+    add_dependencies(${GAR_ARROW_BUNDLED_DEPS_TARGET} arrow_ep)
+    if (TARGET ${GAR_ARROW_ACERO_LIBRARY_TARGET})
+        add_dependencies(${GAR_ARROW_ACERO_LIBRARY_TARGET} arrow_ep)
+    endif()
 endfunction()
