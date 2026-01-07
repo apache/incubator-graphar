@@ -273,7 +273,7 @@ jobs:
       run: |
         mkdir build-bundled
         pushd build-bundled
-        cmake .. -DBUILD_ARROW_FROM_SOURCE=ON -DCMAKE_BUILD_TYPE=Release
+        cmake .. -DBUILD_ARROW_FROM_SOURCE=ON -DCMAKE_BUILD_TYPE=Release  -DBUILD_TESTS=ON
         make -j$(nproc)
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
@@ -382,7 +382,7 @@ jobs:
       run: |
         mkdir build-bundled
         pushd build-bundled
-        cmake .. -DBUILD_ARROW_FROM_SOURCE=ON -DCMAKE_BUILD_TYPE=Release
+        cmake .. -DBUILD_ARROW_FROM_SOURCE=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
         make -j$(nproc)
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
