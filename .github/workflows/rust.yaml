@@ -138,6 +138,16 @@ jobs:
           cargo test --doc
         timeout-minutes: 30
 
+      - name: Release Build
+        run: cargo build -r
+        timeout-minutes: 30
+
+      - name: Release Test
+        run: |
+          cargo nextest run -r
+          cargo test -r --doc
+        timeout-minutes: 30
+
       - name: Build Docs
         run: cargo doc --lib --no-deps
         timeout-minutes: 30

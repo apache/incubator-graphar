@@ -21,7 +21,7 @@ use std::env;
 use std::path::{Path, PathBuf};
 
 fn link_libraries() {
-    // Link to system Arrow, `libarrow` is under `/usr/lib/x86_64-linux-gnu/` on Ubuntu
+    // TODO: Link to system Arrow, `libarrow` is under `/usr/lib/x86_64-linux-gnu/` on Ubuntu
     println!("cargo:rustc-link-search=native=/usr/lib/x86_64-linux-gnu/");
     println!("cargo:rustc-link-lib=dylib=arrow_compute");
     println!("cargo:rustc-link-lib=dylib=arrow_dataset");
@@ -61,7 +61,8 @@ fn build_graphar() -> Vec<PathBuf> {
     build
         .no_build_target(true)
         .define("CMAKE_BUILD_TYPE", cmake_build_type)
-        .define("GRAPHAR_BUILD_STATIC", "on");
+        .define("GRAPHAR_BUILD_STATIC", "ON")
+        .define("GRAPHAR_ENABLE_SANITIZER", "OFF");
     let build_dir = build.build();
 
     let lib_path = build_dir.join("build");
