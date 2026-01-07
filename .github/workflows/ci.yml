@@ -260,6 +260,10 @@ jobs:
       with:
           submodules: true
 
+    - name: Install dependencies
+      run: |
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev libssl-dev pkg-config doxygen lcov
+
     - name: Build with Arrow from Source
       working-directory: "cpp"
       run: |
