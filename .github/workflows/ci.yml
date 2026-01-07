@@ -380,8 +380,9 @@ jobs:
       with:
         cmake-version: '3.29.6'
 
-    - name: Show CMake version
-      run: cmake --version
+    - name: Install dependencies
+      run: |
+        brew install boost 
 
     - name: Build with Arrow from Source
       working-directory: "cpp"
