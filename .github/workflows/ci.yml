@@ -369,11 +369,13 @@ jobs:
       with:
           submodules: true
 
-    - name: Pin CMake 3.29 (avoid CMake 4 incompat)
-      run: |
-        brew install cmake@3.29
-        echo "$(brew --prefix cmake@3.29)/bin" >> "$GITHUB_PATH"
-        cmake --version
+    - name: Setup CMake 3.29.x
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.29.6'
+
+    - name: Show CMake version
+      run: cmake --version
 
     - name: Build with Arrow from Source
       working-directory: "cpp"
