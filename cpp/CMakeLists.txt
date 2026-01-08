@@ -17,7 +17,7 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-# Policies
+# Avoid mixing plain and keyword signature of target_link_libraries
 if (POLICY CMP0023)
   cmake_policy(SET CMP0023 NEW)
 endif()
@@ -38,7 +38,7 @@ set(GRAPHAR_VERSION ${GRAPHAR_MAJOR_VERSION}.${GRAPHAR_MINOR_VERSION}.${GRAPHAR_
 project(graphar-cpp LANGUAGES C CXX VERSION ${GRAPHAR_VERSION})
 
 # ------------------------------------------------------------------------------
-# Options
+# cmake options
 # ------------------------------------------------------------------------------
 option(BUILD_TESTS "Build unit tests" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
@@ -49,6 +49,7 @@ option(USE_STATIC_ARROW "Link arrow static library" OFF)
 option(GRAPHAR_BUILD_STATIC "Build GraphAr as static libraries" OFF)
 option(BUILD_ARROW_FROM_SOURCE "Build Arrow from source" OFF)
 option(GRAPHAR_ENABLE_ORC "Enable Arrow ORC support (build-from-source)" OFF)
+option(GRAPHAR_ENABLE_SANITIZER "Enable address sanitizer (Debug builds only)" ON)
 
 # Consistency Logic
 if (USE_STATIC_ARROW OR BUILD_ARROW_FROM_SOURCE)
@@ -89,11 +90,36 @@ endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fno-omit-frame-pointer -fsanitize=address")
 set(CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
+if(MSVC)
+    # Avoid GCC/Clang-specific flags on MSVC.
+    # C++17 is already enforced via CMAKE_CXX_STANDARD/target features.
+else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall")
+endif()
+
+if (APPLE)
+    set(CMAKE_MACOSX_RPATH ON)
+elseif(UNIX)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
+endif ()
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fno-omit-frame-pointer")
+if (GRAPHAR_ENABLE_SANITIZER)
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
+  # Linker flags are required to pull in the ASan runtime.
+  set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address")
+  set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=address")
+endif()
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -g")
 
 message(STATUS "[graphar] Build Type: ${CMAKE_BUILD_TYPE}")
 message(STATUS "[graphar] Build Static: ${GRAPHAR_BUILD_STATIC}")
 message(STATUS "[graphar] Build Arrow from Source: ${BUILD_ARROW_FROM_SOURCE}")
+
+string(TOUPPER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_UPPER)
+if (CMAKE_BUILD_TYPE_UPPER STREQUAL "DEBUG")
+  message(STATUS "[graphar] GRAPHAR_ENABLE_SANITIZER: ${GRAPHAR_ENABLE_SANITIZER}")
+endif()
 
 # ------------------------------------------------------------------------------
 # Dependencies & Configuration
@@ -123,8 +149,8 @@ function(target_link_arrow_dependencies _TARGET _VISIBILITY)
     if(BUILD_ARROW_FROM_SOURCE)
         # CASE 1: Build from Source -> MUST be Static Linkage
         target_include_directories(${_TARGET} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
-        
-        set(_DEPS 
+
+        set(_DEPS
             ${GAR_ARROW_STATIC_LIB}
             "${GAR_PARQUET_STATIC_LIB}"
             "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
@@ -133,7 +159,7 @@ function(target_link_arrow_dependencies _TARGET _VISIBILITY)
         if(APPLE)
             target_link_libraries(${_TARGET} ${_VISIBILITY} -Wl,-force_load ${_DEPS})
         else()
-            target_link_libraries(${_TARGET} ${_VISIBILITY} 
+            target_link_libraries(${_TARGET} ${_VISIBILITY}
                 -Wl,--exclude-libs,ALL -Wl,--whole-archive ${_DEPS} -Wl,--no-whole-archive)
         endif()
 
@@ -151,7 +177,7 @@ function(target_link_arrow_dependencies _TARGET _VISIBILITY)
         if(APPLE)
             target_link_libraries(${_TARGET} ${_VISIBILITY} -Wl,-force_load ${_DEPS})
         else()
-             target_link_libraries(${_TARGET} ${_VISIBILITY} 
+             target_link_libraries(${_TARGET} ${_VISIBILITY}
                 -Wl,--exclude-libs,ALL -Wl,--whole-archive ${_DEPS} -Wl,--no-whole-archive)
         endif()
 
@@ -165,7 +191,7 @@ function(target_link_arrow_dependencies _TARGET _VISIBILITY)
         if(TARGET ArrowAcero::arrow_acero_shared)
              list(APPEND _DEPS ArrowAcero::arrow_acero_shared)
         endif()
-        
+
         target_link_libraries(${_TARGET} ${_VISIBILITY} ${_DEPS})
     endif()
 endfunction()
@@ -185,7 +211,7 @@ function(graphar_create_merged_static_lib output_target)
   set(one_value_args NAME ROOT)
   set(multi_value_args TO_MERGE)
   cmake_parse_arguments(ARG "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
-  
+
   set(output_lib_path ${BUILD_OUTPUT_ROOT_DIRECTORY}${CMAKE_STATIC_LIBRARY_PREFIX}${ARG_NAME}${CMAKE_STATIC_LIBRARY_SUFFIX})
   set(all_library_paths $<TARGET_FILE:${ARG_ROOT}>)
   foreach(lib ${ARG_TO_MERGE})
@@ -233,7 +259,7 @@ function(graphar_create_merged_static_lib output_target)
      endforeach()
      file(APPEND ${ar_script_path}.in "SAVE\nEND\n")
      file(GENERATE OUTPUT ${ar_script_path} INPUT ${ar_script_path}.in)
-     
+
      set(ar_tool ${CMAKE_AR})
      if(CMAKE_INTERPROCEDURAL_OPTIMIZATION)
        set(ar_tool ${CMAKE_CXX_COMPILER_AR})
@@ -271,7 +297,7 @@ else()
     endif()
     find_package(ArrowDataset QUIET REQUIRED)
     find_package(Parquet QUIET REQUIRED)
-    
+
     if (${Arrow_VERSION} VERSION_GREATER_EQUAL "12.0.0")
         find_package(ArrowAcero QUIET REQUIRED)
     endif()
@@ -284,8 +310,8 @@ endif()
 # ------------------------------------------------------------------------------
 # Main Target: GraphAr
 # ------------------------------------------------------------------------------
-file(GLOB_RECURSE CORE_SRC_FILES 
-    "src/graphar/*.cc" 
+file(GLOB_RECURSE CORE_SRC_FILES
+    "src/graphar/*.cc"
     "${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp"
 )
 
@@ -311,10 +337,10 @@ endif()
 # Dependency Linking Logic
 if(BUILD_ARROW_FROM_SOURCE AND GRAPHAR_BUILD_STATIC)
     set(GAR_BUNDLED_DEPS_STATIC_LIBS
-        gar_arrow_static 
-        gar_parquet_static 
-        gar_dataset_static 
-        gar_acero_static 
+        gar_arrow_static
+        gar_parquet_static
+        gar_dataset_static
+        gar_acero_static
         gar_arrow_bundled_dependencies_static
     )
     GRAPHAR_CAR(_FIRST_LIB ${GAR_BUNDLED_DEPS_STATIC_LIBS})
@@ -325,9 +351,15 @@ if(BUILD_ARROW_FROM_SOURCE AND GRAPHAR_BUILD_STATIC)
         ROOT ${_FIRST_LIB}
         TO_MERGE ${_OTHER_LIBS}
     )
-    
+
     if(APPLE)
-        target_link_libraries(graphar PRIVATE -Wl,-force_load graphar_bundled_dependencies "-framework CoreFoundation" "-framework Security")
+        target_link_libraries(graphar PRIVATE -Wl,-force_load
+                graphar_bundled_dependencies
+                "-framework CoreFoundation"
+                "-framework Security")
+    elseif(MSVC)
+        # MSVC doesn't support GNU ld-style -Wl flags.
+        target_link_libraries(graphar PRIVATE graphar_bundled_dependencies)
     else()
         target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL graphar_bundled_dependencies)
     endif()
@@ -362,8 +394,8 @@ install(TARGETS graphar ${PROJECT_NAME}_interface
 )
 
 # FIX 2: Correctly install from src/graphar since that's where headers are
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/graphar 
-        DESTINATION include 
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/graphar
+        DESTINATION include
         FILES_MATCHING PATTERN "*.h"
 )
 
@@ -382,7 +414,7 @@ install(EXPORT graphar-targets FILE graphar-targets.cmake DESTINATION ${CMAKE_IN
 if (BUILD_EXAMPLES)
     find_package(Boost REQUIRED COMPONENTS graph)
     file(GLOB EXAMPLE_FILES RELATIVE "${PROJECT_SOURCE_DIR}/examples" "${PROJECT_SOURCE_DIR}/examples/*.cc")
-    
+
     foreach(f ${EXAMPLE_FILES})
         string(REGEX MATCH "^(.*)\\.[^.]*$" dummy ${f})
         set(E_NAME ${CMAKE_MATCH_1})
@@ -437,7 +469,7 @@ if (BUILD_BENCHMARKS)
 endif()
 
 # ------------------------------------------------------------------------------
-# Documentation & Formatting
+# Documentation
 # ------------------------------------------------------------------------------
 if (ENABLE_DOCS OR BUILD_DOCS_ONLY)
     set(PROJECT_DOCUMENT_SOURCE ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/README.md)
@@ -454,6 +486,25 @@ if (ENABLE_DOCS OR BUILD_DOCS_ONLY)
     endif()
 endif()
 
-file(GLOB_RECURSE FILES_NEED_FORMAT "src/graphar/*.h" "src/graphar/*.cc" "test/*.h" "test/*.cc" "examples/*.h" "examples/*.cc" "benchmarks/*.h" "benchmarks/*.cc")
-add_custom_target(graphar-clformat COMMAND clang-format --style=file -i ${FILES_NEED_FORMAT} VERBATIM)
-add_custom_target(graphar-cpplint COMMAND ${PROJECT_SOURCE_DIR}/misc/cpplint.py --root=${PROJECT_SOURCE_DIR}/include ${FILES_NEED_FORMAT} VERBATIM)
+
+# ------------------------------------------------------------------------------
+# Format code & cpplint
+# ------------------------------------------------------------------------------
+file(GLOB_RECURSE FILES_NEED_FORMAT "src/graphar/*.h" "src/graphar/*.cc"
+                                    "test/*.h" "test/*.cc"
+                                    "examples/*.h" "examples/*.cc"
+                                    "benchmarks/*.h" "benchmarks/*.cc")
+file(GLOB_RECURSE FILES_NEED_LINT "src/graphar/*.h" "src/graphar/*.cc"
+                                  "test/*.h" "test/*.cc"
+                                  "examples/*.h" "examples/*.cc"
+                                  "benchmarks/*.h" "benchmarks/*.cc")
+
+add_custom_target(graphar-clformat
+                  COMMAND clang-format --style=file -i ${FILES_NEED_FORMAT}
+                  COMMENT "Running clang-format."
+                  VERBATIM)
+
+add_custom_target(graphar-cpplint
+        COMMAND ${PROJECT_SOURCE_DIR}/misc/cpplint.py --root=${PROJECT_SOURCE_DIR}/include ${FILES_NEED_LINT}
+        COMMENT "Running cpplint check."
+        VERBATIM)

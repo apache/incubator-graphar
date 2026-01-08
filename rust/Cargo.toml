@@ -15,34 +15,16 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Bug Report
-description: File a bug report
-labels: ["bug"]
-assignees: []
-body:
-  - type: textarea
-    id: description
-    attributes:
-      label: Describe the bug, including details regarding any error messages, version, and platform.
-      description: Please include what you expected.
-    validations:
-      required: true
-  - type: dropdown
-    id: component
-    attributes:
-      label: Component(s)
-      multiple: true
-      options:
-        - Format
-        - C++
-        - Java
-        - Spark
-        - PySpark
-        - Python
-        - Rust
-        - Continuous Integration
-        - Developer Tools
-        - Documentation
-        - Other
-    validations:
-      required: true
+[package]
+name = "graphar-rs"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+
+[dependencies]
+# anyhow = "1.0.100"
+cxx = "1.0.190"
+
+[build-dependencies]
+cxx-build = "1.0.190"
+cmake = "0.1.54"

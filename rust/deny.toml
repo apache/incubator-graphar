@@ -15,34 +15,33 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: Bug Report
-description: File a bug report
-labels: ["bug"]
-assignees: []
-body:
-  - type: textarea
-    id: description
-    attributes:
-      label: Describe the bug, including details regarding any error messages, version, and platform.
-      description: Please include what you expected.
-    validations:
-      required: true
-  - type: dropdown
-    id: component
-    attributes:
-      label: Component(s)
-      multiple: true
-      options:
-        - Format
-        - C++
-        - Java
-        - Spark
-        - PySpark
-        - Python
-        - Rust
-        - Continuous Integration
-        - Developer Tools
-        - Documentation
-        - Other
-    validations:
-      required: true
+[graph]
+all-features = true
+
+[output]
+feature-depth = 1
+
+[advisories]
+git-fetch-with-cli = true
+unmaintained = "workspace"
+
+[licenses]
+allow = ["MIT", "Apache-2.0", "Zlib", "Unicode-3.0"]
+confidence-threshold = 0.8
+
+[licenses.private]
+ignore = false
+
+[bans]
+highlight = "all"
+multiple-versions = "warn"
+wildcards = "deny"
+
+[bans.workspace-dependencies]
+duplicates = "deny"
+unused = "deny"
+
+[sources]
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+unknown-git = "deny"
+unknown-registry = "deny"
