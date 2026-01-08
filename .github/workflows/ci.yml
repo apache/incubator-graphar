@@ -375,10 +375,24 @@ jobs:
       with:
           submodules: true
 
-    - name: Setup CMake 3.29.x
+    - name: Setup CMake 3.29.6
+      shell: bash
       run: |
-        curl -L https://github.com/Kitware/CMake/releases/download/v3.29.6/cmake-3.29.6-macos-universal.tar.gz | tar xz
-        sudo cp -r cmake-3.29.6-macos-universal/CMake.app/Contents/bin/* /usr/local/bin/
+        set -euo pipefail
+        CMAKE_VERSION="3.29.6"
+        CMAKE_TARBALL="cmake-${CMAKE_VERSION}-macos-universal.tar.gz"
+        CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${CMAKE_TARBALL}"
+
+        DEST_DIR="${RUNNER_TEMP}/cmake-${CMAKE_VERSION}"
+        rm -rf "${DEST_DIR}"
+        mkdir -p "${DEST_DIR}"
+
+        curl -fsSL "${CMAKE_URL}" | tar -xz -C "${DEST_DIR}"
+
+        # Prepend to PATH for subsequent steps in this job
+        echo "${DEST_DIR}/cmake-${CMAKE_VERSION}-macos-universal/CMake.app/Contents/bin" >> "${GITHUB_PATH}"
+
+        cmake --version
 
     - name: Install dependencies
       run: |
