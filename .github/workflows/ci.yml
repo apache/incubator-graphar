@@ -376,9 +376,9 @@ jobs:
           submodules: true
 
     - name: Setup CMake 3.29.x
-      uses: jwlawson/actions-setup-cmake@v2
-      with:
-        cmake-version: '3.29.6'
+      run: |
+        curl -L https://github.com/Kitware/CMake/releases/download/v3.29.6/cmake-3.29.6-macos-universal.tar.gz | tar xz
+        sudo cp -r cmake-3.29.6-macos-universal/CMake.app/Contents/bin/* /usr/local/bin/
 
     - name: Install dependencies
       run: |
