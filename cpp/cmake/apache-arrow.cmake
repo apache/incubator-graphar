@@ -89,7 +89,7 @@ function(build_arrow)
                              "-DARROW_BUILD_TESTS=OFF"
                              "-DARROW_BUILD_INTEGRATION=OFF"
                              "-DBoost_SOURCE=BUNDLED"
-                             "-DARROW_ORC=ON"
+                             "-DARROW_ORC=${GRAPHAR_ENABLE_ORC}"
                              "-DARROW_COMPUTE=ON"
                              "-DARROW_ACERO=ON"
                              "-DARROW_DATASET=ON"
@@ -111,7 +111,7 @@ function(build_arrow)
     if(DEFINED ENV{GAR_ARROW_SOURCE_URL})
         set(GAR_ARROW_SOURCE_URL "$ENV{GAR_ARROW_SOURCE_URL}")
     else()
-        set(ARROW_VERSION_TO_BUILD "15.0.0" CACHE INTERNAL "arrow version")
+        set(ARROW_VERSION_TO_BUILD "17.0.0" CACHE INTERNAL "arrow version")
         if (Arrow_FOUND) # arrow is installed, build the same version as the installed one
             set(ARROW_VERSION_TO_BUILD "${Arrow_VERSION}" CACHE INTERNAL "arrow version")
         endif()
@@ -158,5 +158,12 @@ function(build_arrow)
             IMPORTED_LOCATION ${GAR_ARROW_ACERO_STATIC_LIB})
     endif()
 
+    # Ensure imported targets wait for the ExternalProject build/install step.
     add_dependencies(${GAR_ARROW_LIBRARY_TARGET} arrow_ep)
+    add_dependencies(${GAR_PARQUET_LIBRARY_TARGET} arrow_ep)
+    add_dependencies(${GAR_DATASET_LIBRARY_TARGET} arrow_ep)
+    add_dependencies(${GAR_ARROW_BUNDLED_DEPS_TARGET} arrow_ep)
+    if (TARGET ${GAR_ARROW_ACERO_LIBRARY_TARGET})
+        add_dependencies(${GAR_ARROW_ACERO_LIBRARY_TARGET} arrow_ep)
+    endif()
 endfunction()

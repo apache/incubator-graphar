@@ -22,7 +22,7 @@ on:
   # but only for the main branch
   push:
     branches:
-      - main
+      - "main"
     paths:
       - 'cpp/**'
       - '.github/workflows/ci.yml'
@@ -188,6 +188,48 @@ jobs:
         ./arrow_chunk_reader_benchmark
         ./label_filter_benchmark
 
+  ubuntu-static:
+    # TODO use ubuntu-latest
+    name: Ubuntu 22.04 C++ (static)
+    runs-on: ubuntu-22.04
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') && !github.event.pull_request.draft }}
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          submodules: true
+
+    - name: Install dependencies
+      run: |
+
+        # install the latest arrow deb to test arrow
+        wget -c https://apache.jfrog.io/artifactory/arrow/"$(lsb_release --id --short | tr 'A-Z' 'a-z')"/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
+            -P /tmp/
+        sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
+        sudo apt-get update -y
+        sudo apt install -y libarrow-dev=17.0.0-1 \
+                            libarrow-dataset-dev=17.0.0-1 \
+                            libarrow-acero-dev=17.0.0-1 \
+                            libparquet-dev=17.0.0-1
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
+
+        # install benchmark
+        git clone --branch v1.8.3 https://github.com/google/benchmark.git --depth 1
+        pushd benchmark
+        cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBENCHMARK_ENABLE_TESTING=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF .
+        sudo make install
+        popd
+
+        # install Catch2 v3
+        git clone --branch v3.6.0 https://github.com/catchorg/Catch2.git --depth 1
+        pushd Catch2
+        cmake -Bbuild -H. -DBUILD_TESTING=OFF
+        sudo cmake --build build/ --target install
+        popd
+
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+
     - name: Use Static Arrow
       working-directory: "cpp"
       run: |
@@ -196,8 +238,12 @@ jobs:
         cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
         make -j$(nproc)
         export ASAN_OPTIONS=detect_leaks=0
-        ctest --output-on-failure
         popd
+
+    - name: Test
+      working-directory: "cpp/build-static"    
+      run: |
+        ctest --output-on-failure
 
     - name: Upload libgraphar.a artifact
       if: github.event_name == 'push'
@@ -240,39 +286,44 @@ jobs:
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
 
-    - name: test release build type
-      working-directory: "cpp"
-      run: |
-        mkdir build-release
-        pushd build-release
-        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
-        export ASAN_OPTIONS=detect_leaks=0
-        ctest --output-on-failure
-        popd
+  macos-static:
+    name: macos latest C++ (static)
+    runs-on: macos-latest
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
+    strategy:
+      fail-fast: false
 
-    - name: Benchmark-release
-      working-directory: "cpp/build-release"
+    steps:
+    - uses: actions/checkout@v3
+      with:
+          submodules: true
+
+    - name: Install dependencies
       run: |
-        ./graph_info_benchmark
-        ./arrow_chunk_reader_benchmark
-        ./label_filter_benchmark
+        brew bundle --file=cpp/Brewfile
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
     - name: Use Static Arrow
       working-directory: "cpp"
       run: |
         mkdir build-static
         pushd build-static
-        cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
         make -j$(nproc)
         export ASAN_OPTIONS=detect_leaks=0
         export ASAN_OPTIONS=detect_container_overflow=0
-        ctest --output-on-failure
         popd
+
+    - name: Test
+      working-directory: "cpp/build-static"    
+      run: |
+        ctest --output-on-failure
 
     - name: Upload libgraphar.a artifact
       if: github.event_name == 'push'
       uses: actions/upload-artifact@v4
       with:
-        name: macos-${{ matrix.macos-version }}-libgraphar.a
+        name: macos-libgraphar.a
         path: cpp/build-static/libgraphar.a
