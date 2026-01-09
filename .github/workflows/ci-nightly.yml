@@ -17,7 +17,13 @@
 
 name: GraphAr C++ CI Nightly
 
-on:
+on:  
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'cpp/**'
+      - '.github/workflows/ci.yml'
   workflow_dispatch:
   schedule:
     # The notifications for scheduled workflows are sent to the user who
@@ -56,6 +62,91 @@ jobs:
         popd
 
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+
+    - name: CMake-debug
+      run: |
+        mkdir build-debug
+        pushd build-debug
+        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
+        popd
+
+    - name: Build GraphAr-debug
+      run: |
+        pushd build-debug
+        make -j$(nproc)
+        make graphar-ccache-stats
+        popd
+        
+    - name: Test-debug
+      run: |
+        pushd build-debug
+        ctest --output-on-failure
+        popd
+
+
+    - name: CMake-release
+      run: |
+        mkdir build-release
+        pushd build-release
+        cmake ../cpp -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
+        popd
+
+    - name: Build GraphAr-release
+      run: |
+        pushd build-release
+        make -j$(nproc)
+        make graphar-ccache-stats
+        popd
+
+    - name: Test-release
+      run: |
+        pushd build-release
+        ctest --output-on-failure
+        popd
+
+  GraphAr-macos-arrow-from-source:
+    if: ${{ github.ref == 'refs/heads/main' && github.repository == 'apache/incubator-graphar' }}
+    runs-on: macos-latest
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
+    steps:
+    - uses: actions/checkout@v4
+      with:
+          submodules: true
+
+    - name: Cache for ccache
+      uses: actions/cache@v3
+      with:
+        path: ~/.ccache
+        key: ${{ matrix.os }}-build-ccache-${{ hashFiles('**/git-modules.txt') }}
+        restore-keys: |
+          ${{ matrix.os }}-build-ccache-
+
+    - name: Setup CMake 3.29.6
+      shell: bash
+      run: |
+        set -euo pipefail
+        CMAKE_VERSION="3.29.6"
+        CMAKE_TARBALL="cmake-${CMAKE_VERSION}-macos-universal.tar.gz"
+        CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${CMAKE_TARBALL}"
+
+        DEST_DIR="${RUNNER_TEMP}/cmake-${CMAKE_VERSION}"
+        rm -rf "${DEST_DIR}"
+        mkdir -p "${DEST_DIR}"
+
+        curl -fsSL "${CMAKE_URL}" | tar -xz -C "${DEST_DIR}"
+
+        # Prepend to PATH for subsequent steps in this job
+        echo "${DEST_DIR}/cmake-${CMAKE_VERSION}-macos-universal/CMake.app/Contents/bin" >> "${GITHUB_PATH}"
+
+        cmake --version
+
+
+    - name: Install dependencies
+      run: |
+        brew install boost 
+        brew install ccache
+        brew install catch2
 
     - name: CMake-debug
       run: |

@@ -252,39 +252,6 @@ jobs:
         name: ubuntu-libgraphar.a
         path: cpp/build-static/libgraphar.a
 
-  ubuntu-arrow-source:
-    # TODO use ubuntu-latest
-    name: Ubuntu 22.04 C++ (arrow from source)
-    runs-on: ubuntu-22.04
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && !github.event.pull_request.draft }}
-    env:
-      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
-    steps:
-    - uses: actions/checkout@v3
-      with:
-          submodules: true
-
-    - name: Install dependencies
-      run: |
-        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev libssl-dev pkg-config doxygen lcov
-
-    - name: Build with Arrow from Source
-      working-directory: "cpp"
-      run: |
-        mkdir build-bundled
-        pushd build-bundled
-        cmake .. -DBUILD_ARROW_FROM_SOURCE=ON -DCMAKE_BUILD_TYPE=Release  -DBUILD_EXAMPLES=ON
-        make -j$(nproc)
-        export ASAN_OPTIONS=detect_leaks=0
-        popd
-
-    - name: Run examples
-      working-directory: "cpp/build-bundled"
-      run: |
-        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
-        ./high_level_reader_example
-        ./high_level_writer_example
-
   macos:
     name: macos latest C++
     runs-on: macos-latest
@@ -360,57 +327,3 @@ jobs:
       with:
         name: macos-libgraphar.a
         path: cpp/build-static/libgraphar.a
-
-  macos-arrow-source:
-    name: macos latest C++ (arrow from source)
-    runs-on: macos-latest
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
-    env:
-      GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
-    strategy:
-      fail-fast: false
-
-    steps:
-    - uses: actions/checkout@v3
-      with:
-          submodules: true
-
-    - name: Setup CMake 3.29.6
-      shell: bash
-      run: |
-        set -euo pipefail
-        CMAKE_VERSION="3.29.6"
-        CMAKE_TARBALL="cmake-${CMAKE_VERSION}-macos-universal.tar.gz"
-        CMAKE_URL="https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${CMAKE_TARBALL}"
-
-        DEST_DIR="${RUNNER_TEMP}/cmake-${CMAKE_VERSION}"
-        rm -rf "${DEST_DIR}"
-        mkdir -p "${DEST_DIR}"
-
-        curl -fsSL "${CMAKE_URL}" | tar -xz -C "${DEST_DIR}"
-
-        # Prepend to PATH for subsequent steps in this job
-        echo "${DEST_DIR}/cmake-${CMAKE_VERSION}-macos-universal/CMake.app/Contents/bin" >> "${GITHUB_PATH}"
-
-        cmake --version
-
-    - name: Install dependencies
-      run: |
-        brew install boost 
-
-    - name: Build with Arrow from Source
-      working-directory: "cpp"
-      run: |
-        mkdir build-bundled
-        pushd build-bundled
-        cmake .. -DBUILD_ARROW_FROM_SOURCE=ON -DCMAKE_BUILD_TYPE=Release -DBUILD_EXAMPLES=ON
-        make -j$(nproc)
-        export ASAN_OPTIONS=detect_leaks=0
-        popd
-
-    - name: Run examples
-      working-directory: "cpp/build-bundled"
-      run: |
-        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
-        ./high_level_reader_example
-        ./high_level_writer_example
