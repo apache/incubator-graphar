@@ -32,7 +32,25 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class GraphInfoTest {
-    public static final String root = System.getenv("GAR_TEST_DATA") + "/java";
+    private static String resolveTestData() {
+        String path = System.getenv("GAR_TEST_DATA");
+        if (path == null) {
+            path = System.getProperty("gar.test.data");
+        }
+        if (path == null) {
+            String[] candidates = {"../../testing", "../testing", "testing"};
+            for (String p : candidates) {
+                java.io.File dir = new java.io.File(p).getAbsoluteFile();
+                if (new java.io.File(dir, "ldbc_sample/csv/ldbc_sample.graph.yml").exists()) {
+                    return dir.getAbsolutePath();
+                }
+            }
+            throw new IllegalStateException("GAR_TEST_DATA not found");
+        }
+        return path;
+    }
+
+    public static final String root = resolveTestData() + "/java";
 
     @Test
     public void test1() {
