@@ -32,7 +32,7 @@ on:
     - cron:  '00 19 * * *'
 jobs:
   GraphAr-ubuntu-arrow-from-source:
-    if: ${{ github.ref == 'refs/heads/main' && github.repository == 'apache/incubator-graphar' }}
+    # if: ${{ github.ref == 'refs/heads/main' && github.repository == 'apache/incubator-graphar' }}
     runs-on: ubuntu-latest
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
@@ -105,7 +105,7 @@ jobs:
         popd
 
   GraphAr-macos-arrow-from-source:
-    if: ${{ github.ref == 'refs/heads/main' && github.repository == 'apache/incubator-graphar' }}
+    # if: ${{ github.ref == 'refs/heads/main' && github.repository == 'apache/incubator-graphar' }}
     runs-on: macos-latest
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
