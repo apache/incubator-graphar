@@ -29,10 +29,25 @@ abstract class BaseTestSuite extends AnyFunSuite with BeforeAndAfterAll {
   var spark: SparkSession = _
 
   override def beforeAll(): Unit = {
-    if (System.getenv("GAR_TEST_DATA") == null) {
-      throw new IllegalArgumentException("GAR_TEST_DATA is not set")
+    def resolveTestData(): String = {
+      Option(System.getenv("GAR_TEST_DATA"))
+        .orElse(Option(System.getProperty("gar.test.data")))
+        .getOrElse {
+          val candidates = Seq("../../testing", "../testing", "testing")
+          candidates
+            .map(p => new java.io.File(p).getAbsoluteFile)
+            .find(d =>
+              new java.io.File(d, "ldbc_sample/csv/ldbc_sample.graph.yml")
+                .exists()
+            )
+            .map(_.getAbsolutePath)
+            .getOrElse(
+              throw new IllegalArgumentException("GAR_TEST_DATA not found")
+            )
+        }
     }
-    testData = System.getenv("GAR_TEST_DATA")
+
+    testData = resolveTestData()
     spark = SparkSession
       .builder()
       .enableHiveSupport()
