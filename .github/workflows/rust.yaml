@@ -70,7 +70,7 @@ jobs:
         uses: taiki-e/install-action@v2
         with:
           tool: cargo-nextest@0.9.114
-          
+
       - name: Install cargo-machete
         uses: taiki-e/install-action@v2
         with:
@@ -136,6 +136,16 @@ jobs:
         run: |
           cargo nextest run
           cargo test --doc
+        timeout-minutes: 30
+
+      - name: Release Build
+        run: cargo build -r
+        timeout-minutes: 30
+
+      - name: Release Test
+        run: |
+          cargo nextest run -r
+          cargo test -r --doc
         timeout-minutes: 30
 
       - name: Build Docs

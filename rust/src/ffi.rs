@@ -17,21 +17,71 @@
 
 #[cxx::bridge(namespace = "graphar")]
 pub(crate) mod graphar {
-    unsafe extern "C++" {
+    extern "C++" {
         include!("graphar_rs.h");
-
-        #[allow(unused)]
-        #[namespace = "graphar_rs"]
-        fn foo(x: i64, y: i64) -> i64;
     }
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+    /// The main data type enumeration used by GraphAr.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[repr(u32)]
+    enum Type {
+        /// Boolean.
+        #[cxx_name = "BOOL"]
+        Bool = 0,
+        /// Signed 32-bit integer.
+        #[cxx_name = "INT32"]
+        Int32,
+        /// Signed 64-bit integer.
+        #[cxx_name = "INT64"]
+        Int64,
+        /// 4-byte floating point value.
+        #[cxx_name = "FLOAT"]
+        Float,
+        /// 8-byte floating point value.
+        #[cxx_name = "DOUBLE"]
+        Double,
+        /// UTF-8 variable-length string.
+        #[cxx_name = "STRING"]
+        String,
+        /// List of some logical data type.
+        #[cxx_name = "LIST"]
+        List,
+        /// int32 days since the UNIX epoch.
+        #[cxx_name = "DATE"]
+        Date,
+        /// Exact timestamp encoded with int64 since UNIX epoch in milliseconds.
+        #[cxx_name = "TIMESTAMP"]
+        Timestamp,
+        /// User-defined data type.
+        #[cxx_name = "USER_DEFINED"]
+        UserDefined,
+        /// Sentinel value; do not use as a real type.
+        #[cxx_name = "MAX_ID"]
+        MaxId,
+    }
+    // C++ Enum
+    unsafe extern "C++" {
+        type Type;
+    }
 
-    #[test]
-    fn test_foo() {
-        assert_eq!(graphar::foo(1, 2), 3);
+    // `DataType`
+    unsafe extern "C++" {
+        type DataType;
+
+        fn Equals(&self, other: &DataType) -> bool;
+        fn value_type(&self) -> &SharedPtr<DataType>;
+        fn id(&self) -> Type;
+        #[namespace = "graphar_rs"]
+        fn to_type_name(data_type: &DataType) -> String;
+
+        fn int32() -> &'static SharedPtr<DataType>;
+        fn boolean() -> &'static SharedPtr<DataType>;
+        fn int64() -> &'static SharedPtr<DataType>;
+        fn float32() -> &'static SharedPtr<DataType>;
+        fn float64() -> &'static SharedPtr<DataType>;
+        fn string() -> &'static SharedPtr<DataType>;
+        fn date() -> &'static SharedPtr<DataType>;
+        fn timestamp() -> &'static SharedPtr<DataType>;
+        fn list(inner: &SharedPtr<DataType>) -> SharedPtr<DataType>;
     }
 }
