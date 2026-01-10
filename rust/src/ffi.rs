@@ -21,29 +21,41 @@ pub(crate) mod graphar {
         include!("graphar_rs.h");
     }
 
+    /// The main data type enumeration used by GraphAr.
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     #[repr(u32)]
     enum Type {
+        /// Boolean.
         #[cxx_name = "BOOL"]
         Bool = 0,
+        /// Signed 32-bit integer.
         #[cxx_name = "INT32"]
         Int32,
+        /// Signed 64-bit integer.
         #[cxx_name = "INT64"]
         Int64,
+        /// 4-byte floating point value.
         #[cxx_name = "FLOAT"]
         Float,
+        /// 8-byte floating point value.
         #[cxx_name = "DOUBLE"]
         Double,
+        /// UTF-8 variable-length string.
         #[cxx_name = "STRING"]
         String,
+        /// List of some logical data type.
         #[cxx_name = "LIST"]
         List,
+        /// int32 days since the UNIX epoch.
         #[cxx_name = "DATE"]
         Date,
+        /// Exact timestamp encoded with int64 since UNIX epoch in milliseconds.
         #[cxx_name = "TIMESTAMP"]
         Timestamp,
+        /// User-defined data type.
         #[cxx_name = "USER_DEFINED"]
         UserDefined,
+        /// Sentinel value; do not use as a real type.
         #[cxx_name = "MAX_ID"]
         MaxId,
     }

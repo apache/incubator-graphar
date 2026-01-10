@@ -15,14 +15,30 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//! GraphAr logical data types.
+//!
+//! This module provides Rust wrappers around GraphAr's C++ `graphar::DataType`
+//! and `graphar::Type`.
+
 use crate::ffi;
 use cxx::SharedPtr;
 use std::fmt::{Debug, Display};
 
 // C++ enums
+/// The main data type enumeration used by GraphAr.
+///
+/// This is a re-export of the C++ `graphar::Type` enum.
 pub use crate::ffi::graphar::Type;
 
 #[derive(Clone)]
+/// A logical data type used by GraphAr.
+///
+/// This is a thin wrapper around the C++ `graphar::DataType` (held by a
+/// `cxx::SharedPtr`).
+///
+/// Note that `DataType` may be a null pointer. A null `DataType` is used as a
+/// sentinel value (e.g. `value_type()` for non-list types) and formats as
+/// `"null"` via [`Display`] and [`Debug`].
 pub struct DataType(SharedPtr<ffi::graphar::DataType>);
 
 impl PartialEq for DataType {
@@ -34,81 +50,97 @@ impl PartialEq for DataType {
             return false;
         }
 
-        self.0.Equals(other.0.as_ref().expect("rhs is nullptr"))
+        self.0.Equals(&other.0)
     }
 }
 
 impl Eq for DataType {}
 
+impl DataType {
+    fn fmt_type_name(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self.0.as_ref() {
+            None => write!(f, "null"),
+            Some(data_type) => write!(f, "{}", ffi::graphar::to_type_name(data_type)),
+        }
+    }
+}
+
 impl Display for DataType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.0.is_null() {
-            write!(f, "null")
-        } else {
-            write!(
-                f,
-                "{}",
-                ffi::graphar::to_type_name(self.0.as_ref().unwrap())
-            )
-        }
+        self.fmt_type_name(f)
     }
 }
 
 impl Debug for DataType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.0.is_null() {
-            write!(f, "null")
-        } else {
-            write!(
-                f,
-                "{}",
-                ffi::graphar::to_type_name(self.0.as_ref().unwrap())
-            )
-        }
+        self.fmt_type_name(f)
     }
 }
 
 impl DataType {
+    /// Returns the element type of a list.
+    ///
+    /// For non-list types, this returns a null `DataType`.
     pub fn value_type(&self) -> Self {
         DataType(self.0.value_type().clone())
     }
 
+    /// Returns the type category of this `DataType`.
     pub fn id(&self) -> Type {
         self.0.id()
     }
 
+    /// Returns the boolean type.
     pub fn bool() -> Self {
         Self(ffi::graphar::boolean().clone())
     }
 
+    /// Returns the signed 32-bit integer type.
     pub fn int32() -> Self {
         Self(ffi::graphar::int32().clone())
     }
 
+    /// Returns the signed 64-bit integer type.
     pub fn int64() -> Self {
         Self(ffi::graphar::int64().clone())
     }
 
+    /// Returns the 32-bit floating point type.
     pub fn float32() -> Self {
         Self(ffi::graphar::float32().clone())
     }
 
+    /// Returns the 64-bit floating point type.
     pub fn float64() -> Self {
         Self(ffi::graphar::float64().clone())
     }
 
+    /// Returns the UTF-8 string type.
     pub fn string() -> Self {
         Self(ffi::graphar::string().clone())
     }
 
+    /// Returns the date type.
+    ///
+    /// This corresponds to `int32` days since the UNIX epoch.
     pub fn date() -> Self {
         Self(ffi::graphar::date().clone())
     }
 
+    /// Returns the timestamp type.
+    ///
+    /// This corresponds to an `int64` number of milliseconds since the UNIX
+    /// epoch.
     pub fn timestamp() -> Self {
         Self(ffi::graphar::timestamp().clone())
     }
 
+    /// Returns a list type whose element type is `value_type`.
+    ///
+    /// # Panics
+    ///
+    /// This method may panic or fail in the underlying C++ implementation if
+    /// `value_type` is a null `DataType`.
     pub fn list(value_type: &DataType) -> Self {
         Self(ffi::graphar::list(&value_type.0))
     }

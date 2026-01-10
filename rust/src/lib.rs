@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//! Rust bindings for GraphAr data types.
+
 mod ffi;
 
+/// GraphAr logical data types.
 pub mod types;
