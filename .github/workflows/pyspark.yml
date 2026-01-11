@@ -55,7 +55,7 @@ jobs:
     - name: Install Poetry
       working-directory: pyspark
       run: |
-        yes | sudo python3 -m pip install poetry --quiet
+        yes | python3 -m pip install poetry --quiet
         poetry env use python3
 
     - name: Lint
