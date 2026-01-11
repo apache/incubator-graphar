@@ -18,8 +18,9 @@
  */
 
 #include "graphar_rs.h"
+
 namespace graphar_rs {
-
-int64_t foo(int64_t x, int64_t y) { return x + y; }
-
+rust::String to_type_name(const graphar::DataType &type) {
+  return rust::String(type.ToTypeName());
+}
 } // namespace graphar_rs
