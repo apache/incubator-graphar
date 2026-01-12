@@ -118,7 +118,9 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   REQUIRE(builder->GetNum() == lines);
 
   // dump to files
-  REQUIRE(builder->Dump().ok());
+  auto st1 = builder->Dump();
+  std::cout << st1.message() << std::endl;
+  REQUIRE(st1.ok());
 
   // can not add new vertices after dumping
   REQUIRE(builder->AddVertex(v).IsInvalid());
@@ -217,7 +219,9 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
   REQUIRE(builder->GetNum() == lines);
 
   // dump to files
-  REQUIRE(builder->Dump().ok());
+  auto st1 = builder->Dump();
+  std::cout << st1.message() << std::endl;
+  REQUIRE(st1.ok());
 
   // can not add new edges after dumping
   REQUIRE(builder->AddEdge(e).IsInvalid());
