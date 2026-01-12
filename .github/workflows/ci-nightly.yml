@@ -80,6 +80,7 @@ jobs:
     - name: Test-debug
       run: |
         pushd build-debug
+        ./test_builder
         ctest --output-on-failure
         popd
 
