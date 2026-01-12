@@ -431,10 +431,7 @@ if (BUILD_EXAMPLES)
         target_link_libraries(${E_NAME} PRIVATE graphar ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
 
         # When GraphAr is static, consumers must also link Arrow/Parquet.
-        # But when we build Arrow from source and bundle it into GraphAr's
-        # merged static deps archive, linking Arrow again can duplicate Arrow
-        # object code in the final executable (ODR/global-state issues).
-        if(GRAPHAR_BUILD_STATIC AND NOT (BUILD_ARROW_FROM_SOURCE AND GRAPHAR_BUILD_STATIC))
+        if(GRAPHAR_BUILD_STATIC)
             target_link_arrow_dependencies(${E_NAME} PRIVATE)
         endif()
     endforeach()
@@ -451,10 +448,7 @@ if (BUILD_TESTS)
         target_link_libraries(${target} PRIVATE Catch2::Catch2WithMain graphar ${CMAKE_DL_LIBS})
 
         # When GraphAr is static, consumers must also link Arrow/Parquet.
-        # But when we build Arrow from source and bundle it into GraphAr's
-        # merged static deps archive, linking Arrow again can duplicate Arrow
-        # object code in the final executable (ODR/global-state issues).
-        if(GRAPHAR_BUILD_STATIC AND NOT (BUILD_ARROW_FROM_SOURCE AND GRAPHAR_BUILD_STATIC))
+        if(GRAPHAR_BUILD_STATIC)
             target_link_arrow_dependencies(${target} PRIVATE)
         endif()
         catch_discover_tests(${target})
