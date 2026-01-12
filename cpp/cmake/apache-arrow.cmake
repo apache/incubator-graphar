@@ -111,7 +111,7 @@ function(build_arrow)
     if(DEFINED ENV{GAR_ARROW_SOURCE_URL})
         set(GAR_ARROW_SOURCE_URL "$ENV{GAR_ARROW_SOURCE_URL}")
     else()
-        set(ARROW_VERSION_TO_BUILD "17.0.0" CACHE INTERNAL "arrow version")
+        set(ARROW_VERSION_TO_BUILD "15.0.0" CACHE INTERNAL "arrow version")
         if (Arrow_FOUND) # arrow is installed, build the same version as the installed one
             set(ARROW_VERSION_TO_BUILD "${Arrow_VERSION}" CACHE INTERNAL "arrow version")
         endif()
