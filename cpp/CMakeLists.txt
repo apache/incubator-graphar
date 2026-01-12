@@ -79,7 +79,7 @@ else ()
 endif ()
 
 # Compiler Flags
-if(NOT (CMAKE_CXX_COMPILER_LAUNCHER MATCHES "ccache") AND NOT (CMAKE_C_COMPILER_LAUNCHER MATCHES "ccache"))Add a comment on  line R82Add diff commentMarkdown input:  edit mode selected.WritePreviewAdd a suggestionHeadingBoldItalicQuoteCodeLinkUnordered listNumbered listTask listMentionReferenceSaved repliesAdd FilesPaste, drop, or click to add filesCancelCommentStart a reviewReturn to code
+if(NOT (CMAKE_CXX_COMPILER_LAUNCHER MATCHES "ccache") AND NOT (CMAKE_C_COMPILER_LAUNCHER MATCHES "ccache"))
     find_program(ccache_EXECUTABLE ccache)
     if(ccache_EXECUTABLE)
         set(CMAKE_C_COMPILER_LAUNCHER ${ccache_EXECUTABLE})
