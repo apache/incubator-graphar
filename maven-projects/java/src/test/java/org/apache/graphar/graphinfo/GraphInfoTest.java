@@ -32,7 +32,36 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class GraphInfoTest {
-    public static final String root = System.getenv("GAR_TEST_DATA") + "/java";
+    private static String resolveTestData() {
+        String path = System.getenv("GAR_TEST_DATA");
+        if (path == null) {
+            path = System.getProperty("gar.test.data");
+        }
+        if (path == null) {
+            String[] candidates = {"../../testing", "../testing", "testing"};
+            for (String p : candidates) {
+                java.io.File dir = new java.io.File(p).getAbsoluteFile();
+                if (new java.io.File(dir, "ldbc_sample/csv/ldbc_sample.graph.yml").exists()) {
+                    path = dir.getAbsolutePath();
+                    break;
+                }
+            }
+            if (path == null) {
+                throw new RuntimeException(
+                        "GAR_TEST_DATA not found or invalid. Please set GAR_TEST_DATA environment variable to point to the testing directory or ensure the testing directory exists with ldbc_sample/csv/ldbc_sample.graph.yml");
+            }
+        }
+        java.io.File baseDir = new java.io.File(path).getAbsoluteFile();
+        java.io.File markerFile =
+                new java.io.File(baseDir, "ldbc_sample/csv/ldbc_sample.graph.yml");
+        if (!baseDir.isDirectory() || !markerFile.exists()) {
+            throw new RuntimeException(
+                    "GAR_TEST_DATA not found or invalid. Please set GAR_TEST_DATA environment variable to point to the testing directory or ensure the testing directory exists with ldbc_sample/csv/ldbc_sample.graph.yml");
+        }
+        return baseDir.getAbsolutePath();
+    }
+
+    public static final String root = resolveTestData() + "/java";
 
     @Test
     public void test1() {
