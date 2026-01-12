@@ -30,21 +30,38 @@ abstract class BaseTestSuite extends AnyFunSuite with BeforeAndAfterAll {
 
   override def beforeAll(): Unit = {
     def resolveTestData(): String = {
-      Option(System.getenv("GAR_TEST_DATA"))
-        .orElse(Option(System.getProperty("gar.test.data")))
-        .getOrElse {
-          val candidates = Seq("../../testing", "../testing", "testing")
-          candidates
-            .map(p => new java.io.File(p).getAbsoluteFile)
-            .find(d =>
-              new java.io.File(d, "ldbc_sample/csv/ldbc_sample.graph.yml")
-                .exists()
-            )
-            .map(_.getAbsolutePath)
-            .getOrElse(
-              throw new IllegalArgumentException("GAR_TEST_DATA not found")
-            )
+      var testDataPath: String =
+        Option(System.getenv("GAR_TEST_DATA"))
+          .orElse(Option(System.getProperty("gar.test.data")))
+          .orNull
+
+      if (testDataPath == null) {
+        val candidates = Seq("../../testing", "../testing", "testing")
+        candidates.foreach { p =>
+          val dir = new java.io.File(p).getAbsoluteFile
+          val marker =
+            new java.io.File(dir, "ldbc_sample/csv/ldbc_sample.graph.yml")
+          if (dir.exists() && dir.isDirectory && marker.isFile) {
+            testDataPath = dir.getAbsolutePath
+            return testDataPath
+          }
         }
+      }
+
+      if (testDataPath != null) {
+        val dir = new java.io.File(testDataPath)
+        val marker =
+          new java.io.File(dir, "ldbc_sample/csv/ldbc_sample.graph.yml")
+        if (dir.exists() && dir.isDirectory && marker.isFile) {
+          return testDataPath
+        }
+      }
+
+      throw new RuntimeException(
+        "GAR_TEST_DATA not found or invalid. " +
+          "Please set GAR_TEST_DATA environment variable to point to the testing directory " +
+          "or ensure the testing directory exists with ldbc_sample/csv/ldbc_sample.graph.yml"
+      )
     }
 
     testData = resolveTestData()
