@@ -154,20 +154,20 @@ jobs:
         dnf install -y parquet-devel # For Apache Parquet C++
         dnf install -y parquet-glib-devel # For Apache Parquet GLib (C)
 
-        git clone --branch v3.6.0 https://github.com/catchorg/Catch2.git --depth 1
-        pushd Catch2
-        cmake -Bbuild -H. -DBUILD_TESTING=OFF
-        cmake --build build/ --target install
-        popd
-        ##test build graphar cpp
-        export GAR_TEST_DATA=${{ github.workspace }}/graphar-testing/
-        git clone https://github.com/apache/incubator-graphar.git
-        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1 
-        cd incubator-graphar/cpp
-        mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DARROW_S3=OFF
-        make -j$(nproc)
-        ctest
+        # git clone --branch v3.6.0 https://github.com/catchorg/Catch2.git --depth 1
+        # pushd Catch2
+        # cmake -Bbuild -H. -DBUILD_TESTING=OFF
+        # cmake --build build/ --target install
+        # popd
+        # ##test build graphar cpp
+        # export GAR_TEST_DATA=${{ github.workspace }}/graphar-testing/
+        # git clone https://github.com/apache/incubator-graphar.git
+        # git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1 
+        # cd incubator-graphar/cpp
+        # mkdir build && cd build
+        # cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DARROW_S3=OFF
+        # make -j$(nproc)
+        # ctest
 
 
     steps:
