@@ -375,14 +375,14 @@ Status InitializeS3() {
   arrow::fs::S3GlobalOptions options;
   options.log_level = arrow::fs::S3LogLevel::Fatal;
 #endif
-#if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000 && defined (ARROW_S3)
   RETURN_NOT_ARROW_OK(arrow::fs::InitializeS3(options));
 #endif
   return Status::OK();
 }
 
 Status FinalizeS3() {
-#if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000 && defined (ARROW_S3)
   RETURN_NOT_ARROW_OK(arrow::fs::FinalizeS3());
 #endif
   return Status::OK();
