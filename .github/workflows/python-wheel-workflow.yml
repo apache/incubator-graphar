@@ -156,7 +156,7 @@ jobs:
         git clone --branch v3.6.0 https://github.com/catchorg/Catch2.git --depth 1
         pushd Catch2
         cmake -Bbuild -H. -DBUILD_TESTING=OFF
-        sudo cmake --build build/ --target install
+        cmake --build build/ --target install
         popd
         ##test build graphar cpp
         export GAR_TEST_DATA=${{ github.workspace }}/graphar-testing/
