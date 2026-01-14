@@ -130,27 +130,27 @@ jobs:
         fi
         dnf install -y 'dnf-command(config-manager)' || dnf install -y dnf-plugins-core || true
         # Follow official Apache Arrow install instructions for AlmaLinux/RHEL-family
-        sudo dnf install -y epel-release || sudo dnf install -y oracle-epel-release-el$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1) || sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1).noarch.rpm
-        sudo dnf install -y https://packages.apache.org/artifactory/arrow/almalinux/$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)/apache-arrow-release-latest.rpm
-        sudo dnf config-manager --set-enabled epel || :
-        sudo dnf config-manager --set-enabled powertools || :
-        sudo dnf config-manager --set-enabled crb || :
-        sudo dnf config-manager --set-enabled ol$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)_codeready_builder || :
-        sudo dnf config-manager --set-enabled codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-rhui-rpms || :
-        sudo subscription-manager repos --enable codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-$(arch)-rpms || :
-        sudo dnf install -y arrow-devel # For C++
-        sudo dnf install -y arrow-glib-devel # For GLib (C)
-        sudo dnf install -y arrow-dataset-devel # For Apache Arrow Dataset C++
-        sudo dnf install -y arrow-dataset-glib-devel # For Apache Arrow Dataset GLib (C)
-        sudo dnf install -y arrow-acero-devel # For Apache Arrow Acero C++
-        sudo dnf install -y arrow-flight-devel # For Apache Arrow Flight C++
-        sudo dnf install -y arrow-flight-glib-devel # For Apache Arrow Flight GLib (C)
-        sudo dnf install -y arrow-flight-sql-devel # For Apache Arrow Flight SQL C++
-        sudo dnf install -y arrow-flight-sql-glib-devel # For Apache Arrow Flight SQL GLib (C)
-        sudo dnf install -y gandiva-devel # For Apache Gandiva C++
-        sudo dnf install -y gandiva-glib-devel # For Apache Gandiva GLib (C)
-        sudo dnf install -y parquet-devel # For Apache Parquet C++
-        sudo dnf install -y parquet-glib-devel # For Apache Parquet GLib (C)
+        dnf install -y epel-release || dnf install -y oracle-epel-release-el$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1) || dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1).noarch.rpm
+        dnf install -y https://packages.apache.org/artifactory/arrow/almalinux/$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)/apache-arrow-release-latest.rpm
+        dnf config-manager --set-enabled epel || :
+        dnf config-manager --set-enabled powertools || :
+        dnf config-manager --set-enabled crb || :
+        dnf config-manager --set-enabled ol$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)_codeready_builder || :
+        dnf config-manager --set-enabled codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-rhui-rpms || :
+        subscription-manager repos --enable codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-$(arch)-rpms || :
+        dnf install -y arrow-devel # For C++
+        dnf install -y arrow-glib-devel # For GLib (C)
+        dnf install -y arrow-dataset-devel # For Apache Arrow Dataset C++
+        dnf install -y arrow-dataset-glib-devel # For Apache Arrow Dataset GLib (C)
+        dnf install -y arrow-acero-devel # For Apache Arrow Acero C++
+        dnf install -y arrow-flight-devel # For Apache Arrow Flight C++
+        dnf install -y arrow-flight-glib-devel # For Apache Arrow Flight GLib (C)
+        dnf install -y arrow-flight-sql-devel # For Apache Arrow Flight SQL C++
+        dnf install -y arrow-flight-sql-glib-devel # For Apache Arrow Flight SQL GLib (C)
+        dnf install -y gandiva-devel # For Apache Gandiva C++
+        dnf install -y gandiva-glib-devel # For Apache Gandiva GLib (C)
+        dnf install -y parquet-devel # For Apache Parquet C++
+        dnf install -y parquet-glib-devel # For Apache Parquet GLib (C)
 
     steps:
       - name: Checkout (needed for some tooling)
