@@ -153,6 +153,17 @@ jobs:
         dnf install -y parquet-devel # For Apache Parquet C++
         dnf install -y parquet-glib-devel # For Apache Parquet GLib (C)
 
+        ##test build graphar cpp
+        export GAR_TEST_DATA=${{ github.workspace }}/graphar-testing/
+        git clone https://github.com/apache/incubator-graphar.git
+        git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1 
+        cd incubator-graphar/cpp
+        mkdir build && cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+        make -j$(nproc)
+        ctest
+
+
     steps:
       - name: Checkout (needed for some tooling)
         uses: actions/checkout@v4
