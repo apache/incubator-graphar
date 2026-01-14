@@ -369,21 +369,27 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
 
 // arrow::fs::InitializeS3 and arrow::fs::FinalizeS3 need arrow_version >= 15
 Status InitializeS3() {
-#if defined(ARROW_VERSION) && ARROW_VERSION > 14000000 && defined (ARROW_S3)
+#if defined(ARROW_VERSION) && ARROW_VERSION > 14000000
+#if defined (ARROW_S3)
   auto options = arrow::fs::S3GlobalOptions::Defaults();
+#endif
 #else
   arrow::fs::S3GlobalOptions options;
   options.log_level = arrow::fs::S3LogLevel::Fatal;
 #endif
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000 && defined (ARROW_S3)
+#if defined (ARROW_S3)
   RETURN_NOT_ARROW_OK(arrow::fs::InitializeS3(options));
+#endif
 #endif
   return Status::OK();
 }
 
 Status FinalizeS3() {
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000 && defined (ARROW_S3)
+#if defined (ARROW_S3)
   RETURN_NOT_ARROW_OK(arrow::fs::FinalizeS3());
+#endif
 #endif
   return Status::OK();
 }
