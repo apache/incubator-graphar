@@ -164,7 +164,7 @@ jobs:
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1 
         cd incubator-graphar/cpp
         mkdir build && cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON
         make -j$(nproc)
         ctest
 
