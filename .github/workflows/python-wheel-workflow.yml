@@ -121,6 +121,7 @@ jobs:
       CIBW_MANYLINUX_AARCH64_IMAGE: ${{ matrix.os == 'linux' && format('manylinux{0}', matrix.manylinux) || '' }}
       CIBW_ENVIRONMENT_WINDOWS: DISTUTILS_USE_SDK=1 MSSdk=1
       CIBW_ENVIRONMENT_MACOS: ${{ matrix.os == 'macos' && format('MACOSX_DEPLOYMENT_TARGET={0} CMAKE_OSX_DEPLOYMENT_TARGET={0} CFLAGS=-mmacosx-version-min={0} CXXFLAGS=-mmacosx-version-min={0} LDFLAGS=-mmacosx-version-min={0}', matrix.deployment-target) || '' }}
+      CIBW_ENVIRONMENT_LINUX: "CMAKE_ARGS=-DARROW_S3=OFF"
       CIBW_BEFORE_BUILD_LINUX: |
         set -eux
         if [ -f /etc/system-release-cpe ]; then
