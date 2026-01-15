@@ -112,7 +112,8 @@ jobs:
 
     env:
       CIBW_PLATFORM: ${{ matrix.os }}
-      CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
+      # CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
+      CIBW_BUILD: "cp39-*"
       CIBW_SKIP: "*-musllinux_*"
       # Pin arch to the matrix platform
       CIBW_ARCHS: ${{ matrix.platform }}

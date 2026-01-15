@@ -22,7 +22,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "graphar"
-version = "0.13.0-dev"
+version = "0.13.0.dev1"
 description = "An open source, standard data file format for graph data storage and retrieval."
 readme = "README.md"
 authors = [{ name = "GraphAr community", email = "dev@graphar.apache.org" }]
