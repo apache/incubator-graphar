@@ -215,8 +215,8 @@ Result<T> FileSystem::ReadFileToValue(const std::string& path) const noexcept {
 }
 
 template <>
-Result<std::string> FileSystem::ReadFileToValue(const std::string& path) const
-    noexcept {
+Result<std::string> FileSystem::ReadFileToValue(
+    const std::string& path) const noexcept {
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto access_file,
                                        arrow_fs_->OpenInputFile(path));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto bytes, access_file->GetSize());
@@ -293,8 +293,8 @@ Status FileSystem::WriteTableToFile(
 }
 
 Status FileSystem::WriteLabelTableToFile(
-    const std::shared_ptr<arrow::Table>& table, const std::string& path) const
-    noexcept {
+    const std::shared_ptr<arrow::Table>& table,
+    const std::string& path) const noexcept {
   // try to create the directory, oss filesystem may not support this, ignore
   ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto output_stream,
@@ -370,7 +370,7 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
 // arrow::fs::InitializeS3 and arrow::fs::FinalizeS3 need arrow_version >= 15
 Status InitializeS3() {
 #if defined(ARROW_VERSION) && ARROW_VERSION > 14000000
-#if defined (ARROW_S3)
+#if defined(ARROW_S3)
   auto options = arrow::fs::S3GlobalOptions::Defaults();
 #endif
 #else
@@ -378,7 +378,7 @@ Status InitializeS3() {
   options.log_level = arrow::fs::S3LogLevel::Fatal;
 #endif
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000
-#if defined (ARROW_S3)
+#if defined(ARROW_S3)
   RETURN_NOT_ARROW_OK(arrow::fs::InitializeS3(options));
 #endif
 #endif
@@ -387,7 +387,7 @@ Status InitializeS3() {
 
 Status FinalizeS3() {
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000
-#if defined (ARROW_S3)
+#if defined(ARROW_S3)
   RETURN_NOT_ARROW_OK(arrow::fs::FinalizeS3());
 #endif
 #endif
@@ -398,7 +398,6 @@ Status FinalizeS3() {
 template Result<IdType> FileSystem::ReadFileToValue<IdType>(
     const std::string&) const noexcept;
 /// template specialization for std::string
-template Status FileSystem::WriteValueToFile<IdType>(const IdType&,
-                                                     const std::string&) const
-    noexcept;
+template Status FileSystem::WriteValueToFile<IdType>(
+    const IdType&, const std::string&) const noexcept;
 }  // namespace graphar
