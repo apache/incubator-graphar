@@ -245,8 +245,13 @@ jobs:
       - name: Smoke test wheel
         shell: bash
         run: |
-          python -m pip install python/dist/*.whl
-          python -c "import graphar; print('GraphAr imported successfully')"
+          set -euxo pipefail
+          python -m pip uninstall -y graphar || true
+
+          python -m pip install --no-index --find-links python/dist graphar
+
+          python -c "import graphar; import graphar._core; print('GraphAr imported successfully')"
+          graphar --help >/dev/null
 
   upload_test_pypi:
     name: Publish to TestPyPI (auto)
