@@ -1,8 +1,8 @@
----
+/html/
 id: motivation
 title: Motivation
 sidebar_position: 2
----
+/html/---
 
 Numerous graph systems,
 such as Neo4j, Nebula Graph, and Apache HugeGraph, have been developed in recent years.
