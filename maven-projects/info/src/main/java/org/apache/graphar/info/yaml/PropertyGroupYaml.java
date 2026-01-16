@@ -46,10 +46,22 @@ public class PropertyGroupYaml {
     }
 
     public PropertyGroup toPropertyGroup() {
+        String pgPrefix = prefix;
+        if (pgPrefix == null || pgPrefix.isEmpty()) {
+            StringBuilder prefixBuilder = new StringBuilder();
+            for (int i = 0; i < properties.size(); i++) {
+                if (i > 0) {
+                    prefixBuilder.append("_");
+                }
+                prefixBuilder.append(properties.get(i).getName());
+            }
+            prefixBuilder.append("/");
+            pgPrefix = prefixBuilder.toString();
+        }
         return new PropertyGroup(
                 properties.stream().map(PropertyYaml::toProperty).collect(Collectors.toList()),
                 FileType.fromString(file_type),
-                prefix);
+                pgPrefix);
     }
 
     public List<PropertyYaml> getProperties() {

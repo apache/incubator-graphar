@@ -42,7 +42,7 @@ public class GraphInfoLoaderTest {
 
     @Test
     public void testStringLoader() throws IOException {
-        final URI GRAPH_PATH_URI = TestUtil.getLdbcSampleGraphURI();
+        final URI GRAPH_PATH_URI = TestUtil.getCSVLdbcSampleGraphURI();
         GraphInfoLoader loader = new LocalFileSystemStringGraphInfoLoader();
         final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
         testGraphInfo(graphInfo);
@@ -50,7 +50,7 @@ public class GraphInfoLoaderTest {
 
     @Test
     public void testStreamLoader() throws IOException {
-        final URI GRAPH_PATH_URI = TestUtil.getLdbcSampleGraphURI();
+        final URI GRAPH_PATH_URI = TestUtil.getCSVLdbcSampleGraphURI();
         GraphInfoLoader loader = new LocalFileSystemStreamGraphInfoLoader();
         final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
         testGraphInfo(graphInfo);
@@ -58,7 +58,7 @@ public class GraphInfoLoaderTest {
 
     @Test
     public void testReaderLoader() throws IOException {
-        final URI GRAPH_PATH_URI = TestUtil.getLdbcSampleGraphURI();
+        final URI GRAPH_PATH_URI = TestUtil.getCSVLdbcSampleGraphURI();
         GraphInfoLoader loader = new LocalFileSystemReaderGraphInfoLoader();
         final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
         testGraphInfo(graphInfo);
