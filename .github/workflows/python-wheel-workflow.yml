@@ -130,27 +130,28 @@ jobs:
         fi
         dnf install -y 'dnf-command(config-manager)' || dnf install -y dnf-plugins-core || true
         # Follow official Apache Arrow install instructions for AlmaLinux/RHEL-family
-        dnf install -y epel-release || \
-          dnf install -y oracle-epel-release-el${ALMA_MAJOR} || \
-          dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-${ALMA_MAJOR}.noarch.rpm
-        dnf install -y https://packages.apache.org/artifactory/arrow/almalinux/${ALMA_MAJOR}/apache-arrow-release-latest.rpm
+        dnf install -y epel-release || dnf install -y oracle-epel-release-el$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1) || dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1).noarch.rpm
+        dnf install -y https://packages.apache.org/artifactory/arrow/almalinux/$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)/apache-arrow-release-latest.rpm
         dnf config-manager --set-enabled epel || :
         dnf config-manager --set-enabled powertools || :
         dnf config-manager --set-enabled crb || :
-        dnf config-manager --set-enabled ol${ALMA_MAJOR}_codeready_builder || :
-        dnf config-manager --set-enabled codeready-builder-for-rhel-${ALMA_MAJOR}-rhui-rpms || :
-        subscription-manager repos --enable codeready-builder-for-rhel-${ALMA_MAJOR}-$(arch)-rpms || :
-        # manylinux images may carry older Arrow packages (e.g. arrow1700-*) which
-        # conflict with the newer packages from the Apache Arrow repo (e.g. arrow2200-*).
-        # Remove any preinstalled Arrow/Parquet RPMs so we install a consistent set.
-        dnf remove -y 'arrow*' 'parquet*' || true
-        # Required for GraphAr C++ build via Arrow CMake packages
-        dnf install -y --allowerasing \
-          arrow-devel \
-          arrow-dataset-devel \
-          arrow-acero-devel \
-          parquet-devel \
-          libcurl-devel re2-devel ccache
+        dnf config-manager --set-enabled ol$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)_codeready_builder || :
+        dnf config-manager --set-enabled codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-rhui-rpms || :
+        subscription-manager repos --enable codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-$(arch)-rpms || :
+        dnf install -y arrow-devel # For C++
+        dnf install -y arrow-glib-devel # For GLib (C)
+        dnf install -y arrow-dataset-devel # For Apache Arrow Dataset C++
+        dnf install -y arrow-dataset-glib-devel # For Apache Arrow Dataset GLib (C)
+        dnf install -y arrow-acero-devel # For Apache Arrow Acero C++
+        dnf install -y arrow-flight-devel # For Apache Arrow Flight C++
+        dnf install -y arrow-flight-glib-devel # For Apache Arrow Flight GLib (C)
+        dnf install -y arrow-flight-sql-devel # For Apache Arrow Flight SQL C++
+        dnf install -y arrow-flight-sql-glib-devel # For Apache Arrow Flight SQL GLib (C)
+        dnf install -y gandiva-devel # For Apache Gandiva C++
+        dnf install -y gandiva-glib-devel # For Apache Gandiva GLib (C)
+        dnf install -y parquet-devel # For Apache Parquet C++
+        dnf install -y parquet-glib-devel # For Apache Parquet GLib (C)
+
     steps:
       - name: Checkout (needed for some tooling)
         uses: actions/checkout@v4
@@ -184,6 +185,7 @@ jobs:
               otool -l "$CONDA/lib/libarrow.dylib" | (grep -A3 -E 'LC_BUILD_VERSION|LC_VERSION_MIN_MACOSX' || true)
             fi
           fi
+
       - name: Install Arrow (Windows)
         if: matrix.os == 'windows'
         shell: pwsh
@@ -224,6 +226,7 @@ jobs:
             exit 1
           fi
           echo "PKGDIR=$PKGDIR" >> "$GITHUB_ENV"
+
       - name: Build wheels
         shell: bash
         run: |
@@ -232,11 +235,23 @@ jobs:
           python -m pip install packaging cibuildwheel
           mkdir -p python/dist
           python -m cibuildwheel --output-dir python/dist "$PKGDIR"
+
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.platform }}
           path: python/dist/*
+
+      - name: Smoke test wheel
+        shell: bash
+        run: |
+          set -euxo pipefail
+          python -m pip uninstall -y graphar || true
+
+          python -m pip install --find-links python/dist graphar
+
+          python -c "import graphar; import graphar._core; print('GraphAr imported successfully')"
+          graphar --help >/dev/null
 
   upload_test_pypi:
     name: Publish to TestPyPI (auto)
