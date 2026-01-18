@@ -337,7 +337,7 @@ mod tests {
 
         let pg = PropertyGroup::new(props, FileType::Parquet, "builder/");
         let mut got = pg.properties();
-        got.sort_by(|a, b| a.name().cmp(&b.name()));
+        got.sort_by_key(|a| a.name());
 
         assert_eq!(got.len(), 2);
         assert_eq!(got[0].name(), "id");
