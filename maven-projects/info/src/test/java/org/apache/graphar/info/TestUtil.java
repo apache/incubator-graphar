@@ -149,16 +149,14 @@ public class TestUtil {
         // Always try to find test data freshly to avoid stale cached values
         String testDataPath = null;
 
-        // 1. First try environment variable GAR_TEST_DATA
+        // Try environment variable GAR_TEST_DATA or system property
         testDataPath = System.getenv("GAR_TEST_DATA");
-
-        // 2. Try system property (for custom paths)
-        if (testDataPath == null) {
+        if (testDataPath == null || testDataPath.isEmpty()) {
             testDataPath = System.getProperty("gar.test.data");
         }
 
-        // 3. Default to project root testing directory
-        if (testDataPath == null) {
+        // Default to project root testing directory if nothing is set
+        if (testDataPath == null || testDataPath.isEmpty()) {
             String[] possiblePaths = {
                 "../../testing", // from info module to project root
                 "../testing", // from maven-projects to project root
