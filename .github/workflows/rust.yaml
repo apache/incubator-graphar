@@ -101,7 +101,7 @@ jobs:
                             libarrow-dataset-dev=22.0.0-1 \
                             libarrow-acero-dev=22.0.0-1 \
                             libparquet-dev=22.0.0-1 \
-                            libarrow-compute-22.0.0-1
+                            libarrow-compute-dev=22.0.0-1
           sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen lcov cmake
 
       - name: Spell Check
