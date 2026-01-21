@@ -30,6 +30,14 @@ use std::fmt::{Debug, Display};
 /// This is a re-export of the C++ `graphar::Type` enum.
 pub use crate::ffi::graphar::Type;
 
+/// File format for GraphAr chunk files.
+pub use crate::ffi::graphar::FileType;
+
+/// Cardinality of a property.
+///
+/// This defines how multiple values are handled for a given property key.
+pub use crate::ffi::graphar::Cardinality;
+
 #[derive(Clone)]
 /// A logical data type used by GraphAr.
 ///
@@ -39,7 +47,7 @@ pub use crate::ffi::graphar::Type;
 /// Note that `DataType` may be a null pointer. A null `DataType` is used as a
 /// sentinel value (e.g. `value_type()` for non-list types) and formats as
 /// `"null"` via [`Display`] and [`Debug`].
-pub struct DataType(SharedPtr<ffi::graphar::DataType>);
+pub struct DataType(pub(crate) SharedPtr<ffi::graphar::DataType>);
 
 impl PartialEq for DataType {
     fn eq(&self, other: &Self) -> bool {

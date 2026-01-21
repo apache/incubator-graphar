@@ -15,15 +15,44 @@
 // specific language governing permissions and limitations
 // under the License.
 
+use cxx::{ExternType, SharedPtr};
+
+/// A shared pointer wrapper for `graphar::PropertyGroup`.
+#[repr(transparent)]
+pub struct SharedPropertyGroup(pub(crate) SharedPtr<graphar::PropertyGroup>);
+
+unsafe impl ExternType for SharedPropertyGroup {
+    type Id = cxx::type_id!("graphar::SharedPropertyGroup");
+    type Kind = cxx::kind::Opaque;
+}
+
 #[cxx::bridge(namespace = "graphar")]
 pub(crate) mod graphar {
     extern "C++" {
         include!("graphar_rs.h");
     }
 
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[repr(i32)]
+    /// File format for GraphAr chunk files.
+    enum FileType {
+        /// CSV format.
+        #[cxx_name = "CSV"]
+        Csv = 0,
+        /// Parquet format.
+        #[cxx_name = "PARQUET"]
+        Parquet = 1,
+        /// ORC format.
+        #[cxx_name = "ORC"]
+        Orc = 2,
+        /// JSON format.
+        #[cxx_name = "JSON"]
+        Json = 3,
+    }
+
     /// The main data type enumeration used by GraphAr.
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-    #[repr(u32)]
+    #[repr(i32)]
     enum Type {
         /// Boolean.
         #[cxx_name = "BOOL"]
@@ -59,9 +88,28 @@ pub(crate) mod graphar {
         #[cxx_name = "MAX_ID"]
         MaxId,
     }
-    // C++ Enum
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[repr(i32)]
+    /// Cardinality of a property.
+    ///
+    /// This defines how multiple values are handled for a given property key.
+    enum Cardinality {
+        /// A single value.
+        #[cxx_name = "SINGLE"]
+        Single = 0,
+        /// A list of values.
+        #[cxx_name = "LIST"]
+        List = 1,
+        /// A set of values.
+        #[cxx_name = "SET"]
+        Set = 2,
+    }
+
     unsafe extern "C++" {
+        type FileType;
         type Type;
+        type Cardinality;
     }
 
     // `DataType`
@@ -84,4 +132,71 @@ pub(crate) mod graphar {
         fn timestamp() -> &'static SharedPtr<DataType>;
         fn list(inner: &SharedPtr<DataType>) -> SharedPtr<DataType>;
     }
+
+    // `Property`
+    unsafe extern "C++" {
+        type Property;
+
+        #[namespace = "graphar_rs"]
+        fn new_property(
+            name: &CxxString,
+            type_: SharedPtr<DataType>,
+            is_primary: bool,
+            is_nullable: bool,
+            cardinality: Cardinality,
+        ) -> UniquePtr<Property>;
+        #[namespace = "graphar_rs"]
+        fn property_get_name(prop: &Property) -> &CxxString;
+        #[namespace = "graphar_rs"]
+        fn property_get_type(prop: &Property) -> &SharedPtr<DataType>;
+        #[namespace = "graphar_rs"]
+        fn property_is_primary(prop: &Property) -> bool;
+        #[namespace = "graphar_rs"]
+        fn property_is_nullable(prop: &Property) -> bool;
+        #[namespace = "graphar_rs"]
+        fn property_get_cardinality(prop: &Property) -> Cardinality;
+        #[namespace = "graphar_rs"]
+        fn property_clone(prop: &Property) -> UniquePtr<Property>;
+
+        #[namespace = "graphar_rs"]
+        fn property_vec_push_property(
+            properties: Pin<&mut CxxVector<Property>>,
+            prop: UniquePtr<Property>,
+        );
+
+        #[namespace = "graphar_rs"]
+        fn property_vec_emplace_property(
+            properties: Pin<&mut CxxVector<Property>>,
+            name: &CxxString,
+            data_type: SharedPtr<DataType>,
+            is_primary: bool,
+            is_nullable: bool,
+            cardinality: Cardinality,
+        );
+    }
+
+    // `PropertyGroup`
+    unsafe extern "C++" {
+        type PropertyGroup;
+
+        fn GetProperties(&self) -> &CxxVector<Property>;
+        fn HasProperty(&self, property_name: &CxxString) -> bool;
+
+        fn CreatePropertyGroup(
+            properties: &CxxVector<Property>,
+            file_type: FileType,
+            prefix: &CxxString,
+        ) -> SharedPtr<PropertyGroup>;
+
+        #[namespace = "graphar_rs"]
+        fn property_group_vec_push_property_group(
+            property_groups: Pin<&mut CxxVector<SharedPropertyGroup>>,
+            property_group: SharedPtr<PropertyGroup>,
+        );
+    }
+
+    unsafe extern "C++" {
+        type SharedPropertyGroup = crate::ffi::SharedPropertyGroup;
+    }
+    impl CxxVector<SharedPropertyGroup> {}
 }

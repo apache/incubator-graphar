@@ -15,9 +15,19 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//! Rust bindings for GraphAr data types.
+//! Rust bindings for GraphAr.
+
+#![deny(missing_docs)]
+
+use cxx::CxxString;
 
 mod ffi;
 
+/// GraphAr property.
+pub mod property;
 /// GraphAr logical data types.
 pub mod types;
+
+fn cxx_string_to_string(value: &CxxString) -> String {
+    String::from_utf8_lossy(value.as_bytes()).into_owned()
+}
