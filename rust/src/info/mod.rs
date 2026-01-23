@@ -15,21 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//! Rust bindings for GraphAr.
+//! Graph metadata bindings.
 
-#![deny(missing_docs)]
+mod version;
+mod vertex_info;
 
-use cxx::CxxString;
-
-mod ffi;
-
-/// GraphAr metadata.
-pub mod info;
-/// GraphAr property.
-pub mod property;
-/// GraphAr logical data types.
-pub mod types;
-
-fn cxx_string_to_string(value: &CxxString) -> String {
-    String::from_utf8_lossy(value.as_bytes()).into_owned()
-}
+pub use version::InfoVersion;
+pub use vertex_info::{VertexInfo, VertexInfoBuilder};

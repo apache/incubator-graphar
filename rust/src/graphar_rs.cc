@@ -19,11 +19,21 @@
 
 #include "graphar_rs.h"
 
+#include <stdexcept>
 #include <utility>
 
 namespace graphar_rs {
 rust::String to_type_name(const graphar::DataType &type) {
   return rust::String(type.ToTypeName());
+}
+
+std::shared_ptr<graphar::ConstInfoVersion>
+new_const_info_version(int32_t version) {
+  try {
+    return std::make_shared<graphar::InfoVersion>(static_cast<int>(version));
+  } catch (const std::exception &e) {
+    throw std::runtime_error(e.what());
+  }
 }
 
 std::unique_ptr<graphar::Property>
@@ -67,9 +77,64 @@ void property_vec_emplace_property(std::vector<graphar::Property> &properties,
   properties.emplace_back(name, type, is_primary, is_nullable, cardinality);
 }
 
+std::unique_ptr<std::vector<graphar::Property>>
+property_vec_clone(const std::vector<graphar::Property> &properties) {
+  return std::make_unique<std::vector<graphar::Property>>(properties);
+}
+
 void property_group_vec_push_property_group(
     std::vector<graphar::SharedPropertyGroup> &property_groups,
     std::shared_ptr<graphar::PropertyGroup> property_group) {
   property_groups.emplace_back(std::move(property_group));
+}
+
+std::unique_ptr<std::vector<graphar::SharedPropertyGroup>>
+property_group_vec_clone(
+    const std::vector<graphar::SharedPropertyGroup> &property_groups) {
+  return std::make_unique<std::vector<graphar::SharedPropertyGroup>>(
+      property_groups);
+}
+
+std::shared_ptr<graphar::VertexInfo> create_vertex_info(
+    const std::string &type, graphar::IdType chunk_size,
+    const std::vector<graphar::SharedPropertyGroup> &property_groups,
+    const rust::Vec<rust::String> &labels, const std::string &prefix,
+    std::shared_ptr<graphar::ConstInfoVersion> version) {
+  if (type.empty()) {
+    throw std::runtime_error("CreateVertexInfo: type must not be empty");
+  }
+  if (chunk_size <= 0) {
+    throw std::runtime_error("CreateVertexInfo: chunk_size must be > 0");
+  }
+
+  std::vector<std::string> label_vec;
+  label_vec.reserve(labels.size());
+  for (size_t i = 0; i < labels.size(); ++i) {
+    label_vec.emplace_back(std::string(labels[i]));
+  }
+
+  auto vertex_info = graphar::CreateVertexInfo(type, chunk_size, property_groups,
+                                               label_vec, prefix, std::move(version));
+  if (vertex_info == nullptr) {
+    throw std::runtime_error("CreateVertexInfo: returned nullptr");
+  }
+  return vertex_info;
+}
+
+void vertex_info_save(const graphar::VertexInfo &vertex_info,
+                      const std::string &path) {
+  auto status = vertex_info.Save(path);
+  if (!status.ok()) {
+    throw std::runtime_error(status.message());
+  }
+}
+
+std::unique_ptr<std::string>
+vertex_info_dump(const graphar::VertexInfo &vertex_info) {
+  auto dumped = vertex_info.Dump();
+  if (!dumped) {
+    throw std::runtime_error(dumped.error().message());
+  }
+  return std::make_unique<std::string>(std::move(dumped).value());
 }
 } // namespace graphar_rs

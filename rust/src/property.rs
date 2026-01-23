@@ -162,6 +162,13 @@ impl Default for PropertyVec {
     }
 }
 
+impl Clone for PropertyVec {
+    fn clone(&self) -> Self {
+        let src = self.0.as_ref().expect("properties vec should be valid");
+        Self(ffi::graphar::property_vec_clone(src))
+    }
+}
+
 impl Deref for PropertyVec {
     type Target = UniquePtr<CxxVector<ffi::graphar::Property>>;
 
@@ -213,9 +220,13 @@ impl PropertyVec {
 }
 
 /// A group of properties stored in the same file(s).
-pub struct PropertyGroup(SharedPtr<ffi::graphar::PropertyGroup>);
+pub type PropertyGroup = ffi::SharedPropertyGroup;
 
 impl PropertyGroup {
+    pub(crate) fn from_inner(inner: SharedPtr<ffi::graphar::PropertyGroup>) -> Self {
+        Self(inner)
+    }
+
     /// Create a new property group.
     ///
     /// The `prefix` is a logical prefix string used by GraphAr (it is not a
@@ -250,7 +261,7 @@ impl PropertyGroup {
 }
 
 /// A vector of property groups.
-pub struct PropertyGroupVector(UniquePtr<CxxVector<ffi::SharedPropertyGroup>>);
+pub struct PropertyGroupVector(UniquePtr<CxxVector<PropertyGroup>>);
 
 impl Default for PropertyGroupVector {
     fn default() -> Self {
@@ -258,8 +269,15 @@ impl Default for PropertyGroupVector {
     }
 }
 
+impl Clone for PropertyGroupVector {
+    fn clone(&self) -> Self {
+        let src = self.0.as_ref().expect("property group vec should be valid");
+        Self(ffi::graphar::property_group_vec_clone(src))
+    }
+}
+
 impl Deref for PropertyGroupVector {
-    type Target = UniquePtr<CxxVector<ffi::SharedPropertyGroup>>;
+    type Target = UniquePtr<CxxVector<PropertyGroup>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0

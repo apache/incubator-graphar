@@ -19,6 +19,7 @@ use cxx::{ExternType, SharedPtr};
 
 /// A shared pointer wrapper for `graphar::PropertyGroup`.
 #[repr(transparent)]
+#[derive(Clone)]
 pub struct SharedPropertyGroup(pub(crate) SharedPtr<graphar::PropertyGroup>);
 
 unsafe impl ExternType for SharedPropertyGroup {
@@ -173,6 +174,9 @@ pub(crate) mod graphar {
             is_nullable: bool,
             cardinality: Cardinality,
         );
+
+        #[namespace = "graphar_rs"]
+        fn property_vec_clone(properties: &CxxVector<Property>) -> UniquePtr<CxxVector<Property>>;
     }
 
     // `PropertyGroup`
@@ -193,6 +197,59 @@ pub(crate) mod graphar {
             property_groups: Pin<&mut CxxVector<SharedPropertyGroup>>,
             property_group: SharedPtr<PropertyGroup>,
         );
+
+        #[namespace = "graphar_rs"]
+        fn property_group_vec_clone(
+            property_groups: &CxxVector<SharedPropertyGroup>,
+        ) -> UniquePtr<CxxVector<SharedPropertyGroup>>;
+    }
+
+    // `InfoVersion`
+    //
+    // TODO: upstream C++ APIs still use `int` in a few places for versioning;
+    // prefer fixed-width integer types in the public C++ interface.
+    unsafe extern "C++" {
+        type InfoVersion;
+        type ConstInfoVersion;
+
+        #[namespace = "graphar_rs"]
+        fn new_const_info_version(version: i32) -> Result<SharedPtr<ConstInfoVersion>>;
+    }
+
+    // `VertexInfo`
+    unsafe extern "C++" {
+        type VertexInfo;
+
+        fn GetType(&self) -> &CxxString;
+        fn GetChunkSize(&self) -> i64;
+        fn GetPrefix(&self) -> &CxxString;
+        fn version(&self) -> &SharedPtr<ConstInfoVersion>;
+        fn GetLabels(&self) -> &CxxVector<CxxString>;
+
+        // TODO: upstream C++ uses `int` for this return type; prefer fixed-width.
+        fn PropertyGroupNum(&self) -> i32;
+
+        fn GetPropertyGroups(&self) -> &CxxVector<SharedPropertyGroup>;
+        fn GetPropertyGroup(&self, property_name: &CxxString) -> SharedPtr<PropertyGroup>;
+
+        // TODO: upstream C++ uses `int` for this parameter; prefer fixed-width.
+        fn GetPropertyGroupByIndex(&self, index: i32) -> SharedPtr<PropertyGroup>;
+
+        #[namespace = "graphar_rs"]
+        fn create_vertex_info(
+            type_: &CxxString,
+            chunk_size: i64,
+            property_groups: &CxxVector<SharedPropertyGroup>,
+            labels: &Vec<String>,
+            prefix: &CxxString,
+            version: SharedPtr<ConstInfoVersion>,
+        ) -> Result<SharedPtr<VertexInfo>>;
+
+        #[namespace = "graphar_rs"]
+        fn vertex_info_save(vertex_info: &VertexInfo, path: &CxxString) -> Result<()>;
+
+        #[namespace = "graphar_rs"]
+        fn vertex_info_dump(vertex_info: &VertexInfo) -> Result<UniquePtr<CxxString>>;
     }
 
     unsafe extern "C++" {

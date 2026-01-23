@@ -15,21 +15,22 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//! Rust bindings for GraphAr.
+//! GraphAr info version bindings.
 
-#![deny(missing_docs)]
+use crate::ffi;
+use cxx::SharedPtr;
 
-use cxx::CxxString;
+/// A GraphAr `InfoVersion` value.
+///
+/// This is a thin wrapper around `std::shared_ptr<const graphar::InfoVersion>`.
+#[derive(Clone)]
+pub struct InfoVersion(pub(crate) SharedPtr<ffi::graphar::ConstInfoVersion>);
 
-mod ffi;
-
-/// GraphAr metadata.
-pub mod info;
-/// GraphAr property.
-pub mod property;
-/// GraphAr logical data types.
-pub mod types;
-
-fn cxx_string_to_string(value: &CxxString) -> String {
-    String::from_utf8_lossy(value.as_bytes()).into_owned()
+impl InfoVersion {
+    /// Create a new `InfoVersion` by version number.
+    ///
+    /// TODO: upstream C++ constructor takes `int`; prefer fixed-width integer types.
+    pub fn new(version: i32) -> Result<Self, cxx::Exception> {
+        Ok(Self(ffi::graphar::new_const_info_version(version)?))
+    }
 }
