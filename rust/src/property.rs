@@ -447,4 +447,70 @@ mod tests {
         vec.push(pg2);
         assert_eq!(vec.deref().len(), 2);
     }
+
+    fn make_property_vec_for_clone() -> PropertyVec {
+        let mut props = PropertyVec::new();
+        props.emplace(PropertyBuilder::new("id", DataType::int64()).primary_key(true));
+        props.push(Property::new(
+            "name",
+            DataType::string(),
+            false,
+            true,
+            Cardinality::Single,
+        ));
+        props
+    }
+
+    #[test]
+    fn test_property_vec_clone_independent_container() {
+        let mut original = make_property_vec_for_clone();
+        let cloned = original.clone();
+
+        assert_eq!(original.len(), 2);
+        assert_eq!(cloned.len(), 2);
+
+        let pg = PropertyGroup::new(cloned, FileType::Parquet, "clone_check/");
+        let mut names: Vec<_> = pg.properties().into_iter().map(|p| p.name()).collect();
+        names.sort();
+        assert_eq!(names, vec!["id".to_string(), "name".to_string()]);
+
+        let id_prop = Property::new("id2", DataType::int64(), true, true, Cardinality::Single);
+        original.push(id_prop);
+        assert_eq!(original.len(), 3);
+    }
+
+    #[test]
+    fn test_property_group_vector_clone_independent_container() {
+        let mut props1 = PropertyVec::new();
+        props1.emplace(PropertyBuilder::new("id1", DataType::int64()).primary_key(true));
+        let pg1 = PropertyGroup::new(props1, FileType::Parquet, "pg1/");
+
+        let mut props2 = PropertyVec::new();
+        props2.emplace(PropertyBuilder::new("id2", DataType::int64()).primary_key(true));
+        let pg2 = PropertyGroup::new(props2, FileType::Parquet, "pg2/");
+
+        let mut groups = PropertyGroupVector::new();
+        groups.push(pg1);
+        groups.push(pg2);
+
+        let cloned = groups.clone();
+        assert_eq!(groups.len(), 2);
+        assert_eq!(cloned.len(), 2);
+
+        assert!(cloned.get(0).unwrap().has_property("id1"));
+        assert!(cloned.get(1).unwrap().has_property("id2"));
+
+        let mut props3 = PropertyVec::new();
+        props3.emplace(PropertyBuilder::new("id3", DataType::int64()).primary_key(true));
+        let pg3 = PropertyGroup::new(props3, FileType::Parquet, "pg3/");
+        groups.push(pg3);
+
+        assert_eq!(groups.len(), 3);
+        assert_eq!(cloned.len(), 2);
+
+        let cloned_props = cloned.get(0).unwrap().properties();
+        assert_eq!(cloned_props.len(), 1);
+        assert_eq!(cloned_props[0].name(), "id1");
+        assert_eq!(cloned_props[0].data_type().id(), Type::Int64);
+    }
 }

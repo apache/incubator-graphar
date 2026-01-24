@@ -34,3 +34,18 @@ impl InfoVersion {
         Ok(Self(ffi::graphar::new_const_info_version(version)?))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_info_version_new_ok_and_err() {
+        let v1 = InfoVersion::new(1).unwrap();
+        let v1_clone = v1.clone();
+        drop(v1_clone);
+
+        let err = InfoVersion::new(2).err().unwrap();
+        let _ = err.to_string();
+    }
+}

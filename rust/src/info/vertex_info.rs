@@ -296,3 +296,132 @@ impl VertexInfoBuilder {
         VertexInfo::try_new(r#type, chunk_size, property_groups, labels, prefix, version)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::property::{PropertyBuilder, PropertyGroup, PropertyVec};
+    use crate::types::{DataType, FileType};
+    use tempfile::tempdir;
+
+    fn cxx_string_to_string_for_test(s: &cxx::CxxString) -> String {
+        String::from_utf8_lossy(s.as_bytes()).into_owned()
+    }
+
+    fn make_property_groups() -> PropertyGroupVector {
+        let mut props = PropertyVec::new();
+        props.emplace(PropertyBuilder::new("id", DataType::int64()).primary_key(true));
+        props.emplace(PropertyBuilder::new("name", DataType::string()));
+
+        let pg = PropertyGroup::new(props, FileType::Parquet, "id_name/");
+        let mut groups = PropertyGroupVector::new();
+        groups.push(pg);
+        groups
+    }
+
+    #[test]
+    fn test_vertex_info_try_new_error_paths() {
+        let groups = PropertyGroupVector::new();
+
+        // type cannot be empty and `chunk_size` cannot less than 1.
+        assert!(VertexInfo::try_new("", 1, groups.clone(), vec![], "", None).is_err());
+        assert!(VertexInfo::try_new("person", 0, groups.clone(), vec![], "", None).is_err());
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_vertex_info_new_panics_on_invalid_args() {
+        let groups = PropertyGroupVector::new();
+        // type cannot be empty
+        let _ = VertexInfo::new("", 1, groups, vec![], "", None);
+    }
+
+    #[test]
+    fn test_vertex_info_builder() {
+        let version = InfoVersion::new(1).unwrap();
+        let groups = make_property_groups();
+
+        // Create `VertexInfo` using builder API.
+        let vertex_info = VertexInfo::builder("person", 1024, groups)
+            .labels(vec!["l0".to_string()])
+            .labels_from_iter(["l1", "l2"])
+            .push_label("l3")
+            .prefix("person/")
+            .version(version)
+            .build();
+
+        assert_eq!(vertex_info.type_name(), "person");
+        assert_eq!(vertex_info.chunk_size(), 1024);
+        assert_eq!(vertex_info.prefix(), "person/");
+
+        assert!(vertex_info.version().is_some());
+
+        let labels = vertex_info.labels();
+        assert_eq!(
+            labels,
+            vec!["l1".to_string(), "l2".to_string(), "l3".to_string()]
+        );
+
+        let labels_cxx = vertex_info.labels_cxx();
+        assert_eq!(labels_cxx.len(), 3);
+        assert_eq!(
+            cxx_string_to_string_for_test(labels_cxx.get(0).unwrap()),
+            "l1"
+        );
+
+        assert_eq!(vertex_info.property_group_num(), 1);
+
+        let groups_cxx = vertex_info.property_groups_cxx();
+        assert_eq!(groups_cxx.len(), 1);
+        assert!(groups_cxx.get(0).unwrap().has_property("id"));
+
+        let groups_vec = vertex_info.property_groups();
+        assert_eq!(groups_vec.len(), 1);
+
+        let groups_iter: Vec<_> = vertex_info.property_groups_iter().collect();
+        assert_eq!(groups_iter.len(), 1);
+    }
+
+    #[test]
+    fn test_vertex_info_property_group_lookups() {
+        let groups = make_property_groups();
+
+        let vertex_info = VertexInfo::builder("person", 1024, groups)
+            .prefix("person/")
+            .version_opt(None)
+            .build();
+
+        assert!(vertex_info.version().is_none());
+
+        assert!(vertex_info.property_group("id").is_some());
+        assert!(vertex_info.property_group("missing").is_none());
+
+        let by_index = vertex_info.property_group_by_index(0).unwrap();
+        assert!(by_index.has_property("id"));
+
+        assert!(vertex_info.property_group_by_index(1).is_none());
+        assert!(vertex_info.property_group_by_index(-1).is_none());
+    }
+
+    #[test]
+    fn test_vertex_info_dump_and_save() {
+        let groups = make_property_groups();
+
+        let vertex_info = VertexInfo::builder("person", 1024, groups)
+            .labels_from_iter(["l1"])
+            .prefix("person/")
+            .build();
+
+        let dumped = vertex_info.dump().unwrap();
+        assert!(!dumped.is_empty());
+        println!("{}", dumped);
+
+        let dir = tempdir().unwrap();
+        let path = dir.path().join("vertex_info.yaml");
+        vertex_info.save(&path).unwrap();
+
+        let metadata = std::fs::metadata(&path).unwrap();
+        assert!(metadata.is_file());
+        assert!(metadata.len() > 0);
+    }
+}
