@@ -45,7 +45,9 @@ mod tests {
         let v1_clone = v1.clone();
         drop(v1_clone);
 
-        let err = InfoVersion::new(2).err().unwrap();
+        // Use an obviously invalid version to keep this test future-proof.
+        // Upstream may add support for version 2.
+        let err = InfoVersion::new(-1).err().unwrap();
         let _ = err.to_string();
     }
 }

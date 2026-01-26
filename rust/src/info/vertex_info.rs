@@ -20,6 +20,7 @@
 use super::version::InfoVersion;
 use crate::{cxx_string_to_string, ffi, property::PropertyGroup, property::PropertyGroupVector};
 use cxx::{CxxVector, SharedPtr, UniquePtr, let_cxx_string};
+use std::borrow::Cow;
 use std::path::Path;
 
 /// GraphAr vertex metadata (`graphar::VertexInfo`).
@@ -44,7 +45,8 @@ impl VertexInfo {
     /// The `prefix` is a logical prefix string used by GraphAr (it is not a
     /// filesystem path).
     ///
-    /// Panics if `type` is empty or `chunk_size <= 0`. Prefer [`VertexInfo::try_new`]
+    /// Panics if GraphAr rejects the inputs (including, but not limited to,
+    /// `type` being empty or `chunk_size <= 0`). Prefer [`VertexInfo::try_new`]
     /// if you want to handle errors.
     pub fn new<S: AsRef<[u8]>, P: AsRef<[u8]>>(
         r#type: S,
@@ -150,10 +152,7 @@ impl VertexInfo {
 
     /// Iterate over property groups without allocating a `Vec`.
     pub fn property_groups_iter(&self) -> impl Iterator<Item = PropertyGroup> + '_ {
-        self.0
-            .GetPropertyGroups()
-            .iter()
-            .map(|group| PropertyGroup::from_inner(group.0.clone()))
+        self.0.GetPropertyGroups().iter().cloned()
     }
 
     /// Return the property group containing the given property.
@@ -191,9 +190,23 @@ impl VertexInfo {
     }
 
     /// Save this `VertexInfo` to the given path.
+    ///
+    /// On Unix, this passes the raw `OsStr` bytes to C++ to avoid lossy UTF-8
+    /// conversion. On non-Unix platforms, this falls back to converting the
+    /// path to UTF-8 using [`Path::to_string_lossy`].
     pub fn save<P: AsRef<Path>>(&self, path: P) -> Result<(), cxx::Exception> {
-        let path_string = path.as_ref().to_string_lossy();
-        let_cxx_string!(p = path_string.as_bytes());
+        let path = path.as_ref();
+
+        #[cfg(unix)]
+        let path_bytes: Cow<[u8]> = {
+            use std::os::unix::ffi::OsStrExt;
+            Cow::Borrowed(path.as_os_str().as_bytes())
+        };
+
+        #[cfg(not(unix))]
+        let path_bytes: Cow<[u8]> = Cow::Owned(path.to_string_lossy().into_owned().into_bytes());
+
+        let_cxx_string!(p = path_bytes.as_ref());
         ffi::graphar::vertex_info_save(&self.0, &p)?;
         Ok(())
     }
@@ -278,6 +291,9 @@ impl VertexInfoBuilder {
     }
 
     /// Build a [`VertexInfo`].
+    ///
+    /// Panics if GraphAr rejects the builder inputs. Prefer [`VertexInfoBuilder::try_build`]
+    /// if you want to handle errors.
     pub fn build(self) -> VertexInfo {
         self.try_build().unwrap()
     }
@@ -420,6 +436,37 @@ mod tests {
         let path = dir.path().join("vertex_info.yaml");
         vertex_info.save(&path).unwrap();
 
+        let metadata = std::fs::metadata(&path).unwrap();
+        assert!(metadata.is_file());
+        assert!(metadata.len() > 0);
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_vertex_info_save_non_utf8_path() {
+        use std::os::unix::ffi::OsStringExt;
+
+        let groups = make_property_groups();
+        let vertex_info = VertexInfo::builder("person", 1024, groups)
+            .labels_from_iter(["l1"])
+            .prefix("person/")
+            .build();
+
+        let dir = tempdir().unwrap();
+
+        let mut path = dir.path().to_path_buf();
+        path.push(std::ffi::OsString::from_vec(
+            b"vertex_info_\xFF_non_utf8.yaml".to_vec(),
+        ));
+
+        std::fs::OpenOptions::new()
+            .create(true)
+            .write(true)
+            .open(&path)
+            .unwrap();
+        std::fs::remove_file(&path).unwrap();
+
+        vertex_info.save(&path).unwrap();
         let metadata = std::fs::metadata(&path).unwrap();
         assert!(metadata.is_file());
         assert!(metadata.len() > 0);

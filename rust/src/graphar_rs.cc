@@ -29,11 +29,8 @@ rust::String to_type_name(const graphar::DataType &type) {
 
 std::shared_ptr<graphar::ConstInfoVersion>
 new_const_info_version(int32_t version) {
-  try {
-    return std::make_shared<graphar::InfoVersion>(static_cast<int>(version));
-  } catch (const std::exception &e) {
-    throw std::runtime_error(e.what());
-  }
+  // Let any upstream exceptions propagate to Rust via `cxx::Exception`.
+  return std::make_shared<graphar::InfoVersion>(static_cast<int>(version));
 }
 
 std::unique_ptr<graphar::Property>
