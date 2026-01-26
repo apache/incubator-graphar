@@ -339,9 +339,25 @@ mod tests {
     fn test_vertex_info_try_new_error_paths() {
         let groups = PropertyGroupVector::new();
 
-        // type cannot be empty and `chunk_size` cannot less than 1.
-        assert!(VertexInfo::try_new("", 1, groups.clone(), vec![], "", None).is_err());
-        assert!(VertexInfo::try_new("person", 0, groups.clone(), vec![], "", None).is_err());
+        // type cannot be empty
+        let msg = VertexInfo::try_new("", 1, groups.clone(), vec![], "", None)
+            .err()
+            .unwrap()
+            .to_string();
+        assert!(
+            msg.contains("CreateVertexInfo") && msg.contains("type must not be empty"),
+            "unexpected error message: {msg:?}"
+        );
+
+        // `chunk_size` cannot be less than 1
+        let msg = VertexInfo::try_new("person", 0, groups.clone(), vec![], "", None)
+            .err()
+            .unwrap()
+            .to_string();
+        assert!(
+            msg.contains("CreateVertexInfo") && msg.contains("chunk_size must be > 0"),
+            "unexpected error message: {msg:?}"
+        );
     }
 
     #[test]
@@ -429,8 +445,11 @@ mod tests {
             .build();
 
         let dumped = vertex_info.dump().unwrap();
-        assert!(!dumped.is_empty());
-        println!("{}", dumped);
+        assert!(!dumped.trim().is_empty(), "dumped={dumped:?}");
+        assert!(dumped.contains("person"), "dumped={dumped:?}");
+        assert!(dumped.contains("person/"), "dumped={dumped:?}");
+        assert!(dumped.contains("l1"), "dumped={dumped:?}");
+        assert!(dumped.contains("1024"), "dumped={dumped:?}");
 
         let dir = tempdir().unwrap();
         let path = dir.path().join("vertex_info.yaml");
@@ -439,6 +458,13 @@ mod tests {
         let metadata = std::fs::metadata(&path).unwrap();
         assert!(metadata.is_file());
         assert!(metadata.len() > 0);
+
+        let saved = std::fs::read_to_string(&path).unwrap();
+        assert!(!saved.trim().is_empty(), "saved={saved:?}");
+        assert!(saved.contains("person"), "saved={saved:?}");
+        assert!(saved.contains("person/"), "saved={saved:?}");
+        assert!(saved.contains("l1"), "saved={saved:?}");
+        assert!(saved.contains("1024"), "saved={saved:?}");
     }
 
     #[cfg(unix)]
@@ -459,11 +485,7 @@ mod tests {
             b"vertex_info_\xFF_non_utf8.yaml".to_vec(),
         ));
 
-        std::fs::OpenOptions::new()
-            .create(true)
-            .write(true)
-            .open(&path)
-            .unwrap();
+        std::fs::File::create(&path).unwrap();
         std::fs::remove_file(&path).unwrap();
 
         vertex_info.save(&path).unwrap();

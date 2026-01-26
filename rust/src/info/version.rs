@@ -42,12 +42,12 @@ mod tests {
     #[test]
     fn test_info_version_new_ok_and_err() {
         let v1 = InfoVersion::new(1).unwrap();
-        let v1_clone = v1.clone();
-        drop(v1_clone);
+        let _v1_clone = v1.clone();
 
         // Use an obviously invalid version to keep this test future-proof.
         // Upstream may add support for version 2.
         let err = InfoVersion::new(-1).err().unwrap();
-        let _ = err.to_string();
+        let msg = err.to_string();
+        assert!(!msg.is_empty(), "unexpected empty error message");
     }
 }

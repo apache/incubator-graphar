@@ -469,14 +469,17 @@ mod tests {
         assert_eq!(original.len(), 2);
         assert_eq!(cloned.len(), 2);
 
+        let id_prop = Property::new("id2", DataType::int64(), true, true, Cardinality::Single);
+        original.push(id_prop);
+        assert_eq!(original.len(), 3);
+
+        // Mutating the original container should not affect the cloned one.
+        assert_eq!(cloned.len(), 2);
+
         let pg = PropertyGroup::new(cloned, FileType::Parquet, "clone_check/");
         let mut names: Vec<_> = pg.properties().into_iter().map(|p| p.name()).collect();
         names.sort();
         assert_eq!(names, vec!["id".to_string(), "name".to_string()]);
-
-        let id_prop = Property::new("id2", DataType::int64(), true, true, Cardinality::Single);
-        original.push(id_prop);
-        assert_eq!(original.len(), 3);
     }
 
     #[test]
