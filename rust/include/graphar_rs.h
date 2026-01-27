@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <vector>
@@ -26,14 +27,18 @@
 #include "graphar/fwd.h"
 #include "graphar/graph_info.h"
 #include "graphar/types.h"
+#include "graphar/version_parser.h"
 #include "rust/cxx.h"
 
 namespace graphar {
 using SharedPropertyGroup = std::shared_ptr<PropertyGroup>;
+using ConstInfoVersion = const InfoVersion;
 }
 
 namespace graphar_rs {
 rust::String to_type_name(const graphar::DataType &type);
+
+std::shared_ptr<graphar::ConstInfoVersion> new_const_info_version(int32_t version);
 
 std::unique_ptr<graphar::Property>
 new_property(const std::string &name, std::shared_ptr<graphar::DataType> type,
@@ -56,7 +61,24 @@ void property_vec_emplace_property(std::vector<graphar::Property> &properties,
                                    bool is_primary, bool is_nullable,
                                    graphar::Cardinality cardinality);
 
+std::unique_ptr<std::vector<graphar::Property>>
+property_vec_clone(const std::vector<graphar::Property> &properties);
+
 void property_group_vec_push_property_group(
     std::vector<graphar::SharedPropertyGroup> &property_groups,
     std::shared_ptr<graphar::PropertyGroup> property_group);
+
+std::unique_ptr<std::vector<graphar::SharedPropertyGroup>>
+property_group_vec_clone(
+    const std::vector<graphar::SharedPropertyGroup> &property_groups);
+
+std::shared_ptr<graphar::VertexInfo>
+create_vertex_info(const std::string &type, graphar::IdType chunk_size,
+                   const std::vector<graphar::SharedPropertyGroup> &property_groups,
+                   const rust::Vec<rust::String> &labels,
+                   const std::string &prefix,
+                   std::shared_ptr<graphar::ConstInfoVersion> version);
+
+void vertex_info_save(const graphar::VertexInfo &vertex_info, const std::string &path);
+std::unique_ptr<std::string> vertex_info_dump(const graphar::VertexInfo &vertex_info);
 } // namespace graphar_rs

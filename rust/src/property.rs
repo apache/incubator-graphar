@@ -162,6 +162,13 @@ impl Default for PropertyVec {
     }
 }
 
+impl Clone for PropertyVec {
+    fn clone(&self) -> Self {
+        let src = self.0.as_ref().expect("properties vec should be valid");
+        Self(ffi::graphar::property_vec_clone(src))
+    }
+}
+
 impl Deref for PropertyVec {
     type Target = UniquePtr<CxxVector<ffi::graphar::Property>>;
 
@@ -213,9 +220,13 @@ impl PropertyVec {
 }
 
 /// A group of properties stored in the same file(s).
-pub struct PropertyGroup(SharedPtr<ffi::graphar::PropertyGroup>);
+pub type PropertyGroup = ffi::SharedPropertyGroup;
 
 impl PropertyGroup {
+    pub(crate) fn from_inner(inner: SharedPtr<ffi::graphar::PropertyGroup>) -> Self {
+        Self(inner)
+    }
+
     /// Create a new property group.
     ///
     /// The `prefix` is a logical prefix string used by GraphAr (it is not a
@@ -250,7 +261,7 @@ impl PropertyGroup {
 }
 
 /// A vector of property groups.
-pub struct PropertyGroupVector(UniquePtr<CxxVector<ffi::SharedPropertyGroup>>);
+pub struct PropertyGroupVector(UniquePtr<CxxVector<PropertyGroup>>);
 
 impl Default for PropertyGroupVector {
     fn default() -> Self {
@@ -258,8 +269,15 @@ impl Default for PropertyGroupVector {
     }
 }
 
+impl Clone for PropertyGroupVector {
+    fn clone(&self) -> Self {
+        let src = self.0.as_ref().expect("property group vec should be valid");
+        Self(ffi::graphar::property_group_vec_clone(src))
+    }
+}
+
 impl Deref for PropertyGroupVector {
-    type Target = UniquePtr<CxxVector<ffi::SharedPropertyGroup>>;
+    type Target = UniquePtr<CxxVector<PropertyGroup>>;
 
     fn deref(&self) -> &Self::Target {
         &self.0
@@ -428,5 +446,74 @@ mod tests {
 
         vec.push(pg2);
         assert_eq!(vec.deref().len(), 2);
+    }
+
+    fn make_property_vec_for_clone() -> PropertyVec {
+        let mut props = PropertyVec::new();
+        props.emplace(PropertyBuilder::new("id", DataType::int64()).primary_key(true));
+        props.push(Property::new(
+            "name",
+            DataType::string(),
+            false,
+            true,
+            Cardinality::Single,
+        ));
+        props
+    }
+
+    #[test]
+    fn test_property_vec_clone_independent_container() {
+        let mut original = make_property_vec_for_clone();
+        let cloned = original.clone();
+
+        assert_eq!(original.len(), 2);
+        assert_eq!(cloned.len(), 2);
+
+        let id_prop = Property::new("id2", DataType::int64(), true, true, Cardinality::Single);
+        original.push(id_prop);
+        assert_eq!(original.len(), 3);
+
+        // Mutating the original container should not affect the cloned one.
+        assert_eq!(cloned.len(), 2);
+
+        let pg = PropertyGroup::new(cloned, FileType::Parquet, "clone_check/");
+        let mut names: Vec<_> = pg.properties().into_iter().map(|p| p.name()).collect();
+        names.sort();
+        assert_eq!(names, vec!["id".to_string(), "name".to_string()]);
+    }
+
+    #[test]
+    fn test_property_group_vector_clone_independent_container() {
+        let mut props1 = PropertyVec::new();
+        props1.emplace(PropertyBuilder::new("id1", DataType::int64()).primary_key(true));
+        let pg1 = PropertyGroup::new(props1, FileType::Parquet, "pg1/");
+
+        let mut props2 = PropertyVec::new();
+        props2.emplace(PropertyBuilder::new("id2", DataType::int64()).primary_key(true));
+        let pg2 = PropertyGroup::new(props2, FileType::Parquet, "pg2/");
+
+        let mut groups = PropertyGroupVector::new();
+        groups.push(pg1);
+        groups.push(pg2);
+
+        let cloned = groups.clone();
+        assert_eq!(groups.len(), 2);
+        assert_eq!(cloned.len(), 2);
+
+        assert!(cloned.get(0).unwrap().has_property("id1"));
+        assert!(cloned.get(1).unwrap().has_property("id2"));
+
+        let mut props3 = PropertyVec::new();
+        props3.emplace(PropertyBuilder::new("id3", DataType::int64()).primary_key(true));
+        let pg3 = PropertyGroup::new(props3, FileType::Parquet, "pg3/");
+        groups.push(pg3);
+
+        assert_eq!(groups.len(), 3);
+        assert_eq!(cloned.len(), 2);
+
+        let cloned_props = cloned.get(0).unwrap().properties();
+        assert_eq!(cloned_props.len(), 1);
+        assert_eq!(cloned_props[0].name(), "id1");
+        assert_eq!(cloned_props[0].data_type().id(), Type::Int64);
     }
 }
