@@ -15,10 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//! Graph metadata bindings.
+//! GraphAr metadata information types.
 
+mod adjacent_list;
+mod edge_info;
 mod version;
 mod vertex_info;
 
+/// Re-export of the C++ `graphar::AdjListType`.
+pub use crate::ffi::graphar::AdjListType;
+
+pub use adjacent_list::{AdjacentList, AdjacentListVector};
+pub use edge_info::{EdgeInfo, EdgeInfoBuilder};
 pub use version::InfoVersion;
 pub use vertex_info::{VertexInfo, VertexInfoBuilder};

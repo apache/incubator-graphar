@@ -20,7 +20,7 @@
 use crate::ffi;
 use cxx::SharedPtr;
 
-/// A GraphAr `InfoVersion` value.
+/// A GraphAr info version.
 ///
 /// This is a thin wrapper around `std::shared_ptr<const graphar::InfoVersion>`.
 #[derive(Clone)]
@@ -30,7 +30,7 @@ impl InfoVersion {
     /// Create a new `InfoVersion` by version number.
     ///
     /// TODO: upstream C++ constructor takes `int`; prefer fixed-width integer types.
-    pub fn new(version: i32) -> Result<Self, cxx::Exception> {
+    pub fn new(version: i32) -> crate::Result<Self> {
         Ok(Self(ffi::graphar::new_const_info_version(version)?))
     }
 }

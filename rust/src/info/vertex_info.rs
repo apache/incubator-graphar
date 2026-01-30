@@ -18,9 +18,8 @@
 //! Vertex metadata bindings.
 
 use super::version::InfoVersion;
-use crate::{cxx_string_to_string, ffi, property::PropertyGroup, property::PropertyGroupVector};
+use crate::{ffi, property::PropertyGroup, property::PropertyGroupVector};
 use cxx::{CxxVector, SharedPtr, UniquePtr, let_cxx_string};
-use std::borrow::Cow;
 use std::path::Path;
 
 /// GraphAr vertex metadata (`graphar::VertexInfo`).
@@ -32,12 +31,8 @@ impl VertexInfo {
     ///
     /// This is the preferred API when constructing `VertexInfo` in Rust, since
     /// the raw constructor has many parameters.
-    pub fn builder<S: Into<String>>(
-        r#type: S,
-        chunk_size: i64,
-        property_groups: PropertyGroupVector,
-    ) -> VertexInfoBuilder {
-        VertexInfoBuilder::new(r#type, chunk_size, property_groups)
+    pub fn builder(r#type: impl Into<String>, chunk_size: i64) -> VertexInfoBuilder {
+        VertexInfoBuilder::new(r#type, chunk_size)
     }
 
     /// Create a new `VertexInfo`.
@@ -48,8 +43,8 @@ impl VertexInfo {
     /// Panics if GraphAr rejects the inputs (including, but not limited to,
     /// `type` being empty or `chunk_size <= 0`). Prefer [`VertexInfo::try_new`]
     /// if you want to handle errors.
-    pub fn new<S: AsRef<[u8]>, P: AsRef<[u8]>>(
-        r#type: S,
+    pub fn new<T: AsRef<str>, P: AsRef<str>>(
+        r#type: T,
         chunk_size: i64,
         property_groups: PropertyGroupVector,
         labels: Vec<String>,
@@ -63,20 +58,18 @@ impl VertexInfo {
     ///
     /// This returns an error if `type` is empty, `chunk_size <= 0`, or if the
     /// upstream GraphAr implementation rejects the inputs.
-    pub fn try_new<S: AsRef<[u8]>, P: AsRef<[u8]>>(
-        r#type: S,
+    pub fn try_new<T: AsRef<str>, P: AsRef<str>>(
+        r#type: T,
         chunk_size: i64,
         property_groups: PropertyGroupVector,
         labels: Vec<String>,
         prefix: P,
         version: Option<InfoVersion>,
-    ) -> Result<Self, cxx::Exception> {
+    ) -> crate::Result<Self> {
         let_cxx_string!(ty = r#type.as_ref());
-        let_cxx_string!(prefix = prefix);
+        let_cxx_string!(prefix = prefix.as_ref());
 
-        let groups_ref = property_groups
-            .as_ref()
-            .expect("property group vec should be valid");
+        let groups_ref = property_groups.as_ref();
         let version = version.map(|v| v.0).unwrap_or_else(SharedPtr::null);
 
         Ok(Self(ffi::graphar::create_vertex_info(
@@ -86,7 +79,7 @@ impl VertexInfo {
 
     /// Return the vertex type name.
     pub fn type_name(&self) -> String {
-        cxx_string_to_string(self.0.GetType())
+        self.0.GetType().to_string()
     }
 
     /// Return the chunk size.
@@ -96,7 +89,7 @@ impl VertexInfo {
 
     /// Return the logical prefix.
     pub fn prefix(&self) -> String {
-        cxx_string_to_string(self.0.GetPrefix())
+        self.0.GetPrefix().to_string()
     }
 
     /// Return the optional format version.
@@ -114,7 +107,7 @@ impl VertexInfo {
         let labels = self.0.GetLabels();
         let mut out = Vec::with_capacity(labels.len());
         for label in labels {
-            out.push(cxx_string_to_string(label));
+            out.push(label.to_string());
         }
         out
     }
@@ -158,8 +151,8 @@ impl VertexInfo {
     /// Return the property group containing the given property.
     ///
     /// Returns `None` if the property is not found.
-    pub fn property_group<S: AsRef<[u8]>>(&self, property_name: S) -> Option<PropertyGroup> {
-        let_cxx_string!(name = property_name);
+    pub fn property_group<S: AsRef<str>>(&self, property_name: S) -> Option<PropertyGroup> {
+        let_cxx_string!(name = property_name.as_ref());
 
         let sp = self.0.GetPropertyGroup(&name);
         if sp.is_null() {
@@ -191,29 +184,19 @@ impl VertexInfo {
 
     /// Save this `VertexInfo` to the given path.
     ///
-    /// On Unix, this passes the raw `OsStr` bytes to C++ to avoid lossy UTF-8
-    /// conversion. On non-Unix platforms, this falls back to converting the
-    /// path to UTF-8 using [`Path::to_string_lossy`].
-    pub fn save<P: AsRef<Path>>(&self, path: P) -> Result<(), cxx::Exception> {
-        let path = path.as_ref();
-
-        #[cfg(unix)]
-        let path_bytes: Cow<[u8]> = {
-            use std::os::unix::ffi::OsStrExt;
-            Cow::Borrowed(path.as_os_str().as_bytes())
-        };
-
-        #[cfg(not(unix))]
-        let path_bytes: Cow<[u8]> = Cow::Owned(path.to_string_lossy().into_owned().into_bytes());
-
-        let_cxx_string!(p = path_bytes.as_ref());
+    /// Note: `path` must be valid UTF-8. On Unix, paths can contain arbitrary
+    /// bytes; such non-UTF8 paths return [`crate::Error::NonUtf8Path`].
+    pub fn save<P: AsRef<Path>>(&self, path: P) -> crate::Result<()> {
+        let path_str = crate::path_to_utf8_str(path.as_ref())?;
+        let_cxx_string!(p = path_str);
         ffi::graphar::vertex_info_save(&self.0, &p)?;
         Ok(())
     }
 
     /// Dump this `VertexInfo` as YAML string.
-    pub fn dump(&self) -> Result<String, cxx::Exception> {
+    pub fn dump(&self) -> crate::Result<String> {
         let dumped: UniquePtr<cxx::CxxString> = ffi::graphar::vertex_info_dump(&self.0)?;
+        let dumped = dumped.as_ref().expect("vertex info dump should be valid");
         Ok(dumped.to_string())
     }
 }
@@ -221,6 +204,7 @@ impl VertexInfo {
 /// A builder for constructing a [`VertexInfo`].
 ///
 /// Defaults:
+/// - `property_groups = []`
 /// - `labels = []`
 /// - `prefix = ""` (GraphAr may set a default prefix based on type)
 /// - `version = None`
@@ -229,23 +213,19 @@ pub struct VertexInfoBuilder {
     chunk_size: i64,
     property_groups: PropertyGroupVector,
     labels: Vec<String>,
-    prefix: Vec<u8>,
+    prefix: String,
     version: Option<InfoVersion>,
 }
 
 impl VertexInfoBuilder {
     /// Create a new builder with required fields.
-    pub fn new<S: Into<String>>(
-        r#type: S,
-        chunk_size: i64,
-        property_groups: PropertyGroupVector,
-    ) -> Self {
+    pub fn new(r#type: impl Into<String>, chunk_size: i64) -> Self {
         Self {
             r#type: r#type.into(),
             chunk_size,
-            property_groups,
+            property_groups: PropertyGroupVector::new(),
             labels: Vec::new(),
-            prefix: Vec::new(),
+            prefix: String::new(),
             version: None,
         }
     }
@@ -273,8 +253,25 @@ impl VertexInfoBuilder {
     }
 
     /// Set the logical prefix.
-    pub fn prefix<P: AsRef<[u8]>>(mut self, prefix: P) -> Self {
-        self.prefix = prefix.as_ref().to_vec();
+    ///
+    /// This is a logical prefix string used by GraphAr (it is not a filesystem path).
+    pub fn prefix<P: AsRef<str>>(mut self, prefix: P) -> Self {
+        self.prefix = prefix.as_ref().to_owned();
+        self
+    }
+
+    /// Push a property group definition.
+    ///
+    /// This is a convenience helper when you want to build up property groups
+    /// incrementally.
+    pub fn push_property_group(mut self, property_group: PropertyGroup) -> Self {
+        self.property_groups.push(property_group);
+        self
+    }
+
+    /// Replace property groups with the given vector.
+    pub fn property_groups(mut self, property_groups: PropertyGroupVector) -> Self {
+        self.property_groups = property_groups;
         self
     }
 
@@ -299,7 +296,7 @@ impl VertexInfoBuilder {
     }
 
     /// Try to build a [`VertexInfo`].
-    pub fn try_build(self) -> Result<VertexInfo, cxx::Exception> {
+    pub fn try_build(self) -> crate::Result<VertexInfo> {
         let Self {
             r#type,
             chunk_size,
@@ -333,6 +330,12 @@ mod tests {
         let mut groups = PropertyGroupVector::new();
         groups.push(pg);
         groups
+    }
+
+    fn make_property_group(prefix: &str, id_name: &str) -> PropertyGroup {
+        let mut props = PropertyVec::new();
+        props.emplace(PropertyBuilder::new(id_name, DataType::int64()).primary_key(true));
+        PropertyGroup::new(props, FileType::Parquet, prefix)
     }
 
     #[test]
@@ -374,7 +377,8 @@ mod tests {
         let groups = make_property_groups();
 
         // Create `VertexInfo` using builder API.
-        let vertex_info = VertexInfo::builder("person", 1024, groups)
+        let vertex_info = VertexInfo::builder("person", 1024)
+            .property_groups(groups)
             .labels(vec!["l0".to_string()])
             .labels_from_iter(["l1", "l2"])
             .push_label("l3")
@@ -389,6 +393,10 @@ mod tests {
         assert!(vertex_info.version().is_some());
 
         let labels = vertex_info.labels();
+        assert!(
+            !labels.iter().any(|l| l == "l0"),
+            "expected labels() to reflect the latest setter (labels_from_iter)"
+        );
         assert_eq!(
             labels,
             vec!["l1".to_string(), "l2".to_string(), "l3".to_string()]
@@ -415,10 +423,34 @@ mod tests {
     }
 
     #[test]
+    fn test_vertex_info_builder_property_group_mutators_and_lookup_inputs() {
+        let pg1 = make_property_group("pg1/", "id1");
+        let pg2 = make_property_group("pg2/", "id2");
+
+        let vertex_info = VertexInfo::builder("person", 1024)
+            .push_property_group(pg1.clone())
+            .push_property_group(pg2.clone())
+            .build();
+
+        assert_eq!(vertex_info.property_group_num(), 2);
+        assert!(vertex_info.property_group("id1").is_some());
+        assert!(vertex_info.property_group(String::from("id2")).is_some());
+
+        // Replace property groups with an empty vector.
+        let vertex_info = VertexInfo::builder("person", 1024)
+            .property_groups(make_property_groups())
+            .property_groups(PropertyGroupVector::new())
+            .build();
+        assert_eq!(vertex_info.property_group_num(), 0);
+        assert!(vertex_info.property_group("id").is_none());
+    }
+
+    #[test]
     fn test_vertex_info_property_group_lookups() {
         let groups = make_property_groups();
 
-        let vertex_info = VertexInfo::builder("person", 1024, groups)
+        let vertex_info = VertexInfo::builder("person", 1024)
+            .property_groups(groups)
             .prefix("person/")
             .version_opt(None)
             .build();
@@ -439,7 +471,8 @@ mod tests {
     fn test_vertex_info_dump_and_save() {
         let groups = make_property_groups();
 
-        let vertex_info = VertexInfo::builder("person", 1024, groups)
+        let vertex_info = VertexInfo::builder("person", 1024)
+            .property_groups(groups)
             .labels_from_iter(["l1"])
             .prefix("person/")
             .build();
@@ -473,7 +506,8 @@ mod tests {
         use std::os::unix::ffi::OsStringExt;
 
         let groups = make_property_groups();
-        let vertex_info = VertexInfo::builder("person", 1024, groups)
+        let vertex_info = VertexInfo::builder("person", 1024)
+            .property_groups(groups)
             .labels_from_iter(["l1"])
             .prefix("person/")
             .build();
@@ -485,12 +519,11 @@ mod tests {
             b"vertex_info_\xFF_non_utf8.yaml".to_vec(),
         ));
 
-        std::fs::File::create(&path).unwrap();
-        std::fs::remove_file(&path).unwrap();
-
-        vertex_info.save(&path).unwrap();
-        let metadata = std::fs::metadata(&path).unwrap();
-        assert!(metadata.is_file());
-        assert!(metadata.len() > 0);
+        let err = vertex_info.save(&path).err().unwrap();
+        assert!(
+            matches!(err, crate::Error::NonUtf8Path(_)),
+            "unexpected error: {err:?}"
+        );
+        assert!(std::fs::metadata(&path).is_err());
     }
 }
