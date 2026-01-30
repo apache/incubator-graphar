@@ -17,13 +17,21 @@
 
 use cxx::{ExternType, SharedPtr};
 
-/// A shared pointer wrapper for `graphar::PropertyGroup`.
 #[repr(transparent)]
 #[derive(Clone)]
 pub struct SharedPropertyGroup(pub(crate) SharedPtr<graphar::PropertyGroup>);
 
 unsafe impl ExternType for SharedPropertyGroup {
     type Id = cxx::type_id!("graphar::SharedPropertyGroup");
+    type Kind = cxx::kind::Opaque;
+}
+
+#[repr(transparent)]
+#[derive(Clone)]
+pub struct SharedAdjacentList(pub(crate) SharedPtr<graphar::AdjacentList>);
+
+unsafe impl ExternType for SharedAdjacentList {
+    type Id = cxx::type_id!("graphar::SharedAdjacentList");
     type Kind = cxx::kind::Opaque;
 }
 
@@ -107,10 +115,31 @@ pub(crate) mod graphar {
         Set = 2,
     }
 
+    /// Adjacency list type.
+    ///
+    /// This corresponds to GraphAr's `graphar::AdjListType` bit flags.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    #[repr(i32)]
+    enum AdjListType {
+        /// Unordered adjacency list by source vertex.
+        #[cxx_name = "unordered_by_source"]
+        UnorderedBySource = 0b0000_0001,
+        /// Unordered adjacency list by destination vertex.
+        #[cxx_name = "unordered_by_dest"]
+        UnorderedByDest = 0b0000_0010,
+        /// Ordered adjacency list by source vertex.
+        #[cxx_name = "ordered_by_source"]
+        OrderedBySource = 0b0000_0100,
+        /// Ordered adjacency list by destination vertex.
+        #[cxx_name = "ordered_by_dest"]
+        OrderedByDest = 0b0000_1000,
+    }
+
     unsafe extern "C++" {
         type FileType;
         type Type;
         type Cardinality;
+        type AdjListType;
     }
 
     // `DataType`
@@ -252,8 +281,82 @@ pub(crate) mod graphar {
         fn vertex_info_dump(vertex_info: &VertexInfo) -> Result<UniquePtr<CxxString>>;
     }
 
+    // `AdjacentList`
+    unsafe extern "C++" {
+        type AdjacentList;
+
+        fn GetType(&self) -> AdjListType;
+        fn GetFileType(&self) -> FileType;
+        fn GetPrefix(&self) -> &CxxString;
+
+        fn CreateAdjacentList(
+            type_: AdjListType,
+            file_type: FileType,
+            path_prefix: &CxxString,
+        ) -> SharedPtr<AdjacentList>;
+    }
+
+    // `AdjacentListVector`
+    unsafe extern "C++" {
+        #[namespace = "graphar_rs"]
+        fn new_adjacent_list_vec() -> UniquePtr<CxxVector<SharedAdjacentList>>;
+        #[namespace = "graphar_rs"]
+        fn push_adjacent_list(
+            vec: Pin<&mut CxxVector<SharedAdjacentList>>,
+            adjacent_list: SharedPtr<AdjacentList>,
+        );
+    }
+
+    // `EdgeInfo`
+    unsafe extern "C++" {
+        type EdgeInfo;
+
+        fn GetSrcType(&self) -> &CxxString;
+        fn GetEdgeType(&self) -> &CxxString;
+        fn GetDstType(&self) -> &CxxString;
+        fn GetChunkSize(&self) -> i64;
+        fn GetSrcChunkSize(&self) -> i64;
+        fn GetDstChunkSize(&self) -> i64;
+        fn GetPrefix(&self) -> &CxxString;
+        fn IsDirected(&self) -> bool;
+        fn version(&self) -> &SharedPtr<ConstInfoVersion>;
+        fn HasAdjacentListType(&self, adj_list_type: AdjListType) -> bool;
+        fn GetAdjacentList(&self, adj_list_type: AdjListType) -> SharedPtr<AdjacentList>;
+
+        fn PropertyGroupNum(&self) -> i32;
+        fn GetPropertyGroups(&self) -> &CxxVector<SharedPropertyGroup>;
+        fn GetPropertyGroup(&self, property: &CxxString) -> SharedPtr<PropertyGroup>;
+        fn GetPropertyGroupByIndex(&self, index: i32) -> SharedPtr<PropertyGroup>;
+
+        #[namespace = "graphar_rs"]
+        #[allow(clippy::too_many_arguments)]
+        fn create_edge_info(
+            src_type: &CxxString,
+            edge_type: &CxxString,
+            dst_type: &CxxString,
+            chunk_size: i64,
+            src_chunk_size: i64,
+            dst_chunk_size: i64,
+            directed: bool,
+            adjacent_lists: &CxxVector<SharedAdjacentList>,
+            property_groups: &CxxVector<SharedPropertyGroup>,
+            path_prefix: &CxxString,
+            version: SharedPtr<ConstInfoVersion>,
+        ) -> Result<SharedPtr<EdgeInfo>>;
+
+        #[namespace = "graphar_rs"]
+        fn edge_info_save(edge_info: &EdgeInfo, path: &CxxString) -> Result<()>;
+        #[namespace = "graphar_rs"]
+        fn edge_info_dump(edge_info: &EdgeInfo) -> Result<UniquePtr<CxxString>>;
+    }
+
     unsafe extern "C++" {
         type SharedPropertyGroup = crate::ffi::SharedPropertyGroup;
     }
     impl CxxVector<SharedPropertyGroup> {}
+
+    unsafe extern "C++" {
+        type SharedAdjacentList = crate::ffi::SharedAdjacentList;
+    }
+    impl CxxVector<SharedAdjacentList> {}
 }

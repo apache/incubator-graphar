@@ -110,12 +110,52 @@ std::shared_ptr<graphar::VertexInfo> create_vertex_info(
     label_vec.emplace_back(std::string(labels[i]));
   }
 
-  auto vertex_info = graphar::CreateVertexInfo(type, chunk_size, property_groups,
-                                               label_vec, prefix, std::move(version));
+  auto vertex_info = graphar::CreateVertexInfo(
+      type, chunk_size, property_groups, label_vec, prefix, std::move(version));
   if (vertex_info == nullptr) {
     throw std::runtime_error("CreateVertexInfo: returned nullptr");
   }
   return vertex_info;
+}
+
+std::shared_ptr<graphar::EdgeInfo> create_edge_info(
+    const std::string &src_type, const std::string &edge_type,
+    const std::string &dst_type, graphar::IdType chunk_size,
+    graphar::IdType src_chunk_size, graphar::IdType dst_chunk_size,
+    bool directed, const graphar::AdjacentListVector &adjacent_lists,
+    const std::vector<graphar::SharedPropertyGroup> &property_groups,
+    const std::string &prefix,
+    std::shared_ptr<graphar::ConstInfoVersion> version) {
+  if (src_type.empty()) {
+    throw std::runtime_error("CreateEdgeInfo: src_type must not be empty");
+  }
+  if (edge_type.empty()) {
+    throw std::runtime_error("CreateEdgeInfo: edge_type must not be empty");
+  }
+  if (dst_type.empty()) {
+    throw std::runtime_error("CreateEdgeInfo: dst_type must not be empty");
+  }
+  if (chunk_size <= 0) {
+    throw std::runtime_error("CreateEdgeInfo: chunk_size must be > 0");
+  }
+  if (src_chunk_size <= 0) {
+    throw std::runtime_error("CreateEdgeInfo: src_chunk_size must be > 0");
+  }
+  if (dst_chunk_size <= 0) {
+    throw std::runtime_error("CreateEdgeInfo: dst_chunk_size must be > 0");
+  }
+  if (adjacent_lists.empty()) {
+    throw std::runtime_error(
+        "CreateEdgeInfo: adjacent_lists must not be empty");
+  }
+
+  auto edge_info = graphar::CreateEdgeInfo(
+      src_type, edge_type, dst_type, chunk_size, src_chunk_size, dst_chunk_size,
+      directed, adjacent_lists, property_groups, prefix, std::move(version));
+  if (edge_info == nullptr) {
+    throw std::runtime_error("CreateEdgeInfo: returned nullptr");
+  }
+  return edge_info;
 }
 
 void vertex_info_save(const graphar::VertexInfo &vertex_info,
@@ -133,5 +173,31 @@ vertex_info_dump(const graphar::VertexInfo &vertex_info) {
     throw std::runtime_error(dumped.error().message());
   }
   return std::make_unique<std::string>(std::move(dumped).value());
+}
+
+std::unique_ptr<graphar::AdjacentListVector> new_adjacent_list_vec() {
+  return std::make_unique<graphar::AdjacentListVector>();
+}
+
+void push_adjacent_list(graphar::AdjacentListVector &v,
+                        std::shared_ptr<graphar::AdjacentList> adjacent_list) {
+  v.emplace_back(std::move(adjacent_list));
+}
+
+void edge_info_save(const graphar::EdgeInfo &edge_info,
+                    const std::string &path) {
+  auto status = edge_info.Save(path);
+  if (!status.ok()) {
+    throw std::runtime_error(status.message());
+  }
+}
+
+std::unique_ptr<std::string>
+edge_info_dump(const graphar::EdgeInfo &edge_info) {
+  auto r = edge_info.Dump();
+  if (!r) {
+    throw std::runtime_error(r.error().message());
+  }
+  return std::make_unique<std::string>(std::move(r).value());
 }
 } // namespace graphar_rs

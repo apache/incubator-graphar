@@ -19,17 +19,22 @@
 
 #![deny(missing_docs)]
 
-use cxx::CxxString;
+use std::path::Path;
 
 mod ffi;
 
-/// GraphAr metadata.
+/// Error types for this crate.
+pub mod error;
+/// GraphAr metadata information types.
 pub mod info;
 /// GraphAr property.
 pub mod property;
 /// GraphAr logical data types.
 pub mod types;
 
-fn cxx_string_to_string(value: &CxxString) -> String {
-    String::from_utf8_lossy(value.as_bytes()).into_owned()
+pub use error::{Error, Result};
+
+fn path_to_utf8_str(path: &Path) -> Result<&str> {
+    path.to_str()
+        .ok_or_else(|| Error::NonUtf8Path(path.to_owned()))
 }

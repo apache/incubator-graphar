@@ -17,7 +17,8 @@
 
 //! Rust bindings for GraphAr property types.
 
-use std::ops::{Deref, DerefMut};
+use std::ops::Deref;
+use std::pin::Pin;
 
 use crate::ffi;
 use crate::types::{Cardinality, DataType, FileType};
@@ -26,9 +27,13 @@ use cxx::{CxxVector, SharedPtr, UniquePtr, let_cxx_string};
 /// A property definition in the GraphAr schema.
 ///
 /// This is a thin wrapper around the C++ `graphar::Property`.
-pub struct Property(pub(crate) UniquePtr<ffi::graphar::Property>);
+pub struct Property(UniquePtr<ffi::graphar::Property>);
 
 impl Property {
+    pub(crate) fn as_ref(&self) -> &ffi::graphar::Property {
+        self.0.as_ref().expect("property should be valid")
+    }
+
     /// Create a new property definition.
     ///
     /// Note: In upstream GraphAr C++ (`graphar::Property` constructor), a primary key property is
@@ -55,18 +60,18 @@ impl Property {
 
     /// Return the property name.
     pub fn name(&self) -> String {
-        crate::cxx_string_to_string(ffi::graphar::property_get_name(&self.0))
+        ffi::graphar::property_get_name(self.as_ref()).to_string()
     }
 
     /// Return the property data type.
     pub fn data_type(&self) -> DataType {
-        let ty = ffi::graphar::property_get_type(&self.0);
+        let ty = ffi::graphar::property_get_type(self.as_ref());
         DataType(ty.clone())
     }
 
     /// Return whether this property is a primary key.
     pub fn is_primary(&self) -> bool {
-        ffi::graphar::property_is_primary(&self.0)
+        ffi::graphar::property_is_primary(self.as_ref())
     }
 
     /// Return whether this property is nullable.
@@ -74,12 +79,12 @@ impl Property {
     /// Note: In upstream GraphAr C++ (`graphar::Property` constructor), a primary key property is
     /// always treated as non-nullable, so this returns `false` when `is_primary()` is `true`.
     pub fn is_nullable(&self) -> bool {
-        ffi::graphar::property_is_nullable(&self.0)
+        ffi::graphar::property_is_nullable(self.as_ref())
     }
 
     /// Return the cardinality of this property.
     pub fn cardinality(&self) -> Cardinality {
-        ffi::graphar::property_get_cardinality(&self.0)
+        ffi::graphar::property_get_cardinality(self.as_ref())
     }
 }
 
@@ -164,22 +169,15 @@ impl Default for PropertyVec {
 
 impl Clone for PropertyVec {
     fn clone(&self) -> Self {
-        let src = self.0.as_ref().expect("properties vec should be valid");
-        Self(ffi::graphar::property_vec_clone(src))
+        Self(ffi::graphar::property_vec_clone(self.as_ref()))
     }
 }
 
 impl Deref for PropertyVec {
-    type Target = UniquePtr<CxxVector<ffi::graphar::Property>>;
+    type Target = CxxVector<ffi::graphar::Property>;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl DerefMut for PropertyVec {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+        self.as_ref()
     }
 }
 
@@ -191,7 +189,7 @@ impl PropertyVec {
 
     /// Push a property into the vector.
     pub fn push(&mut self, property: Property) {
-        ffi::graphar::property_vec_push_property(self.0.pin_mut(), property.0);
+        ffi::graphar::property_vec_push_property(self.pin_mut(), property.0);
     }
 
     /// Construct and append a property directly in the underlying C++ vector.
@@ -209,7 +207,7 @@ impl PropertyVec {
 
         let_cxx_string!(name = name.as_ref());
         ffi::graphar::property_vec_emplace_property(
-            self.0.pin_mut(),
+            self.pin_mut(),
             &name,
             data_type.0,
             is_primary,
@@ -217,12 +215,28 @@ impl PropertyVec {
             cardinality,
         );
     }
+
+    pub(crate) fn as_ref(&self) -> &CxxVector<ffi::graphar::Property> {
+        self.0.as_ref().expect("properties vec should be valid")
+    }
+
+    /// Borrow the underlying C++ vector mutably.
+    ///
+    /// Mutating APIs on `cxx::CxxVector` require a pinned mutable reference.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the underlying C++ vector pointer is null.
+    pub fn pin_mut(&mut self) -> Pin<&mut CxxVector<ffi::graphar::Property>> {
+        self.0.as_mut().expect("properties vec should be valid")
+    }
 }
 
 /// A group of properties stored in the same file(s).
 pub type PropertyGroup = ffi::SharedPropertyGroup;
 
 impl PropertyGroup {
+    /// Construct a `PropertyGroup` from a raw C++ shared pointer.
     pub(crate) fn from_inner(inner: SharedPtr<ffi::graphar::PropertyGroup>) -> Self {
         Self(inner)
     }
@@ -231,13 +245,9 @@ impl PropertyGroup {
     ///
     /// The `prefix` is a logical prefix string used by GraphAr (it is not a
     /// filesystem path).
-    pub fn new<S: AsRef<[u8]>>(properties: PropertyVec, file_type: FileType, prefix: S) -> Self {
-        let_cxx_string!(prefix = prefix);
-        let props = properties
-            .0
-            .as_ref()
-            .expect("properties vec should be valid");
-        let inner = ffi::graphar::CreatePropertyGroup(props, file_type, &prefix);
+    pub fn new<S: AsRef<str>>(properties: PropertyVec, file_type: FileType, prefix: S) -> Self {
+        let_cxx_string!(prefix = prefix.as_ref());
+        let inner = ffi::graphar::CreatePropertyGroup(properties.as_ref(), file_type, &prefix);
         Self(inner)
     }
 
@@ -271,22 +281,15 @@ impl Default for PropertyGroupVector {
 
 impl Clone for PropertyGroupVector {
     fn clone(&self) -> Self {
-        let src = self.0.as_ref().expect("property group vec should be valid");
-        Self(ffi::graphar::property_group_vec_clone(src))
+        Self(ffi::graphar::property_group_vec_clone(self.as_ref()))
     }
 }
 
 impl Deref for PropertyGroupVector {
-    type Target = UniquePtr<CxxVector<PropertyGroup>>;
+    type Target = CxxVector<PropertyGroup>;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl DerefMut for PropertyGroupVector {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
+        self.as_ref()
     }
 }
 
@@ -298,7 +301,22 @@ impl PropertyGroupVector {
 
     /// Push a property group into the vector.
     pub fn push(&mut self, property_group: PropertyGroup) {
-        ffi::graphar::property_group_vec_push_property_group(self.0.pin_mut(), property_group.0);
+        ffi::graphar::property_group_vec_push_property_group(self.pin_mut(), property_group.0);
+    }
+
+    pub(crate) fn as_ref(&self) -> &CxxVector<PropertyGroup> {
+        self.0.as_ref().expect("property group vec should be valid")
+    }
+
+    /// Borrow the underlying C++ vector mutably.
+    ///
+    /// Mutating APIs on `cxx::CxxVector` require a pinned mutable reference.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the underlying C++ vector pointer is null.
+    pub fn pin_mut(&mut self) -> Pin<&mut CxxVector<PropertyGroup>> {
+        self.0.as_mut().expect("property group vec should be valid")
     }
 }
 
@@ -372,13 +390,13 @@ mod tests {
     #[test]
     fn test_property_vec_deref() {
         let mut vec = PropertyVec::default();
-        assert_eq!(vec.deref().len(), 0);
-        assert!(vec.deref().is_empty());
-        assert_eq!(vec.deref().capacity(), 0);
+        assert_eq!(vec.len(), 0);
+        assert_eq!(vec.as_ref().len(), 0);
+        assert!(vec.as_ref().is_empty());
+        assert_eq!(vec.as_ref().capacity(), 0);
 
-        // test `deref_mut`
         vec.pin_mut().reserve(2);
-        assert_eq!(vec.deref().capacity(), 2);
+        assert_eq!(vec.as_ref().capacity(), 2);
     }
 
     #[test]
@@ -406,11 +424,11 @@ mod tests {
     #[test]
     fn test_property_group_vector_default_and_deref() {
         let mut vec = PropertyGroupVector::default();
-        assert_eq!(vec.deref().len(), 0);
-        assert!(vec.deref().is_empty());
-        // test `deref_mut`
-        vec.deref_mut().pin_mut().reserve(2);
-        assert_eq!(vec.deref().capacity(), 2);
+        assert_eq!(vec.len(), 0);
+        assert_eq!(vec.as_ref().len(), 0);
+        assert!(vec.as_ref().is_empty());
+        vec.pin_mut().reserve(2);
+        assert_eq!(vec.as_ref().capacity(), 2);
     }
 
     #[test]
@@ -437,15 +455,15 @@ mod tests {
         let pg2 = PropertyGroup::new(props2, FileType::Parquet, "pg2/");
 
         let mut vec = PropertyGroupVector::default();
-        assert_eq!(vec.deref().len(), 0);
-        assert!(vec.deref().is_empty());
+        assert_eq!(vec.as_ref().len(), 0);
+        assert!(vec.as_ref().is_empty());
 
         vec.push(pg1);
-        assert_eq!(vec.deref().len(), 1);
-        assert!(!vec.deref().is_empty());
+        assert_eq!(vec.as_ref().len(), 1);
+        assert!(!vec.as_ref().is_empty());
 
         vec.push(pg2);
-        assert_eq!(vec.deref().len(), 2);
+        assert_eq!(vec.as_ref().len(), 2);
     }
 
     fn make_property_vec_for_clone() -> PropertyVec {
@@ -466,15 +484,15 @@ mod tests {
         let mut original = make_property_vec_for_clone();
         let cloned = original.clone();
 
-        assert_eq!(original.len(), 2);
-        assert_eq!(cloned.len(), 2);
+        assert_eq!(original.as_ref().len(), 2);
+        assert_eq!(cloned.as_ref().len(), 2);
 
         let id_prop = Property::new("id2", DataType::int64(), true, true, Cardinality::Single);
         original.push(id_prop);
-        assert_eq!(original.len(), 3);
+        assert_eq!(original.as_ref().len(), 3);
 
         // Mutating the original container should not affect the cloned one.
-        assert_eq!(cloned.len(), 2);
+        assert_eq!(cloned.as_ref().len(), 2);
 
         let pg = PropertyGroup::new(cloned, FileType::Parquet, "clone_check/");
         let mut names: Vec<_> = pg.properties().into_iter().map(|p| p.name()).collect();
@@ -497,21 +515,21 @@ mod tests {
         groups.push(pg2);
 
         let cloned = groups.clone();
-        assert_eq!(groups.len(), 2);
-        assert_eq!(cloned.len(), 2);
+        assert_eq!(groups.as_ref().len(), 2);
+        assert_eq!(cloned.as_ref().len(), 2);
 
-        assert!(cloned.get(0).unwrap().has_property("id1"));
-        assert!(cloned.get(1).unwrap().has_property("id2"));
+        assert!(cloned.as_ref().get(0).unwrap().has_property("id1"));
+        assert!(cloned.as_ref().get(1).unwrap().has_property("id2"));
 
         let mut props3 = PropertyVec::new();
         props3.emplace(PropertyBuilder::new("id3", DataType::int64()).primary_key(true));
         let pg3 = PropertyGroup::new(props3, FileType::Parquet, "pg3/");
         groups.push(pg3);
 
-        assert_eq!(groups.len(), 3);
-        assert_eq!(cloned.len(), 2);
+        assert_eq!(groups.as_ref().len(), 3);
+        assert_eq!(cloned.as_ref().len(), 2);
 
-        let cloned_props = cloned.get(0).unwrap().properties();
+        let cloned_props = cloned.as_ref().get(0).unwrap().properties();
         assert_eq!(cloned_props.len(), 1);
         assert_eq!(cloned_props[0].name(), "id1");
         assert_eq!(cloned_props[0].data_type().id(), Type::Int64);
