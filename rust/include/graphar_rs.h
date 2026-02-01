@@ -25,11 +25,14 @@
 #include <string>
 #include <vector>
 
-#include "graphar/fwd.h"
-#include "graphar/graph_info.h"
-#include "graphar/types.h"
-#include "graphar/version_parser.h"
+#include "graphar/api/high_level_writer.h"
+#include "graphar/api/info.h"
 #include "rust/cxx.h"
+
+using i32 = int32_t;
+using i64 = int64_t;
+using f32 = float;
+using f64 = double;
 
 namespace graphar {
 using SharedPropertyGroup = std::shared_ptr<PropertyGroup>;
@@ -102,4 +105,36 @@ void push_adjacent_list(graphar::AdjacentListVector &v,
 void edge_info_save(const graphar::EdgeInfo &edge_info,
                     const std::string &path);
 std::unique_ptr<std::string> edge_info_dump(const graphar::EdgeInfo &edge_info);
+
+// =========================== Builder ===========================
+// `Vertex`
+std::unique_ptr<graphar::builder::Vertex> new_vertex_builder();
+
+#define DEF_VERTEX_ADD_PROPERTY_FUNC(type)                                     \
+  inline void vertex_add_property_##type(graphar::builder::Vertex &v,          \
+                                         const std::string &name, type val) { \
+    v.AddProperty(name, val);                                                  \
+  }
+
+DEF_VERTEX_ADD_PROPERTY_FUNC(bool)
+DEF_VERTEX_ADD_PROPERTY_FUNC(i32)
+DEF_VERTEX_ADD_PROPERTY_FUNC(i64)
+DEF_VERTEX_ADD_PROPERTY_FUNC(f32)
+DEF_VERTEX_ADD_PROPERTY_FUNC(f64)
+
+inline void vertex_add_property_string(graphar::builder::Vertex &v,
+                                       const std::string &name,
+                                       const std::string &val) {
+  v.AddProperty(name, val);
+}
+
+void add_vertex(graphar::builder::VerticesBuilder &builder,
+                graphar::builder::Vertex &v);
+
+std::unique_ptr<graphar::builder::VerticesBuilder>
+new_vertices_builder(const std::shared_ptr<graphar::VertexInfo> &vertex_info,
+                     const std::string &path_prefix, i64 start_idx);
+
+void vertices_dump(graphar::builder::VerticesBuilder &builder);
+
 } // namespace graphar_rs

@@ -15,28 +15,17 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//! Rust bindings for GraphAr.
+//! Shared property value abstractions for builders.
 
-#![deny(missing_docs)]
+#[doc(hidden)]
+pub(crate) mod sealed {
+    pub trait Sealed<Target> {}
+}
 
-use std::path::Path;
-
-mod ffi;
-
-/// GraphAr data builders for writing chunks.
-pub mod builder;
-/// Error types for this crate.
-pub mod error;
-/// GraphAr metadata information types.
-pub mod info;
-/// GraphAr property.
-pub mod property;
-/// GraphAr logical data types.
-pub mod types;
-
-pub use error::{Error, Result};
-
-fn path_to_utf8_str(path: &Path) -> Result<&str> {
-    path.to_str()
-        .ok_or_else(|| Error::NonUtf8Path(path.to_owned()))
+/// A value that can be written into a GraphAr property.
+///
+/// This trait is sealed and cannot be implemented outside this crate.
+pub trait PropertyValue<Target>: sealed::Sealed<Target> {
+    /// Add this value as a property on the given target.
+    fn add_to(self, target: &mut Target, name: &str);
 }

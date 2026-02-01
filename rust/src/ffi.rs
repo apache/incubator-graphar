@@ -359,4 +359,49 @@ pub(crate) mod graphar {
         type SharedAdjacentList = crate::ffi::SharedAdjacentList;
     }
     impl CxxVector<SharedAdjacentList> {}
+
+    // =========================== Builder ===========================
+    // `builder::Vertex`
+    #[namespace = "graphar::builder"]
+    unsafe extern "C++" {
+        #[rust_name = "BuilderVertex"]
+        type Vertex;
+
+        #[namespace = "graphar_rs"]
+        fn new_vertex_builder() -> UniquePtr<BuilderVertex>;
+        #[namespace = "graphar_rs"]
+        fn vertex_add_property_bool(vertex: Pin<&mut BuilderVertex>, name: &CxxString, val: bool);
+        #[namespace = "graphar_rs"]
+        fn vertex_add_property_i32(vertex: Pin<&mut BuilderVertex>, name: &CxxString, val: i32);
+        #[namespace = "graphar_rs"]
+        fn vertex_add_property_i64(vertex: Pin<&mut BuilderVertex>, name: &CxxString, val: i64);
+        #[namespace = "graphar_rs"]
+        fn vertex_add_property_f32(vertex: Pin<&mut BuilderVertex>, name: &CxxString, val: f32);
+        #[namespace = "graphar_rs"]
+        fn vertex_add_property_f64(vertex: Pin<&mut BuilderVertex>, name: &CxxString, val: f64);
+        #[namespace = "graphar_rs"]
+        fn vertex_add_property_string(
+            vertex: Pin<&mut BuilderVertex>,
+            name: &CxxString,
+            val: &CxxString,
+        );
+    }
+
+    // `builder::VerticesBuilder`
+    #[namespace = "graphar::builder"]
+    unsafe extern "C++" {
+        type VerticesBuilder;
+
+        #[namespace = "graphar_rs"]
+        fn add_vertex(builder: Pin<&mut VerticesBuilder>, v: Pin<&mut BuilderVertex>)
+        -> Result<()>;
+        #[namespace = "graphar_rs"]
+        fn new_vertices_builder(
+            vertex_info: &SharedPtr<VertexInfo>,
+            path_prefix: &CxxString,
+            start_idx: i64,
+        ) -> Result<UniquePtr<VerticesBuilder>>;
+        #[namespace = "graphar_rs"]
+        fn vertices_dump(builder: Pin<&mut VerticesBuilder>) -> Result<()>;
+    }
 }
