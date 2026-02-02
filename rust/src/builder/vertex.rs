@@ -86,8 +86,8 @@ impl PropertyValue<Vertex> for String {
     }
 }
 
-impl<'a> sealed::Sealed<Vertex> for &'a str {}
-impl<'a> PropertyValue<Vertex> for &'a str {
+impl sealed::Sealed<Vertex> for &str {}
+impl PropertyValue<Vertex> for &str {
     fn add_to(self, vertex: &mut Vertex, name: &str) {
         let_cxx_string!(name = name);
         let_cxx_string!(val = self);
@@ -385,9 +385,9 @@ mod tests {
         let mut v = Vertex::default();
         assert!(v.is_empty());
         v.add_property("name_string", "alice");
-        v.add_property("name_string", "bob".to_string());
+        v.add_property("name_string", "bob");
         v.add_property_string("name_string", "carol");
-        v.add_property_string("name_string", "dave".to_string());
+        v.add_property_string("name_string", "dave");
         assert!(!v.is_empty());
         assert!(!v.is_multi_property("name_string"));
     }
