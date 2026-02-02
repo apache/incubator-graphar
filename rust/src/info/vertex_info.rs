@@ -40,6 +40,8 @@ impl VertexInfo {
     /// The `prefix` is a logical prefix string used by GraphAr (it is not a
     /// filesystem path).
     ///
+    /// GraphAr conventions typically use a trailing slash (`/`) for prefixes.
+    ///
     /// Panics if GraphAr rejects the inputs (including, but not limited to,
     /// `type` being empty or `chunk_size <= 0`). Prefer [`VertexInfo::try_new`]
     /// if you want to handle errors.
@@ -255,6 +257,7 @@ impl VertexInfoBuilder {
     /// Set the logical prefix.
     ///
     /// This is a logical prefix string used by GraphAr (it is not a filesystem path).
+    /// GraphAr conventions typically use a trailing slash (`/`) for prefixes.
     pub fn prefix<P: AsRef<str>>(mut self, prefix: P) -> Self {
         self.prefix = prefix.as_ref().to_owned();
         self

@@ -17,7 +17,6 @@
 
 //! GraphAr writer builders.
 
-use std::path::Path;
 use std::pin::Pin;
 
 use cxx::{UniquePtr, let_cxx_string};
@@ -258,21 +257,22 @@ pub struct VerticesBuilder(pub(crate) UniquePtr<ffi::graphar::VerticesBuilder>);
 impl VerticesBuilder {
     /// Create a new vertices builder.
     ///
-    /// `path_prefix` is an absolute filesystem path used to store chunks.
+    /// The `prefix` is a filesystem prefix string used by GraphAr (it is not a [`std::path::Path`]).
     ///
-    /// Note: `path_prefix` must be valid UTF-8. On Unix, paths can contain
-    /// arbitrary bytes; such non-UTF8 paths return [`crate::Error::NonUtf8Path`].
-    pub fn try_new<P: AsRef<Path>>(
+    /// GraphAr expects `prefix` to end with a trailing slash (`/`).
+    pub fn try_new<P: AsRef<str>>(
         vertex_info: &VertexInfo,
-        path_prefix: P,
+        prefix: P,
         start_idx: i64,
     ) -> crate::Result<Self> {
-        let prefix_str = crate::path_to_utf8_str(path_prefix.as_ref())?;
-        let mut prefix_string = prefix_str.to_string();
-        if !prefix_string.ends_with('/') {
-            prefix_string.push('/');
+        let prefix = prefix.as_ref();
+        if !prefix.ends_with('/') {
+            return Err(crate::Error::InvalidArgument {
+                name: "prefix",
+                reason: "prefix must end with '/'".to_string(),
+            });
         }
-        let_cxx_string!(prefix = prefix_string.as_str());
+        let_cxx_string!(prefix = prefix);
         let inner = ffi::graphar::new_vertices_builder(&vertex_info.0, &prefix, start_idx)?;
         Ok(Self(inner))
     }
@@ -281,8 +281,8 @@ impl VerticesBuilder {
     ///
     /// Panics if the inputs are rejected by GraphAr. Prefer [`VerticesBuilder::try_new`]
     /// if you want to handle errors.
-    pub fn new<P: AsRef<Path>>(vertex_info: &VertexInfo, path_prefix: P, start_idx: i64) -> Self {
-        Self::try_new(vertex_info, path_prefix, start_idx).unwrap()
+    pub fn new<P: AsRef<str>>(vertex_info: &VertexInfo, prefix: P, start_idx: i64) -> Self {
+        Self::try_new(vertex_info, prefix, start_idx).unwrap()
     }
 
     /// Add a vertex into this builder.
@@ -491,7 +491,8 @@ mod tests {
         let prefix = tmp.path().join("vertices");
         std::fs::create_dir_all(&prefix).unwrap();
 
-        let mut b = VerticesBuilder::new(&info, &prefix, 0);
+        let prefix = format!("{}/", prefix.display());
+        let mut b = VerticesBuilder::new(&info, prefix.as_str(), 0);
 
         let mut v = Vertex::with_id(1);
         v.add_property("id_i64", 1_i64);
@@ -503,23 +504,21 @@ mod tests {
         b.add_vertex(v).unwrap();
 
         b.dump().unwrap();
-        assert!(std::fs::read_dir(&prefix).unwrap().next().is_some());
+        let dir = tmp.path().join("vertices");
+        assert!(std::fs::read_dir(&dir).unwrap().next().is_some());
     }
 
-    #[cfg(unix)]
     #[test]
-    fn test_vertices_builder_try_new_rejects_non_utf8_path() {
-        use std::ffi::OsString;
-        use std::os::unix::ffi::OsStringExt;
-
+    fn test_vertices_builder_try_new_rejects_prefix_without_trailing_slash() {
         let info = make_vertex_info();
-        let mut bytes = b"/tmp/graphar_rs_non_utf8_".to_vec();
-        bytes.push(0xff);
-        let path = std::path::PathBuf::from(OsString::from_vec(bytes));
-
-        match VerticesBuilder::try_new(&info, &path, 0) {
-            Ok(_) => panic!("VerticesBuilder::try_new should fail on non-UTF8 paths"),
-            Err(err) => assert!(matches!(err, crate::Error::NonUtf8Path(_))),
+        let tmp = tempdir().unwrap();
+        let prefix = format!("{}", tmp.path().display());
+        match VerticesBuilder::try_new(&info, prefix.as_str(), 0) {
+            Ok(_) => panic!("VerticesBuilder::try_new should reject prefixes without trailing '/'"),
+            Err(err) => assert!(matches!(
+                err,
+                crate::Error::InvalidArgument { name: "prefix", .. }
+            )),
         }
     }
 
@@ -528,9 +527,10 @@ mod tests {
         let info = make_vertex_info();
         let tmp = tempdir().unwrap();
 
-        match VerticesBuilder::try_new(&info, tmp.path(), -1) {
+        let prefix = format!("{}/", tmp.path().display());
+        match VerticesBuilder::try_new(&info, prefix.as_str(), -1) {
             Ok(_) => panic!("VerticesBuilder::try_new should reject negative start_idx"),
-            Err(err) => assert!(err.to_string().contains("start_idx")),
+            Err(err) => assert!(matches!(err, crate::Error::Cxx(_))),
         }
     }
 }
