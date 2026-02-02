@@ -23,6 +23,7 @@ use std::pin::Pin;
 use cxx::{UniquePtr, let_cxx_string};
 
 use crate::builder::property_value::sealed;
+use crate::types::Cardinality;
 use crate::{builder::PropertyValue, ffi, info::VertexInfo};
 
 /// A vertex record being constructed for use with [`VerticesBuilder`].
@@ -39,7 +40,24 @@ macro_rules! impl_vertex_property_value {
                 fn add_to(self, vertex: &mut Vertex, name: &str) {
                     let_cxx_string!(name = name);
                     paste::paste! {
-                        ffi::graphar::[<vertex_add_property_ $ty>](vertex.pin_mut(), &name, self);
+                        ffi::graphar::[<vertex_builder_add_property_ $ty>](vertex.pin_mut(), &name, self);
+                    }
+                }
+
+                fn add_to_with_cardinality(
+                    self,
+                    vertex: &mut Vertex,
+                    name: &str,
+                    cardinality: Cardinality,
+                ) {
+                    let_cxx_string!(name = name);
+                    paste::paste! {
+                        ffi::graphar::[<vertex_builder_add_property_ $ty _with_cardinality>](
+                            vertex.pin_mut(),
+                            cardinality,
+                            &name,
+                            self,
+                        );
                     }
                 }
             }
@@ -54,7 +72,18 @@ impl PropertyValue<Vertex> for String {
     fn add_to(self, vertex: &mut Vertex, name: &str) {
         let_cxx_string!(name = name);
         let_cxx_string!(val = self.as_str());
-        ffi::graphar::vertex_add_property_string(vertex.pin_mut(), &name, &val);
+        ffi::graphar::vertex_builder_add_property_string(vertex.pin_mut(), &name, &val);
+    }
+
+    fn add_to_with_cardinality(self, vertex: &mut Vertex, name: &str, cardinality: Cardinality) {
+        let_cxx_string!(name = name);
+        let_cxx_string!(val = self.as_str());
+        ffi::graphar::vertex_builder_add_property_string_with_cardinality(
+            vertex.pin_mut(),
+            cardinality,
+            &name,
+            &val,
+        );
     }
 }
 
@@ -63,14 +92,49 @@ impl<'a> PropertyValue<Vertex> for &'a str {
     fn add_to(self, vertex: &mut Vertex, name: &str) {
         let_cxx_string!(name = name);
         let_cxx_string!(val = self);
-        ffi::graphar::vertex_add_property_string(vertex.pin_mut(), &name, &val);
+        ffi::graphar::vertex_builder_add_property_string(vertex.pin_mut(), &name, &val);
+    }
+
+    fn add_to_with_cardinality(self, vertex: &mut Vertex, name: &str, cardinality: Cardinality) {
+        let_cxx_string!(name = name);
+        let_cxx_string!(val = self);
+        ffi::graphar::vertex_builder_add_property_string_with_cardinality(
+            vertex.pin_mut(),
+            cardinality,
+            &name,
+            &val,
+        );
     }
 }
 
 impl Vertex {
-    /// Create a new vertex record.
-    pub fn new() -> Self {
+    pub(crate) fn as_ref(&self) -> &ffi::graphar::BuilderVertex {
+        self.0.as_ref().expect("vertex should be valid")
+    }
+
+    /// Create a new vertex record with the given id.
+    pub fn with_id(id: i64) -> Self {
+        Self(ffi::graphar::new_vertex_builder_with_id(id))
+    }
+
+    /// Create an empty vertex record.
+    pub fn empty() -> Self {
         Self(ffi::graphar::new_vertex_builder())
+    }
+
+    /// Returns true if this vertex is empty.
+    pub fn is_empty(&self) -> bool {
+        ffi::graphar::vertex_builder_is_empty(self.as_ref())
+    }
+
+    /// Returns the id of this vertex.
+    pub fn id(&self) -> i64 {
+        ffi::graphar::vertex_builder_get_id(self.as_ref())
+    }
+
+    /// Set the id of this vertex.
+    pub fn set_id(&mut self, id: i64) {
+        ffi::graphar::vertex_builder_set_id(self.pin_mut(), id);
     }
 
     /// Add a property to this vertex.
@@ -114,6 +178,69 @@ impl Vertex {
         self.add_property(name, val.as_ref());
     }
 
+    /// Add a property to this vertex with the specified cardinality.
+    ///
+    /// Supported types are: `bool`, `i32`, `i64`, `f32`, `f64`, `String`, `&str`.
+    pub fn add_property_with_cardinality<S, V>(&mut self, cardinality: Cardinality, name: S, val: V)
+    where
+        S: AsRef<str>,
+        V: PropertyValue<Vertex>,
+    {
+        val.add_to_with_cardinality(self, name.as_ref(), cardinality);
+    }
+
+    /// Returns true if the property is stored as a multi-value (LIST/SET).
+    pub fn is_multi_property<S: AsRef<str>>(&self, name: S) -> bool {
+        let_cxx_string!(name = name.as_ref());
+        ffi::graphar::vertex_builder_is_multi_property(self.as_ref(), &name)
+    }
+
+    /// Returns true if this vertex contains a property with the given name.
+    pub fn contains_property<S: AsRef<str>>(&self, name: S) -> bool {
+        let_cxx_string!(name = name.as_ref());
+        ffi::graphar::vertex_builder_contains_property(self.as_ref(), &name)
+    }
+
+    /// Append a value into a LIST property.
+    pub fn add_property_list_item<S, V>(&mut self, name: S, val: V)
+    where
+        S: AsRef<str>,
+        V: PropertyValue<Vertex>,
+    {
+        self.add_property_with_cardinality(Cardinality::List, name, val);
+    }
+
+    /// Append multiple values into a LIST property.
+    pub fn add_property_list<I, V>(&mut self, name: &str, values: I)
+    where
+        I: IntoIterator<Item = V>,
+        V: PropertyValue<Vertex>,
+    {
+        for v in values {
+            self.add_property_list_item(name, v);
+        }
+    }
+
+    /// Append a value into a SET property.
+    pub fn add_property_set_item<S, V>(&mut self, name: S, val: V)
+    where
+        S: AsRef<str>,
+        V: PropertyValue<Vertex>,
+    {
+        self.add_property_with_cardinality(Cardinality::Set, name, val);
+    }
+
+    /// Append multiple values into a SET property.
+    pub fn add_property_set<I, V>(&mut self, name: &str, values: I)
+    where
+        I: IntoIterator<Item = V>,
+        V: PropertyValue<Vertex>,
+    {
+        for v in values {
+            self.add_property_set_item(name, v);
+        }
+    }
+
     pub(crate) fn pin_mut(&mut self) -> Pin<&mut ffi::graphar::BuilderVertex> {
         self.0.as_mut().expect("vertex should be valid")
     }
@@ -121,7 +248,7 @@ impl Vertex {
 
 impl Default for Vertex {
     fn default() -> Self {
-        Self::new()
+        Self::empty()
     }
 }
 
@@ -141,7 +268,11 @@ impl VerticesBuilder {
         start_idx: i64,
     ) -> crate::Result<Self> {
         let prefix_str = crate::path_to_utf8_str(path_prefix.as_ref())?;
-        let_cxx_string!(prefix = prefix_str);
+        let mut prefix_string = prefix_str.to_string();
+        if !prefix_string.ends_with('/') {
+            prefix_string.push('/');
+        }
+        let_cxx_string!(prefix = prefix_string.as_str());
         let inner = ffi::graphar::new_vertices_builder(&vertex_info.0, &prefix, start_idx)?;
         Ok(Self(inner))
     }
@@ -168,5 +299,238 @@ impl VerticesBuilder {
 
     pub(crate) fn pin_mut(&mut self) -> Pin<&mut ffi::graphar::VerticesBuilder> {
         self.0.as_mut().expect("vertices builder should be valid")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    use crate::info::InfoVersion;
+    use crate::property::{Property, PropertyGroup, PropertyGroupVector, PropertyVec};
+    use crate::types::{Cardinality, DataType, FileType};
+    use tempfile::tempdir;
+
+    fn make_vertex_info() -> VertexInfo {
+        let mut props = PropertyVec::new();
+        props.push(Property::new(
+            "id_i64",
+            DataType::int64(),
+            true,
+            false,
+            Cardinality::Single,
+        ));
+        props.push(Property::new(
+            "active_bool",
+            DataType::bool(),
+            false,
+            false,
+            Cardinality::Single,
+        ));
+        props.push(Property::new(
+            "age_i32",
+            DataType::int32(),
+            false,
+            false,
+            Cardinality::Single,
+        ));
+        props.push(Property::new(
+            "score_f32",
+            DataType::float32(),
+            false,
+            false,
+            Cardinality::Single,
+        ));
+        props.push(Property::new(
+            "rating_f64",
+            DataType::float64(),
+            false,
+            false,
+            Cardinality::Single,
+        ));
+        props.push(Property::new(
+            "name_string",
+            DataType::string(),
+            false,
+            false,
+            Cardinality::Single,
+        ));
+
+        let mut groups = PropertyGroupVector::new();
+        groups.push(PropertyGroup::new(props, FileType::Parquet, ""));
+
+        let ver = Some(InfoVersion::new(1).unwrap());
+        VertexInfo::new("person", 4, groups, vec![], "", ver)
+    }
+
+    #[test]
+    fn test_vertex_add_property_dispatch_primitives() {
+        let mut v = Vertex::default();
+        assert!(v.is_empty());
+        assert!(!v.contains_property("age_i32"));
+        v.set_id(1);
+        assert_eq!(v.id(), 1);
+        v.add_property("id_i64", 1_i64);
+        v.add_property("active_bool", true);
+        v.add_property("age_i32", 42_i32);
+        v.add_property("score_f32", 0.5_f32);
+        v.add_property("rating_f64", 9.5_f64);
+        assert!(!v.is_empty());
+        assert!(!v.is_multi_property("age_i32"));
+        assert!(v.contains_property("age_i32"));
+    }
+
+    #[test]
+    fn test_vertex_add_property_dispatch_string() {
+        let mut v = Vertex::default();
+        assert!(v.is_empty());
+        v.add_property("name_string", "alice");
+        v.add_property("name_string", "bob".to_string());
+        v.add_property_string("name_string", "carol");
+        v.add_property_string("name_string", "dave".to_string());
+        assert!(!v.is_empty());
+        assert!(!v.is_multi_property("name_string"));
+    }
+
+    #[test]
+    fn test_vertex_add_property_wrapper_methods() {
+        let mut v = Vertex::empty();
+        v.add_property_bool("active_bool", true);
+        v.add_property_i32("age_i32", 1);
+        v.add_property_i64("id_i64", 2);
+        v.add_property_f32("score_f32", 1.0);
+        v.add_property_f64("rating_f64", 2.0);
+        v.add_property_string("name_string", "alice");
+        assert!(!v.is_empty());
+    }
+
+    #[test]
+    fn test_vertex_add_property_with_cardinality() {
+        let mut v = Vertex::empty();
+        assert!(!v.is_multi_property("tags"));
+        assert!(!v.contains_property("tags"));
+
+        v.add_property_with_cardinality(Cardinality::List, "tags", "t0");
+        assert!(v.is_multi_property("tags"));
+        assert!(v.contains_property("tags"));
+
+        v.add_property_list("nums", [1_i64, 2_i64, 3_i64]);
+        assert!(v.is_multi_property("nums"));
+        assert!(v.contains_property("nums"));
+
+        v.add_property_set("uniq", ["a", "a", "b"]);
+        assert!(v.is_multi_property("uniq"));
+        assert!(v.contains_property("uniq"));
+    }
+
+    #[test]
+    fn test_vertex_add_property_with_cardinality_dispatch() {
+        let mut v = Vertex::empty();
+
+        v.add_property_with_cardinality(Cardinality::Single, "b_single", true);
+        assert!(v.contains_property("b_single"));
+        assert!(!v.is_multi_property("b_single"));
+
+        v.add_property_with_cardinality(Cardinality::List, "b_list", true);
+        assert!(v.contains_property("b_list"));
+        assert!(v.is_multi_property("b_list"));
+
+        v.add_property_with_cardinality(Cardinality::Single, "i32_single", 1_i32);
+        assert!(v.contains_property("i32_single"));
+        assert!(!v.is_multi_property("i32_single"));
+
+        v.add_property_with_cardinality(Cardinality::List, "i32_list", 1_i32);
+        assert!(v.contains_property("i32_list"));
+        assert!(v.is_multi_property("i32_list"));
+
+        v.add_property_with_cardinality(Cardinality::Single, "i64_single", 1_i64);
+        assert!(v.contains_property("i64_single"));
+        assert!(!v.is_multi_property("i64_single"));
+
+        v.add_property_with_cardinality(Cardinality::List, "i64_list", 1_i64);
+        assert!(v.contains_property("i64_list"));
+        assert!(v.is_multi_property("i64_list"));
+
+        v.add_property_with_cardinality(Cardinality::Single, "f32_single", 1.0_f32);
+        assert!(v.contains_property("f32_single"));
+        assert!(!v.is_multi_property("f32_single"));
+
+        v.add_property_with_cardinality(Cardinality::List, "f32_list", 1.0_f32);
+        assert!(v.contains_property("f32_list"));
+        assert!(v.is_multi_property("f32_list"));
+
+        v.add_property_with_cardinality(Cardinality::Single, "f64_single", 1.0_f64);
+        assert!(v.contains_property("f64_single"));
+        assert!(!v.is_multi_property("f64_single"));
+
+        v.add_property_with_cardinality(Cardinality::List, "f64_list", 1.0_f64);
+        assert!(v.contains_property("f64_list"));
+        assert!(v.is_multi_property("f64_list"));
+
+        v.add_property_with_cardinality(Cardinality::Single, "s_single", "alice");
+        assert!(v.contains_property("s_single"));
+        assert!(!v.is_multi_property("s_single"));
+
+        v.add_property_with_cardinality(Cardinality::List, "s_list", "alice");
+        assert!(v.contains_property("s_list"));
+        assert!(v.is_multi_property("s_list"));
+
+        v.add_property_with_cardinality(Cardinality::Single, "string_single", "bob".to_string());
+        assert!(v.contains_property("string_single"));
+        assert!(!v.is_multi_property("string_single"));
+
+        v.add_property_with_cardinality(Cardinality::Set, "string_set", "bob".to_string());
+        assert!(v.contains_property("string_set"));
+        assert!(v.is_multi_property("string_set"));
+    }
+
+    #[test]
+    fn test_vertices_builder_add_and_dump() {
+        let info = make_vertex_info();
+        let tmp = tempdir().unwrap();
+        let prefix = tmp.path().join("vertices");
+        std::fs::create_dir_all(&prefix).unwrap();
+
+        let mut b = VerticesBuilder::new(&info, &prefix, 0);
+
+        let mut v = Vertex::with_id(1);
+        v.add_property("id_i64", 1_i64);
+        v.add_property("active_bool", true);
+        v.add_property("age_i32", 42_i32);
+        v.add_property("score_f32", 0.5_f32);
+        v.add_property("rating_f64", 9.5_f64);
+        v.add_property("name_string", "alice");
+        b.add_vertex(v).unwrap();
+
+        b.dump().unwrap();
+        assert!(std::fs::read_dir(&prefix).unwrap().next().is_some());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_vertices_builder_try_new_rejects_non_utf8_path() {
+        use std::ffi::OsString;
+        use std::os::unix::ffi::OsStringExt;
+
+        let info = make_vertex_info();
+        let mut bytes = b"/tmp/graphar_rs_non_utf8_".to_vec();
+        bytes.push(0xff);
+        let path = std::path::PathBuf::from(OsString::from_vec(bytes));
+
+        match VerticesBuilder::try_new(&info, &path, 0) {
+            Ok(_) => panic!("VerticesBuilder::try_new should fail on non-UTF8 paths"),
+            Err(err) => assert!(matches!(err, crate::Error::NonUtf8Path(_))),
+        }
+    }
+
+    #[test]
+    fn test_vertices_builder_try_new_rejects_negative_start_idx() {
+        let info = make_vertex_info();
+        let tmp = tempdir().unwrap();
+
+        match VerticesBuilder::try_new(&info, tmp.path(), -1) {
+            Ok(_) => panic!("VerticesBuilder::try_new should reject negative start_idx"),
+            Err(err) => assert!(err.to_string().contains("start_idx")),
+        }
     }
 }

@@ -17,6 +17,8 @@
 
 //! Shared property value abstractions for builders.
 
+use crate::types::Cardinality;
+
 #[doc(hidden)]
 pub(crate) mod sealed {
     pub trait Sealed<Target> {}
@@ -28,4 +30,6 @@ pub(crate) mod sealed {
 pub trait PropertyValue<Target>: sealed::Sealed<Target> {
     /// Add this value as a property on the given target.
     fn add_to(self, target: &mut Target, name: &str);
+    /// Add this value as a property on the given target with the specified cardinality.
+    fn add_to_with_cardinality(self, target: &mut Target, name: &str, cardinality: Cardinality);
 }

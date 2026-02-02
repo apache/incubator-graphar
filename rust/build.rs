@@ -27,6 +27,7 @@ fn link_libraries() {
     println!("cargo:rustc-link-lib=dylib=arrow_dataset");
     println!("cargo:rustc-link-lib=dylib=arrow_acero");
     println!("cargo:rustc-link-lib=dylib=arrow");
+    println!("cargo:rustc-link-lib=dylib=parquet");
 
     println!("cargo:rustc-link-lib=graphar");
 }

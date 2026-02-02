@@ -109,23 +109,66 @@ std::unique_ptr<std::string> edge_info_dump(const graphar::EdgeInfo &edge_info);
 // =========================== Builder ===========================
 // `Vertex`
 std::unique_ptr<graphar::builder::Vertex> new_vertex_builder();
+std::unique_ptr<graphar::builder::Vertex> new_vertex_builder_with_id(i64 id);
 
-#define DEF_VERTEX_ADD_PROPERTY_FUNC(type)                                     \
-  inline void vertex_add_property_##type(graphar::builder::Vertex &v,          \
-                                         const std::string &name, type val) { \
+inline bool vertex_builder_is_empty(const graphar::builder::Vertex &v) {
+  return v.Empty();
+}
+
+inline i64 vertex_builder_get_id(const graphar::builder::Vertex &v) {
+  return static_cast<i64>(v.GetId());
+}
+
+inline void vertex_builder_set_id(graphar::builder::Vertex &v, i64 id) {
+  v.SetId(static_cast<graphar::IdType>(id));
+}
+
+inline bool vertex_builder_is_multi_property(const graphar::builder::Vertex &v,
+                                             const std::string &name) {
+  return v.IsMultiProperty(name);
+}
+
+inline bool vertex_builder_contains_property(const graphar::builder::Vertex &v,
+                                             const std::string &name) {
+  const auto &props = v.GetProperties();
+  return props.find(name) != props.end();
+}
+
+#define DEF_VERTEX_BUILDER_ADD_PROPERTY_FUNC(type)                             \
+  inline void vertex_builder_add_property_##type(                              \
+      graphar::builder::Vertex &v, const std::string &name, type val) {        \
     v.AddProperty(name, val);                                                  \
   }
 
-DEF_VERTEX_ADD_PROPERTY_FUNC(bool)
-DEF_VERTEX_ADD_PROPERTY_FUNC(i32)
-DEF_VERTEX_ADD_PROPERTY_FUNC(i64)
-DEF_VERTEX_ADD_PROPERTY_FUNC(f32)
-DEF_VERTEX_ADD_PROPERTY_FUNC(f64)
+DEF_VERTEX_BUILDER_ADD_PROPERTY_FUNC(bool)
+DEF_VERTEX_BUILDER_ADD_PROPERTY_FUNC(i32)
+DEF_VERTEX_BUILDER_ADD_PROPERTY_FUNC(i64)
+DEF_VERTEX_BUILDER_ADD_PROPERTY_FUNC(f32)
+DEF_VERTEX_BUILDER_ADD_PROPERTY_FUNC(f64)
 
-inline void vertex_add_property_string(graphar::builder::Vertex &v,
-                                       const std::string &name,
-                                       const std::string &val) {
+inline void vertex_builder_add_property_string(graphar::builder::Vertex &v,
+                                               const std::string &name,
+                                               const std::string &val) {
   v.AddProperty(name, val);
+}
+
+#define DEF_VERTEX_BUILDER_ADD_PROPERTY_WITH_CARDINALITY_FUNC(type)            \
+  inline void vertex_builder_add_property_##type##_with_cardinality(           \
+      graphar::builder::Vertex &v, graphar::Cardinality cardinality,           \
+      const std::string &name, type val) {                                     \
+    v.AddProperty(cardinality, name, val);                                     \
+  }
+
+DEF_VERTEX_BUILDER_ADD_PROPERTY_WITH_CARDINALITY_FUNC(bool)
+DEF_VERTEX_BUILDER_ADD_PROPERTY_WITH_CARDINALITY_FUNC(i32)
+DEF_VERTEX_BUILDER_ADD_PROPERTY_WITH_CARDINALITY_FUNC(i64)
+DEF_VERTEX_BUILDER_ADD_PROPERTY_WITH_CARDINALITY_FUNC(f32)
+DEF_VERTEX_BUILDER_ADD_PROPERTY_WITH_CARDINALITY_FUNC(f64)
+
+inline void vertex_builder_add_property_string_with_cardinality(
+    graphar::builder::Vertex &v, graphar::Cardinality cardinality,
+    const std::string &name, const std::string &val) {
+  v.AddProperty(cardinality, name, val);
 }
 
 void add_vertex(graphar::builder::VerticesBuilder &builder,
