@@ -135,10 +135,10 @@ class Status {
    * @param code The error code of the status.
    * @param msg The error message of the status.
    */
-  Status(StatusCode code, const std::string& msg) {
+  Status(StatusCode code, std::string msg) {
     state_ = new State;
     state_->code = code;
-    state_->msg = msg;
+    state_->msg = std::move(msg);
   }
   /** Copy the specified status. */
   inline Status(const Status& s)
@@ -154,11 +154,12 @@ class Status {
   }
 
   /** Returns a success status. */
-  inline static Status OK() { return Status(); }
+  inline static Status OK() { return {}; }
 
   template <typename... Args>
   static Status FromArgs(StatusCode code, Args... args) {
-    return Status(code, util::StringBuilder(std::forward<Args>(args)...));
+    return Status(code,
+                  std::move(util::StringBuilder(std::forward<Args>(args)...)));
   }
 
   /** Returns an error status when some IO-related operation failed. */
