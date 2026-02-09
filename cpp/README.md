@@ -91,7 +91,7 @@ make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for al
 After building, you can run the unit tests with:
 
 ```bash
-git clone https://github.com/apache/incubator-graphar-testing.git testing  # download the testing data
+git submodule update --init --recursive  # download the testing data
 GAR_TEST_DATA=${PWD}/testing ctest
 ```
 
