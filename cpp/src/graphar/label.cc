@@ -85,15 +85,14 @@ int read_parquet_file_and_get_valid_indices(
       }
     }
   }
-  const int kTotLabelNum = tot_label_num;
-  bool state[kTotLabelNum];
+  std::unique_ptr<bool[]> state(new bool[tot_label_num]);
   int count = 0;
   int offset = chunk_idx * chunk_size;
   for (int i = 0; i < row_num; i++) {
     for (int j = 0; j < tested_label_num; j++) {
       state[j] = value[j][i];
     }
-    if (IsValid(state, tested_label_num)) {
+    if (IsValid(state.get(), tested_label_num)) {
       count++;
       if (query_type == QUERY_TYPE::INDEX)
 

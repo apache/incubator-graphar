@@ -333,7 +333,6 @@ Status VertexPropertyWriter::WriteLabelTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType start_chunk_index,
     FileType file_type, ValidateLevel validate_level) const {
   auto schema = input_table->schema();
-  int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
   IdType chunk_size = vertex_info_->GetChunkSize();
   int64_t length = input_table->num_rows();
   IdType chunk_index = start_chunk_index;

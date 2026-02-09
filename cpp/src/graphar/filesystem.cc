@@ -300,7 +300,6 @@ Status FileSystem::WriteLabelTableToFile(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto output_stream,
                                        arrow_fs_->OpenOutputStream(path));
   auto schema = table->schema();
-  auto column_num = schema->num_fields();
   parquet::WriterProperties::Builder builder;
   builder.compression(arrow::Compression::type::ZSTD);  // enable compression
   builder.encoding(parquet::Encoding::RLE);

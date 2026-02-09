@@ -172,7 +172,6 @@ Result<std::vector<IdType>> VerticesCollection::filter(
 
   uint64_t* bitmap = new uint64_t[TOT_ROWS_NUM / 64 + 1];
   memset(bitmap, 0, sizeof(uint64_t) * (TOT_ROWS_NUM / 64 + 1));
-  int total_count = 0;
   int row_num;
 
   if (is_filtered_) {
@@ -226,8 +225,6 @@ Result<std::vector<IdType>> VerticesCollection::filter_by_acero(
       tested_label_ids.push_back(std::distance(labels_.begin(), it));
     }
   }
-  int total_count = 0;
-  int row_num;
   std::vector<std::shared_ptr<Expression>> filters;
   std::shared_ptr<Expression> combined_filter = nullptr;
 
@@ -251,7 +248,6 @@ Result<std::vector<IdType>> VerticesCollection::filter_by_acero(
   for (int chunk_idx = 0; chunk_idx * CHUNK_SIZE < TOT_ROWS_NUM; ++chunk_idx) {
     auto filter_result = filter_reader->GetLabelChunk();
     auto filter_table = filter_result.value();
-    total_count += filter_table->num_rows();
     filter_reader->next_chunk();
   }
   // std::cout << "Total valid count: " << total_count << std::endl;
@@ -271,7 +267,6 @@ Result<std::vector<IdType>> VerticesCollection::filter(
   std::vector<int> indices;
   const int TOT_ROWS_NUM = vertex_num_;
   const int CHUNK_SIZE = vertex_info_->GetChunkSize();
-  int total_count = 0;
   auto property_group = vertex_info_->GetPropertyGroup(property_name);
   auto maybe_filter_reader = graphar::VertexPropertyArrowChunkReader::Make(
       vertex_info_, property_group, prefix_, {});
@@ -309,7 +304,6 @@ Result<std::vector<IdType>> VerticesCollection::filter(
       auto filter_table = filter_result.value();
       int count = filter_table->num_rows();
       filter_reader->next_chunk();
-      total_count += count;
       if (count != 0) {
         valid_chunk_.emplace_back(static_cast<IdType>(chunk_idx));
         // TODO(elssky): record indices
