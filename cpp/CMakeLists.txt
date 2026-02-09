@@ -107,7 +107,7 @@ if(MSVC)
     # Avoid GCC/Clang-specific flags on MSVC.
     # C++17 is already enforced via CMAKE_CXX_STANDARD/target features.
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Werror=unused-variable")
 endif()
 
 if (APPLE)

@@ -198,9 +198,9 @@ class VertexIter {
   /** Copy constructor. */
   VertexIter(const VertexIter& other)
       : readers_(other.readers_),
-        cur_offset_(other.cur_offset_),
-        labels_(other.labels_),
         label_reader_(other.label_reader_),
+        labels_(other.labels_),
+        cur_offset_(other.cur_offset_),
         is_filtered_(other.is_filtered_),
         filtered_ids_(other.filtered_ids_) {}
 
