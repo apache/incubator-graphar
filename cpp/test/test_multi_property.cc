@@ -65,7 +65,7 @@ namespace graphar {
 TEST_CASE_METHOD(GlobalFixture, "read multi-properties from csv file") {
   // read labels csv file as arrow table
   auto person_table = read_csv_to_table(test_data_dir + "/ldbc/person_0_0.csv");
-  auto seed = static_cast<unsigned int>(time(NULL));
+  auto seed = static_cast<unsigned int>(time(nullptr));
   int expected_row = rand_r(&seed) % person_table->num_rows();
   auto person_schema = person_table->schema();
   arrow::MemoryPool* pool = arrow::default_memory_pool();
@@ -120,8 +120,9 @@ TEST_CASE_METHOD(GlobalFixture, "read multi-properties from csv file") {
   std::string emails = "";
   for (int64_t i = start; i < end; ++i) {
     emails += values->GetString(i);
-    if (i < end - 1)
+    if (i < end - 1) {
       emails += ";";
+    }
   }
   std::cout << "random row: " << expected_row << std::endl;
   REQUIRE(expected_emails == emails);
@@ -155,8 +156,9 @@ TEST_CASE_METHOD(GlobalFixture, "read multi-properties from csv file") {
   end = email_result->length();
   for (int64_t i = 0; i < end; ++i) {
     emails += email_result->GetString(i);
-    if (i < end - 1)
+    if (i < end - 1) {
       emails += ";";
+    }
   }
   std::cout << emails << std::endl;
   REQUIRE(expected_emails == emails);

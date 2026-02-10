@@ -718,7 +718,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
               idx++;
               sum += table->num_rows();
             } while (!reader->next_chunk().IsIndexError());
-            REQUIRE(table->num_columns() == (int) expected_cols.size());
+            REQUIRE(table->num_columns() ==
+                    static_cast<int>(expected_cols.size()));
 
             std::cout << "Total Nums: " << sum << "/"
                       << idx * edge_info->GetChunkSize() << '\n';

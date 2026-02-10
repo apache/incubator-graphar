@@ -74,8 +74,9 @@ int main(int argc, char* argv[]) {
     for (graphar::IdType i = 0; i < num_vertices; i++) {
       pr_next[i] = damping * pr_next[i] +
                    (1 - damping) * (1 / static_cast<double>(num_vertices));
-      if (out_degree[i] == 0)
+      if (out_degree[i] == 0) {
         pr_next[i] += damping * pr_curr[i];
+      }
       pr_curr[i] = pr_next[i];
       pr_next[i] = 0;
     }

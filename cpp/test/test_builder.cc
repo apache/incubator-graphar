@@ -104,8 +104,9 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
       getline(readstr, val, '|');
       if (i == 0) {
         int64_t x = 0;
-        for (size_t j = 0; j < val.length(); j++)
+        for (size_t j = 0; j < val.length(); j++) {
           x = x * 10 + val[j] - '0';
+        }
         v.AddProperty(names[i], x);
       } else {
         v.AddProperty(names[i], val);
@@ -198,12 +199,14 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
     for (int i = 0; i < 3; i++) {
       getline(readstr, val, '|');
       if (i == 0) {
-        if (mapping.find(val) == mapping.end())
+        if (mapping.find(val) == mapping.end()) {
           mapping[val] = cnt++;
+        }
         s = mapping[val];
       } else if (i == 1) {
-        if (mapping.find(val) == mapping.end())
+        if (mapping.find(val) == mapping.end()) {
           mapping[val] = cnt++;
+        }
         d = mapping[val];
       } else {
         builder::Edge e(s, d);

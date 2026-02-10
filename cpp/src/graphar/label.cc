@@ -94,11 +94,11 @@ int read_parquet_file_and_get_valid_indices(
     }
     if (IsValid(state.get(), tested_label_num)) {
       count++;
-      if (query_type == QUERY_TYPE::INDEX)
-
+      if (query_type == QUERY_TYPE::INDEX) {
         indices->push_back(i + offset);
-      else if (query_type == QUERY_TYPE::BITMAP)
+      } else if (query_type == QUERY_TYPE::BITMAP) {
         SetBitmap(bitmap, i);
+      }
     }
   }
 
