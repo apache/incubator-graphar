@@ -17,13 +17,62 @@
 
 package graphar
 
-import "testing"
+import (
+	"context"
+	"errors"
+	"testing"
+)
 
 func TestNew(t *testing.T) {
 	t.Parallel()
 
-	c := NewClient()
+	c := New()
 	if c == nil {
 		t.Fatalf("New() returned nil")
+	}
+}
+
+type mockFS struct {
+	files map[string][]byte
+}
+
+func (m *mockFS) ReadFile(ctx context.Context, name string) ([]byte, error) {
+	if b, ok := m.files[name]; ok {
+		return b, nil
+	}
+	return nil, errors.New("file not found")
+}
+
+func TestClientWithFileSystem(t *testing.T) {
+	fs := &mockFS{
+		files: map[string][]byte{
+			"graph.yaml": []byte(`
+name: test_graph
+prefix: /tmp/
+vertices: [v.yaml]
+edges: []
+version: 0.1.0
+`),
+			"v.yaml": []byte(`
+type: person
+chunk_size: 100
+prefix: person/
+property_groups: []
+version: 0.1.0
+`),
+		},
+	}
+
+	c := New(WithFileSystem(fs))
+	g, err := c.LoadGraphInfo(context.Background(), "graph.yaml")
+	if err != nil {
+		t.Fatalf("LoadGraphInfo failed: %v", err)
+	}
+
+	if g.Name != "test_graph" {
+		t.Errorf("expected name test_graph, got %s", g.Name)
+	}
+	if len(g.VertexInfos) != 1 {
+		t.Errorf("expected 1 vertex info, got %d", len(g.VertexInfos))
 	}
 }
