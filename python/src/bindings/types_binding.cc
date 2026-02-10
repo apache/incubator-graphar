@@ -66,13 +66,13 @@ extern "C" void bind_types(pybind11::module_& m) {
       .value("LIST", graphar::Cardinality::LIST)
       .value("SET", graphar::Cardinality::SET)
       .export_values();
-      
-    // Bind ValidateLevel enum
+
+  // Bind ValidateLevel enum
   py::enum_<graphar::ValidateLevel>(m, "ValidateLevel")
       .value("default_validate", graphar::ValidateLevel::default_validate)
       .value("no_validate", graphar::ValidateLevel::no_validate)
       .value("weak_validate", graphar::ValidateLevel::weak_validate)
       .value("strong_validate", graphar::ValidateLevel::strong_validate)
       .export_values();
-    
+
 }  // namespace graphar
