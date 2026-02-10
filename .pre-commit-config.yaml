@@ -39,10 +39,11 @@ repos:
     rev: v21.1.2
     hooks:
     - id: clang-format
-      files: ^python/
+      files: \.(cc|cpp|h|hpp)$
       types_or: [c++]
       args: [--style=file, --verbose]
-
+      exclude: ^cpp/thirdparty/
+      
   - repo: local
     hooks:
       - id: spotless-java-info
