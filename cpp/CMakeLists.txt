@@ -354,6 +354,7 @@ macro(build_graphar_with_arrow_bundled)
     set(GAR_BUNDLED_DEPS_STATIC_LIBS)
     list(APPEND GAR_BUNDLED_DEPS_STATIC_LIBS
         gar_arrow_static
+        gar_arrow_compute_static
         gar_parquet_static
         gar_dataset_static
         gar_acero_static
@@ -378,10 +379,13 @@ macro(build_graphar_with_arrow_bundled)
     list(INSERT ARROW_STATIC_INSTALL_INTERFACE_LIBS 0 "graphar_bundled_dependencies")
 
     if(APPLE)
+        find_package(Protobuf REQUIRED)
         target_link_libraries(graphar PRIVATE -Wl,-force_load
                 graphar_bundled_dependencies
+                protobuf::libprotobuf
                 "-framework CoreFoundation"
-                "-framework Security")
+                "-framework Security"
+                "-framework Network")
     elseif(MSVC)
         # MSVC doesn't support GNU ld-style -Wl flags.
         target_link_libraries(graphar PRIVATE graphar_bundled_dependencies)
@@ -475,7 +479,11 @@ if (BUILD_EXAMPLES)
             if (APPLE)
                 target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load ${GAR_ARROW_STATIC_LIB}
                     "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
+                    protobuf::libprotobuf
+                    "-framework CoreFoundation"
+                    "-framework Security"
+                    "-framework Network")
             else()
                 target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive ${GAR_ARROW_STATIC_LIB}
                     "${GAR_PARQUET_STATIC_LIB}"
@@ -558,7 +566,11 @@ if (BUILD_TESTS)
             if (APPLE)
                 target_link_libraries(${target} PRIVATE -Wl,-force_load gar_arrow_static
                     "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
+                    protobuf::libprotobuf
+                    "-framework CoreFoundation"
+                    "-framework Security"
+                    "-framework Network")
             else()
                 target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
                     "${GAR_PARQUET_STATIC_LIB}"
@@ -615,6 +627,22 @@ if (BUILD_BENCHMARKS)
         target_compile_features(${target} PRIVATE cxx_std_17)
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
         target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar ${CMAKE_DL_LIBS})
+        if (BUILD_ARROW_FROM_SOURCE)
+            target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+            if (APPLE)
+                target_link_libraries(${target} PRIVATE -Wl,-force_load ${GAR_ARROW_STATIC_LIB}
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
+                    protobuf::libprotobuf
+                    "-framework CoreFoundation"
+                    "-framework Security"
+                    "-framework Network")
+            else()
+                target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive ${GAR_ARROW_STATIC_LIB}
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+            endif()
+        endif()
     endmacro()
     add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
     add_benchmark(label_filter_benchmark SRCS benchmarks/label_filter_benchmark.cc)
