@@ -32,6 +32,8 @@
 #include "rust/cxx.h"
 
 namespace graphar {
+using SharedVertexInfo = std::shared_ptr<VertexInfo>;
+using SharedEdgeInfo = std::shared_ptr<EdgeInfo>;
 using SharedPropertyGroup = std::shared_ptr<PropertyGroup>;
 using SharedAdjacentList = std::shared_ptr<AdjacentList>;
 using ConstInfoVersion = const InfoVersion;
@@ -90,6 +92,21 @@ std::shared_ptr<graphar::EdgeInfo> create_edge_info(
     const std::string &prefix,
     std::shared_ptr<graphar::ConstInfoVersion> version);
 
+std::shared_ptr<graphar::GraphInfo> load_graph_info(const std::string &path);
+std::shared_ptr<graphar::GraphInfo> create_graph_info(
+    const std::string &name,
+    const std::vector<graphar::SharedVertexInfo> &vertex_infos,
+    const std::vector<graphar::SharedEdgeInfo> &edge_infos,
+    const rust::Vec<rust::String> &labels, const std::string &prefix,
+    std::shared_ptr<graphar::ConstInfoVersion> version);
+
+void vertex_info_vec_push_vertex_info(
+    std::vector<graphar::SharedVertexInfo> &vertex_infos,
+    std::shared_ptr<graphar::VertexInfo> vertex_info);
+void edge_info_vec_push_edge_info(
+    std::vector<graphar::SharedEdgeInfo> &edge_infos,
+    std::shared_ptr<graphar::EdgeInfo> edge_info);
+
 void vertex_info_save(const graphar::VertexInfo &vertex_info,
                       const std::string &path);
 std::unique_ptr<std::string>
@@ -102,4 +119,8 @@ void push_adjacent_list(graphar::AdjacentListVector &v,
 void edge_info_save(const graphar::EdgeInfo &edge_info,
                     const std::string &path);
 std::unique_ptr<std::string> edge_info_dump(const graphar::EdgeInfo &edge_info);
+void graph_info_save(const graphar::GraphInfo &graph_info,
+                     const std::string &path);
+std::unique_ptr<std::string>
+graph_info_dump(const graphar::GraphInfo &graph_info);
 } // namespace graphar_rs

@@ -19,6 +19,24 @@ use cxx::{ExternType, SharedPtr};
 
 #[repr(transparent)]
 #[derive(Clone)]
+pub struct SharedVertexInfo(pub(crate) SharedPtr<graphar::VertexInfo>);
+
+unsafe impl ExternType for SharedVertexInfo {
+    type Id = cxx::type_id!("graphar::SharedVertexInfo");
+    type Kind = cxx::kind::Opaque;
+}
+
+#[repr(transparent)]
+#[derive(Clone)]
+pub struct SharedEdgeInfo(pub(crate) SharedPtr<graphar::EdgeInfo>);
+
+unsafe impl ExternType for SharedEdgeInfo {
+    type Id = cxx::type_id!("graphar::SharedEdgeInfo");
+    type Kind = cxx::kind::Opaque;
+}
+
+#[repr(transparent)]
+#[derive(Clone)]
 pub struct SharedPropertyGroup(pub(crate) SharedPtr<graphar::PropertyGroup>);
 
 unsafe impl ExternType for SharedPropertyGroup {
@@ -349,6 +367,74 @@ pub(crate) mod graphar {
         #[namespace = "graphar_rs"]
         fn edge_info_dump(edge_info: &EdgeInfo) -> Result<UniquePtr<CxxString>>;
     }
+
+    // `GraphInfo`
+    unsafe extern "C++" {
+        type GraphInfo;
+
+        fn GetName(&self) -> &CxxString;
+        fn GetLabels(&self) -> &CxxVector<CxxString>;
+        fn GetPrefix(&self) -> &CxxString;
+        fn version(&self) -> &SharedPtr<ConstInfoVersion>;
+        fn GetVertexInfo(&self, type_: &CxxString) -> SharedPtr<VertexInfo>;
+        fn GetEdgeInfo(
+            &self,
+            src_type: &CxxString,
+            edge_type: &CxxString,
+            dst_type: &CxxString,
+        ) -> SharedPtr<EdgeInfo>;
+        fn GetVertexInfoIndex(&self, type_: &CxxString) -> i32;
+        fn GetEdgeInfoIndex(
+            &self,
+            src_type: &CxxString,
+            edge_type: &CxxString,
+            dst_type: &CxxString,
+        ) -> i32;
+        fn VertexInfoNum(&self) -> i32;
+        fn EdgeInfoNum(&self) -> i32;
+        fn GetVertexInfos(&self) -> &CxxVector<SharedVertexInfo>;
+        fn GetEdgeInfos(&self) -> &CxxVector<SharedEdgeInfo>;
+
+        #[namespace = "graphar_rs"]
+        fn load_graph_info(path: &CxxString) -> Result<SharedPtr<GraphInfo>>;
+        #[namespace = "graphar_rs"]
+        fn create_graph_info(
+            name: &CxxString,
+            vertex_infos: &CxxVector<SharedVertexInfo>,
+            edge_infos: &CxxVector<SharedEdgeInfo>,
+            labels: &Vec<String>,
+            prefix: &CxxString,
+            version: SharedPtr<ConstInfoVersion>,
+        ) -> Result<SharedPtr<GraphInfo>>;
+        #[namespace = "graphar_rs"]
+        fn graph_info_save(graph_info: &GraphInfo, path: &CxxString) -> Result<()>;
+        #[namespace = "graphar_rs"]
+        fn graph_info_dump(graph_info: &GraphInfo) -> Result<UniquePtr<CxxString>>;
+    }
+
+    unsafe extern "C++" {
+        #[namespace = "graphar_rs"]
+        fn vertex_info_vec_push_vertex_info(
+            vertex_infos: Pin<&mut CxxVector<SharedVertexInfo>>,
+            vertex_info: SharedPtr<VertexInfo>,
+        );
+
+        #[namespace = "graphar_rs"]
+        fn edge_info_vec_push_edge_info(
+            edge_infos: Pin<&mut CxxVector<SharedEdgeInfo>>,
+            edge_info: SharedPtr<EdgeInfo>,
+        );
+    }
+
+    unsafe extern "C++" {
+        type SharedVertexInfo = crate::ffi::SharedVertexInfo;
+    }
+    impl CxxVector<SharedVertexInfo> {}
+
+    unsafe extern "C++" {
+        type SharedEdgeInfo = crate::ffi::SharedEdgeInfo;
+    }
+    impl CxxVector<SharedEdgeInfo> {}
 
     unsafe extern "C++" {
         type SharedPropertyGroup = crate::ffi::SharedPropertyGroup;
