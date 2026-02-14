@@ -286,7 +286,7 @@ inline std::vector<std::string> SplitString(const std::string& str,
   std::string token;
   std::istringstream tokenStream(str);
   while (std::getline(tokenStream, token, delimiter)) {
-    tokens.push_back(token);
+    tokens.push_back(std::move(token));
   }
   return tokens;
 }
