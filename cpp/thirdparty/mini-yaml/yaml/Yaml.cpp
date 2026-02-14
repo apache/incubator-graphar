@@ -1375,7 +1375,7 @@ namespace Yaml
                 //Print();
                 ParseRoot(root);
             }
-            catch(Exception e)
+            catch(const Exception& e)
             {
                 root.Clear();
                 throw;
@@ -2250,7 +2250,7 @@ namespace Yaml
             pImp->Parse(root, stream);
             delete pImp;
         }
-        catch (const Exception e)
+        catch (const Exception& e)
         {
             delete pImp;
             throw;

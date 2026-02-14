@@ -53,6 +53,16 @@ repos:
         args: ['--quiet', '--config-file=.clang-tidy']
         types_or: [c++, c]
 
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.0.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [ commit-msg ]
+        args: [
+          --types,feat,fix,docs,style,refactor,test,chore,perf,ci,build,revert,
+          --scope-optional
+        ]
+
   - repo: local
     hooks:
       - id: spotless-java-info

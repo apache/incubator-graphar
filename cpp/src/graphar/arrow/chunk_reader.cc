@@ -433,6 +433,8 @@ VertexPropertyArrowChunkReader::Make(
   case SelectType::PROPERTIES:
     return MakeForProperties(graph_info, type, property_names_or_labels,
                              options);
+  default:
+    return Status::Invalid("Unsupported select type");
   }
 }
 
@@ -466,7 +468,7 @@ VertexPropertyArrowChunkReader::MakeForProperties(
         property_names_mutable[property_names_mutable.size() - 1],
         " doesn't exist in vertex type ", type, ".");
   }
-  for (int i = 0; i < property_names_mutable.size() - 1; i++) {
+  for (size_t i = 0; i < property_names_mutable.size() - 1; i++) {
     if (property_names_mutable[i] == graphar::GeneralParams::kVertexIndexCol) {
       hasIndexCol = true;
     }

@@ -61,7 +61,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(table->num_rows() == 100);
       std::cout << table->num_columns() << std::endl;
       std::cout << v_pg->GetProperties().size() << std::endl;
-      REQUIRE(table->num_columns() == v_pg->GetProperties().size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(v_pg->GetProperties().size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
 
@@ -71,7 +72,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
-      REQUIRE(table->num_columns() == v_pg->GetProperties().size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(v_pg->GetProperties().size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->next_chunk().ok());
@@ -79,7 +81,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
-      REQUIRE(table->num_columns() == v_pg->GetProperties().size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(v_pg->GetProperties().size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->seek(900).ok());
@@ -87,7 +90,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 3);
-      REQUIRE(table->num_columns() == v_pg->GetProperties().size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(v_pg->GetProperties().size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->GetChunkNum() == 10);
@@ -103,7 +107,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(table->num_rows() == 100);
       std::cout << table->num_columns() << std::endl;
       std::cout << v_pg->GetProperties().size() << std::endl;
-      REQUIRE(table->num_columns() == v_pg->GetProperties().size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(v_pg->GetProperties().size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
 
@@ -113,7 +118,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
-      REQUIRE(table->num_columns() == v_pg->GetProperties().size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(v_pg->GetProperties().size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->next_chunk().ok());
@@ -121,7 +127,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
-      REQUIRE(table->num_columns() == v_pg->GetProperties().size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(v_pg->GetProperties().size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->seek(900).ok());
@@ -129,7 +136,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 3);
-      REQUIRE(table->num_columns() == v_pg->GetProperties().size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(v_pg->GetProperties().size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       REQUIRE(reader->GetChunkNum() == 10);
@@ -148,7 +156,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       auto table = result.value();
       REQUIRE(table->num_rows() == 100);
-      REQUIRE(table->num_columns() == v_pg_name->GetProperties().size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(v_pg_name->GetProperties().size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       // VERSION V1
@@ -160,7 +169,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 48);
-      REQUIRE(table->num_columns() == v_pg_name->GetProperties().size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(v_pg_name->GetProperties().size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
     }
@@ -329,7 +339,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(table->num_rows() == 100);
       std::cout << table->num_columns() << std::endl;
       std::cout << vertex_property_names.size() << std::endl;
-      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(vertex_property_names.size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       for (auto pn : vertex_property_names) {
@@ -341,7 +352,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
-      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(vertex_property_names.size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       for (auto pn : vertex_property_names) {
@@ -352,7 +364,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
-      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(vertex_property_names.size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       for (auto pn : vertex_property_names) {
@@ -363,7 +376,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 3);
-      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(vertex_property_names.size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       for (auto pn : vertex_property_names) {
@@ -381,7 +395,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(table->num_rows() == 100);
       std::cout << table->num_columns() << std::endl;
       std::cout << vertex_property_names.size() << std::endl;
-      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(vertex_property_names.size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       for (auto pn : vertex_property_names) {
@@ -393,7 +408,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
-      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(vertex_property_names.size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       for (auto pn : vertex_property_names) {
@@ -404,7 +420,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 100);
-      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(vertex_property_names.size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       for (auto pn : vertex_property_names) {
@@ -415,7 +432,8 @@ TEST_CASE_METHOD(GlobalFixture, "ArrowChunkReader") {
       REQUIRE(!result.has_error());
       table = result.value();
       REQUIRE(table->num_rows() == 3);
-      REQUIRE(table->num_columns() == vertex_property_names.size() + 1);
+      REQUIRE(table->num_columns() ==
+              static_cast<int>(vertex_property_names.size()) + 1);
       REQUIRE(table->GetColumnByName(GeneralParams::kVertexIndexCol) !=
               nullptr);
       for (auto pn : vertex_property_names) {

@@ -94,7 +94,8 @@ TEST_CASE_METHOD(GlobalFixture, "read multi-properties from csv file") {
     }
   }
   std::shared_ptr<arrow::Array> array;
-  builder.Finish(&array);
+  auto status = builder.Finish(&array);
+  REQUIRE(status.ok());
   auto person_emails_chunked_array = std::make_shared<arrow::ChunkedArray>(
       std::vector<std::shared_ptr<arrow::Array>>{array});
   int emailFieldIndex = person_schema->GetFieldIndex("emails");
