@@ -15,6 +15,10 @@
 # specific language governing permissions and limitations
 # under the License.
 
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+
 repos:
   - repo: https://github.com/zricethezav/gitleaks
     rev: v8.15.0
@@ -54,15 +58,12 @@ repos:
         types_or: [c++, c]
 
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.0.0
+    rev: v4.3.0
     hooks:
       - id: conventional-pre-commit
-        stages: [ commit-msg ]
-        args: [
-          --types,feat,fix,docs,style,refactor,test,chore,perf,ci,build,revert,
-          --scope-optional
-        ]
-
+        stages: [commit-msg]
+        args: [--verbose]
+        
   - repo: local
     hooks:
       - id: spotless-java-info
