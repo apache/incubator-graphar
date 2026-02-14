@@ -138,8 +138,9 @@ Result<std::vector<std::string>> VertexIter::label() noexcept {
 static inline bool IsValid(bool* state, int column_number) {
   for (int i = 0; i < column_number; ++i) {
     // AND case
-    if (!state[i])
+    if (!state[i]) {
       return false;
+    }
     // OR case
     // if (state[i]) return true;
   }
