@@ -30,6 +30,7 @@ fn link_libraries() {
         .expect("Arrow development files not found via pkg-config. Set PKG_CONFIG_PATH if needed.");
 
     println!("cargo:rustc-link-lib=graphar");
+    println!("cargo:rustc-link-lib=graphar_thirdparty");
 }
 
 fn build_ffi(bridge_file: &str, out_name: &str, source_file: &str, include_paths: &[PathBuf]) {

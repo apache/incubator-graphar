@@ -164,8 +164,7 @@ class Status {
 
   template <typename... Args>
   static Status FromArgs(StatusCode code, Args... args) {
-    return Status(code,
-                  std::move(util::StringBuilder(std::forward<Args>(args)...)));
+    return Status(code, util::StringBuilder(std::forward<Args>(args)...));
   }
 
   /** Returns an error status when some IO-related operation failed. */

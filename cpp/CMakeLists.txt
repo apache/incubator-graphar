@@ -110,7 +110,7 @@ if(MSVC)
     # Avoid GCC/Clang-specific flags on MSVC.
     # C++17 is already enforced via CMAKE_CXX_STANDARD/target features.
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror=unused-variable")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -Wno-unused-parameter -Wno-empty-body")
 endif()
 
 if (APPLE)
@@ -191,7 +191,7 @@ endmacro()
 
 macro(install_graphar_target target)
   # install
-  install(TARGETS ${target}
+  install(TARGETS ${target} graphar_thirdparty
           EXPORT graphar-targets
           ARCHIVE DESTINATION lib
           LIBRARY DESTINATION lib
@@ -288,8 +288,19 @@ function(graphar_create_merged_static_lib output_target)
   add_dependencies(${output_target} ${output_target}_merge)
 endfunction()
 
+macro(build_graphar_thirdparty)
+    file(GLOB_RECURSE THIRDPARTY_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
+    add_library(graphar_thirdparty STATIC ${THIRDPARTY_SRC_FILES})
+    target_include_directories(graphar_thirdparty PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
+    target_compile_features(graphar_thirdparty PRIVATE cxx_std_17)
+    if(NOT MSVC)
+        target_compile_options(graphar_thirdparty PRIVATE -fPIC -w)
+    endif()
+endmacro()
+
 macro(build_graphar)
-    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
+    build_graphar_thirdparty()
+    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc")
     if(GRAPHAR_BUILD_STATIC)
         add_library(graphar STATIC ${CORE_SRC_FILES})
     else()
@@ -298,7 +309,7 @@ macro(build_graphar)
     install_graphar_target(graphar)
     target_compile_features(graphar PRIVATE cxx_std_${GAR_CXX_STANDARD})
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
-    target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
+    target_link_libraries(graphar PRIVATE graphar_thirdparty ${CMAKE_DL_LIBS})
 
     if(APPLE)
         if(USE_STATIC_ARROW)
@@ -346,7 +357,8 @@ macro(build_graphar)
 endmacro()
 
 macro(build_graphar_with_arrow_bundled)
-    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
+    build_graphar_thirdparty()
+    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc")
     if(GRAPHAR_BUILD_STATIC)
         add_library(graphar STATIC ${CORE_SRC_FILES})
     else()
@@ -356,7 +368,7 @@ macro(build_graphar_with_arrow_bundled)
     target_compile_features(graphar PRIVATE cxx_std_${GAR_CXX_STANDARD})
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     target_include_directories(graphar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
-    target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
+    target_link_libraries(graphar PRIVATE graphar_thirdparty ${CMAKE_DL_LIBS})
 
     set(GAR_BUNDLED_DEPS_STATIC_LIBS)
     list(APPEND GAR_BUNDLED_DEPS_STATIC_LIBS
