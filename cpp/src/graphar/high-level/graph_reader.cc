@@ -117,10 +117,11 @@ Result<bool> VertexIter::hasLabel(const std::string& label) noexcept {
 Result<std::vector<std::string>> VertexIter::label() noexcept {
   std::shared_ptr<arrow::ChunkedArray> column(nullptr);
   std::vector<std::string> vertex_label;
-  if (is_filtered_)
+  if (is_filtered_) {
     label_reader_.seek(filtered_ids_[cur_offset_]);
-  else
+  } else {
     label_reader_.seek(cur_offset_);
+  }
   GAR_ASSIGN_OR_RAISE(auto chunk_table, label_reader_.GetLabelChunk());
   for (auto label : labels_) {
     column = util::GetArrowColumnByName(chunk_table, label);
@@ -252,10 +253,9 @@ Result<std::vector<IdType>> VerticesCollection::filter_by_acero(
     filter_reader->next_chunk();
   }
   // std::cout << "Total valid count: " << total_count << std::endl;
-  std::vector<int64_t> indices64;
-
-  for (int value : indices) {
-    indices64.push_back(static_cast<int64_t>(value));
+  std::vector<int64_t> indices64(indices.size());
+  for (size_t i = 0; i < indices.size(); ++i) {
+    indices64[i] = static_cast<int64_t>(indices[i]);
   }
 
   return indices64;

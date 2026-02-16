@@ -21,10 +21,7 @@
 
 #include <cassert>
 #include <cstring>
-#include <fstream>
-#include <iostream>
 #include <memory>
-#include <set>
 
 /// Read a parquet file by ParquetReader & get valid indices
 /// The first column_num labels are concerned.
