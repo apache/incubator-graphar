@@ -21,12 +21,13 @@ use std::env;
 use std::path::{Path, PathBuf};
 
 fn link_libraries() {
-    // TODO: Link to system Arrow, `libarrow` is under `/usr/lib/x86_64-linux-gnu/` on Ubuntu
-    println!("cargo:rustc-link-search=native=/usr/lib/x86_64-linux-gnu/");
-    println!("cargo:rustc-link-lib=dylib=arrow_compute");
-    println!("cargo:rustc-link-lib=dylib=arrow_dataset");
-    println!("cargo:rustc-link-lib=dylib=arrow_acero");
-    println!("cargo:rustc-link-lib=dylib=arrow");
+    println!("cargo:rerun-if-env-changed=PKG_CONFIG_PATH");
+
+    let _arrow = pkg_config::Config::new()
+        .statik(false)
+        .cargo_metadata(true)
+        .probe("arrow")
+        .expect("Arrow development files not found via pkg-config. Set PKG_CONFIG_PATH if needed.");
 
     println!("cargo:rustc-link-lib=graphar");
 }
@@ -63,6 +64,11 @@ fn build_graphar() -> Vec<PathBuf> {
         .define("CMAKE_BUILD_TYPE", cmake_build_type)
         .define("GRAPHAR_BUILD_STATIC", "ON")
         .define("GRAPHAR_ENABLE_SANITIZER", "OFF");
+
+    if let Ok(prefix) = pkg_config::get_variable("arrow", "prefix") {
+        build.define("CMAKE_PREFIX_PATH", prefix);
+    }
+    println!("cargo:rerun-if-env-changed=PKG_CONFIG_PATH");
     let build_dir = build.build();
 
     let lib_path = build_dir.join("build");
