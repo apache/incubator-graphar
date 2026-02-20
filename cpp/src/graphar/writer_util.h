@@ -94,7 +94,7 @@ class WriterOptions {
     std::vector<::parquet::SortingColumn> sorting_columns;
     int64_t dictionary_pagesize_limit = 1024 * 1024;
     int64_t write_batch_size = 1024;
-    int64_t max_row_group_length = 1024 * 1024;
+    int64_t max_row_group_length = 64 * 1024 * 1024;
     int64_t data_pagesize = 1024 * 1024;
     size_t max_statistics_size = 4096;
     int compression_level = std::numeric_limits<int>::min();
@@ -429,6 +429,7 @@ class WriterOptions {
   std::shared_ptr<parquet::WriterProperties> getParquetWriterProperties() const;
   std::shared_ptr<parquet::ArrowWriterProperties> getArrowWriterProperties()
       const;
+  int64_t getParquetMaxRowGroupLength() const;
 #ifdef ARROW_ORC
   arrow::adapters::orc::WriteOptions getOrcOption() const;
 #endif

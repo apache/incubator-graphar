@@ -269,8 +269,9 @@ Status FileSystem::WriteTableToFile(
   }
   case FileType::PARQUET: {
     auto schema = table->schema();
+    auto row_group_size = options->getParquetMaxRowGroupLength();
     RETURN_NOT_ARROW_OK(parquet::arrow::WriteTable(
-        *table, arrow::default_memory_pool(), output_stream, 64 * 1024 * 1024,
+        *table, arrow::default_memory_pool(), output_stream, row_group_size,
         options->getParquetWriterProperties(),
         options->getArrowWriterProperties()));
     break;
@@ -303,8 +304,9 @@ Status FileSystem::WriteLabelTableToFile(
   parquet::WriterProperties::Builder builder;
   builder.compression(arrow::Compression::type::ZSTD);  // enable compression
   builder.encoding(parquet::Encoding::RLE);
+  auto row_group_size = builder.build()->max_row_group_length();
   RETURN_NOT_ARROW_OK(parquet::arrow::WriteTable(
-      *table, arrow::default_memory_pool(), output_stream, 64 * 1024 * 1024,
+      *table, arrow::default_memory_pool(), output_stream, row_group_size,
       builder.build(), parquet::default_arrow_writer_properties()));
   return Status::OK();
 }
