@@ -294,7 +294,7 @@ macro(build_graphar)
     else()
         add_library(graphar SHARED ${CORE_SRC_FILES})
     endif()
-    install_graphar_target(graphar)
+   # install_graphar_target(graphar)
     target_compile_features(graphar PRIVATE cxx_std_17)
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
@@ -351,7 +351,7 @@ macro(build_graphar_with_arrow_bundled)
     else()
         add_library(graphar SHARED ${CORE_SRC_FILES})
     endif()
-    install_graphar_target(graphar)
+    #install_graphar_target(graphar)
     target_compile_features(graphar PRIVATE cxx_std_17)
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     target_include_directories(graphar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
@@ -514,6 +514,14 @@ endif()
 # ------------------------------------------------------------------------------
 # Install
 # ------------------------------------------------------------------------------
+install(TARGETS graphar
+  EXPORT graphar-targets
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}   # .lib / .a
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}   # .so / .dylib
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL  # .dll / executables
+)
+
+
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/src/graphar
         DESTINATION include
         FILES_MATCHING
