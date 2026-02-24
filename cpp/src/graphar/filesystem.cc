@@ -123,18 +123,15 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
   builder.memory_pool(arrow::default_memory_pool());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto reader, builder.Build());
   std::shared_ptr<arrow::Table> table;
+  arrow::Status read_status;
   if (column_indices.empty()) {
-    arrow::Status read_status = reader->ReadTable(&table);
-    if (!read_status.ok()) {
-      return Status::Invalid("Failed to read table from file: ", path, " - ",
-                             read_status.ToString());
-    }
+    read_status = reader->ReadTable(&table);
   } else {
-    arrow::Status read_status = reader->ReadTable(column_indices, &table);
-    if (!read_status.ok()) {
-      return Status::Invalid("Failed to read table from file: ", path, " - ",
-                             read_status.ToString());
-    }
+    read_status = reader->ReadTable(column_indices, &table);
+  }
+  if (!read_status.ok()) {
+    return Status::Invalid("Failed to read table from file: ", path, " - ",
+                           read_status.ToString());
   }
   return table;
 }

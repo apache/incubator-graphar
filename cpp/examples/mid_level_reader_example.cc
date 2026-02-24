@@ -81,10 +81,10 @@ void vertex_property_chunk_reader(
       specific_reader->GetChunk(graphar::GetChunkVersion::V1);
   ASSERT(!result.has_error());
   auto specific_table = specific_result.value();
-  std::cout << "rows number of first specificed vertex property chunk: "
+  std::cout << "rows number of first specified vertex property chunk: "
             << specific_table->num_rows() << std::endl;
   ASSERT(specific_table->num_columns() == 2);
-  std::cout << "schema of first specificed vertex property chunk: " << std::endl
+  std::cout << "schema of first specified vertex property chunk: " << std::endl
             << specific_table->schema()->ToString() << std::endl;
   index_col =
       specific_table->GetColumnByName(graphar::GeneralParams::kVertexIndexCol);
@@ -104,10 +104,10 @@ void vertex_property_chunk_reader(
   specific_result = specific_reader->GetChunk(graphar::GetChunkVersion::V2);
   ASSERT(!specific_result.has_error());
   specific_table = specific_result.value();
-  std::cout << "rows number of first specificed vertex property chunk (V2): "
+  std::cout << "rows number of first specified vertex property chunk (V2): "
             << specific_table->num_rows() << std::endl;
   ASSERT(specific_table->num_columns() == 2);
-  std::cout << "schema of first specificed vertex property chunk (V2): "
+  std::cout << "schema of first specified vertex property chunk (V2): "
             << std::endl
             << specific_table->schema()->ToString() << std::endl;
   index_col =
@@ -129,10 +129,10 @@ void vertex_property_chunk_reader(
   specific_result = specific_reader->GetChunk(graphar::GetChunkVersion::V1);
   ASSERT(!result.has_error());
   specific_table = specific_result.value();
-  std::cout << "rows number of specificed vertex properties chunk: "
+  std::cout << "rows number of specified vertex properties chunk: "
             << specific_table->num_rows() << std::endl;
   ASSERT(specific_table->num_columns() == specific_cols.size() + 1);
-  std::cout << "schema of specificed vertex properties chunk: " << std::endl
+  std::cout << "schema of specified vertex properties chunk: " << std::endl
             << specific_table->schema()->ToString() << std::endl;
   index_col =
       specific_table->GetColumnByName(graphar::GeneralParams::kVertexIndexCol);
@@ -157,11 +157,10 @@ void vertex_property_chunk_reader(
   specific_result = specific_reader->GetChunk(graphar::GetChunkVersion::V2);
   ASSERT(!specific_result.has_error());
   specific_table = specific_result.value();
-  std::cout << "rows number of specificed vertex properties chunk (V2): "
+  std::cout << "rows number of specified vertex properties chunk (V2): "
             << specific_table->num_rows() << std::endl;
   ASSERT(specific_table->num_columns() == specific_cols.size() + 1);
-  std::cout << "schema of specificed vertex properties chunk (V2): "
-            << std::endl
+  std::cout << "schema of specified vertex properties chunk (V2): " << std::endl
             << specific_table->schema()->ToString() << std::endl;
   index_col =
       specific_table->GetColumnByName(graphar::GeneralParams::kVertexIndexCol);
