@@ -428,10 +428,8 @@ if (BUILD_ARROW_FROM_SOURCE)
     endif()
     find_package(CURL REQUIRED)
 
-    # Include apache-arrow configuration to determine ARROW_VERSION_TO_BUILD
     include(apache-arrow)
 
-    # Update C++ standard based on Arrow version to build
     if (ARROW_VERSION_TO_BUILD VERSION_GREATER_EQUAL "23.0.0")
         set(GAR_CXX_STANDARD 20)
     endif()
