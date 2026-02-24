@@ -62,7 +62,21 @@ repos:
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
-        args: [--verbose]
+        args:
+          - --verbose
+          - --scope-optional
+          - --types
+          - feat
+          - fix
+          - docs
+          - style
+          - refactor
+          - test
+          - chore
+          - perf
+          - ci
+          - build
+          - revert
         
   - repo: local
     hooks:
