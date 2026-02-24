@@ -203,7 +203,7 @@ Result<std::vector<IdType>> VerticesCollection::filter(
     }
   }
   // std::cout << "Total valid count: " << total_count << std::endl;
-   std::vector<int64_t> indices64(indices.size());
+  std::vector<int64_t> indices64(indices.size());
   for (size_t i = 0; i < indices.size(); ++i) {
     indices64[i] = static_cast<int64_t>(indices[i]);
   }
