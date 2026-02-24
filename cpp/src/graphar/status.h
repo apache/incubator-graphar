@@ -21,6 +21,7 @@
 
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #include "graphar/macros.h"
@@ -64,7 +65,12 @@
 namespace graphar::util {
 template <typename Head>
 void StringBuilderRecursive(std::ostringstream& stream, Head&& head) {
-  stream << head;
+  using Decayed = std::decay_t<Head>;
+  if constexpr (std::is_enum_v<Decayed>) {
+    stream << static_cast<std::underlying_type_t<Decayed>>(head);
+  } else {
+    stream << std::forward<Head>(head);
+  }
 }
 
 template <typename Head, typename... Tail>
