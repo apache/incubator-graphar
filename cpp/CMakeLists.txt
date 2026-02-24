@@ -468,7 +468,7 @@ else()
     endif()
 
     # Update C++ standard based on detected system Arrow version
-    if (Arrow_VERSION VERSION_GREATER_EQUAL "23.0.0")
+    if (${Arrow_VERSION} VERSION_GREATER_EQUAL "23.0.0")
         set(GAR_CXX_STANDARD 20)
         message(STATUS "Arrow ${Arrow_VERSION} detected")
     endif()
