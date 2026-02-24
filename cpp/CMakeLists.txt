@@ -427,14 +427,14 @@ if (BUILD_ARROW_FROM_SOURCE)
         endif()
     endif()
     find_package(CURL REQUIRED)
-    if(DEFINED ENV{GRAPHAR_ARROW_VERSION})
-        if ($ENV{GRAPHAR_ARROW_VERSION} VERSION_GREATER_EQUAL "23.0.0")
-            set(GAR_CXX_STANDARD 20)
-        endif()
-    else()
-        set(GAR_CXX_STANDARD 20) # Default Arrow version is 23.0.0 need C++20
-    endif()
+
+    # Include apache-arrow configuration to determine ARROW_VERSION_TO_BUILD
     include(apache-arrow)
+
+    # Update C++ standard based on Arrow version to build
+    if (ARROW_VERSION_TO_BUILD VERSION_GREATER_EQUAL "23.0.0")
+        set(GAR_CXX_STANDARD 20)
+    endif()
     build_arrow()
     add_definitions(-DARROW_ORC) # Add macro, otherwise inconsistent in build phase with not from source.
     build_graphar_with_arrow_bundled()
