@@ -203,10 +203,9 @@ Result<std::vector<IdType>> VerticesCollection::filter(
     }
   }
   // std::cout << "Total valid count: " << total_count << std::endl;
-  std::vector<int64_t> indices64;
-
-  for (int value : indices) {
-    indices64.push_back(static_cast<int64_t>(value));
+   std::vector<int64_t> indices64(indices.size());
+  for (size_t i = 0; i < indices.size(); ++i) {
+    indices64[i] = static_cast<int64_t>(indices[i]);
   }
 
   delete[] bitmap;
