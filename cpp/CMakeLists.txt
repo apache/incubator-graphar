@@ -372,7 +372,11 @@ macro(build_graphar_with_arrow_bundled)
     target_compile_features(graphar PRIVATE cxx_std_${GAR_CXX_STANDARD})
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     target_include_directories(graphar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
-    target_link_libraries(graphar PRIVATE graphar_thirdparty ${CMAKE_DL_LIBS})
+    if(GRAPHAR_BUILD_STATIC)
+        target_link_libraries(graphar PUBLIC graphar_thirdparty ${CMAKE_DL_LIBS})
+    else()
+        target_link_libraries(graphar PRIVATE graphar_thirdparty ${CMAKE_DL_LIBS})
+    endif()
 
     set(GAR_BUNDLED_DEPS_STATIC_LIBS)
     list(APPEND GAR_BUNDLED_DEPS_STATIC_LIBS
