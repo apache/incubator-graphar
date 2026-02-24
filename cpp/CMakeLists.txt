@@ -464,7 +464,7 @@ else()
 endif()
 
 # ------------------------------------------------------------------------------
-# build example
+# build examples
 # ------------------------------------------------------------------------------
 if (BUILD_EXAMPLES)
     find_package(Boost REQUIRED COMPONENTS graph)

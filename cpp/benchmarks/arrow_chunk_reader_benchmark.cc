@@ -152,7 +152,7 @@ BENCHMARK_DEFINE_F(
   }
 }
 
-// select tow columns and internal ID column
+// select two columns and internal ID column
 BENCHMARK_DEFINE_F(
     BenchmarkFixture,
     VertexPropertyArrowChunkReaderReadChunk_firstGraph_TwoColumns_V1)
@@ -208,7 +208,7 @@ BENCHMARK_DEFINE_F(
   }
 }
 
-// select tow columns and internal ID column
+// select two columns and internal ID column
 BENCHMARK_DEFINE_F(
     BenchmarkFixture,
     VertexPropertyArrowChunkReaderReadChunk_firstGraph_TwoColumns_V2)
@@ -265,7 +265,7 @@ BENCHMARK_DEFINE_F(
   }
 }
 
-// select tow columns and internal ID column
+// select two columns and internal ID column
 BENCHMARK_DEFINE_F(
     BenchmarkFixture,
     VertexPropertyArrowChunkReaderReadChunk_secondGraph_TwoColumns_V1)
@@ -323,7 +323,7 @@ BENCHMARK_DEFINE_F(
   }
 }
 
-// select tow columns and internal ID column
+// select two columns and internal ID column
 BENCHMARK_DEFINE_F(
     BenchmarkFixture,
     VertexPropertyArrowChunkReaderReadChunk_secondGraph_TwoColumns_V2)
