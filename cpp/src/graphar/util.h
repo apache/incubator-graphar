@@ -185,7 +185,7 @@ struct IndexConverter {
     return global_edge_chunk_index + edge_chunk_index;
   }
 
-  // covert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
+  // convert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
   std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(IdType global_index) {
     std::pair<IdType, IdType> index_pair(0, 0);
     for (size_t i = 0; i < edge_chunk_nums_.size(); ++i) {
@@ -213,7 +213,7 @@ static inline IdType IndexPairToGlobalChunkIndex(
   return global_edge_chunk_index + edge_chunk_index;
 }
 
-// covert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
+// convert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
 static inline std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(
     const std::vector<IdType>& edge_chunk_nums, IdType global_index) {
   std::pair<IdType, IdType> index_pair(0, 0);

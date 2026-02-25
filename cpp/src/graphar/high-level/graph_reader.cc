@@ -275,7 +275,7 @@ Result<std::vector<IdType>> VerticesCollection::filter(
   std::vector<int64_t> indices64;
   if (is_filtered_) {
     for (int chunk_idx : valid_chunk_) {
-      // how to itetate valid_chunk_?
+      // how to iterate valid_chunk_?
       filter_reader->seek(chunk_idx * CHUNK_SIZE);
       auto filter_result =
           filter_reader->GetChunk(graphar::GetChunkVersion::V1);
