@@ -870,16 +870,15 @@ class GraphInfo {
   /**
    * @brief Get the vertex info index with the given type.
    */
-  std::optional<size_t> GetVertexInfoIndex(
-      const std::string& type) const;
+  std::optional<size_t> GetVertexInfoIndex(const std::string& type) const;
 
   /**
    * @brief Get the edge info index with the given source vertex type, edge
    * type, and destination type.
    */
-  std::optional<size_t> GetEdgeInfoIndex(
-      const std::string& src_type, const std::string& edge_type,
-      const std::string& dst_type) const;
+  std::optional<size_t> GetEdgeInfoIndex(const std::string& src_type,
+                                         const std::string& edge_type,
+                                         const std::string& dst_type) const;
 
   /**
    * @brief Get the number of vertex infos.
