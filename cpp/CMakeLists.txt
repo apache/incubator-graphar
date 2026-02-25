@@ -355,6 +355,7 @@ endif()
 # Test targets
 # ------------------------------------------------------------------------------
 if (BUILD_TESTS)
+    enable_testing()
     add_subdirectory(test)
 endif()
 

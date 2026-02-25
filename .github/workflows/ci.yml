@@ -127,7 +127,7 @@ jobs:
         ctest --output-on-failure
 
     - name: Benchmark
-      working-directory: "cpp/build"
+      working-directory: "cpp/build/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
