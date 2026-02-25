@@ -201,6 +201,7 @@ jobs:
       run: |
         brew bundle --file=cpp/Brewfile
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+        brew list --versions
 
     - name: Build GraphAr
       working-directory: "cpp"

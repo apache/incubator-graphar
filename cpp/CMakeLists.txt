@@ -104,11 +104,13 @@ if(NOT (CMAKE_CXX_COMPILER_LAUNCHER MATCHES "ccache") AND NOT (CMAKE_C_COMPILER_
     endif(ccache_EXECUTABLE)
 endif()
 
+set(GAR_CXX_STANDARD 17)
+
 if(MSVC)
     # Avoid GCC/Clang-specific flags on MSVC.
     # C++17 is already enforced via CMAKE_CXX_STANDARD/target features.
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Werror=unused-variable")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror=unused-variable")
 endif()
 
 if (APPLE)
@@ -147,7 +149,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(${PROJECT_NAME} INTERFACE)
-target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
 target_include_directories(
     ${PROJECT_NAME}
     INTERFACE
@@ -295,7 +296,7 @@ macro(build_graphar)
         add_library(graphar SHARED ${CORE_SRC_FILES})
     endif()
     install_graphar_target(graphar)
-    target_compile_features(graphar PRIVATE cxx_std_17)
+    target_compile_features(graphar PRIVATE cxx_std_${GAR_CXX_STANDARD})
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
 
@@ -352,7 +353,7 @@ macro(build_graphar_with_arrow_bundled)
         add_library(graphar SHARED ${CORE_SRC_FILES})
     endif()
     install_graphar_target(graphar)
-    target_compile_features(graphar PRIVATE cxx_std_17)
+    target_compile_features(graphar PRIVATE cxx_std_${GAR_CXX_STANDARD})
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     target_include_directories(graphar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
     target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
@@ -428,6 +429,10 @@ if (BUILD_ARROW_FROM_SOURCE)
     find_package(CURL REQUIRED)
 
     include(apache-arrow)
+
+    if (ARROW_VERSION_TO_BUILD VERSION_GREATER_EQUAL "23.0.0")
+        set(GAR_CXX_STANDARD 20)
+    endif()
     build_arrow()
     add_definitions(-DARROW_ORC) # Add macro, otherwise inconsistent in build phase with not from source.
     build_graphar_with_arrow_bundled()
@@ -460,8 +465,16 @@ else()
         message(FATAL_ERROR "parquet is required, please install it and retry")
     endif()
 
+    # Update C++ standard based on detected system Arrow version
+    if (${Arrow_VERSION} VERSION_GREATER_EQUAL "23.0.0")
+        set(GAR_CXX_STANDARD 20)
+        message(STATUS "Arrow ${Arrow_VERSION} detected")
+    endif()
+
     build_graphar()
 endif()
+
+message(STATUS "[graphar] using C++ standard: ${GAR_CXX_STANDARD}")
 
 # ------------------------------------------------------------------------------
 # build examples
@@ -564,7 +577,7 @@ if (BUILD_TESTS)
         set(multiValueArgs SRCS)
         cmake_parse_arguments(add_test "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
         add_executable(${target} ${add_test_SRCS})
-        target_compile_features(${target} PRIVATE cxx_std_17)
+        target_compile_features(${target} PRIVATE cxx_std_${GAR_CXX_STANDARD})
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
         target_link_libraries(${target} PRIVATE Catch2::Catch2WithMain graphar ${CMAKE_DL_LIBS})
         if (BUILD_ARROW_FROM_SOURCE)
@@ -630,7 +643,7 @@ if (BUILD_BENCHMARKS)
         set(multiValueArgs SRCS)
         cmake_parse_arguments(add_test "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
         add_executable(${target} ${add_test_SRCS})
-        target_compile_features(${target} PRIVATE cxx_std_17)
+        target_compile_features(${target} PRIVATE cxx_std_${GAR_CXX_STANDARD})
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
         target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar ${CMAKE_DL_LIBS})
         if (BUILD_ARROW_FROM_SOURCE)
