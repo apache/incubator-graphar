@@ -93,6 +93,12 @@ jobs:
         pre-commit install
         pre-commit run clang-format -a
 
+    - name: Validate commit message format
+      run: |
+        COMMIT_MSG=$(git log -1 --pretty=%B)
+        echo "$COMMIT_MSG" > .git/COMMIT_EDITMSG
+        pre-commit run --hook-stage commit-msg --commit-msg-filename .git/COMMIT_EDITMSG 
+
     - name: cpplint
       working-directory: "cpp/build"
       run: |
