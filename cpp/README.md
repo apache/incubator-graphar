@@ -88,6 +88,27 @@ cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON ..
 make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
 ```
 
+### Quick Build with Scripts
+
+For convenience, we provide build scripts for Ubuntu and macOS that configure the following CMake options:
+
+- `-DBUILD_BENCHMARKS=ON`: Build benchmark executables
+- `-DCMAKE_BUILD_TYPE=Debug`: Build in debug mode
+- `-DBUILD_TESTS=ON`: Build unit tests
+- `-DBUILD_EXAMPLES=ON`: Build example executables
+
+**Ubuntu:**
+```bash
+./build_ubuntu.sh
+```
+
+**macOS:**
+```bash
+./build_macos.sh
+```
+
+These scripts will automatically create the build directory, configure with CMake, and compile the project. Build logs will be saved to `build_ubuntu.log` or `build_macos.log`.
+
 After building, you can run the unit tests with:
 
 ```bash
