@@ -131,7 +131,8 @@ void vertex_property_chunk_reader(
   specific_table = specific_result.value();
   std::cout << "rows number of specified vertex properties chunk: "
             << specific_table->num_rows() << std::endl;
-  ASSERT(specific_table->num_columns() == specific_cols.size() + 1);
+  ASSERT(specific_table->num_columns() ==
+         static_cast<int>(specific_cols.size()) + 1);
   std::cout << "schema of specified vertex properties chunk: " << std::endl
             << specific_table->schema()->ToString() << std::endl;
   index_col =
@@ -159,7 +160,8 @@ void vertex_property_chunk_reader(
   specific_table = specific_result.value();
   std::cout << "rows number of specified vertex properties chunk (V2): "
             << specific_table->num_rows() << std::endl;
-  ASSERT(specific_table->num_columns() == specific_cols.size() + 1);
+  ASSERT(specific_table->num_columns() ==
+         static_cast<int>(specific_cols.size()) + 1);
   std::cout << "schema of specified vertex properties chunk (V2): " << std::endl
             << specific_table->schema()->ToString() << std::endl;
   index_col =
