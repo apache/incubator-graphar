@@ -203,7 +203,7 @@ struct IndexConverter {
   std::vector<IdType> edge_chunk_nums_;
 };
 
-static inline IdType IndexPairToGlobalChunkIndex(
+static IdType IndexPairToGlobalChunkIndex(
     const std::vector<IdType>& edge_chunk_nums, IdType vertex_chunk_index,
     IdType edge_chunk_index) {
   IdType global_edge_chunk_index = 0;
@@ -214,7 +214,7 @@ static inline IdType IndexPairToGlobalChunkIndex(
 }
 
 // convert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
-static inline std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(
+static std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(
     const std::vector<IdType>& edge_chunk_nums, IdType global_index) {
   std::pair<IdType, IdType> index_pair(0, 0);
   for (size_t i = 0; i < edge_chunk_nums.size(); ++i) {
@@ -238,7 +238,7 @@ std::shared_ptr<arrow::Array> GetArrowArrayByChunkIndex(
 Result<const void*> GetArrowArrayData(
     std::shared_ptr<arrow::Array> const& array);
 
-static inline std::string ConcatStringWithDelimiter(
+static std::string ConcatStringWithDelimiter(
     const std::vector<std::string>& str_vec, const std::string& delimiter) {
   return std::accumulate(
       std::begin(str_vec), std::end(str_vec), std::string(),
@@ -249,7 +249,7 @@ static inline std::string ConcatStringWithDelimiter(
 
 template <typename T>
 struct ValueGetter {
-  inline static T Value(const void* data, int64_t offset) {
+  static T Value(const void* data, int64_t offset) {
     return reinterpret_cast<const T*>(data)[offset];
   }
 };
@@ -259,7 +259,7 @@ struct ValueGetter<std::string> {
   static std::string Value(const void* data, int64_t offset);
 };
 
-static inline arrow::Status OpenParquetArrowReader(
+static arrow::Status OpenParquetArrowReader(
     const std::string& file_path, arrow::MemoryPool* pool,
     std::unique_ptr<parquet::arrow::FileReader>* parquet_reader) {
   std::shared_ptr<arrow::io::RandomAccessFile> input;

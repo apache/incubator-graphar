@@ -89,13 +89,13 @@ class PropertyGroup {
    *
    * @return The file type of group.
    */
-  inline FileType GetFileType() const { return file_type_; }
+  FileType GetFileType() const { return file_type_; }
 
   /** Get the prefix of property group chunk file.
    *
    * @return The path prefix of group.
    */
-  inline const std::string& GetPrefix() const { return prefix_; }
+  const std::string& GetPrefix() const { return prefix_; }
 
   /**
    * Check if the property group is validated.
@@ -143,21 +143,21 @@ class AdjacentList {
    *
    * @return The type of adjacent list
    */
-  inline AdjListType GetType() const { return type_; }
+  AdjListType GetType() const { return type_; }
 
   /**
    * @brief Get the file type of adjacent list
    *
    * @return The file type of adjacent list
    */
-  inline FileType GetFileType() const { return file_type_; }
+  FileType GetFileType() const { return file_type_; }
 
   /**
    * @brief Get the prefix of adjacent list
    *
    * @return The path prefix of adjacent list
    */
-  inline const std::string& GetPrefix() const { return prefix_; }
+  const std::string& GetPrefix() const { return prefix_; }
 
   /**
    * Returns whether the adjacent list is validated.
