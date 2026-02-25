@@ -123,7 +123,7 @@ impl VertexInfo {
     /// Return the number of property groups.
     ///
     /// TODO: upstream C++ uses `int` for this return type; prefer fixed-width.
-    pub fn property_group_num(&self) -> u_size {
+    pub fn property_group_num(&self) -> usize {
         self.0.PropertyGroupNum()
     }
 
@@ -464,7 +464,7 @@ mod tests {
         assert!(by_index.has_property("id"));
 
         assert!(vertex_info.property_group_by_index(1).is_none());
-        assert!(vertex_info.property_group_by_index(-1).is_none());
+        assert!(vertex_info.property_group_by_index(usize::MAX).is_none());
     }
 
     #[test]
