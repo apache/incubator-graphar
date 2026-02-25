@@ -159,7 +159,7 @@ jobs:
         popd
 
     - name: Benchmark-release
-      working-directory: "cpp/build-release"
+      working-directory: "cpp/build-release/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
@@ -230,7 +230,7 @@ jobs:
         popd
 
     - name: Benchmark-release
-      working-directory: "cpp/build-release"
+      working-directory: "cpp/build-release/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
