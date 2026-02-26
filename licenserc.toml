@@ -64,3 +64,7 @@ excludes = [
   "cli/*.yml",
   "cli/*.toml",
 ]
+
+[mapping.DOUBLESLASH_STYLE]
+extensions = ['go']
+filenames = ['go.mod']
