@@ -642,6 +642,7 @@ if (BUILD_TESTS)
         catch_discover_tests(${target})
     endmacro()
 
+    add_test(test_lru_cache SRCS test/test_lru_cache.cc)
     add_test(test_info SRCS test/test_info.cc)
     add_test(test_arrow_chunk_writer SRCS test/test_arrow_chunk_writer.cc)
     add_test(test_builder SRCS test/test_builder.cc)

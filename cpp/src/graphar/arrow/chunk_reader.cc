@@ -211,9 +211,8 @@ Status VertexPropertyArrowChunkReader::seek(IdType id) {
   IdType pre_chunk_index = chunk_index_;
   chunk_index_ = id / vertex_info_->GetChunkSize();
   if (chunk_index_ != pre_chunk_index) {
-    // TODO(@acezen): use a cache to avoid reloading the same chunk, could use
-    //  a LRU cache.
-    chunk_table_.reset();
+    auto* cached = chunk_cache_.Get(chunk_index_);
+    chunk_table_ = cached ? *cached : nullptr;
   }
   if (chunk_index_ >= chunk_num_) {
     return Status::IndexError("Internal vertex id ", id, " is out of range [0,",
@@ -260,6 +259,7 @@ VertexPropertyArrowChunkReader::GetChunkV2() {
       GAR_RETURN_NOT_OK(
           CastTableWithSchema(chunk_table_, schema_, &chunk_table_));
     }
+    chunk_cache_.Put(chunk_index_, chunk_table_);
   }
   IdType row_offset = seek_id_ - chunk_index_ * vertex_info_->GetChunkSize();
   return chunk_table_->Slice(row_offset);
@@ -304,6 +304,7 @@ VertexPropertyArrowChunkReader::GetChunkV1() {
       GAR_RETURN_NOT_OK(
           CastTableWithSchema(chunk_table_, schema_, &chunk_table_));
     }
+    chunk_cache_.Put(chunk_index_, chunk_table_);
   }
   IdType row_offset = seek_id_ - chunk_index_ * vertex_info_->GetChunkSize();
   return chunk_table_->Slice(row_offset);
@@ -340,6 +341,7 @@ VertexPropertyArrowChunkReader::GetLabelChunk() {
     //   GAR_RETURN_NOT_OK(
     //       CastTableWithSchema(chunk_table_, schema_, &chunk_table_));
     // }
+    chunk_cache_.Put(chunk_index_, chunk_table_);
   }
   IdType row_offset = seek_id_ - chunk_index_ * vertex_info_->GetChunkSize();
   return chunk_table_->Slice(row_offset);
@@ -352,7 +354,8 @@ Status VertexPropertyArrowChunkReader::next_chunk() {
         vertex_info_->GetType(), " chunk num ", chunk_num_);
   }
   seek_id_ = chunk_index_ * vertex_info_->GetChunkSize();
-  chunk_table_.reset();
+  auto* cached = chunk_cache_.Get(chunk_index_);
+  chunk_table_ = cached ? *cached : nullptr;
 
   return Status::OK();
 }
@@ -585,7 +588,9 @@ Status AdjListArrowChunkReader::seek_src(IdType id) {
     // initialize or update chunk_num_
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_RETURN_NOT_OK(initOrUpdateEdgeChunkNum());
-    chunk_table_.reset();
+    auto key = std::make_pair(vertex_chunk_index_, chunk_index_);
+    auto* cached = chunk_cache_.Get(key);
+    chunk_table_ = cached ? *cached : nullptr;
   }
 
   if (adj_list_type_ == AdjListType::unordered_by_source) {
@@ -618,7 +623,9 @@ Status AdjListArrowChunkReader::seek_dst(IdType id) {
     // initialize or update chunk_num_
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_RETURN_NOT_OK(initOrUpdateEdgeChunkNum());
-    chunk_table_.reset();
+    auto key = std::make_pair(vertex_chunk_index_, chunk_index_);
+    auto* cached = chunk_cache_.Get(key);
+    chunk_table_ = cached ? *cached : nullptr;
   }
 
   if (adj_list_type_ == AdjListType::unordered_by_dest) {
@@ -636,7 +643,9 @@ Status AdjListArrowChunkReader::seek(IdType offset) {
   IdType pre_chunk_index = chunk_index_;
   chunk_index_ = offset / edge_info_->GetChunkSize();
   if (chunk_index_ != pre_chunk_index) {
-    chunk_table_.reset();
+    auto key = std::make_pair(vertex_chunk_index_, chunk_index_);
+    auto* cached = chunk_cache_.Get(key);
+    chunk_table_ = cached ? *cached : nullptr;
   }
   if (chunk_num_ < 0) {
     // initialize chunk_num_
@@ -666,6 +675,8 @@ Result<std::shared_ptr<arrow::Table>> AdjListArrowChunkReader::GetChunk() {
     std::string path = prefix_ + chunk_file_path;
     auto file_type = edge_info_->GetAdjacentList(adj_list_type_)->GetFileType();
     GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadFileToTable(path, file_type));
+    chunk_cache_.Put(std::make_pair(vertex_chunk_index_, chunk_index_),
+                     chunk_table_);
   }
   IdType row_offset = seek_offset_ - chunk_index_ * edge_info_->GetChunkSize();
   return chunk_table_->Slice(row_offset);
@@ -688,21 +699,26 @@ Status AdjListArrowChunkReader::next_chunk() {
     GAR_RETURN_NOT_OK(initOrUpdateEdgeChunkNum());
   }
   seek_offset_ = chunk_index_ * edge_info_->GetChunkSize();
-  chunk_table_.reset();
+  auto key = std::make_pair(vertex_chunk_index_, chunk_index_);
+  auto* cached = chunk_cache_.Get(key);
+  chunk_table_ = cached ? *cached : nullptr;
   return Status::OK();
 }
 
 Status AdjListArrowChunkReader::seek_chunk_index(IdType vertex_chunk_index,
                                                  IdType chunk_index) {
+  bool changed = false;
   if (chunk_num_ < 0 || vertex_chunk_index_ != vertex_chunk_index) {
     vertex_chunk_index_ = vertex_chunk_index;
     GAR_RETURN_NOT_OK(initOrUpdateEdgeChunkNum());
-    chunk_table_.reset();
+    changed = true;
   }
-  if (chunk_index_ != chunk_index) {
+  if (chunk_index_ != chunk_index || changed) {
     chunk_index_ = chunk_index;
     seek_offset_ = chunk_index * edge_info_->GetChunkSize();
-    chunk_table_.reset();
+    auto key = std::make_pair(vertex_chunk_index_, chunk_index_);
+    auto* cached = chunk_cache_.Get(key);
+    chunk_table_ = cached ? *cached : nullptr;
   }
   return Status::OK();
 }
@@ -715,6 +731,8 @@ Result<IdType> AdjListArrowChunkReader::GetRowNumOfChunk() {
     std::string path = prefix_ + chunk_file_path;
     auto file_type = edge_info_->GetAdjacentList(adj_list_type_)->GetFileType();
     GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadFileToTable(path, file_type));
+    chunk_cache_.Put(std::make_pair(vertex_chunk_index_, chunk_index_),
+                     chunk_table_);
   }
   return chunk_table_->num_rows();
 }
@@ -785,7 +803,8 @@ Status AdjListOffsetArrowChunkReader::seek(IdType id) {
   IdType pre_chunk_index = chunk_index_;
   chunk_index_ = id / vertex_chunk_size_;
   if (chunk_index_ != pre_chunk_index) {
-    chunk_table_.reset();
+    auto* cached = chunk_cache_.Get(chunk_index_);
+    chunk_table_ = cached ? *cached : nullptr;
   }
   if (chunk_index_ >= vertex_chunk_num_) {
     return Status::IndexError("Internal vertex id ", id, "is out of range [0,",
@@ -806,6 +825,7 @@ AdjListOffsetArrowChunkReader::GetChunk() {
     std::string path = prefix_ + chunk_file_path;
     auto file_type = edge_info_->GetAdjacentList(adj_list_type_)->GetFileType();
     GAR_ASSIGN_OR_RAISE(chunk_table_, fs_->ReadFileToTable(path, file_type));
+    chunk_cache_.Put(chunk_index_, chunk_table_);
   }
   IdType row_offset = seek_id_ - chunk_index_ * vertex_chunk_size_;
   return chunk_table_->Slice(row_offset)->column(0)->chunk(0);
@@ -820,7 +840,8 @@ Status AdjListOffsetArrowChunkReader::next_chunk() {
                               AdjListTypeToString(adj_list_type_), ".");
   }
   seek_id_ = chunk_index_ * vertex_chunk_size_;
-  chunk_table_.reset();
+  auto* cached = chunk_cache_.Get(chunk_index_);
+  chunk_table_ = cached ? *cached : nullptr;
 
   return Status::OK();
 }
@@ -935,7 +956,9 @@ Status AdjListPropertyArrowChunkReader::seek_src(IdType id) {
   if (chunk_num_ < 0 || vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_RETURN_NOT_OK(initOrUpdateEdgeChunkNum());
-    chunk_table_.reset();
+    auto key = std::make_pair(vertex_chunk_index_, chunk_index_);
+    auto* cached = chunk_cache_.Get(key);
+    chunk_table_ = cached ? *cached : nullptr;
   }
 
   if (adj_list_type_ == AdjListType::unordered_by_source) {
@@ -967,7 +990,9 @@ Status AdjListPropertyArrowChunkReader::seek_dst(IdType id) {
   if (chunk_num_ < 0 || vertex_chunk_index_ != new_vertex_chunk_index) {
     vertex_chunk_index_ = new_vertex_chunk_index;
     GAR_RETURN_NOT_OK(initOrUpdateEdgeChunkNum());
-    chunk_table_.reset();
+    auto key = std::make_pair(vertex_chunk_index_, chunk_index_);
+    auto* cached = chunk_cache_.Get(key);
+    chunk_table_ = cached ? *cached : nullptr;
   }
 
   if (adj_list_type_ == AdjListType::unordered_by_dest) {
@@ -985,7 +1010,9 @@ Status AdjListPropertyArrowChunkReader::seek(IdType offset) {
   seek_offset_ = offset;
   chunk_index_ = offset / edge_info_->GetChunkSize();
   if (chunk_index_ != pre_chunk_index) {
-    chunk_table_.reset();
+    auto key = std::make_pair(vertex_chunk_index_, chunk_index_);
+    auto* cached = chunk_cache_.Get(key);
+    chunk_table_ = cached ? *cached : nullptr;
   }
   if (chunk_num_ < 0) {
     // initialize chunk_num_
@@ -1024,6 +1051,8 @@ AdjListPropertyArrowChunkReader::GetChunk() {
       GAR_RETURN_NOT_OK(
           CastTableWithSchema(chunk_table_, schema_, &chunk_table_));
     }
+    chunk_cache_.Put(std::make_pair(vertex_chunk_index_, chunk_index_),
+                     chunk_table_);
   }
   IdType row_offset = seek_offset_ - chunk_index_ * edge_info_->GetChunkSize();
   return chunk_table_->Slice(row_offset);
@@ -1049,21 +1078,26 @@ Status AdjListPropertyArrowChunkReader::next_chunk() {
     GAR_RETURN_NOT_OK(initOrUpdateEdgeChunkNum());
   }
   seek_offset_ = chunk_index_ * edge_info_->GetChunkSize();
-  chunk_table_.reset();
+  auto key = std::make_pair(vertex_chunk_index_, chunk_index_);
+  auto* cached = chunk_cache_.Get(key);
+  chunk_table_ = cached ? *cached : nullptr;
   return Status::OK();
 }
 
 Status AdjListPropertyArrowChunkReader::seek_chunk_index(
     IdType vertex_chunk_index, IdType chunk_index) {
+  bool changed = false;
   if (chunk_num_ < 0 || vertex_chunk_index_ != vertex_chunk_index) {
     vertex_chunk_index_ = vertex_chunk_index;
     GAR_RETURN_NOT_OK(initOrUpdateEdgeChunkNum());
-    chunk_table_.reset();
+    changed = true;
   }
-  if (chunk_index_ != chunk_index) {
+  if (chunk_index_ != chunk_index || changed) {
     chunk_index_ = chunk_index;
     seek_offset_ = chunk_index * edge_info_->GetChunkSize();
-    chunk_table_.reset();
+    auto key = std::make_pair(vertex_chunk_index_, chunk_index_);
+    auto* cached = chunk_cache_.Get(key);
+    chunk_table_ = cached ? *cached : nullptr;
   }
   return Status::OK();
 }

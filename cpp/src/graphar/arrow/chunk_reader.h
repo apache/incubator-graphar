@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "graphar/fwd.h"
+#include "graphar/lru_cache.h"
 #include "graphar/reader_util.h"
 #include "graphar/status.h"
 
@@ -267,6 +268,7 @@ class VertexPropertyArrowChunkReader {
   IdType vertex_num_;
   std::shared_ptr<arrow::Schema> schema_;
   std::shared_ptr<arrow::Table> chunk_table_;
+  LruCache<IdType, std::shared_ptr<arrow::Table>> chunk_cache_{4};
   util::FilterOptions filter_options_;
   std::shared_ptr<FileSystem> fs_;
 };
@@ -384,6 +386,8 @@ class AdjListArrowChunkReader {
   IdType vertex_chunk_index_, chunk_index_;
   IdType seek_offset_;
   std::shared_ptr<arrow::Table> chunk_table_;
+  LruCache<std::pair<IdType, IdType>, std::shared_ptr<arrow::Table>, PairHash>
+      chunk_cache_{4};
   IdType vertex_chunk_num_, chunk_num_;
   std::string base_dir_;
   std::shared_ptr<FileSystem> fs_;
@@ -467,6 +471,7 @@ class AdjListOffsetArrowChunkReader {
   IdType chunk_index_;
   IdType seek_id_;
   std::shared_ptr<arrow::Table> chunk_table_;
+  LruCache<IdType, std::shared_ptr<arrow::Table>> chunk_cache_{4};
   IdType vertex_chunk_num_;
   IdType vertex_chunk_size_;
   std::string base_dir_;
@@ -633,6 +638,8 @@ class AdjListPropertyArrowChunkReader {
   IdType seek_offset_;
   std::shared_ptr<arrow::Schema> schema_;
   std::shared_ptr<arrow::Table> chunk_table_;
+  LruCache<std::pair<IdType, IdType>, std::shared_ptr<arrow::Table>, PairHash>
+      chunk_cache_{4};
   util::FilterOptions filter_options_;
   IdType vertex_chunk_num_, chunk_num_;
   std::string base_dir_;
