@@ -93,7 +93,8 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
       auto vertices = std::make_shared<VerticesCollection>(
           vertex_info, graph_info->GetPrefix());
 
-      auto maybe_filtered_ids = vertices->filter({labels[0]}, nullptr);
+      auto maybe_filtered_ids =
+          vertices->filter(std::vector<std::string>{labels[0]}, nullptr);
       REQUIRE(maybe_filtered_ids.status().ok());
       auto filtered_ids = maybe_filtered_ids.value();
 
