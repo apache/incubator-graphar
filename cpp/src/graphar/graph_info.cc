@@ -324,7 +324,7 @@ Result<std::string> VertexInfo::GetVerticesNumFilePath() const {
 }
 
 size_t VertexInfo::PropertyGroupNum() const {
-  return static_cast<size_t>(impl_->property_groups_.size());
+  return size_t(impl_->property_groups_.size());
 }
 
 std::shared_ptr<PropertyGroup> VertexInfo::GetPropertyGroup(
@@ -335,7 +335,7 @@ std::shared_ptr<PropertyGroup> VertexInfo::GetPropertyGroup(
 
 std::shared_ptr<PropertyGroup> VertexInfo::GetPropertyGroupByIndex(
     size_t index) const {
-  if (index >= static_cast<size_t>(impl_->property_groups_.size())) {
+  if (index >= size_t(impl_->property_groups_.size())) {
     return nullptr;
   }
   return impl_->property_groups_[index];
@@ -743,7 +743,7 @@ std::shared_ptr<AdjacentList> EdgeInfo::GetAdjacentList(
 }
 
 size_t EdgeInfo::PropertyGroupNum() const {
-  return static_cast<size_t>(impl_->property_groups_.size());
+  return size_t(impl_->property_groups_.size());
 }
 
 const PropertyGroupVector& EdgeInfo::GetPropertyGroups() const {
@@ -753,12 +753,12 @@ const PropertyGroupVector& EdgeInfo::GetPropertyGroups() const {
 std::shared_ptr<PropertyGroup> EdgeInfo::GetPropertyGroup(
     const std::string& property_name) const {
   auto i = LookupKeyIndex(impl_->property_name_to_index_, property_name);
-  return !i.has_value() ? nullptr : impl_->property_groups_[i.value()];
+  return i.has_value() ? impl_->property_groups_[i.value()] : nullptr;
 }
 
 std::shared_ptr<PropertyGroup> EdgeInfo::GetPropertyGroupByIndex(
     size_t index) const {
-  if (index >= static_cast<size_t>(impl_->property_groups_.size())) {
+  if (index >= size_t(impl_->property_groups_.size())) {
     return nullptr;
   }
   return impl_->property_groups_[index];
@@ -887,21 +887,16 @@ Result<std::shared_ptr<EdgeInfo>> EdgeInfo::RemoveAdjacentList(
   if (adj_list == nullptr) {
     return Status::Invalid("adj list is nullptr");
   }
-  std::optional<size_t> idx = std::nullopt;
   for (size_t i = 0; i < impl_->adjacent_lists_.size(); i++) {
     if (impl_->adjacent_lists_[i]->GetType() == adj_list->GetType()) {
-      idx = i;
-      break;
+      return std::make_shared<EdgeInfo>(
+          impl_->src_type_, impl_->edge_type_, impl_->dst_type_,
+          impl_->chunk_size_, impl_->src_chunk_size_, impl_->dst_chunk_size_,
+          impl_->directed_, RemoveVectorElement(impl_->adjacent_lists_, i),
+          impl_->property_groups_, impl_->prefix_, impl_->version_);
     }
   }
-  if (idx == std::nullopt) {
-    return Status::Invalid("adj list not found");
-  }
-  return std::make_shared<EdgeInfo>(
-      impl_->src_type_, impl_->edge_type_, impl_->dst_type_, impl_->chunk_size_,
-      impl_->src_chunk_size_, impl_->dst_chunk_size_, impl_->directed_,
-      RemoveVectorElement(impl_->adjacent_lists_, idx.value()),
-      impl_->property_groups_, impl_->prefix_, impl_->version_);
+  return Status::Invalid("adj list not found");
 }
 
 Result<std::shared_ptr<EdgeInfo>> EdgeInfo::AddPropertyGroup(
