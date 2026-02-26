@@ -58,21 +58,21 @@ class Edge {
    *
    * @return true/false.
    */
-  inline bool Empty() const noexcept { return empty_; }
+  bool Empty() const noexcept { return empty_; }
 
   /**
    * @brief Get source id of the edge.
    *
    * @return The id of the source vertex.
    */
-  inline IdType GetSource() const noexcept { return src_id_; }
+  IdType GetSource() const noexcept { return src_id_; }
 
   /**
    * @brief Get destination id of the edge.
    *
    * @return The id of the destination vertex.
    */
-  inline IdType GetDestination() const noexcept { return dst_id_; }
+  IdType GetDestination() const noexcept { return dst_id_; }
 
   /**
    * @brief Add a property to the edge.
@@ -81,7 +81,7 @@ class Edge {
    * @param val The value of the property.
    */
   // TODO(@acezen): Enable the property to be a vector(list).
-  inline void AddProperty(const std::string& name, const std::any& val) {
+  void AddProperty(const std::string& name, const std::any& val) {
     empty_ = false;
     properties_[name] = val;
   }
@@ -92,7 +92,7 @@ class Edge {
    * @param property The name of the property.
    * @return The value of the property.
    */
-  inline const std::any& GetProperty(const std::string& property) const {
+  const std::any& GetProperty(const std::string& property) const {
     return properties_.at(property);
   }
 
@@ -101,8 +101,7 @@ class Edge {
    *
    * @return The map containing all properties of the edge.
    */
-  inline const std::unordered_map<std::string, std::any>& GetProperties()
-      const {
+  const std::unordered_map<std::string, std::any>& GetProperties() const {
     return properties_;
   }
 
@@ -112,7 +111,7 @@ class Edge {
    * @param property The name of the property.
    * @return true/false.
    */
-  inline bool ContainProperty(const std::string& property) const {
+  bool ContainProperty(const std::string& property) const {
     return (properties_.find(property) != properties_.end());
   }
 
@@ -207,7 +206,7 @@ class EdgesBuilder {
    *
    * @param validate_level The validate level to set.
    */
-  inline void SetValidateLevel(const ValidateLevel& validate_level) {
+  void SetValidateLevel(const ValidateLevel& validate_level) {
     if (validate_level == ValidateLevel::default_validate) {
       return;
     }
@@ -220,7 +219,7 @@ class EdgesBuilder {
    * @return The writerOptions provides configuration options for different file
    * format writers.
    */
-  inline void SetWriterOptions(std::shared_ptr<WriterOptions> writer_options) {
+  void SetWriterOptions(std::shared_ptr<WriterOptions> writer_options) {
     this->writer_options_ = writer_options;
   }
   /**
@@ -229,7 +228,7 @@ class EdgesBuilder {
    * @param writerOptions The writerOptions provides configuration options for
    * different file format writers.
    */
-  inline std::shared_ptr<WriterOptions> GetWriterOptions() {
+  std::shared_ptr<WriterOptions> GetWriterOptions() {
     return this->writer_options_;
   }
 
@@ -238,12 +237,12 @@ class EdgesBuilder {
    *
    * @return The validate level of this writer.
    */
-  inline ValidateLevel GetValidateLevel() const { return validate_level_; }
+  ValidateLevel GetValidateLevel() const { return validate_level_; }
 
   /**
    * @brief Clear the edges in this EdgesBuilder.
    */
-  inline void Clear() {
+  void Clear() {
     edges_.clear();
     num_edges_ = 0;
     is_saved_ = false;
