@@ -41,9 +41,9 @@ macro(add_benchmark target)
                 "-framework Security"
                 "-framework Network")
         else()
-            target_link_libraries(${target} PRIVATE -Wl,-exclude-libs,ALL -Wl,-whole-archive ${GAR_ARROW_STATIC_LIB}
+            target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive ${GAR_ARROW_STATIC_LIB}
                 "${GAR_PARQUET_STATIC_LIB}"
-                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,-no-whole-archive)
+                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
         endif()
     endif()
 endmacro()

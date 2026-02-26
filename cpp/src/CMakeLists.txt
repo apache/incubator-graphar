@@ -83,7 +83,7 @@ if(BUILD_ARROW_FROM_SOURCE)
     elseif(MSVC)
         target_link_libraries(graphar PRIVATE graphar_bundled_dependencies)
     else()
-        target_link_libraries(graphar PRIVATE -Wl,-exclude-libs,ALL
+        target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL
                 graphar_bundled_dependencies)
     endif()
 
@@ -123,16 +123,16 @@ else()
         endif()
     else()
         if(USE_STATIC_ARROW)
-            target_link_libraries(graphar PRIVATE -Wl,-exclude-libs,ALL -Wl,-whole-archive
+            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
                 Arrow::arrow_static
                 Parquet::parquet_static
                 ArrowDataset::arrow_dataset_static
-                ArrowAcero::arrow_acero_static -Wl,-no-whole-archive)
+                ArrowAcero::arrow_acero_static -Wl,--no-whole-archive)
         else()
-            target_link_libraries(graphar PRIVATE -Wl,-exclude-libs,ALL -Wl,-whole-archive Arrow::arrow_shared
+            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_shared
                 Parquet::parquet_shared
                 ArrowDataset::arrow_dataset_shared
-                ArrowAcero::arrow_acero_shared -Wl,-no-whole-archive)
+                ArrowAcero::arrow_acero_shared -Wl,--no-whole-archive)
         endif()
     endif()
 endif()

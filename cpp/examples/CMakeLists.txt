@@ -41,9 +41,9 @@ foreach(f ${EXAMPLE_FILES})
                 "-framework Security"
                 "-framework Network")
         else()
-            target_link_libraries(${E_NAME} PRIVATE -Wl,-exclude-libs,ALL -Wl,-whole-archive ${GAR_ARROW_STATIC_LIB}
+            target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive ${GAR_ARROW_STATIC_LIB}
                 "${GAR_PARQUET_STATIC_LIB}"
-                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,-no-whole-archive)
+                "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
         endif()
     else()
         if(APPLE)
@@ -57,9 +57,9 @@ foreach(f ${EXAMPLE_FILES})
             endif()
         else()
             if(USE_STATIC_ARROW)
-                target_link_libraries(${E_NAME} PRIVATE -Wl,-exclude-libs,ALL -Wl,-whole-archive 
+                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive 
                     Arrow::arrow_static 
-                    Parquet::parquet_static -Wl,-no-whole-archive)
+                    Parquet::parquet_static -Wl,--no-whole-archive)
             else()
                 target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
                     Parquet::parquet_shared)
