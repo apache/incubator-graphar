@@ -25,8 +25,8 @@
 
 namespace graphar {
 
-TEST_CASE("LruCache basic operations") {
-  LruCache<int, std::string> cache(3);
+TEST_CASE("LRUCache basic operations") {
+  LRUCache<int, std::string> cache(3);
 
   SECTION("Empty cache returns nullptr") {
     REQUIRE(cache.Get(1) == nullptr);
@@ -85,9 +85,9 @@ TEST_CASE("LruCache basic operations") {
   }
 }
 
-TEST_CASE("LruCache eviction") {
+TEST_CASE("LRUCache eviction") {
   SECTION("Evict when exceeding capacity") {
-    LruCache<int, std::string> cache(2);
+    LRUCache<int, std::string> cache(2);
 
     cache.Put(1, "one");
     cache.Put(2, "two");
@@ -100,7 +100,7 @@ TEST_CASE("LruCache eviction") {
   }
 
   SECTION("Evict least recently used") {
-    LruCache<int, std::string> cache(3);
+    LRUCache<int, std::string> cache(3);
 
     cache.Put(1, "one");
     cache.Put(2, "two");
@@ -117,8 +117,8 @@ TEST_CASE("LruCache eviction") {
   }
 }
 
-TEST_CASE("LruCache Clear") {
-  LruCache<int, std::string> cache(3);
+TEST_CASE("LRUCache Clear") {
+  LRUCache<int, std::string> cache(3);
 
   cache.Put(1, "one");
   cache.Put(2, "two");
@@ -129,8 +129,8 @@ TEST_CASE("LruCache Clear") {
   REQUIRE(cache.Size() == 0);
 }
 
-TEST_CASE("LruCache with string keys") {
-  LruCache<std::string, int> cache(2);
+TEST_CASE("LRUCache with string keys") {
+  LRUCache<std::string, int> cache(2);
 
   cache.Put("one", 1);
   cache.Put("two", 2);
@@ -144,8 +144,8 @@ TEST_CASE("LruCache with string keys") {
   REQUIRE(*v2 == 2);
 }
 
-TEST_CASE("LruCache with PairHash") {
-  LruCache<std::pair<int, int>, std::string, PairHash> cache(2);
+TEST_CASE("LRUCache with PairHash") {
+  LRUCache<std::pair<int, int>, std::string, PairHash> cache(2);
 
   cache.Put({1, 2}, "value1");
   cache.Put({3, 4}, "value2");
@@ -161,8 +161,8 @@ TEST_CASE("LruCache with PairHash") {
   REQUIRE(cache.Get({5, 6}) == nullptr);
 }
 
-TEST_CASE("LruCache move semantics") {
-  LruCache<int, std::string> cache(2);
+TEST_CASE("LRUCache move semantics") {
+  LRUCache<int, std::string> cache(2);
 
   std::string value = "test_value";
   cache.Put(1, std::move(value));
@@ -172,8 +172,8 @@ TEST_CASE("LruCache move semantics") {
   REQUIRE(*cached == "test_value");
 }
 
-TEST_CASE("LruCache zero capacity edge case") {
-  LruCache<int, std::string> cache(0);
+TEST_CASE("LRUCache zero capacity edge case") {
+  LRUCache<int, std::string> cache(0);
 
   cache.Put(1, "one");
 

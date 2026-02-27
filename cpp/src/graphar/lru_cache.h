@@ -27,16 +27,15 @@
 namespace graphar {
 
 template <typename Key, typename Value, typename Hash = std::hash<Key>>
-class LruCache {
+class LRUCache {
  public:
-  explicit LruCache(size_t capacity) : capacity_(capacity) {}
+  explicit LRUCache(size_t capacity) : capacity_(capacity) {}
 
   Value* Get(const Key& key) {
     auto it = map_.find(key);
     if (it == map_.end()) {
       return nullptr;
     }
-    // Move accessed item to front (most recently used)
     items_.splice(items_.begin(), items_, it->second);
     return &it->second->second;
   }
@@ -44,12 +43,13 @@ class LruCache {
   void Put(const Key& key, Value value) {
     auto it = map_.find(key);
     if (it != map_.end()) {
-      // Update existing entry and move to front
       it->second->second = std::move(value);
       items_.splice(items_.begin(), items_, it->second);
       return;
     }
-    // Evict least recently used if at capacity
+    if (capacity_ == 0) {
+      return;
+    }
     if (map_.size() >= capacity_) {
       auto& back = items_.back();
       map_.erase(back.first);
