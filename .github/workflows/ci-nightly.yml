@@ -36,12 +36,12 @@ jobs:
           submodules: true
 
     - name: Cache for ccache
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.ccache
-        key: ${{ matrix.os }}-build-ccache-${{ hashFiles('**/git-modules.txt') }}
+        key: ${{ runner.os }}-nightly-ccache-${{ github.sha }}
         restore-keys: |
-          ${{ matrix.os }}-build-ccache-
+          ${{ runner.os }}-nightly-ccache-
 
     - name: Install dependencies
       run: |
