@@ -686,12 +686,10 @@ if (BUILD_BENCHMARKS)
             if (BUILD_ARROW_FROM_SOURCE)
                 target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar ${CMAKE_DL_LIBS})
                 link_arrow_libraries(${target})
-                # Enable linker optimizations for faster linking on macOS
                 set_target_properties(${target} PROPERTIES
                     LINK_FLAGS "-Wl,-dead_strip -Wl")
             else()
-                target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar Arrow::arrow_shared Parquet::parquet_shared ${CMAKE_DL_LIBS})
-                # Enable linker optimizations for faster linking on macOS
+                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load Arrow::arrow_static Parquet::parquet_static)
                 set_target_properties(${target} PROPERTIES
                     LINK_FLAGS "-Wl,-dead_strip -Wl")
             endif()
