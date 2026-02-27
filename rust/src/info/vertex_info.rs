@@ -122,7 +122,6 @@ impl VertexInfo {
 
     /// Return the number of property groups.
     ///
-    /// TODO: upstream C++ uses `int` for this return type; prefer fixed-width.
     pub fn property_group_num(&self) -> usize {
         self.0.PropertyGroupNum()
     }
@@ -170,7 +169,6 @@ impl VertexInfo {
     /// If you only need a borrowed reference and want bounds checking, prefer
     /// [`VertexInfo::property_groups_cxx`] and `cxx::CxxVector::get`, or
     /// [`VertexInfo::property_groups_iter`] with `nth`.
-    /// TODO: upstream C++ uses `int` for this parameter; prefer fixed-width.
     ///
     /// Returns `None` if the index is out of range.
     pub fn property_group_by_index(&self, index: usize) -> Option<PropertyGroup> {
