@@ -51,7 +51,7 @@ option(GRAPHAR_BUILD_STATIC "Build GraphAr as static libraries" OFF)
 option(BUILD_ARROW_FROM_SOURCE "Build Arrow from source" OFF)
 option(GRAPHAR_ENABLE_SANITIZER "Enable address sanitizer (Debug builds only)" ON)
 option(GRAPHAR_ENABLE_COVERAGE "Enable coverage instrumentation (Debug builds only)" OFF)
-option(GRAPHAR_USE_CCACHE "Use ccache for faster compilation" ON)
+option(GRAPHAR_ENABLE_CCACHE "Enable ccache for faster compilation" ON)
 
 if (USE_STATIC_ARROW)
     set(GRAPHAR_BUILD_STATIC ON)
@@ -90,7 +90,7 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
                "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif ()
 
-if (GRAPHAR_USE_CCACHE)
+if (GRAPHAR_ENABLE_CCACHE)
     if(NOT (CMAKE_CXX_COMPILER_LAUNCHER MATCHES "ccache") AND NOT (CMAKE_C_COMPILER_LAUNCHER MATCHES "ccache"))
         find_program(ccache_EXECUTABLE ccache)
         if(ccache_EXECUTABLE)
@@ -108,9 +108,9 @@ if (GRAPHAR_USE_CCACHE)
         endif(ccache_EXECUTABLE)
     endif()
 else()
-    message(STATUS "[graphar] ccache disabled by GRAPHAR_USE_CCACHE=OFF")
+    message(STATUS "[graphar] ccache disabled by GRAPHAR_ENABLE_CCACHE=OFF")
     add_custom_target(graphar-ccache-stats
-        COMMAND echo "ccache disabled by GRAPHAR_USE_CCACHE=OFF."
+        COMMAND echo "ccache disabled by GRAPHAR_ENABLE_CCACHE=OFF."
     )
 endif()
 
