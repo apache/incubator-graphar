@@ -35,12 +35,13 @@ jobs:
       with:
           submodules: true
 
-    - name: Cache for ccache
+    - name: Cache ccache
       uses: actions/cache@v4
       with:
         path: ~/.ccache
-        key: ${{ runner.os }}-nightly-ccache-${{ github.sha }}
+        key: ${{ runner.os }}-nightly-ccache-${{ github.head_ref || github.ref_name }}-${{ github.run_id }}
         restore-keys: |
+          ${{ runner.os }}-nightly-ccache-${{ github.head_ref || github.ref_name }}-
           ${{ runner.os }}-nightly-ccache-
 
     - name: Install dependencies

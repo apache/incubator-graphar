@@ -54,8 +54,9 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/.ccache
-        key: ${{ runner.os }}-ccache-${{ github.sha }}
+        key: ${{ runner.os }}-ccache-${{ github.head_ref || github.ref_name }}-${{ github.run_id }}
         restore-keys: |
+          ${{ runner.os }}-ccache-${{ github.head_ref || github.ref_name }}-
           ${{ runner.os }}-ccache-
 
     - name: Install dependencies
@@ -209,8 +210,9 @@ jobs:
       uses: actions/cache@v4
       with:
         path: ~/Library/Caches/ccache
-        key: ${{ runner.os }}-ccache-${{ github.sha }}
+        key: ${{ runner.os }}-ccache-${{ github.head_ref || github.ref_name }}-${{ github.run_id }}
         restore-keys: |
+          ${{ runner.os }}-ccache-${{ github.head_ref || github.ref_name }}-
           ${{ runner.os }}-ccache-
 
     - name: Install dependencies
