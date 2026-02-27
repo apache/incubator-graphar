@@ -51,7 +51,6 @@ option(GRAPHAR_BUILD_STATIC "Build GraphAr as static libraries" OFF)
 option(BUILD_ARROW_FROM_SOURCE "Build Arrow from source" OFF)
 option(GRAPHAR_ENABLE_SANITIZER "Enable address sanitizer (Debug builds only)" ON)
 option(GRAPHAR_ENABLE_COVERAGE "Enable coverage instrumentation (Debug builds only)" OFF)
-option(GRAPHAR_ENABLE_CCACHE "Enable ccache for faster compilation" ON)
 
 if (USE_STATIC_ARROW)
     set(GRAPHAR_BUILD_STATIC ON)
@@ -90,28 +89,19 @@ if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
                "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif ()
 
-if (GRAPHAR_ENABLE_CCACHE)
-    if(NOT (CMAKE_CXX_COMPILER_LAUNCHER MATCHES "ccache") AND NOT (CMAKE_C_COMPILER_LAUNCHER MATCHES "ccache"))
-        find_program(ccache_EXECUTABLE ccache)
-        if(ccache_EXECUTABLE)
-            set(CMAKE_C_COMPILER_LAUNCHER ${ccache_EXECUTABLE})
-            set(CMAKE_CXX_COMPILER_LAUNCHER ${ccache_EXECUTABLE})
-            message(STATUS "[graphar] ccache enabled: ${ccache_EXECUTABLE}")
-            add_custom_target(graphar-ccache-stats
-                COMMAND ${ccache_EXECUTABLE} --show-stats
-            )
-        else()
-            message(STATUS "[graphar] ccache not found, disabling ccache")
-            add_custom_target(graphar-ccache-stats
-                COMMAND echo "ccache not found."
-            )
-        endif(ccache_EXECUTABLE)
-    endif()
-else()
-    message(STATUS "[graphar] ccache disabled by GRAPHAR_ENABLE_CCACHE=OFF")
-    add_custom_target(graphar-ccache-stats
-        COMMAND echo "ccache disabled by GRAPHAR_ENABLE_CCACHE=OFF."
-    )
+if(NOT (CMAKE_CXX_COMPILER_LAUNCHER MATCHES "ccache") AND NOT (CMAKE_C_COMPILER_LAUNCHER MATCHES "ccache"))
+    find_program(ccache_EXECUTABLE ccache)
+    if(ccache_EXECUTABLE)
+        set(CMAKE_C_COMPILER_LAUNCHER ${ccache_EXECUTABLE})
+        set(CMAKE_CXX_COMPILER_LAUNCHER ${ccache_EXECUTABLE})
+        add_custom_target(graphar-ccache-stats
+            COMMAND ${ccache_EXECUTABLE} --show-stats
+        )
+    else()
+        add_custom_target(graphar-ccache-stats
+            COMMAND echo "ccache not found."
+        )
+    endif(ccache_EXECUTABLE)
 endif()
 
 set(GAR_CXX_STANDARD 17)
@@ -525,11 +515,24 @@ if (BUILD_EXAMPLES)
         target_link_libraries(${E_NAME} PRIVATE graphar ${Boost_LIBRARIES} ${CMAKE_DL_LIBS})
         if (BUILD_ARROW_FROM_SOURCE)
             target_include_directories(${E_NAME} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+            if (APPLE)
+                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load ${GAR_ARROW_STATIC_LIB}
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
+                    protobuf::libprotobuf
+                    "-framework CoreFoundation"
+                    "-framework Security"
+                    "-framework Network")
+            else()
+                target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive ${GAR_ARROW_STATIC_LIB}
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive) 
+            endif()
         else()
             if(APPLE)
                 if(USE_STATIC_ARROW)
-                    target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load 
-                        Arrow::arrow_static 
+                    target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load
+                        Arrow::arrow_static
                         Parquet::parquet_static)
                 else()
                     target_link_libraries(${E_NAME} PRIVATE Arrow::arrow_shared
@@ -664,21 +667,20 @@ if (BUILD_BENCHMARKS)
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
         if(APPLE)
             target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar Arrow::arrow_shared Parquet::parquet_shared ${CMAKE_DL_LIBS})
-            set_target_properties(${target} PROPERTIES
-                LINK_FLAGS "-Wl,-dead_strip")
-            if (BUILD_ARROW_FROM_SOURCE)
+        else()
+            target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar parquet arrow ${CMAKE_DL_LIBS})
+        endif()
+        if (BUILD_ARROW_FROM_SOURCE)
+            target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+            if (APPLE)
                 target_link_libraries(${target} PRIVATE -Wl,-force_load ${GAR_ARROW_STATIC_LIB}
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
                     protobuf::libprotobuf
                     "-framework CoreFoundation"
                     "-framework Security"
-                    "-framework SystemConfiguration"
                     "-framework Network")
-            endif()
-        else()
-            target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar parquet arrow ${CMAKE_DL_LIBS})
-            if (BUILD_ARROW_FROM_SOURCE)
+            else()
                 target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive ${GAR_ARROW_STATIC_LIB}
                     "${GAR_PARQUET_STATIC_LIB}"
                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
