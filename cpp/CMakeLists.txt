@@ -688,23 +688,9 @@ if (BUILD_BENCHMARKS)
                 target_include_directories(${target} SYSTEM PRIVATE ${BENCHMARK_INCLUDE_DIR})
             endif()
         endif()
-        if(NOT BUILD_ARROW_FROM_SOURCE)
-            target_link_libraries(${target} PRIVATE
-                benchmark::benchmark_main
-                graphar
-                Arrow::arrow_static
-                Parquet::parquet_static
-                ArrowDataset::arrow_dataset_static
-                ArrowAcero::arrow_acero_static)
-        else()
-            target_link_libraries(${target} PRIVATE
-                benchmark::benchmark_main
-                graphar
-                Arrow::arrow_shared
-                Parquet::parquet_shared
-                ArrowDataset::arrow_dataset_shared
-                ArrowAcero::arrow_acero_shared)
-        endif()
+        target_link_libraries(${target} PRIVATE
+            benchmark::benchmark_main
+            graphar)
     endmacro()
     add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
     add_benchmark(label_filter_benchmark SRCS benchmarks/label_filter_benchmark.cc)
