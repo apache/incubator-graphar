@@ -103,7 +103,7 @@ jobs:
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             echo "| cpplint failures found! Run: "
             echo "|"
-            echo "|    make graphar-cpplint"
+            echo "|    ninja graphar-cpplint"
             echo "|"
             echo "| to fix this error."
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
