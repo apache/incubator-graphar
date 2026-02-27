@@ -255,14 +255,12 @@ pub(crate) mod graphar {
         fn version(&self) -> &SharedPtr<ConstInfoVersion>;
         fn GetLabels(&self) -> &CxxVector<CxxString>;
 
-        // TODO: upstream C++ uses `int` for this return type; prefer fixed-width.
-        fn PropertyGroupNum(&self) -> i32;
+        fn PropertyGroupNum(&self) -> usize;
 
         fn GetPropertyGroups(&self) -> &CxxVector<SharedPropertyGroup>;
         fn GetPropertyGroup(&self, property_name: &CxxString) -> SharedPtr<PropertyGroup>;
 
-        // TODO: upstream C++ uses `int` for this parameter; prefer fixed-width.
-        fn GetPropertyGroupByIndex(&self, index: i32) -> SharedPtr<PropertyGroup>;
+        fn GetPropertyGroupByIndex(&self, index: usize) -> SharedPtr<PropertyGroup>;
 
         #[namespace = "graphar_rs"]
         fn create_vertex_info(
@@ -323,10 +321,10 @@ pub(crate) mod graphar {
         fn HasAdjacentListType(&self, adj_list_type: AdjListType) -> bool;
         fn GetAdjacentList(&self, adj_list_type: AdjListType) -> SharedPtr<AdjacentList>;
 
-        fn PropertyGroupNum(&self) -> i32;
+        fn PropertyGroupNum(&self) -> usize;
         fn GetPropertyGroups(&self) -> &CxxVector<SharedPropertyGroup>;
         fn GetPropertyGroup(&self, property: &CxxString) -> SharedPtr<PropertyGroup>;
-        fn GetPropertyGroupByIndex(&self, index: i32) -> SharedPtr<PropertyGroup>;
+        fn GetPropertyGroupByIndex(&self, index: usize) -> SharedPtr<PropertyGroup>;
 
         #[namespace = "graphar_rs"]
         #[allow(clippy::too_many_arguments)]
