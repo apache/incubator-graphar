@@ -682,24 +682,28 @@ if (BUILD_BENCHMARKS)
         add_executable(${target} ${add_test_SRCS})
         target_compile_features(${target} PRIVATE cxx_std_${GAR_CXX_STANDARD})
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
-        if(APPLE)
-            if (BUILD_ARROW_FROM_SOURCE)
-                target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar ${CMAKE_DL_LIBS})
-                link_arrow_libraries(${target})
-                set_target_properties(${target} PROPERTIES
-                    LINK_FLAGS "-Wl,-dead_strip -Wl")
-            else()
-                target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load Arrow::arrow_static Parquet::parquet_static)
-                set_target_properties(${target} PROPERTIES
-                    LINK_FLAGS "-Wl,-dead_strip -Wl")
+        if(TARGET benchmark::benchmark)
+            get_target_property(BENCHMARK_INCLUDE_DIR benchmark::benchmark INTERFACE_INCLUDE_DIRECTORIES)
+            if(BENCHMARK_INCLUDE_DIR)
+                target_include_directories(${target} SYSTEM PRIVATE ${BENCHMARK_INCLUDE_DIR})
             endif()
+        endif()
+        if(NOT BUILD_ARROW_FROM_SOURCE)
+            target_link_libraries(${target} PRIVATE
+                benchmark::benchmark_main
+                graphar
+                Arrow::arrow_static
+                Parquet::parquet_static
+                ArrowDataset::arrow_dataset_static
+                ArrowAcero::arrow_acero_static)
         else()
-            if (BUILD_ARROW_FROM_SOURCE)
-                target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar ${CMAKE_DL_LIBS})
-                link_arrow_libraries(${target})
-            else()
-                target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar parquet arrow ${CMAKE_DL_LIBS})
-            endif()
+            target_link_libraries(${target} PRIVATE
+                benchmark::benchmark_main
+                graphar
+                Arrow::arrow_shared
+                Parquet::parquet_shared
+                ArrowDataset::arrow_dataset_shared
+                ArrowAcero::arrow_acero_shared)
         endif()
     endmacro()
     add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
