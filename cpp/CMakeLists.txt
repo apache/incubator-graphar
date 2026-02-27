@@ -104,11 +104,13 @@ if(NOT (CMAKE_CXX_COMPILER_LAUNCHER MATCHES "ccache") AND NOT (CMAKE_C_COMPILER_
     endif(ccache_EXECUTABLE)
 endif()
 
+set(GAR_CXX_STANDARD 17)
+
 if(MSVC)
     # Avoid GCC/Clang-specific flags on MSVC.
     # C++17 is already enforced via CMAKE_CXX_STANDARD/target features.
 else()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wall -Werror=unused-variable")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-empty-body")
 endif()
 
 if (APPLE)
@@ -147,7 +149,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(${PROJECT_NAME} INTERFACE)
-target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_17)
 target_include_directories(
     ${PROJECT_NAME}
     INTERFACE
@@ -190,7 +191,7 @@ endmacro()
 
 macro(install_graphar_target target)
   # install
-  install(TARGETS ${target}
+  install(TARGETS ${target} graphar_thirdparty
           EXPORT graphar-targets
           ARCHIVE DESTINATION lib
           LIBRARY DESTINATION lib
@@ -287,17 +288,32 @@ function(graphar_create_merged_static_lib output_target)
   add_dependencies(${output_target} ${output_target}_merge)
 endfunction()
 
+macro(build_graphar_thirdparty)
+    file(GLOB_RECURSE THIRDPARTY_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
+    add_library(graphar_thirdparty STATIC ${THIRDPARTY_SRC_FILES})
+    target_include_directories(graphar_thirdparty PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
+    target_compile_features(graphar_thirdparty PRIVATE cxx_std_17)
+    if(NOT MSVC)
+        target_compile_options(graphar_thirdparty PRIVATE -fPIC -w)
+    endif()
+endmacro()
+
 macro(build_graphar)
-    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
+    build_graphar_thirdparty()
+    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc")
     if(GRAPHAR_BUILD_STATIC)
         add_library(graphar STATIC ${CORE_SRC_FILES})
     else()
         add_library(graphar SHARED ${CORE_SRC_FILES})
     endif()
     install_graphar_target(graphar)
-    target_compile_features(graphar PRIVATE cxx_std_17)
+    target_compile_features(graphar PRIVATE cxx_std_${GAR_CXX_STANDARD})
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
-    target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
+    if(GRAPHAR_BUILD_STATIC)
+        target_link_libraries(graphar PUBLIC graphar_thirdparty ${CMAKE_DL_LIBS})
+    else()
+        target_link_libraries(graphar PRIVATE graphar_thirdparty ${CMAKE_DL_LIBS})
+    endif()
 
     if(APPLE)
         if(USE_STATIC_ARROW)
@@ -345,21 +361,27 @@ macro(build_graphar)
 endmacro()
 
 macro(build_graphar_with_arrow_bundled)
-    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc" ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
+    build_graphar_thirdparty()
+    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc")
     if(GRAPHAR_BUILD_STATIC)
         add_library(graphar STATIC ${CORE_SRC_FILES})
     else()
         add_library(graphar SHARED ${CORE_SRC_FILES})
     endif()
     install_graphar_target(graphar)
-    target_compile_features(graphar PRIVATE cxx_std_17)
+    target_compile_features(graphar PRIVATE cxx_std_${GAR_CXX_STANDARD})
     target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
     target_include_directories(graphar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
-    target_link_libraries(graphar PRIVATE ${CMAKE_DL_LIBS})
+    if(GRAPHAR_BUILD_STATIC)
+        target_link_libraries(graphar PUBLIC graphar_thirdparty ${CMAKE_DL_LIBS})
+    else()
+        target_link_libraries(graphar PRIVATE graphar_thirdparty ${CMAKE_DL_LIBS})
+    endif()
 
     set(GAR_BUNDLED_DEPS_STATIC_LIBS)
     list(APPEND GAR_BUNDLED_DEPS_STATIC_LIBS
         gar_arrow_static
+        gar_arrow_compute_static
         gar_parquet_static
         gar_dataset_static
         gar_acero_static
@@ -384,10 +406,13 @@ macro(build_graphar_with_arrow_bundled)
     list(INSERT ARROW_STATIC_INSTALL_INTERFACE_LIBS 0 "graphar_bundled_dependencies")
 
     if(APPLE)
+        find_package(Protobuf REQUIRED)
         target_link_libraries(graphar PRIVATE -Wl,-force_load
                 graphar_bundled_dependencies
+                protobuf::libprotobuf
                 "-framework CoreFoundation"
-                "-framework Security")
+                "-framework Security"
+                "-framework Network")
     elseif(MSVC)
         # MSVC doesn't support GNU ld-style -Wl flags.
         target_link_libraries(graphar PRIVATE graphar_bundled_dependencies)
@@ -424,6 +449,10 @@ if (BUILD_ARROW_FROM_SOURCE)
     find_package(CURL REQUIRED)
 
     include(apache-arrow)
+
+    if (ARROW_VERSION_TO_BUILD VERSION_GREATER_EQUAL "23.0.0")
+        set(GAR_CXX_STANDARD 20)
+    endif()
     build_arrow()
     add_definitions(-DARROW_ORC) # Add macro, otherwise inconsistent in build phase with not from source.
     build_graphar_with_arrow_bundled()
@@ -456,11 +485,19 @@ else()
         message(FATAL_ERROR "parquet is required, please install it and retry")
     endif()
 
+    # Update C++ standard based on detected system Arrow version
+    if (${Arrow_VERSION} VERSION_GREATER_EQUAL "23.0.0")
+        set(GAR_CXX_STANDARD 20)
+        message(STATUS "Arrow ${Arrow_VERSION} detected")
+    endif()
+
     build_graphar()
 endif()
 
+message(STATUS "[graphar] using C++ standard: ${GAR_CXX_STANDARD}")
+
 # ------------------------------------------------------------------------------
-# build example
+# build examples
 # ------------------------------------------------------------------------------
 if (BUILD_EXAMPLES)
     find_package(Boost REQUIRED COMPONENTS graph)
@@ -481,7 +518,11 @@ if (BUILD_EXAMPLES)
             if (APPLE)
                 target_link_libraries(${E_NAME} PRIVATE -Wl,-force_load ${GAR_ARROW_STATIC_LIB}
                     "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
+                    protobuf::libprotobuf
+                    "-framework CoreFoundation"
+                    "-framework Security"
+                    "-framework Network")
             else()
                 target_link_libraries(${E_NAME} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive ${GAR_ARROW_STATIC_LIB}
                     "${GAR_PARQUET_STATIC_LIB}"
@@ -556,7 +597,7 @@ if (BUILD_TESTS)
         set(multiValueArgs SRCS)
         cmake_parse_arguments(add_test "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
         add_executable(${target} ${add_test_SRCS})
-        target_compile_features(${target} PRIVATE cxx_std_17)
+        target_compile_features(${target} PRIVATE cxx_std_${GAR_CXX_STANDARD})
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
         target_link_libraries(${target} PRIVATE Catch2::Catch2WithMain graphar ${CMAKE_DL_LIBS})
         if (BUILD_ARROW_FROM_SOURCE)
@@ -564,7 +605,11 @@ if (BUILD_TESTS)
             if (APPLE)
                 target_link_libraries(${target} PRIVATE -Wl,-force_load gar_arrow_static
                     "${GAR_PARQUET_STATIC_LIB}"
-                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}")
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
+                    protobuf::libprotobuf
+                    "-framework CoreFoundation"
+                    "-framework Security"
+                    "-framework Network")
             else()
                 target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive gar_arrow_static
                     "${GAR_PARQUET_STATIC_LIB}"
@@ -618,9 +663,29 @@ if (BUILD_BENCHMARKS)
         set(multiValueArgs SRCS)
         cmake_parse_arguments(add_test "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
         add_executable(${target} ${add_test_SRCS})
-        target_compile_features(${target} PRIVATE cxx_std_17)
+        target_compile_features(${target} PRIVATE cxx_std_${GAR_CXX_STANDARD})
         target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
-        target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar ${CMAKE_DL_LIBS})
+        if(APPLE)
+            target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar Arrow::arrow_shared Parquet::parquet_shared ${CMAKE_DL_LIBS})
+        else()
+            target_link_libraries(${target} PRIVATE benchmark::benchmark_main graphar parquet arrow ${CMAKE_DL_LIBS})
+        endif()
+        if (BUILD_ARROW_FROM_SOURCE)
+            target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+            if (APPLE)
+                target_link_libraries(${target} PRIVATE -Wl,-force_load ${GAR_ARROW_STATIC_LIB}
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
+                    protobuf::libprotobuf
+                    "-framework CoreFoundation"
+                    "-framework Security"
+                    "-framework Network")
+            else()
+                target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive ${GAR_ARROW_STATIC_LIB}
+                    "${GAR_PARQUET_STATIC_LIB}"
+                    "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}" -Wl,--no-whole-archive)
+            endif()
+        endif()
     endmacro()
     add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
     add_benchmark(label_filter_benchmark SRCS benchmarks/label_filter_benchmark.cc)

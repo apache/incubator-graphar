@@ -21,6 +21,7 @@
 
 #include <sstream>
 #include <string>
+#include <type_traits>
 #include <utility>
 
 #include "graphar/macros.h"
@@ -64,7 +65,12 @@
 namespace graphar::util {
 template <typename Head>
 void StringBuilderRecursive(std::ostringstream& stream, Head&& head) {
-  stream << head;
+  using Decayed = std::decay_t<Head>;
+  if constexpr (std::is_enum_v<Decayed>) {
+    stream << static_cast<std::underlying_type_t<Decayed>>(head);
+  } else {
+    stream << std::forward<Head>(head);
+  }
 }
 
 template <typename Head, typename... Tail>
@@ -141,12 +147,12 @@ class Status {
     state_->msg = std::move(msg);
   }
   /** Copy the specified status. */
-  inline Status(const Status& s)
+  Status(const Status& s)
       : state_((s.state_ == nullptr) ? nullptr : new State(*s.state_)) {}
   /**  Move the specified status. */
-  inline Status(Status&& s) noexcept : state_(s.state_) { s.state_ = nullptr; }
+  Status(Status&& s) noexcept : state_(s.state_) { s.state_ = nullptr; }
   /** Move assignment operator. */
-  inline Status& operator=(Status&& s) noexcept {
+  Status& operator=(Status&& s) noexcept {
     delete state_;
     state_ = s.state_;
     s.state_ = nullptr;
@@ -154,12 +160,11 @@ class Status {
   }
 
   /** Returns a success status. */
-  inline static Status OK() { return {}; }
+  static Status OK() { return {}; }
 
   template <typename... Args>
   static Status FromArgs(StatusCode code, Args... args) {
-    return Status(code,
-                  std::move(util::StringBuilder(std::forward<Args>(args)...)));
+    return Status(code, util::StringBuilder(std::forward<Args>(args)...));
   }
 
   /** Returns an error status when some IO-related operation failed. */

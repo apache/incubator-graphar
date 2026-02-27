@@ -62,7 +62,7 @@ class Vertex {
    *
    * @return The id of the vertex.
    */
-  inline IdType id() const noexcept { return id_; }
+  IdType id() const noexcept { return id_; }
 
   /**
    * @brief Get the property value of the vertex.
@@ -86,7 +86,7 @@ class Vertex {
    * @param property The property name.
    * @return True if value at the property is valid, False otherwise.
    */
-  inline bool IsValid(const std::string& property) const {
+  bool IsValid(const std::string& property) const {
     if (properties_.find(property) != properties_.end()) {
       return properties_.at(property).has_value();
     }
@@ -123,14 +123,14 @@ class Edge {
    *
    * @return The id of the source vertex.
    */
-  inline IdType source() const noexcept { return src_id_; }
+  IdType source() const noexcept { return src_id_; }
 
   /**
    * @brief Get destination id of the edge.
    *
    * @return The id of the destination vertex.
    */
-  inline IdType destination() const noexcept { return dst_id_; }
+  IdType destination() const noexcept { return dst_id_; }
 
   /**
    * @brief Get the property value of the edge.
@@ -147,7 +147,7 @@ class Edge {
    * @param property The property name.
    * @return True if value at the property is valid, False otherwise.
    */
-  inline bool IsValid(const std::string& property) const {
+  bool IsValid(const std::string& property) const {
     if (properties_.find(property) != properties_.end()) {
       return properties_.at(property).has_value();
     }

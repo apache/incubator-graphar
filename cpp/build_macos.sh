@@ -15,19 +15,13 @@
 # specific language governing permissions and limitations
 # under the License.
 
-BasedOnStyle: Google
-DerivePointerAlignment: false
-PointerAlignment: Left
-Cpp11BracedListStyle: true
-IndentCaseLabels: false
-AllowShortBlocksOnASingleLine: true
-AllowShortLoopsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: false
-Standard: 'Cpp11'
-SpaceAfterCStyleCast: true
-AlignAfterOpenBracket: Align
-SortIncludes: true
-IncludeBlocks: Preserve
-ForEachMacros:
-  - BOOST_FOREACH
+# Change this line to your arrow and parquet include path if needed
+export CPATH="/opt/homebrew/include:$CPATH"
 
+cmake -S . -B build_macos \
+    -DBUILD_BENCHMARKS=ON \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DBUILD_TESTS=ON \
+    -DBUILD_EXAMPLES=ON
+
+cmake --build build_macos -j8 2>&1 | tee build_macos.log

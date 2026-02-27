@@ -20,6 +20,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -89,13 +90,13 @@ class PropertyGroup {
    *
    * @return The file type of group.
    */
-  inline FileType GetFileType() const { return file_type_; }
+  FileType GetFileType() const { return file_type_; }
 
   /** Get the prefix of property group chunk file.
    *
    * @return The path prefix of group.
    */
-  inline const std::string& GetPrefix() const { return prefix_; }
+  const std::string& GetPrefix() const { return prefix_; }
 
   /**
    * Check if the property group is validated.
@@ -143,21 +144,21 @@ class AdjacentList {
    *
    * @return The type of adjacent list
    */
-  inline AdjListType GetType() const { return type_; }
+  AdjListType GetType() const { return type_; }
 
   /**
    * @brief Get the file type of adjacent list
    *
    * @return The file type of adjacent list
    */
-  inline FileType GetFileType() const { return file_type_; }
+  FileType GetFileType() const { return file_type_; }
 
   /**
    * @brief Get the prefix of adjacent list
    *
    * @return The path prefix of adjacent list
    */
-  inline const std::string& GetPrefix() const { return prefix_; }
+  const std::string& GetPrefix() const { return prefix_; }
 
   /**
    * Returns whether the adjacent list is validated.
@@ -256,7 +257,7 @@ class VertexInfo {
    *
    * @return The number of property groups of the vertex.
    */
-  int PropertyGroupNum() const;
+  size_t PropertyGroupNum() const;
 
   /**
    * Get the property groups of the vertex.
@@ -278,7 +279,7 @@ class VertexInfo {
    * @param index The index of the property group.
    * @return property group may be nullptr if the index is out of range.
    */
-  std::shared_ptr<PropertyGroup> GetPropertyGroupByIndex(int index) const;
+  std::shared_ptr<PropertyGroup> GetPropertyGroupByIndex(size_t index) const;
 
   /**
    * Get the data type of the specified property.
@@ -555,7 +556,7 @@ class EdgeInfo {
   /**
    * @brief Get the number of property groups.
    */
-  int PropertyGroupNum() const;
+  size_t PropertyGroupNum() const;
 
   /**
    * @brief Get the property groups.
@@ -578,7 +579,7 @@ class EdgeInfo {
    * @param index The index of the property group.
    * @return Property group may be nullptr if the index is out of range.
    */
-  std::shared_ptr<PropertyGroup> GetPropertyGroupByIndex(int index) const;
+  std::shared_ptr<PropertyGroup> GetPropertyGroupByIndex(size_t index) const;
 
   /**
    * @brief Get the file path for the number of vertices.
@@ -869,25 +870,25 @@ class GraphInfo {
   /**
    * @brief Get the vertex info index with the given type.
    */
-  int GetVertexInfoIndex(const std::string& type) const;
+  std::optional<size_t> GetVertexInfoIndex(const std::string& type) const;
 
   /**
    * @brief Get the edge info index with the given source vertex type, edge
    * type, and destination type.
    */
-  int GetEdgeInfoIndex(const std::string& src_type,
-                       const std::string& edge_type,
-                       const std::string& dst_type) const;
+  std::optional<size_t> GetEdgeInfoIndex(const std::string& src_type,
+                                         const std::string& edge_type,
+                                         const std::string& dst_type) const;
 
   /**
    * @brief Get the number of vertex infos.
    */
-  int VertexInfoNum() const;
+  size_t VertexInfoNum() const;
 
   /**
    * @brief Get the number of edge infos.
    */
-  int EdgeInfoNum() const;
+  size_t EdgeInfoNum() const;
 
   /**
    * @brief Get the vertex info at the specified index.
@@ -895,7 +896,7 @@ class GraphInfo {
    * @param index The index of the vertex info.
    * @return vertex info may be nullptr if the index is out of range.
    */
-  const std::shared_ptr<VertexInfo> GetVertexInfoByIndex(int index) const;
+  const std::shared_ptr<VertexInfo> GetVertexInfoByIndex(size_t index) const;
 
   /**
    * @brief Get the edge info at the specified index.
@@ -903,7 +904,7 @@ class GraphInfo {
    * @param index The index of the edge info.
    * @return edge info may be nullptr if the index is out of range.
    */
-  const std::shared_ptr<EdgeInfo> GetEdgeInfoByIndex(int index) const;
+  const std::shared_ptr<EdgeInfo> GetEdgeInfoByIndex(size_t index) const;
 
   /**
    * @brief Get the vertex infos of graph info

@@ -138,8 +138,8 @@ class ExpressionBinaryOp : public Expression {
   ~ExpressionBinaryOp() = default;
 
  protected:
-  inline Status CheckNullArgs(std::shared_ptr<Expression> lhs,
-                              std::shared_ptr<Expression> rhs) noexcept {
+  Status CheckNullArgs(std::shared_ptr<Expression> lhs,
+                       std::shared_ptr<Expression> rhs) noexcept {
     if (lhs == nullptr || rhs == nullptr) {
       return Status::Invalid("Invalid expression: lhs or rhs is null");
     }

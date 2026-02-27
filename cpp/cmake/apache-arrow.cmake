@@ -64,6 +64,9 @@ function(build_arrow)
     set(GAR_DATASET_STATIC_LIB_FILENAME
 	    "${CMAKE_STATIC_LIBRARY_PREFIX}arrow_dataset${CMAKE_STATIC_LIBRARY_SUFFIX}")
     set(GAR_DATASET_STATIC_LIB "${GAR_ARROW_STATIC_LIBRARY_DIR}/${GAR_DATASET_STATIC_LIB_FILENAME}" CACHE INTERNAL "arrow dataset lib")
+    set(GAR_ARROW_COMPUTE_STATIC_LIB_FILENAME
+	    "${CMAKE_STATIC_LIBRARY_PREFIX}arrow_compute${CMAKE_STATIC_LIBRARY_SUFFIX}")
+    set(GAR_ARROW_COMPUTE_STATIC_LIB "${GAR_ARROW_STATIC_LIBRARY_DIR}/${GAR_ARROW_COMPUTE_STATIC_LIB_FILENAME}" CACHE INTERNAL "arrow compute lib")
     set(GAR_ARROW_BUNDLED_DEPS_STATIC_LIB_FILENAME
         "${CMAKE_STATIC_LIBRARY_PREFIX}arrow_bundled_dependencies${CMAKE_STATIC_LIBRARY_SUFFIX}")
     set(GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
@@ -104,17 +107,20 @@ function(build_arrow)
                              "-DARROW_S3=ON")
 
     set(GAR_ARROW_INCLUDE_DIR "${GAR_ARROW_PREFIX}/include" CACHE INTERNAL "arrow include directory")
-    set(GAR_ARROW_BUILD_BYPRODUCTS "${GAR_ARROW_STATIC_LIB}" "${GAR_PARQUET_STATIC_LIB}" "${GAR_DATASET_STATIC_LIB}")
+    set(GAR_ARROW_BUILD_BYPRODUCTS "${GAR_ARROW_STATIC_LIB}" "${GAR_PARQUET_STATIC_LIB}" "${GAR_DATASET_STATIC_LIB}" "${GAR_ARROW_COMPUTE_STATIC_LIB}")
 
     find_package(Threads)
     find_package(Arrow QUIET)
+    # Set Arrow version: from env var or default to 23.0.0
+    if(DEFINED ENV{GRAPHAR_ARROW_VERSION})
+        set(ARROW_VERSION_TO_BUILD "$ENV{GRAPHAR_ARROW_VERSION}" CACHE INTERNAL "arrow version")
+    else()
+        set(ARROW_VERSION_TO_BUILD "23.0.0" CACHE INTERNAL "arrow version")
+    endif()
+    
     if(DEFINED ENV{GAR_ARROW_SOURCE_URL})
         set(GAR_ARROW_SOURCE_URL "$ENV{GAR_ARROW_SOURCE_URL}")
     else()
-        set(ARROW_VERSION_TO_BUILD "15.0.0" CACHE INTERNAL "arrow version")
-        if (Arrow_FOUND) # arrow is installed, build the same version as the installed one
-            set(ARROW_VERSION_TO_BUILD "${Arrow_VERSION}" CACHE INTERNAL "arrow version")
-        endif()
         set(GAR_ARROW_SOURCE_URL "https://www.apache.org/dyn/closer.lua?action=download&filename=arrow/arrow-${ARROW_VERSION_TO_BUILD}/apache-arrow-${ARROW_VERSION_TO_BUILD}.tar.gz")
     endif ()
 
@@ -157,6 +163,11 @@ function(build_arrow)
             PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${GAR_ARROW_INCLUDE_DIR}
             IMPORTED_LOCATION ${GAR_ARROW_ACERO_STATIC_LIB})
     endif()
+    set(GAR_ARROW_COMPUTE_LIBRARY_TARGET gar_arrow_compute_static)
+    add_library(${GAR_ARROW_COMPUTE_LIBRARY_TARGET} STATIC IMPORTED)
+    set_target_properties(${GAR_ARROW_COMPUTE_LIBRARY_TARGET}
+        PROPERTIES INTERFACE_INCLUDE_DIRECTORIES ${GAR_ARROW_INCLUDE_DIR}
+        IMPORTED_LOCATION ${GAR_ARROW_COMPUTE_STATIC_LIB})
 
     add_dependencies(${GAR_ARROW_LIBRARY_TARGET} arrow_ep)
 endfunction()

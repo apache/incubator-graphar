@@ -15,20 +15,10 @@
 # specific language governing permissions and limitations
 # under the License.
 
-[package]
-name = "graphar-rs"
-version = "0.1.0"
-edition = "2024"
-license = "Apache-2.0"
+cmake -S . -B build_ubuntu \
+    -DBUILD_BENCHMARKS=ON \
+    -DCMAKE_BUILD_TYPE=Debug \
+    -DBUILD_TESTS=ON \
+    -DBUILD_EXAMPLES=ON
 
-[dependencies]
-# anyhow = "1.0.100"
-cxx = "1.0.190"
-
-[build-dependencies]
-cxx-build = "1.0.190"
-cmake = "0.1.54"
-pkg-config = "0.3.32"
-
-[dev-dependencies]
-tempfile = "3"
+cmake --build build_ubuntu -j8 2>&1 | tee build_ubuntu.log
