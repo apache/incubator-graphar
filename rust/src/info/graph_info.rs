@@ -173,11 +173,7 @@ impl GraphInfo {
     /// Returns `None` if the type is not found.
     pub fn vertex_info_index<S: AsRef<str>>(&self, r#type: S) -> Option<usize> {
         let_cxx_string!(ty = r#type.as_ref());
-        if ffi::graphar::graph_info_has_vertex_info_index(&self.0, &ty) {
-            Some(ffi::graphar::graph_info_get_vertex_info_index(&self.0, &ty))
-        } else {
-            None
-        }
+        ffi::graphar::graph_info_vertex_info_index(&self.0, &ty).into()
     }
 
     /// Return the index of the edge info with the given edge triplet.
@@ -192,13 +188,7 @@ impl GraphInfo {
         let_cxx_string!(src = src_type.as_ref());
         let_cxx_string!(edge = edge_type.as_ref());
         let_cxx_string!(dst = dst_type.as_ref());
-        if ffi::graphar::graph_info_has_edge_info_index(&self.0, &src, &edge, &dst) {
-            Some(ffi::graphar::graph_info_get_edge_info_index(
-                &self.0, &src, &edge, &dst,
-            ))
-        } else {
-            None
-        }
+        ffi::graphar::graph_info_edge_info_index(&self.0, &src, &edge, &dst).into()
     }
 
     /// Return the number of vertex infos.

@@ -17,8 +17,10 @@
  * under the License.
  */
 
-#include "graphar_rs.h"
+#include "graphar-rs/src/ffi.rs.h"
 
+#include <cstddef>
+#include <optional>
 #include <stdexcept>
 #include <utility>
 
@@ -186,39 +188,30 @@ std::shared_ptr<graphar::GraphInfo> create_graph_info(
   if (graph_info == nullptr) {
     throw std::runtime_error("CreateGraphInfo: returned nullptr");
   }
+  // if (!graph_info->IsValidated()) {
+  //   throw std::runtime_error("CreateGraphInfo: graph info is not validated");
+  // }
   return graph_info;
 }
 
-bool graph_info_has_vertex_info_index(const graphar::GraphInfo& graph_info,
-                                      const std::string& type) {
-  return graph_info.GetVertexInfoIndex(type).has_value();
-}
-
-size_t graph_info_get_vertex_info_index(const graphar::GraphInfo& graph_info,
-                                        const std::string& type) {
-  auto index = graph_info.GetVertexInfoIndex(type);
-  if (!index.has_value()) {
-    throw std::runtime_error("GetVertexInfoIndex: vertex type not found");
+static graphar::MaybeIndex optional_to_maybe_index(std::optional<size_t> opt) {
+  if (opt) {
+    return graphar::MaybeIndex{true, *opt};
+  } else {
+    return graphar::MaybeIndex{false, 0};
   }
-  return index.value();
 }
 
-bool graph_info_has_edge_info_index(const graphar::GraphInfo& graph_info,
-                                    const std::string& src_type,
-                                    const std::string& edge_type,
-                                    const std::string& dst_type) {
-  return graph_info.GetEdgeInfoIndex(src_type, edge_type, dst_type).has_value();
+graphar::MaybeIndex graph_info_vertex_info_index(
+    const graphar::GraphInfo& graph_info, const std::string& type) {
+  return optional_to_maybe_index(graph_info.GetVertexInfoIndex(type));
 }
 
-size_t graph_info_get_edge_info_index(const graphar::GraphInfo& graph_info,
-                                      const std::string& src_type,
-                                      const std::string& edge_type,
-                                      const std::string& dst_type) {
-  auto index = graph_info.GetEdgeInfoIndex(src_type, edge_type, dst_type);
-  if (!index.has_value()) {
-    throw std::runtime_error("GetEdgeInfoIndex: edge triplet not found");
-  }
-  return index.value();
+graphar::MaybeIndex graph_info_edge_info_index(
+    const graphar::GraphInfo& graph_info, const std::string& src_type,
+    const std::string& edge_type, const std::string& dst_type) {
+  return optional_to_maybe_index(
+      graph_info.GetEdgeInfoIndex(src_type, edge_type, dst_type));
 }
 
 void vertex_info_vec_push_vertex_info(

@@ -32,6 +32,8 @@
 #include "rust/cxx.h"
 
 namespace graphar {
+struct MaybeIndex;
+
 using SharedVertexInfo = std::shared_ptr<VertexInfo>;
 using SharedEdgeInfo = std::shared_ptr<EdgeInfo>;
 using SharedPropertyGroup = std::shared_ptr<PropertyGroup>;
@@ -98,18 +100,11 @@ std::shared_ptr<graphar::GraphInfo> create_graph_info(
     const std::vector<graphar::SharedEdgeInfo>& edge_infos,
     const rust::Vec<rust::String>& labels, const std::string& prefix,
     std::shared_ptr<graphar::ConstInfoVersion> version);
-bool graph_info_has_vertex_info_index(const graphar::GraphInfo& graph_info,
-                                      const std::string& type);
-size_t graph_info_get_vertex_info_index(const graphar::GraphInfo& graph_info,
-                                        const std::string& type);
-bool graph_info_has_edge_info_index(const graphar::GraphInfo& graph_info,
-                                    const std::string& src_type,
-                                    const std::string& edge_type,
-                                    const std::string& dst_type);
-size_t graph_info_get_edge_info_index(const graphar::GraphInfo& graph_info,
-                                      const std::string& src_type,
-                                      const std::string& edge_type,
-                                      const std::string& dst_type);
+graphar::MaybeIndex graph_info_vertex_info_index(
+    const graphar::GraphInfo& graph_info, const std::string& type);
+graphar::MaybeIndex graph_info_edge_info_index(
+    const graphar::GraphInfo& graph_info, const std::string& src_type,
+    const std::string& edge_type, const std::string& dst_type);
 
 void vertex_info_vec_push_vertex_info(
     std::vector<graphar::SharedVertexInfo>& vertex_infos,

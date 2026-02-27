@@ -17,6 +17,8 @@
 
 use cxx::{ExternType, SharedPtr};
 
+use crate::ffi::graphar::MaybeIndex;
+
 #[repr(transparent)]
 #[derive(Clone)]
 pub struct SharedVertexInfo(pub(crate) SharedPtr<graphar::VertexInfo>);
@@ -366,6 +368,11 @@ pub(crate) mod graphar {
         fn edge_info_dump(edge_info: &EdgeInfo) -> Result<UniquePtr<CxxString>>;
     }
 
+    struct MaybeIndex {
+        has_value: bool,
+        index: usize,
+    }
+
     // `GraphInfo`
     unsafe extern "C++" {
         type GraphInfo;
@@ -402,23 +409,14 @@ pub(crate) mod graphar {
         #[namespace = "graphar_rs"]
         fn graph_info_dump(graph_info: &GraphInfo) -> Result<UniquePtr<CxxString>>;
         #[namespace = "graphar_rs"]
-        fn graph_info_has_vertex_info_index(graph_info: &GraphInfo, type_: &CxxString) -> bool;
+        fn graph_info_vertex_info_index(graph_info: &GraphInfo, type_: &CxxString) -> MaybeIndex;
         #[namespace = "graphar_rs"]
-        fn graph_info_get_vertex_info_index(graph_info: &GraphInfo, type_: &CxxString) -> usize;
-        #[namespace = "graphar_rs"]
-        fn graph_info_has_edge_info_index(
+        fn graph_info_edge_info_index(
             graph_info: &GraphInfo,
             src_type: &CxxString,
             edge_type: &CxxString,
             dst_type: &CxxString,
-        ) -> bool;
-        #[namespace = "graphar_rs"]
-        fn graph_info_get_edge_info_index(
-            graph_info: &GraphInfo,
-            src_type: &CxxString,
-            edge_type: &CxxString,
-            dst_type: &CxxString,
-        ) -> usize;
+        ) -> MaybeIndex;
     }
 
     unsafe extern "C++" {
@@ -454,4 +452,14 @@ pub(crate) mod graphar {
         type SharedAdjacentList = crate::ffi::SharedAdjacentList;
     }
     impl CxxVector<SharedAdjacentList> {}
+}
+
+impl From<MaybeIndex> for Option<usize> {
+    fn from(value: MaybeIndex) -> Self {
+        if value.has_value {
+            Some(value.index)
+        } else {
+            None
+        }
+    }
 }
