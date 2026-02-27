@@ -96,10 +96,7 @@ jobs:
     - name: cpplint
       working-directory: "cpp/build"
       run: |
-        function ec() { [[ "$1" == "-h" ]] && { shift && eval $* > /dev/null 2>&1; ec=$?; echo $ec; } || eval $*; ec=$?; }
-
-        ninja graphar-cpplint
-        if [[ "$ec" != "0" ]]; then
+        if ! ninja graphar-cpplint; then
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             echo "| cpplint failures found! Run: "
             echo "|"
