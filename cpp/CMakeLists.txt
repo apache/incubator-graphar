@@ -691,6 +691,30 @@ if (BUILD_BENCHMARKS)
         target_link_libraries(${target} PRIVATE
             benchmark::benchmark_main
             graphar)
+        if (BUILD_ARROW_FROM_SOURCE)
+            target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+            link_arrow_libraries(${target})
+        else()
+            if(APPLE)
+                if(USE_STATIC_ARROW)
+                    target_link_libraries(${target} PRIVATE -Wl,-force_load
+                        Arrow::arrow_static
+                        Parquet::parquet_static)
+                else()
+                    target_link_libraries(${target} PRIVATE Arrow::arrow_shared
+                        Parquet::parquet_shared)
+                endif()
+            else()
+                if(USE_STATIC_ARROW)
+                    target_link_libraries(${target} PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
+                        Arrow::arrow_static
+                        Parquet::parquet_static -Wl,--no-whole-archive)
+                else()
+                    target_link_libraries(${target} PRIVATE Arrow::arrow_shared
+                        Parquet::parquet_shared)
+                endif()
+            endif()
+        endif()
     endmacro()
     add_benchmark(arrow_chunk_reader_benchmark SRCS benchmarks/arrow_chunk_reader_benchmark.cc)
     add_benchmark(label_filter_benchmark SRCS benchmarks/label_filter_benchmark.cc)
