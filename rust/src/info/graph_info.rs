@@ -62,7 +62,7 @@ impl GraphInfo {
         let_cxx_string!(name = name.as_ref());
         let_cxx_string!(prefix = prefix.as_ref());
 
-        let mut vertex_info_vec: UniquePtr<CxxVector<ffi::SharedVertexInfo>> = CxxVector::new();
+        let mut vertex_info_vec = CxxVector::new();
         vertex_info_vec.pin_mut().reserve(vertex_infos.len());
         for vertex_info in vertex_infos {
             ffi::graphar::vertex_info_vec_push_vertex_info(
@@ -170,42 +170,44 @@ impl GraphInfo {
 
     /// Return the index of the vertex info with the given type.
     ///
-    /// Returns `-1` if the type is not found.
-    ///
-    /// TODO: upstream C++ uses `int` for this return type; prefer fixed-width.
-    pub fn vertex_info_index<S: AsRef<str>>(&self, r#type: S) -> i32 {
+    /// Returns `None` if the type is not found.
+    pub fn vertex_info_index<S: AsRef<str>>(&self, r#type: S) -> Option<usize> {
         let_cxx_string!(ty = r#type.as_ref());
-        self.0.GetVertexInfoIndex(&ty)
+        if ffi::graphar::graph_info_has_vertex_info_index(&self.0, &ty) {
+            Some(ffi::graphar::graph_info_get_vertex_info_index(&self.0, &ty))
+        } else {
+            None
+        }
     }
 
     /// Return the index of the edge info with the given edge triplet.
     ///
-    /// Returns `-1` if the edge triplet is not found.
-    ///
-    /// TODO: upstream C++ uses `int` for this return type; prefer fixed-width.
+    /// Returns `None` if the edge triplet is not found.
     pub fn edge_info_index<S1: AsRef<str>, S2: AsRef<str>, S3: AsRef<str>>(
         &self,
         src_type: S1,
         edge_type: S2,
         dst_type: S3,
-    ) -> i32 {
+    ) -> Option<usize> {
         let_cxx_string!(src = src_type.as_ref());
         let_cxx_string!(edge = edge_type.as_ref());
         let_cxx_string!(dst = dst_type.as_ref());
-        self.0.GetEdgeInfoIndex(&src, &edge, &dst)
+        if ffi::graphar::graph_info_has_edge_info_index(&self.0, &src, &edge, &dst) {
+            Some(ffi::graphar::graph_info_get_edge_info_index(
+                &self.0, &src, &edge, &dst,
+            ))
+        } else {
+            None
+        }
     }
 
     /// Return the number of vertex infos.
-    ///
-    /// TODO: upstream C++ uses `int` for this return type; prefer fixed-width.
-    pub fn vertex_info_num(&self) -> i32 {
+    pub fn vertex_info_num(&self) -> usize {
         self.0.VertexInfoNum()
     }
 
     /// Return the number of edge infos.
-    ///
-    /// TODO: upstream C++ uses `int` for this return type; prefer fixed-width.
-    pub fn edge_info_num(&self) -> i32 {
+    pub fn edge_info_num(&self) -> usize {
         self.0.EdgeInfoNum()
     }
 
@@ -452,14 +454,17 @@ mod tests {
 
         assert_eq!(graph_info.vertex_info_num(), 2);
         assert_eq!(graph_info.edge_info_num(), 1);
-        assert_eq!(graph_info.vertex_info_index("person"), 0);
-        assert_eq!(graph_info.vertex_info_index("software"), 1);
-        assert_eq!(graph_info.vertex_info_index("missing"), -1);
+        assert_eq!(graph_info.vertex_info_index("person"), Some(0));
+        assert_eq!(graph_info.vertex_info_index("software"), Some(1));
+        assert_eq!(graph_info.vertex_info_index("missing"), None);
 
-        assert_eq!(graph_info.edge_info_index("person", "knows", "person"), 0);
+        assert_eq!(
+            graph_info.edge_info_index("person", "knows", "person"),
+            Some(0)
+        );
         assert_eq!(
             graph_info.edge_info_index("person", "unknown", "person"),
-            -1
+            None
         );
 
         assert!(graph_info.vertex_info("person").is_some());

@@ -381,15 +381,8 @@ pub(crate) mod graphar {
             edge_type: &CxxString,
             dst_type: &CxxString,
         ) -> SharedPtr<EdgeInfo>;
-        fn GetVertexInfoIndex(&self, type_: &CxxString) -> i32;
-        fn GetEdgeInfoIndex(
-            &self,
-            src_type: &CxxString,
-            edge_type: &CxxString,
-            dst_type: &CxxString,
-        ) -> i32;
-        fn VertexInfoNum(&self) -> i32;
-        fn EdgeInfoNum(&self) -> i32;
+        fn VertexInfoNum(&self) -> usize;
+        fn EdgeInfoNum(&self) -> usize;
         fn GetVertexInfos(&self) -> &CxxVector<SharedVertexInfo>;
         fn GetEdgeInfos(&self) -> &CxxVector<SharedEdgeInfo>;
 
@@ -408,6 +401,24 @@ pub(crate) mod graphar {
         fn graph_info_save(graph_info: &GraphInfo, path: &CxxString) -> Result<()>;
         #[namespace = "graphar_rs"]
         fn graph_info_dump(graph_info: &GraphInfo) -> Result<UniquePtr<CxxString>>;
+        #[namespace = "graphar_rs"]
+        fn graph_info_has_vertex_info_index(graph_info: &GraphInfo, type_: &CxxString) -> bool;
+        #[namespace = "graphar_rs"]
+        fn graph_info_get_vertex_info_index(graph_info: &GraphInfo, type_: &CxxString) -> usize;
+        #[namespace = "graphar_rs"]
+        fn graph_info_has_edge_info_index(
+            graph_info: &GraphInfo,
+            src_type: &CxxString,
+            edge_type: &CxxString,
+            dst_type: &CxxString,
+        ) -> bool;
+        #[namespace = "graphar_rs"]
+        fn graph_info_get_edge_info_index(
+            graph_info: &GraphInfo,
+            src_type: &CxxString,
+            edge_type: &CxxString,
+            dst_type: &CxxString,
+        ) -> usize;
     }
 
     unsafe extern "C++" {

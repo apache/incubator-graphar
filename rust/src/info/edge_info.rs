@@ -201,6 +201,8 @@ impl EdgeInfo {
 
     /// Return the number of property groups.
     ///
+    /// The upstream C++ API uses `int`; this binding returns `usize` for a
+    /// Rust-idiomatic count type.
     pub fn property_group_num(&self) -> usize {
         self.0.PropertyGroupNum()
     }
