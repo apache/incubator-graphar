@@ -62,7 +62,7 @@ jobs:
                             libarrow-dataset-dev=17.0.0-1 \
                             libarrow-acero-dev=17.0.0-1 \
                             libparquet-dev=17.0.0-1
-        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen lcov
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen lcov ninja-build
 
         # install benchmark
         git clone --branch v1.8.3 https://github.com/google/benchmark.git --depth 1
@@ -85,7 +85,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON -DGRAPHAR_ENABLE_COVERAGE=ON
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON -DGRAPHAR_ENABLE_COVERAGE=ON
 
     - name: clang-format
       run: |
@@ -98,7 +98,7 @@ jobs:
       run: |
         function ec() { [[ "$1" == "-h" ]] && { shift && eval $* > /dev/null 2>&1; ec=$?; echo $ec; } || eval $*; ec=$?; }
 
-        ec make graphar-cpplint
+        ninja graphar-cpplint
         if [[ "$ec" != "0" ]]; then
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             echo "| cpplint failures found! Run: "
@@ -114,11 +114,11 @@ jobs:
       working-directory: "cpp/build"
       run: |
         cmake -DENABLE_DOCS=ON ..
-        make docs
+        ninja docs
 
     - name: Build GraphAr
       working-directory: "cpp/build"
-      run: make -j$(nproc)
+      run: ninja
 
     - name: Test
       working-directory: "cpp/build"
@@ -152,8 +152,8 @@ jobs:
       run: |
         mkdir build-release
         pushd build-release
-        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
         popd
@@ -170,8 +170,8 @@ jobs:
       run: |
         mkdir build-static
         pushd build-static
-        cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
         popd
@@ -208,8 +208,8 @@ jobs:
       run: |
         mkdir build
         pushd build
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         popd
 
     - name: Running Test
@@ -223,8 +223,8 @@ jobs:
       run: |
         mkdir build-release
         pushd build-release
-        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
         popd
@@ -241,8 +241,8 @@ jobs:
       run: |
         mkdir build-static
         pushd build-static
-        cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         export ASAN_OPTIONS=detect_leaks=0
         export ASAN_OPTIONS=detect_container_overflow=0
         ctest --output-on-failure

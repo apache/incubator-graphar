@@ -46,7 +46,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update -y
-        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev ninja-build
 
         # install Catch2 v3
         git clone --branch v3.6.0 https://github.com/catchorg/Catch2.git --depth 1
@@ -61,14 +61,14 @@ jobs:
       run: |
         mkdir build-debug
         pushd build-debug
-        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
+        cmake ../cpp -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
         popd
 
     - name: Build GraphAr-debug
       run: |
         pushd build-debug
-        make -j$(nproc)
-        make graphar-ccache-stats
+        ninja
+        ninja graphar-ccache-stats
         popd
         
     - name: Test-debug
@@ -82,14 +82,14 @@ jobs:
       run: |
         mkdir build-release
         pushd build-release
-        cmake ../cpp -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
+        cmake ../cpp -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
         popd
 
     - name: Build GraphAr-release
       run: |
         pushd build-release
-        make -j$(nproc)
-        make graphar-ccache-stats
+        ninja
+        ninja graphar-ccache-stats
         popd
 
     - name: Test-release
