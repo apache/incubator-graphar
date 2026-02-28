@@ -79,6 +79,40 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
             it_begin.property<int64_t>("id").value());
   }
 
+  SECTION("VerticesCollectionFilterByLabel") {
+    std::string path = test_data_dir + "/ldbc/parquet/" + "ldbc.graph.yml";
+    auto maybe_graph_info = GraphInfo::Load(path);
+    REQUIRE(maybe_graph_info.status().ok());
+    auto graph_info = maybe_graph_info.value();
+
+    auto vertex_info = graph_info->GetVertexInfo("organisation");
+    REQUIRE(vertex_info != nullptr);
+
+    auto labels = vertex_info->GetLabels();
+    if (!labels.empty()) {
+      auto vertices = std::make_shared<VerticesCollection>(
+          vertex_info, graph_info->GetPrefix());
+
+      auto maybe_filtered_ids =
+          vertices->filter(std::vector<std::string>{labels[0]}, nullptr);
+      REQUIRE(maybe_filtered_ids.status().ok());
+      auto filtered_ids = maybe_filtered_ids.value();
+
+      std::cout << "Filtered " << filtered_ids.size()
+                << " vertices with label '" << labels[0] << "'" << std::endl;
+
+      auto filtered_vertices = std::make_shared<VerticesCollection>(
+          vertex_info, graph_info->GetPrefix(), true, filtered_ids);
+
+      size_t count = 0;
+      for (auto it = filtered_vertices->begin(); it != filtered_vertices->end();
+           ++it) {
+        count++;
+      }
+      REQUIRE(count == filtered_ids.size());
+    }
+  }
+
   SECTION("ListProperty") {
     // read file and construct graph info
     std::string path =
