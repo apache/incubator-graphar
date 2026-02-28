@@ -142,7 +142,7 @@ jobs:
         ctest --output-on-failure
 
     - name: Benchmark
-      working-directory: "cpp/build"
+      working-directory: "cpp/build/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
@@ -174,7 +174,7 @@ jobs:
         popd
 
     - name: Benchmark-release
-      working-directory: "cpp/build-release"
+      working-directory: "cpp/build-release/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
@@ -254,7 +254,7 @@ jobs:
         popd
 
     - name: Benchmark-release
-      working-directory: "cpp/build-release"
+      working-directory: "cpp/build-release/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark

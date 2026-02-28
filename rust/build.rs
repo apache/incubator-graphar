@@ -73,7 +73,9 @@ fn build_graphar() -> Vec<PathBuf> {
     let build_dir = build.build();
 
     let lib_path = build_dir.join("build");
+    let src_lib_path = lib_path.join("src");
     println!("cargo:rustc-link-search=native={}", lib_path.display());
+    println!("cargo:rustc-link-search=native={}", src_lib_path.display());
 
     println!("cargo:rerun-if-changed=include/graphar_rs.h");
     println!("cargo:rerun-if-changed=src/graphar_rs.cc");
