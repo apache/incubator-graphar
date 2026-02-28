@@ -1,23 +1,23 @@
-# Licensed to the Apache Software Foundation (ASF) under one
-# or more contributor license agreements.  See the NOTICE file
-# distributed with this work for additional information
-# regarding copyright ownership.  The ASF licenses this file
-# to you under the Apache License, Version 2.0 (the
-# "License"); you may not use this file except in compliance
-# with the License.  You may obtain a copy of the License at
+#Licensed to the Apache Software Foundation(ASF) under one
+# or more contributor license agreements.See the NOTICE file
+#distributed with this work for additional information
+#regarding copyright ownership.The ASF licenses this file
+#to you under the Apache License, Version 2.0(the
+#"License"); you may not use this file except in compliance
+#with the License.You may obtain a copy of the License at
 #
-#   http://www.apache.org/licenses/LICENSE-2.0
+#http:  // www.apache.org/licenses/LICENSE-2.0
 #
-# Unless required by applicable law or agreed to in writing,
-# software distributed under the License is distributed on an
-# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-# KIND, either express or implied.  See the License for the
-# specific language governing permissions and limitations
-# under the License.
+#Unless required by applicable law or agreed to in writing,
+#software distributed under the License is distributed on an
+#"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#KIND, either express or implied.See the License for the
+#specific language governing permissions and limitations
+#under the License.
 
 cmake_minimum_required(VERSION 3.5)
 
-# Avoid mixing plain and keyword signature of target_link_libraries
+#Avoid mixing plain and keyword signature of target_link_libraries
 if (POLICY CMP0023)
   cmake_policy(SET CMP0023 NEW)
 endif()
@@ -26,7 +26,7 @@ if(POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
 endif()
 
-# Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
+#Avoid warning about DOWNLOAD_EXTRACT_TIMESTAMP in CMake 3.24:
 if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.24.0")
   cmake_policy(SET CMP0135 NEW)
 endif()
@@ -37,9 +37,9 @@ set(GRAPHAR_PATCH_VERSION 0)
 set(GRAPHAR_VERSION ${GRAPHAR_MAJOR_VERSION}.${GRAPHAR_MINOR_VERSION}.${GRAPHAR_PATCH_VERSION})
 project(graphar-cpp LANGUAGES C CXX VERSION ${GRAPHAR_VERSION})
 
-# ------------------------------------------------------------------------------
-# cmake options
-# ------------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+#cmake options
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
 option(BUILD_TESTS "Build unit tests" OFF)
 option(BUILD_EXAMPLES "Build examples" OFF)
@@ -63,8 +63,9 @@ if (ENABLE_DOCS OR BUILD_DOCS_ONLY)
     find_package(Doxygen REQUIRED)
     set(DOXYGEN_IN ${PROJECT_SOURCE_DIR}/Doxyfile)
     set(DOXYGEN_OUT ${CMAKE_BINARY_DIR}/Doxyfile.out)
-    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-    # Copy disclaimer_footer.html to the build directory
+    configure_file(${DOXYGEN_IN} ${
+  DOXYGEN_OUT} @ONLY)
+#Copy disclaimer_footer.html to the build directory
     configure_file(${PROJECT_SOURCE_DIR}/disclaimer_footer.html ${CMAKE_BINARY_DIR}/disclaimer_footer.html COPYONLY)
     add_custom_target(docs
         COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
@@ -77,9 +78,9 @@ if (ENABLE_DOCS OR BUILD_DOCS_ONLY)
     endif()
 endif()
 
-# ------------------------------------------------------------------------------
-# setting default cmake type to Release
-# ------------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+#setting default cmake type to Release
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 set(DEFAULT_BUILD_TYPE "Release")
 if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   message(STATUS "Setting build type to '${DEFAULT_BUILD_TYPE}' as none was specified.")
@@ -95,7 +96,8 @@ if(NOT (CMAKE_CXX_COMPILER_LAUNCHER MATCHES "ccache") AND NOT (CMAKE_C_COMPILER_
         set(CMAKE_C_COMPILER_LAUNCHER ${ccache_EXECUTABLE})
         set(CMAKE_CXX_COMPILER_LAUNCHER ${ccache_EXECUTABLE})
         add_custom_target(graphar-ccache-stats
-            COMMAND ${ccache_EXECUTABLE} --show-stats
+            COMMAND ${
+  ccache_EXECUTABLE} --show-stats
         )
     else()
         add_custom_target(graphar-ccache-stats
@@ -107,22 +109,23 @@ endif()
 set(GAR_CXX_STANDARD 17)
 
 if(MSVC)
-    # Avoid GCC/Clang-specific flags on MSVC.
-    # C++17 is already enforced via CMAKE_CXX_STANDARD/target features.
+#Avoid GCC / Clang - specific flags on MSVC.
+#C++ 17 is already enforced via CMAKE_CXX_STANDARD / target features.
 else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -Wextra -Wno-unused-parameter -Wno-unused-function -Wno-empty-body")
 endif()
 
 if (APPLE)
     set(CMAKE_MACOSX_RPATH ON)
+    set(CMAKE_INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
 elseif(UNIX)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
 endif ()
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fno-omit-frame-pointer")
 if (GRAPHAR_ENABLE_SANITIZER)
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address")
-  # Linker flags are required to pull in the ASan runtime.
+#Linker flags are required to pull in the ASan runtime.
   set(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -fsanitize=address")
   set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} -fsanitize=address")
 endif()
@@ -140,9 +143,9 @@ if (CMAKE_BUILD_TYPE_UPPER STREQUAL "DEBUG")
   message(STATUS "[graphar] GRAPHAR_ENABLE_COVERAGE: ${GRAPHAR_ENABLE_COVERAGE}")
 endif()
 
-# ------------------------------------------------------------------------------
-# cmake configs
-# ------------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+#cmake configs
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 include(CheckLibraryExists)
 include(GNUInstallDirs)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -156,10 +159,9 @@ target_include_directories(
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-
-# ------------------------------------------------------------------------------
-# macro functions
-# ------------------------------------------------------------------------------
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+#macro functions
+#-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 macro(add_subdirectory_shared directory)
     set(BUILD_SHARED_LIBS_SAVED "${BUILD_SHARED_LIBS}")
     set(BUILD_SHARED_LIBS ON)
@@ -190,17 +192,16 @@ macro(find_yaml_cpp)
 endmacro()
 
 macro(install_graphar_target target)
-  # install
   install(TARGETS ${target} graphar_thirdparty
           EXPORT graphar-targets
-          ARCHIVE DESTINATION lib
-          LIBRARY DESTINATION lib
-          RUNTIME DESTINATION bin
-          INCLUDES DESTINATION include
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL
+          INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   )
 endmacro()
 
-# Implementations of lisp "car" and "cdr" functions
+#Implementations of lisp "car" and "cdr" functions
 macro(GRAPHAR_CAR var)
   set(${var} ${ARGV1})
 endmacro()
@@ -209,8 +210,8 @@ macro(GRAPHAR_CDR var rest)
   set(${var} ${ARGN})
 endmacro()
 
-# Based on MIT-licensed
-# https://gist.github.com/cristianadam/ef920342939a89fae3e8a85ca9459b49
+#Based on MIT - licensed
+#https:  // gist.github.com/cristianadam/ef920342939a89fae3e8a85ca9459b49
 function(graphar_create_merged_static_lib output_target)
   set(options)
   set(one_value_args NAME ROOT)
@@ -301,62 +302,56 @@ endmacro()
 macro(build_graphar)
     build_graphar_thirdparty()
     file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc")
+    
     if(GRAPHAR_BUILD_STATIC)
         add_library(graphar STATIC ${CORE_SRC_FILES})
     else()
         add_library(graphar SHARED ${CORE_SRC_FILES})
     endif()
+
     install_graphar_target(graphar)
+
     target_compile_features(graphar PRIVATE cxx_std_${GAR_CXX_STANDARD})
-    target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
+
+    target_include_directories(graphar
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
+    )
+
     if(GRAPHAR_BUILD_STATIC)
         target_link_libraries(graphar PUBLIC graphar_thirdparty ${CMAKE_DL_LIBS})
     else()
         target_link_libraries(graphar PRIVATE graphar_thirdparty ${CMAKE_DL_LIBS})
     endif()
 
+    set(ARROW_LIB_SUFFIX "shared")
+    if(USE_STATIC_ARROW)
+        set(ARROW_LIB_SUFFIX "static")
+    endif()
+
+    set(ARROW_DEPS
+        Arrow::arrow_${ARROW_LIB_SUFFIX}
+        Parquet::parquet_${ARROW_LIB_SUFFIX}
+        ArrowDataset::arrow_dataset_${ARROW_LIB_SUFFIX}
+    )
+    if(ArrowAcero_FOUND)
+        list(APPEND ARROW_DEPS ArrowAcero::arrow_acero_${ARROW_LIB_SUFFIX})
+    endif()
+
     if(APPLE)
-        if(USE_STATIC_ARROW)
-            target_link_libraries(graphar PRIVATE -Wl,-force_load
-                Arrow::arrow_static
-                Parquet::parquet_static
-                ArrowDataset::arrow_dataset_static
-                ArrowAcero::arrow_acero_static)
-        else()
-            target_link_libraries(graphar PRIVATE -Wl,-force_load Arrow::arrow_shared
-                Parquet::parquet_shared
-                ArrowDataset::arrow_dataset_shared
-                ArrowAcero::arrow_acero_shared)
-        endif()
+        target_link_libraries(graphar PUBLIC -Wl,-force_load ${ARROW_DEPS})
     elseif(MSVC)
-        # MSVC doesn't support GNU ld-style -Wl flags. For shared libraries we
-        # don't need whole-archive semantics.
-        if(USE_STATIC_ARROW)
-            target_link_libraries(graphar PRIVATE
-                Arrow::arrow_static
-                Parquet::parquet_static
-                ArrowDataset::arrow_dataset_static
-                ArrowAcero::arrow_acero_static)
-        else()
-            target_link_libraries(graphar PRIVATE
-                Arrow::arrow_shared
-                Parquet::parquet_shared
-                ArrowDataset::arrow_dataset_shared
-                ArrowAcero::arrow_acero_shared)
-        endif()
+        target_link_libraries(graphar PUBLIC ${ARROW_DEPS})
     else()
-        if(USE_STATIC_ARROW)
-            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
-                Arrow::arrow_static
-                Parquet::parquet_static
-                ArrowDataset::arrow_dataset_static
-                ArrowAcero::arrow_acero_static -Wl,--no-whole-archive)
-        else()
-            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_shared
-                Parquet::parquet_shared
-                ArrowDataset::arrow_dataset_shared
-                ArrowAcero::arrow_acero_shared -Wl,--no-whole-archive)
-        endif()
+        target_link_libraries(graphar PUBLIC 
+            -Wl,--exclude-libs,ALL 
+            -Wl,--whole-archive 
+            ${ARROW_DEPS} 
+            -Wl,--no-whole-archive
+        )
     endif()
 endmacro()
 
