@@ -115,8 +115,9 @@ endif()
 
 if (APPLE)
     set(CMAKE_MACOSX_RPATH ON)
+    set(CMAKE_INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
 elseif(UNIX)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
 endif ()
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fno-omit-frame-pointer")
@@ -193,10 +194,10 @@ macro(install_graphar_target target)
   # install
   install(TARGETS ${target} graphar_thirdparty
           EXPORT graphar-targets
-          ARCHIVE DESTINATION lib
-          LIBRARY DESTINATION lib
-          RUNTIME DESTINATION bin
-          INCLUDES DESTINATION include
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL
+          INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
   )
 endmacro()
 
@@ -301,62 +302,56 @@ endmacro()
 macro(build_graphar)
     build_graphar_thirdparty()
     file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc")
+    
     if(GRAPHAR_BUILD_STATIC)
         add_library(graphar STATIC ${CORE_SRC_FILES})
     else()
         add_library(graphar SHARED ${CORE_SRC_FILES})
     endif()
+
     install_graphar_target(graphar)
+
     target_compile_features(graphar PRIVATE cxx_std_${GAR_CXX_STANDARD})
-    target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
+
+    target_include_directories(graphar
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
+    )
+
     if(GRAPHAR_BUILD_STATIC)
         target_link_libraries(graphar PUBLIC graphar_thirdparty ${CMAKE_DL_LIBS})
     else()
         target_link_libraries(graphar PRIVATE graphar_thirdparty ${CMAKE_DL_LIBS})
     endif()
 
+    set(ARROW_LIB_SUFFIX "shared")
+    if(USE_STATIC_ARROW)
+        set(ARROW_LIB_SUFFIX "static")
+    endif()
+
+    set(ARROW_DEPS
+        Arrow::arrow_${ARROW_LIB_SUFFIX}
+        Parquet::parquet_${ARROW_LIB_SUFFIX}
+        ArrowDataset::arrow_dataset_${ARROW_LIB_SUFFIX}
+    )
+    if(ArrowAcero_FOUND)
+        list(APPEND ARROW_DEPS ArrowAcero::arrow_acero_${ARROW_LIB_SUFFIX})
+    endif()
+
     if(APPLE)
-        if(USE_STATIC_ARROW)
-            target_link_libraries(graphar PRIVATE -Wl,-force_load
-                Arrow::arrow_static
-                Parquet::parquet_static
-                ArrowDataset::arrow_dataset_static
-                ArrowAcero::arrow_acero_static)
-        else()
-            target_link_libraries(graphar PRIVATE -Wl,-force_load Arrow::arrow_shared
-                Parquet::parquet_shared
-                ArrowDataset::arrow_dataset_shared
-                ArrowAcero::arrow_acero_shared)
-        endif()
+        target_link_libraries(graphar PUBLIC -Wl,-force_load ${ARROW_DEPS})
     elseif(MSVC)
-        # MSVC doesn't support GNU ld-style -Wl flags. For shared libraries we
-        # don't need whole-archive semantics.
-        if(USE_STATIC_ARROW)
-            target_link_libraries(graphar PRIVATE
-                Arrow::arrow_static
-                Parquet::parquet_static
-                ArrowDataset::arrow_dataset_static
-                ArrowAcero::arrow_acero_static)
-        else()
-            target_link_libraries(graphar PRIVATE
-                Arrow::arrow_shared
-                Parquet::parquet_shared
-                ArrowDataset::arrow_dataset_shared
-                ArrowAcero::arrow_acero_shared)
-        endif()
+        target_link_libraries(graphar PUBLIC ${ARROW_DEPS})
     else()
-        if(USE_STATIC_ARROW)
-            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive
-                Arrow::arrow_static
-                Parquet::parquet_static
-                ArrowDataset::arrow_dataset_static
-                ArrowAcero::arrow_acero_static -Wl,--no-whole-archive)
-        else()
-            target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL -Wl,--whole-archive Arrow::arrow_shared
-                Parquet::parquet_shared
-                ArrowDataset::arrow_dataset_shared
-                ArrowAcero::arrow_acero_shared -Wl,--no-whole-archive)
-        endif()
+        target_link_libraries(graphar PUBLIC 
+            -Wl,--exclude-libs,ALL 
+            -Wl,--whole-archive 
+            ${ARROW_DEPS} 
+            -Wl,--no-whole-archive
+        )
     endif()
 endmacro()
 
