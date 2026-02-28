@@ -102,3 +102,20 @@ repos:
         files: ^maven-projects/spark/
         pass_filenames: false
         require_serial: true
+
+      - id: cargo-fmt
+        name: Rust cargo fmt
+        entry: bash -c 'cd rust && cargo fmt --all'
+        language: system
+        files: ^rust/.*\.(rs|toml|lock)$
+        pass_filenames: false
+        require_serial: true
+
+      - id: cargo-clippy
+        name: Rust cargo clippy
+        entry: bash -c 'cd rust && cargo clippy --all-targets --all-features -- -D warnings'
+        language: system
+        files: ^rust/.*\.(rs|toml|lock)$
+        pass_filenames: false
+        require_serial: true
+        stages: [manual]
