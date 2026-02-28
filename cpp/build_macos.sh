@@ -22,6 +22,7 @@ cmake -S . -B build_macos \
     -DBUILD_BENCHMARKS=ON \
     -DCMAKE_BUILD_TYPE=Debug \
     -DBUILD_TESTS=ON \
-    -DBUILD_EXAMPLES=ON
+    -DBUILD_EXAMPLES=ON \
+    -G Ninja
 
 cmake --build build_macos -j8 2>&1 | tee build_macos.log
