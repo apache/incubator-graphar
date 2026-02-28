@@ -362,10 +362,14 @@ Status VertexPropertyArrowChunkReader::next_chunk() {
 
 void VertexPropertyArrowChunkReader::Filter(util::Filter filter) {
   filter_options_.filter = filter;
+  chunk_table_ = nullptr;
+  chunk_cache_.Clear();
 }
 
 void VertexPropertyArrowChunkReader::Select(util::ColumnNames column_names) {
   filter_options_.columns = column_names;
+  chunk_table_ = nullptr;
+  chunk_cache_.Clear();
 }
 
 Result<std::shared_ptr<VertexPropertyArrowChunkReader>>
@@ -1104,10 +1108,14 @@ Status AdjListPropertyArrowChunkReader::seek_chunk_index(
 
 void AdjListPropertyArrowChunkReader::Filter(util::Filter filter) {
   filter_options_.filter = filter;
+  chunk_table_ = nullptr;
+  chunk_cache_.Clear();
 }
 
 void AdjListPropertyArrowChunkReader::Select(util::ColumnNames column_names) {
   filter_options_.columns = column_names;
+  chunk_table_ = nullptr;
+  chunk_cache_.Clear();
 }
 
 Result<std::shared_ptr<AdjListPropertyArrowChunkReader>>

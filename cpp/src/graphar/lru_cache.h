@@ -20,6 +20,7 @@
 #pragma once
 
 #include <cstddef>
+#include <functional>
 #include <list>
 #include <unordered_map>
 #include <utility>
@@ -77,9 +78,12 @@ class LRUCache {
 struct PairHash {
   template <typename T1, typename T2>
   size_t operator()(const std::pair<T1, T2>& p) const {
-    auto h1 = std::hash<T1>{}(p.first);
-    auto h2 = std::hash<T2>{}(p.second);
-    return h1 ^ (h2 << 32);
+    size_t h1 = std::hash<T1>{}(p.first);
+    size_t h2 = std::hash<T2>{}(p.second);
+    // inspired by boost::hash_combine
+    constexpr size_t kMul = static_cast<size_t>(0x9e3779b97f4a7c15ULL);
+    h1 ^= h2 + kMul + (h1 << 6) + (h1 >> 2);
+    return h1;
   }
 };
 
