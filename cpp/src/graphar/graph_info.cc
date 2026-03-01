@@ -108,8 +108,10 @@ bool operator==(const Property& lhs, const Property& rhs) {
 }
 
 PropertyGroup::PropertyGroup(const std::vector<Property>& properties,
-                             FileType file_type, const std::string& prefix)
-    : properties_(properties), file_type_(file_type), prefix_(prefix) {
+                             FileType file_type, std::string prefix)
+    : properties_(properties),
+      file_type_(file_type),
+      prefix_(std::move(prefix)) {
   if (prefix_.empty() && !properties_.empty()) {
     for (const auto& p : properties_) {
       prefix_ += p.name + REGULAR_SEPARATOR;
@@ -182,8 +184,8 @@ bool operator==(const PropertyGroup& lhs, const PropertyGroup& rhs) {
 }
 
 AdjacentList::AdjacentList(AdjListType type, FileType file_type,
-                           const std::string& prefix)
-    : type_(type), file_type_(file_type), prefix_(prefix) {
+                           std::string prefix)
+    : type_(type), file_type_(file_type), prefix_(std::move(prefix)) {
   if (prefix_.empty()) {
     prefix_ = std::string(AdjListTypeToString(type_)) + "/";
   }
@@ -212,15 +214,15 @@ std::shared_ptr<AdjacentList> CreateAdjacentList(AdjListType type,
 
 class VertexInfo::Impl {
  public:
-  Impl(const std::string& type, IdType chunk_size, const std::string& prefix,
+  Impl(std::string type, IdType chunk_size, std::string prefix,
        const PropertyGroupVector& property_groups,
        const std::vector<std::string>& labels,
        std::shared_ptr<const InfoVersion> version)
-      : type_(type),
+      : type_(std::move(type)),
         chunk_size_(chunk_size),
         property_groups_(std::move(property_groups)),
         labels_(labels),
-        prefix_(prefix),
+        prefix_(std::move(prefix)),
         version_(std::move(version)) {
     if (prefix_.empty()) {
       prefix_ = type_ + "/";  // default prefix
@@ -568,20 +570,20 @@ Status VertexInfo::Save(const std::string& path) const {
 
 class EdgeInfo::Impl {
  public:
-  Impl(const std::string& src_type, const std::string& edge_type,
-       const std::string& dst_type, IdType chunk_size, IdType src_chunk_size,
-       IdType dst_chunk_size, bool directed, const std::string& prefix,
+  Impl(std::string src_type, std::string edge_type, std::string dst_type,
+       IdType chunk_size, IdType src_chunk_size, IdType dst_chunk_size,
+       bool directed, std::string prefix,
        const AdjacentListVector& adjacent_lists,
        const PropertyGroupVector& property_groups,
        std::shared_ptr<const InfoVersion> version)
-      : src_type_(src_type),
-        edge_type_(edge_type),
-        dst_type_(dst_type),
+      : src_type_(std::move(src_type)),
+        edge_type_(std::move(edge_type)),
+        dst_type_(std::move(dst_type)),
         chunk_size_(chunk_size),
         src_chunk_size_(src_chunk_size),
         dst_chunk_size_(dst_chunk_size),
         directed_(directed),
-        prefix_(prefix),
+        prefix_(std::move(prefix)),
         adjacent_lists_(std::move(adjacent_lists)),
         property_groups_(std::move(property_groups)),
         version_(std::move(version)) {
