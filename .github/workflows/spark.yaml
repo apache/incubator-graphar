@@ -27,6 +27,11 @@ on:
       - 'maven-projects/spark/**'
       - '.github/workflows/spark.yaml'
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
     branches:
       - main
     paths:
@@ -40,7 +45,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     strategy:
