@@ -111,6 +111,16 @@ def test_vertices_builder(sample_graph_vertex):
         # Set validate level
         builder.SetValidateLevel(ValidateLevel.strong_validate)
 
+        empty_vertex = BuilderVertex()
+        assert empty_vertex.Empty()
+        with pytest.raises(Exception):
+            empty_vertex.GetId()
+        empty_vertex.SetId(42)
+        assert empty_vertex.GetId() == 42
+        assert empty_vertex.Empty()
+        empty_vertex.AddProperty("id", 42)
+        assert not empty_vertex.Empty()
+
         # Prepare vertex data
         vertex_count = 3
         property_names = ["id", "firstName", "lastName", "gender"]
