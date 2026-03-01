@@ -25,6 +25,11 @@ on:
       - 'docs/**'
       - '.github/workflows/docs.yml'
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
     branches:
       - main
     paths:
@@ -38,7 +43,7 @@ concurrency:
 jobs:
   build-website:
     runs-on: ubuntu-latest
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
     steps:
       - uses: actions/checkout@v4
         with:

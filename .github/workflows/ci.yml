@@ -27,6 +27,11 @@ on:
       - 'cpp/**'
       - '.github/workflows/ci.yml'
   pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
     branches:
       - main
     paths:
@@ -42,7 +47,7 @@ jobs:
     # TODO use ubuntu-latest
     name: Ubuntu 22.04 C++
     runs-on: ubuntu-22.04
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && !github.event.pull_request.draft }}
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     steps:
@@ -201,7 +206,7 @@ jobs:
   macos:
     name: macos latest C++
     runs-on: macos-latest
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     strategy:
