@@ -115,7 +115,7 @@ jobs:
 
     - name: Build GraphAr
       working-directory: "cpp/build"
-      run: make -j$(nproc)
+      run: ninja
 
     - name: Test
       working-directory: "cpp/build"
@@ -167,8 +167,8 @@ jobs:
       run: |
         mkdir build-static
         pushd build-static
-        cmake .. -G Ninja -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        ninja
+        cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        make -j$(nproc)
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
         popd
