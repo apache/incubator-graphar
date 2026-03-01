@@ -115,7 +115,7 @@ jobs:
 
     - name: Build GraphAr
       working-directory: "cpp/build"
-      run: ninja
+      run: make -j$(nproc)
 
     - name: Test
       working-directory: "cpp/build"
