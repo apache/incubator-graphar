@@ -584,8 +584,8 @@ class EdgeInfo::Impl {
         dst_chunk_size_(dst_chunk_size),
         directed_(directed),
         prefix_(std::move(prefix)),
-        adjacent_lists_(std::move(adjacent_lists)),
-        property_groups_(std::move(property_groups)),
+        adjacent_lists_(adjacent_lists),
+        property_groups_(property_groups),
         version_(std::move(version)) {
     if (prefix_.empty()) {
       prefix_ = src_type_ + REGULAR_SEPARATOR + edge_type_ + REGULAR_SEPARATOR +
