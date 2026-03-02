@@ -220,7 +220,7 @@ class VertexInfo::Impl {
        std::shared_ptr<const InfoVersion> version)
       : type_(std::move(type)),
         chunk_size_(chunk_size),
-        property_groups_(std::move(property_groups)),
+        property_groups_(property_groups),
         labels_(labels),
         prefix_(std::move(prefix)),
         version_(std::move(version)) {
