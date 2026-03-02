@@ -27,11 +27,6 @@ on:
       - 'cpp/**'
       - '.github/workflows/ci.yml'
   pull_request:
-    types:
-      - opened
-      - synchronize
-      - reopened
-      - ready_for_review
     branches:
       - main
     paths:
