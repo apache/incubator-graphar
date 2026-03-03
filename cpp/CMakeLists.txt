@@ -650,6 +650,7 @@ if (BUILD_TESTS)
     add_test(test_graph SRCS test/test_graph.cc)
     add_test(test_multi_label SRCS test/test_multi_label.cc)
     add_test(test_multi_property SRCS test/test_multi_property.cc)
+    add_test(test_util SRCS test/test_util.cc)
 
     # enable_testing()
 endif()
