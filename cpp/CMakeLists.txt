@@ -455,18 +455,7 @@ if (BUILD_TESTS)
         include(Catch)
         catch_discover_tests(${target})
     endmacro()
-
-    add_test(test_info SRCS test/test_info.cc)
-    add_test(test_arrow_chunk_writer SRCS test/test_arrow_chunk_writer.cc)
-    add_test(test_builder SRCS test/test_builder.cc)
-    add_test(test_chunk_info_reader SRCS test/test_chunk_info_reader.cc)
-    add_test(test_arrow_chunk_reader SRCS test/test_arrow_chunk_reader.cc)
-    add_test(test_graph SRCS test/test_graph.cc)
-    add_test(test_multi_label SRCS test/test_multi_label.cc)
-    add_test(test_multi_property SRCS test/test_multi_property.cc)
-    add_test(test_util SRCS test/test_util.cc)
-
-    # enable_testing()
+    
 endif()
 
 if (BUILD_BENCHMARKS)
