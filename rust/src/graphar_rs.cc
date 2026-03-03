@@ -17,8 +17,10 @@
  * under the License.
  */
 
-#include "graphar_rs.h"
+#include "graphar-rs/src/ffi.rs.h"
 
+#include <cstddef>
+#include <optional>
 #include <stdexcept>
 #include <utility>
 
@@ -157,6 +159,73 @@ std::shared_ptr<graphar::EdgeInfo> create_edge_info(
   return edge_info;
 }
 
+std::shared_ptr<graphar::GraphInfo> load_graph_info(const std::string& path) {
+  auto loaded = graphar::GraphInfo::Load(path);
+  if (!loaded) {
+    throw std::runtime_error(loaded.error().message());
+  }
+  return std::move(loaded).value();
+}
+
+std::shared_ptr<graphar::GraphInfo> create_graph_info(
+    const std::string& name,
+    const std::vector<graphar::SharedVertexInfo>& vertex_infos,
+    const std::vector<graphar::SharedEdgeInfo>& edge_infos,
+    const rust::Vec<rust::String>& labels, const std::string& prefix,
+    std::shared_ptr<graphar::ConstInfoVersion> version) {
+  if (name.empty()) {
+    throw std::runtime_error("CreateGraphInfo: name must not be empty");
+  }
+
+  std::vector<std::string> label_vec;
+  label_vec.reserve(labels.size());
+  for (size_t i = 0; i < labels.size(); ++i) {
+    label_vec.emplace_back(std::string(labels[i]));
+  }
+
+  auto graph_info = graphar::CreateGraphInfo(name, vertex_infos, edge_infos,
+                                             label_vec, prefix, version);
+  if (graph_info == nullptr) {
+    throw std::runtime_error("CreateGraphInfo: returned nullptr");
+  }
+  // if (!graph_info->IsValidated()) {
+  //   throw std::runtime_error("CreateGraphInfo: graph info is not validated");
+  // }
+  return graph_info;
+}
+
+static graphar::MaybeIndex optional_to_maybe_index(std::optional<size_t> opt) {
+  if (opt) {
+    return graphar::MaybeIndex{true, *opt};
+  } else {
+    return graphar::MaybeIndex{false, 0};
+  }
+}
+
+graphar::MaybeIndex graph_info_vertex_info_index(
+    const graphar::GraphInfo& graph_info, const std::string& type) {
+  return optional_to_maybe_index(graph_info.GetVertexInfoIndex(type));
+}
+
+graphar::MaybeIndex graph_info_edge_info_index(
+    const graphar::GraphInfo& graph_info, const std::string& src_type,
+    const std::string& edge_type, const std::string& dst_type) {
+  return optional_to_maybe_index(
+      graph_info.GetEdgeInfoIndex(src_type, edge_type, dst_type));
+}
+
+void vertex_info_vec_push_vertex_info(
+    std::vector<graphar::SharedVertexInfo>& vertex_infos,
+    std::shared_ptr<graphar::VertexInfo> vertex_info) {
+  vertex_infos.emplace_back(std::move(vertex_info));
+}
+
+void edge_info_vec_push_edge_info(
+    std::vector<graphar::SharedEdgeInfo>& edge_infos,
+    std::shared_ptr<graphar::EdgeInfo> edge_info) {
+  edge_infos.emplace_back(std::move(edge_info));
+}
+
 void vertex_info_save(const graphar::VertexInfo& vertex_info,
                       const std::string& path) {
   auto status = vertex_info.Save(path);
@@ -198,5 +267,22 @@ std::unique_ptr<std::string> edge_info_dump(
     throw std::runtime_error(r.error().message());
   }
   return std::make_unique<std::string>(std::move(r).value());
+}
+
+void graph_info_save(const graphar::GraphInfo& graph_info,
+                     const std::string& path) {
+  auto status = graph_info.Save(path);
+  if (!status.ok()) {
+    throw std::runtime_error(status.message());
+  }
+}
+
+std::unique_ptr<std::string> graph_info_dump(
+    const graphar::GraphInfo& graph_info) {
+  auto dumped = graph_info.Dump();
+  if (!dumped) {
+    throw std::runtime_error(dumped.error().message());
+  }
+  return std::make_unique<std::string>(std::move(dumped).value());
 }
 }  // namespace graphar_rs
