@@ -25,6 +25,7 @@
 #include <vector>
 
 #include "graphar/fwd.h"
+#include "graphar/lru_cache.h"
 #include "graphar/reader_util.h"
 #include "graphar/status.h"
 
@@ -67,7 +68,10 @@ class VertexPropertyArrowChunkReader {
       const std::vector<std::string>& property_names, const std::string& prefix,
       const util::FilterOptions& options = {});
 
-  VertexPropertyArrowChunkReader() : vertex_info_(nullptr), prefix_("") {}
+  VertexPropertyArrowChunkReader()
+      : vertex_info_(nullptr),
+        prefix_(""),
+        chunk_cache_(util::FilterOptions::kDefaultCacheCapacity) {}
 
   /**
    * @brief Initialize the VertexPropertyArrowChunkReader.
@@ -267,6 +271,7 @@ class VertexPropertyArrowChunkReader {
   IdType vertex_num_;
   std::shared_ptr<arrow::Schema> schema_;
   std::shared_ptr<arrow::Table> chunk_table_;
+  LRUCache<IdType, std::shared_ptr<arrow::Table>> chunk_cache_;
   util::FilterOptions filter_options_;
   std::shared_ptr<FileSystem> fs_;
 };
@@ -283,9 +288,12 @@ class AdjListArrowChunkReader {
    * @param edge_info The edge info that describes the edge type.
    * @param adj_list_type The adj list type for the edge.
    * @param prefix The absolute prefix.
+   * @param cache_capacity The capacity of the LRU chunk cache.
    */
-  AdjListArrowChunkReader(const std::shared_ptr<EdgeInfo>& edge_info,
-                          AdjListType adj_list_type, const std::string& prefix);
+  AdjListArrowChunkReader(
+      const std::shared_ptr<EdgeInfo>& edge_info, AdjListType adj_list_type,
+      const std::string& prefix,
+      size_t cache_capacity = util::FilterOptions::kDefaultCacheCapacity);
 
   /**
    * @brief Copy constructor.
@@ -355,10 +363,12 @@ class AdjListArrowChunkReader {
    * @param edge_info The edge info.
    * @param adj_list_type The adj list type for the edges.
    * @param prefix The absolute prefix of the graph.
+   * @param cache_capacity The capacity of the LRU chunk cache. Default is 4.
    */
   static Result<std::shared_ptr<AdjListArrowChunkReader>> Make(
       const std::shared_ptr<EdgeInfo>& edge_info, AdjListType adj_list_type,
-      const std::string& prefix);
+      const std::string& prefix,
+      size_t cache_capacity = util::FilterOptions::kDefaultCacheCapacity);
 
   /**
    * @brief Create an AdjListArrowChunkReader instance from graph info.
@@ -368,11 +378,13 @@ class AdjListArrowChunkReader {
    * @param edge_type The edge type.
    * @param dst_type The destination vertex type.
    * @param adj_list_type The adj list type for the edges.
+   * @param cache_capacity The capacity of the LRU chunk cache. Default is 4.
    */
   static Result<std::shared_ptr<AdjListArrowChunkReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
       const std::string& edge_type, const std::string& dst_type,
-      AdjListType adj_list_type);
+      AdjListType adj_list_type,
+      size_t cache_capacity = util::FilterOptions::kDefaultCacheCapacity);
 
  private:
   Status initOrUpdateEdgeChunkNum();
@@ -384,6 +396,8 @@ class AdjListArrowChunkReader {
   IdType vertex_chunk_index_, chunk_index_;
   IdType seek_offset_;
   std::shared_ptr<arrow::Table> chunk_table_;
+  LRUCache<std::pair<IdType, IdType>, std::shared_ptr<arrow::Table>, PairHash>
+      chunk_cache_;
   IdType vertex_chunk_num_, chunk_num_;
   std::string base_dir_;
   std::shared_ptr<FileSystem> fs_;
@@ -403,10 +417,12 @@ class AdjListOffsetArrowChunkReader {
    *    Note that the adj list type must be AdjListType::ordered_by_source
    *    or AdjListType::ordered_by_dest.
    * @param prefix The absolute prefix.
+   * @param cache_capacity The capacity of the LRU chunk cache.
    */
-  AdjListOffsetArrowChunkReader(const std::shared_ptr<EdgeInfo>& edge_info,
-                                AdjListType adj_list_type,
-                                const std::string& prefix);
+  AdjListOffsetArrowChunkReader(
+      const std::shared_ptr<EdgeInfo>& edge_info, AdjListType adj_list_type,
+      const std::string& prefix,
+      size_t cache_capacity = util::FilterOptions::kDefaultCacheCapacity);
 
   /**
    * @brief Sets chunk position indicator for reader by internal vertex id.
@@ -441,10 +457,12 @@ class AdjListOffsetArrowChunkReader {
    * @param edge_info The edge info.
    * @param adj_list_type The adj list type for the edges.
    * @param prefix The absolute prefix of the graph.
+   * @param cache_capacity The capacity of the LRU chunk cache.
    */
   static Result<std::shared_ptr<AdjListOffsetArrowChunkReader>> Make(
       const std::shared_ptr<EdgeInfo>& edge_info, AdjListType adj_list_type,
-      const std::string& prefix);
+      const std::string& prefix,
+      size_t cache_capacity = util::FilterOptions::kDefaultCacheCapacity);
 
   /**
    * @brief Create an AdjListOffsetArrowChunkReader instance from graph info.
@@ -454,11 +472,13 @@ class AdjListOffsetArrowChunkReader {
    * @param edge_type The edge type.
    * @param dst_type The destination vertex type.
    * @param adj_list_type The adj list type for the edges.
+   * @param cache_capacity The capacity of the LRU chunk cache. Default is 4.
    */
   static Result<std::shared_ptr<AdjListOffsetArrowChunkReader>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
       const std::string& edge_type, const std::string& dst_type,
-      AdjListType adj_list_type);
+      AdjListType adj_list_type,
+      size_t cache_capacity = util::FilterOptions::kDefaultCacheCapacity);
 
  private:
   std::shared_ptr<EdgeInfo> edge_info_;
@@ -467,6 +487,7 @@ class AdjListOffsetArrowChunkReader {
   IdType chunk_index_;
   IdType seek_id_;
   std::shared_ptr<arrow::Table> chunk_table_;
+  LRUCache<IdType, std::shared_ptr<arrow::Table>> chunk_cache_;
   IdType vertex_chunk_num_;
   IdType vertex_chunk_size_;
   std::string base_dir_;
@@ -633,6 +654,8 @@ class AdjListPropertyArrowChunkReader {
   IdType seek_offset_;
   std::shared_ptr<arrow::Schema> schema_;
   std::shared_ptr<arrow::Table> chunk_table_;
+  LRUCache<std::pair<IdType, IdType>, std::shared_ptr<arrow::Table>, PairHash>
+      chunk_cache_;
   util::FilterOptions filter_options_;
   IdType vertex_chunk_num_, chunk_num_;
   std::string base_dir_;
