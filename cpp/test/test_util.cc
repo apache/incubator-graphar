@@ -17,8 +17,10 @@
  * under the License.
  */
 
-#include <catch2/catch_test_macros.hpp>
 #include <iostream>
+#include <string>
+
+#include <catch2/catch_test_macros.hpp>
 #include "./util.h"
 #include "graphar/util.h"
 
