@@ -28,14 +28,19 @@
 
 namespace graphar::util {
 struct FilterOptions {
+  static constexpr size_t kDefaultCacheCapacity = 4;
+
   // The row filter to apply to the table.
   Filter filter = nullptr;
   // The columns to include in the table. Select all columns by default.
   ColumnNames columns = std::nullopt;
+  // The number of chunks to cache in the LRU cache.
+  size_t cache_capacity = kDefaultCacheCapacity;
 
   FilterOptions() {}
-  FilterOptions(Filter filter, ColumnNames columns)
-      : filter(filter), columns(columns) {}
+  FilterOptions(Filter filter, ColumnNames columns,
+                size_t cache_capacity = kDefaultCacheCapacity)
+      : filter(filter), columns(columns), cache_capacity(cache_capacity) {}
 };
 
 Status CheckFilterOptions(
