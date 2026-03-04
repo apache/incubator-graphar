@@ -47,6 +47,11 @@ repos:
       types_or: [c++]
       args: [--style=file, --verbose]
       exclude: ^cpp/thirdparty/
+
+  - repo: https://github.com/cheshirekow/cmake-format-precommit
+    rev: v0.6.10
+    hooks:
+      - id: cmake-format
       
   - repo: https://github.com/pocc/pre-commit-hooks
     rev: v1.3.5
