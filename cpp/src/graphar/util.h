@@ -273,4 +273,6 @@ static arrow::Status OpenParquetArrowReader(
   return arrow::Status::OK();
 }
 
+std::string PathToDirectory(const std::string& path);
+
 }  // namespace graphar::util
