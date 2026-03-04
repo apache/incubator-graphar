@@ -75,7 +75,7 @@ class PropertyGroup {
    *        prefix is the concatenation of property names with '_' as separator
    */
   explicit PropertyGroup(const std::vector<Property>& properties,
-                         FileType file_type, const std::string& prefix = "");
+                         FileType file_type, std::string prefix = "");
 
   /**
    * Get the property list of group.
@@ -137,7 +137,7 @@ class AdjacentList {
    *        prefix will be set the type name of adjacent list
    */
   explicit AdjacentList(AdjListType type, FileType file_type,
-                        const std::string& prefix = "");
+                        std::string prefix = "");
 
   /**
    * @brief Get the type of adjacent list

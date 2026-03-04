@@ -52,7 +52,7 @@ class VertexPropertyArrowChunkReader {
   VertexPropertyArrowChunkReader(
       const std::shared_ptr<VertexInfo>& vertex_info,
       const std::shared_ptr<PropertyGroup>& property_group,
-      const std::string& prefix, const util::FilterOptions& options = {});
+      const std::string& prefix, util::FilterOptions options = {});
   /**
    * @brief Initialize the VertexPropertyArrowChunkReader.
    *
@@ -65,7 +65,7 @@ class VertexPropertyArrowChunkReader {
       const std::shared_ptr<VertexInfo>& vertex_info,
       const std::shared_ptr<PropertyGroup>& property_group,
       const std::vector<std::string>& property_names, const std::string& prefix,
-      const util::FilterOptions& options = {});
+      util::FilterOptions options = {});
 
   VertexPropertyArrowChunkReader() : vertex_info_(nullptr), prefix_("") {}
 
@@ -79,7 +79,7 @@ class VertexPropertyArrowChunkReader {
   VertexPropertyArrowChunkReader(const std::shared_ptr<VertexInfo>& vertex_info,
                                  const std::vector<std::string>& labels,
                                  const std::string& prefix,
-                                 const util::FilterOptions& options = {});
+                                 util::FilterOptions options = {});
   /**
    * @brief Sets chunk position indicator for reader by internal vertex id.
    *    If internal vertex id is not found, will return Status::IndexError
@@ -492,7 +492,7 @@ class AdjListPropertyArrowChunkReader {
       const std::shared_ptr<EdgeInfo>& edge_info,
       const std::shared_ptr<PropertyGroup>& property_group,
       AdjListType adj_list_type, const std::string prefix,
-      const util::FilterOptions& options = {});
+      util::FilterOptions options = {});
 
   /**
    * @brief Copy constructor.
