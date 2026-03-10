@@ -303,8 +303,7 @@ if(BUILD_ARROW_FROM_SOURCE)
   find_package(OpenSSL REQUIRED)
   if(OPENSSL_FOUND)
     if(OPENSSL_VERSION LESS "1.1.0")
-      message(ERROR
-              "The OpenSSL must be greater than or equal to 1.1.0, current version is  ${OPENSSL_VERSION}"
+      message(FATAL_ERROR "The OpenSSL must be greater than or equal to 1.1.0, current version is  ${OPENSSL_VERSION}"
       )
     endif()
   endif()
