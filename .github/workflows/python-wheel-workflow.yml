@@ -232,7 +232,7 @@ jobs:
         run: |
           set -euxo pipefail
           python -m pip install --upgrade pip
-          python -m pip install packaging cibuildwheel
+          python -m pip install packaging "cibuildwheel>=2.22"
           mkdir -p python/dist
           python -m cibuildwheel --output-dir python/dist "$PKGDIR"
 
