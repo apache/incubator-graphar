@@ -45,11 +45,13 @@ Status VertexChunkInfoWriter::validate(
     const std::shared_ptr<PropertyGroup>& property_group, IdType chunk_index,
     ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // weak & strong validate
   if (!vertex_info_->HasPropertyGroup(property_group)) {
     return Status::KeyError("The property group", " does not exist in ",
@@ -108,11 +110,13 @@ Status EdgeChunkInfoWriter::validate(IdType count_or_index1,
                                      IdType count_or_index2,
                                      ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // weak & strong validate for adj list type
   if (!edge_info_->HasAdjacentListType(adj_list_type_)) {
     return Status::KeyError(
@@ -134,11 +138,13 @@ Status EdgeChunkInfoWriter::validate(
     IdType vertex_chunk_index, IdType chunk_index,
     ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // validate for adj list type & index
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   // weak & strong validate for property group
