@@ -26,28 +26,23 @@
 
 namespace graphar {
 
-TEST_CASE_METHOD(GlobalFixture, "PathUtilTest") {
+TEST_CASE("PathUtilTest", "[util]") {
   SECTION("PathToDirectory_S3_Handling") {
-    // 1. Test standard S3 URI with query (existing functionality)
     std::string s3_with_query = "s3://bucket/path/graph.yml?version=123";
     REQUIRE(util::PathToDirectory(s3_with_query) ==
             "s3://bucket/path/?version=123");
 
-    // 2. Test S3 URI WITHOUT query (The Bug Fix!)
     std::string s3_no_query = "s3://bucket/path/graph.yml";
     REQUIRE(util::PathToDirectory(s3_no_query) == "s3://bucket/path/");
 
-    // 3. Test S3 URI at root
     std::string s3_root = "s3://bucket/graph.yml";
     REQUIRE(util::PathToDirectory(s3_root) == "s3://bucket/");
   }
 
   SECTION("PathToDirectory_Local_Handling") {
-    // 4. Test standard local path
     std::string local_path = "/tmp/data/graph.yml";
     REQUIRE(util::PathToDirectory(local_path) == "/tmp/data/");
 
-    // 5. Test relative path
     std::string relative_path = "graph.yml";
     REQUIRE(util::PathToDirectory(relative_path) == "graph.yml");
   }
