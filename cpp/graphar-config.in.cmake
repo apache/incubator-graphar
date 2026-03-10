@@ -23,9 +23,21 @@
 #  GRAPHAR_INCLUDE_DIRS        - include directories for graphar
 #  GRAPHAR_LIBRARIES           - libraries to link against
 
-set(GRAPHAR_HOME "${CMAKE_CURRENT_LIST_DIR}/../../..")
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+if(NOT @BUILD_ARROW_FROM_SOURCE@)
+    find_dependency(Arrow REQUIRED)
+    find_dependency(Parquet REQUIRED)
+    find_dependency(ArrowDataset REQUIRED)
+    if(@Arrow_VERSION@ VERSION_GREATER_EQUAL "12.0.0")
+        find_dependency(ArrowAcero)
+    endif()
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/graphar-targets.cmake")
 
-set(GRAPHAR_LIBRARIES graphar)
-set(GRAPHAR_INCLUDE_DIR "${GRAPHAR_HOME}/include")
-set(GRAPHAR_INCLUDE_DIRS "${GRAPHAR_INCLUDE_DIR}")
+set(GRAPHAR_LIBRARIES graphar::graphar)
+get_target_property(GRAPHAR_INCLUDE_DIRS graphar::graphar INTERFACE_INCLUDE_DIRECTORIES)
+set(GRAPHAR_INCLUDE_DIR ${GRAPHAR_INCLUDE_DIRS})
