@@ -148,6 +148,7 @@ endif()
 # ------------------------------------------------------------------------------
 include(CheckLibraryExists)
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
