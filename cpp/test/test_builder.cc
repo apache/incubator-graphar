@@ -64,6 +64,18 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   builder->SetValidateLevel(ValidateLevel::strong_validate);
   REQUIRE(builder->GetValidateLevel() == ValidateLevel::strong_validate);
 
+  // vertex id and payload state are tracked independently
+  builder::Vertex empty_vertex;
+  REQUIRE_FALSE(empty_vertex.HasId());
+  REQUIRE(empty_vertex.Empty());
+  REQUIRE_THROWS_AS(empty_vertex.GetId(), std::bad_optional_access);
+  empty_vertex.SetId(42);
+  REQUIRE(empty_vertex.HasId());
+  REQUIRE(empty_vertex.GetId() == 42);
+  REQUIRE(empty_vertex.Empty());
+  empty_vertex.AddProperty("id", int64_t{42});
+  REQUIRE_FALSE(empty_vertex.Empty());
+
   // check different validate levels
   builder::Vertex v;
   v.AddProperty("id", "id_of_string");
@@ -80,6 +92,11 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   // clear vertices
   builder->Clear();
   REQUIRE(builder->GetNum() == 0);
+
+  builder::Vertex indexed_vertex(7);
+  REQUIRE(indexed_vertex.HasId());
+  REQUIRE(indexed_vertex.GetId() == 7);
+  REQUIRE(indexed_vertex.Empty());
 
   // add vertices
   std::ifstream fp(test_data_dir + "/ldbc_sample/person_0_0.csv");

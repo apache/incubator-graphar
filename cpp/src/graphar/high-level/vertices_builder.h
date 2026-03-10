@@ -23,6 +23,7 @@
 #include <cassert>
 #include <cstddef>
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -51,21 +52,30 @@ namespace graphar::builder {
  */
 class Vertex {
  public:
-  Vertex() : empty_(true) {}
+  Vertex() = default;
 
   /**
    * @brief Initialize the vertex with a given id.
    *
    * @param id The id of the vertex.
    */
-  explicit Vertex(IdType id) : id_(id), empty_(false) {}
+  explicit Vertex(IdType id) : id_(id) {}
 
   /**
    * @brief Get id of the vertex.
    *
+   * The id is absent until explicitly set or assigned by VerticesBuilder.
+   *
    * @return The id of the vertex.
    */
-  IdType GetId() const noexcept { return id_; }
+  IdType GetId() const { return id_.value(); }
+
+  /**
+   * @brief Check if the vertex id has been initialized.
+   *
+   * @return true/false.
+   */
+  bool HasId() const noexcept { return id_.has_value(); }
 
   /**
    * @brief Set id of the vertex.
@@ -75,11 +85,11 @@ class Vertex {
   void SetId(IdType id) { id_ = id; }
 
   /**
-   * @brief Check if the vertex is empty.
+   * @brief Check if the vertex contains no property payload.
    *
    * @return true/false.
    */
-  bool Empty() const noexcept { return empty_; }
+  bool Empty() const noexcept { return properties_.empty(); }
 
   /**
    * @brief Add a property to the vertex.
@@ -89,7 +99,6 @@ class Vertex {
    */
   // TODO(@acezen): Enable the property to be a vector(list).
   void AddProperty(const std::string& name, const std::any& val) {
-    empty_ = false;
     properties_[name] = val;
   }
 
@@ -100,7 +109,6 @@ class Vertex {
       AddProperty(name, val);
       return;
     }
-    empty_ = false;
     if (cardinalities_.find(name) != cardinalities_.end()) {
       if (cardinalities_[name] != cardinality) {
         throw std::runtime_error("Cardinality mismatch for property: " + name);
@@ -211,8 +219,7 @@ class Vertex {
   }
 
  private:
-  IdType id_;
-  bool empty_;
+  std::optional<IdType> id_;
   std::unordered_map<std::string, std::any> properties_;
   std::unordered_map<std::string, Cardinality> cardinalities_;
 };
