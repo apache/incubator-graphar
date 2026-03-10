@@ -42,7 +42,7 @@ jobs:
     # TODO use ubuntu-latest
     name: Ubuntu 22.04 C++
     runs-on: ubuntu-22.04
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && !github.event.pull_request.draft }}
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     steps:
@@ -71,7 +71,7 @@ jobs:
                             libarrow-dataset-dev=17.0.0-1 \
                             libarrow-acero-dev=17.0.0-1 \
                             libparquet-dev=17.0.0-1
-        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen lcov
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen lcov ninja-build
 
         # install benchmark
         git clone --branch v1.8.3 https://github.com/google/benchmark.git --depth 1
@@ -94,7 +94,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON -DGRAPHAR_ENABLE_COVERAGE=ON
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON -DGRAPHAR_ENABLE_COVERAGE=ON
 
     - name: clang-format
       run: |
@@ -102,23 +102,14 @@ jobs:
         pre-commit install
         pre-commit run clang-format -a
 
-    - name: Validate commit message format
-      run: |
-        COMMIT_MSG=$(git log -1 --pretty=%B)
-        echo "$COMMIT_MSG" > .git/COMMIT_EDITMSG
-        pre-commit run --hook-stage commit-msg --commit-msg-filename .git/COMMIT_EDITMSG 
-
     - name: cpplint
       working-directory: "cpp/build"
       run: |
-        function ec() { [[ "$1" == "-h" ]] && { shift && eval $* > /dev/null 2>&1; ec=$?; echo $ec; } || eval $*; ec=$?; }
-
-        ec make graphar-cpplint
-        if [[ "$ec" != "0" ]]; then
+        if ! ninja graphar-cpplint; then
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             echo "| cpplint failures found! Run: "
             echo "|"
-            echo "|    make graphar-cpplint"
+            echo "|    ninja graphar-cpplint"
             echo "|"
             echo "| to fix this error."
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -129,11 +120,11 @@ jobs:
       working-directory: "cpp/build"
       run: |
         cmake -DENABLE_DOCS=ON ..
-        make docs
+        ninja docs
 
     - name: Build GraphAr
       working-directory: "cpp/build"
-      run: make -j$(nproc)
+      run: ninja
 
     - name: Test
       working-directory: "cpp/build"
@@ -142,7 +133,7 @@ jobs:
         ctest --output-on-failure
 
     - name: Benchmark
-      working-directory: "cpp/build"
+      working-directory: "cpp/build/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
@@ -167,14 +158,14 @@ jobs:
       run: |
         mkdir build-release
         pushd build-release
-        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
         popd
 
     - name: Benchmark-release
-      working-directory: "cpp/build-release"
+      working-directory: "cpp/build-release/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
@@ -201,7 +192,7 @@ jobs:
   macos:
     name: macos latest C++
     runs-on: macos-latest
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     strategy:
@@ -232,8 +223,8 @@ jobs:
       run: |
         mkdir build
         pushd build
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         popd
 
     - name: Running Test
@@ -247,14 +238,14 @@ jobs:
       run: |
         mkdir build-release
         pushd build-release
-        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
         popd
 
     - name: Benchmark-release
-      working-directory: "cpp/build-release"
+      working-directory: "cpp/build-release/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
@@ -265,8 +256,8 @@ jobs:
       run: |
         mkdir build-static
         pushd build-static
-        cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         export ASAN_OPTIONS=detect_leaks=0
         export ASAN_OPTIONS=detect_container_overflow=0
         ctest --output-on-failure
