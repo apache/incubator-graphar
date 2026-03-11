@@ -38,7 +38,7 @@ macro_rules! impl_vertex_property_value {
             impl PropertyValue<Vertex> for $ty {
                 fn add_to(self, vertex: &mut Vertex, name: &str) {
                     let_cxx_string!(name = name);
-                    paste::paste! {
+                    pastey::paste! {
                         ffi::graphar::[<vertex_builder_add_property_ $ty>](vertex.pin_mut(), &name, self);
                     }
                 }
@@ -50,7 +50,7 @@ macro_rules! impl_vertex_property_value {
                     cardinality: Cardinality,
                 ) {
                     let_cxx_string!(name = name);
-                    paste::paste! {
+                    pastey::paste! {
                         ffi::graphar::[<vertex_builder_add_property_ $ty _with_cardinality>](
                             vertex.pin_mut(),
                             cardinality,
