@@ -285,4 +285,39 @@ std::unique_ptr<std::string> graph_info_dump(
   }
   return std::make_unique<std::string>(std::move(dumped).value());
 }
+
+// =========================== Builder ===========================
+// `Vertex`
+std::unique_ptr<graphar::builder::Vertex> new_vertex_builder() {
+  return std::make_unique<graphar::builder::Vertex>();
+}
+
+void add_vertex(graphar::builder::VerticesBuilder& builder,
+                graphar::builder::Vertex& v) {
+  auto status = builder.AddVertex(v);
+  if (!status.ok()) {
+    throw std::runtime_error(status.message());
+  }
+}
+
+std::unique_ptr<graphar::builder::VerticesBuilder>
+new_vertices_builder(const std::shared_ptr<graphar::VertexInfo>& vertex_info,
+                     const std::string& path_prefix, i64 start_idx) {
+  if (vertex_info == nullptr) {
+    throw std::runtime_error("VerticesBuilder: vertex_info must not be null");
+  }
+  if (start_idx < 0) {
+    throw std::runtime_error("VerticesBuilder: start_idx must be >= 0");
+  }
+
+  return std::make_unique<graphar::builder::VerticesBuilder>(
+      vertex_info, path_prefix, static_cast<graphar::IdType>(start_idx));
+}
+
+void vertices_dump(graphar::builder::VerticesBuilder &builder) {
+  auto status = builder.Dump();
+  if (!status.ok()) {
+    throw std::runtime_error(status.message());
+  }
+}
 }  // namespace graphar_rs
