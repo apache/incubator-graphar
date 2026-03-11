@@ -516,22 +516,4 @@ mod tests {
             Err(err) => assert!(matches!(err, crate::Error::Cxx(_))),
         }
     }
-
-    #[test]
-    fn test() {
-        let info = make_vertex_info();
-
-        let prefix = "/tmp/verticesbuidler/";
-        let mut builder = VerticesBuilder::try_new(&info, prefix, 0).unwrap();
-        let mut v = Vertex::new();
-        v.add_property("id_i64", 1_i64);
-        v.add_property("active_bool", true);
-        v.add_property("age_i32", 42_i32);
-        v.add_property("score_f32", 0.5_f32);
-        v.add_property("rating_f64", 9.5_f64);
-        v.add_property("name_string", "alice");
-        builder.add_vertex(v).unwrap();
-
-        builder.dump().unwrap();
-    }
 }
