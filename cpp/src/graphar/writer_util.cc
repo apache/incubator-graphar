@@ -86,6 +86,13 @@ WriterOptions::getParquetWriterProperties() const {
   return builder.build();
 }
 
+int64_t WriterOptions::getParquetMaxRowGroupLength() const {
+  if (parquetOption_) {
+    return parquetOption_->max_row_group_length;
+  }
+  return parquet::WriterProperties::Builder().build()->max_row_group_length();
+}
+
 std::shared_ptr<parquet::ArrowWriterProperties>
 WriterOptions::getArrowWriterProperties() const {
   parquet::ArrowWriterProperties::Builder builder;

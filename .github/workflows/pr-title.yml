@@ -15,36 +15,49 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: license
+name: GraphAr Pull Request Title Check
 
 on:
-  push:
+  pull_request_target:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - ready_for_review
 
 concurrency:
   group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
   cancel-in-progress: true
 
+permissions:
+  pull-requests: read
+
 jobs:
-  license-check:
-    name: License Check
+  validate-title:
+    name: Validate pull request title
     runs-on: ubuntu-slim
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
-          ref: ${{ github.event.pull_request.head.ref || github.ref }}
-          submodules: false
-          fetch-depth: 0
-
-      - name: Check license header
-        uses: apache/skywalking-eyes@61275cc80d0798a405cb070f7d3a8aaf7cf2c2c1 # v0.8.0
+      - uses: amannn/action-semantic-pull-request@v6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          config: .github/.licenserc.yaml
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            test
+            chore
+            perf
+            ci
+            build
+            revert
+          requireScope: false
+          subjectPattern: ^.+$
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            is empty. Please provide a meaningful description.

@@ -96,14 +96,14 @@ namespace ds = arrow::dataset;
 std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
     const FileType type) const {
   switch (type) {
-  case CSV:
+  case FileType::CSV:
     return std::make_shared<ds::CsvFileFormat>();
-  case PARQUET:
+  case FileType::PARQUET:
     return std::make_shared<ds::ParquetFileFormat>();
-  case JSON:
+  case FileType::JSON:
     return std::make_shared<ds::JsonFileFormat>();
 #ifdef ARROW_ORC
-  case ORC:
+  case FileType::ORC:
     return std::make_shared<ds::OrcFileFormat>();
 #endif
   default:
@@ -123,18 +123,15 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
   builder.memory_pool(arrow::default_memory_pool());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto reader, builder.Build());
   std::shared_ptr<arrow::Table> table;
+  arrow::Status read_status;
   if (column_indices.empty()) {
-    arrow::Status read_status = reader->ReadTable(&table);
-    if (!read_status.ok()) {
-      return Status::Invalid("Failed to read table from file: ", path, " - ",
-                             read_status.ToString());
-    }
+    read_status = reader->ReadTable(&table);
   } else {
-    arrow::Status read_status = reader->ReadTable(column_indices, &table);
-    if (!read_status.ok()) {
-      return Status::Invalid("Failed to read table from file: ", path, " - ",
-                             read_status.ToString());
-    }
+    read_status = reader->ReadTable(column_indices, &table);
+  }
+  if (!read_status.ok()) {
+    return Status::Invalid("Failed to read table from file: ", path, " - ",
+                           read_status.ToString());
   }
   return table;
 }
@@ -215,8 +212,8 @@ Result<T> FileSystem::ReadFileToValue(const std::string& path) const noexcept {
 }
 
 template <>
-Result<std::string> FileSystem::ReadFileToValue(const std::string& path) const
-    noexcept {
+Result<std::string> FileSystem::ReadFileToValue(
+    const std::string& path) const noexcept {
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto access_file,
                                        arrow_fs_->OpenInputFile(path));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto bytes, access_file->GetSize());
@@ -269,8 +266,9 @@ Status FileSystem::WriteTableToFile(
   }
   case FileType::PARQUET: {
     auto schema = table->schema();
+    auto row_group_size = options->getParquetMaxRowGroupLength();
     RETURN_NOT_ARROW_OK(parquet::arrow::WriteTable(
-        *table, arrow::default_memory_pool(), output_stream, 64 * 1024 * 1024,
+        *table, arrow::default_memory_pool(), output_stream, row_group_size,
         options->getParquetWriterProperties(),
         options->getArrowWriterProperties()));
     break;
@@ -293,19 +291,19 @@ Status FileSystem::WriteTableToFile(
 }
 
 Status FileSystem::WriteLabelTableToFile(
-    const std::shared_ptr<arrow::Table>& table, const std::string& path) const
-    noexcept {
+    const std::shared_ptr<arrow::Table>& table,
+    const std::string& path) const noexcept {
   // try to create the directory, oss filesystem may not support this, ignore
   ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto output_stream,
                                        arrow_fs_->OpenOutputStream(path));
   auto schema = table->schema();
-  auto column_num = schema->num_fields();
   parquet::WriterProperties::Builder builder;
   builder.compression(arrow::Compression::type::ZSTD);  // enable compression
   builder.encoding(parquet::Encoding::RLE);
+  auto row_group_size = builder.build()->max_row_group_length();
   RETURN_NOT_ARROW_OK(parquet::arrow::WriteTable(
-      *table, arrow::default_memory_pool(), output_stream, 64 * 1024 * 1024,
+      *table, arrow::default_memory_pool(), output_stream, row_group_size,
       builder.build(), parquet::default_arrow_writer_properties()));
   return Status::OK();
 }
@@ -398,7 +396,6 @@ Status FinalizeS3() {
 template Result<IdType> FileSystem::ReadFileToValue<IdType>(
     const std::string&) const noexcept;
 /// template specialization for std::string
-template Status FileSystem::WriteValueToFile<IdType>(const IdType&,
-                                                     const std::string&) const
-    noexcept;
+template Status FileSystem::WriteValueToFile<IdType>(
+    const IdType&, const std::string&) const noexcept;
 }  // namespace graphar

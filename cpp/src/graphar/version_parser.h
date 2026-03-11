@@ -57,7 +57,7 @@ class InfoVersion {
   /** Copy constructor */
   InfoVersion(const InfoVersion& other) = default;
   /** Copy assignment */
-  inline InfoVersion& operator=(const InfoVersion& other) = default;
+  InfoVersion& operator=(const InfoVersion& other) = default;
 
   /** Check if two InfoVersion are equal */
   bool operator==(const InfoVersion& other) const {
@@ -87,7 +87,7 @@ class InfoVersion {
   }
 
   /** Check if type is supported by version. */
-  inline bool CheckType(const std::string& type_str) const {
+  bool CheckType(const std::string& type_str) const {
     auto& types = version2types.at(version_);
     // check if type_str is in supported types of version
     if (std::find(types.begin(), types.end(), type_str) != types.end()) {

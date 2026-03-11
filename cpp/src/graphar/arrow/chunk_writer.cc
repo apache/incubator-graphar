@@ -126,11 +126,13 @@ VertexPropertyWriter::VertexPropertyWriter(
 Status VertexPropertyWriter::validate(const IdType& count,
                                       ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // weak & strong validate
   if (count < 0) {
     return Status::Invalid("The number of vertices is negative.");
@@ -143,11 +145,13 @@ Status VertexPropertyWriter::validate(
     const std::shared_ptr<PropertyGroup>& property_group, IdType chunk_index,
     ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // weak & strong validate
   if (!vertex_info_->HasPropertyGroup(property_group)) {
     return Status::KeyError("The property group", " does not exist in ",
@@ -333,7 +337,6 @@ Status VertexPropertyWriter::WriteLabelTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType start_chunk_index,
     FileType file_type, ValidateLevel validate_level) const {
   auto schema = input_table->schema();
-  int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
   IdType chunk_size = vertex_info_->GetChunkSize();
   int64_t length = input_table->num_rows();
   IdType chunk_index = start_chunk_index;
@@ -513,11 +516,13 @@ EdgeChunkWriter::EdgeChunkWriter(const std::shared_ptr<EdgeInfo>& edge_info,
 Status EdgeChunkWriter::validate(IdType count_or_index1, IdType count_or_index2,
                                  ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // weak & strong validate for adj list type
   if (!edge_info_->HasAdjacentListType(adj_list_type_)) {
     return Status::KeyError(
@@ -539,11 +544,13 @@ Status EdgeChunkWriter::validate(
     IdType vertex_chunk_index, IdType chunk_index,
     ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // validate for adj list type & index
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   // weak & strong validate for property group
@@ -559,11 +566,13 @@ Status EdgeChunkWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // validate for adj list type & index
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, 0, validate_level));
   // weak validate for the input table
@@ -614,11 +623,13 @@ Status EdgeChunkWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     IdType chunk_index, ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // validate for adj list type & index
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   // weak validate for the input table
@@ -667,11 +678,13 @@ Status EdgeChunkWriter::validate(
     IdType vertex_chunk_index, IdType chunk_index,
     ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // validate for property group, adj list type & index
   GAR_RETURN_NOT_OK(validate(property_group, vertex_chunk_index, chunk_index,
                              validate_level));
@@ -971,12 +984,14 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::getOffsetTable(
   int64_t global_index = 0;
   for (IdType i = begin_index; i < end_index; i++) {
     while (true) {
-      if (array_index >= column->num_chunks())
+      if (array_index >= column->num_chunks()) {
         break;
+      }
       if (index >= ids->length()) {
         array_index++;
-        if (array_index == column->num_chunks())
+        if (array_index == column->num_chunks()) {
           break;
+        }
         ids = std::static_pointer_cast<arrow::Int64Array>(
             column->chunk(array_index));
         index = 0;

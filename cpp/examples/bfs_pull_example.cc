@@ -51,8 +51,9 @@ int main(int argc, char* argv[]) {
   // run bfs algorithm
   graphar::IdType root = 0;
   std::vector<int32_t> distance(num_vertices);
-  for (graphar::IdType i = 0; i < num_vertices; i++)
+  for (graphar::IdType i = 0; i < num_vertices; i++) {
     distance[i] = (i == root ? 0 : -1);
+  }
   auto it_begin = edges->begin(), it_end = edges->end();
   auto it = it_begin;
   for (int iter = 0;; iter++) {
@@ -60,8 +61,9 @@ int main(int argc, char* argv[]) {
     it.to_begin();
     for (graphar::IdType vid = 0; vid < num_vertices; vid++) {
       if (distance[vid] == -1) {
-        if (!it.first_dst(it, vid))
+        if (!it.first_dst(it, vid)) {
           continue;
+        }
         // if (!it.first_dst(it_begin, vid)) continue;
         do {
           graphar::IdType src = it.source(), dst = it.destination();
@@ -74,8 +76,9 @@ int main(int argc, char* argv[]) {
       }
     }
     std::cout << "iter " << iter << ": " << count << " vertices." << std::endl;
-    if (count == 0)
+    if (count == 0) {
       break;
+    }
   }
   for (int i = 0; i < num_vertices; i++) {
     std::cout << i << ", distance: " << distance[i] << std::endl;

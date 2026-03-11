@@ -77,7 +77,7 @@ class VertexPropertyWriter {
    *
    * @param validate_level The validate level to set.
    */
-  inline void SetValidateLevel(const ValidateLevel& validate_level) {
+  void SetValidateLevel(const ValidateLevel& validate_level) {
     if (validate_level == ValidateLevel::default_validate) {
       return;
     }
@@ -89,7 +89,7 @@ class VertexPropertyWriter {
    *
    * @return The validate level of this writer.
    */
-  inline ValidateLevel GetValidateLevel() const { return validate_level_; }
+  ValidateLevel GetValidateLevel() const { return validate_level_; }
 
   /**
    * @brief Write the number of vertices into the file.
@@ -354,7 +354,7 @@ class EdgeChunkWriter {
    *
    * @return The validate level of this writer.
    */
-  inline ValidateLevel GetValidateLevel() const { return validate_level_; }
+  ValidateLevel GetValidateLevel() const { return validate_level_; }
 
   /**
    * @brief Write the number of edges into the file.

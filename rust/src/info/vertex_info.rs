@@ -124,8 +124,9 @@ impl VertexInfo {
 
     /// Return the number of property groups.
     ///
-    /// TODO: upstream C++ uses `int` for this return type; prefer fixed-width.
-    pub fn property_group_num(&self) -> i32 {
+    /// The upstream C++ API uses `int`; this binding returns `usize` for a
+    /// Rust-idiomatic count type.
+    pub fn property_group_num(&self) -> usize {
         self.0.PropertyGroupNum()
     }
 
@@ -172,10 +173,8 @@ impl VertexInfo {
     /// If you only need a borrowed reference and want bounds checking, prefer
     /// [`VertexInfo::property_groups_cxx`] and `cxx::CxxVector::get`, or
     /// [`VertexInfo::property_groups_iter`] with `nth`.
-    /// TODO: upstream C++ uses `int` for this parameter; prefer fixed-width.
-    ///
     /// Returns `None` if the index is out of range.
-    pub fn property_group_by_index(&self, index: i32) -> Option<PropertyGroup> {
+    pub fn property_group_by_index(&self, index: usize) -> Option<PropertyGroup> {
         let sp = self.0.GetPropertyGroupByIndex(index);
         if sp.is_null() {
             None
@@ -467,7 +466,7 @@ mod tests {
         assert!(by_index.has_property("id"));
 
         assert!(vertex_info.property_group_by_index(1).is_none());
-        assert!(vertex_info.property_group_by_index(-1).is_none());
+        assert!(vertex_info.property_group_by_index(usize::MAX).is_none());
     }
 
     #[test]

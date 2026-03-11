@@ -50,6 +50,18 @@ like (where issue \#42 is the ticket you're working on):
 ```shell
 $ git checkout -b 42-add-chinese-translations
 ```
+### pre-commit
+
+Install the python package `pre-commit` and run once `pre-commit install`.
+
+```
+pip install pre-commit
+pre-commit install
+pre-commit run # check staged files
+pre-commit run -a # check all files
+```
+
+This will set up a git pre-commit-hook that is executed on each commit and will report the linting problems.
 
 ### GitHub Pull Requests
 

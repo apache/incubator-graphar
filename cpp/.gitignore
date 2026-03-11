@@ -4,3 +4,4 @@
 
 apidoc/html
 apidoc/xml
+*.log

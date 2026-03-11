@@ -154,15 +154,15 @@ Status CastTableWithSchema(const std::shared_ptr<arrow::Table>& table,
 VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
     const std::shared_ptr<VertexInfo>& vertex_info,
     const std::shared_ptr<PropertyGroup>& property_group,
-    const std::string& prefix, const util::FilterOptions& options)
+    const std::string& prefix, util::FilterOptions options)
     : VertexPropertyArrowChunkReader(vertex_info, property_group, {}, prefix,
-                                     options) {}
+                                     std::move(options)) {}
 
 VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
     const std::shared_ptr<VertexInfo>& vertex_info,
     const std::shared_ptr<PropertyGroup>& property_group,
     const std::vector<std::string>& property_names, const std::string& prefix,
-    const util::FilterOptions& options)
+    util::FilterOptions options)
     : vertex_info_(std::move(vertex_info)),
       property_group_(std::move(property_group)),
       property_names_(std::move(property_names)),
@@ -170,7 +170,7 @@ VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
       seek_id_(0),
       schema_(nullptr),
       chunk_table_(nullptr),
-      filter_options_(options) {
+      filter_options_(std::move(options)) {
   GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
   GAR_ASSIGN_OR_RAISE_ERROR(auto pg_path_prefix,
                             vertex_info->GetPathPrefix(property_group));
@@ -187,14 +187,14 @@ VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
 VertexPropertyArrowChunkReader::VertexPropertyArrowChunkReader(
     const std::shared_ptr<VertexInfo>& vertex_info,
     const std::vector<std::string>& labels, const std::string& prefix,
-    const util::FilterOptions& options)
+    util::FilterOptions options)
     : vertex_info_(std::move(vertex_info)),
       labels_(labels),
       chunk_index_(0),
       seek_id_(0),
       schema_(nullptr),
       chunk_table_(nullptr),
-      filter_options_(options) {
+      filter_options_(std::move(options)) {
   GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
 
   std::string base_dir = prefix_ + vertex_info_->GetPrefix() + "labels/chunk" +
@@ -433,6 +433,8 @@ VertexPropertyArrowChunkReader::Make(
   case SelectType::PROPERTIES:
     return MakeForProperties(graph_info, type, property_names_or_labels,
                              options);
+  default:
+    return Status::Invalid("Unsupported select type");
   }
 }
 
@@ -466,7 +468,7 @@ VertexPropertyArrowChunkReader::MakeForProperties(
         property_names_mutable[property_names_mutable.size() - 1],
         " doesn't exist in vertex type ", type, ".");
   }
-  for (int i = 0; i < property_names_mutable.size() - 1; i++) {
+  for (size_t i = 0; i < property_names_mutable.size() - 1; i++) {
     if (property_names_mutable[i] == graphar::GeneralParams::kVertexIndexCol) {
       hasIndexCol = true;
     }
@@ -546,6 +548,23 @@ AdjListArrowChunkReader::AdjListArrowChunkReader(
       chunk_num_(other.chunk_num_),
       base_dir_(other.base_dir_),
       fs_(other.fs_) {}
+
+AdjListArrowChunkReader& AdjListArrowChunkReader::operator=(
+    const AdjListArrowChunkReader& other) {
+  if (this != &other) {
+    edge_info_ = other.edge_info_;
+    adj_list_type_ = other.adj_list_type_;
+    vertex_chunk_index_ = other.vertex_chunk_index_;
+    chunk_index_ = other.chunk_index_;
+    seek_offset_ = other.seek_offset_;
+    chunk_table_ = nullptr;
+    vertex_chunk_num_ = other.vertex_chunk_num_;
+    chunk_num_ = other.chunk_num_;
+    base_dir_ = other.base_dir_;
+    fs_ = other.fs_;
+  }
+  return *this;
+}
 
 Status AdjListArrowChunkReader::seek_src(IdType id) {
   if (adj_list_type_ != AdjListType::unordered_by_source &&
@@ -836,7 +855,7 @@ AdjListPropertyArrowChunkReader::AdjListPropertyArrowChunkReader(
     const std::shared_ptr<EdgeInfo>& edge_info,
     const std::shared_ptr<PropertyGroup>& property_group,
     AdjListType adj_list_type, const std::string prefix,
-    const util::FilterOptions& options)
+    util::FilterOptions options)
     : edge_info_(std::move(edge_info)),
       property_group_(std::move(property_group)),
       adj_list_type_(adj_list_type),
@@ -846,7 +865,7 @@ AdjListPropertyArrowChunkReader::AdjListPropertyArrowChunkReader(
       seek_offset_(0),
       schema_(nullptr),
       chunk_table_(nullptr),
-      filter_options_(options),
+      filter_options_(std::move(options)),
       chunk_num_(-1) /* -1 means uninitialized */ {
   GAR_ASSIGN_OR_RAISE_ERROR(fs_, FileSystemFromUriOrPath(prefix, &prefix_));
   GAR_ASSIGN_OR_RAISE_ERROR(
@@ -876,6 +895,27 @@ AdjListPropertyArrowChunkReader::AdjListPropertyArrowChunkReader(
       chunk_num_(other.chunk_num_),
       base_dir_(other.base_dir_),
       fs_(other.fs_) {}
+
+AdjListPropertyArrowChunkReader& AdjListPropertyArrowChunkReader::operator=(
+    const AdjListPropertyArrowChunkReader& other) {
+  if (this != &other) {
+    edge_info_ = other.edge_info_;
+    property_group_ = other.property_group_;
+    adj_list_type_ = other.adj_list_type_;
+    prefix_ = other.prefix_;
+    vertex_chunk_index_ = other.vertex_chunk_index_;
+    chunk_index_ = other.chunk_index_;
+    seek_offset_ = other.seek_offset_;
+    schema_ = other.schema_;
+    chunk_table_ = nullptr;
+    filter_options_ = other.filter_options_;
+    vertex_chunk_num_ = other.vertex_chunk_num_;
+    chunk_num_ = other.chunk_num_;
+    base_dir_ = other.base_dir_;
+    fs_ = other.fs_;
+  }
+  return *this;
+}
 
 Status AdjListPropertyArrowChunkReader::seek_src(IdType id) {
   if (adj_list_type_ != AdjListType::unordered_by_source &&

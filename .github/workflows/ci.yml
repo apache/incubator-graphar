@@ -42,13 +42,22 @@ jobs:
     # TODO use ubuntu-latest
     name: Ubuntu 22.04 C++
     runs-on: ubuntu-22.04
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && !github.event.pull_request.draft }}
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     steps:
     - uses: actions/checkout@v3
       with:
           submodules: true
+
+    - name: Cache ccache
+      uses: actions/cache@v4
+      with:
+        path: ~/.ccache
+        key: ${{ runner.os }}-ccache-${{ github.head_ref || github.ref_name }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-${{ github.head_ref || github.ref_name }}-
+          ${{ runner.os }}-ccache-
 
     - name: Install dependencies
       run: |
@@ -62,7 +71,7 @@ jobs:
                             libarrow-dataset-dev=17.0.0-1 \
                             libarrow-acero-dev=17.0.0-1 \
                             libparquet-dev=17.0.0-1
-        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen lcov
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev doxygen lcov ninja-build
 
         # install benchmark
         git clone --branch v1.8.3 https://github.com/google/benchmark.git --depth 1
@@ -85,48 +94,22 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON  -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_C_FLAGS="--coverage"
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON -DGRAPHAR_ENABLE_COVERAGE=ON
 
-    - name: Cpp Format and lint
+    - name: clang-format
+      run: |
+        pip install pre-commit
+        pre-commit install
+        pre-commit run clang-format -a
+
+    - name: cpplint
       working-directory: "cpp/build"
       run: |
-        # install clang-format
-        sudo curl -L https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-22538c65/clang-format-8_linux-amd64 --output /usr/bin/clang-format
-        sudo chmod +x /usr/bin/clang-format
-
-        # validate format
-        function prepend() { while read line; do echo "${1}${line}"; done; }
-
-        make graphar-clformat
-        GIT_DIFF=$(git diff --ignore-submodules)
-        if [[ -n $GIT_DIFF ]]; then
-            echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-            echo "| clang-format failures found!"
-            echo "|"
-            echo "$GIT_DIFF" | prepend "| "
-            echo "|"
-            echo "| Run: "
-            echo "|"
-            echo "|    make graphar-clformat"
-            echo "|"
-            echo "| to fix this error."
-            echo "|"
-            echo "| Ensure you are working with clang-format-8, which can be obtained from"
-            echo "|"
-            echo "|    https://github.com/muttleyxd/clang-tools-static-binaries/releases"
-            echo "|"
-            echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-            exit -1
-        fi
-
-        function ec() { [[ "$1" == "-h" ]] && { shift && eval $* > /dev/null 2>&1; ec=$?; echo $ec; } || eval $*; ec=$?; }
-
-        ec make graphar-cpplint
-        if [[ "$ec" != "0" ]]; then
+        if ! ninja graphar-cpplint; then
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
             echo "| cpplint failures found! Run: "
             echo "|"
-            echo "|    make graphar-cpplint"
+            echo "|    ninja graphar-cpplint"
             echo "|"
             echo "| to fix this error."
             echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
@@ -137,11 +120,11 @@ jobs:
       working-directory: "cpp/build"
       run: |
         cmake -DENABLE_DOCS=ON ..
-        make docs
+        ninja docs
 
     - name: Build GraphAr
       working-directory: "cpp/build"
-      run: make -j$(nproc)
+      run: ninja
 
     - name: Test
       working-directory: "cpp/build"
@@ -150,7 +133,7 @@ jobs:
         ctest --output-on-failure
 
     - name: Benchmark
-      working-directory: "cpp/build"
+      working-directory: "cpp/build/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
@@ -175,14 +158,14 @@ jobs:
       run: |
         mkdir build-release
         pushd build-release
-        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
         popd
 
     - name: Benchmark-release
-      working-directory: "cpp/build-release"
+      working-directory: "cpp/build-release/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
@@ -209,7 +192,7 @@ jobs:
   macos:
     name: macos latest C++
     runs-on: macos-latest
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') && github.event.pull_request.draft == false }}
+    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
     strategy:
@@ -220,18 +203,28 @@ jobs:
       with:
           submodules: true
 
+    - name: Cache ccache
+      uses: actions/cache@v4
+      with:
+        path: ~/Library/Caches/ccache
+        key: ${{ runner.os }}-ccache-${{ github.head_ref || github.ref_name }}-${{ github.run_id }}
+        restore-keys: |
+          ${{ runner.os }}-ccache-${{ github.head_ref || github.ref_name }}-
+          ${{ runner.os }}-ccache-
+
     - name: Install dependencies
       run: |
         brew bundle --file=cpp/Brewfile
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+        brew list --versions
 
     - name: Build GraphAr
       working-directory: "cpp"
       run: |
         mkdir build
         pushd build
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         popd
 
     - name: Running Test
@@ -245,14 +238,14 @@ jobs:
       run: |
         mkdir build-release
         pushd build-release
-        cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         export ASAN_OPTIONS=detect_leaks=0
         ctest --output-on-failure
         popd
 
     - name: Benchmark-release
-      working-directory: "cpp/build-release"
+      working-directory: "cpp/build-release/benchmarks"
       run: |
         ./graph_info_benchmark
         ./arrow_chunk_reader_benchmark
@@ -263,8 +256,8 @@ jobs:
       run: |
         mkdir build-static
         pushd build-static
-        cmake .. -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
-        make -j$(nproc)
+        cmake .. -G Ninja -DUSE_STATIC_ARROW=ON -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_BENCHMARKS=ON
+        ninja
         export ASAN_OPTIONS=detect_leaks=0
         export ASAN_OPTIONS=detect_container_overflow=0
         ctest --output-on-failure

@@ -68,8 +68,9 @@ int main(int argc, char* argv[]) {
       }
     }
     std::cout << "iter " << iter << ": " << count << " vertices." << std::endl;
-    if (count == 0)
+    if (count == 0) {
       break;
+    }
   }
   for (int i = 0; i < num_vertices; i++) {
     std::cout << i << ", distance: " << distance[i] << ", father: " << pre[i]

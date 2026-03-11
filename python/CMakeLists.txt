@@ -59,10 +59,10 @@ find_package(ArrowAcero REQUIRED)
 find_package(Parquet REQUIRED)
 
 if(APPLE)
-  # cibuildwheel uses delocate to bundle external dylibs into the wheel.
-  # delocate needs to be able to resolve @rpath dependencies (e.g.
+  # cibuildwheel uses deallocate to bundle external dylibs into the wheel.
+  # deallocate needs to be able to resolve @rpath dependencies (e.g.
   # @rpath/libarrow.1300.dylib). We add the imported Arrow/Parquet library
-  # directories to LC_RPATH so delocate can find and copy them.
+  # directories to LC_RPATH so deallocate can find and copy them.
   set(_graphar_macos_rpaths "")
 
   foreach(_tgt IN ITEMS Arrow::arrow_shared ArrowDataset::arrow_dataset_shared ArrowAcero::arrow_acero_shared Parquet::parquet_shared)
@@ -111,7 +111,7 @@ target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 # packaged libgraphar at runtime inside the wheel.
 if(APPLE)
   # Keep @loader_path for runtime inside the wheel, and add Arrow/Parquet
-  # library dirs so delocate can resolve @rpath dependencies during repair.
+  # library dirs so deallocate can resolve @rpath dependencies during repair.
   set(_core_rpath "@loader_path")
   if(_graphar_macos_rpaths)
     list(JOIN _graphar_macos_rpaths ";" _graphar_macos_rpaths_joined)

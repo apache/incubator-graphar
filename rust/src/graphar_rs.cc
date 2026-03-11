@@ -17,85 +17,86 @@
  * under the License.
  */
 
-#include "graphar_rs.h"
+#include "graphar-rs/src/ffi.rs.h"
 
+#include <cstddef>
+#include <optional>
 #include <stdexcept>
 #include <utility>
 
 namespace graphar_rs {
-rust::String to_type_name(const graphar::DataType &type) {
+rust::String to_type_name(const graphar::DataType& type) {
   return rust::String(type.ToTypeName());
 }
 
-std::shared_ptr<graphar::ConstInfoVersion>
-new_const_info_version(int32_t version) {
+std::shared_ptr<graphar::ConstInfoVersion> new_const_info_version(
+    int32_t version) {
   // Let any upstream exceptions propagate to Rust via `cxx::Exception`.
   return std::make_shared<graphar::InfoVersion>(static_cast<int>(version));
 }
 
-std::unique_ptr<graphar::Property>
-new_property(const std::string &name, std::shared_ptr<graphar::DataType> type,
-             bool is_primary, bool is_nullable,
-             graphar::Cardinality cardinality) {
+std::unique_ptr<graphar::Property> new_property(
+    const std::string& name, std::shared_ptr<graphar::DataType> type,
+    bool is_primary, bool is_nullable, graphar::Cardinality cardinality) {
   return std::make_unique<graphar::Property>(name, type, is_primary,
                                              is_nullable, cardinality);
 }
-const std::string &property_get_name(const graphar::Property &prop) {
+const std::string& property_get_name(const graphar::Property& prop) {
   return prop.name;
 }
-const std::shared_ptr<graphar::DataType> &
-property_get_type(const graphar::Property &prop) {
+const std::shared_ptr<graphar::DataType>& property_get_type(
+    const graphar::Property& prop) {
   return prop.type;
 }
-bool property_is_primary(const graphar::Property &prop) {
+bool property_is_primary(const graphar::Property& prop) {
   return prop.is_primary;
 }
-bool property_is_nullable(const graphar::Property &prop) {
+bool property_is_nullable(const graphar::Property& prop) {
   return prop.is_nullable;
 }
-graphar::Cardinality property_get_cardinality(const graphar::Property &prop) {
+graphar::Cardinality property_get_cardinality(const graphar::Property& prop) {
   return prop.cardinality;
 }
-std::unique_ptr<graphar::Property>
-property_clone(const graphar::Property &prop) {
+std::unique_ptr<graphar::Property> property_clone(
+    const graphar::Property& prop) {
   return std::make_unique<graphar::Property>(prop);
 }
 
-void property_vec_push_property(std::vector<graphar::Property> &properties,
+void property_vec_push_property(std::vector<graphar::Property>& properties,
                                 std::unique_ptr<graphar::Property> prop) {
   properties.emplace_back(*prop);
 }
 
-void property_vec_emplace_property(std::vector<graphar::Property> &properties,
-                                   const std::string &name,
+void property_vec_emplace_property(std::vector<graphar::Property>& properties,
+                                   const std::string& name,
                                    std::shared_ptr<graphar::DataType> type,
                                    bool is_primary, bool is_nullable,
                                    graphar::Cardinality cardinality) {
   properties.emplace_back(name, type, is_primary, is_nullable, cardinality);
 }
 
-std::unique_ptr<std::vector<graphar::Property>>
-property_vec_clone(const std::vector<graphar::Property> &properties) {
+std::unique_ptr<std::vector<graphar::Property>> property_vec_clone(
+    const std::vector<graphar::Property>& properties) {
   return std::make_unique<std::vector<graphar::Property>>(properties);
 }
 
 void property_group_vec_push_property_group(
-    std::vector<graphar::SharedPropertyGroup> &property_groups,
+    std::vector<graphar::SharedPropertyGroup>& property_groups,
     std::shared_ptr<graphar::PropertyGroup> property_group) {
   property_groups.emplace_back(std::move(property_group));
 }
 
 std::unique_ptr<std::vector<graphar::SharedPropertyGroup>>
 property_group_vec_clone(
-    const std::vector<graphar::SharedPropertyGroup> &property_groups) {
+    const std::vector<graphar::SharedPropertyGroup>& property_groups) {
   return std::make_unique<std::vector<graphar::SharedPropertyGroup>>(
       property_groups);
 }
 
 std::shared_ptr<graphar::VertexInfo> create_vertex_info(
-    const std::string &type, graphar::IdType chunk_size,
-    const std::vector<graphar::SharedPropertyGroup> &property_groups,
-    const rust::Vec<rust::String> &labels, const std::string &prefix,
+    const std::string& type, graphar::IdType chunk_size,
+    const std::vector<graphar::SharedPropertyGroup>& property_groups,
+    const rust::Vec<rust::String>& labels, const std::string& prefix,
     std::shared_ptr<graphar::ConstInfoVersion> version) {
   if (type.empty()) {
     throw std::runtime_error("CreateVertexInfo: type must not be empty");
@@ -119,12 +120,12 @@ std::shared_ptr<graphar::VertexInfo> create_vertex_info(
 }
 
 std::shared_ptr<graphar::EdgeInfo> create_edge_info(
-    const std::string &src_type, const std::string &edge_type,
-    const std::string &dst_type, graphar::IdType chunk_size,
+    const std::string& src_type, const std::string& edge_type,
+    const std::string& dst_type, graphar::IdType chunk_size,
     graphar::IdType src_chunk_size, graphar::IdType dst_chunk_size,
-    bool directed, const graphar::AdjacentListVector &adjacent_lists,
-    const std::vector<graphar::SharedPropertyGroup> &property_groups,
-    const std::string &prefix,
+    bool directed, const graphar::AdjacentListVector& adjacent_lists,
+    const std::vector<graphar::SharedPropertyGroup>& property_groups,
+    const std::string& prefix,
     std::shared_ptr<graphar::ConstInfoVersion> version) {
   if (src_type.empty()) {
     throw std::runtime_error("CreateEdgeInfo: src_type must not be empty");
@@ -158,16 +159,83 @@ std::shared_ptr<graphar::EdgeInfo> create_edge_info(
   return edge_info;
 }
 
-void vertex_info_save(const graphar::VertexInfo &vertex_info,
-                      const std::string &path) {
+std::shared_ptr<graphar::GraphInfo> load_graph_info(const std::string& path) {
+  auto loaded = graphar::GraphInfo::Load(path);
+  if (!loaded) {
+    throw std::runtime_error(loaded.error().message());
+  }
+  return std::move(loaded).value();
+}
+
+std::shared_ptr<graphar::GraphInfo> create_graph_info(
+    const std::string& name,
+    const std::vector<graphar::SharedVertexInfo>& vertex_infos,
+    const std::vector<graphar::SharedEdgeInfo>& edge_infos,
+    const rust::Vec<rust::String>& labels, const std::string& prefix,
+    std::shared_ptr<graphar::ConstInfoVersion> version) {
+  if (name.empty()) {
+    throw std::runtime_error("CreateGraphInfo: name must not be empty");
+  }
+
+  std::vector<std::string> label_vec;
+  label_vec.reserve(labels.size());
+  for (size_t i = 0; i < labels.size(); ++i) {
+    label_vec.emplace_back(std::string(labels[i]));
+  }
+
+  auto graph_info = graphar::CreateGraphInfo(name, vertex_infos, edge_infos,
+                                             label_vec, prefix, version);
+  if (graph_info == nullptr) {
+    throw std::runtime_error("CreateGraphInfo: returned nullptr");
+  }
+  // if (!graph_info->IsValidated()) {
+  //   throw std::runtime_error("CreateGraphInfo: graph info is not validated");
+  // }
+  return graph_info;
+}
+
+static graphar::MaybeIndex optional_to_maybe_index(std::optional<size_t> opt) {
+  if (opt) {
+    return graphar::MaybeIndex{true, *opt};
+  } else {
+    return graphar::MaybeIndex{false, 0};
+  }
+}
+
+graphar::MaybeIndex graph_info_vertex_info_index(
+    const graphar::GraphInfo& graph_info, const std::string& type) {
+  return optional_to_maybe_index(graph_info.GetVertexInfoIndex(type));
+}
+
+graphar::MaybeIndex graph_info_edge_info_index(
+    const graphar::GraphInfo& graph_info, const std::string& src_type,
+    const std::string& edge_type, const std::string& dst_type) {
+  return optional_to_maybe_index(
+      graph_info.GetEdgeInfoIndex(src_type, edge_type, dst_type));
+}
+
+void vertex_info_vec_push_vertex_info(
+    std::vector<graphar::SharedVertexInfo>& vertex_infos,
+    std::shared_ptr<graphar::VertexInfo> vertex_info) {
+  vertex_infos.emplace_back(std::move(vertex_info));
+}
+
+void edge_info_vec_push_edge_info(
+    std::vector<graphar::SharedEdgeInfo>& edge_infos,
+    std::shared_ptr<graphar::EdgeInfo> edge_info) {
+  edge_infos.emplace_back(std::move(edge_info));
+}
+
+void vertex_info_save(const graphar::VertexInfo& vertex_info,
+                      const std::string& path) {
   auto status = vertex_info.Save(path);
   if (!status.ok()) {
     throw std::runtime_error(status.message());
   }
 }
 
-std::unique_ptr<std::string>
-vertex_info_dump(const graphar::VertexInfo &vertex_info) {
+std::unique_ptr<std::string> vertex_info_dump(
+    const graphar::VertexInfo& vertex_info) {
   auto dumped = vertex_info.Dump();
   if (!dumped) {
     throw std::runtime_error(dumped.error().message());
@@ -179,26 +247,43 @@ std::unique_ptr<graphar::AdjacentListVector> new_adjacent_list_vec() {
   return std::make_unique<graphar::AdjacentListVector>();
 }
 
-void push_adjacent_list(graphar::AdjacentListVector &v,
+void push_adjacent_list(graphar::AdjacentListVector& v,
                         std::shared_ptr<graphar::AdjacentList> adjacent_list) {
   v.emplace_back(std::move(adjacent_list));
 }
 
-void edge_info_save(const graphar::EdgeInfo &edge_info,
-                    const std::string &path) {
+void edge_info_save(const graphar::EdgeInfo& edge_info,
+                    const std::string& path) {
   auto status = edge_info.Save(path);
   if (!status.ok()) {
     throw std::runtime_error(status.message());
   }
 }
 
-std::unique_ptr<std::string>
-edge_info_dump(const graphar::EdgeInfo &edge_info) {
+std::unique_ptr<std::string> edge_info_dump(
+    const graphar::EdgeInfo& edge_info) {
   auto r = edge_info.Dump();
   if (!r) {
     throw std::runtime_error(r.error().message());
   }
   return std::make_unique<std::string>(std::move(r).value());
+}
+
+void graph_info_save(const graphar::GraphInfo& graph_info,
+                     const std::string& path) {
+  auto status = graph_info.Save(path);
+  if (!status.ok()) {
+    throw std::runtime_error(status.message());
+  }
+}
+
+std::unique_ptr<std::string> graph_info_dump(
+    const graphar::GraphInfo& graph_info) {
+  auto dumped = graph_info.Dump();
+  if (!dumped) {
+    throw std::runtime_error(dumped.error().message());
+  }
+  return std::make_unique<std::string>(std::move(dumped).value());
 }
 
 // =========================== Builder ===========================
@@ -211,8 +296,8 @@ std::unique_ptr<graphar::builder::Vertex> new_vertex_builder_with_id(i64 id) {
   return std::make_unique<graphar::builder::Vertex>(id);
 }
 
-void add_vertex(graphar::builder::VerticesBuilder &builder,
-                graphar::builder::Vertex &v) {
+void add_vertex(graphar::builder::VerticesBuilder& builder,
+                graphar::builder::Vertex& v) {
   auto status = builder.AddVertex(v);
   if (!status.ok()) {
     throw std::runtime_error(status.message());
@@ -220,8 +305,8 @@ void add_vertex(graphar::builder::VerticesBuilder &builder,
 }
 
 std::unique_ptr<graphar::builder::VerticesBuilder>
-new_vertices_builder(const std::shared_ptr<graphar::VertexInfo> &vertex_info,
-                     const std::string &path_prefix, i64 start_idx) {
+new_vertices_builder(const std::shared_ptr<graphar::VertexInfo>& vertex_info,
+                     const std::string& path_prefix, i64 start_idx) {
   if (vertex_info == nullptr) {
     throw std::runtime_error("VerticesBuilder: vertex_info must not be null");
   }
@@ -239,4 +324,4 @@ void vertices_dump(graphar::builder::VerticesBuilder &builder) {
     throw std::runtime_error(status.message());
   }
 }
-} // namespace graphar_rs
+}  // namespace graphar_rs

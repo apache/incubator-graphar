@@ -21,10 +21,7 @@
 
 #include <cassert>
 #include <cstring>
-#include <fstream>
-#include <iostream>
 #include <memory>
-#include <set>
 
 /// Read a parquet file by ParquetReader & get valid indices
 /// The first column_num labels are concerned.
@@ -85,21 +82,20 @@ int read_parquet_file_and_get_valid_indices(
       }
     }
   }
-  const int kTotLabelNum = tot_label_num;
-  bool state[kTotLabelNum];
+  std::unique_ptr<bool[]> state(new bool[tot_label_num]);
   int count = 0;
   int offset = chunk_idx * chunk_size;
   for (int i = 0; i < row_num; i++) {
     for (int j = 0; j < tested_label_num; j++) {
       state[j] = value[j][i];
     }
-    if (IsValid(state, tested_label_num)) {
+    if (IsValid(state.get(), tested_label_num)) {
       count++;
-      if (query_type == QUERY_TYPE::INDEX)
-
+      if (query_type == QUERY_TYPE::INDEX) {
         indices->push_back(i + offset);
-      else if (query_type == QUERY_TYPE::BITMAP)
+      } else if (query_type == QUERY_TYPE::BITMAP) {
         SetBitmap(bitmap, i);
+      }
     }
   }
 

@@ -19,6 +19,7 @@
 
 mod adjacent_list;
 mod edge_info;
+mod graph_info;
 mod version;
 mod vertex_info;
 
@@ -27,5 +28,6 @@ pub use crate::ffi::graphar::AdjListType;
 
 pub use adjacent_list::{AdjacentList, AdjacentListVector};
 pub use edge_info::{EdgeInfo, EdgeInfoBuilder};
+pub use graph_info::{GraphInfo, GraphInfoBuilder};
 pub use version::InfoVersion;
 pub use vertex_info::{VertexInfo, VertexInfoBuilder};

@@ -27,7 +27,7 @@
 
 void vertex_property_chunk_info_reader(
     const std::shared_ptr<graphar::GraphInfo>& graph_info) {
-  // constuct reader
+  // construct reader
   std::string type = "person", property_name = "id";
   auto maybe_reader = graphar::VertexPropertyChunkInfoReader::Make(
       graph_info, type, property_name);
@@ -112,7 +112,7 @@ void adj_list_property_chunk_info_reader(
   maybe_chunk_path = reader->GetChunk();
   ASSERT(maybe_chunk_path.status().ok());
   chunk_path = maybe_chunk_path.value();
-  std::cout << "path of fisrt adj_list property chunk for outgoing edges of "
+  std::cout << "path of first adj_list property chunk for outgoing edges of "
                "vertex id 100: "
             << chunk_path << std::endl;
   // next chunk

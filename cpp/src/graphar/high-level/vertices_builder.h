@@ -65,21 +65,21 @@ class Vertex {
    *
    * @return The id of the vertex.
    */
-  inline IdType GetId() const noexcept { return id_; }
+  IdType GetId() const noexcept { return id_; }
 
   /**
    * @brief Set id of the vertex.
    *
    * @param id The id of the vertex.
    */
-  inline void SetId(IdType id) { id_ = id; }
+  void SetId(IdType id) { id_ = id; }
 
   /**
    * @brief Check if the vertex is empty.
    *
    * @return true/false.
    */
-  inline bool Empty() const noexcept { return empty_; }
+  bool Empty() const noexcept { return empty_; }
 
   /**
    * @brief Add a property to the vertex.
@@ -88,13 +88,13 @@ class Vertex {
    * @param val The value of the property.
    */
   // TODO(@acezen): Enable the property to be a vector(list).
-  inline void AddProperty(const std::string& name, const std::any& val) {
+  void AddProperty(const std::string& name, const std::any& val) {
     empty_ = false;
     properties_[name] = val;
   }
 
-  inline void AddProperty(const Cardinality cardinality,
-                          const std::string& name, const std::any& val) {
+  void AddProperty(const Cardinality cardinality, const std::string& name,
+                   const std::any& val) {
     if (cardinality == Cardinality::SINGLE) {
       cardinalities_[name] = Cardinality::SINGLE;
       AddProperty(name, val);
@@ -123,7 +123,7 @@ class Vertex {
    * @param property The name of the property.
    * @return The value of the property.
    */
-  inline const std::any& GetProperty(const std::string& property) const {
+  const std::any& GetProperty(const std::string& property) const {
     return properties_.at(property);
   }
 
@@ -132,8 +132,7 @@ class Vertex {
    *
    * @return The map containing all properties of the vertex.
    */
-  inline const std::unordered_map<std::string, std::any>& GetProperties()
-      const {
+  const std::unordered_map<std::string, std::any>& GetProperties() const {
     return properties_;
   }
 
@@ -143,11 +142,11 @@ class Vertex {
    * @param property The name of the property.
    * @return true/false.
    */
-  inline bool ContainProperty(const std::string& property) {
+  bool ContainProperty(const std::string& property) {
     return (properties_.find(property) != properties_.end());
   }
 
-  inline bool IsMultiProperty(const std::string& property) const {
+  bool IsMultiProperty(const std::string& property) const {
     return (cardinalities_.find(property) != cardinalities_.end() &&
             cardinalities_.at(property) != Cardinality::SINGLE);
   }
@@ -260,7 +259,7 @@ class VerticesBuilder {
   /**
    * @brief Clear the vertices in this VerciesBuilder.
    */
-  inline void Clear() {
+  void Clear() {
     vertices_.clear();
     num_vertices_ = 0;
     is_saved_ = false;
@@ -272,7 +271,7 @@ class VerticesBuilder {
    * @return The writerOptions provides configuration options for different file
    * format writers.
    */
-  inline void SetWriterOptions(std::shared_ptr<WriterOptions> writer_options) {
+  void SetWriterOptions(std::shared_ptr<WriterOptions> writer_options) {
     this->writer_options_ = writer_options;
   }
 
@@ -282,7 +281,7 @@ class VerticesBuilder {
    * @param writerOptions The writerOptions provides configuration options for
    * different file format writers.
    */
-  inline std::shared_ptr<WriterOptions> GetWriterOptions() {
+  std::shared_ptr<WriterOptions> GetWriterOptions() {
     return this->writer_options_;
   }
 
@@ -291,7 +290,7 @@ class VerticesBuilder {
    *
    * @param validate_level The validate level to set.
    */
-  inline void SetValidateLevel(const ValidateLevel& validate_level) {
+  void SetValidateLevel(const ValidateLevel& validate_level) {
     if (validate_level == ValidateLevel::default_validate) {
       return;
     }
@@ -303,7 +302,7 @@ class VerticesBuilder {
    *
    * @return The validate level of this writer.
    */
-  inline ValidateLevel GetValidateLevel() const { return validate_level_; }
+  ValidateLevel GetValidateLevel() const { return validate_level_; }
 
   /**
    * @brief Add a vertex with the given index.

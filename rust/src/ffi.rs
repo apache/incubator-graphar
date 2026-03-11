@@ -17,6 +17,26 @@
 
 use cxx::{ExternType, SharedPtr};
 
+use crate::ffi::graphar::MaybeIndex;
+
+#[repr(transparent)]
+#[derive(Clone)]
+pub struct SharedVertexInfo(pub(crate) SharedPtr<graphar::VertexInfo>);
+
+unsafe impl ExternType for SharedVertexInfo {
+    type Id = cxx::type_id!("graphar::SharedVertexInfo");
+    type Kind = cxx::kind::Opaque;
+}
+
+#[repr(transparent)]
+#[derive(Clone)]
+pub struct SharedEdgeInfo(pub(crate) SharedPtr<graphar::EdgeInfo>);
+
+unsafe impl ExternType for SharedEdgeInfo {
+    type Id = cxx::type_id!("graphar::SharedEdgeInfo");
+    type Kind = cxx::kind::Opaque;
+}
+
 #[repr(transparent)]
 #[derive(Clone)]
 pub struct SharedPropertyGroup(pub(crate) SharedPtr<graphar::PropertyGroup>);
@@ -255,14 +275,12 @@ pub(crate) mod graphar {
         fn version(&self) -> &SharedPtr<ConstInfoVersion>;
         fn GetLabels(&self) -> &CxxVector<CxxString>;
 
-        // TODO: upstream C++ uses `int` for this return type; prefer fixed-width.
-        fn PropertyGroupNum(&self) -> i32;
+        fn PropertyGroupNum(&self) -> usize;
 
         fn GetPropertyGroups(&self) -> &CxxVector<SharedPropertyGroup>;
         fn GetPropertyGroup(&self, property_name: &CxxString) -> SharedPtr<PropertyGroup>;
 
-        // TODO: upstream C++ uses `int` for this parameter; prefer fixed-width.
-        fn GetPropertyGroupByIndex(&self, index: i32) -> SharedPtr<PropertyGroup>;
+        fn GetPropertyGroupByIndex(&self, index: usize) -> SharedPtr<PropertyGroup>;
 
         #[namespace = "graphar_rs"]
         fn create_vertex_info(
@@ -323,10 +341,10 @@ pub(crate) mod graphar {
         fn HasAdjacentListType(&self, adj_list_type: AdjListType) -> bool;
         fn GetAdjacentList(&self, adj_list_type: AdjListType) -> SharedPtr<AdjacentList>;
 
-        fn PropertyGroupNum(&self) -> i32;
+        fn PropertyGroupNum(&self) -> usize;
         fn GetPropertyGroups(&self) -> &CxxVector<SharedPropertyGroup>;
         fn GetPropertyGroup(&self, property: &CxxString) -> SharedPtr<PropertyGroup>;
-        fn GetPropertyGroupByIndex(&self, index: i32) -> SharedPtr<PropertyGroup>;
+        fn GetPropertyGroupByIndex(&self, index: usize) -> SharedPtr<PropertyGroup>;
 
         #[namespace = "graphar_rs"]
         #[allow(clippy::too_many_arguments)]
@@ -349,6 +367,81 @@ pub(crate) mod graphar {
         #[namespace = "graphar_rs"]
         fn edge_info_dump(edge_info: &EdgeInfo) -> Result<UniquePtr<CxxString>>;
     }
+
+    struct MaybeIndex {
+        has_value: bool,
+        index: usize,
+    }
+
+    // `GraphInfo`
+    unsafe extern "C++" {
+        type GraphInfo;
+
+        fn GetName(&self) -> &CxxString;
+        fn GetLabels(&self) -> &CxxVector<CxxString>;
+        fn GetPrefix(&self) -> &CxxString;
+        fn version(&self) -> &SharedPtr<ConstInfoVersion>;
+        fn GetVertexInfo(&self, type_: &CxxString) -> SharedPtr<VertexInfo>;
+        fn GetEdgeInfo(
+            &self,
+            src_type: &CxxString,
+            edge_type: &CxxString,
+            dst_type: &CxxString,
+        ) -> SharedPtr<EdgeInfo>;
+        fn VertexInfoNum(&self) -> usize;
+        fn EdgeInfoNum(&self) -> usize;
+        fn GetVertexInfos(&self) -> &CxxVector<SharedVertexInfo>;
+        fn GetEdgeInfos(&self) -> &CxxVector<SharedEdgeInfo>;
+
+        #[namespace = "graphar_rs"]
+        fn load_graph_info(path: &CxxString) -> Result<SharedPtr<GraphInfo>>;
+        #[namespace = "graphar_rs"]
+        fn create_graph_info(
+            name: &CxxString,
+            vertex_infos: &CxxVector<SharedVertexInfo>,
+            edge_infos: &CxxVector<SharedEdgeInfo>,
+            labels: &Vec<String>,
+            prefix: &CxxString,
+            version: SharedPtr<ConstInfoVersion>,
+        ) -> Result<SharedPtr<GraphInfo>>;
+        #[namespace = "graphar_rs"]
+        fn graph_info_save(graph_info: &GraphInfo, path: &CxxString) -> Result<()>;
+        #[namespace = "graphar_rs"]
+        fn graph_info_dump(graph_info: &GraphInfo) -> Result<UniquePtr<CxxString>>;
+        #[namespace = "graphar_rs"]
+        fn graph_info_vertex_info_index(graph_info: &GraphInfo, type_: &CxxString) -> MaybeIndex;
+        #[namespace = "graphar_rs"]
+        fn graph_info_edge_info_index(
+            graph_info: &GraphInfo,
+            src_type: &CxxString,
+            edge_type: &CxxString,
+            dst_type: &CxxString,
+        ) -> MaybeIndex;
+    }
+
+    unsafe extern "C++" {
+        #[namespace = "graphar_rs"]
+        fn vertex_info_vec_push_vertex_info(
+            vertex_infos: Pin<&mut CxxVector<SharedVertexInfo>>,
+            vertex_info: SharedPtr<VertexInfo>,
+        );
+
+        #[namespace = "graphar_rs"]
+        fn edge_info_vec_push_edge_info(
+            edge_infos: Pin<&mut CxxVector<SharedEdgeInfo>>,
+            edge_info: SharedPtr<EdgeInfo>,
+        );
+    }
+
+    unsafe extern "C++" {
+        type SharedVertexInfo = crate::ffi::SharedVertexInfo;
+    }
+    impl CxxVector<SharedVertexInfo> {}
+
+    unsafe extern "C++" {
+        type SharedEdgeInfo = crate::ffi::SharedEdgeInfo;
+    }
+    impl CxxVector<SharedEdgeInfo> {}
 
     unsafe extern "C++" {
         type SharedPropertyGroup = crate::ffi::SharedPropertyGroup;
@@ -479,5 +572,15 @@ pub(crate) mod graphar {
         ) -> Result<UniquePtr<VerticesBuilder>>;
         #[namespace = "graphar_rs"]
         fn vertices_dump(builder: Pin<&mut VerticesBuilder>) -> Result<()>;
+    }
+}
+
+impl From<MaybeIndex> for Option<usize> {
+    fn from(value: MaybeIndex) -> Self {
+        if value.has_value {
+            Some(value.index)
+        } else {
+            None
+        }
     }
 }
