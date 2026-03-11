@@ -136,18 +136,9 @@ std::unique_ptr<std::string> graph_info_dump(
 // =========================== Builder ===========================
 // `Vertex`
 std::unique_ptr<graphar::builder::Vertex> new_vertex_builder();
-std::unique_ptr<graphar::builder::Vertex> new_vertex_builder_with_id(i64 id);
 
 inline bool vertex_builder_is_empty(const graphar::builder::Vertex& v) {
   return v.Empty();
-}
-
-inline i64 vertex_builder_get_id(const graphar::builder::Vertex& v) {
-  return static_cast<i64>(v.GetId());
-}
-
-inline void vertex_builder_set_id(graphar::builder::Vertex& v, i64 id) {
-  v.SetId(static_cast<graphar::IdType>(id));
 }
 
 inline bool vertex_builder_is_multi_property(const graphar::builder::Vertex& v,

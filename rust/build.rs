@@ -23,11 +23,17 @@ use std::path::{Path, PathBuf};
 fn link_libraries() {
     println!("cargo:rerun-if-env-changed=PKG_CONFIG_PATH");
 
-    let _arrow = pkg_config::Config::new()
-        .statik(false)
-        .cargo_metadata(true)
-        .probe("arrow")
-        .expect("Arrow development files not found via pkg-config. Set PKG_CONFIG_PATH if needed.");
+    for package in ["arrow", "parquet", "arrow-dataset", "arrow-acero"] {
+        pkg_config::Config::new()
+            .statik(false)
+            .cargo_metadata(true)
+            .probe(package)
+            .unwrap_or_else(|_| {
+                panic!(
+                    "{package} development files not found via pkg-config. Set PKG_CONFIG_PATH if needed."
+                )
+            });
+    }
 
     println!("cargo:rustc-link-lib=graphar");
     println!("cargo:rustc-link-lib=graphar_thirdparty");
@@ -39,7 +45,7 @@ fn build_ffi(bridge_file: &str, out_name: &str, source_file: &str, include_paths
 
     build.includes(include_paths);
     // TODO support MSVC
-    build.flag("-std=c++17");
+    build.flag("-std=c++20");
     build.flag("-fdiagnostics-color=always");
 
     build.compile(out_name);

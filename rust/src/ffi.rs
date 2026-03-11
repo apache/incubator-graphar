@@ -463,8 +463,6 @@ pub(crate) mod graphar {
         #[namespace = "graphar_rs"]
         fn new_vertex_builder() -> UniquePtr<BuilderVertex>;
         #[namespace = "graphar_rs"]
-        fn new_vertex_builder_with_id(id: i64) -> UniquePtr<BuilderVertex>;
-        #[namespace = "graphar_rs"]
         fn vertex_builder_add_property_bool(
             vertex: Pin<&mut BuilderVertex>,
             name: &CxxString,
@@ -503,10 +501,6 @@ pub(crate) mod graphar {
 
         #[namespace = "graphar_rs"]
         fn vertex_builder_is_empty(vertex: &BuilderVertex) -> bool;
-        #[namespace = "graphar_rs"]
-        fn vertex_builder_get_id(vertex: &BuilderVertex) -> i64;
-        #[namespace = "graphar_rs"]
-        fn vertex_builder_set_id(vertex: Pin<&mut BuilderVertex>, id: i64);
         #[namespace = "graphar_rs"]
         fn vertex_builder_is_multi_property(vertex: &BuilderVertex, name: &CxxString) -> bool;
         #[namespace = "graphar_rs"]

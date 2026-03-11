@@ -292,10 +292,6 @@ std::unique_ptr<graphar::builder::Vertex> new_vertex_builder() {
   return std::make_unique<graphar::builder::Vertex>();
 }
 
-std::unique_ptr<graphar::builder::Vertex> new_vertex_builder_with_id(i64 id) {
-  return std::make_unique<graphar::builder::Vertex>(id);
-}
-
 void add_vertex(graphar::builder::VerticesBuilder& builder,
                 graphar::builder::Vertex& v) {
   auto status = builder.AddVertex(v);

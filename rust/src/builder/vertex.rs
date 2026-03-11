@@ -111,29 +111,14 @@ impl Vertex {
         self.0.as_ref().expect("vertex should be valid")
     }
 
-    /// Create a new vertex record with the given id.
-    pub fn with_id(id: i64) -> Self {
-        Self(ffi::graphar::new_vertex_builder_with_id(id))
-    }
-
-    /// Create an empty vertex record.
-    pub fn empty() -> Self {
+    /// Create a new vertex record.
+    pub fn new() -> Self {
         Self(ffi::graphar::new_vertex_builder())
     }
 
     /// Returns true if this vertex is empty.
     pub fn is_empty(&self) -> bool {
         ffi::graphar::vertex_builder_is_empty(self.as_ref())
-    }
-
-    /// Returns the id of this vertex.
-    pub fn id(&self) -> i64 {
-        ffi::graphar::vertex_builder_get_id(self.as_ref())
-    }
-
-    /// Set the id of this vertex.
-    pub fn set_id(&mut self, id: i64) {
-        ffi::graphar::vertex_builder_set_id(self.pin_mut(), id);
     }
 
     /// Add a property to this vertex.
@@ -247,7 +232,7 @@ impl Vertex {
 
 impl Default for Vertex {
     fn default() -> Self {
-        Self::empty()
+        Self::new()
     }
 }
 
@@ -357,7 +342,7 @@ mod tests {
         ));
 
         let mut groups = PropertyGroupVector::new();
-        groups.push(PropertyGroup::new(props, FileType::Parquet, ""));
+        groups.push(PropertyGroup::new(props, FileType::Csv, ""));
 
         let ver = Some(InfoVersion::new(1).unwrap());
         VertexInfo::new("person", 4, groups, vec![], "", ver)
@@ -368,8 +353,6 @@ mod tests {
         let mut v = Vertex::default();
         assert!(v.is_empty());
         assert!(!v.contains_property("age_i32"));
-        v.set_id(1);
-        assert_eq!(v.id(), 1);
         v.add_property("id_i64", 1_i64);
         v.add_property("active_bool", true);
         v.add_property("age_i32", 42_i32);
@@ -394,7 +377,7 @@ mod tests {
 
     #[test]
     fn test_vertex_add_property_wrapper_methods() {
-        let mut v = Vertex::empty();
+        let mut v = Vertex::new();
         v.add_property_bool("active_bool", true);
         v.add_property_i32("age_i32", 1);
         v.add_property_i64("id_i64", 2);
@@ -406,7 +389,7 @@ mod tests {
 
     #[test]
     fn test_vertex_add_property_with_cardinality() {
-        let mut v = Vertex::empty();
+        let mut v = Vertex::new();
         assert!(!v.is_multi_property("tags"));
         assert!(!v.contains_property("tags"));
 
@@ -425,7 +408,7 @@ mod tests {
 
     #[test]
     fn test_vertex_add_property_with_cardinality_dispatch() {
-        let mut v = Vertex::empty();
+        let mut v = Vertex::new();
 
         v.add_property_with_cardinality(Cardinality::Single, "b_single", true);
         assert!(v.contains_property("b_single"));
@@ -494,7 +477,7 @@ mod tests {
         let prefix = format!("{}/", prefix.display());
         let mut b = VerticesBuilder::new(&info, prefix.as_str(), 0);
 
-        let mut v = Vertex::with_id(1);
+        let mut v = Vertex::new();
         v.add_property("id_i64", 1_i64);
         v.add_property("active_bool", true);
         v.add_property("age_i32", 42_i32);
@@ -532,5 +515,23 @@ mod tests {
             Ok(_) => panic!("VerticesBuilder::try_new should reject negative start_idx"),
             Err(err) => assert!(matches!(err, crate::Error::Cxx(_))),
         }
+    }
+
+    #[test]
+    fn test() {
+        let info = make_vertex_info();
+
+        let prefix = "/tmp/verticesbuidler/";
+        let mut builder = VerticesBuilder::try_new(&info, prefix, 0).unwrap();
+        let mut v = Vertex::new();
+        v.add_property("id_i64", 1_i64);
+        v.add_property("active_bool", true);
+        v.add_property("age_i32", 42_i32);
+        v.add_property("score_f32", 0.5_f32);
+        v.add_property("rating_f64", 9.5_f64);
+        v.add_property("name_string", "alice");
+        builder.add_vertex(v).unwrap();
+
+        builder.dump().unwrap();
     }
 }
