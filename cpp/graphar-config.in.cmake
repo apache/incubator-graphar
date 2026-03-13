@@ -27,6 +27,8 @@
 
 include(CMakeFindDependencyMacro)
 
+set(GRAPHAR_HOME "${CMAKE_CURRENT_LIST_DIR}/../../..")
+
 if(NOT @BUILD_ARROW_FROM_SOURCE@)
     find_dependency(Arrow REQUIRED)
     find_dependency(Parquet REQUIRED)
