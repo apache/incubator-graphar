@@ -32,11 +32,13 @@ namespace graphar::builder {
 Status VerticesBuilder::validate(const Vertex& v, IdType index,
                                  ValidateLevel validate_level) const {
   // use the builder's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
 
   // weak validate
   // can not add new vertices after dumping

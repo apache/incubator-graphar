@@ -33,21 +33,24 @@ Status EdgesBuilder::Dump() {
   // construct empty edge collections for vertex chunks without edges
   IdType num_vertex_chunks =
       (num_vertices_ + vertex_chunk_size_ - 1) / vertex_chunk_size_;
-  for (IdType i = 0; i < num_vertex_chunks; i++)
+  for (IdType i = 0; i < num_vertex_chunks; i++) {
     if (edges_.find(i) == edges_.end()) {
       std::vector<Edge> empty_chunk_edges;
       edges_[i] = empty_chunk_edges;
     }
+  }
   // dump the offsets
   if (adj_list_type_ == AdjListType::ordered_by_source ||
       adj_list_type_ == AdjListType::ordered_by_dest) {
     for (auto& chunk_edges : edges_) {
       IdType vertex_chunk_index = chunk_edges.first;
       // sort the edges
-      if (adj_list_type_ == AdjListType::ordered_by_source)
+      if (adj_list_type_ == AdjListType::ordered_by_source) {
         sort(chunk_edges.second.begin(), chunk_edges.second.end(), cmp_src);
-      if (adj_list_type_ == AdjListType::ordered_by_dest)
+      }
+      if (adj_list_type_ == AdjListType::ordered_by_dest) {
         sort(chunk_edges.second.begin(), chunk_edges.second.end(), cmp_dst);
+      }
       // construct and write offset chunk
       GAR_ASSIGN_OR_RAISE(
           auto offset_table,
@@ -86,11 +89,13 @@ Status EdgesBuilder::Dump() {
 Status EdgesBuilder::validate(const Edge& e,
                               ValidateLevel validate_level) const {
   // use the builder's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
 
   // weak validate
   // can not add new edges after dumping
