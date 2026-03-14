@@ -28,6 +28,7 @@
 #include "graphar/graph_info.h"
 #include "graphar/result.h"
 #include "graphar/types.h"
+#include "graphar/util.h"
 #include "graphar/version_parser.h"
 #include "graphar/yaml.h"
 
@@ -1102,24 +1103,6 @@ Status EdgeInfo::Save(const std::string& path) const {
 
 namespace {
 
-static std::string PathToDirectory(const std::string& path) {
-  if (path.rfind("s3://", 0) == 0) {
-    size_t t = path.find_last_of('?');
-    std::string prefix = path.substr(0, t);
-    std::string suffix = path.substr(t);
-    const size_t last_slash_idx = prefix.rfind('/');
-    if (std::string::npos != last_slash_idx) {
-      return prefix.substr(0, last_slash_idx + 1) + suffix;
-    }
-  } else {
-    const size_t last_slash_idx = path.rfind('/');
-    if (std::string::npos != last_slash_idx) {
-      return path.substr(0, last_slash_idx + 1);  // +1 to include the slash
-    }
-  }
-  return path;
-}
-
 static Result<std::shared_ptr<GraphInfo>> ConstructGraphInfo(
     std::shared_ptr<Yaml> graph_meta, const std::string& default_name,
     const std::string& default_prefix, const std::shared_ptr<FileSystem> fs,
@@ -1411,8 +1394,8 @@ Result<std::shared_ptr<GraphInfo>> GraphInfo::Load(const std::string& path) {
                       fs->ReadFileToValue<std::string>(no_url_path));
   GAR_ASSIGN_OR_RAISE(auto graph_meta, Yaml::Load(yaml_content));
   std::string default_name = "graph";
-  std::string default_prefix = PathToDirectory(path);
-  no_url_path = PathToDirectory(no_url_path);
+  std::string default_prefix = util::PathToDirectory(path);
+  no_url_path = util::PathToDirectory(no_url_path);
   return ConstructGraphInfo(graph_meta, default_name, default_prefix, fs,
                             no_url_path);
 }
@@ -1486,5 +1469,4 @@ Status GraphInfo::Save(const std::string& path) const {
   GAR_ASSIGN_OR_RAISE(auto yaml_content, this->Dump());
   return fs->WriteValueToFile(yaml_content, no_url_path);
 }
-
 }  // namespace graphar
