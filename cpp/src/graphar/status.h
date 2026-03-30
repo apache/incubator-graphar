@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <memory>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -131,33 +132,38 @@ class Status {
   /** Create a success status. */
   Status() noexcept : state_(nullptr) {}
   /** Destructor. */
-  ~Status() noexcept {
-    if (state_ != nullptr) {
-      deleteState();
-    }
-  }
+  ~Status() noexcept = default;
   /**
    * @brief Constructs a status with the specified error code and message.
    * @param code The error code of the status.
    * @param msg The error message of the status.
    */
   Status(StatusCode code, std::string msg) {
-    state_ = new State;
+    state_ = std::make_unique<State>();
     state_->code = code;
     state_->msg = std::move(msg);
   }
   /** Copy the specified status. */
-  Status(const Status& s)
-      : state_((s.state_ == nullptr) ? nullptr : new State(*s.state_)) {}
-  /**  Move the specified status. */
-  Status(Status&& s) noexcept : state_(s.state_) { s.state_ = nullptr; }
-  /** Move assignment operator. */
-  Status& operator=(Status&& s) noexcept {
-    delete state_;
-    state_ = s.state_;
-    s.state_ = nullptr;
+  Status(const Status& s) {
+    if (s.state_) {
+      state_ = std::make_unique<State>(*s.state_);
+    }
+  }
+  /** Copy assignment operator. */
+  Status& operator=(const Status& s) {
+    if (this != &s) {
+      if (s.state_) {
+        state_ = std::make_unique<State>(*s.state_);
+      } else {
+        state_.reset();
+      }
+    }
     return *this;
   }
+  /**  Move the specified status. */
+  Status(Status&& s) noexcept = default;
+  /** Move assignment operator. */
+  Status& operator=(Status&& s) noexcept = default;
 
   /** Returns a success status. */
   static Status OK() { return {}; }
@@ -262,16 +268,11 @@ class Status {
   }
 
  private:
-  void deleteState() {
-    delete state_;
-    state_ = nullptr;
-  }
-
   struct State {
     StatusCode code;
     std::string msg;
   };
-  State* state_;
+  std::unique_ptr<State> state_;
 };
 
 }  // namespace graphar
