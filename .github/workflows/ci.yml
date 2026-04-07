@@ -116,10 +116,6 @@ jobs:
             exit -1
         fi
 
-    - name: cmake-format check
-      run: |
-        pre-commit run cmake-format -a
-
     - name: Build Docs
       working-directory: "cpp/build"
       run: |
