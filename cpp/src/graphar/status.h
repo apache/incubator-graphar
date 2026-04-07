@@ -233,33 +233,23 @@ class Status {
   }
 
   /** Return true iff the status indicates success. */
-  constexpr bool ok() const { return (state_.get() == nullptr); }
+  bool ok() const { return (state_.get() == nullptr); }
 
   /** Return true iff the status indicates a key lookup error. */
-  constexpr bool IsKeyError() const { return code() == StatusCode::kKeyError; }
+  bool IsKeyError() const { return code() == StatusCode::kKeyError; }
   /** Return true iff the status indicates a type match error. */
-  constexpr bool IsTypeError() const {
-    return code() == StatusCode::kTypeError;
-  }
+  bool IsTypeError() const { return code() == StatusCode::kTypeError; }
   /** Return true iff the status indicates invalid data. */
-  constexpr bool IsInvalid() const { return code() == StatusCode::kInvalid; }
+  bool IsInvalid() const { return code() == StatusCode::kInvalid; }
   /** Return true iff the status indicates an index out of bounds. */
-  constexpr bool IsIndexError() const {
-    return code() == StatusCode::kIndexError;
-  }
+  bool IsIndexError() const { return code() == StatusCode::kIndexError; }
   /** Return true iff the status indicates an yaml parse related failure. */
-  constexpr bool IsYamlError() const {
-    return code() == StatusCode::kYamlError;
-  }
+  bool IsYamlError() const { return code() == StatusCode::kYamlError; }
   /** Return true iff the status indicates an arrow-related failure. */
-  constexpr bool IsArrowError() const {
-    return code() == StatusCode::kArrowError;
-  }
+  bool IsArrowError() const { return code() == StatusCode::kArrowError; }
 
   /** Return the StatusCode value attached to this status. */
-  constexpr StatusCode code() const {
-    return ok() ? StatusCode::kOK : state_->code;
-  }
+  StatusCode code() const { return ok() ? StatusCode::kOK : state_->code; }
 
   /** Return the specific error message attached to this status. */
   const std::string& message() const {
