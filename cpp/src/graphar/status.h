@@ -233,7 +233,7 @@ class Status {
   }
 
   /** Return true iff the status indicates success. */
-  constexpr bool ok() const { return (state_ == nullptr); }
+  constexpr bool ok() const { return (state_.get() == nullptr); }
 
   /** Return true iff the status indicates a key lookup error. */
   constexpr bool IsKeyError() const { return code() == StatusCode::kKeyError; }
