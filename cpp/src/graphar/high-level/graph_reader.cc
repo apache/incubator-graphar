@@ -181,10 +181,10 @@ Result<std::vector<IdType>> VerticesCollection::filter(
       row_num = std::min(CHUNK_SIZE, TOT_ROWS_NUM - chunk_idx * CHUNK_SIZE);
       std::string new_filename =
           prefix_ + vertex_info_->GetPrefix() + "labels/chunk";
-      int count = read_parquet_file_and_get_valid_indices(
+      int count = graphar::read_parquet_file_and_get_valid_indices(
           new_filename.c_str(), row_num, TOT_LABEL_NUM, TESTED_LABEL_NUM,
           tested_label_ids, IsValid, chunk_idx, CHUNK_SIZE, &indices, bitmap,
-          QUERY_TYPE::INDEX);
+          graphar::QUERY_TYPE::INDEX);
       if (count != 0 && new_valid_chunk != nullptr)
         new_valid_chunk->emplace_back(static_cast<IdType>(chunk_idx));
     }
@@ -194,10 +194,10 @@ Result<std::vector<IdType>> VerticesCollection::filter(
       row_num = std::min(CHUNK_SIZE, TOT_ROWS_NUM - chunk_idx * CHUNK_SIZE);
       std::string new_filename =
           prefix_ + vertex_info_->GetPrefix() + "labels/chunk";
-      int count = read_parquet_file_and_get_valid_indices(
+      int count = graphar::read_parquet_file_and_get_valid_indices(
           new_filename.c_str(), row_num, TOT_LABEL_NUM, TESTED_LABEL_NUM,
           tested_label_ids, IsValid, chunk_idx, CHUNK_SIZE, &indices, bitmap,
-          QUERY_TYPE::INDEX);
+          graphar::QUERY_TYPE::INDEX);
       if (count != 0)
         valid_chunk_.emplace_back(static_cast<IdType>(chunk_idx));
     }
