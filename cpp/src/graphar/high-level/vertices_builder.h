@@ -337,8 +337,9 @@ class VerticesBuilder {
       vertices_.push_back(v);
     } else {
       v.SetId(index);
-      if (index >= static_cast<IdType>(vertices_.size()))
+      if (index >= static_cast<IdType>(vertices_.size())) {
         vertices_.resize(index + 1);
+      }
       vertices_[index] = v;
     }
     num_vertices_++;

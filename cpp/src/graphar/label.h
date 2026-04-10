@@ -26,8 +26,6 @@
 #include <parquet/api/writer.h>
 #include <parquet/properties.h>
 
-#include <iostream>
-#include <set>
 #include <vector>
 
 using parquet::ConvertedType;

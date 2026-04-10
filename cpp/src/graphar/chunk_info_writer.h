@@ -21,7 +21,6 @@
 
 #include <memory>
 #include <string>
-#include <vector>
 
 #include "graphar/fwd.h"
 #include "graphar/writer_util.h"

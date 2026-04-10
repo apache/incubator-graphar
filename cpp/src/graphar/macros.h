@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include <cstdint>
-
 // namespace config
 
 #define GAR_EXPAND(x) x
