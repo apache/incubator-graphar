@@ -22,6 +22,9 @@
 #include <cassert>
 #include <cstring>
 #include <memory>
+#include <vector>
+
+namespace graphar {
 
 /// Read a parquet file by ParquetReader & get valid indices
 /// The first column_num labels are concerned.
@@ -44,9 +47,9 @@ int read_parquet_file_and_get_valid_indices(
 
   // Initialize the column row counts
   std::vector<int> col_row_counts(num_columns, 0);
-  bool** value = new bool*[num_columns];
+  std::vector<std::unique_ptr<bool[]>> value(num_columns);
   for (int i = 0; i < num_columns; i++) {
-    value[i] = new bool[row_num];
+    value[i] = std::make_unique<bool[]>(row_num);
   }
 
   // Iterate over all the RowGroups in the file
@@ -73,9 +76,9 @@ int read_parquet_file_and_get_valid_indices(
         // Read BATCH_SIZE values at a time. The number of rows read is
         // returned. values_read contains the number of non-null rows
 
-        rows_read = bool_reader->ReadBatch(BATCH_SIZE, nullptr, nullptr,
-                                           value[k] + col_row_counts[col_id],
-                                           &values_read);
+        rows_read = bool_reader->ReadBatch(
+            BATCH_SIZE, nullptr, nullptr,
+            value[k].get() + col_row_counts[col_id], &values_read);
 
         // There are no NULL values in the rows written
         col_row_counts[col_id] += rows_read;
@@ -99,11 +102,7 @@ int read_parquet_file_and_get_valid_indices(
     }
   }
 
-  // destroy the allocated space
-  for (int i = 0; i < num_columns; i++) {
-    delete[] value[i];
-  }
-  delete[] value;
-
   return count;
 }
+
+}  // namespace graphar
