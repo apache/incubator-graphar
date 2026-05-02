@@ -115,8 +115,11 @@ endif()
 
 if (APPLE)
     set(CMAKE_MACOSX_RPATH ON)
+    # Ensure relocatability on macOS
+    set(CMAKE_INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
 elseif(UNIX)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-rpath,$ORIGIN")
+    # $ORIGIN allows the library to find dependencies relative to its own path
+    set(CMAKE_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
 endif ()
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -g -fno-omit-frame-pointer")
@@ -145,6 +148,7 @@ endif()
 # ------------------------------------------------------------------------------
 include(CheckLibraryExists)
 include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
@@ -187,6 +191,17 @@ macro(find_yaml_cpp)
     add_subdirectory_static(thirdparty/yaml-cpp EXCLUDE_FROM_ALL)
     unset(MESSAGE_QUIET)
     set(CMAKE_WARN_DEPRECATED ON CACHE BOOL "" FORCE)
+endmacro()
+
+macro(install_graphar_target target)
+  # install
+  install(TARGETS ${target} graphar_thirdparty
+          EXPORT graphar-targets
+          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} OPTIONAL
+          INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+  )
 endmacro()
 
 # Implementations of lisp "car" and "cdr" functions
@@ -276,6 +291,143 @@ function(graphar_create_merged_static_lib output_target)
   set_target_properties(${output_target} PROPERTIES IMPORTED_LOCATION ${output_lib_path})
   add_dependencies(${output_target} ${output_target}_merge)
 endfunction()
+
+macro(build_graphar_thirdparty)
+    file(GLOB_RECURSE THIRDPARTY_SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/mini-yaml/yaml/*.cpp)
+    add_library(graphar_thirdparty STATIC ${THIRDPARTY_SRC_FILES})
+    target_include_directories(graphar_thirdparty PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
+    target_compile_features(graphar_thirdparty PRIVATE cxx_std_17)
+    if(NOT MSVC)
+        target_compile_options(graphar_thirdparty PRIVATE -fPIC -w)
+    endif()
+endmacro()
+
+macro(build_graphar)
+    build_graphar_thirdparty()
+    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc")
+    
+    if(GRAPHAR_BUILD_STATIC)
+        add_library(graphar STATIC ${CORE_SRC_FILES})
+    else()
+        add_library(graphar SHARED ${CORE_SRC_FILES})
+    endif()
+
+    install_graphar_target(graphar)
+
+    target_compile_features(graphar PRIVATE cxx_std_${GAR_CXX_STANDARD})
+
+    target_include_directories(graphar
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+        PRIVATE
+            ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
+    )
+
+    if(GRAPHAR_BUILD_STATIC)
+        target_link_libraries(graphar PUBLIC graphar_thirdparty ${CMAKE_DL_LIBS})
+    else()
+        target_link_libraries(graphar PRIVATE graphar_thirdparty ${CMAKE_DL_LIBS})
+    endif()
+
+    set(ARROW_LIB_SUFFIX "shared")
+    if(USE_STATIC_ARROW)
+        set(ARROW_LIB_SUFFIX "static")
+    endif()
+
+    set(ARROW_DEPS
+        Arrow::arrow_${ARROW_LIB_SUFFIX}
+        Parquet::parquet_${ARROW_LIB_SUFFIX}
+        ArrowDataset::arrow_dataset_${ARROW_LIB_SUFFIX}
+    )
+    if(ArrowAcero_FOUND)
+        list(APPEND ARROW_DEPS ArrowAcero::arrow_acero_${ARROW_LIB_SUFFIX})
+    endif()
+
+    if(APPLE)
+        target_link_libraries(graphar PUBLIC -Wl,-force_load ${ARROW_DEPS})
+    elseif(MSVC)
+        target_link_libraries(graphar PUBLIC ${ARROW_DEPS})
+    else()
+        target_link_libraries(graphar PUBLIC 
+            -Wl,--exclude-libs,ALL 
+            -Wl,--whole-archive 
+            ${ARROW_DEPS} 
+            -Wl,--no-whole-archive
+        )
+    endif()
+endmacro()
+
+macro(build_graphar_with_arrow_bundled)
+    build_graphar_thirdparty()
+    file(GLOB_RECURSE CORE_SRC_FILES "src/graphar/*.cc")
+    if(GRAPHAR_BUILD_STATIC)
+        add_library(graphar STATIC ${CORE_SRC_FILES})
+    else()
+        add_library(graphar SHARED ${CORE_SRC_FILES})
+    endif()
+    install_graphar_target(graphar)
+    target_compile_features(graphar PRIVATE cxx_std_${GAR_CXX_STANDARD})
+    target_include_directories(graphar PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
+    target_include_directories(graphar SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
+    if(GRAPHAR_BUILD_STATIC)
+        target_link_libraries(graphar PUBLIC graphar_thirdparty ${CMAKE_DL_LIBS})
+    else()
+        target_link_libraries(graphar PRIVATE graphar_thirdparty ${CMAKE_DL_LIBS})
+    endif()
+
+    set(GAR_BUNDLED_DEPS_STATIC_LIBS)
+    list(APPEND GAR_BUNDLED_DEPS_STATIC_LIBS
+        gar_arrow_static
+        gar_arrow_compute_static
+        gar_parquet_static
+        gar_dataset_static
+        gar_acero_static
+        gar_arrow_bundled_dependencies_static)
+    graphar_car(_FIRST_LIB ${GAR_BUNDLED_DEPS_STATIC_LIBS})
+    graphar_cdr(_OTHER_LIBS ${GAR_BUNDLED_DEPS_STATIC_LIBS})
+
+    graphar_create_merged_static_lib(graphar_bundled_dependencies
+                                    NAME
+                                    graphar_bundled_dependencies
+                                    ROOT
+                                    ${_FIRST_LIB}
+                                    TO_MERGE
+                                    ${_OTHER_LIBS})
+    # We can't use install(TARGETS) here because
+    # graphar_bundled_dependencies is an IMPORTED library.
+    get_target_property(graphar_bundled_dependencies_path graphar_bundled_dependencies
+                        IMPORTED_LOCATION)
+    install(FILES ${CMAKE_BINARY_DIR}/${graphar_bundled_dependencies_path} ${INSTALL_IS_OPTIONAL}
+            DESTINATION ${CMAKE_INSTALL_LIBDIR})
+    string(APPEND ARROW_PC_LIBS_PRIVATE " -lgraphar_bundled_dependencies")
+    list(INSERT ARROW_STATIC_INSTALL_INTERFACE_LIBS 0 "graphar_bundled_dependencies")
+
+    if(APPLE)
+        find_package(Protobuf REQUIRED)
+        target_link_libraries(graphar PRIVATE -Wl,-force_load
+                graphar_bundled_dependencies
+                protobuf::libprotobuf
+                "-framework CoreFoundation"
+                "-framework Security"
+                "-framework Network")
+    elseif(MSVC)
+        # MSVC doesn't support GNU ld-style -Wl flags.
+        target_link_libraries(graphar PRIVATE graphar_bundled_dependencies)
+    else()
+        target_link_libraries(graphar PRIVATE -Wl,--exclude-libs,ALL
+                graphar_bundled_dependencies)
+    endif()
+
+    # if OpenSSL library exists, link the OpenSSL library.
+    # OpenSSL has to be linked after GAR_ARROW_BUNDLED_DEPS_STATIC_LIB
+    if(OPENSSL_FOUND)
+        target_link_libraries(graphar PUBLIC OpenSSL::SSL)
+    endif()
+    if (CURL_FOUND)
+        target_link_libraries(graphar PUBLIC ${CURL_LIBRARIES})
+    endif()
+endmacro()
 
 # ------------------------------------------------------------------------------
 # building or find third party library
@@ -396,9 +548,9 @@ install(FILES "${PROJECT_BINARY_DIR}/graphar-config.cmake"
 
 install(EXPORT graphar-targets
         FILE graphar-targets.cmake
+        NAMESPACE graphar::
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/graphar
 )
-
 # ------------------------------------------------------------------------------
 # Format code & cpplint
 # ------------------------------------------------------------------------------
