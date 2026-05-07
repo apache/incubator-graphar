@@ -26,6 +26,7 @@
 #include <parquet/api/writer.h>
 #include <parquet/properties.h>
 
+#include <functional>
 #include <vector>
 
 using parquet::ConvertedType;
@@ -34,6 +35,8 @@ using parquet::Repetition;
 using parquet::Type;
 using parquet::schema::GroupNode;
 using parquet::schema::PrimitiveNode;
+
+namespace graphar {
 
 constexpr int BATCH_SIZE = 1024;  // the batch size
 
@@ -57,5 +60,7 @@ int read_parquet_file_and_get_valid_indices(
     int chunk_size, std::vector<int>* indices = nullptr,
     uint64_t* bitmap = nullptr,
     const QUERY_TYPE query_type = QUERY_TYPE::COUNT);
+
+}  // namespace graphar
 
 #endif  // CPP_SRC_GRAPHAR_LABEL_H_
