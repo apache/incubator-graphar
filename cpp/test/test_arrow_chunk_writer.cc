@@ -334,7 +334,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
               "/tmp/edge/person_knows_person/ordered_by_source/vertex_count")
             .ValueOrDie();
     auto vertex_num = input3->Read(sizeof(IdType)).ValueOrDie();
-    const IdType* vertex_num_ptr =
+    const auto* vertex_num_ptr =
         reinterpret_cast<const IdType*>(vertex_num->data());
     REQUIRE((*vertex_num_ptr) == 903);
 
