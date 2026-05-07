@@ -355,9 +355,10 @@ class VerticesCollection {
 
   /** The iterator pointing to the past-the-end element. */
   VertexIter end() noexcept {
-    if (is_filtered_)
+    if (is_filtered_) {
       return VertexIter(vertex_info_, prefix_, filtered_ids_.size(), labels_,
                         is_filtered_, filtered_ids_);
+    }
     return VertexIter(vertex_info_, prefix_, vertex_num_, labels_, is_filtered_,
                       filtered_ids_);
   }
@@ -369,10 +370,11 @@ class VerticesCollection {
 
   /** Get the number of vertices in the collection. */
   size_t size() const noexcept {
-    if (is_filtered_)
+    if (is_filtered_) {
       return filtered_ids_.size();
-    else
+    } else {
       return vertex_num_;
+    }
   }
 
   std::shared_ptr<VertexInfo> GetVertexInfo() const { return vertex_info_; }
@@ -718,16 +720,18 @@ class EdgeIter {
 
   /** Point to the next edge with the same source, return false if not found. */
   bool next_src() {
-    if (is_end())
+    if (is_end()) {
       return false;
+    }
     IdType id = this->source();
     IdType pre_vertex_chunk_index = vertex_chunk_index_;
     if (adj_list_type_ == AdjListType::ordered_by_source) {
       this->operator++();
-      if (is_end() || this->source() != id)
+      if (is_end() || this->source() != id) {
         return false;
-      else
+      } else {
         return true;
+      }
     }
     this->operator++();
     while (!is_end()) {
@@ -735,8 +739,9 @@ class EdgeIter {
         return true;
       }
       if (adj_list_type_ == AdjListType::unordered_by_source) {
-        if (vertex_chunk_index_ > pre_vertex_chunk_index)
+        if (vertex_chunk_index_ > pre_vertex_chunk_index) {
           return false;
+        }
       }
       this->operator++();
     }
@@ -748,16 +753,18 @@ class EdgeIter {
    * found.
    */
   bool next_dst() {
-    if (is_end())
+    if (is_end()) {
       return false;
+    }
     IdType id = this->destination();
     IdType pre_vertex_chunk_index = vertex_chunk_index_;
     if (adj_list_type_ == AdjListType::ordered_by_dest) {
       this->operator++();
-      if (is_end() || this->destination() != id)
+      if (is_end() || this->destination() != id) {
         return false;
-      else
+      } else {
         return true;
+      }
     }
     this->operator++();
     while (!is_end()) {
@@ -765,8 +772,9 @@ class EdgeIter {
         return true;
       }
       if (adj_list_type_ == AdjListType::unordered_by_dest) {
-        if (vertex_chunk_index_ > pre_vertex_chunk_index)
+        if (vertex_chunk_index_ > pre_vertex_chunk_index) {
           return false;
+        }
       }
       this->operator++();
     }
@@ -778,8 +786,9 @@ class EdgeIter {
    * found.
    */
   bool next_src(IdType id) {
-    if (is_end())
+    if (is_end()) {
       return false;
+    }
     this->operator++();
     return this->first_src(*this, id);
   }
@@ -789,8 +798,9 @@ class EdgeIter {
    * not found.
    */
   bool next_dst(IdType id) {
-    if (is_end())
+    if (is_end()) {
       return false;
+    }
     this->operator++();
     return this->first_dst(*this, id);
   }

@@ -88,7 +88,9 @@ class ExpressionLiteral : public Expression {
   ExpressionLiteral(const ExpressionLiteral& other) = default;
   ~ExpressionLiteral() = default;
 
-  Result<ArrowExpression> Evaluate() { return arrow::compute::literal(value_); }
+  Result<ArrowExpression> Evaluate() override {
+    return arrow::compute::literal(value_);
+  }
 
  private:
   T value_;
