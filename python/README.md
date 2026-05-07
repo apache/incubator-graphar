@@ -1,12 +1,12 @@
 # GraphAr Python SDK
 
-GraphAr Python SDK provides Python bindings for the GraphAr C++ library, allowing user to work with GraphAr formatted graph data in Python environments. It includes both a high-level API for data manipulation and a command-line interface for common operations.
+GraphAr Python SDK provides Python bindings for the GraphAr C++ library, allowing users to work with GraphAr formatted graph data in Python environments. It includes both a high-level API for data manipulation and a command-line interface for common operations.
 
 ## Installation
 
 ### Prerequisites
 
-- Python >= 3.7
+- Python >= 3.9
 - pip (latest version recommended)
 - CMake >= 3.15 (for building from source)
 - Apache Arrow >= 12.0 (for building from source)
