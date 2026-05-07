@@ -163,8 +163,8 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Set up Miniconda (macOS/Windows)
-        if: matrix.os == 'windows' || matrix.os == 'macos'
+      - name: Set up Miniconda (Windows)
+        if: matrix.os == 'windows'
         uses: conda-incubator/setup-miniconda@v3
         with:
           auto-activate-base: true
@@ -176,15 +176,13 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          mamba install -y -c conda-forge "arrow-cpp>=24.0.0"
-          # Note: CONDA_PREFIX may be unset unless conda is activated in this shell.
-          # setup-miniconda exports CONDA (base install prefix), which is sufficient here.
-          echo "CMAKE_PREFIX_PATH=$CONDA" >> "$GITHUB_ENV"
+          brew install apache-arrow
+          echo "CMAKE_PREFIX_PATH=/usr/local" >> "$GITHUB_ENV"
           # Optional sanity check: ensure Arrow dylib isn't built for a newer macOS than deployment target.
           if command -v otool >/dev/null 2>&1; then
-            ls -lah "$CONDA/lib" || true
-            if [ -f "$CONDA/lib/libarrow.dylib" ]; then
-              otool -l "$CONDA/lib/libarrow.dylib" | (grep -A3 -E 'LC_BUILD_VERSION|LC_VERSION_MIN_MACOSX' || true)
+            ls -lah /usr/local/lib || true
+            if [ -f "/usr/local/lib/libarrow.dylib" ]; then
+              otool -l "/usr/local/lib/libarrow.dylib" | (grep -A3 -E 'LC_BUILD_VERSION|LC_VERSION_MIN_MACOSX' || true)
             fi
           fi
 
@@ -192,7 +190,7 @@ jobs:
         if: matrix.os == 'windows'
         shell: pwsh
         run: |
-          mamba install -y -c conda-forge "arrow-cpp>=24.0.0"
+          mamba install -y -c conda-forge arrow-cpp
           Add-Content $env:GITHUB_ENV "CMAKE_PREFIX_PATH=$env:CONDA_PREFIX\\Library"
           Add-Content $env:GITHUB_ENV "PATH=$env:CONDA_PREFIX\\Library\\bin;$env:PATH"
       - name: Download sdist artifact
