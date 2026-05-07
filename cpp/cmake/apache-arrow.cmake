@@ -124,14 +124,14 @@ function(build_arrow)
 
   find_package(Threads)
   find_package(Arrow QUIET)
-  # Set Arrow version: from env var or default to 23.0.0
+  # Set Arrow version: from env var or default to 24.0.0
   if(DEFINED ENV{GRAPHAR_ARROW_VERSION})
     set(ARROW_VERSION_TO_BUILD
         "$ENV{GRAPHAR_ARROW_VERSION}"
         CACHE INTERNAL "arrow version")
   else()
     set(ARROW_VERSION_TO_BUILD
-        "23.0.0"
+        "24.0.0"
         CACHE INTERNAL "arrow version")
   endif()
 

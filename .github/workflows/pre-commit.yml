@@ -46,4 +46,10 @@ jobs:
         submodules: true
 
     - name: cmake-format check
-      run: pre-commit run cmake-format -a
+      run: |
+        pip install pre-commit
+        pre-commit install 
+        pre-commit run cmake-format -a
+    
+    - name: clang-format
+      run: pre-commit run clang-format -a

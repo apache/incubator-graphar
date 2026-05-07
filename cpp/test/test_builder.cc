@@ -38,6 +38,7 @@
 #include "graphar/api/high_level_writer.h"
 
 #include <catch2/catch_test_macros.hpp>
+
 namespace graphar {
 TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   std::cout << "Test vertex builder" << std::endl;
@@ -137,8 +138,9 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   REQUIRE(graphar::util::OpenParquetArrowReader(
               parquet_file, arrow::default_memory_pool(), &parquet_reader)
               .ok());
-  std::shared_ptr<arrow::Table> parquet_table;
-  REQUIRE(parquet_reader->ReadTable(&parquet_table).ok());
+  auto maybe_parquet_table = parquet_reader->ReadTable();
+  REQUIRE(maybe_parquet_table.ok());
+  auto parquet_table = maybe_parquet_table.ValueOrDie();
   auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
   auto row_group_meta = parquet_metadata->RowGroup(0);
   auto col_meta = row_group_meta->ColumnChunk(0);
@@ -242,8 +244,9 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
   REQUIRE(graphar::util::OpenParquetArrowReader(
               parquet_file, arrow::default_memory_pool(), &parquet_reader)
               .ok());
-  std::shared_ptr<arrow::Table> parquet_table;
-  REQUIRE(parquet_reader->ReadTable(&parquet_table).ok());
+  auto maybe_parquet_table = parquet_reader->ReadTable();
+  REQUIRE(maybe_parquet_table.ok());
+  auto parquet_table = maybe_parquet_table.ValueOrDie();
   auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
   auto row_group_meta = parquet_metadata->RowGroup(0);
   auto col_meta = row_group_meta->ColumnChunk(0);
