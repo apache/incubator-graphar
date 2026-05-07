@@ -129,6 +129,7 @@ else()
     endif()
   else()
     if(USE_STATIC_ARROW)
+      find_package(LibXml2 REQUIRED)
       target_link_libraries(graphar
                             PRIVATE -Wl,--exclude-libs,ALL
                                     -Wl,--whole-archive
@@ -136,7 +137,8 @@ else()
                                     Parquet::parquet_static
                                     ArrowDataset::arrow_dataset_static
                                     ArrowAcero::arrow_acero_static
-                                    -Wl,--no-whole-archive)
+                                    -Wl,--no-whole-archive
+                                    LibXml2::LibXml2)
     else()
       target_link_libraries(graphar
                             PRIVATE -Wl,--exclude-libs,ALL
