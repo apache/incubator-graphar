@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include <memory>
 #include <sstream>
 #include <string>
 #include <type_traits>
@@ -131,33 +132,38 @@ class Status {
   /** Create a success status. */
   Status() noexcept : state_(nullptr) {}
   /** Destructor. */
-  ~Status() noexcept {
-    if (state_ != nullptr) {
-      deleteState();
-    }
-  }
+  ~Status() noexcept = default;
   /**
    * @brief Constructs a status with the specified error code and message.
    * @param code The error code of the status.
    * @param msg The error message of the status.
    */
   Status(StatusCode code, std::string msg) {
-    state_ = new State;
+    state_ = std::make_unique<State>();
     state_->code = code;
     state_->msg = std::move(msg);
   }
   /** Copy the specified status. */
-  Status(const Status& s)
-      : state_((s.state_ == nullptr) ? nullptr : new State(*s.state_)) {}
-  /**  Move the specified status. */
-  Status(Status&& s) noexcept : state_(s.state_) { s.state_ = nullptr; }
-  /** Move assignment operator. */
-  Status& operator=(Status&& s) noexcept {
-    delete state_;
-    state_ = s.state_;
-    s.state_ = nullptr;
+  Status(const Status& s) {
+    if (s.state_) {
+      state_ = std::make_unique<State>(*s.state_);
+    }
+  }
+  /** Copy assignment operator. */
+  Status& operator=(const Status& s) {
+    if (this != &s) {
+      if (s.state_) {
+        state_ = std::make_unique<State>(*s.state_);
+      } else {
+        state_.reset();
+      }
+    }
     return *this;
   }
+  /**  Move the specified status. */
+  Status(Status&& s) noexcept = default;
+  /** Move assignment operator. */
+  Status& operator=(Status&& s) noexcept = default;
 
   /** Returns a success status. */
   static Status OK() { return {}; }
@@ -227,33 +233,23 @@ class Status {
   }
 
   /** Return true iff the status indicates success. */
-  constexpr bool ok() const { return (state_ == nullptr); }
+  bool ok() const { return (state_.get() == nullptr); }
 
   /** Return true iff the status indicates a key lookup error. */
-  constexpr bool IsKeyError() const { return code() == StatusCode::kKeyError; }
+  bool IsKeyError() const { return code() == StatusCode::kKeyError; }
   /** Return true iff the status indicates a type match error. */
-  constexpr bool IsTypeError() const {
-    return code() == StatusCode::kTypeError;
-  }
+  bool IsTypeError() const { return code() == StatusCode::kTypeError; }
   /** Return true iff the status indicates invalid data. */
-  constexpr bool IsInvalid() const { return code() == StatusCode::kInvalid; }
+  bool IsInvalid() const { return code() == StatusCode::kInvalid; }
   /** Return true iff the status indicates an index out of bounds. */
-  constexpr bool IsIndexError() const {
-    return code() == StatusCode::kIndexError;
-  }
+  bool IsIndexError() const { return code() == StatusCode::kIndexError; }
   /** Return true iff the status indicates an yaml parse related failure. */
-  constexpr bool IsYamlError() const {
-    return code() == StatusCode::kYamlError;
-  }
+  bool IsYamlError() const { return code() == StatusCode::kYamlError; }
   /** Return true iff the status indicates an arrow-related failure. */
-  constexpr bool IsArrowError() const {
-    return code() == StatusCode::kArrowError;
-  }
+  bool IsArrowError() const { return code() == StatusCode::kArrowError; }
 
   /** Return the StatusCode value attached to this status. */
-  constexpr StatusCode code() const {
-    return ok() ? StatusCode::kOK : state_->code;
-  }
+  StatusCode code() const { return ok() ? StatusCode::kOK : state_->code; }
 
   /** Return the specific error message attached to this status. */
   const std::string& message() const {
@@ -262,16 +258,11 @@ class Status {
   }
 
  private:
-  void deleteState() {
-    delete state_;
-    state_ = nullptr;
-  }
-
   struct State {
     StatusCode code;
     std::string msg;
   };
-  State* state_;
+  std::unique_ptr<State> state_;
 };
 
 }  // namespace graphar
