@@ -940,6 +940,11 @@ Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
     const std::string& edge_type, const std::string& dst_type,
     AdjListType adj_list_type, const IdType vertex_chunk_begin,
     const IdType vertex_chunk_end) noexcept {
+  static bool initialized = false;
+  if (!initialized) {
+    RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+    initialized = true;
+  }
   auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
   if (!edge_info) {
     return Status::KeyError("The edge ", src_type, " ", edge_type, " ",

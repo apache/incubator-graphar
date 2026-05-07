@@ -176,7 +176,7 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          mamba install -y -c conda-forge arrow-cpp
+          mamba install -y -c conda-forge "arrow-cpp>=24.0.0"
           # Note: CONDA_PREFIX may be unset unless conda is activated in this shell.
           # setup-miniconda exports CONDA (base install prefix), which is sufficient here.
           echo "CMAKE_PREFIX_PATH=$CONDA" >> "$GITHUB_ENV"
@@ -192,7 +192,7 @@ jobs:
         if: matrix.os == 'windows'
         shell: pwsh
         run: |
-          mamba install -y -c conda-forge arrow-cpp
+          mamba install -y -c conda-forge "arrow-cpp>=24.0.0"
           Add-Content $env:GITHUB_ENV "CMAKE_PREFIX_PATH=$env:CONDA_PREFIX\\Library"
           Add-Content $env:GITHUB_ENV "PATH=$env:CONDA_PREFIX\\Library\\bin;$env:PATH"
       - name: Download sdist artifact
