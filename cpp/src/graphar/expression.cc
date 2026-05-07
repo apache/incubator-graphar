@@ -22,7 +22,19 @@
 
 namespace graphar {
 
+// Initialize Arrow compute functions on first use (required for Arrow
+// >= 24.0.0)
+static Status EnsureComputeInitialized() {
+  static bool initialized = false;
+  if (!initialized) {
+    RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+    initialized = true;
+  }
+  return Status::OK();
+}
+
 Result<ArrowExpression> ExpressionProperty::Evaluate() {
+  GAR_RETURN_NOT_OK(EnsureComputeInitialized());
   return arrow::compute::field_ref(property_.name);
 }
 Result<ArrowExpression> ExpressionNot::Evaluate() {

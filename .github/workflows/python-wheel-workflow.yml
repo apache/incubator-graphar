@@ -107,7 +107,7 @@ jobs:
           - platform: arm64
             runner: macos-latest
             os: macos
-            deployment-target: '11.0'
+            deployment-target: '13.0'
 
 
     env:
