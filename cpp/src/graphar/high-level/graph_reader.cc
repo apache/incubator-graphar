@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <unordered_set>
 #include "arrow/array.h"
+#include "arrow/dataset/dataset.h"
 #include "graphar/api/arrow_reader.h"
 #include "graphar/convert_to_arrow_type.h"
 #include "graphar/label.h"
@@ -943,6 +944,7 @@ Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
   static bool initialized = false;
   if (!initialized) {
     RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+    RETURN_NOT_ARROW_OK(arrow::dataset::internal::Initialize());
     initialized = true;
   }
   auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
