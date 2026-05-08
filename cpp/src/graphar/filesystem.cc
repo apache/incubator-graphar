@@ -24,7 +24,6 @@
 #include "arrow/adapters/orc/adapter.h"
 #endif
 #include <arrow/compute/api.h>
-#include <arrow/compute/type_fwd.h>
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
@@ -110,22 +109,6 @@ Status EnsureDatasetScannerInitialized() {
   }
   return init_status;
 }
-
-Status EnsureMakeStructRegistered(const char* context) {
-  auto* registry = arrow::compute::GetFunctionRegistry();
-  if (registry == nullptr) {
-    return Status::KeyError(context,
-                            ": Arrow compute function registry is null.");
-  }
-  auto maybe_fn = registry->GetFunction("make_struct");
-  if (!maybe_fn.ok()) {
-    return Status::KeyError(context,
-                            ": Arrow function 'make_struct' is not registered. "
-                            "This usually indicates missing Arrow compute/"
-                            "dataset registration or linker dead-strip.");
-  }
-  return Status::OK();
-}
 }  // namespace
 
 std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
@@ -150,8 +133,6 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     const std::string& path, FileType file_type,
     const std::vector<int>& column_indices) const noexcept {
   GAR_RETURN_NOT_OK(EnsureDatasetScannerInitialized());
-  GAR_RETURN_NOT_OK(EnsureMakeStructRegistered(
-      "FileSystem::ReadFileToTable(column_indices)"));
   parquet::arrow::FileReaderBuilder builder;
   auto open_file_status = builder.OpenFile(path);
   if (!open_file_status.ok()) {
@@ -173,8 +154,6 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     const std::string& path, FileType file_type,
     const util::FilterOptions& options) const noexcept {
   GAR_RETURN_NOT_OK(EnsureDatasetScannerInitialized());
-  GAR_RETURN_NOT_OK(
-      EnsureMakeStructRegistered("FileSystem::ReadFileToTable(FilterOptions)"));
   std::shared_ptr<ds::FileFormat> format = GetFileFormat(file_type);
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
       auto factory, arrow::dataset::FileSystemDatasetFactory::Make(
