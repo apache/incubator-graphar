@@ -15,13 +15,14 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# Change this line to your arrow and parquet include path if needed
 export CPATH="/opt/homebrew/include:$CPATH"
 
+# Use Homebrew-installed Arrow instead of building from source
 cmake -S . -B build_macos \
     -DBUILD_BENCHMARKS=ON \
     -DCMAKE_BUILD_TYPE=Debug \
     -DBUILD_TESTS=ON \
-    -DBUILD_EXAMPLES=ON
+    -DBUILD_EXAMPLES=ON \
+    -DCMAKE_PREFIX_PATH=/opt/homebrew
 
 cmake --build build_macos -j8 2>&1 | tee build_macos.log

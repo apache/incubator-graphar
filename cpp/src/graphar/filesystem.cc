@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <memory>
+#include <mutex>
 #include "graphar/writer_util.h"
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
@@ -94,6 +95,22 @@ static Status CastToLargeOffsetArray(
 namespace graphar {
 namespace ds = arrow::dataset;
 
+namespace {
+Status EnsureDatasetScannerInitialized() {
+  static std::once_flag once;
+  static Status init_status = Status::OK();
+  std::call_once(once, []() {
+    auto st = arrow::compute::Initialize();
+    if (!st.ok()) {
+      init_status = Status::ArrowError(st.ToString());
+      return;
+    }
+    arrow::dataset::internal::Initialize();
+  });
+  return init_status;
+}
+}  // namespace
+
 std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
     const FileType type) const {
   switch (type) {
@@ -135,6 +152,7 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     const std::string& path, FileType file_type,
     const util::FilterOptions& options) const noexcept {
+  GAR_RETURN_NOT_OK(EnsureDatasetScannerInitialized());
   std::shared_ptr<ds::FileFormat> format = GetFileFormat(file_type);
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
       auto factory, arrow::dataset::FileSystemDatasetFactory::Make(
@@ -142,8 +160,6 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
                         arrow::dataset::FileSystemFactoryOptions()));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto dataset, factory->Finish());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
-  RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
-  arrow::dataset::internal::Initialize();
   // Apply the row filter and select the specified columns
   if (options.filter) {
     GAR_ASSIGN_OR_RAISE(auto filter, options.filter->Evaluate());
