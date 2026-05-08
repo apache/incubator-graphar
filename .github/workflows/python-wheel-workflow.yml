@@ -94,20 +94,17 @@ jobs:
             runner: ubuntu-latest # This is the standard x86_64 runner
             os: linux
             manylinux: _2_28
-            deployment-target: ''
 
           # Job 2: Native aarch64 build
           - platform: aarch64
             runner: ubuntu-22.04-arm # This is a native ARM64 runner
             os: linux
             manylinux: _2_28
-            deployment-target: ''
 
           # Job 3: macOS arm64 build
           - platform: arm64
             runner: macos-latest
             os: macos
-            deployment-target: '11.0'
 
 
     env:
@@ -121,7 +118,7 @@ jobs:
       CIBW_MANYLINUX_X86_64_IMAGE: ${{ matrix.os == 'linux' && format('manylinux{0}', matrix.manylinux) || '' }}
       CIBW_MANYLINUX_AARCH64_IMAGE: ${{ matrix.os == 'linux' && format('manylinux{0}', matrix.manylinux) || '' }}
       CIBW_ENVIRONMENT_WINDOWS: DISTUTILS_USE_SDK=1 MSSdk=1
-      CIBW_ENVIRONMENT_MACOS: ${{ matrix.os == 'macos' && format('MACOSX_DEPLOYMENT_TARGET={0} CMAKE_OSX_DEPLOYMENT_TARGET={0} CFLAGS=-mmacosx-version-min={0} CXXFLAGS=-mmacosx-version-min={0} LDFLAGS=-mmacosx-version-min={0}', matrix.deployment-target) || '' }}
+      CIBW_ENVIRONMENT_MACOS: ${{ matrix.os == 'macos' && 'MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion) CMAKE_OSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion) CFLAGS=-mmacosx-version-min=$(sw_vers -productVersion) CXXFLAGS=-mmacosx-version-min=$(sw_vers -productVersion) LDFLAGS=-mmacosx-version-min=$(sw_vers -productVersion)' || '' }}
       CIBW_BEFORE_BUILD_LINUX: |
         set -eux
         if [ -f /etc/system-release-cpe ]; then
@@ -163,8 +160,8 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Set up Miniconda (macOS/Windows)
-        if: matrix.os == 'windows' || matrix.os == 'macos'
+      - name: Set up Miniconda (Windows)
+        if: matrix.os == 'windows'
         uses: conda-incubator/setup-miniconda@v3
         with:
           auto-activate-base: true
@@ -176,15 +173,13 @@ jobs:
         shell: bash
         run: |
           set -euxo pipefail
-          mamba install -y -c conda-forge arrow-cpp
-          # Note: CONDA_PREFIX may be unset unless conda is activated in this shell.
-          # setup-miniconda exports CONDA (base install prefix), which is sufficient here.
-          echo "CMAKE_PREFIX_PATH=$CONDA" >> "$GITHUB_ENV"
+          brew install apache-arrow
+          echo "CMAKE_PREFIX_PATH=/usr/local" >> "$GITHUB_ENV"
           # Optional sanity check: ensure Arrow dylib isn't built for a newer macOS than deployment target.
           if command -v otool >/dev/null 2>&1; then
-            ls -lah "$CONDA/lib" || true
-            if [ -f "$CONDA/lib/libarrow.dylib" ]; then
-              otool -l "$CONDA/lib/libarrow.dylib" | (grep -A3 -E 'LC_BUILD_VERSION|LC_VERSION_MIN_MACOSX' || true)
+            ls -lah /usr/local/lib || true
+            if [ -f "/usr/local/lib/libarrow.dylib" ]; then
+              otool -l "/usr/local/lib/libarrow.dylib" | (grep -A3 -E 'LC_BUILD_VERSION|LC_VERSION_MIN_MACOSX' || true)
             fi
           fi
 
@@ -258,50 +253,3 @@ jobs:
 
           python -c "import graphar; import graphar._core; print('GraphAr imported successfully')"
           graphar --help >/dev/null
-
-  upload_test_pypi:
-    name: Publish to TestPyPI (auto)
-    needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-22.04
-    if: github.event_name == 'push'
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist
-
-      - name: Move artifacts to correct location
-        run: |
-          mkdir -p python/dist
-          find dist -name "*" -type f -exec mv {} python/dist/ \;
-      - name: Publish to Test PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          repository-url: https://test.pypi.org/legacy/
-          packages-dir: python/dist/
-
-  upload_pypi:
-    name: Publish (manual)
-    needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-22.04
-    if: github.event_name == 'workflow_dispatch' && inputs.publish_pypi
-    permissions:
-      contents: read
-      id-token: write
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist
-
-      - name: Move artifacts to correct location
-        run: |
-          mkdir -p python/dist
-          find dist -name "*" -type f -exec mv {} python/dist/ \;
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: python/dist/

@@ -73,6 +73,11 @@ Result<std::shared_ptr<arrow::Schema>> LabelToSchema(
 Status GeneralCast(const std::shared_ptr<arrow::Array>& in,
                    const std::shared_ptr<arrow::DataType>& to_type,
                    std::shared_ptr<arrow::Array>* out) {
+  static bool initialized = false;
+  if (!initialized) {
+    RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+    initialized = true;
+  }
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(*out,
                                        arrow::compute::Cast(*in, to_type));
   return Status::OK();
@@ -110,6 +115,11 @@ Status CastStringToLargeString(const std::shared_ptr<arrow::Array>& in,
 Status CastTableWithSchema(const std::shared_ptr<arrow::Table>& table,
                            const std::shared_ptr<arrow::Schema>& schema,
                            std::shared_ptr<arrow::Table>* out_table) {
+  static bool initialized = false;
+  if (!initialized) {
+    RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+    initialized = true;
+  }
   if (table->schema()->Equals(*schema)) {
     *out_table = table;
   }

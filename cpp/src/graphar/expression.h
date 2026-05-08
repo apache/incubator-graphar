@@ -89,6 +89,8 @@ class ExpressionLiteral : public Expression {
   ~ExpressionLiteral() = default;
 
   Result<ArrowExpression> Evaluate() override {
+    extern Status EnsureComputeInitialized();
+    GAR_RETURN_NOT_OK(EnsureComputeInitialized());
     return arrow::compute::literal(value_);
   }
 

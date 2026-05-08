@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <unordered_set>
 #include "arrow/array.h"
+#include "arrow/dataset/dataset.h"
+#include "arrow/dataset/plan.h"
 #include "graphar/api/arrow_reader.h"
 #include "graphar/convert_to_arrow_type.h"
 #include "graphar/label.h"
@@ -940,6 +942,12 @@ Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
     const std::string& edge_type, const std::string& dst_type,
     AdjListType adj_list_type, const IdType vertex_chunk_begin,
     const IdType vertex_chunk_end) noexcept {
+  static bool initialized = false;
+  if (!initialized) {
+    RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+    arrow::dataset::internal::Initialize();
+    initialized = true;
+  }
   auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
   if (!edge_info) {
     return Status::KeyError("The edge ", src_type, " ", edge_type, " ",
