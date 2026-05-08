@@ -47,6 +47,8 @@ include_directories(SYSTEM ${JAVA_INCLUDE_PATH2})
 
 # some JNI code depends on arrow directly
 find_package(Arrow REQUIRED)
+find_package(ArrowDataset REQUIRED)
+find_package(ArrowAcero REQUIRED)
 
 # build the bridge JNI library
 add_library(${LIBNAME} SHARED ${SOURCES})
@@ -62,6 +64,10 @@ else()
   target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} graphar)
 endif()
 target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} Arrow::arrow_shared)
+target_link_libraries(${LIBNAME}
+                      ${CMAKE_JNI_LINKER_FLAGS}
+                      ArrowDataset::arrow_dataset_shared
+                      ArrowAcero::arrow_acero_shared)
 
 set_target_properties(${LIBNAME} PROPERTIES LINKER_LANGUAGE CXX)
 
