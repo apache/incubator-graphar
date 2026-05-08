@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <unordered_set>
 #include "arrow/array.h"
+#include "arrow/compute/type_fwd.h"
 #include "arrow/dataset/dataset.h"
 #include "arrow/dataset/plan.h"
 #include "graphar/api/arrow_reader.h"
@@ -946,6 +947,18 @@ Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
   if (!initialized) {
     RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
     arrow::dataset::internal::Initialize();
+    auto* registry = arrow::compute::GetFunctionRegistry();
+    if (registry == nullptr) {
+      return Status::KeyError("EdgesCollection::Make: Arrow compute function "
+                              "registry is null.");
+    }
+    auto maybe_fn = registry->GetFunction("make_struct");
+    if (!maybe_fn.ok()) {
+      return Status::KeyError(
+          "EdgesCollection::Make: Arrow function 'make_struct' is not "
+          "registered. This usually indicates missing Arrow compute/dataset "
+          "registration or linker dead-strip.");
+    }
     initialized = true;
   }
   auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);

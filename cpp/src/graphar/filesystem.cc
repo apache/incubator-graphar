@@ -19,12 +19,12 @@
 
 #include <iostream>
 #include <memory>
-#include <mutex>
 #include "graphar/writer_util.h"
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
 #endif
 #include <arrow/compute/api.h>
+#include <arrow/compute/type_fwd.h>
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
@@ -97,17 +97,34 @@ namespace ds = arrow::dataset;
 
 namespace {
 Status EnsureDatasetScannerInitialized() {
-  static std::once_flag once;
+  static bool initialized = false;
   static Status init_status = Status::OK();
-  std::call_once(once, []() {
+  if (!initialized) {
     auto st = arrow::compute::Initialize();
     if (!st.ok()) {
       init_status = Status::ArrowError(st.ToString());
-      return;
+    } else {
+      arrow::dataset::internal::Initialize();
     }
-    arrow::dataset::internal::Initialize();
-  });
+    initialized = true;
+  }
   return init_status;
+}
+
+Status EnsureMakeStructRegistered(const char* context) {
+  auto* registry = arrow::compute::GetFunctionRegistry();
+  if (registry == nullptr) {
+    return Status::KeyError(context,
+                            ": Arrow compute function registry is null.");
+  }
+  auto maybe_fn = registry->GetFunction("make_struct");
+  if (!maybe_fn.ok()) {
+    return Status::KeyError(context,
+                            ": Arrow function 'make_struct' is not registered. "
+                            "This usually indicates missing Arrow compute/"
+                            "dataset registration or linker dead-strip.");
+  }
+  return Status::OK();
 }
 }  // namespace
 
@@ -153,6 +170,8 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     const std::string& path, FileType file_type,
     const util::FilterOptions& options) const noexcept {
   GAR_RETURN_NOT_OK(EnsureDatasetScannerInitialized());
+  GAR_RETURN_NOT_OK(
+      EnsureMakeStructRegistered("FileSystem::ReadFileToTable(FilterOptions)"));
   std::shared_ptr<ds::FileFormat> format = GetFileFormat(file_type);
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
       auto factory, arrow::dataset::FileSystemDatasetFactory::Make(
