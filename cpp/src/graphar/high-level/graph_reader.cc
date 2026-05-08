@@ -949,8 +949,9 @@ Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
     arrow::dataset::internal::Initialize();
     auto* registry = arrow::compute::GetFunctionRegistry();
     if (registry == nullptr) {
-      return Status::KeyError("EdgesCollection::Make: Arrow compute function "
-                              "registry is null.");
+      return Status::KeyError(
+          "EdgesCollection::Make: Arrow compute function "
+          "registry is null.");
     }
     auto maybe_fn = registry->GetFunction("make_struct");
     if (!maybe_fn.ok()) {
