@@ -64,10 +64,8 @@ else()
   target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} graphar)
 endif()
 target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS} Arrow::arrow_shared)
-target_link_libraries(${LIBNAME}
-                      ${CMAKE_JNI_LINKER_FLAGS}
-                      ArrowDataset::arrow_dataset_shared
-                      ArrowAcero::arrow_acero_shared)
+target_link_libraries(${LIBNAME} ${CMAKE_JNI_LINKER_FLAGS}
+                      ArrowDataset::arrow_dataset_shared ArrowAcero::arrow_acero_shared)
 
 set_target_properties(${LIBNAME} PROPERTIES LINKER_LANGUAGE CXX)
 
