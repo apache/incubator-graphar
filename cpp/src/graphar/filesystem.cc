@@ -27,6 +27,7 @@
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
+#include "arrow/dataset/plan.h"
 #include "parquet/arrow/reader.h"
 #if defined(ARROW_VERSION) && ARROW_VERSION <= 12000000
 #include "arrow/dataset/file_json.h"
@@ -141,9 +142,8 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
                         arrow::dataset::FileSystemFactoryOptions()));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto dataset, factory->Finish());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
-#if ARROW_VERSION >= 21000000
   RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
-#endif
+  arrow::dataset::internal::Initialize();
   // Apply the row filter and select the specified columns
   if (options.filter) {
     GAR_ASSIGN_OR_RAISE(auto filter, options.filter->Evaluate());
