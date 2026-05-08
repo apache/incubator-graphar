@@ -29,7 +29,7 @@ on:
       - ready_for_review
 
 concurrency:
-  group: ${{ github.repository }}-${{ github.event.number || github.head_ref || github.sha }}-${{ github.workflow }}
+  group: ${{ github.repository }}-${{ github.event.number }}-${{ github.workflow }}-${{ github.event_name }}
   cancel-in-progress: true
 
 permissions:
