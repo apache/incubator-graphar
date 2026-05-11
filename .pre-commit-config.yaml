@@ -93,7 +93,7 @@ repos:
         name: Rust cargo fmt
         entry: bash -c 'cd rust && cargo fmt --all'
         language: system
-        files: ^rust/.*\.(rs|toml|lock)$
+        files: ^rust/.*\.rs$
         pass_filenames: false
         require_serial: true
 
