@@ -27,6 +27,7 @@
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
+#include "arrow/dataset/plan.h"
 #include "parquet/arrow/reader.h"
 #if defined(ARROW_VERSION) && ARROW_VERSION <= 12000000
 #include "arrow/dataset/file_json.h"
@@ -93,6 +94,23 @@ static Status CastToLargeOffsetArray(
 namespace graphar {
 namespace ds = arrow::dataset;
 
+namespace {
+Status EnsureDatasetScannerInitialized() {
+  static bool initialized = false;
+  static Status init_status = Status::OK();
+  if (!initialized) {
+    auto st = arrow::compute::Initialize();
+    if (!st.ok()) {
+      init_status = Status::ArrowError(st.ToString());
+    } else {
+      arrow::dataset::internal::Initialize();
+    }
+    initialized = true;
+  }
+  return init_status;
+}
+}  // namespace
+
 std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
     const FileType type) const {
   switch (type) {
@@ -114,6 +132,7 @@ std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     const std::string& path, FileType file_type,
     const std::vector<int>& column_indices) const noexcept {
+  GAR_RETURN_NOT_OK(EnsureDatasetScannerInitialized());
   parquet::arrow::FileReaderBuilder builder;
   auto open_file_status = builder.OpenFile(path);
   if (!open_file_status.ok()) {
@@ -122,23 +141,19 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
   }
   builder.memory_pool(arrow::default_memory_pool());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto reader, builder.Build());
-  std::shared_ptr<arrow::Table> table;
-  arrow::Status read_status;
   if (column_indices.empty()) {
-    read_status = reader->ReadTable(&table);
-  } else {
-    read_status = reader->ReadTable(column_indices, &table);
+    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto table, reader->ReadTable());
+    return table;
   }
-  if (!read_status.ok()) {
-    return Status::Invalid("Failed to read table from file: ", path, " - ",
-                           read_status.ToString());
-  }
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto table,
+                                       reader->ReadTable(column_indices));
   return table;
 }
 
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     const std::string& path, FileType file_type,
     const util::FilterOptions& options) const noexcept {
+  GAR_RETURN_NOT_OK(EnsureDatasetScannerInitialized());
   std::shared_ptr<ds::FileFormat> format = GetFileFormat(file_type);
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
       auto factory, arrow::dataset::FileSystemDatasetFactory::Make(
@@ -146,9 +161,6 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
                         arrow::dataset::FileSystemFactoryOptions()));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto dataset, factory->Finish());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
-#if ARROW_VERSION >= 21000000
-  RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
-#endif
   // Apply the row filter and select the specified columns
   if (options.filter) {
     GAR_ASSIGN_OR_RAISE(auto filter, options.filter->Evaluate());

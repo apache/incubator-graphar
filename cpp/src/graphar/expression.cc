@@ -22,15 +22,27 @@
 
 namespace graphar {
 
+Status EnsureComputeInitialized() {
+  static bool initialized = false;
+  if (!initialized) {
+    RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+    initialized = true;
+  }
+  return Status::OK();
+}
+
 Result<ArrowExpression> ExpressionProperty::Evaluate() {
+  GAR_RETURN_NOT_OK(EnsureComputeInitialized());
   return arrow::compute::field_ref(property_.name);
 }
 Result<ArrowExpression> ExpressionNot::Evaluate() {
+  GAR_RETURN_NOT_OK(EnsureComputeInitialized());
   GAR_ASSIGN_OR_RAISE(auto expr, expr_->Evaluate());
   return arrow::compute::not_(expr);
 }
 
 Result<ArrowExpression> ExpressionEqual::Evaluate() {
+  GAR_RETURN_NOT_OK(EnsureComputeInitialized());
   GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
   GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
   GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
@@ -38,6 +50,7 @@ Result<ArrowExpression> ExpressionEqual::Evaluate() {
 }
 
 Result<ArrowExpression> ExpressionNotEqual::Evaluate() {
+  GAR_RETURN_NOT_OK(EnsureComputeInitialized());
   GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
   GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
   GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
@@ -45,6 +58,7 @@ Result<ArrowExpression> ExpressionNotEqual::Evaluate() {
 }
 
 Result<ArrowExpression> ExpressionGreaterThan::Evaluate() {
+  GAR_RETURN_NOT_OK(EnsureComputeInitialized());
   GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
   GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
   GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
@@ -52,6 +66,7 @@ Result<ArrowExpression> ExpressionGreaterThan::Evaluate() {
 }
 
 Result<ArrowExpression> ExpressionGreaterEqual::Evaluate() {
+  GAR_RETURN_NOT_OK(EnsureComputeInitialized());
   GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
   GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
   GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
@@ -59,6 +74,7 @@ Result<ArrowExpression> ExpressionGreaterEqual::Evaluate() {
 }
 
 Result<ArrowExpression> ExpressionLessThan::Evaluate() {
+  GAR_RETURN_NOT_OK(EnsureComputeInitialized());
   GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
   GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
   GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
@@ -66,6 +82,7 @@ Result<ArrowExpression> ExpressionLessThan::Evaluate() {
 }
 
 Result<ArrowExpression> ExpressionLessEqual::Evaluate() {
+  GAR_RETURN_NOT_OK(EnsureComputeInitialized());
   GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
   GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
   GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
@@ -73,6 +90,7 @@ Result<ArrowExpression> ExpressionLessEqual::Evaluate() {
 }
 
 Result<ArrowExpression> ExpressionAnd::Evaluate() {
+  GAR_RETURN_NOT_OK(EnsureComputeInitialized());
   GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
   GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
   GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());
@@ -80,6 +98,7 @@ Result<ArrowExpression> ExpressionAnd::Evaluate() {
 }
 
 Result<ArrowExpression> ExpressionOr::Evaluate() {
+  GAR_RETURN_NOT_OK(EnsureComputeInitialized());
   GAR_RETURN_NOT_OK(CheckNullArgs(lhs_, rhs_));
   GAR_ASSIGN_OR_RAISE(auto lexpr, lhs_->Evaluate());
   GAR_ASSIGN_OR_RAISE(auto rexpr, rhs_->Evaluate());

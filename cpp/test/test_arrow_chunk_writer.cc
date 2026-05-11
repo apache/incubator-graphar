@@ -145,8 +145,9 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     st = graphar::util::OpenParquetArrowReader(path2, pool, &arrow_reader);
 
     // Read entire file as a single Arrow table
-    std::shared_ptr<arrow::Table> table2;
-    st = arrow_reader->ReadTable(&table2);
+    auto maybe_table2 = arrow_reader->ReadTable();
+    REQUIRE(maybe_table2.ok());
+    auto table2 = maybe_table2.ValueOrDie();
 
     REQUIRE(table1->GetColumnByName("firstName")->ToString() ==
             table2->GetColumnByName("firstName")->ToString());
@@ -217,9 +218,9 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     auto st = graphar::util::OpenParquetArrowReader(
         parquet_file, arrow::default_memory_pool(), &parquet_reader);
     REQUIRE(st.ok());
-    std::shared_ptr<arrow::Table> parquet_table;
-    st = parquet_reader->ReadTable(&parquet_table);
-    REQUIRE(st.ok());
+    auto maybe_parquet_table = parquet_reader->ReadTable();
+    REQUIRE(maybe_parquet_table.ok());
+    auto parquet_table = maybe_parquet_table.ValueOrDie();
     auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
     auto row_group_meta = parquet_metadata->RowGroup(0);
     auto col_meta = row_group_meta->ColumnChunk(0);
@@ -280,12 +281,11 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
   std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
   st = graphar::util::OpenParquetArrowReader(path, pool, &arrow_reader);
   // Read entire file as a single Arrow table
-  std::shared_ptr<arrow::Table> maybe_table;
-  st = arrow_reader->ReadTable(&maybe_table);
-  REQUIRE(st.ok());
+  auto maybe_table = arrow_reader->ReadTable();
+  REQUIRE(maybe_table.ok());
 
   std::shared_ptr<arrow::Table> table =
-      maybe_table
+      maybe_table.ValueOrDie()
           ->RenameColumns(
               {GeneralParams::kSrcIndexCol, GeneralParams::kDstIndexCol})
           .ValueOrDie();
@@ -334,7 +334,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
               "/tmp/edge/person_knows_person/ordered_by_source/vertex_count")
             .ValueOrDie();
     auto vertex_num = input3->Read(sizeof(IdType)).ValueOrDie();
-    const IdType* vertex_num_ptr =
+    const auto* vertex_num_ptr =
         reinterpret_cast<const IdType*>(vertex_num->data());
     REQUIRE((*vertex_num_ptr) == 903);
 
@@ -429,9 +429,9 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     auto st = graphar::util::OpenParquetArrowReader(
         parquet_file, arrow::default_memory_pool(), &parquet_reader);
     REQUIRE(st.ok());
-    std::shared_ptr<arrow::Table> parquet_table;
-    st = parquet_reader->ReadTable(&parquet_table);
-    REQUIRE(st.ok());
+    auto maybe_parquet_table = parquet_reader->ReadTable();
+    REQUIRE(maybe_parquet_table.ok());
+    auto parquet_table = maybe_parquet_table.ValueOrDie();
     auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
     auto row_group_meta = parquet_metadata->RowGroup(0);
     auto col_meta = row_group_meta->ColumnChunk(0);
