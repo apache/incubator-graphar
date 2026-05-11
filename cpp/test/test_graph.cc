@@ -21,10 +21,14 @@
 
 #include "./util.h"
 #include "graphar/api/high_level_reader.h"
+#include "graphar/expression.h"
 
 #include <catch2/catch_test_macros.hpp>
 
 namespace graphar {
+constexpr size_t expectedFemaleCount = 454;
+constexpr size_t expectedMaleCount = 449;
+constexpr size_t expectedTotalCount = 903;
 TEST_CASE_METHOD(GlobalFixture, "Graph") {
   // read file and construct graph info
   std::string path =
@@ -111,6 +115,41 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
       }
       REQUIRE(count == filtered_ids.size());
     }
+  }
+
+  SECTION("VerticesCollectionFilterByProperty") {
+    auto vertex_info = graph_info->GetVertexInfo("person");
+    REQUIRE(vertex_info != nullptr);
+
+    auto vertices = std::make_shared<VerticesCollection>(
+        vertex_info, graph_info->GetPrefix());
+    REQUIRE(vertices->size() == expectedTotalCount);
+    std::cout << "total size " << vertices->size() << std::endl;
+    // filter female vertices
+    auto filter_female =
+        _Equal(_Property("gender"), _Literal(std::string("female")));
+    std::vector<IdType> new_valid_chunk;
+    auto maybe_filtered_female_ids =
+        vertices->filter("gender", filter_female, &new_valid_chunk);
+    REQUIRE(maybe_filtered_female_ids.status().ok());
+    auto filtered_female_ids = maybe_filtered_female_ids.value();
+    // filter male vertices
+    auto filter_male =
+        _Equal(_Property("gender"), _Literal(std::string("male")));
+    auto maybe_filtered_male_ids =
+        vertices->filter("gender", filter_male, &new_valid_chunk);
+    REQUIRE(maybe_filtered_male_ids.status().ok());
+    auto filtered_male_ids = maybe_filtered_male_ids.value();
+
+    std::cout << "Filtered " << filtered_female_ids.size()
+              << " vertices with gender='female'" << std::endl;
+    std::cout << "Filtered " << filtered_male_ids.size()
+              << " vertices with gender='male'" << std::endl;
+
+    REQUIRE(filtered_female_ids.size() == expectedFemaleCount);
+    REQUIRE(filtered_male_ids.size() == expectedMaleCount);
+    REQUIRE(filtered_male_ids.size() + filtered_female_ids.size() ==
+            expectedTotalCount);
   }
 
   SECTION("ListProperty") {
