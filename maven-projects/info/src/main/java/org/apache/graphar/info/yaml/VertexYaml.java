@@ -21,13 +21,16 @@ package org.apache.graphar.info.yaml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import org.apache.graphar.info.VersionInfo;
 import org.apache.graphar.info.VertexInfo;
 
 public class VertexYaml {
     private String type;
     private long chunk_size;
     private List<PropertyGroupYaml> property_groups;
+    private List<String> labels;
     private String prefix;
     private String version;
 
@@ -35,6 +38,7 @@ public class VertexYaml {
         this.type = "";
         this.chunk_size = 0;
         this.property_groups = new ArrayList<>();
+        this.labels = null;
         this.prefix = "";
         this.version = "";
     }
@@ -46,17 +50,13 @@ public class VertexYaml {
                 vertexInfo.getPropertyGroups().stream()
                         .map(PropertyGroupYaml::new)
                         .collect(Collectors.toList());
+        this.labels = vertexInfo.getLabels();
         this.prefix = vertexInfo.getPrefix();
-    }
-
-    public VertexInfo toVertexInfo() {
-        return new VertexInfo(
-                type,
-                chunk_size,
-                property_groups.stream()
-                        .map(PropertyGroupYaml::toPropertyGroup)
-                        .collect(Collectors.toList()),
-                prefix);
+        this.version =
+                Optional.of(vertexInfo)
+                        .map(VertexInfo::getVersion)
+                        .map(VersionInfo::toString)
+                        .orElse(null);
     }
 
     public String getType() {
@@ -81,6 +81,20 @@ public class VertexYaml {
 
     public void setProperty_groups(List<PropertyGroupYaml> property_groups) {
         this.property_groups = property_groups;
+    }
+
+    public List<String> getLabels() {
+        if (labels == null) {
+            return null;
+        }
+        // Returns the labels list, or null if the list is null or empty. Returning null for empty
+        // lists ensures that the labels field is omitted from YAML output when no labels are
+        // defined.
+        return labels.isEmpty() ? null : labels;
+    }
+
+    public void setLabels(List<String> labels) {
+        this.labels = labels;
     }
 
     public String getPrefix() {

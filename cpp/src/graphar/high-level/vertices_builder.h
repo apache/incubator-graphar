@@ -20,15 +20,22 @@
 #pragma once
 
 #include <any>
+#include <cassert>
+#include <cstddef>
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <utility>
 #include <vector>
 
 #include "graphar/arrow/chunk_writer.h"
+#include "graphar/fwd.h"
 #include "graphar/graph_info.h"
 #include "graphar/result.h"
+#include "graphar/status.h"
+#include "graphar/types.h"
+#include "graphar/writer_util.h"
 
 // forward declaration
 namespace arrow {
@@ -58,21 +65,21 @@ class Vertex {
    *
    * @return The id of the vertex.
    */
-  inline IdType GetId() const noexcept { return id_; }
+  IdType GetId() const noexcept { return id_; }
 
   /**
    * @brief Set id of the vertex.
    *
    * @param id The id of the vertex.
    */
-  inline void SetId(IdType id) { id_ = id; }
+  void SetId(IdType id) { id_ = id; }
 
   /**
    * @brief Check if the vertex is empty.
    *
    * @return true/false.
    */
-  inline bool Empty() const noexcept { return empty_; }
+  bool Empty() const noexcept { return empty_; }
 
   /**
    * @brief Add a property to the vertex.
@@ -81,9 +88,33 @@ class Vertex {
    * @param val The value of the property.
    */
   // TODO(@acezen): Enable the property to be a vector(list).
-  inline void AddProperty(const std::string& name, const std::any& val) {
+  void AddProperty(const std::string& name, const std::any& val) {
     empty_ = false;
     properties_[name] = val;
+  }
+
+  void AddProperty(const Cardinality cardinality, const std::string& name,
+                   const std::any& val) {
+    if (cardinality == Cardinality::SINGLE) {
+      cardinalities_[name] = Cardinality::SINGLE;
+      AddProperty(name, val);
+      return;
+    }
+    empty_ = false;
+    if (cardinalities_.find(name) != cardinalities_.end()) {
+      if (cardinalities_[name] != cardinality) {
+        throw std::runtime_error("Cardinality mismatch for property: " + name);
+      }
+      auto property_value_list =
+          std::any_cast<std::vector<std::any>>(properties_[name]);
+      property_value_list.push_back(val);
+      properties_[name] = property_value_list;
+    } else {
+      auto property_value_list = std::vector<std::any>();
+      property_value_list.push_back(val);
+      properties_[name] = property_value_list;
+    }
+    cardinalities_[name] = cardinality;
   }
 
   /**
@@ -92,7 +123,7 @@ class Vertex {
    * @param property The name of the property.
    * @return The value of the property.
    */
-  inline const std::any& GetProperty(const std::string& property) const {
+  const std::any& GetProperty(const std::string& property) const {
     return properties_.at(property);
   }
 
@@ -101,8 +132,7 @@ class Vertex {
    *
    * @return The map containing all properties of the vertex.
    */
-  inline const std::unordered_map<std::string, std::any>& GetProperties()
-      const {
+  const std::unordered_map<std::string, std::any>& GetProperties() const {
     return properties_;
   }
 
@@ -112,14 +142,79 @@ class Vertex {
    * @param property The name of the property.
    * @return true/false.
    */
-  inline bool ContainProperty(const std::string& property) {
+  bool ContainProperty(const std::string& property) {
     return (properties_.find(property) != properties_.end());
+  }
+
+  bool IsMultiProperty(const std::string& property) const {
+    return (cardinalities_.find(property) != cardinalities_.end() &&
+            cardinalities_.at(property) != Cardinality::SINGLE);
+  }
+
+  template <typename T>
+  Status ValidatePropertyType(const std::string& property,
+                              const Cardinality cardinality) const {
+    if (cardinality == Cardinality::SINGLE && IsMultiProperty(property)) {
+      return Status::TypeError(
+          "Invalid data cardinality for property ", property,
+          ", defined as SINGLE but got ",
+          cardinalities_.at(property) == Cardinality::LIST ? "LIST" : "SET");
+    }
+    if (IsMultiProperty(property) &&
+        (cardinality == Cardinality::SET ||
+         cardinalities_.at(property) == Cardinality::SET)) {
+      GAR_RETURN_NOT_OK(ValidateMultiPropertySet<T>(property));
+    }
+    if (IsMultiProperty(property)) {
+      auto value_list =
+          std::any_cast<std::vector<std::any>>(properties_.at(property));
+      for (auto value : value_list) {
+        auto& value_type = value.type();
+        if (value_type != typeid(T)) {
+          return Status::TypeError("Invalid data type for property ", property,
+                                   ", defined as ", typeid(T).name(),
+                                   ", but got ", value_type.name());
+        }
+      }
+    } else {
+      auto& value_type = properties_.at(property).type();
+      if (value_type != typeid(T)) {
+        return Status::TypeError("Invalid data type for property ", property,
+                                 ", defined as ", typeid(T).name(),
+                                 ", but got ", value_type.name());
+      }
+    }
+    return Status::OK();
+  }
+
+  template <typename T>
+  Status ValidateMultiProperty(const std::string& property) const {
+    if (IsMultiProperty(property) &&
+        cardinalities_.at(property) == Cardinality::SET) {
+      GAR_RETURN_NOT_OK(ValidateMultiPropertySet<T>(property));
+    }
+    return Status::OK();
+  }
+
+  template <typename T>
+  Status ValidateMultiPropertySet(const std::string& property) const {
+    auto vec = std::any_cast<std::vector<std::any>>(properties_.at(property));
+    std::unordered_set<T> seen;
+    for (const auto& item : vec) {
+      if (!seen.insert(std::any_cast<T>(item)).second) {
+        return Status::KeyError(
+            "Duplicate values exist in set type multi-property key: ", property,
+            " value: ", std::any_cast<T>(item));
+      }
+    }
+    return Status::OK();
   }
 
  private:
   IdType id_;
   bool empty_;
   std::unordered_map<std::string, std::any> properties_;
+  std::unordered_map<std::string, Cardinality> cardinalities_;
 };
 
 /**
@@ -135,6 +230,8 @@ class VerticesBuilder {
    * @param vertex_info The vertex info that describes the vertex type.
    * @param prefix The absolute prefix.
    * @param start_vertex_index The start index of the vertices collection.
+   * @param writerOptions The writerOptions provides configuration options for
+   * different file format writers.
    * @param validate_level The global validate level for the writer, with no
    * validate by default. It could be ValidateLevel::no_validate,
    * ValidateLevel::weak_validate or ValidateLevel::strong_validate, but could
@@ -143,10 +240,12 @@ class VerticesBuilder {
   explicit VerticesBuilder(
       const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
       IdType start_vertex_index = 0,
+      std::shared_ptr<WriterOptions> writerOptions = nullptr,
       const ValidateLevel& validate_level = ValidateLevel::no_validate)
       : vertex_info_(std::move(vertex_info)),
         prefix_(prefix),
         start_vertex_index_(start_vertex_index),
+        writer_options_(writerOptions),
         validate_level_(validate_level) {
     if (validate_level_ == ValidateLevel::default_validate) {
       throw std::runtime_error(
@@ -157,14 +256,33 @@ class VerticesBuilder {
     num_vertices_ = 0;
     is_saved_ = false;
   }
-
   /**
    * @brief Clear the vertices in this VerciesBuilder.
    */
-  inline void Clear() {
+  void Clear() {
     vertices_.clear();
     num_vertices_ = 0;
     is_saved_ = false;
+  }
+
+  /**
+   * @brief Set the writerOptions.
+   *
+   * @return The writerOptions provides configuration options for different file
+   * format writers.
+   */
+  void SetWriterOptions(std::shared_ptr<WriterOptions> writer_options) {
+    this->writer_options_ = writer_options;
+  }
+
+  /**
+   * @brief Set the writerOptions.
+   *
+   * @param writerOptions The writerOptions provides configuration options for
+   * different file format writers.
+   */
+  std::shared_ptr<WriterOptions> GetWriterOptions() {
+    return this->writer_options_;
   }
 
   /**
@@ -172,7 +290,7 @@ class VerticesBuilder {
    *
    * @param validate_level The validate level to set.
    */
-  inline void SetValidateLevel(const ValidateLevel& validate_level) {
+  void SetValidateLevel(const ValidateLevel& validate_level) {
     if (validate_level == ValidateLevel::default_validate) {
       return;
     }
@@ -184,7 +302,7 @@ class VerticesBuilder {
    *
    * @return The validate level of this writer.
    */
-  inline ValidateLevel GetValidateLevel() const { return validate_level_; }
+  ValidateLevel GetValidateLevel() const { return validate_level_; }
 
   /**
    * @brief Add a vertex with the given index.
@@ -219,8 +337,9 @@ class VerticesBuilder {
       vertices_.push_back(v);
     } else {
       v.SetId(index);
-      if (index >= static_cast<IdType>(vertices_.size()))
+      if (index >= static_cast<IdType>(vertices_.size())) {
         vertices_.resize(index + 1);
+      }
       vertices_[index] = v;
     }
     num_vertices_++;
@@ -241,7 +360,8 @@ class VerticesBuilder {
    */
   Status Dump() {
     // construct the writer
-    VertexPropertyWriter writer(vertex_info_, prefix_, validate_level_);
+    VertexPropertyWriter writer(vertex_info_, prefix_, writer_options_,
+                                validate_level_);
     IdType start_chunk_index =
         start_vertex_index_ / vertex_info_->GetChunkSize();
     // convert to table
@@ -261,15 +381,27 @@ class VerticesBuilder {
    * @param vertex_info The vertex info that describes the vertex type.
    * @param prefix The absolute prefix.
    * @param start_vertex_index The start index of the vertices collection.
+   * @param writerOptions The writerOptions provides configuration options for
+   * different file format writers.
    * @param validate_level The global validate level for the builder, default is
    * no_validate.
    */
   static Result<std::shared_ptr<VerticesBuilder>> Make(
       const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+      std::shared_ptr<WriterOptions> writer_options,
+      IdType start_vertex_index = 0,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    return std::make_shared<VerticesBuilder>(vertex_info, prefix,
+                                             start_vertex_index, writer_options,
+                                             validate_level);
+  }
+
+  static Result<std::shared_ptr<VerticesBuilder>> Make(
+      const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
       IdType start_vertex_index = 0,
       const ValidateLevel& validate_level = ValidateLevel::no_validate) {
     return std::make_shared<VerticesBuilder>(
-        vertex_info, prefix, start_vertex_index, validate_level);
+        vertex_info, prefix, start_vertex_index, nullptr, validate_level);
   }
 
   /**
@@ -278,9 +410,26 @@ class VerticesBuilder {
    * @param graph_info The graph info that describes the graph.
    * @param type The type of the vertex.
    * @param start_vertex_index The start index of the vertices collection.
+   * @param writerOptions The writerOptions provides configuration options for
+   * different file format writers.
    * @param validate_level The global validate level for the builder, default is
    * no_validate.
    */
+  static Result<std::shared_ptr<VerticesBuilder>> Make(
+      const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+      std::shared_ptr<WriterOptions> writer_options,
+      IdType start_vertex_index = 0,
+      const ValidateLevel& validate_level = ValidateLevel::no_validate) {
+    const auto vertex_info = graph_info->GetVertexInfo(type);
+    if (!vertex_info) {
+      return Status::KeyError("The vertex type ", type,
+                              " doesn't exist in graph ", graph_info->GetName(),
+                              ".");
+    }
+    return Make(vertex_info, graph_info->GetPrefix(), writer_options,
+                start_vertex_index, validate_level);
+  }
+
   static Result<std::shared_ptr<VerticesBuilder>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
       IdType start_vertex_index = 0,
@@ -291,8 +440,8 @@ class VerticesBuilder {
                               " doesn't exist in graph ", graph_info->GetName(),
                               ".");
     }
-    return Make(vertex_info, graph_info->GetPrefix(), start_vertex_index,
-                validate_level);
+    return Make(vertex_info, graph_info->GetPrefix(), nullptr,
+                start_vertex_index, validate_level);
   }
 
  private:
@@ -343,6 +492,7 @@ class VerticesBuilder {
   IdType start_vertex_index_;
   IdType num_vertices_;
   bool is_saved_;
+  std::shared_ptr<WriterOptions> writer_options_;
   ValidateLevel validate_level_;
 };
 

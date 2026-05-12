@@ -31,6 +31,7 @@ import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.types.AdjListType;
 import org.apache.graphar.types.ValidateLevel;
+import org.apache.graphar.util.Status;
 import org.apache.graphar.util.Yaml;
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,7 +42,7 @@ public class EdgesBuilderTest {
         // construct edge builder
         String edgeMetaFile = root + "/ldbc_sample/parquet/" + "person_knows_person.edge.yml";
         StdSharedPtr<Yaml> edgeMeta = Yaml.loadFile(StdString.create(edgeMetaFile)).value();
-        EdgeInfo edgeInfo = EdgeInfo.load(edgeMeta).value();
+        StdSharedPtr<EdgeInfo> edgeInfo = EdgeInfo.load(edgeMeta).value();
         long verticesNum = 903;
         EdgesBuilder builder =
                 EdgesBuilder.factory.create(
@@ -60,7 +61,8 @@ public class EdgesBuilderTest {
         e.addProperty(StdString.create("creationDate"), 2020);
         Assert.assertTrue(builder.addEdge(e, ValidateLevel.no_validate).ok());
         Assert.assertTrue(builder.addEdge(e, ValidateLevel.weak_validate).ok());
-        Assert.assertTrue(builder.addEdge(e, ValidateLevel.strong_validate).isTypeError());
+        Status status = builder.addEdge(e, ValidateLevel.strong_validate);
+        Assert.assertTrue(status.isTypeError());
         e.addProperty(StdString.create("invalid_name"), StdString.create("invalid_value"));
         Assert.assertTrue(builder.addEdge(e).isKeyError());
 

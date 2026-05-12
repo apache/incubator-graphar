@@ -79,3 +79,6 @@ venv.bak/
 target/
 maven-projects/proto/src/main/java
 dependency-reduced-pom.xml
+
+# Vibe coding
+CLAUDE.md

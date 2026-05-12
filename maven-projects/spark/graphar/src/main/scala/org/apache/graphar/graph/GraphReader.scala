@@ -19,9 +19,8 @@
 
 package org.apache.graphar.graph
 
-import org.apache.graphar.{GraphInfo, VertexInfo, EdgeInfo}
-import org.apache.graphar.reader.{VertexReader, EdgeReader}
-
+import org.apache.graphar.{EdgeInfo, GeneralParams, GraphInfo, VertexInfo}
+import org.apache.graphar.reader.{EdgeReader, VertexReader}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
@@ -48,11 +47,39 @@ object GraphReader {
   ): Map[String, DataFrame] = {
     val vertex_dataframes: Map[String, DataFrame] = vertexInfos.map {
       case (vertex_type, vertexInfo) => {
-        val reader = new VertexReader(prefix, vertexInfo, spark)
-        (vertex_type, reader.readAllVertexPropertyGroups())
+        (vertex_type, readVertexWithLabels(prefix, vertexInfo, spark))
       }
     }
     return vertex_dataframes
+  }
+
+  /**
+   * Loads the vertex chunks as DataFrame with the vertex infos.
+   *
+   * @param prefix
+   *   The absolute prefix.
+   * @param vertexInfos
+   *   The map of (vertex type -> VertexInfo) for the graph.
+   * @param spark
+   *   The Spark session for the reading.
+   * @return
+   *   The map of (vertex type -> DataFrame)
+   */
+  def readVertexWithLabels(
+      prefix: String,
+      vertexInfo: VertexInfo,
+      spark: SparkSession
+  ): DataFrame = {
+    val reader = new VertexReader(prefix, vertexInfo, spark)
+    val frame = reader.readAllVertexPropertyGroups()
+    if (vertexInfo.labels.isEmpty) {
+      return frame
+    }
+    val label_frame = reader.readVertexLabels()
+    if (label_frame.isEmpty) {
+      return frame
+    }
+    frame.join(label_frame, GeneralParams.vertexIndexCol, "left")
   }
 
   /**

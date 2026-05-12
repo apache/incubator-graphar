@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "graphar/fwd.h"
 #include "graphar/macros.h"
@@ -35,7 +36,7 @@ class DataType;
 namespace graphar {
 
 /** @brief Main data type enumeration. */
-enum class Type {
+enum class Type : int32_t {
   /** Boolean */
   BOOL = 0,
 
@@ -96,11 +97,20 @@ class DataType {
         child_(std::move(other.child_)),
         user_defined_type_name_(std::move(other.user_defined_type_name_)) {}
 
-  inline DataType& operator=(const DataType& other) = default;
+  DataType& operator=(const DataType& other) = default;
 
   bool Equals(const DataType& other) const {
-    return id_ == other.id_ &&
-           user_defined_type_name_ == other.user_defined_type_name_;
+    if (id_ != other.id_ ||
+        user_defined_type_name_ != other.user_defined_type_name_) {
+      return false;
+    }
+    if (child_ == nullptr && other.child_ == nullptr) {
+      return true;
+    }
+    if (child_ != nullptr && other.child_ != nullptr) {
+      return child_->Equals(other.child_);
+    }
+    return false;
   }
 
   bool Equals(const std::shared_ptr<DataType>& other) const {
@@ -160,7 +170,7 @@ class Date {
 };
 
 /** Adj list type enumeration for adjacency list of graph. */
-enum class AdjListType : std::uint8_t {
+enum class AdjListType : int32_t {
   /// collection of edges by source, but unordered, can represent COO format
   unordered_by_source = 0b00000001,
   /// collection of edges by destination, but unordered, can represent COO
@@ -185,7 +195,7 @@ constexpr AdjListType operator&(AdjListType lhs, AdjListType rhs) {
       static_cast<std::underlying_type_t<AdjListType>>(rhs));
 }
 
-static inline const char* AdjListTypeToString(AdjListType adj_list_type) {
+static const char* AdjListTypeToString(AdjListType adj_list_type) {
   static const std::map<AdjListType, const char*> adj_list2string{
       {AdjListType::unordered_by_source, "unordered_by_source"},
       {AdjListType::unordered_by_dest, "unordered_by_dest"},
@@ -194,8 +204,8 @@ static inline const char* AdjListTypeToString(AdjListType adj_list_type) {
   return adj_list2string.at(adj_list_type);
 }
 
-static inline AdjListType OrderedAlignedToAdjListType(
-    bool ordered, const std::string& aligned) {
+static AdjListType OrderedAlignedToAdjListType(bool ordered,
+                                               const std::string& aligned) {
   if (ordered) {
     return aligned == "src" ? AdjListType::ordered_by_source
                             : AdjListType::ordered_by_dest;
@@ -204,7 +214,7 @@ static inline AdjListType OrderedAlignedToAdjListType(
                           : AdjListType::unordered_by_dest;
 }
 
-static inline std::pair<bool, std::string> AdjListTypeToOrderedAligned(
+static std::pair<bool, std::string> AdjListTypeToOrderedAligned(
     AdjListType adj_list_type) {
   switch (adj_list_type) {
   case AdjListType::unordered_by_source:
@@ -220,7 +230,7 @@ static inline std::pair<bool, std::string> AdjListTypeToOrderedAligned(
   }
 }
 
-static inline FileType StringToFileType(const std::string& str) {
+static FileType StringToFileType(const std::string& str) {
   static const std::map<std::string, FileType> str2file_type{
       {"csv", FileType::CSV},
       {"json", FileType::JSON},
@@ -233,7 +243,7 @@ static inline FileType StringToFileType(const std::string& str) {
   }
 }
 
-static inline const char* FileTypeToString(FileType file_type) {
+static const char* FileTypeToString(FileType file_type) {
   static const std::map<FileType, const char*> file_type2string{
       {FileType::CSV, "csv"},
       {FileType::JSON, "json"},
@@ -242,4 +252,42 @@ static inline const char* FileTypeToString(FileType file_type) {
   return file_type2string.at(file_type);
 }
 
+static Cardinality StringToCardinality(const std::string& str) {
+  static const std::map<std::string, Cardinality> str2cardinality{
+      {"single", Cardinality::SINGLE},
+      {"list", Cardinality::LIST},
+      {"set", Cardinality::SET},
+  };
+  try {
+    return str2cardinality.at(str.c_str());
+  } catch (const std::exception& e) {
+    throw std::runtime_error("KeyError: " + str);
+  }
+}
+
+static const char* CardinalityToString(Cardinality cardinality) {
+  static const std::map<Cardinality, const char*> cardinality2string{
+      {Cardinality::SINGLE, "single"},
+      {Cardinality::LIST, "list"},
+      {Cardinality::SET, "set"},
+  };
+  try {
+    return cardinality2string.at(cardinality);
+  } catch (const std::exception& e) {
+    throw std::runtime_error("KeyError: " +
+                             std::to_string(static_cast<int>(cardinality)));
+  }
+}
+
+// Helper function to split a string by a delimiter
+inline std::vector<std::string> SplitString(const std::string& str,
+                                            char delimiter) {
+  std::vector<std::string> tokens;
+  std::string token;
+  std::istringstream tokenStream(str);
+  while (std::getline(tokenStream, token, delimiter)) {
+    tokens.push_back(std::move(token));
+  }
+  return tokens;
+}
 }  // namespace graphar

@@ -19,46 +19,63 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.proto.DataType;
+import org.apache.graphar.info.type.Cardinality;
+import org.apache.graphar.info.type.DataType;
+import org.apache.graphar.info.yaml.PropertyYaml;
 
 public class Property {
-    private final org.apache.graphar.proto.Property protoProperty;
+    private final String name;
+    private final DataType dataType;
+    private final Cardinality cardinality;
+    private final boolean primary;
+    private final boolean nullable;
 
     public Property(String name, DataType dataType, boolean primary, boolean nullable) {
-        protoProperty =
-                org.apache.graphar.proto.Property.newBuilder()
-                        .setName(name)
-                        .setType(dataType)
-                        .setIsPrimaryKey(primary)
-                        .setIsNullable(nullable)
-                        .build();
+        this(name, dataType, Cardinality.SINGLE, primary, nullable);
     }
 
-    private Property(org.apache.graphar.proto.Property protoProperty) {
-        this.protoProperty = protoProperty;
+    public Property(
+            String name,
+            DataType dataType,
+            Cardinality cardinality,
+            boolean primary,
+            boolean nullable) {
+        this.name = name;
+        this.dataType = dataType;
+        this.cardinality = cardinality;
+        this.primary = primary;
+        this.nullable = nullable;
     }
 
-    public static Property ofProto(org.apache.graphar.proto.Property protoProperty) {
-        return new Property(protoProperty);
+    public Property(PropertyYaml yamlParser) {
+        this.name = yamlParser.getName();
+        this.dataType = DataType.fromString(yamlParser.getData_type());
+        this.primary = yamlParser.getIs_primary();
+        this.nullable = yamlParser.getIs_nullable();
+        Cardinality cardinality = Cardinality.SINGLE;
+        if (yamlParser.getCardinality() != null && !yamlParser.getCardinality().isEmpty()) {
+            cardinality = Cardinality.fromString(yamlParser.getCardinality());
+        }
+        this.cardinality = cardinality;
     }
 
     public String getName() {
-        return protoProperty.getName();
+        return name;
     }
 
     public DataType getDataType() {
-        return protoProperty.getType();
+        return dataType;
     }
 
     public boolean isPrimary() {
-        return protoProperty.getIsPrimaryKey();
+        return primary;
     }
 
     public boolean isNullable() {
-        return protoProperty.getIsNullable();
+        return nullable;
     }
 
-    org.apache.graphar.proto.Property getProto() {
-        return protoProperty;
+    public Cardinality getCardinality() {
+        return cardinality;
     }
 }

@@ -257,21 +257,21 @@ Here we show statistics of datasets with hundreds of millions of vertices from [
 width="700" alt="storage consumption" />
 
 Two baseline approaches are
-considered: 1) “plain”, which employs plain encoding for the
-source and destination columns, and 2) “plain + offset”, which
-extends the “plain” method by sorting edges and adding an
-offset column to mark each vertex’s starting edge position.
+considered: 1) "plain", which employs plain encoding for the
+source and destination columns, and 2) "plain + offset", which
+extends the "plain" method by sorting edges and adding an
+offset column to mark each vertex's starting edge position.
 The result
 is a notable storage advantage: on average, GraphAr requires
-only 27.3% of the storage needed by the baseline “plain +
-offset”, which is due to delta encoding.
+only 27.3% of the storage needed by the baseline "plain +
+offset", which is due to delta encoding.
 
 ### I/O speed
 <img src="docs/images/benchmark_IO_time.png" class="align-center"
 width="700" alt="I/O time" />
 
 In (a) indicate that GraphAr significantly
-outperforms the baseline (CSV), achieving an average speedup of 4.9×. In Figure (b), the immutable (“Imm”) and mutable (“Mut”) variants are two native in-memory storage of GraphScope. It demonstrates that although the querying time with GraphAr exceeds that of the in-memory storages, attributable to intrinsic I/O overhead, it significantly surpasses the process of loading and then
+outperforms the baseline (CSV), achieving an average speedup of 4.9×. In Figure (b), the immutable ("Imm") and mutable ("Mut") variants are two native in-memory storage of GraphScope. It demonstrates that although the querying time with GraphAr exceeds that of the in-memory storages, attributable to intrinsic I/O overhead, it significantly surpasses the process of loading and then
 executing the query, by 2.4× and 2.5×, respectively. This indicates that GraphAr is a viable option for executing infrequent queries.
 
 
@@ -280,7 +280,7 @@ executing the query, by 2.4× and 2.5×, respectively. This indicates that Graph
 width="700" alt="Neighbor retrival" />
 
 We query vertices with the largest
-degree in selected graphs, maintaining edges in CSR-like or CSC-like formats depending on the degree type. GraphAr significantly outperforms the baselines, achieving an average speedup of 4452× over the “plain” method, 3.05× over “plain + offset”, and 1.23× over “delta + offset”. -->
+degree in selected graphs, maintaining edges in CSR-like or CSC-like formats depending on the degree type. GraphAr significantly outperforms the baselines, achieving an average speedup of 4452× over the "plain" method, 3.05× over "plain + offset", and 1.23× over "delta + offset". -->
 ### Label Filtering
 <img src="docs/images/benchmark_label_simple_filter.png" class="align-center"
 width="700" alt="Simple condition filtering" />
@@ -288,7 +288,7 @@ width="700" alt="Simple condition filtering" />
 **Performance of simple condition filtering.**
 For each graph, we perform experiments where we consider
 each label individually as the target label for filtering.
-GraphAr consistently outperforms the baselines. On average, it achieves a speedup of 14.8× over the “string” method, 8.9× over the “binary (plain)” method, and 7.4× over the  “binary (RLE)” method.
+GraphAr consistently outperforms the baselines. On average, it achieves a speedup of 14.8× over the "string" method, 8.9× over the "binary (plain)" method, and 7.4× over the  "binary (RLE)" method.
 
 <img src="docs/images/benchmark_label_complex_filter.png" class="align-center"
 width="700" alt="Complex condition filtering" />
@@ -296,7 +296,7 @@ width="700" alt="Complex condition filtering" />
 **Performance of complex condition filtering.**
 For each graph,
 we combine two labels by AND or OR as the filtering condition.
-The merge-based decoding method yields the largest gain, where “binary (RLE) + merge” outperforms the “binary (RLE)” method by up to 60.5×.
+The merge-based decoding method yields the largest gain, where "binary (RLE) + merge" outperforms the "binary (RLE)" method by up to 60.5×.
 <!-- ### Query efficiency
 <table>
     <caption style="text-align: center;">Query Execution Times (in seconds)</caption>
@@ -386,7 +386,7 @@ The merge-based decoding method yields the largest gain, where “binary (RLE) +
     </tbody>
 </table>
 <p><strong>Notes: <a href="https://github.com/apache/pinot" target="_blank">Pinot (P)</a>, <a href="https://github.com/neo4j/neo4j" target="_blank">Neo4j (N)</a>, <a href="https://arrow.apache.org/docs/cpp/streaming_execution.html" target="_blank">Acero (A)</a>, and GraphAr (G).
-“OM” denotes failed execution due to out-of-memory errors. 
+"OM" denotes failed execution due to out-of-memory errors. 
 While both Pinot and Neo4j are widely-used, they
 are not natively designed for data lakes and require an Extract-Transform-Load (ETL) process for integration. The three representative queries includes neighbor retrieval and label filtering, reference to <a href="https://github.com/ldbc/ldbc_snb_bi" target="_blank">LDBC SNB Business Intelligence</a> and <a href="https://github.com/ldbc/ldbc_snb_interactive_v1_impls" target="_blank">LDBC SNB Interactive v1 </a> workload implementations. </strong></p>
 
@@ -417,16 +417,26 @@ See [GraphAr Spark
 Library](./maven-projects/spark)
 for details about the Scala with Spark library.
 
-### The Java Library
+### The Java (FFI) Library
 
-> [!NOTE] 
-> The Java library is under development. 
+> [!WARNING] 
+> The Java (FFI) library is no longer being updated. The final version depends on C++ library v0.12.0.
 
-The GraphAr Java library is created with bindings to the C++ library
-(currently at version v0.10.0), utilizing
+The GraphAr Java library was created with bindings to the C++ library
+(currently at version v0.12.0), utilizing
 [Alibaba-FastFFI](https://github.com/alibaba/fastFFI) for
 implementation. See [GraphAr Java Library](./maven-projects/java) for
 details about the building of the Java library.
+
+### The Java Library
+> [!NOTE]
+> The Java library is under development.
+
+Unlike java-FFI, the Java library will be implemented by pure java, which will contain different modules:
+
+- **[java-info](./maven-projects/info)**: Responsible for parsing graphInfo (schema) from YAML files
+- **java-io-xxx**: Responsible for reading graph data from different storage formats (to be implemented)
+- **java-api-xxx**: Provides high level API for graph operations (to be implemented)
 
 ### The Python with PySpark Library
 
@@ -436,6 +446,10 @@ details about the building of the Java library.
 The PySpark library is developed as bindings to the GraphAr
 Spark library. See [GraphAr PySpark
 Library](./pyspark) for details about the PySpark library.
+## Join Community
+
+<img src="./docs/images/qrcode.png" width="150" alt="DingTalk QR Code"/> 
+
 
 ## Contributing
 

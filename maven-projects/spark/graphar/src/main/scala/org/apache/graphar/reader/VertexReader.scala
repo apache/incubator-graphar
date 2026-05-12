@@ -19,12 +19,15 @@
 
 package org.apache.graphar.reader
 
-import org.apache.graphar.util.{IndexGenerator, DataFrameConcat}
-import org.apache.graphar.{VertexInfo, PropertyGroup, GeneralParams}
+import org.apache.graphar.util.{DataFrameConcat, IndexGenerator}
+import org.apache.graphar.{GeneralParams, PropertyGroup, VertexInfo}
 import org.apache.graphar.util.FileSystem
-
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.functions.{col, struct, udf}
+import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.apache.spark.sql.types._
+
+import scala.collection.convert.ImplicitConversions.`list asScalaBuffer`
+import scala.collection.mutable.ListBuffer
 
 /**
  * Reader for vertex chunks.
@@ -153,5 +156,38 @@ class VertexReader(
   def readAllVertexPropertyGroups(): DataFrame = {
     val property_groups = vertexInfo.getProperty_groups()
     return readMultipleVertexPropertyGroups(property_groups)
+  }
+
+  def readVertexLabels(): DataFrame = {
+    if (vertexInfo.labels.size() > 0) {
+      val labels_list = vertexInfo.labels.toSeq
+      val parquet_read_path = prefix + vertexInfo.prefix + "/labels"
+      val rdd = spark.read
+        .option("fileFormat", "parquet")
+        .option("header", "true")
+        .format("org.apache.graphar.datasources.GarDataSource")
+        .load(parquet_read_path)
+        .rdd
+        .map { row =>
+          val labelsBuffer = ListBuffer[String]()
+          for ((colName, index) <- labels_list.zipWithIndex) {
+            if (row.getBoolean(index)) {
+              labelsBuffer += colName
+            }
+          }
+          Row.apply(labelsBuffer.toSeq)
+        }
+        // TODO(yangxk) read the vertexIndexCol from the file.
+        .zipWithIndex()
+        .map { case (row, idx) => Row.fromSeq(row.toSeq :+ idx) }
+      val schema_array = Array(
+        StructField(GeneralParams.kLabelCol, ArrayType(StringType)),
+        StructField(GeneralParams.vertexIndexCol, LongType)
+      )
+      val schema = StructType(schema_array)
+      spark.createDataFrame(rdd, schema)
+    } else {
+      return spark.emptyDataFrame
+    }
   }
 }

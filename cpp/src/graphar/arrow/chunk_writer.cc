@@ -17,11 +17,15 @@
  * under the License.
  */
 
+#include <arrow/acero/api.h>
+#include <cstddef>
+#include <iostream>
 #include <unordered_map>
 #include <utility>
-
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
+#include "graphar/fwd.h"
+#include "graphar/writer_util.h"
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
 #include "arrow/acero/exec_plan.h"
 #else
@@ -101,10 +105,15 @@ Result<std::shared_ptr<arrow::Table>> ExecutePlanAndCollectAsTable(
 
 VertexPropertyWriter::VertexPropertyWriter(
     const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+    const std::shared_ptr<WriterOptions>& options,
     const ValidateLevel& validate_level)
     : vertex_info_(vertex_info),
       prefix_(prefix),
-      validate_level_(validate_level) {
+      validate_level_(validate_level),
+      options_(options) {
+  if (!options) {
+    options_ = WriterOptions::DefaultWriterOption();
+  }
   if (validate_level_ == ValidateLevel::default_validate) {
     throw std::runtime_error(
         "default_validate is not allowed to be set as the global validate "
@@ -117,11 +126,13 @@ VertexPropertyWriter::VertexPropertyWriter(
 Status VertexPropertyWriter::validate(const IdType& count,
                                       ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // weak & strong validate
   if (count < 0) {
     return Status::Invalid("The number of vertices is negative.");
@@ -134,11 +145,13 @@ Status VertexPropertyWriter::validate(
     const std::shared_ptr<PropertyGroup>& property_group, IdType chunk_index,
     ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // weak & strong validate
   if (!vertex_info_->HasPropertyGroup(property_group)) {
     return Status::KeyError("The property group", " does not exist in ",
@@ -186,10 +199,16 @@ Status VertexPropertyWriter::validate(
                                " does not exist in the input table.");
       }
       auto field = schema->field(indice);
-      if (DataType::ArrowDataTypeToDataType(field->type()) != property.type) {
+      auto schema_data_type = DataType::DataTypeToArrowDataType(property.type);
+      if (property.cardinality != Cardinality::SINGLE) {
+        schema_data_type = arrow::list(schema_data_type);
+      }
+      if (!DataType::ArrowDataTypeToDataType(field->type())
+               ->Equals(DataType::ArrowDataTypeToDataType(schema_data_type))) {
         return Status::TypeError(
             "The data type of property: ", property.name, " is ",
-            property.type->ToTypeName(), ", but got ",
+            DataType::ArrowDataTypeToDataType(schema_data_type)->ToTypeName(),
+            ", but got ",
             DataType::ArrowDataTypeToDataType(field->type())->ToTypeName(),
             ".");
       }
@@ -237,7 +256,7 @@ Status VertexPropertyWriter::WriteChunk(
   GAR_ASSIGN_OR_RAISE(auto suffix,
                       vertex_info_->GetFilePath(property_group, chunk_index));
   std::string path = prefix_ + suffix;
-  return fs_->WriteTableToFile(in_table, file_type, path);
+  return fs_->WriteTableToFile(in_table, file_type, path, options_);
 }
 
 Status VertexPropertyWriter::WriteChunk(
@@ -314,22 +333,10 @@ Status VertexPropertyWriter::WriteTable(
   return Status::OK();
 }
 
-// Helper function to split a string by a delimiter
-std::vector<std::string> SplitString(const std::string& str, char delimiter) {
-  std::vector<std::string> tokens;
-  std::string token;
-  std::istringstream tokenStream(str);
-  while (std::getline(tokenStream, token, delimiter)) {
-    tokens.push_back(token);
-  }
-  return tokens;
-}
-
 Status VertexPropertyWriter::WriteLabelTable(
     const std::shared_ptr<arrow::Table>& input_table, IdType start_chunk_index,
     FileType file_type, ValidateLevel validate_level) const {
   auto schema = input_table->schema();
-  int indice = schema->GetFieldIndex(GeneralParams::kVertexIndexCol);
   IdType chunk_size = vertex_info_->GetChunkSize();
   int64_t length = input_table->num_rows();
   IdType chunk_index = start_chunk_index;
@@ -372,6 +379,8 @@ Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::GetLabelTable(
     auto label_column = std::static_pointer_cast<arrow::StringArray>(chunk);
 
     // Populate the matrix based on :LABEL column values
+    // TODO(@yangxk):  store array in the label_column, split the string when
+    // reading file
     for (int64_t row = 0; row < label_column->length(); ++row) {
       if (label_column->IsValid(row)) {
         std::string labels_string = label_column->GetString(row);
@@ -395,11 +404,11 @@ Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::GetLabelTable(
   for (const auto& label : labels) {
     arrow::BooleanBuilder builder;
     for (const auto& row : bool_matrix) {
-      builder.Append(row[label_to_index[label]]);
+      RETURN_NOT_ARROW_OK(builder.Append(row[label_to_index[label]]));
     }
 
     std::shared_ptr<arrow::Array> array;
-    builder.Finish(&array);
+    RETURN_NOT_ARROW_OK(builder.Finish(&array));
     fields.push_back(arrow::field(label, arrow::boolean()));
     arrays.push_back(array);
   }
@@ -413,19 +422,35 @@ Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::GetLabelTable(
 
 Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
     const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+    const std::shared_ptr<WriterOptions>& options,
     const ValidateLevel& validate_level) {
-  return std::make_shared<VertexPropertyWriter>(vertex_info, prefix,
+  return std::make_shared<VertexPropertyWriter>(vertex_info, prefix, options,
                                                 validate_level);
 }
 
 Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+    const std::shared_ptr<WriterOptions>& options,
     const ValidateLevel& validate_level) {
   auto vertex_info = graph_info->GetVertexInfo(type);
   if (!vertex_info) {
     return Status::KeyError("The vertex ", type, " doesn't exist.");
   }
-  return Make(vertex_info, graph_info->GetPrefix(), validate_level);
+  return Make(vertex_info, graph_info->GetPrefix(), options, validate_level);
+}
+
+Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
+    const std::shared_ptr<VertexInfo>& vertex_info, const std::string& prefix,
+    const ValidateLevel& validate_level) {
+  return Make(vertex_info, prefix, WriterOptions::DefaultWriterOption(),
+              validate_level);
+}
+
+Result<std::shared_ptr<VertexPropertyWriter>> VertexPropertyWriter::Make(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& type,
+    const ValidateLevel& validate_level) {
+  return Make(graph_info, type, WriterOptions::DefaultWriterOption(),
+              validate_level);
 }
 
 Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::AddIndexColumn(
@@ -454,10 +479,15 @@ Result<std::shared_ptr<arrow::Table>> VertexPropertyWriter::AddIndexColumn(
 EdgeChunkWriter::EdgeChunkWriter(const std::shared_ptr<EdgeInfo>& edge_info,
                                  const std::string& prefix,
                                  AdjListType adj_list_type,
+                                 const std::shared_ptr<WriterOptions>& options,
                                  const ValidateLevel& validate_level)
     : edge_info_(edge_info),
       adj_list_type_(adj_list_type),
-      validate_level_(validate_level) {
+      validate_level_(validate_level),
+      options_(options) {
+  if (!options) {
+    options_ = WriterOptions::DefaultWriterOption();
+  }
   if (validate_level_ == ValidateLevel::default_validate) {
     throw std::runtime_error(
         "default_validate is not allowed to be set as the global validate "
@@ -486,11 +516,13 @@ EdgeChunkWriter::EdgeChunkWriter(const std::shared_ptr<EdgeInfo>& edge_info,
 Status EdgeChunkWriter::validate(IdType count_or_index1, IdType count_or_index2,
                                  ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // weak & strong validate for adj list type
   if (!edge_info_->HasAdjacentListType(adj_list_type_)) {
     return Status::KeyError(
@@ -512,11 +544,13 @@ Status EdgeChunkWriter::validate(
     IdType vertex_chunk_index, IdType chunk_index,
     ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // validate for adj list type & index
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   // weak & strong validate for property group
@@ -532,11 +566,13 @@ Status EdgeChunkWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // validate for adj list type & index
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, 0, validate_level));
   // weak validate for the input table
@@ -587,11 +623,13 @@ Status EdgeChunkWriter::validate(
     const std::shared_ptr<arrow::Table>& input_table, IdType vertex_chunk_index,
     IdType chunk_index, ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // validate for adj list type & index
   GAR_RETURN_NOT_OK(validate(vertex_chunk_index, chunk_index, validate_level));
   // weak validate for the input table
@@ -640,11 +678,13 @@ Status EdgeChunkWriter::validate(
     IdType vertex_chunk_index, IdType chunk_index,
     ValidateLevel validate_level) const {
   // use the writer's validate level
-  if (validate_level == ValidateLevel::default_validate)
+  if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
+  }
   // no validate
-  if (validate_level == ValidateLevel::no_validate)
+  if (validate_level == ValidateLevel::no_validate) {
     return Status::OK();
+  }
   // validate for property group, adj list type & index
   GAR_RETURN_NOT_OK(validate(property_group, vertex_chunk_index, chunk_index,
                              validate_level));
@@ -715,7 +755,7 @@ Status EdgeChunkWriter::WriteOffsetChunk(
   GAR_ASSIGN_OR_RAISE(auto suffix, edge_info_->GetAdjListOffsetFilePath(
                                        vertex_chunk_index, adj_list_type_));
   std::string path = prefix_ + suffix;
-  return fs_->WriteTableToFile(in_table, file_type, path);
+  return fs_->WriteTableToFile(in_table, file_type, path, options_);
 }
 
 Status EdgeChunkWriter::WriteAdjListChunk(
@@ -747,7 +787,7 @@ Status EdgeChunkWriter::WriteAdjListChunk(
       auto suffix, edge_info_->GetAdjListFilePath(vertex_chunk_index,
                                                   chunk_index, adj_list_type_));
   std::string path = prefix_ + suffix;
-  return fs_->WriteTableToFile(in_table, file_type, path);
+  return fs_->WriteTableToFile(in_table, file_type, path, options_);
 }
 
 Status EdgeChunkWriter::WritePropertyChunk(
@@ -777,7 +817,7 @@ Status EdgeChunkWriter::WritePropertyChunk(
                                        property_group, adj_list_type_,
                                        vertex_chunk_index, chunk_index));
   std::string path = prefix_ + suffix;
-  return fs_->WriteTableToFile(in_table, file_type, path);
+  return fs_->WriteTableToFile(in_table, file_type, path, options_);
 }
 
 Status EdgeChunkWriter::WritePropertyChunk(
@@ -944,12 +984,14 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::getOffsetTable(
   int64_t global_index = 0;
   for (IdType i = begin_index; i < end_index; i++) {
     while (true) {
-      if (array_index >= column->num_chunks())
+      if (array_index >= column->num_chunks()) {
         break;
+      }
       if (index >= ids->length()) {
         array_index++;
-        if (array_index == column->num_chunks())
+        if (array_index == column->num_chunks()) {
           break;
+        }
         ids = std::static_pointer_cast<arrow::Int64Array>(
             column->chunk(array_index));
         index = 0;
@@ -979,6 +1021,8 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::getOffsetTable(
 Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::sortTable(
     const std::shared_ptr<arrow::Table>& input_table,
     const std::string& column_name) {
+  RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+  arrow::dataset::internal::Initialize();
   auto exec_context = arrow::compute::default_exec_context();
   auto plan = arrow_acero_namespace::ExecPlan::Make(exec_context).ValueOrDie();
   auto table_source_options =
@@ -1001,27 +1045,44 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::sortTable(
 
 Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
     const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
-    AdjListType adj_list_type, const ValidateLevel& validate_level) {
+    AdjListType adj_list_type, const std::shared_ptr<WriterOptions>& options,
+    const ValidateLevel& validate_level) {
   if (!edge_info->HasAdjacentListType(adj_list_type)) {
     return Status::KeyError(
         "The adjacent list type ", AdjListTypeToString(adj_list_type),
         " doesn't exist in edge ", edge_info->GetEdgeType(), ".");
   }
   return std::make_shared<EdgeChunkWriter>(edge_info, prefix, adj_list_type,
-                                           validate_level);
+                                           options, validate_level);
+}
+
+Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
+    const std::shared_ptr<EdgeInfo>& edge_info, const std::string& prefix,
+    AdjListType adj_list_type, const ValidateLevel& validate_level) {
+  return Make(edge_info, prefix, adj_list_type,
+              WriterOptions::DefaultWriterOption(), validate_level);
+}
+
+Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
+    const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
+    const std::string& edge_type, const std::string& dst_type,
+    AdjListType adj_list_type, const std::shared_ptr<WriterOptions>& options,
+    const ValidateLevel& validate_level) {
+  auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
+  if (!edge_info) {
+    return Status::KeyError("The edge ", src_type, " ", edge_type, " ",
+                            dst_type, " doesn't exist.");
+  }
+  return Make(edge_info, graph_info->GetPrefix(), adj_list_type, options,
+              validate_level);
 }
 
 Result<std::shared_ptr<EdgeChunkWriter>> EdgeChunkWriter::Make(
     const std::shared_ptr<GraphInfo>& graph_info, const std::string& src_type,
     const std::string& edge_type, const std::string& dst_type,
     AdjListType adj_list_type, const ValidateLevel& validate_level) {
-  auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
-  if (!edge_info) {
-    return Status::KeyError("The edge ", src_type, " ", edge_type, " ",
-                            dst_type, " doesn't exist.");
-  }
-  return Make(edge_info, graph_info->GetPrefix(), adj_list_type,
-              validate_level);
+  return Make(graph_info, src_type, edge_type, dst_type, adj_list_type,
+              WriterOptions::DefaultWriterOption(), validate_level);
 }
 
 std::string EdgeChunkWriter::getSortColumnName(AdjListType adj_list_type) {

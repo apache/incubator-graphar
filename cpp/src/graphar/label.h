@@ -26,8 +26,7 @@
 #include <parquet/api/writer.h>
 #include <parquet/properties.h>
 
-#include <iostream>
-#include <set>
+#include <functional>
 #include <vector>
 
 using parquet::ConvertedType;
@@ -37,10 +36,12 @@ using parquet::Type;
 using parquet::schema::GroupNode;
 using parquet::schema::PrimitiveNode;
 
+namespace graphar {
+
 constexpr int BATCH_SIZE = 1024;  // the batch size
 
 /// The query type
-enum QUERY_TYPE {
+enum class QUERY_TYPE {
   COUNT,    // return the number of valid vertices
   INDEX,    // return the indices of valid vertices
   BITMAP,   // return the bitmap of valid vertices
@@ -57,6 +58,9 @@ int read_parquet_file_and_get_valid_indices(
     const int tested_label_num, std::vector<int> tested_label_ids,
     const std::function<bool(bool*, int)>& IsValid, int chunk_idx,
     int chunk_size, std::vector<int>* indices = nullptr,
-    uint64_t* bitmap = nullptr, const QUERY_TYPE query_type = COUNT);
+    uint64_t* bitmap = nullptr,
+    const QUERY_TYPE query_type = QUERY_TYPE::COUNT);
+
+}  // namespace graphar
 
 #endif  // CPP_SRC_GRAPHAR_LABEL_H_

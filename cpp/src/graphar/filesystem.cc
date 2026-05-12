@@ -17,12 +17,17 @@
  * under the License.
  */
 
+#include <iostream>
+#include <memory>
+#include "graphar/writer_util.h"
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
 #endif
+#include <arrow/compute/api.h>
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
 #include "arrow/dataset/api.h"
+#include "arrow/dataset/plan.h"
 #include "parquet/arrow/reader.h"
 #if defined(ARROW_VERSION) && ARROW_VERSION <= 12000000
 #include "arrow/dataset/file_json.h"
@@ -89,17 +94,34 @@ static Status CastToLargeOffsetArray(
 namespace graphar {
 namespace ds = arrow::dataset;
 
+namespace {
+Status EnsureDatasetScannerInitialized() {
+  static bool initialized = false;
+  static Status init_status = Status::OK();
+  if (!initialized) {
+    auto st = arrow::compute::Initialize();
+    if (!st.ok()) {
+      init_status = Status::ArrowError(st.ToString());
+    } else {
+      arrow::dataset::internal::Initialize();
+    }
+    initialized = true;
+  }
+  return init_status;
+}
+}  // namespace
+
 std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
     const FileType type) const {
   switch (type) {
-  case CSV:
+  case FileType::CSV:
     return std::make_shared<ds::CsvFileFormat>();
-  case PARQUET:
+  case FileType::PARQUET:
     return std::make_shared<ds::ParquetFileFormat>();
-  case JSON:
+  case FileType::JSON:
     return std::make_shared<ds::JsonFileFormat>();
 #ifdef ARROW_ORC
-  case ORC:
+  case FileType::ORC:
     return std::make_shared<ds::OrcFileFormat>();
 #endif
   default:
@@ -110,6 +132,7 @@ std::shared_ptr<ds::FileFormat> FileSystem::GetFileFormat(
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     const std::string& path, FileType file_type,
     const std::vector<int>& column_indices) const noexcept {
+  GAR_RETURN_NOT_OK(EnsureDatasetScannerInitialized());
   parquet::arrow::FileReaderBuilder builder;
   auto open_file_status = builder.OpenFile(path);
   if (!open_file_status.ok()) {
@@ -118,26 +141,19 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
   }
   builder.memory_pool(arrow::default_memory_pool());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto reader, builder.Build());
-  std::shared_ptr<arrow::Table> table;
   if (column_indices.empty()) {
-    arrow::Status read_status = reader->ReadTable(&table);
-    if (!read_status.ok()) {
-      return Status::Invalid("Failed to read table from file: ", path, " - ",
-                             read_status.ToString());
-    }
-  } else {
-    arrow::Status read_status = reader->ReadTable(column_indices, &table);
-    if (!read_status.ok()) {
-      return Status::Invalid("Failed to read table from file: ", path, " - ",
-                             read_status.ToString());
-    }
+    GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto table, reader->ReadTable());
+    return table;
   }
+  GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto table,
+                                       reader->ReadTable(column_indices));
   return table;
 }
 
 Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
     const std::string& path, FileType file_type,
     const util::FilterOptions& options) const noexcept {
+  GAR_RETURN_NOT_OK(EnsureDatasetScannerInitialized());
   std::shared_ptr<ds::FileFormat> format = GetFileFormat(file_type);
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
       auto factory, arrow::dataset::FileSystemDatasetFactory::Make(
@@ -145,7 +161,6 @@ Result<std::shared_ptr<arrow::Table>> FileSystem::ReadFileToTable(
                         arrow::dataset::FileSystemFactoryOptions()));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto dataset, factory->Finish());
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto scan_builder, dataset->NewScan());
-
   // Apply the row filter and select the specified columns
   if (options.filter) {
     GAR_ASSIGN_OR_RAISE(auto filter, options.filter->Evaluate());
@@ -209,8 +224,8 @@ Result<T> FileSystem::ReadFileToValue(const std::string& path) const noexcept {
 }
 
 template <>
-Result<std::string> FileSystem::ReadFileToValue(const std::string& path) const
-    noexcept {
+Result<std::string> FileSystem::ReadFileToValue(
+    const std::string& path) const noexcept {
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto access_file,
                                        arrow_fs_->OpenInputFile(path));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto bytes, access_file->GetSize());
@@ -243,42 +258,38 @@ Status FileSystem::WriteValueToFile(const std::string& value,
   return Status::OK();
 }
 
-Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
-                                    FileType file_type,
-                                    const std::string& path) const noexcept {
+Status FileSystem::WriteTableToFile(
+    const std::shared_ptr<arrow::Table>& table, FileType file_type,
+    const std::string& path,
+    const std::shared_ptr<WriterOptions>& options) const noexcept {
   // try to create the directory, oss filesystem may not support this, ignore
   ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto output_stream,
                                        arrow_fs_->OpenOutputStream(path));
   switch (file_type) {
   case FileType::CSV: {
-    auto write_options = arrow::csv::WriteOptions::Defaults();
-    write_options.include_header = true;
-    write_options.quoting_style = arrow::csv::QuotingStyle::Needed;
     GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
-        auto writer, arrow::csv::MakeCSVWriter(output_stream.get(),
-                                               table->schema(), write_options));
+        auto writer,
+        arrow::csv::MakeCSVWriter(output_stream.get(), table->schema(),
+                                  options->getCsvOption()));
     RETURN_NOT_ARROW_OK(writer->WriteTable(*table));
     RETURN_NOT_ARROW_OK(writer->Close());
     break;
   }
   case FileType::PARQUET: {
     auto schema = table->schema();
-    auto column_num = schema->num_fields();
-    parquet::WriterProperties::Builder builder;
-    builder.compression(arrow::Compression::type::ZSTD);  // enable compression
+    auto row_group_size = options->getParquetMaxRowGroupLength();
     RETURN_NOT_ARROW_OK(parquet::arrow::WriteTable(
-        *table, arrow::default_memory_pool(), output_stream, 64 * 1024 * 1024,
-        builder.build(), parquet::default_arrow_writer_properties()));
+        *table, arrow::default_memory_pool(), output_stream, row_group_size,
+        options->getParquetWriterProperties(),
+        options->getArrowWriterProperties()));
     break;
   }
 #ifdef ARROW_ORC
   case FileType::ORC: {
-    auto writer_options = arrow::adapters::orc::WriteOptions();
-    writer_options.compression = arrow::Compression::type::ZSTD;
     GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
         auto writer, arrow::adapters::orc::ORCFileWriter::Open(
-                         output_stream.get(), writer_options));
+                         output_stream.get(), options->getOrcOption()));
     RETURN_NOT_ARROW_OK(writer->Write(*table));
     RETURN_NOT_ARROW_OK(writer->Close());
     break;
@@ -292,19 +303,19 @@ Status FileSystem::WriteTableToFile(const std::shared_ptr<arrow::Table>& table,
 }
 
 Status FileSystem::WriteLabelTableToFile(
-    const std::shared_ptr<arrow::Table>& table, const std::string& path) const
-    noexcept {
+    const std::shared_ptr<arrow::Table>& table,
+    const std::string& path) const noexcept {
   // try to create the directory, oss filesystem may not support this, ignore
   ARROW_UNUSED(arrow_fs_->CreateDir(path.substr(0, path.find_last_of("/"))));
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(auto output_stream,
                                        arrow_fs_->OpenOutputStream(path));
   auto schema = table->schema();
-  auto column_num = schema->num_fields();
   parquet::WriterProperties::Builder builder;
   builder.compression(arrow::Compression::type::ZSTD);  // enable compression
   builder.encoding(parquet::Encoding::RLE);
+  auto row_group_size = builder.build()->max_row_group_length();
   RETURN_NOT_ARROW_OK(parquet::arrow::WriteTable(
-      *table, arrow::default_memory_pool(), output_stream, 64 * 1024 * 1024,
+      *table, arrow::default_memory_pool(), output_stream, row_group_size,
       builder.build(), parquet::default_arrow_writer_properties()));
   return Status::OK();
 }
@@ -369,20 +380,26 @@ Result<std::shared_ptr<FileSystem>> FileSystemFromUriOrPath(
 // arrow::fs::InitializeS3 and arrow::fs::FinalizeS3 need arrow_version >= 15
 Status InitializeS3() {
 #if defined(ARROW_VERSION) && ARROW_VERSION > 14000000
+#if defined(ARROW_S3)
   auto options = arrow::fs::S3GlobalOptions::Defaults();
+#endif
 #else
   arrow::fs::S3GlobalOptions options;
   options.log_level = arrow::fs::S3LogLevel::Fatal;
 #endif
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000
+#if defined(ARROW_S3)
   RETURN_NOT_ARROW_OK(arrow::fs::InitializeS3(options));
+#endif
 #endif
   return Status::OK();
 }
 
 Status FinalizeS3() {
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 15000000
+#if defined(ARROW_S3)
   RETURN_NOT_ARROW_OK(arrow::fs::FinalizeS3());
+#endif
 #endif
   return Status::OK();
 }
@@ -391,7 +408,6 @@ Status FinalizeS3() {
 template Result<IdType> FileSystem::ReadFileToValue<IdType>(
     const std::string&) const noexcept;
 /// template specialization for std::string
-template Status FileSystem::WriteValueToFile<IdType>(const IdType&,
-                                                     const std::string&) const
-    noexcept;
+template Status FileSystem::WriteValueToFile<IdType>(
+    const IdType&, const std::string&) const noexcept;
 }  // namespace graphar

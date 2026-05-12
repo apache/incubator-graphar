@@ -19,6 +19,10 @@
 
 package org.apache.graphar.info;
 
+import java.io.Writer;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,61 +30,126 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.graphar.info.yaml.GraphYaml;
-import org.apache.graphar.util.GeneralParams;
 import org.yaml.snakeyaml.Yaml;
 
 public class GraphInfo {
-    private final org.apache.graphar.proto.GraphInfo protoGraphInfo;
-    private final List<VertexInfo> cachedVertexInfoList;
-    private final List<EdgeInfo> cachedEdgeInfoList;
-    private final Map<String, VertexInfo> cachedVertexInfoMap;
-    private final Map<String, EdgeInfo> cachedEdgeInfoMap;
+    private final String name;
+    private final List<VertexInfo> vertexInfos;
+    private final List<EdgeInfo> edgeInfos;
+    private final URI baseUri;
+    private final Map<String, VertexInfo> vertexType2VertexInfo;
+    private final Map<String, EdgeInfo> edgeConcat2EdgeInfo;
+    private final VersionInfo version;
+    private final Map<String, URI> types2StoreUri;
 
     public GraphInfo(
-            String name, List<VertexInfo> vertexInfos, List<EdgeInfo> edgeInfos, String prefix) {
-        this.cachedVertexInfoList = List.copyOf(vertexInfos);
-        this.cachedEdgeInfoList = List.copyOf(edgeInfos);
-        this.cachedVertexInfoMap =
+            String name,
+            Map<URI, VertexInfo> vertexInfos,
+            Map<URI, EdgeInfo> edgeInfos,
+            URI uri,
+            String version) {
+        this(
+                name,
+                new ArrayList<>(vertexInfos.values()),
+                new ArrayList<>(edgeInfos.values()),
+                uri,
+                version);
+        vertexInfos.forEach((key, value) -> types2StoreUri.put(value.getType() + ".vertex", key));
+        edgeInfos.forEach((key, value) -> types2StoreUri.put(value.getConcat() + ".edge", key));
+    }
+
+    public GraphInfo(
+            String name,
+            List<VertexInfo> vertexInfos,
+            List<EdgeInfo> edgeInfos,
+            String prefix,
+            String version) {
+        this(name, vertexInfos, edgeInfos, prefix == null ? null : URI.create(prefix), version);
+    }
+
+    public GraphInfo(
+            String name,
+            List<VertexInfo> vertexInfos,
+            List<EdgeInfo> edgeInfos,
+            URI baseUri,
+            String version) {
+        this.name = name;
+        this.vertexInfos = List.copyOf(vertexInfos);
+        this.edgeInfos = List.copyOf(edgeInfos);
+        this.baseUri = baseUri;
+        this.version = VersionParser.getVersion(version);
+        this.vertexType2VertexInfo =
                 vertexInfos.stream()
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         VertexInfo::getType, Function.identity()));
-        this.cachedEdgeInfoMap =
+        this.edgeConcat2EdgeInfo =
                 edgeInfos.stream()
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         EdgeInfo::getConcat, Function.identity()));
-        this.protoGraphInfo =
-                org.apache.graphar.proto.GraphInfo.newBuilder()
-                        .setName(name)
-                        .addAllVertices(
-                                vertexInfos.stream()
-                                        .map(VertexInfo::getVertexPath)
-                                        .collect(Collectors.toList()))
-                        .addAllEdges(
-                                edgeInfos.stream()
-                                        .map(EdgeInfo::getEdgePath)
-                                        .collect(Collectors.toList()))
-                        .setPrefix(prefix)
-                        .build();
+        this.types2StoreUri = new HashMap<>();
     }
 
     private GraphInfo(
-            org.apache.graphar.proto.GraphInfo protoGraphInfo,
-            List<VertexInfo> cachedVertexInfoList,
-            List<EdgeInfo> cachedEdgeInfoList,
-            Map<String, VertexInfo> cachedVertexInfoMap,
-            Map<String, EdgeInfo> cachedEdgeInfoMap) {
+            String name,
+            List<VertexInfo> vertexInfos,
+            List<EdgeInfo> edgeInfos,
+            URI baseUri,
+            String version,
+            Map<String, VertexInfo> vertexType2VertexInfo,
+            Map<String, EdgeInfo> edgeConcat2EdgeInfo) {
+        this(
+                name,
+                vertexInfos,
+                edgeInfos,
+                baseUri,
+                VersionParser.getVersion(version),
+                vertexType2VertexInfo,
+                edgeConcat2EdgeInfo);
+    }
 
-        this.protoGraphInfo = protoGraphInfo;
-        this.cachedVertexInfoList = cachedVertexInfoList;
-        this.cachedEdgeInfoList = cachedEdgeInfoList;
-        this.cachedVertexInfoMap = cachedVertexInfoMap;
-        this.cachedEdgeInfoMap = cachedEdgeInfoMap;
+    private GraphInfo(
+            String name,
+            List<VertexInfo> vertexInfos,
+            List<EdgeInfo> edgeInfos,
+            URI baseUri,
+            VersionInfo version,
+            Map<String, VertexInfo> vertexType2VertexInfo,
+            Map<String, EdgeInfo> edgeConcat2EdgeInfo) {
+        this.name = name;
+        this.vertexInfos = vertexInfos;
+        this.edgeInfos = edgeInfos;
+        this.baseUri = baseUri;
+        this.version = version;
+        this.vertexType2VertexInfo = vertexType2VertexInfo;
+        this.edgeConcat2EdgeInfo = edgeConcat2EdgeInfo;
+        this.types2StoreUri = new HashMap<>();
+    }
+
+    public void dump(URI storeUri, Writer output) {
+        if (!isValidated()) {
+            throw new IllegalStateException("GraphInfo is not valid and cannot be dumped.");
+        }
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
+        GraphYaml graphYaml = new GraphYaml(storeUri, this);
+        yaml.dump(graphYaml, output);
+    }
+
+    public String dump(URI storeUri) {
+        if (!isValidated()) {
+            throw new IllegalStateException("GraphInfo is not valid and cannot be dumped.");
+        }
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
+        GraphYaml graphYaml = new GraphYaml(storeUri, this);
+        return yaml.dump(graphYaml);
     }
 
     public String dump() {
-        Yaml yaml = new Yaml(GraphYaml.getDumperOptions());
+        if (!isValidated()) {
+            throw new IllegalStateException("GraphInfo is not valid and cannot be dumped.");
+        }
+        Yaml yaml = new Yaml(GraphYaml.getRepresenter(), GraphYaml.getDumperOptions());
         GraphYaml graphYaml = new GraphYaml(this);
         return yaml.dump(graphYaml);
     }
@@ -89,117 +158,232 @@ public class GraphInfo {
         if (vertexInfo == null || hasVertexInfo(vertexInfo.getType())) {
             return Optional.empty();
         }
-        final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
-                org.apache.graphar.proto.GraphInfo.newBuilder(protoGraphInfo)
-                        .addVertices(vertexInfo.getVertexPath())
-                        .build();
-        final List<VertexInfo> newVertexInfoList =
-                Stream.concat(cachedVertexInfoList.stream(), Stream.of(vertexInfo))
+        List<VertexInfo> newVertexInfos =
+                Stream.concat(vertexInfos.stream(), Stream.of(vertexInfo))
                         .collect(Collectors.toList());
-        final Map<String, VertexInfo> newVertexInfoMap =
+        Map<String, VertexInfo> newVertexType2VertexInfo =
                 Stream.concat(
-                                cachedVertexInfoMap.entrySet().stream(),
+                                vertexType2VertexInfo.entrySet().stream(),
                                 Stream.of(Map.entry(vertexInfo.getType(), vertexInfo)))
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));
         return Optional.of(
                 new GraphInfo(
-                        newProtoGraphInfo,
+                        name,
+                        newVertexInfos,
+                        edgeInfos,
+                        baseUri,
+                        version,
+                        newVertexType2VertexInfo,
+                        edgeConcat2EdgeInfo));
+    }
+
+    public Optional<GraphInfo> removeVertex(VertexInfo vertexInfo) {
+
+        if (vertexInfo == null || !hasVertexInfo(vertexInfo.getType())) {
+            return Optional.empty();
+        }
+
+        final List<VertexInfo> newVertexInfoList =
+                vertexInfos.stream()
+                        .filter(v -> !v.getType().equals(vertexInfo.getType()))
+                        .collect(Collectors.toList());
+
+        final Map<String, VertexInfo> newVertexInfoMap =
+                vertexType2VertexInfo.entrySet().stream()
+                        .filter(v -> !v.getKey().equals(vertexInfo.getType()))
+                        .collect(
+                                Collectors.toUnmodifiableMap(
+                                        Map.Entry::getKey, Map.Entry::getValue));
+        return Optional.of(
+                new GraphInfo(
+                        name,
                         newVertexInfoList,
-                        cachedEdgeInfoList,
+                        edgeInfos,
+                        baseUri,
+                        version,
                         newVertexInfoMap,
-                        cachedEdgeInfoMap));
+                        edgeConcat2EdgeInfo));
     }
 
     public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
         if (edgeInfo == null
                 || hasEdgeInfo(
-                        edgeInfo.getSrcLabel(), edgeInfo.getEdgeLabel(), edgeInfo.getDstLabel())) {
+                        edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
             return Optional.empty();
         }
-        final org.apache.graphar.proto.GraphInfo newProtoGraphInfo =
-                org.apache.graphar.proto.GraphInfo.newBuilder(protoGraphInfo)
-                        .addEdges(edgeInfo.getEdgePath())
-                        .build();
-        final List<EdgeInfo> newEdgeInfos =
-                Stream.concat(cachedEdgeInfoList.stream(), Stream.of(edgeInfo))
-                        .collect(Collectors.toList());
-        final Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
+        List<EdgeInfo> newEdgeInfos =
+                Stream.concat(edgeInfos.stream(), Stream.of(edgeInfo)).collect(Collectors.toList());
+        Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
                 Stream.concat(
-                                cachedEdgeInfoMap.entrySet().stream(),
+                                edgeConcat2EdgeInfo.entrySet().stream(),
                                 Stream.of(Map.entry(edgeInfo.getConcat(), edgeInfo)))
                         .collect(
                                 Collectors.toUnmodifiableMap(
                                         Map.Entry::getKey, Map.Entry::getValue));
         return Optional.of(
                 new GraphInfo(
-                        newProtoGraphInfo,
-                        cachedVertexInfoList,
+                        name,
+                        vertexInfos,
                         newEdgeInfos,
-                        cachedVertexInfoMap,
+                        baseUri,
+                        version,
+                        vertexType2VertexInfo,
                         newEdgeConcat2EdgeInfo));
     }
 
-    public boolean hasVertexInfo(String label) {
-        return cachedVertexInfoMap.containsKey(label);
+    public Optional<GraphInfo> removeEdge(EdgeInfo edgeInfo) {
+        if (edgeInfo == null
+                || !hasEdgeInfo(
+                        edgeInfo.getSrcType(), edgeInfo.getEdgeType(), edgeInfo.getDstType())) {
+            return Optional.empty();
+        }
+        final List<EdgeInfo> newEdgeInfos =
+                edgeInfos.stream()
+                        .filter(
+                                e ->
+                                        !(e.getSrcType().equals(edgeInfo.getSrcType())
+                                                && e.getDstType().equals(edgeInfo.getDstType())
+                                                && e.getEdgeType().equals(edgeInfo.getEdgeType())))
+                        .collect(Collectors.toList());
+
+        final Map<String, EdgeInfo> newEdgeConcat2EdgeInfo =
+                edgeConcat2EdgeInfo.entrySet().stream()
+                        .filter(e -> !e.getKey().equals(edgeInfo.getConcat()))
+                        .collect(
+                                Collectors.toUnmodifiableMap(
+                                        Map.Entry::getKey, Map.Entry::getValue));
+        return Optional.of(
+                new GraphInfo(
+                        name,
+                        vertexInfos,
+                        newEdgeInfos,
+                        baseUri,
+                        version,
+                        vertexType2VertexInfo,
+                        newEdgeConcat2EdgeInfo));
     }
 
-    public boolean hasEdgeInfo(String srcLabel, String edgeLabel, String dstLabel) {
-        return cachedEdgeInfoMap.containsKey(EdgeInfo.concat(srcLabel, edgeLabel, dstLabel));
+    public boolean hasVertexInfo(String type) {
+        return vertexType2VertexInfo.containsKey(type);
     }
 
-    public VertexInfo getVertexInfo(String label) {
-        checkVertexExist(label);
-        return cachedVertexInfoMap.get(label);
+    public boolean hasEdgeInfo(String srcType, String edgeType, String dstType) {
+        return edgeConcat2EdgeInfo.containsKey(EdgeInfo.concat(srcType, edgeType, dstType));
     }
 
-    public EdgeInfo getEdgeInfo(String srcLabel, String edgeLabel, String dstLabel) {
-        checkEdgeExist(srcLabel, edgeLabel, dstLabel);
-        return cachedEdgeInfoMap.get(EdgeInfo.concat(srcLabel, edgeLabel, dstLabel));
+    public VertexInfo getVertexInfo(String type) {
+        checkVertexExist(type);
+        return vertexType2VertexInfo.get(type);
+    }
+
+    public EdgeInfo getEdgeInfo(String srcType, String edgeType, String dstType) {
+        checkEdgeExist(srcType, edgeType, dstType);
+        return edgeConcat2EdgeInfo.get(EdgeInfo.concat(srcType, edgeType, dstType));
     }
 
     public int getVertexInfoNum() {
-        return cachedVertexInfoList.size();
+        return vertexInfos.size();
     }
 
     public int getEdgeInfoNum() {
-        return cachedEdgeInfoList.size();
+        return edgeInfos.size();
     }
 
     public String getName() {
-        return protoGraphInfo.getName();
+        return name;
     }
 
     public List<VertexInfo> getVertexInfos() {
-        return cachedVertexInfoList;
+        return vertexInfos;
     }
 
     public List<EdgeInfo> getEdgeInfos() {
-        return cachedEdgeInfoList;
+        return edgeInfos;
     }
 
     public String getPrefix() {
-        return protoGraphInfo.getPrefix();
+        return baseUri == null ? null : baseUri.toString();
     }
 
-    private void checkVertexExist(String label) {
-        if (!hasVertexInfo(label)) {
+    public URI getBaseUri() {
+        return baseUri;
+    }
+
+    public VersionInfo getVersion() {
+        return version;
+    }
+
+    public void setStoreUri(VertexInfo vertexInfo, URI storeUri) {
+        this.types2StoreUri.put(vertexInfo.getType() + ".vertex", storeUri);
+    }
+
+    public void setStoreUri(EdgeInfo edgeInfo, URI storeUri) {
+        this.types2StoreUri.put(edgeInfo.getConcat() + ".edge", storeUri);
+    }
+
+    public URI getStoreUri(VertexInfo vertexInfo) {
+        String type = vertexInfo.getType() + ".vertex";
+        if (types2StoreUri.containsKey(type)) {
+            return types2StoreUri.get(type);
+        }
+        return URI.create(type + ".yaml");
+    }
+
+    public URI getStoreUri(EdgeInfo edgeInfo) {
+        String type = edgeInfo.getConcat() + ".edge";
+        if (types2StoreUri.containsKey(type)) {
+            return types2StoreUri.get(type);
+        }
+        return URI.create(type + ".yaml");
+    }
+
+    public Map<String, URI> getTypes2Uri() {
+        return types2StoreUri;
+    }
+
+    public boolean isValidated() {
+        // Check if name is not empty and base URI is not null
+        if (name == null || name.isEmpty() || baseUri == null) {
+            return false;
+        }
+
+        // Check if all vertex infos are valid
+        for (VertexInfo vertexInfo : vertexInfos) {
+            if (vertexInfo == null || !vertexInfo.isValidated()) {
+                return false;
+            }
+        }
+
+        // Check if all edge infos are valid
+        for (EdgeInfo edgeInfo : edgeInfos) {
+            if (edgeInfo == null || !edgeInfo.isValidated()) {
+                return false;
+            }
+        }
+
+        // Check if vertex/edge infos size matches vertex/edge type to index map size
+        if (vertexInfos.size() != vertexType2VertexInfo.size()
+                || edgeInfos.size() != edgeConcat2EdgeInfo.size()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private void checkVertexExist(String type) {
+        if (!hasVertexInfo(type)) {
             throw new IllegalArgumentException(
-                    "Vertex label " + label + " not exist in graph " + getName());
+                    "Vertex type " + type + " not exist in graph " + getName());
         }
     }
 
-    private void checkEdgeExist(String srcLabel, String dstLabel, String edgeLabel) {
-        if (!hasEdgeInfo(srcLabel, dstLabel, edgeLabel)) {
+    private void checkEdgeExist(String srcType, String dstType, String edgeType) {
+        if (!hasEdgeInfo(srcType, dstType, edgeType)) {
             throw new IllegalArgumentException(
-                    "Edge label"
-                            + srcLabel
-                            + GeneralParams.regularSeparator
-                            + GeneralParams.regularSeparator
-                            + edgeLabel
-                            + GeneralParams.regularSeparator
-                            + dstLabel
+                    "Edge type "
+                            + EdgeInfo.concat(srcType, dstType, edgeType)
                             + " not exist in graph "
                             + getName());
         }

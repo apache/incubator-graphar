@@ -88,7 +88,11 @@ class ExpressionLiteral : public Expression {
   ExpressionLiteral(const ExpressionLiteral& other) = default;
   ~ExpressionLiteral() = default;
 
-  Result<ArrowExpression> Evaluate() { return arrow::compute::literal(value_); }
+  Result<ArrowExpression> Evaluate() override {
+    extern Status EnsureComputeInitialized();
+    GAR_RETURN_NOT_OK(EnsureComputeInitialized());
+    return arrow::compute::literal(value_);
+  }
 
  private:
   T value_;
@@ -138,8 +142,8 @@ class ExpressionBinaryOp : public Expression {
   ~ExpressionBinaryOp() = default;
 
  protected:
-  inline Status CheckNullArgs(std::shared_ptr<Expression> lhs,
-                              std::shared_ptr<Expression> rhs) noexcept {
+  Status CheckNullArgs(std::shared_ptr<Expression> lhs,
+                       std::shared_ptr<Expression> rhs) noexcept {
     if (lhs == nullptr || rhs == nullptr) {
       return Status::Invalid("Invalid expression: lhs or rhs is null");
     }

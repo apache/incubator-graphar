@@ -21,6 +21,8 @@
 #include <algorithm>
 #include <unordered_set>
 #include "arrow/array.h"
+#include "arrow/dataset/dataset.h"
+#include "arrow/dataset/plan.h"
 #include "graphar/api/arrow_reader.h"
 #include "graphar/convert_to_arrow_type.h"
 #include "graphar/label.h"
@@ -117,10 +119,11 @@ Result<bool> VertexIter::hasLabel(const std::string& label) noexcept {
 Result<std::vector<std::string>> VertexIter::label() noexcept {
   std::shared_ptr<arrow::ChunkedArray> column(nullptr);
   std::vector<std::string> vertex_label;
-  if (is_filtered_)
+  if (is_filtered_) {
     label_reader_.seek(filtered_ids_[cur_offset_]);
-  else
+  } else {
     label_reader_.seek(cur_offset_);
+  }
   GAR_ASSIGN_OR_RAISE(auto chunk_table, label_reader_.GetLabelChunk());
   for (auto label : labels_) {
     column = util::GetArrowColumnByName(chunk_table, label);
@@ -138,8 +141,9 @@ Result<std::vector<std::string>> VertexIter::label() noexcept {
 static inline bool IsValid(bool* state, int column_number) {
   for (int i = 0; i < column_number; ++i) {
     // AND case
-    if (!state[i])
+    if (!state[i]) {
       return false;
+    }
     // OR case
     // if (state[i]) return true;
   }
@@ -150,7 +154,7 @@ static inline bool IsValid(bool* state, int column_number) {
 }
 
 Result<std::vector<IdType>> VerticesCollection::filter(
-    std::vector<std::string> filter_labels,
+    const std::vector<std::string>& filter_labels,
     std::vector<IdType>* new_valid_chunk) {
   std::vector<int> indices;
   const int TOT_ROWS_NUM = vertex_num_;
@@ -172,7 +176,6 @@ Result<std::vector<IdType>> VerticesCollection::filter(
 
   uint64_t* bitmap = new uint64_t[TOT_ROWS_NUM / 64 + 1];
   memset(bitmap, 0, sizeof(uint64_t) * (TOT_ROWS_NUM / 64 + 1));
-  int total_count = 0;
   int row_num;
 
   if (is_filtered_) {
@@ -202,10 +205,9 @@ Result<std::vector<IdType>> VerticesCollection::filter(
     }
   }
   // std::cout << "Total valid count: " << total_count << std::endl;
-  std::vector<int64_t> indices64;
-
-  for (int value : indices) {
-    indices64.push_back(static_cast<int64_t>(value));
+  std::vector<int64_t> indices64(indices.size());
+  for (size_t i = 0; i < indices.size(); ++i) {
+    indices64[i] = static_cast<int64_t>(indices[i]);
   }
 
   delete[] bitmap;
@@ -214,7 +216,7 @@ Result<std::vector<IdType>> VerticesCollection::filter(
 }
 
 Result<std::vector<IdType>> VerticesCollection::filter_by_acero(
-    std::vector<std::string> filter_labels) const {
+    const std::vector<std::string>& filter_labels) const {
   std::vector<int> indices;
   const int TOT_ROWS_NUM = vertex_num_;
   const int CHUNK_SIZE = vertex_info_->GetChunkSize();
@@ -226,8 +228,6 @@ Result<std::vector<IdType>> VerticesCollection::filter_by_acero(
       tested_label_ids.push_back(std::distance(labels_.begin(), it));
     }
   }
-  int total_count = 0;
-  int row_num;
   std::vector<std::shared_ptr<Expression>> filters;
   std::shared_ptr<Expression> combined_filter = nullptr;
 
@@ -251,26 +251,24 @@ Result<std::vector<IdType>> VerticesCollection::filter_by_acero(
   for (int chunk_idx = 0; chunk_idx * CHUNK_SIZE < TOT_ROWS_NUM; ++chunk_idx) {
     auto filter_result = filter_reader->GetLabelChunk();
     auto filter_table = filter_result.value();
-    total_count += filter_table->num_rows();
     filter_reader->next_chunk();
   }
   // std::cout << "Total valid count: " << total_count << std::endl;
-  std::vector<int64_t> indices64;
-
-  for (int value : indices) {
-    indices64.push_back(static_cast<int64_t>(value));
+  std::vector<int64_t> indices64(indices.size());
+  for (size_t i = 0; i < indices.size(); ++i) {
+    indices64[i] = static_cast<int64_t>(indices[i]);
   }
 
   return indices64;
 }
 
 Result<std::vector<IdType>> VerticesCollection::filter(
-    std::string property_name, std::shared_ptr<Expression> filter_expression,
+    const std::string& property_name,
+    std::shared_ptr<Expression> filter_expression,
     std::vector<IdType>* new_valid_chunk) {
   std::vector<int> indices;
   const int TOT_ROWS_NUM = vertex_num_;
   const int CHUNK_SIZE = vertex_info_->GetChunkSize();
-  int total_count = 0;
   auto property_group = vertex_info_->GetPropertyGroup(property_name);
   auto maybe_filter_reader = graphar::VertexPropertyArrowChunkReader::Make(
       vertex_info_, property_group, prefix_, {});
@@ -279,7 +277,7 @@ Result<std::vector<IdType>> VerticesCollection::filter(
   std::vector<int64_t> indices64;
   if (is_filtered_) {
     for (int chunk_idx : valid_chunk_) {
-      // how to itetate valid_chunk_?
+      // how to iterate valid_chunk_?
       filter_reader->seek(chunk_idx * CHUNK_SIZE);
       auto filter_result =
           filter_reader->GetChunk(graphar::GetChunkVersion::V1);
@@ -308,7 +306,6 @@ Result<std::vector<IdType>> VerticesCollection::filter(
       auto filter_table = filter_result.value();
       int count = filter_table->num_rows();
       filter_reader->next_chunk();
-      total_count += count;
       if (count != 0) {
         valid_chunk_.emplace_back(static_cast<IdType>(chunk_idx));
         // TODO(elssky): record indices
@@ -945,6 +942,12 @@ Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
     const std::string& edge_type, const std::string& dst_type,
     AdjListType adj_list_type, const IdType vertex_chunk_begin,
     const IdType vertex_chunk_end) noexcept {
+  static bool initialized = false;
+  if (!initialized) {
+    RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+    arrow::dataset::internal::Initialize();
+    initialized = true;
+  }
   auto edge_info = graph_info->GetEdgeInfo(src_type, edge_type, dst_type);
   if (!edge_info) {
     return Status::KeyError("The edge ", src_type, " ", edge_type, " ",

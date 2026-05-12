@@ -62,7 +62,7 @@ class Vertex {
    *
    * @return The id of the vertex.
    */
-  inline IdType id() const noexcept { return id_; }
+  IdType id() const noexcept { return id_; }
 
   /**
    * @brief Get the property value of the vertex.
@@ -86,7 +86,7 @@ class Vertex {
    * @param property The property name.
    * @return True if value at the property is valid, False otherwise.
    */
-  inline bool IsValid(const std::string& property) const {
+  bool IsValid(const std::string& property) const {
     if (properties_.find(property) != properties_.end()) {
       return properties_.at(property).has_value();
     }
@@ -123,14 +123,14 @@ class Edge {
    *
    * @return The id of the source vertex.
    */
-  inline IdType source() const noexcept { return src_id_; }
+  IdType source() const noexcept { return src_id_; }
 
   /**
    * @brief Get destination id of the edge.
    *
    * @return The id of the destination vertex.
    */
-  inline IdType destination() const noexcept { return dst_id_; }
+  IdType destination() const noexcept { return dst_id_; }
 
   /**
    * @brief Get the property value of the edge.
@@ -147,7 +147,7 @@ class Edge {
    * @param property The property name.
    * @return True if value at the property is valid, False otherwise.
    */
-  inline bool IsValid(const std::string& property) const {
+  bool IsValid(const std::string& property) const {
     if (properties_.find(property) != properties_.end()) {
       return properties_.at(property).has_value();
     }
@@ -198,9 +198,9 @@ class VertexIter {
   /** Copy constructor. */
   VertexIter(const VertexIter& other)
       : readers_(other.readers_),
-        cur_offset_(other.cur_offset_),
-        labels_(other.labels_),
         label_reader_(other.label_reader_),
+        labels_(other.labels_),
+        cur_offset_(other.cur_offset_),
         is_filtered_(other.is_filtered_),
         filtered_ids_(other.filtered_ids_) {}
 
@@ -330,12 +330,12 @@ class VerticesCollection {
   explicit VerticesCollection(const std::shared_ptr<VertexInfo>& vertex_info,
                               const std::string& prefix,
                               const bool is_filtered = false,
-                              const std::vector<IdType> filtered_ids = {})
-      : vertex_info_(std::move(vertex_info)),
+                              std::vector<IdType> filtered_ids = {})
+      : vertex_info_(vertex_info),
         prefix_(prefix),
         labels_(vertex_info->GetLabels()),
         is_filtered_(is_filtered),
-        filtered_ids_(filtered_ids) {
+        filtered_ids_(std::move(filtered_ids)) {
     // get the vertex num
     std::string base_dir;
     GAR_ASSIGN_OR_RAISE_ERROR(auto fs,
@@ -355,9 +355,10 @@ class VerticesCollection {
 
   /** The iterator pointing to the past-the-end element. */
   VertexIter end() noexcept {
-    if (is_filtered_)
+    if (is_filtered_) {
       return VertexIter(vertex_info_, prefix_, filtered_ids_.size(), labels_,
                         is_filtered_, filtered_ids_);
+    }
     return VertexIter(vertex_info_, prefix_, vertex_num_, labels_, is_filtered_,
                       filtered_ids_);
   }
@@ -369,22 +370,28 @@ class VerticesCollection {
 
   /** Get the number of vertices in the collection. */
   size_t size() const noexcept {
-    if (is_filtered_)
+    if (is_filtered_) {
       return filtered_ids_.size();
-    else
+    } else {
       return vertex_num_;
+    }
   }
+
+  std::shared_ptr<VertexInfo> GetVertexInfo() const { return vertex_info_; }
+
+  std::string GetPrefix() const { return prefix_; }
 
   /** The vertex id list that satisfies the label filter condition. */
   Result<std::vector<IdType>> filter(
-      std::vector<std::string> filter_labels,
+      const std::vector<std::string>& filter_labels,
       std::vector<IdType>* new_valid_chunk = nullptr);
 
   Result<std::vector<IdType>> filter_by_acero(
-      std::vector<std::string> filter_labels) const;
+      const std::vector<std::string>& filter_labels) const;
 
   Result<std::vector<IdType>> filter(
-      std::string property_name, std::shared_ptr<Expression> filter_expression,
+      const std::string& property_name,
+      std::shared_ptr<Expression> filter_expression,
       std::vector<IdType>* new_valid_chunk = nullptr);
 
   /**
@@ -609,6 +616,11 @@ class EdgeIter {
       GAR_ASSIGN_OR_RAISE_ERROR(num_row_of_chunk_,
                                 adj_list_reader_.GetRowNumOfChunk());
       ++global_chunk_index_;
+      // The reader also need to be updated at the boundaries of chunks of size
+      // chunk_size.
+      for (auto& reader : property_readers_) {
+        reader.next_chunk();
+      }
     }
     if (st.IsKeyError()) {
       st = adj_list_reader_.next_chunk();
@@ -708,16 +720,18 @@ class EdgeIter {
 
   /** Point to the next edge with the same source, return false if not found. */
   bool next_src() {
-    if (is_end())
+    if (is_end()) {
       return false;
+    }
     IdType id = this->source();
     IdType pre_vertex_chunk_index = vertex_chunk_index_;
     if (adj_list_type_ == AdjListType::ordered_by_source) {
       this->operator++();
-      if (is_end() || this->source() != id)
+      if (is_end() || this->source() != id) {
         return false;
-      else
+      } else {
         return true;
+      }
     }
     this->operator++();
     while (!is_end()) {
@@ -725,8 +739,9 @@ class EdgeIter {
         return true;
       }
       if (adj_list_type_ == AdjListType::unordered_by_source) {
-        if (vertex_chunk_index_ > pre_vertex_chunk_index)
+        if (vertex_chunk_index_ > pre_vertex_chunk_index) {
           return false;
+        }
       }
       this->operator++();
     }
@@ -738,16 +753,18 @@ class EdgeIter {
    * found.
    */
   bool next_dst() {
-    if (is_end())
+    if (is_end()) {
       return false;
+    }
     IdType id = this->destination();
     IdType pre_vertex_chunk_index = vertex_chunk_index_;
     if (adj_list_type_ == AdjListType::ordered_by_dest) {
       this->operator++();
-      if (is_end() || this->destination() != id)
+      if (is_end() || this->destination() != id) {
         return false;
-      else
+      } else {
         return true;
+      }
     }
     this->operator++();
     while (!is_end()) {
@@ -755,8 +772,9 @@ class EdgeIter {
         return true;
       }
       if (adj_list_type_ == AdjListType::unordered_by_dest) {
-        if (vertex_chunk_index_ > pre_vertex_chunk_index)
+        if (vertex_chunk_index_ > pre_vertex_chunk_index) {
           return false;
+        }
       }
       this->operator++();
     }
@@ -768,8 +786,9 @@ class EdgeIter {
    * found.
    */
   bool next_src(IdType id) {
-    if (is_end())
+    if (is_end()) {
       return false;
+    }
     this->operator++();
     return this->first_src(*this, id);
   }
@@ -779,8 +798,9 @@ class EdgeIter {
    * not found.
    */
   bool next_dst(IdType id) {
-    if (is_end())
+    if (is_end()) {
       return false;
+    }
     this->operator++();
     return this->first_dst(*this, id);
   }
@@ -900,9 +920,7 @@ class EdgesCollection {
   explicit EdgesCollection(const std::shared_ptr<EdgeInfo>& edge_info,
                            const std::string& prefix, IdType vertex_chunk_begin,
                            IdType vertex_chunk_end, AdjListType adj_list_type)
-      : edge_info_(std::move(edge_info)),
-        prefix_(prefix),
-        adj_list_type_(adj_list_type) {
+      : edge_info_(edge_info), prefix_(prefix), adj_list_type_(adj_list_type) {
     GAR_ASSIGN_OR_RAISE_ERROR(
         auto vertex_chunk_num,
         util::GetVertexChunkNum(prefix_, edge_info_, adj_list_type_));

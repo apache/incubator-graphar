@@ -35,20 +35,20 @@ public class AdjListOffsetArrowChunkReaderTest {
     @Test
     public void test1() {
         String path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-        Result<GraphInfo> maybeGraphInfo = GraphInfo.load(path);
+        Result<StdSharedPtr<GraphInfo>> maybeGraphInfo = GraphInfo.load(path);
         Assert.assertTrue(maybeGraphInfo.status().ok());
-        GraphInfo graphInfo = maybeGraphInfo.value();
+        StdSharedPtr<GraphInfo> graphInfo = maybeGraphInfo.value();
 
         // construct adj list chunk reader
         StdString srcLabel = StdString.create("person");
         StdString edgeLabel = StdString.create("knows");
         StdString dstLabel = StdString.create("person");
-        Assert.assertTrue(graphInfo.getEdgeInfo(srcLabel, edgeLabel, dstLabel).status().ok());
-        Result<AdjListOffsetArrowChunkReader> maybeReader =
+        Assert.assertNotNull(graphInfo.get().getEdgeInfo(srcLabel, edgeLabel, dstLabel).get());
+        Result<StdSharedPtr<AdjListOffsetArrowChunkReader>> maybeReader =
                 GrapharStaticFunctions.INSTANCE.constructAdjListOffsetArrowChunkReader(
                         graphInfo, srcLabel, edgeLabel, dstLabel, AdjListType.ordered_by_source);
         Assert.assertTrue(maybeReader.status().ok());
-        AdjListOffsetArrowChunkReader reader = maybeReader.value();
+        AdjListOffsetArrowChunkReader reader = maybeReader.value().get();
         Result<StdSharedPtr<ArrowArray>> result = reader.getChunk();
         Assert.assertTrue(result.status().ok());
         StdSharedPtr<ArrowArray> array = result.value();

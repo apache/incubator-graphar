@@ -16,6 +16,7 @@
 # under the License.
 
 brew "cmake"
+brew "ninja"
 brew "google-benchmark"
 brew "apache-arrow"
 brew "boost"

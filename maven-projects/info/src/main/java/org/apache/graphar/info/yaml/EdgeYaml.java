@@ -21,8 +21,10 @@ package org.apache.graphar.info.yaml;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.apache.graphar.info.EdgeInfo;
+import org.apache.graphar.info.VersionInfo;
 
 public class EdgeYaml {
     private String src_type;
@@ -48,18 +50,23 @@ public class EdgeYaml {
         this.prefix = "";
         this.adj_lists = new ArrayList<>();
         this.property_groups = new ArrayList<>();
-        this.version = "v1";
+        this.version = "";
     }
 
     public EdgeYaml(EdgeInfo edgeInfo) {
-        this.src_type = edgeInfo.getSrcLabel();
-        this.edge_type = edgeInfo.getSrcLabel();
-        this.dst_type = edgeInfo.getDstLabel();
+        this.src_type = edgeInfo.getSrcType();
+        this.edge_type = edgeInfo.getEdgeType();
+        this.dst_type = edgeInfo.getDstType();
         this.chunk_size = edgeInfo.getChunkSize();
         this.src_chunk_size = edgeInfo.getSrcChunkSize();
         this.dst_chunk_size = edgeInfo.getDstChunkSize();
         this.directed = edgeInfo.isDirected();
         this.prefix = edgeInfo.getPrefix();
+        this.version =
+                Optional.of(edgeInfo)
+                        .map(EdgeInfo::getVersion)
+                        .map(VersionInfo::toString)
+                        .orElse(null);
         this.adj_lists =
                 edgeInfo.getAdjacentLists().values().stream()
                         .map(AdjacentListYaml::new)
@@ -68,24 +75,6 @@ public class EdgeYaml {
                 edgeInfo.getPropertyGroups().stream()
                         .map(PropertyGroupYaml::new)
                         .collect(Collectors.toList());
-    }
-
-    public EdgeInfo toEdgeInfo() {
-        return new EdgeInfo(
-                src_type,
-                edge_type,
-                dst_type,
-                chunk_size,
-                src_chunk_size,
-                dst_chunk_size,
-                directed,
-                prefix,
-                adj_lists.stream()
-                        .map(AdjacentListYaml::toAdjacentList)
-                        .collect(Collectors.toUnmodifiableList()),
-                property_groups.stream()
-                        .map(PropertyGroupYaml::toPropertyGroup)
-                        .collect(Collectors.toList()));
     }
 
     public String getSrc_type() {

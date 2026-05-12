@@ -161,7 +161,7 @@ public interface EdgeIter extends CXXPointer {
          * @param indexConverter The converter for transforming the edge chunk indices.
          */
         EdgeIter create(
-                @CXXReference EdgeInfo edgeInfo,
+                @CXXReference StdSharedPtr<EdgeInfo> edgeInfo,
                 @CXXReference StdString prefix,
                 @CXXValue AdjListType adjListType,
                 @FFITypeAlias(GAR_ID_TYPE) long globalChunkIndex,

@@ -56,6 +56,7 @@ On macOS, you can use [Homebrew](https://brew.sh) to install the required packag
 ```bash
 brew update && brew bundle --file=cpp/Brewfile
 ```
+
 > [!NOTE]
 > Currently, the Arrow C++ library has [disabled ARROW_ORC](https://github.com/Homebrew/homebrew-core/blob/4588359b7248b07379094de5310ee7ff89afa17e/Formula/a/apache-arrow.rb#L53) in the brew formula, so you need to build and install the Arrow C++ library manually (with `-DARROW_ORC=True`).
 
@@ -87,10 +88,31 @@ cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON ..
 make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
 ```
 
+### Quick Build with Scripts
+
+For convenience, we provide build scripts for Ubuntu and macOS that configure the following CMake options:
+
+- `-DBUILD_BENCHMARKS=ON`: Build benchmark executables
+- `-DCMAKE_BUILD_TYPE=Debug`: Build in debug mode
+- `-DBUILD_TESTS=ON`: Build unit tests
+- `-DBUILD_EXAMPLES=ON`: Build example executables
+
+**Ubuntu:**
+```bash
+./build_ubuntu.sh
+```
+
+**macOS:**
+```bash
+./build_macos.sh
+```
+
+These scripts will automatically create the build directory, configure with CMake, and compile the project. Build logs will be saved to `build_ubuntu.log` or `build_macos.log`.
+
 After building, you can run the unit tests with:
 
 ```bash
-git clone https://github.com/apache/incubator-graphar-testing.git testing  # download the testing data
+git submodule update --init --recursive  # download the testing data
 GAR_TEST_DATA=${PWD}/testing ctest
 ```
 
@@ -112,6 +134,7 @@ Extra Build Options:
 
 1. `-DGRAPHAR_BUILD_STATIC=ON`: Build GraphAr as static libraries.
 2. `-DUSE_STATIC_ARROW=ON`: Link arrow static library to build GraphAr. If set this option, the option `GRAPHAR_BUILD_STATIC=ON` will be set.
+3. `-DGRAPHAR_ENABLE_SANITIZER=ON|OFF`: Enable AddressSanitizer for Debug builds only (default: `ON`).
 
 ### Building with Arrow from source
 In case you want to build GraphAr as single static library including all dependencies, we include a [apache-arrow.cmake](cmake/apache-arrow.cmake) file that allows you to build Arrow and its dependencies from source and link it statically. To do this, you can follow the steps below:

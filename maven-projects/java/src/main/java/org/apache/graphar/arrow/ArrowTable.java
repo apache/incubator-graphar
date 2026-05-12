@@ -49,7 +49,7 @@ public interface ArrowTable extends CXXPointer {
      * @param allocator Buffer allocator for allocating C data interface fields
      * @param vsr Vector schema root to export
      * @param provider Dictionary provider for dictionary encoded vectors (optional)
-     * @return StdSharedPtr<ArrowTable>
+     * @return ArrowTbale shared pointer
      */
     static StdSharedPtr<ArrowTable> fromVectorSchemaRoot(
             BufferAllocator allocator, VectorSchemaRoot vsr, DictionaryProvider provider) {
@@ -83,7 +83,7 @@ public interface ArrowTable extends CXXPointer {
          *
          * @param arrayAddress Address of C ArrowArray
          * @param schemaAddress Address of C ArrowSchema
-         * @return StdSharedPtr<ArrowTable> wrapped by ArrowResult
+         * @return ArrowTbale shared pointer Result
          */
         @CXXValue
         ArrowResult<StdSharedPtr<ArrowTable>> fromArrowArrayAndArrowSchema(

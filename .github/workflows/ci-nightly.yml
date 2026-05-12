@@ -35,18 +35,19 @@ jobs:
       with:
           submodules: true
 
-    - name: Cache for ccache
-      uses: actions/cache@v3
+    - name: Cache ccache
+      uses: actions/cache@v4
       with:
         path: ~/.ccache
-        key: ${{ matrix.os }}-build-ccache-${{ hashFiles('**/git-modules.txt') }}
+        key: ${{ runner.os }}-nightly-ccache-${{ github.head_ref || github.ref_name }}-${{ github.run_id }}
         restore-keys: |
-          ${{ matrix.os }}-build-ccache-
+          ${{ runner.os }}-nightly-ccache-${{ github.head_ref || github.ref_name }}-
+          ${{ runner.os }}-nightly-ccache-
 
     - name: Install dependencies
       run: |
         sudo apt-get update -y
-        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev
+        sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev ninja-build
 
         # install Catch2 v3
         git clone --branch v3.6.0 https://github.com/catchorg/Catch2.git --depth 1
@@ -57,20 +58,43 @@ jobs:
 
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
-    - name: CMake
+    - name: CMake-debug
       run: |
-        mkdir build
-        pushd build
-        cmake ../cpp -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
+        mkdir build-debug
+        pushd build-debug
+        cmake ../cpp -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
         popd
 
-    - name: Build GraphAr
+    - name: Build GraphAr-debug
       run: |
-        pushd build
-        make -j$(nproc)
-        make graphar-ccache-stats
+        pushd build-debug
+        ninja
+        ninja graphar-ccache-stats
         popd
-    - name: Test
+        
+    - name: Test-debug
       run: |
-        cd build
+        pushd build-debug
         ctest --output-on-failure
+        popd
+
+
+    - name: CMake-release
+      run: |
+        mkdir build-release
+        pushd build-release
+        cmake ../cpp -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
+        popd
+
+    - name: Build GraphAr-release
+      run: |
+        pushd build-release
+        ninja
+        ninja graphar-ccache-stats
+        popd
+
+    - name: Test-release
+      run: |
+        pushd build-release
+        ctest --output-on-failure
+        popd

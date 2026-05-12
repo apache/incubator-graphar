@@ -50,7 +50,6 @@ namespace Yaml
     static const std::string g_ErrorInvalidCharacter        = "Invalid character found.";
     static const std::string g_ErrorKeyMissing              = "Missing key.";
     static const std::string g_ErrorKeyIncorrect            = "Incorrect key.";
-    static const std::string g_ErrorValueIncorrect          = "Incorrect value.";
     static const std::string g_ErrorTabInOffset             = "Tab found in offset.";
     static const std::string g_ErrorBlockSequenceNotAllowed = "Sequence entries are not allowed in this context.";
     static const std::string g_ErrorUnexpectedDocumentEnd   = "Unexpected document end.";
@@ -1376,7 +1375,7 @@ namespace Yaml
                 //Print();
                 ParseRoot(root);
             }
-            catch(Exception e)
+            catch(const Exception& e)
             {
                 root.Clear();
                 throw;
@@ -2251,7 +2250,7 @@ namespace Yaml
             pImp->Parse(root, stream);
             delete pImp;
         }
-        catch (const Exception e)
+        catch (const Exception& e)
         {
             delete pImp;
             throw;

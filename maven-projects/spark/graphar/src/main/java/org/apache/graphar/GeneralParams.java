@@ -25,6 +25,7 @@ import org.apache.spark.storage.StorageLevel;
 public class GeneralParams {
     // column name
     public static final String vertexIndexCol = "_graphArVertexIndex";
+    public static final String kLabelCol = ":LABEL";
     public static final String srcIndexCol = "_graphArSrcIndex";
     public static final String dstIndexCol = "_graphArDstIndex";
     public static final String offsetCol = "_graphArOffset";

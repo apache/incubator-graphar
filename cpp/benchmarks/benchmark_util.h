@@ -27,6 +27,12 @@
 
 #include "graphar/api/info.h"
 
+#define SKIP_WITH_ERROR_STATUS(state, status)      \
+  if (!status.ok()) {                              \
+    state.SkipWithError(status.message().c_str()); \
+    return;                                        \
+  }
+
 namespace graphar {
 
 class BenchmarkFixture : public ::benchmark::Fixture {

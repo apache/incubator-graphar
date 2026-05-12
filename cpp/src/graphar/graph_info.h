@@ -20,6 +20,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -37,16 +38,20 @@ class Property {
   std::shared_ptr<DataType> type;  // property data type
   bool is_primary;                 // primary key tag
   bool is_nullable;                // nullable tag for non-primary key
+  Cardinality
+      cardinality;  // cardinality of the property, only use in vertex info
 
   Property() = default;
 
   explicit Property(const std::string& name,
                     const std::shared_ptr<DataType>& type = nullptr,
-                    bool is_primary = false, bool is_nullable = true)
+                    bool is_primary = false, bool is_nullable = true,
+                    Cardinality cardinality = Cardinality::SINGLE)
       : name(name),
         type(type),
         is_primary(is_primary),
-        is_nullable(!is_primary && is_nullable) {}
+        is_nullable(!is_primary && is_nullable),
+        cardinality(cardinality) {}
 };
 
 bool operator==(const Property& lhs, const Property& rhs);
@@ -70,7 +75,7 @@ class PropertyGroup {
    *        prefix is the concatenation of property names with '_' as separator
    */
   explicit PropertyGroup(const std::vector<Property>& properties,
-                         FileType file_type, const std::string& prefix = "");
+                         FileType file_type, std::string prefix = "");
 
   /**
    * Get the property list of group.
@@ -85,13 +90,13 @@ class PropertyGroup {
    *
    * @return The file type of group.
    */
-  inline FileType GetFileType() const { return file_type_; }
+  FileType GetFileType() const { return file_type_; }
 
   /** Get the prefix of property group chunk file.
    *
    * @return The path prefix of group.
    */
-  inline const std::string& GetPrefix() const { return prefix_; }
+  const std::string& GetPrefix() const { return prefix_; }
 
   /**
    * Check if the property group is validated.
@@ -132,28 +137,28 @@ class AdjacentList {
    *        prefix will be set the type name of adjacent list
    */
   explicit AdjacentList(AdjListType type, FileType file_type,
-                        const std::string& prefix = "");
+                        std::string prefix = "");
 
   /**
    * @brief Get the type of adjacent list
    *
    * @return The type of adjacent list
    */
-  inline AdjListType GetType() const { return type_; }
+  AdjListType GetType() const { return type_; }
 
   /**
    * @brief Get the file type of adjacent list
    *
    * @return The file type of adjacent list
    */
-  inline FileType GetFileType() const { return file_type_; }
+  FileType GetFileType() const { return file_type_; }
 
   /**
    * @brief Get the prefix of adjacent list
    *
    * @return The path prefix of adjacent list
    */
-  inline const std::string& GetPrefix() const { return prefix_; }
+  const std::string& GetPrefix() const { return prefix_; }
 
   /**
    * Returns whether the adjacent list is validated.
@@ -204,6 +209,16 @@ class VertexInfo {
       std::shared_ptr<PropertyGroup> property_group) const;
 
   /**
+   * @brief Removes a property group from the VertexInfo instance and returns a
+   * new VertexInfo.
+   * @param property_group The property group to remove.
+   * @return A Status object indicating the success or failure of the
+   * operation. Returns InvalidOperation if the property group is not contained.
+   */
+  Result<std::shared_ptr<VertexInfo>> RemovePropertyGroup(
+      std::shared_ptr<PropertyGroup> property_group) const;
+
+  /**
    * Get the type of the vertex.
    *
    * @return The type of the vertex.
@@ -242,7 +257,7 @@ class VertexInfo {
    *
    * @return The number of property groups of the vertex.
    */
-  int PropertyGroupNum() const;
+  size_t PropertyGroupNum() const;
 
   /**
    * Get the property groups of the vertex.
@@ -264,7 +279,7 @@ class VertexInfo {
    * @param index The index of the property group.
    * @return property group may be nullptr if the index is out of range.
    */
-  std::shared_ptr<PropertyGroup> GetPropertyGroupByIndex(int index) const;
+  std::shared_ptr<PropertyGroup> GetPropertyGroupByIndex(size_t index) const;
 
   /**
    * Get the data type of the specified property.
@@ -276,6 +291,8 @@ class VertexInfo {
   Result<std::shared_ptr<DataType>> GetPropertyType(
       const std::string& property_name) const;
 
+  Result<Cardinality> GetPropertyCardinality(
+      const std::string& property_name) const;
   /**
    * Get whether the vertex info contains the specified property.
    *
@@ -429,11 +446,31 @@ class EdgeInfo {
       std::shared_ptr<AdjacentList> adj_list) const;
 
   /**
+   * @brief Removes an adjacency list from the EdgeInfo instance and returns a
+   * new EdgeInfo.
+   * @param adj_list The adjacency list to remove.
+   * @return A Status object indicating the success or failure of the
+   * operation. Returns InvalidOperation if the adjacency list is not contained.
+   */
+  Result<std::shared_ptr<EdgeInfo>> RemoveAdjacentList(
+      std::shared_ptr<AdjacentList> adj_list) const;
+
+  /**
    * Add a property group to edge info and returns a new EdgeInfo.
    *
    * @param property_group Property group to add.
    */
   Result<std::shared_ptr<EdgeInfo>> AddPropertyGroup(
+      std::shared_ptr<PropertyGroup> property_group) const;
+
+  /**
+   * @brief Removes a property group from the EdgeInfo instance and returns a
+   * new EdgeInfo.
+   * @param property_group The property group to remove.
+   * @return A Status object indicating the success or failure of the
+   * operation. Returns InvalidOperation if the property group is not contained.
+   */
+  Result<std::shared_ptr<EdgeInfo>> RemovePropertyGroup(
       std::shared_ptr<PropertyGroup> property_group) const;
 
   /**
@@ -519,7 +556,7 @@ class EdgeInfo {
   /**
    * @brief Get the number of property groups.
    */
-  int PropertyGroupNum() const;
+  size_t PropertyGroupNum() const;
 
   /**
    * @brief Get the property groups.
@@ -542,7 +579,7 @@ class EdgeInfo {
    * @param index The index of the property group.
    * @return Property group may be nullptr if the index is out of range.
    */
-  std::shared_ptr<PropertyGroup> GetPropertyGroupByIndex(int index) const;
+  std::shared_ptr<PropertyGroup> GetPropertyGroupByIndex(size_t index) const;
 
   /**
    * @brief Get the file path for the number of vertices.
@@ -749,6 +786,16 @@ class GraphInfo {
       std::shared_ptr<VertexInfo> vertex_info) const;
 
   /**
+   * @brief Removes a vertex info from the GraphInfo instance and returns a new
+   * GraphInfo.
+   * @param vertex_info The vertex info to remove.
+   * @return A Status object indicating the success or failure of the
+   * operation. Returns InvalidOperation if the vertex info is not contained.
+   */
+  Result<std::shared_ptr<GraphInfo>> RemoveVertex(
+      std::shared_ptr<VertexInfo> vertex_info) const;
+
+  /**
    * @brief Adds an edge info to the GraphInfo instance and returns a new
    * GraphInfo.
    * @param edge_info The edge info to add.
@@ -757,6 +804,16 @@ class GraphInfo {
    * contained.
    */
   Result<std::shared_ptr<GraphInfo>> AddEdge(
+      std::shared_ptr<EdgeInfo> edge_info) const;
+
+  /**
+   * @brief Removes an edge info from the GraphInfo instance and returns a new
+   * GraphInfo.
+   * @param edge_info The edge info to remove.
+   * @return A Status object indicating the success or failure of the
+   * operation. Returns InvalidOperation if the edge info is not contained.
+   */
+  Result<std::shared_ptr<GraphInfo>> RemoveEdge(
       std::shared_ptr<EdgeInfo> edge_info) const;
 
   /**
@@ -813,25 +870,25 @@ class GraphInfo {
   /**
    * @brief Get the vertex info index with the given type.
    */
-  int GetVertexInfoIndex(const std::string& type) const;
+  std::optional<size_t> GetVertexInfoIndex(const std::string& type) const;
 
   /**
    * @brief Get the edge info index with the given source vertex type, edge
    * type, and destination type.
    */
-  int GetEdgeInfoIndex(const std::string& src_type,
-                       const std::string& edge_type,
-                       const std::string& dst_type) const;
+  std::optional<size_t> GetEdgeInfoIndex(const std::string& src_type,
+                                         const std::string& edge_type,
+                                         const std::string& dst_type) const;
 
   /**
    * @brief Get the number of vertex infos.
    */
-  int VertexInfoNum() const;
+  size_t VertexInfoNum() const;
 
   /**
    * @brief Get the number of edge infos.
    */
-  int EdgeInfoNum() const;
+  size_t EdgeInfoNum() const;
 
   /**
    * @brief Get the vertex info at the specified index.
@@ -839,7 +896,7 @@ class GraphInfo {
    * @param index The index of the vertex info.
    * @return vertex info may be nullptr if the index is out of range.
    */
-  const std::shared_ptr<VertexInfo> GetVertexInfoByIndex(int index) const;
+  const std::shared_ptr<VertexInfo> GetVertexInfoByIndex(size_t index) const;
 
   /**
    * @brief Get the edge info at the specified index.
@@ -847,7 +904,7 @@ class GraphInfo {
    * @param index The index of the edge info.
    * @return edge info may be nullptr if the index is out of range.
    */
-  const std::shared_ptr<EdgeInfo> GetEdgeInfoByIndex(int index) const;
+  const std::shared_ptr<EdgeInfo> GetEdgeInfoByIndex(size_t index) const;
 
   /**
    * @brief Get the vertex infos of graph info

@@ -24,15 +24,20 @@
 
 #include "./config.h"
 #include "graphar/api/high_level_writer.h"
+#include "graphar/writer_util.h"
 
 void vertices_builder() {
   // construct vertices builder
   std::string vertex_meta_file =
-      GetTestingResourceRoot() + "/ldbc_sample/parquet/" + "person.vertex.yml";
+      GetTestingResourceRoot() + "/ldbc/parquet/" + "person.vertex.yml";
   auto vertex_meta = graphar::Yaml::LoadFile(vertex_meta_file).value();
   auto vertex_info = graphar::VertexInfo::Load(vertex_meta).value();
   graphar::IdType start_index = 0;
   graphar::builder::VerticesBuilder builder(vertex_info, "/tmp/", start_index);
+
+  graphar::WriterOptions::ParquetOptionBuilder parquetOptionBuilder;
+  parquetOptionBuilder.compression(arrow::Compression::ZSTD);
+  builder.SetWriterOptions(parquetOptionBuilder.build());
 
   // set validate level
   builder.SetValidateLevel(graphar::ValidateLevel::strong_validate);
@@ -40,11 +45,16 @@ void vertices_builder() {
   // prepare vertex data
   int vertex_count = 3;
   std::vector<std::string> property_names = {"id", "firstName", "lastName",
-                                             "gender"};
+                                             "gender", "emails"};
   std::vector<int64_t> id = {0, 1, 2};
   std::vector<std::string> firstName = {"John", "Jane", "Alice"};
   std::vector<std::string> lastName = {"Smith", "Doe", "Wonderland"};
   std::vector<std::string> gender = {"male", "famale", "famale"};
+  std::vector<std::vector<std::string>> emails = {
+      {"john@example.com", "john.work@example.com"},
+      {"jane@example.com"},
+      {"alice@example.com", "alice123@example.com",
+       "a.wonderland@example.com"}};
 
   // add vertices
   for (int i = 0; i < vertex_count; i++) {
@@ -53,6 +63,10 @@ void vertices_builder() {
     v.AddProperty(property_names[1], firstName[i]);
     v.AddProperty(property_names[2], lastName[i]);
     v.AddProperty(property_names[3], gender[i]);
+    for (const auto& email : emails[i]) {
+      v.AddProperty(graphar::Cardinality::LIST, property_names[4],
+                    email);  // Multi-property
+    }
     ASSERT(builder.AddVertex(v).ok());
   }
 
@@ -77,6 +91,10 @@ void edges_builder() {
   auto vertex_count = 3;
   graphar::builder::EdgesBuilder builder(
       edge_info, "/tmp/", graphar::AdjListType::ordered_by_dest, vertex_count);
+
+  graphar::WriterOptions::ParquetOptionBuilder parquetOptionBuilder;
+  parquetOptionBuilder.compression(arrow::Compression::ZSTD);
+  builder.SetWriterOptions(parquetOptionBuilder.build());
 
   // set validate level
   builder.SetValidateLevel(graphar::ValidateLevel::strong_validate);

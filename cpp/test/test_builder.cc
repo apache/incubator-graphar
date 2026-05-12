@@ -30,14 +30,17 @@
 #include "arrow/io/api.h"
 #include "arrow/stl.h"
 #include "arrow/util/uri.h"
+#include "graphar/util.h"
+#include "parquet/arrow/reader.h"
 #include "parquet/arrow/writer.h"
 
 #include "./util.h"
 #include "graphar/api/high_level_writer.h"
 
 #include <catch2/catch_test_macros.hpp>
+
 namespace graphar {
-TEST_CASE_METHOD(GlobalFixture, "test_vertices_builder") {
+TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   std::cout << "Test vertex builder" << std::endl;
 
   // construct vertex builder
@@ -50,6 +53,12 @@ TEST_CASE_METHOD(GlobalFixture, "test_vertices_builder") {
       builder::VerticesBuilder::Make(vertex_info, "/tmp/", start_index);
   REQUIRE(!maybe_builder.has_error());
   auto builder = maybe_builder.value();
+
+  // get & set writer options
+  WriterOptions::ParquetOptionBuilder parquetOptionBuilder;
+  parquetOptionBuilder.compression(arrow::Compression::LZ4);
+  builder->SetWriterOptions(parquetOptionBuilder.build());
+  REQUIRE(builder->GetWriterOptions() != nullptr);
 
   // get & set validate level
   REQUIRE(builder->GetValidateLevel() == ValidateLevel::no_validate);
@@ -96,8 +105,9 @@ TEST_CASE_METHOD(GlobalFixture, "test_vertices_builder") {
       getline(readstr, val, '|');
       if (i == 0) {
         int64_t x = 0;
-        for (size_t j = 0; j < val.length(); j++)
+        for (size_t j = 0; j < val.length(); j++) {
           x = x * 10 + val[j] - '0';
+        }
         v.AddProperty(names[i], x);
       } else {
         v.AddProperty(names[i], val);
@@ -122,6 +132,19 @@ TEST_CASE_METHOD(GlobalFixture, "test_vertices_builder") {
   auto num = input->Read(sizeof(IdType)).ValueOrDie();
   const IdType* ptr = reinterpret_cast<const IdType*>(num->data());
   REQUIRE((*ptr) == start_index + builder->GetNum());
+  // check parquet file compression
+  auto parquet_file = "/tmp/vertex/person/id/chunk0";
+  std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
+  REQUIRE(graphar::util::OpenParquetArrowReader(
+              parquet_file, arrow::default_memory_pool(), &parquet_reader)
+              .ok());
+  auto maybe_parquet_table = parquet_reader->ReadTable();
+  REQUIRE(maybe_parquet_table.ok());
+  auto parquet_table = maybe_parquet_table.ValueOrDie();
+  auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
+  auto row_group_meta = parquet_metadata->RowGroup(0);
+  auto col_meta = row_group_meta->ColumnChunk(0);
+  REQUIRE(col_meta->compression() == parquet::Compression::LZ4);
 }
 
 TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
@@ -136,6 +159,12 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
       edge_info, "/tmp/", AdjListType::ordered_by_dest, vertices_num);
   REQUIRE(!maybe_builder.has_error());
   auto builder = maybe_builder.value();
+
+  // get & set writer options
+  WriterOptions::ParquetOptionBuilder parquetOptionBuilder;
+  parquetOptionBuilder.compression(arrow::Compression::LZ4);
+  builder->SetWriterOptions(parquetOptionBuilder.build());
+  REQUIRE(builder->GetWriterOptions() != nullptr);
 
   // get & set validate level
   REQUIRE(builder->GetValidateLevel() == ValidateLevel::no_validate);
@@ -172,12 +201,14 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
     for (int i = 0; i < 3; i++) {
       getline(readstr, val, '|');
       if (i == 0) {
-        if (mapping.find(val) == mapping.end())
+        if (mapping.find(val) == mapping.end()) {
           mapping[val] = cnt++;
+        }
         s = mapping[val];
       } else if (i == 1) {
-        if (mapping.find(val) == mapping.end())
+        if (mapping.find(val) == mapping.end()) {
           mapping[val] = cnt++;
+        }
         d = mapping[val];
       } else {
         builder::Edge e(s, d);
@@ -205,5 +236,20 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
   auto num = input->Read(sizeof(IdType)).ValueOrDie();
   const IdType* ptr = reinterpret_cast<const IdType*>(num->data());
   REQUIRE((*ptr) == vertices_num);
+
+  // check parquet file compression
+  auto parquet_file =
+      "/tmp/edge/person_knows_person/ordered_by_dest/creationDate/part0/chunk0";
+  std::unique_ptr<parquet::arrow::FileReader> parquet_reader;
+  REQUIRE(graphar::util::OpenParquetArrowReader(
+              parquet_file, arrow::default_memory_pool(), &parquet_reader)
+              .ok());
+  auto maybe_parquet_table = parquet_reader->ReadTable();
+  REQUIRE(maybe_parquet_table.ok());
+  auto parquet_table = maybe_parquet_table.ValueOrDie();
+  auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
+  auto row_group_meta = parquet_metadata->RowGroup(0);
+  auto col_meta = row_group_meta->ColumnChunk(0);
+  REQUIRE(col_meta->compression() == parquet::Compression::LZ4);
 }
 }  // namespace graphar

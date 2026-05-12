@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v0.11.4] - 2024-03-27
 ### Added
 
-- [Minor][Spark] Add SPARK_TESTING variable to increse tests performance by @SemyonSinchenko in https://github.com/apache/graphar/pull/405
+- [Minor][Spark] Add SPARK_TESTING variable to increase tests performance by @SemyonSinchenko in https://github.com/apache/graphar/pull/405
 - Bump up GraphAr version to v0.11.4 by @acezen in https://github.com/apache/graphar/pull/417
 
 ### Changed
@@ -76,7 +76,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v0.11.1] - 2024-01-24
 ### Changed
 
-- [Improvement][Spark] Improve the writer effeciency with parallel process by @acezen in https://github.com/apache/graphar/pull/329
+- [Improvement][Spark] Improve the writer efficiency with parallel process by @acezen in https://github.com/apache/graphar/pull/329
 - [Feat][Spark] Memory tuning for GraphAr spark with persist and storage level by @acezen in https://github.com/apache/graphar/pull/326
 - Bump up GraphAr version to v0.11.1 by @acezen in https://github.com/apache/graphar/pull/342
 

@@ -107,11 +107,11 @@ namespace graphar::internal {
 // Extract Status from Status or Result<T>
 // Useful for the status check macros such as RETURN_NOT_OK.
 template <typename T>
-inline const Status& GenericToStatus(const Result<T>& res) {
+const Status& GenericToStatus(const Result<T>& res) {
   return res.status();
 }
 template <typename T>
-inline Status GenericToStatus(Result<T>&& res) {
+Status GenericToStatus(Result<T>&& res) {
   return std::move(res).status();
 }
 

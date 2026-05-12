@@ -45,6 +45,11 @@ namespace graphar::util {
 Status CheckFilterOptions(
     const FilterOptions& filter_options,
     const std::shared_ptr<PropertyGroup>& property_group) noexcept {
+  static bool initialized = false;
+  if (!initialized) {
+    RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+    initialized = true;
+  }
   if (filter_options.filter) {
     GAR_ASSIGN_OR_RAISE(auto filter, filter_options.filter->Evaluate());
     for (const auto& field : arrow::compute::FieldsInExpression(filter)) {

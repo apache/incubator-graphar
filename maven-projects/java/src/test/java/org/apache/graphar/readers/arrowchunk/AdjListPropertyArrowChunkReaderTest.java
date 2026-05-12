@@ -21,7 +21,9 @@ package org.apache.graphar.readers.arrowchunk;
 
 import static org.apache.graphar.graphinfo.GraphInfoTest.root;
 
+import com.alibaba.fastffi.CXXReference;
 import org.apache.graphar.arrow.ArrowTable;
+import org.apache.graphar.graphinfo.EdgeInfo;
 import org.apache.graphar.graphinfo.GraphInfo;
 import org.apache.graphar.graphinfo.PropertyGroup;
 import org.apache.graphar.stdcxx.StdSharedPtr;
@@ -36,29 +38,32 @@ public class AdjListPropertyArrowChunkReaderTest {
     @Test
     public void test1() {
         String path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-        Result<GraphInfo> maybeGraphInfo = GraphInfo.load(path);
+        Result<StdSharedPtr<GraphInfo>> maybeGraphInfo = GraphInfo.load(path);
         Assert.assertTrue(maybeGraphInfo.status().ok());
-        GraphInfo graphInfo = maybeGraphInfo.value();
+        StdSharedPtr<GraphInfo> graphInfo = maybeGraphInfo.value();
 
         StdString srcLabel = StdString.create("person");
         StdString edgeLabel = StdString.create("knows");
         StdString dstLabel = StdString.create("person");
         StdString propertyName = StdString.create("creationDate");
-        Result<PropertyGroup> maybeGroup =
-                graphInfo.getEdgePropertyGroup(
-                        srcLabel, edgeLabel, dstLabel, propertyName, AdjListType.ordered_by_source);
-        Assert.assertTrue(maybeGroup.status().ok());
-        PropertyGroup group = maybeGroup.value();
-        Result<AdjListPropertyArrowChunkReader> maybeReader =
+        StdSharedPtr<@CXXReference EdgeInfo> edgeInfo =
+                graphInfo.get().getEdgeInfo(srcLabel, edgeLabel, dstLabel);
+        StdSharedPtr<PropertyGroup> propertyGroup = edgeInfo.get().getPropertyGroup(propertyName);
+        PropertyGroup group = propertyGroup.get();
+        Assert.assertNotNull(group);
+        StdSharedPtr<PropertyGroup> groupPtr =
+                GrapharStaticFunctions.INSTANCE.createPropertyGroup(
+                        group.getProperties(), group.getFileType(), group.getPrefix());
+        Result<StdSharedPtr<AdjListPropertyArrowChunkReader>> maybeReader =
                 GrapharStaticFunctions.INSTANCE.constructAdjListPropertyArrowChunkReader(
                         graphInfo,
                         srcLabel,
                         edgeLabel,
                         dstLabel,
-                        group,
+                        groupPtr,
                         AdjListType.ordered_by_source);
         Assert.assertTrue(maybeReader.status().ok());
-        AdjListPropertyArrowChunkReader reader = maybeReader.value();
+        AdjListPropertyArrowChunkReader reader = maybeReader.value().get();
         Result<StdSharedPtr<ArrowTable>> result = reader.getChunk();
         Assert.assertTrue(result.status().ok());
         StdSharedPtr<ArrowTable> table = result.value();

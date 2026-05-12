@@ -20,11 +20,14 @@
 package org.apache.graphar
 
 import org.apache.hadoop.fs.Path
-import org.apache.spark.sql.{SparkSession}
-import org.yaml.snakeyaml.{Yaml, DumperOptions}
+import org.apache.spark.sql.SparkSession
+import org.yaml.snakeyaml.{DumperOptions, Yaml}
 import org.yaml.snakeyaml.constructor.Constructor
+
 import scala.beans.BeanProperty
 import org.yaml.snakeyaml.LoaderOptions
+
+import java.util
 
 /** VertexInfo is a class to store the vertex meta information. */
 class VertexInfo() {
@@ -32,6 +35,7 @@ class VertexInfo() {
   @BeanProperty var chunk_size: Long = 0
   @BeanProperty var prefix: String = ""
   @BeanProperty var property_groups = new java.util.ArrayList[PropertyGroup]()
+  @BeanProperty var labels = new java.util.ArrayList[String]()
   @BeanProperty var version: String = ""
 
   /**
@@ -284,6 +288,10 @@ class VertexInfo() {
   def dump(): String = {
     val data = new java.util.HashMap[String, Object]()
     data.put("type", `type`)
+    val labels_num = labels.size()
+    if (labels_num > 0) {
+      data.put("labels", labels)
+    }
     data.put("chunk_size", new java.lang.Long(chunk_size))
     if (prefix != "") data.put("prefix", prefix)
     data.put("version", version)

@@ -69,12 +69,12 @@ public class VertexPropertyWriterTest {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Assert.assertNotNull(table);
+        Assert.assertNotNull(table.get());
 
         String vertexMetaFile = root + "/ldbc_sample/parquet/" + "person.vertex.yml";
         StdSharedPtr<Yaml> vertexMeta = Yaml.loadFile(StdString.create(vertexMetaFile)).value();
-        VertexInfo vertexInfo = VertexInfo.load(vertexMeta).value();
-        Assert.assertEquals("person", vertexInfo.getLabel().toJavaString());
+        StdSharedPtr<VertexInfo> vertexInfo = VertexInfo.load(vertexMeta).value();
+        Assert.assertEquals("person", vertexInfo.get().getLabel().toJavaString());
         VertexPropertyWriter writer =
                 VertexPropertyWriter.factory.create(vertexInfo, StdString.create("/tmp/"));
 

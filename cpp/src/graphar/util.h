@@ -26,7 +26,16 @@
 #include <vector>
 
 #include "graphar/result.h"
+#include "graphar/status.h"
 
+#include "arrow/api.h"
+#include "arrow/csv/api.h"
+#include "arrow/filesystem/api.h"
+#include "arrow/io/api.h"
+#include "arrow/stl.h"
+#include "arrow/util/uri.h"
+#include "parquet/arrow/reader.h"
+#include "parquet/arrow/writer.h"
 #define REGULAR_SEPARATOR "_"
 
 // forward declarations
@@ -176,7 +185,7 @@ struct IndexConverter {
     return global_edge_chunk_index + edge_chunk_index;
   }
 
-  // covert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
+  // convert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
   std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(IdType global_index) {
     std::pair<IdType, IdType> index_pair(0, 0);
     for (size_t i = 0; i < edge_chunk_nums_.size(); ++i) {
@@ -194,7 +203,7 @@ struct IndexConverter {
   std::vector<IdType> edge_chunk_nums_;
 };
 
-static inline IdType IndexPairToGlobalChunkIndex(
+static IdType IndexPairToGlobalChunkIndex(
     const std::vector<IdType>& edge_chunk_nums, IdType vertex_chunk_index,
     IdType edge_chunk_index) {
   IdType global_edge_chunk_index = 0;
@@ -204,8 +213,8 @@ static inline IdType IndexPairToGlobalChunkIndex(
   return global_edge_chunk_index + edge_chunk_index;
 }
 
-// covert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
-static inline std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(
+// convert edge global chunk index to <vertex_chunk_index, edge_chunk_index>
+static std::pair<IdType, IdType> GlobalChunkIndexToIndexPair(
     const std::vector<IdType>& edge_chunk_nums, IdType global_index) {
   std::pair<IdType, IdType> index_pair(0, 0);
   for (size_t i = 0; i < edge_chunk_nums.size(); ++i) {
@@ -229,7 +238,7 @@ std::shared_ptr<arrow::Array> GetArrowArrayByChunkIndex(
 Result<const void*> GetArrowArrayData(
     std::shared_ptr<arrow::Array> const& array);
 
-static inline std::string ConcatStringWithDelimiter(
+static std::string ConcatStringWithDelimiter(
     const std::vector<std::string>& str_vec, const std::string& delimiter) {
   return std::accumulate(
       std::begin(str_vec), std::end(str_vec), std::string(),
@@ -240,7 +249,7 @@ static inline std::string ConcatStringWithDelimiter(
 
 template <typename T>
 struct ValueGetter {
-  inline static T Value(const void* data, int64_t offset) {
+  static T Value(const void* data, int64_t offset) {
     return reinterpret_cast<const T*>(data)[offset];
   }
 };
@@ -249,5 +258,19 @@ template <>
 struct ValueGetter<std::string> {
   static std::string Value(const void* data, int64_t offset);
 };
+
+static arrow::Status OpenParquetArrowReader(
+    const std::string& file_path, arrow::MemoryPool* pool,
+    std::unique_ptr<parquet::arrow::FileReader>* parquet_reader) {
+  std::shared_ptr<arrow::io::RandomAccessFile> input;
+  ARROW_ASSIGN_OR_RAISE(input, arrow::io::ReadableFile::Open(file_path));
+#if defined(ARROW_VERSION) && ARROW_VERSION <= 20000000
+  ARROW_RETURN_NOT_OK(parquet::arrow::OpenFile(input, pool, parquet_reader));
+#else
+  ARROW_ASSIGN_OR_RAISE(auto reader, parquet::arrow::OpenFile(input, pool));
+  *parquet_reader = std::move(reader);
+#endif
+  return arrow::Status::OK();
+}
 
 }  // namespace graphar::util

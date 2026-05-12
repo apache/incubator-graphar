@@ -24,6 +24,7 @@ import static org.apache.graphar.graphinfo.GraphInfoTest.root;
 import org.apache.graphar.arrow.ArrowTable;
 import org.apache.graphar.graphinfo.GraphInfo;
 import org.apache.graphar.graphinfo.PropertyGroup;
+import org.apache.graphar.graphinfo.VertexInfo;
 import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.util.GrapharStaticFunctions;
@@ -35,22 +36,26 @@ public class VertexPropertyArrowChunkReaderTest {
     @Test
     public void test1() {
         String path = root + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
-        Result<GraphInfo> maybeGraphInfo = GraphInfo.load(path);
+        Result<StdSharedPtr<GraphInfo>> maybeGraphInfo = GraphInfo.load(path);
         Assert.assertTrue(maybeGraphInfo.status().ok());
-        GraphInfo graphInfo = maybeGraphInfo.value();
+        StdSharedPtr<GraphInfo> graphInfo = maybeGraphInfo.value();
 
         // construct vertex chunk reader
         StdString label = StdString.create("person");
         StdString propertyName = StdString.create("id");
-        Assert.assertTrue(graphInfo.getVertexInfo(label).status().ok());
-        Result<PropertyGroup> maybeGroup = graphInfo.getVertexPropertyGroup(label, propertyName);
-        Assert.assertTrue(maybeGroup.status().ok());
-        PropertyGroup group = maybeGroup.value();
-        Result<VertexPropertyArrowChunkReader> maybeReader =
+        VertexInfo vertexInfo = graphInfo.get().getVertexInfo(label).get();
+        Assert.assertNotNull(vertexInfo);
+        StdSharedPtr<PropertyGroup> groupStdSharedPtr = vertexInfo.getPropertyGroup(propertyName);
+        PropertyGroup group = groupStdSharedPtr.get();
+        Assert.assertNotNull(group);
+        StdSharedPtr<PropertyGroup> groupPtr =
+                GrapharStaticFunctions.INSTANCE.createPropertyGroup(
+                        group.getProperties(), group.getFileType(), group.getPrefix());
+        Result<StdSharedPtr<VertexPropertyArrowChunkReader>> maybeReader =
                 GrapharStaticFunctions.INSTANCE.constructVertexPropertyArrowChunkReader(
-                        graphInfo, label, group);
+                        graphInfo, label, groupPtr);
         Assert.assertTrue(maybeReader.status().ok());
-        VertexPropertyArrowChunkReader reader = maybeReader.value();
+        VertexPropertyArrowChunkReader reader = maybeReader.value().get();
         Result<StdSharedPtr<ArrowTable>> result = reader.getChunk();
         Assert.assertTrue(result.status().ok());
         StdSharedPtr<ArrowTable> table = result.value();

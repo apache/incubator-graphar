@@ -76,10 +76,10 @@ public class EdgeChunkWriterTest {
                 StdString.create(root + "/ldbc_sample/csv/person_knows_person.edge.yml");
         Result<StdSharedPtr<Yaml>> maybeEdgeMeta = Yaml.loadFile(edgeMetaFile);
         Assert.assertFalse(maybeEdgeMeta.hasError());
-        Result<EdgeInfo> maybeEdgeInfo = EdgeInfo.load(maybeEdgeMeta.value());
+        Result<StdSharedPtr<EdgeInfo>> maybeEdgeInfo = EdgeInfo.load(maybeEdgeMeta.value());
         Assert.assertFalse(maybeEdgeInfo.hasError());
-        EdgeInfo edgeInfo = maybeEdgeInfo.value();
-        Assert.assertTrue(edgeInfo.containAdjList(AdjListType.ordered_by_source));
+        StdSharedPtr<EdgeInfo> edgeInfo = maybeEdgeInfo.value();
+        Assert.assertTrue(edgeInfo.get().hasAdjacentListType(AdjListType.ordered_by_source));
         EdgeChunkWriter writer =
                 EdgeChunkWriter.factory.create(
                         edgeInfo, StdString.create("/tmp/"), AdjListType.ordered_by_source);

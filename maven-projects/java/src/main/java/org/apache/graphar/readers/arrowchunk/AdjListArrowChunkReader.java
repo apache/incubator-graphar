@@ -34,11 +34,9 @@ import com.alibaba.fastffi.FFITypeAlias;
 import com.alibaba.fastffi.FFITypeFactory;
 import org.apache.graphar.arrow.ArrowTable;
 import org.apache.graphar.graphinfo.EdgeInfo;
-import org.apache.graphar.graphinfo.GraphInfo;
 import org.apache.graphar.stdcxx.StdSharedPtr;
 import org.apache.graphar.stdcxx.StdString;
 import org.apache.graphar.types.AdjListType;
-import org.apache.graphar.util.GrapharStaticFunctions;
 import org.apache.graphar.util.Result;
 import org.apache.graphar.util.Status;
 
@@ -85,7 +83,7 @@ public interface AdjListArrowChunkReader extends CXXPointer {
     /** Get the number of rows of the current chunk table. */
     @FFINameAlias("GetRowNumOfChunk")
     @CXXValue
-    @FFITypeAlias("GraphArchive::Result<long>")
+    @FFITypeAlias("graphar::Result<long>")
     Result<Long> getRowNumOfChunk();
 
     /**
@@ -121,25 +119,6 @@ public interface AdjListArrowChunkReader extends CXXPointer {
             @FFITypeAlias(GAR_ID_TYPE) long vertexChunkIndex,
             @FFITypeAlias(GAR_ID_TYPE) long chunkIndex);
 
-    /**
-     * Helper function to Construct AdjListArrowChunkReader.
-     *
-     * @param graphInfo The graph info to describe the graph.
-     * @param srcLabel label of source vertex.
-     * @param edgeLabel label of edge.
-     * @param dstLabel label of destination vertex.
-     * @param adjListType The adj list type for the edges.
-     */
-    static Result<AdjListArrowChunkReader> constructAdjListArrowChunkReader(
-            @CXXReference GraphInfo graphInfo,
-            @CXXReference StdString srcLabel,
-            @CXXReference StdString edgeLabel,
-            @CXXReference StdString dstLabel,
-            @CXXValue AdjListType adjListType) {
-        return GrapharStaticFunctions.INSTANCE.constructAdjListArrowChunkReader(
-                graphInfo, srcLabel, edgeLabel, dstLabel, adjListType);
-    }
-
     @FFIFactory
     interface Factory {
         /**
@@ -151,7 +130,7 @@ public interface AdjListArrowChunkReader extends CXXPointer {
          * @param prefix The absolute prefix.
          */
         AdjListArrowChunkReader create(
-                @CXXReference EdgeInfo edgeInfo,
+                @CXXReference StdSharedPtr<EdgeInfo> edgeInfo,
                 @CXXValue AdjListType adjListType,
                 @CXXReference StdString prefix);
     }

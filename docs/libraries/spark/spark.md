@@ -227,7 +227,6 @@ The Spark library for GraphAr supports reading and writing data from/to cloud st
 - [AWS S3](https://spark.apache.org/docs/latest/cloud-integration.html)
 - [Aliyun OSS](https://hadoop.apache.org/docs/stable/hadoop-aliyun/tools/hadoop-aliyun/index.html)
 
-
 [test-graph-info]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TestGraphInfo.scala
 [test-index-generator]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TestIndexGenerator.scala
 [test-writer]: https://github.com/apache/incubator-graphar/blob/main/maven-projects/spark/graphar/src/test/scala/org/apache/graphar/TestWriter.scala

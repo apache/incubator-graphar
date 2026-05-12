@@ -19,42 +19,57 @@
 
 package org.apache.graphar.info;
 
-import org.apache.graphar.proto.AdjListType;
-import org.apache.graphar.proto.FileType;
+import java.net.URI;
+import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.FileType;
 
 public class AdjacentList {
-    private final org.apache.graphar.proto.AdjacentList protoAdjacentList;
+    private final AdjListType type;
+    private final FileType fileType;
+    private final URI baseUri;
+
+    public AdjacentList(AdjListType type, FileType fileType, URI baseUri) {
+        this.type = type;
+        this.fileType = fileType;
+        this.baseUri = baseUri;
+    }
 
     public AdjacentList(AdjListType type, FileType fileType, String prefix) {
-        protoAdjacentList =
-                org.apache.graphar.proto.AdjacentList.newBuilder()
-                        .setType(type)
-                        .setFileType(fileType)
-                        .setPrefix(prefix)
-                        .build();
-    }
-
-    private AdjacentList(org.apache.graphar.proto.AdjacentList protoAdjacentList) {
-        this.protoAdjacentList = protoAdjacentList;
-    }
-
-    public static AdjacentList ofProto(org.apache.graphar.proto.AdjacentList protoAdjacentList) {
-        return new AdjacentList(protoAdjacentList);
+        this(type, fileType, prefix == null ? null : URI.create(prefix));
     }
 
     public AdjListType getType() {
-        return protoAdjacentList.getType();
+        return type;
     }
 
     public FileType getFileType() {
-        return protoAdjacentList.getFileType();
+        return fileType;
     }
 
     public String getPrefix() {
-        return protoAdjacentList.getPrefix();
+        return baseUri == null ? null : baseUri.toString();
     }
 
-    org.apache.graphar.proto.AdjacentList getProto() {
-        return protoAdjacentList;
+    public URI getBaseUri() {
+        return baseUri;
+    }
+
+    public boolean isValidated() {
+        // Check if type is valid
+        if (type == null) {
+            return false;
+        }
+
+        // Check if file type is valid
+        if (fileType == null) {
+            return false;
+        }
+
+        // Check if base URI is not null
+        if (baseUri == null || baseUri.toString().isEmpty()) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -21,10 +21,14 @@
 
 #include "./util.h"
 #include "graphar/api/high_level_reader.h"
+#include "graphar/expression.h"
 
 #include <catch2/catch_test_macros.hpp>
 
 namespace graphar {
+constexpr size_t expectedFemaleCount = 454;
+constexpr size_t expectedMaleCount = 449;
+constexpr size_t expectedTotalCount = 903;
 TEST_CASE_METHOD(GlobalFixture, "Graph") {
   // read file and construct graph info
   std::string path =
@@ -77,6 +81,75 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
     REQUIRE(it.id() == it_begin.id());
     REQUIRE(it.property<int64_t>("id").value() ==
             it_begin.property<int64_t>("id").value());
+  }
+
+  SECTION("VerticesCollectionFilterByLabel") {
+    std::string path = test_data_dir + "/ldbc/parquet/" + "ldbc.graph.yml";
+    auto maybe_graph_info = GraphInfo::Load(path);
+    REQUIRE(maybe_graph_info.status().ok());
+    auto graph_info = maybe_graph_info.value();
+
+    auto vertex_info = graph_info->GetVertexInfo("organisation");
+    REQUIRE(vertex_info != nullptr);
+
+    auto labels = vertex_info->GetLabels();
+    if (!labels.empty()) {
+      auto vertices = std::make_shared<VerticesCollection>(
+          vertex_info, graph_info->GetPrefix());
+
+      auto maybe_filtered_ids =
+          vertices->filter(std::vector<std::string>{labels[0]}, nullptr);
+      REQUIRE(maybe_filtered_ids.status().ok());
+      auto filtered_ids = maybe_filtered_ids.value();
+
+      std::cout << "Filtered " << filtered_ids.size()
+                << " vertices with label '" << labels[0] << "'" << std::endl;
+
+      auto filtered_vertices = std::make_shared<VerticesCollection>(
+          vertex_info, graph_info->GetPrefix(), true, filtered_ids);
+
+      size_t count = 0;
+      for (auto it = filtered_vertices->begin(); it != filtered_vertices->end();
+           ++it) {
+        count++;
+      }
+      REQUIRE(count == filtered_ids.size());
+    }
+  }
+
+  SECTION("VerticesCollectionFilterByProperty") {
+    auto vertex_info = graph_info->GetVertexInfo("person");
+    REQUIRE(vertex_info != nullptr);
+
+    auto vertices = std::make_shared<VerticesCollection>(
+        vertex_info, graph_info->GetPrefix());
+    REQUIRE(vertices->size() == expectedTotalCount);
+    std::cout << "total size " << vertices->size() << std::endl;
+    // filter female vertices
+    auto filter_female =
+        _Equal(_Property("gender"), _Literal(std::string("female")));
+    std::vector<IdType> new_valid_chunk;
+    auto maybe_filtered_female_ids =
+        vertices->filter("gender", filter_female, &new_valid_chunk);
+    REQUIRE(maybe_filtered_female_ids.status().ok());
+    auto filtered_female_ids = maybe_filtered_female_ids.value();
+    // filter male vertices
+    auto filter_male =
+        _Equal(_Property("gender"), _Literal(std::string("male")));
+    auto maybe_filtered_male_ids =
+        vertices->filter("gender", filter_male, &new_valid_chunk);
+    REQUIRE(maybe_filtered_male_ids.status().ok());
+    auto filtered_male_ids = maybe_filtered_male_ids.value();
+
+    std::cout << "Filtered " << filtered_female_ids.size()
+              << " vertices with gender='female'" << std::endl;
+    std::cout << "Filtered " << filtered_male_ids.size()
+              << " vertices with gender='male'" << std::endl;
+
+    REQUIRE(filtered_female_ids.size() == expectedFemaleCount);
+    REQUIRE(filtered_male_ids.size() == expectedMaleCount);
+    REQUIRE(filtered_male_ids.size() + filtered_female_ids.size() ==
+            expectedTotalCount);
   }
 
   SECTION("ListProperty") {
@@ -220,6 +293,141 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
     REQUIRE(count == 128);
     auto last_invalid_vertex = *(vertices->end() + -1);
     REQUIRE(last_invalid_vertex.property<int64_t>(property).has_error());
+  }
+
+  SECTION("EdgeIterator") {
+    std::string src_type = "person", edge_type = "knows", dst_type = "person";
+    auto expect =
+        EdgesCollection::Make(graph_info, src_type, edge_type, dst_type,
+                              AdjListType::ordered_by_source);
+    REQUIRE(!expect.has_error());
+    auto edges = expect.value();
+
+    // Test iterator functionality
+    auto begin = edges->begin();
+    auto end = edges->end();
+    size_t count = 0;
+
+    // Iterate through first 2000 edges
+    for (auto it = begin; it != end; ++it) {
+      if (count >= 2000) {
+        break;
+      }
+      count++;
+      REQUIRE(it.source() >= 0);
+      REQUIRE(it.destination() >= 0);
+      REQUIRE(it.property<std::string>("creationDate").has_value());
+    }
+    REQUIRE(count == 2000);
+
+    // Test skipping and iterating next 2000 edges
+    auto begin2 = edges->begin();
+    size_t i = 0;
+    for (auto it = begin2; it != end; ++it, i++) {
+      if (i < 2000) {
+        continue;
+      }
+      if (i >= 4000) {
+        break;
+      }
+      count++;
+      REQUIRE(it.source() >= 0);
+      REQUIRE(it.destination() >= 0);
+      REQUIRE(it.property<std::string>("creationDate").has_value());
+    }
+    REQUIRE(count == 4000);
+
+    // Test skipping and iterating next 2000 edges
+    auto begin3 = edges->begin();
+    size_t j = 0;
+    for (auto it = begin3; it != end; ++it, j++) {
+      if (j < 4000) {
+        continue;
+      }
+      if (j >= 6000) {
+        break;
+      }
+      count++;
+      REQUIRE(it.source() >= 0);
+      REQUIRE(it.destination() >= 0);
+      REQUIRE(it.property<std::string>("creationDate").has_value());
+    }
+    REQUIRE(count == 6000);
+
+    // Test iterating remaining edges
+    auto begin4 = edges->begin();
+    size_t k = 0;
+    for (auto it = begin4; it != end; ++it, k++) {
+      if (k < 6000) {
+        continue;
+      }
+      count++;
+      REQUIRE(it.source() >= 0);
+      REQUIRE(it.destination() >= 0);
+      REQUIRE(it.property<std::string>("creationDate").has_value());
+    }
+
+    // Verify total count matches collection size
+    REQUIRE(count == edges->size());
+    std::cout << "Total edge_count=" << count << std::endl;
+  }
+
+  SECTION("DateType") {
+    std::string path_date =
+        test_data_dir + "/ldbc_sample/parquet/ldbc_sample_date.graph.yml";
+    auto maybe_graph_info_date = GraphInfo::Load(path_date);
+    REQUIRE(maybe_graph_info_date.status().ok());
+    auto graph_info_date = maybe_graph_info_date.value();
+    std::string src_type = "person", edge_type = "knows-date",
+                dst_type = "person";
+    auto expect =
+        EdgesCollection::Make(graph_info_date, src_type, edge_type, dst_type,
+                              AdjListType::ordered_by_source);
+    REQUIRE(!expect.has_error());
+    auto edges = expect.value();
+
+    // Expected values for the first ten creationDate-date entries
+    int32_t expected_dates[10] = {14820, 15442, 14909, 15182, 15141,
+                                  15058, 15155, 15135, 15364, 15455};
+    size_t count = 0;
+    for (auto it = edges->begin(); it != edges->end() && count < 10;
+         ++it, ++count) {
+      auto date_val = it.property<int32_t>("creationDate-date");
+      REQUIRE(date_val.has_value());
+      REQUIRE(date_val.value() == expected_dates[count]);
+    }
+    REQUIRE(count == 10);
+    std::cout << "DateType edge_count=" << count << std::endl;
+  }
+
+  SECTION("TimestampType") {
+    std::string path_timestamp =
+        test_data_dir + "/ldbc_sample/parquet/ldbc_sample_timestamp.graph.yml";
+    auto maybe_graph_info_timestamp = GraphInfo::Load(path_timestamp);
+    REQUIRE(maybe_graph_info_timestamp.status().ok());
+    auto graph_info_timestamp = maybe_graph_info_timestamp.value();
+    std::string src_type = "person", edge_type = "knows-timestamp",
+                dst_type = "person";
+    auto expect =
+        EdgesCollection::Make(graph_info_timestamp, src_type, edge_type,
+                              dst_type, AdjListType::ordered_by_source);
+    REQUIRE(!expect.has_error());
+    auto edges = expect.value();
+
+    // Expected values for the first ten creationDate-timestamp entries
+    int64_t expected_timestamps[10] = {
+        1280503193298LL, 1334239018931LL, 1288146786288LL, 1311781394869LL,
+        1308223719623LL, 1301064563134LL, 1309416320777LL, 1307728039432LL,
+        1327492287348LL, 1335389465259LL};
+    size_t count = 0;
+    for (auto it = edges->begin(); it != edges->end() && count < 10;
+         ++it, ++count) {
+      auto ts_val = it.property<int64_t>("creationDate-timestamp");
+      REQUIRE(ts_val.has_value());
+      REQUIRE(ts_val.value() == expected_timestamps[count]);
+    }
+    REQUIRE(count == 10);
+    std::cout << "TimestampType edge_count=" << count << std::endl;
   }
 }
 }  // namespace graphar
