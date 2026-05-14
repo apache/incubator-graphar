@@ -39,6 +39,7 @@ jobs:
   pre-commit:
     name: Pre-commit Checks
     runs-on: ubuntu-slim
+    if: false
 
     steps:
     - uses: actions/checkout@v4

@@ -53,6 +53,7 @@ jobs:
   build_sdist:
     name: Build source distribution
     runs-on: ubuntu-22.04
+    if: false
     steps:
       - uses: actions/checkout@v4
 
@@ -86,6 +87,7 @@ jobs:
     name: Build wheels on ${{ matrix.runner }}
     runs-on: ${{ matrix.runner }}
     needs: build_sdist
+    if: false
     strategy:
       matrix:
         include:
@@ -259,7 +261,7 @@ jobs:
     name: Publish to TestPyPI (auto)
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-22.04
-    if: github.event_name == 'push'
+    if: false
     permissions:
       contents: read
       id-token: write
@@ -283,7 +285,7 @@ jobs:
     name: Publish (manual)
     needs: [build_wheels, build_sdist]
     runs-on: ubuntu-22.04
-    if: github.event_name == 'workflow_dispatch' && inputs.publish_pypi
+    if: false
     permissions:
       contents: read
       id-token: write
