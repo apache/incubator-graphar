@@ -20,6 +20,17 @@ name: GraphAr C++ CI Nightly
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
+    paths:
+      - 'cpp/**'
+      - '.github/workflows/ci-nightly.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'cpp/**'
+      - '.github/workflows/ci-nightly.yml'
   schedule:
     # The notifications for scheduled workflows are sent to the user who
     # last modified the cron syntax in the workflow file.
