@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-FROM ubuntu:22.04
+FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y ca-certificates lsb-release wget \
     && apt-get install -y ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb \
     && apt-get update \
     && apt-get install -y \
-       cmake \
+       ninja-build \
        build-essential \
        libarrow-dev \
        libarrow-dataset-dev \
@@ -44,6 +44,11 @@ RUN apt-get update && apt-get install -y ca-certificates lsb-release wget \
        sudo \
        tzdata \
        maven \
+    && wget https://github.com/Kitware/CMake/releases/download/v3.28.0/cmake-3.28.0-linux-x86_64.tar.gz -O /tmp/cmake.tar.gz \
+    && tar -xzf /tmp/cmake.tar.gz -C /opt \
+    && ln -sf /opt/cmake-3.28.0-linux-x86_64/bin/cmake /usr/local/bin/cmake \
+    && ln -sf /opt/cmake-3.28.0-linux-x86_64/bin/ccmake /usr/local/bin/ccmake \
+    && rm /tmp/cmake.tar.gz \
     && curl -sSL https://install.python-poetry.org | python3 - \
     && wget https://github.com/muttleyxd/clang-tools-static-binaries/releases/download/master-22538c65/clang-format-8_linux-amd64 -O /usr/bin/clang-format \
     && chmod +x /usr/bin/clang-format \
