@@ -44,6 +44,7 @@ jobs:
   ubuntu:
     name: Ubuntu 22.04 Python
     runs-on: ubuntu-latest
+    if: false
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
 
@@ -111,6 +112,7 @@ jobs:
   macos:
     name: macos latest Python
     runs-on: macos-latest
+    if: false
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
 

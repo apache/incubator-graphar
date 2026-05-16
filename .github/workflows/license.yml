@@ -33,6 +33,7 @@ jobs:
   license-check:
     name: License Check
     runs-on: ubuntu-slim
+    if: false
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4

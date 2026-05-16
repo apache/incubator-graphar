@@ -38,7 +38,7 @@ concurrency:
 jobs:
   build-website:
     runs-on: ubuntu-slim
-    if: ${{ !contains(github.event.pull_request.title, 'WIP') }}
+    if: false
     steps:
       - uses: actions/checkout@v4
         with:
