@@ -25,14 +25,8 @@ on:
   pull_request:
     branches:
       - main
-  schedule:
-    # The notifications for scheduled workflows are sent to the user who
-    # last modified the cron syntax in the workflow file.
-    # Trigger the workflow at 03:00(CST) every day.
-    - cron:  '00 19 * * *'
 jobs:
   GraphAr-ubuntu-arrow-from-source:
-    if: ${{ github.ref == 'refs/heads/main' && github.repository == 'apache/incubator-graphar' }}
     runs-on: ubuntu-latest
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
@@ -55,52 +49,52 @@ jobs:
         sudo apt-get update -y
         sudo apt-get install -y libboost-graph-dev ccache libcurl4-openssl-dev ninja-build
 
+        # install CMake 3.28+
+        wget -O- https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /usr/share/keyrings/kitware-archive-keyring.gpg >/dev/null
+        echo 'deb [signed-by=/usr/share/keyrings/kitware-archive-keyring.gpg] https://apt.kitware.com/ubuntu/ jammy main' | sudo tee /etc/apt/sources.list.d/kitware.list >/dev/null
+        sudo apt-get update -y
+        sudo apt-get install -y cmake
+
         # install Catch2 v3
         git clone --branch v3.6.0 https://github.com/catchorg/Catch2.git --depth 1
-        pushd Catch2
-        cmake -Bbuild -H. -DBUILD_TESTING=OFF
-        sudo cmake --build build/ --target install
-        popd
+        cmake -B Catch2/build -S Catch2 \
+              -DBUILD_TESTING=OFF
+        sudo cmake --build Catch2/build \
+                   --target install
 
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
     - name: CMake-debug
       run: |
-        mkdir build-debug
-        pushd build-debug
-        cmake ../cpp -G Ninja -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
-        popd
+        cmake -B build-debug -S cpp \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE=Debug \
+              -DBUILD_TESTS=ON \
+              -DBUILD_EXAMPLES=ON \
+              -DBUILD_ARROW_FROM_SOURCE=ON
 
     - name: Build GraphAr-debug
       run: |
-        pushd build-debug
-        ninja
-        ninja graphar-ccache-stats
-        popd
+        ninja -C build-debug
+        ninja -C build-debug graphar-ccache-stats
         
     - name: Test-debug
-      run: |
-        pushd build-debug
-        ctest --output-on-failure
-        popd
+      run: ctest --output-on-failure -C build-debug
 
 
     - name: CMake-release
       run: |
-        mkdir build-release
-        pushd build-release
-        cmake ../cpp -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo -DBUILD_TESTS=ON -DBUILD_EXAMPLES=ON -DBUILD_ARROW_FROM_SOURCE=ON
-        popd
+        cmake -B build-release -S cpp \
+              -G Ninja \
+              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+              -DBUILD_TESTS=ON \
+              -DBUILD_EXAMPLES=ON \
+              -DBUILD_ARROW_FROM_SOURCE=ON
 
     - name: Build GraphAr-release
       run: |
-        pushd build-release
-        ninja
-        ninja graphar-ccache-stats
-        popd
+        ninja -C build-release
+        ninja -C build-release graphar-ccache-stats
 
     - name: Test-release
-      run: |
-        pushd build-release
-        ctest --output-on-failure
-        popd
+      run: ctest --output-on-failure -C build-release
