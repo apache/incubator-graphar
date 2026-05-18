@@ -433,7 +433,7 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
   SECTION("HasLabel") {
     // Get organisation vertices which have labels: university, company, public
     auto result = VerticesCollection::verticesWithLabel(
-        "university", ldbc_graph_info, "organisation");
+        "university", maybe_graph_info.value(), "organisation");
     REQUIRE(!result.has_error());
     auto vertices = result.value();
     REQUIRE(vertices->size() > 0);
