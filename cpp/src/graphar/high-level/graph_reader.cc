@@ -104,7 +104,11 @@ Vertex::Vertex(IdType id,
 
 Result<bool> VertexIter::hasLabel(const std::string& label) noexcept {
   std::shared_ptr<arrow::ChunkedArray> column(nullptr);
-  label_reader_.seek(cur_offset_);
+  if (is_filtered_) {
+    label_reader_.seek(filtered_ids_[cur_offset_]);
+  } else {
+    label_reader_.seek(cur_offset_);
+  }
   GAR_ASSIGN_OR_RAISE(auto chunk_table, label_reader_.GetLabelChunk());
   column = util::GetArrowColumnByName(chunk_table, label);
   if (column != nullptr) {

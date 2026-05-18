@@ -429,5 +429,25 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
     REQUIRE(count == 10);
     std::cout << "TimestampType edge_count=" << count << std::endl;
   }
+
+  SECTION("HasLabel") {
+    // Get organisation vertices which have labels: university, company, public
+    auto result = VerticesCollection::verticesWithLabel(
+        "university", ldbc_graph_info, "organisation");
+    REQUIRE(!result.has_error());
+    auto vertices = result.value();
+    REQUIRE(vertices->size() > 0);
+
+    // Iterate and test hasLabel
+    size_t count = 0;
+    for (auto it = vertices->begin(); it != vertices->end() && count < 10;
+         ++it, ++count) {
+      REQUIRE(it.id() >= 0);
+      // university vertices should have label "university" as true
+      auto has_university = it.hasLabel("university");
+      REQUIRE(!has_university.has_error());
+      REQUIRE(has_university.value());
+    }
+  }
 }
 }  // namespace graphar
