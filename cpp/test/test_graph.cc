@@ -429,5 +429,33 @@ TEST_CASE_METHOD(GlobalFixture, "Graph") {
     REQUIRE(count == 10);
     std::cout << "TimestampType edge_count=" << count << std::endl;
   }
+
+  SECTION("HasLabel") {
+    // Test hasLabel on organisation vertices which have labels
+    std::string ldbc_path = test_data_dir + "/ldbc/parquet/ldbc.graph.yml";
+    auto maybe_ldbc_graph_info = GraphInfo::Load(ldbc_path);
+    REQUIRE(maybe_ldbc_graph_info.status().ok());
+    auto ldbc_graph_info = maybe_ldbc_graph_info.value();
+
+    // Get university vertices (filtered by label)
+    auto result = VerticesCollection::verticesWithLabel(
+        "university", ldbc_graph_info, "organisation");
+    REQUIRE(!result.has_error());
+    auto vertices = result.value();
+    REQUIRE(vertices->size() > 0);
+
+    // Iterate and verify hasLabel works correctly on filtered collection
+    for (auto it = vertices->begin(); it != vertices->end(); ++it) {
+      REQUIRE(it.id() >= 0);
+      // university vertices should have label "university" as true
+      auto has_university = it.hasLabel("university");
+      REQUIRE(!has_university.has_error());
+      REQUIRE(has_university.value());
+      // university vertices should have label "company" as false
+      auto has_company = it.hasLabel("company");
+      REQUIRE(!has_company.has_error());
+      REQUIRE(!has_company.value());
+    }
+  }
 }
 }  // namespace graphar
