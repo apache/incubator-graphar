@@ -1,96 +1,99 @@
 # GraphAr Python CLI
 
-GraphAr python cli uses [pybind11][] and [scikit-build-core][] to bind C++ code into Python and build command line tools through Python. Command line tools developed using [typer][].
+The GraphAr Python package installs a `graphar` command-line tool for inspecting
+GraphAr metadata and importing data into GraphAr format.
 
-[pybind11]: https://pybind11.readthedocs.io
-[scikit-build-core]: https://scikit-build-core.readthedocs.io
-[typer]: https://typer.tiangolo.com/
+The CLI is implemented with [Typer][] and uses the same Python bindings as the
+`graphar` Python package.
+
+[Typer]: https://typer.tiangolo.com/
 
 ## Requirements
 
-- Linux (work fine on Ubuntu 22.04)
-- Cmake >= 3.15
-- Arrow >= 12.0
-- Python >= 3.7
-- pip == latest
-
-
-The best testing environment is `ghcr.io/apache/graphar-dev` Docker environment.
-
-And using Python in conda or venv is a good choice. 
+- Python >= 3.9
+- pip
+- CMake >= 3.15, Apache Arrow >= 12.0, and a C++ toolchain when building from source
 
 ## Installation
 
-### Install from Pypi
 Install the latest released version from PyPI:
 
 ```bash
 pip install -U graphar
 ```
 
-### Install from Source
+Or install from the repository root:
 
-- Clone this repository
-- `pip install ./python` or set verbose level `pip install -v ./python`
+```bash
+pip install ./python
+```
 
-## Usage
+Verify the CLI is available:
 
 ```bash
 graphar --help
-
-# check the metadata, verify whether the vertex edge information and attribute information of the graph are valid
-graphar check -p ../testing/neo4j/MovieGraph.graph.yml
-
-# show the vertex
-graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
-
-# show the edge
-graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
-
-# import graph data by using a config file
-graphar import -c ../testing/neo4j/data/import.mini.yml
 ```
 
-## Import config file
+## Usage
 
-The config file supports `yaml` data type. We provide two reference templates for it: full and mini.
+Replace the paths below with paths to your GraphAr metadata or import config
+files.
 
-The full version of the configuration file contains all configurable fields, and additional fields will be automatically ignored.
+```bash
+# Show all graph metadata.
+graphar show --path path/to/graph.graph.yml
 
-The mini version of the configuration file is a simplified version of the full configuration file, retaining the same functionality. It shows the essential parts of the configuration information. 
+# Validate graph metadata.
+graphar check --path path/to/graph.graph.yml
 
-For the full configuration file, if all fields can be set to their default values, you can simplify it to the mini version. However, it cannot be further reduced beyond the mini version.
+# Show one vertex type.
+graphar show --path path/to/graph.graph.yml --vertex Person
 
-In the full `yaml` config file, we provide brief comments on the fields, which can be used as a reference.
+# Show one edge type.
+graphar show \
+  --path path/to/graph.graph.yml \
+  --edge-src Person \
+  --edge ACTED_IN \
+  --edge-dst Movie
 
-**Example**
+# Import data with a config file.
+graphar import --config path/to/import.yml
+```
 
-To import the movie graph data from the `testing` directory, you first need to prepare data files. Supported file types include `csv`, `json`(as well as`jsonline`, but should have the `.json` extension), `parquet`, and `orc` files. Please ensure the correct file extensions are set in advance, or specify the `file_type` field in the source section of the configuration. The `file_type` field will ignore the file extension.
+Short options are also available:
 
-Next, write a configuration file following the provided sample. Any empty fields in the `graphar` configuration will be filled with default values. In the `import_schema`, empty fields will use the global configuration values from `graphar`. If fields in `import_schema` are not empty, they will override the values from `graphar`.
+```bash
+graphar show -p path/to/graph.graph.yml -v Person
+graphar show -p path/to/graph.graph.yml -es Person -e ACTED_IN -ed Movie
+graphar import -c path/to/import.yml
+```
 
-A few important notes:
+## Import Config
 
-1. The sources list specifies configuration for the data source files. For `csv` files, you can set the `delimiter`. The format of the `json` file should be given in the format of `jsonline`.
+The import command reads a YAML config file. A config describes source files,
+GraphAr output settings, and how source columns map to vertex or edge
+properties.
 
-2. The columns dictionary maps column names in the data source to node or edge properties. Keys represent column names in the data source, and values represent property names.
+Supported source file types are `csv`, `json`, `parquet`, and `orc`. JSON input
+uses JSON Lines format and should use the `.json` extension. You can override
+extension-based detection by setting `file_type` in the source config.
 
-3. Currently, edge properties cannot have the same names as the edge endpoints' properties; doing so will raise an exception.
+Important fields:
 
-4. The following table lists the default fields, more of which are included in the full configuration.
+1. `sources` describes the input files. CSV sources can set a `delimiter`.
+2. `columns` maps source column names to GraphAr property names.
+3. Edge property names must not duplicate endpoint property names.
+4. Empty fields in `import_schema` use values from the top-level `graphar`
+   config. Explicit `import_schema` values override the top-level defaults.
 
+Common defaults:
 
 | Field                             | Default value        |
-| -----------                       | -----------          |
-|  `graphar.vertex_chunk_size`      | `100`                |
-|  `graphar.edge_chunk_size`        | `1024`               |
-|  `graphar.file_type`              | `parquet`            |
-|  `graphar.adj_list_type`          | `ordered_by_source`  |
-|  `graphar.validate_level`         | `weak`               |
-|  `graphar.version`                | `gar/v1`             |
-|  `property.nullable`              | `true`               |
-
-
-
-
-Wish you a happy use！
+| --------------------------------- | -------------------- |
+| `graphar.vertex_chunk_size`       | `100`                |
+| `graphar.edge_chunk_size`         | `1024`               |
+| `graphar.file_type`               | `parquet`            |
+| `graphar.adj_list_type`           | `ordered_by_source`  |
+| `graphar.validate_level`          | `weak`               |
+| `graphar.version`                 | `gar/v1`             |
+| `property.nullable`               | `true`               |
