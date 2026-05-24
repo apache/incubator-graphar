@@ -4,7 +4,7 @@ The GraphAr Python package installs a `graphar` command-line tool for inspecting
 GraphAr metadata and importing data into GraphAr format.
 
 The CLI is implemented with [Typer][] and uses the same Python bindings as the
-`graphar` Python package.
+[`graphar` Python package](../../README.md).
 
 [Typer]: https://typer.tiangolo.com/
 
