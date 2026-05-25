@@ -45,3 +45,10 @@ Please uncomment the line below (and provide explanation) if the changes fix eit
 We use this to highlight fixes to issues that may affect users without their knowledge. For this reason, fixing bugs that cause errors don't count, since those are usually obvious.
 -->
 <!-- **Critical Fix: <description>** -->
+
+## Checklist
+
+- [ ] I have performed a self-review of my own code.
+- [ ] I have formatted my own code using `make cpplint` before submitting when changed files are in the `cpp` directory.
+- [ ] I have performed `pre-commit run` before commit the changed files.
+- [ ] I have added tests to prove my changes are effective.
