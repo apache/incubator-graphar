@@ -33,7 +33,7 @@ Dependencies for optional features:
 - [BGL](https://www.boost.org/doc/libs/1_80_0/libs/graph/doc/index.html) (>= 1.58)
 - [Google Benchmark](https://github.com/google/benchmark) (>= 1.6.0) for benchmarking
 - [Catch2](https://github.com/catchorg/Catch2) v3 for unit testing
-- [Ninja](https://github.com/ninja-build/ninja) presets will automatically use ninja in default
+- [Ninja](https://github.com/ninja-build/ninja) required for CMake presets
 
 On Ubuntu/Debian, you can install the required packages with:
 
@@ -43,7 +43,7 @@ sudo apt-get install \
     cmake \
     libboost-graph-dev \
     doxygen\
-    Ninja-build
+    ninja-build
 
 # Arrow C++ dependencies
 wget -c \
@@ -55,7 +55,12 @@ sudo apt-get install -y libarrow-dev libarrow-dataset-dev libarrow-acero-dev lib
 ```
 
 On macOS, you can use [Homebrew](https://brew.sh) to install the required packages:
+
 ```bash
+# Minimal install for building with CMake presets:
+brew install ninja cmake
+
+# Or install all development dependencies:
 brew update && brew bundle --file=cpp/Brewfile
 ```
 
