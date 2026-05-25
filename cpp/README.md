@@ -33,6 +33,7 @@ Dependencies for optional features:
 - [BGL](https://www.boost.org/doc/libs/1_80_0/libs/graph/doc/index.html) (>= 1.58)
 - [Google Benchmark](https://github.com/google/benchmark) (>= 1.6.0) for benchmarking
 - [Catch2](https://github.com/catchorg/Catch2) v3 for unit testing
+- [Ninja](https://github.com/ninja-build/ninja) required for CMake presets
 
 On Ubuntu/Debian, you can install the required packages with:
 
@@ -41,7 +42,8 @@ sudo apt-get install \
     build-essential \
     cmake \
     libboost-graph-dev \
-    doxygen
+    doxygen\
+    ninja-build
 
 # Arrow C++ dependencies
 wget -c \
@@ -53,7 +55,12 @@ sudo apt-get install -y libarrow-dev libarrow-dataset-dev libarrow-acero-dev lib
 ```
 
 On macOS, you can use [Homebrew](https://brew.sh) to install the required packages:
+
 ```bash
+# Minimal install for building with CMake presets:
+brew install ninja cmake
+
+# Or install all development dependencies:
 brew update && brew bundle --file=cpp/Brewfile
 ```
 
@@ -88,26 +95,20 @@ cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTS=ON ..
 make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
 ```
 
-### Quick Build with Scripts
+### Quick Build with CMake Presets
 
-For convenience, we provide build scripts for Ubuntu and macOS that configure the following CMake options:
+We use CMake Presets for quick building. Available presets:
 
-- `-DBUILD_BENCHMARKS=ON`: Build benchmark executables
-- `-DCMAKE_BUILD_TYPE=Debug`: Build in debug mode
-- `-DBUILD_TESTS=ON`: Build unit tests
-- `-DBUILD_EXAMPLES=ON`: Build example executables
+- `debug` - Debug build with tests, examples, and benchmarks
+- `release` - Release build with tests, examples, and benchmarks
 
-**Ubuntu:**
 ```bash
-./build_ubuntu.sh
-```
+# Configure the project
+cmake --preset debug    # or: cmake --preset release
 
-**macOS:**
-```bash
-./build_macos.sh
+# Build the project
+cmake --build --preset debug    # or: cmake --build --preset release
 ```
-
-These scripts will automatically create the build directory, configure with CMake, and compile the project. Build logs will be saved to `build_ubuntu.log` or `build_macos.log`.
 
 After building, you can run the unit tests with:
 
@@ -116,17 +117,15 @@ git submodule update --init --recursive  # download the testing data
 GAR_TEST_DATA=${PWD}/testing ctest
 ```
 
-Build with examples, you should build the project with `BUILD_EXAMPLES` option, then run:
+Build with examples, you should build the project with `BUILD_EXAMPLES` option(examples are built by default with presets), then run:
 
 ```bash
-make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
 GAR_TEST_DATA=${PWD}/testing ./bgl_example  # run the BGL example
 ```
 
-Build with benchmarks, you should build the project with `BUILD_BENCHMARKS` option, then run:
+Build with benchmarks, you should build the project with `BUILD_BENCHMARKS` option(benchmarks are built by default with presets), then run:
 
 ```bash
-make -j8       # if you have 8 CPU cores, otherwise adjust, use -j`nproc` for all cores
 GAR_TEST_DATA=${PWD}/testing ./graph_info_benchmark  # run the graph info benchmark
 ```
 
