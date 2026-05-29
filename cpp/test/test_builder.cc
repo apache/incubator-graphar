@@ -182,6 +182,7 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   REQUIRE(name_col != nullptr);
   REQUIRE(id_col != nullptr);
 
+  REQUIRE(id_col->type()->id() == arrow::Type::INT64);
   auto id_array = std::static_pointer_cast<arrow::Int64Array>(id_col->chunk(0));
   auto name_array =
       std::static_pointer_cast<arrow::StringArray>(name_col->chunk(0));
