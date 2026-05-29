@@ -281,6 +281,30 @@ class EdgesBuilder {
   }
 
   /**
+   * @brief Add a property to all edges in the collection.
+   *
+   * @param property name of the property
+   * @param values vector of values where values[i] is mapped to the i-th edge
+   * in chunk-major order with size equal to the edges collection
+   *
+   * @return Status: ok or Status::Invalid error.
+   */
+  [[nodiscard]] Status AddPropertyColumn(const std::string& property,
+                                         const std::vector<std::any>& values) {
+    if (static_cast<IdType>(values.size()) != num_edges_) {
+      return Status::Invalid(
+          "The size of values vector is not equal to the number of edges.");
+    }
+
+    IdType value = 0;
+    for (auto& [id, edges] : edges_) {
+      for (Edge& edge : edges) {
+        edge.AddProperty(property, values[value++]);
+      }
+    }
+    return Status::OK();
+  }
+  /**
    * @brief Get the current number of edges in the collection.
    *
    * @return The current number of edges in the collection.
@@ -471,7 +495,7 @@ class EdgesBuilder {
   std::shared_ptr<EdgeInfo> edge_info_;
   std::string prefix_;
   AdjListType adj_list_type_;
-  std::unordered_map<IdType, std::vector<Edge>> edges_;
+  std::map<IdType, std::vector<Edge>> edges_;
   IdType vertex_chunk_size_;
   IdType num_vertices_;
   IdType num_edges_;
