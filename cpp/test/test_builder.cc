@@ -119,6 +119,23 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   // check the number of vertices in builder
   REQUIRE(builder->GetNum() == lines);
 
+  // add property column
+  std::vector<std::any> int_values(builder->GetNum());
+  std::vector<std::any> string_values(builder->GetNum());
+  for (IdType i = 0; i < builder->GetNum(); i++) {
+    int_values[i] = i + 10;
+    string_values[i] = std::to_string(i);
+  }
+
+  REQUIRE(builder->AddPropertyColumn("id", int_values).ok());
+  REQUIRE(builder->AddPropertyColumn("firstName", string_values).ok());
+
+  int_values.push_back(100);
+  string_values.push_back("test");
+
+  REQUIRE(builder->AddPropertyColumn("id", int_values).IsInvalid());
+  REQUIRE(builder->AddPropertyColumn("firstName", string_values).IsInvalid());
+
   // dump to files
   REQUIRE(builder->Dump().ok());
 
@@ -145,6 +162,37 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   auto row_group_meta = parquet_metadata->RowGroup(0);
   auto col_meta = row_group_meta->ColumnChunk(0);
   REQUIRE(col_meta->compression() == parquet::Compression::LZ4);
+
+  // check that properties were added correctly
+  auto name_file = "/tmp/vertex/person/firstName_lastName_gender/chunk0";
+
+  std::unique_ptr<parquet::arrow::FileReader> name_reader;
+
+  REQUIRE(graphar::util::OpenParquetArrowReader(
+              name_file, arrow::default_memory_pool(), &name_reader)
+              .ok());
+
+  auto id_col = parquet_table->GetColumnByName("id");
+
+  auto maybe_name_table = name_reader->ReadTable();
+  REQUIRE(maybe_name_table.ok());
+  auto name_table = maybe_name_table.ValueOrDie();
+  auto name_col = name_table->GetColumnByName("firstName");
+
+  REQUIRE(name_col != nullptr);
+  REQUIRE(id_col != nullptr);
+
+  REQUIRE(id_col->type()->id() == arrow::Type::INT64);
+  auto id_array = std::static_pointer_cast<arrow::Int64Array>(id_col->chunk(0));
+  auto name_array =
+      std::static_pointer_cast<arrow::StringArray>(name_col->chunk(0));
+
+  for (IdType i = 0; i < id_array->length(); i++) {
+    REQUIRE(id_array->Value(i) == i + 10);
+  }
+  for (IdType i = 0; i < name_array->length(); i++) {
+    REQUIRE(name_array->GetString(i) == std::to_string(i));
+  }
 }
 
 TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
@@ -221,6 +269,17 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
   // check the number of edges in builder
   REQUIRE(builder->GetNum() == lines);
 
+  // add property column
+  std::vector<std::any> string_values(builder->GetNum(),
+                                      std::string("test_edge"));
+
+  REQUIRE(builder->AddPropertyColumn("creationDate", string_values).ok());
+
+  string_values.push_back(std::string("test"));
+
+  REQUIRE(
+      builder->AddPropertyColumn("creationDate", string_values).IsInvalid());
+
   // dump to files
   REQUIRE(builder->Dump().ok());
 
@@ -251,5 +310,17 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
   auto row_group_meta = parquet_metadata->RowGroup(0);
   auto col_meta = row_group_meta->ColumnChunk(0);
   REQUIRE(col_meta->compression() == parquet::Compression::LZ4);
+  // check that properties were added correctly
+
+  auto date_col = parquet_table->GetColumnByName("creationDate");
+
+  REQUIRE(date_col != nullptr);
+
+  auto string_array =
+      std::static_pointer_cast<arrow::StringArray>(date_col->chunk(0));
+
+  for (IdType i = 0; i < string_array->length(); i++) {
+    REQUIRE(string_array->GetString(i) == "test_edge");
+  }
 }
 }  // namespace graphar

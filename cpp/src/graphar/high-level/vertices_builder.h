@@ -347,6 +347,28 @@ class VerticesBuilder {
   }
 
   /**
+   * @brief Add a property to all vertices in the collection.
+   *
+   * @param property name of the property
+   * @param values vector of values where values[i] is mapped to the i-th vertex
+   * in insertion order with size equal to the vertices collection
+   *
+   * @return Status: ok or Status::Invalid error.
+   */
+  [[nodiscard]] Status AddPropertyColumn(const std::string& property,
+                                         const std::vector<std::any>& values) {
+    if (static_cast<IdType>(values.size()) != num_vertices_) {
+      return Status::Invalid(
+          "The size of values vector is not equal to the number of vertices.");
+    }
+
+    for (size_t i = 0; i < vertices_.size(); i++) {
+      vertices_[i].AddProperty(property, values[i]);
+    }
+    return Status::OK();
+  }
+
+  /**
    * @brief Get the current number of vertices in the collection.
    *
    * @return The current number of vertices in the collection.
