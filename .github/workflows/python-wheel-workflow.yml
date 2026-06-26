@@ -52,14 +52,14 @@ on:
 jobs:
   build_sdist:
     name: Build source distribution
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.9"
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
@@ -77,7 +77,7 @@ jobs:
           cd python
           python -m build --sdist
       - name: Store artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sdist
           path: python/dist/*
@@ -97,7 +97,7 @@ jobs:
 
           # Job 2: Native aarch64 build
           - platform: aarch64
-            runner: ubuntu-22.04-arm # This is a native ARM64 runner
+            runner: ubuntu-24.04-arm # This is a native ARM64 runner
             os: linux
             manylinux: _2_28
 
@@ -109,7 +109,7 @@ jobs:
 
     env:
       CIBW_PLATFORM: ${{ matrix.os }}
-      CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
+      CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-*"
       CIBW_SKIP: "*-musllinux_*"
       # Use uv on macOS to avoid transient GitHub rate limits when cibuildwheel
       CIBW_BUILD_FRONTEND: ${{ matrix.os == 'macos' && 'build[uv]' || 'build' }}
@@ -137,7 +137,7 @@ jobs:
         dnf config-manager --set-enabled ol$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)_codeready_builder || :
         dnf config-manager --set-enabled codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-rhui-rpms || :
         subscription-manager repos --enable codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-$(arch)-rpms || :
-        dnf install -y arrow-devel # For C++
+        dnf install -y arrow-devel-23* # For C++
         dnf install -y arrow-glib-devel # For GLib (C)
         dnf install -y arrow-dataset-devel # For Apache Arrow Dataset C++
         dnf install -y arrow-dataset-glib-devel # For Apache Arrow Dataset GLib (C)
@@ -150,19 +150,33 @@ jobs:
         dnf install -y gandiva-glib-devel # For Apache Gandiva GLib (C)
         dnf install -y parquet-devel # For Apache Parquet C++
         dnf install -y parquet-glib-devel # For Apache Parquet GLib (C)
+      CIBW_REPAIR_WHEEL_COMMAND_LINUX: |
+        auditwheel repair --exclude libarrow.so.* --exclude libparquet.so.* --exclude libarrow_dataset.so.* --exclude libarrow_acero.so.* -w {dest_dir} {wheel}
+      CIBW_REPAIR_WHEEL_COMMAND_MACOS: |
+        delocate-wheel --exclude libarrow --exclude libparquet --exclude libarrow_dataset --exclude libarrow_acero -w {dest_dir} -v {wheel}
 
     steps:
       - name: Checkout (needed for some tooling)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.9"
+          python-version: "3.10"
 
       - name: Set up Miniconda (Windows)
+        # This is a placeholder that never run
         if: matrix.os == 'windows'
-        uses: conda-incubator/setup-miniconda@v3
+        uses: conda-incubator/setup-miniconda@v4
+        with:
+          auto-activate-base: true
+          miniforge-version: latest
+          use-mamba: true
+
+      - name: Install Conda (macOS)
+        if: matrix.os == 'macos'
+        # Brew does not allow to install any version of arrow except the last one
+        uses: conda-incubator/setup-miniconda@v4
         with:
           auto-activate-base: true
           miniforge-version: latest
@@ -170,16 +184,16 @@ jobs:
 
       - name: Install Arrow (macOS)
         if: matrix.os == 'macos'
-        shell: bash
+        shell: bash -el {0}
         run: |
           set -euxo pipefail
-          brew install apache-arrow
-          echo "CMAKE_PREFIX_PATH=/usr/local" >> "$GITHUB_ENV"
+          conda install -y -c conda-forge "libarrow-all=23"
+          echo "CMAKE_PREFIX_PATH=$CONDA_PREFIX" >> "$GITHUB_ENV"
           # Optional sanity check: ensure Arrow dylib isn't built for a newer macOS than deployment target.
           if command -v otool >/dev/null 2>&1; then
             ls -lah /usr/local/lib || true
-            if [ -f "/usr/local/lib/libarrow.dylib" ]; then
-              otool -l "/usr/local/lib/libarrow.dylib" | (grep -A3 -E 'LC_BUILD_VERSION|LC_VERSION_MIN_MACOSX' || true)
+            if [ -f "$CONDA_PREFIX/lib/libarrow.dylib" ]; then
+              otool -l "$CONDA_PREFIX/lib/libarrow.dylib" | (grep -A3 -E 'LC_BUILD_VERSION|LC_VERSION_MIN_MACOSX' || true)
             fi
           fi
 
@@ -191,7 +205,7 @@ jobs:
           Add-Content $env:GITHUB_ENV "CMAKE_PREFIX_PATH=$env:CONDA_PREFIX\\Library"
           Add-Content $env:GITHUB_ENV "PATH=$env:CONDA_PREFIX\\Library\\bin;$env:PATH"
       - name: Download sdist artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: sdist
           path: sdist
@@ -238,7 +252,7 @@ jobs:
           python -m cibuildwheel --output-dir python/dist "$PKGDIR"
 
       - name: Store artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wheels-${{ matrix.os }}-${{ matrix.platform }}
           path: python/dist/*
@@ -258,14 +272,14 @@ jobs:
   upload_test_pypi:
     name: Publish to TestPyPI (auto)
     needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'push'
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: dist
 
@@ -282,14 +296,14 @@ jobs:
   upload_pypi:
     name: Publish (manual)
     needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'workflow_dispatch' && inputs.publish_pypi
     permissions:
       contents: read
       id-token: write
     steps:
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: dist
 
@@ -298,6 +312,6 @@ jobs:
           mkdir -p python/dist
           find dist -name "*" -type f -exec mv {} python/dist/ \;
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/2473ec6c6aa87f38946284d51289219fd0b87264
+        uses: pypa/gh-action-pypi-publish@v1
         with:
           packages-dir: python/dist/
