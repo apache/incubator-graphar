@@ -42,18 +42,18 @@ concurrency:
 
 jobs:
   ubuntu:
-    name: Ubuntu 22.04 Python
+    name: Ubuntu 24.04 Python
     runs-on: ubuntu-latest
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
           submodules: true
 
     - name: Install Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v6
       with:
         python-version: '3.10'
 
@@ -65,36 +65,33 @@ jobs:
             -P /tmp/
         sudo apt-get install -y /tmp/apache-arrow-apt-source-latest-"$(lsb_release --codename --short)".deb
         sudo apt-get update -y
-        sudo apt install -y libarrow-dev=24.0.0-1 \
-                            libarrow-dataset-dev=24.0.0-1 \
-                            libarrow-acero-dev=24.0.0-1 \
-                            libparquet-dev=24.0.0-1
+        sudo apt install -y libarrow-dev=23.0.0-1 \
+                            libarrow-dataset-dev=23.0.0-1 \
+                            libarrow-acero-dev=23.0.0-1 \
+                            libparquet-dev=23.0.0-1
         sudo apt-get install -y ccache libcurl4-openssl-dev
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
-    - name: Install GraphAr Python SDK
-      working-directory: "python"
-      run: |
-        pip install ./ -v
-
-    - name: Install Poetry
+    - name: Install Poetry and SDK
       working-directory: python
       run: |
         pip install poetry --quiet
+        poetry env use python3
+        poetry install --with test
 
     - name: Run Cli Test
       working-directory: "python"
       run: |
-        graphar --help
-        graphar check -p ../testing/neo4j/MovieGraph.graph.yml
-        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
-        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
-        graphar import -c ../testing/neo4j/data/import.mini.yml
+        poetry run graphar --help
+        poetry run graphar check -p ../testing/neo4j/MovieGraph.graph.yml
+        poetry run graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
+        poetry run graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
+        poetry run graphar import -c ../testing/neo4j/data/import.mini.yml
 
     - name: Run pytest
       working-directory: "python"
       run: |
-        pytest test -v
+        poetry run pytest test -v
 
 
     - name: Upload coverage reports to Codecov
@@ -115,12 +112,12 @@ jobs:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
           submodules: true
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.13'
 
@@ -130,23 +127,26 @@ jobs:
 
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
-    - name: Install GraphAr Python SDK
-      working-directory: "python"
+    - name: Install Poetry and SDK
+      working-directory: python
       run: |
-        pip install ./ -v
+        pip install poetry --quiet
+        poetry env use python3
+        poetry install --with test
+
     - name: Run Cli Test
       working-directory: "python"
       run: |
-        graphar --help
-        graphar --version
-        graphar check -p ../testing/neo4j/MovieGraph.graph.yml
-        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
-        graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
+        poetry run graphar --help
+        poetry run graphar check -p ../testing/neo4j/MovieGraph.graph.yml
+        poetry run graphar show -p ../testing/neo4j/MovieGraph.graph.yml -v Person
+        poetry run graphar show -p ../testing/neo4j/MovieGraph.graph.yml -es Person -e ACTED_IN -ed Movie
+        poetry run graphar import -c ../testing/neo4j/data/import.mini.yml
 
     - name: Run pytest
       working-directory: "python"
       run: |
-        pytest test -v
+        poetry run pytest test -v
 
       
 # TODO: Add unit tests
