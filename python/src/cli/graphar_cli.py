@@ -17,10 +17,8 @@
 
 from logging import getLogger
 from pathlib import Path
-from typing import List, Optional
 
 import typer
-
 from graphar._core import (
     get_edge_count,
     get_edge_types,
@@ -30,9 +28,9 @@ from graphar._core import (
     show_graph,
     show_vertex,
 )
-from graphar.logging import setup_logging
 
 from graphar.importer import data_import
+from graphar.logging import setup_logging
 
 from . import __version__
 
@@ -50,7 +48,7 @@ logger = getLogger("graphar_cli")
 @app.callback(invoke_without_command=True)
 def _callback(
     ctx: typer.Context,
-    version: Optional[bool] = typer.Option(
+    version: bool | None = typer.Option(
         False, "--version", "-v", help="Show GraphAr version and exit", is_eager=True
     ),
 ):
@@ -92,7 +90,7 @@ def show(
         if not (edge and edge_src and edge_dst):
             logger.error("Edge source, edge, and edge destination must all be set")
             raise typer.Exit(1)
-        edge_types: List[List[str]] = get_edge_types(path)
+        edge_types: list[list[str]] = get_edge_types(path)
         found = False
         for edge_type in edge_types:
             if edge_type[0] == edge_src and edge_type[1] == edge and edge_type[2] == edge_dst:

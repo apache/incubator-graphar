@@ -89,7 +89,7 @@ jobs:
     - name: Run pytest
       working-directory: "python"
       run: |
-        poetry run pytest test -v
+        poetry run pytest -vvv
 
 
     - name: Upload coverage reports to Codecov
@@ -130,7 +130,8 @@ jobs:
       run: |
         pip install poetry --quiet
         poetry env use python3
-        poetry install --with test
+        poetry install --with test --no-root
+        poetry run pip install . -v
 
     - name: Run Cli Test
       working-directory: "python"
@@ -144,7 +145,7 @@ jobs:
     - name: Run pytest
       working-directory: "python"
       run: |
-        poetry run pytest test -v
+        poetry run pytest -vvv
 
       
 # TODO: Add unit tests

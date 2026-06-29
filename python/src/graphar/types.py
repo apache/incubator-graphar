@@ -15,4 +15,3 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from ._core import ValidateLevel, Type, FileType, AdjListType, Cardinality

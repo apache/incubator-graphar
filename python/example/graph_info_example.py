@@ -17,9 +17,9 @@
 # under the License.
 
 import os
-import sys
+
 import graphar
-import graphar.types as types
+from graphar import types
 
 
 def load_graph_info():
@@ -30,7 +30,7 @@ def load_graph_info():
     test_data_dir = os.environ.get("GAR_TEST_DATA")
     if not test_data_dir:
         print("Test data path not set. Please set GAR_TEST_DATA environment variable.")
-        return
+        return None
 
     # Path to the graph YAML file
     graph_yaml_path = os.path.join(test_data_dir, "ldbc_sample/parquet/ldbc_sample.graph.yml")

@@ -26,13 +26,14 @@ PACKAGE_NAME = "graphar"
 FILE_PATH = "python/pyproject.toml"
 URL_TIMEOUT_SECONDS = int(os.getenv("GRAPHAR_VERSION_FETCH_TIMEOUT", "10"))
 
+
 def get_next_version():
     versions = []
     urls = [
         f"https://pypi.org/pypi/{PACKAGE_NAME}/json",
-        f"https://test.pypi.org/pypi/{PACKAGE_NAME}/json"
+        f"https://test.pypi.org/pypi/{PACKAGE_NAME}/json",
     ]
-    
+
     print(f"Fetching versions for {PACKAGE_NAME}...")
     for url in urls:
         try:
@@ -57,6 +58,7 @@ def get_next_version():
     else:
         return f"{latest.major}.{latest.minor}.{latest.micro + 1}.dev1"
 
+
 def main():
     new_ver = get_next_version()
     print(f"Target version: {new_ver}")
@@ -66,23 +68,22 @@ def main():
             content = f.read()
 
         new_content, count = re.subn(
-            r'(version\s*=\s*")([^"]+)(")', 
-            rf'\g<1>{new_ver}\g<3>', 
-            content
+            r'(version\s*=\s*")([^"]+)(")', rf"\g<1>{new_ver}\g<3>", content
         )
-        
+
         if count == 0:
             print(f"Error: Could not find 'version' key in {FILE_PATH}")
             sys.exit(1)
 
         with open(FILE_PATH, "w", encoding="utf-8") as f:
             f.write(new_content)
-            
+
         print(f"Successfully updated {FILE_PATH} to {new_ver}")
-        
+
     except FileNotFoundError:
         print(f"Error: File {FILE_PATH} not found.")
         sys.exit(1)
+
 
 if __name__ == "__main__":
     main()

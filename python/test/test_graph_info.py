@@ -16,7 +16,6 @@
 # under the License.
 
 import pytest
-import typer
 
 import graphar as gar
 

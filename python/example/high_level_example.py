@@ -17,10 +17,10 @@
 # under the License.
 
 import os
-import sys
+
 import graphar
 import graphar.high_level as gar_api
-import graphar.types as types
+from graphar import types
 
 
 def load_graph_info():

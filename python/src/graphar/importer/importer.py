@@ -39,7 +39,7 @@ def validate(import_config: ImportConfig):
                     raise ValueError(msg)
                 prop_names.add(prop.name)
                 if prop.is_primary:
-                    if len(primary_keys):
+                    if primary_keys:
                         msg = (
                             f"Multiple primary keys '{primary_keys[0]}' and '{prop.name}' "
                             f"found in vertex '{vertex.type}'"

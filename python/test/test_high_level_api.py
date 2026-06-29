@@ -15,19 +15,20 @@
 # specific language governing permissions and limitations
 # under the License.
 
-import pytest
 import tempfile
 
+import pytest
+
 from graphar import GraphInfo
-from graphar.types import AdjListType, ValidateLevel
 from graphar.high_level import (
-    VerticesCollection,
-    EdgesCollection,
-    BuilderVertex,
-    VerticesBuilder,
     BuilderEdge,
+    BuilderVertex,
     EdgesBuilder,
+    EdgesCollection,
+    VerticesBuilder,
+    VerticesCollection,
 )
+from graphar.types import AdjListType, ValidateLevel
 
 
 @pytest.fixture

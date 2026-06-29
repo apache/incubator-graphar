@@ -15,9 +15,10 @@
 # specific language governing permissions and limitations
 # under the License.
 
+from pathlib import Path
+
 import pytest
 import typer
-from pathlib import Path
 
 from cli import graphar_cli
 

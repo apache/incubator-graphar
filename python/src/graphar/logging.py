@@ -16,13 +16,12 @@
 # under the License.
 
 import logging
-from typing import Union  # TODO: move to the TYPE_CHECKING block
 
 from rich.console import Console
 from rich.logging import RichHandler
 
 
-def setup_logging(terminal_width: Union[int, None] = None) -> None:
+def setup_logging(terminal_width: int | None = None) -> None:
     logger = logging.getLogger("graphar_cli")
     console = Console(width=terminal_width) if terminal_width else None
     rich_handler = RichHandler(
