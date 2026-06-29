@@ -70,7 +70,13 @@ def check_notice(dir):
 
 def install_conda():
     print("Start installing conda")
-    subprocess.run(["wget", "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh"], check=True)
+    subprocess.run(
+        [
+            "wget",
+            "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh",
+        ],
+        check=True,
+    )
     subprocess.run(["bash", "Miniconda3-latest-Linux-x86_64.sh", "-b"], check=True)
     print(f"{GREEN}Success to install conda{ENDCOLOR}")
 
@@ -80,11 +86,29 @@ def maybe_setup_conda(dependencies):
     if ("USE_CONDA" in os.environ) and (os.environ["USE_CONDA"] > 0):
         print("Configuring conda environment...")
         subprocess.run(["conda", "deactivate"], check=False, stderr=subprocess.STDOUT)
-        create_env_command = ["conda", "create", "--name", "graphar", "--yes", "python=3.8"]
+        create_env_command = [
+            "conda",
+            "create",
+            "--name",
+            "graphar",
+            "--yes",
+            "python=3.8",
+        ]
         subprocess.run(create_env_command, check=True, stderr=subprocess.STDOUT)
-        install_deps_command = ["conda", "install", "--name", "graphar", "--yes"] + dependencies
+        install_deps_command = [
+            "conda",
+            "install",
+            "--name",
+            "graphar",
+            "--yes",
+        ] + dependencies
         subprocess.run(install_deps_command, check=True, stderr=subprocess.STDOUT)
-        subprocess.run(["conda", "activate", "graphar"], check=True, stderr=subprocess.STDOUT, shell=True)
+        subprocess.run(
+            ["conda", "activate", "graphar"],
+            check=True,
+            stderr=subprocess.STDOUT,
+            shell=True,
+        )
 
 
 def build_and_test_cpp(dir):
@@ -112,13 +136,7 @@ def build_and_test_cpp(dir):
         check=True,
         stderr=subprocess.STDOUT,
     )
-    test_command = [
-        "ctest",
-        "--output-on-failure",
-        "--timeout",
-        "300",
-        "-VV"
-    ]
+    test_command = ["ctest", "--output-on-failure", "--timeout", "300", "-VV"]
     subprocess.run(
         test_command,
         cwd=dir / "cpp",
@@ -133,14 +151,14 @@ def build_and_test_scala(dir):
 
     maybe_setup_conda(["--file", f"{dir}/dev/release/conda_env_scala.txt"])
 
-    build_command_32=["mvn", "clean", "package", "-P", "datasource32"]
+    build_command_32 = ["mvn", "clean", "package", "-P", "datasource32"]
     subprocess.run(
         build_command_32,
         cwd=dir / "maven-projects/spark",
         check=True,
         stderr=subprocess.STDOUT,
     )
-    build_command_33=["mvn", "clean", "package", "-P", "datasource33"]
+    build_command_33 = ["mvn", "clean", "package", "-P", "datasource33"]
     subprocess.run(
         build_command_33,
         cwd=dir / "maven-projects/spark",
@@ -149,6 +167,7 @@ def build_and_test_scala(dir):
     )
 
     print(f"{GREEN}Success to build graphar scala{ENDCOLOR}")
+
 
 if __name__ == "__main__":
     # Get a list of all files in the current directory

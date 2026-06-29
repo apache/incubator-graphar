@@ -161,7 +161,9 @@ class GraphWriter:
         :param df: data frame of edge relation.
         """
         relation_jvm = GraphArSession.jvm.scala.Tuple3(
-            relation[0], relation[1], relation[2],
+            relation[0],
+            relation[1],
+            relation[2],
         )
         self._jvm_graph_writer_obj.PutEdgeData(relation_jvm, df._jdf)
 
@@ -199,18 +201,12 @@ class GraphWriter:
         :param version: version of GraphAr format, default is v1.
         """
         if vertex_chunk_size is None:
-            vertex_chunk_size = (
-                GraphArSession.graphar.GeneralParams.defaultVertexChunkSize
-            )
+            vertex_chunk_size = GraphArSession.graphar.GeneralParams.defaultVertexChunkSize
 
         if edge_chunk_size is None:
             edge_chunk_size = GraphArSession.graphar.GeneralParams.defaultEdgeChunkSize
 
-        file_type = (
-            GraphArSession.graphar.GeneralParams.defaultFileType
-            if file_type is None
-            else file_type.value
-        )
+        file_type = GraphArSession.graphar.GeneralParams.defaultFileType if file_type is None else file_type.value
 
         if version is None:
             version = GraphArSession.graphar.GeneralParams.defaultVersion

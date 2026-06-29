@@ -222,10 +222,7 @@ class PropertyGroup:
 
         :returns: list of Properties
         """
-        return [
-            Property.from_scala(jvm_property)
-            for jvm_property in self._jvm_property_group_obj.getProperties()
-        ]
+        return [Property.from_scala(jvm_property) for jvm_property in self._jvm_property_group_obj.getProperties()]
 
     def set_properties(self, properties: Sequence[Property]) -> None:
         """Mutate the corresponding JVM object.
@@ -366,10 +363,7 @@ class VertexInfo:
 
         :returns: property groups
         """
-        return [
-            PropertyGroup.from_scala(jvm_property_group)
-            for jvm_property_group in self._jvm_vertex_info_obj.getProperty_groups()
-        ]
+        return [PropertyGroup.from_scala(jvm_property_group) for jvm_property_group in self._jvm_vertex_info_obj.getProperty_groups()]
 
     def set_property_groups(self, property_groups: Sequence[PropertyGroup]) -> None:
         """Mutate the corresponding JVM object.
@@ -860,10 +854,7 @@ class EdgeInfo:
 
         :returns: sequence of AdjList
         """
-        return [
-            AdjList.from_scala(jvm_adj_list)
-            for jvm_adj_list in self._jvm_edge_info_obj.getAdj_lists()
-        ]
+        return [AdjList.from_scala(jvm_adj_list) for jvm_adj_list in self._jvm_edge_info_obj.getAdj_lists()]
 
     def set_adj_lists(self, adj_lists: Sequence[AdjList]) -> None:
         """Mutate the corresponding JVM object.
@@ -881,10 +872,7 @@ class EdgeInfo:
 
         :returns: property groups of edge info.
         """
-        return [
-            PropertyGroup.from_scala(jvm_property_group)
-            for jvm_property_group in self._jvm_edge_info_obj.getProperty_groups()
-        ]
+        return [PropertyGroup.from_scala(jvm_property_group) for jvm_property_group in self._jvm_edge_info_obj.getProperty_groups()]
 
     def set_property_groups(self, property_groups: Sequence[PropertyGroup]) -> None:
         """Mutate the corresponding JVM object.

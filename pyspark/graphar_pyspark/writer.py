@@ -17,7 +17,6 @@
 
 """Bindings to org.apache.graphar.writer."""
 
-
 from __future__ import annotations
 
 import os

@@ -25,16 +25,23 @@ from pathlib import Path
 
 ROOT_DIR = Path(__file__).parent.parent.parent
 
+
 def get_package_version():
     major_version = None
     minor_version = None
     patch_version = None
-    major_pattern = re.compile(r'set\s*\(\s*GRAPHAR_MAJOR_VERSION\s+(\d+)\s*\)', re.IGNORECASE)
-    minor_pattern = re.compile(r'set\s*\(\s*GRAPHAR_MINOR_VERSION\s+(\d+)\s*\)', re.IGNORECASE)
-    patch_pattern = re.compile(r'set\s*\(\s*GRAPHAR_PATCH_VERSION\s+(\d+)\s*\)', re.IGNORECASE)
+    major_pattern = re.compile(
+        r"set\s*\(\s*GRAPHAR_MAJOR_VERSION\s+(\d+)\s*\)", re.IGNORECASE
+    )
+    minor_pattern = re.compile(
+        r"set\s*\(\s*GRAPHAR_MINOR_VERSION\s+(\d+)\s*\)", re.IGNORECASE
+    )
+    patch_pattern = re.compile(
+        r"set\s*\(\s*GRAPHAR_PATCH_VERSION\s+(\d+)\s*\)", re.IGNORECASE
+    )
 
     file_path = ROOT_DIR / "cpp/CMakeLists.txt"
-    with open(file_path, 'r') as file:
+    with open(file_path, "r") as file:
         for line in file:
             major_match = major_pattern.search(line)
             minor_match = minor_pattern.search(line)
@@ -51,6 +58,7 @@ def get_package_version():
         return f"{major_version}.{minor_version}.{patch_version}"
     else:
         return None
+
 
 def archive_source_package():
     print(f"Archive source package started")
