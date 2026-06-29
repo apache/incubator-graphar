@@ -53,3 +53,10 @@ jobs:
     
     - name: clang-format
       run: pre-commit run clang-format -a
+
+    - name: python
+      run: |
+        pre-commit run ruff-check
+        pre-commit run ruff-format
+        pre-commit run typos
+
