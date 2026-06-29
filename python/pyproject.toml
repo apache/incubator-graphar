@@ -46,7 +46,7 @@ classifiers = [
 [tool.poetry.group.docs]
 optional = true
 dependencies = [
-  pdoc = "*",
+  "pdoc = *",
 ]
 
 [tool.poetry.group.test]
