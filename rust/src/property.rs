@@ -245,6 +245,8 @@ impl PropertyGroup {
     ///
     /// The `prefix` is a logical prefix string used by GraphAr (it is not a
     /// filesystem path).
+    ///
+    /// GraphAr conventions typically use a trailing slash (`/`) for prefixes.
     pub fn new<S: AsRef<str>>(properties: PropertyVec, file_type: FileType, prefix: S) -> Self {
         let_cxx_string!(prefix = prefix.as_ref());
         let inner = ffi::graphar::CreatePropertyGroup(properties.as_ref(), file_type, &prefix);
