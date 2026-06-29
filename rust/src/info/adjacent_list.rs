@@ -38,6 +38,8 @@ impl AdjacentList {
     ///
     /// If `path_prefix` is `None`, GraphAr will use a default prefix derived
     /// from `ty` (e.g. `ordered_by_source/`).
+    ///
+    /// GraphAr conventions typically use a trailing slash (`/`) for prefixes.
     pub fn new<P: AsRef<str>>(
         ty: AdjListType,
         file_type: FileType,

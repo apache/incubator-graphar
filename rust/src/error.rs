@@ -28,6 +28,13 @@ pub type Result<T> = std::result::Result<T, Error>;
 pub enum Error {
     /// An exception raised from the C++ GraphAr implementation and propagated via `cxx`.
     Cxx(cxx::Exception),
+    /// An input argument is rejected by the Rust binding before calling into GraphAr.
+    InvalidArgument {
+        /// The argument name.
+        name: &'static str,
+        /// The reason why this argument is invalid.
+        reason: String,
+    },
     /// A filesystem path is not valid UTF-8.
     NonUtf8Path(PathBuf),
 }
@@ -36,6 +43,9 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::Cxx(e) => write!(f, "C++ exception: {e}"),
+            Self::InvalidArgument { name, reason } => {
+                write!(f, "invalid argument {name}: {reason}")
+            }
             Self::NonUtf8Path(path) => write!(f, "path is not valid UTF-8: {}", path.display()),
         }
     }
@@ -45,6 +55,7 @@ impl std::error::Error for Error {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             Self::Cxx(e) => Some(e),
+            Self::InvalidArgument { .. } => None,
             Self::NonUtf8Path(_) => None,
         }
     }
@@ -88,5 +99,16 @@ mod tests {
         let msg = err.to_string();
         assert!(msg.contains("C++ exception:"), "msg={msg:?}");
         assert!(StdError::source(&err).is_some());
+    }
+
+    #[test]
+    fn test_invalid_argument_display_and_source() {
+        let err = Error::InvalidArgument {
+            name: "prefix",
+            reason: "prefix must end with '/'".to_string(),
+        };
+        let msg = err.to_string();
+        assert!(msg.contains("invalid argument prefix"), "msg={msg:?}");
+        assert!(StdError::source(&err).is_none());
     }
 }
