@@ -45,17 +45,17 @@ classifiers = [
 
 [tool.poetry.group.docs]
 optional = true
-dependencies = [
-  "pdoc = *",
-]
+
+[tool.poetry.group.docs.dependencies]
+pdoc = "*"
 
 [tool.poetry.group.test]
 optional = true
-dependencies = [
-  "pandas ~= 2.0",
-  "typing_extensions ~= 4.0",
-  "pytest ~= 7.2",
-]
+
+[tool.poetry.group.test.dependencies]
+pandas = "~=2.0"
+typeing_extensions = "~=4.0"
+pytest = "~=7.2"
 
 [tool.scikit-build]
 build-dir = "build"
