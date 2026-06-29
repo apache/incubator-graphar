@@ -136,19 +136,19 @@ jobs:
         dnf config-manager --set-enabled ol$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)_codeready_builder || :
         dnf config-manager --set-enabled codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-rhui-rpms || :
         subscription-manager repos --enable codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-$(arch)-rpms || :
-        dnf install -y arrow-devel-23* # For C++
-        dnf install -y arrow-glib-devel # For GLib (C)
-        dnf install -y arrow-dataset-devel # For Apache Arrow Dataset C++
-        dnf install -y arrow-dataset-glib-devel # For Apache Arrow Dataset GLib (C)
-        dnf install -y arrow-acero-devel # For Apache Arrow Acero C++
-        dnf install -y arrow-flight-devel # For Apache Arrow Flight C++
-        dnf install -y arrow-flight-glib-devel # For Apache Arrow Flight GLib (C)
-        dnf install -y arrow-flight-sql-devel # For Apache Arrow Flight SQL C++
-        dnf install -y arrow-flight-sql-glib-devel # For Apache Arrow Flight SQL GLib (C)
-        dnf install -y gandiva-devel # For Apache Gandiva C++
-        dnf install -y gandiva-glib-devel # For Apache Gandiva GLib (C)
-        dnf install -y parquet-devel # For Apache Parquet C++
-        dnf install -y parquet-glib-devel # For Apache Parquet GLib (C)
+        dnf install -y arrow-devel-24* # For C++
+        dnf install -y arrow-glib-devel-24* # For GLib (C)
+        dnf install -y arrow-dataset-devel-24* # For Apache Arrow Dataset C++
+        dnf install -y arrow-dataset-glib-devel-24* # For Apache Arrow Dataset GLib (C)
+        dnf install -y arrow-acero-devel-24* # For Apache Arrow Acero C++
+        dnf install -y arrow-flight-devel-24* # For Apache Arrow Flight C++
+        dnf install -y arrow-flight-glib-devel-24* # For Apache Arrow Flight GLib (C)
+        dnf install -y arrow-flight-sql-devel-24* # For Apache Arrow Flight SQL C++
+        dnf install -y arrow-flight-sql-glib-devel-24* # For Apache Arrow Flight SQL GLib (C)
+        dnf install -y gandiva-devel-24* # For Apache Gandiva C++
+        dnf install -y gandiva-glib-devel-24* # For Apache Gandiva GLib (C)
+        dnf install -y parquet-devel-24* # For Apache Parquet C++
+        dnf install -y parquet-glib-devel-24* # For Apache Parquet GLib (C)
       CIBW_REPAIR_WHEEL_COMMAND_LINUX: |
         auditwheel repair --exclude libarrow.so.* --exclude libparquet.so.* --exclude libarrow_dataset.so.* --exclude libarrow_acero.so.* -w {dest_dir} {wheel}
       CIBW_REPAIR_WHEEL_COMMAND_MACOS: |
@@ -203,6 +203,7 @@ jobs:
           mamba install -y -c conda-forge arrow-cpp
           Add-Content $env:GITHUB_ENV "CMAKE_PREFIX_PATH=$env:CONDA_PREFIX\\Library"
           Add-Content $env:GITHUB_ENV "PATH=$env:CONDA_PREFIX\\Library\\bin;$env:PATH"
+
       - name: Download sdist artifact
         uses: actions/download-artifact@v8
         with:
