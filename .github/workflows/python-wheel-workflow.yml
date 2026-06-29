@@ -274,7 +274,7 @@ jobs:
           mkdir -p python/dist
           find dist -name "*" -type f -exec mv {} python/dist/ \;
       - name: Publish to Test PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
           repository-url: https://test.pypi.org/legacy/
           packages-dir: python/dist/
@@ -298,6 +298,6 @@ jobs:
           mkdir -p python/dist
           find dist -name "*" -type f -exec mv {} python/dist/ \;
       - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/2473ec6c6aa87f38946284d51289219fd0b87264
+        uses: pypa/gh-action-pypi-publish@ed0c53931b1dc9bd32cbe73a98c7f6766f8a527e # v1.13.0
         with:
           packages-dir: python/dist/
