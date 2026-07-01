@@ -41,15 +41,33 @@ jobs:
     runs-on: ubuntu-slim
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
       with:
         submodules: true
+        fetch-depth: 0
 
-    - name: cmake-format check
-      run: |
-        pip install pre-commit
-        pre-commit install 
-        pre-commit run cmake-format -a
-    
+    - name: cmake-format
+      uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+      with:
+        extra_args: cmake-format
+
     - name: clang-format
-      run: pre-commit run clang-format -a
+      uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+      with:
+        extra_args: cmake-format
+
+    - name: ruff-check
+      uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+      with:
+        extra_args: ruff-check
+
+    - name: ruff-format
+      uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+      with:
+        extra_args: ruff-format
+
+    - name: typos
+      uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
+      with:
+        extra_args: typos
+
