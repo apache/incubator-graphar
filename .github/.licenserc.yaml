@@ -61,5 +61,6 @@ header:
     - "**/*.json"
     - "**/*.lock"
     - "**/*.svg"
+    - "**/go.sum"
     - cli/*.yml
     - cli/*.toml

@@ -62,6 +62,14 @@ excludes = [
   "**/*.json",
   "**/*.lock",
   "**/*.svg",
+  "**/go.sum",
   "cli/*.yml",
   "cli/*.toml",
 ]
+
+# Go uses // line comments for license headers by convention (matching
+# Apache Arrow Go, Apache Beam Go SDK, Kubernetes etc.). Without this
+# override hawkeye defaults *.go to JAVADOC_STYLE (/* ... */) and would
+# reject the canonical Go header form.
+[mapping.DOUBLESLASH_STYLE]
+extensions = ["go"]
