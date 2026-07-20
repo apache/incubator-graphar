@@ -82,6 +82,12 @@ macro(add_graphar_test target)
 
   include(CTest)
   include(Catch)
+
+  if(GRAPHAR_ENABLE_SANITIZER)
+    set_target_properties(${target}
+      PROPERTIES CROSSCOMPILING_EMULATOR "env;ASAN_OPTIONS=detect_container_overflow=0"
+    )
+  endif()
   catch_discover_tests(${target})
 endmacro()
 
