@@ -1,0 +1,129 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: GraphAr Go CI
+
+on:
+  push:
+    branches:
+      - "main"
+    paths:
+      - "go/**"
+      - ".github/workflows/go.yaml"
+  pull_request:
+    branches:
+      - "main"
+    paths:
+      - "go/**"
+      - ".github/workflows/go.yaml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+
+defaults:
+  run:
+    shell: bash
+    working-directory: go/graphar
+
+jobs:
+  build:
+    name: Ubuntu Go ${{ matrix.go }}
+    runs-on: ubuntu-24.04
+    if: ${{ github.event_name != 'pull_request' || !contains(github.event.pull_request.title, 'WIP') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        # Lowest supported version (matches the go.mod floor) + latest stable.
+        go: ["1.23", "stable"]
+    env:
+      GAR_TEST_DATA: ${{ github.workspace }}/testing/
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Pull the testing/ submodule so the cross-language interop test
+          # (info.TestLoadAllFixtures) has real C++/Java/Rust fixtures to load.
+          submodules: true
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: go/graphar/go.sum
+          check-latest: true
+
+      - name: Print Go version
+        run: go version
+
+      - name: Verify go.mod is tidy
+        run: |
+          go mod tidy
+          if ! git diff --quiet -- go.mod go.sum; then
+            echo "::error::go.mod / go.sum is not tidy. Run 'go mod tidy' locally and commit the result." >&2
+            git --no-pager diff -- go.mod go.sum
+            exit 1
+          fi
+
+      - name: gofmt
+        run: make fmt-check
+
+      - name: go vet
+        run: make vet
+
+      - name: Build
+        run: go build ./...
+
+      - name: Test (race) + coverage
+        run: |
+          go test -race -covermode=atomic -coverprofile=coverage.out ./...
+          go tool cover -func=coverage.out | tail -n 1
+
+      - name: Coverage floor
+        run: make coverage-check COVER_OUT=coverage.out
+
+      - name: Upload coverage to Codecov
+        if: matrix.go == 'stable'
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: go/graphar/coverage.out
+          flags: go
+          fail_ci_if_error: false
+
+  lint:
+    name: golangci-lint
+    runs-on: ubuntu-24.04
+    if: ${{ github.event_name != 'pull_request' || !contains(github.event.pull_request.title, 'WIP') }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "stable"
+          cache-dependency-path: go/graphar/go.sum
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.64.8
+          working-directory: go/graphar
+          args: --timeout=5m
