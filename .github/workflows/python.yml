@@ -46,6 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
+      ARROW_VERSION: "0.24.1"
 
     steps:
     - uses: actions/checkout@v7
@@ -64,8 +65,8 @@ jobs:
         wget https://packages.apache.org/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
         sudo apt install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
         sudo apt update
-        sudo apt install -y -V libarrow-dev
-        sudo apt install -y -V libarrow-dataset-dev
+        sudo apt install -y -V libarrow-dev==0.24.1
+        sudo apt install -y -V libarrow-dataset-dev==0.24.1
         sudo apt-get install -y ccache libcurl4-openssl-dev
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 

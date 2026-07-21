@@ -121,7 +121,6 @@ target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 # packaged libgraphar at runtime inside the wheel.
 if(APPLE)
   set(_core_rpath "@loader_path;@loader_path/../pyarrow") # explicitly add pyarrow
-  set(_core_rpath "@loader_path")
   if(_graphar_macos_rpaths)
     list(JOIN _graphar_macos_rpaths ";" _graphar_macos_rpaths_joined)
     set(_core_rpath "${_core_rpath};${_graphar_macos_rpaths_joined}")
