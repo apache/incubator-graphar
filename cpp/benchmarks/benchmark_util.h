@@ -46,11 +46,20 @@ class BenchmarkFixture : public ::benchmark::Fixture {
     }
     path_ = std::string(c_root) + "/ldbc_sample/parquet/ldbc_sample.graph.yml";
     auto maybe_graph_info = GraphInfo::Load(path_);
+    if (!maybe_graph_info.has_value()) {
+      throw std::runtime_error(
+          "Failed to load graph info: " +
+          maybe_graph_info.error().message());
+    }
     graph_info_ = maybe_graph_info.value();
 
     second_path_ = std::string(c_root) + "/ldbc/parquet/ldbc.graph.yml";
     auto second_maybe_graph_info = GraphInfo::Load(second_path_);
-    second_graph_info_ = second_maybe_graph_info.value();
+    if (second_maybe_graph_info.has_value()) {
+      second_graph_info_ = second_maybe_graph_info.value();
+    }
+    // If second_path_ is not available, second_graph_info_ remains nullptr.
+    // Benchmarks that need it will skip gracefully.
   }
 
   void TearDown(const ::benchmark::State& state) override {}
