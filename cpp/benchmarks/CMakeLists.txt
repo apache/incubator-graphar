@@ -29,21 +29,11 @@ macro(add_benchmark target)
   add_executable(${target} ${add_test_SRCS})
   target_compile_features(${target} PRIVATE cxx_std_${GAR_CXX_STANDARD})
   target_include_directories(${target} PRIVATE ${PROJECT_SOURCE_DIR}/thirdparty)
-  if(APPLE)
-    target_link_libraries(${target}
-                          PRIVATE benchmark::benchmark_main
-                                  graphar
-                                  Arrow::arrow_shared
-                                  Parquet::parquet_shared
-                                  ${CMAKE_DL_LIBS})
-  else()
-    target_link_libraries(${target}
-                          PRIVATE benchmark::benchmark_main
-                                  graphar
-                                  parquet
-                                  arrow
-                                  ${CMAKE_DL_LIBS})
-  endif()
+  target_link_libraries(${target}
+                        PRIVATE benchmark::benchmark_main
+                                graphar
+                                ${CMAKE_DL_LIBS})
+
   if(BUILD_ARROW_FROM_SOURCE)
     target_include_directories(${target} SYSTEM BEFORE PRIVATE ${GAR_ARROW_INCLUDE_DIR})
     if(APPLE)
@@ -64,6 +54,28 @@ macro(add_benchmark target)
                                     "${GAR_PARQUET_STATIC_LIB}"
                                     "${GAR_ARROW_BUNDLED_DEPS_STATIC_LIB}"
                                     -Wl,--no-whole-archive)
+    endif()
+  else()
+    if(APPLE)
+      if(USE_STATIC_ARROW)
+        target_link_libraries(${target} PRIVATE -Wl,-force_load Arrow::arrow_static
+                                                Parquet::parquet_static)
+      else()
+        target_link_libraries(${target} PRIVATE Arrow::arrow_shared
+                                                Parquet::parquet_shared)
+      endif()
+    else()
+      if(USE_STATIC_ARROW)
+        target_link_libraries(${target}
+                              PRIVATE -Wl,--exclude-libs,ALL
+                                      -Wl,--whole-archive
+                                      Arrow::arrow_static
+                                      Parquet::parquet_static
+                                      -Wl,--no-whole-archive)
+      else()
+        target_link_libraries(${target} PRIVATE Arrow::arrow_shared
+                                                Parquet::parquet_shared)
+      endif()
     endif()
   endif()
 endmacro()
