@@ -120,9 +120,7 @@ target_compile_definitions(_core PRIVATE VERSION_INFO=${PROJECT_VERSION})
 # Use platform-appropriate rpath so the Python extension can find the
 # packaged libgraphar at runtime inside the wheel.
 if(APPLE)
-  # Keep @loader_path for runtime inside the wheel, and add Arrow/Parquet
-  # library dirs so deallocate can resolve @rpath dependencies during repair.
-  set(_core_rpath "@loader_path")
+  set(_core_rpath "@loader_path;@loader_path/../pyarrow") # explicitly add pyarrow
   if(_graphar_macos_rpaths)
     list(JOIN _graphar_macos_rpaths ";" _graphar_macos_rpaths_joined)
     set(_core_rpath "${_core_rpath};${_graphar_macos_rpaths_joined}")
@@ -132,14 +130,30 @@ if(APPLE)
 
   if(TARGET graphar)
     set_target_properties(graphar PROPERTIES BUILD_WITH_INSTALL_RPATH ON)
+    # Resolve Arrow at runtime from the sibling pyarrow package. The build-time
+    # Arrow dirs (_graphar_macos_rpaths) are kept only so linking succeeds and
+    # are absent on the user's machine, so @loader_path/../pyarrow is what
+    # actually resolves libarrow at runtime.
+    set(_graphar_rpath "@loader_path;@loader_path/../pyarrow")
     if(_graphar_macos_rpaths)
       set_target_properties(graphar PROPERTIES INSTALL_RPATH
-                                               "${_graphar_macos_rpaths_joined}")
+        "${_graphar_macos_rpaths_joined}")
+      set(_graphar_rpath "${_graphar_rpath};${_graphar_macos_rpaths_joined}")
     endif()
+    set_target_properties(graphar PROPERTIES INSTALL_RPATH "${_graphar_rpath}")
   endif()
 else()
-  # On Linux and other Unix, use $ORIGIN (escaped so CMake preserves the $)
-  set_target_properties(_core PROPERTIES INSTALL_RPATH "\$ORIGIN")
+  # On Linux, point the runtime search path at the bundled Arrow inside the
+  # sibling pyarrow package ($ORIGIN/../pyarrow), instead of bundling a second
+  # copy of Arrow into the wheel. Both _core.so and libgraphar.so link Arrow and
+  # record a NEEDED libarrow.so.* entry; with DT_RUNPATH each library is resolved
+  # against its OWN runpath (resolution is not transitive), so the path must be
+  # set on the graphar target as well, not only on _core.
+  set(_graphar_linux_rpath "\$ORIGIN;\$ORIGIN/../pyarrow")
+  set_target_properties(_core PROPERTIES INSTALL_RPATH "${_graphar_linux_rpath}")
+  if(TARGET graphar)
+    set_target_properties(graphar PROPERTIES INSTALL_RPATH "${_graphar_linux_rpath}")
+  endif()
 endif()
 
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src/cli/ DESTINATION cli)
