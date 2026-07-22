@@ -404,10 +404,10 @@ Status FinalizeS3() {
   return Status::OK();
 }
 
-/// template specialization for std::string
+// explicit instantiation of the generic binary template for IdType
 template Result<IdType> FileSystem::ReadFileToValue<IdType>(
     const std::string&) const noexcept;
-/// template specialization for std::string
+// explicit instantiation of the generic binary template for IdType
 template Status FileSystem::WriteValueToFile<IdType>(
     const IdType&, const std::string&) const noexcept;
 }  // namespace graphar
