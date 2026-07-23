@@ -982,7 +982,6 @@ Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
   default:
     return Status::Invalid("Unknown adj list type.");
   }
-  return Status::OK();
 }
 
 }  // namespace graphar
