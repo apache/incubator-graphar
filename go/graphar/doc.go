@@ -17,14 +17,13 @@
 
 // Package graphar is the Go SDK for Apache GraphAr.
 //
-// This umbrella package only carries documentation. Functionality lives in
-// sub-packages:
+// This umbrella package only carries documentation. The module is currently
+// a build and CI scaffold; the functional sub-packages are planned:
 //
 //   - types: primitive value types (DataType, FileType, AdjListType,
 //     Cardinality, InfoVersion).
 //   - info:  graph metadata model (Property, PropertyGroup, VertexInfo,
 //     EdgeInfo, GraphInfo) with YAML load/save and validation.
-//
-// Planned for later milestones: an fs filesystem abstraction and
-// reader/writer packages for chunked data access on top of Arrow.
+//   - reader/writer: chunked data access on top of Arrow, over an fs
+//     filesystem abstraction.
 package graphar

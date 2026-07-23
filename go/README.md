@@ -24,8 +24,9 @@ The SDK reads and writes the same on-disk YAML schema as the C++, Java and
 Rust reference implementations, so a graph produced by any of them is
 loadable by any other.
 
-> Status: in development. The metadata layer (`types/`, `info/`) is
-> available; the data layer (`reader/`, `writer/`) is planned.
+> Status: in development. This module currently ships the build and CI
+> scaffold only; the metadata layer (`types/`, `info/`) and the data layer
+> (`reader/`, `writer/`) are planned.
 
 ## Install
 
@@ -36,6 +37,9 @@ go get github.com/apache/incubator-graphar/go/graphar
 Requires Go 1.23 or newer.
 
 ## Quick example
+
+The `info` package lands in the next stacked PR; the snippet below shows the
+intended API once it does.
 
 ```go
 import (
@@ -61,10 +65,12 @@ func main() {
 
 ## Packages
 
-| Package | What lives here |
+The module is currently a build/CI scaffold; the packages below are planned:
+
+| Package | What will live here |
 |---|---|
-| [`graphar/types`](./graphar/types) | Primitive value types: `DataType`, `FileType`, `AdjListType`, `Cardinality`, `InfoVersion`. No external dependencies. |
-| [`graphar/info`](./graphar/info) | Graph metadata model — `Property`, `PropertyGroup`, `VertexInfo`, `EdgeInfo`, `GraphInfo` — plus YAML load/save. Validates against the cpp reference rules so files round-trip across SDKs. |
+| `graphar/types` | Primitive value types: `DataType`, `FileType`, `AdjListType`, `Cardinality`, `InfoVersion`. No external dependencies. |
+| `graphar/info` | Graph metadata model — `Property`, `PropertyGroup`, `VertexInfo`, `EdgeInfo`, `GraphInfo` — plus YAML load/save. Validates against the cpp reference rules so files round-trip across SDKs. |
 
 ## Development
 
@@ -74,10 +80,10 @@ make ci         # gofmt + vet + lint + race tests + coverage floor
 make coverage   # produce coverage.out and print per-package coverage
 ```
 
-The cross-language interop gate (`info.TestLoadAllFixtures`) walks the
-[`testing/`](../testing) submodule for every `*.graph.yml` and verifies it
-loads and round-trips through `MarshalGraphInfo`. The test is skipped
-when the submodule is not initialised.
+Once the `info` package lands, a cross-language interop gate
+(`info.TestLoadAllFixtures`) will walk the [`testing/`](../testing) submodule
+for every `*.graph.yml` and verify it loads and round-trips through
+`MarshalGraphInfo`, skipping when the submodule is not initialised.
 
 ## Reporting issues / proposing changes
 

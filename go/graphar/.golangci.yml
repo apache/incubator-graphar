@@ -15,7 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 
-# golangci-lint configuration (v1.62.x format).
+# golangci-lint configuration.
 
 run:
   timeout: 5m
