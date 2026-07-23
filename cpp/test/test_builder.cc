@@ -18,11 +18,13 @@
  */
 
 #include <time.h>
+#include <any>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
@@ -269,7 +271,7 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
   // check the number of edges in builder
   REQUIRE(builder->GetNum() == lines);
 
-  // add property column
+  // add property column via vector
   std::vector<std::any> string_values(builder->GetNum(),
                                       std::string("test_edge"));
 
@@ -279,6 +281,65 @@ TEST_CASE_METHOD(GlobalFixture, "test_edges_builder") {
 
   REQUIRE(
       builder->AddPropertyColumn("creationDate", string_values).IsInvalid());
+
+  // add property column via (src, dst) map
+  {
+    // build a new builder for map-based test
+    auto maybe_builder2 = builder::EdgesBuilder::Make(
+        edge_info, "/tmp/", AdjListType::ordered_by_dest, vertices_num);
+    REQUIRE(!maybe_builder2.has_error());
+    auto builder2 = maybe_builder2.value();
+
+    // add a few edges manually
+    REQUIRE(builder2->AddEdge(builder::Edge(0, 1)).ok());
+    REQUIRE(builder2->AddEdge(builder::Edge(0, 2)).ok());
+    REQUIRE(builder2->AddEdge(builder::Edge(1, 3)).ok());
+    REQUIRE(builder2->AddEdge(builder::Edge(2, 4)).ok());
+
+    // build map: (src, dst) -> value
+    std::unordered_map<std::pair<IdType, IdType>, std::any, builder::PairIdHash>
+        value_map;
+    value_map[{0, 1}] = std::string("edge_0_1");
+    value_map[{0, 2}] = std::string("edge_0_2");
+    value_map[{1, 3}] = std::string("edge_1_3");
+    // deliberately omit (2, 4) to test null handling
+
+    REQUIRE(builder2->AddPropertyColumn("creationDate", value_map).ok());
+    REQUIRE(builder2->Dump().ok());
+
+    // verify: read back and check
+    auto parquet_file =
+        "/tmp/edge/person_knows_person/ordered_by_dest/creationDate/part0/"
+        "chunk0";
+    std::unique_ptr<parquet::arrow::FileReader> reader;
+    REQUIRE(graphar::util::OpenParquetArrowReader(
+                parquet_file, arrow::default_memory_pool(), &reader)
+                .ok());
+    auto maybe_table = reader->ReadTable();
+    REQUIRE(maybe_table.ok());
+    auto table = maybe_table.ValueOrDie();
+    auto col = table->GetColumnByName("creationDate");
+    REQUIRE(col != nullptr);
+    auto arr = std::static_pointer_cast<arrow::StringArray>(col->chunk(0));
+    REQUIRE(arr->length() == 4);
+
+    // Check that the mapped edges have the correct values
+    bool found_0_1 = false, found_0_2 = false, found_1_3 = false;
+    for (int i = 0; i < arr->length(); i++) {
+      if (arr->IsValid(i)) {
+        std::string val = arr->GetString(i);
+        if (val == "edge_0_1")
+          found_0_1 = true;
+        if (val == "edge_0_2")
+          found_0_2 = true;
+        if (val == "edge_1_3")
+          found_1_3 = true;
+      }
+    }
+    REQUIRE(found_0_1);
+    REQUIRE(found_0_2);
+    REQUIRE(found_1_3);
+  }
 
   // dump to files
   REQUIRE(builder->Dump().ok());
