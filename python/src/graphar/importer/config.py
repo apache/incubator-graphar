@@ -15,17 +15,21 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from enum import Enum
 from logging import getLogger
 from pathlib import Path
-from typing import Dict, List, Literal, Optional  # TODO: move to the TYPE_CHECKING block
+from typing import Literal  # TODO: move to the TYPE_CHECKING block
 
-from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+from pydantic import BaseModel, field_validator, model_validator
 from typing_extensions import Self
 
 logger = getLogger("graphar_cli")
 
 # TODO: move them to constants.py
+
+# Supported source/file types. Kept as plain string literals (instead of an
+# Enum) so pydantic serializes them without enum-vs-str warnings.
+SUPPORTED_FILE_TYPES = ("parquet", "csv", "orc", "json")
+FILE_TYPE = Literal["parquet", "csv", "orc", "json"]
 
 DEFAULT_FILE_TYPE = "parquet"
 DEFAULT_ADJ_LIST_TYPE = "ordered_by_source"
@@ -34,24 +38,17 @@ DEFAULT_VALIDATE_LEVEL = "weak"
 DEFAULT_VERSION = "gar/v1"
 
 
-class FileType(str, Enum):
-    parquet = "parquet"
-    csv = "csv"
-    orc = "orc"
-    json = "json"
-
-
 class GraphArConfig(BaseModel):
     path: str
     name: str
-    vertex_chunk_size: Optional[int] = 100
-    edge_chunk_size: Optional[int] = 1024
-    file_type: FileType = DEFAULT_FILE_TYPE
+    vertex_chunk_size: int | None = 100
+    edge_chunk_size: int | None = 1024
+    file_type: FILE_TYPE = DEFAULT_FILE_TYPE
     adj_list_type: Literal[
         "ordered_by_source", "ordered_by_dest", "unordered_by_source", "unordered_by_dest"
     ] = DEFAULT_ADJ_LIST_TYPE
     validate_level: Literal["no", "weak", "strong"] = DEFAULT_VALIDATE_LEVEL
-    version: Optional[str] = DEFAULT_VERSION
+    version: str | None = DEFAULT_VERSION
 
     @field_validator("path")
     def check_path(cls, v):
@@ -68,7 +65,7 @@ class Property(BaseModel):
     name: str
     data_type: Literal["bool", "int32", "int64", "float", "double", "string", "date", "timestamp"]
     is_primary: bool = False
-    nullable: Optional[bool] = None
+    nullable: bool | None = None
 
     @model_validator(mode="after")
     def check_nullable(self) -> Self:
@@ -83,8 +80,8 @@ class Property(BaseModel):
 
 
 class PropertyGroup(BaseModel):
-    properties: List[Property]
-    file_type: Optional[FileType] = None
+    properties: list[Property]
+    file_type: FILE_TYPE | None = None
 
     @field_validator("properties")
     def check_properties_length(cls, v):
@@ -95,10 +92,10 @@ class PropertyGroup(BaseModel):
 
 
 class Source(BaseModel):
-    file_type: Optional[FileType] = None
+    file_type: FILE_TYPE | None = None
     path: str
     delimiter: str = ","
-    columns: Dict[str, str]
+    columns: dict[str, str]
 
     @field_validator("path")
     def check_path(cls, v):
@@ -122,7 +119,7 @@ class Source(BaseModel):
             if file_type == "":
                 msg = f"File {self.path} has no file type suffix"
                 raise ValueError(msg)
-            if file_type not in FileType.__members__:
+            if file_type not in SUPPORTED_FILE_TYPES:
                 msg = f"Invalid file type '{file_type}'"
                 raise ValueError(msg)
             self.file_type = file_type
@@ -131,12 +128,12 @@ class Source(BaseModel):
 
 class Vertex(BaseModel):
     type: str
-    labels: List[str] = []
-    chunk_size: Optional[int] = None
-    validate_level: Optional[Literal["no", "weak", "strong"]] = None
-    prefix: Optional[str] = None
-    property_groups: List[PropertyGroup]
-    sources: List[Source]
+    labels: list[str] = []
+    chunk_size: int | None = None
+    validate_level: Literal["no", "weak", "strong"] | None = None
+    prefix: str | None = None
+    property_groups: list[PropertyGroup]
+    sources: list[Source]
 
     @field_validator("property_groups")
     def check_property_groups_length(cls, v):
@@ -164,7 +161,7 @@ class Vertex(BaseModel):
 class AdjList(BaseModel):
     ordered: bool
     aligned_by: Literal["src", "dst"]
-    file_type: Optional[FileType] = None
+    file_type: FILE_TYPE | None = None
 
 
 class Edge(BaseModel):
@@ -173,12 +170,12 @@ class Edge(BaseModel):
     src_prop: str
     dst_type: str
     dst_prop: str
-    chunk_size: Optional[int] = None
-    validate_level: Optional[Literal["no", "weak", "strong"]] = None
-    adj_lists: List[AdjList] = []
-    property_groups: List[PropertyGroup] = []
-    sources: List[Source]
-    prefix: Optional[str] = None
+    chunk_size: int | None = None
+    validate_level: Literal["no", "weak", "strong"] | None = None
+    adj_lists: list[AdjList] = []
+    property_groups: list[PropertyGroup] = []
+    sources: list[Source]
+    prefix: str | None = None
 
     @field_validator("sources")
     def check_sources_length(cls, v):
@@ -203,8 +200,8 @@ class Edge(BaseModel):
 
 
 class ImportSchema(BaseModel):
-    vertices: List[Vertex]
-    edges: List[Edge]
+    vertices: list[Vertex]
+    edges: list[Edge]
 
     @field_validator("vertices")
     def check_property_groups_length(cls, v):
@@ -215,8 +212,6 @@ class ImportSchema(BaseModel):
 
 
 class ImportConfig(BaseModel):
-    model_config = ConfigDict(use_enum_values=True)
-
     graphar: GraphArConfig
     import_schema: ImportSchema
 

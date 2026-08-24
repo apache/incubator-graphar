@@ -22,27 +22,35 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "graphar"
-version = "0.13.0.dev1"
+# The version is derived from the git tags at build time (see
+# [[tool.dynamic-metadata]] and [tool.setuptools_scm] below).
+dynamic = ["version"]
 description = "An open source, standard data file format for graph data storage and retrieval."
 readme = "README.md"
 authors = [{ name = "GraphAr community", email = "dev@graphar.apache.org" }]
 requires-python = ">=3.10"
-# The version of the PyArrow here should exactly match the version inside the GraphAr core
+
+# The version of the PyArrow here should exactly match the version inside the GraphAr core!!!
 dependencies = [
   "pyarrow ~= 24.0",
   "typer ~= 0.1",
-  "pydantic ~= 2.0, < 2.12",
+  "pydantic ~= 2.0",
   "pyyaml ~= 6.0",
 ]
-license = {text = "Apache-2.0"}
+license = "Apache-2.0"
 classifiers = [
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
+
+[tool.poetry]
+# Placeholder only: Poetry requires a version for the root package, while the
+# real version is derived from git tags at build time (see [tool.setuptools_scm]).
+version = "0.0.0"
 
 [tool.poetry.group.docs]
 optional = true
@@ -57,6 +65,26 @@ optional = true
 pandas = ">=2.0, <3.0"
 typing_extensions = ">=4.0, <5.0"
 pytest = ">=7.0, <8.0"
+
+# Version is derived from git tags by setuptools-scm. "no-local-version"
+# keeps the version PEP 440 clean (e.g. 0.13.1.dev121) so it can also be
+# parsed by the CMake project() call in CMakeLists.txt.
+[tool.setuptools_scm]
+# The git repository root is one level above python/ (the repo checkout),
+# so setuptools-scm must search parent directories for the .git metadata.
+search_parent_directories = true
+local_scheme = "no-local-version"
+
+[[tool.dynamic-metadata]]
+provider = "scikit_build_core.metadata.setuptools_scm"
+
+# Write the resolved version into the wheel as graphar/_version.py
+# (imported by src/graphar/__init__.py). Using generate (instead of
+# setuptools-scm's write_to) makes sure the file lands in the wheel even
+# though it is not tracked by git.
+[[tool.scikit-build.generate]]
+path = "graphar/_version.py"
+template = '__version__ = "${version}"'
 
 [tool.scikit-build]
 build-dir = "build"
@@ -75,7 +103,6 @@ graphar = "cli.graphar_cli:main"
 [tool.ruff]
 src = ["src"]
 line-length = 100
-
 
 [tool.ruff.lint]
 extend-select = [
