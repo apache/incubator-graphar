@@ -164,6 +164,9 @@ public class TestVerificationUtils {
                 "GraphInfo version mismatch",
                 expected.getVersion().toString(),
                 actual.getVersion().toString());
+        Assert.assertEquals("GraphInfo labels mismatch", expected.getLabels(), actual.getLabels());
+        Assert.assertEquals(
+                "GraphInfo extra info mismatch", expected.getExtraInfo(), actual.getExtraInfo());
         Assert.assertTrue(
                 "VertexInfo list mismatch",
                 equalsVertexInfoList(expected.getVertexInfos(), actual.getVertexInfos()));

@@ -472,7 +472,6 @@ class VerticesCollection {
   static Result<std::shared_ptr<VerticesCollection>> Make(
       const std::shared_ptr<GraphInfo>& graph_info, const std::string& type) {
     auto vertex_info = graph_info->GetVertexInfo(type);
-    auto labels = vertex_info->GetLabels();
     if (!vertex_info) {
       return Status::KeyError("The vertex ", type, " doesn't exist.");
     }

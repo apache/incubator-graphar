@@ -20,6 +20,7 @@
 package org.apache.graphar.info;
 
 import java.util.List;
+import java.util.Map;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.Cardinality;
 import org.apache.graphar.info.type.DataType;
@@ -43,7 +44,9 @@ public class TestDataFactory {
                 List.of(personVertex),
                 List.of(knowsEdge),
                 "file:///test_path",
-                "gar/v1");
+                "gar/v1",
+                List.of("ldbc", "sample"),
+                Map.of("category", "test graph"));
     }
 
     /** Creates a person vertex info for testing. */

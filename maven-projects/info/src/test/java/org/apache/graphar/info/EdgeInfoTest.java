@@ -22,6 +22,7 @@ package org.apache.graphar.info;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.apache.graphar.info.type.AdjListType;
 import org.apache.graphar.info.type.FileType;
 import org.junit.Assert;
@@ -167,6 +168,35 @@ public class EdgeInfoTest {
 
         Assert.assertEquals(2, edgeInfo.getAdjacentLists().size());
         Assert.assertEquals(2, edgeInfo.getPropertyGroups().size());
+    }
+
+    @Test
+    public void propertyGroupLookupAndRemovalTest() {
+        EdgeInfo edgeInfo =
+                createBaseEdgeInfoBuilder()
+                        .dstType("person")
+                        .adjacentLists(List.of(TestUtil.orderedBySource))
+                        .propertyGroups(new PropertyGroups(List.of(TestUtil.pg1, TestUtil.pg2)))
+                        .build();
+
+        Assert.assertEquals(TestUtil.pg1, edgeInfo.getPropertyGroupByIndex(0));
+        Assert.assertEquals(TestUtil.pg2, edgeInfo.getPropertyGroupByIndex(1));
+        Assert.assertThrows(
+                IllegalArgumentException.class, () -> edgeInfo.getPropertyGroupByIndex(-1));
+        Assert.assertThrows(
+                IllegalArgumentException.class, () -> edgeInfo.getPropertyGroupByIndex(2));
+        Assert.assertTrue(edgeInfo.removePropertyGroupAsNew(TestUtil.pg3).isEmpty());
+
+        PropertyGroup equalFirstGroup =
+                new PropertyGroup(
+                        TestUtil.pg1.getPropertyList(),
+                        TestUtil.pg1.getFileType(),
+                        TestUtil.pg1.getBaseUri());
+        Optional<EdgeInfo> withoutFirstGroup = edgeInfo.removePropertyGroupAsNew(equalFirstGroup);
+        Assert.assertTrue(withoutFirstGroup.isPresent());
+        Assert.assertEquals(2, edgeInfo.getPropertyGroupNum());
+        Assert.assertEquals(1, withoutFirstGroup.get().getPropertyGroupNum());
+        Assert.assertEquals(TestUtil.pg2, withoutFirstGroup.get().getPropertyGroupByIndex(0));
     }
 
     @Test

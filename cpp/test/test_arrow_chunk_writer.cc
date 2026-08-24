@@ -145,7 +145,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     st = graphar::util::OpenParquetArrowReader(path2, pool, &arrow_reader);
 
     // Read entire file as a single Arrow table
-    auto maybe_table2 = arrow_reader->ReadTable();
+    auto maybe_table2 = ReadParquetTable(arrow_reader.get());
     REQUIRE(maybe_table2.ok());
     auto table2 = maybe_table2.ValueOrDie();
 
@@ -218,7 +218,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestVertexPropertyWriter") {
     auto st = graphar::util::OpenParquetArrowReader(
         parquet_file, arrow::default_memory_pool(), &parquet_reader);
     REQUIRE(st.ok());
-    auto maybe_parquet_table = parquet_reader->ReadTable();
+    auto maybe_parquet_table = ReadParquetTable(parquet_reader.get());
     REQUIRE(maybe_parquet_table.ok());
     auto parquet_table = maybe_parquet_table.ValueOrDie();
     auto parquet_metadata = parquet_reader->parquet_reader()->metadata();
@@ -281,7 +281,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
   std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
   st = graphar::util::OpenParquetArrowReader(path, pool, &arrow_reader);
   // Read entire file as a single Arrow table
-  auto maybe_table = arrow_reader->ReadTable();
+  auto maybe_table = ReadParquetTable(arrow_reader.get());
   REQUIRE(maybe_table.ok());
 
   std::shared_ptr<arrow::Table> table =
@@ -377,7 +377,9 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     auto writer = maybe_writer.value();
 
     // Valid: Write adj list with options
-    REQUIRE(writer->SortAndWriteAdjListTable(table, 0, 0).ok());
+    auto write_status = writer->SortAndWriteAdjListTable(table, 0, 0);
+    INFO(write_status.message());
+    REQUIRE(write_status.ok());
     // Valid: Write edge count
     REQUIRE(writer->WriteEdgesNum(0, table->num_rows()).ok());
     // Valid: Write vertex count
@@ -429,7 +431,7 @@ TEST_CASE_METHOD(GlobalFixture, "TestEdgeChunkWriter") {
     auto st = graphar::util::OpenParquetArrowReader(
         parquet_file, arrow::default_memory_pool(), &parquet_reader);
     REQUIRE(st.ok());
-    auto maybe_parquet_table = parquet_reader->ReadTable();
+    auto maybe_parquet_table = ReadParquetTable(parquet_reader.get());
     REQUIRE(maybe_parquet_table.ok());
     auto parquet_table = maybe_parquet_table.ValueOrDie();
     auto parquet_metadata = parquet_reader->parquet_reader()->metadata();

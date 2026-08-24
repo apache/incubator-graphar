@@ -158,7 +158,7 @@ public class MultiFormatGraphInfoTest {
         Property floatProp = new Property("score", DataType.FLOAT, false, true);
         Property doubleProp = new Property("precision", DataType.DOUBLE, false, true);
         Property stringProp = new Property("name", DataType.STRING, false, true);
-        Property listProp = new Property("tags", DataType.LIST, false, true);
+        Property listProp = new Property("tags", DataType.listOf(DataType.STRING), false, true);
 
         List<Property> mixedProps =
                 Arrays.asList(
@@ -179,7 +179,8 @@ public class MultiFormatGraphInfoTest {
         Assert.assertEquals(DataType.FLOAT, pg.getPropertyMap().get("score").getDataType());
         Assert.assertEquals(DataType.DOUBLE, pg.getPropertyMap().get("precision").getDataType());
         Assert.assertEquals(DataType.STRING, pg.getPropertyMap().get("name").getDataType());
-        Assert.assertEquals(DataType.LIST, pg.getPropertyMap().get("tags").getDataType());
+        Assert.assertEquals(
+                DataType.listOf(DataType.STRING), pg.getPropertyMap().get("tags").getDataType());
     }
 
     @Test
@@ -272,13 +273,13 @@ public class MultiFormatGraphInfoTest {
         Assert.assertEquals("verylongpropertynamethatgoesonyesitdoes", longNameProp.getName());
         Assert.assertEquals("prop-with_special.chars", specialCharsProp.getName());
 
-        // Test all combinations of primary/nullable flags
+        // Primary properties are normalized to non-nullable by GraphAr.
         Property primaryNullable = new Property("test1", DataType.INT32, true, true);
         Property primaryNotNullable = new Property("test2", DataType.INT32, true, false);
         Property notPrimaryNullable = new Property("test3", DataType.INT32, false, true);
         Property notPrimaryNotNullable = new Property("test4", DataType.INT32, false, false);
 
-        Assert.assertTrue(primaryNullable.isPrimary() && primaryNullable.isNullable());
+        Assert.assertTrue(primaryNullable.isPrimary() && !primaryNullable.isNullable());
         Assert.assertTrue(primaryNotNullable.isPrimary() && !primaryNotNullable.isNullable());
         Assert.assertTrue(!notPrimaryNullable.isPrimary() && notPrimaryNullable.isNullable());
         Assert.assertTrue(

@@ -19,6 +19,7 @@
 
 #ifdef ARROW_ORC
 #include "arrow/adapters/orc/adapter.h"
+#include "arrow/util/config.h"
 #endif
 #include "arrow/api.h"
 #include "arrow/csv/api.h"
@@ -47,7 +48,9 @@ Status CheckFilterOptions(
     const std::shared_ptr<PropertyGroup>& property_group) noexcept {
   static bool initialized = false;
   if (!initialized) {
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 21000000
     RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+#endif
     initialized = true;
   }
   if (filter_options.filter) {

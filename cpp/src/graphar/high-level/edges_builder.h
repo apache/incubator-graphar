@@ -40,6 +40,21 @@ class Array;
 namespace graphar::builder {
 
 /**
+ * @brief Hash functor for std::pair<IdType, IdType>.
+ *
+ * This is needed because the C++ standard does not provide a default
+ * std::hash specialization for std::pair.
+ */
+struct PairIdHash {
+  std::size_t operator()(const std::pair<IdType, IdType>& p) const noexcept {
+    // Combine two 64-bit hashes: a common technique is to XOR the
+    // first hash with a shifted version of the second.
+    std::hash<IdType> h;
+    return h(p.first) ^ (h(p.second) << 1);
+  }
+};
+
+/**
  * @brief Edge is designed for constructing edges builder.
  *
  */
@@ -301,6 +316,31 @@ class EdgesBuilder {
     for (auto& [id, edges] : edges_) {
       for (Edge& edge : edges) {
         edge.AddProperty(property, values[value++]);
+      }
+    }
+    return Status::OK();
+  }
+
+  /**
+   * @brief Add a property to edges in the collection by (src, dst) mapping.
+   *
+   * Edges whose (src_id, dst_id) is not present in the map will not have this
+   * property set (written as null later).
+   *
+   * @param property name of the property
+   * @param values map from (src_id, dst_id) to the property value
+   * @return Status: ok.
+   */
+  [[nodiscard]] Status AddPropertyColumn(
+      const std::string& property,
+      const std::unordered_map<std::pair<IdType, IdType>, std::any, PairIdHash>&
+          values) {
+    for (auto& [chunk_index, edges] : edges_) {
+      for (Edge& edge : edges) {
+        auto it = values.find({edge.GetSource(), edge.GetDestination()});
+        if (it != values.end()) {
+          edge.AddProperty(property, it->second);
+        }
       }
     }
     return Status::OK();

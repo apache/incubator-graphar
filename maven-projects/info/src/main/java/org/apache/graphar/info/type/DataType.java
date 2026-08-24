@@ -19,36 +19,62 @@
 
 package org.apache.graphar.info.type;
 
-public enum DataType {
-    /** Boolean */
-    BOOL,
+import java.util.Objects;
 
-    /** Signed 32-bit integer */
-    INT32,
+/** A GraphAr logical property type. */
+public final class DataType {
+    /** Boolean. */
+    public static final DataType BOOL = new DataType("bool", null);
 
-    /** Signed 64-bit integer */
-    INT64,
+    /** Signed 32-bit integer. */
+    public static final DataType INT32 = new DataType("int32", null);
 
-    /** 4-byte floating point value */
-    FLOAT,
+    /** Signed 64-bit integer. */
+    public static final DataType INT64 = new DataType("int64", null);
 
-    /** 8-byte floating point value */
-    DOUBLE,
+    /** 4-byte floating point value. */
+    public static final DataType FLOAT = new DataType("float", null);
 
-    /** UTF8 variable-length string */
-    STRING,
+    /** 8-byte floating point value. */
+    public static final DataType DOUBLE = new DataType("double", null);
 
-    /** List of same type */
-    LIST,
+    /** UTF8 variable-length string. */
+    public static final DataType STRING = new DataType("string", null);
 
-    /** Date value */
-    DATE,
+    /** Date value. */
+    public static final DataType DATE = new DataType("date", null);
 
-    /** Timestamp value */
-    TIMESTAMP;
+    /** Timestamp value. */
+    public static final DataType TIMESTAMP = new DataType("timestamp", null);
 
-    public static DataType fromString(String s) {
-        switch (s) {
+    private final String typeName;
+    private final DataType valueType;
+
+    private DataType(String typeName, DataType valueType) {
+        this.typeName = typeName;
+        this.valueType = valueType;
+    }
+
+    /**
+     * Creates a GraphAr list type. The GraphAr v1 metadata format supports lists of the five
+     * physical element types that can be represented independently in storage metadata.
+     */
+    public static DataType listOf(DataType valueType) {
+        if (valueType != INT32
+                && valueType != INT64
+                && valueType != FLOAT
+                && valueType != DOUBLE
+                && valueType != STRING) {
+            throw new IllegalArgumentException("Unsupported GraphAr list value type: " + valueType);
+        }
+        return new DataType("list", valueType);
+    }
+
+    public static DataType fromString(String typeName) {
+        if (typeName == null) {
+            throw new IllegalArgumentException("Data type must not be null");
+        }
+        switch (typeName) {
             case "bool":
                 return BOOL;
             case "int32":
@@ -61,19 +87,46 @@ public enum DataType {
                 return DOUBLE;
             case "string":
                 return STRING;
-            case "list":
-                return LIST;
             case "date":
                 return DATE;
             case "timestamp":
                 return TIMESTAMP;
             default:
-                throw new IllegalArgumentException("Unknown data type: " + s);
+                if (typeName.startsWith("list<") && typeName.endsWith(">")) {
+                    return listOf(fromString(typeName.substring(5, typeName.length() - 1)));
+                }
+                throw new IllegalArgumentException("Unknown data type: " + typeName);
         }
+    }
+
+    public boolean isList() {
+        return valueType != null;
+    }
+
+    /** Returns the element type for a list, or {@code null} for a scalar type. */
+    public DataType getValueType() {
+        return valueType;
     }
 
     @Override
     public String toString() {
-        return name().toLowerCase();
+        return isList() ? "list<" + valueType + ">" : typeName;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof DataType)) {
+            return false;
+        }
+        DataType that = (DataType) other;
+        return typeName.equals(that.typeName) && Objects.equals(valueType, that.valueType);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(typeName, valueType);
     }
 }

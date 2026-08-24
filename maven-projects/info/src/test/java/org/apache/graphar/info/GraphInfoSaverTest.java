@@ -23,6 +23,7 @@ import java.net.URI;
 import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.graphar.info.loader.impl.LocalFileSystemStringGraphInfoLoader;
 import org.apache.graphar.info.saver.GraphInfoSaver;
 import org.apache.graphar.info.saver.impl.LocalFileSystemYamlGraphSaver;
@@ -85,7 +86,13 @@ public class GraphInfoSaverTest extends BaseFileSystemTest {
                         vertexInfos,
                         edgeInfos,
                         graphYaml.getPrefix(),
-                        graphYaml.getVersion());
+                        graphYaml.getVersion(),
+                        graphYaml.getLabels(),
+                        graphYaml.getExtra_info().stream()
+                                .collect(
+                                        Collectors.toMap(
+                                                extraInfo -> extraInfo.getKey(),
+                                                extraInfo -> extraInfo.getValue())));
         Assert.assertTrue(TestVerificationUtils.equalsGraphInfo(testGraphInfo, graphInfoFromYaml));
     }
 

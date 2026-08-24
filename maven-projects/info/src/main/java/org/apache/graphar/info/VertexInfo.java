@@ -236,6 +236,21 @@ public class VertexInfo {
                                         version));
     }
 
+    public Optional<VertexInfo> removePropertyGroupAsNew(PropertyGroup propertyGroup) {
+        return propertyGroups
+                .removePropertyGroupAsNew(propertyGroup)
+                .map(PropertyGroups::getPropertyGroupList)
+                .map(
+                        newPropertyGroups ->
+                                new VertexInfo(
+                                        type,
+                                        chunkSize,
+                                        newPropertyGroups,
+                                        labels,
+                                        baseUri,
+                                        version));
+    }
+
     public int getPropertyGroupNum() {
         return propertyGroups.getPropertyGroupNum();
     }
@@ -266,6 +281,10 @@ public class VertexInfo {
 
     public PropertyGroup getPropertyGroup(String property) {
         return propertyGroups.getPropertyGroup(property);
+    }
+
+    public PropertyGroup getPropertyGroupByIndex(int index) {
+        return propertyGroups.getPropertyGroupByIndex(index);
     }
 
     public URI getPropertyGroupUri(PropertyGroup propertyGroup) {

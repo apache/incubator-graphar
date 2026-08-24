@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -422,6 +423,23 @@ public class EdgeInfo {
                                         newPropertyGroups));
     }
 
+    public Optional<EdgeInfo> removePropertyGroupAsNew(PropertyGroup propertyGroup) {
+        return propertyGroups
+                .removePropertyGroupAsNew(propertyGroup)
+                .map(
+                        newPropertyGroups ->
+                                new EdgeInfo(
+                                        edgeTriplet,
+                                        chunkSize,
+                                        srcChunkSize,
+                                        dstChunkSize,
+                                        directed,
+                                        baseUri,
+                                        version,
+                                        adjacentLists,
+                                        newPropertyGroups));
+    }
+
     public boolean hasAdjListType(AdjListType adjListType) {
         return adjacentLists.containsKey(adjListType);
     }
@@ -462,38 +480,99 @@ public class EdgeInfo {
         return propertyGroups.getPropertyGroup(property);
     }
 
-    public URI getPropertyGroupUri(PropertyGroup propertyGroup) {
-        checkPropertyGroupExist(propertyGroup);
-        return getBaseUri().resolve(propertyGroup.getBaseUri());
+    public PropertyGroup getPropertyGroupByIndex(int index) {
+        return propertyGroups.getPropertyGroupByIndex(index);
     }
 
-    public URI getPropertyGroupChunkUri(PropertyGroup propertyGroup, long chunkIndex) {
-        // PropertyGroup will be checked in getPropertyGroupPrefix
-        return getPropertyGroupUri(propertyGroup).resolve("chunk" + chunkIndex);
+    public URI getPropertyGroupUri(PropertyGroup propertyGroup, AdjListType adjListType) {
+        checkPropertyGroupExist(propertyGroup);
+        return resolvePath(getAdjacentListBaseUri(adjListType), propertyGroup.getPrefix());
+    }
+
+    public URI getPropertyGroupChunkUri(
+            PropertyGroup propertyGroup,
+            AdjListType adjListType,
+            long vertexChunkIndex,
+            long edgeChunkIndex) {
+        return resolvePath(
+                getPropertyGroupUri(propertyGroup, adjListType),
+                "part" + vertexChunkIndex + "/chunk" + edgeChunkIndex);
     }
 
     public URI getAdjacentListUri(AdjListType adjListType) {
-        return getBaseUri().resolve(getAdjacentList(adjListType).getBaseUri()).resolve("adj_list/");
+        return resolvePath(getAdjacentListBaseUri(adjListType), "adj_list/");
     }
 
-    public URI getAdjacentListChunkUri(AdjListType adjListType, long vertexChunkIndex) {
-        return getAdjacentListUri(adjListType).resolve("chunk" + vertexChunkIndex);
+    public URI getAdjacentListChunkUri(
+            AdjListType adjListType, long vertexChunkIndex, long edgeChunkIndex) {
+        return resolvePath(
+                getAdjacentListUri(adjListType),
+                "part" + vertexChunkIndex + "/chunk" + edgeChunkIndex);
     }
 
     public URI getOffsetUri(AdjListType adjListType) {
-        return getAdjacentListUri(adjListType).resolve("offset/");
+        return resolvePath(getAdjacentListBaseUri(adjListType), "offset/");
     }
 
     public URI getOffsetChunkUri(AdjListType adjListType, long vertexChunkIndex) {
-        return getOffsetUri(adjListType).resolve("chunk" + vertexChunkIndex);
+        return resolvePath(getOffsetUri(adjListType), "chunk" + vertexChunkIndex);
     }
 
     public URI getVerticesNumFileUri(AdjListType adjListType) {
-        return getAdjacentListUri(adjListType).resolve("vertex_count");
+        return resolvePath(getAdjacentListBaseUri(adjListType), "vertex_count");
     }
 
     public URI getEdgesNumFileUri(AdjListType adjListType, long vertexChunkIndex) {
-        return getAdjacentListUri(adjListType).resolve("edge_count" + vertexChunkIndex);
+        return resolvePath(getAdjacentListBaseUri(adjListType), "edge_count" + vertexChunkIndex);
+    }
+
+    private URI getAdjacentListBaseUri(AdjListType adjListType) {
+        return resolvePath(getBaseUri(), getAdjacentList(adjListType).getPrefix());
+    }
+
+    /**
+     * Resolves a GraphAr child path against a base URI with RFC 3986 reference resolution instead
+     * of raw string concatenation, so that path separators, escaping and normalization follow URI
+     * semantics.
+     *
+     * @param baseUri the directory the child path is relative to
+     * @param childPath a relative GraphAr path such as a prefix or a chunk file name
+     * @return the resolved absolute-or-relative URI of the child
+     * @throws IllegalArgumentException if {@code childPath} is null, is not a valid URI path, or is
+     *     not a relative reference
+     */
+    private static URI resolvePath(URI baseUri, String childPath) {
+        Objects.requireNonNull(baseUri, "baseUri must not be null");
+        if (childPath == null) {
+            throw new IllegalArgumentException("childPath must not be null");
+        }
+        return asDirectoryUri(baseUri).resolve(asRelativeReference(childPath));
+    }
+
+    /**
+     * Returns the base URI in the directory form URI resolution requires, because resolving against
+     * a URI whose path has no trailing separator replaces its last segment.
+     */
+    private static URI asDirectoryUri(URI baseUri) {
+        String rawPath = baseUri.getRawPath();
+        if (rawPath == null) {
+            throw new IllegalArgumentException("baseUri must be hierarchical, but was " + baseUri);
+        }
+        return rawPath.endsWith("/") ? baseUri : URI.create(baseUri + "/");
+    }
+
+    /**
+     * Parses a GraphAr path fragment as a relative URI reference. Prefixes are already stored in
+     * URI form, so the fragment is parsed rather than re-escaped, which would double-encode an
+     * escaped prefix.
+     */
+    private static URI asRelativeReference(String childPath) {
+        URI reference = URI.create(childPath);
+        if (reference.isAbsolute()) {
+            throw new IllegalArgumentException(
+                    "childPath must be a relative reference, but was " + childPath);
+        }
+        return reference;
     }
 
     public void dump(Writer output) {

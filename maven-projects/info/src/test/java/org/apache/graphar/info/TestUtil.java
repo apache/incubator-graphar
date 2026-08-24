@@ -41,6 +41,8 @@ public class TestUtil {
             "/ldbc_sample/csv/ldbc_sample.graph.yml";
     private static final String PARQUET_LDBC_SAMPLE_GRAPH_PATH =
             "/ldbc_sample/parquet/ldbc_sample.graph.yml";
+    private static final String JSON_LDBC_SAMPLE_GRAPH_PATH =
+            "/ldbc_sample/json/LdbcSample.graph.yml";
     private static final String LDBC_GRAPH_PATH = "/ldbc/parquet/ldbc.graph.yml";
 
     public static String getTestData() {
@@ -66,6 +68,14 @@ public class TestUtil {
 
     public static URI getParquetLdbcSampleGraphURI() {
         return URI.create(getParquetLdbcSampleGraphPath());
+    }
+
+    public static String getJsonLdbcSampleGraphPath() {
+        return getTestData() + "/" + JSON_LDBC_SAMPLE_GRAPH_PATH;
+    }
+
+    public static URI getJsonLdbcSampleGraphURI() {
+        return URI.create(getJsonLdbcSampleGraphPath());
     }
 
     public static String getLdbcGraphPath() {

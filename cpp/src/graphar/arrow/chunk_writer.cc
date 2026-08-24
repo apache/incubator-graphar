@@ -24,6 +24,7 @@
 #include <utility>
 #include "arrow/api.h"
 #include "arrow/compute/api.h"
+#include "arrow/util/config.h"
 #include "graphar/fwd.h"
 #include "graphar/writer_util.h"
 #if defined(ARROW_VERSION) && ARROW_VERSION >= 12000000
@@ -94,8 +95,11 @@ Result<std::shared_ptr<arrow::Table>> ExecutePlanAndCollectAsTable(
   GAR_RETURN_ON_ARROW_ERROR_AND_ASSIGN(
       response_table, arrow::Table::FromRecordBatchReader(sink_reader.get()));
 
-  // stop producing
+  // Arrow 17 marks an already drained plan as cancelled when StopProducing is
+  // called. Newer Arrow versions retain the existing explicit shutdown.
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 21000000
   plan->StopProducing();
+#endif
   // plan mark finished
   RETURN_NOT_ARROW_OK(plan->finished().status());
   return response_table;
@@ -1021,8 +1025,10 @@ Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::getOffsetTable(
 Result<std::shared_ptr<arrow::Table>> EdgeChunkWriter::sortTable(
     const std::shared_ptr<arrow::Table>& input_table,
     const std::string& column_name) {
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 21000000
   RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
   arrow::dataset::internal::Initialize();
+#endif
   auto exec_context = arrow::compute::default_exec_context();
   auto plan = arrow_acero_namespace::ExecPlan::Make(exec_context).ValueOrDie();
   auto table_source_options =

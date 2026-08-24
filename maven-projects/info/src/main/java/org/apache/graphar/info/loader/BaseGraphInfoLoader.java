@@ -66,7 +66,17 @@ public abstract class BaseGraphInfoLoader implements GraphInfoLoader {
                 vertexInfos,
                 edgeInfos,
                 defaultBaseUri,
-                graphYaml.getVersion());
+                graphYaml.getVersion(),
+                graphYaml.getLabels() == null ? java.util.List.of() : graphYaml.getLabels(),
+                graphYaml.getExtra_info() == null
+                        ? Map.of()
+                        : graphYaml.getExtra_info().stream()
+                                .collect(
+                                        Collectors.toMap(
+                                                extraInfo -> extraInfo.getKey(),
+                                                extraInfo -> extraInfo.getValue(),
+                                                (left, right) -> right,
+                                                java.util.LinkedHashMap::new)));
     }
 
     protected VertexInfo buildVertexInfoFromVertexYaml(VertexYaml vertexYaml) {

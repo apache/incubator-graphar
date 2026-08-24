@@ -62,6 +62,19 @@ public class PropertyGroupTest {
     }
 
     @Test
+    public void testPropertyGroupValueEquality() {
+        Property equivalentId = new Property("id", DataType.INT64, true, false);
+        Property equivalentName = new Property("name", DataType.STRING, false, true);
+        PropertyGroup equivalentGroup =
+                new PropertyGroup(List.of(equivalentId, equivalentName), FileType.CSV, "test/");
+
+        Assert.assertEquals(idProperty, equivalentId);
+        Assert.assertEquals(idProperty.hashCode(), equivalentId.hashCode());
+        Assert.assertEquals(basicGroup, equivalentGroup);
+        Assert.assertEquals(basicGroup.hashCode(), equivalentGroup.hashCode());
+    }
+
+    @Test
     public void testPropertyGroupWithAllFileTypes() {
         List<Property> properties = Arrays.asList(testProperty);
 
@@ -76,6 +89,10 @@ public class PropertyGroupTest {
         PropertyGroup orcGroup =
                 TestDataFactory.createPropertyGroup(properties, FileType.ORC, "orc/");
         Assert.assertEquals(FileType.ORC, orcGroup.getFileType());
+
+        PropertyGroup jsonGroup =
+                TestDataFactory.createPropertyGroup(properties, FileType.JSON, "json/");
+        Assert.assertEquals(FileType.JSON, jsonGroup.getFileType());
     }
 
     @Test
@@ -249,7 +266,9 @@ public class PropertyGroupTest {
 
     @Test
     public void testPropertyGroupWithComplexDataTypes() {
-        Property listProp = TestDataFactory.createProperty("items", DataType.LIST, false, true);
+        Property listProp =
+                TestDataFactory.createProperty(
+                        "items", DataType.listOf(DataType.STRING), false, true);
         Property boolProp = TestDataFactory.createProperty("flag", DataType.BOOL, false, false);
         Property doubleProp = TestDataFactory.createProperty("score", DataType.DOUBLE, false, true);
         List<Property> properties = Arrays.asList(listProp, boolProp, doubleProp);
@@ -258,7 +277,8 @@ public class PropertyGroupTest {
                 TestDataFactory.createPropertyGroup(properties, FileType.PARQUET, "complex/");
 
         Assert.assertEquals(3, pg.size());
-        Assert.assertEquals(DataType.LIST, pg.getPropertyMap().get("items").getDataType());
+        Assert.assertEquals(
+                DataType.listOf(DataType.STRING), pg.getPropertyMap().get("items").getDataType());
         Assert.assertEquals(DataType.BOOL, pg.getPropertyMap().get("flag").getDataType());
         Assert.assertEquals(DataType.DOUBLE, pg.getPropertyMap().get("score").getDataType());
     }
@@ -309,7 +329,8 @@ public class PropertyGroupTest {
 
         // Test invalid property group with CSV file type and LIST data type
         Property listProperty =
-                TestDataFactory.createProperty("listProp", DataType.LIST, false, true);
+                TestDataFactory.createProperty(
+                        "listProp", DataType.listOf(DataType.STRING), false, true);
         PropertyGroup csvWithListGroup =
                 new PropertyGroup(Arrays.asList(listProperty), FileType.CSV, "test/");
         Assert.assertFalse(csvWithListGroup.isValidated());

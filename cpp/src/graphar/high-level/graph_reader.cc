@@ -23,6 +23,7 @@
 #include "arrow/array.h"
 #include "arrow/dataset/dataset.h"
 #include "arrow/dataset/plan.h"
+#include "arrow/util/config.h"
 #include "graphar/api/arrow_reader.h"
 #include "graphar/convert_to_arrow_type.h"
 #include "graphar/label.h"
@@ -948,7 +949,9 @@ Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
     const IdType vertex_chunk_end) noexcept {
   static bool initialized = false;
   if (!initialized) {
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 21000000
     RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+#endif
     arrow::dataset::internal::Initialize();
     initialized = true;
   }
@@ -982,7 +985,6 @@ Result<std::shared_ptr<EdgesCollection>> EdgesCollection::Make(
   default:
     return Status::Invalid("Unknown adj list type.");
   }
-  return Status::OK();
 }
 
 }  // namespace graphar

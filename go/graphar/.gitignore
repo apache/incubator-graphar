@@ -1,0 +1,5 @@
+coverage.out
+coverage.html
+*.test
+*.out
+.DS_Store

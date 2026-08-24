@@ -41,7 +41,7 @@ void vertices_collection(
     count++;
     // print the first 10 vertices
     if (count > 10) {
-      continue;
+      break;
     }
     // access data through iterator directly
     std::cout << it.id() << ", id=" << it.property<int64_t>("id").value()
@@ -91,7 +91,7 @@ void edges_collection(const std::shared_ptr<graphar::GraphInfo>& graph_info) {
     count++;
     // print the first 10 edges
     if (count > 10) {
-      continue;
+      break;
     }
     // access data through iterator directly
     std::cout << "src=" << it.source() << ", dst=" << it.destination() << "; ";

@@ -18,6 +18,7 @@
  */
 
 #include "graphar/expression.h"
+#include "arrow/util/config.h"
 #include "graphar/result.h"
 
 namespace graphar {
@@ -25,7 +26,9 @@ namespace graphar {
 Status EnsureComputeInitialized() {
   static bool initialized = false;
   if (!initialized) {
+#if defined(ARROW_VERSION) && ARROW_VERSION >= 21000000
     RETURN_NOT_ARROW_OK(arrow::compute::Initialize());
+#endif
     initialized = true;
   }
   return Status::OK();

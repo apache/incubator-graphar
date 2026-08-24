@@ -89,8 +89,10 @@ public class PropertyTest {
         Assert.assertEquals(DataType.STRING, stringProp.getDataType());
         TestVerificationUtils.verifyProperty(stringProp, "text", false, true);
 
-        Property listProp = TestDataFactory.createProperty("items", DataType.LIST, false, true);
-        Assert.assertEquals(DataType.LIST, listProp.getDataType());
+        Property listProp =
+                TestDataFactory.createProperty(
+                        "items", DataType.listOf(DataType.STRING), false, true);
+        Assert.assertEquals(DataType.listOf(DataType.STRING), listProp.getDataType());
         TestVerificationUtils.verifyProperty(listProp, "items", false, true);
 
         // Newly added data types
@@ -111,10 +113,10 @@ public class PropertyTest {
         Property primaryNonNull = TestDataFactory.createProperty("id", DataType.INT64, true, false);
         TestVerificationUtils.verifyProperty(primaryNonNull, "id", true, false);
 
-        // Primary and nullable (unusual but valid)
+        // GraphAr primary properties are never nullable.
         Property primaryNull =
                 TestDataFactory.createProperty("optionalId", DataType.INT64, true, true);
-        TestVerificationUtils.verifyProperty(primaryNull, "optionalId", true, true);
+        TestVerificationUtils.verifyProperty(primaryNull, "optionalId", true, false);
 
         // Non-primary and non-nullable (required field)
         Property requiredField =
@@ -154,13 +156,9 @@ public class PropertyTest {
         Property prop2 = TestDataFactory.createProperty("id", DataType.INT32, true, false);
         Property prop3 = TestDataFactory.createProperty("name", DataType.STRING, false, true);
 
-        // Note: Property class doesn't override equals(), so this tests object identity
-        Assert.assertNotEquals(prop1, prop2); // Different objects
-        Assert.assertNotEquals(prop1, prop3); // Different properties
-
-        // Same object reference
-        Property sameRef = prop1;
-        Assert.assertEquals(prop1, sameRef);
+        Assert.assertEquals(prop1, prop2);
+        Assert.assertEquals(prop1.hashCode(), prop2.hashCode());
+        Assert.assertNotEquals(prop1, prop3);
     }
 
     @Test

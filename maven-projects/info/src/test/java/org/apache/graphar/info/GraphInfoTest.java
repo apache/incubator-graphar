@@ -21,6 +21,8 @@ package org.apache.graphar.info;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -97,6 +99,11 @@ public class GraphInfoTest {
         Assert.assertEquals(1, graphInfo.getVertexInfos().size());
         Assert.assertEquals(1, graphInfo.getVertexInfoNum());
         Assert.assertEquals(personVertexInfo, graphInfo.getVertexInfo("person"));
+        Assert.assertEquals(personVertexInfo, graphInfo.getVertexInfoByIndex(0));
+        Assert.assertThrows(
+                IllegalArgumentException.class, () -> graphInfo.getVertexInfoByIndex(-1));
+        Assert.assertThrows(
+                IllegalArgumentException.class, () -> graphInfo.getVertexInfoByIndex(1));
         IllegalArgumentException illegalArgumentException =
                 Assert.assertThrows(
                         IllegalArgumentException.class, () -> graphInfo.getVertexInfo("not_exist"));
@@ -104,6 +111,9 @@ public class GraphInfoTest {
                 "Vertex type not_exist not exist in graph ldbc_sample",
                 illegalArgumentException.getMessage());
         Assert.assertEquals(knowsEdgeInfo, graphInfo.getEdgeInfo("person", "knows", "person"));
+        Assert.assertEquals(knowsEdgeInfo, graphInfo.getEdgeInfoByIndex(0));
+        Assert.assertThrows(IllegalArgumentException.class, () -> graphInfo.getEdgeInfoByIndex(-1));
+        Assert.assertThrows(IllegalArgumentException.class, () -> graphInfo.getEdgeInfoByIndex(1));
         illegalArgumentException =
                 Assert.assertThrows(
                         IllegalArgumentException.class,
@@ -306,31 +316,31 @@ public class GraphInfoTest {
         Assert.assertEquals("ordered_by_source/", adjOrderBySource.getPrefix());
         Assert.assertEquals(URI.create("ordered_by_source/"), adjOrderBySource.getBaseUri());
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_source/adj_list/vertex_count"),
+                URI.create("edge/person_knows_person/ordered_by_source/vertex_count"),
                 knowsEdgeInfo.getVerticesNumFileUri(AdjListType.ordered_by_source));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_source/adj_list/edge_count0"),
+                URI.create("edge/person_knows_person/ordered_by_source/edge_count0"),
                 knowsEdgeInfo.getEdgesNumFileUri(AdjListType.ordered_by_source, 0));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_source/adj_list/edge_count4"),
+                URI.create("edge/person_knows_person/ordered_by_source/edge_count4"),
                 knowsEdgeInfo.getEdgesNumFileUri(AdjListType.ordered_by_source, 4));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_source/adj_list/"),
                 knowsEdgeInfo.getAdjacentListUri(AdjListType.ordered_by_source));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_source/adj_list/chunk0"),
-                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_source, 0));
+                URI.create("edge/person_knows_person/ordered_by_source/adj_list/part0/chunk0"),
+                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_source, 0, 0));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_source/adj_list/chunk4"),
-                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_source, 4));
+                URI.create("edge/person_knows_person/ordered_by_source/adj_list/part4/chunk2"),
+                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_source, 4, 2));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_source/adj_list/offset/"),
+                URI.create("edge/person_knows_person/ordered_by_source/offset/"),
                 knowsEdgeInfo.getOffsetUri(AdjListType.ordered_by_source));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_source/adj_list/offset/chunk0"),
+                URI.create("edge/person_knows_person/ordered_by_source/offset/chunk0"),
                 knowsEdgeInfo.getOffsetChunkUri(AdjListType.ordered_by_source, 0));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_source/adj_list/offset/chunk4"),
+                URI.create("edge/person_knows_person/ordered_by_source/offset/chunk4"),
                 knowsEdgeInfo.getOffsetChunkUri(AdjListType.ordered_by_source, 4));
 
         // test ordered by destination adjacency list
@@ -341,31 +351,31 @@ public class GraphInfoTest {
         Assert.assertEquals("ordered_by_dest/", adjOrderByDestination.getPrefix());
         Assert.assertEquals(URI.create("ordered_by_dest/"), adjOrderByDestination.getBaseUri());
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_dest/adj_list/vertex_count"),
+                URI.create("edge/person_knows_person/ordered_by_dest/vertex_count"),
                 knowsEdgeInfo.getVerticesNumFileUri(AdjListType.ordered_by_dest));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_dest/adj_list/edge_count0"),
+                URI.create("edge/person_knows_person/ordered_by_dest/edge_count0"),
                 knowsEdgeInfo.getEdgesNumFileUri(AdjListType.ordered_by_dest, 0));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_dest/adj_list/edge_count4"),
+                URI.create("edge/person_knows_person/ordered_by_dest/edge_count4"),
                 knowsEdgeInfo.getEdgesNumFileUri(AdjListType.ordered_by_dest, 4));
         Assert.assertEquals(
                 URI.create("edge/person_knows_person/ordered_by_dest/adj_list/"),
                 knowsEdgeInfo.getAdjacentListUri(AdjListType.ordered_by_dest));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_dest/adj_list/chunk0"),
-                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_dest, 0));
+                URI.create("edge/person_knows_person/ordered_by_dest/adj_list/part0/chunk0"),
+                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_dest, 0, 0));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_dest/adj_list/chunk4"),
-                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_dest, 4));
+                URI.create("edge/person_knows_person/ordered_by_dest/adj_list/part4/chunk2"),
+                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_dest, 4, 2));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_dest/adj_list/offset/"),
+                URI.create("edge/person_knows_person/ordered_by_dest/offset/"),
                 knowsEdgeInfo.getOffsetUri(AdjListType.ordered_by_dest));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_dest/adj_list/offset/chunk0"),
+                URI.create("edge/person_knows_person/ordered_by_dest/offset/chunk0"),
                 knowsEdgeInfo.getOffsetChunkUri(AdjListType.ordered_by_dest, 0));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_dest/adj_list/offset/chunk4"),
+                URI.create("edge/person_knows_person/ordered_by_dest/offset/chunk4"),
                 knowsEdgeInfo.getOffsetChunkUri(AdjListType.ordered_by_dest, 4));
     }
 
@@ -377,7 +387,9 @@ public class GraphInfoTest {
         IllegalArgumentException illegalArgumentException =
                 Assert.assertThrows(
                         IllegalArgumentException.class,
-                        () -> knowsEdgeInfo.getPropertyGroupUri(notExistPg));
+                        () ->
+                                knowsEdgeInfo.getPropertyGroupUri(
+                                        notExistPg, AdjListType.ordered_by_source));
         Assert.assertEquals(
                 "Property group "
                         + notExistPg
@@ -399,14 +411,16 @@ public class GraphInfoTest {
         Assert.assertEquals(URI.create("creationDate/"), propertyGroup.getBaseUri());
         Assert.assertEquals(FileType.CSV, propertyGroup.getFileType());
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/creationDate/"),
-                knowsEdgeInfo.getPropertyGroupUri(propertyGroup));
+                URI.create("edge/person_knows_person/ordered_by_source/creationDate/"),
+                knowsEdgeInfo.getPropertyGroupUri(propertyGroup, AdjListType.ordered_by_source));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/creationDate/chunk0"),
-                knowsEdgeInfo.getPropertyGroupChunkUri(propertyGroup, 0));
+                URI.create("edge/person_knows_person/ordered_by_source/creationDate/part0/chunk0"),
+                knowsEdgeInfo.getPropertyGroupChunkUri(
+                        propertyGroup, AdjListType.ordered_by_source, 0, 0));
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/creationDate/chunk4"),
-                knowsEdgeInfo.getPropertyGroupChunkUri(propertyGroup, 4));
+                URI.create("edge/person_knows_person/ordered_by_dest/creationDate/part4/chunk2"),
+                knowsEdgeInfo.getPropertyGroupChunkUri(
+                        propertyGroup, AdjListType.ordered_by_dest, 4, 2));
         // edge properties in group 1
         Assert.assertNotNull(propertyGroup.getPropertyList());
         Assert.assertEquals(1, propertyGroup.getPropertyList().size());
@@ -546,7 +560,32 @@ public class GraphInfoTest {
         Assert.assertEquals(AdjListType.ordered_by_source, adjOrderBySource.getType());
         Assert.assertEquals("ordered_by_source/", adjOrderBySource.getPrefix());
         Assert.assertEquals(
-                URI.create("edge/person_knows_person/ordered_by_source/adj_list/offset/"),
+                URI.create("edge/person_knows_person/ordered_by_source/offset/"),
                 knowsEdgeInfo.getOffsetUri(AdjListType.ordered_by_source));
+
+        URI adjacencyChunkUri =
+                knowsEdgeInfo.getAdjacentListChunkUri(AdjListType.ordered_by_source, 2, 1);
+        URI propertyChunkUri =
+                knowsEdgeInfo.getPropertyGroupChunkUri(
+                        creationDate, AdjListType.ordered_by_source, 2, 1);
+        URI edgeCountUri = knowsEdgeInfo.getEdgesNumFileUri(AdjListType.ordered_by_source, 2);
+
+        Assert.assertEquals(
+                URI.create("edge/person_knows_person/ordered_by_source/adj_list/part2/chunk1"),
+                adjacencyChunkUri);
+        Assert.assertEquals(
+                URI.create("edge/person_knows_person/ordered_by_source/creationDate/part2/chunk1"),
+                propertyChunkUri);
+        Assert.assertEquals(
+                URI.create("edge/person_knows_person/ordered_by_source/edge_count2"), edgeCountUri);
+        Assert.assertTrue(
+                Files.isRegularFile(
+                        Paths.get(graphInfo.getBaseUri().resolve(adjacencyChunkUri).getPath())));
+        Assert.assertTrue(
+                Files.isRegularFile(
+                        Paths.get(graphInfo.getBaseUri().resolve(propertyChunkUri).getPath())));
+        Assert.assertTrue(
+                Files.isRegularFile(
+                        Paths.get(graphInfo.getBaseUri().resolve(edgeCountUri).getPath())));
     }
 }

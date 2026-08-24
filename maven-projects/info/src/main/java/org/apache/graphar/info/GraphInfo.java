@@ -22,7 +22,9 @@ package org.apache.graphar.info;
 import java.io.Writer;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,6 +42,8 @@ public class GraphInfo {
     private final Map<String, VertexInfo> vertexType2VertexInfo;
     private final Map<String, EdgeInfo> edgeConcat2EdgeInfo;
     private final VersionInfo version;
+    private final List<String> labels;
+    private final Map<String, String> extraInfo;
     private final Map<String, URI> types2StoreUri;
 
     public GraphInfo(
@@ -48,12 +52,25 @@ public class GraphInfo {
             Map<URI, EdgeInfo> edgeInfos,
             URI uri,
             String version) {
+        this(name, vertexInfos, edgeInfos, uri, version, List.of(), Map.of());
+    }
+
+    public GraphInfo(
+            String name,
+            Map<URI, VertexInfo> vertexInfos,
+            Map<URI, EdgeInfo> edgeInfos,
+            URI uri,
+            String version,
+            List<String> labels,
+            Map<String, String> extraInfo) {
         this(
                 name,
                 new ArrayList<>(vertexInfos.values()),
                 new ArrayList<>(edgeInfos.values()),
                 uri,
-                version);
+                version,
+                labels,
+                extraInfo);
         vertexInfos.forEach((key, value) -> types2StoreUri.put(value.getType() + ".vertex", key));
         edgeInfos.forEach((key, value) -> types2StoreUri.put(value.getConcat() + ".edge", key));
     }
@@ -64,7 +81,25 @@ public class GraphInfo {
             List<EdgeInfo> edgeInfos,
             String prefix,
             String version) {
-        this(name, vertexInfos, edgeInfos, prefix == null ? null : URI.create(prefix), version);
+        this(name, vertexInfos, edgeInfos, prefix, version, List.of(), Map.of());
+    }
+
+    public GraphInfo(
+            String name,
+            List<VertexInfo> vertexInfos,
+            List<EdgeInfo> edgeInfos,
+            String prefix,
+            String version,
+            List<String> labels,
+            Map<String, String> extraInfo) {
+        this(
+                name,
+                vertexInfos,
+                edgeInfos,
+                prefix == null ? null : URI.create(prefix),
+                version,
+                labels,
+                extraInfo);
     }
 
     public GraphInfo(
@@ -73,11 +108,27 @@ public class GraphInfo {
             List<EdgeInfo> edgeInfos,
             URI baseUri,
             String version) {
+        this(name, vertexInfos, edgeInfos, baseUri, version, List.of(), Map.of());
+    }
+
+    public GraphInfo(
+            String name,
+            List<VertexInfo> vertexInfos,
+            List<EdgeInfo> edgeInfos,
+            URI baseUri,
+            String version,
+            List<String> labels,
+            Map<String, String> extraInfo) {
         this.name = name;
         this.vertexInfos = List.copyOf(vertexInfos);
         this.edgeInfos = List.copyOf(edgeInfos);
         this.baseUri = baseUri;
         this.version = VersionParser.getVersion(version);
+        this.labels = labels == null ? List.of() : List.copyOf(labels);
+        this.extraInfo =
+                extraInfo == null
+                        ? Map.of()
+                        : Collections.unmodifiableMap(new LinkedHashMap<>(extraInfo));
         this.vertexType2VertexInfo =
                 vertexInfos.stream()
                         .collect(
@@ -98,7 +149,9 @@ public class GraphInfo {
             URI baseUri,
             String version,
             Map<String, VertexInfo> vertexType2VertexInfo,
-            Map<String, EdgeInfo> edgeConcat2EdgeInfo) {
+            Map<String, EdgeInfo> edgeConcat2EdgeInfo,
+            List<String> labels,
+            Map<String, String> extraInfo) {
         this(
                 name,
                 vertexInfos,
@@ -106,7 +159,9 @@ public class GraphInfo {
                 baseUri,
                 VersionParser.getVersion(version),
                 vertexType2VertexInfo,
-                edgeConcat2EdgeInfo);
+                edgeConcat2EdgeInfo,
+                labels,
+                extraInfo);
     }
 
     private GraphInfo(
@@ -116,12 +171,16 @@ public class GraphInfo {
             URI baseUri,
             VersionInfo version,
             Map<String, VertexInfo> vertexType2VertexInfo,
-            Map<String, EdgeInfo> edgeConcat2EdgeInfo) {
+            Map<String, EdgeInfo> edgeConcat2EdgeInfo,
+            List<String> labels,
+            Map<String, String> extraInfo) {
         this.name = name;
         this.vertexInfos = vertexInfos;
         this.edgeInfos = edgeInfos;
         this.baseUri = baseUri;
         this.version = version;
+        this.labels = labels;
+        this.extraInfo = extraInfo;
         this.vertexType2VertexInfo = vertexType2VertexInfo;
         this.edgeConcat2EdgeInfo = edgeConcat2EdgeInfo;
         this.types2StoreUri = new HashMap<>();
@@ -176,7 +235,9 @@ public class GraphInfo {
                         baseUri,
                         version,
                         newVertexType2VertexInfo,
-                        edgeConcat2EdgeInfo));
+                        edgeConcat2EdgeInfo,
+                        labels,
+                        extraInfo));
     }
 
     public Optional<GraphInfo> removeVertex(VertexInfo vertexInfo) {
@@ -204,7 +265,9 @@ public class GraphInfo {
                         baseUri,
                         version,
                         newVertexInfoMap,
-                        edgeConcat2EdgeInfo));
+                        edgeConcat2EdgeInfo,
+                        labels,
+                        extraInfo));
     }
 
     public Optional<GraphInfo> addEdgeAsNew(EdgeInfo edgeInfo) {
@@ -230,7 +293,9 @@ public class GraphInfo {
                         baseUri,
                         version,
                         vertexType2VertexInfo,
-                        newEdgeConcat2EdgeInfo));
+                        newEdgeConcat2EdgeInfo,
+                        labels,
+                        extraInfo));
     }
 
     public Optional<GraphInfo> removeEdge(EdgeInfo edgeInfo) {
@@ -262,7 +327,9 @@ public class GraphInfo {
                         baseUri,
                         version,
                         vertexType2VertexInfo,
-                        newEdgeConcat2EdgeInfo));
+                        newEdgeConcat2EdgeInfo,
+                        labels,
+                        extraInfo));
     }
 
     public boolean hasVertexInfo(String type) {
@@ -281,6 +348,20 @@ public class GraphInfo {
     public EdgeInfo getEdgeInfo(String srcType, String edgeType, String dstType) {
         checkEdgeExist(srcType, edgeType, dstType);
         return edgeConcat2EdgeInfo.get(EdgeInfo.concat(srcType, edgeType, dstType));
+    }
+
+    public VertexInfo getVertexInfoByIndex(int index) {
+        if (index < 0 || index >= vertexInfos.size()) {
+            throw new IllegalArgumentException("Vertex info index " + index + " is out of range");
+        }
+        return vertexInfos.get(index);
+    }
+
+    public EdgeInfo getEdgeInfoByIndex(int index) {
+        if (index < 0 || index >= edgeInfos.size()) {
+            throw new IllegalArgumentException("Edge info index " + index + " is out of range");
+        }
+        return edgeInfos.get(index);
     }
 
     public int getVertexInfoNum() {
@@ -313,6 +394,14 @@ public class GraphInfo {
 
     public VersionInfo getVersion() {
         return version;
+    }
+
+    public List<String> getLabels() {
+        return labels;
+    }
+
+    public Map<String, String> getExtraInfo() {
+        return extraInfo;
     }
 
     public void setStoreUri(VertexInfo vertexInfo, URI storeUri) {

@@ -37,6 +37,8 @@ public class GraphYaml {
     private String prefix;
     private List<String> vertices;
     private List<String> edges;
+    private List<String> labels;
+    private List<ExtraInfoYaml> extra_info;
     private String version;
     private static final DumperOptions dumperOption;
     private static Representer representer;
@@ -65,6 +67,7 @@ public class GraphYaml {
                     }
                 };
         representer.addClassTag(GraphYaml.class, Tag.MAP);
+        representer.addClassTag(ExtraInfoYaml.class, Tag.MAP);
         representer.addClassTag(VertexYaml.class, Tag.MAP);
         representer.addClassTag(EdgeYaml.class, Tag.MAP);
     }
@@ -74,6 +77,8 @@ public class GraphYaml {
         this.prefix = "";
         this.vertices = new ArrayList<>();
         this.edges = new ArrayList<>();
+        this.labels = null;
+        this.extra_info = null;
         this.version = "";
     }
 
@@ -113,6 +118,14 @@ public class GraphYaml {
                                     return storeUri.toString();
                                 })
                         .collect(Collectors.toList());
+        this.labels =
+                graphInfo.getLabels().isEmpty() ? null : new ArrayList<>(graphInfo.getLabels());
+        this.extra_info =
+                graphInfo.getExtraInfo().isEmpty()
+                        ? null
+                        : graphInfo.getExtraInfo().entrySet().stream()
+                                .map(entry -> new ExtraInfoYaml(entry.getKey(), entry.getValue()))
+                                .collect(Collectors.toList());
         this.version =
                 Optional.of(graphInfo)
                         .map(GraphInfo::getVersion)
@@ -158,6 +171,22 @@ public class GraphYaml {
 
     public void setEdges(List<String> edges) {
         this.edges = edges;
+    }
+
+    public List<String> getLabels() {
+        return labels;
+    }
+
+    public void setLabels(List<String> labels) {
+        this.labels = labels;
+    }
+
+    public List<ExtraInfoYaml> getExtra_info() {
+        return extra_info;
+    }
+
+    public void setExtra_info(List<ExtraInfoYaml> extra_info) {
+        this.extra_info = extra_info;
     }
 
     public String getVersion() {

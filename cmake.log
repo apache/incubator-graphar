@@ -1,0 +1,33 @@
+-- The C compiler identification is GNU 11.4.0
+-- The CXX compiler identification is GNU 11.4.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- [graphar] will build in type: Debug
+-- [graphar] GRAPHAR_ENABLE_SANITIZER: ON
+-- [graphar] GRAPHAR_ENABLE_COVERAGE: OFF
+-- Checking for modules 'libbrotlicommon;libbrotlienc;libbrotlidec'
+--   Found libbrotlicommon, version 1.0.9
+--   Found libbrotlienc, version 1.0.9
+--   Found libbrotlidec, version 1.0.9
+-- Checking for module 'liblz4'
+--   Found liblz4, version 1.9.3
+-- Checking for module 'libzstd'
+--   Found libzstd, version 1.4.8
+-- Zstandard library: /usr/lib/aarch64-linux-gnu/libzstd.so
+-- Zstandard include directory: /usr/include
+-- Checking for module 're2'
+--   Found re2, version 0.0.0
+-- Checking for module 'thrift'
+--   Found thrift, version 0.16.0
+-- [graphar] using C++ standard: 17
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /w/cpp/build

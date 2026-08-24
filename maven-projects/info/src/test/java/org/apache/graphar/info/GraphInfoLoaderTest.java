@@ -25,6 +25,8 @@ import org.apache.graphar.info.loader.GraphInfoLoader;
 import org.apache.graphar.info.loader.impl.LocalFileSystemReaderGraphInfoLoader;
 import org.apache.graphar.info.loader.impl.LocalFileSystemStreamGraphInfoLoader;
 import org.apache.graphar.info.loader.impl.LocalFileSystemStringGraphInfoLoader;
+import org.apache.graphar.info.type.AdjListType;
+import org.apache.graphar.info.type.FileType;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -62,6 +64,27 @@ public class GraphInfoLoaderTest {
         GraphInfoLoader loader = new LocalFileSystemReaderGraphInfoLoader();
         final GraphInfo graphInfo = loader.loadGraphInfo(GRAPH_PATH_URI);
         testGraphInfo(graphInfo);
+    }
+
+    @Test
+    public void testJsonMetadataFixture() throws IOException {
+        GraphInfoLoader loader = new LocalFileSystemStreamGraphInfoLoader();
+        GraphInfo graphInfo = loader.loadGraphInfo(TestUtil.getJsonLdbcSampleGraphURI());
+
+        Assert.assertEquals("LdbcSample", graphInfo.getName());
+        Assert.assertEquals(
+                FileType.JSON,
+                graphInfo.getVertexInfos().get(0).getPropertyGroups().get(0).getFileType());
+        Assert.assertEquals(
+                FileType.JSON,
+                graphInfo
+                        .getEdgeInfos()
+                        .get(0)
+                        .getAdjacentList(AdjListType.ordered_by_source)
+                        .getFileType());
+        Assert.assertEquals(
+                FileType.JSON,
+                graphInfo.getEdgeInfos().get(0).getPropertyGroups().get(0).getFileType());
     }
 
     private void testGraphInfo(GraphInfo graphInfo) {

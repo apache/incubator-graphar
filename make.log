@@ -1,0 +1,90 @@
+make: Entering directory '/w/cpp/build'
+make[1]: Entering directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Leaving directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+[  2%] Building CXX object src/CMakeFiles/graphar_thirdparty.dir/__/thirdparty/mini-yaml/yaml/Yaml.cpp.o
+[  5%] Linking CXX static library libgraphar_thirdparty.a
+make[2]: Leaving directory '/w/cpp/build'
+[  5%] Built target graphar_thirdparty
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Leaving directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+[  8%] Building CXX object src/CMakeFiles/graphar.dir/graphar/arrow/chunk_writer.cc.o
+[ 11%] Building CXX object src/CMakeFiles/graphar.dir/graphar/graph_info.cc.o
+[ 13%] Building CXX object src/CMakeFiles/graphar.dir/graphar/chunk_info_reader.cc.o
+[ 16%] Building CXX object src/CMakeFiles/graphar.dir/graphar/filesystem.cc.o
+[ 22%] Building CXX object src/CMakeFiles/graphar.dir/graphar/arrow/chunk_reader.cc.o
+[ 22%] Building CXX object src/CMakeFiles/graphar.dir/graphar/expression.cc.o
+[ 25%] Building CXX object src/CMakeFiles/graphar.dir/graphar/high-level/edges_builder.cc.o
+[ 27%] Building CXX object src/CMakeFiles/graphar.dir/graphar/chunk_info_writer.cc.o
+[ 30%] Building CXX object src/CMakeFiles/graphar.dir/graphar/high-level/graph_reader.cc.o
+[ 33%] Building CXX object src/CMakeFiles/graphar.dir/graphar/high-level/vertices_builder.cc.o
+[ 36%] Building CXX object src/CMakeFiles/graphar.dir/graphar/label.cc.o
+[ 38%] Building CXX object src/CMakeFiles/graphar.dir/graphar/reader_util.cc.o
+[ 41%] Building CXX object src/CMakeFiles/graphar.dir/graphar/types.cc.o
+[ 44%] Building CXX object src/CMakeFiles/graphar.dir/graphar/util.cc.o
+[ 47%] Building CXX object src/CMakeFiles/graphar.dir/graphar/version_parser.cc.o
+[ 50%] Building CXX object src/CMakeFiles/graphar.dir/graphar/writer_util.cc.o
+[ 52%] Building CXX object src/CMakeFiles/graphar.dir/graphar/yaml.cc.o
+[ 55%] Linking CXX shared library libgraphar.so
+make[2]: Leaving directory '/w/cpp/build'
+[ 55%] Built target graphar
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Leaving directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Leaving directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Leaving directory '/w/cpp/build'
+make[2]: Leaving directory '/w/cpp/build'
+make[2]: Leaving directory '/w/cpp/build'
+make[2]: Leaving directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Leaving directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+make[2]: Leaving directory '/w/cpp/build'
+make[2]: Entering directory '/w/cpp/build'
+[ 58%] Building CXX object test/CMakeFiles/test_arrow_chunk_writer.dir/test_arrow_chunk_writer.cc.o
+[ 61%] Building CXX object test/CMakeFiles/test_graph.dir/test_graph.cc.o
+[ 63%] Building CXX object test/CMakeFiles/test_info.dir/test_info.cc.o
+[ 69%] Building CXX object test/CMakeFiles/test_multi_label.dir/test_multi_label.cc.o
+[ 69%] Building CXX object test/CMakeFiles/test_multi_property.dir/test_multi_property.cc.o
+[ 72%] Building CXX object test/CMakeFiles/test_chunk_info_reader.dir/test_chunk_info_reader.cc.o
+[ 75%] Building CXX object test/CMakeFiles/test_builder.dir/test_builder.cc.o
+[ 77%] Building CXX object test/CMakeFiles/test_arrow_chunk_reader.dir/test_arrow_chunk_reader.cc.o
+[ 80%] Linking CXX executable test_multi_label
+make[2]: Leaving directory '/w/cpp/build'
+[ 80%] Built target test_multi_label
+[ 83%] Linking CXX executable test_chunk_info_reader
+[ 86%] Linking CXX executable test_arrow_chunk_writer
+make[2]: Leaving directory '/w/cpp/build'
+[ 86%] Built target test_chunk_info_reader
+make[2]: Leaving directory '/w/cpp/build'
+[ 86%] Built target test_arrow_chunk_writer
+[ 88%] Linking CXX executable test_builder
+[ 91%] Linking CXX executable test_multi_property
+[ 94%] Linking CXX executable test_graph
+[ 97%] Linking CXX executable test_info
+[100%] Linking CXX executable test_arrow_chunk_reader
+make[2]: Leaving directory '/w/cpp/build'
+[100%] Built target test_builder
+make[2]: Leaving directory '/w/cpp/build'
+[100%] Built target test_multi_property
+make[2]: Leaving directory '/w/cpp/build'
+[100%] Built target test_graph
+make[2]: Leaving directory '/w/cpp/build'
+[100%] Built target test_info
+make[2]: Leaving directory '/w/cpp/build'
+[100%] Built target test_arrow_chunk_reader
+make[1]: Leaving directory '/w/cpp/build'
+make: Leaving directory '/w/cpp/build'

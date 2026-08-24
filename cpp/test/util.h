@@ -21,9 +21,25 @@
 
 #include <filesystem>
 #include <iostream>
+#include <memory>
 #include <string>
 
+#include "arrow/table.h"
+#include "arrow/util/config.h"
+#include "parquet/arrow/reader.h"
+
 namespace graphar {
+
+inline arrow::Result<std::shared_ptr<arrow::Table>> ReadParquetTable(
+    parquet::arrow::FileReader* reader) {
+#if ARROW_VERSION <= 20000000
+  std::shared_ptr<arrow::Table> table;
+  ARROW_RETURN_NOT_OK(reader->ReadTable(&table));
+  return table;
+#else
+  return reader->ReadTable();
+#endif
+}
 
 // Define the fixture
 struct GlobalFixture {

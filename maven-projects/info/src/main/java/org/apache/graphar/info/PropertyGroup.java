@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -135,7 +136,7 @@ public class PropertyGroup implements Iterable<Property> {
             propertyNameSet.put(propertyName, true);
 
             // TODO: support list type in csv file
-            if (property.getDataType() == DataType.LIST && fileType == FileType.CSV) {
+            if (property.getDataType().isList() && fileType == FileType.CSV) {
                 return false;
             }
             if (property.getCardinality() != Cardinality.SINGLE && fileType == FileType.CSV) {
@@ -144,6 +145,25 @@ public class PropertyGroup implements Iterable<Property> {
         }
 
         return true;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof PropertyGroup)) {
+            return false;
+        }
+        PropertyGroup propertyGroup = (PropertyGroup) other;
+        return propertyList.equals(propertyGroup.propertyList)
+                && fileType == propertyGroup.fileType
+                && Objects.equals(baseUri, propertyGroup.baseUri);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(propertyList, fileType, baseUri);
     }
 }
 
@@ -208,6 +228,19 @@ class PropertyGroups {
                         newProperties));
     }
 
+    Optional<PropertyGroups> removePropertyGroupAsNew(PropertyGroup propertyGroup) {
+        if (propertyGroup == null || !hasPropertyGroup(propertyGroup)) {
+            return Optional.empty();
+        }
+        return Optional.of(
+                new PropertyGroups(
+                        propertyGroupList.stream()
+                                .filter(
+                                        existingPropertyGroup ->
+                                                !existingPropertyGroup.equals(propertyGroup))
+                                .collect(Collectors.toUnmodifiableList())));
+    }
+
     boolean hasProperty(String propertyName) {
         return properties.containsKey(propertyName);
     }
@@ -247,6 +280,14 @@ class PropertyGroups {
     PropertyGroup getPropertyGroup(String propertyName) {
         checkPropertyExist(propertyName);
         return propertyGroupMap.get(propertyName);
+    }
+
+    PropertyGroup getPropertyGroupByIndex(int index) {
+        if (index < 0 || index >= propertyGroupList.size()) {
+            throw new IllegalArgumentException(
+                    "Property group index " + index + " is out of range");
+        }
+        return propertyGroupList.get(index);
     }
 
     private void checkPropertyExist(String propertyName) {

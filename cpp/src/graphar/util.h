@@ -33,6 +33,7 @@
 #include "arrow/filesystem/api.h"
 #include "arrow/io/api.h"
 #include "arrow/stl.h"
+#include "arrow/util/config.h"
 #include "arrow/util/uri.h"
 #include "parquet/arrow/reader.h"
 #include "parquet/arrow/writer.h"
