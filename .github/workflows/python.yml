@@ -46,8 +46,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
-      # single source of version for arrow
-      ARROW_VERSION: "0.24.1"
+      # Single source of version for Arrow. Must match the pyarrow pinned in
+      # python/pyproject.toml (pyarrow ~= 24.0 -> 24.0.0). The "-1" suffix is the
+      # Debian package revision that apt requires for exact version matching.
+      ARROW_VERSION: "24.0.0-1"
 
     steps:
     - uses: actions/checkout@v7
@@ -68,6 +70,14 @@ jobs:
         sudo apt update
         sudo apt install -y -V libarrow-dev=$ARROW_VERSION
         sudo apt install -y -V libarrow-dataset-dev=$ARROW_VERSION
+        # The Python extension links Arrow, ArrowDataset, ArrowAcero and Parquet
+        # (see python/CMakeLists.txt), so all dev packages are required. Note:
+        # libarrow-acero-dev depends on libarrow-compute-dev, which must be
+        # pinned explicitly too because apt does not auto-resolve an exact
+        # version dependency when a newer candidate exists in the repository.
+        sudo apt install -y -V libarrow-acero-dev=$ARROW_VERSION
+        sudo apt install -y -V libarrow-compute-dev=$ARROW_VERSION
+        sudo apt install -y -V libparquet-dev=$ARROW_VERSION
         sudo apt-get install -y ccache libcurl4-openssl-dev
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
@@ -110,6 +120,13 @@ jobs:
     runs-on: macos-latest
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
+      # Must match the pyarrow pinned in python/pyproject.toml (pyarrow ~= 24.0).
+      ARROW_VERSION: "24.0.0"
+      # Where the Arrow built from source below is installed. The Python
+      # extension links against it at build time, and resolves Arrow from the
+      # sibling pyarrow package at runtime (see the RPATH setup in
+      # python/CMakeLists.txt).
+      ARROW_DIST: ${{ github.workspace }}/arrow-dist
 
     steps:
     - uses: actions/checkout@v7
@@ -121,10 +138,64 @@ jobs:
       with:
         python-version: '3.13'
 
+    - name: Cache Arrow build
+      id: arrow-cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.ARROW_DIST }}
+        key: arrow-${{ runner.os }}-${{ runner.arch }}-${{ env.ARROW_VERSION }}
+
     - name: Install dependencies
       run: |
         brew bundle --file=cpp/Brewfile
+        # Homebrew's apache-arrow is built without ORC support, so it is removed
+        # here and Arrow is built from source in the next step (with ARROW_ORC).
+        brew uninstall apache-arrow || true
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
+
+    - name: Build Arrow from source (with ORC)
+      if: steps.arrow-cache.outputs.cache-hit != 'true'
+      run: |
+        set -euxo pipefail
+        curl -fLsS -o "apache-arrow-${ARROW_VERSION}.tar.gz" \
+          "https://archive.apache.org/dist/arrow/arrow-${ARROW_VERSION}/apache-arrow-${ARROW_VERSION}.tar.gz"
+        tar xzf "apache-arrow-${ARROW_VERSION}.tar.gz"
+        cmake -S "apache-arrow-${ARROW_VERSION}/cpp" -B arrow-build \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DCMAKE_INSTALL_PREFIX="${ARROW_DIST}" \
+          -DCMAKE_INSTALL_LIBDIR=lib \
+          -DARROW_BUILD_SHARED=ON \
+          -DARROW_BUILD_STATIC=OFF \
+          -DARROW_DEPENDENCY_SOURCE=BUNDLED \
+          -DARROW_PARQUET=ON \
+          -DARROW_DATASET=ON \
+          -DARROW_ACERO=ON \
+          -DARROW_ORC=ON \
+          -DARROW_CSV=ON \
+          -DARROW_JSON=ON \
+          -DARROW_COMPUTE=ON \
+          -DARROW_FILESYSTEM=ON \
+          -DARROW_WITH_SNAPPY=ON \
+          -DARROW_WITH_ZSTD=ON \
+          -DARROW_WITH_LZ4=ON \
+          -DARROW_WITH_BZ2=ON \
+          -DARROW_WITH_BROTLI=ON \
+          -DARROW_WITH_ZLIB=ON \
+          -DARROW_WITH_UTF8PROC=ON \
+          -DARROW_WITH_RE2=ON \
+          -DARROW_S3=OFF \
+          -DARROW_GCS=OFF \
+          -DARROW_AZURE=OFF \
+          -DARROW_FLIGHT=OFF \
+          -DARROW_JEMALLOC=OFF \
+          -DARROW_MIMALLOC=OFF \
+          -DARROW_BUILD_TESTS=OFF \
+          -DARROW_BUILD_BENCHMARKS=OFF \
+          -DARROW_BUILD_EXAMPLES=OFF \
+          -DARROW_BUILD_INTEGRATION=OFF \
+          -DARROW_BUILD_UTILITIES=OFF \
+          -DARROW_PYTHON=OFF
+        cmake --build arrow-build --target install -j "$(sysctl -n hw.ncpu)"
 
     - name: Install GraphAr Python SDK
       working-directory: "python"
