@@ -142,7 +142,7 @@ jobs:
 
     - name: Cache Arrow build
       id: arrow-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ${{ env.CMAKE_PREFIX_PATH }}
         key: arrow-${{ runner.os }}-${{ runner.arch }}-${{ env.ARROW_VERSION }}
