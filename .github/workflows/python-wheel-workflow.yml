@@ -1,4 +1,3 @@
-
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -32,7 +31,6 @@ on:
       - 'cpp/**'
       - 'python/**'
       - '.github/workflows/python-wheel-workflow.yml'
-      - '.github/scripts/update_version.py'
   pull_request:
     branches:
       - "main"
@@ -40,7 +38,6 @@ on:
       - 'cpp/**'
       - 'python/**'
       - '.github/workflows/python-wheel-workflow.yml'
-      - '.github/scripts/update_version.py'
   workflow_dispatch:
     inputs:
       publish_pypi:
@@ -52,19 +49,24 @@ on:
 jobs:
   build_sdist:
     name: Build source distribution
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      # fetch-depth 0 is required: since version
+      # is derived from git history
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.9"
+          python-version: "3.10"
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install build twine
+
       - name: Build sdist
         run: |
           # Bundle C++ sources into python/ so the sdist contains them.
@@ -72,6 +74,7 @@ jobs:
           cp -a cpp python/_bundled_cpp
           cd python
           python -m build --sdist
+
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -93,7 +96,7 @@ jobs:
 
           # Job 2: Native aarch64 build
           - platform: aarch64
-            runner: ubuntu-22.04-arm # This is a native ARM64 runner
+            runner: ubuntu-24.04-arm # This is a native ARM64 runner
             os: linux
             manylinux: _2_28
 
@@ -102,10 +105,16 @@ jobs:
             runner: macos-latest
             os: macos
 
-
     env:
+      # Must match the pyarrow pinned in python/pyproject.toml (pyarrow ~= 24.0).
+      # It is the version of Arrow that is installed before the build and that
+      # pyarrow ships at runtime (see the RPATH setup in python/CMakeLists.txt).
+      ARROW_VERSION: "24.0.0"
       CIBW_PLATFORM: ${{ matrix.os }}
-      CIBW_BUILD: "cp39-* cp310-* cp311-* cp312-* cp313-*"
+      # Keep in sync with requires-python (>= 3.10) and the classifiers in
+      # python/pyproject.toml. pyarrow ~= 24.0 (the runtime Arrow provider) has
+      # wheels for cp310-cp314 on every platform we build.
+      CIBW_BUILD: "cp310-* cp311-* cp312-* cp313-* cp314-*"
       CIBW_SKIP: "*-musllinux_*"
       # Use uv on macOS to avoid transient GitHub rate limits when cibuildwheel
       CIBW_BUILD_FRONTEND: ${{ matrix.os == 'macos' && 'build[uv]' || 'build' }}
@@ -113,7 +122,6 @@ jobs:
       CIBW_ARCHS: ${{ matrix.platform }}
       CIBW_MANYLINUX_X86_64_IMAGE: ${{ matrix.os == 'linux' && format('manylinux{0}', matrix.manylinux) || '' }}
       CIBW_MANYLINUX_AARCH64_IMAGE: ${{ matrix.os == 'linux' && format('manylinux{0}', matrix.manylinux) || '' }}
-      CIBW_ENVIRONMENT_WINDOWS: DISTUTILS_USE_SDK=1 MSSdk=1
       CIBW_ENVIRONMENT_MACOS: ${{ matrix.os == 'macos' && 'MACOSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion) CMAKE_OSX_DEPLOYMENT_TARGET=$(sw_vers -productVersion) CFLAGS=-mmacosx-version-min=$(sw_vers -productVersion) CXXFLAGS=-mmacosx-version-min=$(sw_vers -productVersion) LDFLAGS=-mmacosx-version-min=$(sw_vers -productVersion)' || '' }}
       CIBW_BEFORE_BUILD_LINUX: |
         set -eux
@@ -133,59 +141,117 @@ jobs:
         dnf config-manager --set-enabled ol$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)_codeready_builder || :
         dnf config-manager --set-enabled codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-rhui-rpms || :
         subscription-manager repos --enable codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-$(arch)-rpms || :
-        dnf install -y arrow-devel # For C++
-        dnf install -y arrow-glib-devel # For GLib (C)
-        dnf install -y arrow-dataset-devel # For Apache Arrow Dataset C++
-        dnf install -y arrow-dataset-glib-devel # For Apache Arrow Dataset GLib (C)
-        dnf install -y arrow-acero-devel # For Apache Arrow Acero C++
-        dnf install -y arrow-flight-devel # For Apache Arrow Flight C++
-        dnf install -y arrow-flight-glib-devel # For Apache Arrow Flight GLib (C)
-        dnf install -y arrow-flight-sql-devel # For Apache Arrow Flight SQL C++
-        dnf install -y arrow-flight-sql-glib-devel # For Apache Arrow Flight SQL GLib (C)
-        dnf install -y gandiva-devel # For Apache Gandiva C++
-        dnf install -y gandiva-glib-devel # For Apache Gandiva GLib (C)
-        dnf install -y parquet-devel # For Apache Parquet C++
-        dnf install -y parquet-glib-devel # For Apache Parquet GLib (C)
+        # Pin the exact Arrow version: the wheel must be built against the same
+        # 24.0.0 that pyarrow ~= 24.0 ships, because Arrow is resolved at
+        # runtime from the sibling pyarrow package instead of being bundled
+        # (see CIBW_REPAIR_WHEEL_COMMAND_* below). Installing the unpinned
+        # "latest" (e.g. 25.x) would produce libs whose SONAME does not exist
+        # in pyarrow, breaking every wheel.
+        dnf install -y arrow-devel-24.0.0 # For C++
+        dnf install -y arrow-glib-devel-24.0.0 # For GLib (C)
+        dnf install -y arrow-dataset-devel-24.0.0 # For Apache Arrow Dataset C++
+        dnf install -y arrow-dataset-glib-devel-24.0.0 # For Apache Arrow Dataset GLib (C)
+        dnf install -y arrow-acero-devel-24.0.0 # For Apache Arrow Acero C++
+        dnf install -y arrow-flight-devel-24.0.0 # For Apache Arrow Flight C++
+        dnf install -y arrow-flight-glib-devel-24.0.0 # For Apache Arrow Flight GLib (C)
+        dnf install -y arrow-flight-sql-devel-24.0.0 # For Apache Arrow Flight SQL C++
+        dnf install -y arrow-flight-sql-glib-devel-24.0.0 # For Apache Arrow Flight SQL GLib (C)
+        dnf install -y gandiva-devel-24.0.0 # For Apache Gandiva C++
+        dnf install -y gandiva-glib-devel-24.0.0 # For Apache Gandiva GLib (C)
+        dnf install -y parquet-devel-24.0.0 # For Apache Parquet C++
+        dnf install -y parquet-glib-devel-24.0.0 # For Apache Parquet GLib (C)
+      # Do NOT bundle Arrow/Parquet/Dataset/Acero/Compute into the wheel: the
+      # python/CMakeLists.txt RPATH ($ORIGIN/../pyarrow on Linux,
+      # @loader_path/../pyarrow on macOS) resolves them at runtime from the
+      # sibling pyarrow package (pyarrow ~= 24.0). auditwheel/delocate keep the
+      # preserved RPATH entry and only bundle whatever else is left (e.g. re2,
+      # zstd from the manylinux container).
+      CIBW_REPAIR_WHEEL_COMMAND_LINUX: |
+        auditwheel repair --exclude libarrow.so.* --exclude libarrow_compute.so.* --exclude libarrow_dataset.so.* --exclude libarrow_acero.so.* --exclude libparquet.so.* -w {dest_dir} {wheel}
+      CIBW_REPAIR_WHEEL_COMMAND_MACOS: |
+        delocate-wheel --exclude libarrow --exclude libarrow_compute --exclude libarrow_dataset --exclude libarrow_acero --exclude libparquet -w {dest_dir} -v {wheel}
 
     steps:
       - name: Checkout (needed for some tooling)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+        with:
+          # fetch-depth 0 is required: the sdist is extracted inside this
+          # checkout and setuptools-scm (search_parent_directories) picks up the
+          # parent .git. Without tags the wheel version collapses to "0.1.dev1"
+          # instead of reproducing the version baked into the sdist's PKG-INFO.
+          fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.9"
-
-      - name: Set up Miniconda (Windows)
-        if: matrix.os == 'windows'
-        uses: conda-incubator/setup-miniconda@v3
-        with:
-          auto-activate-base: true
-          miniforge-version: latest
-          use-mamba: true
+          python-version: "3.10"
 
       - name: Install Arrow (macOS)
         if: matrix.os == 'macos'
         shell: bash
         run: |
           set -euxo pipefail
-          brew install apache-arrow
-          echo "CMAKE_PREFIX_PATH=/usr/local" >> "$GITHUB_ENV"
-          # Optional sanity check: ensure Arrow dylib isn't built for a newer macOS than deployment target.
-          if command -v otool >/dev/null 2>&1; then
-            ls -lah /usr/local/lib || true
-            if [ -f "/usr/local/lib/libarrow.dylib" ]; then
-              otool -l "/usr/local/lib/libarrow.dylib" | (grep -A3 -E 'LC_BUILD_VERSION|LC_VERSION_MIN_MACOSX' || true)
-            fi
-          fi
+          brew bundle --file=cpp/Brewfile
+          # Homebrew's apache-arrow is built without ORC support, so it is
+          # removed here and Arrow is built from source in the next step (with
+          # ARROW_ORC), exactly like the python.yml CI workflow does.
+          brew uninstall apache-arrow || true
+          echo "CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/arrow-dist" >> "$GITHUB_ENV"
 
-      - name: Install Arrow (Windows)
-        if: matrix.os == 'windows'
-        shell: pwsh
+      - name: Cache Arrow build (macOS)
+        if: matrix.os == 'macos'
+        id: arrow-cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ github.workspace }}/arrow-dist
+          # Same key as the python.yml CI workflow, so both workflows share the
+          # cached Arrow build.
+          key: arrow-${{ runner.os }}-${{ runner.arch }}-${{ env.ARROW_VERSION }}
+
+      - name: Build Arrow from source (macOS, with ORC)
+        if: matrix.os == 'macos' && steps.arrow-cache.outputs.cache-hit != 'true'
         run: |
-          mamba install -y -c conda-forge arrow-cpp
-          Add-Content $env:GITHUB_ENV "CMAKE_PREFIX_PATH=$env:CONDA_PREFIX\\Library"
-          Add-Content $env:GITHUB_ENV "PATH=$env:CONDA_PREFIX\\Library\\bin;$env:PATH"
+          set -euxo pipefail
+          curl -fLsS -o "apache-arrow-${ARROW_VERSION}.tar.gz" \
+            "https://archive.apache.org/dist/arrow/arrow-${ARROW_VERSION}/apache-arrow-${ARROW_VERSION}.tar.gz"
+          tar xzf "apache-arrow-${ARROW_VERSION}.tar.gz"
+          cmake -S "apache-arrow-${ARROW_VERSION}/cpp" -B arrow-build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="${CMAKE_PREFIX_PATH}" \
+            -DCMAKE_INSTALL_LIBDIR=lib \
+            -DARROW_BUILD_SHARED=ON \
+            -DARROW_BUILD_STATIC=OFF \
+            -DARROW_DEPENDENCY_SOURCE=BUNDLED \
+            -DARROW_PARQUET=ON \
+            -DARROW_DATASET=ON \
+            -DARROW_ACERO=ON \
+            -DARROW_ORC=ON \
+            -DARROW_CSV=ON \
+            -DARROW_JSON=ON \
+            -DARROW_COMPUTE=ON \
+            -DARROW_FILESYSTEM=ON \
+            -DARROW_WITH_SNAPPY=ON \
+            -DARROW_WITH_ZSTD=ON \
+            -DARROW_WITH_LZ4=ON \
+            -DARROW_WITH_BZ2=ON \
+            -DARROW_WITH_BROTLI=ON \
+            -DARROW_WITH_ZLIB=ON \
+            -DARROW_WITH_UTF8PROC=ON \
+            -DARROW_WITH_RE2=ON \
+            -DARROW_S3=OFF \
+            -DARROW_GCS=OFF \
+            -DARROW_AZURE=OFF \
+            -DARROW_FLIGHT=OFF \
+            -DARROW_JEMALLOC=OFF \
+            -DARROW_MIMALLOC=OFF \
+            -DARROW_BUILD_TESTS=OFF \
+            -DARROW_BUILD_BENCHMARKS=OFF \
+            -DARROW_BUILD_EXAMPLES=OFF \
+            -DARROW_BUILD_INTEGRATION=OFF \
+            -DARROW_BUILD_UTILITIES=OFF \
+            -DARROW_PYTHON=OFF
+          cmake --build arrow-build --target install -j "$(sysctl -n hw.ncpu)"
+
       - name: Download sdist artifact
         uses: actions/download-artifact@v4
         with:
@@ -250,11 +316,10 @@ jobs:
           python -c "import graphar; import graphar._core; print('GraphAr imported successfully')"
           graphar --help >/dev/null
 
-
   upload_test_pypi:
     name: Publish to TestPyPI (auto)
     needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'push'
     permissions:
       contents: read
@@ -278,7 +343,7 @@ jobs:
   upload_pypi:
     name: Publish (manual)
     needs: [build_wheels, build_sdist]
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: github.event_name == 'workflow_dispatch' && inputs.publish_pypi
     permissions:
       contents: read
