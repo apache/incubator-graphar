@@ -124,11 +124,11 @@ jobs:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
       # Must match the pyarrow pinned in python/pyproject.toml (pyarrow ~= 24.0).
       ARROW_VERSION: "24.0.0"
-      # Where the Arrow built from source below is installed. The Python
-      # extension links against it at build time, and resolves Arrow from the
-      # sibling pyarrow package at runtime (see the RPATH setup in
-      # python/CMakeLists.txt).
-      ARROW_DIST: ${{ github.workspace }}/arrow-dist
+      # Where the Arrow built from source below is installed. CMAKE_PREFIX_PATH
+      # makes the graphar Python build (scikit-build-core) link against that
+      # Arrow at build time; at runtime Arrow is resolved from the sibling
+      # pyarrow package instead (see the RPATH setup in python/CMakeLists.txt).
+      CMAKE_PREFIX_PATH: ${{ github.workspace }}/arrow-dist
 
     steps:
     - uses: actions/checkout@v7
@@ -144,7 +144,7 @@ jobs:
       id: arrow-cache
       uses: actions/cache@v4
       with:
-        path: ${{ env.ARROW_DIST }}
+        path: ${{ env.CMAKE_PREFIX_PATH }}
         key: arrow-${{ runner.os }}-${{ runner.arch }}-${{ env.ARROW_VERSION }}
 
     - name: Install dependencies
@@ -164,7 +164,7 @@ jobs:
         tar xzf "apache-arrow-${ARROW_VERSION}.tar.gz"
         cmake -S "apache-arrow-${ARROW_VERSION}/cpp" -B arrow-build \
           -DCMAKE_BUILD_TYPE=Release \
-          -DCMAKE_INSTALL_PREFIX="${ARROW_DIST}" \
+          -DCMAKE_INSTALL_PREFIX="${CMAKE_PREFIX_PATH}" \
           -DCMAKE_INSTALL_LIBDIR=lib \
           -DARROW_BUILD_SHARED=ON \
           -DARROW_BUILD_STATIC=OFF \
