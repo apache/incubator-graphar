@@ -43,18 +43,25 @@ concurrency:
 jobs:
   ubuntu:
     name: Ubuntu 24.04 Python
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: the Arrow apt packages are versioned per
+    # distro codename (24.0.0-1 exists for noble), and a mutable label would
+    # break the pinned apt install when GitHub rolls the label forward.
+    runs-on: ubuntu-24.04
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
       # Single source of version for Arrow. Must match the pyarrow pinned in
-      # python/pyproject.toml (pyarrow ~= 24.0 -> 24.0.0). The "-1" suffix is the
+      # python/pyproject.toml (pyarrow == 24.0.0). The "-1" suffix is the
       # Debian package revision that apt requires for exact version matching.
       ARROW_VERSION: "24.0.0-1"
 
     steps:
+    # fetch-depth 0 is required: the package version is derived from git tags
+    # by setuptools-scm (python/pyproject.toml), and a shallow checkout has no
+    # tags, which would make the build fail or produce a bogus version.
     - uses: actions/checkout@v7
       with:
           submodules: true
+          fetch-depth: 0
 
     - name: Install Python
       uses: actions/setup-python@v6
@@ -119,10 +126,13 @@ jobs:
 
   macos:
     name: macos latest Python
-    runs-on: macos-latest
+    # Pinned, not macos-latest: the runner OS also sets the effective macOS
+    # deployment target of the built artifacts, so a mutable label could change
+    # the produced wheel/extension compatibility without any code change.
+    runs-on: macos-15
     env:
       GAR_TEST_DATA: ${{ github.workspace }}/graphar-testing/
-      # Must match the pyarrow pinned in python/pyproject.toml (pyarrow ~= 24.0).
+      # Must match the pyarrow pinned in python/pyproject.toml (pyarrow == 24.0.0).
       ARROW_VERSION: "24.0.0"
       # Where the Arrow built from source below is installed. CMAKE_PREFIX_PATH
       # makes the graphar Python build (scikit-build-core) link against that
@@ -131,9 +141,13 @@ jobs:
       CMAKE_PREFIX_PATH: ${{ github.workspace }}/arrow-dist
 
     steps:
+    # fetch-depth 0 is required: the package version is derived from git tags
+    # by setuptools-scm (python/pyproject.toml), and a shallow checkout has no
+    # tags, which would make the build fail or produce a bogus version.
     - uses: actions/checkout@v7
       with:
           submodules: true
+          fetch-depth: 0
 
     - name: Set up Python
       uses: actions/setup-python@v6
@@ -145,7 +159,9 @@ jobs:
       uses: actions/cache@v6
       with:
         path: ${{ env.CMAKE_PREFIX_PATH }}
-        key: arrow-${{ runner.os }}-${{ runner.arch }}-${{ env.ARROW_VERSION }}
+        # The hash of this workflow is part of the key so that changing the
+        # Arrow CMake flags below invalidates the cached build.
+        key: arrow-${{ runner.os }}-${{ runner.arch }}-${{ env.ARROW_VERSION }}-${{ hashFiles('.github/workflows/python.yml') }}
 
     - name: Install dependencies
       run: |

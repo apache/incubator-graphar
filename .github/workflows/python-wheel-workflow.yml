@@ -90,7 +90,7 @@ jobs:
         include:
           # Job 1: Native x86_64 build
           - platform: x86_64
-            runner: ubuntu-latest # This is the standard x86_64 runner
+            runner: ubuntu-24.04 # This is the standard x86_64 runner
             os: linux
             manylinux: _2_28
 
@@ -101,14 +101,17 @@ jobs:
             manylinux: _2_28
 
           # Job 3: macOS arm64 build
+          # Pinned, not macos-latest: the runner OS sets the effective macOS
+          # deployment target (see CIBW_ENVIRONMENT_MACOS), so a mutable label
+          # could silently change the minimum macOS of the produced wheels.
           - platform: arm64
-            runner: macos-latest
+            runner: macos-15
             os: macos
 
     env:
-      # Must match the pyarrow pinned in python/pyproject.toml (pyarrow ~= 24.0).
-      # It is the version of Arrow that is installed before the build and that
-      # pyarrow ships at runtime (see the RPATH setup in python/CMakeLists.txt).
+      # Must match the pyarrow pinned in python/pyproject.toml (pyarrow == 24.0.0).
+      # Single source of truth for the Arrow version: it is used by the macOS
+      # steps (build from source) and by the Linux dnf pins below.
       ARROW_VERSION: "24.0.0"
       CIBW_PLATFORM: ${{ matrix.os }}
       # Keep in sync with requires-python (>= 3.10) and the classifiers in
@@ -142,11 +145,12 @@ jobs:
         dnf config-manager --set-enabled codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-rhui-rpms || :
         subscription-manager repos --enable codeready-builder-for-rhel-$(cut -d: -f5 /etc/system-release-cpe | cut -d. -f1)-$(arch)-rpms || :
         # Pin the exact Arrow version: the wheel must be built against the same
-        # 24.0.0 that pyarrow ~= 24.0 ships, because Arrow is resolved at
-        # runtime from the sibling pyarrow package instead of being bundled
-        # (see CIBW_REPAIR_WHEEL_COMMAND_* below). Installing the unpinned
-        # "latest" (e.g. 25.x) would produce libs whose SONAME does not exist
-        # in pyarrow, breaking every wheel.
+        # 24.0.0 that pyarrow == 24.0.0 ships (and that ARROW_VERSION above
+        # pins for macOS), because Arrow is resolved at runtime from the
+        # sibling pyarrow package instead of being bundled (see
+        # CIBW_REPAIR_WHEEL_COMMAND_* below). Installing the unpinned "latest"
+        # (e.g. 25.x) would produce libs whose SONAME does not exist in
+        # pyarrow, breaking every wheel.
         dnf install -y arrow-devel-24.0.0 # For C++
         dnf install -y arrow-glib-devel-24.0.0 # For GLib (C)
         dnf install -y arrow-dataset-devel-24.0.0 # For Apache Arrow Dataset C++
@@ -156,8 +160,6 @@ jobs:
         dnf install -y arrow-flight-glib-devel-24.0.0 # For Apache Arrow Flight GLib (C)
         dnf install -y arrow-flight-sql-devel-24.0.0 # For Apache Arrow Flight SQL C++
         dnf install -y arrow-flight-sql-glib-devel-24.0.0 # For Apache Arrow Flight SQL GLib (C)
-        dnf install -y gandiva-devel-24.0.0 # For Apache Gandiva C++
-        dnf install -y gandiva-glib-devel-24.0.0 # For Apache Gandiva GLib (C)
         dnf install -y parquet-devel-24.0.0 # For Apache Parquet C++
         dnf install -y parquet-glib-devel-24.0.0 # For Apache Parquet GLib (C)
       # Do NOT bundle Arrow/Parquet/Dataset/Acero/Compute into the wheel: the
@@ -204,9 +206,9 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ github.workspace }}/arrow-dist
-          # Same key as the python.yml CI workflow, so both workflows share the
-          # cached Arrow build.
-          key: arrow-${{ runner.os }}-${{ runner.arch }}-${{ env.ARROW_VERSION }}
+          # The hash of this workflow is part of the key so that changing the
+          # Arrow CMake flags below invalidates the cached build.
+          key: arrow-${{ runner.os }}-${{ runner.arch }}-${{ env.ARROW_VERSION }}-${{ hashFiles('.github/workflows/python-wheel-workflow.yml') }}
 
       - name: Build Arrow from source (macOS, with ORC)
         if: matrix.os == 'macos' && steps.arrow-cache.outputs.cache-hit != 'true'

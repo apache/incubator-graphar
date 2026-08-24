@@ -16,14 +16,18 @@
 # under the License.
 
 [build-system]
-requires = ["scikit-build-core>=0.8.3", "pybind11", "ninja ~= 1.11"]
+requires = [
+  "scikit-build-core>=0.8.3",
+  "pybind11",
+  "ninja ~= 1.11",
+  "setuptools-scm",
+]
 build-backend = "scikit_build_core.build"
 
 
 [project]
 name = "graphar"
-# The version is derived from the git tags at build time (see
-# [[tool.dynamic-metadata]] and [tool.setuptools_scm] below).
+# The version is derived from the git tags at build time;
 dynamic = ["version"]
 description = "An open source, standard data file format for graph data storage and retrieval."
 readme = "README.md"
@@ -32,7 +36,7 @@ requires-python = ">=3.10"
 
 # The version of the PyArrow here should exactly match the version inside the GraphAr core!!!
 dependencies = [
-  "pyarrow ~= 24.0",
+  "pyarrow == 24.0.0",
   "typer ~= 0.1",
   "pydantic ~= 2.0",
   "pyyaml ~= 6.0",
@@ -48,8 +52,7 @@ classifiers = [
 ]
 
 [tool.poetry]
-# Placeholder only: Poetry requires a version for the root package, while the
-# real version is derived from git tags at build time (see [tool.setuptools_scm]).
+# Placeholder only: Poetry requires a version for the root package;
 version = "0.0.0"
 
 [tool.poetry.group.docs]
@@ -66,9 +69,6 @@ pandas = ">=2.0, <3.0"
 typing_extensions = ">=4.0, <5.0"
 pytest = ">=7.0, <8.0"
 
-# Version is derived from git tags by setuptools-scm. "no-local-version"
-# keeps the version PEP 440 clean (e.g. 0.13.1.dev121) so it can also be
-# parsed by the CMake project() call in CMakeLists.txt.
 [tool.setuptools_scm]
 # The git repository root is one level above python/ (the repo checkout),
 # so setuptools-scm must search parent directories for the .git metadata.
