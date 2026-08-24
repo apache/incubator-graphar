@@ -68,16 +68,18 @@ jobs:
         wget https://packages.apache.org/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
         sudo apt install -y -V ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb
         sudo apt update
-        sudo apt install -y -V libarrow-dev=$ARROW_VERSION
-        sudo apt install -y -V libarrow-dataset-dev=$ARROW_VERSION
         # The Python extension links Arrow, ArrowDataset, ArrowAcero and Parquet
-        # (see python/CMakeLists.txt), so all dev packages are required. Note:
-        # libarrow-acero-dev depends on libarrow-compute-dev, which must be
-        # pinned explicitly too because apt does not auto-resolve an exact
-        # version dependency when a newer candidate exists in the repository.
-        sudo apt install -y -V libarrow-acero-dev=$ARROW_VERSION
-        sudo apt install -y -V libarrow-compute-dev=$ARROW_VERSION
-        sudo apt install -y -V libparquet-dev=$ARROW_VERSION
+        # (see python/CMakeLists.txt), so all dev packages are required. They
+        # must be installed in a single apt invocation with the version pinned:
+        # the 24.0.0-1 dev packages depend on each other with exact (=) version
+        # constraints, and apt does not resolve an exact version dependency when
+        # a newer candidate (25.x) exists in the repository, so installing them
+        # one by one fails.
+        sudo apt install -y -V libarrow-dev=$ARROW_VERSION \
+                            libarrow-dataset-dev=$ARROW_VERSION \
+                            libarrow-acero-dev=$ARROW_VERSION \
+                            libarrow-compute-dev=$ARROW_VERSION \
+                            libparquet-dev=$ARROW_VERSION
         sudo apt-get install -y ccache libcurl4-openssl-dev
         git clone https://github.com/apache/incubator-graphar-testing.git $GAR_TEST_DATA --depth 1
 
