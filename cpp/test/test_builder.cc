@@ -101,6 +101,42 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   REQUIRE(indexed_vertex.GetId() == 7);
   REQUIRE(indexed_vertex.Empty());
 
+  SECTION("nonzero start vertex index") {
+    const IdType nonzero_start_index = vertex_info->GetChunkSize();
+    auto nonzero_builder =
+        builder::VerticesBuilder::Make(vertex_info, "/tmp/nonzero/",
+                                       nonzero_start_index)
+            .value();
+    nonzero_builder->SetValidateLevel(ValidateLevel::weak_validate);
+
+    builder::Vertex auto_indexed_vertex;
+    auto_indexed_vertex.AddProperty("id", int64_t{10});
+    REQUIRE(nonzero_builder->AddVertex(auto_indexed_vertex).ok());
+    REQUIRE(auto_indexed_vertex.GetId() == nonzero_start_index);
+
+    builder::Vertex explicitly_indexed_vertex;
+    explicitly_indexed_vertex.AddProperty("id", int64_t{11});
+    REQUIRE(nonzero_builder
+                ->AddVertex(explicitly_indexed_vertex, nonzero_start_index + 1)
+                .ok());
+    REQUIRE(explicitly_indexed_vertex.GetId() == nonzero_start_index + 1);
+    REQUIRE(nonzero_builder->Dump().ok());
+
+    auto nonzero_chunk =
+        "/tmp/nonzero/vertex/person/id/chunk" +
+        std::to_string(nonzero_start_index / vertex_info->GetChunkSize());
+    std::unique_ptr<parquet::arrow::FileReader> nonzero_reader;
+    REQUIRE(graphar::util::OpenParquetArrowReader(
+                nonzero_chunk, arrow::default_memory_pool(), &nonzero_reader)
+                .ok());
+    auto nonzero_table = ReadParquetTable(nonzero_reader.get()).value();
+    REQUIRE(nonzero_table->num_rows() == 2);
+    auto vertex_index_array = std::static_pointer_cast<arrow::Int64Array>(
+        nonzero_table->GetColumnByName("_graphArVertexIndex")->chunk(0));
+    REQUIRE(vertex_index_array->Value(0) == nonzero_start_index);
+    REQUIRE(vertex_index_array->Value(1) == nonzero_start_index + 1);
+  }
+
   // add vertices
   std::ifstream fp(test_data_dir + "/ldbc_sample/person_0_0.csv");
   std::string line;

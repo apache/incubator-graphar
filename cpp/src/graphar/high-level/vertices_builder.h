@@ -338,17 +338,14 @@ class VerticesBuilder {
       ValidateLevel validate_level = ValidateLevel::default_validate) {
     // validate
     GAR_RETURN_NOT_OK(validate(v, index, validate_level));
-    // add a vertex
-    if (index == -1) {
-      v.SetId(vertices_.size());
-      vertices_.push_back(v);
-    } else {
-      v.SetId(index);
-      if (index >= static_cast<IdType>(vertices_.size())) {
-        vertices_.resize(index + 1);
-      }
-      vertices_[index] = v;
+    const IdType local_index = index == -1
+                                   ? static_cast<IdType>(vertices_.size())
+                                   : index - start_vertex_index_;
+    v.SetId(start_vertex_index_ + local_index);
+    if (local_index >= static_cast<IdType>(vertices_.size())) {
+      vertices_.resize(local_index + 1);
     }
+    vertices_[local_index] = v;
     num_vertices_++;
     return Status::OK();
   }
