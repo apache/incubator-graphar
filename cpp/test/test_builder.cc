@@ -103,38 +103,6 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
 
   SECTION("nonzero start vertex index") {
     const IdType nonzero_start_index = vertex_info->GetChunkSize();
-    auto no_validate_builder =
-        builder::VerticesBuilder::Make(vertex_info, "/tmp/nonzero-no-validate/",
-                                       nonzero_start_index)
-            .value();
-    builder::Vertex below_start_vertex;
-    below_start_vertex.AddProperty("id", int64_t{9});
-    REQUIRE(
-        no_validate_builder->AddVertex(below_start_vertex, 5).IsIndexError());
-    REQUIRE_FALSE(below_start_vertex.HasId());
-    REQUIRE(no_validate_builder->GetNum() == 0);
-
-    auto unaligned_builder = builder::VerticesBuilder::Make(
-                                 vertex_info, "/tmp/unaligned-no-validate/",
-                                 nonzero_start_index + 50)
-                                 .value();
-    builder::Vertex unaligned_vertex;
-    unaligned_vertex.AddProperty("id", int64_t{10});
-    REQUIRE(unaligned_builder->AddVertex(unaligned_vertex).IsIndexError());
-    REQUIRE_FALSE(unaligned_vertex.HasId());
-    REQUIRE(unaligned_builder->GetNum() == 0);
-
-    auto negative_start_builder =
-        builder::VerticesBuilder::Make(
-            vertex_info, "/tmp/negative-no-validate/", -nonzero_start_index)
-            .value();
-    builder::Vertex negative_start_vertex;
-    negative_start_vertex.AddProperty("id", int64_t{10});
-    REQUIRE(negative_start_builder->AddVertex(negative_start_vertex)
-                .IsIndexError());
-    REQUIRE_FALSE(negative_start_vertex.HasId());
-    REQUIRE(negative_start_builder->GetNum() == 0);
-
     auto nonzero_builder =
         builder::VerticesBuilder::Make(vertex_info, "/tmp/nonzero/",
                                        nonzero_start_index)
@@ -167,6 +135,38 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
         nonzero_table->GetColumnByName("_graphArVertexIndex")->chunk(0));
     REQUIRE(vertex_index_array->Value(0) == nonzero_start_index);
     REQUIRE(vertex_index_array->Value(1) == nonzero_start_index + 1);
+
+    auto no_validate_builder =
+        builder::VerticesBuilder::Make(vertex_info, "/tmp/nonzero-no-validate/",
+                                       nonzero_start_index)
+            .value();
+    builder::Vertex below_start_vertex;
+    below_start_vertex.AddProperty("id", int64_t{9});
+    REQUIRE(
+        no_validate_builder->AddVertex(below_start_vertex, 5).IsIndexError());
+    REQUIRE_FALSE(below_start_vertex.HasId());
+    REQUIRE(no_validate_builder->GetNum() == 0);
+
+    auto unaligned_builder = builder::VerticesBuilder::Make(
+                                 vertex_info, "/tmp/unaligned-no-validate/",
+                                 nonzero_start_index + 50)
+                                 .value();
+    builder::Vertex unaligned_vertex;
+    unaligned_vertex.AddProperty("id", int64_t{10});
+    REQUIRE(unaligned_builder->AddVertex(unaligned_vertex).IsIndexError());
+    REQUIRE_FALSE(unaligned_vertex.HasId());
+    REQUIRE(unaligned_builder->GetNum() == 0);
+
+    auto negative_start_builder =
+        builder::VerticesBuilder::Make(
+            vertex_info, "/tmp/negative-no-validate/", -nonzero_start_index)
+            .value();
+    builder::Vertex negative_start_vertex;
+    negative_start_vertex.AddProperty("id", int64_t{10});
+    REQUIRE(negative_start_builder->AddVertex(negative_start_vertex)
+                .IsIndexError());
+    REQUIRE_FALSE(negative_start_vertex.HasId());
+    REQUIRE(negative_start_builder->GetNum() == 0);
   }
 
   // add vertices
