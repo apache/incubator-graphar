@@ -114,6 +114,16 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
     REQUIRE_FALSE(below_start_vertex.HasId());
     REQUIRE(no_validate_builder->GetNum() == 0);
 
+    auto unaligned_builder = builder::VerticesBuilder::Make(
+                                 vertex_info, "/tmp/unaligned-no-validate/",
+                                 nonzero_start_index + 50)
+                                 .value();
+    builder::Vertex unaligned_vertex;
+    unaligned_vertex.AddProperty("id", int64_t{10});
+    REQUIRE(unaligned_builder->AddVertex(unaligned_vertex).IsIndexError());
+    REQUIRE_FALSE(unaligned_vertex.HasId());
+    REQUIRE(unaligned_builder->GetNum() == 0);
+
     auto nonzero_builder =
         builder::VerticesBuilder::Make(vertex_info, "/tmp/nonzero/",
                                        nonzero_start_index)

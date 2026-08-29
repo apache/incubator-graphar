@@ -341,11 +341,6 @@ class VerticesBuilder {
     const IdType local_index = index == -1
                                    ? static_cast<IdType>(vertices_.size())
                                    : index - start_vertex_index_;
-    if (local_index < 0) {
-      return Status::IndexError("The vertex index ", index,
-                                " is smaller than the start index ",
-                                start_vertex_index_);
-    }
     v.SetId(start_vertex_index_ + local_index);
     if (local_index >= static_cast<IdType>(vertices_.size())) {
       vertices_.resize(local_index + 1);
