@@ -129,7 +129,9 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
     REQUIRE(graphar::util::OpenParquetArrowReader(
                 nonzero_chunk, arrow::default_memory_pool(), &nonzero_reader)
                 .ok());
-    auto nonzero_table = ReadParquetTable(nonzero_reader.get()).value();
+    auto maybe_nonzero_table = ReadParquetTable(nonzero_reader.get());
+    REQUIRE(maybe_nonzero_table.ok());
+    auto nonzero_table = maybe_nonzero_table.ValueOrDie();
     REQUIRE(nonzero_table->num_rows() == 2);
     auto vertex_index_array = std::static_pointer_cast<arrow::Int64Array>(
         nonzero_table->GetColumnByName("_graphArVertexIndex")->chunk(0));
