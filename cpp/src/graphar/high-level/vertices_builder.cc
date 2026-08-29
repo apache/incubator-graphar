@@ -35,6 +35,10 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
   if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
   }
+  if (start_vertex_index_ < 0) {
+    return Status::IndexError("The start vertex index ", start_vertex_index_,
+                              " is smaller than 0");
+  }
   // the start vertex index must be aligned with the chunk size
   if (start_vertex_index_ % vertex_info_->GetChunkSize() != 0) {
     return Status::IndexError("The start vertex index ", start_vertex_index_,

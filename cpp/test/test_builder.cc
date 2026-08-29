@@ -124,6 +124,17 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
     REQUIRE_FALSE(unaligned_vertex.HasId());
     REQUIRE(unaligned_builder->GetNum() == 0);
 
+    auto negative_start_builder =
+        builder::VerticesBuilder::Make(
+            vertex_info, "/tmp/negative-no-validate/", -nonzero_start_index)
+            .value();
+    builder::Vertex negative_start_vertex;
+    negative_start_vertex.AddProperty("id", int64_t{10});
+    REQUIRE(negative_start_builder->AddVertex(negative_start_vertex)
+                .IsIndexError());
+    REQUIRE_FALSE(negative_start_vertex.HasId());
+    REQUIRE(negative_start_builder->GetNum() == 0);
+
     auto nonzero_builder =
         builder::VerticesBuilder::Make(vertex_info, "/tmp/nonzero/",
                                        nonzero_start_index)
