@@ -103,6 +103,17 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
 
   SECTION("nonzero start vertex index") {
     const IdType nonzero_start_index = vertex_info->GetChunkSize();
+    auto no_validate_builder =
+        builder::VerticesBuilder::Make(vertex_info, "/tmp/nonzero-no-validate/",
+                                       nonzero_start_index)
+            .value();
+    builder::Vertex below_start_vertex;
+    below_start_vertex.AddProperty("id", int64_t{9});
+    REQUIRE(
+        no_validate_builder->AddVertex(below_start_vertex, 5).IsIndexError());
+    REQUIRE_FALSE(below_start_vertex.HasId());
+    REQUIRE(no_validate_builder->GetNum() == 0);
+
     auto nonzero_builder =
         builder::VerticesBuilder::Make(vertex_info, "/tmp/nonzero/",
                                        nonzero_start_index)
