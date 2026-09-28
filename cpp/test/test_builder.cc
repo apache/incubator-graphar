@@ -101,6 +101,76 @@ TEST_CASE_METHOD(GlobalFixture, "Test_vertices_builder") {
   REQUIRE(indexed_vertex.GetId() == 7);
   REQUIRE(indexed_vertex.Empty());
 
+  SECTION("nonzero start vertex index") {
+    const IdType nonzero_start_index = vertex_info->GetChunkSize();
+    auto nonzero_builder =
+        builder::VerticesBuilder::Make(vertex_info, "/tmp/nonzero/",
+                                       nonzero_start_index)
+            .value();
+    nonzero_builder->SetValidateLevel(ValidateLevel::weak_validate);
+
+    builder::Vertex auto_indexed_vertex;
+    auto_indexed_vertex.AddProperty("id", int64_t{10});
+    REQUIRE(nonzero_builder->AddVertex(auto_indexed_vertex).ok());
+    REQUIRE(auto_indexed_vertex.GetId() == nonzero_start_index);
+
+    builder::Vertex explicitly_indexed_vertex;
+    explicitly_indexed_vertex.AddProperty("id", int64_t{11});
+    REQUIRE(nonzero_builder
+                ->AddVertex(explicitly_indexed_vertex, nonzero_start_index + 1)
+                .ok());
+    REQUIRE(explicitly_indexed_vertex.GetId() == nonzero_start_index + 1);
+    REQUIRE(nonzero_builder->Dump().ok());
+
+    auto nonzero_chunk =
+        "/tmp/nonzero/vertex/person/id/chunk" +
+        std::to_string(nonzero_start_index / vertex_info->GetChunkSize());
+    std::unique_ptr<parquet::arrow::FileReader> nonzero_reader;
+    REQUIRE(graphar::util::OpenParquetArrowReader(
+                nonzero_chunk, arrow::default_memory_pool(), &nonzero_reader)
+                .ok());
+    auto maybe_nonzero_table = ReadParquetTable(nonzero_reader.get());
+    REQUIRE(maybe_nonzero_table.ok());
+    auto nonzero_table = maybe_nonzero_table.ValueOrDie();
+    REQUIRE(nonzero_table->num_rows() == 2);
+    auto vertex_index_array = std::static_pointer_cast<arrow::Int64Array>(
+        nonzero_table->GetColumnByName("_graphArVertexIndex")->chunk(0));
+    REQUIRE(vertex_index_array->Value(0) == nonzero_start_index);
+    REQUIRE(vertex_index_array->Value(1) == nonzero_start_index + 1);
+
+    auto no_validate_builder =
+        builder::VerticesBuilder::Make(vertex_info, "/tmp/nonzero-no-validate/",
+                                       nonzero_start_index)
+            .value();
+    builder::Vertex below_start_vertex;
+    below_start_vertex.AddProperty("id", int64_t{9});
+    REQUIRE(
+        no_validate_builder->AddVertex(below_start_vertex, 5).IsIndexError());
+    REQUIRE_FALSE(below_start_vertex.HasId());
+    REQUIRE(no_validate_builder->GetNum() == 0);
+
+    auto unaligned_builder = builder::VerticesBuilder::Make(
+                                 vertex_info, "/tmp/unaligned-no-validate/",
+                                 nonzero_start_index + 50)
+                                 .value();
+    builder::Vertex unaligned_vertex;
+    unaligned_vertex.AddProperty("id", int64_t{10});
+    REQUIRE(unaligned_builder->AddVertex(unaligned_vertex).IsIndexError());
+    REQUIRE_FALSE(unaligned_vertex.HasId());
+    REQUIRE(unaligned_builder->GetNum() == 0);
+
+    auto negative_start_builder =
+        builder::VerticesBuilder::Make(
+            vertex_info, "/tmp/negative-no-validate/", -nonzero_start_index)
+            .value();
+    builder::Vertex negative_start_vertex;
+    negative_start_vertex.AddProperty("id", int64_t{10});
+    REQUIRE(negative_start_builder->AddVertex(negative_start_vertex)
+                .IsIndexError());
+    REQUIRE_FALSE(negative_start_vertex.HasId());
+    REQUIRE(negative_start_builder->GetNum() == 0);
+  }
+
   // add vertices
   std::ifstream fp(test_data_dir + "/ldbc_sample/person_0_0.csv");
   std::string line;

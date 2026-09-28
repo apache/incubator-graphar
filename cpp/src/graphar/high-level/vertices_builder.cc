@@ -35,17 +35,9 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
   if (validate_level == ValidateLevel::default_validate) {
     validate_level = validate_level_;
   }
-  // no validate
-  if (validate_level == ValidateLevel::no_validate) {
-    return Status::OK();
-  }
-
-  // weak validate
-  // can not add new vertices after dumping
-  if (is_saved_) {
-    return Status::Invalid(
-        "The vertices builder has been saved, can not add "
-        "new vertices any more");
+  if (start_vertex_index_ < 0) {
+    return Status::IndexError("The start vertex index ", start_vertex_index_,
+                              " is smaller than 0");
   }
   // the start vertex index must be aligned with the chunk size
   if (start_vertex_index_ % vertex_info_->GetChunkSize() != 0) {
@@ -59,7 +51,18 @@ Status VerticesBuilder::validate(const Vertex& v, IdType index,
                               " is smaller than the start index ",
                               start_vertex_index_);
   }
+  // no validate
+  if (validate_level == ValidateLevel::no_validate) {
+    return Status::OK();
+  }
 
+  // weak validate
+  // can not add new vertices after dumping
+  if (is_saved_) {
+    return Status::Invalid(
+        "The vertices builder has been saved, can not add "
+        "new vertices any more");
+  }
   // strong validate
   if (validate_level == ValidateLevel::strong_validate) {
     for (auto& property : v.GetProperties()) {
