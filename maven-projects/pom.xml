@@ -60,19 +60,31 @@
             <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
         </license>
     </licenses>
-    <!--    <issueManagement>
-            <system>GitHub</system>
-            <url>https://github.com/apache/graphar/issues</url>
-        </issueManagement>
-        <scm>
-            <connection>scm:git:https://github.com/apache/graphar.git</connection>
-            <developerConnection>scm:git:https://github.com/apache/graphar.git</developerConnection>
-            <tag>HEAD</tag>
-            <url>https://github.com/apache/graphar</url>
-        </scm>-->
+    <developers>
+        <developer>
+            <id>graphar</id>
+            <name>Apache GraphAr developers</name>
+            <email>dev@graphar.apache.org</email>
+            <url>https://graphar.apache.org/</url>
+            <organization>The Apache Software Foundation</organization>
+            <organizationUrl>https://www.apache.org/</organizationUrl>
+        </developer>
+    </developers>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/apache/incubator-graphar/issues</url>
+    </issueManagement>
+    <scm>
+        <connection>scm:git:https://github.com/apache/incubator-graphar.git</connection>
+        <developerConnection>scm:git:https://github.com/apache/incubator-graphar.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/apache/incubator-graphar</url>
+    </scm>
     <properties>
         <graphar.version>0.13.0-SNAPSHOT</graphar.version>
         <spotless-maven-plugin.version>2.20.0</spotless-maven-plugin.version>
+        <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
+        <apache-incubator-disclaimer-resource-bundle.version>1.7</apache-incubator-disclaimer-resource-bundle.version>
     </properties>
     <modules>
         <module>java</module>
@@ -93,7 +105,54 @@
                     <artifactId>spotless-maven-plugin</artifactId>
                     <version>${spotless-maven-plugin.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>flatten-maven-plugin</artifactId>
+                    <version>${flatten-maven-plugin.version}</version>
+                    <configuration>
+                        <flattenMode>oss</flattenMode>
+                        <updatePomFile>true</updatePomFile>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>flatten</id>
+                            <phase>process-resources</phase>
+                            <goals>
+                                <goal>flatten</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>flatten-clean</id>
+                            <phase>clean</phase>
+                            <goals>
+                                <goal>clean</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <inherited>false</inherited>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-remote-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>process-resource-bundles</id>
+                        <configuration>
+                            <resourceBundles>
+                                <resourceBundle>org.apache.apache.resources:apache-jar-resource-bundle:${version.apache-resource-bundles}</resourceBundle>
+                                <resourceBundle>org.apache.apache.resources:apache-incubator-disclaimer-resource-bundle:${apache-incubator-disclaimer-resource-bundle.version}</resourceBundle>
+                            </resourceBundles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 </project>

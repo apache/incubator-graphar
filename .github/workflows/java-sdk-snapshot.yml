@@ -1,0 +1,97 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: GraphAr Java SDK Snapshot
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'maven-projects/pom.xml'
+      - 'maven-projects/info/**'
+      - 'maven-projects/storage-api/**'
+      - 'maven-projects/storage-local/**'
+      - 'maven-projects/storage-s3/**'
+      - 'maven-projects/io-api/**'
+      - 'maven-projects/core/**'
+      - '.github/workflows/java-sdk-snapshot.yml'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build and install the snapshot jars without deploying them to the ASF Nexus'
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: github.repository == 'apache/incubator-graphar' || inputs.dry_run
+    runs-on: ubuntu-latest
+    env:
+      SDK_MODULES: info,storage-api,storage-local,io-api,storage-s3,core
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: true
+
+      - name: Cache Maven repository
+        uses: actions/cache@v6
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-sdk-snapshot-${{ hashFiles('maven-projects/**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-sdk-snapshot-
+
+      - name: Configure ASF Nexus credentials
+        if: ${{ !inputs.dry_run }}
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml <<'SETTINGS'
+          <settings>
+            <servers>
+              <server>
+                <id>apache.snapshots.https</id>
+                <username>${env.NEXUS_USER}</username>
+                <password>${env.NEXUS_PW}</password>
+              </server>
+            </servers>
+          </settings>
+          SETTINGS
+
+      - name: Test and publish the SDK snapshot
+        working-directory: maven-projects
+        env:
+          NEXUS_USER: ${{ secrets.NEXUS_USER }}
+          NEXUS_PW: ${{ secrets.NEXUS_PW }}
+          GOAL: ${{ inputs.dry_run && 'install' || 'deploy' }}
+        run: |
+          set -euo pipefail
+          export JAVA_HOME=${JAVA_HOME_11_X64}
+          version=$(mvn --no-transfer-progress -q -N help:evaluate -Dexpression=project.version -DforceStdout)
+          case "$version" in
+            *-SNAPSHOT) ;;
+            *) echo "Refusing to publish non-SNAPSHOT version $version"; exit 1 ;;
+          esac
+          echo "Publishing $version from $(git rev-parse --short HEAD)"
+          mvn --no-transfer-progress -pl ${SDK_MODULES} -am clean ${GOAL} -Dspotless.check.skip=true
