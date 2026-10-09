@@ -81,6 +81,7 @@
         <module>storage-api</module>
         <module>storage-local</module>
         <module>io-api</module>
+        <module>io-parquet</module>
         <module>storage-s3</module>
         <module>core</module>
     </modules>

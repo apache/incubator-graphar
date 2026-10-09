@@ -55,7 +55,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     env:
-      SDK_MODULES: storage-api,storage-local,io-api,storage-s3,core
+      SDK_MODULES: storage-api,storage-local,io-api,io-parquet,storage-s3,core
     steps:
       - uses: actions/checkout@v7
         with:
