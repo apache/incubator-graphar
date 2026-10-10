@@ -50,7 +50,14 @@ import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.schema.PrimitiveType;
 import org.apache.parquet.schema.Type;
 
-/** A storage-backed reader for GraphAr primitive and LIST Parquet fields. */
+/**
+ * A storage-backed reader for GraphAr primitive and LIST Parquet fields.
+ *
+ * <p>A row range is reported as applied when every row group it touches is either selected whole or
+ * read page by page through its Offset Index. When a partly selected row group has no Offset Index,
+ * as in files from writers that do not emit one, that row group is read whole and sliced to the
+ * range, and the row range is reported as declined. The rows returned are the same either way.
+ */
 public final class ParquetPhysicalReader implements PhysicalReader {
     private static final Set<ReadCapability> CAPABILITIES =
             Collections.unmodifiableSet(
@@ -115,7 +122,6 @@ public final class ParquetPhysicalReader implements PhysicalReader {
             fileReader.setRequestedSchema(readSchema);
 
             Schema outputSchema = new Schema(fields(outputColumns));
-            ReadReport report = new ReadReport(applied(request), declined(request));
             ParquetBatchCursor cursor =
                     new ParquetBatchCursor(
                             fileReader,
@@ -126,6 +132,10 @@ public final class ParquetPhysicalReader implements PhysicalReader {
                             outputSchema,
                             request);
             fileReader = null;
+            boolean rowRangeApplied = cursor.rowRangeApplied();
+            ReadReport report =
+                    new ReadReport(
+                            applied(request, rowRangeApplied), declined(request, rowRangeApplied));
             return new ReadResult(request, cursor, report);
         } finally {
             if (fileReader != null) {
@@ -243,12 +253,12 @@ public final class ParquetPhysicalReader implements PhysicalReader {
         return fields;
     }
 
-    private static Set<ReadCapability> applied(ReadRequest request) {
+    private static Set<ReadCapability> applied(ReadRequest request, boolean rowRangeApplied) {
         EnumSet<ReadCapability> applied = EnumSet.noneOf(ReadCapability.class);
         if (!request.projection().isAllColumns()) {
             applied.add(ReadCapability.PROJECTION);
         }
-        if (request.rowRange().isPresent()) {
+        if (rowRangeApplied) {
             applied.add(ReadCapability.ROW_RANGE);
         }
         if (request.limit().isPresent()) {
@@ -257,7 +267,10 @@ public final class ParquetPhysicalReader implements PhysicalReader {
         return applied;
     }
 
-    private static Set<ReadCapability> declined(ReadRequest request) {
+    private static Set<ReadCapability> declined(ReadRequest request, boolean rowRangeApplied) {
+        if (request.rowRange().isPresent() && !rowRangeApplied) {
+            return EnumSet.of(ReadCapability.ROW_RANGE);
+        }
         return Collections.emptySet();
     }
 
