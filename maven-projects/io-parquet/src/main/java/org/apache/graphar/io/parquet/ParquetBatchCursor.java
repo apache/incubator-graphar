@@ -25,8 +25,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.graphar.io.BatchCursor;
 import org.apache.graphar.io.ReadRequest;
 import org.apache.graphar.io.RecordBatch;
@@ -34,19 +36,26 @@ import org.apache.graphar.io.RowRange;
 import org.apache.graphar.io.Schema;
 import org.apache.graphar.io.ValueVector;
 import org.apache.graphar.io.VectorRecordBatch;
+import org.apache.parquet.column.ColumnDescriptor;
 import org.apache.parquet.column.page.PageReadStore;
 import org.apache.parquet.example.data.Group;
 import org.apache.parquet.example.data.simple.convert.GroupRecordConverter;
 import org.apache.parquet.filter2.columnindex.RowRanges;
 import org.apache.parquet.hadoop.ParquetFileReader;
 import org.apache.parquet.hadoop.metadata.BlockMetaData;
-import org.apache.parquet.internal.filter2.columnindex.ColumnIndexStore.MissingOffsetIndexException;
+import org.apache.parquet.hadoop.metadata.ColumnChunkMetaData;
+import org.apache.parquet.hadoop.metadata.ColumnPath;
 import org.apache.parquet.io.ColumnIOFactory;
 import org.apache.parquet.io.MessageColumnIO;
 import org.apache.parquet.io.RecordReader;
 import org.apache.parquet.schema.MessageType;
 
-/** Streams materialized Parquet row groups as neutral record batches. */
+/**
+ * Streams materialized Parquet row groups as neutral record batches. A row group that only partly
+ * overlaps the requested row range is read page by page through its Offset Index; when the file has
+ * no Offset Index for a read column, the whole row group is read and sliced to the range instead.
+ * Row groups outside the range are never read.
+ */
 final class ParquetBatchCursor implements BatchCursor {
     private static final int BATCH_ROWS = 1_024;
     private final ParquetFileReader fileReader;
@@ -60,6 +69,7 @@ final class ParquetBatchCursor implements BatchCursor {
     private final long rangeEnd;
     private final long limit;
     private final List<BlockRange> rowGroups;
+    private final boolean rowRangeApplied;
     private int nextRowGroup;
     private long emitted;
     private long rowsRemainingInGroup;
@@ -88,7 +98,16 @@ final class ParquetBatchCursor implements BatchCursor {
         this.rangeStart = range == null ? 0 : range.startInclusive();
         this.rangeEnd = range == null ? Long.MAX_VALUE : range.endExclusive();
         this.limit = request.limit().isPresent() ? request.limit().getAsLong() : Long.MAX_VALUE;
-        this.rowGroups = rowGroups(fileReader.getRowGroups());
+        this.rowGroups = rowGroups(fileReader.getRowGroups(), columnPaths(readSchema));
+        this.rowRangeApplied = range != null && indexedPartialRowGroups();
+    }
+
+    /**
+     * Returns whether the requested row range is physically applied to every row group it touches.
+     * It is not when a partly selected row group has no Offset Index and is sliced after reading.
+     */
+    boolean rowRangeApplied() {
+        return rowRangeApplied;
     }
 
     @Override
@@ -126,15 +145,6 @@ final class ParquetBatchCursor implements BatchCursor {
                 }
                 return true;
             }
-        } catch (MissingOffsetIndexException exception) {
-            try {
-                closeReader();
-            } catch (IOException closeException) {
-                exception.addSuppressed(closeException);
-            }
-            throw new UnsupportedOperationException(
-                    "A partial row-group range requires a Parquet Offset Index; refusing JVM fallback.",
-                    exception);
         } catch (IOException | RuntimeException exception) {
             try {
                 closeReader();
@@ -275,17 +285,25 @@ final class ParquetBatchCursor implements BatchCursor {
     private boolean openNextRowGroup() throws IOException {
         BlockRange rowGroup = nextRange();
         if (rowGroup == null) return false;
+        boolean filtered = !rowGroup.whole && rowGroup.indexed;
         pages =
-                rowGroup.whole
-                        ? fileReader.readRowGroup(rowGroup.index)
-                        : fileReader.readFilteredRowGroup(
+                filtered
+                        ? fileReader.readFilteredRowGroup(
                                 rowGroup.index,
                                 RowRanges.builder()
                                         .addSelectedRange(rowGroup.start, rowGroup.end - 1)
-                                        .build());
+                                        .build())
+                        : fileReader.readRowGroup(rowGroup.index);
         MessageColumnIO columnIO = new ColumnIOFactory().getColumnIO(readSchema, fileSchema);
         rows = columnIO.getRecordReader(pages, new GroupRecordConverter(readSchema));
-        rowsRemainingInGroup = pages.getRowCount();
+        if (filtered || rowGroup.whole) {
+            rowsRemainingInGroup = pages.getRowCount();
+        } else {
+            for (long skipped = 0; skipped < rowGroup.start; skipped++) {
+                rows.read();
+            }
+            rowsRemainingInGroup = rowGroup.end - rowGroup.start;
+        }
         if (rowsRemainingInGroup == 0) {
             closePages();
             return openNextRowGroup();
@@ -330,21 +348,52 @@ final class ParquetBatchCursor implements BatchCursor {
                         rowGroup.index,
                         begin - rowGroup.start,
                         end - rowGroup.start,
-                        begin == rowGroup.start && end == rowGroup.end);
+                        begin == rowGroup.start && end == rowGroup.end,
+                        rowGroup.indexed);
             }
         }
         return null;
     }
 
-    private static List<BlockRange> rowGroups(List<BlockMetaData> blocks) {
+    private boolean indexedPartialRowGroups() {
+        for (BlockRange rowGroup : rowGroups) {
+            long begin = Math.max(rangeStart, rowGroup.start);
+            long end = Math.min(rangeEnd, rowGroup.end);
+            boolean partial = begin < end && (begin != rowGroup.start || end != rowGroup.end);
+            if (partial && !rowGroup.indexed) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static Set<ColumnPath> columnPaths(MessageType schema) {
+        Set<ColumnPath> paths = new HashSet<>();
+        for (ColumnDescriptor column : schema.getColumns()) {
+            paths.add(ColumnPath.get(column.getPath()));
+        }
+        return paths;
+    }
+
+    private static List<BlockRange> rowGroups(List<BlockMetaData> blocks, Set<ColumnPath> paths) {
         List<BlockRange> result = new ArrayList<>(blocks.size());
         long start = 0;
         for (int index = 0; index < blocks.size(); index++) {
-            long end = Math.addExact(start, blocks.get(index).getRowCount());
-            result.add(new BlockRange(index, start, end, true));
+            BlockMetaData block = blocks.get(index);
+            long end = Math.addExact(start, block.getRowCount());
+            result.add(new BlockRange(index, start, end, true, hasOffsetIndex(block, paths)));
             start = end;
         }
         return List.copyOf(result);
+    }
+
+    private static boolean hasOffsetIndex(BlockMetaData block, Set<ColumnPath> paths) {
+        for (ColumnChunkMetaData column : block.getColumns()) {
+            if (paths.contains(column.getPath()) && column.getOffsetIndexReference() == null) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static final class BlockRange {
@@ -352,12 +401,14 @@ final class ParquetBatchCursor implements BatchCursor {
         private final long start;
         private final long end;
         private final boolean whole;
+        private final boolean indexed;
 
-        private BlockRange(int index, long start, long end, boolean whole) {
+        private BlockRange(int index, long start, long end, boolean whole, boolean indexed) {
             this.index = index;
             this.start = start;
             this.end = end;
             this.whole = whole;
+            this.indexed = indexed;
         }
     }
 }
