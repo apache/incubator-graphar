@@ -82,3 +82,6 @@ dependency-reduced-pom.xml
 
 # Vibe coding
 CLAUDE.md
+
+# Maven flatten plugin output
+.flattened-pom.xml
